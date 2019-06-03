@@ -1,0 +1,4 @@
+# Adding the folder "avr/cores/arduino/api" to ignore list
+# this folder point to the repo below, and note not "master" but "api-release-cpp"
+# https://github.com/arduino/ArduinoCore-api/tree/api-release-cpp
+api

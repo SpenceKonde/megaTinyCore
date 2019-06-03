@@ -1,0 +1,90 @@
+; Windows 2000, XP & Vista setup File for XPLAINED Boards.
+
+; Copyright (c) 2000 Microsoft Corporation
+; Copyright (C) 2007 ATMEL, Inc.
+
+[Version] 
+Signature="$Windows NT$" 
+Class=Ports 
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318} 
+CatalogFile=atmelinf.cat
+Provider=%ATMEL% 
+DriverVer=06/14/2013,6.0.0.1 
+
+;----------------------------------------------------------
+; Targets
+;----------------------------------------------------------
+[Manufacturer] 
+%ATMEL%=ATMEL, NTamd64 
+
+[ATMEL] 
+%ATMEL_CDC%=Reader, USB\VID_03EB&PID_2145&MI_01
+
+[ATMEL.NTamd64]
+%ATMEL_CDC%=DriverInstall, USB\VID_03EB&PID_2145&MI_01 
+
+
+;----------------------------------------------------------
+; Windows 2K, XP, and Vista32
+;----------------------------------------------------------
+[DestinationDirs] 
+DefaultDestDir=12 
+FakeModemCopyFileSection=12
+
+[Reader.NT] 
+include=mdmcpq.inf
+CopyFiles=FakeModemCopyFileSection
+AddReg=Reader.NT.AddReg 
+
+[Reader.NT.AddReg] 
+HKR,,DevLoader,,*ntkern 
+HKR,,NTMPDriver,,usbser.sys 
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider" 
+HKR,,Properties, 1, 80,01,00,00, ff,00,00,00, ff,00,00,00, 07,00,00,00, 0f,00,00,00, f7,03,00,00, 40,4b,4c,00, 40,4b,4c,00
+
+[Reader.NT.Services] 
+AddService = usbser, 0x00000002, Service_Inst 
+
+[Service_Inst] 
+DisplayName = %Serial.SvcDesc% 
+ServiceType = 1 ; SERVICE_KERNEL_DRIVER 
+StartType = 3 ; SERVICE_DEMAND_START 
+ErrorControl = 1 ; SERVICE_ERROR_NORMAL 
+ServiceBinary = %12%\usbser.sys 
+LoadOrderGroup = Base 
+
+
+;----------------------------------------------------------
+; Vista64
+;----------------------------------------------------------
+
+[DriverInstall.NTamd64]
+include=mdmcpq.inf
+CopyFiles=FakeModemCopyFileSection
+AddReg=DriverInstall.NTamd64.AddReg
+
+[DriverInstall.NTamd64.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,usbser.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+HKR,,Properties, 1, 80,01,00,00, ff,00,00,00, ff,00,00,00, 07,00,00,00, 0f,00,00,00, f7,03,00,00, 40,4b,4c,00, 40,4b,4c,00
+
+[DriverInstall.NTamd64.Services]
+AddService=usbser, 0x00000002, DriverService.NTamd64
+
+[DriverService.NTamd64]
+DisplayName=%Serial.SvcDesc%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\usbser.sys
+
+;----------------------------------------------------------
+; String
+;----------------------------------------------------------
+
+[Strings] 
+ATMEL = "Atmel Corp." 
+ATMEL_CDC = "mEDBG Virtual COM Port"
+Serial.SvcDesc = "USB Serial emulation driver" 
+

@@ -1,0 +1,3 @@
+[submodule "cores/test/external/libvireg"]
+	path = cores/test/external/libvireg
+	url = https://github.com/bcmi-labs/libvireg
