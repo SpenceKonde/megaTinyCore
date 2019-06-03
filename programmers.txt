@@ -1,0 +1,6 @@
+medbg.name=Onboard Atmel mEDBG (UNO WiFi Rev2)
+medbg.communication=usb
+medbg.protocol=xplainedmini_updi
+medbg.program.protocol=xplainedmini_updi
+medbg.program.tool=avrdude
+medbg.program.extra_params=-Pusb
