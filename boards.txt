@@ -83,8 +83,8 @@ at1616.pid.0=0x0058
 
 at1616.upload.tool=avrdude
 at1616.upload.protocol=jtag2updi
-at1616.upload.maximum_size=49152
-at1616.upload.maximum_data_size=6144
+at1616.upload.maximum_size=16384
+at1616.upload.maximum_data_size=2048
 at1616.upload.speed=115200
 at1616.upload.use_1200bps_touch=true
 at1616.upload.extra_params=-P{serial.port}
@@ -95,7 +95,7 @@ at1616.build.board=AVR_NANO_EVERY
 at1616.build.core=arduino
 at1616.build.variant=csat1616
 at1616.build.text_section_start=.text=0x0
-at1616.build.extra_flags={build.328emulation} -DMILLIS_USE_TIMERB1 -DNO_EXTERNAL_I2C_PULLUP
+at1616.build.extra_flags=-DMILLIS_USE_TIMERB1 -DNO_EXTERNAL_I2C_PULLUP
 #at1616.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
 
 at1616.bootloader.tool=avrdude
@@ -104,11 +104,5 @@ at1616.bootloader.SYSCFG0=0xC9
 at1616.bootloader.BOOTEND=0x00
 at1616.bootloader.OSCCFG=0x01
 at1616.fuses.file=fuses_4809.bin
-
-menu.mode=Registers emulation
-at1616.menu.mode.on=ATMEGA328
-at1616.menu.mode.on.build.328emulation=-DAVR_NANO_4809_328MODE
-at1616.menu.mode.off=None (ATMEGA4809)
-at1616.menu.mode.off.build.328emulation=
 
 ##############################################################
