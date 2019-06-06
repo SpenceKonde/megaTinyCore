@@ -143,11 +143,20 @@ ISR(vect) { \
   port_interrupt_handler(port);\
 } \
 
+
 IMPLEMENT_ISR(PORTA_PORT_vect, PA)
+#if defined(PORTB_PORT_vect)
 IMPLEMENT_ISR(PORTB_PORT_vect, PB)
+#endif
+#if defined(PORTC_PORT_vect)
 IMPLEMENT_ISR(PORTC_PORT_vect, PC)
-#ifndef ATtiny
+#endif
+#if defined(PORTD_PORT_vect)
 IMPLEMENT_ISR(PORTD_PORT_vect, PD)
+#endif
+#if defined(PORTE_PORT_vect)
 IMPLEMENT_ISR(PORTE_PORT_vect, PE)
+#endif
+#if defined(PORTF_PORT_vect)
 IMPLEMENT_ISR(PORTF_PORT_vect, PF)
 #endif
