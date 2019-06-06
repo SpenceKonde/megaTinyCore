@@ -9,9 +9,8 @@ void setup_timers() {
 
 	/*  TYPE A TIMER   */
 
-	/* PORTMUX setting for TCA -> all outputs [0:2] point to PORTB pins [0:2] */
-	// Not relevant for ATtiny
-	// PORTMUX.TCAROUTEA	= PORTMUX_TCA0_PORTB_gc;
+	/* PORTMUX setting for TCA */
+	PORTMUX.CTRLA = PORTMUX_TCA00_DEFAULT_gc;
 
 	/* Setup timers for single slope PWM, but do not enable, will do in analogWrite() */
 	TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_SINGLESLOPE_gc;

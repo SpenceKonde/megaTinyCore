@@ -375,8 +375,10 @@ void init()
 	analogReference(VDD);
 
 #endif
-	 
-	// PORTMUX.USARTROUTEA = 0; // Temporary removed since this is not on option on the Attiny
+	
+	#if defined(USARTROUTEA)
+	PORTMUX.USARTROUTEA = 0;
+	#endif
 
 	setup_timers();
 

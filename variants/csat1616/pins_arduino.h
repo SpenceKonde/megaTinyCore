@@ -23,8 +23,6 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
-#define ATtiny
-
 #include <avr/pgmspace.h>
 #include "timers.h"
 
@@ -58,6 +56,16 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
+
+// Mapped to HWSERIAL0 in Serial library
+#define HWSERIAL0 (&USART0)
+#define HWSERIAL0_DRE_VECTOR (USART0_DRE_vect)
+#define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
+#define HWSERIAL0_RXC_VECTOR (USART0_RXC_vect)
+#define HWSERIAL0_MUX (PORTMUX_USART0_DEFAULT_gc)
+#define PIN_WIRE_HWSERIAL0_RX (6)
+#define PIN_WIRE_HWSERIAL0_TX (7)
+
 
 #define MUX_SPI			(SPI_MUX)
 #define SPI_INTERFACES_COUNT	1
@@ -97,17 +105,17 @@ static const uint8_t A10 = PIN_A10;
 // pins are a separate set.
 
 // ATtiny1616 / ARDUINO
-//                _____ 
-//        VDD   1|*    |20  GND
-//  (nSS) PA4   2|     |19  PA3 (EXTCLK)
-//        PA5   3|     |18  PA2 (MISO)
-//  (DAC) PA6   4|     |17  PA1 (MOSI)
-//        PA7   5|     |16  PA0 (nRESET/UPDI)
-//        PB5   6|     |15  PC3
-//        PB4   7|     |14  PC2 
-//(TOSC1) PB3   8|     |13  PC1
-//(TOSC2) PB2   9|     |12  PC0
-//  (SDA) PB1  10|_____|11  PB0 (SCL)
+//                   _____ 
+//        VDD      1|*    |20    GND
+//  (nSS) PA4  0   2|     |19  16  PA3 (EXTCLK)
+//        PA5  1   3|     |18  15  PA2 (MISO)
+//  (DAC) PA6  2   4|     |17  14  PA1 (MOSI)
+//        PA7  3   5|     |16      PA0 (nRESET/UPDI)
+//        PB5  4   6|     |15  13  PC3
+//        PB4  5   7|     |14  12  PC2 
+//(TOSC1) PB3  6   8|     |13  11  PC1
+//(TOSC2) PB2  7   9|     |12  10  PC0
+//  (SDA) PB1  8  10|_____|11   9  PB0 (SCL)
 //               
 //
 
@@ -120,8 +128,8 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
 4      LED          PB5       CLKOUT    AIN8                          AINP1               AINP2                                             *WO2
 5                   PB4                 AIN9                          AINN1     AINP3                                                       *WO1                          *LUT0-OUT
 6      RX           PB3       TOSC1                                             OUT                           RxD                           *WO0
-7      TX           PB2       TOSC2 /
-                              EVOUT1                                                      OUT                 TxD                           WO2
+7      TX           PB2       TOSC2 /                                                     OUT                 TxD                           WO2
+                              EVOUT1                                                      
 8      SDA          PB1                 AIN10               X4/Y4     AINP2                                   XCK                 SDA       WO1
 9      SCL          PB0                 AIN11               X5/Y5               AINP2     AINP1               XDIR                SCL       WO0
 10                  PC0                           AIN6                                                                  *SCK                          TCB0 WO   WOC
@@ -133,7 +141,7 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
 16     SCK          PA3       EXTCLK    AIN3                                                                  *XCK      SCK                 WO3       TCB1 WO
 NA     VDD          VDD
 NA     GND          GND
-NA?    UPDI         PA0       RESET/
+NA?    UPDI         PA0       RESET/                                                                                                                                      LUT1-IN0
                               UPDIAIN0         
 	* alternative pin locations			  
 */

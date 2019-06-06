@@ -91,7 +91,7 @@ at1616.upload.extra_params=-P{serial.port}
 
 at1616.build.mcu=attiny1616
 at1616.build.f_cpu=20000000L
-at1616.build.board=AVR_NANO_EVERY
+at1616.build.board=attiny1616
 at1616.build.core=arduino
 at1616.build.variant=csat1616
 at1616.build.text_section_start=.text=0x0

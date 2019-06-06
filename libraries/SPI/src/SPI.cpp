@@ -41,8 +41,10 @@ SPIClass::SPIClass(uint8_t uc_pinMISO, uint8_t uc_pinSCK, uint8_t uc_pinMOSI, ui
 void SPIClass::begin()
 {
   init();
-
+  
+  #if defined(TWISPIROUTEA)
   PORTMUX.TWISPIROUTEA |= _uc_mux;
+  #endif
 
   pinMode(_uc_pinMosi, OUTPUT);
   pinMode(_uc_pinSCK, OUTPUT);
