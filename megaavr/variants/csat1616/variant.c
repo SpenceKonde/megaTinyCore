@@ -30,8 +30,9 @@ void setup_timers() {
 	/*	TYPE B TIMERS  */
 
 	/* PORTMUX alternate location needed for TCB0 & 1, TCB2 is default location */
-	// Not relevant for ATtiny
-	// PORTMUX.TCBROUTEA	|= (PORTMUX_TCB0_bm | PORTMUX_TCB1_bm);
+	#if defined(TCBROUTEA)
+	PORTMUX.TCBROUTEA	|= (PORTMUX_TCB0_bm | PORTMUX_TCB1_bm);
+	#endif
 
 	/* Start with TCB0 */
 	TCB_t *timer_B = (TCB_t *)&TCB0;

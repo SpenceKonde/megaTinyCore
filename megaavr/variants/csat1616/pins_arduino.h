@@ -34,7 +34,7 @@
 #define NUM_SPI_PINS                3 // (MISO / MOSI / SCK)
 #define NUM_TOTAL_FREE_PINS         (NUM_DIGITAL_PINS)
 #define NUM_TOTAL_PINS              (NUM_DIGITAL_PINS + NUM_I2C_PINS + NUM_SPI_PINS)
-#define ANALOG_INPUT_OFFSET         11
+#define ANALOG_INPUT_OFFSET         0
 
 #define EXTERNAL_NUM_INTERRUPTS     17
 
@@ -46,6 +46,9 @@
 #define PIN_SPI_MOSI	(14)
 #define PIN_SPI_SS		(0)
 
+#define MUX_SPI			(SPI_MUX)
+#define SPI_INTERFACES_COUNT	1
+
 static const uint8_t SS   = PIN_SPI_SS;
 static const uint8_t MOSI = PIN_SPI_MOSI;
 static const uint8_t MISO = PIN_SPI_MISO;
@@ -54,21 +57,19 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define PIN_WIRE_SDA        (8)
 #define PIN_WIRE_SCL        (9)
 
+#define TWI_MUX 		(PORTMUX_TWI0_DEFAULT_gc)
+
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
 // Mapped to HWSERIAL0 in Serial library
-#define HWSERIAL0 (&USART0)
-#define HWSERIAL0_DRE_VECTOR (USART0_DRE_vect)
+#define HWSERIAL0 				(&USART0)
+#define HWSERIAL0_DRE_VECTOR 	(USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
-#define HWSERIAL0_RXC_VECTOR (USART0_RXC_vect)
-#define HWSERIAL0_MUX (PORTMUX_USART0_DEFAULT_gc)
-#define PIN_WIRE_HWSERIAL0_RX (6)
-#define PIN_WIRE_HWSERIAL0_TX (7)
-
-
-#define MUX_SPI			(SPI_MUX)
-#define SPI_INTERFACES_COUNT	1
+#define HWSERIAL0_RXC_VECTOR 	(USART0_RXC_vect)
+#define HWSERIAL0_MUX 			(PORTMUX_USART0_DEFAULT_gc)
+#define PIN_WIRE_HWSERIAL0_RX 	(6)
+#define PIN_WIRE_HWSERIAL0_TX 	(7)
 
 #define LED_BUILTIN 4
 
@@ -105,17 +106,17 @@ static const uint8_t A10 = PIN_A10;
 // pins are a separate set.
 
 // ATtiny1616 / ARDUINO
-//                   _____ 
-//        VDD      1|*    |20    GND
-//  (nSS) PA4  0   2|     |19  16  PA3 (EXTCLK)
-//        PA5  1   3|     |18  15  PA2 (MISO)
-//  (DAC) PA6  2   4|     |17  14  PA1 (MOSI)
-//        PA7  3   5|     |16      PA0 (nRESET/UPDI)
-//        PB5  4   6|     |15  13  PC3
-//        PB4  5   7|     |14  12  PC2 
-//(TOSC1) PB3  6   8|     |13  11  PC1
-//(TOSC2) PB2  7   9|     |12  10  PC0
-//  (SDA) PB1  8  10|_____|11   9  PB0 (SCL)
+//                          _____ 
+//                  VDD   1|*    |20  GND
+// (nSS)  (AIN4) PA4  0~  2|     |19  16~ PA3 (AIN3)(EXTCLK)
+//        (AIN5) PA5  1~  3|     |18  15  PA2 (AIN2)(MISO)
+// (DAC)  (AIN6) PA6  2   4|     |17  14  PA1 (AIN1)(MOSI)
+//        (AIN7) PA7  3   5|     |16      PA0 (nRESET/UPDI)
+//        (AIN8) PB5  4   6|     |15  13  PC3
+//        (AIN9) PB4  5   7|     |14  12  PC2 
+// (RXD) (TOSC1) PB3  6   8|     |13  11  PC1
+// (TXD) (TOSC2) PB2  7~  9|     |12  10  PC0
+// (SDA) (AIN10) PB1  8~ 10|_____|11   9~ PB0 (AIN11)(SCL)
 //               
 //
 
@@ -141,8 +142,8 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
 16     SCK          PA3       EXTCLK    AIN3                                                                  *XCK      SCK                 WO3       TCB1 WO
 NA     VDD          VDD
 NA     GND          GND
-NA?    UPDI         PA0       RESET/                                                                                                                                      LUT1-IN0
-                              UPDIAIN0         
+NA?    UPDI         PA0       RESET/    AIN0                                                                                                                              LUT1-IN0
+                              UPDI        
 	* alternative pin locations			  
 */
 
@@ -255,7 +256,8 @@ const uint8_t PROGMEM analog_pin_to_channel[] = {
 #endif
 
 extern const uint8_t analog_pin_to_channel[];
-#define digitalPinToAnalogInput(p)  ((p < NUM_ANALOG_INPUTS) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN )
+// #define digitalPinToAnalogInput(p)  ((p < NUM_ANALOG_INPUTS) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN )
+#define digitalPinToAnalogInput(p) 		(((p) < 6 || (p) == 8 || (p) == 9 || (p) > 13) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN)
 
 
 // These serial port names are intended to allow libraries and architecture-neutral
