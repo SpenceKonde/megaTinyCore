@@ -39,7 +39,7 @@ atx16.build.extra_flags=-DMILLIS_USE_TIMERB0 -DNO_EXTERNAL_I2C_PULLUP
 #atx16.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
 
 atx16.bootloader.tool=avrdude
-atx16.bootloader.file=atmega4809_uart_bl.hex
+atx16.bootloader.file=empty_all.hex
 atx16.bootloader.SYSCFG0=0xC9
 atx16.bootloader.BOOTEND=0x00
 atx16.bootloader.OSCCFG=0x01
