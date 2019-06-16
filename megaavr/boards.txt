@@ -11,22 +11,18 @@ atx16.menu.chip.3216=ATtiny3216
 atx16.menu.chip.3216.build.mcu=attiny3216
 atx16.menu.chip.3216.upload.maximum_size=32768
 atx16.menu.chip.3216.upload.maximum_data_size=2048
-atx16.menu.chip.3216.build.extra_flags=-DMILLIS_USE_TIMERB1 -DNO_EXTERNAL_I2C_PULLUP
 atx16.menu.chip.1616=ATtiny1616
 atx16.menu.chip.1616.build.mcu=attiny1616
 atx16.menu.chip.1616.upload.maximum_size=16384
 atx16.menu.chip.1616.upload.maximum_data_size=2048
-atx16.menu.chip.1616.build.extra_flags=-DMILLIS_USE_TIMERB1 -DNO_EXTERNAL_I2C_PULLUP
 atx16.menu.chip.816=ATtiny816
 atx16.menu.chip.816.build.mcu=attiny816
 atx16.menu.chip.816.upload.maximum_size=8192
 atx16.menu.chip.816.upload.maximum_data_size=512
-atx16.menu.chip.816.build.extra_flags=-DMILLIS_USE_TIMERB0 -DNO_EXTERNAL_I2C_PULLUP
 atx16.menu.chip.416=ATtiny416
 atx16.menu.chip.416.build.mcu=attiny416
 atx16.menu.chip.416.upload.maximum_size=4096
 atx16.menu.chip.416.upload.maximum_data_size=256
-atx16.menu.chip.416.build.extra_flags=-DMILLIS_USE_TIMERB0 -DNO_EXTERNAL_I2C_PULLUP
 
 atx16.upload.tool=avrdude
 atx16.upload.protocol=jtag2updi
@@ -39,6 +35,7 @@ atx16.build.board=attinyx16
 atx16.build.core=arduino
 atx16.build.variant=tx16
 atx16.build.text_section_start=.text=0x0
+atx16.build.extra_flags=-DMILLIS_USE_TIMERB0 -DNO_EXTERNAL_I2C_PULLUP
 #atx16.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
 
 atx16.bootloader.tool=avrdude
