@@ -39,6 +39,11 @@
 #include "Arduino.h"
 #include "pins_arduino.h"
 
+#ifndef TCB1 //start hackjob to make things that don't use tone() compile on t416/816
+
+
+#else //otherwise it has TCB1
+
 /* For more than one tone, change AVAILABLE_TONE_PINS and uncomment the correct
     number of timers 
 */
@@ -219,3 +224,4 @@ ISR(TCB2_INT_vect)
     /* Clear flag */
     _timer->INTFLAGS = TCB_CAPT_bm;
 }
+#endif
