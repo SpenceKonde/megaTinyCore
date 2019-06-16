@@ -19,7 +19,7 @@ at1616.build.mcu=attiny1616
 at1616.build.f_cpu=20000000L
 at1616.build.board=attiny1616
 at1616.build.core=arduino
-at1616.build.variant=csat1616
+at1616.build.variant=tx16
 at1616.build.text_section_start=.text=0x0
 at1616.build.extra_flags=-DMILLIS_USE_TIMERB1 -DNO_EXTERNAL_I2C_PULLUP
 #at1616.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
@@ -30,5 +30,38 @@ at1616.bootloader.SYSCFG0=0xC9
 at1616.bootloader.BOOTEND=0x00
 at1616.bootloader.OSCCFG=0x01
 at1616.fuses.file=fuses_4809.bin
+
+##############################################################
+
+##############################################################
+
+at3216.name=ATtiny3216
+
+at3216.vid.0=0x2341
+at3216.pid.0=0x0058
+
+at3216.upload.tool=avrdude
+at3216.upload.protocol=jtag2updi
+at3216.upload.maximum_size=32768
+at3216.upload.maximum_data_size=2048
+at3216.upload.speed=115200
+at3216.upload.use_1200bps_touch=true
+at3216.upload.extra_params=-P{serial.port}
+
+at3216.build.mcu=attiny3216
+at3216.build.f_cpu=20000000L
+at3216.build.board=attiny3216
+at3216.build.core=arduino
+at3216.build.variant=tx16
+at3216.build.text_section_start=.text=0x0
+at3216.build.extra_flags=-DMILLIS_USE_TIMERB1 -DNO_EXTERNAL_I2C_PULLUP
+#at3216.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
+
+at3216.bootloader.tool=avrdude
+at3216.bootloader.file=atmega4809_uart_bl.hex
+at3216.bootloader.SYSCFG0=0xC9
+at3216.bootloader.BOOTEND=0x00
+at3216.bootloader.OSCCFG=0x01
+at3216.fuses.file=fuses_4809.bin
 
 ##############################################################
