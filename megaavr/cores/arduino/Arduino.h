@@ -51,7 +51,9 @@ extern "C"{
 #define DEFAULT     INTERNAL0V55
 #define INTERNAL    ADC_REFSEL_INTREF_gc
 #define VDD         ADC_REFSEL_VDDREF_gc
+#ifdef ADC_REFSEL_VREFA_gc
 #define EXTERNAL    ADC_REFSEL_VREFA_gc
+#endif
 
 #define VCC_5V0 2
 #define VCC_3V3 1

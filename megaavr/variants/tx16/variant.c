@@ -38,7 +38,9 @@ void setup_timers() {
 	TCB_t *timer_B = (TCB_t *)&TCB0;
 
 	/* Timer B Setup loop for TCB[0:2] */
+	#ifdef TCB1
 	do{
+	#endif 
 		/* 8 bit PWM mode, but do not enable output yet, will do in analogWrite() */
 		timer_B->CTRLB = (TCB_CNTMODE_PWM8_gc);
 
@@ -62,8 +64,9 @@ void setup_timers() {
 	
 	// ATtiny only uses up to TCB1
 	/* Stop when pointing to TCB1 */
+	#ifdef TCB1
 	} while (timer_B < (TCB_t *)&TCB1);
-
+    #endif
 	/* Stuff for synchronizing PWM timers */
 // 	/* Restart TCA to sync TCBs */
 // 	/* should not be needed		*/

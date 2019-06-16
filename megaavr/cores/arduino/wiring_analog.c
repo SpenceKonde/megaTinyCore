@@ -35,7 +35,11 @@ void analogReference(uint8_t mode)
 	VREF.CTRLA &= ~(VREF_ADC0REFSEL_gm);
 
 	/* If reference NOT using internal reference from VREF */
+	#ifdef EXTERNAL
 	if((mode == EXTERNAL) || (mode == VDD)) {
+	#else
+    if((mode == VDD)) {
+	#endif
 
 		/* Set reference in ADC peripheral */
 		ADC0.CTRLC |= mode;
