@@ -1,67 +1,51 @@
 # See: http://code.google.com/p/arduino/wiki/Platforms
 
-##############################################################
 
-at1616.name=ATtiny1616
-
-at1616.vid.0=0x2341
-at1616.pid.0=0x0058
-
-at1616.upload.tool=avrdude
-at1616.upload.protocol=jtag2updi
-at1616.upload.maximum_size=16384
-at1616.upload.maximum_data_size=2048
-at1616.upload.speed=115200
-at1616.upload.use_1200bps_touch=true
-at1616.upload.extra_params=-P{serial.port}
-
-at1616.build.mcu=attiny1616
-at1616.build.f_cpu=20000000L
-at1616.build.board=attiny1616
-at1616.build.core=arduino
-at1616.build.variant=tx16
-at1616.build.text_section_start=.text=0x0
-at1616.build.extra_flags=-DMILLIS_USE_TIMERB1 -DNO_EXTERNAL_I2C_PULLUP
-#at1616.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
-
-at1616.bootloader.tool=avrdude
-at1616.bootloader.file=atmega4809_uart_bl.hex
-at1616.bootloader.SYSCFG0=0xC9
-at1616.bootloader.BOOTEND=0x00
-at1616.bootloader.OSCCFG=0x01
-at1616.fuses.file=fuses_4809.bin
+menu.chip=Chip
 
 ##############################################################
 
-##############################################################
+atx16.name=ATtiny3216/1616/816/416
 
-at3216.name=ATtiny3216
+atx16.menu.chip.3216=ATtiny3216
+atx16.menu.chip.3216.build.mcu=attiny3216
+atx16.menu.chip.3216.upload.maximum_size=32768
+atx16.menu.chip.3216.upload.maximum_data_size=2048
+atx16.menu.chip.3216.build.extra_flags=-DMILLIS_USE_TIMERB1 -DNO_EXTERNAL_I2C_PULLUP
+atx16.menu.chip.1616=ATtiny1616
+atx16.menu.chip.1616.build.mcu=attiny1616
+atx16.menu.chip.1616.upload.maximum_size=16384
+atx16.menu.chip.1616.upload.maximum_data_size=2048
+atx16.menu.chip.1616.build.extra_flags=-DMILLIS_USE_TIMERB1 -DNO_EXTERNAL_I2C_PULLUP
+atx16.menu.chip.816=ATtiny816
+atx16.menu.chip.816.build.mcu=attiny816
+atx16.menu.chip.816.upload.maximum_size=8192
+atx16.menu.chip.816.upload.maximum_data_size=512
+atx16.menu.chip.816.build.extra_flags=-DMILLIS_USE_TIMERB0 -DNO_EXTERNAL_I2C_PULLUP
+atx16.menu.chip.416=ATtiny416
+atx16.menu.chip.416.build.mcu=attiny416
+atx16.menu.chip.416.upload.maximum_size=4096
+atx16.menu.chip.416.upload.maximum_data_size=256
+atx16.menu.chip.416.build.extra_flags=-DMILLIS_USE_TIMERB0 -DNO_EXTERNAL_I2C_PULLUP
 
-at3216.vid.0=0x2341
-at3216.pid.0=0x0058
+atx16.upload.tool=avrdude
+atx16.upload.protocol=jtag2updi
+atx16.upload.speed=115200
+atx16.upload.use_1200bps_touch=true
+atx16.upload.extra_params=-P{serial.port}
 
-at3216.upload.tool=avrdude
-at3216.upload.protocol=jtag2updi
-at3216.upload.maximum_size=32768
-at3216.upload.maximum_data_size=2048
-at3216.upload.speed=115200
-at3216.upload.use_1200bps_touch=true
-at3216.upload.extra_params=-P{serial.port}
+atx16.build.f_cpu=20000000L
+atx16.build.board=attinyx16
+atx16.build.core=arduino
+atx16.build.variant=tx16
+atx16.build.text_section_start=.text=0x0
+#atx16.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
 
-at3216.build.mcu=attiny3216
-at3216.build.f_cpu=20000000L
-at3216.build.board=attiny3216
-at3216.build.core=arduino
-at3216.build.variant=tx16
-at3216.build.text_section_start=.text=0x0
-at3216.build.extra_flags=-DMILLIS_USE_TIMERB1 -DNO_EXTERNAL_I2C_PULLUP
-#at3216.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
-
-at3216.bootloader.tool=avrdude
-at3216.bootloader.file=atmega4809_uart_bl.hex
-at3216.bootloader.SYSCFG0=0xC9
-at3216.bootloader.BOOTEND=0x00
-at3216.bootloader.OSCCFG=0x01
-at3216.fuses.file=fuses_4809.bin
+atx16.bootloader.tool=avrdude
+atx16.bootloader.file=atmega4809_uart_bl.hex
+atx16.bootloader.SYSCFG0=0xC9
+atx16.bootloader.BOOTEND=0x00
+atx16.bootloader.OSCCFG=0x01
+atx16.fuses.file=fuses_4809.bin
 
 ##############################################################
