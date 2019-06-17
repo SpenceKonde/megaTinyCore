@@ -43,6 +43,5 @@ atx16.bootloader.file=empty_all.hex
 atx16.bootloader.SYSCFG0=0xC9
 atx16.bootloader.BOOTEND=0x00
 atx16.bootloader.OSCCFG=0x01
-atx16.fuses.file=fuses_4809.bin
 
 ##############################################################
