@@ -5,43 +5,55 @@ menu.chip=Chip
 
 ##############################################################
 
-atx16.name=ATtiny3216/1616/816/416
+atxy6.name=ATtiny3216/1616/1606/816/806/416/406
 
-atx16.menu.chip.3216=ATtiny3216
-atx16.menu.chip.3216.build.mcu=attiny3216
-atx16.menu.chip.3216.upload.maximum_size=32768
-atx16.menu.chip.3216.upload.maximum_data_size=2048
-atx16.menu.chip.1616=ATtiny1616
-atx16.menu.chip.1616.build.mcu=attiny1616
-atx16.menu.chip.1616.upload.maximum_size=16384
-atx16.menu.chip.1616.upload.maximum_data_size=2048
-atx16.menu.chip.816=ATtiny816
-atx16.menu.chip.816.build.mcu=attiny816
-atx16.menu.chip.816.upload.maximum_size=8192
-atx16.menu.chip.816.upload.maximum_data_size=512
-atx16.menu.chip.416=ATtiny416
-atx16.menu.chip.416.build.mcu=attiny416
-atx16.menu.chip.416.upload.maximum_size=4096
-atx16.menu.chip.416.upload.maximum_data_size=256
+atxy6.menu.chip.3216=ATtiny3216
+atxy6.menu.chip.3216.build.mcu=attiny3216
+atxy6.menu.chip.3216.upload.maximum_size=32768
+atxy6.menu.chip.3216.upload.maximum_data_size=2048
+atxy6.menu.chip.1616=ATtiny1616
+atxy6.menu.chip.1616.build.mcu=attiny1616
+atxy6.menu.chip.1616.upload.maximum_size=16384
+atxy6.menu.chip.1616.upload.maximum_data_size=2048
+atxy6.menu.chip.816=ATtiny816
+atxy6.menu.chip.816.build.mcu=attiny816
+atxy6.menu.chip.816.upload.maximum_size=8192
+atxy6.menu.chip.816.upload.maximum_data_size=512
+atxy6.menu.chip.416=ATtiny416
+atxy6.menu.chip.416.build.mcu=attiny416
+atxy6.menu.chip.416.upload.maximum_size=4096
+atxy6.menu.chip.416.upload.maximum_data_size=256
+atxy6.menu.chip.1606=ATtiny1606
+atxy6.menu.chip.1606.build.mcu=attiny1606
+atxy6.menu.chip.1606.upload.maximum_size=16384
+atxy6.menu.chip.1606.upload.maximum_data_size=2048
+atxy6.menu.chip.806=ATtiny806
+atxy6.menu.chip.806.build.mcu=attiny806
+atxy6.menu.chip.806.upload.maximum_size=8192
+atxy6.menu.chip.806.upload.maximum_data_size=512
+atxy6.menu.chip.406=ATtiny406
+atxy6.menu.chip.406.build.mcu=attiny406
+atxy6.menu.chip.406.upload.maximum_size=4096
+atxy6.menu.chip.406.upload.maximum_data_size=256
 
-atx16.upload.tool=avrdude
-atx16.upload.protocol=jtag2updi
-atx16.upload.speed=115200
-atx16.upload.use_1200bps_touch=true
-atx16.upload.extra_params=-P{serial.port}
+atxy6.upload.tool=avrdude
+atxy6.upload.protocol=jtag2updi
+atxy6.upload.speed=115200
+atxy6.upload.use_1200bps_touch=true
+atxy6.upload.extra_params=-P{serial.port}
 
-atx16.build.f_cpu=20000000L
-atx16.build.board=attinyx16
-atx16.build.core=arduino
-atx16.build.variant=tx16
-atx16.build.text_section_start=.text=0x0
-atx16.build.extra_flags=-DMILLIS_USE_TIMERB0 -DNO_EXTERNAL_I2C_PULLUP
-#atx16.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
+atxy6.build.f_cpu=20000000L
+atxy6.build.board=attinyx16
+atxy6.build.core=arduino
+atxy6.build.variant=txy6
+atxy6.build.text_section_start=.text=0x0
+atxy6.build.extra_flags=-DMILLIS_USE_TIMERB0 -DNO_EXTERNAL_I2C_PULLUP
+#atxy6.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
 
-atx16.bootloader.tool=avrdude
-atx16.bootloader.file=empty_all.hex
-atx16.bootloader.SYSCFG0=0xC9
-atx16.bootloader.BOOTEND=0x00
-atx16.bootloader.OSCCFG=0x01
+atxy6.bootloader.tool=avrdude
+atxy6.bootloader.file=empty_all.hex
+atxy6.bootloader.SYSCFG0=0xC9
+atxy6.bootloader.BOOTEND=0x00
+atxy6.bootloader.OSCCFG=0x01
 
 ##############################################################
