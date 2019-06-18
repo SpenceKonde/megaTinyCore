@@ -30,11 +30,11 @@ atxy6.menu.chip.1606.upload.maximum_data_size=1024
 atxy6.menu.chip.806=ATtiny806
 atxy6.menu.chip.806.build.mcu=attiny806
 atxy6.menu.chip.806.upload.maximum_size=8192
-atxy6.menu.chip.806.upload.maximum_data_size=256
+atxy6.menu.chip.806.upload.maximum_data_size=512
 atxy6.menu.chip.406=ATtiny406
 atxy6.menu.chip.406.build.mcu=attiny406
 atxy6.menu.chip.406.upload.maximum_size=4096
-atxy6.menu.chip.406.upload.maximum_data_size=128
+atxy6.menu.chip.406.upload.maximum_data_size=256
 
 atxy6.upload.tool=avrdude
 atxy6.upload.protocol=jtag2updi
@@ -52,8 +52,13 @@ atxy6.build.extra_flags=-DMILLIS_USE_TIMERB0 -DNO_EXTERNAL_I2C_PULLUP
 
 atxy6.bootloader.tool=avrdude
 atxy6.bootloader.file=empty_all.hex
-atxy6.bootloader.SYSCFG0=0xC9
-atxy6.bootloader.BOOTEND=0x00
+atxy6.bootloader.WDTCFG=0x00
+atxy6.bootloader.BODCFG=0x00
 atxy6.bootloader.OSCCFG=0x01
+atxy6.bootloader.TCD0CFG=0x01
+atxy6.bootloader.SYSCFG0=0xC9
+atxy6.bootloader.SYSCFG1=0x03
+atxy6.bootloader.APPEND=0x00
+atxy6.bootloader.BOOTEND=0x00
 
 ##############################################################
