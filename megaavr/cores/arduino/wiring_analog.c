@@ -80,8 +80,6 @@ int analogRead(uint8_t pin)
 		indicate an active state for Wire) */
 	if(isDoubleBondedActive(pin)) return 0;
 
-	uint8_t low, high;
-
 #if defined(analogPinToChannel)
 	/* If analog pin number != adc0 channel */
 #endif
@@ -97,24 +95,12 @@ int analogRead(uint8_t pin)
 	/* Wait for result ready */
 	while(!(ADC0.INTFLAGS & ADC_RESRDY_bm));
 
-	/* Save state */
-	uint8_t status = SREG;
-	cli();
-
-	/* Read result */
-	low = ADC0.RESL;
-	high = ADC0.RESH;
-
-	/* Restore state */
-	SREG = status;
-
 #else	/* No ADC, return 0 */
-	low = 0;
-	high = 0;
+	return 0;
 #endif
 
 	/* Combine two bytes */
-	return (high << 8) | low;
+	return ADC0.RES;
 }
 
 // Right now, PWM output only works on the pins with
