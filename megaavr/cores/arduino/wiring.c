@@ -57,7 +57,7 @@ inline unsigned long clockCyclesToMicroseconds(unsigned long cycles){
 inline unsigned long microsecondsToClockCycles(unsigned long microseconds){
 	return ( microseconds * clockCyclesPerMicrosecond() );
 }
-
+#ifndef MILLIS_USE_TIMERA0
 static volatile TCB_t* _timer =
 #if defined(MILLIS_USE_TIMERB0)
 &TCB0;
@@ -68,10 +68,12 @@ static volatile TCB_t* _timer =
 #elif defined(MILLIS_USE_TIMERB3)
 &TCB3;
 #else
-// fallback to TCB0 (every platform has it)
-&TCB0;
+#error "No millis timer selected. 
+#endif
 #endif
 
+#if defined(MILLIS_USE_TIMERA0)
+ISR(TCA0_LUNF_vect)
 #if defined(MILLIS_USE_TIMERB0)
 ISR(TCB0_INT_vect)
 #elif defined(MILLIS_USE_TIMERB1)
@@ -103,7 +105,11 @@ ISR(TCB0_INT_vect)
 	timer_overflow_count++;
 
 	/* Clear flag */
+	#ifdef MILLIS_USE_TIMERA0
+	TCA0.SPLIT.INTFLAGS = TCA_LUNF_bm;
+	#else //timerb
 	_timer->INTFLAGS = TCB_CAPT_bm;
+	#endif
 }
 
 unsigned long millis()
@@ -131,14 +137,24 @@ unsigned long micros() {
 
 	/* Get current number of overflows and timer count */
 	overflows = timer_overflow_count;
+	#ifdef MILLIS_USE_TIMERA0
+	ticks = 0xFF-TCA0.SPLIT.CNTL;
+	#else
 	ticks = _timer->CNTL;
-
+	#endif
 	/* If the timer overflow flag is raised, we just missed it,
 	increment to account for it, & read new ticks */
-	if(_timer->INTFLAGS & TCB_CAPT_bm){
+	#ifdef MILLIS_USE_TIMERA0
+	if(TCA0.SPLIT.INTFLAGS = TCA_LUNF_bm){
 		overflows++;
 		ticks = _timer->CNTL;
 	}
+	#else
+	if(_timer->INTFLAGS & TCB_CAPT_bm){
+		overflows++;
+		ticks = 0xFF-TCA0.SPLIT.CNTL;
+	}
+	#endif
 
 	/* Restore state */
 	SREG = status;
