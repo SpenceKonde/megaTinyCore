@@ -8,3 +8,4 @@ Arduino core for the new megaAVR ATtiny series chips - highly experimental (not 
 * Anything and everything may be changed without warning, including pin mapping and names of menu options
 * Other chips are not ready, but may be close. Preliminary pin mapping proposal for 1614/814/414/804/404. 
 * We have a timer shortage on most of these chips, because one of the type b timers is used for millis, meaning it can't be used for tone (or servo, or anything else). 
+* Pretty sure burn bootloader sets OSCCFG wrong, resulting in all the timing being wrong. (#29)
