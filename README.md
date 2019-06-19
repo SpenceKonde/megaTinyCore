@@ -1,5 +1,5 @@
 # megaTinyCore
-Arduino core for the new megaAVR ATtiny series chips - highly experimental
+Arduino core for the new megaAVR ATtiny series chips - highly experimental (not for use in actual projects yet)
 
 
 # Rough status: 
