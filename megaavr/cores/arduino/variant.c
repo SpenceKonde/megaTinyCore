@@ -11,25 +11,33 @@ void setup_timers() {
 
 	/* PORTMUX setting for TCA */
 	PORTMUX.CTRLA = PORTMUX_TCA00_DEFAULT_gc;
+	
+	/* Enable Split Mode */
+	TCA0.SPLIT.CTRLD = TCA_SPLIT_SPLITM_bm;
 
-	/* Setup timers for single slope PWM, but do not enable, will do in analogWrite() */
-	TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_SINGLESLOPE_gc;
+	//Only 1 WGM so no need to specifically set up. 
 
-	/* Period setting, 16 bit register but val resolution is 8 bit */
-	TCA0.SINGLE.PER	= PWM_TIMER_PERIOD;
+	/* Period setting, 8-bit register in SPLIT mode */
+	TCA0.SPLIT.LPER	= PWM_TIMER_PERIOD;
+	TCA0.SPLIT.HPER	= PWM_TIMER_PERIOD;
 
 	/* Default duty 50%, will re-assign in analogWrite() */
-	TCA0.SINGLE.CMP0BUF = PWM_TIMER_COMPARE;
-	TCA0.SINGLE.CMP1BUF = PWM_TIMER_COMPARE;
-	TCA0.SINGLE.CMP2BUF = PWM_TIMER_COMPARE;
+	//TODO: replace with for loop to make this smaller;
+	TCA0.SPLIT.LCMP0 = PWM_TIMER_COMPARE;
+	TCA0.SPLIT.LCMP1 = PWM_TIMER_COMPARE;
+	TCA0.SPLIT.LCMP2 = PWM_TIMER_COMPARE;
+	TCA0.SPLIT.HCMP0 = PWM_TIMER_COMPARE;
+	TCA0.SPLIT.HCMP1 = PWM_TIMER_COMPARE;
+	TCA0.SPLIT.HCMP2 = PWM_TIMER_COMPARE;
 
 	/* Use DIV64 prescaler (giving 250kHz clock), enable TCA timer */
-	TCA0.SINGLE.CTRLA = (TCA_SINGLE_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
+	TCA0.SPLIT.CTRLA = (TCA_SINGLE_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
 
 
 	/*	TYPE B TIMERS  */
 
 	/* PORTMUX alternate location needed for TCB0 & 1, TCB2 is default location */
+	//TODO - As part of the timer wrangling involved in #16 and related issues, this stuff needs to be changed. 
 	#if defined(TCBROUTEA)
 	PORTMUX.TCBROUTEA	|= (PORTMUX_TCB0_bm | PORTMUX_TCB1_bm);
 	#endif
