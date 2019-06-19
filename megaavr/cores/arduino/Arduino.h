@@ -109,6 +109,12 @@ extern const uint8_t PROGMEM digital_pin_to_timer[];
 
 #define NOT_ON_TIMER 0
 #define TIMERA0 1
+#define TIMERA0_W0 0x01
+#define TIMERA0_W1 0x11
+#define TIMERA0_W2 0x21
+#define TIMERA0_W3 0x31
+#define TIMERA0_W4 0x41
+#define TIMERA0_W5 0x51
 #define TIMERB0 2
 #define TIMERB1 3
 #define TIMERB2 4
