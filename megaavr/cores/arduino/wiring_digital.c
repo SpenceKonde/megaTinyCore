@@ -107,7 +107,7 @@ static void turnOffPWM(uint8_t pin)
 		bit_pos = digitalPinToBitPosition(pin);
 		if (bit_pos>2) 	bit_pos++; //there's a blank bit in the middle
 		/* Disable corresponding channel */
-		TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SINGLE_LCMP0EN_bp + bit_pos));
+		TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
 		break;
 
 	/* TCB - only one output */

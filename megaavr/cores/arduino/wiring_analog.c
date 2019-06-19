@@ -131,7 +131,8 @@ void analogWrite(uint8_t pin, int val)
 		uint8_t digital_pin_timer =  digitalPinToTimer(pin);
 
 		uint8_t* timer_cmp_out;
-
+		
+		TCB_t *timer_B;
 		/* Find out Port and Pin to correctly handle port mux, and timer. */
 		switch (digital_pin_timer) { //use only low nybble which defines which timer it is
 
@@ -142,11 +143,11 @@ void analogWrite(uint8_t pin, int val)
 					bit_pos-=3;
 					timer_cmp_out = ((uint8_t*) (&TCA0.SPLIT.HCMP0)) + (bit_pos<<1);
 					(*timer_cmp_out) = (val);
-					TCA0.SPLIT.CTRLB |= (1 << (TCA_SINGLE_HCMP0EN_bp + bit_pos));
+					TCA0.SPLIT.CTRLB |= (1 << (TCA_SPLIT_HCMP0EN_bp + bit_pos));
 				} else {
 					timer_cmp_out = ((uint8_t*) (&TCA0.SPLIT.LCMP0)) + (bit_pos<<1);
 					(*timer_cmp_out) = (val);
-					TCA0.SPLIT.CTRLB |= (1 << (TCA_SINGLE_LCMP0EN_bp + bit_pos));
+					TCA0.SPLIT.CTRLB |= (1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
 				}
 				break;
 
@@ -155,7 +156,7 @@ void analogWrite(uint8_t pin, int val)
 			case TIMERB2:
 			case TIMERB3:
 				
-				TCB_t *timer_B;
+
 				/* Get pointer to timer, TIMERB0 order definition in Arduino.h*/
 				//assert (((TIMERB0 - TIMERB3) == 2));
 				timer_B = ((TCB_t *)&TCB0 + (digital_pin_timer - TIMERB0));
