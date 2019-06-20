@@ -41,14 +41,14 @@
 
 #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 7 || (p) == 8 || (p) == 9 || (p) == 16)
 
-#define SPI_MUX		  	(PORTMUX_SPI0_DEFAULT_gc)
-#define PIN_SPI_MISO	(15)
-#define PIN_SPI_SCK		(16)
-#define PIN_SPI_MOSI	(14)
-#define PIN_SPI_SS		(0)
+#define SPI_MUX         (PORTMUX_SPI0_DEFAULT_gc)
+#define PIN_SPI_MISO    (15)
+#define PIN_SPI_SCK     (16)
+#define PIN_SPI_MOSI    (14)
+#define PIN_SPI_SS      (0)
 
-#define MUX_SPI			(SPI_MUX)
-#define SPI_INTERFACES_COUNT	1
+#define MUX_SPI         (SPI_MUX)
+#define SPI_INTERFACES_COUNT 1
 
 static const uint8_t SS   = PIN_SPI_SS;
 static const uint8_t MOSI = PIN_SPI_MOSI;
@@ -58,19 +58,19 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define PIN_WIRE_SDA        (8)
 #define PIN_WIRE_SCL        (9)
 
-#define TWI_MUX 		(PORTMUX_TWI0_DEFAULT_gc)
+#define TWI_MUX (PORTMUX_TWI0_DEFAULT_gc)
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
 // Mapped to HWSERIAL0 in Serial library
-#define HWSERIAL0 				(&USART0)
-#define HWSERIAL0_DRE_VECTOR 	(USART0_DRE_vect)
+#define HWSERIAL0                (&USART0)
+#define HWSERIAL0_DRE_VECTOR     (USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
-#define HWSERIAL0_RXC_VECTOR 	(USART0_RXC_vect)
-#define HWSERIAL0_MUX 			(PORTMUX_USART0_DEFAULT_gc)
-#define PIN_WIRE_HWSERIAL0_RX 	(6)
-#define PIN_WIRE_HWSERIAL0_TX 	(7)
+#define HWSERIAL0_RXC_VECTOR     (USART0_RXC_vect)
+#define HWSERIAL0_MUX            (PORTMUX_USART0_DEFAULT_gc)
+#define PIN_WIRE_HWSERIAL0_RX    (6)
+#define PIN_WIRE_HWSERIAL0_TX    (7)
 
 #define LED_BUILTIN 4 //FIXME
 
@@ -81,8 +81,8 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define PIN_A2   (2)
 #define PIN_A3   (3)
 #define PIN_A4   (4)
-#define PIN_A5 	 (5)
-#define PIN_A6	 (8)
+#define PIN_A5   (5)
+#define PIN_A6   (8)
 #define PIN_A7   (9)
 #define PIN_A8   (14)
 #define PIN_A9   (15)
@@ -100,7 +100,7 @@ static const uint8_t A8 = PIN_A8;
 static const uint8_t A9 = PIN_A9;
 static const uint8_t A10 = PIN_A10;
 
-#define PINS_COUNT		(11u)
+#define PINS_COUNT (11u)
 
 #ifdef ARDUINO_MAIN
 
@@ -138,73 +138,73 @@ NA     VDD          VDD
 NA     GND          GND
 NA?    UPDI         PA0       RESET/    AIN0                                                                                                                              LUT1-IN0
                               UPDI        
-	* alternative pin locations			  
+    * alternative pin locations           
 */
 
-const uint8_t PROGMEM digital_pin_to_port[] = {	
-	// Left side, top to bottom
-	PA, // 0  PA4
-	PA, // 1  PA5
-	PA, // 2  PA6
-	PA, // 3  PA7
-	PB, // 4  PB3
-	PB, // 5  PB2
-	PB, // 6  PB1
-	// Right side, bottom to top
-	PB, // 7  PB0
-	PA, // 8  PA1
-	PA, // 9  PA2
-	PA  // 10 PA3
+const uint8_t PROGMEM digital_pin_to_port[] = { 
+    // Left side, top to bottom
+    PA, // 0  PA4
+    PA, // 1  PA5
+    PA, // 2  PA6
+    PA, // 3  PA7
+    PB, // 4  PB3
+    PB, // 5  PB2
+    PB, // 6  PB1
+    // Right side, bottom to top
+    PB, // 7  PB0
+    PA, // 8  PA1
+    PA, // 9  PA2
+    PA  // 10 PA3
 };
 
 /* Use this for accessing PINnCTRL register */
 const uint8_t PROGMEM digital_pin_to_bit_position[] = {
-	// Left side, top to bottom
-	PIN4_bp, // 0  PA4
-	PIN5_bp, // 1  PA5
-	PIN6_bp, // 2  PA6
-	PIN7_bp, // 3  PA7
-	PIN3_bp, // 4  PB3
-	PIN2_bp, // 5  PB2
-	PIN1_bp, // 6  PB1
-	// Right side, bottom to top
-	PIN0_bp, // 7  PB0
-	PIN1_bp, // 8  PA1
-	PIN2_bp, // 9  PA2
-	PIN3_bp  // 10 PA3
+    // Left side, top to bottom
+    PIN4_bp, // 0  PA4
+    PIN5_bp, // 1  PA5
+    PIN6_bp, // 2  PA6
+    PIN7_bp, // 3  PA7
+    PIN3_bp, // 4  PB3
+    PIN2_bp, // 5  PB2
+    PIN1_bp, // 6  PB1
+    // Right side, bottom to top
+    PIN0_bp, // 7  PB0
+    PIN1_bp, // 8  PA1
+    PIN2_bp, // 9  PA2
+    PIN3_bp  // 10 PA3
 };
 
 /* Use this for accessing PINnCTRL register */
-const uint8_t PROGMEM digital_pin_to_bit_mask[] = {	
-	// Left side, top to bottom
-	PIN4_bm, // 0  PA4
-	PIN5_bm, // 1  PA5
-	PIN6_bm, // 2  PA6
-	PIN7_bm, // 3  PA7
-	PIN3_bm, // 4  PB3
-	PIN2_bm, // 5  PB2
-	PIN1_bm, // 6  PB1
-	// Right side, bottom to top
-	PIN0_bm, // 7  PB0
-	PIN1_bm, // 8  PA1
-	PIN2_bm, // 9  PA2
-	PIN3_bm  // 10 PA3
+const uint8_t PROGMEM digital_pin_to_bit_mask[] = { 
+    // Left side, top to bottom
+    PIN4_bm, // 0  PA4
+    PIN5_bm, // 1  PA5
+    PIN6_bm, // 2  PA6
+    PIN7_bm, // 3  PA7
+    PIN3_bm, // 4  PB3
+    PIN2_bm, // 5  PB2
+    PIN1_bm, // 6  PB1
+    // Right side, bottom to top
+    PIN0_bm, // 7  PB0
+    PIN1_bm, // 8  PA1
+    PIN2_bm, // 9  PA2
+    PIN3_bm  // 10 PA3
 };
 
 const uint8_t PROGMEM digital_pin_to_timer[] = {
-  	// Left side, top to bottom
-	TIMERA0, 		// 0  PA4
-	TIMERA0, 		// 1  PA5
-	NOT_ON_TIMER, 	// 2  PA6
-	NOT_ON_TIMER, 	// 3  PA7
-	NOT_ON_TIMER, 	// 4  PB3
-	TIMERA0, 		// 5  PB2
-	TIMERA0, 		// 6  PB1
-	// Right side, bottom to top
-	TIMERA0, 		// 7  PB0
-	NOT_ON_TIMER, 	// 8  PA1
-	TIMERA0, 		// 9  PA2
-	NOT_ON_TIMER  	// 10 PA3
+    // Left side, top to bottom
+    TIMERA0,        // 0  PA4
+    TIMERA0,        // 1  PA5
+    NOT_ON_TIMER,   // 2  PA6
+    NOT_ON_TIMER,   // 3  PA7
+    NOT_ON_TIMER,   // 4  PB3
+    TIMERA0,        // 5  PB2
+    TIMERA0,        // 6  PB1
+    // Right side, bottom to top
+    TIMERA0,        // 7  PB0
+    NOT_ON_TIMER,   // 8  PA1
+    TIMERA0,        // 9  PA2
+    NOT_ON_TIMER    // 10 PA3
   
   
 };
@@ -224,9 +224,9 @@ const uint8_t PROGMEM analog_pin_to_channel[] = {
 #endif
 
 extern const uint8_t analog_pin_to_channel[];
-// #define digitalPinToAnalogInput(p)  ((p < NUM_ANALOG_INPUTS) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN )
-//#define digitalPinToAnalogInput(p) 		(((p) < 6 || (p) == 8 || (p) == 9 || (p) > 13) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN)
-#define digitalPinToAnalogInput(p)      ((p<6)?(p+4):((p>13)?(p-13):((p==8)?10:(p==9?11:NOT_A_PIN)))) //FIXME
+//#define digitalPinToAnalogInput(p) ((p < NUM_ANALOG_INPUTS) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN )
+//#define digitalPinToAnalogInput(p) (((p) < 6 || (p) == 8 || (p) == 9 || (p) > 13) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN)
+#define digitalPinToAnalogInput(p) ((p<6)?(p+4):((p>13)?(p-13):((p==8)?10:(p==9?11:NOT_A_PIN)))) //FIXME
 
 
 // These serial port names are intended to allow libraries and architecture-neutral
@@ -244,7 +244,7 @@ extern const uint8_t analog_pin_to_channel[];
 //
 // SERIAL_PORT_HARDWARE_OPEN  Hardware serial ports which are open for use.  Their RX & TX
 //                            pins are NOT connected to anything by default.
-#define SERIAL_PORT_MONITOR			Serial
-#define SERIAL_PORT_HARDWARE		Serial
+#define SERIAL_PORT_MONITOR         Serial
+#define SERIAL_PORT_HARDWARE        Serial
 
 #endif

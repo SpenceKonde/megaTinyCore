@@ -40,7 +40,7 @@ extern "C"{
  // internal from VREF
 
  /* Values shifted to avoid clashing with ADC REFSEL defines
-	Will shift back in analog_reference function
+  Will shift back in analog_reference function
   */
 #define INTERNAL0V55 (VREF_ADC0REFSEL_0V55_gc >> VREF_ADC0REFSEL_gp)
 #define INTERNAL1V1 (VREF_ADC0REFSEL_1V1_gc >> VREF_ADC0REFSEL_gp)
@@ -68,13 +68,13 @@ extern "C"{
 #endif
 
 /* Allows performing a correction on the CPU value using the signature row 
-	values indicating oscillator error provided from the device manufacturer */
+  values indicating oscillator error provided from the device manufacturer */
 #define PERFORM_SIGROW_CORRECTION_F_CPU 0
 
 /* Variable containing corrected F_CPU value, after checks for safe operating
-	frequency vs supply voltage, oscillator fuse setting and MCLK divider.
-	Also includes the correction from signature row values if above #define
-	PERFORM_SIGROW_CORRECTION_F_CPU = 1 */
+  frequency vs supply voltage, oscillator fuse setting and MCLK divider.
+  Also includes the correction from signature row values if above #define
+  PERFORM_SIGROW_CORRECTION_F_CPU = 1 */
 extern uint32_t F_CPU_CORRECTED;
 
 uint16_t clockCyclesPerMicrosecondComp(uint32_t clk);
