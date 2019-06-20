@@ -47,7 +47,7 @@ atxy6.build.board=attinyx16
 atxy6.build.core=arduino
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
-atxy6.build.extra_flags=-DMILLIS_USE_TIMERB0 -DNO_EXTERNAL_I2C_PULLUP
+atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
 #atxy6.build.extra_flags=-B{runtime.tools.atpack.path}/gcc/dev/{build.mcu}
 
 atxy6.bootloader.tool=avrdude

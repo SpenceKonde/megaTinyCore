@@ -106,7 +106,7 @@ ISR(TCB0_INT_vect)
 
 	/* Clear flag */
 	#ifdef MILLIS_USE_TIMERA0
-	TCA0.SPLIT.INTFLAGS = TCA_LUNF_bm;
+	TCA0.SPLIT.INTFLAGS = TCA_SPLIT_LUNF_bm;
 	#else //timerb
 	_timer->INTFLAGS = TCB_CAPT_bm;
 	#endif
@@ -138,21 +138,22 @@ unsigned long micros() {
 	/* Get current number of overflows and timer count */
 	overflows = timer_overflow_count;
 	#ifdef MILLIS_USE_TIMERA0
-	ticks = 0xFF-TCA0.SPLIT.CNTL;
+	ticks = 0xFF-TCA0.SPLIT.LCNT;
 	#else
 	ticks = _timer->CNTL;
 	#endif
 	/* If the timer overflow flag is raised, we just missed it,
 	increment to account for it, & read new ticks */
 	#ifdef MILLIS_USE_TIMERA0
-	if(TCA0.SPLIT.INTFLAGS = TCA_LUNF_bm){
+	if(TCA0.SPLIT.INTFLAGS = TCA_SPLIT_LUNF_bm){
 		overflows++;
-		ticks = _timer->CNTL;
+		ticks = 0xFF-TCA0.SPLIT.LCNT;
+		
 	}
 	#else
 	if(_timer->INTFLAGS & TCB_CAPT_bm){
 		overflows++;
-		ticks = 0xFF-TCA0.SPLIT.LCNT;
+		ticks = _timer->CNTL;
 	}
 	#endif
 
@@ -407,8 +408,12 @@ void init()
 	millis_inc = microseconds_per_timer_overflow / 1000;
 	fract_inc = ((microseconds_per_timer_overflow % 1000));
 
+    #ifdef MILLIS_USE_TIMERA0
+    TCA0.SPLIT.INTCTRL |= TCA_SPLIT_LUNF_bm;
+    
+    #else //It's a type b timer
 	/* Default Periodic Interrupt Mode */
-	/* TOP value for overflow every 1024 clock cycles */
+	/* TOP value for overflow every 256 clock cycles */
 	_timer->CCMP = TIME_TRACKING_TIMER_PERIOD;
 
 	/* Enable timer interrupt */
@@ -419,6 +424,7 @@ void init()
 
 	/* Enable & start */
 	_timer->CTRLA |= TCB_ENABLE_bm;	/* Keep this last before enabling interrupts to ensure tracking as accurate as possible */
+	#endif
 
 /*************************** ENABLE GLOBAL INTERRUPTS *************************/
 
