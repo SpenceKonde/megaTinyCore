@@ -46,6 +46,8 @@ matrix:
       script:
         # Check for UTF-8 BOM file encoding
         - find "${TRAVIS_BUILD_DIR}" -path "${TRAVIS_BUILD_DIR}/.git" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/cores/arduino/api" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script" -prune -or -type f -exec grep --files-with-matches --binary-files=without-match $'\xEF\xBB\xBF' '{}' \; -exec echo 'UTF-8 BOM encoding detected.' \; -exec false '{}' +
+        # Check for files starting with a blank line
+        - find "${TRAVIS_BUILD_DIR}" -path "${TRAVIS_BUILD_DIR}/.git" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/cores/arduino/api" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/firmwares/MuxTO" -prune -or -type f -print0 | xargs --null --max-lines=1 bash -c 'head -1 "$0" | grep --binary-files=without-match --regexp="^$"; if [[ "$?" == "0" ]]; then echo "Blank line found at start of $0."; false; fi'
 
       after_script: true
 
