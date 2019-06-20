@@ -50,6 +50,8 @@ matrix:
         - find "${TRAVIS_BUILD_DIR}" -path "${TRAVIS_BUILD_DIR}/.git" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/cores/arduino/api" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/firmwares/MuxTO" -prune -or -type f -print0 | xargs --null --max-lines=1 bash -c 'head -1 "$0" | grep --binary-files=without-match --regexp="^$"; if [[ "$?" == "0" ]]; then echo "Blank line found at start of $0."; false; fi'
         # Check for tabs
         - find "${TRAVIS_BUILD_DIR}" -path "${TRAVIS_BUILD_DIR}/.git" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/cores/arduino/api" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/firmwares/MuxTO" -prune -or \( -not -name 'keywords.txt' -and -not -name '.gitmodules' -and -type f \) -exec grep --with-filename --line-number --binary-files=without-match --regexp=$'\t' '{}' \; -exec echo 'Tab found.' \; -exec false '{}' +
+        # Check for non-Unix line endings
+        - find "${TRAVIS_BUILD_DIR}" -path "${TRAVIS_BUILD_DIR}/.git" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/cores/arduino/api" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script" -prune -or -type f -exec grep --files-with-matches --binary-files=without-match --regexp=$'\r$' '{}' \; -exec echo 'Non-Unix EOL detected.' \; -exec false '{}' +
 
       after_script: true
 
