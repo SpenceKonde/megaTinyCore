@@ -83,7 +83,7 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 // (nSS)  (AIN4) PA4  0~  2|     |19  16~ PA3 (AIN3)(EXTCLK)
 //        (AIN5) PA5  1~  3|     |18  15  PA2 (AIN2)(MISO)
 // (DAC)  (AIN6) PA6  2   4|     |17  14  PA1 (AIN1)(MOSI)
-//        (AIN7) PA7  3   5|     |16      PA0 (nRESET/UPDI)
+//        (AIN7) PA7  3   5|     |16  17  PA0 (nRESET/UPDI)
 //        (AIN8) PB5  4   6|     |15  13  PC3
 //        (AIN9) PB4  5   7|     |14  12  PC2 
 // (RXD) (TOSC1) PB3  6   8|     |13  11  PC1
@@ -136,7 +136,8 @@ const uint8_t PROGMEM digital_pin_to_port[] = {
 	PC, // 11 PC1
 	PC, // 12 PC2
 	PC, // 13 PC3
-	PA, // 15 PA1
+	PA, // 14 PA1
+	PA, // 15 PA2
 	PA, // 16 PA2
 	PA  // 17 PA3
 };
@@ -159,9 +160,10 @@ const uint8_t PROGMEM digital_pin_to_bit_position[] = {
 	PIN1_bp, // 11 PC1
 	PIN2_bp, // 12 PC2
 	PIN3_bp, // 13 PC3
-	PIN1_bp, // 15 PA1
-	PIN2_bp, // 16 PA2
-	PIN3_bp  // 17 PA3
+	PIN1_bp, // 14 PA1
+	PIN2_bp, // 15 PA2
+	PIN3_bp, // 16 PA3
+	PIN0_bp  // 17 PA0
 };
 
 /* Use this for accessing PINnCTRL register */
@@ -182,9 +184,10 @@ const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
 	PIN1_bm, // 11 PC1
 	PIN2_bm, // 12 PC2
 	PIN3_bm, // 13 PC3
-	PIN1_bm, // 15 PA1
-	PIN2_bm, // 16 PA2
-	PIN3_bm  // 17 PA3
+	PIN1_bm, // 14 PA1
+	PIN2_bm, // 15 PA2
+	PIN3_bm, // 16 PA3
+	PIN0_bm  // 17 PA0
 };
 
 const uint8_t PROGMEM digital_pin_to_timer[] = {
@@ -205,8 +208,9 @@ const uint8_t PROGMEM digital_pin_to_timer[] = {
 	NOT_ON_TIMER, 	// 12 PC2
 	NOT_ON_TIMER, 	// 13 PC3
 	NOT_ON_TIMER, 	// 14 PA1
-	NOT_ON_TIMER, 		// 15 PA2
-	TIMERA0  	// 16 PA3
+	NOT_ON_TIMER, 	// 15 PA2
+	TIMERA0,  		// 16 PA3
+	NOT_ON_TIMER 	// 17 PA0
   
   
 };
