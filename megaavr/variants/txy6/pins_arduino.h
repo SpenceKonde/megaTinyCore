@@ -204,9 +204,9 @@ const uint8_t PROGMEM digital_pin_to_timer[] = {
 	NOT_ON_TIMER, 	// 11 PC1
 	NOT_ON_TIMER, 	// 12 PC2
 	NOT_ON_TIMER, 	// 13 PC3
-	NOT_ON_TIMER, 	// 15 PA1
-	TIMERA0, 		// 16 PA2
-	NOT_ON_TIMER  	// 17 PA3
+	NOT_ON_TIMER, 	// 14 PA1
+	NOT_ON_TIMER, 		// 15 PA2
+	TIMERA0  	// 16 PA3
   
   
 };
