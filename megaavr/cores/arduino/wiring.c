@@ -202,9 +202,9 @@ void delayMicroseconds(unsigned int us)
   // delay requested.
   us *= 6; // x6 us, = 7 cycles
 
-  // account for the time taken in the preceeding commands.
+  // account for the time taken in the preceding commands.
   // we just burned 22 (24) cycles above, remove 5, (5*4=20)
-  // us is at least 6 so we can substract 5
+  // us is at least 6 so we can subtract 5
   us -= 5; //=2 cycles
 
 #elif F_CPU >= 20000000L
@@ -224,9 +224,9 @@ void delayMicroseconds(unsigned int us)
   // delay requested.
   us = (us << 2) + us; // x5 us, = 7 cycles
 
-  // account for the time taken in the preceeding commands.
+  // account for the time taken in the preceding commands.
   // we just burned 26 (28) cycles above, remove 7, (7*4=28)
-  // us is at least 10 so we can substract 7
+  // us is at least 10 so we can subtract 7
   us -= 7; // 2 cycles
 
 #elif F_CPU >= 16000000L
@@ -241,9 +241,9 @@ void delayMicroseconds(unsigned int us)
   // delay requested.
   us <<= 2; // x4 us, = 4 cycles
 
-  // account for the time taken in the preceeding commands.
+  // account for the time taken in the preceding commands.
   // we just burned 19 (21) cycles above, remove 5, (5*4=20)
-  // us is at least 8 so we can substract 5
+  // us is at least 8 so we can subtract 5
   us -= 5; // = 2 cycles,
 
 #elif F_CPU >= 12000000L
@@ -258,9 +258,9 @@ void delayMicroseconds(unsigned int us)
   // delay requested.
   us = (us << 1) + us; // x3 us, = 5 cycles
 
-  // account for the time taken in the preceeding commands.
+  // account for the time taken in the preceding commands.
   // we just burned 20 (22) cycles above, remove 5, (5*4=20)
-  // us is at least 6 so we can substract 5
+  // us is at least 6 so we can subtract 5
   us -= 5; //2 cycles
 
 #elif F_CPU >= 8000000L
@@ -275,9 +275,9 @@ void delayMicroseconds(unsigned int us)
   // delay requested.
   us <<= 1; //x2 us, = 2 cycles
 
-  // account for the time taken in the preceeding commands.
+  // account for the time taken in the preceding commands.
   // we just burned 17 (19) cycles above, remove 4, (4*4=16)
-  // us is at least 6 so we can substract 4
+  // us is at least 6 so we can subtract 4
   us -= 4; // = 2 cycles
 
 #else
@@ -285,9 +285,9 @@ void delayMicroseconds(unsigned int us)
 
   // the overhead of the function calls is 14 (16) cycles
   if (us <= 16) return; //= 3 cycles, (4 when true)
-  if (us <= 25) return; //= 3 cycles, (4 when true), (must be at least 25 if we want to substract 22)
+  if (us <= 25) return; //= 3 cycles, (4 when true), (must be at least 25 if we want to subtract 22)
 
-  // compensate for the time taken by the preceeding and next commands (about 22 cycles)
+  // compensate for the time taken by the preceding and next commands (about 22 cycles)
   us -= 22; // = 2 cycles
   // the following loop takes 4 microseconds (4 cycles)
   // per iteration, so execute it us/4 times
