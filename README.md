@@ -9,3 +9,6 @@ Arduino core for the new megaAVR ATtiny series chips - highly experimental (not 
 * Other chips are not ready, but may be close. Preliminary pin mapping proposal for 1614/814/414/804/404. 
 * We have a timer shortage on most of these chips, because one of the type b timers is used for millis, meaning it can't be used for tone (or servo, or anything else). 
 * Pretty sure burn bootloader sets OSCCFG wrong, resulting in all the timing being wrong. (#29)
+
+# Known Compiler Bugs
+* Sometimes a sketch which is too big to fit will, instead of generating a message saying that, result in the error: 'relocation truncated to fit: R_AVR_13_PCREL against symbol tablejump2'
