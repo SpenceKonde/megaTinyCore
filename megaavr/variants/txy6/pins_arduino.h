@@ -26,15 +26,14 @@
 #include <avr/pgmspace.h>
 #include "timers.h"
 
-#define NUM_ANALOG_INPUTS           11
+#define NUM_ANALOG_INPUTS           12
 //#define NUM_RESERVED_PINS           0 // (TOSC1/2, VREF, RESET, DEBUG USART Rx/Tx)
 //#define NUM_INTERNALLY_USED_PINS    0 // (2 x Chip select + 2 x UART + 4 x IO + LED_BUILTIN + 1 unused pin)
 #define NUM_I2C_PINS                2 // (SDA / SCL)
 #define NUM_SPI_PINS                3 // (MISO / MOSI / SCK)
-#define NUM_TOTAL_PINS              17
-#define ANALOG_INPUT_OFFSET         0
+#define NUM_TOTAL_PINS              18
 
-#define EXTERNAL_NUM_INTERRUPTS     17
+#define EXTERNAL_NUM_INTERRUPTS     18
 
 #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 7 || (p) == 8 || (p) == 9 || (p) == 16)
 
@@ -80,7 +79,7 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 // ATtiny1616 / ARDUINO
 //                          _____ 
 //                  VDD   1|*    |20  GND
-// (nSS)  (AIN4) PA4  0~  2|     |19  16~ PA3 (AIN3)(EXTCLK)
+// (nSS)  (AIN4) PA4  0~  2|     |19  16~ PA3 (AIN3)(SCK)(EXTCLK)
 //        (AIN5) PA5  1~  3|     |18  15  PA2 (AIN2)(MISO)
 // (DAC)  (AIN6) PA6  2   4|     |17  14  PA1 (AIN1)(MOSI)
 //        (AIN7) PA7  3   5|     |16  17  PA0 (AIN0/nRESET/UPDI)

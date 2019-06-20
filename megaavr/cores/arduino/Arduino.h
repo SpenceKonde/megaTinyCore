@@ -120,9 +120,9 @@ bool isDoubleBondedActive(uint8_t pin);
 
 #define digitalPinToPort(pin) ( (pin < NUM_TOTAL_PINS) ? pgm_read_byte(digital_pin_to_port + pin) : NOT_A_PIN )
 #define digitalPinToBitPosition(pin) ( (pin < NUM_TOTAL_PINS) ? pgm_read_byte(digital_pin_to_bit_position + pin) : NOT_A_PIN )
-#define analogPinToBitPosition(pin) ( (pin < NUM_ANALOG_INPUTS) ? pgm_read_byte(digital_pin_to_bit_position + pin + ANALOG_INPUT_OFFSET) : NOT_A_PIN )
+#define analogPinToBitPosition(pin) ( (pin < NUM_ANALOG_INPUTS) ? pgm_read_byte(digital_pin_to_bit_position + pin + 0) : NOT_A_PIN ) //THIS IS WRONG
 #define digitalPinToBitMask(pin) ( (pin < NUM_TOTAL_PINS) ? pgm_read_byte(digital_pin_to_bit_mask + pin) : NOT_A_PIN )
-#define analogPinToBitMask(pin) ( (pin < NUM_ANALOG_INPUTS) ? pgm_read_byte(digital_pin_to_bit_mask + pin + ANALOG_INPUT_OFFSET) : NOT_A_PIN )
+#define analogPinToBitMask(pin) ( (pin < NUM_ANALOG_INPUTS) ? pgm_read_byte(digital_pin_to_bit_mask + pin + 0) : NOT_A_PIN ) //THIS IS WRONG
 #define digitalPinToTimer(pin) ( (pin < NUM_TOTAL_PINS) ? pgm_read_byte(digital_pin_to_timer + pin) : NOT_ON_TIMER )
 
 #define portToPortStruct(port) ( (port < NUM_TOTAL_PORTS) ? ((PORT_t *)&PORTA + port) : NULL)
