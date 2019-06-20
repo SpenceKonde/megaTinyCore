@@ -26,7 +26,7 @@
 #include <avr/pgmspace.h>
 #include "timers.h"
 
-#define NUM_DIGITAL_PINS            11 // 
+#define NUM_DIGITAL_PINS            11 //
 #define NUM_ANALOG_INPUTS           9
 //#define NUM_RESERVED_PINS           0 // (TOSC1/2, VREF, RESET, DEBUG USART Rx/Tx)
 //#define NUM_INTERNALLY_USED_PINS    0 // (2 x Chip select + 2 x UART + 4 x IO + LED_BUILTIN + 1 unused pin)
@@ -109,7 +109,7 @@ static const uint8_t A10 = PIN_A10;
 // pins are a separate set.
 
 // ATtiny1614 / ARDUINO
-//                          _____ 
+//                          _____
 //                  VDD   1|*    |20  GND
 // (nSS)  (AIN4) PA4  0~  2|     |19  10~ PA3 (AIN3)(EXTCLK)
 //        (AIN5) PA5  1~  3|     |18  9   PA2 (AIN2)(MISO)
@@ -117,10 +117,10 @@ static const uint8_t A10 = PIN_A10;
 //        (AIN7) PA7  3   5|     |16      PA0 (nRESET/UPDI)
 // (RXD) (TOSC1) PB3  4   6|     |15  7   PB0 (AIN11)(SCL)
 // (TXD) (TOSC2) PB2  5   7|_____|14  6   PB1 (AIN10)(SDA)
-//               
+//
 //
 
-/* 
+/*
 PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       AC1       AC2       DAC0      USART0    SPI0      TWI0      TCA(PWM)  TCBn      TCD0      CCL
 0      A0 or SS     PA4                 AIN4      AIN0      X0/Y0                                             XDIR      SS                  WO4                 WOA       LUT0-OUT
 1      A1           PA5       VREFA     AIN5      AIN1      X1/Y1     OUT       AINN0                                                       WO5       TCB0 WO   WOB
@@ -128,7 +128,7 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
 3      A3           PA7                 AIN7      AIN3      X3/Y3     AINP0     AINP0     AINN0                                                                           LUT1-OUT
 6      RX           PB3       TOSC1                                             OUT                           RxD                           *WO0
 7      TX           PB2       TOSC2 /                                                     OUT                 TxD                           WO2
-                              EVOUT1                                                      
+                              EVOUT1
 8      SDA          PB1                 AIN10               X4/Y4     AINP2                                   XCK                 SDA       WO1
 9      SCL          PB0                 AIN11               X5/Y5               AINP2     AINP1               XDIR                SCL       WO0
 14     MOSI         PA1                 AIN1                                                                  *TxD      MOSI      *SDA                                    LUT0-IN1
@@ -137,11 +137,11 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
 NA     VDD          VDD
 NA     GND          GND
 NA?    UPDI         PA0       RESET/    AIN0                                                                                                                              LUT1-IN0
-                              UPDI        
-    * alternative pin locations           
+                              UPDI
+    * alternative pin locations
 */
 
-const uint8_t PROGMEM digital_pin_to_port[] = { 
+const uint8_t PROGMEM digital_pin_to_port[] = {
     // Left side, top to bottom
     PA, // 0  PA4
     PA, // 1  PA5
@@ -175,7 +175,7 @@ const uint8_t PROGMEM digital_pin_to_bit_position[] = {
 };
 
 /* Use this for accessing PINnCTRL register */
-const uint8_t PROGMEM digital_pin_to_bit_mask[] = { 
+const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
     // Left side, top to bottom
     PIN4_bm, // 0  PA4
     PIN5_bm, // 1  PA5
@@ -205,8 +205,8 @@ const uint8_t PROGMEM digital_pin_to_timer[] = {
     NOT_ON_TIMER,   // 8  PA1
     TIMERA0,        // 9  PA2
     NOT_ON_TIMER    // 10 PA3
-  
-  
+
+
 };
 /*
 const uint8_t PROGMEM analog_pin_to_channel[] = {

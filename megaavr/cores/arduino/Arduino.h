@@ -67,7 +67,7 @@ extern "C"{
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
 
-/* Allows performing a correction on the CPU value using the signature row 
+/* Allows performing a correction on the CPU value using the signature row
   values indicating oscillator error provided from the device manufacturer */
 #define PERFORM_SIGROW_CORRECTION_F_CPU 0
 

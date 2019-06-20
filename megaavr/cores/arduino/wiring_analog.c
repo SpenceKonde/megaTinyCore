@@ -74,9 +74,9 @@ int analogRead(uint8_t pin)
 {
   pin = digitalPinToAnalogInput(pin);
   if(pin > NUM_ANALOG_INPUTS) return NOT_A_PIN;
-  
-  /* Check if TWI is operating on double bonded pin (Master Enable is high 
-    in both Master and Slave mode for bus error detection, so this can 
+
+  /* Check if TWI is operating on double bonded pin (Master Enable is high
+    in both Master and Slave mode for bus error detection, so this can
     indicate an active state for Wire) */
   if(isDoubleBondedActive(pin)) return 0;
 
@@ -131,13 +131,13 @@ void analogWrite(uint8_t pin, int val)
     uint8_t digital_pin_timer =  digitalPinToTimer(pin);
 
     uint8_t* timer_cmp_out;
-    
+
     TCB_t *timer_B;
     /* Find out Port and Pin to correctly handle port mux, and timer. */
     switch (digital_pin_timer) { //use only low nybble which defines which timer it is
 
       case TIMERA0:
-        
+
         /* Calculate correct compare buffer register */
         if (bit_pos>2) {
           bit_pos-=3;
@@ -155,7 +155,7 @@ void analogWrite(uint8_t pin, int val)
       case TIMERB1:
       case TIMERB2:
       case TIMERB3:
-        
+
 
         /* Get pointer to timer, TIMERB0 order definition in Arduino.h*/
         //assert (((TIMERB0 - TIMERB3) == 2));

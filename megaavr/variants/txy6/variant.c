@@ -11,11 +11,11 @@ void setup_timers() {
 
   /* PORTMUX setting for TCA */
   PORTMUX.CTRLA = PORTMUX_TCA00_DEFAULT_gc;
-  
+
   /* Enable Split Mode */
   TCA0.SPLIT.CTRLD = TCA_SPLIT_SPLITM_bm;
 
-  //Only 1 WGM so no need to specifically set up. 
+  //Only 1 WGM so no need to specifically set up.
 
   /* Period setting, 8-bit register in SPLIT mode */
   TCA0.SPLIT.LPER = PWM_TIMER_PERIOD;
@@ -37,7 +37,7 @@ void setup_timers() {
   /*  TYPE B TIMERS  */
 
   /* PORTMUX alternate location needed for TCB0 & 1, TCB2 is default location */
-  //TODO - As part of the timer wrangling involved in #16 and related issues, this stuff needs to be changed. 
+  //TODO - As part of the timer wrangling involved in #16 and related issues, this stuff needs to be changed.
   #if defined(TCBROUTEA)
   PORTMUX.TCBROUTEA |= (PORTMUX_TCB0_bm | PORTMUX_TCB1_bm);
   #endif
@@ -48,7 +48,7 @@ void setup_timers() {
   /* Timer B Setup loop for TCB[0:2] */
   #ifdef TCB1
   do{
-  #endif 
+  #endif
     /* 8 bit PWM mode, but do not enable output yet, will do in analogWrite() */
     timer_B->CTRLB = (TCB_CNTMODE_PWM8_gc);
 
@@ -69,7 +69,7 @@ void setup_timers() {
 
   /* Stop when pointing to TCB3 */
   // } while (timer_B < (TCB_t *)&TCB3);
-  
+
   // ATtiny only uses up to TCB1
   /* Stop when pointing to TCB1 */
   #ifdef TCB1
@@ -100,12 +100,12 @@ void setup_timers() {
 FORCE_INLINE bool isDoubleBondedActive(uint8_t pin) {
   (void)pin;
 
-  /* Check if TWI is operating on double bonded pin (Master Enable is high 
-  in both Master and Slave mode for bus error detection, so this can 
+  /* Check if TWI is operating on double bonded pin (Master Enable is high
+  in both Master and Slave mode for bus error detection, so this can
   indicate an active state for Wire) */
   //if(((pin == PIN_A4) || (pin == PIN_A5)) && (TWI0.MCTRLA & TWI_ENABLE_bm)) return true;
 
-  /* Special check for SPI_SS double bonded pin -- no action if SPI is active 
+  /* Special check for SPI_SS double bonded pin -- no action if SPI is active
     (Using SPI Enable bit as indicator of SPI activity) */
   //if((pin == 10) && (SPI0.CTRLA & SPI_ENABLE_bm)) return true;
 

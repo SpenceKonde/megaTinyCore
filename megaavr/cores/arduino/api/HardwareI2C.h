@@ -29,7 +29,7 @@ class HardwareI2C : public Stream
     virtual void end() = 0;
 
     virtual void setClock(uint32_t freq) = 0;
-  
+
     virtual void beginTransmission(uint8_t address) = 0;
     virtual uint8_t endTransmission(bool stopBit) = 0;
     virtual uint8_t endTransmission(void) = 0;

@@ -19,7 +19,7 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
-  
+
   Modified 24 November 2006 by David A. Mellis
   Modified 1 August 2010 by Mark Sproul
 */
@@ -131,7 +131,7 @@ static void port_interrupt_handler(uint8_t port) {
       }
     }
     bit_pos++;
-    bit_mask = (bit_mask << 1); 
+    bit_mask = (bit_mask << 1);
   }
 
   /* Clear flags that have been handled */

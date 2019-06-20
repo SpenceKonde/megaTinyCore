@@ -75,7 +75,7 @@ class SPISettings {
     // inverted, so the bits form increasing numbers. Also note that
     // fosc/64 appears twice.  If FOSC is 16 Mhz
     // PRESC[1:0]  ~SPI2X Freq
-    //   0    0     0   fosc/2    8.00 MHz 
+    //   0    0     0   fosc/2    8.00 MHz
     //   0    0     1   fosc/4    4.00 MHz
     //   0    1     0   fosc/8    2.00 MHz
     //   0    1     1   fosc/16   1.00 MHz
@@ -89,34 +89,34 @@ class SPISettings {
     // is 2 ^^ (clock_div + 1). If nothing is slow enough, we'll use the
     // slowest (128 == 2 ^^ 7, so clock_div = 6).
     uint8_t clockDiv;
-    
+
     // When the clock is known at compile time, use this if-then-else
     // cascade, which the compiler knows how to completely optimize
     // away. When clock is not known, use a loop instead, which generates
     // shorter code.
-    
+
     /*  This is no longer the case since, F_CPU_CORRECTED is variable */
     /*  set at run time.                                             */
 
-    uint32_t clockSetting = 0; 
-    
+    uint32_t clockSetting = 0;
+
     clockSetting = F_CPU_CORRECTED / 2;
     clockDiv = 0;
     while ((clockDiv < 6) && (clock < clockSetting)) {
       clockSetting /= 2;
       clockDiv++;
     }
-        
+
     // Compensate for the duplicate fosc/64,
     // should be fosc/128 if clockdiv 6.
     if (clockDiv == 6)
     {
       clockDiv++;
     }
-        
+
     // Invert the SPI2X bit
     clockDiv ^= 0x1;
-        
+
     /* Pack into the SPISettings::ctrlb class */
     /* Set mode, disable master slave select, and disable buffering. */
     /* dataMode is register correct, when using SPI_MODE defines     */
@@ -124,20 +124,20 @@ class SPISettings {
             (SPI_SSD_bm)          |
             (0 << SPI_BUFWR_bp)   |
             (0 << SPI_BUFEN_bp);
-                
+
     /* Get Clock related values.*/
     uint8_t clockDiv_mult = (clockDiv & 0x1);
     uint8_t clockDiv_pres = (clockDiv >> 1);
-        
+
     /* Pack into the SPISettings::ctrlb class     */
     /* Set Prescaler, x2, SPI to Master, and Bit Order. */
-    
+
     ctrla = (clockDiv_pres  << SPI_PRESC_gp)        |
             (clockDiv_mult << SPI_CLK2X_bp)         |
             (SPI_ENABLE_bm)                         |
             (SPI_MASTER_bm)                         |
             ((bitOrder == LSBFIRST) << SPI_DORD_bp);
-    
+
   }
   /* member variables containing the desired SPI settings */
   uint8_t ctrla;
