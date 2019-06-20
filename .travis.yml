@@ -10,6 +10,31 @@ env:
 
 matrix:
   include:
+    - name: 'arduino-ci-script Extra Library Checks'
+
+      language: minimal
+
+      install:
+        # The Arduino IDE must be installed for check_keywords_txt to check the REFERENCE_LINK field
+        - install_ide "newest"
+
+      script:
+        # Check for common problems with the library structure
+        # https://github.com/per1234/arduino-ci-script#check_library_structure-basepath-depth
+        - check_library_structure "${TRAVIS_BUILD_DIR}/megaavr/libraries" '1'
+
+        # Check for common problems with library.properties
+        # https://github.com/per1234/arduino-ci-script#check_library_properties-searchpath-maximumsearchdepth
+        - check_library_properties "${TRAVIS_BUILD_DIR}/megaavr/libraries" '1'
+
+        # Check for common problems with keywords.txt
+        # https://github.com/per1234/arduino-ci-script#check_keywords_txt-searchpath-maximumsearchdepth
+        - check_keywords_txt "${TRAVIS_BUILD_DIR}/megaavr/libraries" '1'
+
+      # Override the default phase definition
+      after_script: true
+
+
     # Compilation tests
     # Compile the "01.Basics" examples bundled with the Arduino IDE for every board configuration using the newest version of the Arduino IDE
     - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=3216' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/01.Basics" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
