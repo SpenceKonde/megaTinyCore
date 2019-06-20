@@ -54,6 +54,25 @@ matrix:
       after_script: true
 
 
+    - name: 'Spell Check'
+
+      language: python
+      python: 3.6
+
+      before_install: true
+
+      install:
+        # Install codespell
+        # https://github.com/codespell-project/codespell
+        - pip install codespell
+
+      script:
+        # In the event of a false positive, add the word in all lower case to /megaavr/travis-ci/codespell-ignore-words-list.txt
+        - codespell --ignore-words="${TRAVIS_BUILD_DIR}/megaavr/travis-ci/codespell-ignore-words-list.txt" --skip="${TRAVIS_BUILD_DIR}/.git","${TRAVIS_BUILD_DIR}/megaavr/cores/arduino/api","${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script","${TRAVIS_BUILD_DIR}/megaavr/firmwares/MuxTO" "${TRAVIS_BUILD_DIR}"
+
+      after_script: true
+
+
     # Compilation tests
     # Compile the "01.Basics" examples bundled with the Arduino IDE for every board configuration using the newest version of the Arduino IDE
     - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=3216' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/01.Basics" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
