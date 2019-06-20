@@ -1,0 +1,167 @@
+# This file is used to configure the Travis CI tests of MegaCore
+
+env:
+  global:
+    # The Arduino IDE will be installed at APPLICATION_FOLDER/arduino
+    - APPLICATION_FOLDER="${HOME}/arduino-ide"
+    - SKETCHBOOK_FOLDER="${HOME}/Arduino"
+    - FULL_IDE_VERSION_LIST='("1.6.7" "1.6.9" "1.6.13" "1.8.6" "newest")'
+
+
+matrix:
+  include:
+    # Compilation tests
+    # Compile the "01.Basics" examples bundled with the Arduino IDE for every board configuration using the newest version of the Arduino IDE
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=3216' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/01.Basics" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=1616' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/01.Basics" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=816' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/01.Basics" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/01.Basics" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=1606' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/01.Basics" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=806' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/01.Basics" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/01.Basics" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+
+    # Compile the "02.Digital" examples bundled with the Arduino IDE for every board configuration using the newest version of the Arduino IDE
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=3216' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/02.Digital" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=1616' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/02.Digital" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=816' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/02.Digital" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/02.Digital" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=1606' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/02.Digital" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=806' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/02.Digital" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/02.Digital" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+
+    # Compile the "03:Analog" examples bundled with the Arduino IDE for every board configuration using the newest version of the Arduino IDE
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=3216' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/03.Analog" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=1616' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/03.Analog" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=816' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/03.Analog" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/03.Analog" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=1606' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/03.Analog" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=806' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/03.Analog" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/03.Analog" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
+
+    # Compile every example sketch for every library included with megaTinyCore for every board configuration and every installed IDE version
+    # ATtiny3216
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=3216' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+
+    # ATtiny1616
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=1616' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+
+    # ATtiny816
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=816' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+
+    # ATtiny416
+    # EEPROM library: some examples sketches fail due to exceeding the available memory
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_clear" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_crc" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # The eeprom_get example exceeds the available flash memory
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_get" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_iteration" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_put" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_read" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_update" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_write" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # SoftwareSerial library
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/SoftwareSerial/examples/SoftwareSerialExample" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # The TwoPortReceive example fails to compile for this chip due to exceeding the available flash memory
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/SoftwareSerial/examples/TwoPortReceive" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # SPI library
+    # The BarometricPressureSensor example fails to compile for this chip due to exceeding the available flash memory?
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/SPI/examples/BarometricPressureSensor" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/SPI/examples/DigitalPotControl" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # Wire library
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/digital_potentiometer" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # The master_reader example fails to compile for this chip due to exceeding the available flash memory?
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/master_reader" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/master_writer" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # The SFRRanger_reader example fails to compile for this chip due to exceeding the available flash memory?
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/SFRRanger_reader" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # The slave_receiver example fails to compile for this chip due to exceeding the available flash memory?
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/slave_receiver" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/slave_sender" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+
+    # ATtiny1606
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=1606' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+
+    # ATtiny806
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=806' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+
+    # ATtiny406
+    # EEPROM library: some examples sketches fail due to exceeding the available memory
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_clear" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_crc" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # The eeprom_get example exceeds the available flash memory
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_get" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_iteration" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_put" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_read" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_update" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/EEPROM/examples/eeprom_write" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # SoftwareSerial library
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/SoftwareSerial/examples/SoftwareSerialExample" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # The TwoPortReceive example fails to compile for this chip due to exceeding the available flash memory
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=416' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/SoftwareSerial/examples/TwoPortReceive" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # SPI library
+    # The BarometricPressureSensor example fails to compile for this chip due to exceeding the available flash memory?
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/SPI/examples/BarometricPressureSensor" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/SPI/examples/DigitalPotControl" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # Wire library
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/digital_potentiometer" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # The master_reader example fails to compile for this chip due to exceeding the available flash memory?
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/master_reader" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/master_writer" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # The SFRRanger_reader example fails to compile for this chip due to exceeding the available flash memory?
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/SFRRanger_reader" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    # The slave_receiver example fails to compile for this chip due to exceeding the available flash memory?
+    #- env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/slave_receiver" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+    - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=406' SKETCH_PATH="${SKETCHBOOK_FOLDER}/hardware/megaTinyCore/megaavr/libraries/Wire/examples/slave_sender" ALLOW_FAILURE='false' IDE_VERSION_LIST="$FULL_IDE_VERSION_LIST"
+
+
+# Global definitions to be used by all jobs that don't define their own
+language: generic
+
+before_install:
+  # Install the script used to simplify use of Travis CI for testing Arduino projects
+  - source "${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script/arduino-ci-script.sh"
+
+  # These functions can be used to get verbose output for debugging the script
+  # set_script_verbosity can be set to values from 0 - 2 (verbosity off - maximum verbosity)
+  #- set_script_verbosity 2
+  # Setting set_verbose_output_during_compilation to true is the same as File > Preferences > Show verbose output during > compilation (check) in the Arduino IDE
+  #- set_verbose_output_during_compilation "true"
+
+  - set_application_folder "$APPLICATION_FOLDER"
+  - set_sketchbook_folder "$SKETCHBOOK_FOLDER"
+
+install:
+  # Check for board definition errors that don't affect compilation
+  - set_board_testing 'true'
+
+  # Check for library issues that don't affect compilation
+  - set_library_testing 'true'
+
+  # Install the IDE versions needed for the tests
+  - install_ide "$IDE_VERSION_LIST"
+
+  # Install megaTinyCore from the repository
+  - install_package
+  # Install Arduino megaAVR Boards so that the necessary tools are available
+  - install_package 'arduino:megaavr'
+
+script:
+  # Verify every sketch in SKETCH_PATH using the environment variables set in the matrix
+  - build_sketch "$SKETCH_PATH" "$BOARD_ID" "$ALLOW_FAILURE" "$START_IDE_VERSION" "$END_IDE_VERSION"
+
+after_script:
+  # Determine user name and repository name from TRAVIS_REPO_SLUG so the configuration will automatically adjust to forks
+  - USER_NAME="$(echo "$TRAVIS_REPO_SLUG" | cut -d'/' -f 1)"
+  - REPOSITORY_NAME="$(echo "$TRAVIS_REPO_SLUG" | cut -d'/' -f 2)"
+  # Commit a report of the job results to a folder named with the build number in the MegaCore branch of the Travis-build-outputs repository
+  - publish_report_to_repository "$REPORT_GITHUB_TOKEN" "https://github.com/${USER_NAME}/CI-Reports.git" "$REPOSITORY_NAME" "build_$(printf "%05d\n" "${TRAVIS_BUILD_NUMBER}")" 'false'
+
+  # Print a tab separated report of all sketch verification results to the log
+  - display_report
+
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
