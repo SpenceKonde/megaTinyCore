@@ -35,6 +35,21 @@ matrix:
       after_script: true
 
 
+    - name: 'File Formatting Checks'
+
+      language: minimal
+
+      before_install: true
+
+      install: true
+
+      script:
+        # Check for UTF-8 BOM file encoding
+        - find "${TRAVIS_BUILD_DIR}" -path "${TRAVIS_BUILD_DIR}/.git" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/cores/arduino/api" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script" -prune -or -type f -exec grep --files-with-matches --binary-files=without-match $'\xEF\xBB\xBF' '{}' \; -exec echo 'UTF-8 BOM encoding detected.' \; -exec false '{}' +
+
+      after_script: true
+
+
     # Compilation tests
     # Compile the "01.Basics" examples bundled with the Arduino IDE for every board configuration using the newest version of the Arduino IDE
     - env: BOARD_ID='megaTinyCore:megaavr:atxy6:chip=3216' SKETCH_PATH="${APPLICATION_FOLDER}/arduino/examples/01.Basics" ALLOW_FAILURE='false' IDE_VERSION_LIST='newest'
