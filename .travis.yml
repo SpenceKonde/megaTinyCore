@@ -56,6 +56,8 @@ matrix:
         - find "${TRAVIS_BUILD_DIR}" -path "${TRAVIS_BUILD_DIR}/.git" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/cores/arduino/api" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script" -prune -or -type f -exec grep --with-filename --line-number --binary-files=without-match --regexp='[[:blank:]]$' '{}' \; -exec echo 'Trailing whitespace found.' \; -exec false '{}' +
         # Check for extra blank lines at end of files
         - find "${TRAVIS_BUILD_DIR}" -path "${TRAVIS_BUILD_DIR}/.git" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/cores/arduino/api" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/firmwares/MuxTO" -prune -or -type f -print0 | xargs --null --max-lines=1 bash -c 'tail -1 "$0" | grep --binary-files=without-match --regexp="^$"; if [[ "$?" == "0" ]]; then echo "Blank line found at end of $0."; false; fi'
+        # Check for files that don't end in a newline (https://stackoverflow.com/a/25686825)
+        - find "${TRAVIS_BUILD_DIR}" -path "${TRAVIS_BUILD_DIR}/.git" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/cores/arduino/api" -prune -or -path "${TRAVIS_BUILD_DIR}/megaavr/travis-ci/arduino-ci-script" -prune -or -type f -print0 | xargs --null --max-lines=1 bash -c 'if test "$(grep --files-with-matches --binary-files=without-match --max-count=1 --regexp='.*' "$0")" && test "$(tail --bytes=1 "$0")"; then echo "No new line at end of $0."; false; fi'
 
       after_script: true
 
