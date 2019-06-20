@@ -33,4 +33,3 @@ void operator delete(void * ptr) {
 void operator delete[](void * ptr) {
   free(ptr);
 }
-

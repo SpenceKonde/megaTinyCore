@@ -48,4 +48,3 @@ sed "s/%%VERSION%%/${VERSION}/" |
 sed "s/%%FILENAME%%/${FILENAME}/" |
 sed "s/%%CHECKSUM%%/${CHKSUM}/" |
 sed "s/%%SIZE%%/${SIZE}/" > package_avr-hourly-build_index.json
-

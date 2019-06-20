@@ -30,4 +30,3 @@ tar --transform "s|$FOLDERNAME|$FOLDERNAME-$VERSION|g"  --exclude=extras/** --ex
 cd -
 
 mv ../avr-$VERSION.tar.bz2 .
-

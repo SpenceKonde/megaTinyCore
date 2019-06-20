@@ -52,4 +52,3 @@ void loop() { // run over and over
     mySerial.write(Serial.read());
   }
 }
-

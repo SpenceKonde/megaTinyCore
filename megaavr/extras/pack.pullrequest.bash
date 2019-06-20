@@ -47,4 +47,3 @@ sed s/%%VERSION%%/${VERSION}-build-${BUILD_NUMBER}/ |
 sed s/%%FILENAME%%/${FILENAME}/ |
 sed s/%%CHECKSUM%%/${CHKSUM}/ |
 sed s/%%SIZE%%/${SIZE}/ > package_avr-b${BUILD_NUMBER}_index.json
-
