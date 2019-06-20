@@ -68,13 +68,13 @@ static volatile TCB_t* _timer =
 #elif defined(MILLIS_USE_TIMERB3)
 &TCB3;
 #else
-#error "No millis timer selected. 
+#error "No millis timer selected". 
 #endif
 #endif
 
 #if defined(MILLIS_USE_TIMERA0)
 ISR(TCA0_LUNF_vect)
-#if defined(MILLIS_USE_TIMERB0)
+#elif defined(MILLIS_USE_TIMERB0)
 ISR(TCB0_INT_vect)
 #elif defined(MILLIS_USE_TIMERB1)
 ISR(TCB1_INT_vect)
@@ -152,7 +152,7 @@ unsigned long micros() {
 	#else
 	if(_timer->INTFLAGS & TCB_CAPT_bm){
 		overflows++;
-		ticks = 0xFF-TCA0.SPLIT.CNTL;
+		ticks = 0xFF-TCA0.SPLIT.LCNT;
 	}
 	#endif
 
