@@ -266,7 +266,7 @@ const uint8_t PROGMEM analog_pin_to_channel[] = {
 //extern const uint8_t analog_pin_to_channel[];
 // #define digitalPinToAnalogInput(p)  ((p < NUM_ANALOG_INPUTS) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN )
 //#define digitalPinToAnalogInput(p) 		(((p) < 6 || (p) == 8 || (p) == 9 || (p) > 13) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN)
-#define digitalPinToAnalogInput(p)      ((p<6)?(p+4):((p>13)?(p-13):((p==8)?10:(p==9?11:NOT_A_PIN))))
+#define digitalPinToAnalogInput(p)      ((p<6)?(p+4):(p==17?0:((p>13)?(p-13):((p==8)?10:(p==9?11:NOT_A_PIN)))))
 
 
 // These serial port names are intended to allow libraries and architecture-neutral
