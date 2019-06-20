@@ -83,11 +83,11 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 // (nSS)  (AIN4) PA4  0~  2|     |19  16~ PA3 (AIN3)(EXTCLK)
 //        (AIN5) PA5  1~  3|     |18  15  PA2 (AIN2)(MISO)
 // (DAC)  (AIN6) PA6  2   4|     |17  14  PA1 (AIN1)(MOSI)
-//        (AIN7) PA7  3   5|     |16  17  PA0 (nRESET/UPDI)
+//        (AIN7) PA7  3   5|     |16  17  PA0 (AIN0/nRESET/UPDI)
 //        (AIN8) PB5  4   6|     |15  13  PC3
 //        (AIN9) PB4  5   7|     |14  12  PC2 
-// (RXD) (TOSC1) PB3  6   8|     |13  11  PC1
-// (TXD) (TOSC2) PB2  7~  9|     |12  10  PC0
+// (RXD) (TOSC1) PB3  6   8|     |13  11~ PC1 (PWM only on 1-series)
+// (TXD) (TOSC2) PB2  7~  9|     |12  10~ PC0 (PWM only on 1-series)
 // (SDA) (AIN10) PB1  8~ 10|_____|11   9~ PB0 (AIN11)(SCL)
 //               
 //
@@ -119,6 +119,32 @@ NA?    UPDI         PA0       RESET/    AIN0                                    
 	* alternative pin locations			  
 */
 
+#define PIN_A0   (17)
+#define PIN_A1   (14)
+#define PIN_A2   (15)
+#define PIN_A3   (16)
+#define PIN_A4   (0)
+#define PIN_A5 	 (1)
+#define PIN_A6	 (2)
+#define PIN_A7   (3)
+#define PIN_A8   (4)
+#define PIN_A9   (5)
+#define PIN_A10  (10)
+#define PIN_A11  (11)
+
+static const uint8_t A0 = PIN_A0;
+static const uint8_t A1 = PIN_A1;
+static const uint8_t A2 = PIN_A2;
+static const uint8_t A3 = PIN_A3;
+static const uint8_t A4 = PIN_A4;
+static const uint8_t A5 = PIN_A5;
+static const uint8_t A6 = PIN_A6;
+static const uint8_t A7 = PIN_A7;
+static const uint8_t A8 = PIN_A8;
+static const uint8_t A9 = PIN_A9;
+static const uint8_t A10 = PIN_A10;
+static const uint8_t A11 = PIN_A11;
+
 const uint8_t PROGMEM digital_pin_to_port[] = {	
 	// Left side, top to bottom
 	PA, // 0  PA4
@@ -136,10 +162,11 @@ const uint8_t PROGMEM digital_pin_to_port[] = {
 	PC, // 11 PC1
 	PC, // 12 PC2
 	PC, // 13 PC3
+	// skip PA0 until the end
 	PA, // 14 PA1
 	PA, // 15 PA2
-	PA, // 16 PA2
-	PA  // 17 PA3
+	PA, // 16 PA3
+	PA  // 17 PA0 UPDI/RST
 };
 
 /* Use this for accessing PINnCTRL register */
@@ -190,6 +217,7 @@ const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
 	PIN0_bm  // 17 PA0
 };
 
+
 const uint8_t PROGMEM digital_pin_to_timer[] = {
   	// Left side, top to bottom
 	TIMERA0, 		// 0  PA4
@@ -203,8 +231,13 @@ const uint8_t PROGMEM digital_pin_to_timer[] = {
 	TIMERA0, 		// 8  PB1
 	// Right side, bottom to top
 	TIMERA0, 		// 9  PB0
+	#ifdef TCD0
+	TIMERD0, 		// 10 PC0
+	TIMERD0, 		// 11 PC1
+	#else
 	NOT_ON_TIMER, 	// 10 PC0
 	NOT_ON_TIMER, 	// 11 PC1
+	#endif
 	NOT_ON_TIMER, 	// 12 PC2
 	NOT_ON_TIMER, 	// 13 PC3
 	NOT_ON_TIMER, 	// 14 PA1
@@ -231,7 +264,7 @@ const uint8_t PROGMEM analog_pin_to_channel[] = {
 */
 #endif
 
-extern const uint8_t analog_pin_to_channel[];
+//extern const uint8_t analog_pin_to_channel[];
 // #define digitalPinToAnalogInput(p)  ((p < NUM_ANALOG_INPUTS) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN )
 //#define digitalPinToAnalogInput(p) 		(((p) < 6 || (p) == 8 || (p) == 9 || (p) > 13) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN)
 #define digitalPinToAnalogInput(p)      ((p<6)?(p+4):((p>13)?(p-13):((p==8)?10:(p==9?11:NOT_A_PIN))))
