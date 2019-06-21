@@ -48,6 +48,7 @@ atxy6.build.core=arduino
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
 atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
+atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude
 atxy6.bootloader.file=empty_all.hex
@@ -109,6 +110,7 @@ atxy4.build.core=arduino
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
 atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
+atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
 atxy4.bootloader.file=empty_all.hex
@@ -162,6 +164,7 @@ atxy2.build.core=arduino
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
 atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
+atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
 atxy2.bootloader.file=empty_all.hex
@@ -211,6 +214,7 @@ atxy7.build.core=arduino
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
 atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
+atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
 atxy7.bootloader.file=empty_all.hex
