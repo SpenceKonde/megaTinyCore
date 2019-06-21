@@ -33,7 +33,7 @@
 #define NUM_I2C_PINS                2 // (SDA / SCL)
 #define NUM_SPI_PINS                3 // (MISO / MOSI / SCK)
 #define NUM_TOTAL_FREE_PINS         (NUM_DIGITAL_PINS)
-#define NUM_TOTAL_PINS              (NUM_DIGITAL_PINS + NUM_I2C_PINS + NUM_SPI_PINS)
+#define NUM_TOTAL_PINS              (NUM_DIGITAL_PINS)
 
 #define EXTERNAL_NUM_INTERRUPTS     12
 

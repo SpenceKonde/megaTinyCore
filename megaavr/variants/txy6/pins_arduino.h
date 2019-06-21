@@ -70,6 +70,8 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 
 #define LED_BUILTIN 4
 
+#define PINS_COUNT		(18u)
+
 #ifdef ARDUINO_MAIN
 
 // On the Arduino board, digital pins are also used
