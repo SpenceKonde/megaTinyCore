@@ -1,3 +1,5 @@
+[![Join the chat at https://gitter.im/SpenceKonde/megaTinyCore](https://badges.gitter.im/SpenceKonde/megaTinyCore.svg)](https://gitter.im/SpenceKonde/megaTinyCore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 # megaTinyCore
 Arduino core for the new megaAVR ATtiny series chips - highly experimental (not for use in actual projects yet)
 
