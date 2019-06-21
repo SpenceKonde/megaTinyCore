@@ -39,21 +39,17 @@
 #include "Arduino.h"
 #include "pins_arduino.h"
 
-#ifndef TCB1 //start hackjob to make things that don't use tone() compile on t416/816
-
-
-#else //otherwise it has TCB1
-
 /* For more than one tone, change AVAILABLE_TONE_PINS and uncomment the correct
     number of timers 
 */
 #define AVAILABLE_TONE_PINS 1    
 
-#define USE_TIMERB1        // interferes with PWM on pin 3
 /*
-#define USE_TIMERB2        // interferes with PWM on pin 11
-#define USE_TIMERB0        // interferes with PWM on pin 6
+#define USE_TIMERB1        
+#define USE_TIMERB2        
 */
+#define USE_TIMERB0        // interferes with PWM on pin 6
+
 #if !defined(USE_TIMERB1) && !defined(USE_TIMERB2) && !defined(USE_TIMERB0)
     # error "No timers allowed for tone()"
     /* Please uncomment a timer above and rebuild */
@@ -224,4 +220,3 @@ ISR(TCB2_INT_vect)
     /* Clear flag */
     _timer->INTFLAGS = TCB_CAPT_bm;
 }
-#endif
