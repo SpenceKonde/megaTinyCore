@@ -57,7 +57,7 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define PIN_WIRE_SDA        (2)
 #define PIN_WIRE_SCL        (3)
 
-#define TWI_MUX 		(PORTMUX_TWI0_DEFAULT_gc) //WRONG
+#define TWI_MUX 		(0x01<<4 ) //this may or may not work
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
@@ -67,7 +67,7 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define HWSERIAL0_DRE_VECTOR 	(USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
 #define HWSERIAL0_RXC_VECTOR 	(USART0_RXC_vect)
-#define HWSERIAL0_MUX 			(PORTMUX_USART0_DEFAULT_gc) //WRONG
+#define HWSERIAL0_MUX 			(PORTMUX_USART0_ALTERNATE_gc) 
 #define PIN_WIRE_HWSERIAL0_RX 	(3)
 #define PIN_WIRE_HWSERIAL0_TX 	(2)
 
