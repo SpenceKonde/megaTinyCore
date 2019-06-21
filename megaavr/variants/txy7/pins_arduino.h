@@ -79,10 +79,30 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 // pins are a separate set.
 
 // ATtiny1617 / ARDUINO
-//                          
-// Pinout goes counterclockwise from the power pins. TODO: ASCII art pinout diagram
-//               
-//
+//                              (MOSI) (UPDI)
+//                              (AIN1) (AIN0)
+//                                PA1   PA0   PC5   PC4   PC3   PC2
+//                                18    21    17    16    15    14
+//                             ______________________________________
+//                            |*  24    23    22    21    20    19   |
+//                            |                                      |
+//        (MISO)(AIN2) PA2 19 | 1                                  18| 13  PC1 (PWM only on 1-series)
+//                            |                                      |
+// (EXTCLK)(SCK)(AIN3) PA3 20~| 2                                  17| 12  10~ PC0 (PWM only on 1-series)
+//                            |                                      |
+//                       GND  | 3                                  16| 11~ PB0 (AIN11)(SCL)
+//                            |                                      |
+//                       VDD  | 4                                  15| 10~ PB1 (AIN10)(SDA)
+//                            |                                      |
+//      (nSS)  (AIN4) PA4  0~ | 5                                  14|  9~ PB2 (TOSC2)(TXD)
+//                            |                                      |
+//             (AIN5) PA5  1~ | 6                                  13|  8  PB3 (TOSC1)(RXD)
+//                            |    7     8     9    10    11    12   |
+//                            |______________________________________|                             
+//                                 2     3     4     5     6     7
+//                                PA6   PA7   PB7   PB6   PB5   PB4
+//                              (AIN6) (AIN7)           (AIN8) (AIN9)
+//                               (DAC)
 
 /* 
 PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       AC1       AC2       DAC0      USART0    SPI0      TWI0      TCA(PWM)  TCBn      TCD0      CCL
