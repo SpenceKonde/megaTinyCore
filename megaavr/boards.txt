@@ -2,6 +2,12 @@
 
 
 menu.chip=Chip
+menu.bodvoltage=BOD Threshold
+menu.bodmodeactive=BOD Mode (active)
+menu.bodmodesleep=BOD Mode (sleep)
+menu.eesave=Preserve EEPROM
+menu.clock=Clock Speed
+menu.clocksource=Clock Source
 
 ##############################################################
 
