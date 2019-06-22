@@ -98,9 +98,9 @@ atxy6.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
 
 atxy6.menu.eesave.enable=EEPROM retained
-atxy6.menu.eesave.enable.bootloader.SYSCFG0=0xC8
+atxy6.menu.eesave.enable.bootloader.SYSCFG0=0xC6
 atxy6.menu.eesave.disable=EEPROM not retained
-atxy6.menu.eesave.disable.bootloader.SYSCFG0=0xC9
+atxy6.menu.eesave.disable.bootloader.SYSCFG0=0xC7
 
 atxy6.upload.tool=avrdude
 atxy6.upload.protocol=jtag2updi
@@ -116,7 +116,6 @@ atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
 atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude
-#atxy6.bootloader.file=empty_all.hex
 atxy6.bootloader.WDTCFG=0x00
 atxy6.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy6.bootloader.TCD0CFG=0x00
@@ -215,9 +214,9 @@ atxy4.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy4.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
 atxy4.menu.eesave.enable=EEPROM retained
-atxy4.menu.eesave.enable.bootloader.SYSCFG0=0xC8
+atxy4.menu.eesave.enable.bootloader.SYSCFG0=0xC6
 atxy4.menu.eesave.disable=EEPROM not retained
-atxy4.menu.eesave.disable.bootloader.SYSCFG0=0xC9
+atxy4.menu.eesave.disable.bootloader.SYSCFG0=0xC7
 
 atxy4.upload.tool=avrdude
 atxy4.upload.protocol=jtag2updi
@@ -233,7 +232,6 @@ atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
-#atxy4.bootloader.file=empty_all.hex
 atxy4.bootloader.WDTCFG=0x00
 atxy4.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy4.bootloader.TCD0CFG=0x00
@@ -325,9 +323,9 @@ atxy2.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy2.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
 atxy2.menu.eesave.enable=EEPROM retained
-atxy2.menu.eesave.enable.bootloader.SYSCFG0=0xC8
+atxy2.menu.eesave.enable.bootloader.SYSCFG0=0xC6
 atxy2.menu.eesave.disable=EEPROM not retained
-atxy2.menu.eesave.disable.bootloader.SYSCFG0=0xC9
+atxy2.menu.eesave.disable.bootloader.SYSCFG0=0xC7
 
 atxy2.upload.tool=avrdude
 atxy2.upload.protocol=jtag2updi
@@ -343,7 +341,6 @@ atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
-#atxy2.bootloader.file=empty_all.hex
 atxy2.bootloader.WDTCFG=0x00
 atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy2.bootloader.TCD0CFG=0x00
@@ -431,9 +428,9 @@ atxy7.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy7.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
 atxy7.menu.eesave.enable=EEPROM retained
-atxy7.menu.eesave.enable.bootloader.SYSCFG0=0xC8
+atxy7.menu.eesave.enable.bootloader.SYSCFG0=0xC6
 atxy7.menu.eesave.disable=EEPROM not retained
-atxy7.menu.eesave.disable.bootloader.SYSCFG0=0xC9
+atxy7.menu.eesave.disable.bootloader.SYSCFG0=0xC7
 
 atxy7.upload.tool=avrdude
 atxy7.upload.protocol=jtag2updi
