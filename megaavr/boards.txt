@@ -2,12 +2,13 @@
 
 
 menu.chip=Chip
-menu.bodvoltage=BOD Threshold
+menu.bodvoltage=BOD Voltage
 menu.bodmodeactive=BOD Mode (active)
 menu.bodmodesleep=BOD Mode (sleep)
-menu.eesave=Preserve EEPROM
+menu.eesave=Save EEPROM
 menu.clock=Clock Speed
 menu.clocksource=Clock Source
+
 
 ##############################################################
 
@@ -42,6 +43,43 @@ atxy6.menu.chip.406.build.mcu=attiny406
 atxy6.menu.chip.406.upload.maximum_size=4096
 atxy6.menu.chip.406.upload.maximum_data_size=256
 
+atxy6.menu.bodvoltage.1v8=1.8V
+atxy6.menu.bodvoltage.2v15=2.15V
+atxy6.menu.bodvoltage.2v6=2.6V
+atxy6.menu.bodvoltage.2v95=2.95V
+atxy6.menu.bodvoltage.3v3=3.30V
+atxy6.menu.bodvoltage.3v7=3.70V
+atxy6.menu.bodvoltage.4v0=4.00V
+atxy6.menu.bodvoltage.4v3=4.30V
+atxy6.menu.bodvoltage.4v3.bootloader.bodlevbits=111
+atxy6.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy6.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy6.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy6.menu.bodvoltage.2v95.bootloader.bodlevbits=011
+atxy6.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy6.menu.bodvoltage.2v15.bootloader.bodlevbits=001
+atxy6.menu.bodvoltage.1v8.bootloader.bodlevbits=000
+atxy6.menu.bodmodeactive.disabled=Disabled
+atxy6.menu.bodmodeactive.enabled=Enabled
+atxy6.menu.bodmodeactive.sampled=Sampled
+atxy6.menu.bodmodeactive.enabledhold=Enabled hold wakeup
+atxy6.menu.bodmodesleep.disabled=Disabled
+atxy6.menu.bodmodesleep.enabled=Enabled
+atxy6.menu.bodmodesleep.sampled=Sampled
+atxy6.menu.bodmodeactive.disabled.bootloader.bodactivebits=00
+atxy6.menu.bodmodeactive.enabled.bootloader.bodactivebits=01
+atxy6.menu.bodmodeactive.sampled.bootloader.bodactivebits=10
+atxy6.menu.bodmodeactive.enabledhold.bootloader.bodactivebits=11
+atxy6.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
+atxy6.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
+atxy6.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
+
+
+atxy6.menu.eesave.enable=EEPROM retained
+atxy6.menu.eesave.enable.bootloader.SYSCFG0=0xC8
+atxy6.menu.eesave.disable=EEPROM not retained
+atxy6.menu.eesave.disable.bootloader.SYSCFG0=0xC9
+
 atxy6.upload.tool=avrdude
 atxy6.upload.protocol=jtag2updi
 atxy6.upload.speed=115200
@@ -59,17 +97,16 @@ atxy6.build.export_merged_output=false
 atxy6.bootloader.tool=avrdude
 atxy6.bootloader.file=empty_all.hex
 atxy6.bootloader.WDTCFG=0x00
-atxy6.bootloader.BODCFG=0x00
+atxy6.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy6.bootloader.OSCCFG=0x01
 atxy6.bootloader.TCD0CFG=0x00
-atxy6.bootloader.SYSCFG0=0xC9
 atxy6.bootloader.SYSCFG1=0x03
 atxy6.bootloader.APPEND=0x00
 atxy6.bootloader.BOOTEND=0x00
 
 ##############################################################
 
-atxy4.name=1614/1604/814/804/414/404/214/204
+atxy4.name=ATtiny1614/1604/814/804/414/404/214/204
 
 atxy4.menu.chip.1614=ATtiny1614
 atxy4.menu.chip.1614.build.mcu=attiny1614
@@ -104,6 +141,42 @@ atxy4.menu.chip.204.build.mcu=attiny204
 atxy4.menu.chip.204.upload.maximum_size=2048
 atxy4.menu.chip.204.upload.maximum_data_size=128
 
+atxy4.menu.bodvoltage.1v8=1.8V
+atxy4.menu.bodvoltage.2v15=2.15V
+atxy4.menu.bodvoltage.2v6=2.6V
+atxy4.menu.bodvoltage.2v95=2.95V
+atxy4.menu.bodvoltage.3v3=3.30V
+atxy4.menu.bodvoltage.3v7=3.70V
+atxy4.menu.bodvoltage.4v0=4.00V
+atxy4.menu.bodvoltage.4v3=4.30V
+atxy4.menu.bodvoltage.4v3.bootloader.bodlevbits=111
+atxy4.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy4.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy4.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy4.menu.bodvoltage.2v95.bootloader.bodlevbits=011
+atxy4.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy4.menu.bodvoltage.2v15.bootloader.bodlevbits=001
+atxy4.menu.bodvoltage.1v8.bootloader.bodlevbits=000
+atxy4.menu.bodmodeactive.disabled=Disabled
+atxy4.menu.bodmodeactive.enabled=Enabled
+atxy4.menu.bodmodeactive.sampled=Sampled
+atxy4.menu.bodmodeactive.enabledhold=Enabled hold wakeup
+atxy4.menu.bodmodesleep.disabled=Disabled
+atxy4.menu.bodmodesleep.enabled=Enabled
+atxy4.menu.bodmodesleep.sampled=Sampled
+atxy4.menu.bodmodeactive.disabled.bootloader.bodactivebits=00
+atxy4.menu.bodmodeactive.enabled.bootloader.bodactivebits=01
+atxy4.menu.bodmodeactive.sampled.bootloader.bodactivebits=10
+atxy4.menu.bodmodeactive.enabledhold.bootloader.bodactivebits=11
+atxy4.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
+atxy4.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
+atxy4.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
+
+atxy4.menu.eesave.enable=EEPROM retained
+atxy4.menu.eesave.enable.bootloader.SYSCFG0=0xC8
+atxy4.menu.eesave.disable=EEPROM not retained
+atxy4.menu.eesave.disable.bootloader.SYSCFG0=0xC9
+
 atxy4.upload.tool=avrdude
 atxy4.upload.protocol=jtag2updi
 atxy4.upload.speed=115200
@@ -121,7 +194,7 @@ atxy4.build.export_merged_output=false
 atxy4.bootloader.tool=avrdude
 atxy4.bootloader.file=empty_all.hex
 atxy4.bootloader.WDTCFG=0x00
-atxy4.bootloader.BODCFG=0x00
+atxy4.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy4.bootloader.OSCCFG=0x01
 atxy4.bootloader.TCD0CFG=0x00
 atxy4.bootloader.SYSCFG0=0xC9
@@ -131,7 +204,7 @@ atxy4.bootloader.BOOTEND=0x00
 
 ##############################################################
 
-atxy2.name=412/402/212/202
+atxy2.name=ATtiny412/402/212/202
 
 #atxy2.menu.chip.812=ATtiny814
 #atxy2.menu.chip.812.build.mcu=attiny812
@@ -158,6 +231,42 @@ atxy2.menu.chip.202.build.mcu=attiny202
 atxy2.menu.chip.202.upload.maximum_size=2048
 atxy2.menu.chip.202.upload.maximum_data_size=128
 
+atxy2.menu.bodvoltage.1v8=1.8V
+atxy2.menu.bodvoltage.2v15=2.15V
+atxy2.menu.bodvoltage.2v6=2.6V
+atxy2.menu.bodvoltage.2v95=2.95V
+atxy2.menu.bodvoltage.3v3=3.30V
+atxy2.menu.bodvoltage.3v7=3.70V
+atxy2.menu.bodvoltage.4v0=4.00V
+atxy2.menu.bodvoltage.4v3=4.30V
+atxy2.menu.bodvoltage.4v3.bootloader.bodlevbits=111
+atxy2.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy2.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy2.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy2.menu.bodvoltage.2v95.bootloader.bodlevbits=011
+atxy2.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy2.menu.bodvoltage.2v15.bootloader.bodlevbits=001
+atxy2.menu.bodvoltage.1v8.bootloader.bodlevbits=000
+atxy2.menu.bodmodeactive.disabled=Disabled
+atxy2.menu.bodmodeactive.enabled=Enabled
+atxy2.menu.bodmodeactive.sampled=Sampled
+atxy2.menu.bodmodeactive.enabledhold=Enabled hold wakeup
+atxy2.menu.bodmodesleep.disabled=Disabled
+atxy2.menu.bodmodesleep.enabled=Enabled
+atxy2.menu.bodmodesleep.sampled=Sampled
+atxy2.menu.bodmodeactive.disabled.bootloader.bodactivebits=00
+atxy2.menu.bodmodeactive.enabled.bootloader.bodactivebits=01
+atxy2.menu.bodmodeactive.sampled.bootloader.bodactivebits=10
+atxy2.menu.bodmodeactive.enabledhold.bootloader.bodactivebits=11
+atxy2.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
+atxy2.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
+atxy2.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
+
+atxy2.menu.eesave.enable=EEPROM retained
+atxy2.menu.eesave.enable.bootloader.SYSCFG0=0xC8
+atxy2.menu.eesave.disable=EEPROM not retained
+atxy2.menu.eesave.disable.bootloader.SYSCFG0=0xC9
+
 atxy2.upload.tool=avrdude
 atxy2.upload.protocol=jtag2updi
 atxy2.upload.speed=115200
@@ -175,7 +284,7 @@ atxy2.build.export_merged_output=false
 atxy2.bootloader.tool=avrdude
 atxy2.bootloader.file=empty_all.hex
 atxy2.bootloader.WDTCFG=0x00
-atxy2.bootloader.BODCFG=0x00
+atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy2.bootloader.OSCCFG=0x01
 atxy2.bootloader.TCD0CFG=0x00
 atxy2.bootloader.SYSCFG0=0xC9
@@ -208,6 +317,42 @@ atxy7.menu.chip.807.build.mcu=attiny807
 atxy7.menu.chip.807.upload.maximum_size=8192
 atxy7.menu.chip.807.upload.maximum_data_size=512
 
+atxy7.menu.bodvoltage.1v8=1.8V
+atxy7.menu.bodvoltage.2v15=2.15V
+atxy7.menu.bodvoltage.2v6=2.6V
+atxy7.menu.bodvoltage.2v95=2.95V
+atxy7.menu.bodvoltage.3v3=3.30V
+atxy7.menu.bodvoltage.3v7=3.70V
+atxy7.menu.bodvoltage.4v0=4.00V
+atxy7.menu.bodvoltage.4v3=4.30V
+atxy7.menu.bodvoltage.4v3.bootloader.bodlevbits=111
+atxy7.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy7.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy7.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy7.menu.bodvoltage.2v95.bootloader.bodlevbits=011
+atxy7.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy7.menu.bodvoltage.2v15.bootloader.bodlevbits=001
+atxy7.menu.bodvoltage.1v8.bootloader.bodlevbits=000
+atxy7.menu.bodmodeactive.disabled=Disabled
+atxy7.menu.bodmodeactive.enabled=Enabled
+atxy7.menu.bodmodeactive.sampled=Sampled
+atxy7.menu.bodmodeactive.enabledhold=Enabled hold wakeup
+atxy7.menu.bodmodesleep.disabled=Disabled
+atxy7.menu.bodmodesleep.enabled=Enabled
+atxy7.menu.bodmodesleep.sampled=Sampled
+atxy7.menu.bodmodeactive.disabled.bootloader.bodactivebits=00
+atxy7.menu.bodmodeactive.enabled.bootloader.bodactivebits=01
+atxy7.menu.bodmodeactive.sampled.bootloader.bodactivebits=10
+atxy7.menu.bodmodeactive.enabledhold.bootloader.bodactivebits=11
+atxy7.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
+atxy7.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
+atxy7.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
+
+atxy7.menu.eesave.enable=EEPROM retained
+atxy7.menu.eesave.enable.bootloader.SYSCFG0=0xC8
+atxy7.menu.eesave.disable=EEPROM not retained
+atxy7.menu.eesave.disable.bootloader.SYSCFG0=0xC9
+
 atxy7.upload.tool=avrdude
 atxy7.upload.protocol=jtag2updi
 atxy7.upload.speed=115200
@@ -225,7 +370,7 @@ atxy7.build.export_merged_output=false
 atxy7.bootloader.tool=avrdude
 atxy7.bootloader.file=empty_all.hex
 atxy7.bootloader.WDTCFG=0x00
-atxy7.bootloader.BODCFG=0x00
+atxy7.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy7.bootloader.OSCCFG=0x01
 atxy7.bootloader.TCD0CFG=0x00
 atxy7.bootloader.SYSCFG0=0xC9
