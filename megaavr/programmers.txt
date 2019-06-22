@@ -1,6 +1,16 @@
-medbg.name=Onboard Atmel mEDBG (UNO WiFi Rev2)
+medbg.name=Onboard Atmel mEDBG (xplained_mini) (megaTinyCore)
 medbg.communication=usb
 medbg.protocol=xplainedmini_updi
 medbg.program.protocol=xplainedmini_updi
 medbg.program.tool=avrdude
 medbg.program.extra_params=-Pusb
+
+jtag2updi.name=jtag2updi (megaTinyCore)
+jtag2updi.communication=serial
+jtag2updi.protocol=jtag2updi
+jtag2updi.program.protocol=jtag2updi
+jtag2updi.program.tool=avrdude
+jtag2updi.upload.extra_params=-P{serial.port}
+jtag2updi.upload.speed=115200
+jtag2updi.upload.use_1200bps_touch=true
+
