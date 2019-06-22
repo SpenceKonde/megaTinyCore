@@ -3,7 +3,7 @@
 
  Specifications |  .
 ------------ | -------------
-Flash (program memory)   | 16384b ( 15744b with bootloader)
+Flash (program memory)   | 16384b
 RAM  | 2048 bytes
 EEPROM | 256 bytes
 Bootloader | No
