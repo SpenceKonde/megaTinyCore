@@ -13,7 +13,7 @@ Arduino core for the new megaAVR ATtiny series chips - highly experimental (not 
 * tone() should work, at least, it compiles on all chips and there's a timer for it to use. Let us know if it doesn't generate tones.
 * I think analogRead() reads the wrong pin (#45)
 * Anything and everything may be changed without warning, including names of menu options
-* Burn bootloader and clock speeds, I think, work. Update core and restart IDE BEFORE burning bootloader, there was a nasty bug in boards.txt (fixed with 42ea5c84639a3e758a4ede9044b4e4db99b128ef ) that would brick chips when burning bootloader!
+* Burn bootloader and clock speeds, I think, work. Update core and restart IDE BEFORE burning bootloader, there was a nasty bug in boards.txt (see #49, very recently fixed) that would brick chips when burning bootloader!
 * Upload uses jtag2updi programmer. Upload using programmer and burn bootloader use the selected programmer. 
 
 # Known Compiler Bugs
