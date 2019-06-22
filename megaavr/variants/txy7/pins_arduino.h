@@ -88,7 +88,7 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 //                            |                                      |
 //        (MISO)(AIN2) PA2 19 | 1                                  18| 13  PC1 (PWM only on 1-series)
 //                            |                                      |
-// (EXTCLK)(SCK)(AIN3) PA3 20~| 2                                  17| 12  10~ PC0 (PWM only on 1-series)
+// (EXTCLK)(SCK)(AIN3) PA3 20~| 2                                  17| 12  PC0 (PWM only on 1-series)
 //                            |                                      |
 //                       GND  | 3                                  16| 11~ PB0 (AIN11)(SCL)
 //                            |                                      |
