@@ -116,7 +116,7 @@ atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
 atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude
-atxy6.bootloader.file=empty_all.hex
+#atxy6.bootloader.file=empty_all.hex
 atxy6.bootloader.WDTCFG=0x00
 atxy6.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy6.bootloader.TCD0CFG=0x00
@@ -233,7 +233,7 @@ atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
-atxy4.bootloader.file=empty_all.hex
+#atxy4.bootloader.file=empty_all.hex
 atxy4.bootloader.WDTCFG=0x00
 atxy4.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy4.bootloader.TCD0CFG=0x00
@@ -343,7 +343,7 @@ atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
-atxy2.bootloader.file=empty_all.hex
+#atxy2.bootloader.file=empty_all.hex
 atxy2.bootloader.WDTCFG=0x00
 atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy2.bootloader.TCD0CFG=0x00
@@ -449,7 +449,6 @@ atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
-atxy7.bootloader.file=empty_all.hex
 atxy7.bootloader.WDTCFG=0x00
 atxy7.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy7.bootloader.TCD0CFG=0x00

@@ -138,7 +138,9 @@ tools.avrdude.erase.pattern=
 
 tools.avrdude.bootloader.params.verbose=-v
 tools.avrdude.bootloader.params.quiet=-q -q
-tools.avrdude.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} "-Ufuse0:w:{bootloader.WDTCFG}:m" "-Ufuse1:w:{bootloader.BODCFG}:m" "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse4:w:{bootloader.TCD0CFG}:m" "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse7:w:{bootloader.APPEND}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i"
+#currently no bootloaders supported, below can be uncommented and following line commented if that changes. 
+#tools.avrdude.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} "-Ufuse0:w:{bootloader.WDTCFG}:m" "-Ufuse1:w:{bootloader.BODCFG}:m" "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse4:w:{bootloader.TCD0CFG}:m" "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse7:w:{bootloader.APPEND}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i"
+tools.avrdude.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} "-Ufuse0:w:{bootloader.WDTCFG}:m" "-Ufuse1:w:{bootloader.BODCFG}:m" "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse4:w:{bootloader.TCD0CFG}:m" "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse7:w:{bootloader.APPEND}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m"
 
 tools.avrdude_remote.upload.pattern=/usr/bin/run-avrdude /tmp/sketch.hex {upload.verbose} -p{build.mcu}
 
