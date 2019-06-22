@@ -183,7 +183,7 @@ void delay(unsigned long ms)
 	while(micros() < return_time);
 }
 
-/* Delay for the given number of microseconds.  Assumes a 1, 8, 12, 16, 20 or 24 MHz clock. */
+/* Delay for the given number of microseconds.  Assumes a 1, 4, 5, 8, 10, 16, or 20 MHz clock. */
 void delayMicroseconds(unsigned int us)
 {
   // call = 4 cycles + 2 to 4 cycles to init us(2 for constant delay, 4 for variable)
