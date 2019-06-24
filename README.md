@@ -59,6 +59,12 @@ The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 2
 ### Tone Support
 Support for tone() is provided on all parts using Timer B 0. This is like the standard tone() function; it does not support use of the hardware output compare to generate tones (yet). 
 
+### EESAVE configuration option
+The EESAVE fuse can be controlled via the Tools -> Save EEPROM menu. If this is set to "EEPROM retained", when the board is erased during programming, the EEPROM will not be erased. If this is set to "EEPROM not retained", uploading a new sketch will clear out the EEPROM memory. You must do Burn Bootloader to apply this setting. 
+
+### BOD configuration options
+These parts support many BOD trigger levels, with Disabled, Active, and Sampled operation options for when the chip is in Active and Sleep modes - Disabled uses the least power, Active uses the most, and Sampled is in the middle. See the datasheet for details on power consumption and the meaning of these options. You must do Burn Bootloader to apply this setting. 
+
 ### DAC Support (not yet implemented)
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage, instead of PWM (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). In a future release of this core, calling analogWrite() on the DAC pin will use the DAC. 
 
