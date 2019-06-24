@@ -1,19 +1,12 @@
 [![Join the chat at https://gitter.im/SpenceKonde/megaTinyCore](https://badges.gitter.im/SpenceKonde/megaTinyCore.svg)](https://gitter.im/SpenceKonde/megaTinyCore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # megaTinyCore
-Arduino core for the new megaAVR ATtiny series chips - highly experimental (not for use in actual projects yet)
-
+Arduino core for the new megaAVR ATtiny series chips - highly experimental
 
 # Rough status: 
-* 3216/1616/816/416 mostly okay. 1606/806/406 probably in a similar state. 
-* 412/402/212/202 totally untested.  Please test and create issues when shit doesn't work! TWI may or may not work at all. 
-* 1614/814/804/414/404/214/204 totally untested. Please test and create issues when shit doesn't work!
-* 3217/1617/1607/817/807 totally untested. Please test and create issues when shit doesn't work!
 * Lots of stuff untested, please help test if you have the hardware!
 * tone() should work, at least, it compiles on all chips and there's a timer for it to use. Let us know if it doesn't generate tones.
-* I think analogRead() reads the wrong pin (#45)
-* Anything and everything may be changed without warning, including names of menu options
-* Burn bootloader and clock speeds, I think, work. Update core and restart IDE BEFORE burning bootloader, there was a nasty bug in boards.txt (see #49, very recently fixed) that would brick chips when burning bootloader!
+* Burn bootloader and clock speeds, I think, work. Update core and restart IDE BEFORE burning bootloader if you have been using 1.0.0-dev versions prior to 6/22/2019, there was a nasty bug in boards.txt (see #49, very recently fixed) that would brick chips when burning bootloader!
 * Upload uses jtag2updi programmer. Upload using programmer and burn bootloader use the selected programmer. 
 
 # Known Compiler Bugs
