@@ -75,26 +75,13 @@ void setup_timers() {
 	#ifdef TCB1
 	} while (timer_B < (TCB_t *)&TCB1);
     #endif
-	/* Stuff for synchronizing PWM timers */
-// 	/* Restart TCA to sync TCBs */
-// 	/* should not be needed		*/
-// 	TCA0.SINGLE.CTRLESET = TCA_SINGLE_CMD_RESTART_gc;
-// 	TCA0.SINGLE.CTRLECLR = TCA_SINGLE_CMD_RESTART_gc;
-//
-// 	timer_B = (TCB_t *)&TCB0;
-//
-// 	/* TCB are sync to TCA, remove setting	*/
-// 	for (uint8_t digitial_pin_timer = (TIMERB0 - TIMERB0);
-// 	digitial_pin_timer < (TIMERB3 - TIMERB0);
-// 	digitial_pin_timer++)
-// 	{
-// 		/* disable sync with tca */
-// 		timer_B->CTRLA &= ~ (TCB_SYNCUPD_bm);
-//
-// 		/* Add offset to register	*/
-// 		timer_B++;
-//
-// 	}
+    #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
+    TCD0.CMPBCLR=255; //Count to 255 (8-bit resolution)
+    TCD0.CTRLC=0x80; //WOD outputs PWM B, WOC outputs PWM A
+	TCD0.CTRLB=0x03; //dual slope
+	TCD0.CTRLA=0x10; //OSC20M prescaled by 32, gives ~1.2 khz PWM at 20MHz. 
+    #endif
+
 }
 
 FORCE_INLINE bool isDoubleBondedActive(uint8_t pin) {

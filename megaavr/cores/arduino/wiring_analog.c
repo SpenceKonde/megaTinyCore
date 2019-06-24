@@ -129,10 +129,9 @@ void analogWrite(uint8_t pin, int val)
 	} else {	/* handle pwm to generate analog value */
 		/* Get timer */
 		uint8_t digital_pin_timer =  digitalPinToTimer(pin);
-
 		uint8_t* timer_cmp_out;
 		
-		TCB_t *timer_B;
+		//TCB_t *timer_B;
 		/* Find out Port and Pin to correctly handle port mux, and timer. */
 		switch (digital_pin_timer) { //use only low nybble which defines which timer it is
 
@@ -150,28 +149,44 @@ void analogWrite(uint8_t pin, int val)
 					TCA0.SPLIT.CTRLB |= (1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
 				}
 				break;
-
+			/* None of these parts have a Timer B that gives us PWM on a pin we don't already have it on. 
 			case TIMERB0:
 			case TIMERB1:
 			case TIMERB2:
 			case TIMERB3:
 				
 
-				/* Get pointer to timer, TIMERB0 order definition in Arduino.h*/
+				// Get pointer to timer, TIMERB0 order definition in Arduino.h
 				//assert (((TIMERB0 - TIMERB3) == 2));
 				timer_B = ((TCB_t *)&TCB0 + (digital_pin_timer - TIMERB0));
 
-				/* set duty cycle */
+				// set duty cycle 
 				timer_B->CCMPH = val;
 
-				/* Enable Timer Output	*/
+				///Enable Timer Output
 				timer_B->CTRLB |= (TCB_CCMPEN_bm);
 
 				break;
+							*/
+			#if (defined(TCD0) && defined(USE_TIMERD0_PWM))
+			case TIMERD0:
+			    if (bit_pos) {
+			    	TCD0.CMPBSET=255-val;
+			    } else {
+			    	TCD0.CMPASET=val;
+			    }
+				if (!(TCD0.FAULTCTRL & (1<<(6+bit_pos)))) { //bitpos will be 0 or 1 for TIMERD pins
+					//if not active, we need to activate it, which produces a glitch in the PWM 
+					TCD0.CTRLA=0x10;//stop the timer
+					delay(1);// wait until it's actually stopped
+					_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL|(1<<6+bit_pos)); 
+					TCD0.CTRLA=0x11; //reenable it
+				}
+				break;
+			#endif
 
 			/* If non timer pin, or unknown timer definition.	*/
-			/* do a digital write								*/
-
+			/* do a digital write	*/
 			case NOT_ON_TIMER:
 			default:
 				if (val < 128) {

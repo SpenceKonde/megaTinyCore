@@ -96,7 +96,7 @@ static void turnOffPWM(uint8_t pin)
 	uint8_t timer = digitalPinToTimer(pin);
 	if(timer == NOT_ON_TIMER) return;
 
-	uint8_t bit_pos;
+	uint8_t bit_pos = digitalPinToBitPosition(pin);
 	TCB_t *timerB;
 
 	switch (timer) {
@@ -104,13 +104,12 @@ static void turnOffPWM(uint8_t pin)
 	/* TCA0 */
 	case TIMERA0:
 		/* Bit position will give output channel */
-		bit_pos = digitalPinToBitPosition(pin);
 		if (bit_pos>2) 	bit_pos++; //there's a blank bit in the middle
 		/* Disable corresponding channel */
 		TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
 		break;
-
-	/* TCB - only one output */
+	/* we don't need the type b timers as this core does not use them for PWM
+	//TCB - only one output 
 	case TIMERB0:
 	case TIMERB1:
 	case TIMERB2:
@@ -118,10 +117,20 @@ static void turnOffPWM(uint8_t pin)
 
 		timerB = (TCB_t *)&TCB0 + (timer - TIMERB0);
 
-		/* Disable TCB compare channel */
+		 //Disable TCB compare channel 
 		timerB->CTRLB &= ~(TCB_CCMPEN_bm);
 
 		break;
+	*/
+	#if (defined(TCD0) && defined(USE_TIMERD0_PWM))
+	case TIMERD0:
+		// rigmarole that produces a glitch in the PWM 
+		TCD0.CTRLA=0x10;//stop the timer
+		delay(1);// wait until it's actually stopped
+		_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL & ~(1<<6+bit_pos)); 
+		TCD0.CTRLA=0x11; //reenable it
+		break;
+	#endif
 	default:
 		break;
 	}

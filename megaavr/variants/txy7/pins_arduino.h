@@ -34,8 +34,11 @@
 #define NUM_TOTAL_PINS              22
 
 #define EXTERNAL_NUM_INTERRUPTS     22
-
+#if (defined(TCD0) && defined(USE_TIMERD0_PWM))
+#define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 7 || (p) == 8 || (p) == 9 || (p)==12 || (p)==13 || (p) == 16 )
+#else 
 #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 11 || (p) == 10 || (p) == 9 || (p) == 20)
+#endif
 
 #define SPI_MUX		  	(PORTMUX_SPI0_DEFAULT_gc)
 #define PIN_SPI_MISO	(19)
@@ -255,7 +258,7 @@ const uint8_t PROGMEM digital_pin_to_timer[] = {
 	TIMERA0, 		// 10 PB1
 	// Right side, bottom to top
 	TIMERA0, 		// 11 PB0
-	#ifdef TCD0
+	#if (defined(TCD0) && defined(USE_TIMERD0_PWM))
 	TIMERD0, 		// 12 PC0
 	TIMERD0, 		// 13 PC1
 	#else
