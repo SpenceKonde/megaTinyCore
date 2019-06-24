@@ -40,7 +40,28 @@ These parts do not support using an external crystal like the classic ATtiny par
 
 # Features
 
-## Assembler Listing generation
+### Serial (UART) Support
+All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards. See the pinout charts for the location of the serial pins. 
+
+### SPI support
+All of these parts have a single hardware SPI peripheral. It works exactly like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. Note that the 8-pin parts (412, 212, 402, 204) do not have a specific SS pin. 
+
+### I2C (TWI) support
+All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library. See the pinout charts for the location of these pins.
+
+### PWM support
+The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), only a single PWM pin is available. On all other parts except the x16 and x17 series, 6 PWM pins are available, driven by Timer A. On the x16 and x17 series, two additional pins are available using Timer D - however note issue #51. The type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A. See the pinout charts for a list of which pins support PWM. 
+
+### Tone Support
+Support for tone() is provided on all parts using Timer B 0. This is like the standard tone() function; it does not support use of the hardware output compare to generate tones (yet). 
+
+### DAC Support (not yet implemented)
+The 1-series parts have an 8-bit DAC which can generate a real analog voltage, instead of PWM (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). In a future release of this core, calling analogWrite() on the DAC pin will use the DAC. 
+
+### Servo Support (not yet implemented)
+A future version of this core will provide a version of the Servo library which will select an appropriate timer (Timer B 0, except on the 3216, 3217, 1617 and 1616, where there is a Timer B 1 available; except on the aforementioned parts, tone cannot be used at the same time as the Servo library).
+
+### Assembler Listing generation
 Like ATTinyCore, Sketch -> Export compiled binary will generate an assembly listing in the sketch folder; this is particularly useful when attempting to reduce flash usage, as you can see how much flash is used by different functions.
 
 # Known Compiler Bugs
