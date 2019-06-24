@@ -74,8 +74,6 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 
 #define LED_BUILTIN 4
 
-#define PINS_COUNT		(18u)
-
 #define PIN_A0   (17)
 #define PIN_A1   (14)
 #define PIN_A2   (15)
@@ -101,6 +99,8 @@ static const uint8_t A8 = PIN_A8;
 static const uint8_t A9 = PIN_A9;
 static const uint8_t A10 = PIN_A10;
 static const uint8_t A11 = PIN_A11;
+
+#define PINS_COUNT		(18u)
 
 #ifdef ARDUINO_MAIN
 
@@ -147,7 +147,6 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
                               UPDI        
 	* alternative pin locations			  
 */
-
 
 
 const uint8_t PROGMEM digital_pin_to_port[] = {	
