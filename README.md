@@ -1,5 +1,9 @@
 [![Join the chat at https://gitter.im/SpenceKonde/megaTinyCore](https://badges.gitter.im/SpenceKonde/megaTinyCore.svg)](https://gitter.im/SpenceKonde/megaTinyCore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+# [Wiring](Wiring.md)
+# [Installation](Installation.md)
+# [Making a cheap UPDI programmer](MakeUPDIProgrammer.md)
+
 # Core status
 * Lots of stuff untested, please help test if you have the hardware!
 * Burn bootloader and clock speeds work. Update core and restart IDE BEFORE burning bootloader if you have been using 1.0.0-dev versions prior to 6/22/2019, there was a nasty bug in boards.txt (see #49, very recently fixed) that would brick chips when burning bootloader!
