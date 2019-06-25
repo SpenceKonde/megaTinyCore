@@ -6,7 +6,7 @@
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
 
 name=megaTinyCore
-version=1.0.0
+version=1.0.1-dev
 
 
 # AVR compile variables
