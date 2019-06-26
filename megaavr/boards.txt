@@ -230,6 +230,17 @@ atxy4.menu.eesave.enable.bootloader.SYSCFG0=0xC6
 atxy4.menu.eesave.disable=EEPROM not retained
 atxy4.menu.eesave.disable.bootloader.SYSCFG0=0xC7
 
+atxy4.menu.dacvref.0v55=0.55V
+atxy4.menu.dacvref.1v1=1.10V
+atxy4.menu.dacvref.1v5=1.50V
+atxy4.menu.dacvref.2v5=2.50V
+atxy4.menu.dacvref.4v3=4.30V
+atxy4.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
+atxy4.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
+atxy4.menu.dacvref.1v5.build.dacvref=-DDACVREF=2
+atxy4.menu.dacvref.2v5.build.dacvref=-DDACVREF=3
+atxy4.menu.dacvref.4v3.build.dacvref=-DDACVREF=4
+
 atxy4.upload.tool=avrdude
 atxy4.upload.protocol=jtag2updi
 atxy4.upload.speed=115200
@@ -240,7 +251,7 @@ atxy4.build.board=attinyxy4
 atxy4.build.core=arduino
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
-atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
+atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
@@ -339,6 +350,17 @@ atxy2.menu.eesave.enable.bootloader.SYSCFG0=0xC6
 atxy2.menu.eesave.disable=EEPROM not retained
 atxy2.menu.eesave.disable.bootloader.SYSCFG0=0xC7
 
+atxy2.menu.dacvref.0v55=0.55V
+atxy2.menu.dacvref.1v1=1.10V
+atxy2.menu.dacvref.1v5=1.50V
+atxy2.menu.dacvref.2v5=2.50V
+atxy2.menu.dacvref.4v3=4.30V
+atxy2.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
+atxy2.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
+atxy2.menu.dacvref.1v5.build.dacvref=-DDACVREF=2
+atxy2.menu.dacvref.2v5.build.dacvref=-DDACVREF=3
+atxy2.menu.dacvref.4v3.build.dacvref=-DDACVREF=4
+
 atxy2.upload.tool=avrdude
 atxy2.upload.protocol=jtag2updi
 atxy2.upload.speed=115200
@@ -349,7 +371,7 @@ atxy2.build.board=attinyxy2
 atxy2.build.core=arduino
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
-atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP
+atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref}
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
@@ -444,6 +466,17 @@ atxy7.menu.eesave.enable.bootloader.SYSCFG0=0xC6
 atxy7.menu.eesave.disable=EEPROM not retained
 atxy7.menu.eesave.disable.bootloader.SYSCFG0=0xC7
 
+atxy7.menu.dacvref.0v55=0.55V
+atxy7.menu.dacvref.1v1=1.10V
+atxy7.menu.dacvref.1v5=1.50V
+atxy7.menu.dacvref.2v5=2.50V
+atxy7.menu.dacvref.4v3=4.30V
+atxy7.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
+atxy7.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
+atxy7.menu.dacvref.1v5.build.dacvref=-DDACVREF=2
+atxy7.menu.dacvref.2v5.build.dacvref=-DDACVREF=3
+atxy7.menu.dacvref.4v3.build.dacvref=-DDACVREF=4
+
 atxy7.upload.tool=avrdude
 atxy7.upload.protocol=jtag2updi
 atxy7.upload.speed=115200
@@ -454,7 +487,7 @@ atxy7.build.board=attinyxy7
 atxy7.build.core=arduino
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM
+atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
