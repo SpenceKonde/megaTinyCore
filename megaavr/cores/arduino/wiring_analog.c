@@ -170,7 +170,7 @@ void analogWrite(uint8_t pin, int val)
 							*/
 			#ifdef DAC0
 			case DACOUT:
-				DATA=val;
+				DAC0.DATA=val;
 				DAC0.CTRLA=0x41; //OUTEN=1, ENABLE=1
 				break;
 			#endif
