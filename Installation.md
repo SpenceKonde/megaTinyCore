@@ -1,9 +1,11 @@
 ## Supported IDE versions
 megaTinyCore requires a version of the IDE later than 1.6.3; - it may require a much more recent version of the IDE; this has not been tested. It has been tested with 1.8.9. 
 
-## Boards Manager Installation - Not yet available
+**The Official Arduino megaAVR board package must be installed using board manager in order for this package to work. **
 
-Board manager support for this core will be added shortly. When it is, it will be possible to install using the boards manager. The boards manager URL is:
+## Boards Manager Installation
+
+This board package can be installed via the board manager. The boards manager URL is:
 
 `http://drazzy.com/package_drazzy.com_index.json`
 
@@ -14,7 +16,7 @@ Board manager support for this core will be added shortly. When it is, it will b
 ## Manual Installation
 Manual installation allows the latest version of the core to be installed, with fixes that may not yet be available in the board manager version of the core. 
 
-For a manual installation, the Official Arduino megaAVR board package must be installed using board manager!
+
 
 For installing megaTinyCore, there are two options:
 
