@@ -322,7 +322,6 @@ void init()
 /******************************** CLOCK STUFF *********************************/
 
 	
-
  	int64_t cpu_freq;
  	
 	#if (F_CPU == 20000000) 
@@ -439,9 +438,12 @@ void init()
 	/* Enable & start */
 	_timer->CTRLA |= TCB_ENABLE_bm;	/* Keep this last before enabling interrupts to ensure tracking as accurate as possible */
 	#endif
-
+/*************************** DAC VREF *****************************************/
+	#ifdef DAC0
+	VREF.CTRLA |= DACVREF;
+	#endif
 /*************************** ENABLE GLOBAL INTERRUPTS *************************/
-
+	
 	sei();
 }
 
