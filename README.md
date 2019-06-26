@@ -65,8 +65,8 @@ The EESAVE fuse can be controlled via the Tools -> Save EEPROM menu. If this is 
 ### BOD configuration options
 These parts support many BOD trigger levels, with Disabled, Active, and Sampled operation options for when the chip is in Active and Sleep modes - Disabled uses the least power, Active uses the most, and Sampled is in the middle. See the datasheet for details on power consumption and the meaning of these options. You must do Burn Bootloader to apply this setting. 
 
-### DAC Support (not yet implemented)
-The 1-series parts have an 8-bit DAC which can generate a real analog voltage, instead of PWM (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). In a future release of this core, calling analogWrite() on the DAC pin will use the DAC. 
+### DAC Support (supported as of 1.0.1)
+The 1-series parts have an 8-bit DAC which can generate a real analog voltage, instead of PWM (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). This generates voltages between 0 and the selected VREF (which cannot be VCC) - select the DAC VREF voltage from the Tools -> DAC Voltage Reference submenu. This voltage must be lower than Vcc to get the correct voltages. Call analogWrite() on the DAC pin to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin. 
 
 ### Servo Support (not yet implemented)
 A future version of this core will provide a version of the Servo library which will select an appropriate timer (Timer B 0, except on the 3216, 3217, 1617 and 1616, where there is a Timer B 1 available; except on the aforementioned parts, tone cannot be used at the same time as the Servo library).
