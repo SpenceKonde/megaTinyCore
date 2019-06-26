@@ -8,6 +8,7 @@ menu.bodmodesleep=BOD Mode (sleep)
 menu.eesave=Save EEPROM
 menu.clock=Clock Speed
 menu.clocksource=Clock Source
+menu.dacvref=DAC Voltage Reference
 
 
 ##############################################################
@@ -102,6 +103,17 @@ atxy6.menu.eesave.enable.bootloader.SYSCFG0=0xC6
 atxy6.menu.eesave.disable=EEPROM not retained
 atxy6.menu.eesave.disable.bootloader.SYSCFG0=0xC7
 
+atxy6.menu.dacvref.0v55=0.55V
+atxy6.menu.dacvref.1v1=1.10V
+atxy6.menu.dacvref.1v5=1.50V
+atxy6.menu.dacvref.2v5=2.50V
+atxy6.menu.dacvref.4v3=4.30V
+atxy6.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
+atxy6.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
+atxy6.menu.dacvref.1v5.build.dacvref=-DDACVREF=2
+atxy6.menu.dacvref.2v5.build.dacvref=-DDACVREF=3
+atxy6.menu.dacvref.4v3.build.dacvref=-DDACVREF=4
+
 atxy6.upload.tool=avrdude
 atxy6.upload.protocol=jtag2updi
 atxy6.upload.speed=115200
@@ -112,7 +124,7 @@ atxy6.build.board=attinyxy6
 atxy6.build.core=arduino
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
-atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM
+atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref}
 atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude

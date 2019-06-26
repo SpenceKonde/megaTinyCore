@@ -150,7 +150,11 @@ const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
 };
 
 const uint8_t PROGMEM digital_pin_to_timer[] = {
+	#ifdef DAC0
+    DACOUT,
+	#else
 	NOT_ON_TIMER, // 0  PA6
+	#endif
 	NOT_ON_TIMER, // 1  PA7
 	NOT_ON_TIMER, // 2  PA1
 	NOT_ON_TIMER, // 3  PA2

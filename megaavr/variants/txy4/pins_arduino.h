@@ -194,8 +194,12 @@ const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
 const uint8_t PROGMEM digital_pin_to_timer[] = {
   	// Left side, top to bottom
 	TIMERA0, 		// 0  PA4
-	TIMERA0, 		// 1  PA5
-	NOT_ON_TIMER, 	// 2  PA6
+	TIMERA0, 		// 1  PA5	
+	#ifdef DAC0
+    DACOUT, // 2  PA6
+	#else
+	NOT_ON_TIMER, // 2  PA6
+	#endif
 	NOT_ON_TIMER, 	// 3  PA7
 	NOT_ON_TIMER, 	// 4  PB3
 	TIMERA0, 		// 5  PB2

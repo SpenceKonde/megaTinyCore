@@ -114,6 +114,7 @@ extern const uint8_t PROGMEM digital_pin_to_timer[];
 #define TIMERB2 4
 #define TIMERB3 5
 #define TIMERD0 8
+#define DACOUT 9
 
 void setup_timers();
 bool isDoubleBondedActive(uint8_t pin);
