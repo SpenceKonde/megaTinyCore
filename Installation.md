@@ -1,7 +1,7 @@
 ## Supported IDE versions
 megaTinyCore requires a version of the IDE later than 1.6.3; - it may require a much more recent version of the IDE; this has not been tested. It has been tested with 1.8.9. 
 
-**The Official Arduino megaAVR board package must be installed using board manager in order for this package to work. **
+**The Official Arduino megaAVR board package must be installed using board manager in order for this package to work**
 
 ## Boards Manager Installation
 
