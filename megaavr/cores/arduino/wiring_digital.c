@@ -122,6 +122,11 @@ static void turnOffPWM(uint8_t pin)
 
 		break;
 	*/
+	#ifdef DAC0
+	case DACOUT:
+		DAC0.CTRLA=0x00;
+		break;
+	#endif
 	#if (defined(TCD0) && defined(USE_TIMERD0_PWM))
 	case TIMERD0:
 		// rigmarole that produces a glitch in the PWM 
