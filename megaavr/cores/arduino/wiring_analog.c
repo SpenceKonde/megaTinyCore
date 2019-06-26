@@ -170,8 +170,8 @@ void analogWrite(uint8_t pin, int val)
 							*/
 			#ifdef DAC0
 			case DACOUT:
-				DAC0.CTRLA=0x41; //OUTEN=1, ENABLE=1
 				DATA=val;
+				DAC0.CTRLA=0x41; //OUTEN=1, ENABLE=1
 				break;
 			#endif
 			#if (defined(TCD0) && defined(USE_TIMERD0_PWM))
