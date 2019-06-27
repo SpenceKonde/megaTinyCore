@@ -237,9 +237,9 @@ atxy4.menu.dacvref.2v5=2.50V
 atxy4.menu.dacvref.4v3=4.30V
 atxy4.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
 atxy4.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy4.menu.dacvref.1v5.build.dacvref=-DDACVREF=2
-atxy4.menu.dacvref.2v5.build.dacvref=-DDACVREF=3
-atxy4.menu.dacvref.4v3.build.dacvref=-DDACVREF=4
+atxy4.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
+atxy4.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
+atxy4.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 
 atxy4.upload.tool=avrdude
 atxy4.upload.protocol=jtag2updi
@@ -357,9 +357,9 @@ atxy2.menu.dacvref.2v5=2.50V
 atxy2.menu.dacvref.4v3=4.30V
 atxy2.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
 atxy2.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy2.menu.dacvref.1v5.build.dacvref=-DDACVREF=2
-atxy2.menu.dacvref.2v5.build.dacvref=-DDACVREF=3
-atxy2.menu.dacvref.4v3.build.dacvref=-DDACVREF=4
+atxy2.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
+atxy2.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
+atxy2.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 
 atxy2.upload.tool=avrdude
 atxy2.upload.protocol=jtag2updi
@@ -473,9 +473,9 @@ atxy7.menu.dacvref.2v5=2.50V
 atxy7.menu.dacvref.4v3=4.30V
 atxy7.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
 atxy7.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy7.menu.dacvref.1v5.build.dacvref=-DDACVREF=2
-atxy7.menu.dacvref.2v5.build.dacvref=-DDACVREF=3
-atxy7.menu.dacvref.4v3.build.dacvref=-DDACVREF=4
+atxy7.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
+atxy7.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
+atxy7.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 
 atxy7.upload.tool=avrdude
 atxy7.upload.protocol=jtag2updi
