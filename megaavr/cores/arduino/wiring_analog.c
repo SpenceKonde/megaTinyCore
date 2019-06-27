@@ -181,19 +181,26 @@ void analogWrite(uint8_t pin, int val)
 		#endif
 		#if (defined(TCD0) && defined(USE_TIMERD0_PWM))
 		case TIMERD0:
-		    if (bit_pos) {
-		    	TCD0.CMPBSET=255-val;
-		    } else {
-		    	TCD0.CMPASET=val;
-		    }
-			if (!(TCD0.FAULTCTRL & (1<<(6+bit_pos)))) { //bitpos will be 0 or 1 for TIMERD pins
-				//if not active, we need to activate it, which produces a glitch in the PWM 
-				TCD0.CTRLA=0x10;//stop the timer
-				delay(1);// wait until it's actually stopped
-				_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL|(1<<6+bit_pos)); 
-				TCD0.CTRLA=0x11; //reenable it
+			if(val < 1){	/* if zero or negative drive digital low */
+				digitalWrite(pin, LOW);
+			} else if(val > 255){	/* if max or greater drive digital high */
+				digitalWrite(pin, HIGH);
+			} else {
+			    if (bit_pos) {
+			    	TCD0.CMPBSET=255-val;
+			    } else {
+			    	TCD0.CMPASET=val;
+			    }
+				if (!(TCD0.FAULTCTRL & (1<<(6+bit_pos)))) { //bitpos will be 0 or 1 for TIMERD pins
+					//if not active, we need to activate it, which produces a glitch in the PWM 
+					TCD0.CTRLA=0x10;//stop the timer
+					delay(1);// wait until it's actually stopped
+					_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL|(1<<6+bit_pos)); 
+					TCD0.CTRLA=0x11; //reenable it
+				}
 			}
 			break;
+
 		#endif
 
 		/* If non timer pin, or unknown timer definition.	*/
