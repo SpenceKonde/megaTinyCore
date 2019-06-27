@@ -110,9 +110,9 @@ atxy6.menu.dacvref.2v5=2.50V
 atxy6.menu.dacvref.4v3=4.30V
 atxy6.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
 atxy6.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy6.menu.dacvref.1v5.build.dacvref=-DDACVREF=2
-atxy6.menu.dacvref.2v5.build.dacvref=-DDACVREF=3
-atxy6.menu.dacvref.4v3.build.dacvref=-DDACVREF=4
+atxy6.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
+atxy6.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
+atxy6.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 
 atxy6.upload.tool=avrdude
 atxy6.upload.protocol=jtag2updi
