@@ -194,7 +194,7 @@ void analogWrite(uint8_t pin, int val)
 				if (!(TCD0.FAULTCTRL & (1<<(6+bit_pos)))) { //bitpos will be 0 or 1 for TIMERD pins
 					//if not active, we need to activate it, which produces a glitch in the PWM 
 					TCD0.CTRLA=0x10;//stop the timer
-					delay(1);// wait until it's actually stopped
+					while(!(TCD0.STATUS&0x01)) {;} // wait until it's actually stopped
 					_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL|(1<<6+bit_pos)); 
 					TCD0.CTRLA=0x11; //reenable it
 				}
