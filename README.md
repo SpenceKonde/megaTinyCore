@@ -66,7 +66,7 @@ The 1-series parts have an 8-bit DAC which can generate a real analog voltage (n
 ### Servo Support (planned for 1.0.1)
 A future version of this core will provide a version of the Servo library which will select an appropriate timer (Timer B 0, except on the 3216, 3217, 1617 and 1616, where there is a Timer B 1 available; except on the aforementioned parts, tone cannot be used at the same time as the Servo library).
 
-### Interrupts (disable option planned for 1.0.1)
+### Pin Interrupts (disable option planned for 1.0.1)
 All pins can be used with attachInterrupt() and detachInterrupt(), on RISING, FALLING, CHANGE, or LOW. All pins can wake the chip from sleep on CHANGE or LOW. Pins marked as ASync Interrupt pins on the pinout chart can be used to wake from sleep on RISING and FALLING edge as well. In 1.0.1, attachInterrupt() and detachInterrupt() can be disabled entirely with a menu option. This allows sketches that do not use this functionality to save some RAM and flash, and for advanced users to handle port interrupts manually, allowing the faster-executing ISRs and reduced flash and memory use.
 
 ### Bootloader Support (not yet implemented)
