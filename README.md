@@ -5,8 +5,7 @@
 ### [Making a cheap UPDI programmer](MakeUPDIProgrammer.md)
 
 # Core status
-* Everything should work now - but testing has been very scant. Please help out and test stuff if you have the hardware!
-* PWM on the Timer D pins (10, 11 on x16, 12,13 on x17) takes 1 ms to turn on or off, and during this time, the other Timer D PWM channel will be disabled. This applies to digitalWrite() or analogWrite of 0 or 255 while it is currently outputting PWM, and analogWrite of 1~254 while the pin is not currently outputting PWM. We are looking at a better solution (#51)
+* Everything should work now - but testing has been very scant. Please help out and test stuff if you have the hardware! 
 * Upload uses jtag2updi programmer. Upload using programmer and burn bootloader use the selected programmer. 
 
 
@@ -49,6 +48,7 @@ All of these parts have a single hardware I2C (TWI) peripheral. It works exactly
 
 ### PWM support
 The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), only a single PWM pin is available (this is a hardware limitation - if you don't like it, direct your complaints to Atmel/Microchip). On all other parts except the x16 and x17 series, 6 PWM pins are available, driven by Timer A. On the x16 and x17 series, two additional pins are available using Timer D - however note issue #51. The type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A. See the pinout charts for a list of which pins support PWM. 
+The 3216,1616,816,416,3217,1617 and 817 have two additional PWM pins driven by Timer D. Timer D is an async timer, and the outputs can't be enabled or disabled without briefly stopping the timer. This results in a brief glitch on the other PWM pin (if it is currently outputting PWM), and doing so requires slightly longer (in 1.0.0, this delay is 1ms, in 1.0.1 and later, it is around 1us). This applies to digitalWrite() or analogWrite of 0 or 255 while it is currently outputting PWM, and analogWrite of 1~254 while the pin is not currently outputting PWM. This is a hardware limitation and cannot be further improved. 
 
 ### Tone Support
 Support for tone() is provided on all parts using Timer B 0. This is like the standard tone() function; it does not support use of the hardware output compare to generate tones (yet). 
