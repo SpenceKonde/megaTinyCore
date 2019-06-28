@@ -58,7 +58,7 @@ These parts all have 11 ADC channels available (except for the 8-pin parts, whic
 * INTERNAL1V5
 * INTERNAL2V5
 * INTERNAL4V3
-* EXTERNAL (1-series only)
+* EXTERNAL (1-series, not including 412/212 only)
 
 ### DAC Support (supported as of 1.0.1)
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). This generates voltages between 0 and the selected VREF (which cannot be VCC, unfortunately) - select the DAC VREF voltage from the Tools -> DAC Voltage Reference submenu. This voltage must be lower than Vcc to get the correct voltages. Call analogWrite() on the DAC pin to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin. 
