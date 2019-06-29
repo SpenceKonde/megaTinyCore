@@ -66,8 +66,10 @@ The 1-series parts have an 8-bit DAC which can generate a real analog voltage (n
 ### Servo Support (planned for 1.0.1)
 A future version of this core will provide a version of the Servo library which will select an appropriate timer (Timer B 0, except on the 3216, 3217, 1617 and 1616, where there is a Timer B 1 available; except on the aforementioned parts, tone cannot be used at the same time as the Servo library).
 
-### Pin Interrupts (disable option planned for 1.0.1)
-All pins can be used with attachInterrupt() and detachInterrupt(), on RISING, FALLING, CHANGE, or LOW. All pins can wake the chip from sleep on CHANGE or LOW. Pins marked as ASync Interrupt pins on the pinout chart can be used to wake from sleep on RISING and FALLING edge as well. In 1.0.1, attachInterrupt() and detachInterrupt() can be disabled entirely with a menu option. This allows sketches that do not use this functionality to save some RAM and flash, and for advanced users to handle port interrupts manually, allowing the faster-executing ISRs and reduced flash and memory use.
+### Pin Interrupts 
+All pins can be used with attachInterrupt() and detachInterrupt(), on RISING, FALLING, CHANGE, or LOW. All pins can wake the chip from sleep on CHANGE or LOW. Pins marked as ASync Interrupt pins on the pinout chart can be used to wake from sleep on RISING and FALLING edge as well. 
+
+Advanced users can instead set up interrupts manually, ignoring attachInterrupt and manipulating the relevant port registers appropriately and defining the ISR with the ISR() macro - this will produce smaller code (using less flash and ram) and the ISRs will run faster as they don't have to check whether an interrupt is enabled for every pin on the port. (A document is planned to describe how to do this)
 
 ### Bootloader Support (not yet implemented)
 When Optiboot is available for the ATmega4809, it will be adapted for these ATtiny parts, and the bootloader added to this core for chips with 8k or more of flash - possibly 4k chips if the bootloader ends up being small enough. 
@@ -89,7 +91,6 @@ These parts support many BOD trigger levels, with Disabled, Active, and Sampled 
 * Tools -> B.O.D. Mode (active) - Determines whether to enable Brown Out Detection when the chip is not sleeping. You must burn bootloader after changing this to apply the changes. 
 * Tools -> B.O.D. Mode (sleep) - Determines whether to enable Brown Out Detection when the chip is sleeping. You must burn bootloader after changing this to apply the changes. 
 * Tools -> DAC Reference Voltage - Determines the voltage reference for the DAC. This should be less than Vcc to get the right voltage. You do not need to use Burn Bootloader to apply changes to this menu. 
-* Tools -> Enable attachInterrupt() (planned for 1.0.1) - Determines whether to include attachInterrupt() and detachInterrupt() functions. Disabling them saves some RAM and flash if pin interrupts are not in use, or allows advanced users to do interrupts manually. 
 
 # Known Compiler Bugs
 * Sometimes a sketch which is too big to fit will, instead of generating a message saying that, result in the error: 'relocation truncated to fit: R_AVR_13_PCREL against symbol tablejump2'
