@@ -132,7 +132,7 @@ const uint8_t PROGMEM digital_pin_to_bit_position[] = {
 	PIN6_bp, // 0  PA6
 	PIN7_bp, // 1  PA7
 	PIN1_bp, // 2  PA1
-	PIN2_bp // 3  PA2
+	PIN2_bp, // 3  PA2
 	// skip PA0 UPDI
 	PIN3_bp, // 4  PA3
 	PIN0_bp  // 5  PA0
