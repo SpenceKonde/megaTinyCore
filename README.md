@@ -83,6 +83,9 @@ The EESAVE fuse can be controlled via the Tools -> Save EEPROM menu. If this is 
 ### BOD configuration options
 These parts support many BOD trigger levels, with Disabled, Active, and Sampled operation options for when the chip is in Active and Sleep modes - Disabled uses the least power, Active uses the most, and Sampled is in the middle. See the datasheet for details on power consumption and the meaning of these options. You must do Burn Bootloader to apply this setting. 
 
+### Link-time Optimization (LTO) support
+This core *always* uses Link Time Optimization - all versions of the compiler which support the 0-series and 1-series ATtiny parts also support LTO. 
+
 # List of Tools sub-menus
 * Tools -> Chip - sets the specific part within a selected family to compile for and upload to. 
 * Tools -> Clock Speed - sets the clock speed. You must burn bootloader after changing this to apply the changes. 
