@@ -12,7 +12,7 @@ Arduino core for the new megaAVR ATtiny series chips. These parts represent the 
 These use a UPDI programmer, not traditional ISP like the classic ATtiny parts did. One can be made from a classic AVR Uno/Nano/Pro Mini - see [Making a UPDI programmer](MakeUPDIProgrammer.md)
 
 ## Supported Parts
-* [ATtiny3217,1617,817](megaavr/extras/ATtiny_x17.md)
+* [ATtiny3217,1617,817,417](megaavr/extras/ATtiny_x17.md)
 * [ATtiny3216,1616,816,416](megaavr/extras/ATtiny_x16.md)
 * [ATtiny1614,814,414,214](megaavr/extras/ATtiny_x14.md)
 * [ATtiny412,212](megaavr/extras/ATtiny_x12.md)
