@@ -1,4 +1,4 @@
-### ATtiny 406/806/1606/3206
+### ATtiny 406/806/1606
 ![x06 Pin Mapping](ATtiny_x06.gif "Arduino Pin Mapping for ATtiny x06")
 
  Specifications |  ATtiny406  |  ATtiny806  |    ATtiny1606   
