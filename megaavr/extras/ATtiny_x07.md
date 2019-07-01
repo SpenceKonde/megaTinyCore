@@ -4,7 +4,7 @@
  Specifications |    ATtiny807  |    ATtiny1607   
 ------------ | ------------- | -------------
 Flash (program memory)   |  8192 bytes | 16384 bytes 
-RAM   | 512 bytes | 2048 bytes 
+RAM   | 512 bytes | 1024 bytes 
 EEPROM | 128 bytes | 256 bytes 
 Bootloader | No | No 
 GPIO Pins | 22 | 22 
