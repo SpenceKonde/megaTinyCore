@@ -11,5 +11,10 @@ GPIO Pins | 18 | 18 | 18 | 18
 ADC Channels | 12 | 12 | 12 | 12 
 DAC | Yes | Yes | Yes | Yes
 PWM Channels | 8 | 8 | 8 | 8 
+Timer type B | 1 | 1 | 2 | 2 
 Interfaces | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C 
 Clock options | Internal 16/20mhz | Internal 16/20mhz | Internal 16/20mhz | Internal 16/20mhz 
+
+### Datasheets
+[ATtiny416/816](http://ww1.microchip.com/downloads/en/devicedoc/40001933a.pdf)
+[ATtiny1616/3216](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny3216_ATtiny1616-data-sheet-40001997B.pdf)
