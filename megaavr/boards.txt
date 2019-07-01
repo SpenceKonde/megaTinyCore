@@ -385,7 +385,7 @@ atxy2.bootloader.BOOTEND=0x00
 
 ##############################################################
 
-atxy7.name=ATtiny3217/1617/1607/817/807
+atxy7.name=ATtiny3217/1617/1607/817/807/417
 
 atxy7.menu.chip.3217=ATtiny3217
 atxy7.menu.chip.3217.build.mcu=attiny3217
@@ -399,6 +399,10 @@ atxy7.menu.chip.817=ATtiny817
 atxy7.menu.chip.817.build.mcu=attiny817
 atxy7.menu.chip.817.upload.maximum_size=8192
 atxy7.menu.chip.817.upload.maximum_data_size=512
+atxy7.menu.chip.417=ATtiny417
+atxy7.menu.chip.417.build.mcu=attiny417
+atxy7.menu.chip.417.upload.maximum_size=4096
+atxy7.menu.chip.417.upload.maximum_data_size=256
 atxy7.menu.chip.1607=ATtiny1607
 atxy7.menu.chip.1607.build.mcu=attiny1607
 atxy7.menu.chip.1607.upload.maximum_size=16384
