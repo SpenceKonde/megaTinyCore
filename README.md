@@ -60,10 +60,10 @@ These parts all have 11 ADC channels available (except for the 8-pin parts, whic
 * INTERNAL4V3
 * EXTERNAL (1-series, not including 412/212 only)
 
-### DAC Support (supported as of 1.0.1)
+### DAC Support (new in 1.0.1)
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). This generates voltages between 0 and the selected VREF (which cannot be VCC, unfortunately) - select the DAC VREF voltage from the Tools -> DAC Voltage Reference submenu. This voltage must be lower than Vcc to get the correct voltages. Call analogWrite() on the DAC pin to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin. 
 
-### Servo Support (planned for 1.0.1)
+### Servo Support (new in 1.0.1)
 A future version of this core will provide a version of the Servo library which will select an appropriate timer (Timer B 0, except on the 3216, 3217, 1617 and 1616, where there is a Timer B 1 available; except on the aforementioned parts, tone cannot be used at the same time as the Servo library).
 
 ### Pin Interrupts 
@@ -85,6 +85,9 @@ These parts support many BOD trigger levels, with Disabled, Active, and Sampled 
 
 ### Link-time Optimization (LTO) support
 This core *always* uses Link Time Optimization to reduce flash usage - all versions of the compiler which support the 0-series and 1-series ATtiny parts also support LTO, so there is no need to make it optional as was done with ATtinyCore. 
+
+### Identifying part family within sketch (new in 1.0.1)
+When writing code that may be compiled for a variety of target chips (which is particularly easy on the megaAVR parts, as the peripherals are so similar), it is often useful to be able to identify which family of parts is being used, in order to, for example, select which pin numbers to use for each purpose. Each part is identified by the compiler with a #define `__AVR_ATtiny***__` where *** is the part number (ex: `__AVR_ATtiny3216__`). This core provides two additional #defines for part "families" - `__AVR_ATtinyx**__` where ** is the last 2 digits of the part number (ex: `__AVR_ATtinyx16`), and `__AVR_ATtinyxy*__` where * is the last digit of the part number, (ex: `__AVR_ATtinyxy6`). This is just shorthand, for convenience - `#ifdef __AVR_ATtinyxy2__` is equivilent to `#if defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__)` .
 
 # List of Tools sub-menus
 * Tools -> Chip - sets the specific part within a selected family to compile for and upload to. 

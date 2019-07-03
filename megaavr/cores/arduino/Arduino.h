@@ -62,6 +62,7 @@ extern "C"{
 #define interrupts() sei()
 #define noInterrupts() cli()
 
+
 // avr-libc defines _NOP() since 1.6.2
 #ifndef _NOP
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
@@ -134,6 +135,35 @@ bool isDoubleBondedActive(uint8_t pin);
 #define portOutputRegister(P) ( (volatile uint8_t *)( &portToPortStruct(P)->OUT ) )
 #define portInputRegister(P) ( (volatile uint8_t *)( &portToPortStruct(P)->IN ) )
 #define portModeRegister(P) ( (volatile uint8_t *)( &portToPortStruct(P)->DIR ) )
+
+//#defines to identify part families
+#if defined(__AVR_ATtiny3217__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny817__) || defined(__AVR_ATtiny417__)
+#define __AVR_ATtinyx17__
+#define __AVR_ATtinyxy7__
+#elif defined(__AVR_ATtiny3207__) || defined(__AVR_ATtiny1607__) || defined(__AVR_ATtiny807__) || defined(__AVR_ATtiny407__)
+#define __AVR_ATtinyx07__
+#define __AVR_ATtinyxy7__
+#elif defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny816__) || defined(__AVR_ATtiny416__)
+#define __AVR_ATtinyx16__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny1606__) || defined(__AVR_ATtiny806__) || defined(__AVR_ATtiny406__)
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny214__) || defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny814__) || defined(__AVR_ATtiny414__)
+#define __AVR_ATtinyx14__
+#define __AVR_ATtinyxy4__
+#elif defined(__AVR_ATtiny204__) || defined(__AVR_ATtiny804__) || defined(__AVR_ATtiny404__)
+#define __AVR_ATtinyx04__
+#define __AVR_ATtinyxy4__
+#elif defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__)
+#define __AVR_ATtinyx12__
+#define __AVR_ATtinyxy2__
+#elif defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__)
+#define __AVR_ATtinyx02__
+#define __AVR_ATtinyxy2__
+#else
+#error "Can't-happen: unknown chip somehow being used"
+#endif
 
 #ifdef __cplusplus
 } // extern "C"
