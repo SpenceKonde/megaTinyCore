@@ -91,7 +91,6 @@ ISR(TCB0_INT_vect)
 	// (volatile variables must be read from memory on every access)
 	uint32_t m = timer_millis;
 	uint16_t f = timer_fract;
-
 	m += millis_inc;
 	f += fract_inc;
 	if (f >= FRACT_MAX) {
@@ -114,6 +113,7 @@ ISR(TCB0_INT_vect)
 
 unsigned long millis()
 {
+	//return timer_overflow_count; //for debugging timekeeping issues where these variables are out of scope from the sketch
 	unsigned long m;
 
 	// disable interrupts while we read timer0_millis or we might get an
@@ -145,7 +145,7 @@ unsigned long micros() {
 	/* If the timer overflow flag is raised, we just missed it,
 	increment to account for it, & read new ticks */
 	#ifdef MILLIS_USE_TIMERA0
-	if(TCA0.SPLIT.INTFLAGS = TCA_SPLIT_LUNF_bm){
+	if(TCA0.SPLIT.INTFLAGS & TCA_SPLIT_LUNF_bm){
 		overflows++;
 		ticks = 0xFF-TCA0.SPLIT.LCNT;
 		
@@ -422,7 +422,7 @@ void init()
 	fract_inc = ((microseconds_per_timer_overflow % 1000));
 
     #ifdef MILLIS_USE_TIMERA0
-    TCA0.SPLIT.INTCTRL |= TCA_SPLIT_LUNF_bm;
+    TCA0.SPLIT.INTCTRL = TCA_SPLIT_LUNF_bm;
     
     #else //It's a type b timer
 	/* Default Periodic Interrupt Mode */
