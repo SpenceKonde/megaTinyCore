@@ -24,3 +24,12 @@ Now, you should be able to select an ATtiny megaAVR series board from Tools -> B
 * Solder the wires in place - we suggest using 0.1" DuPont jumpers: Cut the jumpers in half, strip, and solder in place.
 * After soldering the wires in place, glue them to the bottom of the board with hot-melt glue, otherwise they will fatigue and break easily with handling.
 * We suggest arranging the connectors in the following order: Gnd, UPDI, Vcc. Use a 3-pin DuPont housing, or hold the three 1-pin housings in together with scotch tape. In July 2019, I expect to have breakout boards available for all of the supported families of parts from my Tindie store, these will provide a programming header with the pins in this order, with the 4.7k resistor on-board (so no resistor be included). 
+## Nano as UPDI programmer, assembly and use
+![Nano as UPDI](megaavr/extras/NanoAsUPDI.png) "Nano converted to UPDI programmer")
+
+## Pro Mini (and serial adapter) as UPDI
+![Pro Mini as UPDI](megaavr/extras/ProMiniAsUPDI.png "Pro Mini converted to UPDI programmer")
+
+## Typical development configuration
+Since it is frequently useful to have a serial port for debugging, I typically find myself using a configuration like this, with a serial adapter and UPDI programmer connected simultaneously.
+![Development configuration for megaavr](megaavr/extras/DevConfigUPDI.png "Arduino Pin Mapping for ATtiny x16")
