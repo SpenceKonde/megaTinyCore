@@ -43,5 +43,5 @@ The actual status can be read with:
 
 If you want to use the internal pullup resistor on this input pin you can set this in the PINnCTRL register as follows:
 
-    PORTA.PIN5CTR = PORT_PULLUPEN_bm; // use the insertnal pullup resistor
+    PORTA.PIN5CTRL = PORT_PULLUPEN_bm; // use the insertnal pullup resistor
 
