@@ -18,6 +18,8 @@ Download and extract, or clone the repo to your local machine.
 
 Now, you should be able to select an ATtiny megaAVR series board from Tools -> Board, and upload a sketch via the IDE. The same programmer can also be used to Burn Bootloader (be sure to select the jtag2updi (megaTinyCore) programmer from Tools -> Programmer menu) 
 
+![Minimal UPDI connections](megaavr/extras/MinimalConnectionsUPDI.png "Minimal UPDI connections")
+
 ## Permanent programmer assembly suggestions: 
 * For convenience, we recommend dedicating a Nano or Pro Mini to this purpose, and soldering the connections. Nano and Pro Mini clones can be had on ebay for under $3 including shipping. Use one without the headers pre-installed. 
 * Solder the 10uF cap in place after uploading the sketch. A small ceramic cap can be bent across the bottom of the board. 
