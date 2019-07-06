@@ -10,10 +10,8 @@ The clock speed can be set from the Arduino IDE. Go to Tools -> Clock Speed, and
 
 Clock Speed |	20MHz	| 16MHz |	10MHz |	8MHz |5MHz | 4MHz |	1MHz
 ------------|-------|-------|-------|-------|-------|-------|-------
-Current | 10.2mA	| 10mA*	| 5.5mA	| 5mA*	| 3.2mA	| 3mA*	| 2mA*
-Voltage	| 4.5V-5.5V | 4V-5.5V* | 2.7V-5.5V | 2.7V-5.5V | 1.8V-5.5V | 1.8V-5.5V | 1.8V-5.5V
-
-*not in datasheet, estimated
+Current | 10.2mA	| 8mA	| 5.5mA	| 4.5mA	| 3.2mA	| 2mA	| 0.6mA
+Voltage	| 4.5V-5.5V | 4.2V-5.5V | 2.7V-5.5V | 2.7V-5.5V | 1.8V-5.5V | 1.8V-5.5V | 1.8V-5.5V
 
 We often get the request to add the 32KHz option to the clock speed menu since it only requires 13.5μA. While it is possible to run the main clock from this low power oscillator, it is not recommended. It will make certain peripherals unusable, and timers used for delay and millis do require the faster oscillator to run anyway.
 
