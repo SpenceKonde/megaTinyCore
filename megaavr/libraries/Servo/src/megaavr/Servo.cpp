@@ -3,8 +3,8 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-#define usToTicks(_us)    ((clockCyclesPerMicrosecond() / 16 * _us) / 4)                 // converts microseconds to tick
-#define ticksToUs(_ticks) (((unsigned) _ticks * 16) / (clockCyclesPerMicrosecond() / 4))   // converts from ticks back to microseconds
+#define usToTicks(_us)    ((( _us / 16) * clockCyclesPerMicrosecond()) / 4)                 // converts microseconds to tick
+#define ticksToUs(_ticks) (((unsigned) _ticks * 16 * 4) / clockCyclesPerMicrosecond())   // converts from ticks back to microseconds
 
 #define TRIM_DURATION  5                                   // compensation ticks to trim adjust for digitalWrite delays
 
@@ -80,7 +80,6 @@ ISR(TCB2_INT_vect)
 static void initISR(timer16_Sequence_t timer)
 {
   //TCA0.SINGLE.CTRLA = (TCA_SINGLE_CLKSEL_DIV16_gc) | (TCA_SINGLE_ENABLE_bm);
-
   _timer->CTRLA = TCB_CLKSEL_CLKTCA_gc;
   // Timer to Periodic interrupt mode
   // This write will also disable any active PWM outputs
