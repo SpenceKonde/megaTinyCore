@@ -165,6 +165,8 @@ bool isDoubleBondedActive(uint8_t pin);
 #error "Can't-happen: unknown chip somehow being used"
 #endif
 
+#define MEGATINYCORE
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
