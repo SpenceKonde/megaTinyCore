@@ -71,7 +71,7 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define PIN_WIRE_HWSERIAL0_RX 	(3)
 #define PIN_WIRE_HWSERIAL0_TX 	(2)
 
-#define LED_BUILTIN 4
+#define LED_BUILTIN 1 //PA7 - the only pin on the part that doesn't have some critical function that an LED would interfere with
 
 
 #define PIN_A0   (5)
