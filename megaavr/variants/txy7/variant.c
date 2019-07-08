@@ -73,7 +73,7 @@ void setup_timers() {
 	// ATtiny only uses up to TCB1
 	/* Stop when pointing to TCB1 */
 	#ifdef TCB1
-	} while (timer_B < (TCB_t *)&TCB1);
+	} while (timer_B <= (TCB_t *)&TCB1);
     #endif
     #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
     TCD0.CMPBCLR=255; //Count to 255 (8-bit resolution)
