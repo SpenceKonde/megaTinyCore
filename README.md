@@ -58,13 +58,15 @@ These parts all have 11 ADC channels available (except for the 8-pin parts, whic
 * INTERNAL1V5
 * INTERNAL2V5
 * INTERNAL4V3
-* EXTERNAL (1-series, not including 412/212 only)
+* EXTERNAL (1-series, not including, 412/212 only)
 
 ### DAC Support (new in 1.0.1)
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). This generates voltages between 0 and the selected VREF (which cannot be VCC, unfortunately) - select the DAC VREF voltage from the Tools -> DAC Voltage Reference submenu. This voltage must be lower than Vcc to get the correct voltages. Call analogWrite() on the DAC pin to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin. 
 
 ### Servo Support (new in 1.0.1)
 This core provides a version of the Servo library which will select an appropriate timer (Timer B 0, except on the 3216, 3217, 1617,  1616 and 1614, where there is a Timer B 1 available; except on the aforementioned parts, tone cannot be used at the same time as the Servo library). Servo output is better the higher the clock speed - when using servos, it is recommended to run at the highest frequency permitted by the operating voltage to minimize jitter. 
+
+**Warning** If you have installed a version of the Servo library to your <sketchbook>/libraries folder (including via library manager), the IDE will use that version of the library (which is not compatible with these parts) instead of the one supplied with megaTinyCore (which is). As a workaround, a duplicate of the Servo library is included with a different name - to use it, `#include <Servo_megaTinyCore.h>` instead of `#include <Servo.h>`  
 
 ### Pin Interrupts 
 All pins can be used with attachInterrupt() and detachInterrupt(), on RISING, FALLING, CHANGE, or LOW. All pins can wake the chip from sleep on CHANGE or LOW. Pins marked as ASync Interrupt pins on the pinout chart can be used to wake from sleep on RISING and FALLING edge as well. 
