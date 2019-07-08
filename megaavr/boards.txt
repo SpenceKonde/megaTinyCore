@@ -267,11 +267,11 @@ atxy4.bootloader.BOOTEND=0x00
 
 atxy2.name=ATtiny412/402/212/202
 
-#atxy2.menu.chip.812=ATtiny814
+#atxy2.menu.chip.812=ATtiny812
 #atxy2.menu.chip.812.build.mcu=attiny812
 #atxy2.menu.chip.812.upload.maximum_size=8192
 #atxy2.menu.chip.812.upload.maximum_data_size=512
-atxy2.menu.chip.412=ATtiny414
+atxy2.menu.chip.412=ATtiny412
 atxy2.menu.chip.412.build.mcu=attiny412
 atxy2.menu.chip.412.upload.maximum_size=4096
 atxy2.menu.chip.412.upload.maximum_data_size=256
