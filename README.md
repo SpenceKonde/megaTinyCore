@@ -4,8 +4,6 @@
 ### [Installation](Installation.md)
 ### [Making a cheap UPDI programmer](MakeUPDIProgrammer.md)
 
-**Timing issues with delay() and micros() in 1.0.0 are fixed in github version will be fixed in 1.0.1 release**
-
 # megaTinyCore
 Arduino core for the new megaAVR ATtiny series chips. These parts represent the new megaAVR technology (as used in megaAVR chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) and advanced peripherals in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. Moreover, these parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini!) run just over $1, and under 90 cents in quantity - less than many 8k classic AVR ATtiny parts (AVR architecture, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal. 
 
