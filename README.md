@@ -96,6 +96,10 @@ This is just shorthand, for convenience - `#ifdef __AVR_ATtinyxy2__` is equivile
 ### Bootloader Support (not yet implemented)
 When Optiboot is available for the ATmega4809, it will be adapted for these ATtiny parts, and the bootloader added to this core for chips with 8k or more of flash - possibly 4k chips if the bootloader ends up being small enough. 
 
+# Guides
+[Power Saving techniques and Sleep](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PowerSave.md)
+[Direct Port Manipulation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/DirectPortManipulation.md)
+
 # List of Tools sub-menus
 * Tools -> Chip - sets the specific part within a selected family to compile for and upload to. 
 * Tools -> Clock Speed - sets the clock speed. You must burn bootloader after changing this to apply the changes. 
