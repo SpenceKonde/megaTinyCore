@@ -72,7 +72,7 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define PIN_WIRE_HWSERIAL0_RX 	(6)
 #define PIN_WIRE_HWSERIAL0_TX 	(7)
 
-#define LED_BUILTIN 4
+#define LED_BUILTIN 3
 
 #define PIN_A0   (17)
 #define PIN_A1   (14)
