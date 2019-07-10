@@ -94,7 +94,7 @@ static const uint8_t A5 = PIN_A5;
 static const uint8_t A6 = PIN_A6;
 static const uint8_t A7 = PIN_A7;
 static const uint8_t A10 = PIN_A10;
-static const uint8_t A11 = PIN_A10;
+static const uint8_t A11 = PIN_A11;
 
 #define PINS_COUNT		(12u)
 
