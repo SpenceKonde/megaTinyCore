@@ -106,13 +106,13 @@ static const uint8_t A11 = PIN_A11;
 
 // ATtiny1614 / ARDUINO
 //                          _____ 
-//                  VDD   1|*    |20  GND
-// (nSS)  (AIN4) PA4  0~  2|     |19  10~ PA3 (AIN3)(SCK)(EXTCLK)
-//        (AIN5) PA5  1~  3|     |18  9   PA2 (AIN2)(MISO)
-// (DAC)  (AIN6) PA6  2   4|     |17  8   PA1 (AIN1)(MOSI)
-//        (AIN7) PA7  3   5|     |16  11  PA0 (nRESET/UPDI)
-// (RXD) (TOSC1) PB3  4   6|     |15  7~  PB0 (AIN11)(SCL)
-// (TXD) (TOSC2) PB2  5~  7|_____|14  6~  PB1 (AIN10)(SDA)
+//                  VDD   1|*    |14  GND
+// (nSS)  (AIN4) PA4  0~  2|     |13  10~ PA3 (AIN3)(SCK)(EXTCLK)
+//        (AIN5) PA5  1~  3|     |12  9   PA2 (AIN2)(MISO)
+// (DAC)  (AIN6) PA6  2   4|     |11  8   PA1 (AIN1)(MOSI)
+//        (AIN7) PA7  3   5|     |10  11  PA0 (nRESET/UPDI)
+// (RXD) (TOSC1) PB3  4   6|     |9   7~  PB0 (AIN11)(SCL)
+// (TXD) (TOSC2) PB2  5~  7|_____|8   6~  PB1 (AIN10)(SDA)
 //               
 //
 
