@@ -2,6 +2,7 @@
 1.0.2 (not yet released, changes only in github)
 * Fix analogRead() on most pins. 
 * Fix A11 on ATtiny x04 and x14 parts
+* Fix 1604 (compile and upload both had separate and unrelated issues)
 
 
 1.0.1 (released)
