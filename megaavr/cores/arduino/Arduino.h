@@ -152,7 +152,7 @@ bool isDoubleBondedActive(uint8_t pin);
 #elif defined(__AVR_ATtiny214__) || defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny814__) || defined(__AVR_ATtiny414__)
 #define __AVR_ATtinyx14__
 #define __AVR_ATtinyxy4__
-#elif defined(__AVR_ATtiny204__) || defined(__AVR_ATtiny804__) || defined(__AVR_ATtiny404__)
+#elif defined(__AVR_ATtiny204__) || defined(__AVR_ATtiny804__) || defined(__AVR_ATtiny404__) || defined(__AVR_ATtiny1604__)
 #define __AVR_ATtinyx04__
 #define __AVR_ATtinyxy4__
 #elif defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__)
