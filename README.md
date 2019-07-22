@@ -9,7 +9,7 @@ Arduino core for the new megaAVR ATtiny series chips. These parts represent the 
 
 These use a UPDI programmer, not traditional ISP like the classic ATtiny parts did. One can be made from a classic AVR Uno/Nano/Pro Mini - see [Making a UPDI programmer](MakeUPDIProgrammer.md)
 
-For this core to work, **you must install the official Arduino megaAVR board package** using board manager - this is required to get the compiler installed. If you receive an error of the form "avr-g++: error: device-specs/specs-attiny402: No such file or directory", that indicates that the Arduino megaAVR board package is not installed. 
+For this core to work when installed manually, and via board manager for 1.0.1 and earlier, **you must install the official Arduino megaAVR board package** using board manager - this is required to get the compiler installed. If you receive an error of the form "avr-g++: error: device-specs/specs-attiny402: No such file or directory", that indicates that the Arduino megaAVR board package is not installed. As of 1.0.2, this is no longer required if installed via board manager. It is still required for a manual installation. 
 
 ## Supported Parts (click link for pinout diagram and details)
 * [ATtiny3217,1617,817,417](megaavr/extras/ATtiny_x17.md)
