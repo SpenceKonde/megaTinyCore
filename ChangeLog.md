@@ -3,7 +3,8 @@
 * Fix analogRead() on most pins. 
 * Fix A11 on ATtiny x04 and x14 parts
 * Fix 1604 (compile and upload both had separate and unrelated issues)
-* Board manager installation will no longer require official megaAVR board package to be installed. 
+* Board manager installation will no longer require official megaAVR board package to be installed
+* Correct analog pin macros (these don't appear to be used anywhere, but may be used by third party code)
 
 
 1.0.1 (released)
