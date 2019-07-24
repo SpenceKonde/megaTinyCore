@@ -1,10 +1,12 @@
 
 1.0.2 (released)
-* Fix analogRead() on most pins.
+* Fix analogRead(), which was broken on most pins
 * Fix A11 on ATtiny x04 and x14 parts
 * Fix 1604 (compile and upload both had separate and unrelated issues)
 * Board manager installation will no longer require official megaAVR board package to be installed
 * Correct analog pin macros (these don't appear to be used anywhere, but may be used by third party code)
+* Add workaround for t402's with bad signature
+* Improve consistency in boards.txt
 
 
 1.0.1
