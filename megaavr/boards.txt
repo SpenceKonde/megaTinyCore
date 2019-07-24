@@ -13,6 +13,127 @@ menu.dacvref=DAC Voltage Reference
 
 ##############################################################
 
+atxy7.name=ATtiny3217/1617/1607/817/807/417
+
+atxy7.menu.chip.3217=ATtiny3217
+atxy7.menu.chip.3217.build.mcu=attiny3217
+atxy7.menu.chip.3217.upload.maximum_size=32768
+atxy7.menu.chip.3217.upload.maximum_data_size=2048
+atxy7.menu.chip.1617=ATtiny1617
+atxy7.menu.chip.1617.build.mcu=attiny1617
+atxy7.menu.chip.1617.upload.maximum_size=16384
+atxy7.menu.chip.1617.upload.maximum_data_size=2048
+atxy7.menu.chip.817=ATtiny817
+atxy7.menu.chip.817.build.mcu=attiny817
+atxy7.menu.chip.817.upload.maximum_size=8192
+atxy7.menu.chip.817.upload.maximum_data_size=512
+atxy7.menu.chip.417=ATtiny417
+atxy7.menu.chip.417.build.mcu=attiny417
+atxy7.menu.chip.417.upload.maximum_size=4096
+atxy7.menu.chip.417.upload.maximum_data_size=256
+atxy7.menu.chip.1607=ATtiny1607
+atxy7.menu.chip.1607.build.mcu=attiny1607
+atxy7.menu.chip.1607.upload.maximum_size=16384
+atxy7.menu.chip.1607.upload.maximum_data_size=1024
+atxy7.menu.chip.807=ATtiny807
+atxy7.menu.chip.807.build.mcu=attiny807
+atxy7.menu.chip.807.upload.maximum_size=8192
+atxy7.menu.chip.807.upload.maximum_data_size=512
+
+atxy7.menu.clock.20=20 MHz
+atxy7.menu.clock.16=16 MHz
+atxy7.menu.clock.10=10 MHz
+atxy7.menu.clock.8=8 MHz
+atxy7.menu.clock.5=5 MHz
+atxy7.menu.clock.4=4 MHz
+atxy7.menu.clock.1=1 MHz
+atxy7.menu.clock.20.build.f_cpu=20000000L
+atxy7.menu.clock.16.build.f_cpu=16000000L
+atxy7.menu.clock.10.build.f_cpu=10000000L
+atxy7.menu.clock.8.build.f_cpu=8000000L
+atxy7.menu.clock.5.build.f_cpu=5000000L
+atxy7.menu.clock.4.build.f_cpu=4000000L
+atxy7.menu.clock.1.build.f_cpu=1000000L
+atxy7.menu.clock.20.bootloader.OSCCFG=0x02
+atxy7.menu.clock.16.bootloader.OSCCFG=0x01
+atxy7.menu.clock.10.bootloader.OSCCFG=0x02
+atxy7.menu.clock.8.bootloader.OSCCFG=0x01
+atxy7.menu.clock.5.bootloader.OSCCFG=0x02
+atxy7.menu.clock.4.bootloader.OSCCFG=0x01
+atxy7.menu.clock.1.bootloader.OSCCFG=0x01 
+
+atxy7.menu.bodvoltage.1v8=1.8V
+atxy7.menu.bodvoltage.2v15=2.15V
+atxy7.menu.bodvoltage.2v6=2.6V
+atxy7.menu.bodvoltage.2v95=2.95V
+atxy7.menu.bodvoltage.3v3=3.30V
+atxy7.menu.bodvoltage.3v7=3.70V
+atxy7.menu.bodvoltage.4v0=4.00V
+atxy7.menu.bodvoltage.4v3=4.30V
+atxy7.menu.bodvoltage.4v3.bootloader.bodlevbits=111
+atxy7.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy7.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy7.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy7.menu.bodvoltage.2v95.bootloader.bodlevbits=011
+atxy7.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy7.menu.bodvoltage.2v15.bootloader.bodlevbits=001
+atxy7.menu.bodvoltage.1v8.bootloader.bodlevbits=000
+atxy7.menu.bodmodeactive.disabled=Disabled
+atxy7.menu.bodmodeactive.enabled=Enabled
+atxy7.menu.bodmodeactive.sampled=Sampled
+atxy7.menu.bodmodeactive.enabledhold=Enabled hold wakeup
+atxy7.menu.bodmodesleep.disabled=Disabled
+atxy7.menu.bodmodesleep.enabled=Enabled
+atxy7.menu.bodmodesleep.sampled=Sampled
+atxy7.menu.bodmodeactive.disabled.bootloader.bodactivebits=00
+atxy7.menu.bodmodeactive.enabled.bootloader.bodactivebits=01
+atxy7.menu.bodmodeactive.sampled.bootloader.bodactivebits=10
+atxy7.menu.bodmodeactive.enabledhold.bootloader.bodactivebits=11
+atxy7.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
+atxy7.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
+atxy7.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
+
+atxy7.menu.eesave.enable=EEPROM retained
+atxy7.menu.eesave.enable.bootloader.SYSCFG0=0xC6
+atxy7.menu.eesave.disable=EEPROM not retained
+atxy7.menu.eesave.disable.bootloader.SYSCFG0=0xC7
+
+atxy7.menu.dacvref.0v55=0.55V
+atxy7.menu.dacvref.1v1=1.10V
+atxy7.menu.dacvref.1v5=1.50V
+atxy7.menu.dacvref.2v5=2.50V
+atxy7.menu.dacvref.4v3=4.30V
+atxy7.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
+atxy7.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
+atxy7.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
+atxy7.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
+atxy7.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
+
+atxy7.upload.tool=avrdude
+atxy7.upload.protocol=jtag2updi
+atxy7.upload.speed=115200
+atxy7.upload.use_1200bps_touch=true
+atxy7.upload.extra_params=-P{serial.port}
+
+atxy7.build.board=attinyxy7
+atxy7.build.core=arduino
+atxy7.build.variant=txy7
+atxy7.build.text_section_start=.text=0x0
+atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref}
+atxy7.build.export_merged_output=false
+
+atxy7.bootloader.tool=avrdude
+atxy7.bootloader.WDTCFG=0x00
+atxy7.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
+atxy7.bootloader.TCD0CFG=0x00
+atxy7.bootloader.SYSCFG0=0xC9
+atxy7.bootloader.SYSCFG1=0x03
+atxy7.bootloader.APPEND=0x00
+atxy7.bootloader.BOOTEND=0x00
+
+
+##############################################################
+
 atxy6.name=ATtiny3216/1616/1606/816/806/416/406
 
 atxy6.menu.chip.3216=ATtiny3216
@@ -383,122 +504,3 @@ atxy2.bootloader.SYSCFG1=0x03
 atxy2.bootloader.APPEND=0x00
 atxy2.bootloader.BOOTEND=0x00
 
-##############################################################
-
-atxy7.name=ATtiny3217/1617/1607/817/807/417
-
-atxy7.menu.chip.3217=ATtiny3217
-atxy7.menu.chip.3217.build.mcu=attiny3217
-atxy7.menu.chip.3217.upload.maximum_size=32768
-atxy7.menu.chip.3217.upload.maximum_data_size=2048
-atxy7.menu.chip.1617=ATtiny1617
-atxy7.menu.chip.1617.build.mcu=attiny1617
-atxy7.menu.chip.1617.upload.maximum_size=16384
-atxy7.menu.chip.1617.upload.maximum_data_size=2048
-atxy7.menu.chip.817=ATtiny817
-atxy7.menu.chip.817.build.mcu=attiny817
-atxy7.menu.chip.817.upload.maximum_size=8192
-atxy7.menu.chip.817.upload.maximum_data_size=512
-atxy7.menu.chip.417=ATtiny417
-atxy7.menu.chip.417.build.mcu=attiny417
-atxy7.menu.chip.417.upload.maximum_size=4096
-atxy7.menu.chip.417.upload.maximum_data_size=256
-atxy7.menu.chip.1607=ATtiny1607
-atxy7.menu.chip.1607.build.mcu=attiny1607
-atxy7.menu.chip.1607.upload.maximum_size=16384
-atxy7.menu.chip.1607.upload.maximum_data_size=1024
-atxy7.menu.chip.807=ATtiny807
-atxy7.menu.chip.807.build.mcu=attiny807
-atxy7.menu.chip.807.upload.maximum_size=8192
-atxy7.menu.chip.807.upload.maximum_data_size=512
-
-atxy7.menu.clock.20=20 MHz
-atxy7.menu.clock.16=16 MHz
-atxy7.menu.clock.10=10 MHz
-atxy7.menu.clock.8=8 MHz
-atxy7.menu.clock.5=5 MHz
-atxy7.menu.clock.4=4 MHz
-atxy7.menu.clock.1=1 MHz
-atxy7.menu.clock.20.build.f_cpu=20000000L
-atxy7.menu.clock.16.build.f_cpu=16000000L
-atxy7.menu.clock.10.build.f_cpu=10000000L
-atxy7.menu.clock.8.build.f_cpu=8000000L
-atxy7.menu.clock.5.build.f_cpu=5000000L
-atxy7.menu.clock.4.build.f_cpu=4000000L
-atxy7.menu.clock.1.build.f_cpu=1000000L
-atxy7.menu.clock.20.bootloader.OSCCFG=0x02
-atxy7.menu.clock.16.bootloader.OSCCFG=0x01
-atxy7.menu.clock.10.bootloader.OSCCFG=0x02
-atxy7.menu.clock.8.bootloader.OSCCFG=0x01
-atxy7.menu.clock.5.bootloader.OSCCFG=0x02
-atxy7.menu.clock.4.bootloader.OSCCFG=0x01
-atxy7.menu.clock.1.bootloader.OSCCFG=0x01 
-
-atxy7.menu.bodvoltage.1v8=1.8V
-atxy7.menu.bodvoltage.2v15=2.15V
-atxy7.menu.bodvoltage.2v6=2.6V
-atxy7.menu.bodvoltage.2v95=2.95V
-atxy7.menu.bodvoltage.3v3=3.30V
-atxy7.menu.bodvoltage.3v7=3.70V
-atxy7.menu.bodvoltage.4v0=4.00V
-atxy7.menu.bodvoltage.4v3=4.30V
-atxy7.menu.bodvoltage.4v3.bootloader.bodlevbits=111
-atxy7.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atxy7.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atxy7.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atxy7.menu.bodvoltage.2v95.bootloader.bodlevbits=011
-atxy7.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atxy7.menu.bodvoltage.2v15.bootloader.bodlevbits=001
-atxy7.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atxy7.menu.bodmodeactive.disabled=Disabled
-atxy7.menu.bodmodeactive.enabled=Enabled
-atxy7.menu.bodmodeactive.sampled=Sampled
-atxy7.menu.bodmodeactive.enabledhold=Enabled hold wakeup
-atxy7.menu.bodmodesleep.disabled=Disabled
-atxy7.menu.bodmodesleep.enabled=Enabled
-atxy7.menu.bodmodesleep.sampled=Sampled
-atxy7.menu.bodmodeactive.disabled.bootloader.bodactivebits=00
-atxy7.menu.bodmodeactive.enabled.bootloader.bodactivebits=01
-atxy7.menu.bodmodeactive.sampled.bootloader.bodactivebits=10
-atxy7.menu.bodmodeactive.enabledhold.bootloader.bodactivebits=11
-atxy7.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
-atxy7.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
-atxy7.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
-
-atxy7.menu.eesave.enable=EEPROM retained
-atxy7.menu.eesave.enable.bootloader.SYSCFG0=0xC6
-atxy7.menu.eesave.disable=EEPROM not retained
-atxy7.menu.eesave.disable.bootloader.SYSCFG0=0xC7
-
-atxy7.menu.dacvref.0v55=0.55V
-atxy7.menu.dacvref.1v1=1.10V
-atxy7.menu.dacvref.1v5=1.50V
-atxy7.menu.dacvref.2v5=2.50V
-atxy7.menu.dacvref.4v3=4.30V
-atxy7.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-atxy7.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy7.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-atxy7.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-atxy7.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-
-atxy7.upload.tool=avrdude
-atxy7.upload.protocol=jtag2updi
-atxy7.upload.speed=115200
-atxy7.upload.use_1200bps_touch=true
-atxy7.upload.extra_params=-P{serial.port}
-
-atxy7.build.board=attinyxy7
-atxy7.build.core=arduino
-atxy7.build.variant=txy7
-atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref}
-atxy7.build.export_merged_output=false
-
-atxy7.bootloader.tool=avrdude
-atxy7.bootloader.WDTCFG=0x00
-atxy7.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
-atxy7.bootloader.TCD0CFG=0x00
-atxy7.bootloader.SYSCFG0=0xC9
-atxy7.bootloader.SYSCFG1=0x03
-atxy7.bootloader.APPEND=0x00
-atxy7.bootloader.BOOTEND=0x00
