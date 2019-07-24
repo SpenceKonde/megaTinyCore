@@ -131,6 +131,7 @@ atxy7.bootloader.SYSCFG1=0x03
 atxy7.bootloader.APPEND=0x00
 atxy7.bootloader.BOOTEND=0x00
 
+atxy7.upload.workaround=
 
 ##############################################################
 
@@ -255,6 +256,8 @@ atxy6.bootloader.TCD0CFG=0x00
 atxy6.bootloader.SYSCFG1=0x03
 atxy6.bootloader.APPEND=0x00
 atxy6.bootloader.BOOTEND=0x00
+
+atxy6.upload.workaround=
 
 ##############################################################
 
@@ -384,6 +387,8 @@ atxy4.bootloader.SYSCFG1=0x03
 atxy4.bootloader.APPEND=0x00
 atxy4.bootloader.BOOTEND=0x00
 
+atxy4.upload.workaround=
+
 ##############################################################
 
 atxy2.name=ATtiny412/402/212/202
@@ -392,26 +397,37 @@ atxy2.name=ATtiny412/402/212/202
 #atxy2.menu.chip.812.build.mcu=attiny812
 #atxy2.menu.chip.812.upload.maximum_size=8192
 #atxy2.menu.chip.812.upload.maximum_data_size=512
+#atxy2.menu.chip.812.upload.workaround=
 atxy2.menu.chip.412=ATtiny412
 atxy2.menu.chip.412.build.mcu=attiny412
 atxy2.menu.chip.412.upload.maximum_size=4096
 atxy2.menu.chip.412.upload.maximum_data_size=256
+atxy2.menu.chip.412.upload.workaround=
 atxy2.menu.chip.212=ATtiny212
 atxy2.menu.chip.212.build.mcu=attiny212
 atxy2.menu.chip.212.upload.maximum_size=2048
 atxy2.menu.chip.212.upload.maximum_data_size=128
+atxy2.menu.chip.212.upload.workaround=
 #atxy2.menu.chip.802=ATtiny802
 #atxy2.menu.chip.802.build.mcu=attiny802
 #atxy2.menu.chip.802.upload.maximum_size=8192
 #atxy2.menu.chip.802.upload.maximum_data_size=512
+#atxy2.menu.chip.802.upload.workaround=
 atxy2.menu.chip.402=ATtiny402
 atxy2.menu.chip.402.build.mcu=attiny402
 atxy2.menu.chip.402.upload.maximum_size=4096
 atxy2.menu.chip.402.upload.maximum_data_size=256
+atxy2.menu.chip.402.upload.workaround=
+atxy2.menu.chip.402w=ATtiny402 (bad signature)
+atxy2.menu.chip.402w.build.mcu=attiny402
+atxy2.menu.chip.402w.upload.maximum_size=4096
+atxy2.menu.chip.402w.upload.maximum_data_size=256
+atxy2.menu.chip.402w.upload.workaround=w
 atxy2.menu.chip.202=ATtiny202
 atxy2.menu.chip.202.build.mcu=attiny202
 atxy2.menu.chip.202.upload.maximum_size=2048
 atxy2.menu.chip.202.upload.maximum_data_size=128
+atxy2.menu.chip.202.upload.workaround=
 
 atxy2.menu.clock.20=20 MHz
 atxy2.menu.clock.16=16 MHz
