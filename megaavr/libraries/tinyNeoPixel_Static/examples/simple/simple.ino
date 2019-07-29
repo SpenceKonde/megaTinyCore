@@ -2,7 +2,6 @@
 // released under the GPLv3 license to match the rest of the AdaFruit NeoPixel library
 
 #include <tinyNeoPixel_Static.h>
-#include <avr/power.h>
 
 
 // Which pin on the Arduino is connected to the NeoPixels?
