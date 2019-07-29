@@ -3,7 +3,7 @@
 // press the button it will change to a new pixel animation.  Note that you need to press the
 // button once to start the first animation!
 
-#include <Adafruit_NeoPixel.h>
+#include <tinyNeoPixel_Static.h>
 
 #define BUTTON_PIN   2    // Digital IO pin connected to the button.  This will be
                           // driven with a pull-up resistor so the switch should
@@ -14,6 +14,13 @@
 
 #define PIXEL_COUNT 16
 
+
+// Since this is for the static version of the library, we need to supply the pixel array
+// This saves space by eliminating use of malloc() and free(), and makes the RAM used for
+// the frame buffer show up when the sketch is compiled. 
+
+byte pixels[PIXEL_COUNT * 3];
+
 // Parameter 1 = number of pixels in strip,  neopixel stick has 8
 // Parameter 2 = pin number (most are valid)
 // Parameter 3 = pixel type flags, add together as needed:
@@ -21,14 +28,15 @@
 //   NEO_GRB     Pixels are wired for GRB bitstream, correct for neopixel stick
 //   NEO_KHZ400  400 KHz bitstream (e.g. FLORA pixels)
 //   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip), correct for neopixel stick
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+tinyNeoPixel strip = tinyNeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB, pixels);
 
 bool oldState = HIGH;
 int showType = 0;
 
 void setup() {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
-  strip.begin();
+  pinMode(PIXEL_PIN, OUTPUT);
+  //strip.begin();
   strip.show(); // Initialize all pixels to 'off'
 }
 
