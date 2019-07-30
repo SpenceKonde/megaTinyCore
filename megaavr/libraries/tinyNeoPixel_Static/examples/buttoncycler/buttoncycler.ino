@@ -26,8 +26,7 @@ byte pixels[PIXEL_COUNT * 3];
 // Parameter 3 = pixel type flags, add together as needed:
 //   NEO_RGB     Pixels are wired for RGB bitstream
 //   NEO_GRB     Pixels are wired for GRB bitstream, correct for neopixel stick
-//   NEO_KHZ400  400 KHz bitstream (e.g. FLORA pixels)
-//   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip), correct for neopixel stick
+
 tinyNeoPixel strip = tinyNeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB, pixels);
 
 bool oldState = HIGH;
