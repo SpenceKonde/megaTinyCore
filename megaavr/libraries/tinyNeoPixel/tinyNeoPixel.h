@@ -21,6 +21,7 @@
 
 #include <Arduino.h>
 
+
 // The order of primary colors in the NeoPixel data stream can vary
 // among device types, manufacturers and even different revisions of
 // the same item.  The third parameter to the Adafruit_NeoPixel
@@ -83,34 +84,50 @@
 #define NEO_BGWR ((2 << 6) | (3 << 4) | (1 << 2) | (0))
 #define NEO_BGRW ((3 << 6) | (2 << 4) | (1 << 2) | (0))
 
-
+// Add NEO_KHZ400 to the color order value to indicate a 400 KHz
+// device.  All but the earliest v1 NeoPixels expect an 800 KHz data
+// stream, this is the default if unspecified.  Because flash space
+// is very limited on ATtiny devices (e.g. Trinket, Gemma), v1
+// NeoPixels aren't handled by default on those chips, though it can
+// be enabled by removing the ifndef/endif below -- but code will be
+// bigger.  Conversely, can disable the NEO_KHZ400 line on other MCUs
+// to remove v1 support and save a little space.
 
 #define NEO_KHZ800 0x0000 // 800 KHz datastream
 
+// If 400 KHz support is enabled, the third parameter to the constructor
+// requires a 16-bit value (in order to select 400 vs 800 KHz speed).
+// If only 800 KHz is enabled (as is default on ATtiny), an 8-bit value
+// is sufficient to encode pixel color order, saving some space.
 
-typedef uint8_t neoPixelType;
 
+typedef uint8_t  neoPixelType;
 
 class tinyNeoPixel {
 
  public:
 
   // Constructor: number of LEDs, pin number, LED type
-  //Adafruit_NeoPixel(uint16_t n, uint8_t p=6, neoPixelType t=NEO_GRB + NEO_KHZ800,uint8_t *pxl);
-  tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t,uint8_t *pxl);
-  //Adafruit_NeoPixel(void);
+  tinyNeoPixel(uint16_t n, uint8_t p=6, neoPixelType t=NEO_GRB + NEO_KHZ800);
+  tinyNeoPixel(void);
   ~tinyNeoPixel();
 
   void
+    begin(void),
     show(void),
+    setPin(uint8_t p),
     setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b),
     setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t w),
     setPixelColor(uint16_t n, uint32_t c),
     setBrightness(uint8_t),
-    clear();
+    clear(),
+    updateLength(uint16_t n),
+    updateType(neoPixelType t);
   uint8_t
    *getPixels(void) const,
     getBrightness(void) const;
+  int8_t
+    getPin(void) { return pin; };
   uint16_t
     numPixels(void) const;
   static uint32_t
@@ -123,7 +140,8 @@ class tinyNeoPixel {
 
  private:
 
-    //begun;         // true if begin() previously called
+  boolean
+    begun;         // true if begin() previously called
   uint16_t
     numLEDs,       // Number of RGB LEDs in strip
     numBytes;      // Size of 'pixels' buffer below (3 or 4 bytes/pixel)
@@ -145,4 +163,4 @@ class tinyNeoPixel {
 
 };
 
-#endif
+#endif // ADAFRUIT_NEOPIXEL_H
