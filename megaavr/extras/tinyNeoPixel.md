@@ -20,9 +20,9 @@ tinyNeoPixel_Static is slightly cutdown, removing the option to change the lengt
 `tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t,uint8_t *pxl);` constructor for tinyNeoPixel_Static - the final argument is a uint_8 (byte) array sized to accomodate the data to be sent to the LED. For example: 
     
     
-  >#include <"tinyNeoPixel_Static.h">
-  >#define NUMLEDS 10
-  >byte pixels[NUMLEDS*3];
+  >#include <"tinyNeoPixel_Static.h">                 <br/>
+  >#define NUMLEDS 10                                 <br/>
+  >byte pixels[NUMLEDS*3];                            <br/>
   >tinyNeoPixel(NUMPIXELS, 5, NEO_GRB, pixels);
 
     
@@ -63,36 +63,34 @@ tinyNeoPixel_Static is slightly cutdown, removing the option to change the lengt
 ### Pixel order #defines
 These are the same names for the #defines used by Adafruit_NeoPixel; these are used for the third argument to tinyNeoPixel(). 
 
-#### For RGB LEDs
-  >NEO_RGB
-  >NEO_RBG
-  >NEO_GRB
-  >NEO_GBR
-  >NEO_BRG
-  >NEO_BGR
+>NEO_RGB            <br/>
+>NEO_RBG            <br/>
+>NEO_GRB            <br/>
+>NEO_GBR            <br/>
+>NEO_BRG            <br/>
+>NEO_BGR
 
-#### For RGBW LEDs
-  >NEO_WRGB
-  >NEO_WRBG
-  >NEO_WGRB
-  >NEO_WGBR
-  >NEO_WBRG
-  >NEO_WBGR
-  >NEO_RWGB
-  >NEO_RWBG
-  >NEO_RGWB
-  >NEO_RGBW
-  >NEO_RBWG
-  >NEO_RBGW
-  >NEO_GWRB
-  >NEO_GWBR
-  >NEO_GRWB
-  >NEO_GRBW
-  >NEO_GBWR
-  >NEO_GBRW
-  >NEO_BWRG
-  >NEO_BWGR
-  >NEO_BRWG
-  >NEO_BRGW
-  >NEO_BGWR
-  >NEO_BGRW
+>NEO_WRGB            <br/>
+>NEO_WRBG            <br/>
+>NEO_WGRB            <br/>
+>NEO_WGBR            <br/>
+>NEO_WBRG            <br/>
+>NEO_WBGR            <br/>
+>NEO_RWGB            <br/>
+>NEO_RWBG            <br/>
+>NEO_RGWB            <br/>
+>NEO_RGBW            <br/>
+>NEO_RBWG            <br/>
+>NEO_RBGW            <br/>
+>NEO_GWRB            <br/>
+>NEO_GWBR            <br/>
+>NEO_GRWB            <br/>
+>NEO_GRBW            <br/>
+>NEO_GBWR            <br/>
+>NEO_GBRW            <br/>
+>NEO_BWRG            <br/>
+>NEO_BWGR            <br/>
+>NEO_BRWG            <br/>
+>NEO_BRGW            <br/>
+>NEO_BGWR            <br/>
+>NEO_BGRW
