@@ -1,0 +1,11 @@
+## tinyNeoPixel - a megaAVR compatible library for WS2812 "NeoPixel" and similar
+
+The change in architecture from the classic AVRs to megaAVR causes many of the existing WS2812 libraries to not work on the megaAVR parts. This library adapts the Adafruit_NeoPixel library to work with the megaAVR architecture, and adds support for 10MHz and 20MHz clock speeds. 
+
+### tinyNeoPixel Port menu option
+At 8MHz and 10MHz, the hand-tuned assembly code used to send the data to the LEDs requires the port to be set at compile time. The original Adafruit_NeoPixel library used if/then statements to allow it to work with different ports - however this requires multiple copies of the assembly code in the compiled binary which increases flash usage. Since the pin that the NeoPixel is on is known when the sketch is written, a submenu is provided to select the port to be used with the NeoPixel library - this is used only at 8 and 10MHz (and only on parts with more than 8 pins - the x12 and x02 parts have only one port); at 16MHz and 20MHz, this option is ignored and any pin will work regardless of the menu setting. 
+
+### tinyNeoPixel and tinyNeoPixel_Static
+There are two versions of this library provided. tinyNeoPixel implements the entire API that Adafruit_NeoPixel does, including setting the pin and length of the string at runtime (as noted above, at 8MHz and 10MHz, if the pin is changed, it must be on the same port). This provides maximum portability between code written for use with Adafruit_NeoPixel and tinyNeoPixel (only the constructor and library name need to be changed). 
+
+tinyNeoPixel_Static is slightly cutdown, removing the option to change the pin and length at runtime, and instead of using malloc() to dynamically allocate the pixel buffer, the user must declare the pixel buffer and pass it to the constructor. Additionally, it does not set the pinMode of the pin (the sketch must set this as output). Finally, no call to begin() must be made - begin() is removed entirely. These changes reduce flash use (by eliminating malloc() and free(), and because the pixel buffer is statically declared, the memory used for it is included in count of used SRAM output when the sketch is compiled. Removal of the pinMode() call within the library allows 
