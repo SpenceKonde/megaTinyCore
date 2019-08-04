@@ -1,5 +1,5 @@
 ### ATtiny 214/414/814/1614
-![x14 Pin Mapping](ATtiny_x14.gif "Arduino Pin Mapping for ATtiny x14")
+![x14 Pin Mapping](ATtiny_x14.png "Arduino Pin Mapping for ATtiny x14")
 
  Specifications |  ATtiny214|  ATtiny414  |  ATtiny814  |    ATtiny1614   
 ------------ | ------------- | ------------- | ------------- | ------------- 

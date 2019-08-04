@@ -1,5 +1,5 @@
 ### ATtiny 204/404/804/1604
-![x04 Pin Mapping](ATtiny_x04.gif "Arduino Pin Mapping for ATtiny x04")
+![x04 Pin Mapping](ATtiny_x04.png "Arduino Pin Mapping for ATtiny x04")
 
  Specifications |  ATtiny204|  ATtiny404  |  ATtiny804  |    ATtiny1604   
 ------------ | ------------- | ------------- | ------------- | ------------- 
