@@ -16,6 +16,7 @@ tinyNeoPixel_Static is slightly cutdown, removing the option to change the lengt
 `tinyNeoPixel(uint16_t n, uint8_t p=6, neoPixelType t=NEO_GRB)` constructor for tinyNeoPixel - the first argument is is the number of LEDs in the string, the second is the pin, and the final argument is the color order of the LEDs in use; the library provides #defines for every possible color order for RGB and RGBW LEDs (full list below)
     `tinyNeoPixel()` - empty constructor, set pin and length later with setPin(), updateLength(), and updateType(). 
     `tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t,uint8_t *pxl);` constructor for tinyNeoPixel_Static - the final argument is a uint_8 (byte) array sized to accomodate the data to be sent to the LED. For example: 
+    
     >#include <"tinyNeoPixel_Static.h">
     >#define NUMLEDS 10 
     >byte pixels[NUMLEDS*3];
@@ -44,10 +45,15 @@ These are the same names for the #defines used by Adafruit_NeoPixel; these are u
 
 #### For RGB LEDs
 >NEO_RGB
+
 >NEO_RBG
+
 >NEO_GRB
+
 >NEO_GBR
+
 >NEO_BRG
+
 >NEO_BGR
 
 #### For RGBW LEDs
