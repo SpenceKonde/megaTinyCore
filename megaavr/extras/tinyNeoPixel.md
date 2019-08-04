@@ -46,7 +46,7 @@ tinyNeoPixel_Static is slightly cutdown, removing the option to change the lengt
 These are the same names for the #defines used by Adafruit_NeoPixel; these are used for the third argument to tinyNeoPixel(). 
 
 #### For RGB LEDs
->NEO_RGB&nbsp;
+>NEO_RGB <br/>
 >NEO_RBG
 
 >NEO_GRB
