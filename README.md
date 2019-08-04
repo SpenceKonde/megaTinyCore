@@ -35,29 +35,20 @@ These parts do not support using an external crystal like the classic ATtiny par
 # Features
 
 ### Serial (UART) Support
-All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards. See the pinout charts for the location of the serial pins. Serial output for a few milliseconds after calling Serial.begin() seems to be off - if you are printing a message at the start of the sketch, add a small delay between Serial.begin() and your first Serial.print() call. 
+All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards. See the pinout charts for the location of the serial pins. Serial output for a few milliseconds after calling Serial.begin() seems to be off - if you are printing a message at the start of the sketch, add a small delay between Serial.begin() and your first Serial.print() call. Note: UART serial is broken on the x12 and x02 parts before version 1.0.3.
 
 ### SPI support
 All of these parts have a single hardware SPI peripheral. It works exactly like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. Note that the 8-pin parts (412, 212, 402, 204) do not have a specific SS pin. 
 
 ### I2C (TWI) support
-All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library. See the pinout charts for the location of these pins.
+All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library. See the pinout charts for the location of these pins. Note: I2C (TWI) is broken on the x12 and x02 parts before version 1.0.3.
 
 ### PWM support
 The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), only a single PWM pin is available (this is a hardware limitation - if you don't like it, direct your complaints to Atmel/Microchip). On all other parts except the x16 and x17 series, 6 PWM pins are available, driven by Timer A. The type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A. See the pinout charts for a list of which pins support PWM. 
 The 3216,1616,816,416,3217,1617 and 817 have two additional PWM pins driven by Timer D (pins 10 and 11 on x16, 12 and 13 on x17). Timer D is an async timer, and the outputs can't be enabled or disabled without briefly stopping the timer. This results in a brief glitch on the other PWM pin (if it is currently outputting PWM), and doing so requires slightly longer (in 1.0.0, this delay is 1ms, in 1.0.1 and later, it is around 1us). This applies to digitalWrite() or analogWrite of 0 or 255 while it is currently outputting PWM, and analogWrite of 1~254 while the pin is not currently outputting PWM. This is a hardware limitation and cannot be further improved. 
 
 ### NeoPixel (WS2812) support (new in 1.0.3)
-The usual NeoPixel (WS2812) libraries have problems on these parts. This core includes two libraries for this, both of which are tightly based on the Adafruit_NeoPixel library. For operation below 16MHz, the pin on which you output must match the Tools -> tinyNeoPixel Port setting (this allows for non-trivial flash savings, as the assembly otherwise has to be duplicated for each supported port, and almost nobody switches between multiple strings of neopixels at runtime; if you must, pick pins that are all on the same port). For 16MHz and 20MHz, that menu option is ignored and all pins can be used. The two library versions are:
-#### tinyNeoPixel
-This is a near-exact copy of the Adafruit NeoPixel library, only with support for 10MHz and 20MHz, and for the megaavr attinys added, and support for old 400kHz NeoPixels removed (they are obsolete and almost entirely absent on the market nowadays). 
-
-#### tinyNeoPixel_Static
-This is a cut-down version of the library. The differences are:
-* pin, length cannot be changed at runtime. 
-* pin must be set as OUTPUT using pinMode() or direct port manipulation (this allows you to save some flash if you never use pinMode and use only direct port manipulation for setting pin modes).
-* there is no .begin() method
-* You must declare the array that will store the pixel data and pass that as the 4th argument to the constructor, as opposed to it being dynamically allocated. This saves flash by losing malloc() and free(), and allows you to see the SRAM used by the pixel buffer when the sketch is compiled. 
+The usual NeoPixel (WS2812) libraries have problems on these parts. This core includes two libraries for this, both of which are tightly based on the Adafruit_NeoPixel library. See the [tinyNeoPixel documentation](megaavr/extras/tinyNeoPixel.md) and included examples for more information. 
 
 ### Tone Support
 Support for tone() is provided on all parts using Timer B 0. This is like the standard tone() function; it does not support use of the hardware output compare to generate tones (yet). 
