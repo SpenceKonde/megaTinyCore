@@ -7,8 +7,8 @@ Flash (program memory)   |  8192 bytes | 16384 bytes
 RAM   | 512 bytes | 1024 bytes 
 EEPROM | 128 bytes | 256 bytes 
 Bootloader | No | No 
-GPIO Pins | 22 | 22 
-ADC Channels | 12 | 12 
+GPIO Pins | 22 (21 usable) | 22 (21 usable)
+ADC Channels | 12 (11 usable) | 12 (11 usable)
 DAC | No | No 
 PWM Channels | 6 | 6 
 Timer Type B | 1 | 1 
