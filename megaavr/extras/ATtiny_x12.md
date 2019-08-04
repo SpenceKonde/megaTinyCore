@@ -1,5 +1,5 @@
 ### ATtiny 212/412
-![x12 Pin Mapping](ATtiny_x12.png "Arduino Pin Mapping for ATtiny x12")
+![x12 Pin Mapping](ATtiny_x12.gif "Arduino Pin Mapping for ATtiny x12")
 
  Specifications |  ATtiny212|  ATtiny412   
 ------------ | ------------- | -------------
