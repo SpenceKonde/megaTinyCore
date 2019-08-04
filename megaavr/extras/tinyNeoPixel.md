@@ -17,10 +17,12 @@ tinyNeoPixel_Static is slightly cutdown, removing the option to change the lengt
     `tinyNeoPixel()` - empty constructor, set pin and length later with setPin(), updateLength(), and updateType(). 
     `tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t,uint8_t *pxl);` constructor for tinyNeoPixel_Static - the final argument is a uint_8 (byte) array sized to accomodate the data to be sent to the LED. For example: 
     
+    
     >#include <"tinyNeoPixel_Static.h">
     >#define NUMLEDS 10 
     >byte pixels[NUMLEDS*3];
     >tinyNeoPixel(NUMPIXELS, 5, NEO_GRB, pixels);
+    
     
     `begin()` Enable the LEDs, on tinyNeoPixel, must be called before show() - not applicable for tinyNeoPixel_Static
     `show()` Output the contents of the pixel buffer to the LEDs
