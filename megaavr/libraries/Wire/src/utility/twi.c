@@ -69,9 +69,11 @@ void TWI_MasterInit(uint32_t frequency)
 	pinMode(PIN_WIRE_SDA, INPUT_PULLUP);
 	pinMode(PIN_WIRE_SCL, INPUT_PULLUP);
 #endif
+/* This is done in wiring.c if this is needed for the part. 
 #if defined(TWISPIROUTEA)
 	PORTMUX.TWISPIROUTEA |= TWI_MUX;
 #endif
+*/
 	twi_mode = TWI_MODE_MASTER;
 	
 	master_bytesRead = 0;

@@ -131,11 +131,6 @@ void UartClass::begin(unsigned long baud, uint16_t config)
         this->end();
     }
 
-    // Setup port mux (not required for ATtiny1616 at this moment)
-	#if defined(USARTROUTEA)
-    PORTMUX.USARTROUTEA |= _uart_mux;
-	#endif
-
     int32_t baud_setting = 0;
 
     //Make sure global interrupts are disabled during initialization

@@ -406,8 +406,8 @@ void init()
 
 #endif
 
-	#if defined(USARTROUTEA)
-	PORTMUX.USARTROUTEA = 0;
+	#if (HWSERIAL0_MUX!=0 || SPI_MUX!=0 ||TWI_MUX!=0)
+		PORTMUX.CTRLB=HWSERIAL0_MUX|SPI_MUX|TWI_MUX; //Set PORTMUX
 	#endif
 
 	setup_timers();

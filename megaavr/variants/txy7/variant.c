@@ -9,8 +9,8 @@ void setup_timers() {
 
 	/*  TYPE A TIMER   */
 
-	/* PORTMUX setting for TCA */
-	PORTMUX.CTRLA = PORTMUX_TCA00_DEFAULT_gc;
+	/* PORTMUX setting for TCA - don't need to set because using default */ 
+	//PORTMUX.CTRLA = PORTMUX_TCA00_DEFAULT_gc; 
 	
 	/* Enable Split Mode */
 	TCA0.SPLIT.CTRLD = TCA_SPLIT_SPLITM_bm;
@@ -36,11 +36,7 @@ void setup_timers() {
 
 	/*	TYPE B TIMERS  */
 
-	/* PORTMUX alternate location needed for TCB0 & 1, TCB2 is default location */
-	//TODO - As part of the timer wrangling involved in #16 and related issues, this stuff needs to be changed. 
-	#if defined(TCBROUTEA)
-	PORTMUX.TCBROUTEA	|= (PORTMUX_TCB0_bm | PORTMUX_TCB1_bm);
-	#endif
+	// No megaTinyCore parts need to change the port mapping. 
 
 	/* Start with TCB0 */
 	TCB_t *timer_B = (TCB_t *)&TCB0;
