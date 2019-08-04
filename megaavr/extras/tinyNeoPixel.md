@@ -63,6 +63,7 @@ tinyNeoPixel_Static is slightly cutdown, removing the option to change the lengt
 ### Pixel order #defines
 These are the same names for the #defines used by Adafruit_NeoPixel; these are used for the third argument to tinyNeoPixel(). 
 
+#### For RGB LEDs
 >NEO_RGB            <br/>
 >NEO_RBG            <br/>
 >NEO_GRB            <br/>
@@ -70,6 +71,7 @@ These are the same names for the #defines used by Adafruit_NeoPixel; these are u
 >NEO_BRG            <br/>
 >NEO_BGR
 
+#### For RGBW LEDs
 >NEO_WRGB            <br/>
 >NEO_WRBG            <br/>
 >NEO_WGRB            <br/>
