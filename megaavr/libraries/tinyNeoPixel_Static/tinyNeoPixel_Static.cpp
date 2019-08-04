@@ -589,11 +589,11 @@ void tinyNeoPixel::show(void) {
 }
 
 // Set the output pin number
-//void Adafruit_NeoPixel::setPin(uint8_t p) {
-  //if(begun && (pin >= 0)) pinMode(pin, INPUT);
-
-//  }
-//}
+void tinyNeoPixel::setPin(uint8_t p) {
+    pin = p;
+    port    = portOutputRegister(digitalPinToPort(p));
+    pinMask = digitalPinToBitMask(p);
+}
 
 // Set pixel color from separate R,G,B components:
 void tinyNeoPixel::setPixelColor(

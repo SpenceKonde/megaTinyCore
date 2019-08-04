@@ -108,7 +108,7 @@ class tinyNeoPixel {
  public:
 
   // Constructor: number of LEDs, pin number, LED type
-  tinyNeoPixel(uint16_t n, uint8_t p=6, neoPixelType t=NEO_GRB + NEO_KHZ800);
+  tinyNeoPixel(uint16_t n, uint8_t p=3, neoPixelType t=NEO_GRB + NEO_KHZ800);
   tinyNeoPixel(void);
   ~tinyNeoPixel();
 
