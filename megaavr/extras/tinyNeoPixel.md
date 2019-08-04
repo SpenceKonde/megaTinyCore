@@ -23,7 +23,10 @@ There are two versions of this library provided. `tinyNeoPixel` implements the e
   >#include <"tinyNeoPixel_Static.h">                 <br/>
   >#define NUMLEDS 10                                 <br/>
   >byte pixels[NUMLEDS*3];                            <br/>
-  >tinyNeoPixel(NUMPIXELS, 5, NEO_GRB, pixels);
+  >tinyNeoPixel(NUMPIXELS, 5, NEO_GRB, pixels);       <br/>
+  >void setup() {                                     <br/>
+  >  pinMode(5,OUTPUT);                               <br/>
+  >}
 
     
 `begin()` Enable the LEDs, on tinyNeoPixel, must be called before show() - not applicable for tinyNeoPixel_Static
