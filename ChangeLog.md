@@ -1,6 +1,7 @@
 1.0.3
-* Fix UART on 412/402 and general PORTMUX initialization. 
-* Add tinyNeoPixel and tinyNeoPixel_Static libraries, add menu option to select port at 8/10MHz (saves flash)
+* Fix UART (and I suspect I2C) on 412/402 and general PORTMUX initialization. 
+* Add tinyNeoPixel and tinyNeoPixel_Static libraries, examples and documentation, add menu option to select port at 8/10MHz (saves flash)
+* Pinout chart corrections
 
 1.0.2 (released)
 * Fix analogRead(), which was broken on most pins
