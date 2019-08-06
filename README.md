@@ -32,6 +32,13 @@ For this core to work when installed manually, and via board manager for 1.0.1 a
 
 These parts do not support using an external crystal like the classic ATtiny parts do, however the internal oscillator is tightly calibrated enough that the internal clock will work for UART communication. 
 
+## There is no hardware reset pin
+The reset functionality is shared with UPDI; hence, when UPDI programming is enabled, there is no hardware reset pin. Luckily, the megaAVR architecture provides the ability to do a software reset:
+`_PROTECTED_WRITE(RSTCTRL.SWRR,1);`
+You can set an interrupt on a pin to call this in order to create a ersatz reset pin. 
+
+Once Optiboot is working on the megaAVR ATtiny parts, it will be possible to configure the UPDI/Reset pin to act as reset while still being able to upload code. 
+
 # Features
 
 ### Serial (UART) Support
