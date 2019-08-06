@@ -44,13 +44,17 @@ Once Optiboot is working on the megaAVR ATtiny parts, it will be possible to con
 # Features
 
 ### Serial (UART) Support
-All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards. See the pinout charts for the location of the serial pins. Serial output for a few milliseconds after calling Serial.begin() seems to be off - if you are printing a message at the start of the sketch, add a small delay between Serial.begin() and your first Serial.print() call. Note: UART serial is broken on the x12 and x02 parts before version 1.0.3.
+All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards (except that there is no auto-reset, see note above about the lack of a reset pin). See the pinout charts for the location of the serial pins. Serial output for a few milliseconds after calling Serial.begin() seems to be off - if you are printing a message at the start of the sketch, add a small delay between Serial.begin() and your first Serial.print() call. 
+
+Note: UART serial is broken on the x12 and x02 parts before version 1.0.3.
 
 ### SPI support
 All of these parts have a single hardware SPI peripheral. It works exactly like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. Note that the 8-pin parts (412, 212, 402, 204) do not have a specific SS pin. 
 
 ### I2C (TWI) support
-All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library. See the pinout charts for the location of these pins. Note: I2C (TWI) is broken on the x12 and x02 parts before version 1.0.3.
+All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library. See the pinout charts for the location of these pins. 
+
+Note: I2C (TWI) is broken on the x12 and x02 parts before version 1.0.3.
 
 ### PWM support
 The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), only a single PWM pin is available (this is a hardware limitation - if you don't like it, direct your complaints to Atmel/Microchip). On all other parts except the x16 and x17 series, 6 PWM pins are available, driven by Timer A. The type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A. See the pinout charts for a list of which pins support PWM. 
@@ -70,7 +74,7 @@ These parts all have ADC channels available on most pins (11 pins on 24 and 20 p
 * INTERNAL1V5
 * INTERNAL2V5
 * INTERNAL4V3
-* EXTERNAL (1-series, not including, 412/212 only)
+* EXTERNAL (1-series - not including 412/212 - only)
 
 ### DAC Support (new in 1.0.1)
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). This generates voltages between 0 and the selected VREF (which cannot be VCC, unfortunately) - select the DAC VREF voltage from the Tools -> DAC Voltage Reference submenu. This voltage must be lower than Vcc to get the correct voltages. Call analogWrite() on the DAC pin to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin. 
@@ -116,7 +120,7 @@ When Optiboot is available for the ATmega4809, it will be adapted for these ATti
 
 # List of Tools sub-menus
 * Tools -> Chip - sets the specific part within a selected family to compile for and upload to. 
-* Tools -> Clock Speed - sets the clock speed. You must burn bootloader after changing this to apply the changes. 
+* Tools -> Clock Speed - sets the clock speed. You must burn bootloader after changing between 16/8/4MHz and 20/10/5MHz to apply the changes (ie, changing from 20MHz to 10MHz does not require burning bootloader, changing from 20MHz to 16MHz does). 
 * Tools -> Retain EEPROM - determines whether to save EEPROM when uploading a new sketc. You must burn bootloader after changing this to apply the changes. 
 * Tools -> B.O.D. Voltage - If Brown Out Detection is enabled, when Vcc falls below this voltage, the chip will be held in reset. You must burn bootloader after changing this to apply the changes. 
 * Tools -> B.O.D. Mode (active) - Determines whether to enable Brown Out Detection when the chip is not sleeping. You must burn bootloader after changing this to apply the changes. 
