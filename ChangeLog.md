@@ -1,4 +1,8 @@
-1.0.3
+1.0.4
+* Do not specify version of AVRDude in platform.txt (#73)
+* Board manager installation improvements to prevent breaking USBTinyISP on other installed cores
+
+1.0.3 (released)
 * Fix UART (and I suspect I2C) on 412/402 and general PORTMUX initialization. 
 * Add tinyNeoPixel and tinyNeoPixel_Static libraries, examples and documentation, add menu option to select port at 8/10MHz (saves flash)
 * Pinout chart corrections
