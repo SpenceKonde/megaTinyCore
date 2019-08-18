@@ -2,8 +2,8 @@
   Arduino library to control a wide variety of WS2811- and WS2812-based RGB
   LED devices such as Adafruit FLORA RGB Smart Pixels and NeoPixel strips.
   Currently handles 800 KHz bitstreams on 8, 10, 12, 16, and 20 MHz ATtiny
-  MCUs used with megaTinyCore 1.0.3+ and ATTinyCore 1.2.6+ with LEDs wired 
-  for various color orders. 
+  MCUs used with megaTinyCore 1.0.3+ and ATTinyCore 1.30+ with LEDs wired
+  for various color orders.
 
   Written by Phil Burgess / Paint Your Dragon for Adafruit Industries,
   contributions by PJRC, Michael Miller and other members of the open
@@ -75,7 +75,7 @@ void tinyNeoPixel::show(void) {
   // allows the mainline code to start generating the next frame of data
   // rather than stalling for the latch.
   while(!canShow());
-  // endTime is a private member (rather than global var) so that mutliple
+  // endTime is a private member (rather than global var) so that multiple
   // instances on different pins can be quickly issued in succession (each
   // instance doesn't delay the next).
 
@@ -579,13 +579,15 @@ void tinyNeoPixel::show(void) {
 
 #else
  #error "CPU SPEED NOT SUPPORTED"
-#endif 
+#endif
 
 // END AVR ----------------------------------------------------------------
 
 
   interrupts();
+#ifndef DISABLEMILLIS
   endTime = micros(); // Save EOD time for latch on next call
+#endif
 }
 
 // Set the output pin number
@@ -739,7 +741,7 @@ uint16_t tinyNeoPixel::numPixels(void) const {
 // brightness level).  If there's a significant step up in brightness,
 // the limited number of steps (quantization) in the old data will be
 // quite visible in the re-scaled version.  For a non-destructive
-// change, you'll need to re-render the full strip data.  C'est la vie.
+// change, you'll need to re-render the full strip data.
 void tinyNeoPixel::setBrightness(uint8_t b) {
   // Stored brightness value is different than what's passed.
   // This simplifies the actual scaling math later, allowing a fast
