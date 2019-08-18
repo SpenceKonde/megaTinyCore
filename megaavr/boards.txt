@@ -10,6 +10,7 @@ menu.clock=Clock Speed
 menu.clocksource=Clock Source
 menu.dacvref=DAC Voltage Reference
 menu.neopixelport=tinyNeoPixel Port
+menu.millis=millis()/micros()
 
 
 ##############################################################
@@ -110,6 +111,11 @@ atxy7.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
 atxy7.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy7.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 
+atxy7.menu.millis.enabled=Enabled
+atxy7.menu.millis.disabled=Disabled (saves flash)
+atxy7.menu.millis.enabled.build.millis=
+atxy7.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+
 atxy7.menu.neopixelport.porta=PORTA (pins 0~3,18~21)
 atxy7.menu.neopixelport.portb=PORTB (pins 4~11)
 atxy7.menu.neopixelport.portc=PORTC (pins 12~17)
@@ -127,7 +133,7 @@ atxy7.build.board=attinyxy7
 atxy7.build.core=arduino
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport}
+atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
@@ -244,6 +250,11 @@ atxy6.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
 atxy6.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy6.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 
+atxy6.menu.millis.enabled=Enabled
+atxy6.menu.millis.disabled=Disabled (saves flash)
+atxy6.menu.millis.enabled.build.millis=
+atxy6.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+
 atxy6.menu.neopixelport.porta=PORTA (pins 0~3,14~17)
 atxy6.menu.neopixelport.portb=PORTB (pins 4~9)
 atxy6.menu.neopixelport.portc=PORTC (pins 10~13)
@@ -261,7 +272,7 @@ atxy6.build.board=attinyxy6
 atxy6.build.core=arduino
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
-atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport}
+atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis}
 atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude
@@ -380,6 +391,11 @@ atxy4.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
 atxy4.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy4.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 
+atxy4.menu.millis.enabled=Enabled
+atxy4.menu.millis.disabled=Disabled (saves flash)
+atxy4.menu.millis.enabled.build.millis=
+atxy4.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+
 atxy4.menu.neopixelport.porta=PORTA (pins 0~3,8~11)
 atxy4.menu.neopixelport.portb=PORTB (pins 4~7)
 atxy4.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
@@ -395,7 +411,7 @@ atxy4.build.board=attinyxy4
 atxy4.build.core=arduino
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
-atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport}
+atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
@@ -518,6 +534,11 @@ atxy2.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
 atxy2.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy2.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 
+atxy2.menu.millis.enabled=Enabled
+atxy2.menu.millis.disabled=Disabled (saves flash)
+atxy2.menu.millis.enabled.build.millis=
+atxy2.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+
 atxy2.upload.tool=avrdude
 atxy2.upload.protocol=jtag2updi
 atxy2.upload.speed=115200
@@ -528,12 +549,12 @@ atxy2.build.board=attinyxy2
 atxy2.build.core=arduino
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
-atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT
+atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.millis}
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
 atxy2.bootloader.WDTCFG=0x00
-atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
+atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits} 
 atxy2.bootloader.TCD0CFG=0x00
 atxy2.bootloader.SYSCFG0=0xC9
 atxy2.bootloader.SYSCFG1=0x03

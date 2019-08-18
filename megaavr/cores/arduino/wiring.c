@@ -24,10 +24,12 @@
 
 // the prescaler is set so that timer ticks every 64 clock cycles, and the
 // the overflow handler is called every 256 ticks.
+uint32_t F_CPU_CORRECTED = F_CPU;
+
+#ifndef DISABLEMILLIS
 volatile uint16_t microseconds_per_timer_overflow;
 volatile uint16_t microseconds_per_timer_tick;
 
-uint32_t F_CPU_CORRECTED = F_CPU;
 
 // the whole number of milliseconds per timer overflow
 uint16_t millis_inc;
@@ -182,6 +184,14 @@ void delay(unsigned long ms)
 	/* Wait until return time */
 	while(micros() < return_time);
 }
+#else 
+void delay(unsigned long ms) //non-millis-timer-dependent delay()
+{
+  while(ms--){
+    delayMicroseconds(1000);
+  }
+}
+#endif
 
 /* Delay for the given number of microseconds.  Assumes a 1, 4, 5, 8, 10, 16, or 20 MHz clock. */
 void delayMicroseconds(unsigned int us)
@@ -412,6 +422,8 @@ void init()
 
 	setup_timers();
 
+#ifndef DISABLEMILLIS
+
 	/********************* TIMER for system time tracking **************************/
 
 	/* Calculate relevant time tracking values */
@@ -438,6 +450,7 @@ void init()
 	/* Enable & start */
 	_timer->CTRLA |= TCB_ENABLE_bm;	/* Keep this last before enabling interrupts to ensure tracking as accurate as possible */
 	#endif
+#endif
 /*************************** DAC VREF *****************************************/
 	#ifdef DAC0
 	VREF.CTRLA |= DACVREF;
