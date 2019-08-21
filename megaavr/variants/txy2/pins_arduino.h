@@ -57,8 +57,6 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define PIN_WIRE_SDA        (2)
 #define PIN_WIRE_SCL        (3)
 
-#define TWI_MUX 		(0x01<<4 ) //this may or may not work
-
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
@@ -67,11 +65,17 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define HWSERIAL0_DRE_VECTOR 	(USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
 #define HWSERIAL0_RXC_VECTOR 	(USART0_RXC_vect)
+#ifdef ALTSERIAL
 #define HWSERIAL0_MUX 			(PORTMUX_USART0_ALTERNATE_gc) 
 #define PIN_WIRE_HWSERIAL0_RX 	(3)
 #define PIN_WIRE_HWSERIAL0_TX 	(2)
+#else
+#define HWSERIAL0_MUX 			(PORTMUX_USART0_DEFAULT_gc) 
+#define PIN_WIRE_HWSERIAL0_RX 	(1)
+#define PIN_WIRE_HWSERIAL0_TX 	(0)
+#endif
 
-#define LED_BUILTIN 1 //PA7 - the only pin on the part that doesn't have some critical function that an LED would interfere with
+#define LED_BUILTIN 1 
 
 
 #define PIN_A0   (5)
@@ -107,10 +111,10 @@ static const uint8_t A7 = PIN_A7;
 
 /* 
 PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       AC1       AC2       DAC0      USART0    SPI0      TWI0      TCA(PWM)  TCBn      TCD0      CCL
-0      A2 or DAC    PA6                 AIN6      AIN2      X2/Y2     AINN0     AINP1     AINP0     OUT
-1      A3           PA7                 AIN7      AIN3      X3/Y3     AINP0     AINP0     AINN0                                                                           LUT1-OUT
-2      MOSI         PA1                 AIN1                                                                  *TxD      MOSI      *SDA                                    LUT0-IN1
-3      MISO         PA2       EVOUT0    AIN2                                                                  *RxD      MISO      *SCL                                    LUT0-IN2
+0      A2 or DAC    PA6                 AIN6      AIN2      X2/Y2     AINN0     AINP1     AINP0     OUT       RxD                                               WOA
+1      A3           PA7                 AIN7      AIN3      X3/Y3     AINP0     AINP0     AINN0               TxD                           *WO0                WOB       LUT1-OUT
+2      MOSI         PA1                 AIN1                                                                  *TxD      MOSI      SDA       WO1                           LUT0-IN1
+3      MISO         PA2       EVOUT0    AIN2                                                                  *RxD      MISO      SCL       WO2                           LUT0-IN2
 4      SCK          PA3       EXTCLK    AIN3                                                                  *XCK      SCK                 WO3       TCB1 WO
 5      UPDI         PA0       RESET/    AIN0                                                                                                                              LUT1-IN0
                               UPDI        
@@ -155,9 +159,9 @@ const uint8_t PROGMEM digital_pin_to_timer[] = {
 	#else
 	NOT_ON_TIMER, // 0  PA6
 	#endif
-	NOT_ON_TIMER, // 1  PA7
-	NOT_ON_TIMER, // 2  PA1
-	NOT_ON_TIMER, // 3  PA2
+	TIMERA0, // 1  PA7
+	TIMERA0, // 2  PA1
+	TIMERA0, // 3  PA2
 	// skip PA0 UPDI
 	TIMERA0, // 4  PA3
 	NOT_ON_TIMER  // 5  PA0
