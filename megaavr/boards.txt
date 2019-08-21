@@ -11,6 +11,7 @@ menu.clocksource=Clock Source
 menu.dacvref=DAC Voltage Reference
 menu.neopixelport=tinyNeoPixel Port
 menu.millis=millis()/micros()
+menu.uartpins=UART pins
 
 
 ##############################################################
@@ -545,11 +546,16 @@ atxy2.upload.speed=115200
 atxy2.upload.use_1200bps_touch=true
 atxy2.upload.extra_params=-P{serial.port}
 
+atxy2.menu.uartpins.alternate=TX:2, RX:3
+atxy2.menu.uartpins.standard=TX:0, RX:1
+atxy2.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
+atxy2.menu.uartpins.standard.build.uartpins=
+
 atxy2.build.board=attinyxy2
 atxy2.build.core=arduino
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
-atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.millis}
+atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.millis} {build.uartpins}
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
