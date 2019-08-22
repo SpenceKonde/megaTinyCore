@@ -26,7 +26,7 @@
 #include <avr/pgmspace.h>
 #include "timers.h"
 
-#define NUM_DIGITAL_PINS            6 // 
+#define NUM_DIGITAL_PINS            6 //
 #define NUM_ANALOG_INPUTS           9
 //#define NUM_RESERVED_PINS           0 // (TOSC1/2, VREF, RESET, DEBUG USART Rx/Tx)
 //#define NUM_INTERNALLY_USED_PINS    0 // (2 x Chip select + 2 x UART + 4 x IO + LED_BUILTIN + 1 unused pin)
@@ -57,6 +57,8 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define PIN_WIRE_SDA        (2)
 #define PIN_WIRE_SCL        (3)
 
+#define TWI_MUX 		0
+
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
@@ -65,17 +67,17 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define HWSERIAL0_DRE_VECTOR 	(USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
 #define HWSERIAL0_RXC_VECTOR 	(USART0_RXC_vect)
-#ifdef ALTSERIAL
-#define HWSERIAL0_MUX 			(PORTMUX_USART0_ALTERNATE_gc) 
+#ifdef UARTREMAP
+#define HWSERIAL0_MUX 			(PORTMUX_USART0_ALTERNATE_gc)
 #define PIN_WIRE_HWSERIAL0_RX 	(3)
 #define PIN_WIRE_HWSERIAL0_TX 	(2)
 #else
-#define HWSERIAL0_MUX 			(PORTMUX_USART0_DEFAULT_gc) 
+#define HWSERIAL0_MUX 			(PORTMUX_USART0_DEFAULT_gc)
 #define PIN_WIRE_HWSERIAL0_RX 	(1)
 #define PIN_WIRE_HWSERIAL0_TX 	(0)
 #endif
 
-#define LED_BUILTIN 1 
+#define LED_BUILTIN 1
 
 
 #define PIN_A0   (5)
@@ -101,15 +103,15 @@ static const uint8_t A7 = PIN_A7;
 // pins are a separate set.
 
 // ATtiny412 / ARDUINO
-//                                    _____ 
+//                                    _____
 //                            VDD   1|*    |20  GND
 //           (DAC)  (AIN6) PA6  0   2|     |19  4~  PA3 (AIN3)(SCK)(EXTCLK)
-//                  (AIN7) PA7  1   3|     |18  5   PA0 (nRESET/UPDI) 
+//                  (AIN7) PA7  1   3|     |18  5   PA0 (nRESET/UPDI)
 // (MOSI)(TXD)(SDA) (AIN1) PA1  2   4|_____|17  3   PA2 (AIN2)(MISO)(RXD)(SCL)
-//               
+//
 //
 
-/* 
+/*
 PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       AC1       AC2       DAC0      USART0    SPI0      TWI0      TCA(PWM)  TCBn      TCD0      CCL
 0      A2 or DAC    PA6                 AIN6      AIN2      X2/Y2     AINN0     AINP1     AINP0     OUT       RxD                                               WOA
 1      A3           PA7                 AIN7      AIN3      X3/Y3     AINP0     AINP0     AINN0               TxD                           *WO0                WOB       LUT1-OUT
@@ -117,11 +119,11 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
 3      MISO         PA2       EVOUT0    AIN2                                                                  *RxD      MISO      SCL       WO2                           LUT0-IN2
 4      SCK          PA3       EXTCLK    AIN3                                                                  *XCK      SCK                 WO3       TCB1 WO
 5      UPDI         PA0       RESET/    AIN0                                                                                                                              LUT1-IN0
-                              UPDI        
-	* alternative pin locations			  
+                              UPDI
+	* alternative pin locations
 */
 
-const uint8_t PROGMEM digital_pin_to_port[] = {	
+const uint8_t PROGMEM digital_pin_to_port[] = {
 	PA, // 0  PA6
 	PA, // 1  PA7
 	PA, // 2  PA1
@@ -143,7 +145,7 @@ const uint8_t PROGMEM digital_pin_to_bit_position[] = {
 };
 
 /* Use this for accessing PINnCTRL register */
-const uint8_t PROGMEM digital_pin_to_bit_mask[] = {	
+const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
 	PIN6_bm, // 0  PA6
 	PIN7_bm, // 1  PA7
 	PIN1_bm, // 2  PA1

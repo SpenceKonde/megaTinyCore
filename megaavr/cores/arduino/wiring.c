@@ -70,7 +70,7 @@ static volatile TCB_t* _timer =
 #elif defined(MILLIS_USE_TIMERB3)
 &TCB3;
 #else
-#error "No millis timer selected". 
+#error "No millis timer selected".
 #endif
 #endif
 
@@ -150,7 +150,7 @@ unsigned long micros() {
 	if(TCA0.SPLIT.INTFLAGS & TCA_SPLIT_LUNF_bm){
 		overflows++;
 		ticks = 0xFF-TCA0.SPLIT.LCNT;
-		
+
 	}
 	#else
 	if(_timer->INTFLAGS & TCB_CAPT_bm){
@@ -184,7 +184,7 @@ void delay(unsigned long ms)
 	/* Wait until return time */
 	while(micros() < return_time);
 }
-#else 
+#else
 void delay(unsigned long ms) //non-millis-timer-dependent delay()
 {
   while(ms--){
@@ -274,7 +274,7 @@ void delayMicroseconds(unsigned int us)
   // us is at least 6 so we can subtract 4
   us -= 4; // = 2 cycles
 #elif F_CPU >= 5000000L
-  // for 5MHz (20MHz / 4) 
+  // for 5MHz (20MHz / 4)
 
   // for a 1 ~ 3 microsecond delay, simply return.  the overhead
   // of the function call takes 14 (16) cycles, which is 3us
@@ -328,64 +328,64 @@ void init()
 {
 	// this needs to be called before setup() or some functions won't
 	// work there
-	
+
 /******************************** CLOCK STUFF *********************************/
 
-	
+
  	int64_t cpu_freq;
- 	
-	#if (F_CPU == 20000000) 
+
+	#if (F_CPU == 20000000)
 		cpu_freq = 20000000;
-		
+
 		/* No division on clock */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
-	
+
 	#elif (F_CPU == 16000000)
 		cpu_freq = 16000000;
-		
+
 		/* No division on clock */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
-		
+
 	#elif (F_CPU == 10000000) //20MHz prescaled by 2
 		cpu_freq = 10000000;
-		
+
 		/* Clock DIV2 */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
-		
+
 	#elif (F_CPU == 8000000) //16MHz prescaled by 2
 		cpu_freq = 8000000;
-		
+
 		/* Clock DIV2 */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
-		
+
 	#elif (F_CPU == 5000000) //20MHz prescaled by 4
 		cpu_freq = 5000000;
-		
+
 		/* Clock DIV4 */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
-		
+
 	#elif (F_CPU == 4000000) //16MHz prescaled by 4
 		cpu_freq = 4000000;
-		
+
 		/* Clock DIV4 */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
-		
+
 	#elif (F_CPU == 1000000) //16MHz prescaled by 16
 		cpu_freq = 1000000;
-		
+
 		/* Clock DIV8 */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
 	#else
-		
+
 		#ifndef F_CPU
 			#error "F_CPU not defined"
-		#else 
+		#else
 	 		#error "F_CPU defined as an unsupported value"
 		#endif
 	#endif
 
 	/* Apply calculated value to F_CPU_CORRECTED */
-	F_CPU_CORRECTED = (uint32_t)cpu_freq; //Spence 6/22/2019: This will always be equal to F_CPU! 
+	F_CPU_CORRECTED = (uint32_t)cpu_freq; //Spence 6/22/2019: This will always be equal to F_CPU!
 
 
 /********************************* ADC ****************************************/
@@ -419,6 +419,9 @@ void init()
 	#if (HWSERIAL0_MUX!=0 || SPI_MUX!=0 ||TWI_MUX!=0)
 		PORTMUX.CTRLB=HWSERIAL0_MUX|SPI_MUX|TWI_MUX; //Set PORTMUX
 	#endif
+	#ifdef __AVR_ATtinyxy2__
+		PORTMUX.CTRLC=1;
+	#endif
 
 	setup_timers();
 
@@ -435,7 +438,7 @@ void init()
 
     #ifdef MILLIS_USE_TIMERA0
     TCA0.SPLIT.INTCTRL = TCA_SPLIT_LUNF_bm;
-    
+
     #else //It's a type b timer
 	/* Default Periodic Interrupt Mode */
 	/* TOP value for overflow every 256 clock cycles */
@@ -456,7 +459,7 @@ void init()
 	VREF.CTRLA |= DACVREF;
 	#endif
 /*************************** ENABLE GLOBAL INTERRUPTS *************************/
-	
+
 	sei();
 }
 

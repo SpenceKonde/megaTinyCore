@@ -74,9 +74,9 @@ int analogRead(uint8_t pin)
 {
 	pin = digitalPinToAnalogInput(pin);
 	if(pin == NOT_A_PIN) return NOT_A_PIN;
-	
-	/* Check if TWI is operating on double bonded pin (Master Enable is high 
-		in both Master and Slave mode for bus error detection, so this can 
+
+	/* Check if TWI is operating on double bonded pin (Master Enable is high
+		in both Master and Slave mode for bus error detection, so this can
 		indicate an active state for Wire) */
 	if(isDoubleBondedActive(pin)) return 0;
 
@@ -127,7 +127,7 @@ void analogWrite(uint8_t pin, int val)
 	/* Get timer */
 	uint8_t digital_pin_timer =  digitalPinToTimer(pin);
 	uint8_t* timer_cmp_out;
-	
+
 	//TCB_t *timer_B;
 	/* Find out Port and Pin to correctly handle port mux, and timer. */
 	switch (digital_pin_timer) { //use only low nybble which defines which timer it is
@@ -139,6 +139,9 @@ void analogWrite(uint8_t pin, int val)
 				digitalWrite(pin, HIGH);
 			} else {
 				/* Calculate correct compare buffer register */
+				#ifdef __AVR_ATtinyxy2__
+				if (bit_pos==7) bit_pos=0; //on the xy2, WO0 is on PA7
+				#endif
 				if (bit_pos>2) {
 					bit_pos-=3;
 					timer_cmp_out = ((uint8_t*) (&TCA0.SPLIT.HCMP0)) + (bit_pos<<1);
@@ -151,18 +154,18 @@ void analogWrite(uint8_t pin, int val)
 				}
 			}
 			break;
-		/* None of these parts have a Timer B that gives us PWM on a pin we don't already have it on. 
+		/* None of these parts have a Timer B that gives us PWM on a pin we don't already have it on.
 		case TIMERB0:
 		case TIMERB1:
 		case TIMERB2:
 		case TIMERB3:
-			
+
 
 			// Get pointer to timer, TIMERB0 order definition in Arduino.h
 			//assert (((TIMERB0 - TIMERB3) == 2));
 			timer_B = ((TCB_t *)&TCB0 + (digital_pin_timer - TIMERB0));
 
-			// set duty cycle 
+			// set duty cycle
 			timer_B->CCMPH = val;
 
 			///Enable Timer Output
@@ -189,10 +192,10 @@ void analogWrite(uint8_t pin, int val)
 			    	TCD0.CMPASET=val;
 			    }
 				if (!(TCD0.FAULTCTRL & (1<<(6+bit_pos)))) { //bitpos will be 0 or 1 for TIMERD pins
-					//if not active, we need to activate it, which produces a glitch in the PWM 
+					//if not active, we need to activate it, which produces a glitch in the PWM
 					TCD0.CTRLA=0x10;//stop the timer
 					while(!(TCD0.STATUS&0x01)) {;} // wait until it's actually stopped
-					_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL|(1<<6+bit_pos)); 
+					_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL|(1<<6+bit_pos));
 					TCD0.CTRLA=0x11; //reenable it
 				}
 			}
