@@ -68,14 +68,15 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
 #define HWSERIAL0_RXC_VECTOR 	(USART0_RXC_vect)
 #ifdef UARTREMAP
-#define HWSERIAL0_MUX 			(PORTMUX_USART0_ALTERNATE_gc)
+#define HWSERIAL0_MUX 			0x01
 #define PIN_WIRE_HWSERIAL0_RX 	(3)
 #define PIN_WIRE_HWSERIAL0_TX 	(2)
 #else
-#define HWSERIAL0_MUX 			(PORTMUX_USART0_DEFAULT_gc)
+#define HWSERIAL0_MUX 			0x00
 #define PIN_WIRE_HWSERIAL0_RX 	(1)
 #define PIN_WIRE_HWSERIAL0_TX 	(0)
 #endif
+
 
 #define LED_BUILTIN 1
 
