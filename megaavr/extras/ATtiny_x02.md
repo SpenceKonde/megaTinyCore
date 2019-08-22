@@ -9,7 +9,7 @@ EEPROM | 64 bytes | 128 bytes
 Bootloader | No | No 
 GPIO Pins | 6 (5 usable) | 6 (5 usable)
 ADC Channels | 6 (5 usable) | 6 (5 usable)
-PWM Channels | 1 | 1 
+PWM Channels | 4 | 4 
 Timer Type B | 1 | 1 
 DAC | No | No 
 Interfaces | UART, SPI, I2C | UART, SPI, I2C
