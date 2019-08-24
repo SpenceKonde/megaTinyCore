@@ -133,4 +133,13 @@ When Optiboot is available for the ATmega4809, it will be adapted for these ATti
 * Sometimes a sketch which is too big to fit will, instead of generating a message saying that, result in the error: 'relocation truncated to fit: R_AVR_13_PCREL against symbol tablejump2'
 
 # Buying ATtiny megaAVR breakout boards
-I am planning to introduce breakout boards based on the megaAVR ATtiny parts to my Tindie store in mid-late July. 
+I sell breakout boards with regulator, UPDI header, and Serial header in my tindie shop, as well as the bare boards. Buying from my store helps support further development on the core, and is a great way to get started using these exciting new parts with Arduino. 
+
+### [ATtiny3217, 1607 assembled](https://www.tindie.com/products/17523/)
+### [ATtiny3217/1617/817/417/1607/807 bare board](https://www.tindie.com/products/17613/)
+### [ATtiny3216, 1606 assembled](https://www.tindie.com/products/17597/)
+### [ATtiny3216/1616/816/416/1606/806/406 bare board](https://www.tindie.com/products/17614/)
+### [ATtiny1614, 1604 assembled](https://www.tindie.com/products/17598/)
+### [ATtiny1614/814/414/1604/804/404 bare board](https://www.tindie.com/products/17748/)
+### [ATtiny412, 402 assembled](https://www.tindie.com/products/17685/)
+### [ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
