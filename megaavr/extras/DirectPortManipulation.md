@@ -53,3 +53,20 @@ Note that this does mean that each pin has it's own PINnCTRL register - unlike t
 
     PORTA.PIN6CTRL = PORT_PULLUPEN_bm; // use the insertnal pullup resistor on PA6
     PORTA.PIN6CTRL = 0; // don't use the insertnal pullup resistor on PA6
+    
+## Alternate names for registers
+
+On the new megaAVR parts (as shown above), the registers are normally accessed as members of a struct (eg, PORTA is a struct, PORTA.OUT is a member of that struct). This can in some cases be problematic when porting code. The compiler libraries also provide flat names for all of these registers - replace the . with an _ - ie, PORTA.OUT is the same as PORTA_OUT
+
+## VPORT registers
+
+The normal port registers for are at addresses starting at 0x400. This means they are outside the range of the `sbi`, `cbi`, and `out` instructions. This can be an issue when porting code, or when writing assembler for these parts. Fortunately, to address this, each port has 4 VPORT registers - VPORTx.OUT, VPORTx.IN, VPORTx.DIR, VPORTx.INTFLAGS - these are aliases of the corresponding PORTx registers, and can be used with `sbi`, `cbi`, and `out`. Writing 1 to a bit in VPORTx.IN will toggle the pin state if the pin is an output. 
+
+## Equivilents to classic AVR registers
+Classic AVR |  megaAVR | megaAVR VPORT
+------------ | ------------- | -------------
+PORTx | PORTx.OUT | VPORTx.OUT
+PINx  | PORTx.IN | VPORTx.IN
+DDRx  | PORTx.DIR | VPORTx.DIR
+
+**NOTE** Unlike classic AVRs, setting the bit in PORTx.OUT while pin is set as an INPUT will *NOT* enable the pullups. Only the PORTx.PINnCTRL registers can do that. There is no VPORT register that allows changing pullup status. 
