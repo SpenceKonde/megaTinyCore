@@ -1,3 +1,7 @@
+1.0.6
+* Add missing NUM_DIGITAL_PINS macros to xy7, xy6. 
+* Expand documentation
+
 1.0.5
 * Support more PWM pins on 412/212/402/202
 * Support both UART locations on 412/212/402/202
