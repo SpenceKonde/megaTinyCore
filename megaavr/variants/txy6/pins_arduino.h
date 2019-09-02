@@ -26,6 +26,7 @@
 #include <avr/pgmspace.h>
 #include "timers.h"
 
+#define NUM_DIGITAL_PINS            18
 #define NUM_ANALOG_INPUTS           12
 //#define NUM_RESERVED_PINS           0 // (TOSC1/2, VREF, RESET, DEBUG USART Rx/Tx)
 //#define NUM_INTERNALLY_USED_PINS    0 // (2 x Chip select + 2 x UART + 4 x IO + LED_BUILTIN + 1 unused pin)
