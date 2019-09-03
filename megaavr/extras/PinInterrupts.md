@@ -99,3 +99,5 @@ Certain pins (pin 2 and 6 in each port) are "fully asyncronous" - These pins hav
 * They can be triggered by conditions which last less than one processor cycle. 
 * They can wake the system from sleep on change, rising, falling or level interrupt. Other pins can only wake on change or level interrupt. 
 * There is no "dead time" between successive interrupts (other pins have 3 clock cycle "dead time" between successive interrupts)
+
+In the example above, note that the interrupts on pin 14 and 15 (PA1 and PA2) are configured identically. However, if the part was put to sleep, only the one on pin 15/PA2 would be able to wake the part, as they trigger on rising edge, and only PA2 is a fully asynchronous pin. 
