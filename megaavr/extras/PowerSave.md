@@ -76,7 +76,7 @@ void RTC_init(void)
   {
     ;                                   /* Wait for all register to be synchronized */
   }
-  RTC.CLKSEL = RTC_CLKSEL_INT32K_gc;    /* 32.768kHz Internal Crystal Oscillator (XOSC32K) */
+  RTC.CLKSEL = RTC_CLKSEL_INT32K_gc;    /* 32.768kHz Internal Ultra-Low-Power Oscillator (OSCULP32K) */
   
   RTC.PITINTCTRL = RTC_PI_bm;           /* PIT Interrupt: enabled */
   
