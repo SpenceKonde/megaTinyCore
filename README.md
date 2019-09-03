@@ -44,7 +44,9 @@ Once Optiboot is working on the megaAVR ATtiny parts, it will be possible to con
 # Features
 
 ### Memory-mapped flash: No need to declare PROGMEM or use F() macro anymore!
-Unlike classic AVRs, on the megaavr parts, the flash is within the same address space as the main memory. This means pgm_read_near functions are not needed to read them. Because of this, the compiler automatically puts any variable declared `const` into progmem, and accesses it appropriately - you no longer need to explicitly declare them PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either (and in fact, doing so will waste flash). 
+Unlike classic AVRs, on the megaavr parts, the flash is within the same address space as the main memory. This means pgm_read_near functions are not needed to read them. Because of this, the compiler automatically puts any variable declared `const` into progmem, and accesses it appropriately - you no longer need to explicitly declare them PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either (and in fact, doing so will waste flash).  (
+
+However, do note that if you explicitly declare a variable PROGMEM, you must still use the pgm_read functions to read it, just like on classic AVRs.
 
 ### Serial (UART) Support
 All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards (except that there is no auto-reset, see note above about the lack of a reset pin). See the pinout charts for the location of the serial pins. Serial output for a few milliseconds after calling Serial.begin() seems to be off - if you are printing a message at the start of the sketch, add a small delay between Serial.begin() and your first Serial.print() call. 
