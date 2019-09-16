@@ -34,7 +34,7 @@
 #define NUM_SPI_PINS                3 // (MISO / MOSI / SCK)
 #define NUM_TOTAL_PINS              18
 
-#define EXTERNAL_NUM_INTERRUPTS     18
+#define EXTERNAL_NUM_INTERRUPTS     20
 
 #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
 #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 7 || (p) == 8 || (p) == 9 || (p)==10 || (p)==11 || (p) == 16 )
