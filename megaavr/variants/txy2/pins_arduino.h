@@ -35,7 +35,7 @@
 #define NUM_TOTAL_FREE_PINS         (NUM_DIGITAL_PINS)
 #define NUM_TOTAL_PINS              6
 
-#define EXTERNAL_NUM_INTERRUPTS     6
+#define EXTERNAL_NUM_INTERRUPTS     8
 
 
 #define digitalPinHasPWM(p)         ((p) == 4)
