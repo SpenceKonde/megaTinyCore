@@ -19,4 +19,4 @@ Clock options | Internal 16/20mhz | Internal 16/20mhz
 There exist ATtiny402's in the wild where the last byte of the signature is 0x25, instead of 0x27. Currently shipping parts from Atmel/Microchip have the correct signature. If you are stuck with parts with the wrong signature, choose ATtiny402 (bad signature) from the tools -> chip menu. 
 
 ### Datasheets
-[ATtiny202/402](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny202-402-AVR-MCU-with-Core-Independent-Peripherals_and-picoPower-40001969A.pdf)
+[ATtiny202/402](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny202-402-DataSheet-DS40001969B.pdf)
