@@ -16,4 +16,4 @@ Interfaces | UART, SPI, I2C | UART, SPI, I2C
 Clock options | Internal 16/20mhz | Internal 16/20mhz
 
 ### Datasheets
-[ATtiny212/412](http://ww1.microchip.com/downloads/en/DeviceDoc/40001911A.pdf)
+[ATtiny212/412](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-412-DataSheet-DS40001911B.pdf)
