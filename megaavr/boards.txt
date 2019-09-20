@@ -125,10 +125,6 @@ atxy7.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
 atxy7.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
 atxy7.upload.tool=avrdude
-atxy7.upload.protocol=jtag2updi
-atxy7.upload.speed=115200
-atxy7.upload.use_1200bps_touch=true
-atxy7.upload.extra_params=-P{serial.port}
 
 atxy7.build.board=attinyxy7
 atxy7.build.core=arduino
@@ -264,10 +260,6 @@ atxy6.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
 atxy6.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
 atxy6.upload.tool=avrdude
-atxy6.upload.protocol=jtag2updi
-atxy6.upload.speed=115200
-atxy6.upload.use_1200bps_touch=true
-atxy6.upload.extra_params=-P{serial.port}
 
 atxy6.build.board=attinyxy6
 atxy6.build.core=arduino
@@ -403,10 +395,6 @@ atxy4.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
 atxy4.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
 
 atxy4.upload.tool=avrdude
-atxy4.upload.protocol=jtag2updi
-atxy4.upload.speed=115200
-atxy4.upload.use_1200bps_touch=true
-atxy4.upload.extra_params=-P{serial.port}
 
 atxy4.build.board=attinyxy4
 atxy4.build.core=arduino
@@ -541,10 +529,6 @@ atxy2.menu.millis.enabled.build.millis=
 atxy2.menu.millis.disabled.build.millis=-DDISABLEMILLIS
 
 atxy2.upload.tool=avrdude
-atxy2.upload.protocol=jtag2updi
-atxy2.upload.speed=115200
-atxy2.upload.use_1200bps_touch=true
-atxy2.upload.extra_params=-P{serial.port}
 
 atxy2.menu.uartpins.alternate=TX:2, RX:3
 atxy2.menu.uartpins.standard=TX:0, RX:1
