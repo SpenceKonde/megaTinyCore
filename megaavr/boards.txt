@@ -12,6 +12,7 @@ menu.dacvref=DAC Voltage Reference
 menu.neopixelport=tinyNeoPixel Port
 menu.millis=millis()/micros()
 menu.uartpins=UART pins
+menu.bootloader=Bootloader
 
 
 ##############################################################
@@ -529,6 +530,17 @@ atxy2.menu.millis.enabled.build.millis=
 atxy2.menu.millis.disabled.build.millis=-DDISABLEMILLIS
 
 atxy2.upload.tool=avrdude
+atxy2.upload.speed=115200
+
+atxy2.menu.bootloader.none=none
+atxy2.menu.bootloader.none.upload.protocol=jtag2updi
+atxy2.menu.bootloader.none.upload.extra_params=-e
+atxy2.menu.bootloader.none.build.text_section_start=.text=0x0
+
+atxy2.menu.bootloader.optiboot=optiboot_x
+atxy2.menu.bootloader.optiboot.upload.protocol=arduino
+atxy2.menu.bootloader.optiboot.upload.extra_params=-D
+atxy2.menu.bootloader.optiboot.build.text_section_start=.text=0x200
 
 atxy2.menu.uartpins.alternate=TX:2, RX:3
 atxy2.menu.uartpins.standard=TX:0, RX:1
