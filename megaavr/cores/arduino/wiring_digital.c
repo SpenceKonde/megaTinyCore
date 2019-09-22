@@ -104,12 +104,15 @@ static void turnOffPWM(uint8_t pin)
 	/* TCA0 */
 	case TIMERA0:
 		/* Bit position will give output channel */
+		#ifdef __AVR_ATtinyxy2__
+		if (bit_pos==7) bit_pos=0; //on the xy2, WO0 is on PA7
+		#endif
 		if (bit_pos>2) 	bit_pos++; //there's a blank bit in the middle
 		/* Disable corresponding channel */
 		TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
 		break;
 	/* we don't need the type b timers as this core does not use them for PWM
-	//TCB - only one output 
+	//TCB - only one output
 	case TIMERB0:
 	case TIMERB1:
 	case TIMERB2:
@@ -117,7 +120,7 @@ static void turnOffPWM(uint8_t pin)
 
 		timerB = (TCB_t *)&TCB0 + (timer - TIMERB0);
 
-		 //Disable TCB compare channel 
+		 //Disable TCB compare channel
 		timerB->CTRLB &= ~(TCB_CCMPEN_bm);
 
 		break;
@@ -129,10 +132,10 @@ static void turnOffPWM(uint8_t pin)
 	#endif
 	#if (defined(TCD0) && defined(USE_TIMERD0_PWM))
 	case TIMERD0:
-		// rigmarole that produces a glitch in the PWM 
+		// rigmarole that produces a glitch in the PWM
 		TCD0.CTRLA=0x10;//stop the timer
 		while(!(TCD0.STATUS&0x01)) {;}// wait until it's actually stopped
-		_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL & ~(1<<(6+bit_pos))); 
+		_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL & ~(1<<(6+bit_pos)));
 		TCD0.CTRLA=0x11; //reenable it
 		break;
 	#endif
