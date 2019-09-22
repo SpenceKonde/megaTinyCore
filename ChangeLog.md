@@ -1,5 +1,6 @@
 1.0.6
 * Add missing NUM_DIGITAL_PINS macros to xy7, xy6. 
+* Fix PWM on Pin 1 (PA7) of xy2
 * Expand documentation
 
 1.0.5
