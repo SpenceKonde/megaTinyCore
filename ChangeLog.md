@@ -1,6 +1,7 @@
 1.0.6
 * Add missing NUM_DIGITAL_PINS macros to xy7, xy6. 
 * Fix PWM on Pin 1 (PA7) of xy2
+* Fix Wire.h to prevent "call of overloaded 'requestFrom(int&, unsigned int&)' is ambiguous" errors with code that works on classic avr.
 * Expand documentation
 
 1.0.5
