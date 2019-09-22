@@ -15,7 +15,7 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- 
+
   Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
   Modified 2017 by Chuck Todd (ctodd@cableone.net) to correct Unconfigured Slave Mode reboot
 */
@@ -62,7 +62,7 @@ void TwoWire::begin(void)
 	txBufferIndex = 0;
 	txBufferLength = 0;
 
-	TWI_MasterInit(DEFAULT_FREQUENCY);	
+	TWI_MasterInit(DEFAULT_FREQUENCY);
 }
 
 void TwoWire::begin(uint8_t address)
@@ -72,12 +72,12 @@ void TwoWire::begin(uint8_t address)
 
 	txBufferIndex = 0;
 	txBufferLength = 0;
-  
+
 	TWI_SlaveInit(address);
-	
+
 	TWI_attachSlaveTxEvent(onRequestService, txBuffer); // default callback must exist
 	TWI_attachSlaveRxEvent(onReceiveService, rxBuffer, BUFFER_LENGTH); // default callback must exist
-	
+
 }
 
 void TwoWire::begin(int address)
@@ -95,13 +95,13 @@ void TwoWire::setClock(uint32_t clock)
 	TWI_MasterSetBaud(clock);
 }
 
-uint8_t TwoWire::requestFrom(uint8_t address, size_t quantity, bool sendStop) {	
+uint8_t TwoWire::requestFrom(uint8_t address, size_t quantity, bool sendStop) {
 	if(quantity > BUFFER_LENGTH){
 		quantity = BUFFER_LENGTH;
 	}
-	
+
 	uint8_t bytes_read = TWI_MasterRead(address, rxBuffer, quantity, sendStop);
-	
+
 	/* Initialize read variables */
 	rxBufferIndex = 0;
 	rxBufferLength = bytes_read;
@@ -114,14 +114,14 @@ uint8_t TwoWire::requestFrom(uint8_t address, size_t quantity)
 	return requestFrom(address, quantity, true);
 }
 
-uint8_t TwoWire::requestFrom(int address, int quantity)
+uint8_t TwoWire::requestFrom(int address, size_t quantity)
 {
-	return requestFrom((uint8_t)address, (size_t)quantity, true);
+	return requestFrom((uint8_t)address, quantity, true);
 }
 
-uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)
+uint8_t TwoWire::requestFrom(int address, size_t quantity, int sendStop)
 {
-	return requestFrom((uint8_t)address, (size_t)quantity, (bool)sendStop);
+	return requestFrom((uint8_t)address, quantity, (bool)sendStop);
 }
 
 void TwoWire::beginTransmission(uint8_t address)
@@ -144,8 +144,8 @@ void TwoWire::beginTransmission(int address)
 //	Originally, 'endTransmission' was an f(void) function.
 //	It has been modified to take one parameter indicating
 //	whether or not a STOP should be performed on the bus.
-//	Calling endTransmission(false) allows a sketch to 
-//	perform a repeated start. 
+//	Calling endTransmission(false) allows a sketch to
+//	perform a repeated start.
 //
 //	WARNING: Nothing in the library keeps track of whether
 //	the bus tenure has been properly ended with a STOP. It
@@ -157,14 +157,14 @@ uint8_t TwoWire::endTransmission(bool sendStop)
 {
 	// transmit buffer (blocking)
 	uint8_t status = TWI_MasterWrite(txAddress, txBuffer, txBufferLength, sendStop);
-	
+
 	// reset tx buffer iterator vars
 	txBufferIndex = 0;
 	txBufferLength = 0;
-	
+
 	// indicate that we are done transmitting
 	transmitting = 0;
-	
+
 	return status;
 }
 
@@ -193,7 +193,7 @@ size_t TwoWire::write(uint8_t data)
 
 	/* Update buffer length */
 	txBufferLength = txBufferIndex;
-	 
+
 	return 1;
 }
 
@@ -224,7 +224,7 @@ int TwoWire::available(void)
 int TwoWire::read(void)
 {
 	int value = -1;
-  
+
 	// get each successive byte on each call
 	if(rxBufferIndex < rxBufferLength){
 		value = rxBuffer[rxBufferIndex];
@@ -240,7 +240,7 @@ int TwoWire::read(void)
 int TwoWire::peek(void)
 {
 	int value = -1;
-  
+
 	if(rxBufferIndex < rxBufferLength){
 		value = rxBuffer[rxBufferIndex];
 	}
@@ -248,7 +248,7 @@ int TwoWire::peek(void)
 	return value;
 }
 
-// can be used to get out of an error state in TWI module 
+// can be used to get out of an error state in TWI module
 // e.g. when MDATA regsiter is written before MADDR
 void TwoWire::flush(void)
 {
@@ -257,13 +257,13 @@ void TwoWire::flush(void)
 // 		txBuffer[i] = 0;
 // 		rxBuffer[i] = 0;
 // 	}
-// 	
+//
 // 	/* Clear buffer variables */
 // 	txBufferIndex = 0;
 // 	txBufferLength = 0;
 // 	rxBufferIndex = 0;
 // 	rxBufferLength = 0;
-// 	
+//
 // 	/* Turn off and on TWI module */
 // 	TWI_Flush();
 }
@@ -285,7 +285,7 @@ void TwoWire::onReceiveService(int numBytes)
 	// set rx iterator vars
 	rxBufferIndex = 0;
 	rxBufferLength = numBytes;
-	
+
 	// alert user program
 	user_onReceive(numBytes);
 }
@@ -297,11 +297,11 @@ uint8_t TwoWire::onRequestService(void)
 	if(!user_onRequest){
 		return 0;
 	}
-	
+
 	// reset slave write buffer iterator var
 	txBufferIndex = 0;
 	txBufferLength = 0;
-  
+
 	// alert user program
 	user_onRequest();
 

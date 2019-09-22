@@ -62,8 +62,8 @@ class TwoWire : public HardwareI2C
     uint8_t endTransmission(bool);
     uint8_t requestFrom(uint8_t, size_t);
     uint8_t requestFrom(uint8_t, size_t, bool);
-    uint8_t requestFrom(int, int);
-    uint8_t requestFrom(int, int, int);
+    uint8_t requestFrom(int, size_t);
+    uint8_t requestFrom(int, size_t, int);
     virtual size_t write(uint8_t);
     virtual size_t write(const uint8_t *, size_t);
     virtual int available(void);
