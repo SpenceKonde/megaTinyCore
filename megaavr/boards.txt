@@ -1,4 +1,4 @@
-# See: http://code.google.com/p/arduino/wiki/Platforms
+# See: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
 
 
 menu.chip=Chip
@@ -12,12 +12,14 @@ menu.dacvref=DAC Voltage Reference
 menu.neopixelport=tinyNeoPixel Port
 menu.millis=millis()/micros()
 menu.uartpins=UART pins
-menu.bootloader=Bootloader
+menu.bootmenu=Bootloader
+
 
 
 ##############################################################
 
 atxy7.name=ATtiny3217/1617/1607/817/807/417
+atxy7.upload.speed=115200
 
 atxy7.menu.chip.3217=ATtiny3217
 atxy7.menu.chip.3217.build.mcu=attiny3217
@@ -145,9 +147,25 @@ atxy7.bootloader.BOOTEND=0x00
 
 atxy7.upload.workaround=
 
+atxy7.menu.bootmenu.none=none
+atxy7.menu.bootmenu.none.upload.protocol=jtag2updi
+atxy7.menu.bootmenu.none.upload.extra_params=-e
+atxy7.menu.bootmenu.none.build.text_section_start=.text=0x0
+atxy7.menu.bootmenu.none.bootloader.BOOTEND=0x0
+
+atxy7.menu.bootmenu.optiboot=optiboot_x
+atxy7.menu.bootmenu.optiboot.upload.protocol=arduino
+atxy7.menu.bootmenu.optiboot.upload.extra_params=-D
+atxy7.menu.bootmenu.optiboot.build.text_section_start=.text=0x200
+atxy7.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_atxy7.hex
+atxy7.menu.bootmenu.optiboot.bootloader.BOOTEND=0x2
+
+
+
 ##############################################################
 
 atxy6.name=ATtiny3216/1616/1606/816/806/416/406
+atxy6.upload.speed=115200
 
 atxy6.menu.chip.3216=ATtiny3216
 atxy6.menu.chip.3216.build.mcu=attiny3216
@@ -279,9 +297,23 @@ atxy6.bootloader.BOOTEND=0x00
 
 atxy6.upload.workaround=
 
+atxy6.menu.bootmenu.none=none
+atxy6.menu.bootmenu.none.upload.protocol=jtag2updi
+atxy6.menu.bootmenu.none.upload.extra_params=-e
+atxy6.menu.bootmenu.none.build.text_section_start=.text=0x0
+atxy6.menu.bootmenu.none.bootloader.BOOTEND=0x0
+
+atxy6.menu.bootmenu.optiboot=optiboot_x
+atxy6.menu.bootmenu.optiboot.upload.protocol=arduino
+atxy6.menu.bootmenu.optiboot.upload.extra_params=-D
+atxy6.menu.bootmenu.optiboot.build.text_section_start=.text=0x200
+atxy6.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_atxy6.hex
+atxy6.menu.bootmenu.optiboot.bootloader.BOOTEND=0x2
+
 ##############################################################
 
 atxy4.name=ATtiny1614/1604/814/804/414/404/214/204
+atxy4.upload.speed=115200
 
 atxy4.menu.chip.1614=ATtiny1614
 atxy4.menu.chip.1614.build.mcu=attiny1614
@@ -415,9 +447,24 @@ atxy4.bootloader.BOOTEND=0x00
 
 atxy4.upload.workaround=
 
+atxy4.menu.bootmenu.none=none
+atxy4.menu.bootmenu.none.upload.protocol=jtag2updi
+atxy4.menu.bootmenu.none.upload.extra_params=-e
+atxy4.menu.bootmenu.none.build.text_section_start=.text=0x0
+atxy4.menu.bootmenu.none.bootloader.BOOTEND=0x0
+
+atxy4.menu.bootmenu.optiboot=optiboot_x
+atxy4.menu.bootmenu.optiboot.upload.protocol=arduino
+atxy4.menu.bootmenu.optiboot.upload.extra_params=-D
+atxy4.menu.bootmenu.optiboot.build.text_section_start=.text=0x200
+atxy4.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_atxy4.hex
+atxy4.menu.bootmenu.optiboot.bootloader.BOOTEND=0x2
+
+
 ##############################################################
 
 atxy2.name=ATtiny412/402/212/202
+atxy2.upload.speed=115200
 
 #atxy2.menu.chip.812=ATtiny812
 #atxy2.menu.chip.812.build.mcu=attiny812
@@ -530,17 +577,21 @@ atxy2.menu.millis.enabled.build.millis=
 atxy2.menu.millis.disabled.build.millis=-DDISABLEMILLIS
 
 atxy2.upload.tool=avrdude
-atxy2.upload.speed=115200
 
-atxy2.menu.bootloader.none=none
-atxy2.menu.bootloader.none.upload.protocol=jtag2updi
-atxy2.menu.bootloader.none.upload.extra_params=-e
-atxy2.menu.bootloader.none.build.text_section_start=.text=0x0
+atxy2.menu.bootmenu.none=none
+atxy2.menu.bootmenu.none.upload.protocol=jtag2updi
+atxy2.menu.bootmenu.none.upload.extra_params=-e
+atxy2.menu.bootmenu.none.build.text_section_start=.text=0x0
+atxy2.menu.bootmenu.none.bootloader.BOOTEND=0x0
 
-atxy2.menu.bootloader.optiboot=optiboot_x
-atxy2.menu.bootloader.optiboot.upload.protocol=arduino
-atxy2.menu.bootloader.optiboot.upload.extra_params=-D
-atxy2.menu.bootloader.optiboot.build.text_section_start=.text=0x200
+atxy2.menu.bootmenu.optiboot=optiboot_x
+atxy2.menu.bootmenu.optiboot.upload.protocol=arduino
+atxy2.menu.bootmenu.optiboot.upload.extra_params=-D
+atxy2.menu.bootmenu.optiboot.build.text_section_start=.text=0x200
+atxy2.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_atxy2.hex
+atxy2.menu.bootmenu.optiboot.atxt2.bootloader.BOOTEND=0x2
+
+atxy2.bootloader.tool=avrdude
 
 atxy2.menu.uartpins.alternate=TX:2, RX:3
 atxy2.menu.uartpins.standard=TX:0, RX:1
@@ -561,5 +612,50 @@ atxy2.bootloader.TCD0CFG=0x00
 atxy2.bootloader.SYSCFG0=0xC9
 atxy2.bootloader.SYSCFG1=0x03
 atxy2.bootloader.APPEND=0x00
-atxy2.bootloader.BOOTEND=0x00
+#atxy2.bootloader.BOOTEND=0x00
 
+#
+
+Xplained817.name=Attiny817 Xplained Mini
+Xplained817.build.mcu=attiny817
+Xplained817.upload.maximum_size=8192
+Xplained817.upload.maximum_data_size=512
+Xplained817.build.board=attinyxy7
+Xplained817.build.board=attinyxy7
+Xplained817.build.core=arduino
+Xplained817.build.variant=txy7
+Xplained817.build.f_cpu=20000000
+Xplained817.build.text_section_start=.text=0x200
+Xplained817.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DDACVREF=3 -DNEOPIXELPORT=VPORTA.OUT
+
+Xplained416.name=Attiny416 Xplained Nano
+Xplained416.build.mcu=attiny416
+Xplained416.build.board=attinyxy6
+Xplained416.build.core=arduino
+Xplained416.build.variant=txy6
+Xplained416.build.f_cpu=20000000
+Xplained416.build.text_section_start=.text=0x200
+Xplained416.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DDACVREF=3 -DNEOPIXELPORT=VPORTA.OUT
+Xplained416.upload.tool=avrdude
+Xplained416.upload.workaround=
+Xplained416.upload.speed=57600
+Xplained416.upload.maximum_size=3584
+Xplained416.upload.maximum_data_size=256
+Xplained416.upload.protocol=arduino
+Xplained416.upload.extra_params=-D
+
+Xplained817.name=Attiny817 Xplained Mini
+Xplained817.build.mcu=attiny817
+Xplained817.build.board=attinyxy7
+Xplained817.build.core=arduino
+Xplained817.build.variant=txy7
+Xplained817.build.f_cpu=20000000
+Xplained817.build.text_section_start=.text=0x200
+Xplained817.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DDACVREF=3 -DNEOPIXELPORT=VPORTA.OUT
+Xplained817.upload.tool=avrdude
+Xplained817.upload.workaround=
+Xplained817.upload.speed=57600
+Xplained817.upload.maximum_size=7680
+Xplained817.upload.maximum_data_size=512
+Xplained817.upload.protocol=arduino
+Xplained817.upload.extra_params=-D
