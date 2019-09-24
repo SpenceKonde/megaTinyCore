@@ -634,6 +634,9 @@ Xplained416.upload.maximum_size=3584
 Xplained416.upload.maximum_data_size=256
 Xplained416.upload.protocol=arduino
 Xplained416.upload.extra_params=-D
+Xplained416.bootloader.file=optiboot_x/optiboot_xplained416.hex
+Xplained416.bootloader.tool=avrdude
+Xplained416.bootloader.BOOTEND=0x2
 
 Xplained817.name=Attiny817 Xplained Mini (optiboot)
 Xplained817.build.mcu=attiny817
@@ -650,6 +653,9 @@ Xplained817.upload.maximum_size=7680
 Xplained817.upload.maximum_data_size=512
 Xplained817.upload.protocol=arduino
 Xplained817.upload.extra_params=-D
+Xplained817.bootloader.file=optiboot_x/optiboot_xplained817.hex
+Xplained817.bootloader.tool=avrdude
+Xplained817.bootloader.BOOTEND=0x2
 
 # Separate board types for chips with Optiboot.  Reduces menu clutter.
 
