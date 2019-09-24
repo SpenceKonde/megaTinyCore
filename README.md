@@ -116,8 +116,17 @@ This core provides two additional #defines for part "families":
 
 This is just shorthand, for convenience - `#ifdef __AVR_ATtinyxy2__` is equivilent to `#if defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__)`
 
-### Bootloader Support (not yet implemented)
-When Optiboot is available for the ATmega4809, it will be adapted for these ATtiny parts, and the bootloader added to this core for chips with 8k or more of flash - possibly 4k chips if the bootloader ends up being small enough. 
+### Bootloader Support
+A new version of Optiboot (Optiboot-x) now runs on the Tiny0 and Tiny1 chips.  It's still under 512 bytes, so it will potentially work on any of the chips. including EEPROM support, so it potentially fits on any of the chips.
+
+There are a couple of issues with using Optiboot on these chips:
+* The bootloader is at the beginning of memory, rather than at the end (where it was on older chips.)  This means that you have to compile the sketch differently for use with the bootloader.  There are separate board types designated "(optiboot)" that can be used to compile the images.
+* The "reset" pin is shared with the "UPDI" pin (and also configurable for GPIO..)  In the absense of "high voltage UPDI programmers", this means that you have to select between being able to use auto-reset, and being able to re-program the chip with jtag2updi programmers.  Currently, the pin is assumed to be left in UPDI mode, which means that the only way to enter the bootloader is by power-cycling the target.  The bootloader timeout has been set to 8 second to help with this, but that also means an 8s pause before the application runs.
+* Currently, Optiboot_x resets the reset cause register after saving the contents in R2.  This is compatible with some older versions of Optiboot.
+* The new chips have more than one option for Uart Pins.  The current bootloaders are compiled for the DrAzzy development boards.
+* The new chips have a much more complicated Fuse structure, so the "burn bootloader" command does not set any fuses other than the BOOTEND fuse.  If you need other fuses set, you should use the non-optiboot platforms before the "burn bootloader" is done.
+* There are some good things, too.  Since chips boot to an internal clock and are highly similar, the number of bootloader hex files is vastly reduced.
+
 
 # Guides
 ### [Power Saving techniques and Sleep](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PowerSave.md)
