@@ -1,3 +1,6 @@
+1.1.0
+* Add support for the Optiboot bootloader !!!
+
 1.0.6
 * Add missing NUM_DIGITAL_PINS macros to xy7, xy6. 
 * Fix PWM on Pin 1 (PA7) of xy2
