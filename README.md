@@ -1,4 +1,6 @@
 [![Join the chat at https://gitter.im/SpenceKonde/megaTinyCore](https://badges.gitter.im/SpenceKonde/megaTinyCore.svg)](https://gitter.im/SpenceKonde/megaTinyCore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+### Warning: I just merged Optiboot support. Significant changes have been made. They have not yet been put through testing. It is suggested to use the 1.0.6 release unless you are testing optiboot. 
+
 
 ### [Wiring](Wiring.md)
 ### [Installation](Installation.md)
