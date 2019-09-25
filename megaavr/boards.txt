@@ -66,7 +66,7 @@ atxy7.menu.clock.10.bootloader.OSCCFG=0x02
 atxy7.menu.clock.8.bootloader.OSCCFG=0x01
 atxy7.menu.clock.5.bootloader.OSCCFG=0x02
 atxy7.menu.clock.4.bootloader.OSCCFG=0x01
-atxy7.menu.clock.1.bootloader.OSCCFG=0x01 
+atxy7.menu.clock.1.bootloader.OSCCFG=0x01
 
 atxy7.menu.bodvoltage.1v8=1.8V
 atxy7.menu.bodvoltage.2v15=2.15V
@@ -158,7 +158,7 @@ atxy7.menu.bootmenu.optiboot=optiboot_x
 atxy7.menu.bootmenu.optiboot.upload.protocol=arduino
 atxy7.menu.bootmenu.optiboot.upload.extra_params=-D
 atxy7.menu.bootmenu.optiboot.build.text_section_start=.text=0x200
-atxy7.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_atxy7.hex
+atxy7.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_txy7.hex
 atxy7.menu.bootmenu.optiboot.bootloader.BOOTEND=0x2
 
 
@@ -217,7 +217,7 @@ atxy6.menu.clock.10.bootloader.OSCCFG=0x02
 atxy6.menu.clock.8.bootloader.OSCCFG=0x01
 atxy6.menu.clock.5.bootloader.OSCCFG=0x02
 atxy6.menu.clock.4.bootloader.OSCCFG=0x01
-atxy6.menu.clock.1.bootloader.OSCCFG=0x01 
+atxy6.menu.clock.1.bootloader.OSCCFG=0x01
 
 atxy6.menu.bodvoltage.1v8=1.8V
 atxy6.menu.bodvoltage.2v15=2.15V
@@ -308,7 +308,7 @@ atxy6.menu.bootmenu.optiboot=optiboot_x
 atxy6.menu.bootmenu.optiboot.upload.protocol=arduino
 atxy6.menu.bootmenu.optiboot.upload.extra_params=-D
 atxy6.menu.bootmenu.optiboot.build.text_section_start=.text=0x200
-atxy6.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_atxy6.hex
+atxy6.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_txy6.hex
 atxy6.menu.bootmenu.optiboot.bootloader.BOOTEND=0x2
 
 ##############################################################
@@ -369,7 +369,7 @@ atxy4.menu.clock.10.bootloader.OSCCFG=0x02
 atxy4.menu.clock.8.bootloader.OSCCFG=0x01
 atxy4.menu.clock.5.bootloader.OSCCFG=0x02
 atxy4.menu.clock.4.bootloader.OSCCFG=0x01
-atxy4.menu.clock.1.bootloader.OSCCFG=0x01 
+atxy4.menu.clock.1.bootloader.OSCCFG=0x01
 
 atxy4.menu.bodvoltage.1v8=1.8V
 atxy4.menu.bodvoltage.2v15=2.15V
@@ -458,7 +458,7 @@ atxy4.menu.bootmenu.optiboot=optiboot_x
 atxy4.menu.bootmenu.optiboot.upload.protocol=arduino
 atxy4.menu.bootmenu.optiboot.upload.extra_params=-D
 atxy4.menu.bootmenu.optiboot.build.text_section_start=.text=0x200
-atxy4.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_atxy4.hex
+atxy4.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_txy4.hex
 atxy4.menu.bootmenu.optiboot.bootloader.BOOTEND=0x2
 
 
@@ -523,7 +523,7 @@ atxy2.menu.clock.10.bootloader.OSCCFG=0x02
 atxy2.menu.clock.8.bootloader.OSCCFG=0x01
 atxy2.menu.clock.5.bootloader.OSCCFG=0x02
 atxy2.menu.clock.4.bootloader.OSCCFG=0x01
-atxy2.menu.clock.1.bootloader.OSCCFG=0x01 
+atxy2.menu.clock.1.bootloader.OSCCFG=0x01
 
 atxy2.menu.bodvoltage.1v8=1.8V
 atxy2.menu.bodvoltage.2v15=2.15V
@@ -589,7 +589,7 @@ atxy2.menu.bootmenu.optiboot=optiboot_x
 atxy2.menu.bootmenu.optiboot.upload.protocol=arduino
 atxy2.menu.bootmenu.optiboot.upload.extra_params=-D
 atxy2.menu.bootmenu.optiboot.build.text_section_start=.text=0x200
-atxy2.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_atxy2.hex
+atxy2.menu.bootmenu.optiboot.bootloader.file=optiboot_x/optiboot_txy2.hex
 atxy2.menu.bootmenu.optiboot.atxt2.bootloader.BOOTEND=0x2
 
 atxy2.bootloader.tool=avrdude
@@ -608,7 +608,7 @@ atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
 atxy2.bootloader.WDTCFG=0x00
-atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits} 
+atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy2.bootloader.TCD0CFG=0x00
 atxy2.bootloader.SYSCFG0=0xC9
 atxy2.bootloader.SYSCFG1=0x03
@@ -737,7 +737,7 @@ atxy7o.upload.protocol=arduino
 atxy7o.upload.extra_params=-D
 atxy7o.upload.workaround=
 atxy7o.build.text_section_start=.text=0x200
-atxy7o.bootloader.file=optiboot_x/optiboot_atxy7.hex
+atxy7o.bootloader.file=optiboot_x/optiboot_txy7.hex
 atxy7o.bootloader.BOOTEND=0x2
 atxy7o.bootloader.tool=avrdude
 
@@ -828,7 +828,7 @@ atxy6o.upload.workaround=
 atxy6o.upload.protocol=arduino
 atxy6o.upload.extra_params=-D
 atxy6o.build.text_section_start=.text=0x200
-atxy6o.bootloader.file=optiboot_x/optiboot_atxy6o.hex
+atxy6o.bootloader.file=optiboot_x/optiboot_txy6o.hex
 atxy6o.bootloader.BOOTEND=0x2
 atxy6o.bootloader.tool=avrdude
 
@@ -890,7 +890,7 @@ atxy4o.menu.clock.10.bootloader.OSCCFG=0x02
 atxy4o.menu.clock.8.bootloader.OSCCFG=0x01
 atxy4o.menu.clock.5.bootloader.OSCCFG=0x02
 atxy4o.menu.clock.4.bootloader.OSCCFG=0x01
-atxy4o.menu.clock.1.bootloader.OSCCFG=0x01 
+atxy4o.menu.clock.1.bootloader.OSCCFG=0x01
 
 atxy4o.menu.dacvref.0v55=0.55V
 atxy4o.menu.dacvref.1v1=1.10V
@@ -926,7 +926,7 @@ atxy4o.upload.workaround=
 atxy4o.upload.protocol=arduino
 atxy4o.upload.extra_params=-D
 atxy4o.build.text_section_start=.text=0x200
-atxy4o.bootloader.file=optiboot_x/optiboot_atxy4.hex
+atxy4o.bootloader.file=optiboot_x/optiboot_txy4.hex
 atxy4o.bootloader.BOOTEND=0x2
 atxy4o.bootloader.tool=avrdude
 
@@ -1007,7 +1007,7 @@ atxy2o.upload.tool=avrdude
 atxy2o.upload.protocol=arduino
 atxy2o.upload.extra_params=-D
 atxy2o.build.text_section_start=.text=0x200
-atxy2o.bootloader.file=optiboot_x/optiboot_atxy2.hex
+atxy2o.bootloader.file=optiboot_x/optiboot_txy2.hex
 atxy2o.bootloader.BOOTEND=0x2
 atxy2o.bootloader.tool=avrdude
 
