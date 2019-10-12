@@ -6,6 +6,7 @@
 * Fix PWM on Pin 1 (PA7) of xy2
 * Fix Wire.h to prevent "call of overloaded 'requestFrom(int&, unsigned int&)' is ambiguous" errors with code that works on classic avr.
 * Expand documentation
+* Tools -> Programmer selection now used for normal uploads
 
 1.0.5
 * Support more PWM pins on 412/212/402/202
