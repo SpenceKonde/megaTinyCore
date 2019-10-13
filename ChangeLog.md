@@ -1,5 +1,6 @@
 1.1.0
 * Add support for the Optiboot bootloader !!!
+* Correct sketch size output to account for const variables (#95)
 
 1.0.6
 * Add missing NUM_DIGITAL_PINS macros to xy7, xy6. 
