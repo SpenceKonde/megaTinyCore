@@ -100,9 +100,9 @@ atxy7.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy7.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
 atxy7.menu.eesave.enable=EEPROM retained
-atxy7.menu.eesave.enable.bootloader.SYSCFG0=0xC6
+atxy7.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy7.menu.eesave.disable=EEPROM not retained
-atxy7.menu.eesave.disable.bootloader.SYSCFG0=0xC7
+atxy7.menu.eesave.disable.bootloader.SYSCFG0=0xC6
 
 atxy7.menu.dacvref.0v55=0.55V
 atxy7.menu.dacvref.1v1=1.10V
@@ -236,9 +236,9 @@ atxy6.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
 
 atxy6.menu.eesave.enable=EEPROM retained
-atxy6.menu.eesave.enable.bootloader.SYSCFG0=0xC6
+atxy6.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy6.menu.eesave.disable=EEPROM not retained
-atxy6.menu.eesave.disable.bootloader.SYSCFG0=0xC7
+atxy6.menu.eesave.disable.bootloader.SYSCFG0=0xC6
 
 atxy6.menu.dacvref.0v55=0.55V
 atxy6.menu.dacvref.1v1=1.10V
@@ -376,9 +376,9 @@ atxy4.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy4.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
 atxy4.menu.eesave.enable=EEPROM retained
-atxy4.menu.eesave.enable.bootloader.SYSCFG0=0xC6
+atxy4.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy4.menu.eesave.disable=EEPROM not retained
-atxy4.menu.eesave.disable.bootloader.SYSCFG0=0xC7
+atxy4.menu.eesave.disable.bootloader.SYSCFG0=0xC6
 
 atxy4.menu.dacvref.0v55=0.55V
 atxy4.menu.dacvref.1v1=1.10V
@@ -518,9 +518,9 @@ atxy2.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy2.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
 atxy2.menu.eesave.enable=EEPROM retained
-atxy2.menu.eesave.enable.bootloader.SYSCFG0=0xC6
+atxy2.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy2.menu.eesave.disable=EEPROM not retained
-atxy2.menu.eesave.disable.bootloader.SYSCFG0=0xC7
+atxy2.menu.eesave.disable.bootloader.SYSCFG0=0xC6
 
 atxy2.menu.dacvref.0v55=0.55V
 atxy2.menu.dacvref.1v1=1.10V
