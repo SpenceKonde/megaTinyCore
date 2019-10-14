@@ -57,13 +57,29 @@ However, do note that if you explicitly declare a variable PROGMEM, you must sti
 ### Serial (UART) Support
 All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards (except that there is no auto-reset, see note above about the lack of a reset pin). See the pinout charts for the location of the serial pins. Serial output for a few milliseconds after calling Serial.begin() seems to be off - if you are printing a message at the start of the sketch, add a small delay between Serial.begin() and your first Serial.print() call. 
 
+On all parts, the UART pins can be swapped to an alternate location. This is controlled by the Tools -> UART Pins menu (new in 1.1.0)
+
 Note: UART serial is broken on the x12 and x02 parts before version 1.0.3.
 
 ### SPI support
 All of these parts have a single hardware SPI peripheral. It works exactly like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. Note that the 8-pin parts (412, 212, 402, 204) do not have a specific SS pin. 
 
+On all parts, the SPI pins can be swapped to an alternate location:
+
+Move to alternate pins:
+> PORTMUX.CTRLB|=(1<<SPI0);
+Move to default pins:
+> PORTMUX.CTRLB&=~(1<<SPI0);
+
 ### I2C (TWI) support
 All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library. See the pinout charts for the location of these pins. 
+
+On all parts with more than 8 pins, the TWI pins can be swapped to an alternate location:
+
+Move to alternate pins:
+> PORTMUX.CTRLB|=(1<<TWI0);
+Move to default pins:
+> PORTMUX.CTRLB&=~(1<<TWI0);
 
 Note: I2C (TWI) is broken on the x12 and x02 parts before version 1.0.3.
 
