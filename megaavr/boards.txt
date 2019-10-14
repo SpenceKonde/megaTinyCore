@@ -127,13 +127,18 @@ atxy7.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
 atxy7.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
 atxy7.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
+atxy7.menu.uartpins.standard=TX:9, RX:8
+atxy7.menu.uartpins.alternate=TX:18, RX:19
+atxy7.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
+atxy7.menu.uartpins.standard.build.uartpins=
+
 atxy7.upload.tool=avrdude
 
 atxy7.build.board=attinyxy7
 atxy7.build.core=arduino
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis}
+atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
@@ -263,13 +268,18 @@ atxy6.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
 atxy6.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
 atxy6.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
+atxy6.menu.uartpins.standard=TX:7, RX:6
+atxy6.menu.uartpins.alternate=TX:14, RX:15
+atxy6.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
+atxyo.menu.uartpins.standard.build.uartpins=
+
 atxy6.upload.tool=avrdude
 
 atxy6.build.board=attinyxy6
 atxy6.build.core=arduino
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
-atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis}
+atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins}
 atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude
@@ -401,13 +411,19 @@ atxy4.menu.neopixelport.portb=PORTB (pins 4~7)
 atxy4.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
 atxy4.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
 
+
+atxy4.menu.uartpins.standard=TX:5, RX:4
+atxy4.menu.uartpins.alternate=TX:8, RX:9
+atxy4.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
+atxy4.menu.uartpins.standard.build.uartpins=
+
 atxy4.upload.tool=avrdude
 
 atxy4.build.board=attinyxy4
 atxy4.build.core=arduino
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
-atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis}
+atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
@@ -729,11 +745,18 @@ atxy7o.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
 atxy7o.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
 atxy7o.menu.resetpin.UPDI=UPDI (powercycle to enter bootloader)
-atxy7o.menu.resetpin.UPDI.bootloader.file=optiboot_x/optiboot_txy7.hex
+atxy7o.menu.resetpin.UPDI.bootloader.file=optiboot_x/optiboot_txy7{bootloader.uartswap}.hex
 atxy7o.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy7o.menu.resetpin.reset=Reset (DANGER - Read docs first!)
-atxy7o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy7.hex
+atxy7o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy7{bootloader.uartswap}_rst.hex
 atxy7o.menu.resetpin.reset.bootloader.resetpinbits=10
+
+atxy7o.menu.uartpins.standard=TX:9, RX:8
+atxy7o.menu.uartpins.alternate=TX:18, RX:19
+atxy7o.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
+atxy7o.menu.uartpins.alternate.bootloader.uartswap=_alt
+atxy7o.menu.uartpins.standard.build.uartpins=
+atxy7o.menu.uartpins.standard.bootloader.uartswap=
 
 atxy7o.upload.tool=avrdude
 
@@ -880,11 +903,18 @@ atxy6o.build.export_merged_output=false
 atxy6o.upload.workaround=
 
 atxy6o.menu.resetpin.UPDI=UPDI (powercycle to enter bootloader)
-atxy6o.menu.resetpin.UPDI.bootloader.file=optiboot_x/optiboot_txy6.hex
+atxy6o.menu.resetpin.UPDI.bootloader.file=optiboot_x/optiboot_txy6{bootloader.uartswap}.hex
 atxy6o.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy6o.menu.resetpin.reset=Reset (DANGER - Read docs first!)
-atxy6o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy6.hex
+atxy6o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy6{bootloader.uartswap}_rst.hex
 atxy6o.menu.resetpin.reset.bootloader.resetpinbits=10
+
+atxy6o.menu.uartpins.standard=TX:7, RX:6
+atxy6o.menu.uartpins.alternate=TX:14, RX:15
+atxy6o.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
+atxy6o.menu.uartpins.alternate.bootloader.uartswap=_alt
+atxy6o.menu.uartpins.standard.build.uartpins=
+atxy6o.menu.uartpins.standard.bootloader.uartswap=
 
 atxy6o.upload.tool=avrdude
 
@@ -984,6 +1014,37 @@ atxy4o.menu.neopixelport.portb=PORTB (pins 4~7)
 atxy4o.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
 atxy4o.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
 
+atxy4o.menu.bodvoltage.1v8=1.8V
+atxy4o.menu.bodvoltage.2v15=2.15V
+atxy4o.menu.bodvoltage.2v6=2.6V
+atxy4o.menu.bodvoltage.2v95=2.95V
+atxy4o.menu.bodvoltage.3v3=3.30V
+atxy4o.menu.bodvoltage.3v7=3.70V
+atxy4o.menu.bodvoltage.4v0=4.00V
+atxy4o.menu.bodvoltage.4v3=4.30V
+atxy4o.menu.bodvoltage.4v3.bootloader.bodlevbits=111
+atxy4o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy4o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy4o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy4o.menu.bodvoltage.2v95.bootloader.bodlevbits=011
+atxy4o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy4o.menu.bodvoltage.2v15.bootloader.bodlevbits=001
+atxy4o.menu.bodvoltage.1v8.bootloader.bodlevbits=000
+atxy4o.menu.bodmodeactive.disabled=Disabled
+atxy4o.menu.bodmodeactive.enabled=Enabled
+atxy4o.menu.bodmodeactive.sampled=Sampled
+atxy4o.menu.bodmodeactive.enabledhold=Enabled hold wakeup
+atxy4o.menu.bodmodesleep.disabled=Disabled
+atxy4o.menu.bodmodesleep.enabled=Enabled
+atxy4o.menu.bodmodesleep.sampled=Sampled
+atxy4o.menu.bodmodeactive.disabled.bootloader.bodactivebits=00
+atxy4o.menu.bodmodeactive.enabled.bootloader.bodactivebits=01
+atxy4o.menu.bodmodeactive.sampled.bootloader.bodactivebits=10
+atxy4o.menu.bodmodeactive.enabledhold.bootloader.bodactivebits=11
+atxy4o.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
+atxy4o.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
+atxy4o.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
+
 atxy4o.upload.tool=avrdude
 
 atxy4o.build.board=attinyxy4
@@ -992,10 +1053,18 @@ atxy4o.build.variant=txy4
 atxy4o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis}
 atxy4o.build.export_merged_output=false
 
+atxy4o.menu.uartpins.standard=TX:5, RX:4
+atxy4o.menu.uartpins.alternate=TX:8, RX:9
+atxy4o.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
+atxy4o.menu.uartpins.alternate.bootloader.uartswap=_alt
+atxy4o.menu.uartpins.standard.build.uartpins=
+atxy4o.menu.uartpins.standard.bootloader.uartswap=
+
 atxy4o.upload.workaround=
 atxy4o.upload.protocol=arduino
 atxy4o.upload.extra_params=-D
 atxy4o.build.text_section_start=.text=0x200
+atxy4o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
 atxy4o.bootloader.tool=avrdude
 
 atxy4o.bootloader.WDTCFG=0x00
@@ -1007,10 +1076,10 @@ atxy4o.bootloader.APPEND=0x00
 atxy4o.bootloader.BOOTEND=0x02
 
 atxy4o.menu.resetpin.UPDI=UPDI (powercycle to enter bootloader)
-atxy4o.menu.resetpin.UPDI.bootloader.file=optiboot_x/optiboot_txy4.hex
+atxy4o.menu.resetpin.UPDI.bootloader.file=optiboot_x/optiboot_txy4{bootloader.uartswap}.hex
 atxy4o.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy4o.menu.resetpin.reset=Reset (DANGER - Read docs first!)
-atxy4o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy4.hex
+atxy4o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy4{bootloader.uartswap}_rst.hex
 atxy4o.menu.resetpin.reset.bootloader.resetpinbits=10
 
 
@@ -1093,17 +1162,51 @@ atxy2o.menu.millis.disabled=Disabled (saves flash)
 atxy2o.menu.millis.enabled.build.millis=
 atxy2o.menu.millis.disabled.build.millis=-DDISABLEMILLIS
 
+atxy2o.menu.bodvoltage.1v8=1.8V
+atxy2o.menu.bodvoltage.2v15=2.15V
+atxy2o.menu.bodvoltage.2v6=2.6V
+atxy2o.menu.bodvoltage.2v95=2.95V
+atxy2o.menu.bodvoltage.3v3=3.30V
+atxy2o.menu.bodvoltage.3v7=3.70V
+atxy2o.menu.bodvoltage.4v0=4.00V
+atxy2o.menu.bodvoltage.4v3=4.30V
+atxy2o.menu.bodvoltage.4v3.bootloader.bodlevbits=111
+atxy2o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy2o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy2o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy2o.menu.bodvoltage.2v95.bootloader.bodlevbits=011
+atxy2o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy2o.menu.bodvoltage.2v15.bootloader.bodlevbits=001
+atxy2o.menu.bodvoltage.1v8.bootloader.bodlevbits=000
+atxy2o.menu.bodmodeactive.disabled=Disabled
+atxy2o.menu.bodmodeactive.enabled=Enabled
+atxy2o.menu.bodmodeactive.sampled=Sampled
+atxy2o.menu.bodmodeactive.enabledhold=Enabled hold wakeup
+atxy2o.menu.bodmodesleep.disabled=Disabled
+atxy2o.menu.bodmodesleep.enabled=Enabled
+atxy2o.menu.bodmodesleep.sampled=Sampled
+atxy2o.menu.bodmodeactive.disabled.bootloader.bodactivebits=00
+atxy2o.menu.bodmodeactive.enabled.bootloader.bodactivebits=01
+atxy2o.menu.bodmodeactive.sampled.bootloader.bodactivebits=10
+atxy2o.menu.bodmodeactive.enabledhold.bootloader.bodactivebits=11
+atxy2o.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
+atxy2o.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
+atxy2o.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
+
 atxy2o.upload.tool=avrdude
 atxy2o.upload.protocol=arduino
 atxy2o.upload.extra_params=-D
 atxy2o.build.text_section_start=.text=0x200
+atxy2o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
 atxy2o.bootloader.tool=avrdude
 
 
 atxy2o.menu.uartpins.alternate=TX:2, RX:3
 atxy2o.menu.uartpins.standard=TX:0, RX:1
 atxy2o.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
+atxy2o.menu.uartpins.alternate.bootloader.uartswap=_alt
 atxy2o.menu.uartpins.standard.build.uartpins=
+atxy2o.menu.uartpins.standard.bootloader.uartswap=
 
 atxy2o.upload.workaround=
 
@@ -1116,8 +1219,8 @@ atxy2o.bootloader.APPEND=0x00
 atxy2o.bootloader.BOOTEND=0x02
 
 atxy2o.menu.resetpin.UPDI=UPDI (powercycle to enter bootloader)
-atxy2o.menu.resetpin.UPDI.bootloader.file=optiboot_x/optiboot_txy2.hex
+atxy2o.menu.resetpin.UPDI.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}.hex
 atxy2o.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy2o.menu.resetpin.reset=Reset (DANGER - Read docs first!)
-atxy2o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy2.hex
+atxy2o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}_rst.hex
 atxy2o.menu.resetpin.reset.bootloader.resetpinbits=10
