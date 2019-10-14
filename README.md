@@ -1,5 +1,4 @@
 [![Join the chat at https://gitter.im/SpenceKonde/megaTinyCore](https://badges.gitter.im/SpenceKonde/megaTinyCore.svg)](https://gitter.im/SpenceKonde/megaTinyCore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-### Warning: I just merged Optiboot support. Significant changes have been made. They have not yet been put through testing. It is suggested to use the 1.0.6 release unless you are testing optiboot. 
 
 
 ### [Wiring](Wiring.md)
@@ -9,9 +8,11 @@
 # megaTinyCore
 Arduino core for the new megaAVR ATtiny series chips. These parts represent the new megaAVR technology (as used in megaAVR chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) and advanced peripherals in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. Moreover, these parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini!) run just over $1, and under 90 cents in quantity - less than many 8k classic AVR ATtiny parts (AVR architecture, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal. 
 
-These use a UPDI programmer, not traditional ISP like the classic ATtiny parts did. One can be made from a classic AVR Uno/Nano/Pro Mini - see [Making a UPDI programmer](MakeUPDIProgrammer.md)
+These use a UPDI programmer, not traditional ISP like the classic ATtiny parts did. One can be made from a classic AVR Uno/Nano/Pro Mini - see [Making a UPDI programmer](MakeUPDIProgrammer.md). 
 
-For this core to work when installed manually, and via board manager for 1.0.1 and earlier, **you must install the official Arduino megaAVR board package** using board manager - this is required to get the compiler installed. If you receive an error of the form "avr-g++: error: device-specs/specs-attiny402: No such file or directory", that indicates that the Arduino megaAVR board package is not installed. As of 1.0.2, this is no longer required if installed via board manager. It is still required for a manual installation. 
+The Optiboot serial bootloader is now supported (as of 1.1.0) on these parts, allowing them to be programmed via a serial port. See the Optiboot section below for more information on this, and the relevant options. Installing the bootloader does require a UPDI programmer. In the near future, I will be selling pre-bootloaded boards on Tindie.
+
+For this core to work when installed manually, and via board manager for 1.0.1 and earlier, **you must install the official Arduino megaAVR board package** using board manager - this is required to get the compiler and correct version of avrdude installed. If you receive an error of the form "avr-g++: error: device-specs/specs-attiny402: No such file or directory", that indicates that the Arduino megaAVR board package is not installed. As of 1.0.2, this is no longer required if installed via board manager. It is still required for a manual installation. 
 
 ## Supported Parts (click link for pinout diagram and details)
 * [ATtiny3217,1617,817,417](megaavr/extras/ATtiny_x17.md)
@@ -41,7 +42,7 @@ The reset functionality is shared with UPDI; hence, when UPDI programming is ena
 
 You can set an interrupt on a pin to call this in order to create a ersatz reset pin. 
 
-Once Optiboot is working on the megaAVR ATtiny parts, it will be possible to configure the UPDI/Reset pin to act as reset while still being able to upload code. 
+If the optiboot bootloader is used, you may optionally set the UPDI pin to act as reset; in this case it works like the normal reset pin. Note that after doing this, HV programming is needed if future UPDI programming is required. 
 
 # Features
 
@@ -122,17 +123,28 @@ This core provides two additional #defines for part "families":
 
 This is just shorthand, for convenience - `#ifdef __AVR_ATtinyxy2__` is equivilent to `#if defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__)`
 
-### Bootloader Support
-A new version of Optiboot (Optiboot-x) now runs on the Tiny0 and Tiny1 chips.  It's still under 512 bytes, so it will potentially work on any of the chips. including EEPROM support, so it potentially fits on any of the chips.
+# Bootloader (optiboot) Support
+A new version of Optiboot (Optiboot-x) now runs on the Tiny0 and Tiny1 chips.  It's still under 512 bytes, so it will potentially work on any of the chips. including EEPROM support. Optiboot supports all boards supported by megaTinyCore. 
 
-There are a couple of issues with using Optiboot on these chips:
-* The bootloader is at the beginning of memory, rather than at the end (where it was on older chips.)  This means that you have to compile the sketch differently for use with the bootloader.  There are separate board types designated "(optiboot)" that can be used to compile the images.
-* The "reset" pin is shared with the "UPDI" pin (and also configurable for GPIO..)  In the absense of "high voltage UPDI programmers", this means that you have to select between being able to use auto-reset, and being able to re-program the chip with jtag2updi programmers.  Currently, the pin is assumed to be left in UPDI mode, which means that the only way to enter the bootloader is by power-cycling the target.  The bootloader timeout has been set to 8 second to help with this, but that also means an 8s pause before the application runs.
-* Currently, Optiboot_x resets the reset cause register after saving the contents in R2.  This is compatible with some older versions of Optiboot.
-* The new chips have more than one option for Uart Pins.  The current bootloaders are compiled for the DrAzzy development boards.
-* The new chips have a much more complicated Fuse structure, so the "burn bootloader" command does not set any fuses other than the BOOTEND fuse.  If you need other fuses set, you should use the non-optiboot platforms before the "burn bootloader" is done.
-* There are some good things, too.  Since chips boot to an internal clock and are highly similar, the number of bootloader hex files is vastly reduced.
+To use the serial bootloader, select a board definition with (optiboot) after it (note - this might be cut off due to the width of the menu; the second set of board definitions are the optiboot ones). Unless the chip has already been bootloaded, you must connect a UPDI programmer, select your desired options, and do Tools -> Burn Bootloader to load the bootloader onto the chip. 
 
+After this, connect a serial adapter to the serial pins (as well as ground and Vcc). On the boards which I sell on Tindie, a standard 6-pin "FTDI" header is provided for this, and "upload" your sketch normally. 
+
+If the UPDI/Reset pin option was set to UPDI when bootloading, you must unplug/replug the board (or use a software reset - see note near start of readme; you can make an ersatz reset button this way) to enter the bootloader - after this the bootloader will be active for 8 seconds. 
+
+If the UPDI/Reset pin option was set to reset, you must reset the chip via the reset pin (or software reset) to enter the bootloader, and the bootloader will run for 1 second before jumping to the application. This is the same as how optiboot works on classic AVR boards. The standard DTR-autoreset circuit is recommended (this is how boards I sell on Tindie with Optiboot preloaded are configured).
+
+Serial uploads are done at 115200 baud. 
+
+### Autoreset circuit
+Connect the DTR pin of the serial adapter to one side of a 0.1uF ceramic capacitor, the other side of the capacitor is connected to the Reset pin. Connect a 10k resistor between Reset and Vcc, and a diode between Reset and Vcc with the band towards Vcc. Note that these parts must be connected AFTER the pin is set to act as Reset instead of UPDI, as it will interfere with UPDI programming. The breakout boards I sell on Tindie have a pair of pads on the back that can be bridged with solder to reversibly connect the on-board autoreset circuit to the UPDI/Reset pin. Note that this same circuit can be used if using a software reset and pin interrupt to create an ersatz reset pin (connect to that pin, instead of reset). 
+
+### A few caveats: 
+* The bootloader is at the beginning of memory, rather than at the end (where it was on older chips.). Thus, the start of the application code must be 512b after the start of the memory - this is handled by the core, but you cannot upload a .hex file compiled with a non-optiboot board definition to an optiboot board definition and vise versa. 
+* **If you have set the UPDI/Reset pin to act as a reset pin, you can no longer program the part via UPDI** without using an HV programmer to reset the pin to act as UPDI. 
+* Currently, Optiboot_x resets the reset cause register after saving the contents in R2.  
+* The new chips have more than one option for Uart Pins. The option selected when you "burn bootloader" determines which version is used. If using the breakout boards I sell on Tindie, the first menu option uses the pins connected to the 6-pin FTDI-style serial header. 
+* When you "burn bootloader", the base oscillator frequency is set according to the selected clock speed, but the actual operating speed while running the sketch is set in the uploading code. If you initially set it to 16/8/4/1MHz, you may use any of those options when you upload your sketch and it will run at that speed; if you initially set it to 20/10/5MHz, you may use any of those options. If you wish to change between 16/8/4/1MHz and 20/10/5MHz, you must burn bootloader again - failure to do so will result in it running at the wrong speed, and all timing will be wrong. 
 
 # Guides
 ### [Power Saving techniques and Sleep](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PowerSave.md)
@@ -141,8 +153,10 @@ There are a couple of issues with using Optiboot on these chips:
 # List of Tools sub-menus
 * Tools -> Chip - sets the specific part within a selected family to compile for and upload to.
 * Tools -> Clock Speed - sets the clock speed. You must burn bootloader after changing between 16/8/4/1MHz and 20/10/5MHz to apply the changes (ie, changing from 20MHz to 10MHz does not require burning bootloader, changing from 20MHz to 16MHz does). A virgin chip will be set to use the 20MHz internal oscillator as it's base clock source, so 20/10/5MHz clock speed options should work without an initial "burn bootloader" - though we still recommend it to ensure that all other fuses are set to the values you expect.
-* Tools -> Retain EEPROM - determines whether to save EEPROM when uploading a new sketc. You must burn bootloader after changing this to apply the changes.
+* Tools -> Retain EEPROM - determines whether to save EEPROM when uploading a new sketc. You must burn bootloader after changing this to apply the changes. This option is not available on Optiboot board definitions - programming through the bootloader does not execute a chip erase function. 
+* Tools -> UART pins - All of these parts have the potential to remap the UART pins. This menu option sets which pins will be used as TX and RX by default. If Optiboot is being used, the selection from this menu when you "burn bootloader" will set which set of pins will be used by Optiboot (however, once the bootloader has been uploaded, you may change this if you need the sketch to use the other set of pins - the pins chosen when the bootloader was burned will still be used for uploads, but the current selection will be used by the sketch). 
 * Tools -> B.O.D. Voltage - If Brown Out Detection is enabled, when Vcc falls below this voltage, the chip will be held in reset. You must burn bootloader after changing this to apply the changes. Take care that these threshold voltages are not exact - they may vary by as much as +/- 0.3v! (depending on threshold level - see electrical characteristics section of datasheet). Be sure that you do not select a BOD threshold voltage that could be triggered during programming, as this can prevent successful programming via UPDI (reported in #86).
+* Tools -> UPDI/Reset pin - This menu is only available on board definitions that use the Optiboot bootloader. If set to UPDI, the pin will be left as the UPDI pin, there will be no hardware reset pin - to enter the bootloader, disconnect and reconnect power to the part, and upload within 8 seconds. If set to Reset, the pin will be configured to act as reset, like a classic AVR, but **UPDI programming will no longer work - you must use an HV programmer if you wish to reenable UPDI** - if the pin is set to reset, the version of Optiboot uploaded will jump straight to the application after a power-on reset, and will only enter the bootloader if reset by software reset or via the reset pin. The bootloader will also only wait 1 second for a sketch (ie, it behaves like optiboot does on classic AVR microcontrollers), instead of 8. 
 * Tools -> B.O.D. Mode (active) - Determines whether to enable Brown Out Detection when the chip is not sleeping. You must burn bootloader after changing this to apply the changes.
 * Tools -> B.O.D. Mode (sleep) - Determines whether to enable Brown Out Detection when the chip is sleeping. You must burn bootloader after changing this to apply the changes.
 * Tools -> DAC Reference Voltage - Determines the voltage reference for the DAC. This should be less than Vcc to get the right voltage. You do not need to use Burn Bootloader to apply changes to this menu.
