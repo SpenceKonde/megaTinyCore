@@ -764,7 +764,7 @@ atxy7o.build.board=attinyxy7
 atxy7o.build.core=arduino
 atxy7o.build.variant=txy7
 atxy7o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis}
-atxy7o.build.export_merged_output=false
+atxy7o.build.export_merged_output=true
 
 atxy7o.bootloader.WDTCFG=0x00
 atxy7o.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
@@ -898,7 +898,7 @@ atxy6o.build.board=attinyxy6
 atxy6o.build.core=arduino
 atxy6o.build.variant=txy6
 atxy6o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis}
-atxy6o.build.export_merged_output=false
+atxy6o.build.export_merged_output=true
 
 atxy6o.upload.workaround=
 
@@ -1051,7 +1051,7 @@ atxy4o.build.board=attinyxy4
 atxy4o.build.core=arduino
 atxy4o.build.variant=txy4
 atxy4o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis}
-atxy4o.build.export_merged_output=false
+atxy4o.build.export_merged_output=true
 
 atxy4o.menu.uartpins.standard=TX:5, RX:4
 atxy4o.menu.uartpins.alternate=TX:8, RX:9
@@ -1199,6 +1199,12 @@ atxy2o.upload.extra_params=-D
 atxy2o.build.text_section_start=.text=0x200
 atxy2o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
 atxy2o.bootloader.tool=avrdude
+
+atxy2o.build.board=attinyxy2
+atxy2o.build.core=arduino
+atxy2o.build.variant=txy2
+atxy2o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.millis} {build.uartpins}
+atxy2o.build.export_merged_output=true
 
 
 atxy2o.menu.uartpins.alternate=TX:2, RX:3
