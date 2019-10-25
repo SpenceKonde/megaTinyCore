@@ -136,7 +136,7 @@ HELPTEXT += "\n-------------\n\n"
 
 
 optiboot_%.hex: optiboot_%.elf
-	$(OBJCOPY) -j .text -j .data -j .version --set-section-flags .version=alloc,load -j .application -O ihex $< $@
+	$(OBJCOPY) -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex $< $@
 
 optiboot_%.elf:	optiboot_x.c FORCE
 	$(CC) $(CFLAGS) $(CPU_OPTIONS) $(LED_OPTIONS) $(UART_OPTIONS) $(POR_CMD) $(COMMON_OPTIONS) $(LDFLAGS) $(PACK_OPT) -mmcu=$(TARGET) -o $@ $<
