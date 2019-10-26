@@ -1,5 +1,7 @@
 1.1.0
+
 o Add Logic library (#103)
+
 o Improve pinout diagrams (#98)
 * Add support for the Optiboot bootloader !!! (#52)
 * Correct sketch size output to account for const variables (#95)
