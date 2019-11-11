@@ -271,7 +271,7 @@ atxy6.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 atxy6.menu.uartpins.standard=TX:7, RX:6
 atxy6.menu.uartpins.alternate=TX:14, RX:15
 atxy6.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
-atxyo.menu.uartpins.standard.build.uartpins=
+atxy6.menu.uartpins.standard.build.uartpins=
 
 atxy6.upload.tool=avrdude
 
@@ -682,7 +682,7 @@ atxy7o.menu.clock.8.build.f_cpu=8000000L
 atxy7o.menu.clock.5.build.f_cpu=5000000L
 atxy7o.menu.clock.4.build.f_cpu=4000000L
 atxy7o.menu.clock.1.build.f_cpu=1000000L
-atxyo.menu.clock.20.bootloader.OSCCFG=0x02
+atxy7o.menu.clock.20.bootloader.OSCCFG=0x02
 atxy7o.menu.clock.16.bootloader.OSCCFG=0x01
 atxy7o.menu.clock.10.bootloader.OSCCFG=0x02
 atxy7o.menu.clock.8.bootloader.OSCCFG=0x01
