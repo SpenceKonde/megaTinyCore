@@ -19,7 +19,6 @@ menu.resetpin=UPDI/reset pin
 ##############################################################
 
 atxy7.name=ATtiny3217/1617/1607/817/807/417
-atxy7.upload.speed=115200
 
 atxy7.menu.chip.3217=ATtiny3217
 atxy7.menu.chip.3217.build.mcu=attiny3217
@@ -155,7 +154,6 @@ atxy7.bootloader.flashcommand=
 ##############################################################
 
 atxy6.name=ATtiny3216/1616/1606/816/806/416/406
-atxy6.upload.speed=115200
 
 atxy6.menu.chip.3216=ATtiny3216
 atxy6.menu.chip.3216.build.mcu=attiny3216
@@ -297,7 +295,6 @@ atxy6.bootloader.flashcommand=
 ##############################################################
 
 atxy4.name=ATtiny1614/1604/814/804/414/404/214/204
-atxy4.upload.speed=115200
 
 atxy4.menu.chip.1614=ATtiny1614
 atxy4.menu.chip.1614.build.mcu=attiny1614
@@ -442,7 +439,6 @@ atxy4.bootloader.flashcommand=
 ##############################################################
 
 atxy2.name=ATtiny412/402/212/202
-atxy2.upload.speed=115200
 
 #atxy2.menu.chip.812=ATtiny812
 #atxy2.menu.chip.812.build.mcu=attiny812
