@@ -26,7 +26,7 @@
 #include <avr/pgmspace.h>
 #include "timers.h"
 
-#define NUM_DIGITAL_PINS            12 // 
+#define NUM_DIGITAL_PINS            12 //
 #define NUM_ANALOG_INPUTS           9
 //#define NUM_RESERVED_PINS           0 // (TOSC1/2, VREF, RESET, DEBUG USART Rx/Tx)
 //#define NUM_INTERNALLY_USED_PINS    0 // (2 x Chip select + 2 x UART + 4 x IO + LED_BUILTIN + 1 unused pin)
@@ -67,9 +67,16 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define HWSERIAL0_DRE_VECTOR 	(USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
 #define HWSERIAL0_RXC_VECTOR 	(USART0_RXC_vect)
-#define HWSERIAL0_MUX 			(PORTMUX_USART0_DEFAULT_gc)
+#ifdef UARTREMAP
+#define HWSERIAL0_MUX 			0x01
+#define PIN_WIRE_HWSERIAL0_RX 	(9)
+#define PIN_WIRE_HWSERIAL0_TX 	(8)
+#else
+#define HWSERIAL0_MUX 			0x00
 #define PIN_WIRE_HWSERIAL0_RX 	(4)
 #define PIN_WIRE_HWSERIAL0_TX 	(5)
+#endif
+
 
 #define LED_BUILTIN 3 //FIXME
 
@@ -105,7 +112,7 @@ static const uint8_t A11 = PIN_A11;
 // pins are a separate set.
 
 // ATtiny1614 / ARDUINO
-//                          _____ 
+//                          _____
 //                  VDD   1|*    |14  GND
 // (nSS)  (AIN4) PA4  0~  2|     |13  10~ PA3 (AIN3)(SCK)(EXTCLK)
 //        (AIN5) PA5  1~  3|     |12  9   PA2 (AIN2)(MISO)
@@ -113,10 +120,10 @@ static const uint8_t A11 = PIN_A11;
 //        (AIN7) PA7  3   5|     |10  11  PA0 (nRESET/UPDI)
 // (RXD) (TOSC1) PB3  4   6|     |9   7~  PB0 (AIN11)(SCL)
 // (TXD) (TOSC2) PB2  5~  7|_____|8   6~  PB1 (AIN10)(SDA)
-//               
+//
 //
 
-/* 
+/*
 PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       AC1       AC2       DAC0      USART0    SPI0      TWI0      TCA(PWM)  TCBn      TCD0      CCL
 0      A0 or SS     PA4                 AIN4      AIN0      X0/Y0                                             XDIR      SS                  WO4                 WOA       LUT0-OUT
 1      A1           PA5       VREFA     AIN5      AIN1      X1/Y1     OUT       AINN0                                                       WO5       TCB0 WO   WOB
@@ -124,18 +131,18 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
 3      A3           PA7                 AIN7      AIN3      X3/Y3     AINP0     AINP0     AINN0                                                                           LUT1-OUT
 4      RX           PB3       TOSC1                                             OUT                           RxD                           *WO0
 5      TX           PB2       TOSC2 /                                                     OUT                 TxD                           WO2
-                              EVOUT1                                                      
+                              EVOUT1
 6      SDA          PB1                 AIN10               X4/Y4     AINP2                                   XCK                 SDA       WO1
 7      SCL          PB0                 AIN11               X5/Y5               AINP2     AINP1               XDIR                SCL       WO0
 8      MOSI         PA1                 AIN1                                                                  *TxD      MOSI      *SDA                                    LUT0-IN1
 9      MISO         PA2       EVOUT0    AIN2                                                                  *RxD      MISO      *SCL                                    LUT0-IN2
 10     SCK          PA3       EXTCLK    AIN3                                                                  *XCK      SCK                 WO3       TCB1 WO
 11     UPDI         PA0       RESET/    AIN0                                                                                                                              LUT1-IN0
-                              UPDI        
-	* alternative pin locations			  
+                              UPDI
+	* alternative pin locations
 */
 
-const uint8_t PROGMEM digital_pin_to_port[] = {	
+const uint8_t PROGMEM digital_pin_to_port[] = {
 	// Left side, top to bottom
 	PA, // 0  PA4
 	PA, // 1  PA5
@@ -173,7 +180,7 @@ const uint8_t PROGMEM digital_pin_to_bit_position[] = {
 };
 
 /* Use this for accessing PINnCTRL register */
-const uint8_t PROGMEM digital_pin_to_bit_mask[] = {	
+const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
 	// Left side, top to bottom
 	PIN4_bm, // 0  PA4
 	PIN5_bm, // 1  PA5
@@ -194,7 +201,7 @@ const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
 const uint8_t PROGMEM digital_pin_to_timer[] = {
   	// Left side, top to bottom
 	TIMERA0, 		// 0  PA4
-	TIMERA0, 		// 1  PA5	
+	TIMERA0, 		// 1  PA5
 	#ifdef DAC0
     DACOUT, // 2  PA6
 	#else
@@ -211,8 +218,8 @@ const uint8_t PROGMEM digital_pin_to_timer[] = {
 	TIMERA0, 		// 9  PA2
 	NOT_ON_TIMER,  	// 10 PA3
 	NOT_ON_TIMER  	// 11 PA3
-  
-  
+
+
 };
 /*
 #define PIN_A0   (11)
