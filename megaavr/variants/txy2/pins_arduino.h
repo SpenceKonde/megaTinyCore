@@ -38,13 +38,21 @@
 #define EXTERNAL_NUM_INTERRUPTS     8
 
 
-#define digitalPinHasPWM(p)         ((p) == 4)
+#define digitalPinHasPWM(p)         ((p) != 0 && (p) != 5)
 
-#define SPI_MUX		  	(PORTMUX_SPI0_DEFAULT_gc)
+#ifdef SPIREMAP
+#define SPI_MUX 		(4)
+#define PIN_SPI_MISO	(1)
+#define PIN_SPI_SCK		(4)
+#define PIN_SPI_MOSI	(0)
+#define PIN_SPI_SS		(0)
+#else
+#define SPI_MUX 		(0)
 #define PIN_SPI_MISO	(3)
 #define PIN_SPI_SCK		(4)
 #define PIN_SPI_MOSI	(2)
 #define PIN_SPI_SS		(0)
+#endif
 
 #define MUX_SPI			(SPI_MUX)
 #define SPI_INTERFACES_COUNT	1
