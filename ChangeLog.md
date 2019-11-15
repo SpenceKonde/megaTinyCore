@@ -1,3 +1,6 @@
+1.1.1
+o Fix issue with board manager installation
+
 1.1.0
 
 * Add Logic library (#103)
