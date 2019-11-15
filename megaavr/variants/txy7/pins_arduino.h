@@ -40,12 +40,21 @@
 #else
 #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 11 || (p) == 10 || (p) == 9 || (p) == 20)
 #endif
+	(0)
 
-#define SPI_MUX		  	(PORTMUX_SPI0_DEFAULT_gc)
+#ifdef SPIREMAP
+#define SPI_MUX 		(4)
+#define PIN_SPI_MISO	(13)
+#define PIN_SPI_SCK		(12)
+#define PIN_SPI_MOSI	(14)
+#define PIN_SPI_SS		(15)
+#else
+#define SPI_MUX 		(0)
 #define PIN_SPI_MISO	(19)
 #define PIN_SPI_SCK		(20)
 #define PIN_SPI_MOSI	(18)
 #define PIN_SPI_SS		(0)
+#endif
 
 #define MUX_SPI			(SPI_MUX)
 #define SPI_INTERFACES_COUNT	1
@@ -55,10 +64,15 @@ static const uint8_t MOSI = PIN_SPI_MOSI;
 static const uint8_t MISO = PIN_SPI_MISO;
 static const uint8_t SCK  = PIN_SPI_SCK;
 
+#ifdef TWIREMAP
+#define TWI_MUX 		(16)
+#define PIN_WIRE_SDA        (18)
+#define PIN_WIRE_SCL        (19)
+#else
+#define TWI_MUX 		(0)
 #define PIN_WIRE_SDA        (10)
 #define PIN_WIRE_SCL        (11)
-
-#define TWI_MUX 		(PORTMUX_TWI0_DEFAULT_gc)
+#endif
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
