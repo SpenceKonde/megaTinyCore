@@ -44,16 +44,16 @@
 
 #ifdef SPIREMAP
 #define SPI_MUX 		(4)
-#define PIN_SPI_MISO	(15)
-#define PIN_SPI_SCK		(16)
-#define PIN_SPI_MOSI	(14)
-#define PIN_SPI_SS		(0)
-#else
-#define SPI_MUX 		(0)
 #define PIN_SPI_MISO	(11)
 #define PIN_SPI_SCK		(10)
 #define PIN_SPI_MOSI	(12)
 #define PIN_SPI_SS		(13)
+#else
+#define SPI_MUX 		(0)
+#define PIN_SPI_MISO	(15)
+#define PIN_SPI_SCK		(16)
+#define PIN_SPI_MOSI	(14)
+#define PIN_SPI_SS		(0)
 #endif
 
 #define MUX_SPI			(SPI_MUX)
