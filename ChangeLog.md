@@ -1,5 +1,8 @@
 1.1.1
 o Fix issue with board manager installation
+* Add support for printf to printable library (#112)
+* Add menus for I2C and SPI pin mapping (#110)
+* Correct bug with UART pin mapping menu and xy4/xy6/xy7 optiboot board definitions
 
 1.1.0
 
