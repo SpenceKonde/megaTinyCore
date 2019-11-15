@@ -54,10 +54,16 @@ static const uint8_t MOSI = PIN_SPI_MOSI;
 static const uint8_t MISO = PIN_SPI_MISO;
 static const uint8_t SCK  = PIN_SPI_SCK;
 
+
+#ifdef TWIREMAP
+#define TWI_MUX 		(16)
+#define PIN_WIRE_SDA        (8)
+#define PIN_WIRE_SCL        (9)
+#else
+#define TWI_MUX 		(0)
 #define PIN_WIRE_SDA        (6)
 #define PIN_WIRE_SCL        (7)
-
-#define TWI_MUX 		(PORTMUX_TWI0_DEFAULT_gc)
+#endif
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
