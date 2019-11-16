@@ -22,6 +22,7 @@ There exist ATtiny402's in the wild where the last byte of the signature is 0x25
 
 ### Buy official megaTinyCore breakouts and support continued development!
 [ATtiny402 assembled](https://www.tindie.com/products/17685/)
+
 [ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
 
 ### Datasheets
