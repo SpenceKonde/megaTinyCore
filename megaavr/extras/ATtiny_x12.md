@@ -16,5 +16,10 @@ DAC | Yes | Yes
 Interfaces | UART, SPI, I2C | UART, SPI, I2C
 Clock options | Internal 16/20mhz | Internal 16/20mhz
 
+
+### Buy official megaTinyCore breakouts and support continued development!
+[ATtiny412 assembled](https://www.tindie.com/products/17685/)
+[ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
+
 ### Datasheets
 [ATtiny212/412](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-412-DataSheet-DS40001911B.pdf)
