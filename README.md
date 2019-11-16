@@ -35,14 +35,17 @@ For this core to work when installed manually, and via board manager for 1.0.1 a
 
 These parts do not support using an external crystal like the classic ATtiny parts do, however the internal oscillator is tightly calibrated enough that the internal clock will work for UART communication. 
 
-## There is no hardware reset pin
-The reset functionality is shared with UPDI; hence, when UPDI programming is enabled, there is no hardware reset pin. Luckily, the megaAVR architecture provides the ability to do a software reset:
+## There hardware reset pin is shared with UPDI programming. 
+It could also be set as a GPIO pin, but we already have two very compelling uses for said pin!
 
+This has one very troubling consequence - if we want to program via UPDI, we must not make that pin a Reset pin, otherwise we would need to use an HV programmer to reset the chip to allow UPDI programming again. At present this process is beyond the scope of this guide (apparently on some silicon revs, it is trivially easy to do, while on others it requires careful timing and a magic KEY signal). I hope to be able to point y'all to an affordable re-UPDIFIER in the near future. 
+
+There is a solution to the lack of a hardware reset pin when you need to keep UPDI programming, however - and that is that these parts support a software reset. Such a reset can be achieved with the simple command:
 `_PROTECTED_WRITE(RSTCTRL.SWRR,1);`
 
-You can set an interrupt on a pin to call this in order to create a ersatz reset pin. 
+If you were to set up a "low level" interrupt on a pin, and put that in the ISR, that pin would act as an ersatz reset pin (note that it wouldn't "stay" in reset like a real reset pin - it will reset the chip, and then the sketch (or bootloader) will start running again from the start until the interrupt was enabled, then reset again). 
 
-If the optiboot bootloader is used, you may optionally set the UPDI pin to act as reset; in this case it works like the normal reset pin. Note that after doing this, HV programming is needed if future UPDI programming is required. 
+
 
 # Features
 
@@ -53,23 +56,63 @@ However, do note that if you explicitly declare a variable PROGMEM, you must sti
 
 **WARNING** In versions of megaTinyCore 1.0.6 and earlier, the sketch size reported during compilation does not include variables declared const. PROGMEM variables, however, are reported normally. This will be fixed in the next release. 
 
+### Ways to refer to pins
+The simple matter of how to refer to a pin for analogRead() and digitalRead(), particularly on non-standard hardware, leads to a surprising amount of confusion. It's my opinion that the blame rests with the dubious usability decisions made in design of the original Arduino core. This core uses an extremely simple basic scheme - but with a few additional options for people who are used to other conventions.  
+
+For digitalRead(), digitalWrite(), pinMode(), analogWrite() analogRead() and other sundry functions , the "Arduino Pin Number" shown in the pinout charts (see the charts in the [part specific documentation](megaavr/extras/ImportantInfo.md). This is the recommended way to refer to pins. digitalRead(1) and analogRead(1) refer to the same pin, and will perform a digital or analog read on said pin.
+
+Two additional ways are provided to refer to pins:
+* The analog channel numbers are available as An defines (ex, A0, A1, A2, etc). These are the analog *channel* numbers; they are simply #defined as the digital pin number associated with the analog channel in question. See the datasheet for the assignments of analog channel numbers to pins; because we do not recommend referring to pins in this way, we have chosen not to include the analog channel numbers on the included pinout charts. There are also PIN_An defines for compatibility with the official cores - these likewise point to the digital pin number associated with the analog channel. Note that channel A0 is on the UPDI/Reset pin, and hence is typically not usable. 
+* If you wish to refer to pins by their port and pin number, you can do that to - As of 1.1.1, the core provides PIN_Pxn (for example, PIN_PA1, or PIN_PC0). Not to be confused with the PIN_An defines described above). Again, these just resolve to the digital pin number of the pin in question - they don't go through a different code path or anything (for that - for example if you need higher performance than digitalWrite() et. al. can provide - see [direct port manipulation](megaavr/extras/DirectPortManipulation.md). 
+
 
 ### Serial (UART) Support
 All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards (except that there is no auto-reset, see note above about the lack of a reset pin). See the pinout charts for the location of the serial pins. Serial output for a few milliseconds after calling Serial.begin() seems to be off - if you are printing a message at the start of the sketch, add a small delay between Serial.begin() and your first Serial.print() call. 
 
 On all parts, the UART pins can be swapped to an alternate location. This is controlled by the Tools -> UART Pins menu (new in 1.1.0)
 
+> #ifdef UARTREMAP
+> #error "This sketch and hardware assume the the standard UART pin locations, please select that option"
+> #endif
+
+Alternately, you can manually move to alternate pins within the sketch - but this won't automatically get you the TX and RX #defines on the correct pins. 
+> PORTMUX.CTRLB|=(1<<SPI0);
+Move to default pins:
+> PORTMUX.CTRLB&=~(1<<SPI0);
+
+Note: The UART Serial option selected when you do "burn bootloader" for an Optiboot board definition is the serial port that the uploaded bootloaded will use. You may freely change this when compiling/uploading sketches to use the other pins - the pins used by the bootloader will only change when you do "burn bootloader". **If this is your first time bootloading the board in question, and you want to turn UPDI into a Reset pin, burn bootloader first with the UPDI pin left as UPDI, so you can verify that, with the desired UART option, the bootloader really does try to use the pins you want it to - before you turn UPDI into reset and render the part unprogrammable.**
+
+
 Note: UART serial is broken on the x12 and x02 parts before version 1.0.3.
 
 ### SPI support
 All of these parts have a single hardware SPI peripheral. It works exactly like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. Note that the 8-pin parts (412, 212, 402, 204) do not have a specific SS pin. 
 
-On all parts except the 14-pin parts, the SPI pins can be moved to an alternate location (note: On 8-pin parts, the SCK pin cannot be moved). This can be configured using the Tools -> SPI Pins submenu; this is set at compile time (reburning bootloader is not required).
+On all parts except the 14-pin parts, the SPI pins can be moved to an alternate location (note: On 8-pin parts, the SCK pin cannot be moved). This can be configured using the Tools -> SPI Pins submenu; this is set at compile time (reburning bootloader is not required). You can test for whether the alternate pins are in use by checking if SPIREMAP is #defined - you can for example use to check that the correct options are selected and terminate compilation so you can select the right option if that is the case:
+
+> #ifdef SPIREMAP
+> #error "This sketch and hardware assume the the standard SPI pin locations, please select that option"
+> #endif
+
+Alternately, you can manually move to alternate pins within the sketch - but this won't automatically get you the SCK, MISO, MOSI, SS #defines on the correct pins. 
+> PORTMUX.CTRLB|=(1<<SPI0);
+Move to default pins:
+> PORTMUX.CTRLB&=~(1<<SPI0);
+
 
 ### I2C (TWI) support
 All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library. See the pinout charts for the location of these pins. 
 
-On all parts with more than 8 pins, the TWI pins can be swapped to an alternate location. This can be configured using the Tools -> I2C Pins submenu; this is set at compile time (reburning bootloader is not required).
+On all parts with more than 8 pins, the TWI pins can be swapped to an alternate location. This can be configured using the Tools -> I2C Pins submenu; this is set at compile time (reburning bootloader is not required). You can test for whether the alternate pins are in use by checking if TWIREMAP is #defined - you can for example use to check that the correct options are selected and terminate compilation  so you can select the right option if that is the case:
+
+> #ifndef TWIREMAP
+> #error "This sketch and hardware assume the alternate I2C/TWI pins are used, please select that option"
+> #endif
+
+Alternately, you can manually move to alternate pins within the sketch; this is not guaranteed to work with all libraries because it doesn't set the pin macros to the correct pins - though these pin macros don't look like they are widely used, so it may not matter. This can be done like this:
+> PORTMUX.CTRLB|=(1<<UART0);
+Move back to default pins:
+> PORTMUX.CTRLB&=~(1<<UART0);
 
 ### PWM support
 The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available (1.0.5 and later - 1.0.4 and earlier only have 1). On all other parts except the x16 and x17 series, 6 PWM pins are available, driven by Timer A. The type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A. See the pinout charts for a list of which pins support PWM. 
@@ -133,20 +176,37 @@ This core provides two additional #defines for part "families":
 This is just shorthand, for convenience - `#ifdef __AVR_ATtinyxy2__` is equivilent to `#if defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__)`
 
 # Bootloader (optiboot) Support
-A new version of Optiboot (Optiboot-x) now runs on the Tiny0 and Tiny1 chips.  It's still under 512 bytes, so it will potentially work on any of the chips. including EEPROM support. Optiboot supports all boards supported by megaTinyCore. 
+A new version of Optiboot (Optiboot-x) now runs on the Tiny0 and Tiny1 chips.  It's under 512 bytes, and works on all parts supported by megaTinyCore, allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini). 
 
-To use the serial bootloader, select a board definition with (optiboot) after it (note - this might be cut off due to the width of the menu; the second set of board definitions are the optiboot ones). Unless the chip has already been bootloaded, you must connect a UPDI programmer, select your desired options, and do Tools -> Burn Bootloader to load the bootloader onto the chip. 
+To use the serial bootloader, select a board definition with (optiboot) after it (note - this might be cut off due to the width of the menu; the second set of board definitions are the optiboot ones). 
 
-After this, connect a serial adapter to the serial pins (as well as ground and Vcc). On the boards which I sell on Tindie, a standard 6-pin "FTDI" header is provided for this, and "upload" your sketch normally. 
+If the chip you will be programming has not been bootloaded, connect your UPDI programmer, and the desired options for clock rate (20/10/5MHz vs 16/8/4/1MHz is all that matters here - the fuses set the base clock to 20MHz or 16MHz, but the prescaler is set at startup by the sketch - so if you "burn bootloader" with 20MHz selected, but upload sketch compiled for 10MHz, that's fine and will work), Brown Out Detect (BOD), Serial port pins for the bootloader, and whether to leave the UPDI pin configured as such, or reconfigure it as a reset pin, and select Tools -> "Burn Bootloader" 
+**WARNING: After doing "Burn Bootloader", if you set the UPDI pin to act as reset, the chip cannot be reprogrammed except via the serial bootloader or using an HV UPDI programmer - it is strongly suggested to first burn the bootloader with the UPDI/Reset pin left as UPDI, verify that sketches can be uploaded, and only then "Burn Bootloader" with the UPDI/Reset pin set to act as Reset** 
+
+After this, connect a serial adapter to the serial pins (as well as ground and Vcc). On the megaavr ATtiny breakout boards which I sell on Tindie, a standard 6-pin "FTDI" header is provided for this that can be connected directly to many serial adapters. 
+
 
 If the UPDI/Reset pin option was set to UPDI when bootloading, you must unplug/replug the board (or use a software reset - see note near start of readme; you can make an ersatz reset button this way) to enter the bootloader - after this the bootloader will be active for 8 seconds. 
 
-If the UPDI/Reset pin option was set to reset, you must reset the chip via the reset pin (or software reset) to enter the bootloader, and the bootloader will run for 1 second before jumping to the application. This is the same as how optiboot works on classic AVR boards. The standard DTR-autoreset circuit is recommended (this is how boards I sell on Tindie with Optiboot preloaded are configured).
+If the UPDI/Reset pin option was set to reset, you must reset the chip via the reset pin (or software reset54444 to enter the bootloader, and the bootloader will run for 1 second before jumping to the application. This is the same as how optiboot works on classic AVR boards. The standard DTR-autoreset circuit is recommended (this is how boards I sell on Tindie with Optiboot preloaded are configured).
 
-Serial uploads are done at 115200 baud. 
+Serial uploads are all done at 115200 baud, regardless of speed or part. 
 
 ### Autoreset circuit
-Connect the DTR pin of the serial adapter to one side of a 0.1uF ceramic capacitor, the other side of the capacitor is connected to the Reset pin. Connect a 10k resistor between Reset and Vcc, and a diode between Reset and Vcc with the band towards Vcc. Note that these parts must be connected AFTER the pin is set to act as Reset instead of UPDI, as it will interfere with UPDI programming. The breakout boards I sell on Tindie have a pair of pads on the back that can be bridged with solder to reversibly connect the on-board autoreset circuit to the UPDI/Reset pin. Note that this same circuit can be used if using a software reset and pin interrupt to create an ersatz reset pin (connect to that pin, instead of reset). 
+You will neeed:
+* 1 Small signal diode (specifics aren't important, as long as it's approximately a standard diode)
+* 1 0.1uF Ceramic Capacitor
+* 1 10k Resistor
+* An ATtiny megaavr with the bootloader installed on it (you can't do UPDI programming once the autoreset circuit is connected the the UPDI/Reset pin, even if that pin hasn't yet been set to act as reset, as the autoreset circuit will interfere with UPDI programming. 
+
+Connect the DTR pin of the serial adapter to one side of a 0.1uF ceramic capacitor.  
+Connect the other side of the capacitor to the Reset (formerly UPDI) pin. 
+Connect the 10k resistor between Reset and Vcc.
+Connect the diode between Reset and Vcc with the band towards Vcc. 
+
+The breakout boards I sell on Tindie have a pair of pads on the back that can be bridged with solder to reversibly connect the on-board autoreset circuit to the UPDI/Reset pin. If you buy a breakout board from me which has the autoreset circuit, but  which is not bootloaded, these pads will not have been connected - use a UPDI programmer to put the bootloader on it with your desired settings, then bridge the pads on the back to connect the auto-reset circuit. If you buy a breakout board from me with Optiboot preloaded, it will come set for 20/10/5MHz, BOD set to "sampled" mode with a threshold of 3.7v (for 5v boards) or 2.6v (for 3.3v boards) or disabled entirely (for no-regulator boardds), and if you ordered a board with the autoreset circuit, the UPDI pin will be set to work as reset (if you need different settings, please mention this when ordering - boards with optiboot preloaded are bootloaded only when the order is packed, so I can use whatever settings you specify. 
+
+Note that, if you want to keep UPDI programming enabled, and have the convenience of autoresetting serial bootloader to upload sketches, you can use the technique described above (under the section about there not being a dedicated reset pin) to make an ersatz reset pin that does a software reset when held low - this will enter the bootloader, so if your sketches set up an ersatz reset pin, you can use that to get into the bootloader (this isn't foolproof, because if your sketch chokes before it properly sets up the interrupt, or you choked and forgot to include the ersatz reset code in the last sketch you uploaded, it won't work - but you've left UPDI enabled and can re-bootload it if this happens). The autoreset circuit works the same way here - just connect the parts as described above, only using the ersatz reset pin instead of the UPDI/Reset pin. 
 
 ### A few caveats: 
 * The bootloader is at the beginning of memory, rather than at the end (where it was on older chips.). Thus, the start of the application code must be 512b after the start of the memory - this is handled by the core, but you cannot upload a .hex file compiled with a non-optiboot board definition to an optiboot board definition and vise versa. 
