@@ -124,12 +124,35 @@ static const uint8_t A9 = PIN_A9;
 static const uint8_t A10 = PIN_A10;
 static const uint8_t A11 = PIN_A11;
 
+static const uint8_t PIN_PA4=0;
+static const uint8_t PIN_PA5=1;
+static const uint8_t PIN_PA6=2;
+static const uint8_t PIN_PA7=3;
+static const uint8_t PIN_PB7=4;
+static const uint8_t PIN_PB6=5;
+static const uint8_t PIN_PB5=6;
+static const uint8_t PIN_PB4=7;
+static const uint8_t PIN_PB3=8;
+static const uint8_t PIN_PB2=9;
+static const uint8_t PIN_PB1=10;
+static const uint8_t PIN_PB0=11;
+static const uint8_t PIN_PC0=12;
+static const uint8_t PIN_PC1=13;
+static const uint8_t PIN_PC2=14;
+static const uint8_t PIN_PC3=15;
+static const uint8_t PIN_PC4=16;
+static const uint8_t PIN_PC5=17;
+static const uint8_t PIN_PA0=21;
+static const uint8_t PIN_PA1=18;
+static const uint8_t PIN_PA2=19;
+static const uint8_t PIN_PA3=20;
+
+
 #ifdef ARDUINO_MAIN
 
 // On the Arduino board, digital pins are also used
-// for the analog output (software PWM).  Analog input
-// pins are a separate set.
-
+// for the analog output (PWM).  Analog input
+// pins are a separate set.9
 // ATtiny1617 / ARDUINO
 //                              (MOSI) (UPDI)
 //                              (AIN1) (AIN0)
