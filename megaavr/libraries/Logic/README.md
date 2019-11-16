@@ -1,8 +1,10 @@
 # Logic
 A library for interfacing with the CCL (Configurable Custom Logic) peripherals of the megaAVR-0 MCUs.  
-Developed by MCUdude for use with [MegaCoreX](https://github.com/MCUdude/MegaCoreX).  
-The megaAVR-0 has four independent internal logic blocks that can be individually customized.  
+Developed by MCUdude for use with [MegaCoreX](https://github.com/MCUdude/MegaCoreX), adapted to megaAVR ATtiny parts by [Tadashi G. Takaoka](https://github.com/tgtakaoka).
+The megaTiny parts have either 1 (0-series) or 3 (1-series) blocks of CCL available.
 More useful information about CCL can be found in the [Microchip Application Note TB3218](http://ww1.microchip.com/downloads/en/AppNotes/TB3218-Getting-Started-with-CCL-90003218A.pdf) and in the [megaAVR-0 family data sheet](http://ww1.microchip.com/downloads/en/DeviceDoc/megaAVR0-series-Family-Data-Sheet-DS40002015B.pdf).
+
+### Warning: Examples not updated for ATtiny parts!
 
 
 ## Logic

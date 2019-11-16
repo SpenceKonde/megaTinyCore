@@ -1,12 +1,19 @@
+1.1.1
+o Fix issue with board manager installation (#111)
+* Add support for printf to printable library (#112)
+* Add menus for I2C and SPI pin mapping (#110)
+* Correct bug with UART pin mapping menu and xy4/xy6/xy7 optiboot board definitions
+* Correct bug with digitalPinHasPWM macro on xy2.
+
 1.1.0
 
-o Add Logic library (#103)
-
-o Improve pinout diagrams (#98)
+* Add Logic library (#103)
+* Improve pinout diagrams (#98)
 * Add support for the Optiboot bootloader !!! (#52)
 * Correct sketch size output to account for const variables (#95)
 * Fix EESAVE option (which was backwards - #93)
 * Fix Onboard mEDBG programmer for ATTiny416 Xplained Nano (#96)
+* Add menu options for UART location on all parts (#108)
 
 1.0.6
 * Add missing NUM_DIGITAL_PINS macros to xy7, xy6. 
