@@ -109,6 +109,19 @@ static const uint8_t A7 = PIN_A7;
 static const uint8_t A10 = PIN_A10;
 static const uint8_t A11 = PIN_A11;
 
+static const uint8_t PIN_PA4=0;
+static const uint8_t PIN_PA5=1;
+static const uint8_t PIN_PA6=2;
+static const uint8_t PIN_PA7=3;
+static const uint8_t PIN_PB3=4;
+static const uint8_t PIN_PB2=5;
+static const uint8_t PIN_PB1=6;
+static const uint8_t PIN_PB0=7;
+static const uint8_t PIN_PA0=11;
+static const uint8_t PIN_PA1=8;
+static const uint8_t PIN_PA2=9;
+static const uint8_t PIN_PA3=10;
+
 #define PINS_COUNT		(12u)
 
 #ifdef ARDUINO_MAIN
