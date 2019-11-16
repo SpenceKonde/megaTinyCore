@@ -18,8 +18,9 @@ Clock options | Internal 16/20mhz | Internal 16/20mhz | Internal 16/20mhz | Inte
 
 
 ### Buy official megaTinyCore breakouts and support my work!
-### [ATtiny3217 assembled](https://www.tindie.com/products/17523/)
-### [ATtiny3217/1617/817/417/1607/807 bare board](https://www.tindie.com/products/17613/)
+[ATtiny3217 assembled](https://www.tindie.com/products/17523/)
+
+[ATtiny3217/1617/817/417/1607/807 bare board](https://www.tindie.com/products/17613/)
 
 ### Datasheets
 [ATtiny417/817](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417-817-DataSheet-DS40001901D.pdf)
