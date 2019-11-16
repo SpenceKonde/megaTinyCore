@@ -15,7 +15,13 @@ Timer type B | 1 | 1 | 2 | 2
 Interfaces | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C 
 Clock options | Internal 16/20mhz | Internal 16/20mhz | Internal 16/20mhz | Internal 16/20mhz 
 
-### Datasheets
-[ATtiny416/816](http://ww1.microchip.com/downloads/en/devicedoc/40001933a.pdf)
+### Buy official megaTinyCore breakouts and support continued development!
+[ATtiny3216 assembled](https://www.tindie.com/products/17597/)
 
-[ATtiny1616/3216](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny3216_ATtiny1616-data-sheet-40001997B.pdf)
+[ATtiny3216/1616/816/416/1606/806/406 bare board](https://www.tindie.com/products/17614/)
+
+
+### Datasheets
+[ATtiny416/816](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416-816-DataSheet-DS40001913C.pdf)
+
+[ATtiny1616/3216](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny1616-3216-DataSheet-DS40001997C.pdf)
