@@ -4,6 +4,7 @@
  Specifications |    ATtiny807  |    ATtiny1607   
 ------------ | ------------- | -------------
 Flash (program memory)   |  8192 bytes | 16384 bytes 
+Flash w/Optiboot   |  7680 bytes | 15872 bytes 
 RAM   | 512 bytes | 1024 bytes 
 EEPROM | 128 bytes | 256 bytes 
 Bootloader | No | No 
@@ -16,4 +17,4 @@ Interfaces | UART, SPI, I2C | UART, SPI, I2C
 Clock options | Internal 16/20mhz | Internal 16/20mhz 
 
 ### Datasheets
-[ATtiny807/1607](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny807_1607-Data-Sheet-40002030A.pdf)
+[ATtiny807/1607](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny807-1607-DataSheet-DS40002030B.pdf)
