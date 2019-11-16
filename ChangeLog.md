@@ -1,9 +1,11 @@
 1.1.1
-o Fix issue with board manager installation (#111)
+* Fix issue with board manager installation (#111)
 * Add support for printf to printable library (#112)
 * Add menus for I2C and SPI pin mapping (#110)
 * Correct bug with UART pin mapping menu and xy4/xy6/xy7 optiboot board definitions
 * Correct bug with digitalPinHasPWM macro on xy2.
+* Update datasheet links to point to latest dataheet version. This *should* get rid of all the preliminary datasheet links. 
+* Add row in entry in part-specific doc pages for spxzz bootloader for optiboot board defs
 
 1.1.0
 
@@ -18,7 +20,7 @@ o Fix issue with board manager installation (#111)
 1.0.6
 * Add missing NUM_DIGITAL_PINS macros to xy7, xy6. 
 * Fix PWM on Pin 1 (PA7) of xy2
-* Fix Wire.h to prevent "call of overloaded 'requestFrom(int&, unsigned int&)' is ambiguous" errors with code that works on classic avr.
+* Fix Wire.h to prevent "call of overloaded 'requestFro&, unsigned int&)' is ambiguous" errors with code that works on classic avr.
 * Expand documentation
 * Tools -> Programmer selection now used for normal uploads
 
