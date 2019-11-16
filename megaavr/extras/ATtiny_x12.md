@@ -4,6 +4,7 @@
  Specifications |  ATtiny212|  ATtiny412   
 ------------ | ------------- | -------------
 Flash (program memory)   | 2048 bytes | 4096 bytes
+Flash w/Optiboot   | 1536 bytes | 3584 bytes
 RAM  | 128 bytes | 256 bytes  
 EEPROM | 64 bytes | 128 bytes 
 Bootloader | No | No 
