@@ -4,6 +4,7 @@
  Specifications |  ATtiny417  |  ATtiny817  |    ATtiny1617   |   ATtiny3217
 ------------ | ------------- | ------------- | ------------- | -------------
 Flash (program memory)   | 4096 bytes| 8192 bytes | 16384 bytes | 32768 bytes 
+Flash w/Optiboot   | 3584 bytes| 7680 bytes | 15872 bytes | 32256 bytes 
 RAM  | 256 bytes | 512 bytes | 2048 bytes | 2048 bytes 
 EEPROM | 128 bytes | 128 bytes | 256 bytes | 256 bytes
 Bootloader | No | No | No | No 
@@ -16,6 +17,6 @@ Interfaces | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C
 Clock options | Internal 16/20mhz | Internal 16/20mhz | Internal 16/20mhz | Internal 16/20mhz 
 
 ### Datasheets
-[ATtiny417/817](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-42721-ATtiny417-814-816-817_Complete.pdf)
+[ATtiny417/817](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417-817-DataSheet-DS40001901D.pdf)
 
-[ATtiny1617/3217](http://ww1.microchip.com/downloads/en/devicedoc/attiny3217_1617-data-sheet-40001999b.pdf)
+[ATtiny1617/3217](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny1617-3217-DataSheet-DS40001999C.pdf)
