@@ -1,3 +1,6 @@
+1.1.2
+* Fix issue with PWM on PA3 on 14-pin devices.
+
 1.1.1
 * Fix issue with board manager installation (#111)
 * Add support for printf to printable library (#112)
