@@ -234,9 +234,9 @@ const uint8_t PROGMEM digital_pin_to_timer[] = {
 	TIMERA0, 		// 7  PB0
 	//skip PA0 UPDI
 	NOT_ON_TIMER, 	// 8  PA1
-	TIMERA0, 		// 9  PA2
-	NOT_ON_TIMER,  	// 10 PA3
-	NOT_ON_TIMER  	// 11 PA3
+	NOT_ON_TIMER, 		// 9  PA2
+	TIMERA0,  	// 10 PA3
+	NOT_ON_TIMER  	// 11 PA0
 
 
 };
