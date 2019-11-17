@@ -1,5 +1,5 @@
 1.1.2
-* Fix issue with PWM on PA3 on 14-pin devices.
+* Fix issue with PWM on PA3 on 14-pin devices. (#115)
 
 1.1.1
 * Fix issue with board manager installation (#111)
