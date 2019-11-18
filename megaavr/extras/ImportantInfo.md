@@ -19,5 +19,5 @@
 
 ## Special Libraries
 * [tinyNeoPixel - based tightly off of adafruitNeopixel library, optimized for minimized space, with support for all clock speeds megatTinyCore supports higher than 6MHz.](tinyNeoPixel.md)
-* Logic (CCL) - the Logic library provides an easy to use wrapper around the "Configurable Custom Logic" blocks
-* AC (analog comparator)
+* Logic (CCL) - the Logic library provides an easy to use wrapper around the "Configurable Custom Logic" blocks. As of 1.1.2, this is not fully working on the megaavr ATtiny parts. Fixes are planned for future versions.
+* AC (analog comparator) - (library planned for future version) These parts include one or more Analog Comparator units. These can be used to continuously compare an analog value to a reference voltage, generating an interrupt or event based on which voltage is higher. A library which provides a user-friendly wrapper for this functionality is planned for a future release, based on the library in MCUDude's MegaCoreX.
