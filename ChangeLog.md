@@ -1,4 +1,6 @@
 1.1.2
+* Fix critical issue compiling for 24-pin parts (#118)
+* Fix issue with eesave menu option (#117)
 * Fix issue with PWM on PA3 on 14-pin devices. (#115)
 * Remove unused {upload.extra_files} parameter from platform.txt upload recipe.
 
