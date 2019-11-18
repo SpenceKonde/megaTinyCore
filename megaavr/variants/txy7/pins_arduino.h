@@ -40,7 +40,6 @@
 #else
 #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 11 || (p) == 10 || (p) == 9 || (p) == 20)
 #endif
-	(0)
 
 #ifdef SPIREMAP
 #define SPI_MUX 		(4)
