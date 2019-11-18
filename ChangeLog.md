@@ -1,5 +1,6 @@
 1.1.2
 * Fix issue with PWM on PA3 on 14-pin devices. (#115)
+* Remove unused {upload.extra_files} parameter from platform.txt upload recipe.
 
 1.1.1
 * Fix issue with board manager installation (#111)
