@@ -1,3 +1,5 @@
+1.1.3
+
 1.1.2
 * Fix critical issue compiling for 24-pin parts (#118)
 * Fix issue with eesave menu option (#117)
