@@ -193,7 +193,7 @@ If the UPDI/Reset pin option was set to reset, you must reset the chip via the r
 Serial uploads are all done at 115200 baud, regardless of speed or part. 
 
 ### Autoreset circuit
-You will neeed:
+The auto reset circuit is needed for the proper functioning of serial communication to the Arduino IDE. You will need:
 * 1 Small signal diode (specifics aren't important, as long as it's approximately a standard diode)
 * 1 0.1uF Ceramic Capacitor
 * 1 10k Resistor
