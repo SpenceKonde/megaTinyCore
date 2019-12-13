@@ -6,7 +6,7 @@
 #define TIME_TRACKING_TIMER_DIVIDER		64		/* Clock divider for TCB3 */
 #define TIME_TRACKING_CYCLES_PER_OVF	(TIME_TRACKING_TICKS_PER_OVF * TIME_TRACKING_TIMER_DIVIDER)
 
-#define PWM_TIMER_PERIOD	0xFF	/* For frequency */
+#define PWM_TIMER_PERIOD	0xFE	/* For frequency */
 #define PWM_TIMER_COMPARE	0x80	/* For duty cycle */
 
 #endif
