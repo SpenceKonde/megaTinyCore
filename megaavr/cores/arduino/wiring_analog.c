@@ -133,9 +133,9 @@ void analogWrite(uint8_t pin, int val)
 	switch (digital_pin_timer) { //use only low nybble which defines which timer it is
 
 		case TIMERA0:
-			if(val < 1){	/* if zero or negative drive digital low */
+			if(val <= 0){	/* if zero or negative drive digital low */
 				digitalWrite(pin, LOW);
-			} else if(val > 255){	/* if max or greater drive digital high */
+			} else if(val >= 255){	/* if max or greater drive digital high */
 				digitalWrite(pin, HIGH);
 			} else {
 				/* Calculate correct compare buffer register */
