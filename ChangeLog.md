@@ -1,5 +1,6 @@
 1.1.3
 * Fix issue with PWM duty cycle and analogWrite(pin,255)
+* Fix issue with some UPDI programmers (#125)
 
 1.1.2
 * Fix critical issue compiling for 24-pin parts (#118)
