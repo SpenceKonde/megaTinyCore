@@ -186,25 +186,26 @@ void TWI_MasterSetBaud(uint32_t frequency){
 //			From 1617 DS: 1000ns @ 100kHz / 300ns @ 400kHz / 120ns @ 1MHz
 
 	uint16_t t_rise;
+	uint16_t freq_khz = frequency/1000;
 	
-	if(frequency < 200000){
-		frequency = 100000;
+	if(freq_khz < 200){
+		freq_khz = 100;
 		t_rise = 1000;
 		
-	} else if (frequency < 800000){
-		frequency = 400000;
+	} else if (freq_khz < 800){
+		freq_khz = 400;
 		t_rise = 300;	
 
-	} else if (frequency < 1200000){
-		frequency = 1000000;
+	} else if (freq_khz < 1200){
+		freq_khz = 1000;
 		t_rise = 120;
 		
 	} else {
-		frequency = 100000;
+		freq_khz = 100;
 		t_rise = 1000;
 	}
 	
-	uint32_t baud = ((F_CPU_CORRECTED/frequency) - (((F_CPU_CORRECTED*t_rise)/1000)/1000)/1000 - 10)/2;
+	uint32_t baud = ((F_CPU_CORRECTED/1000/freq_khz) - (((F_CPU_CORRECTED*t_rise)/1000)/1000)/1000 - 10)/2;
 	TWI0.MBAUD = (uint8_t)baud;
 
 }
