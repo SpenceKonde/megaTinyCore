@@ -11,6 +11,7 @@ menu.clocksource=Clock Source
 menu.dacvref=DAC Voltage Reference
 menu.neopixelport=tinyNeoPixel Port
 menu.millis=millis()/micros()
+menu.wireversion=Wire Mode
 menu.uartpins=UART pins
 menu.twipins=I2C (TWI) pins
 menu.spipins=SPI pins
@@ -100,6 +101,12 @@ atxy7.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
 atxy7.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy7.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
+atxy7.menu.wireversion.compact=Compact (less compatible)
+atxy7.menu.wireversion.compact.build.wireversion=-DWIRE_COMPACT
+atxy7.menu.wireversion.normal=Normal (uses more flash)
+atxy7.menu.wireversion.normal.build.wireversion=
+
+
 atxy7.menu.eesave.enable=EEPROM retained
 atxy7.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy7.menu.eesave.disable=EEPROM not retained
@@ -147,7 +154,7 @@ atxy7.build.board=attinyxy7
 atxy7.build.core=arduino
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins}
+atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.wireversion}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
@@ -245,6 +252,10 @@ atxy6.menu.bodmodeactive.enabledhold.bootloader.bodactivebits=11
 atxy6.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
 atxy6.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy6.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
+atxy6.menu.wireversion.compact=Compact (less compatible)
+atxy6.menu.wireversion.compact.build.wireversion=-DWIRE_COMPACT
+atxy6.menu.wireversion.normal=Normal (uses more flash)
+atxy6.menu.wireversion.normal.build.wireversion=
 
 
 atxy6.menu.eesave.enable=EEPROM retained
@@ -294,7 +305,7 @@ atxy6.build.board=attinyxy6
 atxy6.build.core=arduino
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
-atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins}
+atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.wireversion}
 atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude
@@ -399,6 +410,11 @@ atxy4.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
 atxy4.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy4.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
+atxy4.menu.wireversion.compact=Compact (less compatible)
+atxy4.menu.wireversion.compact.build.wireversion=-DWIRE_COMPACT
+atxy4.menu.wireversion.normal=Normal (uses more flash)
+atxy4.menu.wireversion.normal.build.wireversion=
+
 atxy4.menu.eesave.enable=EEPROM retained
 atxy4.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy4.menu.eesave.disable=EEPROM not retained
@@ -441,7 +457,7 @@ atxy4.build.board=attinyxy4
 atxy4.build.core=arduino
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
-atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins}
+atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.wireversion}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
@@ -549,6 +565,11 @@ atxy2.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
 atxy2.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy2.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
+atxy2.menu.wireversion.compact=Compact (less compatible)
+atxy2.menu.wireversion.compact.build.wireversion=-DWIRE_COMPACT
+atxy2.menu.wireversion.normal=Normal (uses more flash)
+atxy2.menu.wireversion.normal.build.wireversion=
+
 atxy2.menu.eesave.enable=EEPROM retained
 atxy2.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy2.menu.eesave.disable=EEPROM not retained
@@ -589,7 +610,7 @@ atxy2.build.board=attinyxy2
 atxy2.build.core=arduino
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
-atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.millis} {build.uartpins} {build.spipins}
+atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.millis} {build.uartpins} {build.spipins} {build.wireversion}
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
@@ -611,7 +632,7 @@ Xplained416.build.core=arduino
 Xplained416.build.variant=txy6
 Xplained416.build.f_cpu=20000000
 Xplained416.build.text_section_start=.text=0x200
-Xplained416.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DDACVREF=3 -DNEOPIXELPORT=VPORTA.OUT
+Xplained416.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.wireversion}
 Xplained416.upload.tool=avrdude
 Xplained416.upload.workaround=
 Xplained416.upload.speed=57600
@@ -631,6 +652,50 @@ Xplained416.bootloader.SYSCFG0=0xC9
 Xplained416.bootloader.SYSCFG1=0x03
 Xplained416.bootloader.APPEND=0x00
 
+Xplained416.menu.wireversion.compact=Compact (less compatible)
+Xplained416.menu.wireversion.compact.build.wireversion=-DWIRE_COMPACT
+Xplained416.menu.wireversion.normal=Normal (uses more flash)
+Xplained416.menu.wireversion.normal.build.wireversion=
+
+Xplained416.menu.dacvref.0v55=0.55V
+Xplained416.menu.dacvref.1v1=1.10V
+Xplained416.menu.dacvref.1v5=1.50V
+Xplained416.menu.dacvref.2v5=2.50V
+Xplained416.menu.dacvref.4v3=4.30V
+Xplained416.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
+Xplained416.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
+Xplained416.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
+Xplained416.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
+Xplained416.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
+
+Xplained416.menu.neopixelport.porta=PORTA (pins 0~3,14~17)
+Xplained416.menu.neopixelport.portb=PORTB (pins 4~9)
+Xplained416.menu.neopixelport.portc=PORTC (pins 10~13)
+Xplained416.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
+Xplained416.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
+Xplained416.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
+
+Xplained416.menu.millis.enabled=Enabled
+Xplained416.menu.millis.disabled=Disabled (saves flash)
+Xplained416.menu.millis.enabled.build.millis=
+Xplained416.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+
+Xplained416.menu.uartpins.standard=TX:7, RX:6
+Xplained416.menu.uartpins.alternate=TX:14, RX:15
+Xplained416.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
+Xplained416.menu.uartpins.alternate.bootloader.uartswap=_alt
+Xplained416.menu.uartpins.standard.build.uartpins=
+Xplained416.menu.uartpins.standard.bootloader.uartswap=
+Xplained416.menu.twipins.standard=SDA:8, SCL:9
+Xplained416.menu.twipins.alternate=SDA:14, SCL:15
+Xplained416.menu.twipins.alternate.build.twipins=-DTWIREMAP
+Xplained416.menu.twipins.standard.build.twipins=
+Xplained416.menu.spipins.standard=SCK:16, MISO:15, MOSI:14
+Xplained416.menu.spipins.alternate=SCK:10, MISO:11, MOSI:12
+Xplained416.menu.spipins.alternate.build.spipins=-DSPIREMAP
+Xplained416.menu.spipins.standard.build.spipins=
+
+
 Xplained817.name=Attiny817 Xplained Mini (optiboot)
 Xplained817.build.mcu=attiny817
 Xplained817.build.board=attinyxy7
@@ -638,7 +703,7 @@ Xplained817.build.core=arduino
 Xplained817.build.variant=txy7
 Xplained817.build.f_cpu=20000000
 Xplained817.build.text_section_start=.text=0x200
-Xplained817.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DDACVREF=3 -DNEOPIXELPORT=VPORTA.OUT
+Xplained817.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.wireversion}
 Xplained817.upload.tool=avrdude
 Xplained817.upload.workaround=
 Xplained817.upload.speed=57600
@@ -656,6 +721,50 @@ Xplained817.bootloader.BODCFG=0b00000000
 Xplained817.bootloader.TCD0CFG=0x00
 Xplained817.bootloader.SYSCFG0=0xC9
 Xplained817.bootloader.SYSCFG1=0x03
+Xplained817.bootloader.APPEND=0x00
+
+Xplained817.menu.wireversion.compact=Compact (less compatible)
+Xplained817.menu.wireversion.compact.build.wireversion=-DWIRE_COMPACT
+Xplained817.menu.wireversion.normal=Normal (uses more flash)
+Xplained817.menu.wireversion.normal.build.wireversion=
+
+Xplained817.menu.dacvref.0v55=0.55V
+Xplained817.menu.dacvref.1v1=1.10V
+Xplained817.menu.dacvref.1v5=1.50V
+Xplained817.menu.dacvref.2v5=2.50V
+Xplained817.menu.dacvref.4v3=4.30V
+Xplained817.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
+Xplained817.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
+Xplained817.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
+Xplained817.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
+Xplained817.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
+
+Xplained817.menu.millis.enabled=Enabled
+Xplained817.menu.millis.disabled=Disabled (saves flash)
+Xplained817.menu.millis.enabled.build.millis=
+Xplained817.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+
+Xplained817.menu.neopixelport.porta=PORTA (pins 0~3,18~21)
+Xplained817.menu.neopixelport.portb=PORTB (pins 4~11)
+Xplained817.menu.neopixelport.portc=PORTC (pins 12~17)
+Xplained817.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
+Xplained817.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
+Xplained817.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
+
+Xplained817.menu.uartpins.standard=TX:9, RX:8
+Xplained817.menu.uartpins.alternate=TX:18, RX:19
+Xplained817.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
+Xplained817.menu.uartpins.alternate.bootloader.uartswap=_alt
+Xplained817.menu.uartpins.standard.build.uartpins=
+Xplained817.menu.uartpins.standard.bootloader.uartswap=
+Xplained817.menu.twipins.standard=SDA:10, SCL:11
+Xplained817.menu.twipins.alternate=SDA:18, SCL:19
+Xplained817.menu.twipins.alternate.build.twipins=-DTWIREMAP
+Xplained817.menu.twipins.standard.build.twipins=
+Xplained817.menu.spipins.standard=SCK:20, MISO:19, MOSI:18
+Xplained817.menu.spipins.alternate=SCK:12, MISO:13, MOSI:14
+Xplained817.menu.spipins.alternate.build.spipins=-DSPIREMAP
+Xplained817.menu.spipins.standard.build.spipins=
 
 # Separate board types for chips with Optiboot.  Reduces menu clutter.
 
@@ -740,6 +849,11 @@ atxy7o.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
 atxy7o.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy7o.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
+atxy7o.menu.wireversion.compact=Compact (less compatible)
+atxy7o.menu.wireversion.compact.build.wireversion=-DWIRE_COMPACT
+atxy7o.menu.wireversion.normal=Normal (uses more flash)
+atxy7o.menu.wireversion.normal.build.wireversion=
+
 atxy7o.menu.dacvref.0v55=0.55V
 atxy7o.menu.dacvref.1v1=1.10V
 atxy7o.menu.dacvref.1v5=1.50V
@@ -790,7 +904,7 @@ atxy7o.upload.tool=avrdude
 atxy7o.build.board=attinyxy7
 atxy7o.build.core=arduino
 atxy7o.build.variant=txy7
-atxy7o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins}
+atxy7o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.wireversion}
 atxy7o.build.export_merged_output=true
 
 atxy7o.bootloader.WDTCFG=0x00
@@ -921,6 +1035,11 @@ atxy6o.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
 atxy6o.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy6o.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
+atxy6o.menu.wireversion.compact=Compact (less compatible)
+atxy6o.menu.wireversion.compact.build.wireversion=-DWIRE_COMPACT
+atxy6o.menu.wireversion.normal=Normal (uses more flash)
+atxy6o.menu.wireversion.normal.build.wireversion=
+
 
 atxy6o.menu.uartpins.standard=TX:7, RX:6
 atxy6o.menu.uartpins.alternate=TX:14, RX:15
@@ -940,7 +1059,7 @@ atxy6o.menu.spipins.standard.build.spipins=
 atxy6o.build.board=attinyxy6
 atxy6o.build.core=arduino
 atxy6o.build.variant=txy6
-atxy6o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins}
+atxy6o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.wireversion}
 atxy6o.build.export_merged_output=true
 
 atxy6o.upload.workaround=
@@ -1082,6 +1201,11 @@ atxy4o.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
 atxy4o.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy4o.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
+atxy4o.menu.wireversion.compact=Compact (less compatible)
+atxy4o.menu.wireversion.compact.build.wireversion=-DWIRE_COMPACT
+atxy4o.menu.wireversion.normal=Normal (uses more flash)
+atxy4o.menu.wireversion.normal.build.wireversion=
+
 atxy4o.menu.uartpins.standard=TX:5, RX:4
 atxy4o.menu.uartpins.alternate=TX:8, RX:9
 atxy4o.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
@@ -1099,7 +1223,7 @@ atxy4o.upload.tool=avrdude
 atxy4o.build.board=attinyxy4
 atxy4o.build.core=arduino
 atxy4o.build.variant=txy4
-atxy4o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins}
+atxy4o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.wireversion}
 atxy4o.build.export_merged_output=true
 atxy4o.upload.workaround=
 atxy4o.upload.protocol=arduino
@@ -1234,6 +1358,11 @@ atxy2o.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
 atxy2o.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy2o.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
+atxy2o.menu.wireversion.compact=Compact (less compatible)
+atxy2o.menu.wireversion.compact.build.wireversion=-DWIRE_COMPACT
+atxy2o.menu.wireversion.normal=Normal (uses more flash)
+atxy2o.menu.wireversion.normal.build.wireversion=
+
 atxy2o.upload.tool=avrdude
 atxy2o.upload.protocol=arduino
 atxy2o.upload.extra_params=-D
@@ -1244,7 +1373,7 @@ atxy2o.bootloader.tool=avrdude
 atxy2o.build.board=attinyxy2
 atxy2o.build.core=arduino
 atxy2o.build.variant=txy2
-atxy2o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.millis} {build.uartpins} {build.spipins}
+atxy2o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.millis} {build.uartpins} {build.spipins} {build.wireversion}
 atxy2o.build.export_merged_output=true
 
 
