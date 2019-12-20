@@ -79,7 +79,7 @@ extern "C"{
 	frequency vs supply voltage, oscillator fuse setting and MCLK divider.
 	Also includes the correction from signature row values if above #define
 	PERFORM_SIGROW_CORRECTION_F_CPU = 1 */
-extern uint32_t F_CPU_CORRECTED;
+extern const uint32_t F_CPU_CORRECTED;
 
 uint16_t clockCyclesPerMicrosecondComp(uint32_t clk);
 uint16_t clockCyclesPerMicrosecond();
