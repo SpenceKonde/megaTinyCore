@@ -24,7 +24,7 @@
 
 // the prescaler is set so that timer ticks every 64 clock cycles, and the
 // the overflow handler is called every 256 ticks.
-uint32_t F_CPU_CORRECTED = F_CPU;
+const uint32_t F_CPU_CORRECTED = F_CPU;
 
 #ifndef DISABLEMILLIS
 volatile uint16_t microseconds_per_timer_overflow;
@@ -332,47 +332,31 @@ void init()
 /******************************** CLOCK STUFF *********************************/
 
 
- 	int64_t cpu_freq;
-
 	#if (F_CPU == 20000000)
-		cpu_freq = 20000000;
-
 		/* No division on clock */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
 
 	#elif (F_CPU == 16000000)
-		cpu_freq = 16000000;
-
 		/* No division on clock */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
 
 	#elif (F_CPU == 10000000) //20MHz prescaled by 2
-		cpu_freq = 10000000;
-
 		/* Clock DIV2 */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
 
 	#elif (F_CPU == 8000000) //16MHz prescaled by 2
-		cpu_freq = 8000000;
-
 		/* Clock DIV2 */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
 
 	#elif (F_CPU == 5000000) //20MHz prescaled by 4
-		cpu_freq = 5000000;
-
 		/* Clock DIV4 */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
 
 	#elif (F_CPU == 4000000) //16MHz prescaled by 4
-		cpu_freq = 4000000;
-
 		/* Clock DIV4 */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
 
 	#elif (F_CPU == 1000000) //16MHz prescaled by 16
-		cpu_freq = 1000000;
-
 		/* Clock DIV8 */
 		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
 	#else
@@ -383,9 +367,6 @@ void init()
 	 		#error "F_CPU defined as an unsupported value"
 		#endif
 	#endif
-
-	/* Apply calculated value to F_CPU_CORRECTED */
-	F_CPU_CORRECTED = (uint32_t)cpu_freq; //Spence 6/22/2019: This will always be equal to F_CPU!
 
 
 /********************************* ADC ****************************************/
