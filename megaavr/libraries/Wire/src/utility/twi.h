@@ -33,7 +33,7 @@
 #define TWIS_STATUS_BUSY                 1
 
 /*! Transaction result enumeration. */
-typedef enum TWIM_RESULT_enum {
+typedef enum __attribute__((packed)) TWIM_RESULT_enum {
 	TWIM_RESULT_UNKNOWN          = (0x00<<0),
 	TWIM_RESULT_OK               = (0x01<<0),
 	TWIM_RESULT_BUFFER_OVERFLOW  = (0x02<<0),
@@ -44,7 +44,7 @@ typedef enum TWIM_RESULT_enum {
 } TWIM_RESULT_t;
 
 /* Transaction result enumeration */
-typedef enum TWIS_RESULT_enum {
+typedef enum __attribute__((packed)) TWIS_RESULT_enum {
 	TWIS_RESULT_UNKNOWN            = (0x00<<0),
 	TWIS_RESULT_OK                 = (0x01<<0),
 	TWIS_RESULT_BUFFER_OVERFLOW    = (0x02<<0),
@@ -55,7 +55,7 @@ typedef enum TWIS_RESULT_enum {
 } TWIS_RESULT_t;
 
 /*! TWI Modes */
-typedef enum TWI_MODE_enum {
+typedef enum __attribute__((packed)) TWI_MODE_enum {
 	TWI_MODE_UNKNOWN = 0,
 	TWI_MODE_MASTER = 1,
 	TWI_MODE_SLAVE = 2,
