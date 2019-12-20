@@ -110,9 +110,12 @@ On all parts with more than 8 pins, the TWI pins can be swapped to an alternate 
 > #endif
 
 Alternately, you can manually move to alternate pins within the sketch; this is not guaranteed to work with all libraries because it doesn't set the pin macros to the correct pins - though these pin macros don't look like they are widely used, so it may not matter. This can be done like this:
-> PORTMUX.CTRLB|=(1<<UART0);
+> PORTMUX.CTRLB|=(1<<TWI0);
 Move back to default pins:
-> PORTMUX.CTRLB&=~(1<<UART0);
+> PORTMUX.CTRLB&=~(1<<TWI0);
+
+#### Wire Version Menu
+As of version 1.1.3, there is a new Wire Version menu option. The "Compact" version can save up to 1k of flash - however, it may have compatibility issues with libraries that specify wire as a subclass of HardwareI2C - it specifies that it is a subclass of Stream, which allows the compiler to optimize away unused functions (as the functions are defined as "virtual" in HardwareI2C, this results in the creation of a vtable, so the compiler must include all library functions, even ones not called in the sketch). The "Normal" version uses more flash, but should have full compatibility with any library that works through the standard Wire library for I2C.
 
 ### PWM support
 The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available (1.0.5 and later - 1.0.4 and earlier only have 1). On all other parts except the x16 and x17 series, 6 PWM pins are available, driven by Timer A. The type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A - however you can take them over if you need to generate PWM at different frequencies. See the pinout charts for a list of which pins support PWM.
@@ -232,6 +235,7 @@ Note that, if you have UPDI programming enabled, and desire the convenience of a
 * Tools -> B.O.D. Mode (sleep) - Determines whether to enable Brown Out Detection when the chip is sleeping. You must burn bootloader after changing this to apply the changes.
 * Tools -> DAC Reference Voltage - Determines the voltage reference for the DAC. This should be less than Vcc to get the right voltage. You do not need to use Burn Bootloader to apply changes to this menu.
 * Tools -> tinyNeoPixel Port - If using the tinyNeoPixel library (see above), and you are running at 8 or 10 MHz, you must set this option to the port with the pin(s) you are using. Not present on the 8-pin parts, as they only have one port. If not using tinyNeoPixel library or running at 16MHz or more, this option can be ignored.
+* Tools -> Wire Version - If set to compact, it saves a significant amount of flash, however it may be incompatible with some libraries. The normal option is the standard Wire library, which uses more flash, but has full compatibility with any library using Wire for I2C.
 * Tools -> millis()/micros() - If set to enable (the default), millis(), micros() and pulseInLong() will be available. If set to disable, these will not be available, Serial methods which take a timeout as an argument will not have an accurate timeout (though the actual time will be proportional to the timeout supplied); delay will still work. Disabling millis() and micros() saves flash, and eliminates the millis interrupt every 1-2ms; this is especially useful on the 8-pin parts which are extremely limited in flash.
 
 # Known Compiler Bugs
