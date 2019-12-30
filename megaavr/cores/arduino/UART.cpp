@@ -151,9 +151,22 @@ void UartClass::begin(unsigned long baud, uint16_t config)
     digitalWrite(_hwserial_tx_pin, HIGH);
     pinMode(_hwserial_tx_pin, OUTPUT);
 
+    //See #131 for more info on this
+    #if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL) //this means we are on the 20MHz oscillator
+    #ifdef UARTBAUD3V
+    int8_t sigrow_val = SIGROW.OSC20ERR3V;
+    #else
+    int8_t sigrow_val = SIGROW.OSC20ERR5V;
+    #endif
+    #else //we are on 16MHz one
+    #ifdef UARTBAUD3V
+    int8_t sigrow_val = SIGROW.OSC16ERR3V;
+    #else
     int8_t sigrow_val = SIGROW.OSC16ERR5V;
+    #endif
+    #endif
     baud_setting *= (1024 + sigrow_val);
-    baud_setting /= (1024 - abs(sigrow_val));
+    baud_setting /= 1024;
 
     // assign the baud_setting, a.k.a. BAUD (USART Baud Rate Register)
     (*_hwserial_module).BAUD = (int16_t) baud_setting;

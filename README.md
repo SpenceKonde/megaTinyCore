@@ -80,6 +80,8 @@ Alternately, you can manually move to alternate pins within the sketch - but thi
 Move to default pins:
 > PORTMUX.CTRLB&=~(1<<SPI0);
 
+To maximize the accuracy of the baud rate, from the Tools -> Voltage for UART Baud menu, select whether the voltage is closer to 5v or 3v - the factory calibration supplies an oscillator error adjustment for the purpose of UART baud calculation for 5v and 3v, and using the right one will produce a baud rate closer to the target value. That said, testing has indicated that either setting is almost always good enough.
+
 Note: The UART Serial option selected when you do "burn bootloader" for an Optiboot board definition is the serial port that the uploaded bootloaded will use. You may freely change this when compiling/uploading sketches to use the other pins - the pins used by the bootloader will only change when you do "burn bootloader". **If this is your first time bootloading the board in question, and you want to turn UPDI into a Reset pin, burn bootloader first with the UPDI pin left as UPDI, so you can verify that, with the desired UART option, the bootloader really does try to use the pins you want it to - before you turn UPDI into reset and render the part unprogrammable.**
 
 
@@ -233,6 +235,7 @@ Note that, if you have UPDI programming enabled, and desire the convenience of a
 * Tools -> B.O.D. Mode (sleep) - Determines whether to enable Brown Out Detection when the chip is sleeping. You must burn bootloader after changing this to apply the changes.
 * Tools -> DAC Reference Voltage - Determines the voltage reference for the DAC. This should be less than Vcc to get the right voltage. You do not need to use Burn Bootloader to apply changes to this menu.
 * Tools -> tinyNeoPixel Port - If using the tinyNeoPixel library (see above), and you are running at 8 or 10 MHz, you must set this option to the port with the pin(s) you are using. Not present on the 8-pin parts, as they only have one port. If not using tinyNeoPixel library or running at 16MHz or more, this option can be ignored.
+* Tools -> Voltage for UART Baud - Controls which oscillator error values will be used to maximize the accuracy of the UART baud rate generation - choose whether operating voltage is closer to 5v or 3v.
 * Tools -> millis()/micros() - If set to enable (the default), millis(), micros() and pulseInLong() will be available. If set to disable, these will not be available, Serial methods which take a timeout as an argument will not have an accurate timeout (though the actual time will be proportional to the timeout supplied); delay will still work. Disabling millis() and micros() saves flash, and eliminates the millis interrupt every 1-2ms; this is especially useful on the 8-pin parts which are extremely limited in flash.
 
 # Known Compiler Bugs
