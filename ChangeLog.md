@@ -1,6 +1,10 @@
 1.1.3
 * Fix issue with PWM duty cycle and analogWrite(pin,255) (#123)
 * Fix issue with some UPDI programmers (#125, #126)
+* Reduce flash usage of all parts slightly (#127)
+* Reduce flash usage of Wire library significantly (#128, #129, #130)
+* Add DAC disabled option (saves flash)
+* Fix issue with UART baud rate calculation (#131)
 
 1.1.2
 * Fix critical issue compiling for 24-pin parts (#118)
@@ -14,7 +18,7 @@
 * Add menus for I2C and SPI pin mapping (#110)
 * Correct bug with UART pin mapping menu and xy4/xy6/xy7 optiboot board definitions
 * Correct bug with digitalPinHasPWM macro on xy2.
-* Update datasheet links to point to latest dataheet version. This *should* get rid of all the preliminary datasheet links. 
+* Update datasheet links to point to latest dataheet version. This *should* get rid of all the preliminary datasheet links.
 * Add row in entry in part-specific doc pages for spxzz bootloader for optiboot board defs
 
 1.1.0
@@ -28,7 +32,7 @@
 * Add menu options for UART location on all parts (#108)
 
 1.0.6
-* Add missing NUM_DIGITAL_PINS macros to xy7, xy6. 
+* Add missing NUM_DIGITAL_PINS macros to xy7, xy6.
 * Fix PWM on Pin 1 (PA7) of xy2
 * Fix Wire.h to prevent "call of overloaded 'requestFro&, unsigned int&)' is ambiguous" errors with code that works on classic avr.
 * Expand documentation
