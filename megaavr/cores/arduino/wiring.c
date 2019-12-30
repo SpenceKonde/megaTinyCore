@@ -436,7 +436,7 @@ void init()
 	#endif
 #endif
 /*************************** DAC VREF *****************************************/
-	#ifdef DAC0
+	#if defined(DAC0) && defined(DACVREF)
 	VREF.CTRLA |= DACVREF;
 	#endif
 /*************************** ENABLE GLOBAL INTERRUPTS *************************/

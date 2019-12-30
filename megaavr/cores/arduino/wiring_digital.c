@@ -125,7 +125,7 @@ static void turnOffPWM(uint8_t pin)
 
 		break;
 	*/
-	#ifdef DAC0
+	#if defined(DAC0) && defined(DACVREF)
 	case DACOUT:
 		DAC0.CTRLA=0x00;
 		break;

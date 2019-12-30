@@ -292,7 +292,7 @@ const uint8_t PROGMEM digital_pin_to_timer[] = {
   	// Left side, top to bottom
 	TIMERA0, 		// 0  PA4
 	TIMERA0, 		// 1  PA5
-	#ifdef DAC0
+	#if defined(DAC0) && defined(DACVREF)
     DACOUT, // 2  PA6
 	#else
 	NOT_ON_TIMER, // 2  PA6
