@@ -179,7 +179,7 @@ void analogWrite(uint8_t pin, int val)
 			DAC0.CTRLA=0x41; //OUTEN=1, ENABLE=1
 			break;
 		#endif
-		#if (defined(TCD0) && defined(USE_TIMERD0_PWM))
+	    #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && (!defined(MILLIS_USE_TIMERD0)))
 		case TIMERD0:
 			if(val < 1){	/* if zero or negative drive digital low */
 				digitalWrite(pin, LOW);

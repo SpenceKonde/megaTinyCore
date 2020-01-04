@@ -120,10 +120,18 @@ atxy7.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy7.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 atxy7.menu.dacvref.disabled.build.dacvref=
 
-atxy7.menu.millis.enabled=Enabled
+atxy7.menu.millis.enabled=Enabled (default timer)
 atxy7.menu.millis.disabled=Disabled (saves flash)
-atxy7.menu.millis.enabled.build.millis=
-atxy7.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+atxy7.menu.millis.timera=TCA0 (default)
+atxy7.menu.millis.timerd=TCD0 (1-series, breaks PWM on 12,13)
+atxy7.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+atxy7.menu.millis.timerb1=TCB1 (3217,1617 only)
+atxy7.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERA0
+atxy7.menu.millis.disabled.build.millis=-DDISABLEMILLIS -DMILLIS_USE_TIMERD0_A0
+atxy7.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
+atxy7.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
+atxy7.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
+atxy7.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 
 atxy7.menu.neopixelport.porta=PORTA (pins 0~3,18~21)
 atxy7.menu.neopixelport.portb=PORTB (pins 4~11)
@@ -156,7 +164,7 @@ atxy7.build.board=attinyxy7
 atxy7.build.core=arduino
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
+atxy7.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
@@ -274,10 +282,18 @@ atxy6.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy6.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 atxy6.menu.dacvref.disabled.build.dacvref=
 
-atxy6.menu.millis.enabled=Enabled
+atxy6.menu.millis.enabled=Enabled (default timer)
 atxy6.menu.millis.disabled=Disabled (saves flash)
-atxy6.menu.millis.enabled.build.millis=
-atxy6.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+atxy6.menu.millis.timera=TCA0 (default)
+atxy6.menu.millis.timerd=TCD0 (1-series, breaks PWM on 10,11)
+atxy6.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+atxy6.menu.millis.timerb1=TCB1 (3216,1616 only)
+atxy6.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERA0
+atxy6.menu.millis.disabled.build.millis=-DDISABLEMILLIS -DMILLIS_USE_TIMERD0_A0
+atxy6.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
+atxy6.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
+atxy6.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
+atxy6.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 
 atxy6.menu.neopixelport.porta=PORTA (pins 0~3,14~17)
 atxy6.menu.neopixelport.portb=PORTB (pins 4~9)
@@ -310,7 +326,7 @@ atxy6.build.board=attinyxy6
 atxy6.build.core=arduino
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
-atxy6.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
+atxy6.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
 atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude
@@ -433,10 +449,18 @@ atxy4.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy4.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 atxy2.menu.dacvref.disabled.build.dacvref=
 
-atxy4.menu.millis.enabled=Enabled
+atxy4.menu.millis.enabled=Enabled (default timer)
 atxy4.menu.millis.disabled=Disabled (saves flash)
-atxy4.menu.millis.enabled.build.millis=
-atxy4.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+atxy4.menu.millis.timera=TCA0 (default on 804/404/204)
+atxy4.menu.millis.timerd=TCD0 (1614/814/414/214 only, default there)
+atxy4.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+atxy4.menu.millis.timerb1=TCB1 (1614 only)
+atxy4.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
+atxy4.menu.millis.disabled.build.millis=-DDISABLEMILLIS -DMILLIS_USE_TIMERD0_A0
+atxy4.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
+atxy4.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
+atxy4.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
+atxy4.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 
 atxy4.menu.neopixelport.porta=PORTA (pins 0~3,8~11)
 atxy4.menu.neopixelport.portb=PORTB (pins 4~7)
@@ -463,7 +487,7 @@ atxy4.build.board=attinyxy4
 atxy4.build.core=arduino
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
-atxy4.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.uartvoltage}
+atxy4.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.uartpins} {build.twipins} {build.uartvoltage}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
@@ -589,10 +613,16 @@ atxy2.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy2.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 atxy2.menu.dacvref.disabled.build.dacvref=
 
-atxy2.menu.millis.enabled=Enabled
+atxy2.menu.millis.enabled=Enabled (default timer)
 atxy2.menu.millis.disabled=Disabled (saves flash)
-atxy2.menu.millis.enabled.build.millis=
-atxy2.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+atxy2.menu.millis.timera=TCA0 (default on 402/202)
+atxy2.menu.millis.timerd=TCD0 (412/212 only, default there)
+atxy2.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+atxy2.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
+atxy2.menu.millis.disabled.build.millis=-DDISABLEMILLIS -DMILLIS_USE_TIMERD0_A0
+atxy2.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
+atxy2.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
+atxy2.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
 
 atxy2.upload.tool=avrdude
 
@@ -618,7 +648,7 @@ atxy2.build.board=attinyxy2
 atxy2.build.core=arduino
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
-atxy2.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.millis} {build.uartpins} {build.spipins} {build.uartvoltage}
+atxy2.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.uartpins} {build.spipins} {build.uartvoltage}
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
@@ -640,7 +670,7 @@ Xplained416.build.core=arduino
 Xplained416.build.variant=txy6
 Xplained416.build.f_cpu=20000000
 Xplained416.build.text_section_start=.text=0x200
-Xplained416.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
+Xplained416.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
 Xplained416.upload.tool=avrdude
 Xplained416.upload.workaround=
 Xplained416.upload.speed=57600
@@ -684,6 +714,16 @@ Xplained416.menu.millis.enabled=Enabled
 Xplained416.menu.millis.disabled=Disabled (saves flash)
 Xplained416.menu.millis.enabled.build.millis=
 Xplained416.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+Xplained416.menu.millis.enabled=Enabled (default timer)
+Xplained416.menu.millis.disabled=Disabled (saves flash)
+Xplained416.menu.millis.timera=TCA0 (default)
+Xplained416.menu.millis.timerd=TCD0 (1-series, breaks PWM on 10,11)
+Xplained416.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+Xplained416.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERA0
+Xplained416.menu.millis.disabled.build.millis=-DDISABLEMILLIS -DMILLIS_USE_TIMERD0_A0
+Xplained416.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
+Xplained416.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
+Xplained416.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
 
 Xplained416.menu.uartvoltage.5v=Closer to 5v
 Xplained416.menu.uartvoltage.3v=Closer to 3v
@@ -713,7 +753,7 @@ Xplained817.build.core=arduino
 Xplained817.build.variant=txy7
 Xplained817.build.f_cpu=20000000
 Xplained817.build.text_section_start=.text=0x200
-Xplained817.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
+Xplained817.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
 Xplained817.upload.tool=avrdude
 Xplained817.upload.workaround=
 Xplained817.upload.speed=57600
@@ -750,6 +790,17 @@ Xplained817.menu.millis.enabled=Enabled
 Xplained817.menu.millis.disabled=Disabled (saves flash)
 Xplained817.menu.millis.enabled.build.millis=
 Xplained817.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+
+Xplained817.menu.millis.enabled=Enabled (default timer)
+Xplained817.menu.millis.disabled=Disabled (saves flash)
+Xplained817.menu.millis.timera=TCA0 (default)
+Xplained817.menu.millis.timerd=TCD0 (1-series, breaks PWM on 12,13)
+Xplained817.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+Xplained817.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERA0
+Xplained817.menu.millis.disabled.build.millis=-DDISABLEMILLIS -DMILLIS_USE_TIMERD0_A0
+Xplained817.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
+Xplained817.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
+Xplained817.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
 
 Xplained817.menu.neopixelport.porta=PORTA (pins 0~3,18~21)
 Xplained817.menu.neopixelport.portb=PORTB (pins 4~11)
@@ -874,10 +925,18 @@ atxy7o.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy7o.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 atxy7o.menu.dacvref.disabled.build.dacvref=
 
-atxy7o.menu.millis.enabled=Enabled
+atxy7o.menu.millis.enabled=Enabled (default timer)
 atxy7o.menu.millis.disabled=Disabled (saves flash)
-atxy7o.menu.millis.enabled.build.millis=
-atxy7o.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+atxy7o.menu.millis.timera=TCA0 (default)
+atxy7o.menu.millis.timerd=TCD0 (1-series, breaks PWM on 12,13)
+atxy7o.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+atxy7o.menu.millis.timerb1=TCB1 (3217,1617 only)
+atxy7o.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERA0
+atxy7o.menu.millis.disabled.build.millis=-DDISABLEMILLIS -DMILLIS_USE_TIMERD0_A0
+atxy7o.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
+atxy7o.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
+atxy7o.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
+atxy7o.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 
 atxy7o.menu.neopixelport.porta=PORTA (pins 0~3,18~21)
 atxy7o.menu.neopixelport.portb=PORTB (pins 4~11)
@@ -918,7 +977,7 @@ atxy7o.upload.tool=avrdude
 atxy7o.build.board=attinyxy7
 atxy7o.build.core=arduino
 atxy7o.build.variant=txy7
-atxy7o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
+atxy7o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
 atxy7o.build.export_merged_output=true
 
 atxy7o.bootloader.WDTCFG=0x00
@@ -1008,10 +1067,18 @@ atxy6o.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy6o.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 atxy6o.menu.dacvref.disabled.build.dacvref=
 
-atxy6o.menu.millis.enabled=Enabled
+atxy6o.menu.millis.enabled=Enabled (default timer)
 atxy6o.menu.millis.disabled=Disabled (saves flash)
-atxy6o.menu.millis.enabled.build.millis=
-atxy6o.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+atxy6o.menu.millis.timera=TCA0 (default)
+atxy6o.menu.millis.timerd=TCD0 (1-series, breaks PWM on 10,11)
+atxy6o.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+atxy6o.menu.millis.timerb1=TCB1 (3216,1616 only)
+atxy6o.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERA0
+atxy6o.menu.millis.disabled.build.millis=-DDISABLEMILLIS -DMILLIS_USE_TIMERD0_A0
+atxy6o.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
+atxy6o.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
+atxy6o.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
+atxy6o.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 
 atxy6o.menu.neopixelport.porta=PORTA (pins 0~3,14~17)
 atxy6o.menu.neopixelport.portb=PORTB (pins 4~9)
@@ -1074,7 +1141,7 @@ atxy6o.menu.spipins.standard.build.spipins=
 atxy6o.build.board=attinyxy6
 atxy6o.build.core=arduino
 atxy6o.build.variant=txy6
-atxy6o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
+atxy6o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartpins} {build.twipins} {build.spipins} {build.uartvoltage}
 atxy6o.build.export_merged_output=true
 
 atxy6o.upload.workaround=
@@ -1177,10 +1244,18 @@ atxy4o.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy4o.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 atxy4o.menu.dacvref.disabled.build.dacvref=
 
-atxy4o.menu.millis.enabled=Enabled
+atxy4o.menu.millis.enabled=Enabled (default timer)
 atxy4o.menu.millis.disabled=Disabled (saves flash)
-atxy4o.menu.millis.enabled.build.millis=
-atxy4o.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+atxy4o.menu.millis.timera=TCA0 (default on 804/404/204)
+atxy4o.menu.millis.timerd=TCD0 (1614/814/414/214 only, default there)
+atxy4o.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+atxy4o.menu.millis.timerb1=TCB1 (1614 only)
+atxy4o.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
+atxy4o.menu.millis.disabled.build.millis=-DDISABLEMILLIS -DMILLIS_USE_TIMERD0_A0
+atxy4o.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
+atxy4o.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
+atxy4o.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
+atxy4o.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 
 atxy4o.menu.neopixelport.porta=PORTA (pins 0~3,8~11)
 atxy4o.menu.neopixelport.portb=PORTB (pins 4~7)
@@ -1240,7 +1315,7 @@ atxy4o.upload.tool=avrdude
 atxy4o.build.board=attinyxy4
 atxy4o.build.core=arduino
 atxy4o.build.variant=txy4
-atxy4o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.millis} {build.uartpins} {build.twipins} {build.uartvoltage}
+atxy4o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.uartpins} {build.twipins} {build.uartvoltage}
 atxy4o.build.export_merged_output=true
 atxy4o.upload.workaround=
 atxy4o.upload.protocol=arduino
@@ -1341,10 +1416,16 @@ atxy2o.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy2o.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
 atxy2o.menu.dacvref.disabled.build.dacvref=
 
-atxy2o.menu.millis.enabled=Enabled
+atxy2o.menu.millis.enabled=Enabled (default timer)
 atxy2o.menu.millis.disabled=Disabled (saves flash)
-atxy2o.menu.millis.enabled.build.millis=
-atxy2o.menu.millis.disabled.build.millis=-DDISABLEMILLIS
+atxy2o.menu.millis.timera=TCA0 (default on 402/202)
+atxy2o.menu.millis.timerd=TCD0 (412/212 only, default there)
+atxy2o.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+atxy2o.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
+atxy2o.menu.millis.disabled.build.millis=-DDISABLEMILLIS -DMILLIS_USE_TIMERD0_A0
+atxy2o.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
+atxy2o.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
+atxy2o.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
 
 atxy2o.menu.bodvoltage.1v8=1.8V
 atxy2o.menu.bodvoltage.2v15=2.15V
@@ -1387,7 +1468,7 @@ atxy2o.bootloader.tool=avrdude
 atxy2o.build.board=attinyxy2
 atxy2o.build.core=arduino
 atxy2o.build.variant=txy2
-atxy2o.build.extra_flags=-DMILLIS_USE_TIMERA0 -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.millis} {build.uartpins} {build.spipins} {build.uartvoltage}
+atxy2o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.uartpins} {build.spipins} {build.uartvoltage}
 atxy2o.build.export_merged_output=true
 
 atxy2o.menu.uartvoltage.5v=Closer to 5v

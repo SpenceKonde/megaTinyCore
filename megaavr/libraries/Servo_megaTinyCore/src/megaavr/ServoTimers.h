@@ -27,7 +27,7 @@
 #ifndef __SERVO_TIMERS_H__
 #define __SERVO_TIMERS_H__
 
-#ifdef TCB1
+#if defined(TCB1) && (!defined(MILLIS_USE_TIMERB1))
 #define USE_TIMERB1
 #else
 #define USE_TIMERB0

@@ -27,6 +27,15 @@
 const uint32_t F_CPU_CORRECTED = F_CPU;
 
 #ifndef DISABLEMILLIS
+
+#ifdef MILLIS_USE_TIMERD0_A0
+#ifdef TCD0
+#define MILLIS_USE_TIMERD0
+#else
+#define MILLIS_USE_TIMERA0
+#endif
+#endif
+
 volatile uint16_t microseconds_per_timer_overflow;
 volatile uint16_t microseconds_per_timer_tick;
 
@@ -44,8 +53,13 @@ volatile uint32_t timer_overflow_count = 0;
 volatile uint32_t timer_millis = 0;
 static uint16_t timer_fract = 0;
 
+
 inline uint16_t clockCyclesPerMicrosecondComp(uint32_t clk){
+#ifdef MILLIS_USE_TIMERD0
+	return ( 20 ); //this always runs off the 20MHz oscillator
+#else
 	return ( (clk) / 1000000L );
+#endif
 }
 
 inline uint16_t clockCyclesPerMicrosecond(){
@@ -59,15 +73,33 @@ inline unsigned long clockCyclesToMicroseconds(unsigned long cycles){
 inline unsigned long microsecondsToClockCycles(unsigned long microseconds){
 	return ( microseconds * clockCyclesPerMicrosecond() );
 }
-#ifndef MILLIS_USE_TIMERA0
+
+
+
+#ifdef MILLIS_USE_TIMERD0
+#ifndef TCD0
+#error "Selected millis timer, TCD0, only exists on 1-series parts"
+#endif
+#endif
+
+#if !(defined(MILLIS_USE_TIMERA0)||defined(MILLIS_USE_TIMERD0))
 static volatile TCB_t* _timer =
 #if defined(MILLIS_USE_TIMERB0)
 &TCB0;
 #elif defined(MILLIS_USE_TIMERB1)
+#ifndef TCB1
+#error "Selected millis timer, TCB1 does not exist on this part."
+#endif
 &TCB1;
-#elif defined(MILLIS_USE_TIMERB2)
+#elif defined(MILLIS_USE_TIMERB2) //not sure if any parts that support this exist in the tiny line, but it here anyway
+#ifndef TCB2
+#error "Selected millis timer, TCB2 does not exist on this part."
+#endif
 &TCB2;
-#elif defined(MILLIS_USE_TIMERB3)
+#elif defined(MILLIS_USE_TIMERB3)//not sure if any parts that support this exist in the tiny line, but it here anyway
+#ifndef TCB3
+#error "Selected millis timer, TCB3 does not exist on this parts."
+#endif
 &TCB3;
 #else
 #error "No millis timer selected".
@@ -76,6 +108,8 @@ static volatile TCB_t* _timer =
 
 #if defined(MILLIS_USE_TIMERA0)
 ISR(TCA0_LUNF_vect)
+#elif defined(MILLIS_USE_TIMERD0)
+ISR(TCD0_OVF_vect)
 #elif defined(MILLIS_USE_TIMERB0)
 ISR(TCB0_INT_vect)
 #elif defined(MILLIS_USE_TIMERB1)
@@ -106,8 +140,10 @@ ISR(TCB0_INT_vect)
 	timer_overflow_count++;
 
 	/* Clear flag */
-	#ifdef MILLIS_USE_TIMERA0
+	#if defined(MILLIS_USE_TIMERA0)
 	TCA0.SPLIT.INTFLAGS = TCA_SPLIT_LUNF_bm;
+	#elif defined(MILLIS_USE_TIMERD0)
+	TCD0.INTFLAGS=TCD_OVF_bm;
 	#else //timerb
 	_timer->INTFLAGS = TCB_CAPT_bm;
 	#endif
@@ -131,7 +167,12 @@ unsigned long millis()
 
 unsigned long micros() {
 	unsigned long overflows, microseconds;
+
+	#if defined(MILLIS_USE_TIMERD0)
+	uint16_t ticks;
+	#else
 	uint8_t ticks;
+	#endif
 
 	/* Save current state and disable interrupts */
 	uint8_t status = SREG;
@@ -139,14 +180,25 @@ unsigned long micros() {
 
 	/* Get current number of overflows and timer count */
 	overflows = timer_overflow_count;
-	#ifdef MILLIS_USE_TIMERA0
+	#if defined(MILLIS_USE_TIMERA0)
 	ticks = 0xFF-TCA0.SPLIT.LCNT;
+	#elif defined(MILLIS_USE_TIMERD0)
+	TCD0.CTRLE=TCD_SCAPTUREA_bm;
+	while(!(TCD0.STATUS&TCD_CMDRDY_bm)); //wait for sync - should be only one iteration of this loop
+	ticks=TCD0.CAPTUREA;
 	#else
 	ticks = _timer->CNTL;
 	#endif
 	/* If the timer overflow flag is raised, we just missed it,
 	increment to account for it, & read new ticks */
-	#ifdef MILLIS_USE_TIMERA0
+	#if defined(MILLIS_USE_TIMERD0)
+	if(TCD0.INTFLAGS & TCD_OVF_bm){
+		overflows++;
+		TCD0.CTRLE=TCD_SCAPTUREA_bm;
+		while(!(TCD0.STATUS & TCD_CMDRDY_bm)); //wait for sync - should be only one iteration of this loop
+		ticks=TCD0.CAPTUREA;
+	}
+	#elif defined(MILLIS_USE_TIMERA0)
 	if(TCA0.SPLIT.INTFLAGS & TCA_SPLIT_LUNF_bm){
 		overflows++;
 		ticks = 0xFF-TCA0.SPLIT.LCNT;
@@ -192,6 +244,7 @@ void delay(unsigned long ms) //non-millis-timer-dependent delay()
   }
 }
 #endif
+
 
 /* Delay for the given number of microseconds.  Assumes a 1, 4, 5, 8, 10, 16, or 20 MHz clock. */
 void delayMicroseconds(unsigned int us)
@@ -417,9 +470,13 @@ void init()
 	millis_inc = microseconds_per_timer_overflow / 1000;
 	fract_inc = ((microseconds_per_timer_overflow % 1000));
 
-    #ifdef MILLIS_USE_TIMERA0
+    #if defined(MILLIS_USE_TIMERA0)
     TCA0.SPLIT.INTCTRL = TCA_SPLIT_LUNF_bm;
-
+    #elif defined(MILLIS_USE_TIMERD0)
+    TCD0.CMPBCLR=TIME_TRACKING_TIMER_PERIOD; //essentially, this is TOP
+    TCD0.INTCTRL=0x01;//enable interrupt
+    TCD0.CTRLB=0x00; //oneramp mode
+    TCD0.CTRLA=0x11; //set clock source and enable!
     #else //It's a type b timer
 	/* Default Periodic Interrupt Mode */
 	/* TOP value for overflow every 256 clock cycles */

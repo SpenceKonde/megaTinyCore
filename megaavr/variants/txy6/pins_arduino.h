@@ -280,7 +280,7 @@ const uint8_t PROGMEM digital_pin_to_timer[] = {
 	TIMERA0, 		// 8  PB1
 	// Right side, bottom to top
 	TIMERA0, 		// 9  PB0
-	#if (defined(TCD0) && defined(USE_TIMERD0_PWM))
+    #if (defined(TCD0) && defined(USE_TIMERD0_PWM) &&(!defined(MILLIS_USE_TIMERD0)))
 	TIMERD0, 		// 10 PC0
 	TIMERD0, 		// 11 PC1
 	#else
