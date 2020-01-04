@@ -5,6 +5,8 @@
 * Reduce flash usage of Wire library significantly (#128, #129, #130)
 * Add DAC disabled option (saves flash)
 * Fix issue with UART baud rate calculation (#131)
+* Add menu option to control timer used for millis/micros (#124, #132)
+* Default millis timer for 412,212,1614,814,414,214 changed to TCD0, as it's not used for anything else (#124)
 
 1.1.2
 * Fix critical issue compiling for 24-pin parts (#118)
