@@ -1,3 +1,5 @@
+1.1.4
+
 1.1.3
 * Fix issue with PWM duty cycle and analogWrite(pin,255) (#123)
 * Fix issue with some UPDI programmers (#125, #126)
