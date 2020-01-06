@@ -81,6 +81,7 @@ void setup_timers() {
     TCD0.CTRLA=0x10; //OSC20M prescaled by 32, gives ~1.2 khz PWM at 20MHz.
     #endif
     #endif
+}
 
 void initVariant() {
     // NA
