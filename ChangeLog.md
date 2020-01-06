@@ -1,4 +1,5 @@
 1.1.4
+* Correct issue introduced with 1.1.3 that broke compile for 20-pin parts (#134)
 
 1.1.3
 * Fix issue with PWM duty cycle and analogWrite(pin,255) (#123)
