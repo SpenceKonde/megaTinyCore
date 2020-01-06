@@ -44,15 +44,20 @@ volatile uint16_t microseconds_per_timer_tick;
 uint16_t millis_inc;
 
 // the fractional number of milliseconds per timer overflow
+
+#if !defined(MILLIS_USE_TIMERRTC)
 uint16_t fract_inc;
 #define FRACT_MAX (1000)
+#endif
 
 // whole number of microseconds per timer tick
 
-volatile uint32_t timer_overflow_count = 0;
+//volatile uint32_t timer_overflow_count = 0; //variable appears to be unused.
 volatile uint32_t timer_millis = 0;
-static uint16_t timer_fract = 0;
 
+#if !defined(MILLIS_USE_TIMERRTC)
+static uint16_t timer_fract = 0;
+#endif
 
 inline uint16_t clockCyclesPerMicrosecondComp(uint32_t clk){
 #ifdef MILLIS_USE_TIMERD0
@@ -82,7 +87,7 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds){
 #endif
 #endif
 
-#if !(defined(MILLIS_USE_TIMERA0)||defined(MILLIS_USE_TIMERD0))
+#if !(defined(MILLIS_USE_TIMERA0)||defined(MILLIS_USE_TIMERD0)||defined(MILLIS_USE_TIMERRTC))
 static volatile TCB_t* _timer =
 #if defined(MILLIS_USE_TIMERB0)
 &TCB0;
@@ -110,6 +115,8 @@ static volatile TCB_t* _timer =
 ISR(TCA0_LUNF_vect)
 #elif defined(MILLIS_USE_TIMERD0)
 ISR(TCD0_OVF_vect)
+#elif defined(MILLIS_USE_TIMERRTC)
+ISR(RTC_OVF_vect)
 #elif defined(MILLIS_USE_TIMERB0)
 ISR(TCB0_INT_vect)
 #elif defined(MILLIS_USE_TIMERB1)
@@ -125,6 +132,8 @@ ISR(TCB0_INT_vect)
 {
 	// copy these to local variables so they can be stored in registers
 	// (volatile variables must be read from memory on every access)
+	
+        #if !defined(MILLIS_USE_TIMERRTC)
 	uint32_t m = timer_millis;
 	uint16_t f = timer_fract;
 	m += millis_inc;
@@ -137,13 +146,17 @@ ISR(TCB0_INT_vect)
 
 	timer_fract = f;
 	timer_millis = m;
-	timer_overflow_count++;
-
+	//timer_overflow_count++; //why is this even here? it is never used!
+        #else
+	timer_millis+=millis_inc;
+	#endif
 	/* Clear flag */
 	#if defined(MILLIS_USE_TIMERA0)
 	TCA0.SPLIT.INTFLAGS = TCA_SPLIT_LUNF_bm;
 	#elif defined(MILLIS_USE_TIMERD0)
 	TCD0.INTFLAGS=TCD_OVF_bm;
+	#elif defined(MILLIS_USE_TIMERRTC)
+	RTC.INTFLAGS=RTC_OVF_bm;
 	#else //timerb
 	_timer->INTFLAGS = TCB_CAPT_bm;
 	#endif
@@ -159,12 +172,14 @@ unsigned long millis()
 	uint8_t status = SREG;
 	cli();
 	m = timer_millis;
-
+	#ifdef MILLIS_USE_TIMERRTC
+	//to do: implement millis for RTC timer, as the value of the RTC is very important here.
+	#endif
 	SREG = status;
-
+	
 	return m;
 }
-
+#ifndef MILLIS_USE_TIMERRTC
 unsigned long micros() {
 	unsigned long overflows, microseconds;
 
@@ -219,8 +234,11 @@ unsigned long micros() {
 				+ (ticks * microseconds_per_timer_tick));
 	return microseconds;
 }
+#endif //end of non-RTC micros code
+#endif //end of non-DISABLE_MILLIS code
 
-void delay(unsigned long ms)
+#if !(defined(DISABLE_MILLIS) || defined(MILLIS_USE_TIMERRTC)) //delay implementation when we do have micros()
+void delay(unsigned long ms) 
 {
 	uint32_t start_time = micros(), delay_time = 1000*ms;
 
@@ -236,8 +254,8 @@ void delay(unsigned long ms)
 	/* Wait until return time */
 	while(micros() < return_time);
 }
-#else
-void delay(unsigned long ms) //non-millis-timer-dependent delay()
+#else //delay implementation when we do not
+void delay(unsigned long ms) 
 {
   while(ms--){
     delayMicroseconds(1000);
@@ -477,6 +495,8 @@ void init()
     TCD0.INTCTRL=0x01;//enable interrupt
     TCD0.CTRLB=0x00; //oneramp mode
     TCD0.CTRLA=0x11; //set clock source and enable!
+    #elif defined(MILLIS_USE_TIMERRTC)
+    // to do: add support for RTC timer initialization
     #else //It's a type b timer
 	/* Default Periodic Interrupt Mode */
 	/* TOP value for overflow every 256 clock cycles */
