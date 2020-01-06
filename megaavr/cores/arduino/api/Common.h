@@ -109,7 +109,9 @@ void analogWrite(pin_size_t pinNumber, int value);
 
 #ifndef DISABLEMILLIS
 unsigned long millis(void);
+#ifndef MILLIS_USE_TIMER_RTC
 unsigned long micros(void);
+#endif
 #endif
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
