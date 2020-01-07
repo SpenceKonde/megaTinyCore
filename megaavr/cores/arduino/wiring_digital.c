@@ -26,15 +26,12 @@
 #include "wiring_private.h"
 #include "pins_arduino.h"
 
-__attribute__((weak))  bool isDoubleBondedActive(uint8_t pin __attribute__((unused))) {
-	return false;
-};
 
 void pinMode(uint8_t pin, PinMode mode)
 {
 	uint8_t bit_mask = digitalPinToBitMask(pin);
 
-	if ((bit_mask == NOT_A_PIN) || (mode > INPUT_PULLUP) || isDoubleBondedActive(pin)) return;
+	if ((bit_mask == NOT_A_PIN) || (mode > INPUT_PULLUP)) return;
 
 	PORT_t* port = digitalPinToPortStruct(pin);
 	if(port == NULL) return;
@@ -148,7 +145,7 @@ void digitalWrite(uint8_t pin, PinStatus val)
 {
 	/* Get bit mask for pin */
 	uint8_t bit_mask = digitalPinToBitMask(pin);
-	if(bit_mask == NOT_A_PIN || isDoubleBondedActive(pin)) return;
+	if(bit_mask == NOT_A_PIN) return;
 
 	/* Turn off PWM if applicable */
 
@@ -211,7 +208,7 @@ PinStatus digitalRead(uint8_t pin)
 {
 	/* Get bit mask and check valid pin */
 	uint8_t bit_mask = digitalPinToBitMask(pin);
-	if(bit_mask == NOT_A_PIN || isDoubleBondedActive(pin)) return LOW;
+	if(bit_mask == NOT_A_PIN) return LOW;
 
 	// If the pin that support PWM output, we need to turn it off
 	// before getting a digital reading.

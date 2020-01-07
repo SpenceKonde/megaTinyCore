@@ -71,7 +71,7 @@ extern "C"{
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
 
-/* Allows performing a correction on the CPU value using the signature row 
+/* Allows performing a correction on the CPU value using the signature row
 	values indicating oscillator error provided from the device manufacturer */
 #define PERFORM_SIGROW_CORRECTION_F_CPU 0
 
@@ -121,11 +121,10 @@ extern const uint8_t PROGMEM digital_pin_to_timer[];
 #define DACOUT 9
 
 void setup_timers();
-bool isDoubleBondedActive(uint8_t pin);
 
 #define digitalPinToPort(pin) ( (pin < NUM_TOTAL_PINS) ? pgm_read_byte(digital_pin_to_port + pin) : NOT_A_PIN )
 #define digitalPinToBitPosition(pin) ( (pin < NUM_TOTAL_PINS) ? pgm_read_byte(digital_pin_to_bit_position + pin) : NOT_A_PIN )
-#define analogPinToBitPosition(pin) ( (digitalPinToAnalogInput(pin)!=NOT_A_PIN) ? pgm_read_byte(digital_pin_to_bit_position + pin + 0) : NOT_A_PIN ) 
+#define analogPinToBitPosition(pin) ( (digitalPinToAnalogInput(pin)!=NOT_A_PIN) ? pgm_read_byte(digital_pin_to_bit_position + pin + 0) : NOT_A_PIN )
 #define digitalPinToBitMask(pin) ( (pin < NUM_TOTAL_PINS) ? pgm_read_byte(digital_pin_to_bit_mask + pin) : NOT_A_PIN )
 #define analogPinToBitMask(pin) ( (digitalPinToAnalogInput(pin)!=NOT_A_PIN) ? pgm_read_byte(digital_pin_to_bit_mask + pin + 0) : NOT_A_PIN )
 #define digitalPinToTimer(pin) ( (pin < NUM_TOTAL_PINS) ? pgm_read_byte(digital_pin_to_timer + pin) : NOT_ON_TIMER )

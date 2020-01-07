@@ -75,11 +75,6 @@ int analogRead(uint8_t pin)
 	pin = digitalPinToAnalogInput(pin);
 	if(pin == NOT_A_PIN) return -1;
 
-	/* Check if TWI is operating on double bonded pin (Master Enable is high
-		in both Master and Slave mode for bus error detection, so this can
-		indicate an active state for Wire) */
-	if(isDoubleBondedActive(pin)) return 0;
-
 
 #if defined(ADC0)
 	/* Reference should be already set up */
@@ -107,7 +102,7 @@ int analogRead(uint8_t pin)
 void analogWrite(uint8_t pin, int val)
 {
 	uint8_t bit_pos  = digitalPinToBitPosition(pin);
-	if(bit_pos == NOT_A_PIN || isDoubleBondedActive(pin)) return;
+	if(bit_pos == NOT_A_PIN) return;
 	// We need to make sure the PWM output is enabled for those pins
 	// that support it, as we turn it off when digitally reading or
 	// writing with them.  Also, make sure the pin is in output mode
