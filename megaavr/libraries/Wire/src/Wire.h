@@ -31,11 +31,7 @@
 #endif
 // WIRE_HAS_END means Wire has end()
 #define WIRE_HAS_END 1
-#ifdef WIRE_COMPACT
 class TwoWire : public Stream
-#else 
-class TwoWire : public HardwareI2C
-#endif
 {
   private:
     static uint8_t rxBuffer[];
