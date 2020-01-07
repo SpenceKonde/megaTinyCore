@@ -24,7 +24,6 @@
 
 // the prescaler is set so that timer ticks every 64 clock cycles, and the
 // the overflow handler is called every 256 ticks.
-const uint32_t F_CPU_CORRECTED = F_CPU;
 
 #ifndef DISABLEMILLIS
 
@@ -52,7 +51,7 @@ uint16_t fract_inc;
 
 // whole number of microseconds per timer tick
 
-volatile uint32_t timer_overflow_count = 0; //variable appears to be unused.
+volatile uint32_t timer_overflow_count = 0;
 volatile uint32_t timer_millis = 0;
 
 #if !defined(MILLIS_USE_TIMERRTC)
@@ -72,7 +71,7 @@ inline uint16_t clockCyclesPerMicrosecondComp(uint32_t clk){
 }
 
 inline uint16_t clockCyclesPerMicrosecond(){
-	return clockCyclesPerMicrosecondComp(F_CPU_CORRECTED);
+	return clockCyclesPerMicrosecondComp(F_CPU);
 }
 
 inline unsigned long clockCyclesToMicroseconds(unsigned long cycles){
