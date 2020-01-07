@@ -1,5 +1,7 @@
 1.1.4
 * Correct issue introduced with 1.1.3 that broke compile for 20-pin parts (#134)
+* Correct issue when Timer D is specified explicitly as the millis timer
+* Correct issue when Timer D is used as the millis timer when clock speed is not 20/10/5MHz
 
 1.1.3
 * Fix issue with PWM duty cycle and analogWrite(pin,255) (#123)
