@@ -7,7 +7,7 @@
 #endif
 #define TIME_TRACKING_TICKS_PER_OVF		(TIME_TRACKING_TIMER_PERIOD + 1)	/* Timer ticks per overflow of TCB3 */
 
-#if (defined(MILLIS_USE_TIMERD0_A0) && defined(TCD0))
+#if (defined(MILLIS_USE_TIMERD0_A0) && defined(TCD0) || defined(MILLIS_USE_TIMERD0))
 #define TIME_TRACKING_TIMER_DIVIDER		32		/* Clock divider for TCB3 */
 #else
 #define TIME_TRACKING_TIMER_DIVIDER		64		/* Clock divider for TCB3 */
