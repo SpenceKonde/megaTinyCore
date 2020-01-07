@@ -75,12 +75,6 @@ extern "C"{
 	values indicating oscillator error provided from the device manufacturer */
 #define PERFORM_SIGROW_CORRECTION_F_CPU 0
 
-/* Variable containing corrected F_CPU value, after checks for safe operating
-	frequency vs supply voltage, oscillator fuse setting and MCLK divider.
-	Also includes the correction from signature row values if above #define
-	PERFORM_SIGROW_CORRECTION_F_CPU = 1 */
-extern const uint32_t F_CPU_CORRECTED;
-
 uint16_t clockCyclesPerMicrosecondComp(uint32_t clk);
 uint16_t clockCyclesPerMicrosecond();
 unsigned long clockCyclesToMicroseconds(unsigned long cycles);

@@ -1,7 +1,7 @@
 /* Tone.cpp
 
-  A Tone Generator Library 
-  
+  A Tone Generator Library
+
   Written by Brett Hagman
 
   This library is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-  
+
   -------- ----------- -------- --------
   0001    B Hagman    09/08/02 Initial coding
   0002    B Hagman    09/08/18 Multiple pins
@@ -40,13 +40,13 @@
 #include "pins_arduino.h"
 
 /* For more than one tone, change AVAILABLE_TONE_PINS and uncomment the correct
-    number of timers 
+    number of timers
 */
-#define AVAILABLE_TONE_PINS 1    
+#define AVAILABLE_TONE_PINS 1
 
 /*
-#define USE_TIMERB1        
-#define USE_TIMERB2        
+#define USE_TIMERB1
+#define USE_TIMERB2
 */
 #define USE_TIMERB0        // interferes with PWM on pin 6
 
@@ -55,7 +55,7 @@
     /* Please uncomment a timer above and rebuild */
 #endif
 
-// Can't use TIMERB3 -- used for application time tracking 
+// Can't use TIMERB3 -- used for application time tracking
 // Using TIMERA0 NOT RECOMMENDED -- all other timers use its clock!
 static volatile TCB_t* _timer =
 #if defined(USE_TIMERB0)
@@ -104,12 +104,12 @@ void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
     }
 
     // Calculate compare value
-    compare_val = F_CPU_CORRECTED / frequency / 2 - 1;
+    compare_val = F_CPU / frequency / 2 - 1;
     // If compare larger than 16bits, need to prescale (will be DIV64)
     uint8_t prescaler_needed = 0;
     if (compare_val > 0xFFFF){
         // recalculate with new prescaler
-        compare_val = F_CPU_CORRECTED / frequency / 2 / 64 - 1;
+        compare_val = F_CPU / frequency / 2 / 64 - 1;
         prescaler_needed = 1;
     }
 
@@ -167,7 +167,7 @@ void noTone(uint8_t pin)
 }
 
 // helper function for noTone()
-/* Works for all timers -- the timer being disabled will go back to the 
+/* Works for all timers -- the timer being disabled will go back to the
     configuration it had to output PWM for analogWrite() */
 static void disableTimer()
 {

@@ -27,6 +27,9 @@
 
 #ifndef DISABLEMILLIS
 
+#define FRACT_INC
+#define MILLIS_INC
+
 #ifdef MILLIS_USE_TIMERD0_A0
 #ifdef TCD0
 #define MILLIS_USE_TIMERD0
