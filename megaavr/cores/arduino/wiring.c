@@ -27,8 +27,9 @@
 
 #ifndef DISABLEMILLIS
 
-#define FRACT_INC
-#define MILLIS_INC
+
+#define FRACT_INC (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)%1000);
+#define MILLIS_INC (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/1000);
 
 #ifdef MILLIS_USE_TIMERD0_A0
 #ifdef TCD0
@@ -142,8 +143,8 @@ ISR(TCB0_INT_vect)
     #if !defined(MILLIS_USE_TIMERRTC)
 	uint32_t m = timer_millis;
 	uint16_t f = timer_fract;
-	m += millis_inc;
-	f += fract_inc;
+	m += MILLIS_INC;
+	f += FRACT_INC;
 	if (f >= FRACT_MAX) {
 
 		f -= FRACT_MAX;
@@ -154,7 +155,7 @@ ISR(TCB0_INT_vect)
 	timer_millis = m;
 	timer_overflow_count++;
     #else
-	timer_millis+=millis_inc;
+	timer_millis+=MILLIS_INC;
 	#endif
 	/* Clear flag */
 	#if defined(MILLIS_USE_TIMERA0)
@@ -185,6 +186,7 @@ unsigned long millis()
 
 	return m;
 }
+
 #ifndef MILLIS_USE_TIMERRTC
 unsigned long micros() {
 	unsigned long overflows, microseconds;
@@ -236,8 +238,8 @@ unsigned long micros() {
 	SREG = status;
 
 	/* Return microseconds of up time  (resets every ~70mins) */
-	microseconds = ((overflows * microseconds_per_timer_overflow)
-				+ (ticks * microseconds_per_timer_tick));
+	microseconds = ((overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+				+ (ticks * (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/TIME_TRACKING_TIMER_PERIOD)));
 	return microseconds;
 }
 #endif //end of non-RTC micros code
@@ -488,11 +490,6 @@ void init()
 	/********************* TIMER for system time tracking **************************/
 
 	/* Calculate relevant time tracking values */
-	microseconds_per_timer_overflow = clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF);
-	microseconds_per_timer_tick = microseconds_per_timer_overflow/TIME_TRACKING_TIMER_PERIOD;
-
-	millis_inc = microseconds_per_timer_overflow / 1000;
-	fract_inc = ((microseconds_per_timer_overflow % 1000));
 
     #if defined(MILLIS_USE_TIMERA0)
     TCA0.SPLIT.INTCTRL = TCA_SPLIT_LUNF_bm;
