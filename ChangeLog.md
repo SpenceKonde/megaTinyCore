@@ -1,3 +1,8 @@
+1.1.5
+* Reduce flash used by millis/micros() (#135)
+* Undo change that broke #130
+* Eliminate variants.c (#40)
+
 1.1.4
 * Correct issue introduced with 1.1.3 that broke compile for 20-pin parts (#134)
 * Correct issue when Timer D is specified explicitly as the millis timer
