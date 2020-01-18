@@ -215,31 +215,57 @@ unsigned long micros() {
 	/* If the timer overflow flag is raised, we just missed it,
 	increment to account for it, & read new ticks */
 	#if defined(MILLIS_USE_TIMERD0)
-	if(TCD0.INTFLAGS & TCD_OVF_bm){
-		overflows++;
+	if ((TCD0.INTFLAGS & TCD_OVF_bm) && (ticks < TIME_TRACKING_TIMER_PERIOD)){
 		TCD0.CTRLE=TCD_SCAPTUREA_bm;
 		while(!(TCD0.STATUS & TCD_CMDRDY_bm)); //wait for sync - should be only one iteration of this loop
-		ticks=TCD0.CAPTUREA;
+		//ticks=TCD0.CAPTUREA;
+		overflows++;
 	}
 	#elif defined(MILLIS_USE_TIMERA0)
-	if(TCA0.SPLIT.INTFLAGS & TCA_SPLIT_LUNF_bm){
+	if ((TCA0.SPLIT.INTFLAGS & TCA_SPLIT_LUNF_bm ) && (ticks < TIME_TRACKING_TIMER_PERIOD)){
+		//ticks = 0xFF-TCA0.SPLIT.LCNT;
 		overflows++;
-		ticks = 0xFF-TCA0.SPLIT.LCNT;
 
 	}
 	#else
-	if(_timer->INTFLAGS & TCB_CAPT_bm){
+	if ((_timer->INTFLAGS & TCB_CAPT_bm) && (ticks < TIME_TRACKING_TIMER_PERIOD)){
+		//ticks = _timer->CNTL;
 		overflows++;
-		ticks = _timer->CNTL;
 	}
 	#endif
 
 	/* Restore state */
 	SREG = status;
 
-	/* Return microseconds of up time  (resets every ~70mins) */
-	microseconds = ((overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-				+ (ticks * (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/TIME_TRACKING_TIMER_PERIOD)));
+	#ifdef MILLIS_USE_TIMERD0
+	#if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL)
+	microseconds = ((overflows * (TIME_TRACKING_CYCLES_PER_OVF/(20)))
+				+ (ticks * ((TIME_TRACKING_CYCLES_PER_OVF)/(20)/TIME_TRACKING_TIMER_PERIOD)));
+	#else
+	microseconds = ((overflows * (TIME_TRACKING_CYCLES_PER_OVF/(16)))
+				+ (ticks * ((TIME_TRACKING_CYCLES_PER_OVF)/(16)/TIME_TRACKING_TIMER_PERIOD)));
+	#endif
+	#else
+	/*
+	#if (F_CPU==20000001UL && TIME_TRACKING_TICKS_PER_OVF==256 && TIME_TRACKING_TIMER_DIVIDER==64)
+	microseconds=(overflows<<8)+ticks;
+	microseconds=microseconds*3-(microseconds>>4)+(microseconds>>2);
+	#elif (F_CPU==10000000UL && TIME_TRACKING_TICKS_PER_OVF==256 && TIME_TRACKING_TIMER_DIVIDER==64)
+	microseconds=(overflows<<8)+ticks;
+	microseconds=microseconds*6-(microseconds>>3)+(microseconds>>1);
+	#elif (F_CPU==5000000UL && TIME_TRACKING_TICKS_PER_OVF==256 && TIME_TRACKING_TIMER_DIVIDER==64)
+	microseconds=(overflows<<8)+ticks;
+	microseconds=(microseconds*12-(microseconds>>2))+microseconds;
+	#else //fallback
+	#warning "fallback"
+	*/
+	//microseconds = ((overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+	//			+ (ticks * (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/TIME_TRACKING_TIMER_PERIOD)));
+	microseconds = ((overflows * (TIME_TRACKING_CYCLES_PER_OVF/(F_CPU/1000000UL)))
+				+ (ticks * ((TIME_TRACKING_CYCLES_PER_OVF)/(F_CPU/1000000UL)/TIME_TRACKING_TIMER_PERIOD)));
+	//#endif //end of other timer speed specific micros calculations
+	#endif //end of timerd vs non-timer-d for micros calculations
+
 	return microseconds;
 }
 #endif //end of non-RTC micros code
