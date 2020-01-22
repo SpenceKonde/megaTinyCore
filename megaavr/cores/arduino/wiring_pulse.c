@@ -52,7 +52,7 @@ unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
 		return 0;
 }
 
-#ifndef DISABLEMILLIS
+#if !(defined(DISABLEMILLIS) || defined(MILLIS_USE_TIMERRTC)|| defined(MILLIS_USE_TIMERRT_XTAL))
 /* Measures the length (in microseconds) of a pulse on the pin; state is HIGH
  * or LOW, the type of pulse to measure.  Works on pulses from 2-3 microseconds
  * to 3 minutes in length, but must be called at least a few dozen microseconds

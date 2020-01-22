@@ -27,10 +27,6 @@
 
 #ifndef DISABLEMILLIS
 
-
-#define FRACT_INC (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)%1000);
-#define MILLIS_INC (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/1000);
-
 #ifdef MILLIS_USE_TIMERD0_A0
 #ifdef TCD0
 #define MILLIS_USE_TIMERD0
@@ -38,28 +34,30 @@
 #define MILLIS_USE_TIMERA0
 #endif
 #endif
+#ifdef MILLIS_USE_TIMERRTC_XTAL
+#define MILLIS_USE_TIMERRTC
+#endif
 
 volatile uint16_t microseconds_per_timer_overflow;
 volatile uint16_t microseconds_per_timer_tick;
 
 
-// the whole number of milliseconds per timer overflow
-uint16_t millis_inc;
-
-// the fractional number of milliseconds per timer overflow
-
-#if !defined(MILLIS_USE_TIMERRTC)
+#if !defined(MILLIS_USE_TIMERRTC) //all of this stuff is not used when the RTC is used as the timekeeping timer
+static uint16_t timer_fract = 0;
 uint16_t fract_inc;
+volatile uint32_t timer_millis = 0;
 #define FRACT_MAX (1000)
+#define FRACT_INC (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)%1000);
+#define MILLIS_INC (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/1000);
+volatile uint32_t timer_overflow_count = 0;
+#else
+volatile uint16_t timer_overflow_count = 0;
 #endif
 
-// whole number of microseconds per timer tick
+//overflow count is tracked for all timer options, even the RTC
 
-volatile uint32_t timer_overflow_count = 0;
-volatile uint32_t timer_millis = 0;
 
 #if !defined(MILLIS_USE_TIMERRTC)
-static uint16_t timer_fract = 0;
 #endif
 
 inline uint16_t clockCyclesPerMicrosecondComp(uint32_t clk){
@@ -123,7 +121,7 @@ ISR(TCA0_LUNF_vect)
 #elif defined(MILLIS_USE_TIMERD0)
 ISR(TCD0_OVF_vect)
 #elif defined(MILLIS_USE_TIMERRTC)
-ISR(RTC_OVF_vect)
+ISR(RTC_CNT_vect)
 #elif defined(MILLIS_USE_TIMERB0)
 ISR(TCB0_INT_vect)
 #elif defined(MILLIS_USE_TIMERB1)
@@ -153,10 +151,10 @@ ISR(TCB0_INT_vect)
 
 	timer_fract = f;
 	timer_millis = m;
-	timer_overflow_count++;
-    #else
-	timer_millis+=MILLIS_INC;
 	#endif
+	//if RTC is used as timer, we only increment the overflow count
+	timer_overflow_count++;
+
 	/* Clear flag */
 	#if defined(MILLIS_USE_TIMERA0)
 	TCA0.SPLIT.INTFLAGS = TCA_SPLIT_LUNF_bm;
@@ -178,11 +176,20 @@ unsigned long millis()
 	// inconsistent value (e.g. in the middle of a write to timer0_millis)
 	uint8_t status = SREG;
 	cli();
-	m = timer_millis;
 	#ifdef MILLIS_USE_TIMERRTC
-	//to do: implement millis for RTC timer, as the value of the RTC is very important here.
-	#endif
+	m=timer_overflow_count;
+	if (RTC.INTFLAGS & RTC_OVF_bm) { //there has just been an overflow that hasn't been accounted for by the interrupt
+		m++;
+	}
 	SREG = status;
+	m=(m<<16);
+	m+=RTC_CNT;
+	//now correct for there being 1000ms to the second instead of 1024
+	m=m-(m>>5)-(m>>6);
+	#else
+	m = timer_millis;
+	SREG = status;
+	#endif
 
 	return m;
 }
@@ -526,6 +533,17 @@ void init()
     TCD0.CTRLA=0x11; //set clock source and enable!
     #elif defined(MILLIS_USE_TIMERRTC)
     // to do: add support for RTC timer initialization
+    RTC.PER=0xFFFF;
+    #ifdef MILLIS_USE_TIMERRTC_XTAL
+    _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA,0x03);
+    RTC.CLKSEL=2; //external crystal
+    #else
+    _PROTECTED_WRITE(CLKCTRL.OSC32KCTRLA,0x02);
+    //RTC.CLKSEL=0; this is the power on value
+    #endif
+    RTC.INTCTRL=0x01; //enable overflow interupt
+    RTC.CTRLA=0xA9;  //fire it up, prescale by 32.
+
     #else //It's a type b timer
 	/* Default Periodic Interrupt Mode */
 	/* TOP value for overflow every 256 clock cycles */
