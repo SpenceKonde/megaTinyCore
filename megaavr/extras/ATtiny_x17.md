@@ -14,7 +14,10 @@ DAC | Yes | Yes | Yes | Yes
 PWM Channels | 8 | 8 | 8 | 8 
 Timer Type B | 1 | 1 | 2 | 2 
 Interfaces | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C 
-Clock options | Internal 16/20mhz | Internal 16/20mhz | Internal 16/20mhz | Internal 16/20mhz 
+Clock options | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz 
+
+#### Millis/micros timer options
+All parts default to using TCA0 for millis/micros. All options are supported, except on the 417 and 817, where TCB1 is not supported as these parts do not have a TCB1. If RTC with external crystal is used, the crystal and associated loading caps must be connected to pins 8 and 9, and those pins may not be used for other purposes - this means if Serial it to be used, the alternate pins must be selected.  
 
 
 ### Buy official megaTinyCore breakouts and support continued development!
