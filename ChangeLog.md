@@ -4,6 +4,7 @@
 * Eliminate variants.c (#40)
 * Fix issue with disabling millis not working correctly
 * Add option to use RTC as millis timer (#133)
+* Correct and update part-specific docs
 
 1.1.4
 * Correct issue introduced with 1.1.3 that broke compile for 20-pin parts (#134)
