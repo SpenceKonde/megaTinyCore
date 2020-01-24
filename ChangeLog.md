@@ -1,3 +1,6 @@
+1.1.6
+* Remove option for RTC using external crystal on 412/212/402/202 - these do not support it.
+
 1.1.5
 * Reduce flash used by millis/micros() (#135)
 * Undo change that broke #130
