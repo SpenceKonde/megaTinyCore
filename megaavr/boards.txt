@@ -631,14 +631,12 @@ atxy2.menu.millis.timera=TCA0 (default on 402/202)
 atxy2.menu.millis.timerd=TCD0 (412/212 only, default there)
 atxy2.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 atxy2.menu.millis.rtc=RTC (no micros)
-atxy2.menu.millis.rtcxtal=RTC w/w32khz xtal (no micros)
 atxy2.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
 atxy2.menu.millis.disabled.build.millis=-DDISABLE_MILLIS -DMILLIS_USE_TIMERD0_A0
 atxy2.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
 atxy2.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
 atxy2.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
 atxy2.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
-atxy2.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
 
 atxy2.upload.tool=avrdude
 
@@ -1458,14 +1456,12 @@ atxy2o.menu.millis.timera=TCA0 (default on 402/202)
 atxy2o.menu.millis.timerd=TCD0 (412/212 only, default there)
 atxy2o.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 atxy2o.menu.millis.rtc=RTC (no micros)
-atxy2o.menu.millis.rtcxtal=RTC w/w32khz xtal (no micros)
 atxy2o.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
 atxy2o.menu.millis.disabled.build.millis=-DDISABLE_MILLIS -DMILLIS_USE_TIMERD0_A0
 atxy2o.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
 atxy2o.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
 atxy2o.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
 atxy2o.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
-atxy2o.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
 
 atxy2o.menu.bodvoltage.1v8=1.8V
 atxy2o.menu.bodvoltage.2v15=2.15V
