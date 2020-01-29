@@ -29,6 +29,7 @@ When the interrupt condition occurs, the bit int PORTx.INTFLAGS corresponding to
 
 ### A basic example for the x16/x06
 
+```cpp
     unsigned long previousMillis;
     byte ledState;
     volatile byte interrupt1;
@@ -93,6 +94,7 @@ When the interrupt condition occurs, the bit int PORTx.INTFLAGS corresponding to
     ISR(PORTC_PORT_vect) {
       _PROTECTED_WRITE(RSTCTRL.SWRR,1); //virtual reset
     }
+```
 
 ### Syncronous and Asynchronous pins
 Certain pins (pin 2 and 6 in each port) are "fully asyncronous" - These pins have several special properties:
