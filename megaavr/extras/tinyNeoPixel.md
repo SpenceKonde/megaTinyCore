@@ -13,20 +13,20 @@ There are two versions of this library provided. `tinyNeoPixel` implements the e
 ### API Summary
 
 
-`tinyNeoPixel(uint16_t n, uint8_t p=6, neoPixelType t=NEO_GRB)` constructor for tinyNeoPixel - the first argument is is the number of LEDs in the string, the second is the pin, and the final argument is the color order of the LEDs in use; the library provides #defines for every possible color order for RGB and RGBW LEDs (full list below)
+`tinyNeoPixel(uint16_t n, uint8_t p=6, neoPixelType t=NEO_GRB)` constructor for tinyNeoPixel - the first argument is is the number of LEDs in the string, the second is the pin, and the final argument is the color order of the LEDs in use; the library provides #defines for every possible color order for RGB and RGBW LEDs (full list below).
 
 `tinyNeoPixel()` - empty constructor, set pin and length later with setPin(), updateLength(), and updateType().
 
 `tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t,uint8_t *pxl);` constructor for tinyNeoPixel_Static - the final argument is a uint_8 (byte) array sized to accomodate the data to be sent to the LED. For example:
 
 
-  >#include <"tinyNeoPixel_Static.h">                 <br/>
-  >#define NUMLEDS 10                                 <br/>
-  >byte pixels[NUMLEDS*3];                            <br/>
-  >tinyNeoPixel(NUMPIXELS, 5, NEO_GRB, pixels);       <br/>
-  >void setup() {                                     <br/>
-  >  pinMode(5,OUTPUT);                               <br/>
-  >}
+    #include <"tinyNeoPixel_Static.h">
+    #define NUMLEDS 10
+    byte pixels[NUMLEDS*3];
+    tinyNeoPixel(NUMPIXELS, 5, NEO_GRB, pixels);
+    void setup() {
+      pinMode(5,OUTPUT);
+    }
 
 
 `begin()` Enable the LEDs, on tinyNeoPixel, must be called before show() - not applicable for tinyNeoPixel_Static
@@ -43,7 +43,7 @@ There are two versions of this library provided. `tinyNeoPixel` implements the e
 
 `clear()` clear the pixel buffer (set all colors on all LEDs to 0)
 
-`setPin(uint8_t p)` Set the pin for output. At 8 or 10MHz, this must be on the port selected from the tools -> tinyNeoPixel Port submenu. Note that in tinyNeoPixel, the old pin is set input, and the new pin set OUTPUT and written LOW. This is not done on tinyNeoPixel_Static for the reasons described above.
+`setPin(uint8_t p)` Set the pin for output. At 8 or 10MHz, this must be on the port selected from the tools -> tinyNeoPixel Port submenu. Note that in tinyNeoPixel, the old pin is set as input, and the new pin is set as OUTPUT and written LOW. This is not done on tinyNeoPixel_Static for the reasons described above.
 
 `updateLength(uint16_t n)` Set the length of the string of LEDs. Not available on tinyNeoPixel_Static.
 
@@ -67,35 +67,35 @@ There are two versions of this library provided. `tinyNeoPixel` implements the e
 These are the same names for the #defines used by Adafruit_NeoPixel; these are used for the third argument to tinyNeoPixel().
 
 #### For RGB LEDs
->NEO_RGB            <br/>
->NEO_RBG            <br/>
->NEO_GRB            <br/>
->NEO_GBR            <br/>
->NEO_BRG            <br/>
->NEO_BGR
+    NEO_RGB
+    NEO_RBG
+    NEO_GRB
+    NEO_GBR
+    NEO_BRG
+    NEO_BGR
 
 #### For RGBW LEDs
->NEO_WRGB            <br/>
->NEO_WRBG            <br/>
->NEO_WGRB            <br/>
->NEO_WGBR            <br/>
->NEO_WBRG            <br/>
->NEO_WBGR            <br/>
->NEO_RWGB            <br/>
->NEO_RWBG            <br/>
->NEO_RGWB            <br/>
->NEO_RGBW            <br/>
->NEO_RBWG            <br/>
->NEO_RBGW            <br/>
->NEO_GWRB            <br/>
->NEO_GWBR            <br/>
->NEO_GRWB            <br/>
->NEO_GRBW            <br/>
->NEO_GBWR            <br/>
->NEO_GBRW            <br/>
->NEO_BWRG            <br/>
->NEO_BWGR            <br/>
->NEO_BRWG            <br/>
->NEO_BRGW            <br/>
->NEO_BGWR            <br/>
->NEO_BGRW
+    NEO_WRGB
+    NEO_WRBG
+    NEO_WGRB
+    NEO_WGBR
+    NEO_WBRG
+    NEO_WBGR
+    NEO_RWGB
+    NEO_RWBG
+    NEO_RGWB
+    NEO_RGBW
+    NEO_RBWG
+    NEO_RBGW
+    NEO_GWRB
+    NEO_GWBR
+    NEO_GRWB
+    NEO_GRBW
+    NEO_GBWR
+    NEO_GBRW
+    NEO_BWRG
+    NEO_BWGR
+    NEO_BRWG
+    NEO_BRGW
+    NEO_BGWR
+    NEO_BGRW
