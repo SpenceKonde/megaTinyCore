@@ -144,12 +144,7 @@ void UartClass::begin(unsigned long baud, uint16_t config)
 
     _written = false;
 
-    //Set up the rx pin
-    pinMode(_hwserial_rx_pin, INPUT_PULLUP);
 
-    //Set up the tx pin
-    digitalWrite(_hwserial_tx_pin, HIGH);
-    pinMode(_hwserial_tx_pin, OUTPUT);
 
     //See #131 for more info on this
     #if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL) //this means we are on the 20MHz oscillator
@@ -178,7 +173,13 @@ void UartClass::begin(unsigned long baud, uint16_t config)
     (*_hwserial_module).CTRLB |= (USART_RXEN_bm | USART_TXEN_bm);
 
     (*_hwserial_module).CTRLA |= USART_RXCIE_bm;
+  
+    //Set up the rx pin
+    pinMode(_hwserial_rx_pin, INPUT_PULLUP);
 
+    //Set up the tx pin
+    digitalWrite(_hwserial_tx_pin, HIGH);
+    pinMode(_hwserial_tx_pin, OUTPUT);
     // Restore SREG content
     SREG = oldSREG;
 }
