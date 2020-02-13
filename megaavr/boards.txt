@@ -455,7 +455,7 @@ atxy4.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
 atxy4.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
 atxy4.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
 atxy4.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-atxy2.menu.dacvref.disabled.build.dacvref=
+atxy4.menu.dacvref.disabled.build.dacvref=
 
 atxy4.menu.millis.enabled=Enabled (default timer)
 atxy4.menu.millis.disabled=Disabled (saves flash)
@@ -1085,7 +1085,7 @@ atxy6o.menu.dacvref.1v1=1.10V
 atxy6o.menu.dacvref.1v5=1.50V
 atxy6o.menu.dacvref.2v5=2.50V
 atxy6o.menu.dacvref.4v3=4.30V
-atxy6o.menu.bodvoltage.disabled=Disabled (saves flash)
+atxy6o.menu.dacvref.disabled=Disabled (saves flash)
 atxy6o.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
 atxy6o.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
 atxy6o.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
