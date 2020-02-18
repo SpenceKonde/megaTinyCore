@@ -3,6 +3,7 @@
 * Correct issue with gibberish if using Serial just after Serial.begin()
 * Fix issue with disabling DAC on 14-pin parts (#141)
 * Fix issue with missing option to disable DAC on 20-pin optiboot parts.
+* Fix issue with pulseIn() giving incorrect results. (#142)
 
 1.1.5
 * Reduce flash used by millis/micros() (#135)
