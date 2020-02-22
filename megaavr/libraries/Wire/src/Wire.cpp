@@ -65,7 +65,7 @@ void TwoWire::begin(void)
 	TWI_MasterInit(DEFAULT_FREQUENCY);
 }
 
-void TwoWire::begin(uint8_t address)
+void TwoWire::begin(uint8_t address,bool receive_broadcast)
 {
 	rxBufferIndex = 0;
 	rxBufferLength = 0;
@@ -73,16 +73,26 @@ void TwoWire::begin(uint8_t address)
 	txBufferIndex = 0;
 	txBufferLength = 0;
 
-	TWI_SlaveInit(address);
+	TWI_SlaveInit(address,receive_broadcast);
 
 	TWI_attachSlaveTxEvent(onRequestService, txBuffer); // default callback must exist
 	TWI_attachSlaveRxEvent(onReceiveService, rxBuffer, BUFFER_LENGTH); // default callback must exist
 
 }
 
+void TwoWire::begin(int address,bool receive_broadcast)
+{
+	begin((uint8_t)address,receive_broadcast);
+}
+
+void TwoWire::begin(uint8_t address)
+{
+	begin(address,0);
+}
+
 void TwoWire::begin(int address)
 {
-	begin((uint8_t)address);
+	begin(address,0);
 }
 
 void TwoWire::end(void)
