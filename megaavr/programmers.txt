@@ -14,3 +14,9 @@ jtag2updi.program.extra_params=-P{serial.port}
 jtag2updi.program.speed=115200
 jtag2updi.program.use_1200bps_touch=true
 
+atmel_ice_updi.name=Atmel-ICE (UPDI)
+atmel_ice_updi.communication=usb
+atmel_ice_updi.protocol=atmelice_updi
+atmel_ice_updi.program.protocol=atmelice_updi
+atmel_ice_updi.program.tool=avrdude
+atmel_ice_updi.program.extra_params=-Pusb
