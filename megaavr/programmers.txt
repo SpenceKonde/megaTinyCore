@@ -5,6 +5,13 @@ medbg.program.protocol=xplainedmini_updi
 medbg.program.tool=avrdude
 medbg.program.extra_params=-Pusb
 
+medbg_pro.name=Onboard Atmel mEDBG (xplained_pro) (megaTinyCore)
+medbg_pro.communication=usb
+medbg_pro.protocol=xplainedpro_updi
+medbg_pro.program.protocol=xplainedpro_updi
+medbg_pro.program.tool=avrdude
+medbg_pro.program.extra_params=-Pusb
+
 jtag2updi.name=jtag2updi (megaTinyCore)
 jtag2updi.communication=serial
 jtag2updi.protocol=jtag2updi
