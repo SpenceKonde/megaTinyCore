@@ -110,6 +110,8 @@ Move to default pins:
 PORTMUX.CTRLB&=~(1<<SPI0);
 ```
 
+**Be warned that the SS pin on the megaavr parts has the same, often surprising, behavior as the classic AVRs - that is, if it is not set as an OUTPUT, and is driven low while the SPI peripheral is enabled, that will put SPI into slave mode, after which it must manually be set back to master. If you are using SPI in master mode, SS should be set as an OUTPUT to prevent this from happening. If it is to be used as an SPI slave, you probably want it set INPUT_PULLUP**
+
 ### I2C (TWI) support
 All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library. See the pinout charts for the location of these pins.
 
