@@ -190,7 +190,7 @@ void analogWrite(uint8_t pin, int val)
 					//if not active, we need to activate it, which produces a glitch in the PWM
 					TCD0.CTRLA=0x10;//stop the timer
 					while(!(TCD0.STATUS&0x01)) {;} // wait until it's actually stopped
-					_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL|(1<<6+bit_pos));
+					_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL|(1<<(6+bit_pos)));
 					TCD0.CTRLA=0x11; //reenable it
 				}
 			}

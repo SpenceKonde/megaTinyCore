@@ -94,7 +94,7 @@ static void turnOffPWM(uint8_t pin)
 	if(timer == NOT_ON_TIMER) return;
 
 	uint8_t bit_pos = digitalPinToBitPosition(pin);
-	TCB_t *timerB;
+	//TCB_t *timerB;
 
 	switch (timer) {
 
