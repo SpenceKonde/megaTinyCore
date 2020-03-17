@@ -18,6 +18,9 @@ Bit 3 controls the pullup.
 
 Bit 3 is set when pinMode() is used to set the pin to INPUT_PULLUP. When manually writing the PINnCTRL registers, be sure to either use bitwise operators to preserve this bit, or set it to the correct value. 
 
+### "Fully Asynchronous" pins
+On the megaavr parts, pins that are pin number 2 or 6 within a port are "fully asynchronous" - these are marked on the included pinout charts. These pins provide more sensitive detection of interrupts - on all other pins, an interrupt condition must persist for at least one system clock to trigger the interrupt; on these pins, even shorter pulses can trigger it. Additionally, these pins can wake the system from a sleep mode where the main clock is stopped on a rinsing or falling edge, instead of low level or any change. However, the length of a pulse that triggers an interrupt on these pins is so short that they can be significantly more sensitive to noise than other pins. 
+
 ### The ISR
 Each port has one interrupt vector; their names are:
     
@@ -25,7 +28,7 @@ Each port has one interrupt vector; their names are:
     PORTB_PORT_vect
     PORTC_PORT_vect
 
-When the interrupt condition occurs, the bit int PORTx.INTFLAGS corresponding to the interrupt will be set. **YOU MUST CLEAR THIS BIT WITHIN THE ISR** - the interrupt will continue to be generated as long as the flag is set, so if you do not unset it, the ISR will run continuously after it was triggered once. To clear the bit, write a 1 to it. 
+When the interrupt condition occurs, the bit int PORTx.INTFLAGS corresponding to the interrupt will be set. If multiple pins in a port are used for interrupts corresponding to different things, you can use this to determine which pin triggered the interrupt. **YOU MUST CLEAR THIS BIT WITHIN THE ISR** - the interrupt will continue to be generated as long as the flag is set, so if you do not unset it, the ISR will run continuously after it was triggered once. To clear the bit, write a 1 to it; writing 255 to it will clear all of them.
 
 ### A basic example for the x16/x06
 
