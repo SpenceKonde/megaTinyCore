@@ -5,6 +5,8 @@
 #elif (defined(MILLIS_USE_TIMERB0)  || defined(MILLIS_USE_TIMERB1) )
 //conflgure we will configure it to count to (256*64)-1 instead of prescale by 64
 #define TIME_TRACKING_TIMER_PERIOD		0x3FFF
+#else
+#define TIME_TRACKING_TIMER_PERIOD	    0xFE
 #endif
 #define TIME_TRACKING_TICKS_PER_OVF		(TIME_TRACKING_TIMER_PERIOD + 1)	/* Timer ticks per overflow of TCB3 */
 

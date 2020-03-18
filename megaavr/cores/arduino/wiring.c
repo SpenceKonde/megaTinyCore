@@ -59,20 +59,19 @@ volatile uint16_t timer_overflow_count = 0;
 
 #if !defined(MILLIS_USE_TIMERRTC)
 
-inline uint16_t clockCyclesPerMicrosecondComp(uint32_t clk){
-#ifdef MILLIS_USE_TIMERD0
-	#if (F_CPU==20000000UL || F_CPU==10000000UL ||F_CPU==5000000UL)
-	return ( 20 ); //this always runs off the 20MHz oscillator
-	#else
-	return ( 16 );
-	#endif
-#else
-	return ( (clk) / 1000000L );
-#endif
-}
+
+
 
 inline uint16_t clockCyclesPerMicrosecond(){
-	return clockCyclesPerMicrosecondComp(F_CPU);
+#ifdef MILLIS_USE_TIMERD0
+#if (F_CPU==20000000UL || F_CPU==10000000UL ||F_CPU==5000000UL)
+	return ( 20 ); //this always runs off the 20MHz oscillator
+#else
+	return ( 16 );
+#endif
+#else
+	return ( (F_CPU) / 1000000L );
+#endif
 }
 
 inline unsigned long clockCyclesToMicroseconds(unsigned long cycles){
@@ -109,10 +108,9 @@ static volatile TCB_t* _timer =
 #endif
 &TCB3;
 #endif
+#endif
 #else
 #error "No millis timer selected, but not disabled - can't happen!".
-#endif
-
 #endif //end #if !defined(MILLIS_USE_TIMERRTC)
 
 
