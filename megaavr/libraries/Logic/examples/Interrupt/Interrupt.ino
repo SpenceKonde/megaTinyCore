@@ -35,6 +35,7 @@ void setup()
   Serial.begin(9600);
 
   // The interrupt is only available on ATmega parts.
+  // This will error on ATtiny parts.
 
   // Initialize logic block 2
   // Logic block 2 has three inputs, PA0, PA1 and PA2.
@@ -43,7 +44,7 @@ void setup()
   Logic2.input0 = in::input_pullup;   // Set PD0 as input with pullup
   Logic2.input1 = in::input_pullup;   // Set PD1 as input with pullup
   Logic2.input2 = in::input_pullup;   // Set PD2 as input with pullup
-  Logic2.output = out::disable;       // Disable output on PD3 (we don't have to though)
+  Logic2.output = out::disable;       // Disable output on PA0 (we don't have to though)
   Logic2.filter = filter::disable;    // No output filter enabled
   Logic2.truth = 0x01;                // Set truth table
 
