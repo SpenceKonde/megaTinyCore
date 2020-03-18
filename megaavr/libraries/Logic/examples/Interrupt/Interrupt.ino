@@ -33,7 +33,9 @@ void setup()
 {
   // Modify the serial port to match your hardware
   Serial.begin(9600);
-  
+
+  // The interrupt is only available on ATmega parts.
+
   // Initialize logic block 2
   // Logic block 2 has three inputs, PA0, PA1 and PA2.
   // It has one output, but this is disabled because we're using an interrupt instead.

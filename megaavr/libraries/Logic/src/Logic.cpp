@@ -161,6 +161,7 @@ Logic::Logic(const uint8_t block_number)
       output(out::disable),
       output_swap(out::no_swap),
       filter(filter::disable),
+      edgedetect(edgedetect::disable),
       truth(0x00),
       sequencer(sequencer::disable),
       block(blocks[block_number])
@@ -192,18 +193,16 @@ static volatile register8_t& PINCTRL(PORT_t& port, const uint8_t pin_bm)
   return port.PIN7CTRL;
 }
 
-
 void Logic::initInput(in::input_t& input, PORT_t& port, const uint8_t pin_bm)
 {
-  if(input == in::input && pin_bm)
+  if(((input&in::input) == in::input) && pin_bm)
   {
     port.DIRCLR = pin_bm;
-    PINCTRL(port, pin_bm) &= ~PORT_PULLUPEN_bm;
-  }
-  else if (input == in::input_pullup && pin_bm)
-  {
-    port.DIRCLR = pin_bm;
-    PINCTRL(port, pin_bm) |= PORT_PULLUPEN_bm;
+    if ((input&&in::input) == in::input) {
+      PINCTRL(port, pin_bm) |= PORT_PULLUPEN_bm;
+    } else {
+      PINCTRL(port, pin_bm) &= ~PORT_PULLUPEN_bm;
+    }
     input = in::input;
   }
 }
@@ -214,14 +213,14 @@ void Logic::init()
   initInput(input0, block.PORT_IN, block.input0_bm);
   initInput(input1, block.PORT_IN, block.input1_bm);
   initInput(input2, block.PORT_IN, block.input2_bm);
-  
+
   // Set inputs modes
   block.LUTCTRLB = (input1 << CCL_INSEL1_gp) | (input0 << CCL_INSEL0_gp);
   block.LUTCTRLC = (input2 << CCL_INSEL2_gp);
 
   // Set truth table
   block.TRUTH = truth;
-  
+
   // Set sequencer
   block.SEQCTRL = sequencer;
 
@@ -243,9 +242,10 @@ void Logic::init()
       block.PORT_ALT_OUT.DIRSET = block.output_bm;
     }
   }
-  
+
   // Set logic output state and output filter
   block.LUTCTRLA = (output ? CCL_OUTEN_bm : 0)
+      | (edgedetect ? CCL_EDGEDET_EN_gc : 0 )
       | (filter << CCL_FILTSEL_gp)
       | (enable ? CCL_ENABLE_bm : 0);
 }
@@ -255,7 +255,7 @@ void Logic::init()
 void Logic::attachInterrupt(void (*userFunc)(void), PinStatus mode)
 {
   CCL_INTMODE0_t intmode;
-  switch (mode) 
+  switch (mode)
   {
     // Set RISING, FALLING or CHANGE interrupt trigger for a block output
     case RISING:
@@ -274,7 +274,7 @@ void Logic::attachInterrupt(void (*userFunc)(void), PinStatus mode)
   const int intmode_bp = block.number * 2;
   CCL.INTCTRL0 = (CCL.INTCTRL0 & ~(CCL_INTMODE0_gm << intmode_bp))
       | (intmode << intmode_bp);
-  
+
   // Store function pointer
   intFuncCCL[block.number] = userFunc;
 }
