@@ -42,13 +42,13 @@ void setup()
   PORTA.PIN3CTRL|=PORT_PULLUPEN_bm;   // enable pullup
   EVSYS.ASYNC0=0x0D;                  // PA3 per table 14-2 in datasheet
   EVSYS.ASYNCUSER3= 0x03;             // Use Async0 as LUT1 event 0 per Table 14-4 in datasheet
-  Logic0.input1 = in::event_0;        // Use LUT event 0 as input 0
+  Logic0.input1 = in::event_0;        // Use LUT event 0 as input 1, which will take input from PA3
 
   PORTB.DIRCLR=(1<<0);                // set PB0 as input
   PORTB.PIN0CTRL|=PORT_PULLUPEN_bm;   // enable pullup
   EVSYS.ASYNC1=0x0A;                  // PB0 per table 14-2 in datasheet
   EVSYS.ASYNCUSER5= 0x04;             // Use Async1 as LUT1 event 1 per Table 14-4 in datasheet
-  Logic1.input2 = in::event_1;        // Use LUT event 1 as input 2
+  Logic1.input2 = in::event_1;        // Use LUT event 1 as input 2, which will take input from PB0
 
   #elif defined(MEGATINYCORE) && !defined(__AVR_ATtinyxy7__)
   // If it's neither 20-pin nor 24-pin part, cannot be used.
@@ -62,9 +62,10 @@ void setup()
   Logic1.input2 = in::input_pullup;   // Set PC2 or PC5 input with pullup
 
   #endif
+  //End of workaround code
 
   Logic1.input0 = in::input_pullup;   // Set PC0 or PC3 as input with pullup
-  Logic1.output = out::enable;        // Enable output pin
+  Logic1.output = out::disable;       // Enable output pin
   Logic1.filter = filter::disable;    // No output filter enabled
   Logic1.truth = 0x01;                // Set truth table
 
@@ -73,22 +74,10 @@ void setup()
   // Block 0 output on PA3 on ATmega, PA5 on ATtiny.
 
   Logic0.enable = true;               // Enable logic block 0
-
-  #ifdef MEGATINYCORE
-  //For ATtiny parts, we have to work around PA0 being UPDI
-  PORTA.DIRCLR=(1<<3);                // set PA3 as input
-  PORTA.PIN3CTRL|=PORT_PULLUPEN_bm;   // enable pullup
-  EVSYS.ASYNC0=0x0D;                  // PA3 per table 14-2 in datasheet
-  EVSYS.ASYNCUSER2= 0x03;             // Use Async0 as LUT0 event 0 per Table 14-4 in datasheet
-  Logic0.input0 = in::event_0;        // Use LUT event 0 as input 0
-  #else
-  //For ATmega parts, PA0 is a normal input pin, so we use it.
-  Logic0.input0 = in::input_pullup;   // Set PA0 as input with pullup
-  #endif
-
+  Logic0.input0 = in::link;           // Route output from block 1 to this input internally
   Logic0.input1 = in::input_pullup;   // Set PA1 as input with pullup
-  Logic0.input2 = in::input_pullup;           // Route output from block 1 to this input internally
-  Logic0.output = out::disable;       // Enable logic block 0 output pin
+  Logic0.input2 = in::input_pullup;   // Set PA2 as input with pullup
+  Logic0.output = out::enable;        // Enable logic block 0 output pin (PA3 (ATmega) or PA5 (ATtiny))
   Logic0.filter = filter::disable;    // No output filter enabled
   Logic0.truth = 0xFE;                // Set truth table
 
