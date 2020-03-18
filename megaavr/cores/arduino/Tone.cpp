@@ -45,18 +45,21 @@
 #define AVAILABLE_TONE_PINS 1
 
 /*
-#define USE_TIMERB1
+
 #define USE_TIMERB2
 */
-#define USE_TIMERB0        // interferes with PWM on pin 6
+#if defined(USE_MILLIS_TIMERB0)
+#define USE_TIMERB1
+#else
+#define USE_TIMERB0
+#endif
 
-#if !defined(USE_TIMERB1) && !defined(USE_TIMERB2) && !defined(USE_TIMERB0)
-    # error "No timers allowed for tone()"
+#if (!defined(USE_TIMERB1) && !defined(USE_TIMERB2) && !defined(USE_TIMERB0))||(defined(USE_MILLIS_TIMERB0)&&defined(USE_TIMERB0))
+    # error "No timers allowed for tone() because only option used for millis()"
     /* Please uncomment a timer above and rebuild */
 #endif
 
-// Can't use TIMERB3 -- used for application time tracking
-// Using TIMERA0 NOT RECOMMENDED -- all other timers use its clock!
+
 static volatile TCB_t* _timer =
 #if defined(USE_TIMERB0)
 &TCB0;
@@ -78,6 +81,8 @@ static int _pin = NOT_A_PIN;
 volatile long timer_toggle_count;
 volatile uint8_t *timer_outtgl_reg;
 volatile uint8_t timer_bit_mask;
+uint8_t timer_cycle_per_tgl;
+uint8_t timer_cycle_per_tgl_count;
 
 // helper functions
 static void disableTimer();
@@ -104,17 +109,20 @@ void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
     }
 
     // Calculate compare value
-    compare_val = F_CPU / frequency / 2 - 1;
-    // If compare larger than 16bits, need to prescale (will be DIV64)
-    uint8_t prescaler_needed = 0;
-    if (compare_val > 0xFFFF){
-        // recalculate with new prescaler
-        compare_val = F_CPU / frequency / 2 / 64 - 1;
-        prescaler_needed = 1;
+    uint8_t divisionfactor = 1; //no prescale, toggles at half the frequency
+
+    compare_val = ((F_CPU / frequency)>>1);
+    while ((compare_val > 0x10000)&&(divisionfactor<8))
+    {
+      compare_val = compare_val>>1;
+    }
+    if (--compare_val > 0xFFFF) {
+      //if still too high, divisionfactor reached 8 (/256), corresponding to 1Hz
+      compare_val=0xFFFF; //do the best we can.
     }
 
     // Calculate the toggle count
-    if (duration > 0){    // Duration defined
+    if (duration > 0) {    // Duration defined
         toggle_count = 2 * frequency * duration / 1000;
     } else {            // Duration not defined -- tone until noTone() call
         toggle_count = -1;
@@ -124,20 +132,19 @@ void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
     uint8_t status = SREG;
     cli();
 
-    // Disable for now, set clk according to 'prescaler_needed'
-    // (Prescaled clock will come from TCA --
-    //  by default it should have a prescaler of 64 (250kHz clock)
-    // TCA default initialization is in wiring.c -- init()  )
-    if(prescaler_needed){
-        _timer->CTRLA = TCB_CLKSEL_CLKTCA_gc;
-    } else {
-        _timer->CTRLA = TCB_CLKSEL_CLKDIV1_gc;
+    // Disable for now, set clk to divide by 2 if divisionfactor 2 or more
+    if(divisionfactor==1)
+    {
+      _timer->CTRLA = TCB_CLKSEL_CLKDIV1_gc;
+    } else { //division factor between 2 and 8
+      _timer->CTRLA = TCB_CLKSEL_CLKDIV2_gc;
+      divisionfactor--; //now between 1 and 7
     }
+    divisionfactor--; //now between 0 and 6
 
     // Timer to Periodic interrupt mode
     // This write will also disable any active PWM outputs
     _timer->CTRLB = TCB_CNTMODE_INT_gc;
-
     // Write compare register
     _timer->CCMP = compare_val;
 
@@ -147,7 +154,8 @@ void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
     timer_outtgl_reg = port_outtgl;
     timer_bit_mask = bit_mask;
     timer_toggle_count = toggle_count;
-
+    timer_cycle_per_tgl = 1<<divisionfactor; //1, 2, 4, 8, 16, 32, or 64 - toggle pin this often
+    timer_cycle_per_tgl_count=timer_cycle_per_tgl;
     // Enable timer
     _timer->CTRLA |= TCB_ENABLE_bm;
 
@@ -200,23 +208,18 @@ ISR(TCB1_INT_vect)
 ISR(TCB2_INT_vect)
 #endif
 {
-    if (timer_toggle_count != 0){
+  if(!(--timer_cycle_per_tgl_count)) //Are we ready to toggle? pre-decrement, then see if 0 or more
+  {
+    timer_cycle_per_tgl_count=timer_cycle_per_tgl;
+    // toggle the pin
+    *timer_outtgl_reg = timer_bit_mask; //toggle the pin
 
-        // toggle the pin
-        *timer_outtgl_reg = timer_bit_mask;
-
-        // If duration was defined, decrement
-        if (timer_toggle_count > 0){
-            timer_toggle_count--;
-        }
-
-        // If no duration (toggle count negative), go on until noTone() call
-
+    if (timer_toggle_count > 0){  //if duration was specified, decrement toggle count.
+        timer_toggle_count--;
     } else if (timer_toggle_count == 0) {    // If toggle count = 0, stop
-
         disableTimer();
-    }
-
-    /* Clear flag */
-    _timer->INTFLAGS = TCB_CAPT_bm;
+    } //otherwise timer_toggle_count wasn't supplied, go on until noTone() called
+  }
+  /* Clear flag */
+  _timer->INTFLAGS = TCB_CAPT_bm;
 }
