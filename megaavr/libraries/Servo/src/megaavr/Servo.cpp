@@ -77,7 +77,7 @@ ISR(TCB2_INT_vect)
   ServoHandler(0);
 }
 
-static void initISR(timer16_Sequence_t timer)
+static void initISR()
 {
   //TCA0.SINGLE.CTRLA = (TCA_SINGLE_CLKSEL_DIV16_gc) | (TCA_SINGLE_ENABLE_bm);
   _timer->CTRLA = TCB_CLKSEL_CLKTCA_gc;
@@ -92,7 +92,7 @@ static void initISR(timer16_Sequence_t timer)
   _timer->CTRLA |= TCB_ENABLE_bm;
 }
 
-static void finISR(timer16_Sequence_t timer)
+static void finISR()
 {
   // Disable interrupt
   _timer->INTCTRL = 0;
@@ -138,7 +138,7 @@ uint8_t Servo::attach(int pin, int min, int max)
     // initialize the timer if it has not already been initialized
     timer = SERVO_INDEX_TO_TIMER(servoIndex);
     if (isTimerActive(timer) == false) {
-      initISR(timer);
+      initISR();
     }
     servos[this->servoIndex].Pin.isActive = true;  // this must be set after the check for isTimerActive
   }
@@ -152,7 +152,7 @@ void Servo::detach()
   servos[this->servoIndex].Pin.isActive = false;
   timer = SERVO_INDEX_TO_TIMER(servoIndex);
   if(isTimerActive(timer) == false) {
-    finISR(timer);
+    finISR();
   }
 }
 
