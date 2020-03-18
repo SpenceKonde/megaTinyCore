@@ -33,8 +33,8 @@
 #define USE_TIMERB0
 #endif
 
-#if !defined(USE_TIMERB1) && !defined(USE_TIMERB2) && !defined(USE_TIMERB0)
-    # error "Can't Happen: No timer available for servo. Please report this to github.com/SpenceKonde/megaTinyCore"
+#if (!defined(USE_TIMERB1) && !defined(USE_TIMERB2) && !defined(USE_TIMERB0))||(defined(USE_TIMERB0)&&defined(MILLIS_USE_TIMERB0))
+    # error "No timer available for servo, only option used for millis()"
 #endif
 
 static volatile TCB_t* _timer =

@@ -84,6 +84,8 @@ static void initISR(timer16_Sequence_t timer)
   // Timer to Periodic interrupt mode
   // This write will also disable any active PWM outputs
   _timer->CTRLB = TCB_CNTMODE_INT_gc;
+
+  _timer->CCMP = 0x80FF; //this is what wiring.c previously set it to, removed when #144 was resolved.
   // Enable interrupt
   _timer->INTCTRL = TCB_CAPTEI_bm;
   // Enable timer
