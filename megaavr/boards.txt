@@ -977,6 +977,9 @@ atxy7o.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy7o.menu.resetpin.reset=Reset (DANGER - Read docs first!)
 atxy7o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy7{bootloader.uartswap}_rst.hex
 atxy7o.menu.resetpin.reset.bootloader.resetpinbits=10
+atxy7o.menu.resetpin.gpio=IO (DANGER - Read docs first! powercycle to enter bootloader)
+atxy7o.menu.resetpin.gpio.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}.hex
+atxy7o.menu.resetpin.gpio.bootloader.resetpinbits=00
 
 atxy7o.menu.uartvoltage.5v=Closer to 5v
 atxy7o.menu.uartvoltage.3v=Closer to 3v
@@ -1182,6 +1185,9 @@ atxy6o.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy6o.menu.resetpin.reset=Reset (DANGER - Read docs first!)
 atxy6o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy6{bootloader.uartswap}_rst.hex
 atxy6o.menu.resetpin.reset.bootloader.resetpinbits=10
+atxy6o.menu.resetpin.gpio=IO (DANGER - Read docs first! powercycle to enter bootloader)
+atxy6o.menu.resetpin.gpio.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}.hex
+atxy6o.menu.resetpin.gpio.bootloader.resetpinbits=00
 
 
 atxy6o.upload.tool=avrdude
@@ -1372,6 +1378,9 @@ atxy4o.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy4o.menu.resetpin.reset=Reset (DANGER - Read docs first!)
 atxy4o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy4{bootloader.uartswap}_rst.hex
 atxy4o.menu.resetpin.reset.bootloader.resetpinbits=10
+atxy4o.menu.resetpin.gpio=IO (DANGER - Read docs first! powercycle to enter bootloader)
+atxy4o.menu.resetpin.gpio.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}.hex
+atxy4o.menu.resetpin.gpio.bootloader.resetpinbits=00
 
 
 ##############################################################
@@ -1539,3 +1548,6 @@ atxy2o.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy2o.menu.resetpin.reset=Reset (DANGER - Read docs first!)
 atxy2o.menu.resetpin.reset.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}_rst.hex
 atxy2o.menu.resetpin.reset.bootloader.resetpinbits=10
+atxy2o.menu.resetpin.gpio=IO (DANGER - Read docs first! powercycle to enter bootloader)
+atxy2o.menu.resetpin.gpio.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}.hex
+atxy2o.menu.resetpin.gpio.bootloader.resetpinbits=00
