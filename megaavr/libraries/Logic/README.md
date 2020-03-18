@@ -44,7 +44,7 @@ in::masked;       // Pin not in use
 in::unused;       // Pin not in use
 in::disable;      // Pin not in use
 in::feedback;     // Connect output of the logic block to this input
-in::link;         // Connect output of logic block n+1 to this input
+in::link;         // Connect output of the other logic block to this input
 in::event_0;      // Connect input to event 0
 in::event_a;      // Connect input to event 0
 in::event_1;      // Connect input to event 1
@@ -91,8 +91,10 @@ in::tcb;          // Connect input to TCB. Input 0 connects to TCB0 W0, input 1 
 ```
 
 Notes specific to ATmega parts
-* On 28-pin versions of the ATmega 4808, 3208, 1608, and 808, IN1 and IN2 inputs for logic3 are not available. If all input pins for all logic blocks are needed, the event system workaround shown for the ATtiny parts in the examples can be used.
+* On 28-pin versions of the ATmega 4808, 3208, 1608, and 808, IN1 and IN2 inputs for logic3 are not available. If all input pins for all logic blocks are needed, the event system workaround shown for the ATtiny parts in the examples can be used, though note that register names and values are different.
 * According to the datasheet for SPI as input source, inputs 0 and 1 connect to MOSI. Thus, on these parts, there is no input to the logic blocks for MISO. Note also that the order is different from the ATtiny parts.
+* If input on Logic3 is set to link, it will use the output of Logic0.
+* If you need to link input to logic block other than the n+1 block, you can use the event system for that.
 
 
 ##### Usage
