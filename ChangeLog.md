@@ -4,6 +4,10 @@
 * Fix issue with disabling DAC on 14-pin parts (#141)
 * Fix issue with missing option to disable DAC on 20-pin optiboot parts.
 * Fix issue with pulseIn() giving incorrect results. (#142)
+* Add support for PA0 (UPDI) as IO pin to Optiboot boards (#150)
+* Fix issues with Logic library and examples (#106)
+* Remove dependence of tone() and TCB as millis/micros source TCA0 prescaler (#144)
+* Documentation improvements
 
 1.1.5
 * Reduce flash used by millis/micros() (#135)
