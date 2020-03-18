@@ -115,6 +115,7 @@ void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
     while ((compare_val > 0x10000)&&(divisionfactor<8))
     {
       compare_val = compare_val>>1;
+      divisionfactor++;
     }
     if (--compare_val > 0xFFFF) {
       //if still too high, divisionfactor reached 8 (/256), corresponding to 1Hz
