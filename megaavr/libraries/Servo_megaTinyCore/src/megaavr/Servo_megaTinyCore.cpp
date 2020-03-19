@@ -3,8 +3,8 @@
 #include <Arduino.h>
 #include <Servo_megaTinyCore.h>
 
-#define usToTicks(_us)    ((( _us / 16) * clockCyclesPerMicrosecond()) / 4)                 // converts microseconds to tick
-#define ticksToUs(_ticks) (((unsigned) _ticks * 16 * 4) / clockCyclesPerMicrosecond())   // converts from ticks back to microseconds
+#define usToTicks(_us)    ((( _us / 2) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
+#define ticksToUs(_ticks) (((unsigned) _ticks * 2) / clockCyclesPerMicrosecond())   // converts from ticks back to microseconds
 
 #define TRIM_DURATION  5                                   // compensation ticks to trim adjust for digitalWrite delays
 
@@ -79,13 +79,13 @@ ISR(TCB2_INT_vect)
 
 static void initISR()
 {
-  //TCA0.SINGLE.CTRLA = (TCA_SINGLE_CLKSEL_DIV16_gc) | (TCA_SINGLE_ENABLE_bm);
-  _timer->CTRLA = TCB_CLKSEL_CLKTCA_gc;
+  //divide CLK_PER by 2 instead of using TCA0-prescaled
+  _timer->CTRLA = TCB_CLKSEL_CLKDIV2_gc;
   // Timer to Periodic interrupt mode
   // This write will also disable any active PWM outputs
   _timer->CTRLB = TCB_CNTMODE_INT_gc;
 
-  _timer->CCMP = 0x80FF; //this is what wiring.c previously set it to, removed when #144 was resolved.
+  _timer->CCMP = 0x8000; //Experience has shown that without this, it goes off the rails
   // Enable interrupt
   _timer->INTCTRL = TCB_CAPTEI_bm;
   // Enable timer
@@ -120,12 +120,12 @@ Servo::Servo()
   }
 }
 
-uint8_t Servo::attach(int pin)
+uint8_t Servo::attach(byte pin)
 {
   return this->attach(pin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
 }
 
-uint8_t Servo::attach(int pin, int min, int max)
+uint8_t Servo::attach(byte pin, int min, int max)
 {
   timer16_Sequence_t timer;
 
@@ -156,7 +156,7 @@ void Servo::detach()
   }
 }
 
-void Servo::write(int value)
+void Servo::write(unsigned int value)
 {
   // treat values less than 544 as angles in degrees (valid values in microseconds are handled as microseconds)
   if (value < MIN_PULSE_WIDTH)
@@ -171,7 +171,7 @@ void Servo::write(int value)
   writeMicroseconds(value);
 }
 
-void Servo::writeMicroseconds(int value)
+void Servo::writeMicroseconds(unsigned int value)
 {
   // calculate and store the values for the given channel
   byte channel = this->servoIndex;
