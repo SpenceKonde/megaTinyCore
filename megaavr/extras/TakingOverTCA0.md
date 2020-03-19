@@ -2,11 +2,11 @@
 
 We have received many questions from users about how to take over TCA0 to generate 16-bit PWM or change the output frequency. There are a few non-obvious complications here, and this page aims to clear this up. First, before you begin, make sure you have megaTinyCore 1.1.6 - in prior versions, the type B timer(s) are clocked from the prescaled clock of TCA0 when they are used as a millis/micros source or for low frequency output with tone() - which meant that reconfiguring TCA0 would break that functionality as well. In 1.1.6, the only thing included with the core that is broken by reconfiguring the TCA0 prescaler is the Servo library, and that is fixed for 1.1.7.
 
-The most common point of confusion is the fact that megaTinyCore, out of the box, configures TCA0 for use in "Split Mode" - this allows it to generate 6 8-bit PWM signals. This provides 2 additional PWM pins (3 if TCB0 is needed for other purposes) - and since analogWrite() only supports 8-bit PWM anyway, when using the Arduino API functions, there is no loss of functionality imposed by this. Microchip recommends that you do the following before changing between split and single modes to prevent unpredictable behavior
+The most common point of confusion is the fact that megaTinyCore, out of the box, configures TCA0 for use in "Split Mode" - this allows it to generate 6 8-bit PWM signals. This provides 2 additional PWM pins (3 if TCB0 is needed for other purposes) - and since analogWrite() only supports 8-bit PWM anyway, when using the Arduino API functions, there is no loss of functionality imposed by this. You must disable the timer when switching between modes, and Microchip recommends that you issue a reset command - this will reset the period, count, and compare registers to their default values. Note that in split mode, the two low bits must also be 1, or the command is ignored. The intent of those bits is unclear, as only 00 (none) and 11 (both) are listed as valid.
 
 ```
   TCA0.SPLIT.CTRLA=0; //disable TCA0 and set divider to 1
-  TCA0.SPLIT.CTRLESET=TCA_SPLIT_CMD_RESET_gc; //set CMD to RESET to do a hard reset of TCA0
+  TCA0.SPLIT.CTRLESET=TCA_SPLIT_CMD_RESET_gc|0x03; //set CMD to RESET to do a hard reset of TCA0 and enable for both halves.
   TCA0.SPLIT.CTRLD=0; //turn off split mode
 ```
 Note that as these bits have the same function in SINGLE and SPLIT mode, it does not matter whether you reference them as TCA0.SINGLE.* or TCA0.SPLIT.*
@@ -44,7 +44,7 @@ PORTMUX.CTRLC = PORTMUX_TCA00_ALTERNATE_gc; // Move it to PA7
 # Examples
 Now for the fun part - example code! 
 
-A note about the pin numbers - we use the PORT_Pxn notation to refer to pins; when I mention in the comments the pin number, that is an Arduino (logical) pin number, not a physical pin number. Because the mappings of peripherals to pins by the port and pin within the port is constant across the non-8-pin parts,  this means the examples (except the one for 8-pin parts) will all work on all 14, 20, and 28-pin parts.
+A note about the pin numbers - we use the PORT_Pxn notation to refer to pins; when I mention in the comments the pin number, that is an Arduino (logical) pin number, not a physical pin number (generally, this documentation does not refer to physical pin numbers except on the pinout charts). Because the mappings of peripherals to pins by the port and pin within the port is constant across the non-8-pin parts, this means the examples (except the one for 8-pin parts) will all work on all 14, 20, and 28-pin parts.
 
 
 ### Example 1: 16-bit PWM in single mode, dual slope with interrupt.
