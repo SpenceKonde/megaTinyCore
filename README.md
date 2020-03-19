@@ -136,7 +136,9 @@ PORTMUX.CTRLB&=~(1<<TWI0);
 The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available (1.0.5 and later - 1.0.4 and earlier only have 1). On all other parts except the x16 and x17 series, 6 PWM pins are available, driven by Timer A. The type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A - however you can take them over if you need to generate PWM at different frequencies. See the pinout charts for a list of which pins support PWM.
 The 3216,1616,816,416,3217,1617 and 817 have two additional PWM pins driven by Timer D (pins 10 and 11 on x16, 12 and 13 on x17). Timer D is an async timer, and the outputs can't be enabled or disabled without briefly stopping the timer. This results in a brief glitch on the other PWM pin (if it is currently outputting PWM), and doing so requires slightly longer (in 1.0.0, this delay is 1ms, in 1.0.1 and later, it is around 1us). This applies to digitalWrite() or analogWrite of 0 or 255 while it is currently outputting PWM, and analogWrite of 1~254 while the pin is not currently outputting PWM. This is a hardware limitation and cannot be further improved.
 
-**Note that TCA0 (the type A timer) on all parts is configured in split mode to support the most PWM pins possible with analogWrite(). This timer is also used for millis() (all parts on 1.1.2 and earlier, and all parts except 8 and 14-pin 1-series parts on 1.1.3 and later), so reconfiguring it for different PWM frequencies will break millis(). Use a type B timer if you need to take over a timer if possible, or change millis() to use a different timer - see the section on that below**
+**Note that TCA0 (the type A timer) on all parts is configured in split mode to support the most PWM pins possible with analogWrite(). As of 1.1.6, and to a lesser extent other versions since 1.1.3 it has been made much easier to reconfigure TCA0 without messing up other functions of the core. If you want to reconfigure TCA0 for other purposes, please refer to the below guide**
+#### [Taking over TCA0](extras/TakingOverTCA0.md)
+
 
 If you wish to change the PWM frequency, on versions prior to 1.1.6, it will break tone, as well as millis/micros with TCA0, TCB0, or TCB1 as a clock source, and the Servo library. On 1.1.6 and later, only TCA0 as millis/micros source and the Servo library will be broken by changing the TCA0 prescaler. 
 
@@ -206,15 +208,38 @@ These parts support many BOD trigger levels, with Disabled, Active, and Sampled 
 ### Link-time Optimization (LTO) support
 This core *always* uses Link Time Optimization to reduce flash usage - all versions of the compiler which support the 0-series and 1-series ATtiny parts also support LTO, so there is no need to make it optional as was done with ATtinyCore.
 
+### Identifying menu options within sketch
+It is often useful to identify what options are selected on the menus from within the sketch; this is particularly useful for verifying that you have selected the options you wrote the sketch for when you open it. See the example below.
+
+##### Millis timer
+The option used for the millis/micros timekeeping is given by a define of the form USE_MILLIS_TIMERxx. Possible options are:
+* USE_MILLIS_TIMERA0
+* USE_MILLIS_TIMERB0
+* USE_MILLIS_TIMERB1
+* USE_MILLIS_TIMERD0
+* USE_MILLIS_TIMERRTC
+* DISABLE_MILLIS
+
+##### Using to check that correct menu option is selected
+If your sketch requires that the B0 is used as the millis timer
+
+```
+#ifndef MILLIS_USE_TIMERB0
+#error "This sketch is written for use with TCB0 as the millis timing source"
+#endif
+```
+
 ### Identifying part family within sketch
 When writing code that may be compiled for a variety of target chips (which is particularly easy on the megaAVR parts, as the peripherals are so similar), it is often useful to be able to identify which family of parts is being used, in order to, for example, select which pin numbers to use for each purpose. Each part is identified by a #define:
 `__AVR_ATtiny***__` where *** is the part number (ex: `__AVR_ATtiny3216__`).
 
 This core provides two additional #defines for part "families":
-* `__AVR_ATtinyx**__` where ** is the last 2 digits of the part number (ex: `__AVR_ATtinyx16`)
-* `__AVR_ATtinyxy*__` where * is the last digit of the part number, (ex: `__AVR_ATtinyxy6`).
+* `__AVR_ATtinyx**__` where ** is the last 2 digits of the part number (ex: `__AVR_ATtinyx16__`)
+* `__AVR_ATtinyxy*__` where * is the last digit of the part number, (ex: `__AVR_ATtinyxy6__`).
 
 This is just shorthand, for convenience - `#ifdef __AVR_ATtinyxy2__` is equivilent to `#if defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__)`
+
+Additionally, `MEGATINYCORE` will be defined whenever this core is in use.
 
 # Bootloader (optiboot) Support
 A new version of Optiboot (Optiboot-x) now runs on the Tiny0 and Tiny1 chips.  It's under 512 bytes, and works on all parts supported by megaTinyCore, allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini).
