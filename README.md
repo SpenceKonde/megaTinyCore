@@ -140,7 +140,7 @@ The 3216,1616,816,416,3217,1617 and 817 have two additional PWM pins driven by T
 #### [Taking over TCA0](extras/TakingOverTCA0.md)
 
 
-If you wish to change the PWM frequency, on versions prior to 1.1.6, it will break tone, as well as millis/micros with TCA0, TCB0, or TCB1 as a clock source, and the Servo library. On 1.1.6 and later, only TCA0 as millis/micros source and the Servo library will be broken by changing the TCA0 prescaler. 
+If you wish to change the PWM frequency, on versions prior to 1.1.6, it will break tone, as well as millis/micros with TCA0, TCB0, or TCB1 as a clock source, and the Servo library. On 1.1.6, only the Servo library, and of course TCA0 for millis/micros will be broken by changing the TCA0 prescaler. Servo library dependence on TCA0 prescaler has been removed for 1.1.7.
 
 ### NeoPixel (WS2812) support (new in 1.0.3)
 The usual NeoPixel (WS2812) libraries have problems on these parts. This core includes two libraries for this, both of which are tightly based on the Adafruit_NeoPixel library. See the [tinyNeoPixel documentation](megaavr/extras/tinyNeoPixel.md) and included examples for more information.
@@ -153,7 +153,7 @@ By default, as of 1.1.3, TCD0 will be used by default for millis() on parts with
 
 When 20/10/5MHz system clock is used, the micros() count will not increase exactly 1000 times faster than millis() count - it is close, but not exact. This was required for performance and flash usage optimization.
 
-In versions prior to 1.1.6, TCB0 and TCB1 as the millis/micros source, as well as tone and the Servo library depend on the prescaler of TCA0 not being changed - this prescaled clock source is used (type B timers do not have a separate prescaler). On 1.1.6, this dependence is removed for millis/micros and tone, so that the TCA0 prescaler can be freely changed. However, the Servo library still requires the TCA0 prescaler to be unchanged.
+In versions prior to 1.1.6, TCB0 and TCB1 as the millis/micros source, as well as tone and the Servo library depend on the prescaler of TCA0 not being changed - this prescaled clock source is used (type B timers do not have a separate prescaler). On 1.1.6, this dependence is removed for millis/micros and tone, so that the TCA0 prescaler can be freely changed. Servo library will have this dependence removed in 1.1.7.
 
 #### RTC timer for millis
 If the RTC is selected as the timer for millis timekeeping, micros will not be available. Additionally, this timer is configured to run while in STANDBY sleep mode. This has two important consequences: First, it will keep time while in sleep. Secondly, every 64 seconds, the RTC overflow interrupt will fire, waking the chip - thus, if you are using the RTC for millis and putting the part into sleep, you should declare a volatile global variable that you set in the ISR that is supposed to wake the part, eg 'volatile boolean ShouldWakeUp=0;' - set it to 1 in the ISR, and when you put the ATtiny to sleep, have it check this immediately after waking, going back to sleep if it's not set, and clearing it if it is, e.g.:
