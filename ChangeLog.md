@@ -2,6 +2,9 @@
 * Make Servo library work independently of TCA0 prescaler
 * Fix bug that prevented compilation with RTC as millis source
 * Improve TCBn as timekeeping source - it is now the best if you can spare a type B timer
+* Fix tone not moving to TCB1 when millis using TCB0
+* Improve compile errors if TCB0 used as millis and you try to use tone
+* Remove dead code relating to TCB2, TCB3 - nothing here has them, why do we have that code here?
 
 1.1.6
 * Remove option for RTC using external crystal on 412/212/402/202 - these do not support it.
