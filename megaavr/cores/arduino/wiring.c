@@ -91,7 +91,7 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds){
 #ifndef TCD0
 #error "Selected millis timer, TCD0, only exists on 1-series parts"
 #endif
-#elif !(defined(MILLIS_USE_TIMERA0)||defined(MILLIS_USE_TIMERD0))
+#elif !defined(MILLIS_USE_TIMERA0)
 static volatile TCB_t* _timer =
 #if defined(MILLIS_USE_TIMERB0)
 &TCB0;
@@ -100,9 +100,9 @@ static volatile TCB_t* _timer =
 #error "Selected millis timer, TCB1 does not exist on this part."
 #endif
 &TCB1;
-#endif
-#else //it's not TCB0, TCB1, TCD0, TCA0, or RTC
+#else  //it's not TCB0, TCB1, TCD0, TCA0, or RTC
 #error "No millis timer selected, but not disabled - can't happen!".
+#endif
 #endif
 
 #endif //end #if !defined(MILLIS_USE_TIMERRTC)

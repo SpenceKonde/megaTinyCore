@@ -1,3 +1,6 @@
+1.1.8
+* Fix critical bug introduced in 1.1.7 that prevented compilation with TCA0 as millis source
+
 1.1.7
 * Make Servo library work independently of TCA0 prescaler
 * Fix bug that prevented compilation with RTC as millis source
