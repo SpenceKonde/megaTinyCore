@@ -1,3 +1,8 @@
+1.1.7
+* Make Servo library work independently of TCA0 prescaler
+* Fix bug that prevented compilation with RTC as millis source
+* Improve TCBn as timekeeping source - it is now the best if you can spare a type B timer
+
 1.1.6
 * Remove option for RTC using external crystal on 412/212/402/202 - these do not support it.
 * Correct issue with gibberish if using Serial just after Serial.begin()
