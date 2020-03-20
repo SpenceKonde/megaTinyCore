@@ -44,21 +44,14 @@
 */
 #define AVAILABLE_TONE_PINS 1
 
-/*
-
-#define USE_TIMERB2
-*/
-#if defined(USE_MILLIS_TIMERB0)
+#if defined(MILLIS_USE_TIMERB0)
+#if defined(TCB1)
 #define USE_TIMERB1
 #else
+#error "This part only has one type B timer, but it is selected as millis source; tone cannot be used."
+#endif
 #define USE_TIMERB0
 #endif
-
-#if (!defined(USE_TIMERB1) && !defined(USE_TIMERB2) && !defined(USE_TIMERB0))||(defined(USE_MILLIS_TIMERB0)&&defined(USE_TIMERB0))
-    # error "No timers allowed for tone() because only option used for millis()"
-    /* Please uncomment a timer above and rebuild */
-#endif
-
 
 static volatile TCB_t* _timer =
 #if defined(USE_TIMERB0)
@@ -66,9 +59,6 @@ static volatile TCB_t* _timer =
 #endif
 #if defined(USE_TIMERB1)
 &TCB1;
-#endif
-#if defined(USE_TIMERB2)
-&TCB2;
 #endif
 
 static int _pin = NOT_A_PIN;
@@ -205,8 +195,6 @@ static void disableTimer()
 ISR(TCB0_INT_vect)
 #elif defined USE_TIMERB1
 ISR(TCB1_INT_vect)
-#elif defined USE_TIMERB2
-ISR(TCB2_INT_vect)
 #endif
 {
   if(!(--timer_cycle_per_tgl_count)) //Are we ready to toggle? pre-decrement, then see if 0 or more

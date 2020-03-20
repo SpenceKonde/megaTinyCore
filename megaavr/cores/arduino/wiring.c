@@ -100,18 +100,7 @@ static volatile TCB_t* _timer =
 #error "Selected millis timer, TCB1 does not exist on this part."
 #endif
 &TCB1;
-#elif defined(MILLIS_USE_TIMERB2) //not sure if any parts that support this exist in the tiny line, but it here anyway
-#ifndef TCB2
-#error "Selected millis timer, TCB2 does not exist on this part."
-#endif
-&TCB2;
-#elif defined(MILLIS_USE_TIMERB3)//not sure if any parts that support this exist in the tiny line, but it here anyway
-#ifndef TCB3
-#error "Selected millis timer, TCB3 does not exist on this parts."
-#endif
-&TCB3;
-#endif
-#else //it's not TCB0, TCB1, TCB2, TCB3. TCD0, TCA0, or RTC
+#else //it's not TCB0, TCB1, TCD0, TCA0, or RTC
 #error "No millis timer selected, but not disabled - can't happen!".
 #endif
 
@@ -128,10 +117,6 @@ ISR(RTC_CNT_vect)
 ISR(TCB0_INT_vect)
 #elif defined(MILLIS_USE_TIMERB1)
 ISR(TCB1_INT_vect)
-#elif defined(MILLIS_USE_TIMERB2)
-ISR(TCB2_INT_vect)
-#elif defined(MILLIS_USE_TIMERB3)
-ISR(TCB3_INT_vect)
 #else
 #error "no millis timer selected"
 #endif
@@ -202,7 +187,7 @@ unsigned long micros() {
 
 	unsigned long overflows, microseconds;
 
-	#if (defined(MILLIS_USE_TIMERD0)||defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1)||defined(MILLIS_USE_TIMERB2)||defined(MILLIS_USE_TIMERB3))
+	#if (defined(MILLIS_USE_TIMERD0)||defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1))
 	uint16_t ticks;
 	#else
 	uint8_t ticks;
@@ -259,7 +244,7 @@ unsigned long micros() {
 	microseconds = ((overflows * (TIME_TRACKING_CYCLES_PER_OVF/(16)))
 				+ (ticks * ((TIME_TRACKING_CYCLES_PER_OVF)/(16)/TIME_TRACKING_TIMER_PERIOD)));
 	#endif
-    #elif (defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1)||defined(MILLIS_USE_TIMERB2)||defined(MILLIS_USE_TIMERB3))
+    #elif (defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1))
     //20MHz-derived clocks, microsecond part is 0.4% slow. 16MHz derived ones dead-on.
 	#if (F_CPU==20000000UL)
 	ticks=ticks>>3;
