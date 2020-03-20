@@ -649,8 +649,8 @@ atxy2.menu.uartvoltage.3v=Closer to 3v
 atxy2.menu.uartvoltage.5v.build.uartvoltage=
 atxy2.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
 
-atxy2.menu.uartpins.alternate=TX:2, RX:3
-atxy2.menu.uartpins.standard=TX:0, RX:1
+atxy2.menu.uartpins.alternate=TX:2 (PA1), RX:3 (PA2)
+atxy2.menu.uartpins.standard=TX:0 (PA6), RX:1 (PA7)
 atxy2.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
 atxy2.menu.uartpins.standard.build.uartpins=
 atxy2.menu.spipins.standard=SCK:4, MISO:3, MOSI:2
@@ -1521,8 +1521,8 @@ atxy2o.menu.uartvoltage.3v=Closer to 3v
 atxy2o.menu.uartvoltage.5v.build.uartvoltage=
 atxy2o.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
 
-atxy2o.menu.uartpins.alternate=TX:2, RX:3
-atxy2o.menu.uartpins.standard=TX:0, RX:1
+atxy2o.menu.uartpins.alternate=TX:2 (PA1), RX:3 (PA2)
+atxy2o.menu.uartpins.standard=TX:0 (PA6), RX:1 (PA7)
 atxy2o.menu.uartpins.alternate.build.uartpins=-DUARTREMAP
 atxy2o.menu.uartpins.alternate.bootloader.uartswap=_alt
 atxy2o.menu.uartpins.standard.build.uartpins=
