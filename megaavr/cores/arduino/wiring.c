@@ -100,6 +100,7 @@ static volatile TCB_t* _timer =
 #error "Selected millis timer, TCB1 does not exist on this part."
 #endif
 &TCB1;
+#endif
 #else //it's not TCB0, TCB1, TCD0, TCA0, or RTC
 #error "No millis timer selected, but not disabled - can't happen!".
 #endif
@@ -288,7 +289,10 @@ unsigned long micros() {
 	#endif //end of timer-specific part of micros calculations
 	return microseconds;
 }
+
 #endif //end of non-RTC micros code
+
+
 #endif //end of non-DISABLE_MILLIS code
 
 #if !(defined(DISABLE_MILLIS) || defined(MILLIS_USE_TIMERRTC)) //delay implementation when we do have micros()
