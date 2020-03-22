@@ -303,12 +303,7 @@ Note that, if you have UPDI programming enabled, and desire the convenience of a
 
 # Known Compiler Bugs
 * Sometimes a sketch which is too big to fit will, instead of generating a message saying that, result in the error: 'relocation truncated to fit: R_AVR_13_PCREL against symbol tablejump2'.
-* At least as of the avr-gcc package 7.3.0-atmel3.6.1-arduino5 there is a bug in the `<avr/eeprom.h>` library's eeprom_is_ready() macro - it refers to registers that don't exist on the parts (this impacts the 4809 and it's ilk as used in Nano Every/Uno WiFi Rev. 2 as well). Attempting to use that macro will generate a error stating that `'NVM_STATUS' was not declared in this scope`. When a newer version of that package that corrects this issue is available, megaTinyCore will use it. In the meantime, replace eeprom_is_ready() with this:
-
-```
-bit_is_clear(NVMCTRL.STATUS,NVMCTRL_EEBUSY_bp);
-```
-If writing a library or sketch that is intended to work on both megaavr and classic avr parts, you can test for effected parts using `#if defined(ARDUINO_ARCH_MEGAAVR)`
+* At least as of the avr-gcc package 7.3.0-atmel3.6.1-arduino5 there is a bug in the `<avr/eeprom.h>` library's eeprom_is_ready() macro - it refers to registers that don't exist on the parts (this impacts the 4809 and it's ilk as used in Nano Every/Uno WiFi Rev. 2 as well). Attempting to use that macro will generate a error stating that `'NVM_STATUS' was not declared in this scope`. When a newer version of that package that corrects this issue is available, megaTinyCore will use it. In the meantime, `replace eeprom_is_ready()` with `bit_is_clear(NVMCTRL.STATUS,NVMCTRL_EEBUSY_bp)`. If writing a library or sketch that is intended to work on both megaavr and classic avr parts, you can test for effected parts using `#if defined(ARDUINO_ARCH_MEGAAVR)`
 
 
 # Buying ATtiny megaAVR breakout boards
