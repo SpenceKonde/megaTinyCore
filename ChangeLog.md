@@ -1,3 +1,6 @@
+1.1.9
+* Add support for writing to the user row using EEPROM.h
+
 1.1.8
 * Fix critical bug introduced in 1.1.7 that prevented compilation with TCA0 as millis source
 
