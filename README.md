@@ -131,6 +131,7 @@ Move back to default pins:
 ```cpp
 PORTMUX.CTRLB&=~(1<<TWI0);
 ```
+As of 1.1.9, courtesey of https://github.com/LordJakson, when the version of Wire.h supplied with megaTinyCore 1.1.9 and later in slave mode, it is now possible to respond to the general call (0x00) address as well. This is controlled by the optional second argument to Wire.begin(). If the argument is supplied amd true, general call broadcasts will also trigger the interrupt. This version also introduces a third optional argument, which is passed unaltered to the TWI0.SADDRMASK register. If the low bit is 0, and bits set 1 sill cause the I2C hardware to ignore that bit of the address (masked off bits will be treated as matching). If the low bit is 1, it will instead act as a second address that the device can respond to.
 
 ### PWM support
 The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available (1.0.5 and later - 1.0.4 and earlier only have 1). On all other parts except the x16 and x17 series, 6 PWM pins are available, driven by Timer A. The type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A - however you can take them over if you need to generate PWM at different frequencies. See the pinout charts for a list of which pins support PWM.

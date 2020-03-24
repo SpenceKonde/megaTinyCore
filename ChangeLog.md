@@ -1,5 +1,7 @@
 1.1.9
 * Add support for writing to the user row using EEPROM.h
+* Add support for receiving general call messages in slave mode using the TWI peripheral through the Wire library
+* Add support for second address or masking off bits of the address using the TWI0.SADDRMSK register
 
 1.1.8
 * Fix critical bug introduced in 1.1.7 that prevented compilation with TCA0 as millis source
