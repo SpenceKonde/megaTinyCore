@@ -70,7 +70,7 @@ typedef enum __attribute__((packed)) TWI_MODE_enum {
 #define ADD_WRITE_BIT(address)  (address & ~0x01)
 
 void TWI_MasterInit(uint32_t frequency);
-void TWI_SlaveInit(uint8_t address);
+void TWI_SlaveInit(uint8_t address,uint8_t receive_broadcast);
 void TWI_Flush(void);
 void TWI_Disable(void);
 TWI_BUSSTATE_t TWI_MasterState(void);

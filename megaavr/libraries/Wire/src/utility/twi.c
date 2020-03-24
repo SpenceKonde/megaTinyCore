@@ -95,7 +95,7 @@ void TWI_MasterInit(uint32_t frequency)
  *
  *  \param address				    The TWI Slave's own address.
  */
-void TWI_SlaveInit(uint8_t address)
+void TWI_SlaveInit(uint8_t address,uint8_t receive_broadcast)
 {
 	if(twi_mode != TWI_MODE_UNKNOWN) return;
 
@@ -108,7 +108,7 @@ void TWI_SlaveInit(uint8_t address)
 	slave_callUserRequest = 0;
 	slave_callUserReceive = 0;
 
-	TWI0.SADDR = address << 1;
+	TWI0.SADDR = address << 1 | receive_broadcast;
 	TWI0.SCTRLA = TWI_DIEN_bm | TWI_APIEN_bm | TWI_PIEN_bm  | TWI_ENABLE_bm;
 
 	/* Bus Error Detection circuitry needs Master enabled to work */
