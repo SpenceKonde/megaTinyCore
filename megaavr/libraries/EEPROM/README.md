@@ -19,7 +19,7 @@ As with most Arduino libraries, this library sacrifices performance and function
 No facility for wear leveling is provided, other than the `update()` and `put()` methods checking that the contents have not changed before writing. Under typical usage scenarios, further wear leveling methods are unnecessary - these devices are rated for 100,000 erase-write cycles, and according to the datasheet, the hardware only erases and writes bytes which have been written to the page buffer - it deos not perform a read-modify-write cycle on the whole page when any byte within the page is written or erased. If you do determine thas wear leveling is required for your application, many libraries that do this are available from various authors. Be aware that there is a bug in eeprom_is_ready() macro provided by the <avr/eeprom.h> included with most versions of avr-libc, which impacts many third party EEPROM-rel;ated libraries.  The symptom of this issue is an error referring to NVM_STATUS; to fix it, search the library code for eeprom_is_ready(). Replace `eeprom_is_ready()` with `!(NVMCTRL.STATUS & NVMCTRL_EEBUSY_bm)` and the library should work, assuming they do not make use of direct register writes that would require hand-porting to other families of AVR.
 
 ### **How to use it**
-The EEPROM library is included in your IDE download. To add its functionality to your sketch you'll need to reference the library header file. You do this by adding an include directive to the top of your sketch.
+The EEPROM library is provided as part of all board packages for hardware with this sort of memory - this particular version is supplied with megaTinyCore. It will be used whenver you are compiling for
 
 ```Arduino
 #include <EEPROM.h>
