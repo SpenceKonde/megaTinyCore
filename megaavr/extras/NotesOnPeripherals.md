@@ -11,14 +11,29 @@ TCNT1=-(F_CPU/1024); // timer clocks at 1024 prescaler in 1 second, as negative 
 TCCR1B=0x05; //turn on Timwer 1 with prescaler=1024
 while(!(TIFR1&(1<<TOV1))); //spin for 1 second
 ```
-On megaavr, trying the same thing will spin forever, because the INFLAGS register is never set if it's not 
+On megaavr, trying the same thing will spin forever, because the INTFLAGS register are never set if it's not enabled... 
 ```
-TCA0.SINGLE.CTRLA=0x0F; //TCA0 1024 prescaler
-TCB0.CTRLA=0; TCB0.CTRLB=0; TCB0.INTCTRL=0; TCB0.INTFLAGS=255; //Stop TCB0, Periodic Interrupt timing mode, interrupt off
-TCB0.CNT=-(F_CPU/1024); //Number of clocks until overflow
-TCB0.CTRLA=0x05; //TCB0 uses prescaled CLK_TCA
-while(!TCB0.INTFLAGS); //Spins forever!
+  TCA0.SINGLE.CTRLA=0x0F; //TCA0 1024 prescaler
+  TCB0.CTRLA=0; TCB0.CTRLB=0; TCB0.INTCTRL=0; TCB0.CNT=0; //Stop TCB0, Periodic Interrupt timing mode, interrupt off, Count 0
+  TCB0.CCMP=(F_CPU/1024); //Number of clocks until overflow
+  TCB0.CTRLA=0x05; //TCB0 uses prescaled CLK_TCA
+  while(!TCB0.INTFLAGS); //Spins forever!
 ```
+Of course, if you enable the interrupt, but have interrupts globally disabled, that trick works fine:
+
+```
+  TCA0.SINGLE.CTRLA=0x0F; //TCA0 1024 prescaler
+  TCB0.CTRLA=0; TCB0.CTRLB=0; TCB0.INTCTRL=1; TCB0.CNT=0; //Stop TCB0, Periodic Interrupt timing mode, interrupt on, Count 0
+  TCB0.CCMP=(F_CPU/1024); //Number of clocks until overflow
+  TCB0.CTRLA=0x05; //TCB0 uses prescaled CLK_TCA
+  cli();
+  while(!TCB0.INTFLAGS); //Spins forever!
+  TCB0.INTFLAGS=1; //You really need to do this here too!
+  sei();
+```
+
+If you don't clear the INTFLAGS when doing that (even if you clear INTCTRL instead), that interrupt will still fire. If you don't have an ISR defined, it will go to the "bad interrupt" handler, which jumps to the reset vector... but the INTFLAG is still set, so the non-existent interrupt will still fire... again and again and again.
+
 
 ##### Flags MUST be cleared in interrupts
 * Unlike classic AVRs, you MUST clear the interrupt flag in the ISR. They are not cleared automatically. Do this by writing 1 to the bit. Failing to do so can produce surprising results, because the processor doesn't *halt* - it just runs agonizingly slowly (plus whatever the interrupt does keeps happening - but this may not be as obvious) - because at least one instruction will always happen between interrupts. 
