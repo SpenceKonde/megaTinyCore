@@ -14,7 +14,7 @@ while(!(TIFR1&(1<<TOV1))); //spin for 1 second
 On megaavr, trying the same thing will spin forever, because the INFLAGS register is never set if it's not 
 ```
 TCA0.SINGLE.CTRLA=0x0F; //TCA0 1024 prescaler
-TCB0.CTRLA=0; TCB0.CTRLB=0; TCB0.INTCTRL=0; TCB0.INTFLAGSL=255; //Stop TCB0, Periodic Interrupt timing mode, interrupt off
+TCB0.CTRLA=0; TCB0.CTRLB=0; TCB0.INTCTRL=0; TCB0.INTFLAGS=255; //Stop TCB0, Periodic Interrupt timing mode, interrupt off
 TCB0.CNT=-(F_CPU/1024); //Number of clocks until overflow
 TCB0.CTRLA=0x05; //TCB0 uses prescaled CLK_TCA
 while(!TCB0.INTFLAGS); //Spins forever!
