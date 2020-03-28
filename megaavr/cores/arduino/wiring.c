@@ -122,6 +122,7 @@ ISR(TCB1_INT_vect)
 #error "no millis timer selected"
 #endif
 {
+  VPORTA.IN|=0x80;
 	// copy these to local variables so they can be stored in registers
 	// (volatile variables must be read from memory on every access)
 
@@ -154,6 +155,7 @@ ISR(TCB1_INT_vect)
 	#else //timerb
 	_timer->INTFLAGS = TCB_CAPT_bm;
 	#endif
+  VPORTA.IN|=0x80;
 }
 
 unsigned long millis()
@@ -618,7 +620,14 @@ void setup_timers() {
     TCA0.SPLIT.HCMP2 = PWM_TIMER_COMPARE;
 
     /* Use DIV64 prescaler (giving 250kHz clock), enable TCA timer */
-    TCA0.SPLIT.CTRLA = (TCA_SINGLE_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
+    #if (F_CPU > 5000000) //use 64 divider
+    TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
+    #elif (F_CPU > 1000000)
+    TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV16_gc) | (TCA_SINGLE_ENABLE_bm);
+    #else //TIME_TRACKING_TIMER_DIVIDER==8
+    TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SINGLE_ENABLE_bm);
+    PORTA.DIRSET=0x80;
+    #endif
 
 
     /*    TYPE B TIMERS  */
