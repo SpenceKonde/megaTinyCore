@@ -1,7 +1,9 @@
 1.1.9
+* At 4 MHz or 5 MHz, we now reduce the prescaling for TCA - this helps maintain micros granularity and output flicker-free PWM.
 * Add support for writing to the user row using EEPROM.h
 * Add support for receiving general call messages in slave mode using the TWI peripheral through the Wire library
 * Add support for second address or masking off bits of the address using the TWI0.SADDRMSK register
+* Lots of expanded documentation
 
 1.1.8
 * Fix critical bug introduced in 1.1.7 that prevented compilation with TCA0 as millis source
