@@ -45,7 +45,10 @@ There is a solution to the lack of a hardware reset pin when you need to keep UP
 
 If you were to set up a "low level" interrupt on a pin, and put that in the ISR, that pin would act as an ersatz reset pin (note that it wouldn't "stay" in reset like a real reset pin - it will reset the chip, and then the sketch (or bootloader) will start running again from the start until the interrupt was enabled, then reset again).
 
-megaTinyCore supports configurations with this pin fused to act as reset with programming over UART serial, as well as with the UPDI pin used as GPIO, on Optiboot boards only. See the Optiboot section below for more information
+megaTinyCore supports configurations with this pin fused to act as reset, or as GPIO in Optiboot configurations. This is because it is still possible to program the board ove the UART serial using the bootloader with the UPDI functionality disabled. By default, when UPDI is set as reset, the standard boot-reset source behavior is used - it will enter the bootloader only when reset by a Software Reset, or by the Reset pin (allowing the usual DTR reset trick, but the sketch can start instantly on power-pn. When the pin is set as UPDI or GPIO, the optiboot bootloader used will also enter the bootloader on a power-on reset, and stay there for 8 seconds to faciiitate bootloading (and will also enter the bootloader on a software reset. Work is ongoing on a design for a low-cost arduino-based solution for 12v programming. As I am able to validate that and integrate support, we will introduce GPIO and reset for all configurations. 
+
+**Limited input facilities on PA0 with pin set as UPDI** 
+It has been discovered that as long as the patterns applied to the UPDI pin are not mistaken for a UPDI signal, the pin will still act as a fully functional input - for analogRead(), digitalRead(), and as input0 to CCL0. Obviously I cant's 
 
 # Features
 
@@ -57,14 +60,18 @@ However, do note that if you explicitly declare a variable PROGMEM, you must sti
 **WARNING** In versions of megaTinyCore 1.0.6 and earlier, the sketch size reported during compilation does not include variables declared const. PROGMEM variables, however, are reported normally. in 1.1.0 and subsequent releases, the flash used by const variables is correctly reported.
 
 ### Ways to refer to pins
-The simple matter of how to refer to a pin for analogRead() and digitalRead(), particularly on non-standard hardware, leads to a surprising amount of confusion. It's my opinion that the blame rests with the dubious usability decisions made in design of the original Arduino core. This core uses an extremely simple basic scheme - but with a few additional options for people who are used to other conventions.
+The simple matter of how to refer to a pin for analogRead() and digitalRead(), particularly on non-standard hardware, leads to a surprising amount of confusion. It's my opinion that the blame rests with the dubious usability decisions made in design of the original Arduino core, where pins were referred to as "analog" and "digital" pins. This core uses an extremely simple scheme: Pins are numbered starting from the the I/O pin closest to Vcc as pin 0 and proceeding counterclockwise, skipping the (usually) non-usable UPDI pin, assigning it the highest pin number in the event that it is enabled for use. However, a few additional options are provided to
 
-For digitalRead(), digitalWrite(), pinMode(), analogWrite() analogRead() and other sundry functions, the "Arduino Pin Number" shown in the pinout charts is the recommended way to refer to pins. digitalRead(1) and analogRead(1) refer to the same pin, and will perform a digital or analog read on said pin. See the charts in the [part specific documentation](megaavr/extras/ImportantInfo.md).
+#### Arduino Pin Numbers
+When a single number is used to refer to a pin - in the documentation, or in your code - it is always the "Arduino pin number" - these are the pin numbers shown in orange (for pins capable of analogRead()) and blue (for pins that are not) on the pinout charts. All of the other ways of referring to pins listed below are #defined to the corresponding Arduino pin number.
 
-Two additional ways are provided to refer to pins:
-* The analog channel numbers are available as An defines (ex, A0, A1, A2, etc). These are the analog *channel* numbers; they are simply #defined as the digital pin number associated with the analog channel in question. See the datasheet for the assignments of analog channel numbers to pins; because we do not recommend referring to pins in this way, we have chosen not to include the analog channel numbers on the included pinout charts. There are also PIN_An defines for compatibility with the official cores - these likewise point to the digital pin number associated with the analog channel. Note that channel A0 is on the UPDI/Reset pin, and hence is typically not usable.
-* If you wish to refer to pins by their port and pin number, you can do that too - As of 1.1.1, the core provides PIN_Pxn (for example, PIN_PA1, or PIN_PC0). Not to be confused with the PIN_An defines described above). Again, these just resolve to the digital pin number of the pin in question - they don't go through a different code path or anything (for that - for example if you need higher performance than digitalWrite() et. al. can provide - see [direct port manipulation](megaavr/extras/DirectPortManipulation.md).
+The built-in functions for manipulating pins - digitalRead(), digitalWrite(), pinMode(), analogWrite() analogRead() and others all take these "Arduino Pin Number". digitalRead(1) and analogRead(1) refer to the same pin, and will perform a digital or analog read on said pin. See the charts in the [part specific documentation](megaavr/extras/ImportantInfo.md).
 
+#### PIN_Pxn Port Pin Numbers
+Defines are also provided of the form PIN_Pxn, where x is A, B, or C, and n is a number 0~7 - (Not to be confused with the PIN_An defines described below). These just resolve to the digital pin number of the pin in question - they don't go through a different code path or anything. However, they have particular utility in writing code that works across the product line with peripherals that are linked to certain pins (by Port), as most peripherals are. Several pieces of demo code in the documentation take advantage of this.  Direct port manipulation is absolutely possible on the megaAVR parts - and in fact several powerful additional options are available for it - see [direct port manipulation](megaavr/extras/DirectPortManipulation.md).
+
+#### An and PIN_An constants
+The core also provides An and PIN_An constants (where n is a number from 0 to 11). These refer to the ADC0 *channel* numbers. This naming system is similar to what was used on many classic AVR cores - on some of those, it is used to simplify the code behind analogRead() - but here, they are just #defined as the corresponding Arduino pin number. These are not shown on the pinout charts, as this is a deprecated way of referring to pins. The mapping of analog channels to pins is shown in the the datasheet under the I/O Multiplexing Considerations chapter. There are additionally PIN_An defines for compatibility with the official cores - these likewise point to the digital pin number associated with the analog channel. Note that channel A0 is on the UPDI/Reset pin, while, as of 1.1..
 
 ### Serial (UART) Support
 All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards (except that there is no auto-reset, see note above about the lack of a reset pin). See the pinout charts for the location of the serial pins. Serial output for a few milliseconds after calling Serial.begin() seems to be off - if you are printing a message at the start of the sketch, add a small delay between Serial.begin() and your first Serial.print() call.
@@ -89,8 +96,6 @@ To maximize the accuracy of the baud rate, from the Tools -> Voltage for UART Ba
 
 Note: The UART Serial option selected when you do "burn bootloader" for an Optiboot board definition is the serial port that the uploaded bootloaded will use. You may freely change this when compiling/uploading sketches to use the other pins - the pins used by the bootloader will only change when you do "burn bootloader". **If this is your first time bootloading the board in question, and you want to turn UPDI into a Reset pin, burn bootloader first with the UPDI pin left as UPDI, so you can verify that, with the desired UART option, the bootloader really does try to use the pins you want it to - before you turn UPDI into reset and render the part unprogrammable.**
 
-
-Note: UART serial is broken on the x12 and x02 parts before version 1.0.3.
 
 ### SPI support
 All of these parts have a single hardware SPI peripheral. It works exactly like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. Note that the 8-pin parts (412, 212, 402, 204) do not have a specific SS pin.
@@ -134,30 +139,35 @@ PORTMUX.CTRLB&=~(1<<TWI0);
 As of 1.1.9, courtesey of https://github.com/LordJakson, when the version of Wire.h supplied with megaTinyCore 1.1.9 and later in slave mode, it is now possible to respond to the general call (0x00) address as well. This is controlled by the optional second argument to Wire.begin(). If the argument is supplied amd true, general call broadcasts will also trigger the interrupt. This version also introduces a third optional argument, which is passed unaltered to the TWI0.SADDRMASK register. If the low bit is 0, and bits set 1 sill cause the I2C hardware to ignore that bit of the address (masked off bits will be treated as matching). If the low bit is 1, it will instead act as a second address that the device can respond to.
 
 ### PWM support
-The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available (1.0.5 and later - 1.0.4 and earlier only have 1). On all other parts except the x16 and x17 series, 6 PWM pins are available, driven by Timer A. The type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A - however you can take them over if you need to generate PWM at different frequencies. See the pinout charts for a list of which pins support PWM.
-The 3216,1616,816,416,3217,1617 and 817 have two additional PWM pins driven by Timer D (pins 10 and 11 on x16, 12 and 13 on x17). Timer D is an async timer, and the outputs can't be enabled or disabled without briefly stopping the timer. This results in a brief glitch on the other PWM pin (if it is currently outputting PWM), and doing so requires slightly longer (in 1.0.0, this delay is 1ms, in 1.0.1 and later, it is around 1us). This applies to digitalWrite() or analogWrite of 0 or 255 while it is currently outputting PWM, and analogWrite of 1~254 while the pin is not currently outputting PWM. This is a hardware limitation and cannot be further improved.
+The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available. On all other parts except the x16 and x17 series, 6 PWM pins are available, all driven by Timer A. The Type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A - however you can take them over if you need to generate PWM at different frequencies. See the pinout charts for a list of which pins support PWM.
+The 3216,1616,816,416,3217,1617 and 817 have two additional PWM pins driven by Timer D (PC0 and PC1 - pins 10 and 11 on x16, 12 and 13 on x17). Timer D is an async timer, and the outputs can't be enabled or disabled without briefly stopping the timer. This results in a brief glitch on the other PWM pin (if it is currently outputting PWM), and doing so requires slightly longer (in 1.0.0, this delay is 1ms, in 1.0.1 and later, it is around 1us). This applies to digitalWrite() or analogWrite of 0 or 255 while it is currently outputting PWM, and analogWrite of 1~254 while the pin is not currently outputting PWM. This is a hardware limitation and cannot be further improved.
 
 **Note that TCA0 (the type A timer) on all parts is configured in split mode to support the most PWM pins possible with analogWrite(). As of 1.1.6, and to a lesser extent other versions since 1.1.3 it has been made much easier to reconfigure TCA0 without messing up other functions of the core. If you want to reconfigure TCA0 for other purposes, please refer to the below guide**
-#### [Taking over TCA0](extras/TakingOverTCA0.md)
+#### [Taking over TCA0](megaavr/extras/TakingOverTCA0.md)
 
+**For general information on the available timers and how they are used PWM and other functions, consult the guide:**
+#### [Timers and megaTinyCore](megaavr/extras/PWMandTimers.md)
 
-If you wish to change the PWM frequency, on versions prior to 1.1.6, it will break tone, as well as millis/micros with TCA0, TCB0, or TCB1 as a clock source, and the Servo library. On 1.1.6, only the Servo library, and of course TCA0 for millis/micros will be broken by changing the TCA0 prescaler. Servo library dependence on TCA0 prescaler has been removed for 1.1.7.
+In versions prior to 1.1.7, reconfiguting the TCA0's prescaler adversely effected tone and servo functionality. This is no longer the case.
 
-### NeoPixel (WS2812) support (new in 1.0.3)
+### NeoPixel (WS2812) support
 The usual NeoPixel (WS2812) libraries have problems on these parts. This core includes two libraries for this, both of which are tightly based on the Adafruit_NeoPixel library. See the [tinyNeoPixel documentation](megaavr/extras/tinyNeoPixel.md) and included examples for more information.
 
 ### Tone Support
 Support for tone() is provided on all parts using TCB0, unless TCB1 is present and TCB0 is set as millis source. This is like the standard tone() function; it does not support use of the hardware output compare to generate tones. See caveats below if using TCB0 or TCB1 for millis/micros settings.
 
-### millis/micros options and timer use
-By default, as of 1.1.3, TCD0 will be used by default for millis() on parts without PWM pins that can be driven by TCD0 and not TCA0, otherwise TCA0 will be used (on previous versions, TCA0 is used on all parts). A tools submenu, millis()/micros() provides options to enable with default settings for the part, disable millis and micros entirely (to save flash), or to force it onto a specific timer - as of 1.1.5, TCA0 and TCD0 (1-series parts only, breaks PWM on the two timer D pins on 20 and 24 pin parts), TCB0, TCB1 (where present) and the RTC (no micros, only millis, clocked from internal ULP or external 32,768khz watch crystal) are supported for timekeeping. When using TCB0 as millis() source, tone and the Servo library will be unavailable on parts with only one type b timer. Using either TCB0 or TCB1 on parts with both will prevent simultaneous use of tone and the Servo library. Support for millis() with the RTC using external watch crystal or internal ULP are planned for a future version (this will only support millis, not micros - the 32kHz clock is not fast enough for microsecond timing). The timer selection menu provides a way to ensure that if you need to take over a specific timer completely, you can move millis()/micros() to a different timer, accepting the consequences outlined above.
+### millis/micros Timekeeping Options
+megaTinyCore provides the option to use any available timer on a part for the millis()/micros timekeeping, controlled by a Tools submenu - or it can be disabled entirely to save flash and allow use of all timer interrupts. By default, TCD0 will be used by on parts that have one and don't use it for PWM (the 8 and 14-pin 1-series parts) - otherwise TCA0 will be used. All timers available on the parts can be used: TCA0, TCD0 (on parts that have it), TCB0, TCB1 (where present) and the RTC. Many of these - particularly the non-default options, involve tradeoffs. In brief, using TCD0 for timing disables thw two additional PWM pins it can drive on the 20 and 24-pin parts, TCB0 conflicts with Servo and tone on parts that don't have TCB1, and when the RTC is used micros() is not available at all becuase the clock isn't fast enough. However, in spite of all that, the timer selection menu provides a way to ensure that if you need to take over a specific timer completely, you can move millis()/micros() to a different timer, accepting the consequences. 
+
+For more information, on the hardware timers of the supported parts, and how they are used by megaTinyCore's built-in functionality, see the [Timers and megaTinyCore](megaavr/extras/PWMandTimers.md)
 
 When 20/10/5MHz system clock is used, the micros() count will not increase exactly 1000 times faster than millis() count - it is close, but not exact. This was required for performance and flash usage optimization.
 
-In versions prior to 1.1.6, TCB0 and TCB1 as the millis/micros source, as well as tone and the Servo library depend on the prescaler of TCA0 not being changed - this prescaled clock source is used (type B timers do not have a separate prescaler). On 1.1.6, this dependence is removed for millis/micros and tone, so that the TCA0 prescaler can be freely changed. Servo library will have this dependence removed in 1.1.7.
+In recent versions, the timekeeping timer options have been undergoing frequent and significant improvements. If you are partiularly concerned with manipulating these timers, be sure to use the latest version - more enhancements are on the way!
 
 #### RTC timer for millis
 If the RTC is selected as the timer for millis timekeeping, micros will not be available. Additionally, this timer is configured to run while in STANDBY sleep mode. This has two important consequences: First, it will keep time while in sleep. Secondly, every 64 seconds, the RTC overflow interrupt will fire, waking the chip - thus, if you are using the RTC for millis and putting the part into sleep, you should declare a volatile global variable that you set in the ISR that is supposed to wake the part, eg 'volatile boolean ShouldWakeUp=0;' - set it to 1 in the ISR, and when you put the ATtiny to sleep, have it check this immediately after waking, going back to sleep if it's not set, and clearing it if it is, e.g.:
+
 ```cpp
 void GoToSleep() {
     do {
@@ -166,6 +176,9 @@ void GoToSleep() {
     ShouldWakeUp=0;
 }
 ```
+
+This functionality will be made easier to use via the megaTinySleep library in a future version of the core.
+
 This board package also supports using an external 32.768khz crystal as the clock source for the RTC (not supported on 8-pin parts). If this is used, make sure that the crystal is connected between the TOSC1 and TOSC2 pins (these are tbe same as the TX and RX pins), that nothing else is, that no excessively long wires or traces are connected to these pins, and that appropriate loading capacitors per crystal manufacturer datasheet are connected. Since the TOSC1 and TOSC2 pins are the same pins used for serial, you must use the alternate serial pins.
 
 ### ADC Support
@@ -177,6 +190,8 @@ These parts all have ADC channels available on most pins (11 pins on 24 and 20 p
 * INTERNAL2V5
 * INTERNAL4V3
 * EXTERNAL (1-series - not including 412/212 - only)
+
+**Note:** Some of these parts have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins. Currently adding support for this to the core is not a high priority, as already most pins are available. 
 
 ### DAC Support
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). This generates voltages between 0 and the selected VREF (which cannot be VCC, unfortunately) - select the DAC VREF voltage from the Tools -> DAC Voltage Reference submenu. This voltage must be lower than Vcc to get the correct voltages. Call analogWrite() on the DAC pin to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin. The Tools -> DAC Voltage menu contains an additional option to disable the DAC output, as this saves a fair bit of flash.
