@@ -127,7 +127,7 @@ static void turnOffPWM(uint8_t pin)
 		DAC0.CTRLA=0x00;
 		break;
 	#endif
-    #if (defined(TCD0) && defined(USE_TIMERD0_PWM) &&(!defined(MILLIS_USE_TIMERD0)))
+    #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
 	case TIMERD0:
 		// rigmarole that produces a glitch in the PWM
 		TCD0.CTRLA=0x10;//stop the timer

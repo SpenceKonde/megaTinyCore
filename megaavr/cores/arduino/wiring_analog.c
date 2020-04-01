@@ -158,7 +158,7 @@ void analogWrite(uint8_t pin, int val)
 
 			// Get pointer to timer, TIMERB0 order definition in Arduino.h
 			//assert (((TIMERB0 - TIMERB3) == 2));
-			timer_B = ((TCB_t *)&TCB0 + (digital_pin_timer - TIMERB0));
+			timer_B = ((TCB_t *)&TCB0 + (digital_pin_timer - (TIMERB0&0x07));
 
 			// set duty cycle
 			timer_B->CCMPH = val;
@@ -174,24 +174,30 @@ void analogWrite(uint8_t pin, int val)
 			DAC0.CTRLA=0x41; //OUTEN=1, ENABLE=1
 			break;
 		#endif
-	    #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && (!defined(MILLIS_USE_TIMERD0)))
+	    #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
 		case TIMERD0:
 			if(val < 1){	/* if zero or negative drive digital low */
 				digitalWrite(pin, LOW);
-			} else if(val > 255){	/* if max or greater drive digital high */
+			} else if(val > 254){	/* if max or greater drive digital high */
 				digitalWrite(pin, HIGH);
 			} else {
 			    if (bit_pos) {
-			    	TCD0.CMPBSET=255-val;
+			    	TCD0.CMPBSET=(255-val)<<1;
 			    } else {
-			    	TCD0.CMPASET=val;
+			    	TCD0.CMPASET=(255-val)<<1;
 			    }
 				if (!(TCD0.FAULTCTRL & (1<<(6+bit_pos)))) { //bitpos will be 0 or 1 for TIMERD pins
 					//if not active, we need to activate it, which produces a glitch in the PWM
-					TCD0.CTRLA=0x10;//stop the timer
+					TCD0.CTRLA=TIMERD0_PRESCALER;//stop the timer
 					while(!(TCD0.STATUS&0x01)) {;} // wait until it's actually stopped
+					uint8_t sreg=SREG;
+					cli();
 					_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL|(1<<(6+bit_pos)));
-					TCD0.CTRLA=0x11; //reenable it
+					SREG=sreg;
+					TCD0.CTRLA=TIMERD0_PRESCALER|1; //reenable it
+				} else {
+					while(!(TCD0.STATUS&0x02)) {;} //if previous sync in progress, wait for it to finish.
+					TCD0.CTRLE=0x02; //Synchronize
 				}
 			}
 			break;

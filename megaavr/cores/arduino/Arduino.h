@@ -105,14 +105,25 @@ extern const uint8_t PROGMEM digital_pin_to_timer[];
 #define PF 5
 #define NUM_TOTAL_PORTS 6
 
-#define NOT_ON_TIMER 0
-#define TIMERA0 1
-#define TIMERB0 2
-#define TIMERB1 3
-#define TIMERB2 4
-#define TIMERB3 5
-#define TIMERD0 8
-#define DACOUT 9
+// These are used for two things: identifying the timer on a pin
+// and for the MILLIS_TIMER define that the uses can test which timer
+// actually being used for millis is actually being used
+// Reasoning these constants are what they are:
+// Low 3 bits are the number of that peripheral
+// other bits specify the type of timer
+// TCA=0x08, TCB=0x10, TCD=0x10 (leaving room in case Microchip ever decides to release a TCC)
+// Things that aren't hardware timers with output compare are after that
+// DAC output isn't a timer, but has to be treated as such by PINMODE
+// RTC timer is a tiner, but certainly not that kind of timer
+#define NOT_ON_TIMER 0x00
+#define TIMERA0 0x10
+#define TIMERB0 0x20
+#define TIMERB1 0x21
+#define TIMERB2 0x22
+#define TIMERB3 0x23
+#define TIMERD0 0x40
+#define TIMERRTC 0x90
+#define DACOUT 0x80
 
 void setup_timers();
 
@@ -133,35 +144,126 @@ void setup_timers();
 #define portModeRegister(P) ( (volatile uint8_t *)( &portToPortStruct(P)->DIR ) )
 
 //#defines to identify part families
-#if defined(__AVR_ATtiny3217__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny817__) || defined(__AVR_ATtiny417__)
-#define __AVR_ATtinyx17__
-#define __AVR_ATtinyxy7__
-#elif defined(__AVR_ATtiny3207__) || defined(__AVR_ATtiny1607__) || defined(__AVR_ATtiny807__) || defined(__AVR_ATtiny407__)
-#define __AVR_ATtinyx07__
-#define __AVR_ATtinyxy7__
-#elif defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny816__) || defined(__AVR_ATtiny416__)
-#define __AVR_ATtinyx16__
-#define __AVR_ATtinyxy6__
-#elif defined(__AVR_ATtiny1606__) || defined(__AVR_ATtiny806__) || defined(__AVR_ATtiny406__)
+#if defined(__AVR_ATtiny3217__)
+#define MEGATINYCORE_MCU 3217
 #define __AVR_ATtinyx06__
 #define __AVR_ATtinyxy6__
-#elif defined(__AVR_ATtiny214__) || defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny814__) || defined(__AVR_ATtiny414__)
+#elif defined(__AVR_ATtiny1617__)
+#define MEGATINYCORE_MCU 1617
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny817__)
+#define MEGATINYCORE_MCU 817
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny417__)
+#define MEGATINYCORE_MCU 417
+#define __AVR_ATtinyx17__
+#define __AVR_ATtinyxy7__
+#elif defined(__AVR_ATtiny3207__)
+#define MEGATINYCORE_MCU 3207
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny1607__)
+#define MEGATINYCORE_MCU 1607
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny807__)
+#define MEGATINYCORE_MCU 807
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny407__)
+#define MEGATINYCORE_MCU 407
+#define __AVR_ATtinyx07__
+#define __AVR_ATtinyxy7__
+#elif defined(__AVR_ATtiny3216__)
+#define MEGATINYCORE_MCU 3216
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny1616__)
+#define MEGATINYCORE_MCU 1616
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny816__)
+#define MEGATINYCORE_MCU 816
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny416__)
+#define MEGATINYCORE_MCU 416
+#define __AVR_ATtinyx16__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny1606__)
+#define MEGATINYCORE_MCU 1606
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny806__)
+#define MEGATINYCORE_MCU 806
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny406__)
+#define MEGATINYCORE_MCU 406
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny214__)
+#define MEGATINYCORE_MCU 214
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny1614__)
+#define MEGATINYCORE_MCU 1614
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny814__)
+#define MEGATINYCORE_MCU 814
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny414__)
+#define MEGATINYCORE_MCU 414
 #define __AVR_ATtinyx14__
 #define __AVR_ATtinyxy4__
-#elif defined(__AVR_ATtiny204__) || defined(__AVR_ATtiny804__) || defined(__AVR_ATtiny404__) || defined(__AVR_ATtiny1604__)
+#elif defined(__AVR_ATtiny204__)
+#define MEGATINYCORE_MCU 204
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny804__)
+#define MEGATINYCORE_MCU 804
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny404__)
+#define MEGATINYCORE_MCU 404
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny1604__)
+#define MEGATINYCORE_MCU 1604
 #define __AVR_ATtinyx04__
 #define __AVR_ATtinyxy4__
-#elif defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__)
+#elif defined(__AVR_ATtiny212__)
+#define MEGATINYCORE_MCU 212
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny412__)
+#define MEGATINYCORE_MCU 412
 #define __AVR_ATtinyx12__
 #define __AVR_ATtinyxy2__
-#elif defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__)
+#elif defined(__AVR_ATtiny202__)
+#define MEGATINYCORE_MCU 202
+#define __AVR_ATtinyx06__
+#define __AVR_ATtinyxy6__
+#elif defined(__AVR_ATtiny402__)
+#define MEGATINYCORE_MCU 402
 #define __AVR_ATtinyx02__
 #define __AVR_ATtinyxy2__
 #else
 #error "Can't-happen: unknown chip somehow being used"
 #endif
 
-#define MEGATINYCORE
+#define MEGATINYCORE "1.1.19-dev"
+#define MEGATINYCORE_MAJOR 01
+#define MEGATINYCORE_MINOR 01
+#define MEGATINYCORE_PATCH 19
+#define MEGATINYCORE_RELEASED 00
+#define MEGATINYCORE_NUM 0x01011300
+
+
 
 #ifdef __cplusplus
 } // extern "C"
