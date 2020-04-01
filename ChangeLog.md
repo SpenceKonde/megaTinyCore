@@ -6,8 +6,8 @@
 * Add support for PWM on TCD0 when it is used as millis source
 * Adjust TCBm period when used for millis timekeeping with 1MHz system clock to reduce time spend in the millis ISR (reduces millis resolution to 2ms)
 * Lower prescaler on TCA0 to 16 when system clock is 4 Mhz or 5 MHz and 8 when running at 1 MHz (was 64)
-* Increase prescaler on TCD0 to 64 when used as millis() source with 1 MHz system clock (it still runs from unprescaled 20/16 MHz oscillator) in order to reduce portion of time spent in the ISR.
-* At 4 MHz or 5 MHz, we now reduce the prescaling for TCA - this helps maintain micros granularity and output flicker-free PWM.
+* Increase prescaler on TCD0 to 64 when used as millis() source with 1 MHz system clock (it still runs from unprescaled 20/16 MHz oscillator) in order to reduce portion of time spent in the ISR. Previously it spent more than 12% of it's time in the ISR.
+* micros() times returned are now as close to the time when micros() was called as possible.
 * Add support for writing to the user row using EEPROM.h
 * Add support for receiving general call messages in slave mode using the TWI peripheral through the Wire library
 * Add support for second address or masking off bits of the address using the TWI0.SADDRMSK register
