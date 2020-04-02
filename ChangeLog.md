@@ -11,7 +11,9 @@
 * Add support for writing to the user row using EEPROM.h
 * Add support for receiving general call messages in slave mode using the TWI peripheral through the Wire library
 * Add support for second address or masking off bits of the address using the TWI0.SADDRMSK register
-* Added support for the Atmel embedded debugger on the explained pro kits as programmer (thanks @rneurink #149 ) 
+* Added support for the Atmel embedded debugger on the explained pro kits as programmer (thanks @rneurink #149 )
+* Don't prescale TCB clock in Servo at 10MHz or lower for smoother output
+* Correct TRIM_DURATION in Servo library
 * Lots of expanded documentation
 
 1.1.8

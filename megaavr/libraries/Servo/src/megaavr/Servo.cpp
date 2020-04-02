@@ -3,10 +3,17 @@
 #include <Arduino.h>
 #include <Servo.h>
 
+#if (F_CPU > 10000000)
 #define usToTicks(_us)    ((( _us / 2) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
 #define ticksToUs(_ticks) (((unsigned) _ticks * 2) / clockCyclesPerMicrosecond())   // converts from ticks back to microseconds
+#define TRIM_DURATION  84                                   // compensation ticks to trim adjust for digitalWrite delays
+#else
+#define usToTicks(_us)    ((( _us ) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
+#define ticksToUs(_ticks) (((unsigned) _ticks ) / clockCyclesPerMicrosecond())   // converts from ticks back to microseconds
+#define TRIM_DURATION  167                                  // compensation ticks to trim adjust for digitalWrite delays
+#endif
 
-#define TRIM_DURATION  5                                   // compensation ticks to trim adjust for digitalWrite delays
+
 
 static servo_t servos[MAX_SERVOS];                         // static array of servo structures
 
@@ -79,8 +86,12 @@ ISR(TCB2_INT_vect)
 
 static void initISR()
 {
-  //divide CLK_PER by 2 instead of using TCA0-prescaled
+  //divide CLK_PER by 2 instead of using TCA0-prescaled at 16/20MHz
+  #if (F_CPU > 10000000)
   _timer->CTRLA = TCB_CLKSEL_CLKDIV2_gc;
+  #else // and don't divide it at all at lower clock speeds
+  _timer->CTRLA = TCB_CLKSEL_CLKDIV1_gc;
+  #endif
   // Timer to Periodic interrupt mode
   // This write will also disable any active PWM outputs
   _timer->CTRLB = TCB_CNTMODE_INT_gc;
