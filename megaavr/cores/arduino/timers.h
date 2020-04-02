@@ -9,7 +9,7 @@
     #define TIME_TRACKING_TIMER_DIVIDER   2
     #define TIME_TRACKING_TIMER_PERIOD ((F_CPU/2000)-1)
   #endif
-#elif defined(MILLIS_USE_TIMERD0)
+#elif (defined(MILLIS_USE_TIMERD0) || (defined(MILLIS_USE_TIMERD0_A0)&&defined(TCD0)))
   #define TIME_TRACKING_TIMER_PERIOD		0x1FD
   #if (F_CPU==1000000UL)
     #define TIME_TRACKING_TIMER_DIVIDER		64		/* Clock divider for TCD0 */
