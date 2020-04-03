@@ -27,6 +27,7 @@ The asychronous nature of this timer, however, comes at a great cost. Most chang
 
 
 ### RTC - 16-bit Real Time Clock and Programmable Interrupt Timer
+Information on the RTC and PIT will be added in a future update. It is currently only used when the RTC timer is set as millis timekeeping source.
 
 ## Timer Prescaler Availability
 
@@ -50,7 +51,7 @@ When working with timers, I constantly found myself calculating periods, resolut
 ### [In Google Sheets](https://docs.google.com/spreadsheets/d/10Id8DYLRtlp01KA7vvslC3cHaR4S2a1TrH7u6pHXMNY/edit?usp=sharing)
 
 ## Usage of Timers by megaTinyCore
-This section applies only to megaTinyCore. A summary of the settings used for millis()/micros() timekeeping and their ramifications for the the frequency of generated PWM, time taken for micros() to return, and the percentage of time the microcontroller will spend in the millis() ISR - both before and after the changes introduced in 1.1.19, see the summary chart in google sheets.
+This section applies only to megaTinyCore. A summary of the settings used for millis()/micros() timekeeping and their ramifications for the the frequency of generated PWM, time taken for micros() to return, and the percentage of time the microcontroller will spend in the millis() ISR - both before and after the changes introduced in 1.1.19, see the [summary chart in google sheets](https://docs.google.com/spreadsheets/d/1W6XAChKxozjN87hF34xwsb6TCKHA1KMztx8wL_UbLmk/edit?usp=sharing)
 
 
 ### PWM ( analogWrite() )
@@ -65,10 +66,10 @@ Prior ro 1.1.19, TCD0 was used in dual-ramp mode, counting to 255 - this was res
 The type B timers are not very good at generating PWM, and are not used for that purpose by the core.
 
 ### Millis/Micros Timekeeping
-megaTinyCore allows all of the above listed timers to be selected as the clock source for timekeeping via the standard millis timekeeping functions. The timer used and system clock speed will effect the resolution of millis() and micros(), the time spent in the millis ISR when the timer overflows, and the time it takes for micros() to return a value (micros always takes several times it's resolution to return - the time returned corresponds to the time micros() was called, regardless of how long it takes to return). These numbers are provided in the chart linked above.
+megaTinyCore allows all of the above listed timers to be selected as the clock source for timekeeping via the standard millis timekeeping functions. The timer used and system clock speed will effect the resolution of millis() and micros(), the time spent in the millis ISR when the timer overflows, and the time it takes for micros() to return a value (micros always takes several times it's resolution to return - the time returned corresponds to the time micros() was called, regardless of how long it takes to return). These numbers are provided in [millis timing summary chart in google sheets](https://docs.google.com/spreadsheets/d/1W6XAChKxozjN87hF34xwsb6TCKHA1KMztx8wL_UbLmk/edit?usp=sharing)
 
 #### TCA0 for millis timekeeping
-When TCA0 is used as the millis timekeeping source,
+When TCA0 is used as the millis timekeeping source, it is set to run at the system clock prescaled by 8 when system clock is 1MHz, 16 when system clock is 4 MHz or 5 MHz, and 64 for faster clock speeds, with a period of 255 (as with PWM). This provides a millis() resolution of 1 or 2 mss, and a micros() resolution of between 3us and 8us (see the table linked above for more specifics). The time taken for micros() to return is slightly faster than with TCD0 as the timekeeping source; the same goes for the time spent in the millis overflow ISR. This is the default timekeeping timer for the 0-series parts, as they do not have a type D timer. Since the timer is run in split mode, the interrupt is set on TCA0_HUNF (in 1.1.19 and later - in earlier versions, LUNF is used instead) - that means that, if you wanted to, you could change TCA0.SPLIT.LPER and TCA0.SPLIT.LCMPn registers to increase the frequency of PWM output on the WO0/1/2 pins (PA7/1/2 on 8-pin parts, PB0 ~ 2 on all other parts) at the cost of reducing PWM resolution, without disrupting millis timekeeping.
 
 #### TDBn for millis timekeeping
 When TCB0 (or TCB1 on parts that have it) is used for millis() timekeeping, it is set to run at the system clock prescaled by 2 (1 at 1 MHz system clock) and tick over every millisecond (every 2 milliseconds at 1 MHz). This makes the millis ISR very fast, and provides 1ms resolution at all clock speeds except 1 MHz (where it has 2ms resolution). The micros() function also has 1 us resolution at all clock speeds. In many ways, the type B timer is an ideal timer for millis - the reason it is not used by default is that most of the tinyAVR parts only have one, and it is the only timer suitable for tone and to control servos with the Servo library (a type B timer is also the only viable option for input capture and outputting pulses of a controlled length, which is a relatively common procedure; it is anticipated that as libraries for IR, 433MHz OOK'ed remote control, and similar add support for megaAVR parts, that these timers will be in even more demand for those purposes).
@@ -94,5 +95,5 @@ Regardless of which type B timer it uses, Servo configures that timer in Periodi
 The above also applies to the Servo_megaTinyCore library; it is an exact copy except for the name. If you have installed a version of Servo via Library Manager or by manually placing it in your sketchbook/libraries folder, the IDE will use that in preference to the one supplied with this core. Unfortunately, that version is not compatible with the tinyAVR parts. Include Servo_megaTinyCore.h instead in this case. No changes to your code are needed other than the name of the library you include.
 
 ### megaTinySleep Library
-Coming in 1.1.20
+Coming in 1.1.20, this will provide methods that use the RTC to keep time while the part is sleeping, while another timer can be used for millis timekeeping.
 
