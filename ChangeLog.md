@@ -8,10 +8,10 @@
 * Lower prescaler on TCA0 to 16 when system clock is 4 Mhz or 5 MHz and 8 when running at 1 MHz (was 64)
 * Increase prescaler on TCD0 to 64 when used as millis() source with 1 MHz system clock (it still runs from unprescaled 20/16 MHz oscillator) in order to reduce portion of time spent in the ISR. Previously it spent more than 12% of it's time in the ISR.
 * micros() times returned are now as close to the time when micros() was called as possible
-* Add support for writing to the user row using EEPROM.h
 * Move millis interrupt to HUNF instead of LUNF when TCA0 is used for timing
 * Don't prescale TCB clock in Servo at 10MHz or lower for smoother output
 * Correct TRIM_DURATION in Servo library
+* Add support for writing to the user row using EEPROM.h
 * Add support for receiving general call messages in slave mode using the TWI peripheral through the Wire library (Thanks @LordJakson - #146 )
 * Add support for second address or masking off bits of the address using the TWI0.SADDRMSK register
 * Added support for the Atmel embedded debugger on the explained pro kits as programmer (thanks @rneurink #149 )
