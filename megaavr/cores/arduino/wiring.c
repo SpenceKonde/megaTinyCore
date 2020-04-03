@@ -27,13 +27,6 @@
 
 #ifndef DISABLEMILLIS
 
-#ifdef MILLIS_USE_TIMERD0_A0
-#ifdef TCD0
-#define MILLIS_USE_TIMERD0
-#else
-#define MILLIS_USE_TIMERA0
-#endif
-#endif
 #ifdef MILLIS_USE_TIMERRTC_XTAL
 #define MILLIS_USE_TIMERRTC
 #endif
@@ -106,7 +99,7 @@
 
 
 #if defined(MILLIS_USE_TIMERA0)
-  ISR(TCA0_LUNF_vect)
+  ISR(TCA0_HUNF_vect)
 #elif defined(MILLIS_USE_TIMERD0)
   ISR(TCD0_OVF_vect)
 #elif defined(MILLIS_USE_TIMERRTC)
@@ -147,7 +140,7 @@
 	#endif
 	/* Clear flag */
 	#if defined(MILLIS_USE_TIMERA0)
-	  TCA0.SPLIT.INTFLAGS = TCA_SPLIT_LUNF_bm;
+	  TCA0.SPLIT.INTFLAGS = TCA_SPLIT_HUNF_bm;
 	#elif defined(MILLIS_USE_TIMERD0)
 	  TCD0.INTFLAGS=TCD_OVF_bm;
 	#elif defined(MILLIS_USE_TIMERRTC)
@@ -533,7 +526,7 @@ void init()
 	/* Calculate relevant time tracking values */
 
     #if defined(MILLIS_USE_TIMERA0)
-      TCA0.SPLIT.INTCTRL = TCA_SPLIT_LUNF_bm;
+      TCA0.SPLIT.INTCTRL = TCA_SPLIT_HUNF_bm;
     #elif defined(MILLIS_USE_TIMERD0)
       TCD0.CMPBCLR=TIME_TRACKING_TIMER_PERIOD; //essentially, this is TOP
       TCD0.INTCTRL=0x01;//enable interrupt

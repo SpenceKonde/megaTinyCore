@@ -1,6 +1,13 @@
 #ifndef __TIMERS_H__
 #define __TIMERS_H__
 
+#ifdef MILLIS_USE_TIMERD0_A0
+#ifdef TCD0
+#define MILLIS_USE_TIMERD0
+#else
+#define MILLIS_USE_TIMERA0
+#endif
+#endif
 #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
   #if (F_CPU==1000000UL)
     #define TIME_TRACKING_TIMER_DIVIDER   1
