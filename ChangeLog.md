@@ -11,10 +11,10 @@
 * Add support for writing to the user row using EEPROM.h
 * Move millis interrupt to HUNF instead of LUNF when TCA0 is used for timing
 * Don't prescale TCB clock in Servo at 10MHz or lower for smoother output
+* Correct TRIM_DURATION in Servo library
 * Add support for receiving general call messages in slave mode using the TWI peripheral through the Wire library (Thanks @LordJakson - #146 )
 * Add support for second address or masking off bits of the address using the TWI0.SADDRMSK register
 * Added support for the Atmel embedded debugger on the explained pro kits as programmer (thanks @rneurink #149 )
-* Correct TRIM_DURATION in Servo library
 * Lots of expanded documentation
 
 1.1.8
