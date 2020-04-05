@@ -2,6 +2,7 @@
 * Fix bug with Wire introduced by not testing 1.1.9 changes to Wire.
 * Fix bug with EEPROM introduced by not testing 1.1.9 changes to EEPROM
 * Add ability to read from temp sensor, internal reference via ADC, clean up analogReference()
+* Add some example sketches, including reading temp and Vcc
 
 1.1.9
 * Correct micros() results at 20, 10, and 5 MHz when TCA0 or TCD0 is used as millis source
