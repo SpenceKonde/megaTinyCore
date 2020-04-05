@@ -48,15 +48,19 @@ extern "C"{
 #define INTERNAL0V55 (VREF_ADC0REFSEL_0V55_gc >> VREF_ADC0REFSEL_gp)
 #define INTERNAL1V1 (VREF_ADC0REFSEL_1V1_gc >> VREF_ADC0REFSEL_gp)
 #define INTERNAL2V5 (VREF_ADC0REFSEL_2V5_gc >> VREF_ADC0REFSEL_gp)
-#define INTERNAL4V3 (VREF_ADC0REFSEL_4V34_gc >> VREF_ADC0REFSEL_gp)
+#define INTERNAL4V3 INTERNAL4V34
+#define INTERNAL4V34 (VREF_ADC0REFSEL_4V34_gc >> VREF_ADC0REFSEL_gp)
 #define INTERNAL1V5 (VREF_ADC0REFSEL_1V5_gc >> VREF_ADC0REFSEL_gp)
 
-#define DEFAULT     INTERNAL0V55
+#define DEFAULT     ADC_REFSEL_VDDREF_gc
 #define INTERNAL    ADC_REFSEL_INTREF_gc
 #define VDD         ADC_REFSEL_VDDREF_gc
-#ifdef ADC_REFSEL_VREFA_gc
-#define EXTERNAL    ADC_REFSEL_VREFA_gc
+#ifdef DAC0 //shortcut to detecting the 1-series parts that have this feature, since testing that the *_gc constants doesn't work as they are enums, not defines.
+  #define EXTERNAL    ADC_REFSEL_VREFA_gc
+  #define ADC_DAC0 ADC_MUXPOS_DAC0_gc
 #endif
+#define ADC_TEMPERATURE ADC_MUXPOS_TEMPSENSE_gc
+#define ADC_INTREF ADC_MUXPOS_INTREF_gc
 
 #define VCC_5V0 2
 #define VCC_3V3 1
@@ -68,7 +72,7 @@ extern "C"{
 
 // avr-libc defines _NOP() since 1.6.2
 #ifndef _NOP
-#define _NOP() do { __asm__ volatile ("nop"); } while (0)
+  #define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
 
 /* Allows performing a correction on the CPU value using the signature row
@@ -256,12 +260,12 @@ void setup_timers();
 #error "Can't-happen: unknown chip somehow being used"
 #endif
 
-#define MEGATINYCORE "1.1.9"
+#define MEGATINYCORE "1.1.10-dev"
 #define MEGATINYCORE_MAJOR 01
 #define MEGATINYCORE_MINOR 01
-#define MEGATINYCORE_PATCH 09
-#define MEGATINYCORE_RELEASED 01
-#define MEGATINYCORE_NUM 0x01010900
+#define MEGATINYCORE_PATCH 10
+#define MEGATINYCORE_RELEASED 00
+#define MEGATINYCORE_NUM 0x01011000
 
 
 

@@ -95,5 +95,5 @@ Regardless of which type B timer it uses, Servo configures that timer in Periodi
 The above also applies to the Servo_megaTinyCore library; it is an exact copy except for the name. If you have installed a version of Servo via Library Manager or by manually placing it in your sketchbook/libraries folder, the IDE will use that in preference to the one supplied with this core. Unfortunately, that version is not compatible with the tinyAVR parts. Include Servo_megaTinyCore.h instead in this case. No changes to your code are needed other than the name of the library you include.
 
 ### megaTinySleep Library
-Coming in 1.1.10, this will provide methods that use the RTC to keep time while the part is sleeping, while another timer can be used for millis timekeeping.
+Coming in 1.2.0, this will provide methods that use the RTC to keep time while the part is sleeping, while another timer can be used for millis timekeeping.
 

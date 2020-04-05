@@ -190,10 +190,16 @@ These parts all have ADC channels available on most pins (11 pins on 24 and 20 p
 * INTERNAL1V1
 * INTERNAL1V5
 * INTERNAL2V5
-* INTERNAL4V3
+* INTERNAL4V3 (alias of INTERNAL4V34)
+* INTERNAL4V34
 * EXTERNAL (1-series - not including 412/212 - only)
 
-**Note:** The 3217,1617,3216,1616, and 1614 have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins. Currently, there are no plans to implement this in the core due to the large number of currently available pins. Instead, it is recommended that users who wish to "take over" and ADC to use the advanced features available on the megaavr parts choose ADC1 for this purpose.
+In addition to the pin numbers, as of 1.1.10, you can read from the following sources:
+* ADC_INTREF (The internal reference - you can set it manually via VREF.CTRLA, or by calling analogReference(), followed by analogReference(VDD) - The internal reference register is not changed when switching back to VDD as reference)
+* ADC_DAC0 (The value being output by DAC0, 1-series parts only)
+* ADC_TEMPERATUIRE (The internal temperature sensor)
+
+**Note:** The 3217,1617,3216,1616, and 1614 have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins (it can also read from DAC2). Currently, there are no plans to implement this in the core due to the large number of currently available pins. Instead, it is recommended that users who wish to "take over" and ADC to use the advanced features available on the megaavr parts choose ADC1 for this purpose.
 
 ### DAC Support
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). This generates voltages between 0 and the selected VREF (which cannot be VCC, unfortunately) - select the DAC VREF voltage from the Tools -> DAC Voltage Reference submenu. This voltage must be lower than Vcc to get the correct voltages. Call analogWrite() on the DAC pin to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin. The Tools -> DAC Voltage menu contains an additional option to disable the DAC output, as this saves a fair bit of flash.

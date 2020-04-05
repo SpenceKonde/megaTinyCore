@@ -26,54 +26,45 @@
 #include "pins_arduino.h"
 #include "Arduino.h"
 
-uint8_t analog_reference = DEFAULT;
-
 void analogReference(uint8_t mode)
 {
-	/* Clear relevant settings */
-	ADC0.CTRLC &= ~(ADC_REFSEL_gm);
-	VREF.CTRLA &= ~(VREF_ADC0REFSEL_gm);
-
-	/* If reference NOT using internal reference from VREF */
+	switch (mode)
+	{
 	#ifdef EXTERNAL
-	if((mode == EXTERNAL) || (mode == VDD)) {
-	#else
-    if((mode == VDD)) {
+		case EXTERNAL:
 	#endif
-
-		/* Set reference in ADC peripheral */
-		ADC0.CTRLC |= mode;
-
-	/* If reference using internal reference from VREF */
-	} else if (
-	   (mode == INTERNAL0V55)
-		|| (mode == INTERNAL1V1)
-		|| (mode == INTERNAL2V5)
-		|| (mode == INTERNAL4V3)
-		|| (mode == INTERNAL1V5)) {
-
-		/* Set ADC reference to INTERNAL */
-		ADC0.CTRLC |= INTERNAL;
-
-		/* Configure VREF ADC0 reference */
-		VREF.CTRLA |= (mode << VREF_ADC0REFSEL_gp);
-
-	/* Non-standard values / default */
-	} else {
-
-		/* Non valid value will set default */
-		/* Set ADC reference to INTERNAL */
-		ADC0.CTRLC |= INTERNAL;
-
-		/* Configure VREF ADC0 reference */
-		VREF.CTRLA |= (INTERNAL0V55 << VREF_ADC0REFSEL_gp);
+		case VDD:
+			ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
+			// VREF.CTRLA does not need to be reconfigured, as the voltage references only supply their specified voltage when requested to do so by the ADC.
+			break;
+		case INTERNAL0V55:
+			VREF.CTRLA =  VREF.CTRLA & ~(VREF_ADC0REFSEL_gm); //These bits are all 0 for 0.55v reference, so no need to do the mode << VREF_ADC0REFSEL_gp here;
+			ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; //per datasheet, recommended SAMPCAP=0 at ref < 1v
+			break;
+		case INTERNAL1V1:
+		case INTERNAL2V5:
+		case INTERNAL4V34:
+		case INTERNAL1V5:
+			VREF.CTRLA = (VREF.CTRLA & ~(VREF_ADC0REFSEL_gm)) | (mode << VREF_ADC0REFSEL_gp);
+			ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v
+			break;
+		default:
+			ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | VDD | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
 	}
 }
 
+
 int analogRead(uint8_t pin)
 {
-	pin = digitalPinToAnalogInput(pin);
-	if(pin == NOT_A_PIN) return -1;
+	#ifdef ADC_DAC0
+		if (pin!=ADC_DAC0 && pin != ADC_INTREF && pin != ADC_TEMPERATURE)
+	#else
+		if (pin != ADC_INTREF && pin != ADC_TEMPERATURE)
+	#endif
+	{
+		pin = digitalPinToAnalogInput(pin);
+		if(pin == NOT_A_PIN) return -1;
+	}
 
 
 #if defined(ADC0)
@@ -87,12 +78,13 @@ int analogRead(uint8_t pin)
 	/* Wait for result ready */
 	while(!(ADC0.INTFLAGS & ADC_RESRDY_bm));
 
+	/* Combine two bytes */
+	return ADC0.RES;
+
 #else	/* No ADC, return 0 */
 	return 0;
 #endif
 
-	/* Combine two bytes */
-	return ADC0.RES;
 }
 
 // Right now, PWM output only works on the pins with
