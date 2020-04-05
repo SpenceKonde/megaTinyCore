@@ -80,6 +80,16 @@ void TwoWire::begin(uint8_t address,bool receive_broadcast,uint8_t second_addres
 
 }
 
+void TwoWire::begin(int address,bool receive_broadcast,uint8_t second_address)
+{
+  begin((uint8_t)address,receive_broadcast,second_address);
+}
+
+void TwoWire::begin(uint8_t address,bool receive_broadcast)
+{
+  begin(address,receive_broadcast,0);
+}
+
 void TwoWire::begin(int address,bool receive_broadcast)
 {
 	begin((uint8_t)address,receive_broadcast,0);
@@ -92,7 +102,7 @@ void TwoWire::begin(uint8_t address)
 
 void TwoWire::begin(int address)
 {
-	begin(address,0,0);
+	begin((uint8_t)address,0,0);
 }
 
 void TwoWire::end(void)

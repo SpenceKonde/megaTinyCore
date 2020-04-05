@@ -51,12 +51,12 @@ class TwoWire : public Stream
   public:
     TwoWire();
     void begin();
+    void begin(uint8_t,bool,uint8_t);
+    void begin(int,bool,uint8_t);
     void begin(uint8_t,bool);
     void begin(int,bool);
     void begin(uint8_t);
     void begin(int);
-    void begin(uint8_t,bool,uint8_t);
-    void begin(int,bool,uint8_t);
     void end();
     void setClock(uint32_t);
     void beginTransmission(uint8_t);
