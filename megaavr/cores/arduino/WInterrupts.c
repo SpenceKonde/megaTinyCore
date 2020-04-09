@@ -37,8 +37,8 @@ static volatile voidFuncPtr intFunc[EXTERNAL_NUM_INTERRUPTS];
 void attachInterrupt(uint8_t pin, void (*userFunc)(void), uint8_t mode) {
 
   /* Get bit position and check pin validity */
-  if (!digitalPinExists(pin)) return;
   uint8_t bit_pos = digitalPinToBitPosition(pin);
+  if(bit_pos == NOT_A_PIN) return;
 
   /* Get interrupt number from pin */
   uint8_t interruptNum = (digitalPinToPort(pin) * 8) + bit_pos;

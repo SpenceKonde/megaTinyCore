@@ -260,12 +260,12 @@ void setup_timers();
 #error "Can't-happen: unknown chip somehow being used"
 #endif
 
-#define MEGATINYCORE "1.1.10"
-#define MEGATINYCORE_MAJOR 01
-#define MEGATINYCORE_MINOR 01
-#define MEGATINYCORE_PATCH 10
-#define MEGATINYCORE_RELEASED 01
-#define MEGATINYCORE_NUM 0x01010A01
+#define MEGATINYCORE "2.0.0-dev"
+#define MEGATINYCORE_MAJOR 02
+#define MEGATINYCORE_MINOR 00
+#define MEGATINYCORE_PATCH 00
+#define MEGATINYCORE_RELEASED 00
+#define MEGATINYCORE_NUM 0x02000000
 
 
 

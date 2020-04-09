@@ -27,7 +27,7 @@
 #include "pins_arduino.h"
 
 
-void pinMode(uint8_t pin, PinMode mode)
+void pinMode(uint8_t pin, uint8_t mode)
 {
 	uint8_t bit_mask = digitalPinToBitMask(pin);
 
@@ -141,7 +141,7 @@ static void turnOffPWM(uint8_t pin)
 	}
 }
 
-void digitalWrite(uint8_t pin, PinStatus val)
+void digitalWrite(uint8_t pin, uint8_t val)
 {
 	/* Get bit mask for pin */
 	uint8_t bit_mask = digitalPinToBitMask(pin);
@@ -204,7 +204,7 @@ void digitalWrite(uint8_t pin, PinStatus val)
 
 }
 
-PinStatus digitalRead(uint8_t pin)
+int digitalRead(uint8_t pin)
 {
 	/* Get bit mask and check valid pin */
 	uint8_t bit_mask = digitalPinToBitMask(pin);
