@@ -114,7 +114,7 @@ class Logic
     Logic(const uint8_t block_number);
     void init();
 #if defined(CCL_CCL_vect)
-    void attachInterrupt(voidFuncPtr callback, PinStatus mode);
+    void attachInterrupt(voidFuncPtr callback, uint8_t mode);
     void detachInterrupt();
 #endif
 

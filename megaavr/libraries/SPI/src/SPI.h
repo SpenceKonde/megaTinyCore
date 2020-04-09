@@ -162,7 +162,7 @@ class SPIClass {
   void begin();
   void end();
 
-  void setBitOrder(BitOrder order);
+  void setBitOrder(uint8_t order);
   void setDataMode(uint8_t uc_mode);
   void setClockDivider(uint8_t uc_div);
 

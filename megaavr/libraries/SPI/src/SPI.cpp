@@ -41,7 +41,7 @@ SPIClass::SPIClass(uint8_t uc_pinMISO, uint8_t uc_pinSCK, uint8_t uc_pinMOSI, ui
 void SPIClass::begin()
 {
   init();
-  
+
   #if defined(TWISPIROUTEA)
   PORTMUX.TWISPIROUTEA |= _uc_mux;
   #endif
@@ -204,11 +204,11 @@ void SPIClass::endTransaction(void)
   }
 }
 
-void SPIClass::setBitOrder(BitOrder order)
+void SPIClass::setBitOrder(uint8_t order)
 {
   if (order == LSBFIRST)
     SPI0.CTRLA |=  (SPI_DORD_bm);
-  else 
+  else
     SPI0.CTRLA &= ~(SPI_DORD_bm);
 }
 
@@ -219,9 +219,9 @@ void SPIClass::setDataMode(uint8_t mode)
 
 void SPIClass::setClockDivider(uint8_t div)
 {
-  SPI0.CTRLA = ((SPI0.CTRLA & 
+  SPI0.CTRLA = ((SPI0.CTRLA &
                   ((~SPI_PRESC_gm) | (~SPI_CLK2X_bm) ))  // mask out values
-                  | div);                           // write value 
+                  | div);                           // write value
 }
 
 byte SPIClass::transfer(uint8_t data)
