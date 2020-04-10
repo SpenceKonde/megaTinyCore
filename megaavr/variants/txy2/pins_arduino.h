@@ -139,7 +139,7 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
 	* alternative pin locations
 */
 
-const uint8_t PROGMEM digital_pin_to_port[] = {
+const uint8_t digital_pin_to_port[] = {
 	PA, // 0  PA6
 	PA, // 1  PA7
 	PA, // 2  PA1
@@ -150,7 +150,7 @@ const uint8_t PROGMEM digital_pin_to_port[] = {
 };
 
 /* Use this for accessing PINnCTRL register */
-const uint8_t PROGMEM digital_pin_to_bit_position[] = {
+const uint8_t digital_pin_to_bit_position[] = {
 	PIN6_bp, // 0  PA6
 	PIN7_bp, // 1  PA7
 	PIN1_bp, // 2  PA1
@@ -161,7 +161,7 @@ const uint8_t PROGMEM digital_pin_to_bit_position[] = {
 };
 
 /* Use this for accessing PINnCTRL register */
-const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
+const uint8_t digital_pin_to_bit_mask[] = {
 	PIN6_bm, // 0  PA6
 	PIN7_bm, // 1  PA7
 	PIN1_bm, // 2  PA1
@@ -171,7 +171,7 @@ const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
 	PIN0_bm  // 5  PA0
 };
 
-const uint8_t PROGMEM digital_pin_to_timer[] = {
+const uint8_t digital_pin_to_timer[] = {
 	#if defined(DAC0) && defined(DACVREF)
     DACOUT,
 	#else

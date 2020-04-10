@@ -207,7 +207,7 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
     * alternative pin locations
 */
 
-const uint8_t PROGMEM digital_pin_to_port[] = {
+const uint8_t digital_pin_to_port[] = {
     // Left side, top to bottom
     PA, // 0  PA4
     PA, // 1  PA5
@@ -235,7 +235,7 @@ const uint8_t PROGMEM digital_pin_to_port[] = {
 };
 
 /* Use this for accessing PINnCTRL register */
-const uint8_t PROGMEM digital_pin_to_bit_position[] = {
+const uint8_t digital_pin_to_bit_position[] = {
     // Left side, top to bottom
     PIN4_bp, // 0  PA4
     PIN5_bp, // 1  PA5
@@ -262,7 +262,7 @@ const uint8_t PROGMEM digital_pin_to_bit_position[] = {
 };
 
 /* Use this for accessing PINnCTRL register */
-const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
+const uint8_t digital_pin_to_bit_mask[] = {
     PIN4_bm, // 0  PA4
     PIN5_bm, // 1  PA5
     PIN6_bm, // 2  PA6
@@ -288,7 +288,7 @@ const uint8_t PROGMEM digital_pin_to_bit_mask[] = {
 };
 
 
-const uint8_t PROGMEM digital_pin_to_timer[] = {
+const uint8_t digital_pin_to_timer[] = {
       // Left side, top to bottom
     TIMERA0,         // 0  PA4
     TIMERA0,         // 1  PA5
