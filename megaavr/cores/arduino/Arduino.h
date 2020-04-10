@@ -91,10 +91,10 @@ unsigned long microsecondsToClockCycles(unsigned long microseconds);
 // Get the bit location within the hardware port of the given virtual pin.
 // This comes from the pins_*.c file for the active board configuration.
 
-extern const uint8_t PROGMEM digital_pin_to_port[];
-extern const uint8_t PROGMEM digital_pin_to_bit_mask[];
-extern const uint8_t PROGMEM digital_pin_to_bit_position[];
-extern const uint8_t PROGMEM digital_pin_to_timer[];
+extern const uint8_t digital_pin_to_port[];
+extern const uint8_t digital_pin_to_bit_mask[];
+extern const uint8_t digital_pin_to_bit_position[];
+extern const uint8_t digital_pin_to_timer[];
 
 // Get the bit location within the hardware port of the given virtual pin.
 // This comes from the pins_*.c file for the active board configuration.
