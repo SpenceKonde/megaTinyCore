@@ -575,14 +575,15 @@ void init()
 /********************************* ADC ****************************************/
 
   #if defined(ADC0)
-    //#ifdef FASTADC
+    #ifndef SLOWADC
       /* ADC clock 1 MHz to 1.25 MHz at frequencies supported by megaTinyCore
       Unlike the classic AVRs, which demand 50~200 kHz, for these, the datasheet
       spec's 50 kHz to 1.5 MHz. We hypothesize that lower clocks provide better
       response to high impedance signals, since the sample and hold circuit will
       be connected to the pin for longer, though the datasheet does not explicitly
-      state that this is the case. */
-    /*
+      state that this is the case. However, we can use the SAMPLEN register to
+      compensate for this! */
+
       #if F_CPU >= 12000000 // 16 MHz / 16 = 1 MHz,  20 MHz / 16 = 1.25 MHz
         ADC0.CTRLC |= ADC_PRESC_DIV16_gc;
       #elif F_CPU >= 6000000 // 8 MHz / 8 = 1 MHz, 10 MHz / 64 = 1.25 MHz
@@ -592,23 +593,23 @@ void init()
       #else  // 1 MHz / 2 = 500 kHz - the lowest setting
         ADC0.CTRLC |= ADC_PRESC_DIV2_gc;
       #endif
-    #else
-    */
-    /* ADC clock around 125 kHz - datasheet spec's 50 kHz to 1.5 MHz */
-    #if F_CPU >= 16000000 // 16 MHz / 128 = 125 kHz,  20 MHz / 128 = 156.250 kHz
-      ADC0.CTRLC |= ADC_PRESC_DIV128_gc;
-    #elif F_CPU >= 8000000 // 8 MHz / 64 = 125 kHz, 10 MHz / 64 = 156.25 KHz
-      ADC0.CTRLC |= ADC_PRESC_DIV64_gc;
-    #elif F_CPU >= 4000000 // 4 MHz / 32 = 125 kHz, 5 MHz / 32 = 156.25 KHz
-      ADC0.CTRLC |= ADC_PRESC_DIV32_gc;
-    #elif F_CPU >= 2000000 // 2 MHz / 16 = 125 kHz - note that megaTinyCore does not provide support for 2 MHz
-      ADC0.CTRLC |= ADC_PRESC_DIV16_gc;
-    #elif F_CPU >= 1000000 // 1 MHz / 8 = 125 kHz
-      ADC0.CTRLC |= ADC_PRESC_DIV8_gc;
-    #else // 128 kHz / 2 = 64 kHz -> This is the closest you can get, the prescaler is 2
-      ADC0.CTRLC |= ADC_PRESC_DIV2_gc;
+      ADC0.SAMPCTRL=14; //16 ADC clock sampling time - should be about the same amount of *time* as originally?
+    #else //if SLOWADC is defined - as of 2.0.0 this option isn't exposed.
+      /* ADC clock around 125 kHz - datasheet spec's 50 kHz to 1.5 MHz */
+      #if F_CPU >= 16000000 // 16 MHz / 128 = 125 kHz,  20 MHz / 128 = 156.250 kHz
+        ADC0.CTRLC |= ADC_PRESC_DIV128_gc;
+      #elif F_CPU >= 8000000 // 8 MHz / 64 = 125 kHz, 10 MHz / 64 = 156.25 KHz
+        ADC0.CTRLC |= ADC_PRESC_DIV64_gc;
+      #elif F_CPU >= 4000000 // 4 MHz / 32 = 125 kHz, 5 MHz / 32 = 156.25 KHz
+        ADC0.CTRLC |= ADC_PRESC_DIV32_gc;
+      #elif F_CPU >= 2000000 // 2 MHz / 16 = 125 kHz - note that megaTinyCore does not provide support for 2 MHz
+        ADC0.CTRLC |= ADC_PRESC_DIV16_gc;
+      #elif F_CPU >= 1000000 // 1 MHz / 8 = 125 kHz
+        ADC0.CTRLC |= ADC_PRESC_DIV8_gc;
+      #else // 128 kHz / 2 = 64 kHz -> This is the closest you can get, the prescaler is 2
+        ADC0.CTRLC |= ADC_PRESC_DIV2_gc;
+      #endif
     #endif
-  //#endif
 
     /* Enable ADC */
     ADC0.CTRLA |= ADC_ENABLE_bm;
