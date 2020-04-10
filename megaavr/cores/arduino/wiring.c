@@ -166,7 +166,7 @@ unsigned long millis()
     }
     SREG = status;
     m=(m<<16);
-    m+=RTC_CNT;
+    m+=RTC.CNT;
     //now correct for there being 1000ms to the second instead of 1024
     m=m-(m>>5)-(m>>6);
   #else
@@ -441,80 +441,91 @@ void delayMicroseconds(unsigned int us)
   // return = 4 cycles
 }
 
-/*
+
 #ifndef DISABLEMILLIS
+  void stop_millis()
+  { // Disable the interrupt:
+    #if defined(MILLIS_USE_TIMERA0)
+      TCA0.SPLIT.INTCTRL &= (~TCA_SPLIT_HUNF_bm);
+    #elif defined(MILLIS_USE_TIMERD0)
+      TCD0.INTCTRL&=0xFE;
+    #elif defined(MILLIS_USE_TIMERRTC)
+      RTC.INTCTRL&=0xFE;
+      RTC.CTRLA&=0xFE;
+    #else
+      _timer->INTCTRL &= ~TCB_CAPT_bm;
+    #endif
+  }
 
+  void restart_millis()
+  {
+    // Call this to restart millis after it has been stopped and/or millis timer has been molested by other routines.
+    // This resets key registers to their expected states.
 
-void stop_millis()
-{ // Disable the interrupt:
-  #if defined(MILLIS_USE_TIMERA0)
-    TCA0.SPLIT.INTCTRL &= (~TCA_SPLIT_HUNF_bm);
-  #elif defined(MILLIS_USE_TIMERD0)
-    TCD0.INTCTRL&=0xFE;
-  #elif defined(MILLIS_USE_TIMERRTC)
-    RTC.INTCTRL&=0xFE;
-  #else
-    _timer->INTCTRL &= ~TCB_CAPT_bm;
-  #endif
-}
+    #if defined(MILLIS_USE_TIMERA0)
+      TCA0.SPLIT.CTRLA = 0x00;
+      TCA0.SPLIT.CTRLD = TCA_SPLIT_SPLITM_bm;
+      TCA0.SPLIT.HPER    = PWM_TIMER_PERIOD;
+    #elif defined(MILLIS_USE_TIMERD0)
+      TCD0.CTRLA=0x00;
+      while(TCD0.STATUS & 0x01);
+    #elif (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1)) //It's a type b timer
+      _timer->CTRLB = 0;
+    #endif
+    init_millis();
+  }
 
-void restart_millis()
-{
-  // Call this to restart millis after it has been stopped and/or millis timer has been molested by other routines.
-  // This resets key registers to their expected states.
+  void init_millis()
+  {
+    #if defined(MILLIS_USE_TIMERA0)
+      TCA0.SPLIT.INTCTRL |= TCA_SPLIT_HUNF_bm;
+    #elif defined(MILLIS_USE_TIMERD0)
+      TCD0.CMPBCLR=TIME_TRACKING_TIMER_PERIOD; //essentially, this is TOP
+      TCD0.INTCTRL=0x01;//enable interrupt
+      TCD0.CTRLB=0x00; //oneramp mode
+      TCD0.CTRLC=0x80;
+      TCD0.CTRLA=TIMERD0_PRESCALER|0x01; //set clock source and enable!
+    #elif defined(MILLIS_USE_TIMERRTC)
+      while(RTC.STATUS); //if RTC is currently busy, spin until it's not.
+      // to do: add support for RTC timer initialization
+      RTC.PER=0xFFFF;
+    #ifdef MILLIS_USE_TIMERRTC_XTAL
+      _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA,0x03);
+      RTC.CLKSEL=2; //external crystal
+    #else
+      _PROTECTED_WRITE(CLKCTRL.OSC32KCTRLA,0x02);
+      //RTC.CLKSEL=0; this is the power on value
+    #endif
+      RTC.INTCTRL=0x01; //enable overflow interupt
+      RTC.CTRLA=(RTC_RUNSTDBY_bm|RTC_RTCEN_bm|RTC_PRESCALER_DIV32_gc);//fire it up, prescale by 32.
 
-  #if defined(MILLIS_USE_TIMERA0)
-    TCA0.SPLIT.CTRLA = 0x00;
-    TCA0.SPLIT.CTRLD = TCA_SPLIT_SPLITM_bm;
-    TCA0.SPLIT.HPER    = PWM_TIMER_PERIOD;
-  #elif defined(MILLIS_USE_TIMERD0)
-    TCD0.CTRLA=0x00;
-    while(TCD0.STATUS & 0x01);
-  #elif (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1)) //It's a type b timer
-    _timer->CTRLB = 0; //
-  #endif
-  init_millis();
-}
+    #else //It's a type b timer
+      _timer->CCMP = TIME_TRACKING_TIMER_PERIOD;
+      // Enable timer interrupt
+      _timer->INTCTRL |= TCB_CAPT_bm;
+      // CLK_PER/1 is 0b00,. CLK_PER/2 is 0b01, so bitwise OR of valid divider with enable works
+      _timer->CTRLA = TIME_TRACKING_TIMER_DIVIDER|TCB_ENABLE_bm;  // Keep this last before enabling interrupts to ensure tracking as accurate as possible
+    #endif
+  }
 
-void init_millis()
-{
-  #if defined(MILLIS_USE_TIMERA0)
-    TCA0.SPLIT.INTCTRL |= TCA_SPLIT_HUNF_bm;
-  #elif defined(MILLIS_USE_TIMERD0)
-    TCD0.CMPBCLR=TIME_TRACKING_TIMER_PERIOD; //essentially, this is TOP
-    TCD0.INTCTRL=0x01;//enable interrupt
-    TCD0.CTRLB=0x00; //oneramp mode
-    TCD0.CTRLC=0x80;
-    TCD0.CTRLA=TIMERD0_PRESCALER|0x01; //set clock source and enable!
-  #elif defined(MILLIS_USE_TIMERRTC)
-    // to do: add support for RTC timer initialization
-    RTC.PER=0xFFFF;
-  #ifdef MILLIS_USE_TIMERRTC_XTAL
-    _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA,0x03);
-    RTC.CLKSEL=2; //external crystal
-  #else
-    _PROTECTED_WRITE(CLKCTRL.OSC32KCTRLA,0x02);
-    //RTC.CLKSEL=0; this is the power on value
-  #endif
-    RTC.INTCTRL=0x01; //enable overflow interupt
-    RTC.CTRLA=0xA9;  //fire it up, prescale by 32.
-
-  #else //It's a type b timer
-    _timer->CCMP = TIME_TRACKING_TIMER_PERIOD;
-    // Enable timer interrupt
-    _timer->INTCTRL |= TCB_CAPT_bm;
-    // CLK_PER/1 is 0b00,. CLK_PER/2 is 0b01, so bitwise OR of valid divider with enable works
-    _timer->CTRLA = TIME_TRACKING_TIMER_DIVIDER|TCB_ENABLE_bm;  // Keep this last before enabling interrupts to ensure tracking as accurate as possible
-  #endif
-}
-
-void set_millis(uint32_t newmillis)
-{
-  timer_millis=newmillis;
-}
+  void set_millis(uint32_t newmillis)
+  {
+    #if defined(MILLIS_USE_TIMERRTC)
+      //timer_overflow_count=newmillis>>16;
+      // millis = 61/64(timer_overflow_count<<16 + RTC.CNT)
+      uint16_t temp=(newmillis%61)<<6;
+      newmillis=(newmillis/61)<<6;
+      temp=temp/61;
+      newmillis+=temp;
+      timer_overflow_count=newmillis>>16;
+      while(RTC.STATUS&RTC_CNTBUSY_bm); //wait if RTC busy
+      RTC.CNT=newmillis&0xFFFF;
+    #else
+      timer_millis=newmillis;
+    #endif
+  }
 
 #endif
-*/
 
 void init()
 {
@@ -614,34 +625,7 @@ void init()
   setup_timers();
 
   #ifndef DISABLEMILLIS
-    #if defined(MILLIS_USE_TIMERA0)
-      TCA0.SPLIT.INTCTRL |= TCA_SPLIT_HUNF_bm;
-    #elif defined(MILLIS_USE_TIMERD0)
-      TCD0.CMPBCLR=TIME_TRACKING_TIMER_PERIOD; //essentially, this is TOP
-      TCD0.INTCTRL=0x01;//enable interrupt
-      TCD0.CTRLB=0x00; //oneramp mode
-      TCD0.CTRLC=0x80;
-      TCD0.CTRLA=TIMERD0_PRESCALER|0x01; //set clock source and enable!
-    #elif defined(MILLIS_USE_TIMERRTC)
-      // to do: add support for RTC timer initialization
-      RTC.PER=0xFFFF;
-    #ifdef MILLIS_USE_TIMERRTC_XTAL
-      _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA,0x03);
-      RTC.CLKSEL=2; //external crystal
-    #else
-      _PROTECTED_WRITE(CLKCTRL.OSC32KCTRLA,0x02);
-      //RTC.CLKSEL=0; this is the power on value
-    #endif
-      RTC.INTCTRL=0x01; //enable overflow interupt
-      RTC.CTRLA=0xA9;  //fire it up, prescale by 32.
-
-    #else //It's a type b timer
-      _timer->CCMP = TIME_TRACKING_TIMER_PERIOD;
-      // Enable timer interrupt
-      _timer->INTCTRL |= TCB_CAPT_bm;
-      // CLK_PER/1 is 0b00,. CLK_PER/2 is 0b01, so bitwise OR of valid divider with enable works
-      _timer->CTRLA = TIME_TRACKING_TIMER_DIVIDER|TCB_ENABLE_bm;  // Keep this last before enabling interrupts to ensure tracking as accurate as possible
-    #endif
+  init_millis();
   #endif //end #ifndef DISABLEMILLIS
 /*************************** DAC VREF *****************************************/
   #if defined(DAC0) && defined(DACVREF)

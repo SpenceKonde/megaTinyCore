@@ -101,6 +101,11 @@ int digitalRead(pin_size_t pinNumber);
 
 #ifndef DISABLEMILLIS
 unsigned long millis(void);
+void init_millis();
+void stop_millis();
+void restart_millis();
+void set_millis(uint32_t newmillis);
+
 #ifndef MILLIS_USE_TIMERRTC
 unsigned long micros(void);
 #endif
