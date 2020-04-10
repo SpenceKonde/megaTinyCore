@@ -56,7 +56,9 @@ extern "C"{
 #define INTERNAL    ADC_REFSEL_INTREF_gc
 #define VDD         ADC_REFSEL_VDDREF_gc
 #ifdef DAC0 //shortcut to detecting the 1-series parts that have this feature, since testing that the *_gc constants doesn't work as they are enums, not defines.
-  #define EXTERNAL    ADC_REFSEL_VREFA_gc
+  #if !(defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__) ) //but the 8-pin parts don't have it
+    #define EXTERNAL    ADC_REFSEL_VREFA_gc
+  #endif
   #define ADC_DAC0 ADC_MUXPOS_DAC0_gc
 #endif
 
