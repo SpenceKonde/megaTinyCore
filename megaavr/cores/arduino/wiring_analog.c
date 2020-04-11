@@ -52,8 +52,14 @@ void analogReference(uint8_t mode)
 			ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | VDD | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
 	}
 }
-
-
+#ifdef DAC0
+void DACReference(uint8_t mode)
+{
+	if (mode < 5){
+		VREF.CTRLA = mode|(VREF.CTRLA&~7);
+	}
+}
+#endif
 int analogRead(uint8_t pin)
 {
 	#ifdef ADC_DAC0

@@ -140,7 +140,7 @@ atxy7.build.board=attinyxy7
 atxy7.build.core=arduino
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartvoltage}
+atxy7.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
@@ -281,7 +281,7 @@ atxy6.build.board=attinyxy6
 atxy6.build.core=arduino
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
-atxy6.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartvoltage}
+atxy6.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
 atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude
@@ -426,7 +426,7 @@ atxy4.build.board=attinyxy4
 atxy4.build.core=arduino
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
-atxy4.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.uartvoltage}
+atxy4.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.neopixelport} {build.uartvoltage}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
@@ -570,7 +570,7 @@ atxy2.build.board=attinyxy2
 atxy2.build.core=arduino
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
-atxy2.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.uartvoltage}
+atxy2.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DNEOPIXELPORT=VPORTA.OUT {build.uartvoltage}
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
@@ -592,7 +592,7 @@ Xplained416.build.core=arduino
 Xplained416.build.variant=txy6
 Xplained416.build.f_cpu=20000000
 Xplained416.build.text_section_start=.text=0x200
-Xplained416.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartvoltage}
+Xplained416.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
 Xplained416.upload.tool=avrdude
 Xplained416.upload.workaround=
 Xplained416.upload.speed=57600
@@ -653,7 +653,7 @@ Xplained817.build.core=arduino
 Xplained817.build.variant=txy7
 Xplained817.build.f_cpu=20000000
 Xplained817.build.text_section_start=.text=0x200
-Xplained817.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartvoltage}
+Xplained817.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
 Xplained817.upload.tool=avrdude
 Xplained817.upload.workaround=
 Xplained817.upload.speed=57600
@@ -836,7 +836,7 @@ atxy7o.upload.tool=avrdude
 atxy7o.build.board=attinyxy7
 atxy7o.build.core=arduino
 atxy7o.build.variant=txy7
-atxy7o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartvoltage}
+atxy7o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
 atxy7o.build.export_merged_output=true
 
 atxy7o.bootloader.WDTCFG=0x00
@@ -978,7 +978,7 @@ atxy6o.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
 atxy6o.build.board=attinyxy6
 atxy6o.build.core=arduino
 atxy6o.build.variant=txy6
-atxy6o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.dacvref} {build.neopixelport} {build.uartvoltage}
+atxy6o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
 atxy6o.build.export_merged_output=true
 
 atxy6o.upload.workaround=
@@ -1137,7 +1137,7 @@ atxy4o.upload.tool=avrdude
 atxy4o.build.board=attinyxy4
 atxy4o.build.core=arduino
 atxy4o.build.variant=txy4
-atxy4o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} {build.neopixelport} {build.uartvoltage}
+atxy4o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.neopixelport} {build.uartvoltage}
 atxy4o.build.export_merged_output=true
 atxy4o.upload.workaround=
 atxy4o.upload.protocol=arduino
@@ -1283,7 +1283,7 @@ atxy2o.bootloader.tool=avrdude
 atxy2o.build.board=attinyxy2
 atxy2o.build.core=arduino
 atxy2o.build.variant=txy2
-atxy2o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.dacvref} -DNEOPIXELPORT=VPORTA.OUT {build.uartvoltage}
+atxy2o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DNEOPIXELPORT=VPORTA.OUT {build.uartvoltage}
 atxy2o.build.export_merged_output=true
 
 atxy2o.menu.uartvoltage.5v=Closer to 5v
