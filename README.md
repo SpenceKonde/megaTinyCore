@@ -76,67 +76,50 @@ The core also provides An and PIN_An constants (where n is a number from 0 to 11
 ### Serial (UART) Support
 All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards (except that there is no auto-reset, unless you are using Optiboot and have configured that pin to act as reset, or have wired up an "ersatz reset pin" as described above). See the pinout charts for the location of the serial pins.
 
-On all parts, the UART pins can be swapped to an alternate location. This is controlled by the Tools -> UART Pins menu (new in 1.1.0)
+On all parts, the UART pins can be swapped to an alternate location. 
 
-```cpp
-#ifdef UARTREMAP
-#error "This sketch and hardware assume the the standard UART pin locations, please select that option"
-#endif
-```
+On 2.0.0 and later, this is configured using the Wire.swap() or Wire.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** calling SPI.begin().
 
-Alternately, you can manually move to alternate pins within the sketch - but this won't automatically get you the TX and RX #defines on the correct pins.
-```cpp
-PORTMUX.CTRLB|=(1<<SPI0);
-```
-Move to default pins:
-```cpp
-PORTMUX.CTRLB&=~(1<<SPI0);
-```
+`Serial.swap(1) or Serial.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one. 
+
+`Serial.pins(TX pin, RX pin)` - this will set the mapping to whichever mapping has the specified pins as TX and RX. If this is not a valid mapping option, it will return false and set the mapping to the default. This uses more flash than Wire.swap(); that method is preferred.
+
+In versions prior to 2.0.0, this was instead configured using the Tools -> UART Pins menu.
+
 To maximize the accuracy of the baud rate, from the Tools -> Voltage for UART Baud menu, select whether the voltage is closer to 5v or 3v - the factory calibration supplies an oscillator error adjustment for the purpose of UART baud calculation for 5v and 3v, and using the right one will produce a baud rate closer to the target value. That said, testing has indicated that either setting is almost always good enough.
 
-Note: The UART Serial option selected when you do "burn bootloader" for an Optiboot board definition is the serial port that the uploaded bootloaded will use. You may freely change this when compiling/uploading sketches to use the other pins - the pins used by the bootloader will only change when you do "burn bootloader". **If this is your first time bootloading the board in question, and you want to turn UPDI into a Reset pin, burn bootloader first with the UPDI pin left as UPDI, so you can verify that, with the desired UART option, the bootloader really does try to use the pins you want it to - before you turn UPDI into reset and render the part unprogrammable.**
+Bootloaders are available for both UART mappings; the UART bootloader option (prior to 2.0.0, the UART Pins option) selected when you do "burn bootloader" for an Optiboot board definition is the serial port that the uploaded bootloaded will use. You may freely change this when compiling/uploading sketches to use the other pins - the pins used by the bootloader will only change when you do "burn bootloader". **If this is your first time bootloading the board in question, and you want to turn UPDI into a Reset pin, burn bootloader first with the UPDI pin left as UPDI, so you can verify that, with the desired UART option, the bootloader really does try to use the pins you want it to - before you turn UPDI into reset and render the part unprogrammable.**
 
 When operating at 1MHz, the UART can output 56700 baud, but not 115200 baud.
 
 ### SPI support
 All of these parts have a single hardware SPI peripheral. It works exactly like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. Note that the 8-pin parts (412, 212, 402, 204) do not have a specific SS pin.
 
-On all parts except the 14-pin parts, the SPI pins can be moved to an alternate location (note: On 8-pin parts, the SCK pin cannot be moved). This can be configured using the Tools -> SPI Pins submenu; this is set at compile time (reburning bootloader is not required). You can test for whether the alternate pins are in use by checking if SPIREMAP is #defined - you can for example use it to check that the correct options are selected and terminate compilation so you can select the right option if that is the case:
-```cpp
-#ifdef SPIREMAP
-#error "This sketch and hardware assume the the standard SPI pin locations, please select that option"
-#endif
-```
-Alternatively, you can manually move to alternate pins within the sketch - but this won't automatically get you the SCK, MISO, MOSI, SS #defines on the correct pins.
-```cpp
-PORTMUX.CTRLB|=(1<<SPI0);
-```
-Move to default pins:
-```cpp
-PORTMUX.CTRLB&=~(1<<SPI0);
-```
+On all parts except the 14-pin parts, the SPI pins can be moved to an alternate location (note: On 8-pin parts, the SCK pin cannot be moved). 
 
-**Be warned that the SS pin on the megaavr parts has the same, often surprising, behavior as the classic AVRs - that is, if it is not set as an OUTPUT, and is driven low while the SPI peripheral is enabled, that will put SPI into slave mode, after which it must manually be set back to master. If you are using SPI in master mode, SS should be set as an OUTPUT to prevent this from happening. If it is to be used as an SPI slave, you probably want it set INPUT_PULLUP**
+On 2.0.0 and later, this is configured using the Wire.swap() or Wire.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** calling SPI.begin().
+
+`SPI.swap(1) or SPI.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one. 
+
+`SPI.pins(MOSI pin, MISO pin, SCK pin, SS pin);` - this will set the mapping to whichever mapping has the specified pins. If this is not a valid mapping option, it will return false and set the mapping to the default. This uses more flash than SPI.swap(); that method is preferred. 
+
+In versions prior to 2.0.0, this was instead configured using the Tools -> SPI Pins submenu; this is set at compile time (reburning bootloader is not required). In these versions, you could see whether the alternate pins are in use by checking if SPIREMAP is #defined - you can for example use it to check that the correct options are selected and terminate compilation so you can select the right option if that is the case.
+
+This core disables the SS pin when running in SPI master mode. This means that the "SS" pin can be used for whatever purpose you want - unlike classic AVRs, where this could not be disabled. Earlier versions of this document incorrectly stated that this behavior was enabled in megaTinyCore; it never was, and SS was always disabled. It should be reenabled and the SS pin configured appropriately (probably as INPUT_PULLUP) if master/slave functionality is required.
 
 ### I2C (TWI) support
 All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library. See the pinout charts for the location of these pins.
 
-On all parts with more than 8 pins, the TWI pins can be swapped to an alternate location. This can be configured using the Tools -> I2C Pins submenu; this is set at compile time (reburning bootloader is not required). You can see whether the alternate pins are in use by checking if TWIREMAP is #defined - you can, for example, use it to check whether correct options are selected and terminate compilation, so you can select the right option:
-```cpp
-#ifndef TWIREMAP
-#error "This sketch and hardware assumes the alternate I2C/TWI pins are used, please select that option"
-#endif
-```
-Alternately, you can manually move to alternate pins within the sketch; this is not guaranteed to work with all libraries because it doesn't set the pin macros to the correct pins - though these pin macros don't look like they are widely used, so it may not matter.
+On all parts with more than 8 pins, the TWI pins can be swapped to an alternate location. 
 
-It can be done like this:
-```cpp
-PORTMUX.CTRLB|=(1<<TWI0);
-```
-Move back to default pins:
-```cpp
-PORTMUX.CTRLB&=~(1<<TWI0);
-```
+On 2.0.0 and later, this is configured using the Wire.swap() or Wire.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** Wire.begin(). 
+
+`Wire.swap(1) or Wire.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one. 
+
+`Wire.pins(SDA pin, SCL pin)` - this will set the mapping to whichever mapping has the specified pins as SDA and SCL. If this is not a valid mapping option, it will return false and set the mapping to the default. This uses more flash than Wire.swap(); that method is preferred. 
+
+In versions prior to 2.0.0, this was instead configured using the Tools -> I2C Pins submenu; this is set at compile time (reburning bootloader is not required). In these versions, you could see whether the alternate pins are in use by checking if TWIREMAP is #defined - you can, for example, use it to check whether correct options are selected and terminate compilation, so you can select the right option.
+
 As of 1.1.9, courtesey of https://github.com/LordJakson, when the version of Wire.h supplied with megaTinyCore 1.1.9 and later in slave mode, it is now possible to respond to the general call (0x00) address as well. This is controlled by the optional second argument to Wire.begin(). If the argument is supplied amd true, general call broadcasts will also trigger the interrupt. This version also introduces a third optional argument, which is passed unaltered to the TWI0.SADDRMASK register. If the low bit is 0, and bits set 1 sill cause the I2C hardware to ignore that bit of the address (masked off bits will be treated as matching). If the low bit is 1, it will instead act as a second address that the device can respond to.
 
 ### PWM support
