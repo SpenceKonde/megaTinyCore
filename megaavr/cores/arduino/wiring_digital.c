@@ -208,11 +208,15 @@ int8_t digitalRead(uint8_t pin)
 {
 	/* Get bit mask and check valid pin */
 	uint8_t bit_mask = digitalPinToBitMask(pin);
-	if(bit_mask == NOT_A_PIN) return LOW;
+	if(bit_mask == NOT_A_PIN) return -1;
 
 	// If the pin that support PWM output, we need to turn it off
 	// before getting a digital reading.
-	turnOffPWM(pin);
+	// turnOffPWM(pin);
+	// And why do we "need" to do that? Do we have some obsessive
+	// need to make digitalRead slower than it needs to be?!
+	// or keep people from seeing their own PWM?
+	// digitalRead() should not change the output of the pin!
 
 	/* Get port and check valid port */
 	PORT_t *port = digitalPinToPortStruct(pin);
@@ -223,5 +227,4 @@ int8_t digitalRead(uint8_t pin)
 	} else {
 		return LOW;
 	}
-	return LOW;
 }
