@@ -122,7 +122,7 @@ static void turnOffPWM(uint8_t pin)
 
 		break;
 	*/
-	#if defined(DAC0) && defined(DACVREF)
+	#if defined(DAC0)
 	case DACOUT:
 		DAC0.CTRLA=0x00;
 		break;
@@ -204,7 +204,7 @@ void digitalWrite(uint8_t pin, uint8_t val)
 
 }
 
-int digitalRead(uint8_t pin)
+int8_t digitalRead(uint8_t pin)
 {
 	/* Get bit mask and check valid pin */
 	uint8_t bit_mask = digitalPinToBitMask(pin);

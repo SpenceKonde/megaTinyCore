@@ -97,7 +97,10 @@ void digitalWrite(pin_size_t pinNumber, uint8_t val);
 int analogRead(pin_size_t pinNumber);
 void analogReference(uint8_t mode);
 void analogWrite(pin_size_t pinNumber, int value);
-int digitalRead(pin_size_t pinNumber);
+int8_t digitalRead(pin_size_t pinNumber);
+#ifdef DAC0
+void DACReference(uint8_t mode);
+#endif
 
 #ifndef DISABLEMILLIS
 unsigned long millis(void);

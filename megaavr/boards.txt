@@ -8,7 +8,6 @@ menu.bodmodesleep=BOD Mode (sleep)
 menu.eesave=Save EEPROM
 menu.clock=Clock Speed
 menu.clocksource=Clock Source
-menu.dacvref=DAC Voltage Reference
 menu.neopixelport=tinyNeoPixel Port
 menu.millis=millis()/micros()
 menu.uartvoltage=Voltage for UART baud calc)
@@ -104,18 +103,6 @@ atxy7.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy7.menu.eesave.disable=EEPROM not retained
 atxy7.menu.eesave.disable.bootloader.SYSCFG0=0xC6
 
-atxy7.menu.dacvref.0v55=0.55V
-atxy7.menu.dacvref.1v1=1.10V
-atxy7.menu.dacvref.1v5=1.50V
-atxy7.menu.dacvref.2v5=2.50V
-atxy7.menu.dacvref.4v3=4.30V
-atxy7.menu.dacvref.disabled=Disabled (saves flash)
-atxy7.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-atxy7.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy7.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-atxy7.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-atxy7.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-atxy7.menu.dacvref.disabled.build.dacvref=
 
 atxy7.menu.millis.enabled=Enabled (default timer)
 atxy7.menu.millis.disabled=Disabled (saves flash)
@@ -258,18 +245,6 @@ atxy6.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy6.menu.eesave.disable=EEPROM not retained
 atxy6.menu.eesave.disable.bootloader.SYSCFG0=0xC6
 
-atxy6.menu.dacvref.0v55=0.55V
-atxy6.menu.dacvref.1v1=1.10V
-atxy6.menu.dacvref.1v5=1.50V
-atxy6.menu.dacvref.2v5=2.50V
-atxy6.menu.dacvref.4v3=4.30V
-atxy6.menu.dacvref.disabled=Disabled (saves flash)
-atxy6.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-atxy6.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy6.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-atxy6.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-atxy6.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-atxy6.menu.dacvref.disabled.build.dacvref=
 
 atxy6.menu.millis.enabled=Enabled (default timer)
 atxy6.menu.millis.disabled=Disabled (saves flash)
@@ -416,18 +391,6 @@ atxy4.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy4.menu.eesave.disable=EEPROM not retained
 atxy4.menu.eesave.disable.bootloader.SYSCFG0=0xC6
 
-atxy4.menu.dacvref.0v55=0.55V
-atxy4.menu.dacvref.1v1=1.10V
-atxy4.menu.dacvref.1v5=1.50V
-atxy4.menu.dacvref.2v5=2.50V
-atxy4.menu.dacvref.4v3=4.30V
-atxy4.menu.dacvref.disabled=Disabled (saves flash)
-atxy4.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-atxy4.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy4.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-atxy4.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-atxy4.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-atxy4.menu.dacvref.disabled.build.dacvref=
 
 atxy4.menu.millis.enabled=Enabled (default timer)
 atxy4.menu.millis.disabled=Disabled (saves flash)
@@ -482,6 +445,7 @@ atxy4.bootloader.flashcommand=
 
 atxy2.name=ATtiny412/402/212/202
 
+#Come on Microchip, give us an 't812!
 #atxy2.menu.chip.812=ATtiny812
 #atxy2.menu.chip.812.build.mcu=attiny812
 #atxy2.menu.chip.812.upload.maximum_size=8192
@@ -576,18 +540,6 @@ atxy2.menu.eesave.enable.bootloader.SYSCFG0=0xC7
 atxy2.menu.eesave.disable=EEPROM not retained
 atxy2.menu.eesave.disable.bootloader.SYSCFG0=0xC6
 
-atxy2.menu.dacvref.0v55=0.55V
-atxy2.menu.dacvref.1v1=1.10V
-atxy2.menu.dacvref.1v5=1.50V
-atxy2.menu.dacvref.2v5=2.50V
-atxy2.menu.dacvref.4v3=4.30V
-atxy2.menu.dacvref.disabled=Disabled (saves flash)
-atxy2.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-atxy2.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy2.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-atxy2.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-atxy2.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-atxy2.menu.dacvref.disabled.build.dacvref=
 
 atxy2.menu.millis.enabled=Enabled (default timer)
 atxy2.menu.millis.disabled=Disabled (saves flash)
@@ -660,18 +612,6 @@ Xplained416.bootloader.SYSCFG0=0xC9
 Xplained416.bootloader.SYSCFG1=0x03
 Xplained416.bootloader.APPEND=0x00
 
-Xplained416.menu.dacvref.0v55=0.55V
-Xplained416.menu.dacvref.1v1=1.10V
-Xplained416.menu.dacvref.1v5=1.50V
-Xplained416.menu.dacvref.2v5=2.50V
-Xplained416.menu.dacvref.4v3=4.30V
-Xplained416.menu.dacvref.disabled=Disabled (saves flash)
-Xplained416.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-Xplained416.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-Xplained416.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-Xplained416.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-Xplained416.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-Xplained416.menu.dacvref.disabled.build.dacvref=
 
 Xplained416.menu.neopixelport.porta=PORTA (pins 0~3,14~17)
 Xplained416.menu.neopixelport.portb=PORTB (pins 4~9)
@@ -733,18 +673,6 @@ Xplained817.bootloader.SYSCFG0=0xC9
 Xplained817.bootloader.SYSCFG1=0x03
 Xplained817.bootloader.APPEND=0x00
 
-Xplained817.menu.dacvref.0v55=0.55V
-Xplained817.menu.dacvref.1v1=1.10V
-Xplained817.menu.dacvref.1v5=1.50V
-Xplained817.menu.dacvref.2v5=2.50V
-Xplained817.menu.dacvref.4v3=4.30V
-Xplained817.menu.dacvref.disabled=Disabled (saves flash)
-Xplained817.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-Xplained817.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-Xplained817.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-Xplained817.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-Xplained817.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-Xplained817.menu.dacvref.disabled.build.dacvref=
 
 Xplained817.menu.millis.enabled=Enabled
 Xplained817.menu.millis.disabled=Disabled (saves flash)
@@ -862,18 +790,6 @@ atxy7o.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
 atxy7o.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy7o.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
-atxy7o.menu.dacvref.0v55=0.55V
-atxy7o.menu.dacvref.1v1=1.10V
-atxy7o.menu.dacvref.1v5=1.50V
-atxy7o.menu.dacvref.2v5=2.50V
-atxy7o.menu.dacvref.4v3=4.30V
-atxy7o.menu.dacvref.disabled=Disabled (saves flash)
-atxy7o.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-atxy7o.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy7o.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-atxy7o.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-atxy7o.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-atxy7o.menu.dacvref.disabled.build.dacvref=
 
 atxy7o.menu.millis.enabled=Enabled (default timer)
 atxy7o.menu.millis.disabled=Disabled (saves flash)
@@ -997,18 +913,6 @@ atxy6o.menu.clock.5.bootloader.OSCCFG=0x02
 atxy6o.menu.clock.4.bootloader.OSCCFG=0x01
 atxy6o.menu.clock.1.bootloader.OSCCFG=0x01
 
-atxy6o.menu.dacvref.0v55=0.55V
-atxy6o.menu.dacvref.1v1=1.10V
-atxy6o.menu.dacvref.1v5=1.50V
-atxy6o.menu.dacvref.2v5=2.50V
-atxy6o.menu.dacvref.4v3=4.30V
-atxy6o.menu.dacvref.disabled=Disabled (saves flash)
-atxy6o.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-atxy6o.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy6o.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-atxy6o.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-atxy6o.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-atxy6o.menu.dacvref.disabled.build.dacvref=
 
 atxy6o.menu.millis.enabled=Enabled (default timer)
 atxy6o.menu.millis.disabled=Disabled (saves flash)
@@ -1167,18 +1071,6 @@ atxy4o.menu.clock.5.bootloader.OSCCFG=0x02
 atxy4o.menu.clock.4.bootloader.OSCCFG=0x01
 atxy4o.menu.clock.1.bootloader.OSCCFG=0x01
 
-atxy4o.menu.dacvref.0v55=0.55V
-atxy4o.menu.dacvref.1v1=1.10V
-atxy4o.menu.dacvref.1v5=1.50V
-atxy4o.menu.dacvref.2v5=2.50V
-atxy4o.menu.dacvref.4v3=4.30V
-atxy4o.menu.dacvref.disabled=Disabled (saves flash)
-atxy4o.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-atxy4o.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy4o.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-atxy4o.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-atxy4o.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-atxy4o.menu.dacvref.disabled.build.dacvref=
 
 atxy4o.menu.millis.enabled=Enabled (default timer)
 atxy4o.menu.millis.disabled=Disabled (saves flash)
@@ -1336,18 +1228,6 @@ atxy2o.menu.clock.5.bootloader.OSCCFG=0x02
 atxy2o.menu.clock.4.bootloader.OSCCFG=0x01
 atxy2o.menu.clock.1.bootloader.OSCCFG=0x01
 
-atxy2o.menu.dacvref.0v55=0.55V
-atxy2o.menu.dacvref.1v1=1.10V
-atxy2o.menu.dacvref.1v5=1.50V
-atxy2o.menu.dacvref.2v5=2.50V
-atxy2o.menu.dacvref.4v3=4.30V
-atxy2o.menu.dacvref.disabled=Disabled (saves flash)
-atxy2o.menu.dacvref.0v55.build.dacvref=-DDACVREF=0
-atxy2o.menu.dacvref.1v1.build.dacvref=-DDACVREF=1
-atxy2o.menu.dacvref.1v5.build.dacvref=-DDACVREF=4
-atxy2o.menu.dacvref.2v5.build.dacvref=-DDACVREF=2
-atxy2o.menu.dacvref.4v3.build.dacvref=-DDACVREF=3
-atxy2o.menu.dacvref.disabled.build.dacvref=
 
 atxy2o.menu.millis.enabled=Enabled (default timer)
 atxy2o.menu.millis.disabled=Disabled (saves flash)
