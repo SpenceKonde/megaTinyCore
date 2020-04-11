@@ -12,6 +12,7 @@ menu.neopixelport=tinyNeoPixel Port
 menu.millis=millis()/micros()
 menu.uartvoltage=Voltage for UART baud calc)
 menu.resetpin=UPDI/reset pin
+menu.bootloaderuart=UART for Bootloader
 
 
 
@@ -830,6 +831,10 @@ atxy7o.menu.uartvoltage.3v=Closer to 3v
 atxy7o.menu.uartvoltage.5v.build.uartvoltage=
 atxy7o.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
 
+atxy7o.menu.bootloaderuart.default=TX:9, RX:8
+atxy7o.menu.bootloaderuart.alternate=TX:18, RX:19
+atxy7o.menu.bootloaderuart.default.bootloader.uartswap=
+atxy7o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
 atxy7o.upload.tool=avrdude
 
@@ -996,6 +1001,12 @@ atxy6o.menu.resetpin.gpio.bootloader.resetpinbits=00
 
 atxy6o.upload.tool=avrdude
 
+
+atxy6o.menu.bootloaderuart.default=TX:7, RX:6
+atxy6o.menu.bootloaderuart.alternate=TX:14, RX:15
+atxy6o.menu.bootloaderuart.default.bootloader.uartswap=
+atxy6o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
+
 atxy6o.bootloader.WDTCFG=0x00
 atxy6o.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy6o.bootloader.TCD0CFG=0x00
@@ -1146,6 +1157,13 @@ atxy4o.build.text_section_start=.text=0x200
 atxy4o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
 atxy4o.bootloader.tool=avrdude
 
+
+atxy4o.menu.bootloaderuart.default=TX:5, RX:4
+atxy4o.menu.bootloaderuart.alternate=TX:8, RX:9
+atxy4o.menu.bootloaderuart.default.bootloader.uartswap=
+atxy4o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
+
+
 atxy4o.bootloader.WDTCFG=0x00
 atxy4o.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}
 atxy4o.bootloader.TCD0CFG=0x00
@@ -1272,6 +1290,12 @@ atxy2o.menu.bodmodeactive.enabledhold.bootloader.bodactivebits=11
 atxy2o.menu.bodmodesleep.disabled.bootloader.bodsleepbits=00
 atxy2o.menu.bodmodesleep.enabled.bootloader.bodsleepbits=01
 atxy2o.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
+
+atxy2o.menu.bootloaderuart.default=TX:0 (PA6), RX:1 (PA7)
+atxy2o.menu.bootloaderuart.alternate=TX:2 (PA1), RX:3 (PA2)
+atxy2o.menu.bootloaderuart.default.bootloader.uartswap=
+atxy2o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
+
 
 atxy2o.upload.tool=avrdude
 atxy2o.upload.protocol=arduino
