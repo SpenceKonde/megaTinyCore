@@ -616,9 +616,6 @@ void init()
     analogReference(VDD);
   #endif
 
-  #if (HWSERIAL0_MUX!=0 || SPI_MUX!=0 ||TWI_MUX!=0)
-    PORTMUX.CTRLB=HWSERIAL0_MUX|SPI_MUX|TWI_MUX; //Set PORTMUX
-  #endif
   #ifdef __AVR_ATtinyxy2__
     PORTMUX.CTRLC=1; //move WO0 output to PA7 so PA3 can be used with WO3
   #endif

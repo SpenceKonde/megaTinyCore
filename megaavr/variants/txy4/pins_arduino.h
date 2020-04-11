@@ -40,48 +40,52 @@
 
 #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 5 || (p) == 6 || (p) == 7 || (p) == 10)
 
-#define SPI_MUX		  	(PORTMUX_SPI0_DEFAULT_gc)
 #define PIN_SPI_MISO	(9)
 #define PIN_SPI_SCK		(10)
 #define PIN_SPI_MOSI	(8)
 #define PIN_SPI_SS		(0)
 
-#define MUX_SPI			(SPI_MUX)
 #define SPI_INTERFACES_COUNT	1
 
+
+
+#define PIN_WIRE_SDA_PINSWAP_1        (8)
+#define PIN_WIRE_SCL_PINSWAP_1        (9)
+#define PIN_WIRE_SDA        (6)
+#define PIN_WIRE_SCL        (7)
+
+#ifdef PIN_WIRE_SCL_PINSWAP_1
+#define SDA ((uint8_t) (PORTMUX.CTRLB&PORTMUX_TWI0_bm?PIN_WIRE_SDA_PINSWAP_1:PIN_WIRE_SDA))
+#define SCL ((uint8_t) (PORTMUX.CTRLB&PORTMUX_TWI0_bm?PIN_WIRE_SCL_PINSWAP_1:PIN_WIRE_SCL))
+#else
+static const uint8_t SDA = PIN_WIRE_SDA;
+static const uint8_t SCL = PIN_WIRE_SCL;
+#endif
+
+#ifdef PIN_SPI_SCK_PINSWAP_1
+#define SS ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_SS_PINSWAP_1:PIN_SPI_SS))
+#define MOSI ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_MOSI_PINSWAP_1:PIN_MOSI_SCK))
+#define MISO ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_MISO_PINSWAP_1:PIN_MISO_SCK))
+#define SCK ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_SCK_PINSWAP_1:PIN_SPI_SCK))
+#else
 static const uint8_t SS   = PIN_SPI_SS;
 static const uint8_t MOSI = PIN_SPI_MOSI;
 static const uint8_t MISO = PIN_SPI_MISO;
 static const uint8_t SCK  = PIN_SPI_SCK;
-
-
-#ifdef TWIREMAP
-#define TWI_MUX 		(16)
-#define PIN_WIRE_SDA        (8)
-#define PIN_WIRE_SCL        (9)
-#else
-#define TWI_MUX 		(0)
-#define PIN_WIRE_SDA        (6)
-#define PIN_WIRE_SCL        (7)
 #endif
-
-static const uint8_t SDA = PIN_WIRE_SDA;
-static const uint8_t SCL = PIN_WIRE_SCL;
 
 // Mapped to HWSERIAL0 in Serial library
 #define HWSERIAL0 				(&USART0)
 #define HWSERIAL0_DRE_VECTOR 	(USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
 #define HWSERIAL0_RXC_VECTOR 	(USART0_RXC_vect)
-#ifdef UARTREMAP
-#define HWSERIAL0_MUX 			0x01
-#define PIN_WIRE_HWSERIAL0_RX 	(9)
-#define PIN_WIRE_HWSERIAL0_TX 	(8)
-#else
+
+#define HWSERIAL0_MUX_PINSWAP_1 			0x01
+#define PIN_WIRE_HWSERIAL0_RX_PINSWAP_1 	(9)
+#define PIN_WIRE_HWSERIAL0_TX_PINSWAP_1 	(8)
 #define HWSERIAL0_MUX 			0x00
 #define PIN_WIRE_HWSERIAL0_RX 	(4)
 #define PIN_WIRE_HWSERIAL0_TX 	(5)
-#endif
 
 
 #define LED_BUILTIN 3 //FIXME

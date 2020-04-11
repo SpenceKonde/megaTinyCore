@@ -54,29 +54,130 @@ TwoWire::TwoWire()
 
 // Public Methods //////////////////////////////////////////////////////////////
 
+// Special for megaAVR 0-series: Select which pins to use for I2C interface
+// True if pin specification actually exists
+// Note that we do not currently support the dual TWI mode
+bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin)
+{
+  #if defined(PORTMUX_CTRLB)
+    #if defined(PIN_WIRE_SDA_PINSWAP_1) && defined(PIN_WIRE_SCL_PINSWAP_1)
+      if (sda_pin == PIN_WIRE_SDA_PINSWAP_1 && scl_pin == PIN_WIRE_SCL_PINSWAP_1)
+      {
+        // Use pin swap
+        PORTMUX.CTRLB|=PORTMUX_TWI0_bm;
+        return true;
+      }
+      else if(sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL)
+      {
+        // Use default configuration
+        PORTMUX.CTRLB&=~PORTMUX_TWI0_bm;
+        return true;
+      }
+      else
+      {
+        // Assume default configuration
+        PORTMUX.CTRLB&=~PORTMUX_TWI0_bm;
+        return false;
+      }
+    #endif
+  #elif defined(PORTMUX_TWIROUTEA)
+    if (sda_pin == PIN_WIRE_SDA_PINSWAP_2 && scl_pin == PIN_WIRE_SCL_PINSWAP_2)
+    {
+      // Use pin swap
+      PORTMUX.TWIROUTEA=(PORTMUX.TWIROUTEA&0xFC)|0x02;
+      return true;
+    }
+    else if(sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL)
+    {
+      // Use default configuration
+      PORTMUX.TWIROUTEA=(PORTMUX.TWIROUTEA&0xFC);
+      return true;
+    }
+    else
+    {
+      // Assume default configuration
+      PORTMUX.TWIROUTEA=(PORTMUX.TWIROUTEA&0xFC);
+      return false;
+    }
+  #endif
+  return false;
+}
+
+bool TwoWire::swap(uint8_t state)
+{
+  #if defined(PORTMUX_CTRLB)
+    #if defined(PIN_WIRE_SDA_PINSWAP_1) && defined(PIN_WIRE_SCL_PINSWAP_1)
+      if(state == 1)
+      {
+        // Use pin swap
+        PORTMUX.CTRLB|=PORTMUX_TWI0_bm;
+        return true;
+      }
+      else if(state == 0)
+      {
+        // Use default configuration
+        PORTMUX.CTRLB&=~PORTMUX_TWI0_bm;
+        return true;
+      }
+      else
+      {
+        // Assume default configuration
+        PORTMUX.CTRLB&=~PORTMUX_TWI0_bm;
+        return false;
+      }
+    #endif
+  #elif defined(PORTMUX_TWIROUTEA)
+    if(state == 2)
+    {
+      // Use pin swap
+      PORTMUX.TWIROUTEA=(PORTMUX.TWIROUTEA&0xFC)|0x02;
+      return true;
+    }
+    else if(state == 1)
+    {
+      // Use pin swap
+      PORTMUX.TWIROUTEA=(PORTMUX.TWIROUTEA&0xFC)|0x01;
+      return true;
+    }
+    else if(state == 0)
+    {
+      // Use default configuration
+      PORTMUX.TWIROUTEA=(PORTMUX.TWIROUTEA&0xFC);
+      return true;
+    }
+    else
+    {
+      // Assume default configuration
+      PORTMUX.TWIROUTEA=(PORTMUX.TWIROUTEA&0xFC);
+      return false;
+    }
+  #endif
+  return false;
+}
+
 void TwoWire::begin(void)
 {
-	rxBufferIndex = 0;
-	rxBufferLength = 0;
+  rxBufferIndex = 0;
+  rxBufferLength = 0;
 
-	txBufferIndex = 0;
-	txBufferLength = 0;
+  txBufferIndex = 0;
+  txBufferLength = 0;
 
-	TWI_MasterInit(DEFAULT_FREQUENCY);
+  TWI_MasterInit(DEFAULT_FREQUENCY);
 }
 
 void TwoWire::begin(uint8_t address,bool receive_broadcast,uint8_t second_address)
 {
-	rxBufferIndex = 0;
-	rxBufferLength = 0;
+  rxBufferIndex = 0;
+  rxBufferLength = 0;
 
-	txBufferIndex = 0;
-	txBufferLength = 0;
+  txBufferIndex = 0;
+  txBufferLength = 0;
 
-	TWI_SlaveInit(address,receive_broadcast,second_address);
+  TWI_SlaveInit(address,receive_broadcast,second_address);
 
-	TWI_attachSlaveTxEvent(onRequestService, txBuffer); // default callback must exist
-	TWI_attachSlaveRxEvent(onReceiveService, rxBuffer, BUFFER_LENGTH); // default callback must exist
+  TWI_attachSlaveTxEvent(onRequestService, txBuffer); // default callback must exist
+  TWI_attachSlaveRxEvent(onReceiveService, rxBuffer, BUFFER_LENGTH); // default callback must exist
 
 }
 
@@ -92,19 +193,18 @@ void TwoWire::begin(uint8_t address,bool receive_broadcast)
 
 void TwoWire::begin(int address,bool receive_broadcast)
 {
-	begin((uint8_t)address,receive_broadcast,0);
+  begin((uint8_t)address,receive_broadcast,0);
 }
 
 void TwoWire::begin(uint8_t address)
 {
-	begin(address,0,0);
+  begin(address,0,0);
 }
 
 void TwoWire::begin(int address)
 {
-	begin((uint8_t)address,0,0);
+  begin((uint8_t)address,0,0);
 }
-
 void TwoWire::end(void)
 {
 	TWI_Disable();
@@ -134,14 +234,14 @@ uint8_t TwoWire::requestFrom(uint8_t address, size_t quantity)
 	return requestFrom(address, quantity, true);
 }
 
-uint8_t TwoWire::requestFrom(int address, size_t quantity)
+uint8_t TwoWire::requestFrom(int address, int quantity)
 {
-	return requestFrom((uint8_t)address, quantity, true);
+	return requestFrom((uint8_t)address, (size_t)quantity, true);
 }
 
-uint8_t TwoWire::requestFrom(int address, size_t quantity, int sendStop)
+uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)
 {
-	return requestFrom((uint8_t)address, quantity, (bool)sendStop);
+	return requestFrom((uint8_t)address, (size_t)quantity, (bool)sendStop);
 }
 
 void TwoWire::beginTransmission(uint8_t address)
@@ -343,4 +443,3 @@ void TwoWire::onRequest( void (*function)(void) )
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
 TwoWire Wire = TwoWire();
-

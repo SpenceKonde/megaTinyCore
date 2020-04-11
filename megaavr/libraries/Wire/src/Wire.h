@@ -24,11 +24,8 @@
 
 #include <Arduino.h>
 
-#if ((RAMEND - RAMSTART) < 1023)
-#define BUFFER_LENGTH 16
-#else
-#define BUFFER_LENGTH 32
-#endif
+#define BUFFER_LENGTH 128
+
 // WIRE_HAS_END means Wire has end()
 #define WIRE_HAS_END 1
 class TwoWire : public Stream
@@ -50,13 +47,15 @@ class TwoWire : public Stream
     static void onReceiveService(int);
   public:
     TwoWire();
+    bool pins(uint8_t sda_pin, uint8_t scl_pin);
+    bool swap(uint8_t state = 1);
     void begin();
+    void begin(uint8_t);
+    void begin(int);
     void begin(uint8_t,bool,uint8_t);
     void begin(int,bool,uint8_t);
     void begin(uint8_t,bool);
     void begin(int,bool);
-    void begin(uint8_t);
-    void begin(int);
     void end();
     void setClock(uint32_t);
     void beginTransmission(uint8_t);
@@ -65,8 +64,8 @@ class TwoWire : public Stream
     uint8_t endTransmission(bool);
     uint8_t requestFrom(uint8_t, size_t);
     uint8_t requestFrom(uint8_t, size_t, bool);
-    uint8_t requestFrom(int, size_t);
-    uint8_t requestFrom(int, size_t, int);
+    uint8_t requestFrom(int, int);
+    uint8_t requestFrom(int, int, int);
     virtual size_t write(uint8_t);
     virtual size_t write(const uint8_t *, size_t);
     virtual int available(void);
@@ -86,4 +85,3 @@ class TwoWire : public Stream
 extern TwoWire Wire;
 
 #endif
-

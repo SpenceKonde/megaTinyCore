@@ -13,6 +13,8 @@ SPI	KEYWORD1
 #######################################
 begin	KEYWORD2
 end	KEYWORD2
+swap	KEYWORD2
+pins	KEYWORD2
 transfer	KEYWORD2
 setBitOrder	KEYWORD2
 setDataMode	KEYWORD2
