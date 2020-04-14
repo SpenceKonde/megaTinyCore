@@ -8,7 +8,6 @@ menu.bodmodesleep=BOD Mode (sleep)
 menu.eesave=Save EEPROM
 menu.clock=Clock Speed
 menu.clocksource=Clock Source
-menu.neopixelport=tinyNeoPixel Port
 menu.millis=millis()/micros()
 menu.uartvoltage=Voltage for UART baud calc)
 menu.resetpin=UPDI/reset pin
@@ -122,12 +121,6 @@ atxy7.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 atxy7.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
 atxy7.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
 
-atxy7.menu.neopixelport.porta=PORTA (pins 0~3,18~21)
-atxy7.menu.neopixelport.portb=PORTB (pins 4~11)
-atxy7.menu.neopixelport.portc=PORTC (pins 12~17)
-atxy7.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
-atxy7.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
-atxy7.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
 atxy7.menu.uartvoltage.5v=Closer to 5v
 atxy7.menu.uartvoltage.3v=Closer to 3v
@@ -141,7 +134,7 @@ atxy7.build.board=attinyxy7
 atxy7.build.core=arduino
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
+atxy7.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
@@ -264,12 +257,6 @@ atxy6.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 atxy6.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
 atxy6.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
 
-atxy6.menu.neopixelport.porta=PORTA (pins 0~3,14~17)
-atxy6.menu.neopixelport.portb=PORTB (pins 4~9)
-atxy6.menu.neopixelport.portc=PORTC (pins 10~13)
-atxy6.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
-atxy6.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
-atxy6.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
 atxy6.menu.uartvoltage.5v=Closer to 5v
 atxy6.menu.uartvoltage.3v=Closer to 3v
@@ -282,7 +269,7 @@ atxy6.build.board=attinyxy6
 atxy6.build.core=arduino
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
-atxy6.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
+atxy6.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
 atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude
@@ -410,10 +397,6 @@ atxy4.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 atxy4.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
 atxy4.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
 
-atxy4.menu.neopixelport.porta=PORTA (pins 0~3,8~11)
-atxy4.menu.neopixelport.portb=PORTB (pins 4~7)
-atxy4.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
-atxy4.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
 
 atxy4.menu.uartvoltage.5v=Closer to 5v
 atxy4.menu.uartvoltage.3v=Closer to 3v
@@ -427,7 +410,7 @@ atxy4.build.board=attinyxy4
 atxy4.build.core=arduino
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
-atxy4.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.neopixelport} {build.uartvoltage}
+atxy4.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.uartvoltage}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
@@ -593,7 +576,7 @@ Xplained416.build.core=arduino
 Xplained416.build.variant=txy6
 Xplained416.build.f_cpu=20000000
 Xplained416.build.text_section_start=.text=0x200
-Xplained416.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
+Xplained416.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
 Xplained416.upload.tool=avrdude
 Xplained416.upload.workaround=
 Xplained416.upload.speed=57600
@@ -614,12 +597,6 @@ Xplained416.bootloader.SYSCFG1=0x03
 Xplained416.bootloader.APPEND=0x00
 
 
-Xplained416.menu.neopixelport.porta=PORTA (pins 0~3,14~17)
-Xplained416.menu.neopixelport.portb=PORTB (pins 4~9)
-Xplained416.menu.neopixelport.portc=PORTC (pins 10~13)
-Xplained416.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
-Xplained416.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
-Xplained416.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
 Xplained416.menu.millis.enabled=Enabled
 Xplained416.menu.millis.disabled=Disabled (saves flash)
@@ -654,7 +631,7 @@ Xplained817.build.core=arduino
 Xplained817.build.variant=txy7
 Xplained817.build.f_cpu=20000000
 Xplained817.build.text_section_start=.text=0x200
-Xplained817.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
+Xplained817.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
 Xplained817.upload.tool=avrdude
 Xplained817.upload.workaround=
 Xplained817.upload.speed=57600
@@ -695,12 +672,6 @@ Xplained817.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
 Xplained817.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
 Xplained817.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
 
-Xplained817.menu.neopixelport.porta=PORTA (pins 0~3,18~21)
-Xplained817.menu.neopixelport.portb=PORTB (pins 4~11)
-Xplained817.menu.neopixelport.portc=PORTC (pins 12~17)
-Xplained817.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
-Xplained817.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
-Xplained817.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
 Xplained817.menu.uartvoltage.5v=Closer to 5v
 Xplained817.menu.uartvoltage.3v=Closer to 3v
@@ -809,12 +780,6 @@ atxy7o.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 atxy7o.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
 atxy7o.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
 
-atxy7o.menu.neopixelport.porta=PORTA (pins 0~3,18~21)
-atxy7o.menu.neopixelport.portb=PORTB (pins 4~11)
-atxy7o.menu.neopixelport.portc=PORTC (pins 12~17)
-atxy7o.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
-atxy7o.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
-atxy7o.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
 atxy7o.menu.resetpin.UPDI=UPDI (powercycle to enter bootloader)
 atxy7o.menu.resetpin.UPDI.bootloader.file=optiboot_x/optiboot_txy7{bootloader.uartswap}.hex
@@ -841,7 +806,7 @@ atxy7o.upload.tool=avrdude
 atxy7o.build.board=attinyxy7
 atxy7o.build.core=arduino
 atxy7o.build.variant=txy7
-atxy7o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
+atxy7o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
 atxy7o.build.export_merged_output=true
 
 atxy7o.bootloader.WDTCFG=0x00
@@ -936,12 +901,6 @@ atxy6o.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 atxy6o.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
 atxy6o.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
 
-atxy6o.menu.neopixelport.porta=PORTA (pins 0~3,14~17)
-atxy6o.menu.neopixelport.portb=PORTB (pins 4~9)
-atxy6o.menu.neopixelport.portc=PORTC (pins 10~13)
-atxy6o.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
-atxy6o.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
-atxy6o.menu.neopixelport.portc.build.neopixelport=-DNEOPIXELPORT=VPORTC.OUT
 
 atxy6o.menu.bodvoltage.1v8=1.8V
 atxy6o.menu.bodvoltage.2v15=2.15V
@@ -983,7 +942,7 @@ atxy6o.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
 atxy6o.build.board=attinyxy6
 atxy6o.build.core=arduino
 atxy6o.build.variant=txy6
-atxy6o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.neopixelport} {build.uartvoltage}
+atxy6o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
 atxy6o.build.export_merged_output=true
 
 atxy6o.upload.workaround=
@@ -1100,10 +1059,6 @@ atxy4o.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
 atxy4o.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
 atxy4o.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
 
-atxy4o.menu.neopixelport.porta=PORTA (pins 0~3,8~11)
-atxy4o.menu.neopixelport.portb=PORTB (pins 4~7)
-atxy4o.menu.neopixelport.porta.build.neopixelport=-DNEOPIXELPORT=VPORTA.OUT
-atxy4o.menu.neopixelport.portb.build.neopixelport=-DNEOPIXELPORT=VPORTB.OUT
 
 atxy4o.menu.bodvoltage.1v8=1.8V
 atxy4o.menu.bodvoltage.2v15=2.15V
@@ -1148,7 +1103,7 @@ atxy4o.upload.tool=avrdude
 atxy4o.build.board=attinyxy4
 atxy4o.build.core=arduino
 atxy4o.build.variant=txy4
-atxy4o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.neopixelport} {build.uartvoltage}
+atxy4o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.uartvoltage}
 atxy4o.build.export_merged_output=true
 atxy4o.upload.workaround=
 atxy4o.upload.protocol=arduino
