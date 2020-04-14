@@ -1,9 +1,8 @@
 ## tinyNeoPixel - a megaAVR compatible library for WS2812 "NeoPixel" and similar
 
-The change in architecture from the classic AVRs to megaAVR causes many of the existing WS2812 libraries to not work on the megaAVR parts. This library adapts the Adafruit_NeoPixel library to work with the megaAVR architecture, and adds support for 10MHz and 20MHz clock speeds.
+The change in architecture from the classic AVRs to megaAVR causes many of the existing WS2812 libraries to not work on the megaAVR parts. This library adapts the Adafruit_NeoPixel library to work with the megaAVR architecture, and adds support for 10MHz and 20MHz clock speeds. In order to reduce flash usage at lower clock frequencies (where there is no time to meet the constraints unless the address of the port register is set at compile time in the hand-tuned assembly), there is a separate version of the library for each of the three ports; you must use the correct library for the port that the pin you are using is on; these are shown in the pinout charts. The alternative would have meant including multiple copies of that assembly code for each port, which would have imposed a significant overhead in terms of flash usage.
 
-### tinyNeoPixel Port menu option
-At 8MHz and 10MHz, the hand-tuned assembly code used to send the data to the LEDs requires the port to be set at compile time. The original Adafruit_NeoPixel library used if/then statements to allow it to work with different ports - however this requires multiple copies of the assembly code in the compiled binary which increases flash usage. Since the pin that the NeoPixel is on is known when the sketch is written, a submenu is provided to select the port to be used with the NeoPixel library - this is used only at 8 and 10MHz (and only on parts with more than 8 pins - the x12 and x02 parts have only one port, and hence no tinyNeoPixel port menu); at 16MHz and 20MHz, this option is ignored and any pin will work regardless of the menu setting.
+Prior to version 2.0.1, this was instead set using a tools -> tinyNeoPixel menu option. However, feedback from users and my own experience demonstrated that using tools submenus for this was problematic, since those settings are not saved on a per-sketch basis - so one had to remember what settings had been chosen when the sketch was written. Hence, this was replaced with 3 copies of the library in 2.0.1.
 
 ### tinyNeoPixel and tinyNeoPixel_Static
 There are two versions of this library provided. `tinyNeoPixel` implements the entire API that Adafruit_NeoPixel does, including setting the pin and length of the string at runtime (as noted above, at 8MHz and 10MHz, if the pin is changed, it must be on the same port). This provides maximum portability between code written for use with Adafruit_NeoPixel and tinyNeoPixel (only the constructor and library name need to be changed).
@@ -20,10 +19,10 @@ There are two versions of this library provided. `tinyNeoPixel` implements the e
 `tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t,uint8_t *pxl);` constructor for tinyNeoPixel_Static - the final argument is a uint_8 (byte) array sized to accomodate the data to be sent to the LED. For example:
 
 
-    #include <"tinyNeoPixel_Static.h">
+    #include <"tinyNeoPixel_StaticPORTB.h">
     #define NUMLEDS 10
     byte pixels[NUMLEDS*3];
-    tinyNeoPixel(NUMPIXELS, 5, NEO_GRB, pixels);
+    tinyNeoPixel(NUMPIXELS, 5, NEO_GRB, pixels); //pin 5 is on PORT B on all parts except the 8-pin ones
     void setup() {
       pinMode(5,OUTPUT);
     }
@@ -62,7 +61,7 @@ There are two versions of this library provided. `tinyNeoPixel` implements the e
 `Color(uint8_t r, uint8_t g, uint8_t b, uint8_t w)` Return the color `r,g,b,w` as a uint_32 (For RGBW leds)
 
 `getPixelColor(uint16_t n)` Returns the color of pin `n` as a uint_32
-    
+
 ### Pixel order #defines
 These are the same names for the #defines used by Adafruit_NeoPixel; these are used for the third argument to tinyNeoPixel().
 
