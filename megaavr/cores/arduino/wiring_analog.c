@@ -166,7 +166,7 @@ void analogWrite(uint8_t pin, int val)
 
 			break;
 						*/
-		#if defined(DAC0) && defined(DACVREF)
+		#if defined(DAC0)
 		case DACOUT:
 			DAC0.DATA=val;
 			DAC0.CTRLA=0x41; //OUTEN=1, ENABLE=1

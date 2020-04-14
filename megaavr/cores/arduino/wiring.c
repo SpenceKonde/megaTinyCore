@@ -625,10 +625,6 @@ void init()
   #ifndef DISABLEMILLIS
   init_millis();
   #endif //end #ifndef DISABLEMILLIS
-/*************************** DAC VREF *****************************************/
-  #if defined(DAC0) && defined(DACVREF)
-    VREF.CTRLA |= DACVREF;
-  #endif
 /*************************** ENABLE GLOBAL INTERRUPTS *************************/
 
   sei();

@@ -93,7 +93,11 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define PIN_WIRE_HWSERIAL0_TX     (9)
 
 
-#define LED_BUILTIN 3
+#ifdef DAC0
+#define DAC_PIN PIN_PA6
+#endif
+#define LED_BUILTIN PIN_PA7
+
 
 #define PINS_COUNT        (22u)
 
@@ -293,7 +297,7 @@ const uint8_t digital_pin_to_timer[] = {
       // Left side, top to bottom
     TIMERA0,         // 0  PA4
     TIMERA0,         // 1  PA5
-    #if defined(DAC0) && defined(DACVREF)
+    #if defined(DAC0)
     DACOUT, // 2  PA6
     #else
     NOT_ON_TIMER, // 2  PA6

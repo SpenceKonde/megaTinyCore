@@ -87,8 +87,10 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define PIN_WIRE_HWSERIAL0_RX 	(1)
 #define PIN_WIRE_HWSERIAL0_TX 	(0)
 
-
-#define LED_BUILTIN 1
+#ifdef DAC0
+#define DAC_PIN PIN_PA6
+#endif
+#define LED_BUILTIN PIN_PA3
 
 
 #define PIN_A0   (5)
@@ -123,9 +125,9 @@ static const uint8_t PIN_PA3=4;
 // ATtiny412 / ARDUINO
 //                                    _____
 //                            VDD   1|*    |20  GND
-//           (DAC)  (AIN6) PA6  0   2|     |19  4~  PA3 (AIN3)(SCK)(EXTCLK)
-//                  (AIN7) PA7  1   3|     |18  5   PA0 (nRESET/UPDI)
-// (MOSI)(TXD)(SDA) (AIN1) PA1  2   4|_____|17  3   PA2 (AIN2)(MISO)(RXD)(SCL)
+//           (DAC)   (AIN6) PA6  0   2|     |19  4~  PA3 (AIN3)(SCK)(EXTCLK)
+//                   (AIN7) PA7  1   3|     |18  5   PA0 (nRESET/UPDI)
+// (MOSI)(TXD*)(SDA) (AIN1) PA1  2   4|_____|17  3   PA2 (AIN2)(MISO)(RXD*)(SCL)
 //
 //
 
@@ -174,7 +176,7 @@ const uint8_t digital_pin_to_bit_mask[] = {
 };
 
 const uint8_t digital_pin_to_timer[] = {
-	#if defined(DAC0) && defined(DACVREF)
+	#if defined(DAC0)
     DACOUT,
 	#else
 	NOT_ON_TIMER, // 0  PA6
