@@ -30,8 +30,10 @@ void analogReference(uint8_t mode)
 {
 	switch (mode)
 	{
-	#ifdef EXTERNAL
+	#if defined(EXTERNAL)
 		case EXTERNAL:
+	#elif defined(EXTERNAL_EXPERIMENTAL)
+		case EXTERNAL_EXPERIMENTAL:
 	#endif
 		case VDD:
 			ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...

@@ -48,9 +48,7 @@ void attachInterrupt(uint8_t pin, void (*userFunc)(void), uint8_t mode) {
     intFunc[interruptNum] = userFunc;
 
     // Configure the interrupt mode (trigger on low input, any change, rising
-    // edge, or falling edge).  The mode constants were chosen to correspond
-    // to the configuration bits in the hardware register, so we simply apply
-    // the setting in the pin control register
+    // edge, or falling edge)
 
     switch (mode) {
       case CHANGE:
@@ -66,7 +64,6 @@ void attachInterrupt(uint8_t pin, void (*userFunc)(void), uint8_t mode) {
         mode = PORT_ISC_LEVEL_gc;
         break;
       default:
-        // AVR doesn't support level triggered interrupts
         return;
     }
 

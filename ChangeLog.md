@@ -1,3 +1,26 @@
+2.0.1
+* Fix bug in DAC introduced by 2.0.0
+* Switch to 3 separate tinyNeopixel libraries instead of one, and change the examples and documentation accordingly.
+* Renumber interrupt modes for consistency with MegaCoreX
+* Correct EESAVE fuse settings for optiboot boards - it is now always off. With optiboot on the chip, it is likely that the only time chip erase is executed is when UPDI is used to erase the chip to reburn the bootloader, and users would probably expect that to wipe the EEPROM too.
+*
+
+
+2.0.0
+* Remove all the UART/SPI/I2C pin mapping menus from tools submenus. Instead, use the newly added .swap() and .pins() methods on these objects to set the pins to be used.
+* WARNING: POTENTIALLY BREAKING CHANGE: **The default pins used for Serial on 8-pin parts in previous versions are not the "default" pins per datasheet (arduino pins 0 and 1); instead, the "alternate" pins were used by default (arduino pins 2 and 3). Note that on the Rev. - and Rev. A breakouts for these parts from my Tindie store, the serial lines from the FTDI header go to the alternate pins, not the "default" ones.** (this will be corrected in Rev. B of the board). If you have sketches/hardware using this, you will either need to move connections, or add Serial.swap(1); before calling Serial.begin(). I realize this is inconvenient, but that previous behavior should never have been the case, and, having finally accepted the fact, it was better to cut over quickly than let more people get used to the previous behavior and then change it later.
+* Improve ADC speed dramatically (it runs in about a quarter of the time it used to!) - I do not expect this to cause any issues with accuracy. The megaavr parts support much higher maximum ADC clock compared to the classic AVRs. We now set the ADC clock near to the top of it's range. In order to prevent this from hurting accuracy when reading high impedance sources, the ADC0.SAMPCTRL is set to SAMPLEN=14 instead of 0. This means samples will be taken for 16 ADC clocks instead of 2. Since the ADC clock is 8 times faster now, this should result in the same sampling time. See the ADC section for more information, including how to get even faster ADC readings from low impedance signals.
+* digitalRead(), pinMode(), and digitalWrite() were changed back to operating on uint8's instead of the PinMode, PinStatus, etc enums like the official megaavr core does (and unlike how every other core does it). Using the enums, while it was defensible from a software architecture perspective, caused a lot of breakage of common Arduino ideoms that have been in widespread use for ages, for very little benefit. This also applies to things that used BitOrder.
+* digitalRead(), pinMode(), digitalWrite() and analogWrite() now take advantage of the unified memory architecture of the megaavr parts to improve performance and reduce flash usage by removing the PROGMEM attribute and accompanying pgm_read_byte() calls. This yields a significant improvement in performance of analogWrite() and digitalRead() in particular.
+* Remove the DAC reference voltage from tools submenu. Now, use the DACReference() function - it can take any of the INTERNAL reference arguments that would be passed to analogReferece().
+* digitalRead() no longer turns off PWM and DAC output on the pin that is read. There was no technical need for this, and digitalRead() should not change the pin output state!
+* digitalRead() now returns an int8_t instead of an int16_t - this saves a tiny amount of flash and slightly improves execution time.
+* digitalRead() now returns -1 if called on a pin that doesn't exist, instead of 0 (LOW). This should make debugging easier, without impacting behavior when valid pin is passed to digitalRead().
+* Added support for manipulating the millis timer from within libraries or the sketch: init_millis(), stop_millis(), set_millis(), and restart_millis(). These are not expected to be normally used in sketches; these will be used in the upcoming megaTinySleep library which will "switch" millis timekeeping to the RTC when in sleep, and restore the millis value to whatever other timer is normally used.
+* Fix a bug with the EXTERNAL reference option being defined for the '212 and '412 - the 8-pin parts do not have that reference option, even if they're 1-series and otherwise would.
+
+
+
 1.1.10
 * Fix bug with Wire introduced by not testing 1.1.9 changes to Wire.
 * Fix bug with EEPROM introduced by not testing 1.1.9 changes to EEPROM
