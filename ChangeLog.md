@@ -1,4 +1,6 @@
 2.0.1
+* Fix bug with some 1-series parts not compiling because of references to external reference introduced by 1.1.10
+* Add an EXTERNAL_EXPERIMENTAL reference option, since the headers and datasheets disagree about what parts support this
 * Fix bug in DAC introduced by 2.0.0
 * Switch to 3 separate tinyNeopixel libraries instead of one, and change the examples and documentation accordingly.
 * Renumber interrupt modes for consistency with MegaCoreX
