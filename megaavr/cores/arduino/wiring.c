@@ -221,7 +221,11 @@ unsigned long millis()
     #else //timerb
       if ((_timer->INTFLAGS & TCB_CAPT_bm) && !(ticks&0xFF00)) {
     #endif
+    #if ((defined(MILLIS_USE_TIMERB0)|defined(MILLIS_USE_TIMERB1))&&(F_CPU>1000000))
       overflows++;
+    #else
+      overflows+=2;
+    #endif
     }
 
     //end getting ticks
