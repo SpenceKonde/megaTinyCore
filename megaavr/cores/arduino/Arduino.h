@@ -61,9 +61,6 @@ extern "C"{
 
 #if (defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3216__) )
   #define EXTERNAL  ADC_REFSEL_VREFA_gc
-  #define EXTERNAL_EXPERIMENTAL EXTERNAL
-#else
-  #define EXTERNAL_EXPERIMENTAL (0x02<<4)
 #endif
 
 #define ADC_TEMPERATURE ADC_MUXPOS_TEMPSENSE_gc
@@ -157,110 +154,137 @@ void setup_timers();
 //#defines to identify part families
 #if defined(__AVR_ATtiny3217__)
 #define MEGATINYCORE_MCU 3217
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 1
+#define __AVR_ATtinyx17__
+#define __AVR_ATtinyxy7__
 #elif defined(__AVR_ATtiny1617__)
 #define MEGATINYCORE_MCU 1617
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 1
+#define __AVR_ATtinyx17__
+#define __AVR_ATtinyxy7__
 #elif defined(__AVR_ATtiny817__)
 #define MEGATINYCORE_MCU 817
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 1
+#define __AVR_ATtinyx17__
+#define __AVR_ATtinyxy7__
 #elif defined(__AVR_ATtiny417__)
 #define MEGATINYCORE_MCU 417
+#define MEGATINYCORE_SERIES 1
 #define __AVR_ATtinyx17__
 #define __AVR_ATtinyxy7__
 #elif defined(__AVR_ATtiny3207__)
 #define MEGATINYCORE_MCU 3207
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 0
+#define __AVR_ATtinyx07__
+#define __AVR_ATtinyxy7__
 #elif defined(__AVR_ATtiny1607__)
 #define MEGATINYCORE_MCU 1607
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 0
+#define __AVR_ATtinyx07__
+#define __AVR_ATtinyxy7__
 #elif defined(__AVR_ATtiny807__)
 #define MEGATINYCORE_MCU 807
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 0
+#define __AVR_ATtinyx07__
+#define __AVR_ATtinyxy7__
 #elif defined(__AVR_ATtiny407__)
 #define MEGATINYCORE_MCU 407
+#define MEGATINYCORE_SERIES 0
 #define __AVR_ATtinyx07__
 #define __AVR_ATtinyxy7__
 #elif defined(__AVR_ATtiny3216__)
 #define MEGATINYCORE_MCU 3216
+#define MEGATINYCORE_SERIES 1
 #define __AVR_ATtinyx06__
 #define __AVR_ATtinyxy6__
 #elif defined(__AVR_ATtiny1616__)
 #define MEGATINYCORE_MCU 1616
+#define MEGATINYCORE_SERIES 1
 #define __AVR_ATtinyx06__
 #define __AVR_ATtinyxy6__
 #elif defined(__AVR_ATtiny816__)
 #define MEGATINYCORE_MCU 816
+#define MEGATINYCORE_SERIES 1
 #define __AVR_ATtinyx06__
 #define __AVR_ATtinyxy6__
 #elif defined(__AVR_ATtiny416__)
 #define MEGATINYCORE_MCU 416
+#define MEGATINYCORE_SERIES 1
 #define __AVR_ATtinyx16__
 #define __AVR_ATtinyxy6__
 #elif defined(__AVR_ATtiny1606__)
 #define MEGATINYCORE_MCU 1606
+#define MEGATINYCORE_SERIES 0
 #define __AVR_ATtinyx06__
 #define __AVR_ATtinyxy6__
 #elif defined(__AVR_ATtiny806__)
 #define MEGATINYCORE_MCU 806
+#define MEGATINYCORE_SERIES 0
 #define __AVR_ATtinyx06__
 #define __AVR_ATtinyxy6__
 #elif defined(__AVR_ATtiny406__)
 #define MEGATINYCORE_MCU 406
+#define MEGATINYCORE_SERIES 0
 #define __AVR_ATtinyx06__
 #define __AVR_ATtinyxy6__
 #elif defined(__AVR_ATtiny214__)
 #define MEGATINYCORE_MCU 214
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 1
+#define __AVR_ATtinyx14__
+#define __AVR_ATtinyxy4__
 #elif defined(__AVR_ATtiny1614__)
 #define MEGATINYCORE_MCU 1614
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 1
+#define __AVR_ATtinyx14__
+#define __AVR_ATtinyxy4__
 #elif defined(__AVR_ATtiny814__)
 #define MEGATINYCORE_MCU 814
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 1
+#define __AVR_ATtinyx14__
+#define __AVR_ATtinyxy4__
 #elif defined(__AVR_ATtiny414__)
 #define MEGATINYCORE_MCU 414
+#define MEGATINYCORE_SERIES 1
 #define __AVR_ATtinyx14__
 #define __AVR_ATtinyxy4__
 #elif defined(__AVR_ATtiny204__)
 #define MEGATINYCORE_MCU 204
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 0
+#define __AVR_ATtinyx04__
+#define __AVR_ATtinyxy4__
 #elif defined(__AVR_ATtiny804__)
 #define MEGATINYCORE_MCU 804
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 0
+#define __AVR_ATtinyx04__
+#define __AVR_ATtinyxy4__
 #elif defined(__AVR_ATtiny404__)
 #define MEGATINYCORE_MCU 404
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 0
+#define __AVR_ATtinyx04__
+#define __AVR_ATtinyxy4__
 #elif defined(__AVR_ATtiny1604__)
 #define MEGATINYCORE_MCU 1604
+#define MEGATINYCORE_SERIES 0
 #define __AVR_ATtinyx04__
 #define __AVR_ATtinyxy4__
 #elif defined(__AVR_ATtiny212__)
 #define MEGATINYCORE_MCU 212
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 1
+#define __AVR_ATtinyx12__
+#define __AVR_ATtinyxy2__
 #elif defined(__AVR_ATtiny412__)
 #define MEGATINYCORE_MCU 412
+#define MEGATINYCORE_SERIES 1
 #define __AVR_ATtinyx12__
 #define __AVR_ATtinyxy2__
 #elif defined(__AVR_ATtiny202__)
 #define MEGATINYCORE_MCU 202
-#define __AVR_ATtinyx06__
-#define __AVR_ATtinyxy6__
+#define MEGATINYCORE_SERIES 0
+#define __AVR_ATtinyx02__
+#define __AVR_ATtinyxy2__
 #elif defined(__AVR_ATtiny402__)
 #define MEGATINYCORE_MCU 402
+#define MEGATINYCORE_SERIES 0
 #define __AVR_ATtinyx02__
 #define __AVR_ATtinyxy2__
 #else
@@ -273,6 +297,7 @@ void setup_timers();
 #define MEGATINYCORE_PATCH 2
 #define MEGATINYCORE_RELEASED 1
 #define MEGATINYCORE_NUM 0x02000201
+
 
 
 

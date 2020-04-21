@@ -1,5 +1,10 @@
 2.0.2
 * Fix bug with 1MHz system clock with TCB as milis source (micros was broken)
+* Remove EXTERNAL_EXPERIMENTAL - newer atpack removes ambiguity.
+* Fix part family defines
+* Add MEGATINYCORE_SERIES definition
+
+
 2.0.1
 * Fix bug with some 1-series parts not compiling because of references to external reference introduced by 1.1.10
 * Add an EXTERNAL_EXPERIMENTAL reference option, since the headers and datasheets disagree about what parts support this

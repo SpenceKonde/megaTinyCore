@@ -227,7 +227,7 @@ These parts support many BOD trigger levels, with Disabled, Active, and Sampled 
 This core *always* uses Link Time Optimization to reduce flash usage - all versions of the compiler which support the 0-series and 1-series ATtiny parts also support LTO, so there is no need to make it optional as was done with ATtinyCore.
 
 ### Identifying menu options within sketch
-It is often useful to identify what options are selected on the menus from within the sketch; this is particularly useful for verifying that you have selected the options you wrote the sketch for when you open it; however, note that as of 2.0.1, almost all of these options have been removed except for the millis timer option.
+It is often useful to identify what options are selected on the menus from within the sketch; this is particularly useful for verifying that you have selected the options you wrote the sketch for when you open it; however, note that as of 2.0.1, almost all of these options have been removed to alleviate this headache, with the exception of the millis timer, which must be known prior because this setting determines which interrupt will be used.
 
 ##### Millis timer
 The option used for the millis/micros timekeeping is given by a define of the form USE_MILLIS_TIMERxx. Possible options are:
@@ -239,7 +239,7 @@ The option used for the millis/micros timekeeping is given by a define of the fo
 * DISABLE_MILLIS
 
 ##### Using to check that correct menu option is selected
-If your sketch requires that the B0 is used as the millis timer
+If your sketch requires that the TCB0 is used as the millis timer
 
 ```
 #ifndef MILLIS_USE_TIMERB0
@@ -251,13 +251,16 @@ If your sketch requires that the B0 is used as the millis timer
 When writing code that may be compiled for a variety of target chips (which is particularly easy on the megaAVR parts, as the peripherals are so similar), it is often useful to be able to identify which family of parts is being used, in order to, for example, select which pin numbers to use for each purpose. Each part is identified by a #define:
 `__AVR_ATtiny***__` where *** is the part number (ex: `__AVR_ATtiny3216__`).
 
-This core provides two additional #defines for part "families":
+This core provides two additional #defines for part "families" - note that in versions prior to 2.0.2, these are incorrect for many parts:
 * `__AVR_ATtinyx**__` where ** is the last 2 digits of the part number (ex: `__AVR_ATtinyx16__`)
 * `__AVR_ATtinyxy*__` where * is the last digit of the part number, (ex: `__AVR_ATtinyxy6__`).
 
 This is just shorthand, for convenience - `#ifdef __AVR_ATtinyxy2__` is equivilent to `#if defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__)`
 
-Additionally, `MEGATINYCORE` will be defined whenever this core is in use.
+Additionally, a few other useful #defines are provided for convenience:
+* `MEGATINYCORE` will be defined whenever this core is in use.
+* `MEGATINYCORE_MCU` will be defined as the numeric part of the part number.
+* `MEGATINYCORE_SERIES` will be defined as 0 or 1 for 0-series and 1-series parts (2.0.2 and later)
 
 # Bootloader (optiboot) Support
 A new version of Optiboot (Optiboot-x) now runs on the Tiny0 and Tiny1 chips.  It's under 512 bytes, and works on all parts supported by megaTinyCore, allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini).
