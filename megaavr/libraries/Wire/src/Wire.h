@@ -24,7 +24,13 @@
 
 #include <Arduino.h>
 
-#define BUFFER_LENGTH 128
+#if ((RAMEND - RAMSTART) < 1023)
+#define BUFFER_LENGTH 16
+#elif ((RAMEND - RAMSTART) < 4095)
+#define BUFFER_LENGTH 32
+#else
+#define BUFFER_LENGTH 64
+#endif
 
 // WIRE_HAS_END means Wire has end()
 #define WIRE_HAS_END 1
