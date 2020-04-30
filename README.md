@@ -258,9 +258,11 @@ This core provides two additional #defines for part "families" - note that in ve
 This is just shorthand, for convenience - `#ifdef __AVR_ATtinyxy2__` is equivilent to `#if defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__)`
 
 Additionally, a few other useful #defines are provided for convenience:
-* `MEGATINYCORE` will be defined whenever this core is in use.
+* `MEGATINYCORE` will be defined whenever this core is in use, and should contain a string representation of the version.
 * `MEGATINYCORE_MCU` will be defined as the numeric part of the part number.
 * `MEGATINYCORE_SERIES` will be defined as 0 or 1 for 0-series and 1-series parts (2.0.2 and later)
+
+Version information for MEGATINYCORE is
 
 # Bootloader (optiboot) Support
 A new version of Optiboot (Optiboot-x) now runs on the Tiny0 and Tiny1 chips.  It's under 512 bytes, and works on all parts supported by megaTinyCore, allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini).
