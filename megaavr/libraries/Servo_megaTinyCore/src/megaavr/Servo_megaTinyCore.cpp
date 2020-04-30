@@ -6,11 +6,11 @@
 #if (F_CPU > 10000000)
 #define usToTicks(_us)    ((( _us / 2) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
 #define ticksToUs(_ticks) (((unsigned) _ticks * 2) / clockCyclesPerMicrosecond())   // converts from ticks back to microseconds
-#define TRIM_DURATION  84                                   // compensation ticks to trim adjust for digitalWrite delays
+#define TRIM_DURATION  51                                   // compensation ticks to trim adjust for digitalWrite delays
 #else
 #define usToTicks(_us)    ((( _us ) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
 #define ticksToUs(_ticks) (((unsigned) _ticks ) / clockCyclesPerMicrosecond())   // converts from ticks back to microseconds
-#define TRIM_DURATION  167                                  // compensation ticks to trim adjust for digitalWrite delays
+#define TRIM_DURATION  102                                  // compensation ticks to trim adjust for digitalWrite delays
 #endif
 static servo_t servos[MAX_SERVOS];                         // static array of servo structures
 
