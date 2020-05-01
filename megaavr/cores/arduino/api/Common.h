@@ -96,6 +96,7 @@ void pinMode(pin_size_t pinNumber, uint8_t mode);
 void digitalWrite(pin_size_t pinNumber, uint8_t val);
 int analogRead(pin_size_t pinNumber);
 void analogReference(uint8_t mode);
+bool analogReadResolution(uint8_t res);
 void analogWrite(pin_size_t pinNumber, int value);
 int8_t digitalRead(pin_size_t pinNumber);
 #ifdef DAC0

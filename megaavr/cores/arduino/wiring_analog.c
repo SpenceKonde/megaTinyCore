@@ -95,6 +95,20 @@ int analogRead(uint8_t pin)
 
 }
 
+//analogReadResolution() has two legal values you can pass it, 8 or 10 on these parts. According to the datasheet, you can clock the ADC faster if you set it to 8.
+//like the pinswap functions, if the user passes bogus values, we set it to the default and return false.
+
+bool analogReadResolution(uint8_t res) {
+	if (res==8) {
+		ADC0.CTRLA&=~ADC_RESSEL_bm;
+		return true;
+	}
+	//if argument wasn't 8, we'll be putting it to default value either way
+	ADC0.CTRLA|=ADC_RESSEL_bm;
+	return (res==10); //but only return true if the value passed was the valid option, 10.
+}
+
+
 // Right now, PWM output only works on the pins with
 // hardware support.  These are defined in the appropriate
 // pins_*.c file.  For the rest of the pins, we default
