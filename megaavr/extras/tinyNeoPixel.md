@@ -1,11 +1,9 @@
-## tinyNeoPixel - a megaAVR compatible library for WS2812 "NeoPixel" and similar
+## tinyNeoPixel - a compatible library for WS2812 "NeoPixel" and similar
 
-The change in architecture from the classic AVRs to megaAVR causes many of the existing WS2812 libraries to not work on the megaAVR parts. This library adapts the Adafruit_NeoPixel library to work with the megaAVR architecture, and adds support for 10MHz and 20MHz clock speeds. In order to reduce flash usage at lower clock frequencies (where there is no time to meet the constraints unless the address of the port register is set at compile time in the hand-tuned assembly), there is a separate version of the library for each of the three ports; you must use the correct library for the port that the pin you are using is on; these are shown in the pinout charts. The alternative would have meant including multiple copies of that assembly code for each port, which would have imposed a significant overhead in terms of flash usage.
-
-Prior to version 2.0.1, this was instead set using a tools -> tinyNeoPixel menu option. However, feedback from users and my own experience demonstrated that using tools submenus for this was problematic, since those settings are not saved on a per-sketch basis - so one had to remember what settings had been chosen when the sketch was written. Hence, this was replaced with 3 copies of the library in 2.0.1.
+The change in architecture from the classic AVR to the "modern AVR" of the tinyAVR 0-series and 1-series parts (and megaAVR 0-series parts) causes many of the existing WS2812 libraries to not work on the these parts. This library adapts the Adafruit_NeoPixel library to work with the improved architecture, and adds support for 10MHz and 20MHz clock speeds. Unlike in ATTinyCore, where slower clock speeds require a separate implementation (chosen via a menu option in that case) depending on which PORT the pin being used is on, these parts do not need this, because the indirect ST instruction executes in a single clock cycle instead of 2. Prior to version 2.0.2, this was not realized, and there were issues with real WS2812B LEDs (as opposed to SK6812 clones) in addition to a requirement for awkward port-dependant methods of calling the library.
 
 ### tinyNeoPixel and tinyNeoPixel_Static
-There are two versions of this library provided. `tinyNeoPixel` implements the entire API that Adafruit_NeoPixel does, including setting the pin and length of the string at runtime (as noted above, at 8MHz and 10MHz, if the pin is changed, it must be on the same port). This provides maximum portability between code written for use with Adafruit_NeoPixel and tinyNeoPixel (only the constructor and library name need to be changed).
+There are two versions of this library provided. `tinyNeoPixel` implements the entire API that Adafruit_NeoPixel does, including setting the pin and length of the string at runtime. This provides maximum portability between code written for use with Adafruit_NeoPixel and tinyNeoPixel (only the constructor and library name need to be changed).
 
 `tinyNeoPixel_Static` is slightly cutdown, removing the option to change the length at runtime, and instead of using malloc() to dynamically allocate the pixel buffer, the user must declare the pixel buffer and pass it to the constructor. Additionally, it does not set the pinMode of the pin (the sketch must set this as OUTPUT). Finally, no call to begin() need be made - begin() is removed entirely. These changes reduce flash use (by eliminating malloc() and free(), and because the pixel buffer is statically declared, the memory used for it is included in count of used SRAM output when the sketch is compiled. Removal of the pinMode() call within the library, while it requires an additional line of code in the sketch, opens the option of eliminating all calls to pinMode() from a sketch (replacing with direct port manipulation) when maximum flash savings is required.
 
@@ -19,7 +17,7 @@ There are two versions of this library provided. `tinyNeoPixel` implements the e
 `tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t,uint8_t *pxl);` constructor for tinyNeoPixel_Static - the final argument is a uint_8 (byte) array sized to accomodate the data to be sent to the LED. For example:
 
 
-    #include <"tinyNeoPixel_StaticPORTB.h">
+    #include <"tinyNeoPixel_Static.h">
     #define NUMLEDS 10
     byte pixels[NUMLEDS*3];
     tinyNeoPixel(NUMPIXELS, 5, NEO_GRB, pixels); //pin 5 is on PORT B on all parts except the 8-pin ones
