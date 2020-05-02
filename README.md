@@ -6,7 +6,7 @@
 ### [Making a cheap UPDI programmer](MakeUPDIProgrammer.md)
 
 # megaTinyCore
-Arduino core for the new megaAVR ATtiny series chips. These parts represent the new megaAVR technology (as used in megaAVR chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) and advanced peripherals in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. Moreover, these parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini!) run just over $1 USD, and under $.90 in quantity - less than many 8k classic AVR ATtiny parts (AVR architecture, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal.
+Arduino core for the new tinyAVR 0-series and 1-series chips. These parts have an improved architecture, with improved peripherals and improved execution time for certain instructions (similar to megaAVR 0-series chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. Moreover, these parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini!) run just over $1 USD, and under $.90 in quantity - less than many 8k classic AVR ATtiny parts (AVR architecture, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal.
 
 These use a UPDI programmer, not traditional ISP like the classic ATtiny parts did. One can be made from a classic AVR Uno/Nano/Pro Mini - see [Making a UPDI programmer](MakeUPDIProgrammer.md).
 
@@ -50,10 +50,14 @@ megaTinyCore supports configurations with this pin fused to act as reset, or as 
 **Limited input facilities on PA0 with pin set as UPDI**
 It has been discovered that as long as the patterns applied to the UPDI pin are not mistaken for a UPDI signal, the pin will still act as a fully functional input - for analogRead(), digitalRead(), and as input0 to CCL0. Obviously I cant's
 
+# A word on terminology ("megaAVR")
+In the official Arduino board definition for their "megaAVR" hardware package, they imply that the new architecture on the megaAVR 0-series parts (which is nearly the same as used on the tinyAVR 0-series and 1-series) is called "megaavr" - that is not an official term. Microchip uses the term "megaAVR" to refer to any "ATmega" part, whether it has the old style or modern peripherals. There are no official terms to refer to all AVR parts of one family or the other. In this document, prior to 2.0.2, we used the Arduino convention. As of now we are trying to move away from that, though there are many cases where "megaAVR" is still used. Where possible we avoid naming it, but the term "modern AVR" may be used to describe these parts. The term "classic AVR" (which is not an official term) refers to any parts with the old-style peripherals.
+
+
 # Features
 
 ### Memory-mapped flash: No need to declare PROGMEM or use F() macro anymore!
-Unlike classic AVRs, on the megaavr parts, the flash is within the same address space as the main memory. This means pgm_read_*_near functions are not needed to read them. Because of this, the compiler automatically puts any variable declared `const` into progmem, and accesses it appropriately - you no longer need to explicitly declare them as PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either (as of 1.0.6, the F() macro is a no-op).
+Unlike classic AVRs, on the these  parts, the flash is within the same address space as the main memory. This means pgm_read_*_near functions are not needed to read them. Because of this, the compiler automatically puts any variable declared `const` into progmem, and accesses it appropriately - you no longer need to explicitly declare them as PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either (as of 1.0.6, the F() macro is a no-op).
 
 However, do note that if you explicitly declare a variable PROGMEM, you must still use the pgm_read functions to read it, just like on classic AVRs - when a variable is declared PROGMEM on megaavr parts, the pointer is offset (address is relative to start of flash, not start of address space); this same offset is applied when using the pgm_read_*_near functions. Do note that declaring things PROGMEM and accessing with pgm_read_*_near functions, although it works fine, is slower and wastes a small amount of flash (compared to simply declaring the variables const).
 
@@ -135,7 +139,7 @@ The 3216,1616,816,416,3217,1617 and 817 have two additional PWM pins driven by T
 In versions prior to 1.1.7, reconfiguting the TCA0's prescaler adversely effected tone and servo functionality. This is no longer the case.
 
 ### NeoPixel (WS2812) support
-The usual NeoPixel (WS2812) libraries have problems on these parts. This core includes two libraries for this, both of which are tightly based on the Adafruit_NeoPixel library. See the [tinyNeoPixel documentation](megaavr/extras/tinyNeoPixel.md) and included examples for more information. As of 2.0.1, these libraries are split into three versions specific to the part to eliminate the use of an additional submenu option.
+The usual NeoPixel (WS2812) libraries have problems on these parts. This core includes two libraries for this, both of which are tightly based on the Adafruit_NeoPixel library. See the [tinyNeoPixel documentation](megaavr/extras/tinyNeoPixel.md) and included examples for more information.
 
 ### Tone Support
 Support for tone() is provided on all parts using TCB0, unless TCB1 is present and TCB0 is set as millis source. This is like the standard tone() function; it does not support use of the hardware output compare to generate tones. See caveats below if using TCB0 or TCB1 for millis/micros settings.
@@ -262,7 +266,14 @@ Additionally, a few other useful #defines are provided for convenience:
 * `MEGATINYCORE_MCU` will be defined as the numeric part of the part number.
 * `MEGATINYCORE_SERIES` will be defined as 0 or 1 for 0-series and 1-series parts (2.0.2 and later)
 
-Version information for MEGATINYCORE is
+Version information for MEGATINYCORE is also provided by a few additional defines to make it easier to work with these in a sketch or compare to specific values; an example is presented below:
+* MEGATINYCORE "2.0.2"
+* MEGATINYCORE_MAJOR 2
+* MEGATINYCORE_MINOR 0
+* MEGATINYCORE_PATCH 2
+* MEGATINYCORE_RELEASED 1
+* MEGATINYCORE_NUM 0x02000201
+Be warned that the historical record has been
 
 # Bootloader (optiboot) Support
 A new version of Optiboot (Optiboot-x) now runs on the Tiny0 and Tiny1 chips.  It's under 512 bytes, and works on all parts supported by megaTinyCore, allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini).

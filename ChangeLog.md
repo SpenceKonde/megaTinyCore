@@ -1,8 +1,11 @@
 2.0.2
 * Fix bug with 1MHz system clock with TCB as milis source (micros was broken)
-* Remove EXTERNAL_EXPERIMENTAL - newer atpack removes ambiguity.
+* Remove EXTERNAL_EXPERIMENTAL - newer atpack removes ambiguity (note - we don't *use* it yet, but we didn't really need to either).
 * Fix part family defines
 * Add MEGATINYCORE_SERIES definition
+* analogReadResolution() added
+* Wire buffer size (broken in 2.0.0) fixed in very general way, with cases for a wide range
+* fix tinyNeoPixel on real WS2812's (it previously was busted on real ones, only worked with SK6812 clones) and unsplit the libraries, because architecture improvements make that possible!
 
 
 2.0.1
