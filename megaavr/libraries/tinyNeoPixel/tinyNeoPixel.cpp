@@ -173,8 +173,9 @@ void tinyNeoPixel::show(void) {
 
   // 10 instruction clocks per bit: HHxxxxxLLL
   // OUT instructions:              ^ ^    ^   (T=0,2,7)
-  hi = VPORTA.OUT |  pinMask;
-  lo = VPORTA.OUT & ~pinMask;
+
+  hi   = *port |  pinMask;
+  lo   = *port & ~pinMask;
   n1 = lo;
   if(b & 0x80) n1 = hi;
 
@@ -187,83 +188,83 @@ void tinyNeoPixel::show(void) {
   asm volatile(
    "headD:"                   "\n\t" // Clk  Pseudocode
     // Bit 7:
-    "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi
+    "st   %a[port], %[hi]"    "\n\t" // 1    PORT = hi
     "mov  %[n2]   , %[lo]"    "\n\t" // 1    n2   = lo
-    "out  %[port] , %[n1]"    "\n\t" // 1    PORT = n1
+    "st   %a[port], %[n1]"    "\n\t" // 1    PORT = n1
     "rjmp .+0"                "\n\t" // 2    nop nop
     "sbrc %[byte] , 6"        "\n\t" // 1-2  if(b & 0x40)
      "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
-    "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
+    "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo
     "rjmp .+0"                "\n\t" // 2    nop nop
     // Bit 6:
-    "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi
+    "st   %a[port], %[hi]"    "\n\t" // 1    PORT = hi
     "mov  %[n1]   , %[lo]"    "\n\t" // 1    n1   = lo
-    "out  %[port] , %[n2]"    "\n\t" // 1    PORT = n2
+    "st   %a[port], %[n2]"    "\n\t" // 1    PORT = n2
     "rjmp .+0"                "\n\t" // 2    nop nop
     "sbrc %[byte] , 5"        "\n\t" // 1-2  if(b & 0x20)
      "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
-    "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
+    "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo
     "rjmp .+0"                "\n\t" // 2    nop nop
     // Bit 5:
-    "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi
+    "st   %a[port], %[hi]"    "\n\t" // 1    PORT = hi
     "mov  %[n2]   , %[lo]"    "\n\t" // 1    n2   = lo
-    "out  %[port] , %[n1]"    "\n\t" // 1    PORT = n1
+    "st   %a[port], %[n1]"    "\n\t" // 1    PORT = n1
     "rjmp .+0"                "\n\t" // 2    nop nop
     "sbrc %[byte] , 4"        "\n\t" // 1-2  if(b & 0x10)
      "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
-    "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
+    "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo
     "rjmp .+0"                "\n\t" // 2    nop nop
     // Bit 4:
-    "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi
+    "st   %a[port], %[hi]"    "\n\t" // 1    PORT = hi
     "mov  %[n1]   , %[lo]"    "\n\t" // 1    n1   = lo
-    "out  %[port] , %[n2]"    "\n\t" // 1    PORT = n2
+    "st   %a[port], %[n2]"    "\n\t" // 1    PORT = n2
     "rjmp .+0"                "\n\t" // 2    nop nop
     "sbrc %[byte] , 3"        "\n\t" // 1-2  if(b & 0x08)
      "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
-    "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
+    "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo
     "rjmp .+0"                "\n\t" // 2    nop nop
     // Bit 3:
-    "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi
+    "st   %a[port], %[hi]"    "\n\t" // 1    PORT = hi
     "mov  %[n2]   , %[lo]"    "\n\t" // 1    n2   = lo
-    "out  %[port] , %[n1]"    "\n\t" // 1    PORT = n1
+    "st   %a[port], %[n1]"    "\n\t" // 1    PORT = n1
     "rjmp .+0"                "\n\t" // 2    nop nop
     "sbrc %[byte] , 2"        "\n\t" // 1-2  if(b & 0x04)
      "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
-    "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
+    "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo
     "rjmp .+0"                "\n\t" // 2    nop nop
     // Bit 2:
-    "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi
+    "st   %a[port], %[hi]"    "\n\t" // 1    PORT = hi
     "mov  %[n1]   , %[lo]"    "\n\t" // 1    n1   = lo
-    "out  %[port] , %[n2]"    "\n\t" // 1    PORT = n2
+    "st   %a[port], %[n2]"    "\n\t" // 1    PORT = n2
     "rjmp .+0"                "\n\t" // 2    nop nop
     "sbrc %[byte] , 1"        "\n\t" // 1-2  if(b & 0x02)
      "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
-    "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
+    "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo
     "rjmp .+0"                "\n\t" // 2    nop nop
     // Bit 1:
-    "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi
+    "st   %a[port], %[hi]"    "\n\t" // 1    PORT = hi
     "mov  %[n2]   , %[lo]"    "\n\t" // 1    n2   = lo
-    "out  %[port] , %[n1]"    "\n\t" // 1    PORT = n1
+    "st   %a[port], %[n1]"    "\n\t" // 1    PORT = n1
     "rjmp .+0"                "\n\t" // 2    nop nop
     "sbrc %[byte] , 0"        "\n\t" // 1-2  if(b & 0x01)
      "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
-    "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
+    "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo
     "sbiw %[count], 1"        "\n\t" // 2    i-- (don't act on Z flag yet)
     // Bit 0:
-    "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi
+    "st   %a[port], %[hi]"    "\n\t" // 1    PORT = hi
     "mov  %[n1]   , %[lo]"    "\n\t" // 1    n1   = lo
-    "out  %[port] , %[n2]"    "\n\t" // 1    PORT = n2
+    "st   %a[port], %[n2]"    "\n\t" // 1    PORT = n2
     "ld   %[byte] , %a[ptr]+" "\n\t" // 2    b = *ptr++
     "sbrc %[byte] , 7"        "\n\t" // 1-2  if(b & 0x80)
      "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
-    "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
+    "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo
     "brne headD"              "\n"   // 2    while(i) (Z flag set above)
-  : [byte]  "+r" (b),
+  : [port]  "+e" (port),
+    [byte]  "+r" (b),
     [n1]    "+r" (n1),
     [n2]    "+r" (n2),
     [count] "+w" (i)
-  : [port]   "I" (_SFR_IO_ADDR(VPORTA.OUT)),
-    [ptr]    "e" (ptr),
+  : [ptr]    "e" (ptr),
     [hi]     "r" (hi),
     [lo]     "r" (lo));
 
@@ -399,8 +400,8 @@ void tinyNeoPixel::show(void) {
     // OUT instructions:              ^   ^   ^   (T=0,4,7)
       volatile uint8_t next;
 
-      hi   = VPORTA.OUT |  pinMask;
-      lo   = VPORTA.OUT & ~pinMask;
+      hi   = *port |  pinMask;
+      lo   = *port & ~pinMask;
       next = lo;
       if(b & 0x80) next = hi;
 
@@ -408,46 +409,46 @@ void tinyNeoPixel::show(void) {
       // we're exploiting the RCALL and RET as 3- and 4-cycle NOPs!
       asm volatile(
        "headD:"                   "\n\t" //        (T =  0)
-        "out   %[port], %[hi]"    "\n\t" //        (T =  1)
+        "st   %a[port], %[hi]"    "\n\t" //        (T =  1)
         "rcall bitTimeD"          "\n\t" // Bit 7  (T = 14)
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 6
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 5
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 4
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 3
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 2
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 1
         // Bit 0:
-        "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi    (T =  1)
+        "st   %a[port], %[hi]"    "\n\t" // 1    PORT = hi    (T =  1)
         "rjmp .+0"                "\n\t" // 2    nop nop      (T =  3)
         "ld   %[byte] , %a[ptr]+" "\n\t" // 2    b = *ptr++   (T =  5)
-        "out  %[port] , %[next]"  "\n\t" // 1    PORT = next  (T =  6)
+        "st   %a[port], %[next]"  "\n\t" // 1    PORT = next  (T =  6)
         "mov  %[next] , %[lo]"    "\n\t" // 1    next = lo    (T =  7)
         "sbrc %[byte] , 7"        "\n\t" // 1-2  if(b & 0x80) (T =  8)
          "mov %[next] , %[hi]"    "\n\t" // 0-1    next = hi  (T =  9)
-        "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo    (T = 10)
+        "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo    (T = 10)
         "sbiw %[count], 1"        "\n\t" // 2    i--          (T = 12)
         "brne headD"              "\n\t" // 2    if(i != 0) -> (next byte)
          "rjmp doneD"             "\n\t"
         "bitTimeD:"               "\n\t" //      nop nop nop     (T =  4)
-         "out  %[port], %[next]"  "\n\t" // 1    PORT = next     (T =  5)
+        "st   %a[port], %[next]"  "\n\t" // 1    PORT = next     (T =  5)
          "mov  %[next], %[lo]"    "\n\t" // 1    next = lo       (T =  6)
          "rol  %[byte]"           "\n\t" // 1    b <<= 1         (T =  7)
          "sbrc %[byte], 7"        "\n\t" // 1-2  if(b & 0x80)    (T =  8)
           "mov %[next], %[hi]"    "\n\t" // 0-1   next = hi      (T =  9)
-         "out  %[port], %[lo]"    "\n\t" // 1    PORT = lo       (T = 10)
+         "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo       (T = 10)
          "ret"                    "\n\t" // 4    nop nop nop nop (T = 14)
          "doneD:"                 "\n"
-        : [byte]  "+r" (b),
+        : [port]  "+e" (port),
+          [byte]  "+r" (b),
           [next]  "+r" (next),
           [count] "+w" (i)
-        : [port]   "I" (_SFR_IO_ADDR(VPORTA.OUT)),
-          [ptr]    "e" (ptr),
+        : [ptr]    "e" (ptr),
           [hi]     "r" (hi),
           [lo]     "r" (lo));
 
@@ -465,8 +466,8 @@ void tinyNeoPixel::show(void) {
 
     volatile uint8_t next;
 
-      hi   = VPORTA.OUT |  pinMask;
-      lo   = VPORTA.OUT & ~pinMask;
+      hi   = *port |  pinMask;
+      lo   = *port & ~pinMask;
       next = lo;
       if(b & 0x80) next = hi;
 
@@ -474,48 +475,48 @@ void tinyNeoPixel::show(void) {
       // we're exploiting the RCALL and RET as 3- and 4-cycle NOPs!
       asm volatile(
        "headD:"                   "\n\t" //        (T =  0)
-        "out   %[port], %[hi]"    "\n\t" //        (T =  1)
+        "st   %a[port], %[hi]"    "\n\t" //        (T =  1)
         "rcall bitTimeD"          "\n\t" // Bit 7  (T = 15)
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 6
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 5
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 4
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 3
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 2
-        "out   %[port], %[hi]"    "\n\t"
+        "st   %a[port], %[hi]"    "\n\t"
         "rcall bitTimeD"          "\n\t" // Bit 1
         // Bit 0:
-        "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi    (T =  1)
+        "st   %a[port], %[hi]"    "\n\t" // 1    PORT = hi    (T =  1)
         "rjmp .+0"                "\n\t" // 2    nop nop      (T =  3)
         "ld   %[byte] , %a[ptr]+" "\n\t" // 2    b = *ptr++   (T =  5)
-        "out  %[port] , %[next]"  "\n\t" // 1    PORT = next  (T =  6)
+        "st   %a[port], %[next]"  "\n\t" // 1    PORT = next  (T =  6)
         "mov  %[next] , %[lo]"    "\n\t" // 1    next = lo    (T =  7)
         "sbrc %[byte] , 7"        "\n\t" // 1-2  if(b & 0x80) (T =  8)
          "mov %[next] , %[hi]"    "\n\t" // 0-1    next = hi  (T =  9)
         "nop"                     "\n\t" // 1                 (T = 10)
-        "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo    (T = 11)
+        "st   %a[port], %[lo]"    "\n\t" // 1    PORT = lo    (T = 11)
         "sbiw %[count], 1"        "\n\t" // 2    i--          (T = 13)
         "brne headD"              "\n\t" // 2    if(i != 0) -> (next byte)
          "rjmp doneD"             "\n\t"
         "bitTimeD:"               "\n\t" //      nop nop nop     (T =  4)
-         "out  %[port], %[next]"  "\n\t" // 1    PORT = next     (T =  5)
+         "st   %a[port], %[next]" "\n\t" // 1    PORT = next     (T =  5)
          "mov  %[next], %[lo]"    "\n\t" // 1    next = lo       (T =  6)
          "rol  %[byte]"           "\n\t" // 1    b <<= 1         (T =  7)
          "sbrc %[byte], 7"        "\n\t" // 1-2  if(b & 0x80)    (T =  8)
           "mov %[next], %[hi]"    "\n\t" // 0-1   next = hi      (T =  9)
          "nop"                    "\n\t" // 1                    (T = 10)
-         "out  %[port], %[lo]"    "\n\t" // 1    PORT = lo       (T = 11)
+         "st   %a[port], %[lo]"   "\n\t" // 1    PORT = lo       (T = 11)
          "ret"                    "\n\t" // 4    nop nop nop nop (T = 15)
          "doneD:"                 "\n"
-        : [byte]  "+r" (b),
+        : [port]  "+e" (port),
+          [byte]  "+r" (b),
           [next]  "+r" (next),
           [count] "+w" (i)
-        : [port]   "I" (_SFR_IO_ADDR(VPORTA.OUT)),
-          [ptr]    "e" (ptr),
+        : [ptr]    "e" (ptr),
           [hi]     "r" (hi),
           [lo]     "r" (lo));
 
@@ -538,25 +539,27 @@ void tinyNeoPixel::show(void) {
 
   asm volatile(
    "head20:"                   "\n\t" // Clk  Pseudocode    (T =  0)
-    "st   %a[port],  %[hi]"    "\n\t" // 2    PORT = hi     (T =  2)
+    "st   %a[port],  %[hi]"    "\n\t" // 1    PORT = hi     (T =  1)
+    "nop"                      "\n\t" // 1    nop           (T =  2)
     "sbrc %[byte],  7"         "\n\t" // 1-2  if(b & 128)
      "mov  %[next], %[hi]"     "\n\t" // 0-1   next = hi    (T =  4)
     "dec  %[bit]"              "\n\t" // 1    bit--         (T =  5)
-    "st   %a[port],  %[next]"  "\n\t" // 2    PORT = next   (T =  7)
+    "st   %a[port],  %[next]"  "\n\t" // 1    PORT = next   (T =  6)
+    "nop"                      "\n\t" // 1    nop           (T =  7)
     "mov  %[next] ,  %[lo]"    "\n\t" // 1    next = lo     (T =  8)
     "breq nextbyte20"          "\n\t" // 1-2  if(bit == 0) (from dec above)
     "rol  %[byte]"             "\n\t" // 1    b <<= 1       (T = 10)
     "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 12)
     "nop"                      "\n\t" // 1    nop           (T = 13)
-    "st   %a[port],  %[lo]"    "\n\t" // 2    PORT = lo     (T = 15)
-    "nop"                      "\n\t" // 1    nop           (T = 16)
+    "st   %a[port],  %[lo]"    "\n\t" // 1    PORT = lo     (T = 14)
+    "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 16)
     "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 18)
     "rjmp head20"              "\n\t" // 2    -> head20 (next bit out) (T=20)
    "nextbyte20:"               "\n\t" //                    (T = 10)
     "ldi  %[bit]  ,  8"        "\n\t" // 1    bit = 8       (T = 11)
     "ld   %[byte] ,  %a[ptr]+" "\n\t" // 2    b = *ptr++    (T = 13)
-    "st   %a[port], %[lo]"     "\n\t" // 2    PORT = lo     (T = 15)
-    "nop"                      "\n\t" // 1    nop           (T = 16)
+    "st   %a[port], %[lo]"     "\n\t" // 1    PORT = lo     (T = 14)
+    "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 16)
     "sbiw %[count], 1"         "\n\t" // 2    i--           (T = 18)
      "brne head20"             "\n"   // 2    if(i != 0) -> (next byte) (T=20)
     : [port]  "+e" (port),
@@ -583,26 +586,30 @@ void tinyNeoPixel::show(void) {
 
   asm volatile(
    "head20:"                   "\n\t" // Clk  Pseudocode    (T =  0)
-    "st   %a[port],  %[hi]"    "\n\t" // 2    PORT = hi     (T =  2)
+    "st   %a[port],  %[hi]"    "\n\t" // 1    PORT = hi     (T =  1)
     "sbrc %[byte],  7"         "\n\t" // 1-2  if(b & 128)
-     "mov  %[next], %[hi]"     "\n\t" // 0-1   next = hi    (T =  4)
-    "dec  %[bit]"              "\n\t" // 1    bit--         (T =  5)
+     "mov  %[next], %[hi]"     "\n\t" // 0-1   next = hi    (T =  3)
+    "dec  %[bit]"              "\n\t" // 1    bit--         (T =  4)
+    "nop"                      "\n\t" // 1    nop           (T =  5)
     "rjmp .+0"                 "\n\t" // 2    nop nop       (T =  7)
-    "st   %a[port],  %[next]"  "\n\t" // 2    PORT = next   (T =  9)
-    "mov  %[next] ,  %[lo]"    "\n\t" // 1    next = lo     (T =  10)
+    "st   %a[port],  %[next]"  "\n\t" // 1    PORT = next   (T =  8)
+    "mov  %[next] ,  %[lo]"    "\n\t" // 1    next = lo     (T =  9)
     "breq nextbyte20"          "\n\t" // 1-2  if(bit == 0) (from dec above)
-    "rol  %[byte]"             "\n\t" // 1    b <<= 1       (T = 12)
-    "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 14)
-    "nop"                      "\n\t" // 1    nop           (T = 15)
-    "st   %a[port],  %[lo]"    "\n\t" // 2    PORT = lo     (T = 17)
+    "rol  %[byte]"             "\n\t" // 1    b <<= 1       (T = 11)
+    "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 13)
+    "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 15)
+    "st   %a[port],  %[lo]"    "\n\t" // 1    PORT = lo     (T = 16)
+    "nop"                      "\n\t" // 1    nop           (T = 17)
     "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 19)
     "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 21)
     "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 23)
     "rjmp head20"              "\n\t" // 2    -> head20 (next bit out)
-   "nextbyte20:"               "\n\t" //                    (T = 12)
-    "ldi  %[bit]  ,  8"        "\n\t" // 1    bit = 8       (T = 13)
-    "ld   %[byte] ,  %a[ptr]+" "\n\t" // 2    b = *ptr++    (T = 15)
-    "st   %a[port], %[lo]"     "\n\t" // 2    PORT = lo     (T = 17)
+   "nextbyte20:"               "\n\t" //                    (T = 11)
+    "ldi  %[bit]  ,  8"        "\n\t" // 1    bit = 8       (T = 12)
+    "ld   %[byte] ,  %a[ptr]+" "\n\t" // 2    b = *ptr++    (T = 14)
+    "nop"                      "\n\t" // 1    nop           (T = 15)
+    "st   %a[port], %[lo]"     "\n\t" // 1    PORT = lo     (T = 16)
+    "nop"                      "\n\t" // 1    nop           (T = 17)
     "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 19)
     "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 21)
     "sbiw %[count], 1"         "\n\t" // 2    i--           (T = 23)
