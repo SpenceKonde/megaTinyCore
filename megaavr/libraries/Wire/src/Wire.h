@@ -28,8 +28,10 @@
 #define BUFFER_LENGTH 16
 #elif ((RAMEND - RAMSTART) < 4095)
 #define BUFFER_LENGTH 32
-#else
+#elif ((RAMEND - RAMSTART) < 8191)
 #define BUFFER_LENGTH 64
+#else
+#define BUFFER_LENGTH 128
 #endif
 
 // WIRE_HAS_END means Wire has end()
