@@ -112,11 +112,11 @@ In versions prior to 2.0.0, this was instead configured using the Tools -> SPI P
 This core disables the SS pin when running in SPI master mode. This means that the "SS" pin can be used for whatever purpose you want - unlike classic AVRs, where this could not be disabled. Earlier versions of this document incorrectly stated that this behavior was enabled in megaTinyCore; it never was, and SS was always disabled. It should be reenabled and the SS pin configured appropriately (probably as INPUT_PULLUP) if master/slave functionality is required.
 
 ### I2C (TWI) support
-All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library. See the pinout charts for the location of these pins.
+All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library, except for the additional features noted below. See the pinout charts for the location of these pins.
 
 On all parts with more than 8 pins, the TWI pins can be swapped to an alternate location.
 
-On 2.0.0 and later, this is configured using the Wire.swap() or Wire.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** Wire.begin().
+On 2.0.0 and later, this is configured using the Wire.swap() or Wire.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** Wire.begin(). This implementation of pin swapping is the same as what is used by
 
 `Wire.swap(1) or Wire.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one.
 
@@ -186,7 +186,9 @@ In addition to the pin numbers, as of 1.1.10, you can read from the following so
 * ADC_DAC0 (The value being output by DAC0, 1-series parts only)
 * ADC_TEMPERATUIRE (The internal temperature sensor)
 
-As of 2.0.0, we have taken full advantage of the improvements in the ADC on the megaAVR parts to improve the speed of analogRead() by more than a factor of three - the ADC clock which was - on the classic AVRs - constrained to the range 50~200kHz - on the megaavr parts can be cranked up as high as 1.5MHz. As of 2.0.0, we now use 1MHz at 16/8/4 MHz system clock, and 1.25 MHz at 20/10/5 MHz system clock. To compensate for the faster ADC clock, we set ADC0.SAMPCTRL to 14 to extend the sampling period from the default of 2 ADC clock cycles to 16 - providing the same sampling period as we did in previous versions, which should preserve the same accuracy when measuring high impedance signals. If you are measuring a lower impedance signal and need even faster analogRead() performance - or if you are measuring a high-impedance signal and need a longer sampling time, you can adjust that setting:
+`analogReadResolution()` is also supported as on 2.0.2 - valid options are 8 and 10 (this is the number of bits in the result). Like the pin-swapping functions for Serial, SPI, and I2C, this returns a boolean, `true` if the argument was valid, and `false` if the argument was not valid. When called with an invalid value, the resolution of analogRead() will be set back to the default of 10 bits.
+
+As of 2.0.0, we have taken advantage of the improvements in the ADC on the newer AVR parts to improve the speed of analogRead() by more than a factor of three - the ADC clock which was - on the classic AVRs - constrained to the range 50~200kHz - can be cranked up as high as 1.5MHz at full resolution! As of 2.0.0, we now use 1MHz at 16/8/4 MHz system clock, and 1.25 MHz at 20/10/5 MHz system clock. To compensate for the faster ADC clock, we set ADC0.SAMPCTRL to 14 to extend the sampling period from the default of 2 ADC clock cycles to 16 - providing the same sampling period as in previous versions, which should preserve the same accuracy when measuring high impedance signals. If you are measuring a lower impedance signal and need even faster analogRead() performance - or if you are measuring a high-impedance signal and need a longer sampling time, you can adjust that setting:
 
 ```
 ADC0.SAMPCTRL=31; // maximum sampling length = 31+2 = 33 ADC clock cycles
@@ -195,7 +197,7 @@ ADC0.SAMPCTRL=0; //minimum sampling length = 0+2 = 2 ADC clock cycles
 
 With the minimum sampling length, analogRead() speed would be approximately doubled from it's already-faster value.
 
-**Note:** The 3217,1617,3216,1616, and 1614 have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins (it can also read from DAC2). Currently, there are no plans to implement this in the core due to the large number of currently available pins. Instead, it is recommended that users who wish to "take over" and ADC to use the advanced features available on the megaavr parts choose ADC1 for this purpose.
+**Note:** The 3217,1617,3216,1616, and 1614 have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins (it can also read from DAC2). Currently, there are no plans to implement this in the core due to the large number of currently available pins. Instead, it is recommended that users who wish to "take over" and ADC to use it's more advanced functionality choose ADC1 for this purpose. In the future, examples showing use of ADC1 in this way may be published.
 
 ### DAC Support
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). This generates voltages between 0 and the selected VREF (which cannot be VCC, unfortunately). In 2.0.0 and later, set the DAC reference voltage via the DACReference() function - pass it one of the INTERNAL reference options listed under the ADC section above. In versions prior to 2.0.0, select the DAC VREF voltage from the Tools -> DAC Voltage Reference submenu. This voltage must be lower than Vcc to get the correct voltages. Call analogWrite() on the DAC pin to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin.

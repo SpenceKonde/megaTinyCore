@@ -100,11 +100,11 @@ int analogRead(uint8_t pin)
 
 bool analogReadResolution(uint8_t res) {
 	if (res==8) {
-		ADC0.CTRLA&=~ADC_RESSEL_bm;
+		ADC0.CTRLA|=ADC_RESSEL_bm;
 		return true;
 	}
 	//if argument wasn't 8, we'll be putting it to default value either way
-	ADC0.CTRLA|=ADC_RESSEL_bm;
+	ADC0.CTRLA&=~ADC_RESSEL_bm;
 	return (res==10); //but only return true if the value passed was the valid option, 10.
 }
 
