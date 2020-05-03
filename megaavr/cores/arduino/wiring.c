@@ -25,7 +25,7 @@
 // the prescaler is set so that timer ticks every 64 clock cycles, and the
 // the overflow handler is called every 256 ticks.
 
-#ifndef DISABLEMILLIS
+#ifndef DISABLE_MILLIS
 
 #ifdef MILLIS_USE_TIMERRTC_XTAL
 #define MILLIS_USE_TIMERRTC
@@ -446,7 +446,7 @@ void delayMicroseconds(unsigned int us)
 }
 
 
-#ifndef DISABLEMILLIS
+#ifndef DISABLE_MILLIS
   void stop_millis()
   { // Disable the interrupt:
     #if defined(MILLIS_USE_TIMERA0)
@@ -626,9 +626,9 @@ void init()
 
   setup_timers();
 
-  #ifndef DISABLEMILLIS
+  #ifndef DISABLE_MILLIS
   init_millis();
-  #endif //end #ifndef DISABLEMILLIS
+  #endif //end #ifndef DISABLE_MILLIS
 /*************************** ENABLE GLOBAL INTERRUPTS *************************/
 
   sei();

@@ -1,3 +1,6 @@
+2.0.3
+* Fix problem with millis not being entirely disabled when set to be disabled.
+
 2.0.2
 * Fix bug with 1MHz system clock with TCB as milis source (micros was broken)
 * Remove EXTERNAL_EXPERIMENTAL - newer atpack removes ambiguity (note - we don't *use* it yet, but we didn't really need to either).
