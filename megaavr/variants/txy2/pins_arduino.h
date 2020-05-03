@@ -40,10 +40,12 @@
 
 #define digitalPinHasPWM(p)         ((p) != 0 && (p) != 5)
 
+#ifdef PORTMUX_SPI0_bm
 #define PIN_SPI_MISO_PINSWAP_1 	(1)
 #define PIN_SPI_SCK_PINSWAP_1 		(4)
 #define PIN_SPI_MOSI_PINSWAP_1 	(0)
 #define PIN_SPI_SS_PINSWAP_1 		(0)
+#endif
 #define PIN_SPI_MISO	(3)
 #define PIN_SPI_SCK		(4)
 #define PIN_SPI_MOSI	(2)

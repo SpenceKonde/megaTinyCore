@@ -47,18 +47,22 @@
 #define PIN_SPI_SCK		(16)
 #define PIN_SPI_MOSI	(14)
 #define PIN_SPI_SS		(0)
+#ifdef PORTMUX_SPI0_bm
 #define PIN_SPI_MISO_PINSWAP_1  (11)
 #define PIN_SPI_SCK_PINSWAP_1   (10)
 #define PIN_SPI_MOSI_PINSWAP_1  (12)
 #define PIN_SPI_SS_PINSWAP_1    (13)
+#endif
 
 #define SPI_INTERFACES_COUNT	1
 
 
-#define PIN_WIRE_SDA        (14)
-#define PIN_WIRE_SCL        (15)
-#define PIN_WIRE_SDA_PINSWAP_1        (8)
-#define PIN_WIRE_SCL_PINSWAP_1        (9)
+#define PIN_WIRE_SDA        (8)
+#define PIN_WIRE_SCL        (9)
+#ifdef PORTMUX_TWI0_bm
+#define PIN_WIRE_SDA_PINSWAP_1        (14)
+#define PIN_WIRE_SCL_PINSWAP_1        (15)
+#endif
 
 
 //Define the pin names, since user code may depend on them, even though the core libraries don't...

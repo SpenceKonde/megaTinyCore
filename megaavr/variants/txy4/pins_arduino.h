@@ -49,8 +49,10 @@
 
 
 
+#ifdef PORTMUX_TWI0_bm
 #define PIN_WIRE_SDA_PINSWAP_1        (8)
 #define PIN_WIRE_SCL_PINSWAP_1        (9)
+#endif
 #define PIN_WIRE_SDA        (6)
 #define PIN_WIRE_SCL        (7)
 
