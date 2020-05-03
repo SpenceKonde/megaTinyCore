@@ -278,7 +278,7 @@ Version information for MEGATINYCORE is also provided by a few additional define
 Be warned that the historical record has been
 
 # Bootloader (optiboot) Support
-A new version of Optiboot (Optiboot-x) now runs on the Tiny0 and Tiny1 chips.  It's under 512 bytes, and works on all parts supported by megaTinyCore, allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini).
+A new version of Optiboot (Optiboot-x) now runs on the tinyAVR 0-series and 1-series chips.  It's under 512 bytes, and works on all parts supported by megaTinyCore, allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini).
 
 To use the serial bootloader, select a board definition with (optiboot) after it (note - this might be cut off due to the width of the menu; the second set of board definitions are the optiboot ones).
 
@@ -314,7 +314,7 @@ Note that, if you have UPDI programming enabled, and desire the convenience of a
 * The bootloader is at the beginning of memory, rather than at the end (where it was on older chips). Thus, the start of the application code must be 512b after the start of the memory - this is handled by the core, but you cannot upload a .hex file compiled with a non-optiboot board definition to an optiboot board definition and vise versa.
 * **If you have set the UPDI/Reset pin to act as a reset pin, you can no longer program the part via UPDI** without using an HV programmer to reset the pin to act as UPDI.
 * Currently, Optiboot_x resets the reset cause register after saving the contents in R2.
-* The new chips have more than one option for Uart Pins. The option selected when you "burn bootloader" determines which version is used. If using the breakout boards I sell on Tindie, the first menu option uses the pins connected to the 6-pin FTDI-style serial header.
+* The new chips have more than one option mapping option for the UART (serial) pins. There is a menu option to choose this, and the one selected when you "burn bootloader" determines which version is used.
 * When you "burn bootloader", the base oscillator frequency is set according to the selected clock speed, but the actual operating speed while running the sketch is set in the uploading code. If you initially set it to 16/8/4/1MHz, you may use any of those options when you upload your sketch and it will run at that speed; if you initially set it to 20/10/5MHz, you may use any of those options. If you wish to change between 16/8/4/1MHz and 20/10/5MHz, you must burn bootloader again - failure to do so will result in it running at the wrong speed, and all timing will be wrong.
 * The "size" of the sketch as reported by avrdude during the upload process is 512b larger (the size of the bootloader) than the actual sketch size when a bootloader is in use. The fact that the bootloader goes at the start of the flash instead of the end confuses avrdude. The size displayed by the IDE when you "verify" a sketch is correct, the value that avrdude displays is not.
 
