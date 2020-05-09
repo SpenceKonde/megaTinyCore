@@ -1,6 +1,7 @@
 2.0.3
 * Fix problem with millis not being entirely disabled when set to be disabled.
 * Ever so slightly improve baud rate accuracy, reduce space taken by Serial.begin() by a few bytes.
+* Fix compile error from Tone() on parts without a second type B timer (ie, everything not a 1614, 3216, 1616, 3217, or 1617) when TCB0 was selected as a millis source. (part of #189)
 
 2.0.2
 * Fix bug with 1MHz system clock with TCB as milis source (micros was broken)
