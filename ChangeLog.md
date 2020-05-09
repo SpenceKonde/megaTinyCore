@@ -1,5 +1,6 @@
 2.0.3
 * Fix problem with millis not being entirely disabled when set to be disabled.
+* Ever so slightly improve baud rate accuracy, reduce space taken by Serial.begin() by a few bytes.
 
 2.0.2
 * Fix bug with 1MHz system clock with TCB as milis source (micros was broken)
