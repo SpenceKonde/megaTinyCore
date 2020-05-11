@@ -202,7 +202,7 @@ unsigned long millis()
     #endif
 
     #if defined(MILLIS_USE_TIMERA0)
-      ticks = 0xFF-TCA0.SPLIT.LCNT;
+      ticks = 0xFF-TCA0.SPLIT.HCNT;
     #elif defined(MILLIS_USE_TIMERD0)
       TCD0.CTRLE=TCD_SCAPTUREA_bm;
       while(!(TCD0.STATUS&TCD_CMDRDY_bm)); //wait for sync - should be only one iteration of this loop
@@ -217,7 +217,7 @@ unsigned long millis()
     #if defined(MILLIS_USE_TIMERD0)
       if ((TCD0.INTFLAGS & TCD_OVF_bm) && !(ticks&0xFF00)){
     #elif defined(MILLIS_USE_TIMERA0)
-      if ((TCA0.SPLIT.INTFLAGS & TCA_SPLIT_LUNF_bm ) && !(ticks&0x80)){
+      if ((TCA0.SPLIT.INTFLAGS & TCA_SPLIT_HUNF_bm ) && !(ticks&0x80)){
     #else //timerb
       if ((_timer->INTFLAGS & TCB_CAPT_bm) && !(ticks&0xFF00)) {
     #endif
