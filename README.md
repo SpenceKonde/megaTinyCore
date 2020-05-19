@@ -6,7 +6,7 @@
 ### [Making a cheap UPDI programmer](MakeUPDIProgrammer.md)
 
 # megaTinyCore
-Arduino core for the new tinyAVR 0-series and 1-series chips. These parts have an improved architecture, with improved peripherals and improved execution time for certain instructions (similar to megaAVR 0-series chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. Moreover, these parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini!) run just over $1 USD, and under $.90 in quantity - less than many 8k classic AVR ATtiny parts (AVR architecture, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal.
+Arduino core for the tinyAVR 0-series and 1-series chips. These parts have an improved architecture, with improved peripherals and improved execution time for certain instructions (similar to megaAVR 0-series chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. Moreover, these parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini!) run just over $1 USD, and under $.90 in quantity - less than many 8k classic AVR ATtiny parts (AVR architecture, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal.
 
 These use a UPDI programmer, not traditional ISP like the classic ATtiny parts did. One can be made from a classic AVR Uno/Nano/Pro Mini - see [Making a UPDI programmer](MakeUPDIProgrammer.md).
 
@@ -23,6 +23,9 @@ For this core to work when installed manually, and via board manager for 1.0.1 a
 * [ATtiny1606,806,406](megaavr/extras/ATtiny_x06.md)
 * [ATtiny1604,804,404,204](megaavr/extras/ATtiny_x04.md)
 * [ATtiny402,202](megaavr/extras/ATtiny_x02.md)
+
+### Upcoming tinyAVR 2-series
+Microchip has dropped hints that they are working on a tinyAVR "2-series" product line, with part numbers like ATtiny 1626 - there is currently no publically available information on these devices beyond what can be deduced from the io.h headers for these parts, and what is listed in Microchip's listing of AVR processors. Based on the io.h, it looks like these parts will **not** use the DA-style NVM controller and will **not** have the async type-D timer like the 1-series, but will have a second USART (that scream you just heard in the distance was the ATtiny 841 and 1634, whose sole claim to relevance in the face of these new parts was their second hardware USART) and more sophisticated ADC (12 bit, and differential ADC support). No information has been made available regarding the timing of their availability. When these parts are available, support for them will be added to this core.
 
 ## Supported Clock Speeds
 * 20MHz Internal (4.5v~5.5v - typical for 5v systems)
