@@ -221,7 +221,7 @@ Serial.printf("Milliseconds since start: %ld\n", millis());
 Note that using this method will pull in just as much bloat as sprintf(), so it may be unsuitable on devices with small flash memory.
 
 ### Pin Interrupts
-All pins can be used with attachInterrupt() and detachInterrupt(), on RISING, FALLING, CHANGE, or LOW. All pins can wake the chip from sleep on CHANGE or LOW. Pins marked as ASync Interrupt pins on the pinout chart can be used to wake from sleep on RISING and FALLING edge as well.
+All pins can be used with attachInterrupt() and detachInterrupt(), on RISING, FALLING, CHANGE, or LOW. All pins can wake the chip from sleep on CHANGE or LOW. Pins marked as ASync Interrupt pins on the megaTinyCore pinout charts (pins 2 and 6 within each port can be used to wake from sleep on RISING and FALLING edge as well. Those pins are termed "fully asynchronous pins" in the datasheet
 
 Advanced users can instead set up interrupts manually, ignoring attachInterrupt and manipulating the relevant port registers appropriately and defining the ISR with the ISR() macro - this will produce smaller code (using less flash and ram) and the ISRs will run faster as they don't have to check whether an interrupt is enabled for every pin on the port. For full information and example, see: [Pin Interrupts](megaavr/extras/PinInterrupts.md)
 
@@ -233,7 +233,9 @@ The EESAVE fuse can be controlled via the Tools -> Save EEPROM menu. If this is 
 **WARNING** In megaTinyCore 1.0.6 and earlier, this setting is backwards - setting it to retained will not retain, and vise versa. This is corrected in 1.0.7 and later.
 
 ### BOD configuration options
-These parts support many BOD trigger levels, with Disabled, Active, and Sampled operation options for when the chip is in Active and Sleep modes - Disabled uses the least power, Active uses the most, and Sampled is in the middle. See the datasheet for details on power consumption and the meaning of these options. You must do Burn Bootloader to apply this setting.
+These parts officially support BOD trigger levels of 1.8V, 2.6V, and 4.2V, with Disabled, Active, and Sampled operation options for when the chip is in Active and Sleep modes - Disabled uses no extra power, Active uses the most, and Sampled is in the middle. See the datasheet for details on power consumption and the meaning of these options. You must do Burn Bootloader to apply this setting.
+#### Unofficial BOD levels
+Between the initial header file and preliminary datasheet release, and the most recent versions of each, several BOD settings (which were described as "unqualified" in the release notes- which I belive means they were not tested or guaranteed to behave correctly) were removed from the datasheet and io.h files. These are still supported by the dropdown menu, but (as of 2.0.4 - the first version that has the new headers) are marked as such in the submenu. Arduino.h also provides the missing defines. *When using these, proper operation should not be counted on without doing your own testing*
 
 ### Link-time Optimization (LTO) support
 This core *always* uses Link Time Optimization to reduce flash usage - all versions of the compiler which support the 0-series and 1-series ATtiny parts also support LTO, so there is no need to make it optional as was done with ATtinyCore.
