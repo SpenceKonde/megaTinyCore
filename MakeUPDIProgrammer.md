@@ -11,10 +11,10 @@ Download and extract, or clone the repo to your local machine.
 3.	Open the sketch jtag2updi.ino and upload it to your Arduino. The .ino file itself is empty, and this is fine - all the code is contained in other files in the same folder, but the empty .ino is needed so that the IDE can compile it. 
 
 ## Part 2: Connect hardware
-1.  Connect a 10uF capacitor (if you don't have a 10uF one, any value higher than 4.7uF is fine) between reset and ground on the Arduino (this must be removed before you upload a different sketch to the Arduino). 
-2.  Connect Ground of Arduino to Ground of the ATTiny
-3.  Connect Pin 6 of the Arduino to the UPDI pin of the ATTiny - if using the bare chip, connect it via a 4.7k resistor. Many breakout boards will provide a separate UPDI pin that has this resistor built-in; in this case, pin 6 should be connected directly to this programming pin. 
-4.	Unless the ATtiny has it's own power supply, connect 5v pin of the Arduino to the Vcc pin of the ATtiny
+*previous versions of this guide specified a cap between reset and ground after programming. Testing has revealed this to be unnecessary*
+1.  Connect Ground of Arduino to Ground of the ATTiny
+2.  Connect Pin 6 of the Arduino to the UPDI pin of the ATTiny - if using the bare chip, connect it via a 4.7k resistor. Many breakout boards will provide a separate UPDI pin that has this resistor built-in; in this case, pin 6 should be connected directly to this programming pin. 
+3.	Unless the ATtiny has it's own power supply, connect 5v pin of the Arduino to the Vcc pin of the ATtiny
 
 Now, you should be able to select an ATtiny megaAVR series board from Tools -> Board, and upload a sketch via the IDE. The same programmer can also be used to Burn Bootloader (be sure to select the jtag2updi (megaTinyCore) programmer from Tools -> Programmer menu) 
 
