@@ -346,12 +346,22 @@ Note that, if you have UPDI programming enabled, and desire the convenience of a
 * Tools -> Voltage for UART Baud - Controls which oscillator error values will be used to maximize the accuracy of the UART baud rate generation - choose whether operating voltage is closer to 5v or 3v.
 * Tools -> millis()/micros() - If set to enable (default), millis(), micros() and pulseInLong() will be available. If set to disable, these will not be available, Serial methods which take a timeout as an argument will not have an accurate timeout (though the actual time will be proportional to the timeout supplied); delay will still work. Disabling millis() and micros() saves flash, and eliminates the millis interrupt every 1-2ms; this is especially useful on the 8-pin parts which are extremely limited in flash. Depending on the part, options to force millis/micros onto specific timers are available. A #error will be shown upon compile if a specific timer is chosen but that timer does not exist on the part in question. If RTC is selected, micros() andpulseInLong() will not be available - only millis() will be.
 
-# Known Compiler Bugs
-* Sometimes a sketch which is too big to fit will, instead of generating a message saying that, result in the error: 'relocation truncated to fit: R_AVR_13_PCREL against symbol tablejump2'.
-* At least as of the avr-gcc package 7.3.0-atmel3.6.1-arduino5 there is a bug in the `<avr/eeprom.h>` library's eeprom_is_ready() macro - it refers to registers that don't exist on the parts (this impacts the 4809 and it's ilk as used in Nano Every/Uno WiFi Rev. 2 as well). Attempting to use that macro will generate a error stating that `'NVM_STATUS' was not declared in this scope`. When a newer version of that package that corrects this issue is available, megaTinyCore will use it. In the meantime, `replace eeprom_is_ready()` with `bit_is_clear(NVMCTRL.STATUS,NVMCTRL_EEBUSY_bp)`. If writing a library or sketch that is intended to work on both megaavr and classic avr parts, you can test for effected parts using `#if defined(ARDUINO_ARCH_MEGAAVR)`
+# Known Compiler Bugs in 2.0.3 and earlier
+The earlier versions of the avr-gcc toolchain contained several issues relevant to these parts. Version 2.0.4 and later, when installed through Board Manager, will pull in the new toolchain package which corrects both of these issues (among other ones that nobody had noticed yet)
+* Sometimes a sketch which is too big to fit will, instead of generating a message saying that, result in the error: 'relocation truncated to fit: R_AVR_13_PCREL against symbol tablejump2'. 
+* There is a bug in the `<avr/eeprom.h>` library's eeprom_is_ready() macro - it uses names for registers from the XMEGA family of parts (under the hood, these chips actually have an XMEGA core!). Attempting to use that macro will generate a error stating that `'NVM_STATUS' was not declared in this scope`. When a newer version of that package that corrects this issue is available, megaTinyCore will use it. In the meantime, `replace eeprom_is_ready()` with `bit_is_clear(NVMCTRL.STATUS,NVMCTRL_EEBUSY_bp)`. If writing a library or sketch that is intended to work on both megaavr and classic avr parts, you can test for effected parts using `#if defined(ARDUINO_ARCH_MEGAAVR)`
 
+# Instruction timing changes
+These parts have a newer CPU core with slightly improved timings. This distinction is unimportant for 99.9% of users - but if you happen to be working with hand-tuned assembly (or using a library that does so, and are wondering why the timing is messed up), you should be aware of this. 
+* PUSH is 1 cycle vs 2 on classic AVR (POP is still 2)
+* CBI and SBI are 1 cycle vs 2 on classic AVR
+* LDS is 3 cycles vs 2 on classic AVR (16-bit LDS is still 1 cycle) :disappointed:
+* RCALL and ICALL are 2 cycles vs 3 on classic AVR
+* CALL is 3 cycles instead of 4 on classic AVR
+* Saving the best for last... ST and STD is 1 cycle vs 2 on classic AVR! (STS is still 2) 
+Note that the improvement to PUSH can make interrupts respond significantly faster (since they often have to push one or more registers onto the stack at the beginning of the ISR), though the corresponding POP's at the end aren't any faster. The change with ST impacted tinyNeoPixel. Prior to my realizing this, the library worked on SK6812 LEDs (which happened to be what I tested with) at 16/20 MHz, but not real WS2812's. However, once I discovered this, I was able to leverage it to use a single tinyNeoPixel library instead of a different one for each port like was needed with ATTinyCore (for 8 MHz, they need to use the single cycle OUT on classic AVRs to meet timing requirements, the two cycle ST was just too slow; hence the port had to be known at compiletime. But with single cycle ST, that issue vanished)
 
-# Buying ATtiny megaAVR breakout boards
+# Buying ATtiny 0-series and 1-series breakout boards
 I sell breakout boards with regulator, UPDI header, and Serial header in my tindie shop, as well as the bare boards. Buying from my store helps support further development on the core, and is a great way to get started using these exciting new parts with Arduino.
 
 ### [ATtiny3217, 1607 assembled](https://www.tindie.com/products/17523/)
