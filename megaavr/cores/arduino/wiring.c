@@ -537,41 +537,47 @@ void init()
   // work there
 
 /******************************** CLOCK STUFF *********************************/
+  #if (EXTERNAL_CLOCK_SOURCE)
+    #if (F_CPU==20000000 || F_CPU==16000000|| F_CPU==12000000 || F_CPU==10000000 || F_CPU==8000000 ||F_CPU==5000000 || F_CPU==4000000 || F_CPU=1000000)
 
-
-  #if (F_CPU == 20000000)
-    /* No division on clock */
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
-
-  #elif (F_CPU == 16000000)
-    /* No division on clock */
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
-
-  #elif (F_CPU == 10000000) //20MHz prescaled by 2
-    /* Clock DIV2 */
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
-
-  #elif (F_CPU == 8000000) //16MHz prescaled by 2
-    /* Clock DIV2 */
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
-
-  #elif (F_CPU == 5000000) //20MHz prescaled by 4
-    /* Clock DIV4 */
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
-
-  #elif (F_CPU == 4000000) //16MHz prescaled by 4
-    /* Clock DIV4 */
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
-
-  #elif (F_CPU == 1000000) //16MHz prescaled by 16
-    /* Clock DIV8 */
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
-  #else
-
-    #ifndef F_CPU
-      #error "F_CPU not defined"
     #else
-      #error "F_CPU defined as an unsupported value"
+
+    #endif
+  #else //we're using internal clock
+    #if (F_CPU == 20000000)
+      /* No division on clock */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+
+    #elif (F_CPU == 16000000)
+      /* No division on clock */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+
+    #elif (F_CPU == 10000000) //20MHz prescaled by 2
+      /* Clock DIV2 */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+
+    #elif (F_CPU == 8000000) //16MHz prescaled by 2
+      /* Clock DIV2 */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+
+    #elif (F_CPU == 5000000) //20MHz prescaled by 4
+      /* Clock DIV4 */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
+
+    #elif (F_CPU == 4000000) //16MHz prescaled by 4
+      /* Clock DIV4 */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
+
+    #elif (F_CPU == 1000000) //16MHz prescaled by 16
+      /* Clock DIV8 */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
+    #else
+
+      #ifndef F_CPU
+        #error "F_CPU not defined"
+      #else
+        #error "F_CPU defined as an unsupported value"
+      #endif
     #endif
   #endif
 
