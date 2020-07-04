@@ -118,19 +118,20 @@ Open-Drain Mode Does Not Work When TXD is Configured as Output | X | - | - | X |
 
 ## tinyAVR 0-series Errata
 . |ATtiny202|ATtiny204|ATtiny202/204|ATtiny804/806/807
+--- | --- | --- | --- | --- 
 . |ATtiny402|ATtiny404|ATtiny402/404/406|ATtiny1604/1606/1607
 . | . |ATtiny406|Automotive|Both
 Silicon Revision |B|B|B|A
-Device| . || . | .
+Device| . | . | . | .
 The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)|-|-|-|-
 **ADC** |-|-|-| .
 ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle|X|X|X|X
-ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V| . || . |X
+ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V| . | . | . |X
 One Extra Measurement Performed After Disabling ADC FreeRunning Mode|-|-|-|X
 Pending Event Stuck When Disabling the ADC|-|-|-|X
 **CCL** |-|-|-| .
 Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’|-|-|-|X
-D-latch is Not Functional| . || . |X
+D-latch is Not Functional| . | . | . |X
 **PORTMUX** |X|X|X| .
 Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5|-|-|-|-
 **RTC** |X|X|-| .
@@ -139,7 +140,7 @@ Disabling the RTC Stops the PIT|-|-|-|X
 **TCB** |X|X|X| .
 Minimum Event Duration Must Exceed the Selected Clock Period|-|-|-|X
 The TCA Restart Command Does Not Force a Restart of TCB|-|-|-|X
-**USART** | . || . | .
+**USART** | . | . | . | .
 TXD Pin Override Not Released When Disabling the Transmitter|X|X|X|X
 Frame Error on a Previous Message May Cause False Start Bit Detection|X|X|X|-
 
