@@ -121,25 +121,25 @@ Open-Drain Mode Does Not Work When TXD is Configured as Output | X | - | - | X |
 --- | --- | --- | --- | --- 
 . |ATtiny402|ATtiny404|ATtiny402/404/406|ATtiny1604/1606/1607
 . | . |ATtiny406|Automotive|Both
-Silicon Revision |B|B|B|A
+. |B|B|B|A
 Device| . | . | . | .
-The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)|-|-|-|-
-**ADC** |-|-|-| .
+The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)|X|X|X|-
+**ADC** | . | . | . | .
 ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle|X|X|X|X
-ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V| . | . | . |X
-One Extra Measurement Performed After Disabling ADC FreeRunning Mode|-|-|-|X
+ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V|X|X|-|X
+One Extra Measurement Performed After Disabling ADC FreeRunning Mode|X|X|X|X
 Pending Event Stuck When Disabling the ADC|-|-|-|X
-**CCL** |-|-|-| .
-Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’|-|-|-|X
-D-latch is Not Functional| . | . | . |X
-**PORTMUX** |X|X|X| .
-Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5|-|-|-|-
-**RTC** |X|X|-| .
-Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler|-|-|-|X
-Disabling the RTC Stops the PIT|-|-|-|X
-**TCB** |X|X|X| .
-Minimum Event Duration Must Exceed the Selected Clock Period|-|-|-|X
-The TCA Restart Command Does Not Force a Restart of TCB|-|-|-|X
+**CCL** | . | . | . | .
+Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’|X|X|X|X
+D-latch is Not Functional|X|X|X|X
+**PORTMUX** | . | . | . | .
+Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5|-|X|X|-
+**RTC** | . | . | . | .
+Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler|X|X|X|X
+Disabling the RTC Stops the PIT|X|X|X|X
+**TCB** | . | . | . | .
+Minimum Event Duration Must Exceed the Selected Clock Period|X|X|X|X
+The TCA Restart Command Does Not Force a Restart of TCB|X|X|X|X
 **USART** | . | . | . | .
 TXD Pin Override Not Released When Disabling the Transmitter|X|X|X|X
 Frame Error on a Previous Message May Cause False Start Bit Detection|X|X|X|-
