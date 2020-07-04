@@ -24,5 +24,5 @@ This matches the megaTinyCore 412/402 Rev. - and Rev. A breakout boards below. *
 [ATtiny412/402 assembled](https://www.tindie.com/products/17685/)
 [ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
 
-### Datasheets
-[ATtiny212/412](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-412-DataSheet-DS40001911B.pdf)
+### Datasheets and Errata
+See [Datasheet Listing](Datasheets.md)

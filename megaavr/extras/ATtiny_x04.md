@@ -22,9 +22,5 @@ Clock options | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz | 
 
 [ATtiny1614/814/414/1604/804/404 bare board](https://www.tindie.com/products/17748/)
 
-
-
-### Datasheets
-[ATtiny204/404](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny204-404-DataSheet-DS50002687B.pdf)
-
-[ATtiny804/1604](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny804_1604-Data-Sheet-40002028A.pdf)
+### Datasheets and Errata
+See [Datasheet Listing](Datasheets.md)

@@ -29,5 +29,5 @@ There exist ATtiny402's in the wild where the last byte of the signature is 0x25
 
 [ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
 
-### Datasheets
-[ATtiny202/402](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny202-402-DataSheet-DS40001969B.pdf)
+### Datasheets and Errata
+See [Datasheet Listing](Datasheets.md)

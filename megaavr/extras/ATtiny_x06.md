@@ -21,6 +21,5 @@ Clock options | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz | 
 [ATtiny1606 assembled](https://www.tindie.com/products/17597/)
 [ATtiny3216/1616/816/416/1606/806/406 bare board](https://www.tindie.com/products/17614/)
 
-### Datasheets
-[ATtiny406](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny406-DataSheet-DS40001976B.pdf)
-[ATtiny806/1606](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny806-1606-DataSheet-DS40002029B.pdf)
+### Datasheets and Errata
+See [Datasheet Listing](Datasheets.md)

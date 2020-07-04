@@ -22,7 +22,5 @@ Clock options | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz | 
 
 [ATtiny3217/1617/817/417/1607/807 bare board](https://www.tindie.com/products/17613/)
 
-### Datasheets
-[ATtiny417/817](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417-817-DataSheet-DS40001901D.pdf)
-
-[ATtiny1617/3217](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny1617-3217-DataSheet-DS40001999C.pdf)
+### Datasheets and Errata
+See [Datasheet Listing](Datasheets.md)
