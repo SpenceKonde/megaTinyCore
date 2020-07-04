@@ -15,8 +15,8 @@ Thankfully, most of these issues will not be encountered by most Arduino users. 
  . |ATtiny212 | . |ATtiny214/414 | . |ATtiny417|ATtiny1614|ATtiny3216|.
 --- | --- | --- | --- | --- | --- | --- | --- | ---
  . |ATtiny412 | . |ATtiny416 | . |ATtiny816|ATtiny1616|ATtiny3217|.
- | .  | . |ATtiny814 | . |ATtiny817|ATtiny1617 | . |.
- . |A|B|A|B|A,B|A|A|C
+. | .  | . |ATtiny814 | . |ATtiny817|ATtiny1617 | . |.
+Silicon Revision  |A|B|A|B|A,B|A|A|C
 Device | .  | . | .  | . | .  | . | . |.
 On 24-Pin Automotive Devices Pin PC5 is Not Available|-|-|-|-|-|-|-|-
 Writing the OSCLOCK Fuse in FUSE.OSCCFG to ‘1’ Prevents Automatic Loading of Calibration Values|-|-|-|-|-|X|X|X
@@ -121,7 +121,7 @@ Open-Drain Mode Does Not Work When TXD is Configured as Output | X | - | - | X |
 --- | --- | --- | --- | ---
  . |ATtiny402/404/406|ATtiny1604/1606/1607|ATtiny402/404/406|ATtiny1604/1606/1607
  . |Automotive|Both|Automotive|Both
- . |B|A|B|A
+Silicon Revision  |B|A|B|A
 Device | .  | . | . |.
 The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)|X|-|X|-
 **ADC** | .  | . | . |.
