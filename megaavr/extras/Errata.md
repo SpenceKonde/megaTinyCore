@@ -8,7 +8,7 @@ Serial.print("Silicon revision is: ");
 Serial.println(SYSCFG.REVID);
 ```
 
-Thankfully, most of these issues will not be encountered by most Arduino users. The issue with TCD autoupdate was stumbled over during development of megaTinyCore, and worked around. The
+Thankfully, most of these issues will not be encountered by most Arduino users. The issue with TCD autoupdate was stumbled over during development of megaTinyCore, and worked around. The issue with changing settings during free running mode is probably the one that is most likely to be encountered, except that most people set up free running mode with fixed settings.
 
 
 ## tinyAVR 1-series
