@@ -1,5 +1,5 @@
 # Datasheet Links
-The most recent versions of the datasheets for the TinyAVR product line are combined versions across different pin counts. This page collects links to the most recent versions of the datasheets as of July 2020, as well as the "silicon errata" sheets, which describe bugs in different versions of the hardware. 
+The most recent versions of the datasheets for the TinyAVR product line are combined versions across different pin counts. This page collects links to the most recent versions of the datasheets as of July 2020, as well as the "silicon errata" sheets, which describe bugs in different versions of the hardware. There is also a page summarizing the errata including tables listing what issues apply to which parts on the [silicon errata page](Errata.md). 
 
 ## 1-series
 
@@ -15,10 +15,10 @@ The most recent versions of the datasheets for the TinyAVR product line are comb
 [ATtiny416/816](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416-816-DataSheet-DS40001913C.pdf) || [ATtiny416/816 Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416_816-Errata-and-Clarification-DS40002116B.pdf)
 
 
-[ATtiny416/417/814/816/817 Automotive](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416-417-814-816-817-Auto-DataSheet-DS40002014C.pdf) || [ATtiny416/417/814/816/817 Automotive Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416_417_816_817-Auto-Errata-Clarification-DS40002122B.pdf)
-
-
 [ATtiny417/817](http://ww1.microchip.com/downloads/en/DeviceDoc/40001934A.pdf) || [ATtiny417/817 Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417_817-Errata-and-Clarification-DS40002117B.pdf)
+
+
+[ATtiny416/417/814/816/817 Automotive](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416-417-814-816-817-Auto-DataSheet-DS40002014C.pdf) || [ATtiny416/417/814/816/817 Automotive Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416_417_816_817-Auto-Errata-Clarification-DS40002122B.pdf)
 
 
 [ATtiny1614/1616/1617](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny1614-16-17-DataSheet-DS40002204A.pdf) || [ATtiny1614/1616/1617 Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny1614-16-17-SilConErrataClarif-DS80000886A.pdf)
