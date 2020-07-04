@@ -66,6 +66,7 @@ Open-Drain Mode Does Not Work When TXD is Configured as Output | - | - | - | - |
 ## Automotive tinyAVR 1-series
 
 . | ATtiny212/214 | ATtiny814 | ATtiny416/417 | ATtiny1614 | ATtiny3216
+--- | --- | --- | --- | --- | ---
 . | ATtiny412/414 | . | ATtiny816/817 | ATtiny1616 | ATtiny3217
 . | . | . | . | ATtiny1617 | . 
 Rev. | B | A, B | A, B | A | B
