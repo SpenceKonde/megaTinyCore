@@ -79,6 +79,8 @@ bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin)
         PORTMUX.CTRLB&=~PORTMUX_TWI0_bm;
         return false;
       }
+    #else //keep compiler happy
+      return (sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL);
     #endif
   #elif defined(PORTMUX_TWIROUTEA)
     if (sda_pin == PIN_WIRE_SDA_PINSWAP_2 && scl_pin == PIN_WIRE_SCL_PINSWAP_2)
@@ -125,6 +127,8 @@ bool TwoWire::swap(uint8_t state)
         PORTMUX.CTRLB&=~PORTMUX_TWI0_bm;
         return false;
       }
+    #else //keep compiler happy
+      return (state==0);
     #endif
   #elif defined(PORTMUX_TWIROUTEA)
     if(state == 2)
@@ -215,7 +219,7 @@ void TwoWire::setClock(uint32_t clock)
 	TWI_MasterSetBaud(clock);
 }
 
-uint8_t TwoWire::requestFrom(uint8_t address, size_t quantity, bool sendStop) {
+uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop) {
 	if(quantity > BUFFER_LENGTH){
 		quantity = BUFFER_LENGTH;
 	}
@@ -228,20 +232,29 @@ uint8_t TwoWire::requestFrom(uint8_t address, size_t quantity, bool sendStop) {
 
 	return bytes_read;
 }
-
+uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity)
+{
+  return requestFrom(address, quantity, (uint8_t)1);
+}
+// Translate "new" style of call to requestFrom()
 uint8_t TwoWire::requestFrom(uint8_t address, size_t quantity)
 {
-	return requestFrom(address, quantity, true);
+	return requestFrom(address, (uint8_t)quantity, (uint8_t)1);
+}
+// Translate "new" style of call with three args to traditional requestFrom()
+uint8_t TwoWire::requestFrom(uint8_t address, size_t quantity, bool sendStop)
+{
+  return requestFrom(address, (uint8_t)quantity, (uint8_t)sendStop);
 }
 
 uint8_t TwoWire::requestFrom(int address, int quantity)
 {
-	return requestFrom((uint8_t)address, (size_t)quantity, true);
+	return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)1);
 }
 
 uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)
 {
-	return requestFrom((uint8_t)address, (size_t)quantity, (bool)sendStop);
+	return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)sendStop);
 }
 
 void TwoWire::beginTransmission(uint8_t address)
@@ -329,6 +342,7 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity)
 
 	return quantity;
 }
+
 
 // must be called in:
 // slave rx event callback

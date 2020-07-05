@@ -70,6 +70,8 @@ class TwoWire : public Stream
     void beginTransmission(int);
     uint8_t endTransmission(void);
     uint8_t endTransmission(bool);
+    uint8_t requestFrom(uint8_t, uint8_t);
+    uint8_t requestFrom(uint8_t, uint8_t, uint8_t);
     uint8_t requestFrom(uint8_t, size_t);
     uint8_t requestFrom(uint8_t, size_t, bool);
     uint8_t requestFrom(int, int);
