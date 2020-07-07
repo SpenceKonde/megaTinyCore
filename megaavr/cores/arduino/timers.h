@@ -1,13 +1,10 @@
 #ifndef __TIMERS_H__
 #define __TIMERS_H__
 
-#ifdef MILLIS_USE_TIMERD0_A0
-#ifdef TCD0
-#define MILLIS_USE_TIMERD0
-#else
-#define MILLIS_USE_TIMERA0
+#ifdef MILLIS_USE_TIMERNONE
+  #define DISABLE_MILLIS
 #endif
-#endif
+
 #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
   #if (F_CPU==1000000UL)
     #define TIME_TRACKING_TIMER_DIVIDER   1
@@ -16,7 +13,7 @@
     #define TIME_TRACKING_TIMER_DIVIDER   2
     #define TIME_TRACKING_TIMER_PERIOD ((F_CPU/2000)-1)
   #endif
-#elif (defined(MILLIS_USE_TIMERD0) || (defined(MILLIS_USE_TIMERD0_A0)&&defined(TCD0)))
+#elif defined(MILLIS_USE_TIMERD0)
   #define TIME_TRACKING_TIMER_PERIOD		0x1FD
   #if (F_CPU==1000000UL)
     #define TIME_TRACKING_TIMER_DIVIDER		64		/* Clock divider for TCD0 */
@@ -36,7 +33,7 @@
 #endif
 
 
-#if (defined(MILLIS_USE_TIMERD0) && F_CPU==1000000 && defined(TCD0))
+#if (defined(MILLIS_USE_TIMERD0) && F_CPU==1000000)
   #define TIMERD0_PRESCALER 0x12
 #else
   #define TIMERD0_PRESCALER 0x10
@@ -58,6 +55,8 @@
   #define MILLIS_TIMER TIMERB1
 #elif defined(MILLIS_USE_TIMERD0)
   #define MILLIS_TIMER TIMERD0
+#elif defined(MILLIS_USE_TIMERRTC_XTAL)
+  #define MILLIS_TIMER TIMERRTC_XTAL
 #elif defined(MILLIS_USE_TIMERRTC)
   #define MILLIS_TIMER TIMERRTC
 #else

@@ -37,7 +37,7 @@ Notes for all parts:
 * Timer WO channels correspond to the specified timer's PWM Output channels. They are true when the specified timer's value is higher than the compare register for that output channel.
 * Type-B timers can only generate an output under circumstances where they could drive an output pin if CCMPEN in TCBn.CTRLA is set.
 
-Accepted values for megaavr 0-series and 1-series ATtiny parts
+Accepted values for tinyAVR 0/1-series parts:
 
 ``` c++
 in::masked;       // Pin not in use
@@ -69,7 +69,7 @@ Notes specific to ATtiny:
 * CCL0's IN0 pin is on PA0, which is nominally the UPDI pin. It can only be used as input when that pin is set as GPIO. This limits the usefulness of CCL0 on the ATtiny parts; configuring UPDI as GPIO prevents further programming via UPDI except via HV programming. Configuring this option is only supported on megaTinyCore with Optiboot bootloader (from 1.1.6 on), and prevents further modification of the fuses or bootloader without HV programming, however, as noted above, input0 can be used via the event inputs to take input from another pin. This is demonstrated in the three input examples.
 
 
-Accepted values for megaavr 0-series ATmega parts
+Accepted values for megaAVR 0-series parts
 
 ``` c++
 in::masked;       // Pin not in use

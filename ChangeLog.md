@@ -1,9 +1,12 @@
 2.0.4
+* Improve naming of exported binary and assembler listings - now includes every setting that could impact the output!
+* Fix failure to export compiled binary on some linux platforms (#201)
+* Massive doc improvements.
+* Improve backwards compatibility of Wire.h (#203)
+* Fix strange bug in EEPROM.h that was somehow missed 
 * Mark unqualified BOD settings that were removed from datasheet as unofficial, add warning that they may not work correctly (but suspect will be close - they were working for me before I realized they were unsupported! they were listed in io.h before!), and add Microchip's guaranteed operating speeds + BOD levels per datasheet to documentation.
 * Switch to new and improved compiler toolchain - now get informative errors if sketch is too big on parts that use RJMP, various header improvements (board manager install only).
 * Possibly fix #189!
-
-2.0.3
 * Fix problem with millis not being entirely disabled when set to be disabled.
 * Ever so slightly improve baud rate accuracy, reduce space taken by Serial.begin() by a few bytes.
 * Fix compile error from Tone() on parts without a second type B timer (ie, everything not a 1614, 3216, 1616, 3217, or 1617) when TCB0 was selected as a millis source. (part of #189)

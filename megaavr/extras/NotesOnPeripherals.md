@@ -11,7 +11,7 @@ TCNT1=-(F_CPU/1024); // timer clocks at 1024 prescaler in 1 second, as negative 
 TCCR1B=0x05; //turn on Timwer 1 with prescaler=1024
 while(!(TIFR1&(1<<TOV1))); //spin for 1 second
 ```
-On megaavr, trying the same thing will spin forever, because the INTFLAGS register are never set if it's not enabled... 
+On "modern" AVRs, trying the same thing with a type B timer will spin forever... but the same sort of thing works fine on a type A timer! 
 ```
   TCA0.SINGLE.CTRLA=0x0F; //TCA0 1024 prescaler
   TCB0.CTRLA=0; TCB0.CTRLB=0; TCB0.INTCTRL=0; TCB0.CNT=0; //Stop TCB0, Periodic Interrupt timing mode, interrupt off, Count 0
@@ -27,7 +27,7 @@ Of course, if you enable the interrupt, but have interrupts globally disabled, t
   TCB0.CCMP=(F_CPU/1024); //Number of clocks until overflow
   TCB0.CTRLA=0x05; //TCB0 uses prescaled CLK_TCA
   cli();
-  while(!TCB0.INTFLAGS); //Spins forever!
+  while(!TCB0.INTFLAGS); //Spins until overflow
   TCB0.INTFLAGS=1; //You really need to do this here too!
   sei();
 ```

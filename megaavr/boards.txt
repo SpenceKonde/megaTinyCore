@@ -18,29 +18,36 @@ menu.bootloaderuart=UART for Bootloader
 ##############################################################
 
 atxy7.name=ATtiny3217/1617/1607/817/807/417
+atxy7.upload.workaround=
+atxy7.build.defaultmillistimer=D0
+atxy7.build.mcu=attiny{build.attiny}
+atxy7.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+atxy7.build.f_cpu={build.speed}000000L
 
 atxy7.menu.chip.3217=ATtiny3217
-atxy7.menu.chip.3217.build.mcu=attiny3217
+atxy7.menu.chip.3217.build.attiny=3217
 atxy7.menu.chip.3217.upload.maximum_size=32768
 atxy7.menu.chip.3217.upload.maximum_data_size=2048
 atxy7.menu.chip.1617=ATtiny1617
-atxy7.menu.chip.1617.build.mcu=attiny1617
+atxy7.menu.chip.1617.build.attiny=1617
 atxy7.menu.chip.1617.upload.maximum_size=16384
 atxy7.menu.chip.1617.upload.maximum_data_size=2048
 atxy7.menu.chip.817=ATtiny817
-atxy7.menu.chip.817.build.mcu=attiny817
+atxy7.menu.chip.817.build.attiny=817
 atxy7.menu.chip.817.upload.maximum_size=8192
 atxy7.menu.chip.817.upload.maximum_data_size=512
 atxy7.menu.chip.417=ATtiny417
-atxy7.menu.chip.417.build.mcu=attiny417
+atxy7.menu.chip.417.build.attiny=417
 atxy7.menu.chip.417.upload.maximum_size=4096
 atxy7.menu.chip.417.upload.maximum_data_size=256
 atxy7.menu.chip.1607=ATtiny1607
-atxy7.menu.chip.1607.build.mcu=attiny1607
+atxy7.menu.chip.1607.build.attiny=1607
+atxy7.menu.chip.1607.build.defaultmillistimer=A0
 atxy7.menu.chip.1607.upload.maximum_size=16384
 atxy7.menu.chip.1607.upload.maximum_data_size=1024
 atxy7.menu.chip.807=ATtiny807
-atxy7.menu.chip.807.build.mcu=attiny807
+atxy7.menu.chip.807.build.attiny=807
+atxy7.menu.chip.807.build.defaultmillistimer=A0
 atxy7.menu.chip.807.upload.maximum_size=8192
 atxy7.menu.chip.807.upload.maximum_data_size=512
 
@@ -51,13 +58,13 @@ atxy7.menu.clock.8=8 MHz
 atxy7.menu.clock.5=5 MHz
 atxy7.menu.clock.4=4 MHz
 atxy7.menu.clock.1=1 MHz
-atxy7.menu.clock.20.build.f_cpu=20000000L
-atxy7.menu.clock.16.build.f_cpu=16000000L
-atxy7.menu.clock.10.build.f_cpu=10000000L
-atxy7.menu.clock.8.build.f_cpu=8000000L
-atxy7.menu.clock.5.build.f_cpu=5000000L
-atxy7.menu.clock.4.build.f_cpu=4000000L
-atxy7.menu.clock.1.build.f_cpu=1000000L
+atxy7.menu.clock.20.build.speed=20
+atxy7.menu.clock.16.build.speed=16
+atxy7.menu.clock.10.build.speed=10
+atxy7.menu.clock.8.build.speed=8
+atxy7.menu.clock.5.build.speed=5
+atxy7.menu.clock.4.build.speed=4
+atxy7.menu.clock.1.build.speed=1
 atxy7.menu.clock.20.bootloader.OSCCFG=0x02
 atxy7.menu.clock.16.bootloader.OSCCFG=0x01
 atxy7.menu.clock.10.bootloader.OSCCFG=0x02
@@ -121,20 +128,20 @@ atxy7.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 atxy7.menu.millis.timerb1=TCB1 (3217,1617 only)
 atxy7.menu.millis.rtc=RTC (no micros)
 atxy7.menu.millis.rtcxtal=RTC w/w32khz xtal (no micros)
-atxy7.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
-atxy7.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
-atxy7.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
-atxy7.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
-atxy7.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
-atxy7.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
-atxy7.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
-atxy7.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
+atxy7.menu.millis.enabled.build.millistimer={build.defaultmillistimer}
+atxy7.menu.millis.disabled.build.millistimer=NONE
+atxy7.menu.millis.timera.build.millistimer=A0
+atxy7.menu.millis.timerd.build.millistimer=D0
+atxy7.menu.millis.timerb0.build.millistimer=B0
+atxy7.menu.millis.timerb1.build.millistimer=B1
+atxy7.menu.millis.rtc.build.millistimer=RTC
+atxy7.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 
 
 atxy7.menu.uartvoltage.5v=Closer to 5v
 atxy7.menu.uartvoltage.3v=Closer to 3v
-atxy7.menu.uartvoltage.5v.build.uartvoltage=
-atxy7.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
+atxy7.menu.uartvoltage.5v.build.uartvoltage=5V
+atxy7.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 atxy7.upload.tool=avrdude
@@ -143,7 +150,7 @@ atxy7.build.board=attinyxy7
 atxy7.build.core=arduino
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
+atxy7.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DUARTBAUD{build.uartvoltage}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
@@ -159,33 +166,41 @@ atxy7.bootloader.flashcommand=
 ##############################################################
 
 atxy6.name=ATtiny3216/1616/1606/816/806/416/406
+atxy6.upload.workaround=
+atxy6.build.defaultmillistimer=D0
+atxy6.build.mcu=attiny{build.attiny}
+atxy6.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+atxy6.build.f_cpu={build.speed}000000L
 
 atxy6.menu.chip.3216=ATtiny3216
-atxy6.menu.chip.3216.build.mcu=attiny3216
+atxy6.menu.chip.3216.build.attiny=3216
 atxy6.menu.chip.3216.upload.maximum_size=32768
 atxy6.menu.chip.3216.upload.maximum_data_size=2048
 atxy6.menu.chip.1616=ATtiny1616
-atxy6.menu.chip.1616.build.mcu=attiny1616
+atxy6.menu.chip.1616.build.attiny=1616
 atxy6.menu.chip.1616.upload.maximum_size=16384
 atxy6.menu.chip.1616.upload.maximum_data_size=2048
 atxy6.menu.chip.816=ATtiny816
-atxy6.menu.chip.816.build.mcu=attiny816
+atxy6.menu.chip.816.build.attiny=816
 atxy6.menu.chip.816.upload.maximum_size=8192
 atxy6.menu.chip.816.upload.maximum_data_size=512
 atxy6.menu.chip.416=ATtiny416
-atxy6.menu.chip.416.build.mcu=attiny416
+atxy6.menu.chip.416.build.attiny=416
 atxy6.menu.chip.416.upload.maximum_size=4096
 atxy6.menu.chip.416.upload.maximum_data_size=256
 atxy6.menu.chip.1606=ATtiny1606
-atxy6.menu.chip.1606.build.mcu=attiny1606
+atxy6.menu.chip.1606.build.attiny=1606
+atxy6.menu.chip.1606.build.defaultmillistimer=A0
 atxy6.menu.chip.1606.upload.maximum_size=16384
 atxy6.menu.chip.1606.upload.maximum_data_size=1024
 atxy6.menu.chip.806=ATtiny806
-atxy6.menu.chip.806.build.mcu=attiny806
+atxy6.menu.chip.806.build.attiny=806
+atxy6.menu.chip.806.build.defaultmillistimer=A0
 atxy6.menu.chip.806.upload.maximum_size=8192
 atxy6.menu.chip.806.upload.maximum_data_size=512
 atxy6.menu.chip.406=ATtiny406
-atxy6.menu.chip.406.build.mcu=attiny406
+atxy6.menu.chip.406.build.attiny=406
+atxy6.menu.chip.406.build.defaultmillistimer=A0
 atxy6.menu.chip.406.upload.maximum_size=4096
 atxy6.menu.chip.406.upload.maximum_data_size=256
 
@@ -196,13 +211,13 @@ atxy6.menu.clock.8=8 MHz
 atxy6.menu.clock.5=5 MHz
 atxy6.menu.clock.4=4 MHz
 atxy6.menu.clock.1=1 MHz
-atxy6.menu.clock.20.build.f_cpu=20000000L
-atxy6.menu.clock.16.build.f_cpu=16000000L
-atxy6.menu.clock.10.build.f_cpu=10000000L
-atxy6.menu.clock.8.build.f_cpu=8000000L
-atxy6.menu.clock.5.build.f_cpu=5000000L
-atxy6.menu.clock.4.build.f_cpu=4000000L
-atxy6.menu.clock.1.build.f_cpu=1000000L
+atxy6.menu.clock.20.build.speed=20
+atxy6.menu.clock.16.build.speed=16
+atxy6.menu.clock.10.build.speed=10
+atxy6.menu.clock.8.build.speed=8
+atxy6.menu.clock.5.build.speed=5
+atxy6.menu.clock.4.build.speed=4
+atxy6.menu.clock.1.build.speed=1
 atxy6.menu.clock.20.bootloader.OSCCFG=0x02
 atxy6.menu.clock.16.bootloader.OSCCFG=0x01
 atxy6.menu.clock.10.bootloader.OSCCFG=0x02
@@ -257,20 +272,20 @@ atxy6.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 atxy6.menu.millis.timerb1=TCB1 (3216,1616 only)
 atxy6.menu.millis.rtc=RTC (no micros)
 atxy6.menu.millis.rtcxtal=RTC w/w32khz xtal (no micros)
-atxy6.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
-atxy6.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
-atxy6.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
-atxy6.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
-atxy6.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
-atxy6.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
-atxy6.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
-atxy6.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
+atxy6.menu.millis.enabled.build.millistimer={build.defaultmillistimer}
+atxy6.menu.millis.disabled.build.millistimer=NONE
+atxy6.menu.millis.timera.build.millistimer=A0
+atxy6.menu.millis.timerd.build.millistimer=D0
+atxy6.menu.millis.timerb0.build.millistimer=B0
+atxy6.menu.millis.timerb1.build.millistimer=B1
+atxy6.menu.millis.rtc.build.millistimer=RTC
+atxy6.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 
 
 atxy6.menu.uartvoltage.5v=Closer to 5v
 atxy6.menu.uartvoltage.3v=Closer to 3v
-atxy6.menu.uartvoltage.5v.build.uartvoltage=
-atxy6.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
+atxy6.menu.uartvoltage.5v.build.uartvoltage=5V
+atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
 
 atxy6.upload.tool=avrdude
 
@@ -278,7 +293,7 @@ atxy6.build.board=attinyxy6
 atxy6.build.core=arduino
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
-atxy6.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
+atxy6.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DUARTBAUD{build.uartvoltage}
 atxy6.build.export_merged_output=false
 
 atxy6.bootloader.tool=avrdude
@@ -289,44 +304,52 @@ atxy6.bootloader.SYSCFG1=0x03
 atxy6.bootloader.APPEND=0x00
 atxy6.bootloader.BOOTEND=0x00
 
-atxy6.upload.workaround=
 
 atxy6.bootloader.flashcommand=
 
 ##############################################################
 
 atxy4.name=ATtiny1614/1604/814/804/414/404/214/204
+atxy4.upload.workaround=
+atxy4.build.defaultmillistimer=D0
+atxy4.build.mcu=attiny{build.attiny}
+atxy4.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+atxy4.build.f_cpu={build.speed}000000L
 
 atxy4.menu.chip.1614=ATtiny1614
-atxy4.menu.chip.1614.build.mcu=attiny1614
+atxy4.menu.chip.1614.build.attiny=1614
 atxy4.menu.chip.1614.upload.maximum_size=16384
 atxy4.menu.chip.1614.upload.maximum_data_size=2048
 atxy4.menu.chip.814=ATtiny814
-atxy4.menu.chip.814.build.mcu=attiny814
+atxy4.menu.chip.814.build.attiny=814
 atxy4.menu.chip.814.upload.maximum_size=8192
 atxy4.menu.chip.814.upload.maximum_data_size=512
 atxy4.menu.chip.414=ATtiny414
-atxy4.menu.chip.414.build.mcu=attiny414
+atxy4.menu.chip.414.build.attiny=414
 atxy4.menu.chip.414.upload.maximum_size=4096
 atxy4.menu.chip.414.upload.maximum_data_size=256
 atxy4.menu.chip.214=ATtiny214
-atxy4.menu.chip.214.build.mcu=attiny214
+atxy4.menu.chip.214.build.attiny=214
 atxy4.menu.chip.214.upload.maximum_size=2048
 atxy4.menu.chip.214.upload.maximum_data_size=128
 atxy4.menu.chip.1604=ATtiny1604
-atxy4.menu.chip.1604.build.mcu=attiny1604
+atxy4.menu.chip.1604.build.attiny=1604
+atxy4.menu.chip.1604.build.defaultmillistimer=A0
 atxy4.menu.chip.1604.upload.maximum_size=16384
 atxy4.menu.chip.1604.upload.maximum_data_size=1024
 atxy4.menu.chip.804=ATtiny804
-atxy4.menu.chip.804.build.mcu=attiny804
+atxy4.menu.chip.804.build.attiny=804
+atxy4.menu.chip.804.build.defaultmillistimer=A0
 atxy4.menu.chip.804.upload.maximum_size=8192
 atxy4.menu.chip.804.upload.maximum_data_size=512
 atxy4.menu.chip.404=ATtiny404
-atxy4.menu.chip.404.build.mcu=attiny404
+atxy4.menu.chip.404.build.attiny=404
+atxy4.menu.chip.404.build.defaultmillistimer=A0
 atxy4.menu.chip.404.upload.maximum_size=4096
 atxy4.menu.chip.404.upload.maximum_data_size=256
 atxy4.menu.chip.204=ATtiny204
-atxy4.menu.chip.204.build.mcu=attiny204
+atxy4.menu.chip.204.build.attiny=204
+atxy4.menu.chip.204.build.defaultmillistimer=A0
 atxy4.menu.chip.204.upload.maximum_size=2048
 atxy4.menu.chip.204.upload.maximum_data_size=128
 
@@ -337,13 +360,13 @@ atxy4.menu.clock.8=8 MHz
 atxy4.menu.clock.5=5 MHz
 atxy4.menu.clock.4=4 MHz
 atxy4.menu.clock.1=1 MHz
-atxy4.menu.clock.20.build.f_cpu=20000000L
-atxy4.menu.clock.16.build.f_cpu=16000000L
-atxy4.menu.clock.10.build.f_cpu=10000000L
-atxy4.menu.clock.8.build.f_cpu=8000000L
-atxy4.menu.clock.5.build.f_cpu=5000000L
-atxy4.menu.clock.4.build.f_cpu=4000000L
-atxy4.menu.clock.1.build.f_cpu=1000000L
+atxy4.menu.clock.20.build.speed=20
+atxy4.menu.clock.16.build.speed=16
+atxy4.menu.clock.10.build.speed=10
+atxy4.menu.clock.8.build.speed=8
+atxy4.menu.clock.5.build.speed=5
+atxy4.menu.clock.4.build.speed=4
+atxy4.menu.clock.1.build.speed=1
 atxy4.menu.clock.20.bootloader.OSCCFG=0x02
 atxy4.menu.clock.16.bootloader.OSCCFG=0x01
 atxy4.menu.clock.10.bootloader.OSCCFG=0x02
@@ -397,20 +420,20 @@ atxy4.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 atxy4.menu.millis.timerb1=TCB1 (1614 only)
 atxy4.menu.millis.rtc=RTC (no micros)
 atxy4.menu.millis.rtcxtal=RTC w/w32khz xtal (no micros)
-atxy4.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
-atxy4.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
-atxy4.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
-atxy4.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
-atxy4.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
-atxy4.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
-atxy4.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
-atxy4.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
+atxy4.menu.millis.enabled.build.millistimer={build.defaultmillistimer}
+atxy4.menu.millis.disabled.build.millistimer=NONE
+atxy4.menu.millis.timera.build.millistimer=A0
+atxy4.menu.millis.timerd.build.millistimer=D0
+atxy4.menu.millis.timerb0.build.millistimer=B0
+atxy4.menu.millis.timerb1.build.millistimer=B1
+atxy4.menu.millis.rtc.build.millistimer=RTC
+atxy4.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 
 
 atxy4.menu.uartvoltage.5v=Closer to 5v
 atxy4.menu.uartvoltage.3v=Closer to 3v
-atxy4.menu.uartvoltage.5v.build.uartvoltage=
-atxy4.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
+atxy4.menu.uartvoltage.5v.build.uartvoltage=5V
+atxy4.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 atxy4.upload.tool=avrdude
@@ -419,7 +442,7 @@ atxy4.build.board=attinyxy4
 atxy4.build.core=arduino
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
-atxy4.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.uartvoltage}
+atxy4.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUARTBAUD{build.uartvoltage}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.tool=avrdude
@@ -430,50 +453,52 @@ atxy4.bootloader.SYSCFG1=0x03
 atxy4.bootloader.APPEND=0x00
 atxy4.bootloader.BOOTEND=0x00
 
-atxy4.upload.workaround=
 atxy4.bootloader.flashcommand=
 
 
 ##############################################################
 
 atxy2.name=ATtiny412/402/212/202
+atxy2.upload.workaround=
+atxy2.build.defaultmillistimer=D0
+atxy2.build.mcu=attiny{build.attiny}
+atxy2.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+atxy2.build.f_cpu={build.speed}000000L
 
 #Come on Microchip, give us an 't812!
 #atxy2.menu.chip.812=ATtiny812
-#atxy2.menu.chip.812.build.mcu=attiny812
+#atxy2.menu.chip.812.build.attiny=812
 #atxy2.menu.chip.812.upload.maximum_size=8192
 #atxy2.menu.chip.812.upload.maximum_data_size=512
-#atxy2.menu.chip.812.upload.workaround=
 atxy2.menu.chip.412=ATtiny412
-atxy2.menu.chip.412.build.mcu=attiny412
+atxy2.menu.chip.412.build.attiny=412
 atxy2.menu.chip.412.upload.maximum_size=4096
 atxy2.menu.chip.412.upload.maximum_data_size=256
-atxy2.menu.chip.412.upload.workaround=
 atxy2.menu.chip.212=ATtiny212
-atxy2.menu.chip.212.build.mcu=attiny212
+atxy2.menu.chip.212.build.attiny=212
 atxy2.menu.chip.212.upload.maximum_size=2048
 atxy2.menu.chip.212.upload.maximum_data_size=128
-atxy2.menu.chip.212.upload.workaround=
 #atxy2.menu.chip.802=ATtiny802
-#atxy2.menu.chip.802.build.mcu=attiny802
+#atxy2.menu.chip.802.build.attiny=802
+#atxy2.menu.chip.802.build.defaultmillistimer=A0
 #atxy2.menu.chip.802.upload.maximum_size=8192
 #atxy2.menu.chip.802.upload.maximum_data_size=512
-#atxy2.menu.chip.802.upload.workaround=
 atxy2.menu.chip.402=ATtiny402
-atxy2.menu.chip.402.build.mcu=attiny402
+atxy2.menu.chip.402.build.attiny=402
+atxy2.menu.chip.402.build.defaultmillistimer=A0
 atxy2.menu.chip.402.upload.maximum_size=4096
 atxy2.menu.chip.402.upload.maximum_data_size=256
-atxy2.menu.chip.402.upload.workaround=
 atxy2.menu.chip.402w=ATtiny402 (bad signature)
-atxy2.menu.chip.402w.build.mcu=attiny402w
+atxy2.menu.chip.402w.build.attiny=402
+atxy2.menu.chip.402w.build.defaultmillistimer=A0
 atxy2.menu.chip.402w.upload.maximum_size=4096
 atxy2.menu.chip.402w.upload.maximum_data_size=256
 atxy2.menu.chip.402w.upload.workaround=w
 atxy2.menu.chip.202=ATtiny202
-atxy2.menu.chip.202.build.mcu=attiny202
+atxy2.menu.chip.202.build.attiny=202
+atxy2.menu.chip.202.build.defaultmillistimer=A0
 atxy2.menu.chip.202.upload.maximum_size=2048
 atxy2.menu.chip.202.upload.maximum_data_size=128
-atxy2.menu.chip.202.upload.workaround=
 
 atxy2.menu.clock.20=20 MHz
 atxy2.menu.clock.16=16 MHz
@@ -482,13 +507,13 @@ atxy2.menu.clock.8=8 MHz
 atxy2.menu.clock.5=5 MHz
 atxy2.menu.clock.4=4 MHz
 atxy2.menu.clock.1=1 MHz
-atxy2.menu.clock.20.build.f_cpu=20000000L
-atxy2.menu.clock.16.build.f_cpu=16000000L
-atxy2.menu.clock.10.build.f_cpu=10000000L
-atxy2.menu.clock.8.build.f_cpu=8000000L
-atxy2.menu.clock.5.build.f_cpu=5000000L
-atxy2.menu.clock.4.build.f_cpu=4000000L
-atxy2.menu.clock.1.build.f_cpu=1000000L
+atxy2.menu.clock.20.build.speed=20
+atxy2.menu.clock.16.build.speed=16
+atxy2.menu.clock.10.build.speed=10
+atxy2.menu.clock.8.build.speed=8
+atxy2.menu.clock.5.build.speed=5
+atxy2.menu.clock.4.build.speed=4
+atxy2.menu.clock.1.build.speed=1
 atxy2.menu.clock.20.bootloader.OSCCFG=0x02
 atxy2.menu.clock.16.bootloader.OSCCFG=0x01
 atxy2.menu.clock.10.bootloader.OSCCFG=0x02
@@ -540,12 +565,12 @@ atxy2.menu.millis.timera=TCA0 (default on 402/202)
 atxy2.menu.millis.timerd=TCD0 (412/212 only, default there)
 atxy2.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 atxy2.menu.millis.rtc=RTC (no micros)
-atxy2.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
-atxy2.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
-atxy2.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
-atxy2.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
-atxy2.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
-atxy2.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
+atxy2.menu.millis.enabled.build.millistimer={build.defaultmillistimer}
+atxy2.menu.millis.disabled.build.millistimer=NONE
+atxy2.menu.millis.timera.build.millistimer=A0
+atxy2.menu.millis.timerd.build.millistimer=D0
+atxy2.menu.millis.timerb0.build.millistimer=B0
+atxy2.menu.millis.rtc.build.millistimer=RTC
 
 atxy2.upload.tool=avrdude
 
@@ -555,15 +580,15 @@ atxy2.bootloader.tool=avrdude
 
 atxy2.menu.uartvoltage.5v=Closer to 5v
 atxy2.menu.uartvoltage.3v=Closer to 3v
-atxy2.menu.uartvoltage.5v.build.uartvoltage=
-atxy2.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
+atxy2.menu.uartvoltage.5v.build.uartvoltage=5V
+atxy2.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 atxy2.build.board=attinyxy2
 atxy2.build.core=arduino
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
-atxy2.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DNEOPIXELPORT=VPORTA.OUT {build.uartvoltage}
+atxy2.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DNEOPIXELPORT=VPORTA.OUT -DUARTBAUD{build.uartvoltage}
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
@@ -579,15 +604,22 @@ atxy2.bootloader.BOOTEND=0x00
 # Xplained boards with Tiny-1 chips
 
 Xplained416.name=Attiny416 Xplained Nano (optiboot)
-Xplained416.build.mcu=attiny416
+Xplained416.upload.workaround=
+Xplained416.build.defaultmillistimer=D0
+Xplained416.build.bootload=opti
+Xplained416.build.mcu=attiny{build.attiny}
+Xplained416.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+Xplained416.build.f_cpu={build.speed}000000L
+
+
+Xplained416.build.attiny=416
 Xplained416.build.board=attinyxy6
 Xplained416.build.core=arduino
 Xplained416.build.variant=txy6
-Xplained416.build.f_cpu=20000000
+Xplained416.build.speed=20
 Xplained416.build.text_section_start=.text=0x200
-Xplained416.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
+Xplained416.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DUARTBAUD{build.uartvoltage}
 Xplained416.upload.tool=avrdude
-Xplained416.upload.workaround=
 Xplained416.upload.speed=57600
 Xplained416.upload.maximum_size=3584
 Xplained416.upload.maximum_data_size=256
@@ -607,42 +639,45 @@ Xplained416.bootloader.APPEND=0x00
 
 
 
-Xplained416.menu.millis.enabled=Enabled
-Xplained416.menu.millis.disabled=Disabled (saves flash)
-Xplained416.menu.millis.enabled.build.millis=
-Xplained416.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
 Xplained416.menu.millis.enabled=Enabled (default timer)
 Xplained416.menu.millis.disabled=Disabled (saves flash)
 Xplained416.menu.millis.timera=TCA0
 Xplained416.menu.millis.timerd=TCD0 (default)
 Xplained416.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
-Xplained416.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0
+Xplained416.menu.millis.enabled.build.millistimer=D0
 Xplained416.menu.millis.rtc=RTC (no micros)
 Xplained416.menu.millis.rtcxtal=RTC w/w32khz xtal (no micros)
-Xplained416.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
-Xplained416.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
-Xplained416.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
-Xplained416.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
-Xplained416.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
-Xplained416.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
+Xplained416.menu.millis.disabled.build.millistimer=NONE
+Xplained416.menu.millis.timera.build.millistimer=A0
+Xplained416.menu.millis.timerd.build.millistimer=D0
+Xplained416.menu.millis.timerb0.build.millistimer=B0
+Xplained416.menu.millis.rtc.build.millistimer=RTC
+Xplained416.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 
 Xplained416.menu.uartvoltage.5v=Closer to 5v
 Xplained416.menu.uartvoltage.3v=Closer to 3v
-Xplained416.menu.uartvoltage.5v.build.uartvoltage=
-Xplained416.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
+Xplained416.menu.uartvoltage.5v.build.uartvoltage=5V
+Xplained416.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 
 Xplained817.name=Attiny817 Xplained Mini (optiboot)
-Xplained817.build.mcu=attiny817
+Xplained817.upload.workaround=
+Xplained817.build.defaultmillistimer=D0
+Xplained817.build.bootload=opti
+Xplained817.build.mcu=attiny{build.attiny}
+Xplained817.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+Xplained817.build.f_cpu={build.speed}000000L
+
+
+Xplained817.build.attiny=817
 Xplained817.build.board=attinyxy7
 Xplained817.build.core=arduino
 Xplained817.build.variant=txy7
-Xplained817.build.f_cpu=20000000
+Xplained817.build.speed=20
 Xplained817.build.text_section_start=.text=0x200
-Xplained817.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
+Xplained817.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DUARTBAUD{build.uartvoltage}
 Xplained817.upload.tool=avrdude
-Xplained817.upload.workaround=
 Xplained817.upload.speed=57600
 Xplained817.upload.maximum_size=7680
 Xplained817.upload.maximum_data_size=512
@@ -661,10 +696,6 @@ Xplained817.bootloader.SYSCFG1=0x03
 Xplained817.bootloader.APPEND=0x00
 
 
-Xplained817.menu.millis.enabled=Enabled
-Xplained817.menu.millis.disabled=Disabled (saves flash)
-Xplained817.menu.millis.enabled.build.millis=
-Xplained817.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
 
 Xplained817.menu.millis.enabled=Enabled (default timer)
 Xplained817.menu.millis.disabled=Disabled (saves flash)
@@ -673,48 +704,58 @@ Xplained817.menu.millis.timerd=TCD0 (default)
 Xplained817.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 Xplained817.menu.millis.rtc=RTC (no micros)
 Xplained817.menu.millis.rtcxtal=RTC w/w32khz xtal (no micros)
-Xplained817.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0
-Xplained817.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
-Xplained817.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
-Xplained817.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
-Xplained817.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
-Xplained817.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
-Xplained817.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
+Xplained817.menu.millis.enabled.build.millistimer=D0
+Xplained817.menu.millis.disabled.build.millistimer=NONE
+Xplained817.menu.millis.timera.build.millistimer=A0
+Xplained817.menu.millis.timerd.build.millistimer=D0
+Xplained817.menu.millis.timerb0.build.millistimer=B0
+Xplained817.menu.millis.rtc.build.millistimer=RTC
+Xplained817.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 
 
 Xplained817.menu.uartvoltage.5v=Closer to 5v
 Xplained817.menu.uartvoltage.3v=Closer to 3v
-Xplained817.menu.uartvoltage.5v.build.uartvoltage=
-Xplained817.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
+Xplained817.menu.uartvoltage.5v.build.uartvoltage=5V
+Xplained817.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 # Separate board types for chips with Optiboot.  Reduces menu clutter.
 
 atxy7o.name=ATtiny3217/1617/1607/817/807/417 (Optiboot)
+atxy7o.upload.workaround=
+atxy7o.build.defaultmillistimer=D0
+atxy7o.build.bootload=opti
+atxy7o.build.mcu=attiny{build.attiny}
+atxy7o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+atxy7o.build.f_cpu={build.speed}000000L
 atxy7o.upload.speed=115200
 
+
+
 atxy7o.menu.chip.3217=ATtiny3217
-atxy7o.menu.chip.3217.build.mcu=attiny3217
+atxy7o.menu.chip.3217.build.attiny=3217
 atxy7o.menu.chip.3217.upload.maximum_size=32256
 atxy7o.menu.chip.3217.upload.maximum_data_size=2048
 atxy7o.menu.chip.1617=ATtiny1617
-atxy7o.menu.chip.1617.build.mcu=attiny1617
+atxy7o.menu.chip.1617.build.attiny=1617
 atxy7o.menu.chip.1617.upload.maximum_size=15872
 atxy7o.menu.chip.1617.upload.maximum_data_size=2048
 atxy7o.menu.chip.817=ATtiny817
-atxy7o.menu.chip.817.build.mcu=attiny817
+atxy7o.menu.chip.817.build.attiny=817
 atxy7o.menu.chip.817.upload.maximum_size=7680
 atxy7o.menu.chip.817.upload.maximum_data_size=512
 atxy7o.menu.chip.417=ATtiny417
-atxy7o.menu.chip.417.build.mcu=attiny417
+atxy7o.menu.chip.417.build.attiny=417
 atxy7o.menu.chip.417.upload.maximum_size=3584
 atxy7o.menu.chip.417.upload.maximum_data_size=256
 atxy7o.menu.chip.1607=ATtiny1607
-atxy7o.menu.chip.1607.build.mcu=attiny1607
+atxy7o.menu.chip.1607.build.attiny=1607
+atxy7o.menu.chip.1607.build.defaultmillistimer=A0
 atxy7o.menu.chip.1607.upload.maximum_size=15872
 atxy7o.menu.chip.1607.upload.maximum_data_size=1024
 atxy7o.menu.chip.807=ATtiny807
-atxy7o.menu.chip.807.build.mcu=attiny807
+atxy7o.menu.chip.807.build.attiny=807
+atxy7o.menu.chip.807.build.defaultmillistimer=A0
 atxy7o.menu.chip.807.upload.maximum_size=7680
 atxy7o.menu.chip.807.upload.maximum_data_size=512
 
@@ -725,13 +766,13 @@ atxy7o.menu.clock.8=8 MHz
 atxy7o.menu.clock.5=5 MHz
 atxy7o.menu.clock.4=4 MHz
 atxy7o.menu.clock.1=1 MHz
-atxy7o.menu.clock.20.build.f_cpu=20000000L
-atxy7o.menu.clock.16.build.f_cpu=16000000L
-atxy7o.menu.clock.10.build.f_cpu=10000000L
-atxy7o.menu.clock.8.build.f_cpu=8000000L
-atxy7o.menu.clock.5.build.f_cpu=5000000L
-atxy7o.menu.clock.4.build.f_cpu=4000000L
-atxy7o.menu.clock.1.build.f_cpu=1000000L
+atxy7o.menu.clock.20.build.speed=20
+atxy7o.menu.clock.16.build.speed=16
+atxy7o.menu.clock.10.build.speed=10
+atxy7o.menu.clock.8.build.speed=8
+atxy7o.menu.clock.5.build.speed=5
+atxy7o.menu.clock.4.build.speed=4
+atxy7o.menu.clock.1.build.speed=1
 atxy7o.menu.clock.20.bootloader.OSCCFG=0x02
 atxy7o.menu.clock.16.bootloader.OSCCFG=0x01
 atxy7o.menu.clock.10.bootloader.OSCCFG=0x02
@@ -780,14 +821,14 @@ atxy7o.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 atxy7o.menu.millis.timerb1=TCB1 (3217,1617 only)
 atxy7o.menu.millis.rtc=RTC (no micros)
 atxy7o.menu.millis.rtcxtal=RTC w/w32khz xtal (no micros)
-atxy7o.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
-atxy7o.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
-atxy7o.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
-atxy7o.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
-atxy7o.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
-atxy7o.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
-atxy7o.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
-atxy7o.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
+atxy7o.menu.millis.enabled.build.millistimer={build.defaultmillistimer}
+atxy7o.menu.millis.disabled.build.millistimer=NONE
+atxy7o.menu.millis.timera.build.millistimer=A0
+atxy7o.menu.millis.timerd.build.millistimer=D0
+atxy7o.menu.millis.timerb0.build.millistimer=B0
+atxy7o.menu.millis.timerb1.build.millistimer=B1
+atxy7o.menu.millis.rtc.build.millistimer=RTC
+atxy7o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 
 
 atxy7o.menu.resetpin.UPDI=UPDI (powercycle to enter bootloader)
@@ -802,8 +843,8 @@ atxy7o.menu.resetpin.gpio.bootloader.resetpinbits=00
 
 atxy7o.menu.uartvoltage.5v=Closer to 5v
 atxy7o.menu.uartvoltage.3v=Closer to 3v
-atxy7o.menu.uartvoltage.5v.build.uartvoltage=
-atxy7o.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
+atxy7o.menu.uartvoltage.5v.build.uartvoltage=5V
+atxy7o.menu.uartvoltage.3v.build.uartvoltage=3V
 
 atxy7o.menu.bootloaderuart.default=TX:9, RX:8
 atxy7o.menu.bootloaderuart.alternate=TX:18, RX:19
@@ -815,7 +856,7 @@ atxy7o.upload.tool=avrdude
 atxy7o.build.board=attinyxy7
 atxy7o.build.core=arduino
 atxy7o.build.variant=txy7
-atxy7o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
+atxy7o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DUARTBAUD{build.uartvoltage}
 atxy7o.build.export_merged_output=true
 
 atxy7o.bootloader.WDTCFG=0x00
@@ -830,7 +871,6 @@ atxy7o.bootloader.BOOTEND=0x02
 
 atxy7o.upload.protocol=arduino
 atxy7o.upload.extra_params=-D
-atxy7o.upload.workaround=
 atxy7o.build.text_section_start=.text=0x200
 atxy7o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
 atxy7o.bootloader.tool=avrdude
@@ -838,35 +878,46 @@ atxy7o.bootloader.tool=avrdude
 ##############################################################
 
 atxy6o.name=ATtiny3216/1616/1606/816/806/416/406 (optiboot)
+atxy6o.upload.workaround=
+atxy6o.build.defaultmillistimer=D0
+atxy6o.build.bootload=opti
+atxy6o.build.mcu=attiny{build.attiny}
+atxy6o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+atxy6o.build.f_cpu={build.speed}000000L
 atxy6o.upload.speed=115200
 
+
+
 atxy6o.menu.chip.3216=ATtiny3216
-atxy6o.menu.chip.3216.build.mcu=attiny3216
+atxy6o.menu.chip.3216.build.attiny=3216
 atxy6o.menu.chip.3216.upload.maximum_size=32768
 atxy6o.menu.chip.3216.upload.maximum_data_size=2048
 atxy6o.menu.chip.1616=ATtiny1616
-atxy6o.menu.chip.1616.build.mcu=attiny1616
+atxy6o.menu.chip.1616.build.attiny=1616
 atxy6o.menu.chip.1616.upload.maximum_size=16384
 atxy6o.menu.chip.1616.upload.maximum_data_size=2048
 atxy6o.menu.chip.816=ATtiny816
-atxy6o.menu.chip.816.build.mcu=attiny816
+atxy6o.menu.chip.816.build.attiny=816
 atxy6o.menu.chip.816.upload.maximum_size=8192
 atxy6o.menu.chip.816.upload.maximum_data_size=512
 atxy6o.menu.chip.416=ATtiny416
-atxy6o.menu.chip.416.build.mcu=attiny416
+atxy6o.menu.chip.416.build.attiny=416
 atxy6o.menu.chip.416.upload.maximum_size=4096
 atxy6o.menu.chip.416.upload.maximum_data_size=256
 
 atxy6o.menu.chip.1606=ATtiny1606
-atxy6o.menu.chip.1606.build.mcu=attiny1606
+atxy6o.menu.chip.1606.build.attiny=1606
+atxy6o.menu.chip.1606.build.defaultmillistimer=A0
 atxy6o.menu.chip.1606.upload.maximum_size=16384
 atxy6o.menu.chip.1606.upload.maximum_data_size=1024
 atxy6o.menu.chip.806=ATtiny806
-atxy6o.menu.chip.806.build.mcu=attiny806
+atxy6o.menu.chip.806.build.attiny=806
+atxy6o.menu.chip.806.build.defaultmillistimer=A0
 atxy6o.menu.chip.806.upload.maximum_size=8192
 atxy6o.menu.chip.806.upload.maximum_data_size=512
 atxy6o.menu.chip.406=ATtiny406
-atxy6o.menu.chip.406.build.mcu=attiny406
+atxy6o.menu.chip.406.build.attiny=406
+atxy6o.menu.chip.406.build.defaultmillistimer=A0
 atxy6o.menu.chip.406.upload.maximum_size=4096
 atxy6o.menu.chip.406.upload.maximum_data_size=256
 
@@ -877,13 +928,13 @@ atxy6o.menu.clock.8=8 MHz
 atxy6o.menu.clock.5=5 MHz
 atxy6o.menu.clock.4=4 MHz
 atxy6o.menu.clock.1=1 MHz
-atxy6o.menu.clock.20.build.f_cpu=20000000L
-atxy6o.menu.clock.16.build.f_cpu=16000000L
-atxy6o.menu.clock.10.build.f_cpu=10000000L
-atxy6o.menu.clock.8.build.f_cpu=8000000L
-atxy6o.menu.clock.5.build.f_cpu=5000000L
-atxy6o.menu.clock.4.build.f_cpu=4000000L
-atxy6o.menu.clock.1.build.f_cpu=1000000L
+atxy6o.menu.clock.20.build.speed=20
+atxy6o.menu.clock.16.build.speed=16
+atxy6o.menu.clock.10.build.speed=10
+atxy6o.menu.clock.8.build.speed=8
+atxy6o.menu.clock.5.build.speed=5
+atxy6o.menu.clock.4.build.speed=4
+atxy6o.menu.clock.1.build.speed=1
 atxy6o.menu.clock.20.bootloader.OSCCFG=0x02
 atxy6o.menu.clock.16.bootloader.OSCCFG=0x01
 atxy6o.menu.clock.10.bootloader.OSCCFG=0x02
@@ -901,14 +952,14 @@ atxy6o.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 atxy6o.menu.millis.timerb1=TCB1 (3216,1616 only)
 atxy6o.menu.millis.rtc=RTC (no micros)
 atxy6o.menu.millis.rtcxtal=RTC w/w32khz xtal (no micros)
-atxy6o.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
-atxy6o.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
-atxy6o.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
-atxy6o.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
-atxy6o.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
-atxy6o.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
-atxy6o.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
-atxy6o.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
+atxy6o.menu.millis.enabled.build.millistimer={build.defaultmillistimer}
+atxy6o.menu.millis.disabled.build.millistimer=NONE
+atxy6o.menu.millis.timera.build.millistimer=A0
+atxy6o.menu.millis.timerd.build.millistimer=D0
+atxy6o.menu.millis.timerb0.build.millistimer=B0
+atxy6o.menu.millis.timerb1.build.millistimer=B1
+atxy6o.menu.millis.rtc.build.millistimer=RTC
+atxy6o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 
 
 atxy6o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
@@ -944,17 +995,16 @@ atxy6o.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
 atxy6o.menu.uartvoltage.5v=Closer to 5v
 atxy6o.menu.uartvoltage.3v=Closer to 3v
-atxy6o.menu.uartvoltage.5v.build.uartvoltage=
-atxy6o.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
+atxy6o.menu.uartvoltage.5v.build.uartvoltage=5V
+atxy6o.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 atxy6o.build.board=attinyxy6
 atxy6o.build.core=arduino
 atxy6o.build.variant=txy6
-atxy6o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM {build.uartvoltage}
+atxy6o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUSE_TIMERD0_PWM -DUARTBAUD{build.uartvoltage}
 atxy6o.build.export_merged_output=true
 
-atxy6o.upload.workaround=
 
 atxy6o.menu.resetpin.UPDI=UPDI (powercycle to enter bootloader)
 atxy6o.menu.resetpin.UPDI.bootloader.file=optiboot_x/optiboot_txy6{bootloader.uartswap}.hex
@@ -993,38 +1043,50 @@ atxy6o.bootloader.tool=avrdude
 ##############################################################
 
 atxy4o.name=ATtiny1614/1604/814/804/414/404/214/204 (optiboot)
+atxy4o.upload.workaround=
+atxy4o.build.defaultmillistimer=D0
+atxy4o.build.bootload=opti
+atxy4o.build.mcu=attiny{build.attiny}
+atxy4o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+atxy4o.build.f_cpu={build.speed}000000L
 atxy4o.upload.speed=115200
 
+
+
 atxy4o.menu.chip.1614=ATtiny1614
-atxy4o.menu.chip.1614.build.mcu=attiny1614
+atxy4o.menu.chip.1614.build.attiny=1614
 atxy4o.menu.chip.1614.upload.maximum_size=16384
 atxy4o.menu.chip.1614.upload.maximum_data_size=2048
 atxy4o.menu.chip.814=ATtiny814
-atxy4o.menu.chip.814.build.mcu=attiny814
+atxy4o.menu.chip.814.build.attiny=814
 atxy4o.menu.chip.814.upload.maximum_size=8192
 atxy4o.menu.chip.814.upload.maximum_data_size=512
 atxy4o.menu.chip.414=ATtiny414
-atxy4o.menu.chip.414.build.mcu=attiny414
+atxy4o.menu.chip.414.build.attiny=414
 atxy4o.menu.chip.414.upload.maximum_size=4096
 atxy4o.menu.chip.414.upload.maximum_data_size=256
 atxy4o.menu.chip.214=ATtiny214
-atxy4o.menu.chip.214.build.mcu=attiny214
+atxy4o.menu.chip.214.build.attiny=214
 atxy4o.menu.chip.214.upload.maximum_size=2048
 atxy4o.menu.chip.214.upload.maximum_data_size=128
 atxy4o.menu.chip.1604=ATtiny1604
-atxy4o.menu.chip.1604.build.mcu=attiny1604
+atxy4o.menu.chip.1604.build.attiny=1604
+atxy4o.menu.chip.1604.build.defaultmillistimer=A0
 atxy4o.menu.chip.1604.upload.maximum_size=16384
 atxy4o.menu.chip.1604.upload.maximum_data_size=1024
 atxy4o.menu.chip.804=ATtiny804
-atxy4o.menu.chip.804.build.mcu=attiny804
+atxy4o.menu.chip.804.build.attiny=804
+atxy4o.menu.chip.804.build.defaultmillistimer=A0
 atxy4o.menu.chip.804.upload.maximum_size=8192
 atxy4o.menu.chip.804.upload.maximum_data_size=512
 atxy4o.menu.chip.404=ATtiny404
-atxy4o.menu.chip.404.build.mcu=attiny404
+atxy4o.menu.chip.404.build.attiny=404
+atxy4o.menu.chip.404.build.defaultmillistimer=A0
 atxy4o.menu.chip.404.upload.maximum_size=4096
 atxy4o.menu.chip.404.upload.maximum_data_size=256
 atxy4o.menu.chip.204=ATtiny204
-atxy4o.menu.chip.204.build.mcu=attiny204
+atxy4o.menu.chip.204.build.attiny=204
+atxy4o.menu.chip.204.build.defaultmillistimer=A0
 atxy4o.menu.chip.204.upload.maximum_size=2048
 atxy4o.menu.chip.204.upload.maximum_data_size=128
 
@@ -1035,13 +1097,13 @@ atxy4o.menu.clock.8=8 MHz
 atxy4o.menu.clock.5=5 MHz
 atxy4o.menu.clock.4=4 MHz
 atxy4o.menu.clock.1=1 MHz
-atxy4o.menu.clock.20.build.f_cpu=20000000L
-atxy4o.menu.clock.16.build.f_cpu=16000000L
-atxy4o.menu.clock.10.build.f_cpu=10000000L
-atxy4o.menu.clock.8.build.f_cpu=8000000L
-atxy4o.menu.clock.5.build.f_cpu=5000000L
-atxy4o.menu.clock.4.build.f_cpu=4000000L
-atxy4o.menu.clock.1.build.f_cpu=1000000L
+atxy4o.menu.clock.20.build.speed=20
+atxy4o.menu.clock.16.build.speed=16
+atxy4o.menu.clock.10.build.speed=10
+atxy4o.menu.clock.8.build.speed=8
+atxy4o.menu.clock.5.build.speed=5
+atxy4o.menu.clock.4.build.speed=4
+atxy4o.menu.clock.1.build.speed=1
 atxy4o.menu.clock.20.bootloader.OSCCFG=0x02
 atxy4o.menu.clock.16.bootloader.OSCCFG=0x01
 atxy4o.menu.clock.10.bootloader.OSCCFG=0x02
@@ -1059,14 +1121,14 @@ atxy4o.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 atxy4o.menu.millis.timerb1=TCB1 (1614 only)
 atxy4o.menu.millis.rtc=RTC (no micros)
 atxy4o.menu.millis.rtcxtal=RTC w/w32khz xtal (no micros)
-atxy4o.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
-atxy4o.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
-atxy4o.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
-atxy4o.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
-atxy4o.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
-atxy4o.menu.millis.timerb1.build.millis=-DMILLIS_USE_TIMERB1
-atxy4o.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
-atxy4o.menu.millis.rtcxtal.build.millis=-DMILLIS_USE_TIMERRTC_XTAL
+atxy4o.menu.millis.enabled.build.millistimer={build.defaultmillistimer}
+atxy4o.menu.millis.disabled.build.millistimer=NONE
+atxy4o.menu.millis.timera.build.millistimer=A0
+atxy4o.menu.millis.timerd.build.millistimer=D0
+atxy4o.menu.millis.timerb0.build.millistimer=B0
+atxy4o.menu.millis.timerb1.build.millistimer=B1
+atxy4o.menu.millis.rtc.build.millistimer=RTC
+atxy4o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 
 
 atxy4o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
@@ -1102,8 +1164,8 @@ atxy4o.menu.bodmodesleep.sampled.bootloader.bodsleepbits=10
 
 atxy4o.menu.uartvoltage.5v=Closer to 5v
 atxy4o.menu.uartvoltage.3v=Closer to 3v
-atxy4o.menu.uartvoltage.5v.build.uartvoltage=
-atxy4o.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
+atxy4o.menu.uartvoltage.5v.build.uartvoltage=5V
+atxy4o.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 
@@ -1112,9 +1174,8 @@ atxy4o.upload.tool=avrdude
 atxy4o.build.board=attinyxy4
 atxy4o.build.core=arduino
 atxy4o.build.variant=txy4
-atxy4o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP {build.uartvoltage}
+atxy4o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DUARTBAUD{build.uartvoltage}
 atxy4o.build.export_merged_output=true
-atxy4o.upload.workaround=
 atxy4o.upload.protocol=arduino
 atxy4o.upload.extra_params=-D
 atxy4o.build.text_section_start=.text=0x200
@@ -1150,43 +1211,49 @@ atxy4o.menu.resetpin.gpio.bootloader.resetpinbits=00
 ##############################################################
 
 atxy2o.name=ATtiny412/402/212/202 (optiboot)
+atxy2o.upload.workaround=
+atxy2o.build.defaultmillistimer=D0
+atxy2o.build.bootload=opti
+atxy2o.build.mcu=attiny{build.attiny}
+atxy2o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+atxy2o.build.f_cpu={build.speed}000000L
 atxy2o.upload.speed=115200
 
+
+
 #atxy2o.menu.chip.812=ATtiny812
-#atxy2o.menu.chip.812.build.mcu=attiny812
+#atxy2o.menu.chip.812.build.attiny=812
 #atxy2o.menu.chip.812.upload.maximum_size=8192
 #atxy2o.menu.chip.812.upload.maximum_data_size=512
-#atxy2o.menu.chip.812.upload.workaround=
 atxy2o.menu.chip.412=ATtiny412
-atxy2o.menu.chip.412.build.mcu=attiny412
+atxy2o.menu.chip.412.build.attiny=412
 atxy2o.menu.chip.412.upload.maximum_size=4096
 atxy2o.menu.chip.412.upload.maximum_data_size=256
-atxy2o.menu.chip.412.upload.workaround=
 atxy2o.menu.chip.212=ATtiny212
-atxy2o.menu.chip.212.build.mcu=attiny212
+atxy2o.menu.chip.212.build.attiny=212
 atxy2o.menu.chip.212.upload.maximum_size=2048
 atxy2o.menu.chip.212.upload.maximum_data_size=128
-atxy2o.menu.chip.212.upload.workaround=
 #atxy2o.menu.chip.802=ATtiny802
-#atxy2o.menu.chip.802.build.mcu=attiny802
+#atxy2o.menu.chip.802.build.attiny=802
+#atxy2o.menu.chip.802.build.defaultmillistimer=A0
 #atxy2o.menu.chip.802.upload.maximum_size=8192
 #atxy2o.menu.chip.802.upload.maximum_data_size=512
-#atxy2o.menu.chip.802.upload.workaround=
 atxy2o.menu.chip.402=ATtiny402
-atxy2o.menu.chip.402.build.mcu=attiny402
+atxy2o.menu.chip.402.build.attiny=402
+atxy2o.menu.chip.402.build.defaultmillistimer=A0
 atxy2o.menu.chip.402.upload.maximum_size=4096
 atxy2o.menu.chip.402.upload.maximum_data_size=256
-atxy2o.menu.chip.402.upload.workaround=
 atxy2o.menu.chip.402w=ATtiny402 (bad signature)
-atxy2o.menu.chip.402w.build.mcu=attiny402w
+atxy2o.menu.chip.402w.build.attiny=402
+atxy2o.menu.chip.402w.build.defaultmillistimer=A0
 atxy2o.menu.chip.402w.upload.maximum_size=4096
 atxy2o.menu.chip.402w.upload.maximum_data_size=256
 atxy2o.menu.chip.402w.upload.workaround=w
 atxy2o.menu.chip.202=ATtiny202
-atxy2o.menu.chip.202.build.mcu=attiny202
+atxy2o.menu.chip.202.build.attiny=202
+atxy2o.menu.chip.202.build.defaultmillistimer=A0
 atxy2o.menu.chip.202.upload.maximum_size=2048
 atxy2o.menu.chip.202.upload.maximum_data_size=128
-atxy2o.menu.chip.202.upload.workaround=
 
 atxy2o.menu.clock.20=20 MHz
 atxy2o.menu.clock.16=16 MHz
@@ -1195,13 +1262,13 @@ atxy2o.menu.clock.8=8 MHz
 atxy2o.menu.clock.5=5 MHz
 atxy2o.menu.clock.4=4 MHz
 atxy2o.menu.clock.1=1 MHz
-atxy2o.menu.clock.20.build.f_cpu=20000000L
-atxy2o.menu.clock.16.build.f_cpu=16000000L
-atxy2o.menu.clock.10.build.f_cpu=10000000L
-atxy2o.menu.clock.8.build.f_cpu=8000000L
-atxy2o.menu.clock.5.build.f_cpu=5000000L
-atxy2o.menu.clock.4.build.f_cpu=4000000L
-atxy2o.menu.clock.1.build.f_cpu=1000000L
+atxy2o.menu.clock.20.build.speed=20
+atxy2o.menu.clock.16.build.speed=16
+atxy2o.menu.clock.10.build.speed=10
+atxy2o.menu.clock.8.build.speed=8
+atxy2o.menu.clock.5.build.speed=5
+atxy2o.menu.clock.4.build.speed=4
+atxy2o.menu.clock.1.build.speed=1
 atxy2o.menu.clock.20.bootloader.OSCCFG=0x02
 atxy2o.menu.clock.16.bootloader.OSCCFG=0x01
 atxy2o.menu.clock.10.bootloader.OSCCFG=0x02
@@ -1217,12 +1284,12 @@ atxy2o.menu.millis.timera=TCA0 (default on 402/202)
 atxy2o.menu.millis.timerd=TCD0 (412/212 only, default there)
 atxy2o.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
 atxy2o.menu.millis.rtc=RTC (no micros)
-atxy2o.menu.millis.enabled.build.millis=-DMILLIS_USE_TIMERD0_A0
-atxy2o.menu.millis.disabled.build.millis=-DDISABLE_MILLIS
-atxy2o.menu.millis.timera.build.millis=-DMILLIS_USE_TIMERA0
-atxy2o.menu.millis.timerd.build.millis=-DMILLIS_USE_TIMERD0
-atxy2o.menu.millis.timerb0.build.millis=-DMILLIS_USE_TIMERB0
-atxy2o.menu.millis.rtc.build.millis=-DMILLIS_USE_TIMERRTC
+atxy2o.menu.millis.enabled.build.millistimer={build.defaultmillistimer}
+atxy2o.menu.millis.disabled.build.millistimer=NONE
+atxy2o.menu.millis.timera.build.millistimer=A0
+atxy2o.menu.millis.timerd.build.millistimer=D0
+atxy2o.menu.millis.timerb0.build.millistimer=B0
+atxy2o.menu.millis.rtc.build.millistimer=RTC
 
 atxy2o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy2o.menu.bodvoltage.2v6=2.6V (10 MHz or less)
@@ -1271,16 +1338,15 @@ atxy2o.bootloader.tool=avrdude
 atxy2o.build.board=attinyxy2
 atxy2o.build.core=arduino
 atxy2o.build.variant=txy2
-atxy2o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DNEOPIXELPORT=VPORTA.OUT {build.uartvoltage}
+atxy2o.build.extra_flags={build.millis} -DNO_EXTERNAL_I2C_PULLUP -DNEOPIXELPORT=VPORTA.OUT -DUARTBAUD{build.uartvoltage}
 atxy2o.build.export_merged_output=true
 
 atxy2o.menu.uartvoltage.5v=Closer to 5v
 atxy2o.menu.uartvoltage.3v=Closer to 3v
-atxy2o.menu.uartvoltage.5v.build.uartvoltage=
-atxy2o.menu.uartvoltage.3v.build.uartvoltage=-DUARTBAUD3V
+atxy2o.menu.uartvoltage.5v.build.uartvoltage=5V
+atxy2o.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
-atxy2o.upload.workaround=
 
 atxy2o.bootloader.WDTCFG=0x00
 atxy2o.bootloader.BODCFG=0b{bootloader.bodlevbits}0{bootloader.bodactivebits}{bootloader.bodsleepbits}

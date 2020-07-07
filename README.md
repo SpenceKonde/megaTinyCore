@@ -6,14 +6,16 @@
 ### [Making a cheap UPDI programmer](MakeUPDIProgrammer.md)
 
 # megaTinyCore
-Arduino core for the tinyAVR 0-series and 1-series chips. These parts have an improved architecture, with improved peripherals and improved execution time for certain instructions (similar to megaAVR 0-series chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. Moreover, these parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini!) run just over $1 USD, and under $.90 in quantity - less than many 8k classic AVR ATtiny parts (AVR architecture, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal.
+Arduino core for the tinyAVR 0-series and 1-series chips. These parts have an improved architecture, with improved peripherals and improved execution time for certain instructions (similar to megaAVR 0-series chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. Moreover, these parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini!) run just over $1 USD, and under $.90 in quantity - less than many 8k classic AVR ATtiny parts (AVR instruction sets, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal, and accurately enough for UART communication!
 
 These use a UPDI programmer, not traditional ISP like the classic ATtiny parts did. One can be made from a classic AVR Uno/Nano/Pro Mini - see [Making a UPDI programmer](MakeUPDIProgrammer.md).
 
 The Optiboot serial bootloader is now supported (as of 1.1.1) on these parts, allowing them to be programmed via a serial port. See the Optiboot section below for more information on this, and the relevant options. Installing the bootloader does require a UPDI programmer. In the near future, I will be selling pre-bootloaded boards on Tindie.
 
-For this core to work when installed manually, and via board manager for 1.0.1 and earlier, **you must install the official Arduino megaAVR board package** using board manager - this is required to get the compiler and correct version of avrdude installed. If you receive an error similar to "avr-g++: error: device-specs/specs-attiny402: No such file or directory", that indicates that the Arduino megaAVR board package is not installed. As of 1.0.2, this is no longer required if installed via board manager. It is still required for a manual installation.
-**Currently it looks like manual installs will need an additional step to get the compiler improvements; we are currently working on determining what these are - it will be sorted out closer to 2.0.4 release.**
+This core depends on the 7.3.0-atmel3.6.1-arduino7 version of the toolchain. For this core to work when installed manually, one of the following must be true:
+* Using Arduino 1.8.13, without having downgraded the Official Arduino AVR Boards package using board manager (version 1.8.13 introduces compelling UX improvements and is strongly recommended)
+* Using Arduino 1.8.13, with [MegaCoreX](https://github.com/MCUdude/MegaCoreX) 1.0.4 installed using board manager
+* Using older version of Arduino, with the Official Arduino AVR Boards package updated to 1.8.3, or [MegaCoreX](https://github.com/MCUdude/MegaCoreX) 1.0.4 installed using board manager
 
 ## Supported Parts (click link for pinout diagram and details)
 * [ATtiny3217,1617,817,417](megaavr/extras/ATtiny_x17.md)
@@ -24,6 +26,7 @@ For this core to work when installed manually, and via board manager for 1.0.1 a
 * [ATtiny1606,806,406](megaavr/extras/ATtiny_x06.md)
 * [ATtiny1604,804,404,204](megaavr/extras/ATtiny_x04.md)
 * [ATtiny402,202](megaavr/extras/ATtiny_x02.md)
+
 
 ### Upcoming tinyAVR 2-series
 Microchip has dropped hints that they are working on a tinyAVR "2-series" product line, with part numbers like ATtiny 1626 - there is currently no publically available information on these devices beyond what can be deduced from the io.h headers for these parts, and what is listed in Microchip's listing of AVR processors. Based on the io.h, it looks like these parts will **not** use the DA-style NVM controller and will **not** have the async type-D timer like the 1-series, but will have a second USART (that scream you just heard in the distance was the ATtiny 841 and 1634, whose sole claim to relevance in the face of these new parts was their second hardware USART) and more sophisticated ADC (12 bit, and differential ADC support - queue another scream from the '841, which also had a fancy differential ADC - not that any Arduino people were likely using it). It also looks like the clock frequency will be set like the other tinyAVR 0-series and 1-series parts, with the oscillator frequency of 20MHz vs 16MHz set by fuse, and prescaler configured after startup to choose operating frequency. No information has been made available regarding the timing of their availability. When these parts are available, support for them will be added to this core.
@@ -49,10 +52,10 @@ There is a solution to the lack of a hardware reset pin when you need to keep UP
 
 If you were to set up a "low level" interrupt on a pin, and put that in the ISR, that pin would act as an ersatz reset pin (note that it wouldn't "stay" in reset like a real reset pin - it will reset the chip, and then the sketch (or bootloader) will start running again from the start until the interrupt was enabled, then reset again).
 
-megaTinyCore supports configurations with this pin fused to act as reset, or as GPIO in Optiboot configurations. This is because it is still possible to program the board ove the UART serial using the bootloader with the UPDI functionality disabled. By default, when UPDI is set as reset, the standard boot-reset source behavior is used - it will enter the bootloader only when reset by a Software Reset, or by the Reset pin (allowing the usual DTR reset trick, but the sketch can start instantly on power-pn. When the pin is set as UPDI or GPIO, the optiboot bootloader used will also enter the bootloader on a power-on reset, and stay there for 8 seconds to faciiitate bootloading (and will also enter the bootloader on a software reset. Work is ongoing on a design for a low-cost arduino-based solution for 12v programming. As I am able to validate that and integrate support, we will introduce GPIO and reset for all configurations.
+megaTinyCore supports configurations with this pin fused to act as reset, or as GPIO in Optiboot configurations. This is because it is still possible to program the board over the UART serial using the bootloader with the UPDI functionality disabled. By default, when UPDI is set as reset, the standard boot-reset source behavior is used - it will enter the bootloader only when reset by a Software Reset, or by the Reset pin (allowing the usual DTR reset trick, but the sketch can start instantly on power-pn. When the pin is set as UPDI or GPIO, the optiboot bootloader used will also enter the bootloader on a power-on reset, and stay there for 8 seconds to facilitate programming (and will also enter the bootloader on a software reset. Work is ongoing on a design for a low-cost arduino-based solution for 12v programming. As I am able to validate that and integrate support, we will introduce GPIO and reset for all configurations.
 
 **Limited input facilities on PA0 with pin set as UPDI**
-It has been discovered that as long as the patterns applied to the UPDI pin are not mistaken for a UPDI signal, the pin will still act as a fully functional input - for analogRead(), digitalRead(), and as input0 to CCL0. Obviously I cant's
+It has been discovered that as long as the patterns applied to the UPDI pin are not mistaken for a UPDI signal, the pin will still act as a fully functional input - for analogRead(), digitalRead(), and as input0 to CCL0.
 
 # A word on terminology ("megaAVR")
 In the official Arduino board definition for their "megaAVR" hardware package, they imply that the new architecture on the megaAVR 0-series parts (which is nearly the same as used on the tinyAVR 0-series and 1-series) is called "megaavr" - that is not an official term. Microchip uses the term "megaAVR" to refer to any "ATmega" part, whether it has the old style or modern peripherals. There are no official terms to refer to all AVR parts of one family or the other. In this document, prior to 2.0.2, we used the Arduino convention. As of now we are trying to move away from that, though there are many cases where "megaAVR" is still used. Where possible we avoid naming it, but the term "modern AVR" may be used to describe these parts. The term "classic AVR" (which is not an official term) will be used to refer to any parts with the old-style peripherals.
@@ -61,23 +64,34 @@ Do note that the terms `avr` and `megaavr` are still used internally (for exampl
 
 It is unfortunate that there are not officially sanctioned terms for these two classes of AVR microcontrollers.
 
+# Buying tinyAVR 0-series and 1-series Breakout Boards
+I sell breakout boards with regulator, UPDI header, and Serial header in my tindie shop, as well as the bare boards. Buying from my store helps support further development on the core, and is a great way to get started using these exciting new parts with Arduino.
+
+### [ATtiny3217, 1607 assembled](https://www.tindie.com/products/17523/)
+### [ATtiny3217/1617/817/417/1607/807 bare board](https://www.tindie.com/products/17613/)
+### [ATtiny3216, 1606 assembled](https://www.tindie.com/products/17597/)
+### [ATtiny3216/1616/816/416/1606/806/406 bare board](https://www.tindie.com/products/17614/)
+### [ATtiny1614, 1604 assembled](https://www.tindie.com/products/17598/)
+### [ATtiny1614/814/414/1604/804/404 bare board](https://www.tindie.com/products/17748/)
+### [ATtiny412, 402 assembled](https://www.tindie.com/products/17685/)
+### [ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
+
 # Features
 
 ### Memory-mapped flash: No need to declare PROGMEM or use F() macro anymore!
 Unlike classic AVRs, on the these parts, the flash is within the same address space as the main memory. This means pgm_read_*_near functions are not needed to read them. Because of this, the compiler automatically puts any variable declared `const` into progmem, and accesses it appropriately - you no longer need to explicitly declare them as PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either (as of 1.0.6, the F() macro is a no-op).
 
-However, do note that if you explicitly declare a variable PROGMEM, you must still use the pgm_read functions to read it, just like on classic AVRs - when a variable is declared PROGMEM on megaavr parts, the pointer is offset (address is relative to start of flash, not start of address space); this same offset is applied when using the pgm_read_*_near functions. Do note that declaring things PROGMEM and accessing with pgm_read_*_near functions, although it works fine, is slower and wastes a small amount of flash (compared to simply declaring the variables const).
+However, do note that if you explicitly declare a variable PROGMEM, you must still use the pgm_read functions to read it, just like on classic AVRs - when a variable is declared PROGMEM on parts with memory mapped flash, the pointer is offset (address is relative to start of flash, not start of address space); this same offset is applied when using the pgm_read_*_near functions. Do note that declaring things PROGMEM and accessing with pgm_read_*_near functions, although it works fine, is slower and wastes a small amount of flash (compared to simply declaring the variables const).
 
 **WARNING** In versions of megaTinyCore 1.0.6 and earlier, the sketch size reported during compilation does not include variables declared const. PROGMEM variables, however, are reported normally. in 1.1.0 and subsequent releases, the flash used by const variables is correctly reported.
 
 #### Ways to refer to pins
-The simple matter of how to refer to a pin for analogRead() and digitalRead(), particularly on non-standard hardware, has been a persistent source of confusion among Arduino users. It's my opinion that much of the blame rests with the decisions made by the Arduino team regarding how pins were to be referred to; the designation of some pins as "analog pins" leads people to think that those pins cannot be used for digital input, and the fact that all of the pins were renumbered fuirther muddies the water. The fact that many ATmega parts have a confusing mapping of ports to physical pins (which, thankfully, is no longer a problem on the megaavr parts), and the inconsistent decisions made by authors of subsequent hardwarte packages in an attempt to make those parts "more like an Arduino Uno", or (in some cases) to make the functions to map arduino pin numbers to PORT registers has led to further confusion around this topic.
+The simple matter of how to refer to a pin for analogRead() and digitalRead(), particularly on non-standard hardware, has been a persistent source of confusion among Arduino users. It's my opinion that much of the blame rests with the decisions made by the Arduino team regarding how pins were to be referred to; the designation of some pins as "analog pins" leads people to think that those pins cannot be used for digital input, and the fact that all of the pins were renumbered fuirther muddies the water. The fact that many classic AVR parts have a confusing mapping of ports to physical pins (which, thankfully, is not an issue here, as we don't have to deal with legacy cores and their wacky pin mappings), and the inconsistent decisions made by authors of subsequent hardwarte packages in an attempt to make those parts "more like an Arduino Uno", or (in some cases) to make the functions to map arduino pin numbers to PORT registers has led to further confusion around this topic.
 
 This core uses a simple scheme for assigning the Arduino pin numbers: Pins are numbered starting from the the I/O pin closest to Vcc as pin 0 and proceeding counterclockwise, skipping the (mostly) non-usable UPDI pin. The UPDI pin is then assigned to the last pin number - as noted above, it is possible to read the voltage on the UPDI pin - we recommend this only as a last resort. On unofficial parts like these, we recommend that pins be referred to by the PIN_Pxn constants - this will maximize portability of your code and make it easier to look up information on the pins you are using in the relevant datasheets should that be necessary.
 
 #### PIN_Pxn Port Pin Numbers (recommended)
-**This is the recommended way to refer to pins** Defines are also provided of form PIN_Pxn, where x is A, B, or C, and n is a number 0~7 - (Not to be confused with the PIN_An defines described below). These just resolve to the digital pin number of the pin in question - they don't go through a different code path or anything. However, they have particular utility in writing code that works across the product line with peripherals that are linked to certain pins (by Port), as most peripherals are. Several pieces of demo code in the documentation take advantage of this.  Direct port manipulation is possible on the megaavr parts - and in fact several powerful additional options are available for it - see [direct port manipulation](megaavr/extras/DirectPortManipulation.md).
-
+**This is the recommended way to refer to pins** Defines are also provided of form PIN_Pxn, where x is A, B, or C, and n is a number 0~7 - (Not to be confused with the PIN_An defines described below). These just resolve to the digital pin number of the pin in question - they don't go through a different code path or anything. However, they have particular utility in writing code that works across the product line with peripherals that are linked to certain pins (by Port), as most peripherals are. Several pieces of demo code in the documentation take advantage of this.  Direct port manipulation is possible as well - and in fact several powerful additional options are available for it - see [direct port manipulation](megaavr/extras/DirectPortManipulation.md).
 
 #### Arduino Pin Numbers
 When a single number is used to refer to a pin - in the documentation, or in your code - it is always the "Arduino pin number". These are the pin numbers shown in orange (for pins capable of analogRead()) and blue (for pins that are not) on the pinout charts. All of the other ways of referring to pins are #defined to the corresponding Arduino pin number.
@@ -227,8 +241,11 @@ All pins can be used with attachInterrupt() and detachInterrupt(), on RISING, FA
 
 Advanced users can instead set up interrupts manually, ignoring attachInterrupt and manipulating the relevant port registers appropriately and defining the ISR with the ISR() macro - this will produce smaller code (using less flash and ram) and the ISRs will run faster as they don't have to check whether an interrupt is enabled for every pin on the port. For full information and example, see: [Pin Interrupts](megaavr/extras/PinInterrupts.md)
 
+### Improved Exported Binary naming
+When you do Sketch -> Export compiled binary, as of 2.0.4, it gets a name which includes every tools submenu selection that could impact the output, for example `Test.ino.t1614opti.20.u5V.mD0.hex` - the full part number (not just family), whether it's using optiboot (this effects start address of .hex, unlike classic AVRs), the clock speed (in MHz), the approximate voltage for UART baud rate, and the millis timer source (`A0`, `B0`, `B1`, `D0`, `RTC`, `RTC_XTAL` or `NONE`).
+
 ### Assembler Listing generation
-Like ATTinyCore, Sketch -> Export compiled binary will generate an assembly listing in the sketch folder; this is particularly useful when attempting to reduce flash usage, as you can see how much flash is used by different functions.
+Like ATTinyCore, Sketch -> Export compiled binary will generate an assembly listing in the sketch folder; this is particularly useful when attempting to reduce flash usage, as you can see how much flash is used by different functions. As of 2.0.4, it uses the same naming as above.
 
 ### EESAVE configuration option
 The EESAVE fuse can be controlled via the Tools -> Save EEPROM menu. If this is set to "EEPROM retained", when the board is erased during programming, the EEPROM will not be erased. If this is set to "EEPROM not retained", uploading a new sketch will clear out the EEPROM memory. You must do Burn Bootloader to apply this setting.
@@ -237,7 +254,7 @@ The EESAVE fuse can be controlled via the Tools -> Save EEPROM menu. If this is 
 ### BOD configuration options
 These parts officially support BOD trigger levels of 1.8V, 2.6V, and 4.2V, with Disabled, Active, and Sampled operation options for when the chip is in Active and Sleep modes - Disabled uses no extra power, Active uses the most, and Sampled is in the middle. See the datasheet for details on power consumption and the meaning of these options. You must do Burn Bootloader to apply this setting.
 #### Unofficial BOD levels
-Between the initial header file and preliminary datasheet release, and the most recent versions of each, several BOD settings (which were described as "unqualified" in the release notes- which I belive means they were not tested or guaranteed to behave correctly) were removed from the datasheet and io.h files. These are still supported by the dropdown menu, but (as of 2.0.4 - the first version that has the new headers) are marked as such in the submenu. **it is currently undecided whether the `_gc` enum entries will be added back for 2.0.4** *When using these, proper operation should not be counted on without doing your own testing*
+Between the initial header file and preliminary datasheet release, and the most recent versions of each, several BOD settings (which were described as "unqualified" in the release notes- which I belive means they were not tested or guaranteed to behave correctly) were removed from the datasheet and io.h files. These are still supported by the dropdown menu, but (as of 2.0.4 - the first version that has the new headers) are marked as such in the submenu. Note that the new headers no longer provide the `*_gc` enum entries for these BOD levels. *When using these, proper operation should not be counted on without doing your own testing*
 
 ### Link-time Optimization (LTO) support
 This core *always* uses Link Time Optimization to reduce flash usage - all versions of the compiler which support the 0-series and 1-series ATtiny parts also support LTO, so there is no need to make it optional as was done with ATtinyCore.
@@ -245,16 +262,19 @@ This core *always* uses Link Time Optimization to reduce flash usage - all versi
 ### Identifying menu options within sketch
 It is often useful to identify what options are selected on the menus from within the sketch; this is particularly useful for verifying that you have selected the options you wrote the sketch for when you open it; however, note that as of 2.0.1, almost all of these options have been removed to alleviate this headache, with the exception of the millis timer, which must be known prior because this setting determines which interrupt will be used.
 
-##### Millis timer
+#### Millis timer
 The option used for the millis/micros timekeeping is given by a define of the form USE_MILLIS_TIMERxx. Possible options are:
 * USE_MILLIS_TIMERA0
 * USE_MILLIS_TIMERB0
 * USE_MILLIS_TIMERB1
 * USE_MILLIS_TIMERD0
-* USE_MILLIS_TIMERRTC
-* DISABLE_MILLIS
+* USE_MILLIS_TIMERRTC (defined if RTC is used for millis - whether or not external crystal is used)
+* USE_MILLIS_TIMERRTC_XTAL (only defined if RTC is used with external crystal)
+* USE_MILLIS_TIMERNONE (defined if millis timekeeping is disabled)
+* DISABLE_MILLIS (synonym for above, for backwards compatibility)
+Additionally, `MILLIS_TIMER` is defined to that timer - see `Identifying Timers` below
 
-##### Using to check that correct menu option is selected
+#### Using to check that correct menu option is selected
 If your sketch requires that the TCB0 is used as the millis timer
 
 ```
@@ -287,6 +307,25 @@ Version information for MEGATINYCORE is also provided by a few additional define
 * MEGATINYCORE_NUM 0x02000201
 Be warned that the historical record has been
 
+### Identifying Timers
+Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statenebts to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro. 
+
+```
+#define NOT_ON_TIMER 0x00
+#define TIMERA0 0x10
+#define TIMERA1 0x11 // Not present on any tinyAVR 0/1-series 
+#define TIMERB0 0x20
+#define TIMERB1 0x21
+#define TIMERB2 0x22 // Not present on any tinyAVR 0/1-series 
+#define TIMERB3 0x23 // Not present on any tinyAVR 0/1-series 
+#define TIMERB4 0x23 // Not present on any tinyAVR 0/1-series 
+#define TIMERB5 0x23 // Not present on any tinyAVR 0/1-series 
+#define TIMERD0 0x40
+#define DACOUT 0x80
+#define TIMERRTC 0x90
+#define TIMERRTC_XTAL 0x91
+```
+
 # Bootloader (optiboot) Support
 A new version of Optiboot (Optiboot-x) now runs on the tinyAVR 0-series and 1-series chips.  It's under 512 bytes, and works on all parts supported by megaTinyCore, allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini).
 
@@ -295,7 +334,7 @@ To use the serial bootloader, select a board definition with (optiboot) after it
 If the chip you will be programming has not been bootloaded, connect your UPDI programmer, and the desired options for clock rate (20/10/5MHz vs 16/8/4/1MHz is all that matters here. The fuses set the base clock to 20MHz or 16MHz, but the prescaler is set at startup by the sketch - so if you "burn bootloader" with 20MHz selected, but upload sketch compiled for 10MHz, that's fine and will work), Brown Out Detect (BOD), Serial port pins for the bootloader, and whether to leave the UPDI pin configured as such, or reconfigure it as a reset pin, and select Tools -> "Burn Bootloader"
 **WARNING: After doing "Burn Bootloader", if you set the UPDI pin to act as reset or IO, the chip cannot be reprogrammed except via the serial bootloader or using an HV UPDI programmer - it is strongly suggested to first burn the bootloader with the UPDI/Reset pin left as UPDI, verify that sketches can be uploaded, and only then "Burn Bootloader" with the UPDI/Reset pin set to act as Reset**
 
-After this, connect a serial adapter to the serial pins (as well as ground and Vcc). On the megaavr ATtiny breakout boards which I sell on Tindie, a standard 6-pin "FTDI" header is provided for this that can be connected directly to many serial adapters.
+After this, connect a serial adapter to the serial pins (as well as ground and Vcc). On the tinyAVR 0/1-series breakout boards which I sell on Tindie, a standard 6-pin "FTDI" header is provided for this that can be connected directly to many serial adapters.
 
 
 If the UPDI/Reset pin option was set to UPDI or IO when bootloading, you must unplug/replug the board (or use a software reset - see note near start of readme; you can make an ersatz reset button this way) to enter the bootloader - after this the bootloader will be active for 8 seconds.
@@ -309,7 +348,7 @@ If using the bootloader with with the UPDI pin set to reset, this is needed for 
 * 1 Small signal diode (specifics aren't important, as long as it's approximately a standard diode)
 * 1 0.1uF Ceramic Capacitor
 * 1 10k Resistor
-* An ATtiny megaavr with the bootloader installed on it (you can't do UPDI programming once the autoreset circuit is connected the the UPDI/Reset pin, even if that pin hasn't yet been set to act as reset, as the autoreset circuit will interfere with UPDI programming).
+* A tinyAVR 0/1-series part with the bootloader installed on it (you can't do UPDI programming once the autoreset circuit is connected the the UPDI/Reset pin, even if that pin hasn't yet been set to act as reset, as the autoreset circuit will interfere with UPDI programming).
 
 Connect the DTR pin of the serial adapter to one side of a 0.1uF ceramic capacitor.
 Connect the other side of the capacitor to the Reset (formerly UPDI) pin.
@@ -347,12 +386,12 @@ Note that, if you have UPDI programming enabled, and desire the convenience of a
 * Tools -> Voltage for UART Baud - Controls which oscillator error values will be used to maximize the accuracy of the UART baud rate generation - choose whether operating voltage is closer to 5v or 3v.
 * Tools -> millis()/micros() - If set to enable (default), millis(), micros() and pulseInLong() will be available. If set to disable, these will not be available, Serial methods which take a timeout as an argument will not have an accurate timeout (though the actual time will be proportional to the timeout supplied); delay will still work. Disabling millis() and micros() saves flash, and eliminates the millis interrupt every 1-2ms; this is especially useful on the 8-pin parts which are extremely limited in flash. Depending on the part, options to force millis/micros onto specific timers are available. A #error will be shown upon compile if a specific timer is chosen but that timer does not exist on the part in question. If RTC is selected, micros() andpulseInLong() will not be available - only millis() will be.
 
-# Known Compiler Bugs in 2.0.3 and earlier
+# Known Compiler Bugs in 2.0.3 and Earlier
 The earlier versions of the avr-gcc toolchain contained several issues relevant to these parts. Version 2.0.4 and later, when installed through Board Manager, will pull in the new toolchain package which corrects both of these issues (among other ones that nobody had noticed yet)
 * Sometimes a sketch which is too big to fit will, instead of generating a message saying that, result in the error: 'relocation truncated to fit: R_AVR_13_PCREL against symbol tablejump2'. 
 * There is a bug in the `<avr/eeprom.h>` library's eeprom_is_ready() macro - it uses names for registers from the XMEGA family of parts (under the hood, these chips actually have an XMEGA core!). Attempting to use that macro will generate a error stating that `'NVM_STATUS' was not declared in this scope`. When a newer version of that package that corrects this issue is available, megaTinyCore will use it. In the meantime, `replace eeprom_is_ready()` with `bit_is_clear(NVMCTRL.STATUS,NVMCTRL_EEBUSY_bp)`. If writing a library or sketch that is intended to work on both megaavr and classic avr parts, you can test for effected parts using `#if defined(ARDUINO_ARCH_MEGAAVR)`
 
-# Instruction timing changes
+# Instruction Timing Changes
 These parts have a newer CPU core with slightly improved timings. This distinction is unimportant for 99.9% of users - but if you happen to be working with hand-tuned assembly (or using a library that does so, and are wondering why the timing is messed up), you should be aware of this. 
 * PUSH is 1 cycle vs 2 on classic AVR (POP is still 2)
 * CBI and SBI are 1 cycle vs 2 on classic AVR
@@ -360,16 +399,19 @@ These parts have a newer CPU core with slightly improved timings. This distincti
 * RCALL and ICALL are 2 cycles vs 3 on classic AVR
 * CALL is 3 cycles instead of 4 on classic AVR
 * Saving the best for last... ST and STD is 1 cycle vs 2 on classic AVR! (STS is still 2) 
-Note that the improvement to PUSH can make interrupts respond significantly faster (since they often have to push one or more registers onto the stack at the beginning of the ISR), though the corresponding POP's at the end aren't any faster. The change with ST impacted tinyNeoPixel. Prior to my realizing this, the library worked on SK6812 LEDs (which happened to be what I tested with) at 16/20 MHz, but not real WS2812's. However, once I discovered this, I was able to leverage it to use a single tinyNeoPixel library instead of a different one for each port like was needed with ATTinyCore (for 8 MHz, they need to use the single cycle OUT on classic AVRs to meet timing requirements, the two cycle ST was just too slow; hence the port had to be known at compiletime. But with single cycle ST, that issue vanished)
+Note that the improvement to PUSH can make interrupts respond significantly faster (since they often have to push the contents of registers onto the stack at the beginning of the ISR), though the corresponding POP's at the end aren't any faster. The change with ST impacted tinyNeoPixel. Prior to my realizing this, the library worked on SK6812 LEDs (which happened to be what I tested with) at 16/20 MHz, but not real WS2812's. However, once I discovered this, I was able to leverage it to use a single tinyNeoPixel library instead of a different one for each port like was needed with ATTinyCore (for 8 MHz, they need to use the single cycle OUT on classic AVRs to meet timing requirements, the two cycle ST was just too slow; hence the port had to be known at compiletime. But with single cycle ST, that issue vanished)
 
-# Buying ATtiny 0-series and 1-series breakout boards
-I sell breakout boards with regulator, UPDI header, and Serial header in my tindie shop, as well as the bare boards. Buying from my store helps support further development on the core, and is a great way to get started using these exciting new parts with Arduino.
+# Differences in Behavior between megaTinyCore and Official Cores
+While we generally make an effort to emulate the official Arduino core, there are a few cases that were investigated, but we came to the conclusion that the compatibilit would not be worth the price. The following is a (hopefully nearly complete) list of these cases.
 
-### [ATtiny3217, 1607 assembled](https://www.tindie.com/products/17523/)
-### [ATtiny3217/1617/817/417/1607/807 bare board](https://www.tindie.com/products/17613/)
-### [ATtiny3216, 1606 assembled](https://www.tindie.com/products/17597/)
-### [ATtiny3216/1616/816/416/1606/806/406 bare board](https://www.tindie.com/products/17614/)
-### [ATtiny1614, 1604 assembled](https://www.tindie.com/products/17598/)
-### [ATtiny1614/814/414/1604/804/404 bare board](https://www.tindie.com/products/17748/)
-### [ATtiny412, 402 assembled](https://www.tindie.com/products/17685/)
-### [ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
+### digitalRead() does not turn off PWM. 
+On official cores, and most third party ones, the digitalRead() function turns off PWM when called on a pin. This behavior is not documented by the Arduino reference. This interferes with certain optimizations (such as fast digital IO - which is coming soon, I swear) - and moreover is logically inconsistent - a "read" operation should not change the thing it's called on. That's why it's called "read" and not "write". There does not seem to be a logically coherent reason for this - and it makes simple demonstrations of what PWM is non-trivial (imagine setting a pin to output PWM, and then looking at the output by repeatedly reading the pin). 
+
+### TCA0 configured in Split Mode to get 3 additional PWM pins
+On official "megaavr" board package, TCA0 is configured for "Single mode" as 3 16-bit timers (used to output 8-bit PWM). megaTinyCore always configured it for "Split mode" to get additional PWM outputs. See the datasheets for more information on the capabilities of TCA0.
+
+### Type B timers not used for PWM
+On official "megaavr" board package, the type B timers are used to generate 8-bit PWM (one pin per timer). On the tinyAVR 0/1 series, there are no circumstances where this would increase the number of PWM pins, so this was removed entirely to reserve the type B timers for Servo, Tone, and other utility timing applications. 
+
+### digital I/O functions use old function signatures.
+They return and expect uint8_t (byte) values, not enums like the official megaavr board package does. Like classic AVR cores, constants like LOW, HIGH, etc are simply #defined to appropriate values. The use of enums instead broke many common Arduino programming idioms and existing code; switching to the old standard method improved performance as well. 

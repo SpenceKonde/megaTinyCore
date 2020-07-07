@@ -25,10 +25,10 @@
 // the prescaler is set so that timer ticks every 64 clock cycles, and the
 // the overflow handler is called every 256 ticks.
 
-#ifndef DISABLE_MILLIS
+#ifndef MILLIS_USE_TIMERNONE
 
 #ifdef MILLIS_USE_TIMERRTC_XTAL
-#define MILLIS_USE_TIMERRTC
+  #define MILLIS_USE_TIMERRTC
 #endif
 
 //volatile uint16_t microseconds_per_timer_overflow;
@@ -109,7 +109,7 @@
 #elif defined(MILLIS_USE_TIMERB1)
   ISR(TCB1_INT_vect)
 #else
-  #error "no millis timer selected"
+  #error "No millis timer selected, but not disabled - cannot determine millis vector"
 #endif
 {
   // copy these to local variables so they can be stored in registers
@@ -285,9 +285,9 @@ unsigned long millis()
 #endif //end of non-RTC micros code
 
 
-#endif //end of non-DISABLE_MILLIS code
+#endif //end of non-MILLIS_USE_TIMERNONE code
 
-#if !(defined(DISABLE_MILLIS) || defined(MILLIS_USE_TIMERRTC)) //delay implementation when we do have micros()
+#if !(defined(MILLIS_USE_TIMERNONE) || defined(MILLIS_USE_TIMERRTC)) //delay implementation when we do have micros()
 void delay(unsigned long ms)
 {
   uint32_t start_time = micros(), delay_time = 1000*ms;
@@ -446,7 +446,7 @@ void delayMicroseconds(unsigned int us)
 }
 
 
-#ifndef DISABLE_MILLIS
+#ifndef MILLIS_USE_TIMERNONE
   void stop_millis()
   { // Disable the interrupt:
     #if defined(MILLIS_USE_TIMERA0)
@@ -632,9 +632,9 @@ void init()
 
   setup_timers();
 
-  #ifndef DISABLE_MILLIS
+  #ifndef MILLIS_USE_TIMERNONE
   init_millis();
-  #endif //end #ifndef DISABLE_MILLIS
+  #endif //end #ifndef MILLIS_USE_TIMERNONE
 /*************************** ENABLE GLOBAL INTERRUPTS *************************/
 
   sei();
@@ -679,7 +679,7 @@ void setup_timers() {
 
     // No megaTinyCore parts need to configure this unless used for millis
   #ifdef TCD0
-      #if (defined(USE_TIMERD0_PWM) && (!(defined(MILLIS_USE_TIMERD0_A0) || defined(MILLIS_USE_TIMERD0))))
+      #if (defined(USE_TIMERD0_PWM) && (!defined(MILLIS_USE_TIMERD0)))
       TCD0.CMPBCLR=510; //Count to 510
       TCD0.CMPACLR=510;
       TCD0.CTRLC=0x80; //WOD outputs PWM B, WOC outputs PWM A

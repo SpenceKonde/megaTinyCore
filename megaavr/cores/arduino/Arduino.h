@@ -119,19 +119,24 @@ extern const uint8_t digital_pin_to_timer[];
 // Reasoning these constants are what they are:
 // Low 3 bits are the number of that peripheral
 // other bits specify the type of timer
-// TCA=0x08, TCB=0x10, TCD=0x10 (leaving room in case Microchip ever decides to release a TCC)
+// TCA=0x10, TCB=0x20, TCD=0x40 (leaving room in case Microchip ever decides to release a TCC)
+// DAC=0x80, RTC=0x90, 
 // Things that aren't hardware timers with output compare are after that
 // DAC output isn't a timer, but has to be treated as such by PINMODE
 // RTC timer is a tiner, but certainly not that kind of timer
 #define NOT_ON_TIMER 0x00
 #define TIMERA0 0x10
+#define TIMERA1 0x11 // Not present on any tinyAVR 0/1-series 
 #define TIMERB0 0x20
 #define TIMERB1 0x21
-#define TIMERB2 0x22
-#define TIMERB3 0x23
+#define TIMERB2 0x22 // Not present on any tinyAVR 0/1-series 
+#define TIMERB3 0x23 // Not present on any tinyAVR 0/1-series 
+#define TIMERB4 0x23 // Not present on any tinyAVR 0/1-series 
+#define TIMERB5 0x23 // Not present on any tinyAVR 0/1-series 
 #define TIMERD0 0x40
-#define TIMERRTC 0x90
 #define DACOUT 0x80
+#define TIMERRTC 0x90
+#define TIMERRTC_XTAL 0x91
 
 void setup_timers();
 
@@ -288,15 +293,15 @@ void setup_timers();
 #define __AVR_ATtinyx02__
 #define __AVR_ATtinyxy2__
 #else
-#error "Can't-happen: unknown chip somehow being used"
+#error "Can't-happen: unknown chip somehow being used!"
 #endif
 
-#define MEGATINYCORE "2.0.3-dev"
+#define MEGATINYCORE "2.0.4"
 #define MEGATINYCORE_MAJOR 2
 #define MEGATINYCORE_MINOR 0
-#define MEGATINYCORE_PATCH 3
-#define MEGATINYCORE_RELEASED 0
-#define MEGATINYCORE_NUM 0x02000300
+#define MEGATINYCORE_PATCH 4
+#define MEGATINYCORE_RELEASED 1
+#define MEGATINYCORE_NUM 0x02000401
 
 
 
