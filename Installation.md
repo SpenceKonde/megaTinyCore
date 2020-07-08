@@ -11,11 +11,11 @@ This board package can be installed via the board manager. The boards manager UR
 
 1. File -> Preferences, enter the above URL in "Additional Boards Manager URLs"
 2. Tools -> Boards -> Boards Manager...
-3. Select "megaTinyCore by Spence Konde" and click "Install".
-4. If you installed version 1.0.1 or 1.0.0 of megaTinyCore, find the "Official Arduino megaAVR boards" package, and install the most recent version. You may skip this step if you installed version 1.0.2. 
+3. Wait while the list loads (takes longer than one would expect, and refreshes several times).
+4. Select "megaTinyCore by Spence Konde" and click "Install". For best results, choose the most recent version.
 
 ## Manual Installation
-Manual installation allows the latest version of the core to be installed, with fixes that may not yet be available in the board manager version of the core. **You must use board manager to install the latest version of the Official Arduino megaAVR board package** for manual installation to work. Manual installation is recommended if you are working on developing or modifying the core, or if you need the latest fixes which are not in the released version. 
+Manual installation allows the latest version of the core to be installed, with fixes that may not yet be available in the board manager version of the core. You must have the 1.8.3 version of the Official AVR Board Package installed (comes with 1.8.13 of Arduino IDE, or upgrade using board manager) for manual installation to work. Manual installation is recommended if you are working on developing or modifying the core, or if you need the latest fixes which are not in the released version. 
 
 For installing megaTinyCore, there are two options:
 
