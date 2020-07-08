@@ -27,9 +27,10 @@ This core depends on the 7.3.0-atmel3.6.1-arduino7 version of the toolchain. For
 * [ATtiny1604,804,404,204](megaavr/extras/ATtiny_x04.md)
 * [ATtiny402,202](megaavr/extras/ATtiny_x02.md)
 
+The automotive versions of these parts are also supported - however, as of early July 2020, those parts do not appear to be available. The extended temperature range (F-spec) parts are not the same as the automotive version. 
 
 ### Upcoming tinyAVR 2-series
-Microchip has dropped hints that they are working on a tinyAVR "2-series" product line, with part numbers like ATtiny 1626 - there is currently no publically available information on these devices beyond what can be deduced from the io.h headers for these parts, and what is listed in Microchip's listing of AVR processors. Based on the io.h, it looks like these parts will **not** use the DA-style NVM controller and will **not** have the async type-D timer like the 1-series, but will have a second USART (that scream you just heard in the distance was the ATtiny 841 and 1634, whose sole claim to relevance in the face of these new parts was their second hardware USART) and more sophisticated ADC (12 bit, and differential ADC support - queue another scream from the '841, which also had a fancy differential ADC - not that any Arduino people were likely using it). It also looks like the clock frequency will be set like the other tinyAVR 0-series and 1-series parts, with the oscillator frequency of 20MHz vs 16MHz set by fuse, and prescaler configured after startup to choose operating frequency. No information has been made available regarding the timing of their availability. When these parts are available, support for them will be added to this core.
+Microchip has dropped hints that they are working on a tinyAVR "2-series" product line, with part numbers like ATtiny 1626 - there is currently no publically available information on these devices beyond what can be deduced from the io.h headers for these parts, and what is listed in Microchip's listing of AVR processors. Based on the io.h, it looks like these parts will **not** use the DA-style NVM controller and will **not** have the async type-D timer like the 1-series, but will have a second USART (that scream you just heard in the distance was the ATtiny 841 and 1634, whose sole claim to relevance in the face of these new parts was their second hardware USART) and more sophisticated ADC (12 bit, and differential ADC support - queue another scream from the '841, which also had a fancy differential ADC - not that any Arduino people were likely using it). It also looks like the clock frequency will be set like the other tinyAVR 0-series and 1-series parts, with the oscillator frequency of 20MHz vs 16MHz set by fuse, and prescaler configured after startup to choose operating frequency, as opposed to the scheme used by the AVR-Dx-series parts). No information has been made available regarding the timing of their availability. When these parts are available, support for them will be added to this core.
 
 ## Supported Clock Speeds
 * 20MHz Internal (4.5v~5.5v - typical for 5v systems)
@@ -39,6 +40,9 @@ Microchip has dropped hints that they are working on a tinyAVR "2-series" produc
 * 5MHz Internal (1.8v~5.5v)
 * 4MHz Internal (1.8v~5.5v)
 * 1MHz Internal (1.8v~5.5v)
+
+The 16 MHz and 8 MHz speeds are supported at an extended temperature range on the F-spec (-40~125C) parts. 
+The Automotive versions of these parts do not provide a 20 MHz oscillator option, so 20 MHz, 10 MHz, and 5 MHz clock options will not work on those parts.
 
 These parts do not support using an external crystal like the classic ATtiny parts do, however the internal oscillator is tightly calibrated enough that the internal clock will work for UART communication.
 

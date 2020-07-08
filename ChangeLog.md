@@ -1,3 +1,5 @@
+2.0.5
+* Quick fix to naming of .hex and .lst files
 2.0.4
 * Switch to new and improved compiler toolchain - now get informative errors if sketch is too big on parts that use RJMP, bugfix for eeprom.h (not to be confused with EEPROM.h), various header improvements (board manager install only).
 * Improve naming of exported binary and assembler listings - now includes every setting that could impact the output!
