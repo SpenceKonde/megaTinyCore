@@ -103,6 +103,10 @@ int8_t digitalRead(pin_size_t pinNumber);
 void DACReference(uint8_t mode);
 #endif
 
+#ifdef ADC0
+void init_ADC1(void);
+#endif
+
 #ifndef DISABLEMILLIS
 unsigned long millis(void);
 void init_millis();

@@ -1,4 +1,5 @@
 2.0.5
+* Internal change to ADC initialization (saves a bit of flash) and init_ADC1() function for parts that have ADC1.
 * Quick fix to naming of .hex and .lst files
 2.0.4
 * Switch to new and improved compiler toolchain - now get informative errors if sketch is too big on parts that use RJMP, bugfix for eeprom.h (not to be confused with EEPROM.h), various header improvements (board manager install only).
