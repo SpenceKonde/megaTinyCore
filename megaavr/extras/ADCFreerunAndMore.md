@@ -101,10 +101,12 @@ volatile uint16_t latest_reading=0; // remember to disabe interrupts while readi
 ADC0.CTRLB=ADC_SAMPNUM_ACC64_gc;  //take 64 samples for 3 extra bits
 ADC0.MUXPOS=0x06; //reads from PA6/arduino pin 2, ADC0 channel 6
 ADC0.CTRLA=ADC_ENABLE_bm|ADC_FREERUN_bm; //start in freerun
+ADC0.INTCTRL = 1 << ADC_RESRDY_bp  /* Result Ready Interrupt Enable: enabled */
+               | 0 << ADC_WCMP_bp; /* Window Comparator Interrupt Enable: disabled */
 ADC0.COMMAND=ADC_STCONV_bm; //start first conversion!
 
 // These readings will take forever (1.5-1.8ms), so we will keep that global updated via an ISR:
-ISR(ADC_RESRDY_vect) {
+ISR(ADC0_RESRDY_vect) {
   uint16_t raw_reading=ADC0.RES;
   latest_reading=raw_reading>>3; // 0~8191
 }
