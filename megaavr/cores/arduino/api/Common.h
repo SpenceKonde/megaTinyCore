@@ -99,25 +99,17 @@ void analogReference(uint8_t mode);
 bool analogReadResolution(uint8_t res);
 void analogWrite(pin_size_t pinNumber, int value);
 int8_t digitalRead(pin_size_t pinNumber);
-#ifdef DAC0
 void DACReference(uint8_t mode);
-#endif
-
-#ifdef ADC0
 void init_ADC1(void);
-#endif
 
-#ifndef DISABLEMILLIS
 unsigned long millis(void);
 void init_millis();
 void stop_millis();
 void restart_millis();
 void set_millis(uint32_t newmillis);
 
-#ifndef MILLIS_USE_TIMERRTC
 unsigned long micros(void);
-#endif
-#endif
+
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(pin_size_t pin, uint8_t state, unsigned long timeout);
