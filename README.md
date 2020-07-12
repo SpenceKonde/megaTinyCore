@@ -41,10 +41,9 @@ Microchip has dropped hints that they are working on a tinyAVR "2-series" produc
 * 4MHz Internal (1.8v~5.5v)
 * 1MHz Internal (1.8v~5.5v)
 
-The 16 MHz and 8 MHz speeds are supported at an extended temperature range on the F-spec (-40~125C) parts. 
-The Automotive versions of these parts do not provide a 20 MHz oscillator option, so 20 MHz, 10 MHz, and 5 MHz clock options will not work on those parts.
+See [Speed Grades](megaavr/extras/SpeedGrades.md) for more information.
 
-These parts do not support using an external crystal like the classic ATtiny parts do, however the internal oscillator is tightly calibrated enough that the internal clock will work for UART communication.
+These parts do not support using an external crystal like the classic ATtiny parts do, however the internal oscillator is tightly calibrated enough that the internal clock will work for UART communication. A future update will add support for using an external **clock**.
 
 ## The hardware reset pin is shared with UPDI programming.
 The pin PA0 is the UPDI *or* reset pin depending on fuse settings (it could also be set as a GPIO pin, but we already have two very compelling uses for said pin)
