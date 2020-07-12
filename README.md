@@ -10,7 +10,9 @@ Arduino core for the tinyAVR 0-series and 1-series chips. These parts have an im
 
 These use a UPDI programmer, not traditional ISP like the classic ATtiny parts did. One can be made from a classic AVR Uno/Nano/Pro Mini - see [Making a UPDI programmer](MakeUPDIProgrammer.md).
 
-The Optiboot serial bootloader is now supported (as of 1.1.1) on these parts, allowing them to be programmed via a serial port. See the Optiboot section below for more information on this, and the relevant options. Installing the bootloader does require a UPDI programmer. In the near future, I will be selling pre-bootloaded boards on Tindie.
+The Optiboot serial bootloader is now supported on these parts, allowing them to be programmed via a serial port. See the Optiboot section below for more information on this, and the relevant options. Installing the bootloader does require a UPDI programmer. The assembled breakout boards I sell on Tindie are available pre-bootloaded (they are bootloaded on demand
+
+**Arduino 1.8.13 is recommended**
 
 This core depends on the 7.3.0-atmel3.6.1-arduino7 version of the toolchain. For this core to work when installed manually, one of the following must be true:
 * Using Arduino 1.8.13, without having downgraded the Official Arduino AVR Boards package using board manager (version 1.8.13 introduces compelling UX improvements and is strongly recommended)
@@ -346,6 +348,9 @@ If the UPDI/Reset pin option was set to UPDI or IO when bootloading, you must un
 If the UPDI/Reset pin option was set to reset, you must reset the chip via the reset pin (or software reset to enter the bootloader, and the bootloader will run for 1 second before jumping to the application). This is the same as how optiboot works on classic AVR boards. The standard DTR-autoreset circuit is recommended (this is how boards I sell on Tindie with Optiboot preloaded are configured).
 
 Serial uploads are all done at 115200 baud, regardless of speed or part.
+
+### Removing Optiboot
+Like classic AVRs with hardware bootloader support (like the ATmega328p, and all other ATmega parts older than the 4809/4808), and unlike ATtiny parts without that, which use "virtual boot" to get bootloader functionality, you must do "burn bootloader" with a non-optiboot part selected in order to reprogram the part normally via UPDI. Unlike classic AVRs with hardware bootloader support, where not doing "burn bootloader" would work until sketch size reached the very end of the flash (where the chip thinks the bootloader is), on these parts, it won't work at all. 
 
 ### Autoreset circuit
 If using the bootloader with with the UPDI pin set to reset, this is needed for uploading. It will reset the chip when serial connection is opened like on typical Arduino boards. Do not connect an autoreset circuit to the UPDI pin if it is not set to act as reset, as this will not reset the chip, and will just block UPDI programming.
