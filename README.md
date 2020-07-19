@@ -34,6 +34,8 @@ The automotive versions of these parts are also supported - however, as of early
 ### Upcoming tinyAVR 2-series
 Microchip has released a product brief describing the upcoming tinyAVR 2-series parts. So far only information about 16k parts with 14, 20, and 24 pins has been released; other sizes have not been anounced. They appear to be similar to the 1-series parts, only without the DAC or type D timer, but with an additional USART (that scream you just heard in the distance was the ATtiny 841 and 1634, whose sole* claim to relevance in the face of these new parts was their second hardware USART) and more sophisticated ADC (12 bit, and differential ADC support - queue another scream from the '841, which also had a fancy differential ADC - not that any Arduino people were likely using it). When these parts become available, support for them will be added to megaTinyCore - the development effort required should be minimal, requiring only changes to the ADC code and standard addition to variants to handle the second USART. They have the 1.024/2.048/2.500/4.096/VDD references, not the (less useful) ones that the 0/1-series do. Judging from the io headers, it looks like their pair of type B timers can be clocked from events (addressing a major deficiency in the 0/1-series timers and event system) and cascaded for 32-bit input capture.
 
+*Okay, arguably the tiny841 has one remaining claim to relevance, that being the three timers having independant prescalers with the two 16-bit timers each equipped with dual 16-bit output compare.
+
 ## Supported Clock Speeds
 * 20MHz Internal (4.5v~5.5v - typical for 5v systems)
 * 16MHz Internal (4.5v~5.5v - typical for 5v systems)
