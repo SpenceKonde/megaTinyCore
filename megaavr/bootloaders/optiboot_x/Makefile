@@ -153,10 +153,10 @@ optiboot_%.elf:	optiboot_x.c FORCE
 #  appropriate specific options
 #---------------------------------------------------------------------------
 
-## For megaavr attiny with default UART port mapping
+## For tinyAVR 0/1-series with default UART port mapping
 tinyxy2: TARGET = attiny412
 tinyxy2:
-	$(MAKE) -f $(MF) optiboot_txy2.hex UARTTX=A6 TIMEOUT=8 LED=A7
+	$(MAKE) -f $(MF) optiboot_txy2.hex UARTTX=A6 TIMEOUT=8 LED=A3
 
 HELPTEXT += "target drazzy*4      - Dr Azzy's 14pin dev boards.\n"
 tinyxy4: TARGET = attiny1614
@@ -172,7 +172,7 @@ HELPTEXT += "target drazzy*7      - Dr Azzy's 24pin dev boards.\n"
 tinyxy7: TARGET = attiny3217
 tinyxy7:
 	$(MAKE) -f $(MF) optiboot_txy7.hex UARTTX=B2 TIMEOUT=8 LED=A7
-## For megaavr attiny with alternate UART port mapping
+## For tinyAVR 0/1-series with alternate UART port mapping
 tinyxy2alt: TARGET = attiny412
 tinyxy2alt:
 	$(MAKE) -f $(MF) optiboot_txy2_alt.hex UARTTX=A1 TIMEOUT=8 LED=A7
@@ -192,11 +192,11 @@ tinyxy7alt: TARGET = attiny3217
 tinyxy7alt:
 	$(MAKE) -f $(MF) optiboot_txy7_alt.hex UARTTX=A1 TIMEOUT=8 LED=A7
 
-## For megaavr attiny for use when UPDI is reset
-## For megaavr attiny with default UART port mapping
+## For tinyAVR 0/1-series for use when UPDI is reset
+## For tinyAVR 0/1-series with default UART port mapping
 tinyxy2rst: TARGET = attiny412
 tinyxy2rst:
-	$(MAKE) -f $(MF) optiboot_txy2_rst.hex START_APP_ON_POR=1 UARTTX=A6 TIMEOUT=1 LED=A7
+	$(MAKE) -f $(MF) optiboot_txy2_rst.hex START_APP_ON_POR=1 UARTTX=A6 TIMEOUT=1 LED=A3
 
 HELPTEXT += "target drazzy*4      - Dr Azzy's 14pin dev boards.\n"
 tinyxy4rst: TARGET = attiny1614
@@ -212,7 +212,7 @@ HELPTEXT += "target drazzy*7      - Dr Azzy's 24pin dev boards.\n"
 tinyxy7rst: TARGET = attiny3217
 tinyxy7rst:
 	$(MAKE) -f $(MF) optiboot_txy7_rst.hex START_APP_ON_POR=1 UARTTX=B2 TIMEOUT=1 LED=A7
-## For megaavr attiny with alternate UART port mapping
+## For tinyAVR 0/1-series with alternate UART port mapping
 tinyxy2altrst: TARGET = attiny412
 tinyxy2altrst:
 	$(MAKE) -f $(MF) optiboot_txy2_alt_rst.hex START_APP_ON_POR=1 UARTTX=A1 TIMEOUT=1 LED=A7
