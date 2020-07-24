@@ -12,9 +12,9 @@ Thankfully, most of these issues will not be encountered by most Arduino users. 
 * 0 - Impact extremely unlikely
 * 1 - Impact likely when using exotic features rarely used in Arduino through libraries or register configuration.
 * 2 - Impact likely when using normal features which may be used through libraries or register configuration.
-* 3 - Impacted functionality exposed by megaTinyCore in previous versions, but does not impact the current version.
-* 4 - Impacted functionality exposed by megaTinyCore in the current released version
-* 5 - Impacted functionality exposed by megaTinyCore and relevant to all versions
+* 3 - Issue impacted functions provided by megaTinyCore or included libraries in previous versions, but worked around in current version, and will impact users of this functionality if reconfigured manually.
+* 4 - Issue impacts functions provided by megaTinyCore or included libraries in the current released version, but will be worked around in future versions.
+* 5 - Issue impacts functions provided by megaTinyCore or included libraries and cannot be worked around.
 
 ## tinyAVR 1-series
  . |ATtiny212 | . |ATtiny214/414 | . |ATtiny417|ATtiny1614|ATtiny3216|.
@@ -27,8 +27,8 @@ Writing the OSCLOCK Fuse in FUSE.OSCCFG to ‘1’ Prevents Automatic Loading of
 The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)|-|X|-|X|-|-|-|-
 **AC** | .  | . | .  | . | .  | . | . |.
 Coupling Through AC Pins ! |-|-|-|-|X|-|-|-
-AC Interrupt Flag Not Set Unless Interrupt is Enabled ! |X|-|X|-|X|X|-|-
-False Triggers May Occur Under Certain Conditions ! |X|-|X|-|X|X|-|-
+AC Interrupt Flag Not Set Unless Interrupt is Enabled |X|-|X|-|X|X|-|-
+False Triggers May Occur Under Certain Conditions |X|-|X|-|X|X|-|-
 False Triggering When Sweeping Negative Input of the AC When the Low Power Mode is Disabled |-|-|-|-|X|X|-|-
 **ADC** | .  | . | .  | . | .  | . | . |.
 ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle|X|X|X|X|X|X|X|X
@@ -155,13 +155,14 @@ Frame Error on a Previous Message May Cause False Start Bit Detection|X|X|X|-
 
 These errata details are taken verbatim from the Silicon Errata and Datasheet Clarification documents except as noted below - see the links in the [datasheet pages](Datasheets.md) - they have only been formatted for markdown, and gathered from the multiple errata sheets into a single document for ease of comparison and reference. Be sure to check that a given item applies to the part you are working with on the above tables. 
 
-In some cases we have added a note (clearly marked) where we can confidently say whether it impacts megaTinyCore users. In a very small number of cases, we have marked annotated the text for clarity in the context of this combined errata document, these notes are *in italics* and the old wording in ~strikethrough~.
+For each issue, we have added a **megaTinyCore note** describing impact on megaTinyCore users. In a very small number of cases, we have marked annotated the text for clarity in the context of this combined errata document, these notes are *in italics* and the old wording in ~strikethrough~.
 
 
 ### Device
 #### On ~24-Pin~ *ATtiny1617* Automotive Devices Pin PC5 is Not Available
 On ~24-pin~ *ATtiny1617* automotive devices pin PC5 is not available.
 **Workaround:** Do not connect pin PC5 and disable input on pin (PORTC.PINTCRL5.ISC=0x4)
+
 **megaTinyCore note:** The effected part is unlikely to be used with megaTinyCore
 
 #### Writing the OSCLOCK Fuse in `FUSE.OSCCFG` to '1' Prevents Automatic Loading of Calibration
@@ -169,11 +170,13 @@ Values Writing the OSCLOCK fuse in `FUSE.OSCCFG` to '1' prevents the automatic l
 
 **Workaround:** Do not use OSCLOCK for locking the oscillator calibration value. The oscillator calibration value can be locked by
 writing LOCK in `CLKCTRL.OSC`20MCALIBB to '1'.
+
 **megaTinyCore note:** No concern
 
 #### The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)
 The temperature sensor is not calibrated on parts with date code 727/728 (used on QFN packages) and 1728 (used on SOIC packages).
 **Workaround:** If temperature sensor calibration data is required, devices with the affected date code may be returned through the Microchip RMA service. Devices with this date code are no longer shipped by Microchip.
+
 **megaTinyCore note:** These are unlikely to be found in the wild anymore. 
 
 ### AC - Analog Comparator
@@ -181,10 +184,14 @@ The temperature sensor is not calibrated on parts with date code 727/728 (used o
 There is a capacitive coupling through the Analog Comparator. Toggling the selected positive AC pin may affect the selected negative input pin and vice versa.
 **Workaround:** When the AC is disabled, configure AC.MUXCTRLA.MUXNEG to DAC or internal reference.
 
+**megaTinyCore note:** megaTinyCore does not provide any functionality related to the analog comparators. If your code or libraries do, and you disable them and use the input pins for other purposes, you must take account of this.
+
 #### AC Interrupt Flag Not Set Unless Interrupt is Enabled
 `ACn.STATUS.CMP` is not set if the `ACn.INTCTRL.CMP` is not set.
 
 **Workaround:** Enable `ACn.INTCTRL.CMP` or use `ACn.STATUS.STATE` for polling.
+
+**megaTinyCore note:** megaTinyCore does not provide any functionality related to the analog comparators. If your code or libraries do, you cannot poll the interrupt flag to see whether it has been triggered. You can poll `ACn.STATUS.CMP` (though if the comparison condition becomes true, and then false again, between the occasions on which you check this bit, you would miss it). 
 
 #### False Triggers May Occur Under Certain Conditions
 False triggers may occur on falling input pin:
@@ -199,37 +206,43 @@ is enabled
 A false trigger may occur if sweeping the negative input of the AC with a negative slope, and the AC has Low-Power mode disabled.
 
 **Workaround:** Enable Low-Power mode in `AC.CTRLA.LPMODE`.
-**megaTinyCore note:** megaTinyCore does not provide any functionality related to the analog comparators If your code or libraries do, this must be accounted for)
+
+**megaTinyCore note:** megaTinyCore does not provide any functionality related to the analog comparators. If your code or libraries do, this must be accounted for)
 
 ### ADC - Analog-to-Digital Converter
 #### SAMPDLY and ASDV Does Not Work Together With SAMPLEN
 Using `SAMPCTRL.SAMPLEN` at the same time as `CTRLD.SAMPDLY` or `CTRLD.ASDV` will cause an unpredictable sampling length.
 
 **Workaround:** When setting `SAMPCTRL.SAMPLEN` greater than 0x0, the `CTRLD.SAMPDLY` and `CTRLD.ASDV` must be cleared.
+
 **megaTinyCore note:** Not an issue unless you reconfigure the ADC manually, but be aware that megaTinyCore does set SAMPLEN. 
 
 #### Pending Event Stuck When Disabling the ADC
 If the ADC is disabled during an event-triggered conversion, the event will not be cleared.
 
 **Workaround:** Clear `ADC.EVCTRL.STARTEI` and wait for the conversion to complete before disabling the ADC.
-**megaTinyCore note:** Only an issue if you configure this functionality.
+
+**megaTinyCore note:** Only an issue if you reconfigure the ADC to use the event system as a start trigger.
 
 #### ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle
 The ADC functionality cannot be ensured if CLKADC > 1.5 MHz with `ADCn.CALIB.DUTYCYC` set to '1'.
 
 **Workaround:** If ADC is operated with CLKADC > 1.5 MHz, `ADCn.CALIB.DUTYCYC` must be set to '0' (50% duty cycle).
+
 **megaTinyCore note:** megaTinyCore sets CLKADC at 1.0 - 1.25 MHz, so only an issue if you change that. 
 
 #### ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V
 The ADC INL performance degrades if CLKADC > 1.5 MHz and `ADCn.CALIB.DUTYCYC` set to '0' for VDD < 2.7V.
 
 **Workaround:** None.
+
 **megaTinyCore note:** megaTinyCore sets CLKADC at 1.0 - 1.25 MHz, so only an issue if you change that. 
 
 #### ADC Interrupt Flags Cleared When Reading RESH
 `ADCn.INTFLAGS.RESRDY` and `ADCn.INTFLAGS.WCOMP` are cleared when reading `ADCn.RESH`.
 
 **Workaround:** In 8-bit mode, read `ADCn.RESH` to clear the flag or clear the flag directly.
+
 **megaTinyCore note:** megaTinyCore always reads the whole register, so this is not an issue unless you write your own routine for reading the ADC result in 8-bit mode. 
 
 #### Changing ADC Control Bits During Free-Running Mode not Working
@@ -237,12 +250,14 @@ If control signals are changed during Free-Running mode, the new configuration i
 
 **Workaround:** Disable ADC Free-Running mode before updating the `ADC.CTRLB`, `ADC.CTRLC`, `ADC.SAMPCTRL`,
 `ADC.MUXPOS`, `ADC.WINLT` or `ADC.WINHT` registers.
+
 **megaTinyCore note:** If you reconfigure the ADC for free running mode, you must be aware of this. 
 
 #### One Extra Measurement Performed After Disabling ADC Free-Running Mode
 The ADC may perform one additional measurement after clearing `ADCn.CTRLA.FREERUN`.
 
 **Workaround:** Write `ADCn.CTRLA.ENABLE` to '0' to stop the Free-Running mode immediately.
+
 **megaTinyCore note:** If you reconfigure the ADC for free running mode, you must be aware of this. 
 
 #### ADC Wake-Up with WCOMP
@@ -271,6 +286,7 @@ Connecting the LUTs in linked mode requires `LUTnCTRLA.OUTEN` set to '1' for the
 The CCL D-latch is not functional.
 
 **Workaround:** None.
+
 **megaTinyCore note:** Don't try to use this through the Logic library on effected parts (which is most of them) 
 
 ### RTC - Real-Time Counter
@@ -278,6 +294,7 @@ The CCL D-latch is not functional.
 Any write to the `RTC.CTRLA` register resets the RTC and PIT prescaler.
 
 **Workaround:** None.
+
 **megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted; users manually configuring these timers on effected parts must take account of this.
 
 #### Disabling the RTC Stops the PIT
@@ -285,6 +302,7 @@ Writing `RTC.CTRLA.RTCEN` to '0' will stop the PIT.
 Writing `RTC.PITCTRLA.PITEN` to '0' will stop the RTC.
 
 **Workaround:** Do not disable the RTC or the PIT if any of the modules are used.
+
 **megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted; users manually configuring these timers on effected parts must take account of this.
 
 ### TCB - Timer/Counter B
@@ -300,6 +318,7 @@ Event detection will fail if TCBn receives an input event with a high/low period
 `TCBn.INTFLAGS.CAPT` is cleared when reading `TCBn.CCMPH` instead of CCMPL.
 
 **Workaround:** Read both `TCBn.CCMPL` and `TCBn.CCMPH`.
+
 **megaTinyCore note:** Only impacts users who reconfigure a Type B timer for input capture and tried to read only the low byte of CCMP; impact on someone who tried that would be severe if workaround above not used. Manually clearing the interrupt flag should also work.
 
 #### TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working with Prescaled
@@ -307,12 +326,14 @@ Clock The TCB Input Capture Frequency and Pulse-Width Measurement mode may lock 
 `TCB.CTRLA` is set to any other value than 0x0.
 
 **Workaround:** Only use CLKSEL equal to 0x0 when using Input Capture Frequency and Pulse-Width Measurement mode.
+
 **megaTinyCore note:** Only impacts users who reconfigure a Type B timer for these input capture modes.
 
 #### The TCA Restart Command Does Not Force a Restart of TCB
 The TCA restart command does not force a restart of the TCB when TCB is running in SYNCUPD mode. TCB is only restarted after a TCA OVF.
 
 **Workaround:** None.
+
 **megaTinyCore note:** No impact unless you are trying to use this unusual feature. 
 
 ### TCD - Timer/Counter D
@@ -320,16 +341,19 @@ The TCA restart command does not force a restart of the TCB when TCB is running 
 The TCD event output lines can give out false events.
 
 **Workaround:** Use the delayed event functionality with a minimum of one cycle delay.
+
 **megaTinyCore note:** Only an issue if using TCD0 as an event source. 
 
 #### TCD Auto-Update Not Working
 The TCD auto-update feature is not working.
 
 **Workaround:** None.
+
 **megaTinyCore note:** This is accounted for in by the analogWrite() function on pins controlled by TCD0 after it was discovered the hard way.
 
 ### TWI - Two-Wire Interface
 #### TIMEOUT Bits in the `TWI.MCTRLB` Register are Not Accessible
+
 The TIMEOUT bits in the `TWI.MCTRLB` register are not accessible from software.
 
 **Workaround:** When initializing TWI, BUSSTATE in `TWI.MSTATUS` should be brought into IDLE state by writing 0x1 to it.
@@ -338,18 +362,21 @@ The TIMEOUT bits in the `TWI.MCTRLB` register are not accessible from software.
 If TWI is enabled in Master mode followed by an immediate write to the MADDR register, the bus monitor recognizes the Start bit as a Stop bit.
 
 **Workaround:** Wait for a minimum of two clock cycles from `TWI.MCTRLA.ENABLE` until `TWI.MADDR` is written.
+
 **megaTinyCore note:** No concern for megaTinyCore users unless you write your own I2C implementation. 
 
 #### TWI Smart Mode Gives Extra Clock Pulse
 TWI Master with Smart mode enabled gives an extra clock pulse on the SCL line after sending NACK.
 
 **Workaround:** None.
+
 **megaTinyCore note:** No concern for megaTinyCore users unless you write your own I2C implementation, our Wire implementation doesn't use Smart Mode. 
 
 #### The TWI Master Enable Quick Command is Not Accessible
 `TWI.MCTRLA.QCEN` is not accessible from software.
 
 **Workaround:** None.
+
 **megaTinyCore note:** No concern for megaTinyCore users unless you write your own I2C implementation, our Wire implementation doesn't use that either. 
 
 ### USART - Universal Synchronous and Asynchronous Receiver and Transmitter
@@ -373,6 +400,7 @@ release the pin override of the TXD pin
 For the LIN sync field, the USART is validating each bit to be within ±15% instead of the time between falling edges as described in the LIN specification. This allows a minimum duty cycle of 43.5% and a maximum duty cycle of 57.5%.
 
 **Workaround:** None.
+
 **megaTinyCore note:** Only a concern if reconfiguring USART for LIN. 
 
 #### Frame Error on a Previous Message May Cause False Start Bit Detection
