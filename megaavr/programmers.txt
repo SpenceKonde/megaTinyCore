@@ -12,7 +12,7 @@ edbg.program.protocol=xplainedpro_updi
 edbg.program.tool=avrdude
 edbg.program.extra_params=-Pusb
 
-nedbg.name=Atmel nEDBG (ATSAMD21E18)
+nedbg.name=Atmel nEDBG (ATSAMD21E18) (megaTinyCore)
 nedbg.communication=usb
 nedbg.protocol=curiosity_updi
 nedbg.program.protocol=curiosity_updi
