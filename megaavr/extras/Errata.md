@@ -17,12 +17,10 @@ Thankfully, most of these issues will not be encountered by most Arduino users. 
 * 5 - Issue impacts functions provided by megaTinyCore or included libraries and cannot be worked around.
 
 ## tinyAVR 1-series
- . | . |ATtiny212 | . |ATtiny214/414 | . |ATtiny417|ATtiny1614|ATtiny3216 | . |.
+ . | . |ATtiny212 | . |ATtiny214/414 | . |ATtiny417|ATtiny1614|ATtiny3216 | . 
 ---| --- | --- | --- | --- | --- | --- | --- | --- | ---
- . | . |ATtiny412 | . |ATtiny416 | . |ATtiny816|ATtiny1616|ATtiny3217 | . |.
- . | Impact | .  | . |ATtiny814 | . |ATtiny817|ATtiny1617  | . | . |.
-
-
+ . | . |ATtiny412 | . |ATtiny416 | . |ATtiny816|ATtiny1616|ATtiny3217 | . 
+ . | Impact | .  | . |ATtiny814 | . |ATtiny817|ATtiny1617  | . | . 
 Silicon Revision | . |A|B|A|B|A,B|A|A|C
 Device  | . | .  | . | .  | . | .  | . | . |.
 Writing the OSCLOCK Fuse in FUSE.OSCCFG to ‘1’ Prevents Automatic Loading of Calibration Values | . |-|-|-|-|-|X|X|X
