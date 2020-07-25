@@ -17,137 +17,136 @@ Thankfully, most of these issues will not be encountered by most Arduino users. 
 * 5 - Issue impacts functions provided by megaTinyCore or included libraries and cannot be worked around.
 
 ## tinyAVR 1-series
- . |ATtiny212 | . |ATtiny214/414 | . |ATtiny417|ATtiny1614|ATtiny3216|.
---- | --- | --- | --- | --- | --- | --- | --- | ---
- . |ATtiny412 | . |ATtiny416 | . |ATtiny816|ATtiny1616|ATtiny3217|.
-. | .  | . |ATtiny814 | . |ATtiny817|ATtiny1617 | . |.
-Silicon Revision  |A|B|A|B|A,B|A|A|C
-Device | .  | . | .  | . | .  | . | . |.
-Writing the OSCLOCK Fuse in FUSE.OSCCFG to ‘1’ Prevents Automatic Loading of Calibration Values|-|-|-|-|-|X|X|X
-The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)|-|X|-|X|-|-|-|-
-**AC** | .  | . | .  | . | .  | . | . |.
-Coupling Through AC Pins ! |-|-|-|-|X|-|-|-
-AC Interrupt Flag Not Set Unless Interrupt is Enabled |X|-|X|-|X|X|-|-
-False Triggers May Occur Under Certain Conditions |X|-|X|-|X|X|-|-
-False Triggering When Sweeping Negative Input of the AC When the Low Power Mode is Disabled |-|-|-|-|X|X|-|-
-**ADC** | .  | . | .  | . | .  | . | . |.
-ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle|X|X|X|X|X|X|X|X
-ADC Interrupt Flags Cleared When Reading RESH|-|-|-|-|X|X|-|-
-ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V|X|X|X|X|X|X|X|X
-ADC Wake-Up with WCOMP|X|-|X|-|X|X|-|-
-Changing ADC Control Bits During Free-Running Mode not Working|X|-|X|-|X|X|-|-
-One Extra Measurement Performed After Disabling ADC FreeRunning Mode|X|X|X|X|X|X|X|X
-Pending Event Stuck When Disabling the ADC|-|-|-|-|X|X|X|-
-SAMPDLY and ASDV Does Not Work Together With SAMPLEN|X|-|X|-|-|X|-|-
-**CCL** | .  | . | .  | . | .  | . | . |.
-Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’|X|X|X|X|X|X|X|-
-D-latch is Not Functional|X|X|X|X|X|X|X|-
-**PORTMUX** | .  | . | .  | . | .  | . | . |.
-Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5|-|-|X|X|-|-|-|-
-**RTC** | .  | . | .  | . | .  | . | . |.
-Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler|X|X|X|X|X|X|X|-
-Disabling the RTC Stops the PIT|X|X|X|X|X|X|X|-
-**TCB** | .  | . | .  | . | .  | . | . |.
-Minimum Event Duration Must Exceed the Selected Clock Period|X|X|X|X|X|X|X|X
-The TCB Interrupt Flag is Cleared When Reading CCMPH|X|-|X|-|X|X|-|-
-TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working with Prescaled Clock|X|-|X|-|X|X|-|-
-The TCA Restart Command Does Not Force a Restart of TCB|X|X|X|X|X|X|X|X
-**TCD** | .  | . | .  | . | .  | . | . |.
-TCD Auto-Update Not Working|-|-|-|-|X|X|-|-
-TCD Event Output Lines May Give False Events|-|-|-|-|X|X|-|-
-**TWI** | .  | . | .  | . | .  | . | . |.
-TIMEOUT Bits in the TWI.MCTRLB Register are Not Accessible|X|-|X|-|X|X|-|-
-TWI Smart Mode Gives Extra Clock Pulse|X|-|X|-|X|X|-|-
-TWI Master Mode Wrongly Detects the Start Bit as a Stop Bit|X|-|X|-|X|X|-|-
-The TWI Master Enable Quick Command is Not Accessible|X|-|X|-|X|X|-|-
-**USART** | .  | . | .  | . | .  | . | . |.
-TXD Pin Override Not Released When Disabling the Transmitter|X|X|X|X|X|X|X|X
-Full Range Duty Cycle Not Supported When Validating LIN Sync Field|-|-|-|-|-|X|-|-
-Frame Error on a Previous Message May Cause False Start Bit Detection|X|X|X|X|X|X|X|-
-Open-Drain Mode Does Not Work When TXD is Configured as Output|-|-|-|-|-|X|X|X
+ . | . |ATtiny212 | . |ATtiny214/414 | . |ATtiny417|ATtiny1614|ATtiny3216 | . |.
+---  | --- | --- | --- | --- | --- | --- | --- | --- | ---
+ . | . |ATtiny412 | . |ATtiny416 | . |ATtiny816|ATtiny1616|ATtiny3217 | . |.
+ . | Impact | .  | . |ATtiny814 | . |ATtiny817|ATtiny1617  | . | . |.
+Silicon Revision | . |A|B|A|B|A,B|A|A|C
+Device  | . | .  | . | .  | . | .  | . | . |.
+Writing the OSCLOCK Fuse in FUSE.OSCCFG to ‘1’ Prevents Automatic Loading of Calibration Values | . |-|-|-|-|-|X|X|X
+The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28) | . |-|X|-|X|-|-|-|-
+**AC**  | . | .  | . | .  | . | .  | . | . |.
+Coupling Through AC Pins !  | . |-|-|-|-|X|-|-|-
+AC Interrupt Flag Not Set Unless Interrupt is Enabled  | . |X|-|X|-|X|X|-|-
+False Triggers May Occur Under Certain Conditions  | . |X|-|X|-|X|X|-|-
+False Triggering When Sweeping Negative Input of the AC When the Low Power Mode is Disabled  | . |-|-|-|-|X|X|-|-
+**ADC**  | . | .  | . | .  | . | .  | . | . |.
+ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle | . |X|X|X|X|X|X|X|X
+ADC Interrupt Flags Cleared When Reading RESH | . |-|-|-|-|X|X|-|-
+ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V | . |X|X|X|X|X|X|X|X
+ADC Wake-Up with WCOMP | . |X|-|X|-|X|X|-|-
+Changing ADC Control Bits During Free-Running Mode not Working | . |X|-|X|-|X|X|-|-
+One Extra Measurement Performed After Disabling ADC FreeRunning Mode | . |X|X|X|X|X|X|X|X
+Pending Event Stuck When Disabling the ADC | . |-|-|-|-|X|X|X|-
+SAMPDLY and ASDV Does Not Work Together With SAMPLEN | . |X|-|X|-|-|X|-|-
+**CCL**  | . | .  | . | .  | . | .  | . | . |.
+Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’ | . |X|X|X|X|X|X|X|-
+D-latch is Not Functional | . |X|X|X|X|X|X|X|-
+**PORTMUX**  | . | .  | . | .  | . | .  | . | . |.
+Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5 | . |-|-|X|X|-|-|-|-
+**RTC**  | . | .  | . | .  | . | .  | . | . |.
+Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler | . |X|X|X|X|X|X|X|-
+Disabling the RTC Stops the PIT | . |X|X|X|X|X|X|X|-
+**TCB**  | . | .  | . | .  | . | .  | . | . |.
+Minimum Event Duration Must Exceed the Selected Clock Period | . |X|X|X|X|X|X|X|X
+The TCB Interrupt Flag is Cleared When Reading CCMPH | . |X|-|X|-|X|X|-|-
+TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working with Prescaled Clock | . |X|-|X|-|X|X|-|-
+The TCA Restart Command Does Not Force a Restart of TCB | . |X|X|X|X|X|X|X|X
+**TCD**  | . | .  | . | .  | . | .  | . | . |.
+TCD Auto-Update Not Working | . |-|-|-|-|X|X|-|-
+TCD Event Output Lines May Give False Events | . |-|-|-|-|X|X|-|-
+**TWI**  | . | .  | . | .  | . | .  | . | . |.
+TIMEOUT Bits in the TWI.MCTRLB Register are Not Accessible | . |X|-|X|-|X|X|-|-
+TWI Smart Mode Gives Extra Clock Pulse | . |X|-|X|-|X|X|-|-
+TWI Master Mode Wrongly Detects the Start Bit as a Stop Bit | . |X|-|X|-|X|X|-|-
+The TWI Master Enable Quick Command is Not Accessible | . |X|-|X|-|X|X|-|-
+**USART**  | . | .  | . | .  | . | .  | . | . |.
+TXD Pin Override Not Released When Disabling the Transmitter | . |X|X|X|X|X|X|X|X
+Full Range Duty Cycle Not Supported When Validating LIN Sync Field | . |-|-|-|-|-|X|-|-
+Frame Error on a Previous Message May Cause False Start Bit Detection | . |X|X|X|X|X|X|X|-
+Open-Drain Mode Does Not Work When TXD is Configured as Output | . |-|-|-|-|-|X|X|X
 
 
 
 ## Automotive tinyAVR 1-series
 
-. | ATtiny212/214 | ATtiny814 | ATtiny416/417 | ATtiny1614 | ATtiny3216
---- | --- | --- | --- | --- | ---
-. | ATtiny412/414 | . | ATtiny816/817 | ATtiny1616 | ATtiny3217
-. | . | . | . | ATtiny1617 | . 
-Silicon Revision  | B | A, B | A, B | A | B
-Device | . | . | . | . | . 
-On 24-Pin Automotive Devices Pin PC5 is Not Available | - | - | - | X | -
-Writing the OSCLOCK Fuse in FUSE.OSCCFG to ‘1’ Prevents Automatic Loading of Calibration Values | X | - | - | X | X
-The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28) | X | - | - | - | -
-**AC** | . | . | . | . | . 
-Coupling Through AC Pins | - | X | X | - | -
-AC Interrupt Flag Not Set Unless Interrupt is Enabled | - | X | X | X | -
-False Triggers May Occur Under Certain Conditions | - | X | X | X | -
-False Triggering When Sweeping Negative Input of the AC When the Low Power Mode is Disabled | - | X | X | X | -
-**ADC** | . | . | . | . | . 
-ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle | X | X | X | X | X
-ADC Interrupt Flags Cleared When Reading RESH | - | X | X | X | -
-ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V | - | X | - | - | -
-ADC Wake-Up with WCOMP | - | X | X | X | -
-Changing ADC Control Bits During Free-Running Mode not Working | - | X | X | X | -
-One Extra Measurement Performed After Disabling ADC FreeRunning Mode | X | X | X | X | X
-Pending Event Stuck When Disabling the ADC | - | X | X | X | -
-SAMPDLY and ASDV Does Not Work Together With SAMPLEN | - | - | - | X | -
-**CCL** | . | . | . | . | . 
-Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’ | X | X | X | X | -
-D-latch is Not Functional | X | X | X | X | -
-**PORTMUX** | . | . | . | . | . 
-Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5 | X | - | - | - | -
-**RTC** | . | . | . | . | . 
-Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler | X | X | X | X | -
-Disabling the RTC Stops the PIT | X | X | X | X | -
-**TCB** | . | . | . | . | . 
-Minimum Event Duration Must Exceed the Selected Clock Period | X | X | X | X | X
-The TCB Interrupt Flag is Cleared When Reading CCMPH | - | X | X | X | -
-TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working with Prescaled Clock | - | X | X | X | -
-The TCA Restart Command Does Not Force a Restart of TCB | X | X | X | X | X
-**TCD** | . | . | . | . | . 
-TCD Auto-Update Not Working | - | X | X | X | -
-TCD Event Output Lines May Give False Events | - | X | X | X | -
-**TWI** | . | . | . | . | . 
-TIMEOUT Bits in the TWI.MCTRLB Register are Not Accessible | - | X | X | X | -
-TWI Smart Mode Gives Extra Clock Pulse | - | X | X | X | -
-TWI Master Mode Wrongly Detects the Start Bit as a Stop Bit | - | X | X | X | -
-The TWI Master Enable Quick Command is Not Accessible | - | X | X | X | -
-**USART** | . | . | . | . | . 
-TXD Pin Override Not Released When Disabling the Transmitter | X | X | X | X | X
-Full Range Duty Cycle Not Supported When Validating LIN Sync Field | X | - | - | X | -
-Frame Error on a Previous Message May Cause False Start Bit Detection | X | X | X | X | -
-Open-Drain Mode Does Not Work When TXD is Configured as Output | X | - | - | X | X
+ . |. | ATtiny212/214 | ATtiny814 | ATtiny416/417 | ATtiny1614 | ATtiny3216
+--- | --- | --- | --- | --- | --- | ---
+ . |. | ATtiny412/414 | . | ATtiny816/817 | ATtiny1616 | ATtiny3217
+ . | Impact | . | . | . | ATtiny1617  | . | . 
+Silicon Revision | . | B | A, B | A, B | A | B
+Device  | . | . | . | . | . | . 
+On 24-Pin Automotive Devices Pin PC5 is Not Available  | . | - | - | - | X | -
+Writing the OSCLOCK Fuse in FUSE.OSCCFG to ‘1’ Prevents Automatic Loading of Calibration Values  | . | X | - | - | X | X
+The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)  | . | X | - | - | - | -
+**AC**  | . | . | . | . | . | . 
+Coupling Through AC Pins  | . | - | X | X | - | -
+AC Interrupt Flag Not Set Unless Interrupt is Enabled  | . | - | X | X | X | -
+False Triggers May Occur Under Certain Conditions  | . | - | X | X | X | -
+False Triggering When Sweeping Negative Input of the AC When the Low Power Mode is Disabled  | . | - | X | X | X | -
+**ADC**  | . | . | . | . | . | . 
+ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle  | . | X | X | X | X | X
+ADC Interrupt Flags Cleared When Reading RESH  | . | - | X | X | X | -
+ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V  | . | - | X | - | - | -
+ADC Wake-Up with WCOMP  | . | - | X | X | X | -
+Changing ADC Control Bits During Free-Running Mode not Working  | . | - | X | X | X | -
+One Extra Measurement Performed After Disabling ADC FreeRunning Mode  | . | X | X | X | X | X
+Pending Event Stuck When Disabling the ADC  | . | - | X | X | X | -
+SAMPDLY and ASDV Does Not Work Together With SAMPLEN  | . | - | - | - | X | -
+**CCL**  | . | . | . | . | . | . 
+Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’  | . | X | X | X | X | -
+D-latch is Not Functional  | . | X | X | X | X | -
+**PORTMUX**  | . | . | . | . | . | . 
+Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5  | . | X | - | - | - | -
+**RTC**  | . | . | . | . | . | . 
+Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler  | . | X | X | X | X | -
+Disabling the RTC Stops the PIT  | . | X | X | X | X | -
+**TCB**  | . | . | . | . | . | . 
+Minimum Event Duration Must Exceed the Selected Clock Period  | . | X | X | X | X | X
+The TCB Interrupt Flag is Cleared When Reading CCMPH  | . | - | X | X | X | -
+TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working with Prescaled Clock  | . | - | X | X | X | -
+The TCA Restart Command Does Not Force a Restart of TCB  | . | X | X | X | X | X
+**TCD**  | . | . | . | . | . | . 
+TCD Auto-Update Not Working  | . | - | X | X | X | -
+TCD Event Output Lines May Give False Events  | . | - | X | X | X | -
+**TWI**  | . | . | . | . | . | . 
+TIMEOUT Bits in the TWI.MCTRLB Register are Not Accessible  | . | - | X | X | X | -
+TWI Smart Mode Gives Extra Clock Pulse  | . | - | X | X | X | -
+TWI Master Mode Wrongly Detects the Start Bit as a Stop Bit  | . | - | X | X | X | -
+The TWI Master Enable Quick Command is Not Accessible  | . | - | X | X | X | -
+**USART**  | . | . | . | . | . | . 
+TXD Pin Override Not Released When Disabling the Transmitter  | . | X | X | X | X | X
+Full Range Duty Cycle Not Supported When Validating LIN Sync Field  | . | X | - | - | X | -
+Frame Error on a Previous Message May Cause False Start Bit Detection  | . | X | X | X | X | -
+Open-Drain Mode Does Not Work When TXD is Configured as Output  | . | X | - | - | X | X
 
 ## tinyAVR 0-series Errata
-. |ATtiny202|ATtiny204|ATtiny202/204|ATtiny804/806/807
---- | --- | --- | --- | --- 
-. |ATtiny402|ATtiny404|ATtiny402/404/406|ATtiny1604/1606/1607
-. | . |ATtiny406|Automotive|Both
+ . | . |ATtiny202|ATtiny204|ATtiny202/204|ATtiny804/806/807
+---  |---| --- | --- | --- | --- 
+ . |. |ATtiny402|ATtiny404|ATtiny402/404/406|ATtiny1604/1606/1607
+ . | Impact | . |ATtiny406|Automotive|Both
 Silicon Revision |B|B|B|A
-Device| . | . | . | .
-The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)|X|X|X|-
-**ADC** | . | . | . | .
-ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle|X|X|X|X
-ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V|X|X|-|X
-One Extra Measurement Performed After Disabling ADC FreeRunning Mode|X|X|X|X
-Pending Event Stuck When Disabling the ADC|-|-|-|X
-**CCL** | . | . | . | .
-Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’|X|X|X|X
-D-latch is Not Functional|X|X|X|X
-**PORTMUX** | . | . | . | .
-Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5|-|X|X|-
-**RTC** | . | . | . | .
-Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler|X|X|X|X
-Disabling the RTC Stops the PIT|X|X|X|X
-**TCB** | . | . | . | .
-Minimum Event Duration Must Exceed the Selected Clock Period|X|X|X|X
-The TCA Restart Command Does Not Force a Restart of TCB|X|X|X|X
-**USART** | . | . | . | .
-TXD Pin Override Not Released When Disabling the Transmitter|X|X|X|X
+Device | . | . | . | . | .
+The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28) | . |X|X|X|-
+**ADC**  | . | . | . | . | .
+ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle | . |X|X|X|X
+ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V | . |X|X|-|X
+One Extra Measurement Performed After Disabling ADC FreeRunning Mode | . |X|X|X|X
+Pending Event Stuck When Disabling the ADC | . |-|-|-|X
+**CCL**  | . | . | . | . | .
+Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’ | . |X|X|X|X
+D-latch is Not Functional | . |X|X|X|X
+**PORTMUX**  | . | . | . | . | .
+Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5 | . |-|X|X|-
+**RTC**  | . | . | . | . | .
+Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler | . |X|X|X|X
+Disabling the RTC Stops the PIT | . |X|X|X|X
+**TCB**  | . | . | . | . | .
+Minimum Event Duration Must Exceed the Selected Clock Period | . |X|X|X|X
+The TCA Restart Command Does Not Force a Restart of TCB | . |X|X|X|X
+**USART**  | . | . | . | . | .
+TXD Pin Override Not Released When Disabling the Transmitter | . |X|X|X|X
 Frame Error on a Previous Message May Cause False Start Bit Detection|X|X|X|-
-
 
 
 
