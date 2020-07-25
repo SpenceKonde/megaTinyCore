@@ -126,7 +126,7 @@ Open-Drain Mode Does Not Work When TXD is Configured as Output  | . | X | - | - 
 ---  |---| --- | --- | --- | --- 
  . |. |ATtiny402|ATtiny404|ATtiny402/404/406|ATtiny1604/1606/1607
  . | Impact | . |ATtiny406|Automotive|Both
-Silicon Revision |B|B|B|A
+Silicon Revision | . |B|B|B|A
 Device | . | . | . | . | .
 The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28) | . |X|X|X|-
 **ADC**  | . | . | . | . | .
@@ -161,6 +161,7 @@ For each issue, we have added a **megaTinyCore note** describing impact on megaT
 ### Device
 #### On ~24-Pin~ *ATtiny1617* Automotive Devices Pin PC5 is Not Available
 On ~24-pin~ *ATtiny1617* automotive devices pin PC5 is not available.
+
 **Workaround:** Do not connect pin PC5 and disable input on pin (PORTC.PINTCRL5.ISC=0x4)
 
 **megaTinyCore note:** The effected part is unlikely to be used with megaTinyCore
@@ -182,6 +183,7 @@ The temperature sensor is not calibrated on parts with date code 727/728 (used o
 ### AC - Analog Comparator
 #### Coupling Through AC Pins
 There is a capacitive coupling through the Analog Comparator. Toggling the selected positive AC pin may affect the selected negative input pin and vice versa.
+
 **Workaround:** When the AC is disabled, configure AC.MUXCTRLA.MUXNEG to DAC or internal reference.
 
 **megaTinyCore note:** megaTinyCore does not provide any functionality related to the analog comparators. If your code or libraries do, and you disable them and use the input pins for other purposes, you must take account of this.
