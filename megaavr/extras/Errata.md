@@ -21,6 +21,8 @@ Thankfully, most of these issues will not be encountered by most Arduino users. 
 ---| --- | --- | --- | --- | --- | --- | --- | --- | ---
  . | . |ATtiny412 | . |ATtiny416 | . |ATtiny816|ATtiny1616|ATtiny3217 | . |.
  . | Impact | .  | . |ATtiny814 | . |ATtiny817|ATtiny1617  | . | . |.
+
+
 Silicon Revision | . |A|B|A|B|A,B|A|A|C
 Device  | . | .  | . | .  | . | .  | . | . |.
 Writing the OSCLOCK Fuse in FUSE.OSCCFG to ‘1’ Prevents Automatic Loading of Calibration Values | . |-|-|-|-|-|X|X|X
