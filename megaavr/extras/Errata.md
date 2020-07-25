@@ -18,7 +18,7 @@ Thankfully, most of these issues will not be encountered by most Arduino users. 
 
 ## tinyAVR 1-series
  . | . |ATtiny212 | . |ATtiny214/414 | . |ATtiny417|ATtiny1614|ATtiny3216 | . |.
----  | --- | --- | --- | --- | --- | --- | --- | --- | ---
+---| --- | --- | --- | --- | --- | --- | --- | --- | ---
  . | . |ATtiny412 | . |ATtiny416 | . |ATtiny816|ATtiny1616|ATtiny3217 | . |.
  . | Impact | .  | . |ATtiny814 | . |ATtiny817|ATtiny1617  | . | . |.
 Silicon Revision | . |A|B|A|B|A,B|A|A|C
@@ -65,6 +65,7 @@ TXD Pin Override Not Released When Disabling the Transmitter | . |X|X|X|X|X|X|X|
 Full Range Duty Cycle Not Supported When Validating LIN Sync Field | . |-|-|-|-|-|X|-|-
 Frame Error on a Previous Message May Cause False Start Bit Detection | . |X|X|X|X|X|X|X|-
 Open-Drain Mode Does Not Work When TXD is Configured as Output | . |-|-|-|-|-|X|X|X
+
 
 
 
