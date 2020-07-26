@@ -7,7 +7,7 @@
  http://www.arduino.cc/en/Tutorial/Knob
 */
 
-#include <Servo.h>
+#include <Servo_megaTinyCore.h>
 
 Servo myservo;  // create servo object to control a servo
 
