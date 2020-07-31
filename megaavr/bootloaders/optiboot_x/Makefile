@@ -236,20 +236,23 @@ tinyxy7altrst:
 
 
 HELPTEXT += "target curiosity1607 - Microchip ATtiny1607 Curiosity Nano.\n"
+curiosity1607: TARGET = attiny1607
 curiosity1607:
-	$(MAKE) -f $(MF) optiboot_attiny1607.hex UARTTX=B2 TIMEOUT=8 LED=B7 LED_INVERT=1
+	$(MAKE) -f $(MF) optiboot_curiosity1607.hex UARTTX=B2 TIMEOUT=8 LED=B7 LED_INVERT=1
 
 HELPTEXT += "target curiosity4809 - Microchip ATmega4809 Curiosity Nano.\n"
 curiosity4809:
 	$(MAKE) -f $(MF) optiboot_atmega4809.hex UARTTX=B0 TIMEOUT=8 LED=F5 LED_INVERT=1
 
 HELPTEXT += "target xplained416   - Microchip ATtiny416 Xplained Nano.\n"
+xplained416: TARGET = attiny1607
 xplained416:
-	$(MAKE) -f $(MF) optiboot_attiny416.hex UARTTX=A1 TIMEOUT=8 LED=B5 LED_INVERT=1 BAUD_RATE=57600
+	$(MAKE) -f $(MF) optiboot_xplained416.hex UARTTX=A1 TIMEOUT=8 LED=B5 LED_INVERT=1 BAUD_RATE=57600
 
 HELPTEXT += "target xplained817   - Microchip ATtiny817 Xplained Mini.\n"
+xplained817: TARGET = attiny1607
 xplained817:
-	$(MAKE) -f $(MF) optiboot_attiny817.hex UARTTX=B2 TIMEOUT=8 LED=C0 BAUD_RATE=57600
+	$(MAKE) -f $(MF) optiboot_xplained817.hex UARTTX=B2 TIMEOUT=8 LED=C0 BAUD_RATE=57600
 
 HELPTEXT += "target xplained4809  - Microchip ATmega4809 Xplained Pro.\n"
 xplained4809:

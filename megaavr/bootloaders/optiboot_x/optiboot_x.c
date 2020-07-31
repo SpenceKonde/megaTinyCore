@@ -344,14 +344,21 @@ int main (void) {
 #define RESET_EXTERNAL (RSTCTRL_EXTRF_bm|RSTCTRL_UPDIRF_bm|RSTCTRL_SWRF_bm)
 #ifndef FANCY_RESET_LOGIC
     ch = RSTCTRL.RSTFR;   // get reset cause
-    RSTCTRL.RSTFR = ch;   //  and reset them all!
     #ifdef START_APP_ON_POR
-    if (ch & (RSTCTRL_WDRF_bm | RSTCTRL_PORF_bm)) {
+    // If WDRF is set  OR nothing except BORF and PORF are set, that's not bootloader entry condition
+    // so jump to app - this is for when UPDI pin is used as reset, so we go straight to app on start.
+    if (ch & RSTCTRL_WDRF_bm || (!(ch & (~(RSTCTRL_BORF_bm | RSTCTRL_PORF_bm))))) {
     #else
-    if (ch & RSTCTRL_WDRF_bm) {
+      // If WDRF is set  OR nothing except BORF is set, that's not bootloader entry condition
+      // so jump to app - let's see if this works okay or not...
+    if (ch & RSTCTRL_WDRF_bm || (!( ch & (~RSTCTRL_BORF_bm)))) {
     #endif
-	// Start the app.
-	__asm__ __volatile__ ("mov r2, %0\n" :: "r" (ch));
+	  // Start the app.
+    // Dont bother trying to stuff it in r2, which requires heroic effort to fish out
+    // we'll put it in GPIOR0 where it won't get stomped on.
+	  //__asm__ __volatile__ ("mov r2, %0\n" :: "r" (ch));
+    RSTCTRL.RSTFR=ch; //clear the reset causes before jumping to app...
+    GPIOR0 = ch; // but, stash the reset cause in GPIOR0 for use by app...
 	watchdogConfig(WDT_PERIOD_OFF_gc);
 	__asm__ __volatile__ (
 	    "jmp app\n"
@@ -647,7 +654,7 @@ void watchdogConfig (uint8_t x) {
  */
 static void do_nvmctrl(uint16_t address, uint8_t command, uint16_t data)  __attribute__ ((used));
 static void do_nvmctrl (uint16_t address, uint8_t command, uint16_t data) {
-    _PROTECTED_WRITE(WDT.CTRLA, command);
+    _PROTECTED_WRITE(NVMCTRL.CTRLA, command);
     while (NVMCTRL.STATUS & (NVMCTRL_FBUSY_bm|NVMCTRL_EEBUSY_bm))
 	; // wait for flash and EEPROM not busy, just in case.
 }

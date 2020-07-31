@@ -14,3 +14,6 @@ call omake tinyxy2altrst
 call omake tinyxy4altrst
 call omake tinyxy6altrst
 call omake tinyxy7altrst
+call omake xplained817
+call omake xplained416
+call omake curiosity1607
