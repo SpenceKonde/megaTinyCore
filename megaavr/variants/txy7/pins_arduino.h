@@ -61,9 +61,6 @@
 #define PIN_WIRE_SDA        (10)
 #define PIN_WIRE_SCL        (11)
 
-static const uint8_t SDA = PIN_WIRE_SDA;
-static const uint8_t SCL = PIN_WIRE_SCL;
-
 #ifdef PIN_WIRE_SCL_PINSWAP_1
 #define SDA ((uint8_t) (PORTMUX.CTRLB&PORTMUX_TWI0_bm?PIN_WIRE_SDA_PINSWAP_1:PIN_WIRE_SDA))
 #define SCL ((uint8_t) (PORTMUX.CTRLB&PORTMUX_TWI0_bm?PIN_WIRE_SCL_PINSWAP_1:PIN_WIRE_SCL))
