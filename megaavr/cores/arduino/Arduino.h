@@ -59,7 +59,7 @@ extern "C"{
   #define ADC_DAC0 ADC_MUXPOS_DAC0_gc
 #endif
 
-#if (defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3216__) )
+#if (defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3217__) )
   #define EXTERNAL  ADC_REFSEL_VREFA_gc
 #endif
 
@@ -120,19 +120,19 @@ extern const uint8_t digital_pin_to_timer[];
 // Low 3 bits are the number of that peripheral
 // other bits specify the type of timer
 // TCA=0x10, TCB=0x20, TCD=0x40 (leaving room in case Microchip ever decides to release a TCC)
-// DAC=0x80, RTC=0x90, 
+// DAC=0x80, RTC=0x90,
 // Things that aren't hardware timers with output compare are after that
 // DAC output isn't a timer, but has to be treated as such by PINMODE
 // RTC timer is a tiner, but certainly not that kind of timer
 #define NOT_ON_TIMER 0x00
 #define TIMERA0 0x10
-#define TIMERA1 0x11 // Not present on any tinyAVR 0/1-series 
+#define TIMERA1 0x11 // Not present on any tinyAVR 0/1-series
 #define TIMERB0 0x20
 #define TIMERB1 0x21
-#define TIMERB2 0x22 // Not present on any tinyAVR 0/1-series 
-#define TIMERB3 0x23 // Not present on any tinyAVR 0/1-series 
-#define TIMERB4 0x23 // Not present on any tinyAVR 0/1-series 
-#define TIMERB5 0x23 // Not present on any tinyAVR 0/1-series 
+#define TIMERB2 0x22 // Not present on any tinyAVR 0/1-series
+#define TIMERB3 0x23 // Not present on any tinyAVR 0/1-series
+#define TIMERB4 0x23 // Not present on any tinyAVR 0/1-series
+#define TIMERB5 0x23 // Not present on any tinyAVR 0/1-series
 #define TIMERD0 0x40
 #define DACOUT 0x80
 #define TIMERRTC 0x90

@@ -1,6 +1,9 @@
 ### latest (planned 2.0.6)
+* Fix bug with which parts we thought had the external reference, corrected docs. (#211)
+* Correct bug in the bootloader do_nvmctrl() function, which looked like it would try to write to CTRLA of the WDT instead of MVMCTRL. Still untested, but it might work now.
+* Change handling of reset cause in bootloader, see #213.
 * Correct bootloader for 8-pin parts with non-swapped serial port to use PIN_PA3 for the blink LED instead of PIN_PA7 which is used when the serial port is on the alternate pins. PA7 is one of the serial pins, and hence is not available for the Optiboot triple blink if the serial port is not swapped. Swapped serial port still used PA7, as that matches a) all other megaTinyCore boards and b) the initial versions of the hardware I sell.
-* Add support for nedbg programmer option, whatever that is. (You've got to admit Atmel's naming was better "AVR-ISP", "JTAG-ICE", "Dragon" vs "EDBG", "mEDBG", "nEDBG"... "megaAVR ATmega4809" versus the newest top end AVRs, the "AVR DA-series" with nice memorable part numbers like "AVR128DA64". Microchip does a lot of things very well, but naming isn't one of them)  
+* Add support for nedbg programmer option, whatever that is. (You've got to admit Atmel's naming was better "AVR-ISP", "JTAG-ICE", "Dragon" vs "EDBG", "mEDBG", "nEDBG"... "megaAVR ATmega4809" versus the newest top end AVRs, the "AVR DA-series" with nice memorable part numbers like "AVR128DA64". Microchip does a lot of things very well, but naming isn't one of them)
 #### 2.0.5
 * Internal change to ADC initialization (saves a bit of flash) and init_ADC1() function for parts that have ADC1.
 * Quick fix to naming of .hex and .lst files
@@ -10,7 +13,7 @@
 * Fix failure to export compiled binary on some linux platforms (#201)
 * Massive doc improvements.
 * Improve backwards compatibility of Wire.h (#203)
-* Fix strange bug in EEPROM.h that was somehow missed 
+* Fix strange bug in EEPROM.h that was somehow missed
 * Mark unqualified BOD settings that were removed from datasheet as unofficial, add warning that they may not work correctly (but suspect will be close - they were working for me before I realized they were unsupported! they were listed in io.h before!), and add Microchip's guaranteed operating speeds + BOD levels per datasheet to documentation.
 * Possibly fix #189!
 * Fix problem with millis not being entirely disabled when set to be disabled.

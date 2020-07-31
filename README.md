@@ -29,12 +29,12 @@ This core depends on the 7.3.0-atmel3.6.1-arduino7 version of the toolchain. For
 * [ATtiny1604,804,404,204](megaavr/extras/ATtiny_x04.md)
 * [ATtiny402,202](megaavr/extras/ATtiny_x02.md)
 
-The automotive versions of these parts are also supported (though untested); these parts are not available as of summer 2020, but they will return; Microchip Direct now lists the 32K parts becoming available from late October 2020, and one assumes that the others will be showing up sometime after that. 
+The automotive versions of these parts are also supported (though untested); these parts are not available as of summer 2020, but they will return; Microchip Direct now lists the 32K parts becoming available from late October 2020, and one assumes that the others will be showing up sometime after that.
 
 ### Upcoming tinyAVR 2-series
 Microchip has released a product brief describing the upcoming tinyAVR 2-series parts. So far only information about 16k parts with 14, 20, and 24 pins has been released; other sizes have not been anounced. They appear to be similar to the 1-series parts, only without the DAC or type D timer, but with an additional USART (that scream you just heard in the distance was the ATtiny 841 and 1634, whose sole* claim to relevance in the face of these new parts was their second hardware USART) and more sophisticated ADC (12 bit, and differential ADC support - queue another scream from the '841, which also had a fancy differential ADC - not that any Arduino people were likely using it). When these parts become available, support for them will be added to megaTinyCore - the development effort required should be minimal, requiring only changes to the ADC code and standard addition to variants to handle the second USART. They have the 1.024/2.048/2.500/4.096/VDD references, not the (less useful) ones that the 0/1-series do. Judging from the io headers, it looks like their pair of type B timers can be clocked from events (addressing a major deficiency in the 0/1-series timers and event system) and cascaded for 32-bit input capture.
 
-*Okay, arguably the tiny841 has one remaining claim to relevance, that being the three timers having independant prescalers with the two 16-bit timers each equipped with dual 16-bit output compare. The 
+*Okay, arguably the tiny841 has one remaining claim to relevance, that being the three timers having independant prescalers with the two 16-bit timers each equipped with dual 16-bit output compare. The
 
 ## Supported Clock Speeds
 * 20MHz Internal (4.5v~5.5v - typical for 5v systems)
@@ -104,7 +104,7 @@ This core uses a simple scheme for assigning the Arduino pin numbers: Pins are n
 When a single number is used to refer to a pin - in the documentation, or in your code - it is always the "Arduino pin number". These are the pin numbers shown in orange (for pins capable of analogRead()) and blue (for pins that are not) on the pinout charts. All of the other ways of referring to pins are #defined to the corresponding Arduino pin number.
 
 #### An and PIN_An constants
-The core also provides An and PIN_An constants (where n is a number from 0 to 11). These refer to the ADC0 *channel* numbers. This naming system is similar to what was used on many classic AVR cores **but here, they are just #defined as the corresponding Arduino pin number**. If you need to get the analog channel number on a digital pin, use the `digitalPinToAnalogInput(pin)` macro. The An numbers are not shown on the pinout charts - just use the digital pin numbers. The mapping of analog channels to pins is shown in the the datasheet under the I/O Multiplexing Considerations chapter, and reproduced in the [advanced ADC documentation page](megaavr/extras/ADCFreerunAndMore.md). Note that channel A0 is on the UPDI/Reset pin - however, even when configured as UPDI, it can be used as an input as long as the signals it can be exposed to do not look like the UPDI enable sequence. 
+The core also provides An and PIN_An constants (where n is a number from 0 to 11). These refer to the ADC0 *channel* numbers. This naming system is similar to what was used on many classic AVR cores **but here, they are just #defined as the corresponding Arduino pin number**. If you need to get the analog channel number on a digital pin, use the `digitalPinToAnalogInput(pin)` macro. The An numbers are not shown on the pinout charts - just use the digital pin numbers. The mapping of analog channels to pins is shown in the the datasheet under the I/O Multiplexing Considerations chapter, and reproduced in the [advanced ADC documentation page](megaavr/extras/ADCFreerunAndMore.md). Note that channel A0 is on the UPDI/Reset pin - however, even when configured as UPDI, it can be used as an input as long as the signals it can be exposed to do not look like the UPDI enable sequence.
 
 ### Serial (UART) Support
 All of these parts have a single hardware serial port (UART). It works exactly like the one on official Arduino boards (except that there is no auto-reset, unless you are using Optiboot and have configured that pin to act as reset, or have wired up an "ersatz reset pin" as described above). See the pinout charts for the location of the serial pins.
@@ -208,7 +208,7 @@ These parts all have ADC channels available on most pins (11 pins on 24 and 20 p
 * INTERNAL2V5
 * INTERNAL4V3 (alias of INTERNAL4V34)
 * INTERNAL4V34
-* EXTERNAL (1-series - not including 412/212 - only)
+* EXTERNAL (1614, 1616, 1617, 3216, 3217 only - though it appears in io headers for many more parts)
 
 In addition to the pin numbers, as of 1.1.10, you can read from the following sources:
 * ADC_INTREF (The internal reference - you can set it manually via VREF.CTRLA, or by calling analogReference(), followed by analogReference(VDD) - The internal reference register is not changed when switching back to VDD as reference)
@@ -226,7 +226,7 @@ ADC0.SAMPCTRL=0; //minimum sampling length = 0+2 = 2 ADC clock cycles
 
 With the minimum sampling length, analogRead() speed would be approximately doubled from it's already-faster value.
 
-**Note:** The 3217,1617,3216,1616, and 1614 have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins (it can also read from DAC2). Currently, there are no plans to implement this in the core due to the large number of currently available pins. Instead, it is recommended that users who wish to "take over" an ADC to use it's more advanced functionality choose ADC1 for this purpose. In the future, examples showing use of ADC1 in this way may be published. As of 2.0.5, megaTinyCore provides a function `init_ADC1()` which initializes ADC1 in the same way that ADC0 is (with correct prescaler for clock speed and VDD reference).
+**Note:** The (1614, 1616, 1617, 3216, and 3217 have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins (it can also read from DAC2). Currently, there are no plans to implement this in the core due to the large number of currently available pins. Instead, it is recommended that users who wish to "take over" an ADC to use it's more advanced functionality choose ADC1 for this purpose. See [ADC free-run and more](megaavr/extras/ADCFreerunAndMore.md) for some examples of what one might do to take advantage of it.  As of 2.0.5, megaTinyCore provides a function `init_ADC1()` which initializes ADC1 in the same way that ADC0 is (with correct prescaler for clock speed and VDD reference).
 
 ### DAC Support
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage (note that this provides very low current and can only be used as a voltage reference, it cannot be used to power other devices). This generates voltages between 0 and the selected VREF (which cannot be VCC, unfortunately). In 2.0.0 and later, set the DAC reference voltage via the DACReference() function - pass it one of the INTERNAL reference options listed under the ADC section above. In versions prior to 2.0.0, select the DAC VREF voltage from the Tools -> DAC Voltage Reference submenu. This voltage must be lower than Vcc to get the correct voltages. Call analogWrite() on the DAC pin to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin.
@@ -316,18 +316,18 @@ Version information for MEGATINYCORE is also provided by a few additional define
 Be warned that the historical record has been
 
 ### Identifying Timers
-Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statenebts to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro. 
+Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statenebts to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro.
 
 ```
 #define NOT_ON_TIMER 0x00
 #define TIMERA0 0x10
-#define TIMERA1 0x11 // Not present on any tinyAVR 0/1-series 
+#define TIMERA1 0x11 // Not present on any tinyAVR 0/1-series
 #define TIMERB0 0x20
 #define TIMERB1 0x21
-#define TIMERB2 0x22 // Not present on any tinyAVR 0/1-series 
-#define TIMERB3 0x23 // Not present on any tinyAVR 0/1-series 
-#define TIMERB4 0x23 // Not present on any tinyAVR 0/1-series 
-#define TIMERB5 0x23 // Not present on any tinyAVR 0/1-series 
+#define TIMERB2 0x22 // Not present on any tinyAVR 0/1-series
+#define TIMERB3 0x23 // Not present on any tinyAVR 0/1-series
+#define TIMERB4 0x23 // Not present on any tinyAVR 0/1-series
+#define TIMERB5 0x23 // Not present on any tinyAVR 0/1-series
 #define TIMERD0 0x40
 #define DACOUT 0x80
 #define TIMERRTC 0x90
@@ -352,7 +352,7 @@ If the UPDI/Reset pin option was set to reset, you must reset the chip via the r
 Serial uploads are all done at 115200 baud, regardless of speed or part.
 
 ### Removing Optiboot
-Like classic AVRs with hardware bootloader support (like the ATmega328p, and all other ATmega parts older than the 4809/4808), and unlike ATtiny parts without that, which use "virtual boot" to get bootloader functionality, you must do "burn bootloader" with a non-optiboot part selected in order to reprogram the part normally via UPDI. Unlike classic AVRs with hardware bootloader support, where not doing "burn bootloader" would work until sketch size reached the very end of the flash (where the chip thinks the bootloader is), on these parts, it won't work at all. 
+Like classic AVRs with hardware bootloader support (like the ATmega328p, and all other ATmega parts older than the 4809/4808), and unlike ATtiny parts without that, which use "virtual boot" to get bootloader functionality, you must do "burn bootloader" with a non-optiboot part selected in order to reprogram the part normally via UPDI. Unlike classic AVRs with hardware bootloader support, where not doing "burn bootloader" would work until sketch size reached the very end of the flash (where the chip thinks the bootloader is), on these parts, it won't work at all.
 
 ### Autoreset circuit
 If using the bootloader with with the UPDI pin set to reset, this is needed for uploading. It will reset the chip when serial connection is opened like on typical Arduino boards. Do not connect an autoreset circuit to the UPDI pin if it is not set to act as reset, as this will not reset the chip, and will just block UPDI programming.
@@ -398,30 +398,30 @@ Note that, if you have UPDI programming enabled, and desire the convenience of a
 
 # Known Compiler Bugs in 2.0.3 and Earlier
 The earlier versions of the avr-gcc toolchain contained several issues relevant to these parts. Version 2.0.4 and later, when installed through Board Manager, will pull in the new toolchain package which corrects both of these issues (among other ones that nobody had noticed yet)
-* Sometimes a sketch which is too big to fit will, instead of generating a message saying that, result in the error: 'relocation truncated to fit: R_AVR_13_PCREL against symbol tablejump2'. 
+* Sometimes a sketch which is too big to fit will, instead of generating a message saying that, result in the error: 'relocation truncated to fit: R_AVR_13_PCREL against symbol tablejump2'.
 * There is a bug in the `<avr/eeprom.h>` library's eeprom_is_ready() macro - it uses names for registers from the XMEGA family of parts (under the hood, these chips actually have an XMEGA core!). Attempting to use that macro will generate a error stating that `'NVM_STATUS' was not declared in this scope`. When a newer version of that package that corrects this issue is available, megaTinyCore will use it. In the meantime, `replace eeprom_is_ready()` with `bit_is_clear(NVMCTRL.STATUS,NVMCTRL_EEBUSY_bp)`. If writing a library or sketch that is intended to work on both megaavr and classic avr parts, you can test for effected parts using `#if defined(ARDUINO_ARCH_MEGAAVR)`
 
 # Instruction Timing Changes
-These parts have a newer CPU core with slightly improved timings. This distinction is unimportant for 99.9% of users - but if you happen to be working with hand-tuned assembly (or using a library that does so, and are wondering why the timing is messed up), you should be aware of this. 
+These parts have a newer CPU core with slightly improved timings. This distinction is unimportant for 99.9% of users - but if you happen to be working with hand-tuned assembly (or using a library that does so, and are wondering why the timing is messed up), you should be aware of this.
 * PUSH is 1 cycle vs 2 on classic AVR (POP is still 2)
 * CBI and SBI are 1 cycle vs 2 on classic AVR
 * LDS is 3 cycles vs 2 on classic AVR (16-bit LDS is still 1 cycle) :disappointed:
 * RCALL and ICALL are 2 cycles vs 3 on classic AVR
 * CALL is 3 cycles instead of 4 on classic AVR
-* Saving the best for last... ST and STD is 1 cycle vs 2 on classic AVR! (STS is still 2) 
+* Saving the best for last... ST and STD is 1 cycle vs 2 on classic AVR! (STS is still 2)
 Note that the improvement to PUSH can make interrupts respond significantly faster (since they often have to push the contents of registers onto the stack at the beginning of the ISR), though the corresponding POP's at the end aren't any faster. The change with ST impacted tinyNeoPixel. Prior to my realizing this, the library worked on SK6812 LEDs (which happened to be what I tested with) at 16/20 MHz, but not real WS2812's. However, once I discovered this, I was able to leverage it to use a single tinyNeoPixel library instead of a different one for each port like was needed with ATTinyCore (for 8 MHz, they need to use the single cycle OUT on classic AVRs to meet timing requirements, the two cycle ST was just too slow; hence the port had to be known at compiletime. But with single cycle ST, that issue vanished)
 
 # Differences in Behavior between megaTinyCore and Official Cores
 While we generally make an effort to emulate the official Arduino core, there are a few cases that were investigated, but we came to the conclusion that the compatibilit would not be worth the price. The following is a (hopefully nearly complete) list of these cases.
 
-### digitalRead() does not turn off PWM. 
-On official cores, and most third party ones, the digitalRead() function turns off PWM when called on a pin. This behavior is not documented by the Arduino reference. This interferes with certain optimizations (such as fast digital IO - which is coming soon, I swear) - and moreover is logically inconsistent - a "read" operation should not change the thing it's called on. That's why it's called "read" and not "write". There does not seem to be a logically coherent reason for this - and it makes simple demonstrations of what PWM is non-trivial (imagine setting a pin to output PWM, and then looking at the output by repeatedly reading the pin). 
+### digitalRead() does not turn off PWM.
+On official cores, and most third party ones, the digitalRead() function turns off PWM when called on a pin. This behavior is not documented by the Arduino reference. This interferes with certain optimizations (such as fast digital IO - which is coming soon, I swear) - and moreover is logically inconsistent - a "read" operation should not change the thing it's called on. That's why it's called "read" and not "write". There does not seem to be a logically coherent reason for this - and it makes simple demonstrations of what PWM is non-trivial (imagine setting a pin to output PWM, and then looking at the output by repeatedly reading the pin).
 
 ### TCA0 configured in Split Mode to get 3 additional PWM pins
 On official "megaavr" board package, TCA0 is configured for "Single mode" as 3 16-bit timers (used to output 8-bit PWM). megaTinyCore always configured it for "Split mode" to get additional PWM outputs. See the datasheets for more information on the capabilities of TCA0.
 
 ### Type B timers not used for PWM
-On the official "megaavr" board package, as well as [DxCore](https://github.com/SpenceKonde/DxCore), the type B timers are used to generate 8-bit PWM (one pin per timer), there are very few circumstances where this could increase the number of usable PWM pins. These timers are just too scarce and valuable on these parts. Being minimally useful, their being removed entirely from possible PWM timers allows us to save space used for initializing and  to reserve the type B timers for Servo, Tone, and other utility timing applications. 
+On the official "megaavr" board package, as well as [DxCore](https://github.com/SpenceKonde/DxCore), the type B timers are used to generate 8-bit PWM (one pin per timer), there are very few circumstances where this could increase the number of usable PWM pins. These timers are just too scarce and valuable on these parts. Being minimally useful, their being removed entirely from possible PWM timers allows us to save space used for initializing and  to reserve the type B timers for Servo, Tone, and other utility timing applications.
 
 ### digital I/O functions use old function signatures.
 They return and expect uint8_t (byte) values, not enums like the official megaavr board package does. Like classic AVR cores, constants like LOW, HIGH, etc are simply #defined to appropriate values. The use of enums instead broke many common Arduino programming idioms and existing code, increased flash usage, lowered performance, and made optimization more challenging. While the enum implementation made language design purists comfortable, and provided error checking for newbies - because you couldn't pass anything  that wasn't a pinState to a digital I/O function, and would get that error checking if - as a newbie - you accidentally got careless. A compatibility layer was added to the official core - but then that got rid of what was probably the most compelling benefit, the fact that it did generate an error for new users to train them away from common Arduino practices like passing 1 or 0 to digitalWrite, `if(digitalRead(pin))` and the like. This change also had the perverse effect of making PinMode(pin,OUTPUT), an obvious typo of pinMode(pin,OUTPUT) into valid syntax (comma operator turns pin,OUTPUT into OUTPUT, and it returns a new PinMode of value OUTPUT...), instead of a syntax error. Anyway - these changes are not present here, and they never will be; this is the case with [MegaCoreX](https://github.com/MCUdude/MegaCoreX) and [DxCore](https://github.com/SpenceKonde/DxCore) as well.
