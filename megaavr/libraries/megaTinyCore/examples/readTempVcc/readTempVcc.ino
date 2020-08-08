@@ -14,9 +14,20 @@ void setup() {
 uint16_t readSupplyVoltage() { //returns value in millivolts to avoid floating point
   analogReference(VDD);
   VREF.CTRLA=VREF_ADC0REFSEL_1V5_gc;
+  // there is a settling time betweeen when reference is turned on, and when it becomes valid.
+  // since the reference is normally turned on only when it is requested, this virtually guarantees
+  // that the first reading will be garbage; subsequent readings taken immediately after will be fine.
+  // VREF.CTRLB|=VREF_ADC0REFEN_bm;
+  // delay(10);
   uint16_t reading = analogRead(ADC_INTREF);
-  uint32_t intermediate=1023*1500;
+  Serial.print(reading);
+  Serial.println(" (discarded)");
+  reading = analogRead(ADC_INTREF);
+  Serial.println(reading);
+  uint32_t intermediate=1023UL*1500;
+  Serial.println(intermediate);
   reading=intermediate/reading;
+  Serial.println(reading);
   return reading;
 }
 void printRegisters(){
@@ -34,13 +45,15 @@ uint16_t readTemp() {
   int8_t sigrow_offset = SIGROW.TEMPSENSE1; // Read signed value from signature row
   uint8_t sigrow_gain = SIGROW.TEMPSENSE0; // Read unsigned value from signature row
   analogReference(INTERNAL1V1);
-  ADC0.SAMPCTRL=0x1F; //Appears very necessary!
-  ADC0.CTRLD|=ADC_INITDLY_DLY32_gc; //Doesn't seem so necessary?
+  ADC0.SAMPCTRL=0x1F; //maximum length sampling
+  ADC0.CTRLD&=~(ADC_INITDLY_gm);
+  ADC0.CTRLD|=ADC_INITDLY_DLY32_gc; //wait 32 ADC clocks before reading new reference
   uint16_t adc_reading = analogRead(ADC_TEMPERATURE); // ADC conversion result with 1.1 V internal reference
   Serial.println(adc_reading);
   analogReference(VDD);
-  ADC0.SAMPCTRL=0x0;
+  ADC0.SAMPCTRL=0x0E;//14, what we now set it to automatically on startup so we can run the ADC while keeping the same sampling time
   ADC0.CTRLD&=~(ADC_INITDLY_gm);
+  ADC0.CTRLD|=ADC_INITDLY_DLY16_gc;
   uint32_t temp = adc_reading - sigrow_offset;
   Serial.println(temp);
   temp *= sigrow_gain; // Result might overflow 16 bit variable (10bit+8bit)
