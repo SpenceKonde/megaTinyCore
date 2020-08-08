@@ -25,9 +25,7 @@ uint16_t readSupplyVoltage() { //returns value in millivolts to avoid floating p
   reading = analogRead(ADC_INTREF);
   Serial.println(reading);
   uint32_t intermediate=1023UL*1500;
-  Serial.println(intermediate);
   reading=intermediate/reading;
-  Serial.println(reading);
   return reading;
 }
 void printRegisters(){
