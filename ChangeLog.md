@@ -1,4 +1,5 @@
 ### latest (planned 2.0.6)
+* Improve ADC accuracy when switching references
 * Fix bug with which parts we thought had the external reference, corrected docs. (#211)
 * Correct bug in the bootloader do_nvmctrl() function, which looked like it would try to write to CTRLA of the WDT instead of MVMCTRL. Still untested, but it might work now.
 * Change handling of reset cause in bootloader, see #213.
