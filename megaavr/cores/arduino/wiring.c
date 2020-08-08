@@ -620,7 +620,7 @@ void init()
         ADC0.CTRLC = ADC_PRESC_DIV2_gc|ADC_REFSEL_VDDREF_gc|ADC_SAMPCAP_bm;;
       #endif
     #endif
-
+    ADC0.CTRLD = ADC_INITDLY_DLY16_gc;
     /* Enable ADC */
     ADC0.CTRLA |= ADC_ENABLE_bm;
   #endif
@@ -676,7 +676,7 @@ void init()
         ADC1.CTRLC = ADC_PRESC_DIV2_gc|ADC_REFSEL_VDDREF_gc|ADC_SAMPCAP_bm;;
       #endif
     #endif
-
+    ADC1.CTRLD = ADC_INITDLY_DLY16_gc;
     /* Enable ADC */
     ADC1.CTRLA |= ADC_ENABLE_bm;
   }
