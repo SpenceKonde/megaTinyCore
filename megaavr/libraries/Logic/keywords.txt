@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map For Wire
+# Syntax Coloring Map For Logic
 #######################################
 
 #######################################
@@ -35,3 +35,4 @@ in	LITERAL1
 out	LITERAL1
 filter	LITERAL1
 sequencer	LITERAL1
+clocksource LITERAL1
