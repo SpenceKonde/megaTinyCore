@@ -14,7 +14,12 @@ This board package can be installed via the board manager. The boards manager UR
 4. Select "megaTinyCore by Spence Konde" and click "Install". For best results, choose the most recent version.
 
 ## Manual Installation
-Manual installation allows the latest version of the core to be installed, with fixes that may not yet be available in the board manager version of the core. **Unless using Arduino IDE 1.8.13, you must use board manager to install the latest version of the Official Arduino AVR board package** for manual installation to work. Manual installation is recommended if you are working on developing or modifying the core, or if you need the latest fixes which are not in the released version. 
+Manual installation allows the latest version of the core to be installed, with fixes that may not yet be available in the board manager version of the core. Manual installation is recommended if you are working on developing or modifying the core, or if you need the latest fixes which are not in the released version. 
+
+This core depends on the 7.3.0-atmel3.6.1-arduino7 version of the toolchain. For this core to work when installed manually, one of the following must be true:
+* Using Arduino 1.8.13, without having downgraded the Official Arduino AVR Boards package using board manager (version 1.8.13 introduces compelling UX improvements and is strongly recommended)
+* Using Arduino 1.8.13, with MegaCoreX 1.0.4 installed using board manager
+* Using older version of Arduino, with the Official Arduino AVR Boards package updated to 1.8.3, or MegaCoreX 1.0.4 installed using board manager
 
 For installing megaTinyCore, there are two options:
 
