@@ -636,25 +636,20 @@ void watchdogConfig (uint8_t x) {
 #ifndef APP_NOSPM
 
 /*
- * Separate function for doing spm stuff
- * It's needed for application to do SPM, as SPM instruction works only
- * from bootloader.
- *
- * How it works:
- * - do SPM
- * - wait for SPM to complete
- * - if chip have RWW/NRWW sections it does additionaly:
- *   - if command is WRITE or ERASE, AND data=0 then reenable RWW section
- *
- * In short:
- * If you play erase-fill-write, just set data to 0 in ERASE and WRITE
- * If you are brave, you have your code just below bootloader in NRWW section
- *   you could do fill-erase-write sequence with data!=0 in ERASE and
- *   data=0 in WRITE
+ * Separate function for doing nvm stuff
+ * It's needed for application to write to the application section,
+ * because commands to write there can only be performed from the
+ * bootloader section... and since we don't know when we set the fuses how
+ * large the application will be, and how much data they might want to
+ * store in flash, we set all of the flash as either boot or app.
+ * This will work if the thing that's locked is the write to NVMCTRL
+ * to actually make the write happen. If it's the ST instructions
+ * pointed at the mapped flash, it won't, since this assumes the app
+ * has already done that.
  */
 static void do_nvmctrl(uint16_t address, uint8_t command, uint16_t data)  __attribute__ ((used));
 static void do_nvmctrl (uint16_t address, uint8_t command, uint16_t data) {
-    _PROTECTED_WRITE(NVMCTRL.CTRLA, command);
+    _PROTECTED_WRITE_SPM(NVMCTRL.CTRLA, command);
     while (NVMCTRL.STATUS & (NVMCTRL_FBUSY_bm|NVMCTRL_EEBUSY_bm))
 	; // wait for flash and EEPROM not busy, just in case.
 }
