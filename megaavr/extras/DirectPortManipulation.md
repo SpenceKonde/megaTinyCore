@@ -71,8 +71,14 @@ HOWEVER, on those magic 32 registers in the "low I/O space", provided you are se
 
 So, while many examples of direct port writes for classic AVRs will use |= and &= for single bit flips, these should only be used in preference to simple assignment (assuming both would achieve the required behavior) when using VPORT registers (Or when using the GPIO registers, but if you're using those, you're using them exclusively because of this, and know what you're doing). Specifically, as warned about above, you should NEVER use |= or &= with the PORTx.DIRCLR, PORTx.DIRSET, PORTx.OUTSET or PORTx.OUTCLR; the SETs are simply inefficient, while the CLRs produce unexpected behavior.
 
+## VPORTx.OUT vs PORTx.OUTSET/PORTx.OUTCLR
+So, knowing all this, when is it more efficient to use `VPORTx.OUT |= PIN3_bm` and when is it more efficient to use `PORTx.OUTSET=PIN3_bm`? 
+* When PIN3_bm is known at compiletime, using `VPORTx.OUT |= PIN3_bm`is faster, and consumes less flash (likely 2 bytes less flash, 1 clock cycle faster). 
+* If instead of a constant like PIN3_bm, a variable is used, it's value is NOT compiletime known, and `PORTx.OUTSET` should be used - `VPORTx.OUT |= 1<<(variable)` takes 2 bytes more flash, 0~1 more clock cycle - **and is not atomic**. 
+* If the extreme performance of the VPORT access is not needed, considering the small penalty, is is likely better practice to use `PORTx.OUTSET` in any event, if your code is for public consumption, as it's purpose is much more immediately obvious to the uninitiated. Arduino users with little experience frequently reuse and modify sketches they find on the internet, and using the option that can safely deal with non-compiletime-known values reduces the likelihood of such careless modifications producing strange bugs. That in turn benefits the experienced Arduino users who end up helping them on the forums.
+
 ## Equivalents to classic AVR registers
-Classic AVR |  megaAVR | megaAVR VPORT
+Classic AVR |  modern AVR |  VPORT
 ------------ | ------------- | -------------
 PORTx | PORTx.OUT | VPORTx.OUT
 PINx  | PORTx.IN | VPORTx.IN
