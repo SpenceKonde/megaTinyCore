@@ -108,6 +108,8 @@
 /**********************************************************/
 /* Edit History:					  */
 /*							  */
+/* Sep 2020                                               */
+/* 9.1 fix do_nvmctrl                                     */
 /* Aug 2019						  */
 /* 9.0 Refactored for Mega0/Xtiny from optiboot.c         */
 /*   :                                                    */
@@ -115,7 +117,7 @@
 /**********************************************************/
 
 #define OPTIBOOT_MAJVER 9
-#define OPTIBOOT_MINVER 0
+#define OPTIBOOT_MINVER 1
 
 /*
  * OPTIBOOT_CUSTOMVER should be defined (by the makefile) for custom edits
@@ -634,27 +636,35 @@ void watchdogConfig (uint8_t x) {
 
 
 #ifndef APP_NOSPM
-
 /*
- * Separate function for doing nvm stuff
- * It's needed for application to write to the application section,
- * because commands to write there can only be performed from the
- * bootloader section... and since we don't know when we set the fuses how
- * large the application will be, and how much data they might want to
- * store in flash, we set all of the flash as either boot or app.
- * This will work if the thing that's locked is the write to NVMCTRL
- * to actually make the write happen. If it's the ST instructions
- * pointed at the mapped flash, it won't, since this assumes the app
- * has already done that.
+ * Separate function for doing nvmctrl stuff.
+ * It's needed for application to do manipulate flash, since only the
+ *  bootloader can write or erase flash, or write to the flash alias areas.
+ * Note that this is significantly different in the details than the
+ *  do_spm() function provided on older AVRs.  Same "vector", though.
+ *
+ * How it works:
+ * - if the "command" is legal, write it to NVMCTRL.CTRLA
+ * - if the command is not legal, store data to *address
+ * - wait for NVM to complete
+ *
+ * For example, to write a flash page:
+ * Copy each byte with
+ *   do_nvmctrl(flashOffset+MAPPED_PROGMEM_START, 0xFF, *inputPtr);
+ * Erase and write page with
+ *   do_nvmctrl(0, NVMCTRL_CMD_PAGEERASEWRITE_gc, 0);
  */
-static void do_nvmctrl(uint16_t address, uint8_t command, uint16_t data)  __attribute__ ((used));
-static void do_nvmctrl (uint16_t address, uint8_t command, uint16_t data) {
-    _PROTECTED_WRITE_SPM(NVMCTRL.CTRLA, command);
-    while (NVMCTRL.STATUS & (NVMCTRL_FBUSY_bm|NVMCTRL_EEBUSY_bm))
-	; // wait for flash and EEPROM not busy, just in case.
+static void do_nvmctrl(uint16_t address, uint8_t command, uint8_t data)  __attribute__ ((used));
+static void do_nvmctrl (uint16_t address, uint8_t command, uint8_t data) {
+    if (command <= NVMCTRL_CMD_gm) {
+	_PROTECTED_WRITE_SPM(NVMCTRL.CTRLA, command);
+	while (NVMCTRL.STATUS & (NVMCTRL_FBUSY_bm|NVMCTRL_EEBUSY_bm))
+	    ; // wait for flash and EEPROM not busy, just in case.
+    } else {
+	*(uint8_t *)address = data;
+    }
 }
 #endif
-
 
 
 #ifdef BIGBOOT
