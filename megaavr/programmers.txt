@@ -34,3 +34,10 @@ atmel_ice_updi.protocol=atmelice_updi
 atmel_ice_updi.program.protocol=atmelice_updi
 atmel_ice_updi.program.tool=avrdude
 atmel_ice_updi.program.extra_params=-Pusb
+
+curiosity.name=Microchip Curiosity Nano (megaTinyCore)
+curiosity.communication=usb
+curiosity.protocol=curiositynano_updi
+curiosity.program.protocol=curiositynano_updi
+curiosity.program.tool=avrdude
+curiosity.program.extra_params=-Pusb
