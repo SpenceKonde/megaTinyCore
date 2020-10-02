@@ -168,9 +168,7 @@ class tinyNeoPixel {
     setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t w),
     setPixelColor(uint16_t n, uint32_t c),
     setBrightness(uint8_t b),
-    clear(),
-    updateLength(uint16_t n),
-    updateType(neoPixelType t);
+    clear();
   uint8_t
    *getPixels(void) const,
     getBrightness(void) const;
