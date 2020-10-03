@@ -1,0 +1,23 @@
+# https://github.com/per1234/formatting-checks
+name: General Formatting Checks
+
+on:
+  pull_request:
+  push:
+  # workflow_dispatch event allows the workflow to be triggered manually
+  # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch
+  workflow_dispatch:
+  # repository_dispatch event allows the workflow to be triggered via the GitHub API
+  # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#repository_dispatch
+  repository_dispatch:
+
+jobs:
+  utf-8-bom:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check for UTF-8 BOM file encoding
+        run: find . -path './.git' -prune -or -type f -exec grep --files-with-matches --binary-files=without-match $'\xEF\xBB\xBF' '{}' \; -exec echo 'UTF-8 BOM encoding detected.' \; -exec false '{}' +
