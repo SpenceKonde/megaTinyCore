@@ -80,7 +80,7 @@ void pinMode(uint8_t pin, uint8_t mode)
 //
 // Mark Sproul:
 // - Removed inline. Save 170 bytes on atmega1280
-// - changed to a switch statment; added 32 bytes but much easier to read and maintain.
+// - changed to a switch statement; added 32 bytes but much easier to read and maintain.
 // - Added more #ifdefs, now compiles for atmega645
 //
 //static inline void turnOffPWM(uint8_t timer) __attribute__ ((always_inline));
@@ -133,7 +133,7 @@ static void turnOffPWM(uint8_t pin)
 		TCD0.CTRLA=0x10;//stop the timer
 		while(!(TCD0.STATUS&0x01)) {;}// wait until it's actually stopped
 		_PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL & ~(1<<(6+bit_pos)));
-		TCD0.CTRLA=0x11; //reenable it
+		TCD0.CTRLA=0x11; //re-enable it
 		break;
 	#endif
 	default:

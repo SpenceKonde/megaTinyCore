@@ -143,4 +143,4 @@ This is useful for STL objects, custom iteration and C++11 style ranged for loop
 This function returns an `USPtr` pointing at the location after the last USERSIG cell.
 Used with `begin()` to provide custom iteration.
 
-**Note:** The `USPtr` returned is invalid as it is out of range. Infact the hardware causes wrapping of the address (overflow) and `USERSIG.end()` actually references the first USERSIG cell.
+**Note:** The `USPtr` returned is invalid as it is out of range. In fact the hardware causes wrapping of the address (overflow) and `USERSIG.end()` actually references the first USERSIG cell.

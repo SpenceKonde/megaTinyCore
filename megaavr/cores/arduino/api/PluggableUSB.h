@@ -25,7 +25,7 @@
 #include <stddef.h>
 
 // core need to define
-void* epBuffer(unsigned int n); // -> returns a poointer to the Nth element of the EP buffer structure
+void* epBuffer(unsigned int n); // -> returns a pointer to the Nth element of the EP buffer structure
 
 class PluggableUSBModule {
 public:

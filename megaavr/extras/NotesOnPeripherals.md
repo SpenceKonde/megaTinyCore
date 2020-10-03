@@ -1,7 +1,7 @@
 # Notes on peripherals and other things
 This document lays out some general notes on the peripherals - some general, some advanced, and some particularly aimed at people who are used to classic AVRs...
 
-## Interrupts and Interupt Flags
+## Interrupts and Interrupt Flags
 
 ### Disabled interrupts don't set flags
 Unlike classic AVRs, if an interrupt is not enabled, the interrupt flag will not be set. IE, on a classic AVR, you could do something like this as a delay (it's how optiboot times the triple-blink):
@@ -43,7 +43,7 @@ If you don't have an ISR defined, it will go to the "bad interrupt" handler, whi
 ### Flags MUST be cleared in interrupts
 * Unlike classic AVRs, you MUST clear the interrupt flag in the ISR. They are not cleared automatically. Do this by writing 1 to the bit. Failing to do so can produce surprising results, because the processor doesn't *halt* - it just runs agonizingly slowly (plus whatever the interrupt does keeps happening - but this may not be as obvious) - because at least one instruction will always happen between interrupts. 
 
-Here's a sketch that demonstrates this, and another interesting thing; the loop waiting for the ISR is exited as soon as it fires the first time... but it keeps running continually, letting the while loop after it run one instruction for each time the ISR runs. Both of those unsigned ints cause the ISR and while() loop to toggle the pins more slowly, so you can see how fast the two are running relative to eachother with even really crude means.
+Here's a sketch that demonstrates this, and another interesting thing; the loop waiting for the ISR is exited as soon as it fires the first time... but it keeps running continually, letting the while loop after it run one instruction for each time the ISR runs. Both of those unsigned ints cause the ISR and while() loop to toggle the pins more slowly, so you can see how fast the two are running relative to each other with even really crude means.
 
 ```
 volatile unsigned int test=0;

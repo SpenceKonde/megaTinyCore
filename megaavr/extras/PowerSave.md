@@ -5,7 +5,7 @@ There are several solutions to reduce the power consumption on the ATtiny. Here 
 The clock speed is very important for the following two reasons:
 
 1.  Slower clock speeds will reduce the power consumption
-1.  Minimum voltage to keep the CPU runnning is lower with a slower clock speed
+1.  Minimum voltage to keep the CPU running is lower with a slower clock speed
 
 The clock speed can be set from the Arduino IDE. Go to Tools -> Clock Speed, and pick one of the 7 options.  After selecting the required clock speed, go to Tools -> Burn Bootloader. Every time you change a clock, make sure you burn the bootloader - otherwise it is not applied, and timing will be off. 
 
@@ -28,7 +28,7 @@ There is a significant difference between running the MCU at 5V or just 2V. Acco
 The absolute minimum power consumption of the device, when all the peripherals are stopped, is 0.1μA. This can be accomplished by using sleep mode when the MCU is not required. When the device is in sleep mode the CPU is not executing any of the application, but will continue where it left off after it receives an interrupt. While the CPU is not running, the device itself is still monitoring all the interrupts out there and to do so has to keep the peripherals running. Which peripherals are running depends on the sleep mode setting selected before entering sleep mode. The following 3 options are available:
 
 1.	Idle, only the CPU is turned off
-1.	Standy, the CPU is turned off and most Peripherals
+1.	Standby, the CPU is turned off and most Peripherals
 1.	Power Down, the CPU is turned off and all Peripherals (except the WDT and RTC), only the PIT (RTC) , Pin change and TWI Address match can wake up the device.
 
 The sleep functions are not part of the Arduino Core, but part of the AVR-GCC compiler. Add the following line at the beginning of your code to add the sleep mode functions:

@@ -33,7 +33,7 @@ Better yet, you can verify that you chose the intended millis timer, rather than
 In these examples, it is also used to make sure one doesn't try to run them on a part where the mappings of the channels to pins are different (ie, the 8-pin parts).
 
 ##### Added complication for 8-pin parts
-On the 8-pin parts, the default location for WO0 is the same as for WO3: PA3, ie, you can't get an extra channel from split mode. However, WO0 can be moved from it's default location to PA7 via the PORTMUX; megaTinyCore does this to get the extra PWM channel out of the box. This is controlled by `PORTMUX.CTRLC`. Nothing else is controlled by this register, so you can just set it to the compiler-provided constants. None of the other parts supported by megaTinyCore have PWM pins blocking eachother like this.
+On the 8-pin parts, the default location for WO0 is the same as for WO3: PA3, ie, you can't get an extra channel from split mode. However, WO0 can be moved from it's default location to PA7 via the PORTMUX; megaTinyCore does this to get the extra PWM channel out of the box. This is controlled by `PORTMUX.CTRLC`. Nothing else is controlled by this register, so you can just set it to the compiler-provided constants. None of the other parts supported by megaTinyCore have PWM pins blocking each other like this.
 
 ```
 PORTMUX.CTRLC = PORTMUX_TCA00_DEFAULT_gc;   // Move it back to PA3
@@ -163,7 +163,7 @@ void setup() {
   TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; //enable the timer with no prescaler
 }
 
-void loop() { //Lets generate some output just to proove it works
+void loop() { //Lets generate some output just to prove it works
   static byte pass = 0;
   static unsigned int duty = 255;
   TCA0.SINGLE.CMP0 = duty-- ; //step down the duty cycle each iteration through loop;

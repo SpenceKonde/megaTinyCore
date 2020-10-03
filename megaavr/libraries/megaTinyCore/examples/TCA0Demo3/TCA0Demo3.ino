@@ -17,7 +17,7 @@ void setup() {
   TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; //enable the timer with no prescaler
 }
 
-void loop() { //Lets generate some output just to proove it works
+void loop() { //Lets generate some output just to prove it works
   static byte pass = 0;
   static unsigned int duty = 255;
   TCA0.SINGLE.CMP0 = duty-- ; //step down the duty cycle each iteration through loop;

@@ -99,8 +99,8 @@ in::ac2;              // Connect input to AC2 OUT (input 0, 1 only)
 
 Notes specific to ATtiny:
 * It is not clear what TCD0 WOAn is. I suspect it is true when TCD0 count is greater than TCD0.COMPSET0 and TCD0.CMPCLR0, ie, when WOA turns on and off, which can be individually controlled; the timer continues counting until reaching TCD0.CMPCLR1 when WOB turns off (TCD0 is a very strange timer).
-* Not all inputs are available on all parts - only input sources corresponding to peripherals on that device are available. Not all options are avalable for input 2, as noted above.
-* On CCL1 (logic1), IN0 I/O input is available only on the 20 and-24 pin parts, and IN1 and IN2 only on 24-pin parts. The event inputs can be used with pin events to take input from a diferent pins for up to two inputs. This is demonstrated in the five input example.
+* Not all inputs are available on all parts - only input sources corresponding to peripherals on that device are available. Not all options are available for input 2, as noted above.
+* On CCL1 (logic1), IN0 I/O input is available only on the 20 and-24 pin parts, and IN1 and IN2 only on 24-pin parts. The event inputs can be used with pin events to take input from a different pins for up to two inputs. This is demonstrated in the five input example.
 * CCL0's IN0 pin is on PA0, which is nominally the UPDI pin. It can only be used as input when that pin is set as GPIO. This limits the usefulness of CCL0 on the ATtiny parts; configuring UPDI as GPIO prevents further programming via UPDI except via HV programming. Configuring this option is only supported on megaTinyCore with Optiboot bootloader (from 1.1.6 on), and prevents further modification of the fuses or bootloader without HV programming, however, as noted above, input0 can be used via the event inputs to take input from another pin. This is demonstrated in the three input examples.
 
 
@@ -266,7 +266,7 @@ Logic::stop(); // Stop CCL
 ## attachInterrupt()
 Method for enabling interrupts for a specific block.
 Valid arguments for the third parameters are `RISING`, `FALLING` and `CHANGE`.
-This method ins't available on tinyAVR series, as these parts cannot generate an interrupt from the CCL blocks.
+This method isn't available on tinyAVR series, as these parts cannot generate an interrupt from the CCL blocks.
 
 ##### Usage
 ```c++
@@ -282,7 +282,7 @@ void blinkLED()
 
 ## detachInterrupt()
 Method for disabling interrupts for a specific block.
-This method ins't available on tinyAVR series.
+This method isn't available on tinyAVR series.
 
 ##### Usage
 ```c++

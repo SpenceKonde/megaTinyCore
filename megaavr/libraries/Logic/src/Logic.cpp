@@ -345,7 +345,7 @@ void Logic::detachInterrupt()
 // Use attachIntterupt to activate this.
 ISR(CCL_CCL_vect)
 {
-   // Cleck for block 0 interrupt
+   // Check for block 0 interrupt
   if(CCL.INTFLAGS & CCL_INT0_bm)
   {
     // Run user function
@@ -363,7 +363,7 @@ ISR(CCL_CCL_vect)
     intFuncCCL[CCL_INT2_bp]();
     CCL.INTFLAGS |= CCL_INT2_bm;
   }
-  // Cleck for block 3 interrupt
+  // Check for block 3 interrupt
   if(CCL.INTFLAGS & CCL_INT3_bm)
   {
     // Run user function

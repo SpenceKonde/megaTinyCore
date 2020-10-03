@@ -8,7 +8,7 @@
 /* Arduino-maintained version : See README.TXT            */
 /* http://code.google.com/p/arduino/                      */
 /*  It is the intent that changes not relevant to the     */
-/*  Arduino production envionment get moved from the      */
+/*  Arduino production environment get moved from the      */
 /*  optiboot project to the arduino project in "lumps."   */
 /*                                                        */
 /* Heavily optimised bootloader that is faster and        */
@@ -173,7 +173,7 @@
 /*      at BOOTSTART+2, controllable with compile option  */
 /* July 2018						  */
 /* 7.0	WestfW (with much input from Others)		  */
-/*	Fix MCUSR treatement as per much discussion,	  */
+/*	Fix MCUSR treatment as per much discussion,	  */
 /*	 Patches by MarkG55, majekw.  Preserve value	  */
 /*	 for the application, as much as possible.	  */
 /*	 see https://github.com/Optiboot/optiboot/issues/97 */
@@ -402,7 +402,7 @@ typedef uint8_t pagelen_t;
  * The main() function is in init9, which removes the interrupt vector table
  * we don't need. It is also 'OS_main', which means the compiler does not
  * generate any entry or exit code itself (but unlike 'naked', it doesn't
- * supress some compile-time options we want.)
+ * suppress some compile-time options we want.)
  */
 
 void pre_main(void) __attribute__ ((naked)) __attribute__ ((section (".init8")));
@@ -452,7 +452,7 @@ static addr16_t buff = {(uint8_t *)(RAMSTART)};
 /* Virtual boot partition support */
 #ifdef VIRTUAL_BOOT_PARTITION
 
-// RAM locations to save vector info (temporarilly)
+// RAM locations to save vector info (temporarily)
 #define rstVect0_sav (*(uint8_t*)(RAMSTART+SPM_PAGESIZE*2+4))
 #define rstVect1_sav (*(uint8_t*)(RAMSTART+SPM_PAGESIZE*2+5))
 #define saveVect0_sav (*(uint8_t*)(RAMSTART+SPM_PAGESIZE*2+6))
@@ -476,7 +476,7 @@ static addr16_t buff = {(uint8_t *)(RAMSTART)};
 #elif defined (WDT_vect_num)
 #define save_vect_num (WDT_vect_num)
 #else
-#error Cant find SPM or WDT interrupt vector for this CPU
+#error Can't find SPM or WDT interrupt vector for this CPU
 #endif
 #endif //save_vect_num
 
@@ -518,7 +518,7 @@ static addr16_t buff = {(uint8_t *)(RAMSTART)};
 /* everything that needs to run VERY early */
 void pre_main(void) {
   // Allow convenient way of calling do_spm function - jump table,
-  //   so entry to this function will always be here, indepedent of compilation,
+  //   so entry to this function will always be here, independent of compilation,
   //   features etc
   asm volatile (
     "	rjmp	1f\n"
@@ -568,7 +568,7 @@ int main(void) {
    * and still skip bootloader if not necessary
    * 
    * Code by MarkG55
-   * see discusion in https://github.com/Optiboot/optiboot/issues/97
+   * see discussion in https://github.com/Optiboot/optiboot/issues/97
    */
 #if defined(__AVR_ATmega8515__) || defined(__AVR_ATmega8535__) ||	\
     defined(__AVR_ATmega16__)   || defined(__AVR_ATmega162__) ||	\
@@ -812,7 +812,7 @@ int main(void) {
  *          jmp lastvector
  * To implement the "Virtual Boot Partition", Optiboot detects when the
  * flash page containing the vectors is being programmed, and replaces the
- * startup vector with a jump to te beginning of Optiboot.  Then it saves
+ * startup vector with a jump to the beginning of Optiboot.  Then it saves
  * the applications's startup vector in another (must be unused by the
  * application), and finally programs the page with the changed vectors.
  * Thereafter, on reset, the vector will dispatch to the beginning of
@@ -845,7 +845,7 @@ int main(void) {
         buff.bptr[rstVect1] = ((uint16_t)pre_main) >> 8;
 
 #if (SAVVEC_ADDRESS != RSTVEC_ADDRESS)
-// the save_vector is not necessarilly on the same flash page as the reset
+// the save_vector is not necessarily on the same flash page as the reset
 //  vector.  If it isn't, we've waiting to actually write it.
       } else if (address.word == SAVVEC_ADDRESS) {
 	  // Save old values for Verify
@@ -897,7 +897,7 @@ int main(void) {
 	saveVect0_sav = buff.bptr[saveVect0 - SAVVEC_ADDRESS];
 	saveVect1_sav = buff.bptr[saveVect1 - SAVVEC_ADDRESS];
 
-	vect.word = (vect.word-save_vect_num); //substract 'save' interrupt position
+	vect.word = (vect.word-save_vect_num); //subtract 'save' interrupt position
         // Move RESET jmp target to 'save' vector
         buff.bptr[saveVect0 - SAVVEC_ADDRESS] = vect.bytes[0];
         buff.bptr[saveVect1 - SAVVEC_ADDRESS] = (vect.bytes[1] & 0x0F)| 0xC0;  // make an "rjmp"
@@ -910,7 +910,7 @@ int main(void) {
 
       vect.bytes[0] = rstVect0_sav;
       vect.bytes[1] = rstVect1_sav;
-      vect.word = (vect.word-save_vect_num); //substract 'save' interrupt position
+      vect.word = (vect.word-save_vect_num); //subtract 'save' interrupt position
       // Move RESET jmp target to 'save' vector
       buff.bptr[saveVect0] = vect.bytes[0];
       buff.bptr[saveVect1] = (vect.bytes[1] & 0x0F)| 0xC0;  // make an "rjmp"
@@ -980,8 +980,8 @@ void putch(char ch) {
     "   rjmp 3f\n"
     "2: sbi %[uartPort],%[uartBit]\n"
     "   nop\n"
-    "3: rcall uartDelay\n"
-    "   rcall uartDelay\n"
+    "3: recall uartDelay\n"
+    "   recall uartDelay\n"
     "   lsr %[ch]\n"
     "   dec %[bitcnt]\n"
     "   brne 1b\n"
@@ -1016,9 +1016,9 @@ uint8_t getch(void) {
   __asm__ __volatile__ (
     "1: sbic  %[uartPin],%[uartBit]\n"  // Wait for start edge
     "   rjmp  1b\n"
-    "   rcall uartDelay\n"          // Get to middle of start bit
-    "2: rcall uartDelay\n"              // Wait 1 bit period
-    "   rcall uartDelay\n"              // Wait 1 bit period
+    "   recall uartDelay\n"          // Get to middle of start bit
+    "2: recall uartDelay\n"              // Wait 1 bit period
+    "   recall uartDelay\n"              // Wait 1 bit period
     "   clc\n"
     "   sbic  %[uartPin],%[uartBit]\n"
     "   sec\n"
@@ -1246,7 +1246,7 @@ static inline void writebuffer(int8_t memtype, addr16_t mybuff,
 	    __boot_page_write_short(address.word);
 	    boot_spm_busy_wait();
 #if defined(RWWSRE)
-	    // Reenable read access to flash
+	    // Re-enable read access to flash
 	    __boot_rww_enable_short();
 #endif
 	} // default block
@@ -1305,8 +1305,8 @@ static inline void read_mem(uint8_t memtype, addr16_t address, pagelen_t length)
  * How it works:
  * - do SPM
  * - wait for SPM to complete
- * - if chip have RWW/NRWW sections it does additionaly:
- *   - if command is WRITE or ERASE, AND data=0 then reenable RWW section
+ * - if chip have RWW/NRWW sections it does additionally:
+ *   - if command is WRITE or ERASE, AND data=0 then re-enable RWW section
  *
  * In short:
  * If you play erase-fill-write, just set data to 0 in ERASE and WRITE
@@ -1339,7 +1339,7 @@ static void do_spm(uint16_t address, uint8_t command, uint16_t data) {
     // but it's tweaked a little assuming that in every command we are interested in here, there
     // must be also SELFPRGEN set. If we skip checking this bit, we save here 4B
     if ((command & (_BV(PGWRT)|_BV(PGERS))) && (data == 0) ) {
-      // Reenable read access to flash
+      // Re-enable read access to flash
       __boot_rww_enable_short();
     }
 #endif

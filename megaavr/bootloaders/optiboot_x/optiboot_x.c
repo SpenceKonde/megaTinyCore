@@ -6,7 +6,7 @@
 /* Arduino-maintained version : See README.TXT            */
 /* http://code.google.com/p/arduino/                      */
 /*  It is the intent that changes not relevant to the     */
-/*  Arduino production envionment get moved from the      */
+/*  Arduino production environment get moved from the      */
 /*  optiboot project to the arduino project in "lumps."   */
 /*                                                        */
 /* Heavily optimised bootloader that is faster and        */
@@ -144,7 +144,7 @@ optiboot_version = 256*(OPTIBOOT_MAJVER + OPTIBOOT_CUSTOMVER) + OPTIBOOT_MINVER;
 /*
  * Fuses.
  * This is an example of what they'd be like, but some should not
- * necessarilly be under control of the bootloader.  You'll need a
+ * necessarily be under control of the bootloader.  You'll need a
  * a programmer that processes the .fuses section to actually get
  * these programmed into the chip.
  * The fuses actually REQUIRED by Optiboot are:
@@ -279,7 +279,7 @@ typedef uint8_t pagelen_t;
  * The main() function is in init9, which removes the interrupt vector table
  * we don't need. It is also 'OS_main', which means the compiler does not
  * generate any entry or exit code itself (but unlike 'naked', it doesn't
- * supress some compile-time options we want.)
+ * suppress some compile-time options we want.)
  */
 
 void pre_main(void) __attribute__ ((naked)) __attribute__ ((section (".init8")));
@@ -310,7 +310,7 @@ static inline void flash_led(uint8_t);
 /* everything that needs to run VERY early */
 void pre_main (void) {
     // Allow convenient way of calling do_spm function - jump table,
-    //   so entry to this function will always be here, indepedent
+    //   so entry to this function will always be here, independent
     //    of compilation, features, etc
     __asm__ __volatile__ (
 	"	rjmp	1f\n"

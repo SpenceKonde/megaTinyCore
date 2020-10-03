@@ -14,7 +14,7 @@ void setup() {
 uint16_t readSupplyVoltage() { //returns value in millivolts to avoid floating point
   analogReference(VDD);
   VREF.CTRLA=VREF_ADC0REFSEL_1V5_gc;
-  // there is a settling time betweeen when reference is turned on, and when it becomes valid.
+  // there is a settling time between when reference is turned on, and when it becomes valid.
   // since the reference is normally turned on only when it is requested, this virtually guarantees
   // that the first reading will be garbage; subsequent readings taken immediately after will be fine.
   // VREF.CTRLB|=VREF_ADC0REFEN_bm;

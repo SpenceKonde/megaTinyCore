@@ -8,7 +8,7 @@
  *    The entropy is not distributed uniformly across the serial number,
  *        that is to say, it's a serial number, not a hash of a serial number. 
  *        Don't try to use it as an entropy source.
- *    For these reasons, it is possible that additional infomation can be deduced from it
+ *    For these reasons, it is possible that additional information can be deduced from it
  */
 
 #if (__AVR_ARCH__ < 100)

@@ -23,7 +23,7 @@ Now, you should be able to select an ATtiny megaAVR series board from Tools -> B
 ![Minimal UPDI connections](megaavr/extras/NanoUPDI_Minimal.png "Minimal UPDI connections - no resistors")
 
 
-![Reccomended UPDI connections](megaavr/extras/NanoUPDI_Recommendedx.png "Recommeded UPDI connections - 470 Ohm in series with UPDI, 10 Ohm in series with power.")
+![Recommended UPDI connections](megaavr/extras/NanoUPDI_Recommendedx.png "Recommended UPDI connections - 470 Ohm in series with UPDI, 10 Ohm in series with power.")
 
 ### Ignore the warning about "flash" and "boot" memories
 A warning will be shown during the upload process `avrdude: jtagmkII_initialize(): Cannot locate "flash" and "boot" memories in description` - this warning is spurious and can be safely ignored.
