@@ -98,4 +98,3 @@ asm(".macro __wr_spmcsr p, v \n\t"
 #define __boot_rww_enable_short() boot_rww_enable()
 
 #endif
-

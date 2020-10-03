@@ -34,4 +34,3 @@ extern char* ultoa(unsigned long value, char *string, int radix);
 #ifdef __cplusplus
 } // extern "C"
 #endif
-

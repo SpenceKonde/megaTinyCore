@@ -213,6 +213,3 @@ void loop() { //nothing to do here but enjoy your PWM.
 //Prescaler of 16 and LPER and HPER values give 4.88 kHz on PB0 and 6.25kHz on PA5.
 }
 ```
-
-
-

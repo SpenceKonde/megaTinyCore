@@ -26,4 +26,3 @@ For installing megaTinyCore, there are two options:
 Option 1: Download the .zip package (either the "released" version, or by downloading the .zip of master repo), extract, and place in the hardware folder inside your sketchbook folder (if there is no hardware folder, create it). You can find/set the location of the sketchbook folder in the Arduino IDE at File > Preferences -> Sketchbook location.
 
 Option 2: Download the github client, and sync this repo to the hardware subfolder of your sketchbook folder.
-

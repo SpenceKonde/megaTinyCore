@@ -59,4 +59,3 @@ The avrdude output is very terse by default, particularly with AVRdude
 ### Typical development configuration
 Since it is frequently useful to have a serial port for debugging, I typically find myself using a configuration like this, with a serial adapter and UPDI programmer connected simultaneously. Obviously, one could also use Optiboot, but without disabling UPDI to get reset, or using other awkward tricks (see [AlternativeReset. So
 ![Development configuration for tinyAVR 0/1-series](megaavr/extras/DevConfigUPDI.png "A common development configuration for tinyAVR 0/1-series")
-

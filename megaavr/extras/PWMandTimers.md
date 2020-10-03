@@ -96,4 +96,3 @@ The above also applies to the Servo_megaTinyCore library; it is an exact copy ex
 
 ### megaTinySleep Library
 Coming in 1.2.0, this will provide methods that use the RTC to keep time while the part is sleeping, while another timer can be used for millis timekeeping.
-

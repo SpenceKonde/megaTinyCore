@@ -56,4 +56,3 @@ The most recent versions of the datasheets for the TinyAVR product line are comb
 
 
 [ATtiny807/1607](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny807-1607-DataSheet-DS40002030B.pdf) || [ATtiny807/1607 Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny807_1607-Errata-and-Clarification-DS40002128B.pdf)
-

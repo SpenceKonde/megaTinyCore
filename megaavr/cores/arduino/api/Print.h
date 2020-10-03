@@ -81,4 +81,3 @@ class Print
     int16_t printf(const char *format, ...);
     int16_t printf(const __FlashStringHelper *format, ...);
 };
-

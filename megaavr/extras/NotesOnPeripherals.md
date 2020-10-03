@@ -76,5 +76,3 @@ You may be wondering about the nop instruction there.
 That's because there's another wacky thing demonstrated there: The C standard - surprisingly - doesn't guarantee that it won't optimize away things that can only happen if an unsigned integer overflows. It usually doesn't - but it *can*. And here, apparently taking out that noop causes it to do so - in this case, PA6 flips every time the now very tight (3 instructions) loop runs, instead of every 65436'th time! Obviously making test2 volatile prevents it from optimizing that out, and then you can remove the nop... Interestingly enough, removing the first while loop, and making not-volatile doesn't result in the same surprising optimization in the ISR - it still runs at the same speed... This is a reminder that you shouldn't rely on the behavior of unsigned, non-volatile variables overflowing.
 
 As it happens, I'd read that about the C language just days ago - quite a coincidence.....
-
-

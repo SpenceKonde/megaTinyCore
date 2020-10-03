@@ -33,4 +33,3 @@ atmel_ice_updi.protocol=atmelice_updi
 atmel_ice_updi.program.protocol=atmelice_updi
 atmel_ice_updi.program.tool=avrdude
 atmel_ice_updi.program.extra_params=-Pusb
-
