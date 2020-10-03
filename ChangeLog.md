@@ -1,13 +1,13 @@
 ### latest (planned 2.0.6)
 * Improve ADC accuracy when switching references
 * Fix bug with which parts we thought had the external reference, corrected docs. (#211)
-* Correct bug in the bootloader do_nvmctrl() function, which looked like it would try to write to CTRLA of the WDT instead of MVMCTRL. Still untested, but it might work now.
 * Change handling of reset cause in bootloader, see #213.
 * Correct bootloader for 8-pin parts with non-swapped serial port to use PIN_PA3 for the blink LED instead of PIN_PA7 which is used when the serial port is on the alternate pins. PA7 is one of the serial pins, and hence is not available for the Optiboot triple blink if the serial port is not swapped. Swapped serial port still used PA7, as that matches a) all other megaTinyCore boards and b) the initial versions of the hardware I sell.
 * Fix programmer options (#232 and others)
-* Fix EEPROM library, no more USERROW - this is just the standard EEPROM library.
+* Fix EEPROM library, no more USERROW - this is just the standard EEPROM library. (#200, #168)
 * Add USERSIG library for writing to the USERROW (also called USER_SIGNATURE)
-* Writing to flash from app now works on Optiboot parts (Thanks @WestFW)
+* Writing to flash from app now works on Optiboot parts (Thanks @WestFW) (#212, #233)
+* Move to conservative settings for SUT, lower BOD sampling frequency. (#202)
 
 ### 2.0.5
 * Internal change to ADC initialization (saves a bit of flash) and init_ADC1() function for parts that have ADC1.
