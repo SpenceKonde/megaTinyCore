@@ -41,3 +41,13 @@ jobs:
 
       - name: Check for unnecessary use of true tabs
         run: find . -path './.git' -prune -or \( -not -name 'keywords.txt' -and -not -name 'Makefile' -and -not -name '.gitmodules' -and -type f \) -exec grep --with-filename --line-number --binary-files=without-match --regexp=$'\t' '{}' \; -exec echo 'Tab found.' \; -exec false '{}' +
+
+  trailing:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check for trailing whitespace
+        run: find . -path './.git' -prune -or \( -not -name '*.hex' -and -not -name '*.gif' -and -not -name '*.png' -and -type f \) -exec grep --with-filename --line-number --binary-files=without-match --regexp='[[:blank:]]$' '{}' \; -exec echo 'Trailing whitespace found.' \; -exec false '{}' +
