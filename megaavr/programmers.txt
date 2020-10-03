@@ -1,18 +1,18 @@
-medbg.name=Onboard Atmel mEDBG (ATmega32u4/xplained_mini) (megaTinyCore)
+medbg.name=Onboard Atmel mEDBG (ATmega32u4/Xplained Mini) (megaTinyCore)
 medbg.communication=usb
 medbg.protocol=xplainedmini_updi
 medbg.program.protocol=xplainedmini_updi
 medbg.program.tool=avrdude
 medbg.program.extra_params=-Pusb
 
-edbg.name=Atmel EDBG (AT32UC3A4256/xplained_pro) (megaTinyCore)
+edbg.name=Atmel EDBG (AT32UC3A4256/Xplained Pro) (megaTinyCore)
 edbg.communication=usb
 edbg.protocol=xplainedpro_updi
 edbg.program.protocol=xplainedpro_updi
 edbg.program.tool=avrdude
 edbg.program.extra_params=-Pusb
 
-nedbg.name=Atmel nEDBG (ATSAMD21E18) (megaTinyCore)
+nedbg.name=Atmel nEDBG (ATSAMD21E18/Curiosity) (megaTinyCore)
 nedbg.communication=usb
 nedbg.protocol=curiosity_updi
 nedbg.program.protocol=curiosity_updi
@@ -26,7 +26,6 @@ jtag2updi.program.protocol=jtag2updi
 jtag2updi.program.tool=avrdude
 jtag2updi.program.extra_params=-P{serial.port}
 jtag2updi.program.speed=115200
-jtag2updi.program.use_1200bps_touch=true
 
 atmel_ice_updi.name=Atmel-ICE UPDI (megaTinyCore)
 atmel_ice_updi.communication=usb
@@ -35,9 +34,3 @@ atmel_ice_updi.program.protocol=atmelice_updi
 atmel_ice_updi.program.tool=avrdude
 atmel_ice_updi.program.extra_params=-Pusb
 
-curiosity.name=Microchip Curiosity Nano (megaTinyCore)
-curiosity.communication=usb
-curiosity.protocol=curiositynano_updi
-curiosity.program.protocol=curiositynano_updi
-curiosity.program.tool=avrdude
-curiosity.program.extra_params=-Pusb
