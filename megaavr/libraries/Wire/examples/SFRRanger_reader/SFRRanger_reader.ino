@@ -55,11 +55,11 @@ void loop() {
 
 /*
 
-// The following code changes the address of a Devantech Ultrasonic Range Finder (SRF10 or SRF08)
-// usage: changeAddress(0x70, 0xE6);
+  // The following code changes the address of a Devantech Ultrasonic Range Finder (SRF10 or SRF08)
+  // usage: changeAddress(0x70, 0xE6);
 
-void changeAddress(byte oldAddress, byte newAddress)
-{
+  void changeAddress(byte oldAddress, byte newAddress)
+  {
   Wire.beginTransmission(oldAddress);
   Wire.write(byte(0x00));
   Wire.write(byte(0xA0));
@@ -79,6 +79,6 @@ void changeAddress(byte oldAddress, byte newAddress)
   Wire.write(byte(0x00));
   Wire.write(newAddress);
   Wire.endTransmission();
-}
+  }
 
 */

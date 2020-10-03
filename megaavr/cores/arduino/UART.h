@@ -39,28 +39,28 @@
 // often work, but occasionally a race condition can occur that makes
 // Serial behave erratically. See https://github.com/arduino/Arduino/issues/2405
 #if !defined(SERIAL_TX_BUFFER_SIZE)
-#if ((RAMEND - RAMSTART) < 1023)
-#define SERIAL_TX_BUFFER_SIZE 16
-#else
-#define SERIAL_TX_BUFFER_SIZE 64
-#endif
+  #if ((RAMEND - RAMSTART) < 1023)
+    #define SERIAL_TX_BUFFER_SIZE 16
+  #else
+    #define SERIAL_TX_BUFFER_SIZE 64
+  #endif
 #endif
 #if !defined(SERIAL_RX_BUFFER_SIZE)
-#if ((RAMEND - RAMSTART) < 1023)
-#define SERIAL_RX_BUFFER_SIZE 16
-#else
-#define SERIAL_RX_BUFFER_SIZE 64
-#endif
+  #if ((RAMEND - RAMSTART) < 1023)
+    #define SERIAL_RX_BUFFER_SIZE 16
+  #else
+    #define SERIAL_RX_BUFFER_SIZE 64
+  #endif
 #endif
 #if (SERIAL_TX_BUFFER_SIZE>256)
-typedef uint16_t tx_buffer_index_t;
+  typedef uint16_t tx_buffer_index_t;
 #else
-typedef uint8_t tx_buffer_index_t;
+  typedef uint8_t tx_buffer_index_t;
 #endif
 #if  (SERIAL_RX_BUFFER_SIZE>256)
-typedef uint16_t rx_buffer_index_t;
+  typedef uint16_t rx_buffer_index_t;
 #else
-typedef uint8_t rx_buffer_index_t;
+  typedef uint8_t rx_buffer_index_t;
 #endif
 
 // Define config for Serial.begin(baud, config);
@@ -122,10 +122,9 @@ typedef uint8_t rx_buffer_index_t;
 
 #define SERIAL_PIN_SETS 2
 
-class UartClass : public HardwareSerial
-{
+class UartClass : public HardwareSerial {
   protected:
-    volatile USART_t * const _hwserial_module;
+    volatile USART_t *const _hwserial_module;
 
     struct UartPinSet {
       uint8_t const rx_pin;
@@ -157,7 +156,9 @@ class UartClass : public HardwareSerial
     inline UartClass(volatile USART_t *hwserial_module, uint8_t hwserial_rx_pin, uint8_t hwserial_tx_pin, uint8_t hwserial_rx_pin_swap, uint8_t hwserial_tx_pin_swap, uint8_t dre_vect_num, uint8_t uart_mux, uint8_t uart_mux_swap);
     bool pins(uint8_t tx, uint8_t rx);
     bool swap(uint8_t state = 1);
-    void begin(unsigned long baud) { begin(baud, SERIAL_8N1); }
+    void begin(unsigned long baud) {
+      begin(baud, SERIAL_8N1);
+    }
     void begin(unsigned long, uint16_t);
     void end();
     virtual int available(void);
@@ -166,12 +167,22 @@ class UartClass : public HardwareSerial
     virtual int availableForWrite(void);
     virtual void flush(void);
     virtual size_t write(uint8_t);
-    inline size_t write(unsigned long n) { return write((uint8_t)n); }
-    inline size_t write(long n) { return write((uint8_t)n); }
-    inline size_t write(unsigned int n) { return write((uint8_t)n); }
-    inline size_t write(int n) { return write((uint8_t)n); }
+    inline size_t write(unsigned long n) {
+      return write((uint8_t)n);
+    }
+    inline size_t write(long n) {
+      return write((uint8_t)n);
+    }
+    inline size_t write(unsigned int n) {
+      return write((uint8_t)n);
+    }
+    inline size_t write(int n) {
+      return write((uint8_t)n);
+    }
     using Print::write; // pull in write(str) and write(buf, size) from Print
-    explicit operator bool() { return true; }
+    explicit operator bool() {
+      return true;
+    }
 
     // Interrupt handlers - Not intended to be called externally
     inline void _rx_complete_irq(void);

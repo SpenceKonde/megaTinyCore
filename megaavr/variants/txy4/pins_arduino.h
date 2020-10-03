@@ -50,30 +50,30 @@
 
 
 #ifdef PORTMUX_TWI0_bm
-#define PIN_WIRE_SDA_PINSWAP_1        (8)
-#define PIN_WIRE_SCL_PINSWAP_1        (9)
+  #define PIN_WIRE_SDA_PINSWAP_1        (8)
+  #define PIN_WIRE_SCL_PINSWAP_1        (9)
 #endif
 #define PIN_WIRE_SDA        (6)
 #define PIN_WIRE_SCL        (7)
 
 #ifdef PIN_WIRE_SCL_PINSWAP_1
-#define SDA ((uint8_t) (PORTMUX.CTRLB&PORTMUX_TWI0_bm?PIN_WIRE_SDA_PINSWAP_1:PIN_WIRE_SDA))
-#define SCL ((uint8_t) (PORTMUX.CTRLB&PORTMUX_TWI0_bm?PIN_WIRE_SCL_PINSWAP_1:PIN_WIRE_SCL))
+  #define SDA ((uint8_t) (PORTMUX.CTRLB&PORTMUX_TWI0_bm?PIN_WIRE_SDA_PINSWAP_1:PIN_WIRE_SDA))
+  #define SCL ((uint8_t) (PORTMUX.CTRLB&PORTMUX_TWI0_bm?PIN_WIRE_SCL_PINSWAP_1:PIN_WIRE_SCL))
 #else
-static const uint8_t SDA = PIN_WIRE_SDA;
-static const uint8_t SCL = PIN_WIRE_SCL;
+  static const uint8_t SDA = PIN_WIRE_SDA;
+  static const uint8_t SCL = PIN_WIRE_SCL;
 #endif
 
 #ifdef PIN_SPI_SCK_PINSWAP_1
-#define SS ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_SS_PINSWAP_1:PIN_SPI_SS))
-#define MOSI ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_MOSI_PINSWAP_1:PIN_SPI_MOSI))
-#define MISO ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_MISO_PINSWAP_1:PIN_SPI_MISO))
-#define SCK ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_SCK_PINSWAP_1:PIN_SPI_SCK))
+  #define SS ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_SS_PINSWAP_1:PIN_SPI_SS))
+  #define MOSI ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_MOSI_PINSWAP_1:PIN_SPI_MOSI))
+  #define MISO ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_MISO_PINSWAP_1:PIN_SPI_MISO))
+  #define SCK ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_SCK_PINSWAP_1:PIN_SPI_SCK))
 #else
-static const uint8_t SS   = PIN_SPI_SS;
-static const uint8_t MOSI = PIN_SPI_MOSI;
-static const uint8_t MISO = PIN_SPI_MISO;
-static const uint8_t SCK  = PIN_SPI_SCK;
+  static const uint8_t SS   = PIN_SPI_SS;
+  static const uint8_t MOSI = PIN_SPI_MOSI;
+  static const uint8_t MISO = PIN_SPI_MISO;
+  static const uint8_t SCK  = PIN_SPI_SCK;
 #endif
 
 // Mapped to HWSERIAL0 in Serial library
@@ -90,7 +90,7 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define PIN_WIRE_HWSERIAL0_TX   (5)
 
 #ifdef DAC0
-#define DAC_PIN PIN_PA6
+  #define DAC_PIN PIN_PA6
 #endif
 #define LED_BUILTIN PIN_PA7
 
@@ -117,18 +117,18 @@ static const uint8_t A7 = PIN_A7;
 static const uint8_t A10 = PIN_A10;
 static const uint8_t A11 = PIN_A11;
 
-static const uint8_t PIN_PA4=0;
-static const uint8_t PIN_PA5=1;
-static const uint8_t PIN_PA6=2;
-static const uint8_t PIN_PA7=3;
-static const uint8_t PIN_PB3=4;
-static const uint8_t PIN_PB2=5;
-static const uint8_t PIN_PB1=6;
-static const uint8_t PIN_PB0=7;
-static const uint8_t PIN_PA0=11;
-static const uint8_t PIN_PA1=8;
-static const uint8_t PIN_PA2=9;
-static const uint8_t PIN_PA3=10;
+static const uint8_t PIN_PA4 = 0;
+static const uint8_t PIN_PA5 = 1;
+static const uint8_t PIN_PA6 = 2;
+static const uint8_t PIN_PA7 = 3;
+static const uint8_t PIN_PB3 = 4;
+static const uint8_t PIN_PB2 = 5;
+static const uint8_t PIN_PB1 = 6;
+static const uint8_t PIN_PB0 = 7;
+static const uint8_t PIN_PA0 = 11;
+static const uint8_t PIN_PA1 = 8;
+static const uint8_t PIN_PA2 = 9;
+static const uint8_t PIN_PA3 = 10;
 
 #define PINS_COUNT    (12u)
 
@@ -151,22 +151,22 @@ static const uint8_t PIN_PA3=10;
 //
 
 /*
-PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       AC1       AC2       DAC0      USART0    SPI0      TWI0      TCA(PWM)  TCBn      TCD0      CCL
-0      A0 or SS     PA4                 AIN4      AIN0      X0/Y0                                             XDIR      SS                  WO4                 WOA       LUT0-OUT
-1      A1           PA5       VREFA     AIN5      AIN1      X1/Y1     OUT       AINN0                                                       WO5       TCB0 WO   WOB
-2      A2 or DAC    PA6                 AIN6      AIN2      X2/Y2     AINN0     AINP1     AINP0     OUT
-3      A3           PA7                 AIN7      AIN3      X3/Y3     AINP0     AINP0     AINN0                                                                           LUT1-OUT
-4      RX           PB3       TOSC1                                             OUT                           RxD                           *WO0
-5      TX           PB2       TOSC2 /                                                     OUT                 TxD                           WO2
+  PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       AC1       AC2       DAC0      USART0    SPI0      TWI0      TCA(PWM)  TCBn      TCD0      CCL
+  0      A0 or SS     PA4                 AIN4      AIN0      X0/Y0                                             XDIR      SS                  WO4                 WOA       LUT0-OUT
+  1      A1           PA5       VREFA     AIN5      AIN1      X1/Y1     OUT       AINN0                                                       WO5       TCB0 WO   WOB
+  2      A2 or DAC    PA6                 AIN6      AIN2      X2/Y2     AINN0     AINP1     AINP0     OUT
+  3      A3           PA7                 AIN7      AIN3      X3/Y3     AINP0     AINP0     AINN0                                                                           LUT1-OUT
+  4      RX           PB3       TOSC1                                             OUT                           RxD                           *WO0
+  5      TX           PB2       TOSC2 /                                                     OUT                 TxD                           WO2
                               EVOUT1
-6      SDA          PB1                 AIN10               X4/Y4     AINP2                                   XCK                 SDA       WO1
-7      SCL          PB0                 AIN11               X5/Y5               AINP2     AINP1               XDIR                SCL       WO0
-8      MOSI         PA1                 AIN1                                                                  *TxD      MOSI      *SDA                                    LUT0-IN1
-9      MISO         PA2       EVOUT0    AIN2                                                                  *RxD      MISO      *SCL                                    LUT0-IN2
-10     SCK          PA3       EXTCLK    AIN3                                                                  *XCK      SCK                 WO3       TCB1 WO
-11     UPDI         PA0       RESET/    AIN0                                                                                                                              LUT1-IN0
+  6      SDA          PB1                 AIN10               X4/Y4     AINP2                                   XCK                 SDA       WO1
+  7      SCL          PB0                 AIN11               X5/Y5               AINP2     AINP1               XDIR                SCL       WO0
+  8      MOSI         PA1                 AIN1                                                                  *TxD      MOSI      *SDA                                    LUT0-IN1
+  9      MISO         PA2       EVOUT0    AIN2                                                                  *RxD      MISO      *SCL                                    LUT0-IN2
+  10     SCK          PA3       EXTCLK    AIN3                                                                  *XCK      SCK                 WO3       TCB1 WO
+  11     UPDI         PA0       RESET/    AIN0                                                                                                                              LUT1-IN0
                               UPDI
-  * alternative pin locations
+    alternative pin locations
 */
 
 const uint8_t digital_pin_to_port[] = {
@@ -230,7 +230,7 @@ const uint8_t digital_pin_to_timer[] = {
   TIMERA0,    // 0  PA4
   TIMERA0,    // 1  PA5
   #if defined(DAC0)
-    DACOUT, // 2  PA6
+  DACOUT, // 2  PA6
   #else
   NOT_ON_TIMER, // 2  PA6
   #endif
@@ -249,16 +249,16 @@ const uint8_t digital_pin_to_timer[] = {
 
 };
 /*
-#define PIN_A0   (11)
-#define PIN_A1   (8)
-#define PIN_A2   (9)
-#define PIN_A3   (10)
-#define PIN_A4   (0)
-#define PIN_A5   (1)
-#define PIN_A6   (2)
-#define PIN_A7   (3)
-#define PIN_A10  (6)
-#define PIN_A11  (7)
+  #define PIN_A0   (11)
+  #define PIN_A1   (8)
+  #define PIN_A2   (9)
+  #define PIN_A3   (10)
+  #define PIN_A4   (0)
+  #define PIN_A5   (1)
+  #define PIN_A6   (2)
+  #define PIN_A7   (3)
+  #define PIN_A10  (6)
+  #define PIN_A11  (7)
 
 */
 #endif

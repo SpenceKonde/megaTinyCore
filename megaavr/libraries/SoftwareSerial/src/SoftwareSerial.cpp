@@ -1,32 +1,32 @@
 /*
-SoftwareSerial.cpp (formerly NewSoftSerial.cpp) -
-Multi-instance software serial library for Arduino/Wiring
--- Interrupt-driven receive and other improvements by ladyada
+  SoftwareSerial.cpp (formerly NewSoftSerial.cpp) -
+  Multi-instance software serial library for Arduino/Wiring
+  -- Interrupt-driven receive and other improvements by ladyada
    (http://ladyada.net)
--- Tuning, circular buffer, derivation from class Print/Stream,
+  -- Tuning, circular buffer, derivation from class Print/Stream,
    multi-instance support, porting to 8MHz processors,
    various optimizations, PROGMEM delay tables, inverse logic and
    direct port writing by Mikal Hart (http://www.arduiniana.org)
--- Pin change interrupt macros by Paul Stoffregen (http://www.pjrc.com)
--- 20MHz processor support by Garrett Mace (http://www.macetech.com)
--- ATmega1280/2560 support by Brett Hagman (http://www.roguerobotics.com/)
+  -- Pin change interrupt macros by Paul Stoffregen (http://www.pjrc.com)
+  -- 20MHz processor support by Garrett Mace (http://www.macetech.com)
+  -- ATmega1280/2560 support by Brett Hagman (http://www.roguerobotics.com/)
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-The latest version of this library can always be found at
-http://arduiniana.org.
+  The latest version of this library can always be found at
+  http://arduiniana.org.
 */
 
 // When set, _DEBUG co-opts pins 11 and 13 for debugging with an
@@ -58,13 +58,11 @@ volatile uint8_t SoftwareSerial::_receive_buffer_head = 0;
 // This function generates a brief pulse
 // for debugging or measuring on an oscilloscope.
 #if _DEBUG
-inline void DebugPulse(uint8_t pin, uint8_t count)
-{
+inline void DebugPulse(uint8_t pin, uint8_t count) {
   volatile uint8_t *pport = portOutputRegister(digitalPinToPort(pin));
 
   uint8_t val = *pport;
-  while (count--)
-  {
+  while (count--) {
     *pport = val | digitalPinToBitMask(pin);
     *pport = val;
   }
@@ -84,15 +82,15 @@ inline void SoftwareSerial::tunedDelay(uint16_t delay) {
 
 // This function sets the current object as the "listening"
 // one and returns true if it replaces another
-bool SoftwareSerial::listen()
-{
-  if (!_rx_delay_stopbit)
+bool SoftwareSerial::listen() {
+  if (!_rx_delay_stopbit) {
     return false;
+  }
 
-  if (active_object != this)
-  {
-    if (active_object)
+  if (active_object != this) {
+    if (active_object) {
       active_object->stopListening();
+    }
 
     _buffer_overflow = false;
     _receive_buffer_head = _receive_buffer_tail = 0;
@@ -106,10 +104,8 @@ bool SoftwareSerial::listen()
 }
 
 // Stop listening. Returns true if we were actually listening.
-bool SoftwareSerial::stopListening()
-{
-  if (active_object == this)
-  {
+bool SoftwareSerial::stopListening() {
+  if (active_object == this) {
     setRxIntMsk(false);
     active_object = NULL;
     return true;
@@ -120,13 +116,12 @@ bool SoftwareSerial::stopListening()
 //
 // The receive routine called by the interrupt handler
 //
-void SoftwareSerial::recv()
-{
+void SoftwareSerial::recv() {
 
-#if GCC_VERSION < 40302
-// Work-around for avr-gcc 4.3.0 OSX version bug
-// Preserve the registers that the compiler misses
-// (courtesy of Arduino forum user *etracer*)
+  #if GCC_VERSION < 40302
+  // Work-around for avr-gcc 4.3.0 OSX version bug
+  // Preserve the registers that the compiler misses
+  // (courtesy of Arduino forum user *etracer*)
   asm volatile(
     "push r18 \n\t"
     "push r19 \n\t"
@@ -137,14 +132,13 @@ void SoftwareSerial::recv()
     "push r26 \n\t"
     "push r27 \n\t"
     ::);
-#endif
+  #endif
 
   uint8_t d = 0;
 
   // If RX line is high, then we don't see any start bit
   // so interrupt is probably not for us
-  if (_inverse_logic ? rx_pin_read() : !rx_pin_read())
-  {
+  if (_inverse_logic ? rx_pin_read() : !rx_pin_read()) {
     // Disable further interrupts during reception, this prevents
     // triggering another interrupt directly after we return, which can
     // cause problems at higher baudrates.
@@ -155,28 +149,26 @@ void SoftwareSerial::recv()
     DebugPulse(_DEBUG_PIN2, 1);
 
     // Read each of the 8 bits
-    for (uint8_t i=8; i > 0; --i)
-    {
+    for (uint8_t i = 8; i > 0; --i) {
       tunedDelay(_rx_delay_intrabit);
       d >>= 1;
       DebugPulse(_DEBUG_PIN2, 1);
-      if (rx_pin_read())
+      if (rx_pin_read()) {
         d |= 0x80;
+      }
     }
 
-    if (_inverse_logic)
+    if (_inverse_logic) {
       d = ~d;
+    }
 
     // if buffer full, set the overflow flag and return
     uint8_t next = (_receive_buffer_tail + 1) % _SS_MAX_RX_BUFF;
-    if (next != _receive_buffer_head)
-    {
+    if (next != _receive_buffer_head) {
       // save new data in buffer: tail points to where byte goes
       _receive_buffer[_receive_buffer_tail] = d; // save new byte
       _receive_buffer_tail = next;
-    }
-    else
-    {
+    } else {
       DebugPulse(_DEBUG_PIN1, 1);
       _buffer_overflow = true;
     }
@@ -190,9 +182,9 @@ void SoftwareSerial::recv()
 
   }
 
-#if GCC_VERSION < 40302
-// Work-around for avr-gcc 4.3.0 OSX version bug
-// Restore the registers that the compiler misses
+  #if GCC_VERSION < 40302
+  // Work-around for avr-gcc 4.3.0 OSX version bug
+  // Restore the registers that the compiler misses
   asm volatile(
     "pop r27 \n\t"
     "pop r26 \n\t"
@@ -203,11 +195,10 @@ void SoftwareSerial::recv()
     "pop r19 \n\t"
     "pop r18 \n\t"
     ::);
-#endif
+  #endif
 }
 
-uint8_t SoftwareSerial::rx_pin_read()
-{
+uint8_t SoftwareSerial::rx_pin_read() {
   return *_receivePortRegister & _receiveBitMask;
 }
 
@@ -216,10 +207,8 @@ uint8_t SoftwareSerial::rx_pin_read()
 //
 
 /* static */
-inline void SoftwareSerial::handle_interrupt()
-{
-  if (active_object)
-  {
+inline void SoftwareSerial::handle_interrupt() {
+  if (active_object) {
     active_object->recv();
   }
 }
@@ -233,8 +222,7 @@ SoftwareSerial::SoftwareSerial(uint8_t receivePin, uint8_t transmitPin, bool inv
   _rx_delay_stopbit(0),
   _tx_delay(0),
   _buffer_overflow(false),
-  _inverse_logic(inverse_logic)
-{
+  _inverse_logic(inverse_logic) {
   setTX(transmitPin);
   setRX(receivePin);
 }
@@ -242,13 +230,11 @@ SoftwareSerial::SoftwareSerial(uint8_t receivePin, uint8_t transmitPin, bool inv
 //
 // Destructor
 //
-SoftwareSerial::~SoftwareSerial()
-{
+SoftwareSerial::~SoftwareSerial() {
   end();
 }
 
-void SoftwareSerial::setTX(uint8_t tx)
-{
+void SoftwareSerial::setTX(uint8_t tx) {
   // First write, then set output. If we do this the other way around,
   // the pin would be output low for a short while before switching to
   // output high. Now, it is input with pullup for a short while, which
@@ -260,11 +246,11 @@ void SoftwareSerial::setTX(uint8_t tx)
   _transmitPortRegister = portOutputRegister(port);
 }
 
-void SoftwareSerial::setRX(uint8_t rx)
-{
+void SoftwareSerial::setRX(uint8_t rx) {
   pinMode(rx, INPUT);
-  if (!_inverse_logic)
+  if (!_inverse_logic) {
     digitalWrite(rx, HIGH);  // pullup for normal logic!
+  }
   _receivePin = rx;
   _receiveBitMask = digitalPinToBitMask(rx);
   uint8_t port = digitalPinToPort(rx);
@@ -272,18 +258,18 @@ void SoftwareSerial::setRX(uint8_t rx)
 }
 
 uint16_t SoftwareSerial::subtract_cap(uint16_t num, uint16_t sub) {
-  if (num > sub)
+  if (num > sub) {
     return num - sub;
-  else
+  } else {
     return 1;
+  }
 }
 
 //
 // Public methods
 //
 
-void SoftwareSerial::begin(long speed)
-{
+void SoftwareSerial::begin(long speed) {
   _rx_delay_centering = _rx_delay_intrabit = _rx_delay_stopbit = _tx_delay = 0;
 
   // Precalculate the various delays, in number of 4-cycle delays
@@ -339,37 +325,37 @@ void SoftwareSerial::begin(long speed)
     tunedDelay(_tx_delay); // if we were low this establishes the end
   }
 
-#if _DEBUG
+  #if _DEBUG
   pinMode(_DEBUG_PIN1, OUTPUT);
   pinMode(_DEBUG_PIN2, OUTPUT);
-#endif
+  #endif
 
   listen();
 }
 
-void SoftwareSerial::setRxIntMsk(bool enable)
-{
-    if (enable)
-      *_pcint_maskreg |= _pcint_maskvalue;
-    else
-      *_pcint_maskreg &= ~_pcint_maskvalue;
+void SoftwareSerial::setRxIntMsk(bool enable) {
+  if (enable) {
+    *_pcint_maskreg |= _pcint_maskvalue;
+  } else {
+    *_pcint_maskreg &= ~_pcint_maskvalue;
+  }
 }
 
-void SoftwareSerial::end()
-{
+void SoftwareSerial::end() {
   stopListening();
 }
 
 
 // Read data from buffer
-int SoftwareSerial::read()
-{
-  if (!isListening())
+int SoftwareSerial::read() {
+  if (!isListening()) {
     return -1;
+  }
 
   // Empty buffer?
-  if (_receive_buffer_head == _receive_buffer_tail)
+  if (_receive_buffer_head == _receive_buffer_tail) {
     return -1;
+  }
 
   // Read from "head"
   uint8_t d = _receive_buffer[_receive_buffer_head]; // grab next byte
@@ -377,16 +363,15 @@ int SoftwareSerial::read()
   return d;
 }
 
-int SoftwareSerial::available()
-{
-  if (!isListening())
+int SoftwareSerial::available() {
+  if (!isListening()) {
     return 0;
+  }
 
   return (_receive_buffer_tail + _SS_MAX_RX_BUFF - _receive_buffer_head) % _SS_MAX_RX_BUFF;
 }
 
-size_t SoftwareSerial::write(uint8_t b)
-{
+size_t SoftwareSerial::write(uint8_t b) {
   if (_tx_delay == 0) {
     setWriteError();
     return 0;
@@ -403,36 +388,39 @@ size_t SoftwareSerial::write(uint8_t b)
   bool inv = _inverse_logic;
   uint16_t delay = _tx_delay;
 
-  if (inv)
+  if (inv) {
     b = ~b;
+  }
 
   cli();  // turn off interrupts for a clean txmit
 
   // Write the start bit
-  if (inv)
+  if (inv) {
     *reg |= reg_mask;
-  else
+  } else {
     *reg &= inv_mask;
+  }
 
   tunedDelay(delay);
 
   // Write each of the 8 bits
-  for (uint8_t i = 8; i > 0; --i)
-  {
-    if (b & 1) // choose bit
-      *reg |= reg_mask; // send 1
-    else
-      *reg &= inv_mask; // send 0
+  for (uint8_t i = 8; i > 0; --i) {
+    if (b & 1) { // choose bit
+      *reg |= reg_mask;  // send 1
+    } else {
+      *reg &= inv_mask;  // send 0
+    }
 
     tunedDelay(delay);
     b >>= 1;
   }
 
   // restore pin to natural state
-  if (inv)
+  if (inv) {
     *reg &= inv_mask;
-  else
+  } else {
     *reg |= reg_mask;
+  }
 
   SREG = oldSREG; // turn interrupts back on
   tunedDelay(_tx_delay);
@@ -440,19 +428,19 @@ size_t SoftwareSerial::write(uint8_t b)
   return 1;
 }
 
-void SoftwareSerial::flush()
-{
+void SoftwareSerial::flush() {
   // There is no tx buffering, simply return
 }
 
-int SoftwareSerial::peek()
-{
-  if (!isListening())
+int SoftwareSerial::peek() {
+  if (!isListening()) {
     return -1;
+  }
 
   // Empty buffer?
-  if (_receive_buffer_head == _receive_buffer_tail)
+  if (_receive_buffer_head == _receive_buffer_tail) {
     return -1;
+  }
 
   // Read from "head"
   return _receive_buffer[_receive_buffer_head];

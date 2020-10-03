@@ -30,21 +30,21 @@
 #define F(str) (str)
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 /* Analog reference options */
 
 /* Change in mega4809: two places to define analog reference
- - VREF peripheral defines internal reference
- - analog peripherals define internal/Vdd/external
+  - VREF peripheral defines internal reference
+  - analog peripherals define internal/Vdd/external
 */
 
- // internal from VREF
+// internal from VREF
 
- /* Values shifted to avoid clashing with ADC REFSEL defines
-    Will shift back in analog_reference function
-  */
+/* Values shifted to avoid clashing with ADC REFSEL defines
+   Will shift back in analog_reference function
+*/
 #define INTERNAL0V55 (VREF_ADC0REFSEL_0V55_gc >> VREF_ADC0REFSEL_gp)
 #define INTERNAL1V1 (VREF_ADC0REFSEL_1V1_gc >> VREF_ADC0REFSEL_gp)
 #define INTERNAL2V5 (VREF_ADC0REFSEL_2V5_gc >> VREF_ADC0REFSEL_gp)
@@ -56,11 +56,11 @@ extern "C"{
 #define INTERNAL    ADC_REFSEL_INTREF_gc
 #define VDD         ADC_REFSEL_VDDREF_gc
 #ifdef DAC0
-  #define ADC_DAC0 ADC_MUXPOS_DAC0_gc
+#define ADC_DAC0 ADC_MUXPOS_DAC0_gc
 #endif
 
 #if (defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3217__) )
-  #define EXTERNAL  ADC_REFSEL_VREFA_gc
+#define EXTERNAL  ADC_REFSEL_VREFA_gc
 #endif
 
 #define ADC_TEMPERATURE ADC_MUXPOS_TEMPSENSE_gc
@@ -76,7 +76,7 @@ extern "C"{
 
 // avr-libc defines _NOP() since 1.6.2
 #ifndef _NOP
-  #define _NOP() do { __asm__ volatile ("nop"); } while (0)
+#define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
 
 /* Allows performing a correction on the CPU value using the signature row
@@ -311,7 +311,7 @@ void setup_timers();
 #endif
 
 #ifdef __cplusplus
-#include "UART.h"
+  #include "UART.h"
 
 #endif
 

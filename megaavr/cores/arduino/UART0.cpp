@@ -37,8 +37,7 @@
 #if defined(HAVE_HWSERIAL0)
 
 #if defined(HWSERIAL0_RXC_VECTOR)
-ISR(HWSERIAL0_RXC_VECTOR)
-{
+ISR(HWSERIAL0_RXC_VECTOR) {
   Serial._rx_complete_irq();
 }
 #else
@@ -46,8 +45,7 @@ ISR(HWSERIAL0_RXC_VECTOR)
 #endif
 
 #if defined(HWSERIAL0_DRE_VECTOR)
-ISR(HWSERIAL0_DRE_VECTOR)
-{
+ISR(HWSERIAL0_DRE_VECTOR) {
   Serial._tx_data_empty_irq();
 }
 #else

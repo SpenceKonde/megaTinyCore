@@ -25,19 +25,18 @@
 #include <Arduino.h>
 
 #if ((RAMEND - RAMSTART) < 1023)
-#define BUFFER_LENGTH 16
+  #define BUFFER_LENGTH 16
 #elif ((RAMEND - RAMSTART) < 4095)
-#define BUFFER_LENGTH 32
+  #define BUFFER_LENGTH 32
 #elif ((RAMEND - RAMSTART) < 8191)
-#define BUFFER_LENGTH 64
+  #define BUFFER_LENGTH 64
 #else
-#define BUFFER_LENGTH 128
+  #define BUFFER_LENGTH 128
 #endif
 
 // WIRE_HAS_END means Wire has end()
 #define WIRE_HAS_END 1
-class TwoWire : public Stream
-{
+class TwoWire : public Stream {
   private:
     static uint8_t rxBuffer[];
     static uint8_t rxBufferIndex;
@@ -60,10 +59,10 @@ class TwoWire : public Stream
     void begin();
     void begin(uint8_t);
     void begin(int);
-    void begin(uint8_t,bool,uint8_t);
-    void begin(int,bool,uint8_t);
-    void begin(uint8_t,bool);
-    void begin(int,bool);
+    void begin(uint8_t, bool, uint8_t);
+    void begin(int, bool, uint8_t);
+    void begin(uint8_t, bool);
+    void begin(int, bool);
     void end();
     void setClock(uint32_t);
     void beginTransmission(uint8_t);
@@ -82,13 +81,21 @@ class TwoWire : public Stream
     virtual int read(void);
     virtual int peek(void);
     virtual void flush(void);
-    void onReceive( void (*)(int) );
-    void onRequest( void (*)(void) );
+    void onReceive(void (*)(int));
+    void onRequest(void (*)(void));
 
-    inline size_t write(unsigned long n) { return write((uint8_t)n); }
-    inline size_t write(long n) { return write((uint8_t)n); }
-    inline size_t write(unsigned int n) { return write((uint8_t)n); }
-    inline size_t write(int n) { return write((uint8_t)n); }
+    inline size_t write(unsigned long n) {
+      return write((uint8_t)n);
+    }
+    inline size_t write(long n) {
+      return write((uint8_t)n);
+    }
+    inline size_t write(unsigned int n) {
+      return write((uint8_t)n);
+    }
+    inline size_t write(int n) {
+      return write((uint8_t)n);
+    }
     using Print::write;
 };
 

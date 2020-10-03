@@ -21,8 +21,7 @@
 #include <inttypes.h>
 #include "Stream.h"
 
-class HardwareI2C : public Stream
-{
+class HardwareI2C : public Stream {
   public:
     virtual void begin() = 0;
     virtual void begin(uint8_t address) = 0;

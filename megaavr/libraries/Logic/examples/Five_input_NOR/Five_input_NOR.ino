@@ -1,24 +1,23 @@
 /***********************************************************************|
-| megaAVR Configurable Custom Logic library                             |
-|                                                                       |
-| Five_input_NOR.ino                                                    |
-|                                                                       |
-| A library for interfacing with the megaAVR Configurable Custom Logic. |
-| Developed in 2019 by MCUdude.                                         |
-| https://github.com/MCUdude/                                           |
-|                                                                       |
-| In this example we use two logic blocks to get five inputs.           |
-| The output of block 1 is connected to one of the inputs of block 0.   |
-| With the correct truth tables values we can make the output of        |
-| block 0 go high when all inputs are low.                              |
-|                                                                       |
-| See Microchip's application note TB3218 for more information.         |
-|***********************************************************************/
+  | megaAVR Configurable Custom Logic library                             |
+  |                                                                       |
+  | Five_input_NOR.ino                                                    |
+  |                                                                       |
+  | A library for interfacing with the megaAVR Configurable Custom Logic. |
+  | Developed in 2019 by MCUdude.                                         |
+  | https://github.com/MCUdude/                                           |
+  |                                                                       |
+  | In this example we use two logic blocks to get five inputs.           |
+  | The output of block 1 is connected to one of the inputs of block 0.   |
+  | With the correct truth tables values we can make the output of        |
+  | block 0 go high when all inputs are low.                              |
+  |                                                                       |
+  | See Microchip's application note TB3218 for more information.         |
+  |***********************************************************************/
 
 #include <Logic.h>
 
-void setup()
-{
+void setup() {
   // Initialize logic block 1
   // Logic block 1 has three inputs, PC0, PC1 and PC2 on ATmega parts
   // Logic block 1 inputs are PC3, PC4, and PC5 on ATtiny parts, but
@@ -38,22 +37,22 @@ void setup()
   // only use this workaround if it's a 20-pin part.
   // Here, PA3 is used as input 1 and PB0 is used as input 2
 
-  PORTA.DIRCLR=(1<<3);                // set PA3 as input
-  PORTA.PIN3CTRL|=PORT_PULLUPEN_bm;   // enable pullup
-  EVSYS.ASYNC0=0x0D;                  // PA3 per table 14-2 in datasheet
-  EVSYS.ASYNCUSER3= 0x03;             // Use Async0 as LUT1 event 0 per Table 14-4 in datasheet
+  PORTA.DIRCLR = (1 << 3);            // set PA3 as input
+  PORTA.PIN3CTRL |= PORT_PULLUPEN_bm; // enable pullup
+  EVSYS.ASYNC0 = 0x0D;                // PA3 per table 14-2 in datasheet
+  EVSYS.ASYNCUSER3 = 0x03;            // Use Async0 as LUT1 event 0 per Table 14-4 in datasheet
   Logic0.input1 = in::event_0;        // Use LUT event 0 as input 1, which will take input from PA3
 
-  PORTB.DIRCLR=(1<<0);                // set PB0 as input
-  PORTB.PIN0CTRL|=PORT_PULLUPEN_bm;   // enable pullup
-  EVSYS.ASYNC1=0x0A;                  // PB0 per table 14-2 in datasheet
-  EVSYS.ASYNCUSER5= 0x04;             // Use Async1 as LUT1 event 1 per Table 14-4 in datasheet
+  PORTB.DIRCLR = (1 << 0);            // set PB0 as input
+  PORTB.PIN0CTRL |= PORT_PULLUPEN_bm; // enable pullup
+  EVSYS.ASYNC1 = 0x0A;                // PB0 per table 14-2 in datasheet
+  EVSYS.ASYNCUSER5 = 0x04;            // Use Async1 as LUT1 event 1 per Table 14-4 in datasheet
   Logic1.input2 = in::event_1;        // Use LUT event 1 as input 2, which will take input from PB0
 
   #elif defined(MEGATINYCORE) && !defined(__AVR_ATtinyxy7__)
   // If it's neither 20-pin nor 24-pin part, cannot be used.
 
-  #error "The 8-pin and 14-pin parts do not support this"
+#error "The 8-pin and 14-pin parts do not support this"
 
   #else
   // Otherwise it is an ATmega or ATtiny with 24 pins, and no workaround needed.
@@ -89,7 +88,6 @@ void setup()
   Logic::start();
 }
 
-void loop()
-{
+void loop() {
   // When using configurable custom logic the CPU isn't doing anything!
 }

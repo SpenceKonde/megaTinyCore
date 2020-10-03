@@ -41,52 +41,58 @@
 // but we can refer to it weakly so we don't pull in the entire
 // UART instance if the user doesn't also refer to it.
 #if defined(HAVE_HWSERIAL0)
-void serialEvent() __attribute__((weak));
-bool Serial0_available() __attribute__((weak));
+  void serialEvent() __attribute__((weak));
+  bool Serial0_available() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL1)
-void serialEvent1() __attribute__((weak));
-bool Serial1_available() __attribute__((weak));
+  void serialEvent1() __attribute__((weak));
+  bool Serial1_available() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL2)
-void serialEvent2() __attribute__((weak));
-bool Serial2_available() __attribute__((weak));
+  void serialEvent2() __attribute__((weak));
+  bool Serial2_available() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL3)
-void serialEvent3() __attribute__((weak));
-bool Serial3_available() __attribute__((weak));
+  void serialEvent3() __attribute__((weak));
+  bool Serial3_available() __attribute__((weak));
 #endif
 
-void serialEventRun(void)
-{
-#if defined(HAVE_HWSERIAL0)
-  if (Serial0_available && serialEvent && Serial0_available()) serialEvent();
-#endif
-#if defined(HAVE_HWSERIAL1)
-  if (Serial1_available && serialEvent1 && Serial1_available()) serialEvent1();
-#endif
-#if defined(HAVE_HWSERIAL2)
-  if (Serial2_available && serialEvent2 && Serial2_available()) serialEvent2();
-#endif
-#if defined(HAVE_HWSERIAL3)
-  if (Serial3_available && serialEvent3 && Serial3_available()) serialEvent3();
-#endif
+void serialEventRun(void) {
+  #if defined(HAVE_HWSERIAL0)
+  if (Serial0_available && serialEvent && Serial0_available()) {
+    serialEvent();
+  }
+  #endif
+  #if defined(HAVE_HWSERIAL1)
+  if (Serial1_available && serialEvent1 && Serial1_available()) {
+    serialEvent1();
+  }
+  #endif
+  #if defined(HAVE_HWSERIAL2)
+  if (Serial2_available && serialEvent2 && Serial2_available()) {
+    serialEvent2();
+  }
+  #endif
+  #if defined(HAVE_HWSERIAL3)
+  if (Serial3_available && serialEvent3 && Serial3_available()) {
+    serialEvent3();
+  }
+  #endif
 }
 
 // macro to guard critical sections when needed for large TX buffer sizes
 #if (SERIAL_TX_BUFFER_SIZE > 256)
-#define TX_BUFFER_ATOMIC ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  #define TX_BUFFER_ATOMIC ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 #else
-#define TX_BUFFER_ATOMIC
+  #define TX_BUFFER_ATOMIC
 #endif
 
 // Actual interrupt handlers //////////////////////////////////////////////////////////////
 
-void UartClass::_tx_data_empty_irq(void)
-{
+void UartClass::_tx_data_empty_irq(void) {
   // Check if tx buffer already empty.
   if (_tx_buffer_head == _tx_buffer_tail) {
     // Buffer empty, so disable "data register empty" interrupt
@@ -111,7 +117,7 @@ void UartClass::_tx_data_empty_irq(void)
     (*_hwserial_module).CTRLA &= (~USART_DREIE_bm);
 
     //Take the DRE interrupt back no normal priority level if it has been elevated
-    if(_hwserial_dre_interrupt_elevated) {
+    if (_hwserial_dre_interrupt_elevated) {
       CPUINT.LVL1VEC = _prev_lvl1_interrupt_vect;
       _hwserial_dre_interrupt_elevated = 0;
     }
@@ -119,9 +125,8 @@ void UartClass::_tx_data_empty_irq(void)
 }
 
 // To invoke data empty "interrupt" via a call, use this method
-void UartClass::_poll_tx_data_empty(void)
-{
-  if ( (!(SREG & CPU_I_bm)) || (!((*_hwserial_module).CTRLA & USART_DREIE_bm)) ) {
+void UartClass::_poll_tx_data_empty(void) {
+  if ((!(SREG & CPU_I_bm)) || (!((*_hwserial_module).CTRLA & USART_DREIE_bm))) {
     // Interrupts are disabled either globally or for data register empty,
     // so we'll have to poll the "data register empty" flag ourselves.
     // If it is set, pretend an interrupt has happened and call the handler
@@ -139,8 +144,7 @@ void UartClass::_poll_tx_data_empty(void)
 // Public Methods //////////////////////////////////////////////////////////////
 
 // Invoke this function before 'begin' to define the pins used
-bool UartClass::pins(uint8_t tx, uint8_t rx)
-{
+bool UartClass::pins(uint8_t tx, uint8_t rx) {
   for (_pin_set = 0; _pin_set < SERIAL_PIN_SETS; ++_pin_set) {
     if (tx == _hw_set[_pin_set].tx_pin && rx == _hw_set[_pin_set].rx_pin) {
       // We are good, this set of pins is supported
@@ -151,30 +155,23 @@ bool UartClass::pins(uint8_t tx, uint8_t rx)
   return false;
 }
 
-bool UartClass::swap(uint8_t state)
-{
-  if(state == 1) // Use alternative pin position
-  {
+bool UartClass::swap(uint8_t state) {
+  if (state == 1) { // Use alternative pin position
     _pin_set = state;
     return true;
-  }
-  else if(state == 0) // Use default pin position
-  {
+  } else if (state == 0) { // Use default pin position
     _pin_set = 0;
     return true;
-  }
-  else  // Invalid swap value. Use default position
-  {
+  } else { // Invalid swap value. Use default position
     _pin_set = 0;
     return false;
   }
 }
 
-void UartClass::begin(unsigned long baud, uint16_t config)
-{
+void UartClass::begin(unsigned long baud, uint16_t config) {
   // Make sure no transmissions are ongoing and USART is disabled in case begin() is called by accident
   // without first calling end()
-  if(_written) {
+  if (_written) {
     this->end();
   }
 
@@ -196,25 +193,25 @@ void UartClass::begin(unsigned long baud, uint16_t config)
 
   //See #131 for more info on this
   #if !defined(USE_EXTERNAL_OSCILLATOR)
-    #if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL) //this means we are on the 20MHz oscillator
-      #ifdef UARTBAUD3V
-        int8_t sigrow_val = SIGROW.OSC20ERR3V;
-      #else
-        int8_t sigrow_val = SIGROW.OSC20ERR5V;
-      #endif
-    #else //we are on 16MHz one
-      #ifdef UARTBAUD3V
-        int8_t sigrow_val = SIGROW.OSC16ERR3V;
-      #else
-        int8_t sigrow_val = SIGROW.OSC16ERR5V;
-      #endif
-    #endif
-    baud_setting = ((8 * F_CPU) / baud);
-    baud_setting *= (1024 + sigrow_val);
-    baud_setting += 1024;
-    baud_setting /= 2048;
+  #if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL) //this means we are on the 20MHz oscillator
+  #ifdef UARTBAUD3V
+  int8_t sigrow_val = SIGROW.OSC20ERR3V;
   #else
-    baud_setting = (((8 * F_CPU) / baud)+1)/2;
+  int8_t sigrow_val = SIGROW.OSC20ERR5V;
+  #endif
+  #else //we are on 16MHz one
+  #ifdef UARTBAUD3V
+  int8_t sigrow_val = SIGROW.OSC16ERR3V;
+  #else
+  int8_t sigrow_val = SIGROW.OSC16ERR5V;
+  #endif
+  #endif
+  baud_setting = ((8 * F_CPU) / baud);
+  baud_setting *= (1024 + sigrow_val);
+  baud_setting += 1024;
+  baud_setting /= 2048;
+  #else
+  baud_setting = (((8 * F_CPU) / baud) + 1) / 2;
   #endif
   //baud_setting += (baud_setting * sigrow_val) / 1024;
 
@@ -232,9 +229,9 @@ void UartClass::begin(unsigned long baud, uint16_t config)
 
   // Let PORTMUX point to alternative UART pins as requested
   #ifdef PORTMUX_CTRLB
-    PORTMUX.CTRLB = set->mux | (PORTMUX.CTRLB & ~_hw_set[1].mux);
+  PORTMUX.CTRLB = set->mux | (PORTMUX.CTRLB & ~_hw_set[1].mux);
   #else
-    PORTMUX.USARTROUTEA = set->mux | (PORTMUX.USARTROUTEA & ~_hw_set[1].mux);
+  PORTMUX.USARTROUTEA = set->mux | (PORTMUX.USARTROUTEA & ~_hw_set[1].mux);
   #endif
 
   // Set pin state for swapped UART pins
@@ -246,8 +243,7 @@ void UartClass::begin(unsigned long baud, uint16_t config)
   SREG = oldSREG;
 }
 
-void UartClass::end()
-{
+void UartClass::end() {
   // wait for transmission of outgoing data
   flush();
 
@@ -263,13 +259,11 @@ void UartClass::end()
   _written = false;
 }
 
-int UartClass::available(void)
-{
+int UartClass::available(void) {
   return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) % SERIAL_RX_BUFFER_SIZE;
 }
 
-int UartClass::peek(void)
-{
+int UartClass::peek(void) {
   if (_rx_buffer_head == _rx_buffer_tail) {
     return -1;
   } else {
@@ -277,8 +271,7 @@ int UartClass::peek(void)
   }
 }
 
-int UartClass::read(void)
-{
+int UartClass::read(void) {
   // if the head isn't ahead of the tail, we don't have any characters
   if (_rx_buffer_head == _rx_buffer_tail) {
     return -1;
@@ -289,8 +282,7 @@ int UartClass::read(void)
   }
 }
 
-int UartClass::availableForWrite(void)
-{
+int UartClass::availableForWrite(void) {
   tx_buffer_index_t head;
   tx_buffer_index_t tail;
 
@@ -298,12 +290,13 @@ int UartClass::availableForWrite(void)
     head = _tx_buffer_head;
     tail = _tx_buffer_tail;
   }
-  if (head >= tail) return SERIAL_TX_BUFFER_SIZE - 1 - head + tail;
+  if (head >= tail) {
+    return SERIAL_TX_BUFFER_SIZE - 1 - head + tail;
+  }
   return tail - head - 1;
 }
 
-void UartClass::flush()
-{
+void UartClass::flush() {
   // If we have never written a byte, no need to flush. This special
   // case is needed since there is no way to force the TXCIF (transmit
   // complete) bit to 1 during initialization
@@ -313,7 +306,7 @@ void UartClass::flush()
 
   //Check if we are inside an ISR already (e.g. connected to a different peripheral then UART), in which case the UART ISRs will not be called.
   //Temporarily elevate the DRE interrupt to allow it to run.
-  if(CPUINT.STATUS & CPUINT_LVL0EX_bm) {
+  if (CPUINT.STATUS & CPUINT_LVL0EX_bm) {
     //Elevate the priority level of the Data Register Empty Interrupt vector
     //and copy whatever vector number that might be in the register already.
     _prev_lvl1_interrupt_vect = CPUINT.LVL1VEC;
@@ -323,7 +316,7 @@ void UartClass::flush()
   }
 
   // Spin until the data-register-empty-interrupt is disabled and TX complete interrupt flag is raised
-  while ( ((*_hwserial_module).CTRLA & USART_DREIE_bm) || (!((*_hwserial_module).STATUS & USART_TXCIF_bm)) ) {
+  while (((*_hwserial_module).CTRLA & USART_DREIE_bm) || (!((*_hwserial_module).STATUS & USART_TXCIF_bm))) {
 
     // If interrupts are globally disabled or the and DR empty interrupt is disabled,
     // poll the "data register empty" interrupt flag to prevent deadlock
@@ -333,15 +326,14 @@ void UartClass::flush()
   // the hardware finished transmission (TXCIF is set).
 }
 
-size_t UartClass::write(uint8_t c)
-{
+size_t UartClass::write(uint8_t c) {
   _written = true;
 
   // If the buffer and the data register is empty, just write the byte
   // to the data register and be done. This shortcut helps
   // significantly improve the effective data rate at high (>
   // 500kbit/s) bit rates, where interrupt overhead becomes a slowdown.
-  if ( (_tx_buffer_head == _tx_buffer_tail) && ((*_hwserial_module).STATUS & USART_DREIF_bm) ) {
+  if ((_tx_buffer_head == _tx_buffer_tail) && ((*_hwserial_module).STATUS & USART_DREIF_bm)) {
     (*_hwserial_module).TXDATAL = c;
     (*_hwserial_module).STATUS = USART_TXCIF_bm;
 
@@ -354,7 +346,7 @@ size_t UartClass::write(uint8_t c)
 
   //Check if we are inside an ISR already (could be from by a source other than UART),
   // in which case the UART ISRs will be blocked.
-  if(CPUINT.STATUS & CPUINT_LVL0EX_bm) {
+  if (CPUINT.STATUS & CPUINT_LVL0EX_bm) {
     //Elevate the priority level of the Data Register Empty Interrupt vector
     //and copy whatever vector number that might be in the register already.
     _prev_lvl1_interrupt_vect = CPUINT.LVL1VEC;

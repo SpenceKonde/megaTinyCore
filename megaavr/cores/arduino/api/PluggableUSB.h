@@ -25,51 +25,54 @@
 #include <stddef.h>
 
 // core need to define
-void* epBuffer(unsigned int n); // -> returns a pointer to the Nth element of the EP buffer structure
+void *epBuffer(unsigned int n); // -> returns a pointer to the Nth element of the EP buffer structure
 
 class PluggableUSBModule {
-public:
-  PluggableUSBModule(uint8_t numEps, uint8_t numIfs, unsigned int *epType) :
-    numEndpoints(numEps), numInterfaces(numIfs), endpointType(epType)
-  { }
+  public:
+    PluggableUSBModule(uint8_t numEps, uint8_t numIfs, unsigned int *epType) :
+      numEndpoints(numEps), numInterfaces(numIfs), endpointType(epType)
+    { }
 
-protected:
-  virtual bool setup(USBSetup& setup) = 0;
-  virtual int getInterface(uint8_t* interfaceCount) = 0;
-  virtual int getDescriptor(USBSetup& setup) = 0;
-  virtual uint8_t getShortName(char *name) { name[0] = 'A'+pluggedInterface; return 1; }
+  protected:
+    virtual bool setup(USBSetup &setup) = 0;
+    virtual int getInterface(uint8_t *interfaceCount) = 0;
+    virtual int getDescriptor(USBSetup &setup) = 0;
+    virtual uint8_t getShortName(char *name) {
+      name[0] = 'A' + pluggedInterface;
+      return 1;
+    }
 
-  uint8_t pluggedInterface;
-  uint8_t pluggedEndpoint;
+    uint8_t pluggedInterface;
+    uint8_t pluggedEndpoint;
 
-  const uint8_t numEndpoints;
-  const uint8_t numInterfaces;
-  const unsigned int *endpointType;
+    const uint8_t numEndpoints;
+    const uint8_t numInterfaces;
+    const unsigned int *endpointType;
 
-  PluggableUSBModule *next = NULL;
+    PluggableUSBModule *next = NULL;
 
-  friend class PluggableUSB_;
+    friend class PluggableUSB_;
 };
 
 class PluggableUSB_ {
-public:
-  PluggableUSB_();
-  bool plug(PluggableUSBModule *node);
-  int getInterface(uint8_t* interfaceCount);
-  int getDescriptor(USBSetup& setup);
-  bool setup(USBSetup& setup);
-  void getShortName(char *iSerialNum);
+  public:
+    PluggableUSB_();
+    bool plug(PluggableUSBModule *node);
+    int getInterface(uint8_t *interfaceCount);
+    int getDescriptor(USBSetup &setup);
+    bool setup(USBSetup &setup);
+    void getShortName(char *iSerialNum);
 
-private:
-  uint8_t lastIf;
-  uint8_t lastEp;
-  PluggableUSBModule* rootNode;
-  uint8_t totalEP;
+  private:
+    uint8_t lastIf;
+    uint8_t lastEp;
+    PluggableUSBModule *rootNode;
+    uint8_t totalEP;
 };
 
 // Replacement for global singleton.
 // This function prevents static-initialization-order-fiasco
 // https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
-PluggableUSB_& PluggableUSB();
+PluggableUSB_ &PluggableUSB();
 
 #endif
