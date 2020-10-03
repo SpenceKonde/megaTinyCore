@@ -7,7 +7,7 @@ The clock speed is very important for the following two reasons:
 1.  Slower clock speeds will reduce the power consumption
 1.  Minimum voltage to keep the CPU running is lower with a slower clock speed
 
-The clock speed can be set from the Arduino IDE. Go to Tools -> Clock Speed, and pick one of the 7 options.  After selecting the required clock speed, go to Tools -> Burn Bootloader. Every time you change a clock, make sure you burn the bootloader - otherwise it is not applied, and timing will be off. 
+The clock speed can be set from the Arduino IDE. Go to Tools -> Clock Speed, and pick one of the 7 options.  After selecting the required clock speed, go to Tools -> Burn Bootloader. Every time you change a clock, make sure you burn the bootloader - otherwise it is not applied, and timing will be off.
 
 These are the power characteristics for each clock:
 
@@ -43,7 +43,7 @@ Before entering sleep mode, the correct setting must be selected with set_sleep_
 set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 ```
 
-Other options are: 
+Other options are:
 
 ```cpp
 set_sleep_mode(SLEEP_MODE_IDLE);
@@ -82,9 +82,9 @@ void RTC_init(void)
     ;                                   /* Wait for all register to be synchronized */
   }
   RTC.CLKSEL = RTC_CLKSEL_INT32K_gc;    /* 32.768kHz Internal Ultra-Low-Power Oscillator (OSCULP32K) */
-  
+
   RTC.PITINTCTRL = RTC_PI_bm;           /* PIT Interrupt: enabled */
-  
+
   RTC.PITCTRLA = RTC_PERIOD_CYC16384_gc /* RTC Clock Cycles 16384, resulting in 32.768kHz/16384 = 2Hz */
   | RTC_PITEN_bm;                       /* Enable PIT counter: enabled */
 }

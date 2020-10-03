@@ -11,7 +11,7 @@ TCNT1=-(F_CPU/1024); // timer clocks at 1024 prescaler in 1 second, as negative 
 TCCR1B=0x05; //turn on Timwer 1 with prescaler=1024
 while(!(TIFR1&(1<<TOV1))); //spin for 1 second
 ```
-On "modern" AVRs, trying the same thing with a type B timer will spin forever... but the same sort of thing works fine on a type A timer! 
+On "modern" AVRs, trying the same thing with a type B timer will spin forever... but the same sort of thing works fine on a type A timer!
 ```
   TCA0.SINGLE.CTRLA=0x0F; //TCA0 1024 prescaler
   TCB0.CTRLA=0; TCB0.CTRLB=0; TCB0.INTCTRL=0; TCB0.CNT=0; //Stop TCB0, Periodic Interrupt timing mode, interrupt off, Count 0
@@ -41,7 +41,7 @@ If you don't have an ISR defined, it will go to the "bad interrupt" handler, whi
 
 
 ### Flags MUST be cleared in interrupts
-* Unlike classic AVRs, you MUST clear the interrupt flag in the ISR. They are not cleared automatically. Do this by writing 1 to the bit. Failing to do so can produce surprising results, because the processor doesn't *halt* - it just runs agonizingly slowly (plus whatever the interrupt does keeps happening - but this may not be as obvious) - because at least one instruction will always happen between interrupts. 
+* Unlike classic AVRs, you MUST clear the interrupt flag in the ISR. They are not cleared automatically. Do this by writing 1 to the bit. Failing to do so can produce surprising results, because the processor doesn't *halt* - it just runs agonizingly slowly (plus whatever the interrupt does keeps happening - but this may not be as obvious) - because at least one instruction will always happen between interrupts.
 
 Here's a sketch that demonstrates this, and another interesting thing; the loop waiting for the ISR is exited as soon as it fires the first time... but it keeps running continually, letting the while loop after it run one instruction for each time the ISR runs. Both of those unsigned ints cause the ISR and while() loop to toggle the pins more slowly, so you can see how fast the two are running relative to each other with even really crude means.
 
@@ -72,8 +72,8 @@ ISR(TCB0_INT_vect){
 As it happens the "test2" PA7 transitions 10 times for each time PA6 does - and sure enough in the assembly listing (sketch -> export compiled binary with this core exports it to sketch folder!), there are 10 instructions. **And the ISR takes a whopping 50 instructions!** (Lots of POPs and the RETI at the end; loading a byte from RAM into registers is also 3 cycles, and storing it back is 2 more. So it is surprisingly slow. Just like you'd expect (20,000,000/(2^16*51)), it transitionas once per 167mS or so.
 
 ### Don't rely on variables overflowing...
-You may be wondering about the nop instruction there. 
-That's because there's another wacky thing demonstrated there: The C standard - surprisingly - doesn't guarantee that it won't optimize away things that can only happen if an unsigned integer overflows. It usually doesn't - but it *can*. And here, apparently taking out that noop causes it to do so - in this case, PA6 flips every time the now very tight (3 instructions) loop runs, instead of every 65436'th time! Obviously making test2 volatile prevents it from optimizing that out, and then you can remove the nop... Interestingly enough, removing the first while loop, and making not-volatile doesn't result in the same surprising optimization in the ISR - it still runs at the same speed... This is a reminder that you shouldn't rely on the behavior of unsigned, non-volatile variables overflowing. 
+You may be wondering about the nop instruction there.
+That's because there's another wacky thing demonstrated there: The C standard - surprisingly - doesn't guarantee that it won't optimize away things that can only happen if an unsigned integer overflows. It usually doesn't - but it *can*. And here, apparently taking out that noop causes it to do so - in this case, PA6 flips every time the now very tight (3 instructions) loop runs, instead of every 65436'th time! Obviously making test2 volatile prevents it from optimizing that out, and then you can remove the nop... Interestingly enough, removing the first while loop, and making not-volatile doesn't result in the same surprising optimization in the ISR - it still runs at the same speed... This is a reminder that you shouldn't rely on the behavior of unsigned, non-volatile variables overflowing.
 
 As it happens, I'd read that about the C language just days ago - quite a coincidence.....
 

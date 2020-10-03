@@ -266,7 +266,7 @@
 #define OPTIBOOT_CUSTOMVER 0
 #endif
 
-unsigned const int __attribute__((section(".version"))) 
+unsigned const int __attribute__((section(".version")))
 optiboot_version = 256*(OPTIBOOT_MAJVER + OPTIBOOT_CUSTOMVER) + OPTIBOOT_MINVER;
 
 
@@ -360,11 +360,11 @@ typedef union {
 #endif
 
 #if BAUD_SETTING > 250
-#error Unachievable baud rate (too slow) BAUD_RATE 
+#error Unachievable baud rate (too slow) BAUD_RATE
 #endif // baud rate slow check
 #if (BAUD_SETTING - 1) < 3
 #if BAUD_ERROR != 0 // permit high bitrates (ie 1Mbps@16MHz) if error is zero
-#error Unachievable baud rate (too fast) BAUD_RATE 
+#error Unachievable baud rate (too fast) BAUD_RATE
 #endif
 #endif // baud rate fast check
 #endif // SOFT_UART
@@ -566,7 +566,7 @@ int main(void) {
   /*
    * Protect as much from MCUSR as possible for application
    * and still skip bootloader if not necessary
-   * 
+   *
    * Code by MarkG55
    * see discussion in https://github.com/Optiboot/optiboot/issues/97
    */
@@ -586,11 +586,11 @@ int main(void) {
        * shouldn't run bootloader in loop :-) That's why:
        *  1. application is running if WDRF is cleared
        *  2. we clear WDRF if it's set with EXTRF to avoid loops
-       * One problematic scenario: broken application code sets watchdog timer 
+       * One problematic scenario: broken application code sets watchdog timer
        * without clearing MCUSR before and triggers it quickly. But it's
        * recoverable by power-on with pushed reset button.
        */
-      if ((ch & (_BV(WDRF) | _BV(EXTRF))) != _BV(EXTRF)) { 
+      if ((ch & (_BV(WDRF) | _BV(EXTRF))) != _BV(EXTRF)) {
           if (ch & _BV(EXTRF)) {
               /*
                * Clear WDRF because it was most probably set by wdr in bootloader.
@@ -608,7 +608,7 @@ int main(void) {
               MCUSR = ~(_BV(WDRF));
 #endif
           }
-          /* 
+          /*
            * save the reset flags in the designated register
            * This can be saved in a main program by putting code in .init0 (which
            * executes before normal c init code) to save R2 to a global variable.
@@ -643,9 +643,9 @@ int main(void) {
 #if LED_START_FLASHES > 0
   // Set up Timer 1 for timeout counter
 #if defined(__AVR_ATtiny261__)||defined(__AVR_ATtiny461__)||defined(__AVR_ATtiny861__)
-  TCCR1B = 0x0E; //div 8196 - we could divide by less since it's a 10-bit counter, but why? 
+  TCCR1B = 0x0E; //div 8196 - we could divide by less since it's a 10-bit counter, but why?
 #elif defined(__AVR_ATtiny25__)||defined(__AVR_ATtiny45__)||defined(__AVR_ATtiny85__)
-  TCCR1 = 0x0E; //div 8196 - it's an 8-bit timer. 
+  TCCR1 = 0x0E; //div 8196 - it's an 8-bit timer.
 #elif defined(__AVR_ATtiny43__)
   #error "LED flash for Tiny43 not yet supported"
 #else
@@ -667,11 +667,11 @@ int main(void) {
   #else // mega8/etc
     #ifdef LIN_UART
   //DDRB|=3;
-  LINCR = (1 << LSWRES); 
-  //LINBRRL = (((F_CPU * 10L / 32L / BAUD_RATE) + 5L) / 10L) - 1; 
+  LINCR = (1 << LSWRES);
+  //LINBRRL = (((F_CPU * 10L / 32L / BAUD_RATE) + 5L) / 10L) - 1;
   LINBRRL=(uint8_t)BAUD_SETTING;
-  LINBTR = (1 << LDISR) | (8 << LBT0); 
-  LINCR = _BV(LENA) | _BV(LCMD2) | _BV(LCMD1) | _BV(LCMD0); 
+  LINBTR = (1 << LDISR) | (8 << LBT0);
+  LINCR = _BV(LENA) | _BV(LCMD2) | _BV(LCMD1) | _BV(LCMD0);
   LINDAT=0;
     #else
       #ifndef SINGLESPEED
@@ -856,7 +856,7 @@ int main(void) {
           buff.bptr[saveVect0 - SAVVEC_ADDRESS] = rstVect0_sav;
           buff.bptr[saveVect1 - SAVVEC_ADDRESS] = rstVect1_sav;
       }
-#else 
+#else
         // Save old values for Verify
         saveVect0_sav = buff.bptr[saveVect0];
         saveVect1_sav = buff.bptr[saveVect1];
@@ -918,7 +918,7 @@ int main(void) {
       vect.word = ((uint16_t)pre_main-1); // (main) is always <= 0x0FFF; no masking needed.
       buff.bptr[0] = vect.bytes[0]; // rjmp 0x1c00 instruction
   }
-  
+
 #endif
 
 #endif // FLASHEND
@@ -1127,7 +1127,7 @@ void flash_led(uint8_t count) {
         TIFR1 = _BV(TOV1);
         while(!(TIFR1 & _BV(TOV1)));
         #endif
-    
+
 #if defined(__AVR_ATmega8__)    || defined(__AVR_ATmega8515__) ||       \
     defined(__AVR_ATmega8535__) || defined(__AVR_ATmega16__)   ||       \
     defined(__AVR_ATmega162__)  || defined(__AVR_ATmega32__)   ||       \
@@ -1175,7 +1175,7 @@ void watchdogConfig(uint8_t x) {
  #endif
 #else //then it must be one of those newfangled ones that use CCP
   CCP=0xD8; //so write this magic number to CCP
-#endif 
+#endif
 
 #ifdef WDTCSR
   WDTCSR = x;
@@ -1359,7 +1359,7 @@ static void do_spm(uint16_t address, uint8_t command, uint16_t data) {
  * information about how Optiboot was built (which options were selected,
  * what version, all in human-readable form (and extractable from the
  * binary with avr-strings.)
- * 
+ *
  * This can always be removed or trimmed if more actual program space
  * is needed in the future.  Currently the data occupies about 160 bytes,
  */

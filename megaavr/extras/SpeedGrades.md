@@ -6,9 +6,9 @@ The datasheets for these parts specify the maximum officially supported operatin
 
 Voltage | BOD voltage | Max F_CPU (-40~105C) | Max F_CPU (>105C, or any automotive)
 --------|-------------|----------------------|----------------------
-1.8~5.5 | 1.8 | 5 MHz | n/a 
-2.7~5.5 | 2.6 | 10 MHz | 8 MHz 
-4.5~5.5 | 4.2 | 20 MHz | 16 MHz 
+1.8~5.5 | 1.8 | 5 MHz | n/a
+2.7~5.5 | 2.6 | 10 MHz | 8 MHz
+4.5~5.5 | 4.2 | 20 MHz | 16 MHz
 
 ## Calculating for other voltages
 The datasheet specifies that the maximum frequency is linear over the operating voltage range.
@@ -16,6 +16,6 @@ For all non-automotive parts, between -40 and 105C, maximum frequency is `5*(V/0
 For F-spec parts above 105C, and all automotive parts maximum frequency is `8*(V/1.8-0.5) MHz` within 2.7 < V < 4.6
 
 * Per datasheet, operation at each speed grade is guaranteed down to the specified BOD threshold.
-* Automotive parts do not have a 20 MHz internal oscillator option at all. Both temperature ranges of non-automotive parts do. 
+* Automotive parts do not have a 20 MHz internal oscillator option at all. Both temperature ranges of non-automotive parts do.
 * Both temperature ranges of non-automotive parts are rated for operation from 1.8~2.7V and 20 MHz at 4.5~5.5V, from -40~105C.
 * Both the voltage and speed specs of the "F-spec" parts are reported in a confusing manner in many online catalogs.

@@ -11,7 +11,7 @@ The most common point of confusion is the fact that megaTinyCore, out of the box
 ```
 Note that as these bits have the same function in SINGLE and SPLIT mode, it does not matter whether you reference them as TCA0.SINGLE.* or TCA0.SPLIT.*
 
-Once this has been done, further configuration is straightforward. Failing to turn off split mode when you intend to, however, can result in strange behavior. 
+Once this has been done, further configuration is straightforward. Failing to turn off split mode when you intend to, however, can result in strange behavior.
 
 ### Avoid using TCA0 as the millis timer
 Reconfiguring TCA0 when it is used as the millis timer source will result in loss of timekeeping functionality. When doing this, you should avoid using TCA0 as the millis source. To ensure that you don't forget to set the millis timer correctly, it is suggested to put code like the following in your sketch to halt compile if you later open the sketch and did not choose the correct millis timer source.
@@ -42,7 +42,7 @@ PORTMUX.CTRLC = PORTMUX_TCA00_ALTERNATE_gc; // Move it to PA7
 ```
 
 # Examples
-Now for the fun part - example code! 
+Now for the fun part - example code!
 
 A note about the pin numbers - we use the PORT_Pxn notation to refer to pins; when I mention in the comments the pin number, that is an Arduino (logical) pin number, not a physical pin number (generally, this documentation does not refer to physical pin numbers except on the pinout charts). Because the mappings of peripherals to pins by the port and pin within the port is constant across the non-8-pin parts, this means the examples (except the one for 8-pin parts) will all work on all 14, 20, and 28-pin parts.
 
@@ -81,7 +81,7 @@ ISR(TCA0_OVF_vect) { //on overflow, we will increment TCA0.CMP0, this will happe
 
 
 ### Example 2: Variable frequency and duty cycle PWM
-This generates PWM similar to above (though without the silly interrupt to change the duty cycle), but takes it a step further with two functions to set the duty cycle and frequency. 
+This generates PWM similar to above (though without the silly interrupt to change the duty cycle), but takes it a step further with two functions to set the duty cycle and frequency.
 
 ```
 #if defined(MILLIS_USE_TIMERA0)||defined(__AVR_ATtinyxy2__)
@@ -209,8 +209,8 @@ void setup() {
   TCA0.SPLIT.HCMP2=150;  //75% duty cycle
   TCA0.SPLIT.CTRLA=TCA_SPLIT_CLKSEL_DIV16_gc|TCA_SPLIT_ENABLE_bm; //enable the timer with prescaler of 16
 }
-void loop() { //nothing to do here but enjoy your PWM. 
-//Prescaler of 16 and LPER and HPER values give 4.88 kHz on PB0 and 6.25kHz on PA5.   
+void loop() { //nothing to do here but enjoy your PWM.
+//Prescaler of 16 and LPER and HPER values give 4.88 kHz on PB0 and 6.25kHz on PA5.
 }
 ```
 

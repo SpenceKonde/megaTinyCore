@@ -14,5 +14,5 @@ void setup() {
   TCA0.SPLIT.HCMP2=150;  //75% duty cycle
   TCA0.SPLIT.CTRLA=TCA_SPLIT_CLKSEL_DIV16_gc|TCA_SPLIT_ENABLE_bm; //enable the timer with prescaler of 16
 }
-void loop() { //nothing to do here but enjoy your PWM. Prescaler of 16 and LPER and HPER values give 4.88 kHz on PB0 and 6.25kHz on PA5.   
+void loop() { //nothing to do here but enjoy your PWM. Prescaler of 16 and LPER and HPER values give 4.88 kHz on PB0 and 6.25kHz on PA5.
 }
