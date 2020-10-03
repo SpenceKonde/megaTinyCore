@@ -1,20 +1,21 @@
 /***
     eeprom_put example.
 
-    This shows how to use the EEPROM.put() method.
-    Also, this sketch will pre-set the EEPROM data for the
+    This shows how to use the USERSIG.put() method.
+    Also, this sketch will pre-set the USERSIG data for the
     example sketch eeprom_get.
 
-    Note, unlike the single byte version EEPROM.write(),
+    Note, unlike the single byte version USERSIG.write(),
     the put method will use update semantics. As in a byte
-    will only be written to the EEPROM if the data is actually
+    will only be written to the USERSIG if the data is actually
     different.
 
     Written by Christopher Andrews 2015
+    Adapted to USERSIG Spence Konde 2020
     Released under MIT licence.
 ***/
 
-#include <EEPROM.h>
+#include <USERSIG.h>
 
 struct MyObject {
   float field1;
@@ -26,12 +27,12 @@ void setup() {
 
   Serial.begin(115200);
 
-  float f = 123.456f;  //Variable to store in EEPROM.
+  float f = 123.456f;  //Variable to store in USERSIG.
   int eeAddress = 0;   //Location we want the data to be put.
 
 
   //One simple call, with the address first and the object second.
-  EEPROM.put(eeAddress, f);
+  USERSIG.put(eeAddress, f);
 
   Serial.println("Written float data type!");
 
@@ -46,7 +47,7 @@ void setup() {
 
   eeAddress += sizeof(float); //Move address to the next byte after float 'f'.
 
-  EEPROM.put(eeAddress, customVar);
+  USERSIG.put(eeAddress, customVar);
   Serial.print("Written custom data type! \n\nView the example sketch eeprom_get to see how you can retrieve the values!");
 }
 

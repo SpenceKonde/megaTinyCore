@@ -4,10 +4,15 @@
 * Correct bug in the bootloader do_nvmctrl() function, which looked like it would try to write to CTRLA of the WDT instead of MVMCTRL. Still untested, but it might work now.
 * Change handling of reset cause in bootloader, see #213.
 * Correct bootloader for 8-pin parts with non-swapped serial port to use PIN_PA3 for the blink LED instead of PIN_PA7 which is used when the serial port is on the alternate pins. PA7 is one of the serial pins, and hence is not available for the Optiboot triple blink if the serial port is not swapped. Swapped serial port still used PA7, as that matches a) all other megaTinyCore boards and b) the initial versions of the hardware I sell.
-* Add support for nedbg programmer option, whatever that is. (You've got to admit Atmel's naming was better "AVR-ISP", "JTAG-ICE", "Dragon" vs "EDBG", "mEDBG", "nEDBG"... "megaAVR ATmega4809" versus the newest top end AVRs, the "AVR DA-series" with nice memorable part numbers like "AVR128DA64". Microchip does a lot of things very well, but naming isn't one of them)
-#### 2.0.5
+* Fix programmer options (#232 and others)
+* Fix EEPROM library, no more USERROW - this is just the standard EEPROM library.
+* Add USERSIG library for writing to the USERROW (also called USER_SIGNATURE)
+* Writing to flash from app now works on Optiboot parts (Thanks @WestFW)
+
+### 2.0.5
 * Internal change to ADC initialization (saves a bit of flash) and init_ADC1() function for parts that have ADC1.
 * Quick fix to naming of .hex and .lst files
+
 ### 2.0.4
 * Switch to new and improved compiler toolchain - now get informative errors if sketch is too big on parts that use RJMP, bugfix for eeprom.h (not to be confused with EEPROM.h), various header improvements (board manager install only).
 * Improve naming of exported binary and assembler listings - now includes every setting that could impact the output!
@@ -21,6 +26,7 @@
 * Ever so slightly improve baud rate accuracy, reduce space taken by Serial.begin() by a few bytes.
 * Fix compile error from Tone() on parts without a second type B timer (ie, everything not a 1614, 3216, 1616, 3217, or 1617) when TCB0 was selected as a millis source. (part of #189)
 * Correct bug in micros() timekeeping when TCA0 is used as millis() timing source (introduced in 1.1.9 - after the exhausive testing for these sorts of issues) (#189)
+
 ### 2.0.2
 * Fix bug with 1MHz system clock with TCB as milis source (micros was broken)
 * Remove EXTERNAL_EXPERIMENTAL - newer atpack removes ambiguity (note - we don't *use* it yet, but we didn't really need to either).
@@ -29,6 +35,7 @@
 * analogReadResolution() added
 * Wire buffer size (broken in 2.0.0) fixed in very general way, with cases for a wide range
 * fix tinyNeoPixel on real WS2812's (it previously was busted on real ones, only worked with SK6812 clones) and unsplit the libraries, because architecture improvements make that possible!
+
 ### 2.0.1
 * Fix bug with some 1-series parts not compiling because of references to external reference introduced by 1.1.10
 * Add an EXTERNAL_EXPERIMENTAL reference option, since the headers and datasheets disagree about what parts support this
@@ -36,7 +43,8 @@
 * Switch to 3 separate tinyNeopixel libraries instead of one, and change the examples and documentation accordingly.
 * Renumber interrupt modes for consistency with MegaCoreX
 * Correct EESAVE fuse settings for optiboot boards - it is now always off. With optiboot on the chip, it is likely that the only time chip erase is executed is when UPDI is used to erase the chip to reburn the bootloader, and users would probably expect that to wipe the EEPROM too.
-## 2.0.0
+
+### 2.0.0
 * Remove all the UART/SPI/I2C pin mapping menus from tools submenus. Instead, use the newly added .swap() and .pins() methods on these objects to set the pins to be used.
 * WARNING: POTENTIALLY BREAKING CHANGE: **The default pins used for Serial on 8-pin parts in previous versions are not the "default" pins per datasheet (arduino pins 0 and 1); instead, the "alternate" pins were used by default (arduino pins 2 and 3). Note that on the Rev. - and Rev. A breakouts for these parts from my Tindie store, the serial lines from the FTDI header go to the alternate pins, not the "default" ones.** (this will be corrected in Rev. B of the board). If you have sketches/hardware using this, you will either need to move connections, or add Serial.swap(1); before calling Serial.begin(). I realize this is inconvenient, but that previous behavior should never have been the case, and, having finally accepted the fact, it was better to cut over quickly than let more people get used to the previous behavior and then change it later.
 * Improve ADC speed dramatically (it runs in about a quarter of the time it used to!) - I do not expect this to cause any issues with accuracy. The megaavr parts support much higher maximum ADC clock compared to the classic AVRs. We now set the ADC clock near to the top of it's range. In order to prevent this from hurting accuracy when reading high impedance sources, the ADC0.SAMPCTRL is set to SAMPLEN=14 instead of 0. This means samples will be taken for 16 ADC clocks instead of 2. Since the ADC clock is 8 times faster now, this should result in the same sampling time. See the ADC section for more information, including how to get even faster ADC readings from low impedance signals.
@@ -47,12 +55,14 @@
 * digitalRead() now returns an int8_t instead of an int16_t - this saves a tiny amount of flash and slightly improves execution time.
 * digitalRead() now returns -1 if called on a pin that doesn't exist, instead of 0 (LOW). This should make debugging easier, without impacting behavior when valid pin is passed to digitalRead().
 * Added support for manipulating the millis timer from within libraries or the sketch: init_millis(), stop_millis(), set_millis(), and restart_millis(). These are not expected to be normally used in sketches; these will be used in the upcoming megaTinySleep library which will "switch" millis timekeeping to the RTC when in sleep, and restore the millis value to whatever other timer is normally used.
-* Fix a bug with the EXTERNAL reference option being defined for the '212 and '412 - the 8-pin parts do not have that reference option, even if they're 1-series and otherwise would.
+* Fix a bug with the EXTERNAL reference option being defined for the '212 and '412 - the 8-pin parts do not have that reference option, even if they're 1-series and otherwise would
+
 ### 1.1.10
 * Fix bug with Wire introduced by not testing 1.1.9 changes to Wire.
 * Fix bug with EEPROM introduced by not testing 1.1.9 changes to EEPROM
 * Add ability to read from temp sensor, internal reference via ADC, clean up analogReference()
-* Add some example sketches, including reading temp and Vcc
+* Add some example sketches, including reading temp and Vc
+
 ### 1.1.9
 * Correct micros() results at 20, 10, and 5 MHz when TCA0 or TCD0 is used as millis source
 * Correct micros() and millis() long term drift at 20, 10, and 5 Mhz when TCD used as millis source
@@ -70,9 +80,11 @@
 * Add support for receiving general call messages in slave mode using the TWI peripheral through the Wire library (Thanks @LordJakson - #146 )
 * Add support for second address or masking off bits of the address using the TWI0.SADDRMSK register
 * Added support for the Atmel embedded debugger on the explained pro kits as programmer (thanks @rneurink #149 )
-* Lots of expanded documentation
-#### 1.1.8
-* Fix critical bug introduced in 1.1.7 that prevented compilation with TCA0 as millis source
+* Lots of expanded documentatio
+
+### 1.1.8
+* Fix critical bug introduced in 1.1.7 that prevented compilation with TCA0 as millis sourc
+
 ### 1.1.7
 * Make Servo library work independently of TCA0 prescaler
 * Fix bug that prevented compilation with RTC as millis source
@@ -80,6 +92,7 @@
 * Fix tone not moving to TCB1 when millis using TCB0
 * Improve compile errors if TCB0 used as millis and you try to use tone
 * Remove dead code relating to TCB2, TCB3 - nothing here has them, why do we have that code here?
+
 ### 1.1.6
 * Remove option for RTC using external crystal on 412/212/402/202 - these do not support it.
 * Correct issue with gibberish if using Serial just after Serial.begin()
@@ -89,18 +102,21 @@
 * Add support for PA0 (UPDI) as IO pin to Optiboot boards (#150)
 * Fix issues with Logic library and examples (#106)
 * Remove dependence of tone() and TCB as millis/micros source TCA0 prescaler (#144)
-* Documentation improvements
+* Documentation improvement
+
 ### 1.1.5
 * Reduce flash used by millis/micros() (#135)
 * Undo change that broke #130
 * Eliminate variants.c (#40)
 * Fix issue with disabling millis not working correctly
 * Add option to use RTC as millis timer (#133)
-* Correct and update part-specific docs
+* Correct and update part-specific doc
+
 ### 1.1.4
 * Correct issue introduced with 1.1.3 that broke compile for 20-pin parts (#134)
 * Correct issue when Timer D is specified explicitly as the millis timer
-* Correct issue when Timer D is used as the millis timer when clock speed is not 20/10/5MHz
+* Correct issue when Timer D is used as the millis timer when clock speed is not 20/10/5MH
+
 ### 1.1.3
 * Fix issue with PWM duty cycle and analogWrite(pin,255) (#123)
 * Fix issue with some UPDI programmers (#125, #126)
@@ -110,11 +126,13 @@
 * Fix issue with UART baud rate calculation (#131)
 * Add menu option to control timer used for millis/micros (#124, #132)
 * Default millis timer for 412,212,1614,814,414,214 changed to TCD0, as it's not used for anything else (#124)
+
 ### 1.1.2
 * Fix critical issue compiling for 24-pin parts (#118)
 * Fix issue with eesave menu option (#117)
 * Fix issue with PWM on PA3 on 14-pin devices. (#115)
 * Remove unused {upload.extra_files} parameter from platform.txt upload recipe.
+
 ### 1.1.1
 * Fix issue with board manager installation (#111)
 * Add support for printf to printable library (#112)
@@ -122,7 +140,8 @@
 * Correct bug with UART pin mapping menu and xy4/xy6/xy7 optiboot board definitions
 * Correct bug with digitalPinHasPWM macro on xy2.
 * Update datasheet links to point to latest dataheet version. This *should* get rid of all the preliminary datasheet links.
-* Add row in entry in part-specific doc pages for spxzz bootloader for optiboot board defs
+* Add row in entry in part-specific doc pages for spxzz bootloader for optiboot board def
+
 ### 1.1.0
 * Add Logic library (#103)
 * Improve pinout diagrams (#98)
@@ -131,22 +150,27 @@
 * Fix EESAVE option (which was backwards - #93)
 * Fix Onboard mEDBG programmer for ATTiny416 Xplained Nano (#96)
 * Add menu options for UART location on all parts (#108)
+
 ### 1.0.6
 * Add missing NUM_DIGITAL_PINS macros to xy7, xy6.
 * Fix PWM on Pin 1 (PA7) of xy2
 * Fix Wire.h to prevent "call of overloaded 'requestFro&, unsigned int&)' is ambiguous" errors with code that works on classic avr.
 * Expand documentation
-* Tools -> Programmer selection now used for normal uploads
+* Tools -> Programmer selection now used for normal upload
+
 ### 1.0.5
 * Support more PWM pins on 412/212/402/202
 * Support both UART locations on 412/212/402/202
+
 ### 1.0.4
 * Do not specify version of AVRDude in platform.txt (#73)
-* Board manager installation improvements to prevent breaking USBTinyISP on other installed cores
+* Board manager installation improvements to prevent breaking USBTinyISP on other installed core
+
 ### 1.0.3
 * Fix UART (and I suspect I2C) on 412/402 and general PORTMUX initialization.
 * Add tinyNeoPixel and tinyNeoPixel_Static libraries, examples and documentation, add menu option to select port at 8/10MHz (saves flash)
-* Pinout chart corrections
+* Pinout chart correction
+
 ### 1.0.2
 * Fix analogRead(), which was broken on most pins
 * Fix A11 on ATtiny x04 and x14 parts
@@ -154,7 +178,8 @@
 * Board manager installation will no longer require official megaAVR board package to be installed
 * Correct analog pin macros (these don't appear to be used anywhere, but may be used by third party code)
 * Add workaround for t402's with bad signature
-* Improve consistency in boards.txt
+* Improve consistency in boards.tx
+
 ### 1.0.1
 * Improve TCD0-based PWM pins on parts that have them
 * Implement DAC output on 1-series
@@ -162,6 +187,7 @@
 * Add a number of useful #defines
 * Fix minor typos
 * Move LED_BUILTIN to PA7 on all parts. The exact number of this pin will depend on the version of megaTinyCore in use
-* Improve and expand documentation
+* Improve and expand documentatio
+
 ### 1.0.0
 * Initial Release

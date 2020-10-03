@@ -1,38 +1,39 @@
 /***
     eeprom_get example.
 
-    This shows how to use the EEPROM.get() method.
+    This shows how to use the USERSIG.get() method.
 
-    To pre-set the EEPROM data, run the example sketch eeprom_put.
+    To pre-set the USERSIG data, run the example sketch eeprom_put.
     This sketch will run without it, however, the values shown
-    will be shown from what ever is already on the EEPROM.
+    will be shown from what ever is already on the USERSIG.
 
     This may cause the serial object to print out a large string
     of garbage if there is no null character inside one of the strings
     loaded.
 
     Written by Christopher Andrews 2015
+    Adapted to USERSIG Spence Konde 2020
     Released under MIT licence.
 ***/
 
-#include <EEPROM.h>
+#include <USERSIG.h>
 
 void setup() {
 
-  float f = 0.00f;   //Variable to store data read from EEPROM.
-  int eeAddress = 0; //EEPROM address to start reading from
+  float f = 0.00f;   //Variable to store data read from USERSIG.
+  int eeAddress = 0; //USERSIG address to start reading from
 
   Serial.begin(115200);
 
-  Serial.print("Read float from EEPROM: ");
+  Serial.print("Read float from USERSIG: ");
 
-  //Get the float data from the EEPROM at position 'eeAddress'
-  EEPROM.get(eeAddress, f);
-  Serial.println(f, 3);    //This may print 'ovf, nan' if the data inside the EEPROM is not a valid float.
+  //Get the float data from the USERSIG at position 'eeAddress'
+  USERSIG.get(eeAddress, f);
+  Serial.println(f, 3);    //This may print 'ovf, nan' if the data inside the USERSIG is not a valid float.
 
   /***
     As get also returns a reference to 'f', you can use it inline.
-    E.g: Serial.print( EEPROM.get( eeAddress, f ) );
+    E.g: Serial.print( USERSIG.get( eeAddress, f ) );
   ***/
 
   /***
@@ -52,10 +53,10 @@ struct MyObject {
 void secondTest() {
   int eeAddress = sizeof(float); //Move address to the next byte after float 'f'.
 
-  MyObject customVar; //Variable to store custom object read from EEPROM.
-  EEPROM.get(eeAddress, customVar);
+  MyObject customVar; //Variable to store custom object read from USERSIG.
+  USERSIG.get(eeAddress, customVar);
 
-  Serial.println("Read custom object from EEPROM: ");
+  Serial.println("Read custom object from USERSIG: ");
   Serial.println(customVar.field1);
   Serial.println(customVar.field2);
   Serial.println(customVar.name);

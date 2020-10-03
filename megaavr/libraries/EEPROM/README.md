@@ -1,25 +1,13 @@
-## **EEPROM Library V2.1** for megaTinyCore
+## **EEPROM Library V2.0** for Arduino
 
 **Written by:** _Christopher Andrews_.
 
 ### **What is the EEPROM library.**
 
-Th EEPROM library provides an easy to use interface to interact with the internal non-volatile storage found on tinyAVR 0/1-series any megaAVR 0-series devices. It was adapted for these devices by Spence Konde for distribution as part of megaTinyCore ( https://github.com/SpenceKonde/megaTinyCore ). The interface is fully compatible with the standard Arduino EEPROM.h library. EEPROM memory will retain it's stored data when the device is powered off. If the EESAVE bit in the SYSCFG0 fuse is set, it will retain it's values even if a UPDI programmer is used to issue a Chip Erase command, unless the part has been "locked" via the LOCKJBIT fuse, in which case the EEPROM is always cleared.
-
-### **Additional features when used with megaAVR 0-series and tinyAVR 0/1-series devices**
-
-Like all AVR microcontrollers, these devices have the usual complement of EEPROM memory available (See the datasheet or megaTinyCore part-specific documentation for more details). In addition to the standard EEPROM, they also have an additional "page" of memory available in what Atmel/Microchip refers to as the "user row". When using this version of EEPROM.h (Included in megaTinyCore 1.1.9 and later), the same methods described below work in the same way to read and write the user row. The library will treat any address greater than 0xFF (255) as pointing to the user row, as no devices in these product lines provide more than 256b of EEPROM memory.
-
-The user row can be used like normal EEPROM. Unlike normal EEPROM, when the chip is locked (via the LOCKBIT fuse), it can be *written to* (but not read from) via UPDI. It is still erased when a Chip Erase instruction is used.
-
-### **Library limitations**
-
-As with most Arduino libraries, this library sacrifices performance and functionality in favor of ease of use. This is particularly true here - unlike "classic" AVR devices, these provide a readiliy accessible facility for programming EEPROM memory a whole page at a time (see the datasheet for additional information) - this library writes all memory one byte at a time. Providing a high performance library that made use of that would require that the library be aware of the page boundaries; after consideration, it eas decided that the flash and performance overhead of such a system would not nr justified in the resource-constrained environment of a tinyAVR device as this version of the library is intended for. 
-
-No facility for wear leveling is provided, other than the `update()` and `put()` methods checking that the contents have not changed before writing. Under typical usage scenarios, further wear leveling methods are unnecessary - these devices are rated for 100,000 erase-write cycles, and according to the datasheet, the hardware only erases and writes bytes which have been written to the page buffer - it deos not perform a read-modify-write cycle on the whole page when any byte within the page is written or erased. If you do determine thas wear leveling is required for your application, many libraries that do this are available from various authors. Be aware that there is a bug in eeprom_is_ready() macro provided by the <avr/eeprom.h> included with most versions of avr-libc (the new toolchain package included with megaTinyCore 2.0.4 corrects this), which impacts many third party EEPROM-rel;ated libraries.  The symptom of this issue is an error referring to NVM_STATUS; to fix it, search the library code for eeprom_is_ready(). Replace `eeprom_is_ready()` with `!(NVMCTRL.STATUS & NVMCTRL_EEBUSY_bm)` and the library should work, assuming they do not make use of direct register writes that would require hand-porting to other families of AVR.
+Th EEPROM library provides an easy to use interface to interact with the internal non-volatile storage found in AVR based Arduino boards. This library will work on many AVR devices like ATtiny and ATmega chips.
 
 ### **How to use it**
-The EEPROM library is provided as part of all board packages for hardware with this sort of memory - this particular version is supplied with megaTinyCore. It will be used whenver you are compiling for
+The EEPROM library is included in your IDE download. To add its functionality to your sketch you'll need to reference the library header file. You do this by adding an include directive to the top of your sketch.
 
 ```Arduino
 #include <EEPROM.h>
@@ -35,6 +23,20 @@ void loop(){
 ```
 
 The library provides a global variable named `EEPROM`, you use this variable to access the library functions. The methods provided in the EEPROM class are listed below.
+
+### Warning about invalid addresses
+It is possible to specify addresses beyond the end of the EEPROM or (through a negative number) ones before it's beginning. On parts with 256b of EEPROM, this just wraps around to the other end, like classic AVRs did. On parts with less, it will still wrap around, but addresses between the end of the EEPROM and 255 (after which it wraps around) read as 0x00 and cannot be written. On Dx-series parts, many of which have 512b of EEPROM, there is no wraparound, and if you go far enough out and try to write, you'll overwrite other stuff. Don't do that.
+
+### EEPROM Sizes
+
+| AVR Device | EEPROM size |
+|---------------------|--------|
+| tinyAVR 0/1/2-series 2k flash | 64b |
+| tinyAVR 0/1/2-series 4-8k flash | 128b |
+| tinyAVR 0/1/2-series 16-32k flash | 256b |
+| megaAVR 0-series (all flash sizes) | 256b |
+| DA, DB, EA-series (all flash sizes) | 512b |
+| DD-series (all flash sizes) | 256b |
 
 You can view all the examples [here](examples/).
 
@@ -148,4 +150,4 @@ This is useful for STL objects, custom iteration and C++11 style ranged for loop
 This function returns an `EEPtr` pointing at the location after the last EEPROM cell.
 Used with `begin()` to provide custom iteration.
 
-**Note:** The `EEPtr` returned is invalid as it is out of range. Infact the hardware causes wrapping of the address (overflow) and `EEPROM.end()` actually references the first EEPROM cell.
+**Note:** The `EEPtr` returned is invalid as it is out of range. See the warning about invalid addresses above.
