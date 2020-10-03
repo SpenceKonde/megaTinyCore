@@ -51,3 +51,13 @@ jobs:
 
       - name: Check for trailing whitespace
         run: find . -path './.git' -prune -or \( -not -name '*.hex' -and -not -name '*.gif' -and -not -name '*.png' -and -type f \) -exec grep --with-filename --line-number --binary-files=without-match --regexp='[[:blank:]]$' '{}' \; -exec echo 'Trailing whitespace found.' \; -exec false '{}' +
+
+  line-endings:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check for non-Unix line endings
+        run: find . -path './.git' -prune -or \( -not -name '*.hex' -and -type f \) -exec grep --files-with-matches --binary-files=without-match --regexp=$'\r$' '{}' \; -exec echo 'Non-Unix EOL detected.' \; -exec false '{}' +
