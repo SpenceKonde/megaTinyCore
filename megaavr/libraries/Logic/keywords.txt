@@ -35,4 +35,4 @@ in	LITERAL1
 out	LITERAL1
 filter	LITERAL1
 sequencer	LITERAL1
-clocksource LITERAL1
+clocksource	LITERAL1
