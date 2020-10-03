@@ -14,7 +14,7 @@ These are the power characteristics for each clock:
 Clock Speed | 20MHz | 16MHz | 10MHz | 8MHz | 5MHz | 4MHz | 1MHz
 ------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------
 Current | 10.2mA | 8mA | 5.5mA | 4.5mA | 3.2mA | 2mA | 0.6mA
-Voltage	| 4.5V-5.5V | 4.2V-5.5V | 2.7V-5.5V | 2.7V-5.5V | 1.8V-5.5V | 1.8V-5.5V | 1.8V-5.5V
+Voltage | 4.5V-5.5V | 4.2V-5.5V | 2.7V-5.5V | 2.7V-5.5V | 1.8V-5.5V | 1.8V-5.5V | 1.8V-5.5V
 
 We often get the request to add the 32KHz option to the clock speed menu since it only requires 13.5μA. While it is possible to run the main clock from this low power oscillator, it is not recommended. It will make certain peripherals unusable, and timers used for delay and millis require the faster oscillator to run anyway.
 
@@ -27,9 +27,9 @@ There is a significant difference between running the MCU at 5V or just 2V. Acco
 ## Use Sleep Mode
 The absolute minimum power consumption of the device, when all the peripherals are stopped, is 0.1μA. This can be accomplished by using sleep mode when the MCU is not required. When the device is in sleep mode the CPU is not executing any of the application, but will continue where it left off after it receives an interrupt. While the CPU is not running, the device itself is still monitoring all the interrupts out there and to do so has to keep the peripherals running. Which peripherals are running depends on the sleep mode setting selected before entering sleep mode. The following 3 options are available:
 
-1.	Idle, only the CPU is turned off
-1.	Standby, the CPU is turned off and most Peripherals
-1.	Power Down, the CPU is turned off and all Peripherals (except the WDT and RTC), only the PIT (RTC) , Pin change and TWI Address match can wake up the device.
+1.  Idle, only the CPU is turned off
+1.  Standby, the CPU is turned off and most Peripherals
+1.  Power Down, the CPU is turned off and all Peripherals (except the WDT and RTC), only the PIT (RTC) , Pin change and TWI Address match can wake up the device.
 
 The sleep functions are not part of the Arduino Core, but part of the AVR-GCC compiler. Add the following line at the beginning of your code to add the sleep mode functions:
 

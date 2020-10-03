@@ -1,9 +1,9 @@
 # Direct Port Manipulation
 When multiple i/o pins should be controlled simultaneously by the microcontroller, or when using Arduino functions, like digitalWrite and digitalRead, are too slow, port manipulation can be used to write directly to the registers.
 Port registers allow for lower-level and faster manipulation of the i/o pins of the ATtiny. At least 1 port, and up to 3 ports are used in the ATtiny, where each port is indicated by a letter:
-*	PORTA
-*	PORTB
-*	PORTC
+* PORTA
+* PORTB
+* PORTC
 
 In the ensuing text, these are referred to as PORTx, where x represents a letter corresponding to a port (A, and B, C on most tinyAVR parts). Each port is linked with up to 8 pins, numbered 0 through 7. For example, on the ATtiny1616, Arduino Pin 0 is located on PORTA, bit 4, noted as PA4. The PORT registers on these modern AVR parts work a little differently from classic AVR microcontrollers (like ATmega328p, ATtiny85, etc), though the concept is the same. 
 

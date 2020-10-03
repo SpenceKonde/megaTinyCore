@@ -34,39 +34,39 @@
 
 /*! Transaction result enumeration. */
 typedef enum __attribute__((packed)) TWIM_RESULT_enum {
-	TWIM_RESULT_UNKNOWN          = (0x00<<0),
-	TWIM_RESULT_OK               = (0x01<<0),
-	TWIM_RESULT_BUFFER_OVERFLOW  = (0x02<<0),
-	TWIM_RESULT_ARBITRATION_LOST = (0x03<<0),
-	TWIM_RESULT_BUS_ERROR        = (0x04<<0),
-	TWIM_RESULT_NACK_RECEIVED    = (0x05<<0),
-	TWIM_RESULT_FAIL             = (0x06<<0),
+  TWIM_RESULT_UNKNOWN          = (0x00<<0),
+  TWIM_RESULT_OK               = (0x01<<0),
+  TWIM_RESULT_BUFFER_OVERFLOW  = (0x02<<0),
+  TWIM_RESULT_ARBITRATION_LOST = (0x03<<0),
+  TWIM_RESULT_BUS_ERROR        = (0x04<<0),
+  TWIM_RESULT_NACK_RECEIVED    = (0x05<<0),
+  TWIM_RESULT_FAIL             = (0x06<<0),
 } TWIM_RESULT_t;
 
 /* Transaction result enumeration */
 typedef enum __attribute__((packed)) TWIS_RESULT_enum {
-	TWIS_RESULT_UNKNOWN            = (0x00<<0),
-	TWIS_RESULT_OK                 = (0x01<<0),
-	TWIS_RESULT_BUFFER_OVERFLOW    = (0x02<<0),
-	TWIS_RESULT_TRANSMIT_COLLISION = (0x03<<0),
-	TWIS_RESULT_BUS_ERROR          = (0x04<<0),
-	TWIS_RESULT_FAIL               = (0x05<<0),
-	TWIS_RESULT_ABORTED            = (0x06<<0),
+  TWIS_RESULT_UNKNOWN            = (0x00<<0),
+  TWIS_RESULT_OK                 = (0x01<<0),
+  TWIS_RESULT_BUFFER_OVERFLOW    = (0x02<<0),
+  TWIS_RESULT_TRANSMIT_COLLISION = (0x03<<0),
+  TWIS_RESULT_BUS_ERROR          = (0x04<<0),
+  TWIS_RESULT_FAIL               = (0x05<<0),
+  TWIS_RESULT_ABORTED            = (0x06<<0),
 } TWIS_RESULT_t;
 
 /*! TWI Modes */
 typedef enum __attribute__((packed)) TWI_MODE_enum {
-	TWI_MODE_UNKNOWN = 0,
-	TWI_MODE_MASTER = 1,
-	TWI_MODE_SLAVE = 2,
-	TWI_MODE_MASTER_TRANSMIT = 3,
-	TWI_MODE_MASTER_RECEIVE = 4,
-	TWI_MODE_SLAVE_TRANSMIT = 5,
-	TWI_MODE_SLAVE_RECEIVE = 6
+  TWI_MODE_UNKNOWN = 0,
+  TWI_MODE_MASTER = 1,
+  TWI_MODE_SLAVE = 2,
+  TWI_MODE_MASTER_TRANSMIT = 3,
+  TWI_MODE_MASTER_RECEIVE = 4,
+  TWI_MODE_SLAVE_TRANSMIT = 5,
+  TWI_MODE_SLAVE_RECEIVE = 6
 } TWI_MODE_t;
 
 /*! For adding R/_W bit to address */
-#define ADD_READ_BIT(address)	(address | 0x01)
+#define ADD_READ_BIT(address) (address | 0x01)
 #define ADD_WRITE_BIT(address)  (address & ~0x01)
 
 void TWI_MasterInit(uint32_t frequency);
@@ -77,18 +77,18 @@ TWI_BUSSTATE_t TWI_MasterState(void);
 uint8_t TWI_MasterReady(void);
 void TWI_MasterSetBaud(uint32_t frequency);
 uint8_t TWI_MasterWrite(uint8_t slave_address,
-                     uint8_t *write_data,
-                     uint8_t bytes_to_write,
-					 uint8_t send_stop);
+                        uint8_t *write_data,
+                        uint8_t bytes_to_write,
+                        uint8_t send_stop);
 uint8_t TWI_MasterRead(uint8_t slave_address,
-                    uint8_t* read_data,
-                    uint8_t bytes_to_read,
-					uint8_t send_stop);
+                       uint8_t* read_data,
+                       uint8_t bytes_to_read,
+                       uint8_t send_stop);
 uint8_t TWI_MasterWriteRead(uint8_t slave_address,
                          uint8_t *write_data,
                          uint8_t bytes_to_write,
                          uint8_t bytes_to_read,
-						 uint8_t send_stop);
+                         uint8_t send_stop);
 void TWI_MasterInterruptHandler(void);
 void TWI_MasterArbitrationLostBusErrorHandler(void);
 void TWI_MasterWriteHandler(void);
@@ -111,13 +111,13 @@ void TWI_SlaveTransactionFinished(uint8_t result);
  *
 
 
-	ISR(TWI0_TWIM_vect){
-		TWI_MasterInterruptHandler();
-	}
+  ISR(TWI0_TWIM_vect){
+    TWI_MasterInterruptHandler();
+  }
 
-	ISR(TWI0_TWIS_vect){
-		TWI_SlaveInterruptHandler();
-	}
+  ISR(TWI0_TWIS_vect){
+    TWI_SlaveInterruptHandler();
+  }
 
  *
  */

@@ -43,10 +43,10 @@
 #endif
 
 
-#define PIN_SPI_MISO	(15)
-#define PIN_SPI_SCK		(16)
-#define PIN_SPI_MOSI	(14)
-#define PIN_SPI_SS		(0)
+#define PIN_SPI_MISO  (15)
+#define PIN_SPI_SCK   (16)
+#define PIN_SPI_MOSI  (14)
+#define PIN_SPI_SS    (0)
 #ifdef PORTMUX_SPI0_bm
 #define PIN_SPI_MISO_PINSWAP_1  (11)
 #define PIN_SPI_SCK_PINSWAP_1   (10)
@@ -54,7 +54,7 @@
 #define PIN_SPI_SS_PINSWAP_1    (13)
 #endif
 
-#define SPI_INTERFACES_COUNT	1
+#define SPI_INTERFACES_COUNT  1
 
 
 #define PIN_WIRE_SDA        (8)
@@ -89,14 +89,14 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 
 
 // Mapped to HWSERIAL0 in Serial library
-#define HWSERIAL0 				(&USART0)
-#define HWSERIAL0_DRE_VECTOR 	(USART0_DRE_vect)
+#define HWSERIAL0             (&USART0)
+#define HWSERIAL0_DRE_VECTOR  (USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
-#define HWSERIAL0_RXC_VECTOR 	(USART0_RXC_vect)
-#define HWSERIAL0_MUX 			0x00
-#define PIN_WIRE_HWSERIAL0_RX 	(6)
-#define PIN_WIRE_HWSERIAL0_TX 	(7)
-#define HWSERIAL0_MUX_PINSWAP_1       0x01
+#define HWSERIAL0_RXC_VECTOR  (USART0_RXC_vect)
+#define HWSERIAL0_MUX           0x00
+#define PIN_WIRE_HWSERIAL0_RX   (6)
+#define PIN_WIRE_HWSERIAL0_TX   (7)
+#define HWSERIAL0_MUX_PINSWAP_1            0x01
 #define PIN_WIRE_HWSERIAL0_RX_PINSWAP_1    (15)
 #define PIN_WIRE_HWSERIAL0_TX_PINSWAP_1    (14)
 
@@ -110,8 +110,8 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define PIN_A2   (15)
 #define PIN_A3   (16)
 #define PIN_A4   (0)
-#define PIN_A5 	 (1)
-#define PIN_A6	 (2)
+#define PIN_A5   (1)
+#define PIN_A6   (2)
 #define PIN_A7   (3)
 #define PIN_A8   (4)
 #define PIN_A9   (5)
@@ -150,7 +150,7 @@ static const uint8_t PIN_PA1=14;
 static const uint8_t PIN_PA2=15;
 static const uint8_t PIN_PA3=16;
 
-#define PINS_COUNT		(18u)
+#define PINS_COUNT    (18u)
 
 #ifdef ARDUINO_MAIN
 
@@ -195,113 +195,113 @@ PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       
 16     SCK          PA3       EXTCLK    AIN3                                                                  *XCK      SCK                 WO3       TCB1 WO
 17     UPDI         PA0       RESET/    AIN0                                                                                                                              LUT1-IN0
                               UPDI
-	* alternative pin locations
+  * alternative pin locations
 */
 
 
 const uint8_t digital_pin_to_port[] = {
-	// Left side, top to bottom
-	PA, // 0  PA4
-	PA, // 1  PA5
-	PA, // 2  PA6
-	PA, // 3  PA7
-	PB, // 4  PB5
-	PB, // 5  PB4
-	PB, // 6  PB3
-	PB, // 7  PB2
-	PB, // 8  PB1
-	// Right side, bottom to top
-	PB, // 9  PB0
-	PC, // 10 PC0
-	PC, // 11 PC1
-	PC, // 12 PC2
-	PC, // 13 PC3
-	// skip PA0 until the end
-	PA, // 14 PA1
-	PA, // 15 PA2
-	PA, // 16 PA3
-	PA  // 17 PA0 UPDI/RST
+  // Left side, top to bottom
+  PA, // 0  PA4
+  PA, // 1  PA5
+  PA, // 2  PA6
+  PA, // 3  PA7
+  PB, // 4  PB5
+  PB, // 5  PB4
+  PB, // 6  PB3
+  PB, // 7  PB2
+  PB, // 8  PB1
+  // Right side, bottom to top
+  PB, // 9  PB0
+  PC, // 10 PC0
+  PC, // 11 PC1
+  PC, // 12 PC2
+  PC, // 13 PC3
+  // skip PA0 until the end
+  PA, // 14 PA1
+  PA, // 15 PA2
+  PA, // 16 PA3
+  PA  // 17 PA0 UPDI/RST
 };
 
 /* Use this for accessing PINnCTRL register */
 const uint8_t digital_pin_to_bit_position[] = {
-	// Left side, top to bottom
-	PIN4_bp, // 0  PA4
-	PIN5_bp, // 1  PA5
-	PIN6_bp, // 2  PA6
-	PIN7_bp, // 3  PA7
-	PIN5_bp, // 4  PB5
-	PIN4_bp, // 5  PB4
-	PIN3_bp, // 6  PB3
-	PIN2_bp, // 7  PB2
-	PIN1_bp, // 8  PB1
-	// Right side, bottom to top
-	PIN0_bp, // 9  PB0
-	PIN0_bp, // 10 PC0
-	PIN1_bp, // 11 PC1
-	PIN2_bp, // 12 PC2
-	PIN3_bp, // 13 PC3
-	PIN1_bp, // 14 PA1
-	PIN2_bp, // 15 PA2
-	PIN3_bp, // 16 PA3
-	PIN0_bp  // 17 PA0
+  // Left side, top to bottom
+  PIN4_bp, // 0  PA4
+  PIN5_bp, // 1  PA5
+  PIN6_bp, // 2  PA6
+  PIN7_bp, // 3  PA7
+  PIN5_bp, // 4  PB5
+  PIN4_bp, // 5  PB4
+  PIN3_bp, // 6  PB3
+  PIN2_bp, // 7  PB2
+  PIN1_bp, // 8  PB1
+  // Right side, bottom to top
+  PIN0_bp, // 9  PB0
+  PIN0_bp, // 10 PC0
+  PIN1_bp, // 11 PC1
+  PIN2_bp, // 12 PC2
+  PIN3_bp, // 13 PC3
+  PIN1_bp, // 14 PA1
+  PIN2_bp, // 15 PA2
+  PIN3_bp, // 16 PA3
+  PIN0_bp  // 17 PA0
 };
 
 /* Use this for accessing PINnCTRL register */
 const uint8_t digital_pin_to_bit_mask[] = {
-	// Left side, top to bottom
-	PIN4_bm, // 0  PA4
-	PIN5_bm, // 1  PA5
-	PIN6_bm, // 2  PA6
-	PIN7_bm, // 3  PA7
-	PIN5_bm, // 4  PB5
-	PIN4_bm, // 5  PB4
-	PIN3_bm, // 6  PB3
-	PIN2_bm, // 7  PB2
-	PIN1_bm, // 8  PB1
-	// Right side, bottom to top
-	PIN0_bm, // 9  PB0
-	PIN0_bm, // 10 PC0
-	PIN1_bm, // 11 PC1
-	PIN2_bm, // 12 PC2
-	PIN3_bm, // 13 PC3
-	PIN1_bm, // 14 PA1
-	PIN2_bm, // 15 PA2
-	PIN3_bm, // 16 PA3
-	PIN0_bm  // 17 PA0
+  // Left side, top to bottom
+  PIN4_bm, // 0  PA4
+  PIN5_bm, // 1  PA5
+  PIN6_bm, // 2  PA6
+  PIN7_bm, // 3  PA7
+  PIN5_bm, // 4  PB5
+  PIN4_bm, // 5  PB4
+  PIN3_bm, // 6  PB3
+  PIN2_bm, // 7  PB2
+  PIN1_bm, // 8  PB1
+  // Right side, bottom to top
+  PIN0_bm, // 9  PB0
+  PIN0_bm, // 10 PC0
+  PIN1_bm, // 11 PC1
+  PIN2_bm, // 12 PC2
+  PIN3_bm, // 13 PC3
+  PIN1_bm, // 14 PA1
+  PIN2_bm, // 15 PA2
+  PIN3_bm, // 16 PA3
+  PIN0_bm  // 17 PA0
 };
 
 
 const uint8_t digital_pin_to_timer[] = {
-  	// Left side, top to bottom
-	TIMERA0, 		// 0  PA4
-	TIMERA0, 		// 1  PA5
-	#if defined(DAC0)
+  // Left side, top to bottom
+  TIMERA0,    // 0  PA4
+  TIMERA0,    // 1  PA5
+  #if defined(DAC0)
     DACOUT, // 2  PA6
-	#else
-	  NOT_ON_TIMER, // 2  PA6
-	#endif
-	NOT_ON_TIMER, 	// 3  PA7
-	NOT_ON_TIMER, 	// 4  PB5
-	NOT_ON_TIMER, 	// 5  PB4
-	NOT_ON_TIMER, 	// 6  PB3
-	TIMERA0, 		// 7  PB2
-	TIMERA0, 		// 8  PB1
-	// Right side, bottom to top
-	TIMERA0, 		// 9  PB0
-    #if (defined(TCD0) && defined(USE_TIMERD0_PWM) &&(!defined(MILLIS_USE_TIMERD0)))
-	TIMERD0, 		// 10 PC0
-	TIMERD0, 		// 11 PC1
-	#else
-	NOT_ON_TIMER, 	// 10 PC0
-	NOT_ON_TIMER, 	// 11 PC1
-	#endif
-	NOT_ON_TIMER, 	// 12 PC2
-	NOT_ON_TIMER, 	// 13 PC3
-	NOT_ON_TIMER, 	// 14 PA1
-	NOT_ON_TIMER, 	// 15 PA2
-	TIMERA0,  		// 16 PA3
-	NOT_ON_TIMER 	// 17 PA0
+  #else
+    NOT_ON_TIMER, // 2  PA6
+  #endif
+  NOT_ON_TIMER,   // 3  PA7
+  NOT_ON_TIMER,   // 4  PB5
+  NOT_ON_TIMER,   // 5  PB4
+  NOT_ON_TIMER,   // 6  PB3
+  TIMERA0,    // 7  PB2
+  TIMERA0,    // 8  PB1
+  // Right side, bottom to top
+  TIMERA0,    // 9  PB0
+  #if (defined(TCD0) && defined(USE_TIMERD0_PWM) &&(!defined(MILLIS_USE_TIMERD0)))
+  TIMERD0,    // 10 PC0
+  TIMERD0,    // 11 PC1
+  #else
+  NOT_ON_TIMER,   // 10 PC0
+  NOT_ON_TIMER,   // 11 PC1
+  #endif
+  NOT_ON_TIMER,   // 12 PC2
+  NOT_ON_TIMER,   // 13 PC3
+  NOT_ON_TIMER,   // 14 PA1
+  NOT_ON_TIMER,   // 15 PA2
+  TIMERA0,      // 16 PA3
+  NOT_ON_TIMER  // 17 PA0
 
 
 };
@@ -324,7 +324,7 @@ const uint8_t PROGMEM analog_pin_to_channel[] = {
 
 //extern const uint8_t analog_pin_to_channel[];
 // #define digitalPinToAnalogInput(p)  ((p < NUM_ANALOG_INPUTS) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN )
-//#define digitalPinToAnalogInput(p) 		(((p) < 6 || (p) == 8 || (p) == 9 || (p) > 13) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN)
+//#define digitalPinToAnalogInput(p)    (((p) < 6 || (p) == 8 || (p) == 9 || (p) > 13) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN)
 #define digitalPinToAnalogInput(p)      ((p<6)?(p+4):(p==17?0:((p>13)?(p-13):((p==8)?10:(p==9?11:NOT_A_PIN)))))
 
 
@@ -343,7 +343,7 @@ const uint8_t PROGMEM analog_pin_to_channel[] = {
 //
 // SERIAL_PORT_HARDWARE_OPEN  Hardware serial ports which are open for use.  Their RX & TX
 //                            pins are NOT connected to anything by default.
-#define SERIAL_PORT_MONITOR			Serial
-#define SERIAL_PORT_HARDWARE		Serial
+#define SERIAL_PORT_MONITOR     Serial
+#define SERIAL_PORT_HARDWARE    Serial
 
 #endif
