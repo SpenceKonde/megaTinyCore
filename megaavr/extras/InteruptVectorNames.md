@@ -48,7 +48,7 @@ ISR(PORTA_PORT_vect) {
 }
 ```
 ### Reminders
-* ISRs should run FAST. Minimize the time that the code spends in the ISR. Never use polling loops, and avoid writing to serial. Most interrupts should just set a flag that is checked elsewhere, and do what must be done that instant (eg, reading from certain hardware registers). 
-* Read the datasheet, particularly relating to the relevant INTFLAGS register - some interrupt flags are not automatically cleared when the ISR runs, and if these are not cleared, it will trigger continually once it is triggered once. 
-* Any global variable that an interrupt changes, if used outside the ISR, must be declared volatile - otherwise the compiler may optimize away access to it, resulting in code elsewhere not knowing that it was changed by the ISR. 
+* ISRs should run FAST. Minimize the time that the code spends in the ISR. Never use polling loops, and avoid writing to serial. Most interrupts should just set a flag that is checked elsewhere, and do what must be done that instant (eg, reading from certain hardware registers).
+* Read the datasheet, particularly relating to the relevant INTFLAGS register - some interrupt flags are not automatically cleared when the ISR runs, and if these are not cleared, it will trigger continually once it is triggered once.
+* Any global variable that an interrupt changes, if used outside the ISR, must be declared volatile - otherwise the compiler may optimize away access to it, resulting in code elsewhere not knowing that it was changed by the ISR.
 * Any global variable read by the ISR and written to by code outside of the ISR larger than a byte must be written to with interrupts disabled - if the interrupt triggers in the middle of a write, the ISR would see a corrupted value.

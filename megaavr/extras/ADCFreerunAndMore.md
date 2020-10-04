@@ -58,10 +58,10 @@ uint16_t getAnalogValue() {
 }
 ```
 
-Alternately, you may wish to use an ISR when the ADC conversion is complete - though be aware that with the ADC so much faster on these parts, you may find yourself dealing with more interrupts than you were expecting (unless you are using the accumulation funciton, see below). This makes sense when there's a clear thing that you want to do with each result - just be sure that whatever it is, it's fast (for example, if you're controlling PWM duty cycle, write the register directly, don't use analogWrite()).
+Alternately, you may wish to use an ISR when the ADC conversion is complete - though be aware that with the ADC so much faster on these parts, you may find yourself dealing with more interrupts than you were expecting (unless you are using the accumulation function, see below). This makes sense when there's a clear thing that you want to do with each result - just be sure that whatever it is, it's fast (for example, if you're controlling PWM duty cycle, write the register directly, don't use analogWrite()).
 
 ```
-// during setup proceedures, before starting freerunning mode conversions.
+// during setup procedures, before starting freerunning mode conversions.
 ADC0.INTCTRL=ADC_RESRDY_bm; //enable the interrupt
 
 // The ISR
@@ -95,7 +95,7 @@ If you need more accuracy - assuming the signal is changing (it won't work if yo
 
 ```
 // global variables:
-volatile uint16_t latest_reading=0; // remember to disabe interrupts while reading this so it doesn't get changed by the ISR while you're halfway through reading it.
+volatile uint16_t latest_reading=0; // remember to disable interrupts while reading this so it doesn't get changed by the ISR while you're halfway through reading it.
 
 // Setup:
 ADC0.CTRLB=ADC_SAMPNUM_ACC64_gc;  //take 64 samples for 3 extra bits
@@ -116,7 +116,7 @@ ISR(ADC0_RESRDY_vect) {
 Note that future updates of megaTinyCore may provide an automated way of configuring analogRead() to do this via an extension to analogReadResolution() - though the need for non-blocking code may render this inappropriate.
 
 # Faster ADC conversions? Extra-high-impedance sources?
-On classic AVRs, the ADC wanted to be clocked at 100-200kHz, and sampled for 1.5 ADC clocks; hence, the sampling time was 15-30 uS. On the tinyAVR 0/1-series, the ADC clock can be up to 1.5 MHz. megaTinyCore configures it for 1 MHz on 16 MHz derived clocks, and 1.25 MHz on 20 MHz derived clocks. These parts also provide the ADCn.SAMPCTRL register to allow a longer sampling time - the sampling time is 2+ADCn.SAMPCTRL. By default, megaTinyCore configures this for 14. 14+2 = 16; this is a conservative attempt to ensure that the accuracy on modern AVR parts does not suffer with higher-impedance sources, particularly ones that worked with classic AVRs. Since the faster clock permits much faster conversions anyway, this was considered an acceptable limitation for the defaut. Because the sampling cap is smaller on these parts, though, this is probably significantly higher than it needs to be. For low impedance sources, this can be cranked all the way back to 0 if conversion speed is of particular importance - this will reduce the conversion time from 29 ADC clocks (29us or 23us for 16 and 20 MHz derived clocks, respectively) to 13 (13us or 10.5us). By comparison, on classic AVRs, the ADC conversion time was between 65u and 130us (104us on most common clock speeds).
+On classic AVRs, the ADC wanted to be clocked at 100-200kHz, and sampled for 1.5 ADC clocks; hence, the sampling time was 15-30 uS. On the tinyAVR 0/1-series, the ADC clock can be up to 1.5 MHz. megaTinyCore configures it for 1 MHz on 16 MHz derived clocks, and 1.25 MHz on 20 MHz derived clocks. These parts also provide the ADCn.SAMPCTRL register to allow a longer sampling time - the sampling time is 2+ADCn.SAMPCTRL. By default, megaTinyCore configures this for 14. 14+2 = 16; this is a conservative attempt to ensure that the accuracy on modern AVR parts does not suffer with higher-impedance sources, particularly ones that worked with classic AVRs. Since the faster clock permits much faster conversions anyway, this was considered an acceptable limitation for the default. Because the sampling cap is smaller on these parts, though, this is probably significantly higher than it needs to be. For low impedance sources, this can be cranked all the way back to 0 if conversion speed is of particular importance - this will reduce the conversion time from 29 ADC clocks (29us or 23us for 16 and 20 MHz derived clocks, respectively) to 13 (13us or 10.5us). By comparison, on classic AVRs, the ADC conversion time was between 65u and 130us (104us on most common clock speeds).
 
 On the other hand, if you are reading a particularly high impedance source, you may wish to *increase* the sampling time instead. SAMPCTRL can be set as high as 31, which would give a sampling time of 33 ADC clocks (conversion time 46 ADC clocks - 46 or 37 us).
 

@@ -82,8 +82,7 @@
 #define SERIAL_7S2           (SERIAL_STOP_BIT_2 | SERIAL_PARITY_SPACE | SERIAL_DATA_7)
 #define SERIAL_8S2           (SERIAL_STOP_BIT_2 | SERIAL_PARITY_SPACE | SERIAL_DATA_8)
 
-class HardwareSerial : public Stream
-{
+class HardwareSerial : public Stream {
   public:
     virtual void begin(unsigned long) = 0;
     virtual void begin(unsigned long baudrate, uint16_t config) = 0;
@@ -99,4 +98,3 @@ class HardwareSerial : public Stream
 
 // XXX: Are we keeping the serialEvent API?
 extern void serialEventRun(void) __attribute__((weak));
-

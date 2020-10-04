@@ -17,15 +17,15 @@
 */
 
 /**
- * Empty yield() hook.
- *
- * This function is intended to be used by library writers to build
- * libraries or sketches that supports cooperative threads.
- *
- * Its defined as a weak symbol and it can be redefined to implement a
- * real cooperative scheduler.
- */
+   Empty yield() hook.
+
+   This function is intended to be used by library writers to build
+   libraries or sketches that supports cooperative threads.
+
+   Its defined as a weak symbol and it can be redefined to implement a
+   real cooperative scheduler.
+*/
 static void __empty() {
-	// Empty
+  // Empty
 }
-void yield(void) __attribute__ ((weak, alias("__empty")));
+void yield(void) __attribute__((weak, alias("__empty")));

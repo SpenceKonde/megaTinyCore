@@ -34,52 +34,84 @@
     This class has an overhead of two bytes, similar to storing a pointer to an USERSIG cell.
 ***/
 
-struct USRef{
+struct USRef {
 
-    USRef( const uint8_t index )
-        : index( index )                 {}
+  USRef(const uint8_t index)
+    : index(index)                 {}
 
-    //Access/read members.
-    uint8_t operator*() const            { return *(volatile uint8_t*) ( index + USER_SIGNATURES_START ); }
-    operator uint8_t() const             { return **this; }
+  //Access/read members.
+  uint8_t operator*() const            {
+    return *(volatile uint8_t *)(index + USER_SIGNATURES_START);
+  }
+  operator uint8_t() const             {
+    return **this;
+  }
 
-    //Assignment/write members.
-    USRef &operator=( const USRef &ref ) { return *this = *ref; }
-    USRef &operator=( uint8_t in )       {
-                                              *(uint8_t *)((index & 0x1F) |  USER_SIGNATURES_START) = in;
-                                              _PROTECTED_WRITE_SPM(NVMCTRL.CTRLA, NVMCTRL_CMD_PAGEERASEWRITE_gc);
-                                              while (NVMCTRL.STATUS & NVMCTRL_EEBUSY_bm);
-                                              return *this;
-                                         }
-    USRef &operator +=( uint8_t in )     { return *this = **this + in; }
-    USRef &operator -=( uint8_t in )     { return *this = **this - in; }
-    USRef &operator *=( uint8_t in )     { return *this = **this * in; }
-    USRef &operator /=( uint8_t in )     { return *this = **this / in; }
-    USRef &operator ^=( uint8_t in )     { return *this = **this ^ in; }
-    USRef &operator %=( uint8_t in )     { return *this = **this % in; }
-    USRef &operator &=( uint8_t in )     { return *this = **this & in; }
-    USRef &operator |=( uint8_t in )     { return *this = **this | in; }
-    USRef &operator <<=( uint8_t in )    { return *this = **this << in; }
-    USRef &operator >>=( uint8_t in )    { return *this = **this >> in; }
+  //Assignment/write members.
+  USRef &operator=(const USRef &ref) {
+    return *this = *ref;
+  }
+  USRef &operator=(uint8_t in)       {
+    *(uint8_t *)((index & 0x1F) |  USER_SIGNATURES_START) = in;
+    _PROTECTED_WRITE_SPM(NVMCTRL.CTRLA, NVMCTRL_CMD_PAGEERASEWRITE_gc);
+    while (NVMCTRL.STATUS & NVMCTRL_EEBUSY_bm);
+    return *this;
+  }
+  USRef &operator +=(uint8_t in)     {
+    return *this = **this + in;
+  }
+  USRef &operator -=(uint8_t in)     {
+    return *this = **this - in;
+  }
+  USRef &operator *=(uint8_t in)     {
+    return *this = **this * in;
+  }
+  USRef &operator /=(uint8_t in)     {
+    return *this = **this / in;
+  }
+  USRef &operator ^=(uint8_t in)     {
+    return *this = **this ^ in;
+  }
+  USRef &operator %=(uint8_t in)     {
+    return *this = **this % in;
+  }
+  USRef &operator &=(uint8_t in)     {
+    return *this = **this & in;
+  }
+  USRef &operator |=(uint8_t in)     {
+    return *this = **this | in;
+  }
+  USRef &operator <<=(uint8_t in)    {
+    return *this = **this << in;
+  }
+  USRef &operator >>=(uint8_t in)    {
+    return *this = **this >> in;
+  }
 
-    USRef &update( uint8_t in )          { return  in != *this ? *this = in : *this; }
+  USRef &update(uint8_t in)          {
+    return  in != *this ? *this = in : *this;
+  }
 
-    /** Prefix increment/decrement **/
-    USRef& operator++()                  { return *this += 1; }
-    USRef& operator--()                  { return *this -= 1; }
+  /** Prefix increment/decrement **/
+  USRef &operator++()                  {
+    return *this += 1;
+  }
+  USRef &operator--()                  {
+    return *this -= 1;
+  }
 
-    /** Postfix increment/decrement **/
-    uint8_t operator++ (int){
-        uint8_t ret = **this;
-        return ++(*this), ret;
-    }
+  /** Postfix increment/decrement **/
+  uint8_t operator++ (int) {
+    uint8_t ret = **this;
+    return ++(*this), ret;
+  }
 
-    uint8_t operator-- (int){
-        uint8_t ret = **this;
-        return --(*this), ret;
-    }
+  uint8_t operator-- (int) {
+    uint8_t ret = **this;
+    return --(*this), ret;
+  }
 
-    uint8_t index; //Index of current USERSIG cell.
+  uint8_t index; //Index of current USERSIG cell.
 };
 
 /***
@@ -90,25 +122,41 @@ struct USRef{
     increment/decrement operators.
 ***/
 
-struct USPtr{
+struct USPtr {
 
-    USPtr( const uint8_t index )
-        : index( index )                {}
+  USPtr(const uint8_t index)
+    : index(index)                {}
 
-    operator int() const                { return index; }
-    USPtr &operator=( int in )          { return index = (in), *this; }
+  operator int() const                {
+    return index;
+  }
+  USPtr &operator=(int in)          {
+    return index = (in), *this;
+  }
 
-    //Iterator functionality.
-    bool operator!=( const USPtr &ptr ) { return index != ptr.index; }
-    USRef operator*()                   { return index; }
+  //Iterator functionality.
+  bool operator!=(const USPtr &ptr) {
+    return index != ptr.index;
+  }
+  USRef operator*()                   {
+    return index;
+  }
 
-    /** Prefix & Postfix increment/decrement **/
-    USPtr& operator++()                 { return ++index, *this; }
-    USPtr& operator--()                 { return --index, *this; }
-    USPtr operator++ (int)              { return index++; }
-    USPtr operator-- (int)              { return index--; }
+  /** Prefix & Postfix increment/decrement **/
+  USPtr &operator++()                 {
+    return ++index, *this;
+  }
+  USPtr &operator--()                 {
+    return --index, *this;
+  }
+  USPtr operator++ (int)              {
+    return index++;
+  }
+  USPtr operator-- (int)              {
+    return index--;
+  }
 
-    uint8_t index; //Index of current EEPROM cell.
+  uint8_t index; //Index of current EEPROM cell.
 };
 
 /***
@@ -119,33 +167,51 @@ struct USPtr{
     This class is also 100% backwards compatible with earlier Arduino core releases.
 ***/
 
-struct USERSIGClass{
+struct USERSIGClass {
 
-    //Basic user access methods.
-    USRef operator[]( const int idx )    { return idx; }
-    uint8_t read( int idx )              { return USRef( idx ); }
-    void write( int idx, uint8_t val )   { (USRef( idx )) = val; }
-    void update( int idx, uint8_t val )  { USRef( idx ).update( val ); }
+  //Basic user access methods.
+  USRef operator[](const int idx)    {
+    return idx;
+  }
+  uint8_t read(int idx)              {
+    return USRef(idx);
+  }
+  void write(int idx, uint8_t val)   {
+    (USRef(idx)) = val;
+  }
+  void update(int idx, uint8_t val)  {
+    USRef(idx).update(val);
+  }
 
-    //STL and C++11 iteration capability.
-    USPtr begin()                        { return 0x00; }
-    USPtr end()                          { return length(); } //Standards requires this to be the item after the last valid entry. The returned pointer is invalid.
-    static constexpr uint8_t length()   { return 32; }
+  //STL and C++11 iteration capability.
+  USPtr begin()                        {
+    return 0x00;
+  }
+  USPtr end()                          {
+    return length();  //Standards requires this to be the item after the last valid entry. The returned pointer is invalid.
+  }
+  static constexpr uint8_t length()   {
+    return 32;
+  }
 
-    //Functionality to 'get' and 'put' objects to and from EEPROM.
-    template< typename T > T &get( int idx, T &t ){
-        USPtr e = idx;
-        uint8_t *ptr = (uint8_t*) &t;
-        for( int count = sizeof(T) ; count ; --count, ++e )  *ptr++ = *e;
-        return t;
+  //Functionality to 'get' and 'put' objects to and from EEPROM.
+  template< typename T > T &get(int idx, T &t) {
+    USPtr e = idx;
+    uint8_t *ptr = (uint8_t *) &t;
+    for (int count = sizeof(T) ; count ; --count, ++e) {
+      *ptr++ = *e;
     }
+    return t;
+  }
 
-    template< typename T > const T &put( int idx, const T &t ){
-        USPtr e = idx;
-        const uint8_t *ptr = (const uint8_t*) &t;
-        for( int count = sizeof(T) ; count ; --count, ++e )  (*e).update( *ptr++ );
-        return t;
+  template< typename T > const T &put(int idx, const T &t) {
+    USPtr e = idx;
+    const uint8_t *ptr = (const uint8_t *) &t;
+    for (int count = sizeof(T) ; count ; --count, ++e) {
+      (*e).update(*ptr++);
     }
+    return t;
+  }
 };
 
 static USERSIGClass USERSIG;

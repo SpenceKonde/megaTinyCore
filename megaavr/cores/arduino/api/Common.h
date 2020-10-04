@@ -1,7 +1,7 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 void yield(void);
@@ -30,16 +30,16 @@ void yield(void);
 
 #ifndef min
 #define min(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a < _b ? _a : _b; })
+  ({ __typeof__ (a) _a = (a); \
+    __typeof__ (b) _b = (b); \
+    _a < _b ? _a : _b; })
 #endif
 
 #ifndef max
 #define max(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
+  ({ __typeof__ (a) _a = (a); \
+    __typeof__ (b) _b = (b); \
+    _a > _b ? _a : _b; })
 #endif
 
 #ifndef constrain
@@ -86,7 +86,7 @@ int atexit(void (*func)()) __attribute__((weak));
 int main() __attribute__((weak));
 
 #ifdef EXTENDED_PIN_MODE
-// Platforms who wnat to declare more than 256 pins need to define EXTENDED_PIN_MODE globally
+// Platforms who want to declare more than 256 pins need to define EXTENDED_PIN_MODE globally
 typedef uint32_t pin_size_t;
 #else
 typedef uint8_t pin_size_t;
@@ -130,22 +130,22 @@ void loop(void);
 
 #ifdef __cplusplus
 
-/* C++ prototypes */
-uint16_t makeWord(uint16_t w);
-uint16_t makeWord(byte h, byte l);
+  /* C++ prototypes */
+  uint16_t makeWord(uint16_t w);
+  uint16_t makeWord(byte h, byte l);
 
-#define word(...) makeWord(__VA_ARGS__)
+  #define word(...) makeWord(__VA_ARGS__)
 
-unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout = 1000000L);
-unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout = 1000000L);
+  unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout = 1000000L);
+  unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout = 1000000L);
 
-void tone(uint8_t _pin, unsigned int frequency, unsigned long duration = 0);
-void noTone(uint8_t _pin);
+  void tone(uint8_t _pin, unsigned int frequency, unsigned long duration = 0);
+  void noTone(uint8_t _pin);
 
-// WMath prototypes
-long random(long);
-long random(long, long);
-void randomSeed(unsigned long);
-long map(long, long, long, long, long);
+  // WMath prototypes
+  long random(long);
+  long random(long, long);
+  void randomSeed(unsigned long);
+  long map(long, long, long, long, long);
 
 #endif // __cplusplus

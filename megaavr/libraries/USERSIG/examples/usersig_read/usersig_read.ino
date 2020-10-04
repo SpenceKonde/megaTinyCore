@@ -1,10 +1,10 @@
 /*
- * USERSIG Read
- *
- * Reads the value of each byte of the USERSIG and prints it
- * to the computer.
- * This example code is in the public domain.
- */
+   USERSIG Read
+
+   Reads the value of each byte of the USERSIG and prints it
+   to the computer.
+   This example code is in the public domain.
+*/
 
 #include <USERSIG.h>
 
@@ -25,14 +25,14 @@ void loop() {
   Serial.print(value, DEC);
   Serial.println();
 
- /***
-    Advance to the next address, when at the end restart at the beginning.
+  /***
+     Advance to the next address, when at the end restart at the beginning.
 
-    All (post 2016) parts have 32 bytes of USERSIG/USERROW space.
+     All (post 2016) parts have 32 bytes of USERSIG/USERROW space.
 
-    Rather than hard-coding the length, you should use the pre-provided length function.
-    This will make your code portable to future AVR processors which may have more.
-  ***/
+     Rather than hard-coding the length, you should use the pre-provided length function.
+     This will make your code portable to future AVR processors which may have more.
+   ***/
 
   address = address + 1;
   if (address == USERSIG.length()) {

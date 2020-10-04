@@ -5,16 +5,16 @@ The ATtiny 0- and 1-series are programmed through the Unified Program and Debug 
 An Arduino sketch is available to turn ATmega328(p)-based Arduino’s, like the Arduino UNO and Nano, into an UPDI programmer (it does not work on boards based on other parts, like the 32u4 (Micro/Leo) or any non-AVR board). The following steps show how to make one of these low cost UPDI programmers. We recommend using an Arduino Nano or Pro Mini (a cheap clone from ebay is fine) and hard-wiring it for the task.
 
 ## Part 1: Upload the sketch to your Arduino
-1.	The UPDI programmer sketch can be found here: https://github.com/SpenceKonde/jtag2updi
+1. The UPDI programmer sketch can be found here: https://github.com/SpenceKonde/jtag2updi
 Download and extract, or clone the repo to your local machine.
-2.	Browse to the download location and open the jtag2updi folder
-3.	Open the sketch jtag2updi.ino and upload it to your Arduino. The .ino file itself is empty, and this is fine - all the code is contained in other files in the same folder, but the empty .ino is needed so that the IDE can compile it.
+2. Browse to the download location and open the jtag2updi folder
+3. Open the sketch jtag2updi.ino and upload it to your Arduino. The .ino file itself is empty, and this is fine - all the code is contained in other files in the same folder, but the empty .ino is needed so that the IDE can compile it.
 
 ## Part 2: Connect hardware
 *previous versions of this guide specified a cap between reset and ground after programming. Testing has revealed this to be unnecessary*
-1.  Connect Ground of Arduino to Ground of the ATTiny
-2.  Connect Pin 6 of the Arduino to the UPDI pin of the ATTiny - if using the bare chip, connect it via a [470 ohm resistor](https://github.com/SpenceKonde/AVR-Best-Practices/blob/master/HardwareNotes/UPDISeriesResistors.md). Many breakout boards will provide a separate UPDI pin that has this resistor built-in; in this case, this pin may be connected directly to the programming pin.
-3.	Unless the ATtiny has it's own power supply, connect 5v pin of the Arduino to the Vcc pin of the ATtiny
+1. Connect Ground of Arduino to Ground of the ATTiny
+2. Connect Pin 6 of the Arduino to the UPDI pin of the ATTiny - if using the bare chip, connect it via a [470 ohm resistor](https://github.com/SpenceKonde/AVR-Best-Practices/blob/master/HardwareNotes/UPDISeriesResistors.md). Many breakout boards will provide a separate UPDI pin that has this resistor built-in; in this case, this pin may be connected directly to the programming pin.
+3. Unless the ATtiny has it's own power supply, connect 5v pin of the Arduino to the Vcc pin of the ATtiny
 
 Now, you should be able to select an ATtiny megaAVR series board from Tools -> Board, and upload a sketch via the IDE. The same programmer can also be used to Burn Bootloader (be sure to select the jtag2updi (megaTinyCore) programmer from Tools -> Programmer menu)
 
@@ -23,7 +23,7 @@ Now, you should be able to select an ATtiny megaAVR series board from Tools -> B
 ![Minimal UPDI connections](megaavr/extras/NanoUPDI_Minimal.png "Minimal UPDI connections - no resistors")
 
 
-![Reccomended UPDI connections](megaavr/extras/NanoUPDI_Recommendedx.png "Recommeded UPDI connections - 470 Ohm in series with UPDI, 10 Ohm in series with power.")
+![Recommended UPDI connections](megaavr/extras/NanoUPDI_Recommendedx.png "Recommended UPDI connections - 470 Ohm in series with UPDI, 10 Ohm in series with power.")
 
 ### Ignore the warning about "flash" and "boot" memories
 A warning will be shown during the upload process `avrdude: jtagmkII_initialize(): Cannot locate "flash" and "boot" memories in description` - this warning is spurious and can be safely ignored.
@@ -59,4 +59,3 @@ The avrdude output is very terse by default, particularly with AVRdude
 ### Typical development configuration
 Since it is frequently useful to have a serial port for debugging, I typically find myself using a configuration like this, with a serial adapter and UPDI programmer connected simultaneously. Obviously, one could also use Optiboot, but without disabling UPDI to get reset, or using other awkward tricks (see [AlternativeReset. So
 ![Development configuration for tinyAVR 0/1-series](megaavr/extras/DevConfigUPDI.png "A common development configuration for tinyAVR 0/1-series")
-

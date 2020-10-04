@@ -1,36 +1,35 @@
 /***********************************************************************|
-| megaAVR Configurable Custom Logic library                             |
-|                                                                       |
-| Interrupt.ino                                                         |
-|                                                                       |
-| A library for interfacing with the megaAVR Configurable Custom Logic. |
-| Developed in 2019 by MCUdude.                                         |
-| https://github.com/MCUdude/                                           |
-|                                                                       |
-| In this example we use the configurable logic peripherals the the     |
-| megaAVR to create a 3-input NOR gate using logic block 2 on PORT D.   |
-| We will use input on PD0, PD1 and PD2. Instead of having an output    |
-| pin the logic block will instead trigger an interrupt that runs a     |
-| user defined function.                                                |
-|                                                                       |
-|                                     3-input NOR truth table:          |
-| If we look at the truth table       |PD2|PD1|PD0| Y |                 |
-| to the right, we can see that       |---|---|---|---|                 |
-| all binary values for Y can         | 0 | 0 | 0 | 1 |                 |
-| be represented as 00000001.         | 0 | 0 | 1 | 0 |                 |
-| If we convert this 8-bit            | 0 | 1 | 0 | 0 |                 |
-| binary number into hex, we          | 0 | 1 | 1 | 0 |                 |
-| get 0x01.                           | 1 | 0 | 0 | 0 |                 |
-|                                     | 1 | 0 | 1 | 0 |                 |
-| In this example the output is       | 1 | 1 | 0 | 0 |                 |
-| true if all inputs are low.         | 1 | 1 | 1 | 0 |                 |
-|                                                                       |
-|***********************************************************************/
+  | megaAVR Configurable Custom Logic library                             |
+  |                                                                       |
+  | Interrupt.ino                                                         |
+  |                                                                       |
+  | A library for interfacing with the megaAVR Configurable Custom Logic. |
+  | Developed in 2019 by MCUdude.                                         |
+  | https://github.com/MCUdude/                                           |
+  |                                                                       |
+  | In this example we use the configurable logic peripherals the the     |
+  | megaAVR to create a 3-input NOR gate using logic block 2 on PORT D.   |
+  | We will use input on PD0, PD1 and PD2. Instead of having an output    |
+  | pin the logic block will instead trigger an interrupt that runs a     |
+  | user defined function.                                                |
+  |                                                                       |
+  |                                     3-input NOR truth table:          |
+  | If we look at the truth table       |PD2|PD1|PD0| Y |                 |
+  | to the right, we can see that       |---|---|---|---|                 |
+  | all binary values for Y can         | 0 | 0 | 0 | 1 |                 |
+  | be represented as 00000001.         | 0 | 0 | 1 | 0 |                 |
+  | If we convert this 8-bit            | 0 | 1 | 0 | 0 |                 |
+  | binary number into hex, we          | 0 | 1 | 1 | 0 |                 |
+  | get 0x01.                           | 1 | 0 | 0 | 0 |                 |
+  |                                     | 1 | 0 | 1 | 0 |                 |
+  | In this example the output is       | 1 | 1 | 0 | 0 |                 |
+  | true if all inputs are low.         | 1 | 1 | 1 | 0 |                 |
+  |                                                                       |
+  |***********************************************************************/
 
 #include <Logic.h>
 
-void setup()
-{
+void setup() {
   // Modify the serial port to match your hardware
   Serial.begin(9600);
 
@@ -58,12 +57,10 @@ void setup()
   Logic::start();
 }
 
-void loop()
-{
+void loop() {
   // When using configurable custom logic the CPU isn't doing anything!
 }
 
-void interruptFunction()
-{
+void interruptFunction() {
   Serial.println("Output of logic block 2 went high!");
 }

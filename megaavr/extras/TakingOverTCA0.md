@@ -11,7 +11,7 @@ The most common point of confusion is the fact that megaTinyCore, out of the box
 ```
 Note that as these bits have the same function in SINGLE and SPLIT mode, it does not matter whether you reference them as TCA0.SINGLE.* or TCA0.SPLIT.*
 
-Once this has been done, further configuration is straightforward. Failing to turn off split mode when you intend to, however, can result in strange behavior. 
+Once this has been done, further configuration is straightforward. Failing to turn off split mode when you intend to, however, can result in strange behavior.
 
 ### Avoid using TCA0 as the millis timer
 Reconfiguring TCA0 when it is used as the millis timer source will result in loss of timekeeping functionality. When doing this, you should avoid using TCA0 as the millis source. To ensure that you don't forget to set the millis timer correctly, it is suggested to put code like the following in your sketch to halt compile if you later open the sketch and did not choose the correct millis timer source.
@@ -33,7 +33,7 @@ Better yet, you can verify that you chose the intended millis timer, rather than
 In these examples, it is also used to make sure one doesn't try to run them on a part where the mappings of the channels to pins are different (ie, the 8-pin parts).
 
 ##### Added complication for 8-pin parts
-On the 8-pin parts, the default location for WO0 is the same as for WO3: PA3, ie, you can't get an extra channel from split mode. However, WO0 can be moved from it's default location to PA7 via the PORTMUX; megaTinyCore does this to get the extra PWM channel out of the box. This is controlled by `PORTMUX.CTRLC`. Nothing else is controlled by this register, so you can just set it to the compiler-provided constants. None of the other parts supported by megaTinyCore have PWM pins blocking eachother like this.
+On the 8-pin parts, the default location for WO0 is the same as for WO3: PA3, ie, you can't get an extra channel from split mode. However, WO0 can be moved from it's default location to PA7 via the PORTMUX; megaTinyCore does this to get the extra PWM channel out of the box. This is controlled by `PORTMUX.CTRLC`. Nothing else is controlled by this register, so you can just set it to the compiler-provided constants. None of the other parts supported by megaTinyCore have PWM pins blocking each other like this.
 
 ```
 PORTMUX.CTRLC = PORTMUX_TCA00_DEFAULT_gc;   // Move it back to PA3
@@ -42,7 +42,7 @@ PORTMUX.CTRLC = PORTMUX_TCA00_ALTERNATE_gc; // Move it to PA7
 ```
 
 # Examples
-Now for the fun part - example code! 
+Now for the fun part - example code!
 
 A note about the pin numbers - we use the PORT_Pxn notation to refer to pins; when I mention in the comments the pin number, that is an Arduino (logical) pin number, not a physical pin number (generally, this documentation does not refer to physical pin numbers except on the pinout charts). Because the mappings of peripherals to pins by the port and pin within the port is constant across the non-8-pin parts, this means the examples (except the one for 8-pin parts) will all work on all 14, 20, and 28-pin parts.
 
@@ -81,7 +81,7 @@ ISR(TCA0_OVF_vect) { //on overflow, we will increment TCA0.CMP0, this will happe
 
 
 ### Example 2: Variable frequency and duty cycle PWM
-This generates PWM similar to above (though without the silly interrupt to change the duty cycle), but takes it a step further with two functions to set the duty cycle and frequency. 
+This generates PWM similar to above (though without the silly interrupt to change the duty cycle), but takes it a step further with two functions to set the duty cycle and frequency.
 
 ```
 #if defined(MILLIS_USE_TIMERA0)||defined(__AVR_ATtinyxy2__)
@@ -163,7 +163,7 @@ void setup() {
   TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; //enable the timer with no prescaler
 }
 
-void loop() { //Lets generate some output just to proove it works
+void loop() { //Lets generate some output just to prove it works
   static byte pass = 0;
   static unsigned int duty = 255;
   TCA0.SINGLE.CMP0 = duty-- ; //step down the duty cycle each iteration through loop;
@@ -209,10 +209,7 @@ void setup() {
   TCA0.SPLIT.HCMP2=150;  //75% duty cycle
   TCA0.SPLIT.CTRLA=TCA_SPLIT_CLKSEL_DIV16_gc|TCA_SPLIT_ENABLE_bm; //enable the timer with prescaler of 16
 }
-void loop() { //nothing to do here but enjoy your PWM. 
-//Prescaler of 16 and LPER and HPER values give 4.88 kHz on PB0 and 6.25kHz on PA5.   
+void loop() { //nothing to do here but enjoy your PWM.
+//Prescaler of 16 and LPER and HPER values give 4.88 kHz on PB0 and 6.25kHz on PA5.
 }
 ```
-
-
-

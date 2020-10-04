@@ -1,12 +1,12 @@
 /*
- * EEPROM Clear
- *
- * Sets all of the bytes of the EEPROM to 0xFF (blank).
- * Please see eeprom_iteration for a more in depth
- * look at how to traverse the EEPROM.
- *
- * This example code is in the public domain.
- */
+   EEPROM Clear
+
+   Sets all of the bytes of the EEPROM to 0xFF (blank).
+   Please see eeprom_iteration for a more in depth
+   look at how to traverse the EEPROM.
+
+   This example code is in the public domain.
+*/
 
 #include <EEPROM.h>
 

@@ -5,16 +5,16 @@ There are several solutions to reduce the power consumption on the ATtiny. Here 
 The clock speed is very important for the following two reasons:
 
 1.  Slower clock speeds will reduce the power consumption
-1.  Minimum voltage to keep the CPU runnning is lower with a slower clock speed
+1.  Minimum voltage to keep the CPU running is lower with a slower clock speed
 
-The clock speed can be set from the Arduino IDE. Go to Tools -> Clock Speed, and pick one of the 7 options.  After selecting the required clock speed, go to Tools -> Burn Bootloader. Every time you change a clock, make sure you burn the bootloader - otherwise it is not applied, and timing will be off. 
+The clock speed can be set from the Arduino IDE. Go to Tools -> Clock Speed, and pick one of the 7 options.  After selecting the required clock speed, go to Tools -> Burn Bootloader. Every time you change a clock, make sure you burn the bootloader - otherwise it is not applied, and timing will be off.
 
 These are the power characteristics for each clock:
 
 Clock Speed | 20MHz | 16MHz | 10MHz | 8MHz | 5MHz | 4MHz | 1MHz
 ------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------
 Current | 10.2mA | 8mA | 5.5mA | 4.5mA | 3.2mA | 2mA | 0.6mA
-Voltage	| 4.5V-5.5V | 4.2V-5.5V | 2.7V-5.5V | 2.7V-5.5V | 1.8V-5.5V | 1.8V-5.5V | 1.8V-5.5V
+Voltage | 4.5V-5.5V | 4.2V-5.5V | 2.7V-5.5V | 2.7V-5.5V | 1.8V-5.5V | 1.8V-5.5V | 1.8V-5.5V
 
 We often get the request to add the 32KHz option to the clock speed menu since it only requires 13.5μA. While it is possible to run the main clock from this low power oscillator, it is not recommended. It will make certain peripherals unusable, and timers used for delay and millis require the faster oscillator to run anyway.
 
@@ -27,9 +27,9 @@ There is a significant difference between running the MCU at 5V or just 2V. Acco
 ## Use Sleep Mode
 The absolute minimum power consumption of the device, when all the peripherals are stopped, is 0.1μA. This can be accomplished by using sleep mode when the MCU is not required. When the device is in sleep mode the CPU is not executing any of the application, but will continue where it left off after it receives an interrupt. While the CPU is not running, the device itself is still monitoring all the interrupts out there and to do so has to keep the peripherals running. Which peripherals are running depends on the sleep mode setting selected before entering sleep mode. The following 3 options are available:
 
-1.	Idle, only the CPU is turned off
-1.	Standy, the CPU is turned off and most Peripherals
-1.	Power Down, the CPU is turned off and all Peripherals (except the WDT and RTC), only the PIT (RTC) , Pin change and TWI Address match can wake up the device.
+1.  Idle, only the CPU is turned off
+1.  Standby, the CPU is turned off and most Peripherals
+1.  Power Down, the CPU is turned off and all Peripherals (except the WDT and RTC), only the PIT (RTC) , Pin change and TWI Address match can wake up the device.
 
 The sleep functions are not part of the Arduino Core, but part of the AVR-GCC compiler. Add the following line at the beginning of your code to add the sleep mode functions:
 
@@ -43,7 +43,7 @@ Before entering sleep mode, the correct setting must be selected with set_sleep_
 set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 ```
 
-Other options are: 
+Other options are:
 
 ```cpp
 set_sleep_mode(SLEEP_MODE_IDLE);
@@ -82,9 +82,9 @@ void RTC_init(void)
     ;                                   /* Wait for all register to be synchronized */
   }
   RTC.CLKSEL = RTC_CLKSEL_INT32K_gc;    /* 32.768kHz Internal Ultra-Low-Power Oscillator (OSCULP32K) */
-  
+
   RTC.PITINTCTRL = RTC_PI_bm;           /* PIT Interrupt: enabled */
-  
+
   RTC.PITCTRLA = RTC_PERIOD_CYC16384_gc /* RTC Clock Cycles 16384, resulting in 32.768kHz/16384 = 2Hz */
   | RTC_PITEN_bm;                       /* Enable PIT counter: enabled */
 }
