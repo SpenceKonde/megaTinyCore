@@ -606,8 +606,6 @@ void TWI_SlaveAddressMatchHandler(){
 	slave_trans_status = TWIS_STATUS_BUSY;
 	slave_result = TWIS_RESULT_UNKNOWN;
 
-	/* Send ACK, wait for data interrupt */
-	TWI0.SCTRLB = TWI_SCMD_RESPONSE_gc;
 
 	/* If Master Read/Slave Write */
 	if(TWI0.SSTATUS & TWI_DIR_bm){
@@ -622,6 +620,9 @@ void TWI_SlaveAddressMatchHandler(){
 		slave_callUserReceive = 1;
 		twi_mode = TWI_MODE_SLAVE_RECEIVE;
 	}
+
+	/* Send ACK, wait for data interrupt */
+	TWI0.SCTRLB = TWI_SCMD_RESPONSE_gc;
 
 	/* Data interrupt to follow... */
 }
