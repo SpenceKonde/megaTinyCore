@@ -186,3 +186,12 @@ jobs:
             # The sketches don't have any external library dependencies, so just define an empty array
             -
           verbose: false
+          enable-deltas-report: true
+          sketches-report-path: sketches-reports
+
+      # The report artifact is the mechanism used to pass data to the Report Size Deltas workflow
+      - name: Save memory usage change report as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: sketches-reports
+          path: sketches-reports
