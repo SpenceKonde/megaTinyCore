@@ -187,6 +187,7 @@ jobs:
             -
           verbose: false
           enable-deltas-report: true
+          enable-warnings-report: true
           sketches-report-path: sketches-reports
 
       # The report artifact is the mechanism used to pass data to the Report Size Deltas workflow
