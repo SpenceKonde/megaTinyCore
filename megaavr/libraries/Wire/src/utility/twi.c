@@ -606,7 +606,6 @@ void TWI_SlaveAddressMatchHandler(){
 	slave_trans_status = TWIS_STATUS_BUSY;
 	slave_result = TWIS_RESULT_UNKNOWN;
 
-
 	/* If Master Read/Slave Write */
 	if(TWI0.SSTATUS & TWI_DIR_bm){
 		slave_bytesWritten = 0;
