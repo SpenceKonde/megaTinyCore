@@ -65,11 +65,9 @@ void TWI_MasterInit(uint32_t frequency) {
     return;
   }
 
-  // Enable pullups just in case, should have external ones though
-  #ifdef NO_EXTERNAL_I2C_PULLUP
-  pinMode(PIN_WIRE_SDA, INPUT_PULLUP);
-  pinMode(PIN_WIRE_SCL, INPUT_PULLUP);
-  #endif
+  // No longer bother turning on the pullups. You need external ones for reliable operation, and unreliable operation is worse than it just straight up not working.
+  // Most I2C breakout boards have a pair on that board anyway...
+
   /* This is done in wiring.c if this is needed for the part.
     #if defined(TWISPIROUTEA)
     PORTMUX.TWISPIROUTEA |= TWI_MUX;

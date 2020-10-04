@@ -26,6 +26,10 @@
 #include <avr/pgmspace.h>
 #include "timers.h"
 
+#if (defined(USE_TIMERD0_PWM) && defined(TCD0))
+#define USE_TIMERD0_PWM
+#endif
+
 #define NUM_DIGITAL_PINS            22
 #define NUM_ANALOG_INPUTS           12
 //#define NUM_RESERVED_PINS           0 // (TOSC1/2, VREF, RESET, DEBUG USART Rx/Tx)
