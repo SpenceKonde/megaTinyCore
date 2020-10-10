@@ -21,6 +21,10 @@
 */
 
 #include <Arduino.h>
+/*
+These turn out to be slower and less flash efficient than this imlpementation.
+Note that faster implementations are possible (MUCH faster, such that they might
+cause compatibility problems because they're too fast) See #197
 
 uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
 	uint8_t value = 0;
@@ -46,6 +50,31 @@ void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val)
 			digitalWrite(dataPin, !!(val & (1 << i)));
 		else
 			digitalWrite(dataPin, !!(val & (1 << (7 - i))));
+
+		digitalWrite(clockPin, HIGH);
+		digitalWrite(clockPin, LOW);
+	}
+}
+*/
+uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
+	uint8_t val = 0;
+	for (uint8_t = 0; i != 8; i++) {
+		digitalWrite(clockPin, HIGH);
+		if (bitOrder == LSBFIRST)
+			val = (val>>1) | (digitalRead(dataPin)<<7);
+		else
+			val = (val<<1) | digitalRead(dataPin);
+		digitalWrite(clockPin, LOW);
+	}
+	return val;
+}
+
+void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val) {
+	for (uint8_t i = 0; i != 8; i++)  {
+		if (bitOrder == LSBFIRST)
+			digitalWrite(dataPin, val & 0x01), val >>= 1;
+		else
+			digitalWrite(dataPin, !!(val & 0x80)), val <<= 1;
 
 		digitalWrite(clockPin, HIGH);
 		digitalWrite(clockPin, LOW);
