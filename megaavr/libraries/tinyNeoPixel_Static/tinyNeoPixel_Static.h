@@ -104,7 +104,11 @@
     print("{:3},".format(int((math.sin(x/128.0*math.pi)+1.0)*127.5+0.5))),
     if x&15 == 15: print
 */
+#if (__AVR_ARCH__==103)
+static const uint8_t _NeoPixelSineTable[256] = {
+#else
 static const uint8_t PROGMEM _NeoPixelSineTable[256] = {
+#endif
   128, 131, 134, 137, 140, 143, 146, 149, 152, 155, 158, 162, 165, 167, 170, 173,
   176, 179, 182, 185, 188, 190, 193, 196, 198, 201, 203, 206, 208, 211, 213, 215,
   218, 220, 222, 224, 226, 228, 230, 232, 234, 235, 237, 238, 240, 241, 243, 244,
@@ -131,7 +135,11 @@ static const uint8_t PROGMEM _NeoPixelSineTable[256] = {
     print("{:3},".format(int(math.pow((x)/255.0,gamma)*255.0+0.5))),
     if x&15 == 15: print
 */
+#if (__AVR_ARCH__==103)
+static const uint8_t _NeoPixelGammaTable[256] = {
+#else
 static const uint8_t PROGMEM _NeoPixelGammaTable[256] = {
+#endif
   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
   0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,  1,  1,  1,  1,
   1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,  2,  3,  3,  3,  3,
@@ -149,7 +157,6 @@ static const uint8_t PROGMEM _NeoPixelGammaTable[256] = {
   182, 184, 186, 188, 191, 193, 195, 197, 199, 202, 204, 206, 209, 211, 213, 215,
   218, 220, 223, 225, 227, 230, 232, 235, 237, 240, 242, 245, 247, 250, 252, 255
 };
-
 
 
 typedef uint8_t  neoPixelType;
@@ -190,9 +197,15 @@ class tinyNeoPixel {
                a signed int8_t, but you'll most likely want unsigned as this
                output is often used for pixel brightness in animation effects.
     */
+    #if (__AVR_ARCH__==103)
+    static uint8_t    sine8(uint8_t x) {
+      return _NeoPixelSineTable[x]; // 0-255 in, 0-255 out
+    }
+    #else
     static uint8_t    sine8(uint8_t x) {
       return pgm_read_byte(&_NeoPixelSineTable[x]); // 0-255 in, 0-255 out
     }
+    #endif
     /*!
       @brief   An 8-bit gamma-correction function for basic pixel brightness
                adjustment. Makes color transitions appear more perceptially
@@ -204,9 +217,15 @@ class tinyNeoPixel {
                NeoPixels in average tasks. If you need finer control you'll
                need to provide your own gamma-correction function instead.
     */
+    #if (__AVR_ARCH__==103)
+    static uint8_t    gamma8(uint8_t x) {
+      return _NeoPixelGammaTable[x]; // 0-255 in, 0-255 out
+    }
+    #else
     static uint8_t    gamma8(uint8_t x) {
       return pgm_read_byte(&_NeoPixelGammaTable[x]); // 0-255 in, 0-255 out
     }
+    #endif
     /*!
       @brief   Convert separate red, green and blue values into a single
                "packed" 32-bit RGB color.
