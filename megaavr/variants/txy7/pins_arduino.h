@@ -90,12 +90,19 @@
 #define HWSERIAL0_DRE_VECTOR     (USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
 #define HWSERIAL0_RXC_VECTOR     (USART0_RXC_vect)
+#define HWSERIAL0_RXC_VECTOR_NUM (USART0_RXC_vect_num)
+#define HWSERIAL0_TXC_VECTOR     (USART0_TXC_vect)
+#define HWSERIAL0_TXC_VECTOR_NUM (USART0_TXC_vect_num)
 #define HWSERIAL0_MUX_PINSWAP_1             0x01
-#define PIN_WIRE_HWSERIAL0_RX_PINSWAP_1     (19)
-#define PIN_WIRE_HWSERIAL0_TX_PINSWAP_1     (18)
+#define PIN_HWSERIAL0_RX_PINSWAP_1     (PIN_PA1)
+#define PIN_HWSERIAL0_TX_PINSWAP_1     (PIN_PA2)
+#define PIN_HWSERIAL0_XCK_PINSWAP_1     (PIN_PA3)
+#define PIN_HWSERIAL0_XDIR_PINSWAP_1     (PIN_PA4)
 #define HWSERIAL0_MUX             0x00
-#define PIN_WIRE_HWSERIAL0_RX     (8)
-#define PIN_WIRE_HWSERIAL0_TX     (9)
+#define PIN_HWSERIAL0_RX     (PIN_PB3)
+#define PIN_HWSERIAL0_TX     (PIN_PB2)
+#define PIN_HWSERIAL0_XCK     (PIN_PB1)
+#define PIN_HWSERIAL0_XDIR     (PIN_PB0)
 
 
 #ifdef DAC0
@@ -111,12 +118,12 @@
 #define PIN_A1   (18)
 #define PIN_A2   (19)
 #define PIN_A3   (20)
-#define PIN_A4   (0)
-#define PIN_A5      (1)
-#define PIN_A6     (2)
-#define PIN_A7   (3)
-#define PIN_A8   (6)
-#define PIN_A9   (7)
+#define PIN_A4   ( 0)
+#define PIN_A5   ( 1)
+#define PIN_A6   ( 2)
+#define PIN_A7   ( 3)
+#define PIN_A8   ( 6)
+#define PIN_A9   ( 7)
 #define PIN_A10  (10)
 #define PIN_A11  (11)
 

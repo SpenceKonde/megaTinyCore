@@ -93,21 +93,30 @@
 
 
 // Mapped to HWSERIAL0 in Serial library
-#define HWSERIAL0             (&USART0)
-#define HWSERIAL0_DRE_VECTOR  (USART0_DRE_vect)
+#define HWSERIAL0                 (&USART0)
+#define HWSERIAL0_DRE_VECTOR     (USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
-#define HWSERIAL0_RXC_VECTOR  (USART0_RXC_vect)
-#define HWSERIAL0_MUX           0x00
-#define PIN_WIRE_HWSERIAL0_RX   (6)
-#define PIN_WIRE_HWSERIAL0_TX   (7)
-#define HWSERIAL0_MUX_PINSWAP_1            0x01
-#define PIN_WIRE_HWSERIAL0_RX_PINSWAP_1    (15)
-#define PIN_WIRE_HWSERIAL0_TX_PINSWAP_1    (14)
+#define HWSERIAL0_RXC_VECTOR     (USART0_RXC_vect)
+#define HWSERIAL0_RXC_VECTOR_NUM (USART0_RXC_vect_num)
+#define HWSERIAL0_TXC_VECTOR     (USART0_TXC_vect)
+#define HWSERIAL0_TXC_VECTOR_NUM (USART0_TXC_vect_num)
+#define HWSERIAL0_MUX_PINSWAP_1             0x01
+#define PIN_HWSERIAL0_RX_PINSWAP_1     (PIN_PA1)
+#define PIN_HWSERIAL0_TX_PINSWAP_1     (PIN_PA2)
+#define PIN_HWSERIAL0_XCK_PINSWAP_1     (PIN_PA3)
+#define PIN_HWSERIAL0_XDIR_PINSWAP_1     (PIN_PA4)
+#define HWSERIAL0_MUX             0x00
+#define PIN_HWSERIAL0_RX     (PIN_PB3)
+#define PIN_HWSERIAL0_TX     (PIN_PB2)
+#define PIN_HWSERIAL0_XCK     (PIN_PB1)
+#define PIN_HWSERIAL0_XDIR     (PIN_PB0)
 
 #ifdef DAC0
   #define DAC_PIN PIN_PA6
 #endif
 #define LED_BUILTIN PIN_PA7
+
+
 
 #define PIN_A0   (17)
 #define PIN_A1   (14)
