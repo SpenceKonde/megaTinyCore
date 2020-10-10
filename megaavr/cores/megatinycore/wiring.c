@@ -31,9 +31,6 @@
   #define MILLIS_USE_TIMERRTC
 #endif
 
-#ifdef MILLIS_USE_TIMERRTC
-  #warning "Warning: Significant changes are planned for near-future releases of megaTinyCore relating to use of the RTC for millis()."
-#endif
 
 //volatile uint16_t microseconds_per_timer_overflow;
 //volatile uint16_t microseconds_per_timer_tick;
