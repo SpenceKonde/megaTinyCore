@@ -1,4 +1,4 @@
-### latest (planned 2.1.0)
+### 2.1.0
 * Improve ADC accuracy when switching references
 * Fix bug with which parts we thought had the external reference, corrected docs. (#211)
 * Change handling of reset cause in bootloader, see #213.
@@ -18,7 +18,8 @@
 * In order to maintain compatibility, F() macro now behaves just the same as on official boards. This comes at a cost of performance and size, but allows interoperability with major libraries (#216)
 * Fixed bug with millis conversion with RTC (any) as clock source (#327)
 * Added support for external clock sources, including ones that attempt to overclock the device.
-* Added support for ignoring SerialEvent - this little used and ill-conceived feature imposes a significant cost in time on all parts whether they use it or nor
+* Added support for ignoring SerialEvent - this little used and ill-conceived feature imposes a significant cost in time on all parts whether they use it or not.
+* Pulled in latest logic library (#224). Did not bring in all the examples, which were really repetitive, but added some new ones that are super cool...
 
 ### 2.0.5
 * Internal change to ADC initialization (saves a bit of flash) and init_ADC1() function for parts that have ADC1.
