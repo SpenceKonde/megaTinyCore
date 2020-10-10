@@ -56,25 +56,6 @@
 #define PIN_WIRE_SDA        (6)
 #define PIN_WIRE_SCL        (7)
 
-#ifdef PIN_WIRE_SCL_PINSWAP_1
-  #define SDA ((uint8_t) (PORTMUX.CTRLB&PORTMUX_TWI0_bm?PIN_WIRE_SDA_PINSWAP_1:PIN_WIRE_SDA))
-  #define SCL ((uint8_t) (PORTMUX.CTRLB&PORTMUX_TWI0_bm?PIN_WIRE_SCL_PINSWAP_1:PIN_WIRE_SCL))
-#else
-  static const uint8_t SDA = PIN_WIRE_SDA;
-  static const uint8_t SCL = PIN_WIRE_SCL;
-#endif
-
-#ifdef PIN_SPI_SCK_PINSWAP_1
-  #define SS ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_SS_PINSWAP_1:PIN_SPI_SS))
-  #define MOSI ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_MOSI_PINSWAP_1:PIN_SPI_MOSI))
-  #define MISO ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_MISO_PINSWAP_1:PIN_SPI_MISO))
-  #define SCK ((uint8_t) (PORTMUX.CTRLB&PORTMUX_SPI0_bm?PIN_SPI_SCK_PINSWAP_1:PIN_SPI_SCK))
-#else
-  static const uint8_t SS   = PIN_SPI_SS;
-  static const uint8_t MOSI = PIN_SPI_MOSI;
-  static const uint8_t MISO = PIN_SPI_MISO;
-  static const uint8_t SCK  = PIN_SPI_SCK;
-#endif
 
 // Mapped to HWSERIAL0 in Serial library
 #define HWSERIAL0                 (&USART0)
