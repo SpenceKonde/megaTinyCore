@@ -605,7 +605,7 @@ atxy4.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy4.bootloader.TCD0CFG=0x00
 atxy4.bootloader.APPEND=0x00
 atxy4.bootloader.BOOTEND=0x00
-atxy2.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
+atxy4.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 
 ##############################################################
 
