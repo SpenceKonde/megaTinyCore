@@ -58,7 +58,7 @@ void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val)
 */
 uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
 	uint8_t val = 0;
-	for (uint8_t = 0; i != 8; i++) {
+	for (uint8_t i = 0; i != 8; i++) {
 		digitalWrite(clockPin, HIGH);
 		if (bitOrder == LSBFIRST)
 			val = (val>>1) | (digitalRead(dataPin)<<7);
