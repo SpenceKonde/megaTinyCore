@@ -1,4 +1,4 @@
-### latest (planned 2.0.6)
+### latest (planned 2.1.0)
 * Improve ADC accuracy when switching references
 * Fix bug with which parts we thought had the external reference, corrected docs. (#211)
 * Change handling of reset cause in bootloader, see #213.
@@ -7,7 +7,13 @@
 * Fix EEPROM library, no more USERROW - this is just the standard EEPROM library. (#200, #168)
 * Add USERSIG library for writing to the USERROW (also called USER_SIGNATURE)
 * Writing to flash from app now works on Optiboot parts (Thanks @WestFW) (#212, #233)
-* Move to conservative settings for SUT, lower BOD sampling frequency. (#202)
+* Add options for SUT, BOD sampling frequency (#202)
+* As part of above, rolled all the bod mode options into one menu; this rules out nonsensical options (ex, enabled hold wake until BOD started, when BOD is not disabled in sleep, or more stringent BOD while in sleep)
+* Wire no longer tries turning on pullups; this caused problems when switching between master and slave, and the internal pullups just arent strong enough for this
+* Moved USE_TIMERD_PWM to the variant files instead of boards.txt
+* Corrected maximum sketch size for parts with less than 24 pins when using Optiboot.
+* Added support for reprogrammming UPDI pin on non-Optiboot board definitions (requires HV UPDI)
+* Added support for external 32.768 kHz oscillator as millis source
 
 ### 2.0.5
 * Internal change to ADC initialization (saves a bit of flash) and init_ADC1() function for parts that have ADC1.

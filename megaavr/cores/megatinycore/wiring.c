@@ -27,8 +27,12 @@
 
 #ifndef MILLIS_USE_TIMERNONE
 
-#ifdef MILLIS_USE_TIMERRTC_XTAL
+#if (defined(MILLIS_USE_TIMERRTC_XTAL)|defined(MILLIS_USE_TIMERRTC_XOSC))
   #define MILLIS_USE_TIMERRTC
+#endif
+
+#ifdef MILLIS_USE_TIMERRTC
+  #warning "Warning: Significant changes are planned for near-future releases of megaTinyCore relating to use of the RTC for millis()."
 #endif
 
 //volatile uint16_t microseconds_per_timer_overflow;
@@ -493,13 +497,16 @@ void delayMicroseconds(unsigned int us)
       while(RTC.STATUS); //if RTC is currently busy, spin until it's not.
       // to do: add support for RTC timer initialization
       RTC.PER=0xFFFF;
-    #ifdef MILLIS_USE_TIMERRTC_XTAL
-      _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA,0x03);
-      RTC.CLKSEL=2; //external crystal
-    #else
-      _PROTECTED_WRITE(CLKCTRL.OSC32KCTRLA,0x02);
-      //RTC.CLKSEL=0; this is the power on value
-    #endif
+      #if defined(MILLIS_USE_TIMERRTC_XTAL)
+        _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA,CLKCTRL_CSUT_16K_gc|CLKCTRL_ENABLE_bm|CLKCTRL_RUNSTDBY_bm);
+        RTC.CLKSEL=2; //external crystal
+      #elif defined(MILLIS_USE_TIMERRTC_XOSC)
+        _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA,CLKCTRL_SEL_bm|CLKCTRL_ENABLE_bm|CLKCTRL_RUNSTDBY_bm);
+        RTC.CLKSEL=2; //external crystal
+      #else
+        _PROTECTED_WRITE(CLKCTRL.OSC32KCTRLA,CLKCTRL_RUNSTDBY_bm;
+        //RTC.CLKSEL=0; this is the power on value
+      #endif
       RTC.INTCTRL=0x01; //enable overflow interupt
       RTC.CTRLA=(RTC_RUNSTDBY_bm|RTC_RTCEN_bm|RTC_PRESCALER_DIV32_gc);//fire it up, prescale by 32.
 
@@ -537,13 +544,7 @@ void init()
   // work there
 
 /******************************** CLOCK STUFF *********************************/
-  #if (EXTERNAL_CLOCK_SOURCE)
-    #if (F_CPU==20000000 || F_CPU==16000000|| F_CPU==12000000 || F_CPU==10000000 || F_CPU==8000000 ||F_CPU==5000000 || F_CPU==4000000 || F_CPU=1000000)
-
-    #else
-
-    #endif
-  #else //we're using internal clock
+  #if (CLOCK_SOURCE==0)
     #if (F_CPU == 20000000)
       /* No division on clock */
       _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
@@ -572,13 +573,18 @@ void init()
       /* Clock DIV8 */
       _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
     #else
-
       #ifndef F_CPU
         #error "F_CPU not defined"
       #else
         #error "F_CPU defined as an unsupported value"
       #endif
     #endif
+  #elif (CLOCK_SOURCE==2)
+    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA,CLKCTRL_CLKSEL_EXTCLK_gc);
+    while (CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm ); //This either works, or hangs the chip - EXTS is pretty much useless here.
+    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+  #else
+    #error "CLOCK_SOURCE isn't 0 (internal) or 2 (external CLOCK); one of these options must be selected for all boards."
   #endif
 
 
