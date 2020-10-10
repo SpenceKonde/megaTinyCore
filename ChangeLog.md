@@ -9,11 +9,16 @@
 * Writing to flash from app now works on Optiboot parts (Thanks @WestFW) (#212, #233)
 * Add options for SUT, BOD sampling frequency (#202)
 * As part of above, rolled all the bod mode options into one menu; this rules out nonsensical options (ex, enabled hold wake until BOD started, when BOD is not disabled in sleep, or more stringent BOD while in sleep)
-* Wire no longer tries turning on pullups; this caused problems when switching between master and slave, and the internal pullups just arent strong enough for this
+* Wire no longer tries turning on pullups; this caused problems when switching between master and slave, and the internal pullups just arent strong enough for this! (#223)
 * Moved USE_TIMERD_PWM to the variant files instead of boards.txt
 * Corrected maximum sketch size for parts with less than 24 pins when using Optiboot.
 * Added support for reprogrammming UPDI pin on non-Optiboot board definitions (requires HV UPDI)
-* Added support for external 32.768 kHz oscillator as millis source
+* Added support for external 32.768 kHz oscillator as millis source (#238)
+* Actually fix bug with names of exported binaries
+* In order to maintain compatibility, F() macro now behaves just the same as on official boards. This comes at a cost of performance and size, but allows interoperability with major libraries (#216)
+* Fixed bug with millis conversion with RTC (any) as clock source (#327)
+* Added support for external clock sources, including ones that attempt to overclock the device.
+* Added support for ignoring SerialEvent - this little used and ill-conceived feature imposes a significant cost in time on all parts whether they use it or nor
 
 ### 2.0.5
 * Internal change to ADC initialization (saves a bit of flash) and init_ADC1() function for parts that have ADC1.

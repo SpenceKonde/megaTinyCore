@@ -40,6 +40,7 @@
 // The Serialx_available is just a wrapper around Serialx.available(),
 // but we can refer to it weakly so we don't pull in the entire
 // UART instance if the user doesn't also refer to it.
+#ifndef NOSERIALEVENT
 #if defined(HAVE_HWSERIAL0)
 void serialEvent() __attribute__((weak));
 bool Serial0_available() __attribute__((weak));
@@ -75,7 +76,7 @@ void serialEventRun(void)
   if (Serial3_available && serialEvent3 && Serial3_available()) serialEvent3();
 #endif
 }
-
+#endif
 // macro to guard critical sections when needed for large TX buffer sizes
 #if (SERIAL_TX_BUFFER_SIZE > 256)
 #define TX_BUFFER_ATOMIC ATOMIC_BLOCK(ATOMIC_RESTORESTATE)

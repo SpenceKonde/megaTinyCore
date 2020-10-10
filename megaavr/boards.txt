@@ -1,10 +1,10 @@
 # See: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
 
-
 menu.chip=Chip
 menu.clock=Clock (change 20/10/5 int<->other=burn bootloader)
 menu.millis=millis()/micros()
 menu.uartvoltage=Voltage for UART baud calc
+menu.serialevent=Support SerialEvent
 menu.bodvoltage=BOD Voltage (Bootload burn req'd)
 menu.bodmode=BOD Mode Active/Sleeping (Bootload burn req'd)
 menu.eesave=Save EEPROM (Bootload burn req'd)
@@ -12,8 +12,6 @@ menu.startuptime=Startup Time (Bootload burn req'd)
 menu.bootloaderuart=UART for Bootloader (Bootload burn req'd)
 menu.resetpin=UPDI Pin, READ DOCS or pick UPDI! (Bootload burn req'd)
 menu.resetpinopti=UPDI/reset pin (Bootload burn req'd)
-
-
 
 ##############################################################
 
@@ -144,7 +142,6 @@ atxy7.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy7.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy7.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-
 atxy7.menu.eesave.enable=EEPROM retained
 atxy7.menu.eesave.enable.bootloader.eesavebit=1
 atxy7.menu.eesave.disable=EEPROM not retained
@@ -168,7 +165,6 @@ atxy7.menu.millis.rtc.build.millistimer=RTC
 atxy7.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy7.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-
 atxy7.menu.resetpin.UPDI=UPDI (pick this unless you have an HV UPDI programmer!)
 atxy7.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy7.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
@@ -183,19 +179,22 @@ atxy7.menu.startuptime.8.bootloader.SYSCFG1=0x03
 atxy7.menu.startuptime.1.bootloader.SYSCFG1=0x01
 atxy7.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
-
 atxy7.menu.uartvoltage.5v=Closer to 5v
 atxy7.menu.uartvoltage.3v=Closer to 3v
 atxy7.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy7.menu.uartvoltage.3v.build.uartvoltage=3V
 
+atxy7.menu.serialevent.no=No (saves space)
+atxy7.menu.serialevent.yes=Yes
+atxy7.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+atxy7.menu.serialevent.yes.build.serialevent=
 
 atxy7.upload.tool=avrdude
 
 atxy7.build.core=megatinycore
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags={build.millis} -DUARTBAUD{build.uartvoltage}
+atxy7.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
@@ -218,7 +217,7 @@ atxy6.build.core=megatinycore
 atxy6.build.mcu=attiny{build.attiny}
 atxy6.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy6.build.f_cpu={build.speed}000000L
-atxy6.build.extra_flags={build.millis} -DUARTBAUD{build.uartvoltage}
+atxy6.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy6.build.export_merged_output=false
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
@@ -357,12 +356,10 @@ atxy6.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy6.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy6.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-
 atxy6.menu.eesave.enable=EEPROM retained
 atxy6.menu.eesave.enable.bootloader.eesavebit=1
 atxy6.menu.eesave.disable=EEPROM not retained
 atxy6.menu.eesave.disable.bootloader.eesavebit=0
-
 
 atxy6.menu.millis.enabled=Enabled (default timer)
 atxy6.menu.millis.disabled=Disabled (saves flash)
@@ -381,7 +378,6 @@ atxy6.menu.millis.timerb1.build.millistimer=B1
 atxy6.menu.millis.rtc.build.millistimer=RTC
 atxy6.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy6.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
-
 
 atxy6.menu.resetpin.UPDI=UPDI (pick this unless you have an HV UPDI programmer!)
 atxy6.menu.resetpin.UPDI.bootloader.resetpinbits=01
@@ -402,11 +398,7 @@ atxy6.menu.uartvoltage.3v=Closer to 3v
 atxy6.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
 
-
-
 ##############################################################
-
-
 
 atxy4.name=ATtiny1614/1604/814/804/414/404/214/204
 atxy4.upload.workaround=
@@ -416,7 +408,13 @@ atxy4.build.millistimer=D0
 atxy4.bootloader.OSCCFG=0x01
 atxy4.build.bootload=
 atxy4.build.board=generic_txy4
+atxy4.menu.serialevent.no=No (saves space)
+atxy4.menu.serialevent.yes=Yes
+atxy4.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+atxy4.menu.serialevent.yes.build.serialevent=
+
 atxy4.upload.tool=avrdude
+
 atxy4.bootloader.tool=avrdude
 atxy4.bootloader.flashcommand=
 atxy4.build.core=megatinycore
@@ -562,7 +560,6 @@ atxy4.menu.eesave.enable.bootloader.eesavebit=1
 atxy4.menu.eesave.disable=EEPROM not retained
 atxy4.menu.eesave.disable.bootloader.eesavebit=0
 
-
 atxy4.menu.millis.enabled=Enabled (default timer)
 atxy4.menu.millis.disabled=Disabled (saves flash)
 atxy4.menu.millis.timera=TCA0 (default on 0-series)
@@ -581,7 +578,6 @@ atxy4.menu.millis.rtc.build.millistimer=RTC
 atxy4.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy4.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-
 atxy4.menu.resetpin.UPDI=UPDI (pick this unless you have an HV UPDI programmer!)
 atxy4.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy4.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
@@ -596,15 +592,12 @@ atxy4.menu.startuptime.8.bootloader.SYSCFG1=0x03
 atxy4.menu.startuptime.1.bootloader.SYSCFG1=0x01
 atxy4.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
-
 atxy4.menu.uartvoltage.5v=Closer to 5v
 atxy4.menu.uartvoltage.3v=Closer to 3v
 atxy4.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy4.menu.uartvoltage.3v.build.uartvoltage=3V
 
-
-
-atxy4.build.extra_flags={build.millis} -DUARTBAUD{build.uartvoltage}
+atxy4.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.WDTCFG=0x00
@@ -613,8 +606,6 @@ atxy4.bootloader.TCD0CFG=0x00
 atxy4.bootloader.APPEND=0x00
 atxy4.bootloader.BOOTEND=0x00
 atxy2.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
-
-
 
 ##############################################################
 
@@ -626,10 +617,15 @@ atxy2.build.board=generic_txy2
 atxy2.build.mcu=attiny{build.attiny}
 atxy2.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy2.build.f_cpu={build.speed}000000L
+atxy2.menu.serialevent.no=No (saves space)
+atxy2.menu.serialevent.yes=Yes
+atxy2.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+atxy2.menu.serialevent.yes.build.serialevent=
+
 atxy2.upload.tool=avrdude
+
 atxy2.bootloader.flashcommand=
 atxy2.bootloader.tool=avrdude
-
 
 atxy2.menu.chip.412=ATtiny412
 atxy2.menu.chip.412.build.board=ATtiny412
@@ -751,7 +747,6 @@ atxy2.menu.eesave.enable.bootloader.eesavebit=1
 atxy2.menu.eesave.disable=EEPROM not retained
 atxy2.menu.eesave.disable.bootloader.eesavebit=0
 
-
 atxy2.menu.millis.enabled=Enabled (default timer)
 atxy2.menu.millis.disabled=Disabled (saves flash)
 atxy2.menu.millis.timera=TCA0 (default on 402/202)
@@ -764,18 +759,15 @@ atxy2.menu.millis.timerd.build.millistimer=D0
 atxy2.menu.millis.timerb0.build.millistimer=B0
 atxy2.menu.millis.rtc.build.millistimer=RTC
 
-
-
 atxy2.menu.uartvoltage.5v=Closer to 5v
 atxy2.menu.uartvoltage.3v=Closer to 3v
 atxy2.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy2.menu.uartvoltage.3v.build.uartvoltage=3V
 
-
 atxy2.build.core=megatinycore
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
-atxy2.build.extra_flags={build.millis} -DUARTBAUD{build.uartvoltage}
+atxy2.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
@@ -798,7 +790,6 @@ Xplained416.build.mcu=attiny{build.attiny}
 Xplained416.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 Xplained416.build.f_cpu={build.speed}000000L
 
-
 Xplained416.build.attiny=416
 Xplained416.build.board=attinyxy6
 Xplained416.build.core=megatinycore
@@ -806,8 +797,14 @@ Xplained416.build.variant=txy6
 Xplained416.build.speed=20
 Xplained416.build.clocksource=0
 Xplained416.build.text_section_start=.text=0x200
-Xplained416.build.extra_flags={build.millis} -DUARTBAUD5V
+Xplained416.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD5V
+Xplained416.menu.serialevent.no=No (saves space)
+Xplained416.menu.serialevent.yes=Yes
+Xplained416.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+Xplained416.menu.serialevent.yes.build.serialevent=
+
 Xplained416.upload.tool=avrdude
+
 Xplained416.upload.speed=57600
 Xplained416.upload.maximum_size=3584
 Xplained416.upload.maximum_data_size=256
@@ -824,8 +821,6 @@ Xplained416.bootloader.TCD0CFG=0x00
 Xplained416.bootloader.SYSCFG0=0xC9
 Xplained416.bootloader.SYSCFG1=0x07
 Xplained416.bootloader.APPEND=0x00
-
-
 
 Xplained416.menu.millis.enabled=Enabled (default timer)
 Xplained416.menu.millis.disabled=Disabled (saves flash)
@@ -844,8 +839,6 @@ Xplained416.menu.millis.rtc.build.millistimer=RTC
 Xplained416.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 Xplained416.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-
-
 Xplained817.name=Attiny817 Xplained Mini (optiboot)
 Xplained817.upload.workaround=
 Xplained817.build.millistimer=D0
@@ -854,7 +847,6 @@ Xplained817.build.mcu=attiny{build.attiny}
 Xplained817.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 Xplained817.build.f_cpu={build.speed}000000L
 
-
 Xplained817.build.attiny=817
 Xplained817.build.board=attinyxy7
 Xplained817.build.core=megatinycore
@@ -862,8 +854,14 @@ Xplained817.build.variant=txy7
 Xplained817.build.speed=20
 Xplained817.build.clocksource=0
 Xplained817.build.text_section_start=.text=0x200
-Xplained817.build.extra_flags={build.millis} -DUARTBAUD5V
+Xplained817.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD5V
+Xplained817.menu.serialevent.no=No (saves space)
+Xplained817.menu.serialevent.yes=Yes
+Xplained817.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+Xplained817.menu.serialevent.yes.build.serialevent=
+
 Xplained817.upload.tool=avrdude
+
 Xplained817.upload.speed=57600
 Xplained817.upload.maximum_size=7680
 Xplained817.upload.maximum_data_size=512
@@ -880,8 +878,6 @@ Xplained817.bootloader.TCD0CFG=0x00
 Xplained817.bootloader.SYSCFG0=0xC9
 Xplained817.bootloader.SYSCFG1=0x07
 Xplained817.bootloader.APPEND=0x00
-
-
 
 Xplained817.menu.millis.enabled=Enabled (default timer)
 Xplained817.menu.millis.disabled=Disabled (saves flash)
@@ -900,9 +896,6 @@ Xplained817.menu.millis.rtc.build.millistimer=RTC
 Xplained817.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 Xplained817.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-
-
-
 # Separate board types for chips with Optiboot.  Reduces menu clutter.
 
 atxy7o.name=ATtiny3217/1617/1607/817/807/417 (Optiboot)
@@ -913,8 +906,6 @@ atxy7o.build.mcu=attiny{build.attiny}
 atxy7o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy7o.build.f_cpu={build.speed}000000L
 atxy7o.upload.speed=115200
-
-
 
 atxy7o.menu.chip.3217=ATtiny3217
 atxy7o.menu.chip.3217.build.board=ATtiny3217
@@ -1035,7 +1026,6 @@ atxy7o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy7o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy7o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-
 atxy7o.menu.millis.enabled=Enabled (default timer)
 atxy7o.menu.millis.disabled=Disabled (saves flash)
 atxy7o.menu.millis.timera=TCA0 (default on 0-series)
@@ -1053,8 +1043,6 @@ atxy7o.menu.millis.timerb1.build.millistimer=B1
 atxy7o.menu.millis.rtc.build.millistimer=RTC
 atxy7o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy7o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
-
-
 
 atxy7o.menu.resetpinopti.UPDI=UPDI (powercycle to enter bootloader)
 atxy7o.menu.resetpinopti.UPDI.bootloader.file=optiboot_x/optiboot_txy7{bootloader.uartswap}.hex
@@ -1083,12 +1071,17 @@ atxy7o.menu.bootloaderuart.alternate=TX:18, RX:19
 atxy7o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy7o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
+atxy7o.menu.serialevent.no=No (saves space)
+atxy7o.menu.serialevent.yes=Yes
+atxy7o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+atxy7o.menu.serialevent.yes.build.serialevent=
+
 atxy7o.upload.tool=avrdude
 
 atxy7o.build.board=attinyxy7
 atxy7o.build.core=megatinycore
 atxy7o.build.variant=txy7
-atxy7o.build.extra_flags={build.millis} -DUARTBAUD{build.uartvoltage}
+atxy7o.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy7o.build.export_merged_output=true
 
 atxy7o.bootloader.WDTCFG=0x00
@@ -1114,8 +1107,6 @@ atxy6o.build.mcu=attiny{build.attiny}
 atxy6o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy6o.build.f_cpu={build.speed}000000L
 atxy6o.upload.speed=115200
-
-
 
 atxy6o.menu.chip.3216=ATtiny3216
 atxy6o.menu.chip.3216.build.board=ATtiny3216
@@ -1207,7 +1198,6 @@ atxy6o.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy6o.menu.clock.5internal.bootloader.OSCCFG=0x02
 # all others are handled by the default of 16 MHz
 
-
 atxy6o.menu.millis.enabled=Enabled (default timer)
 atxy6o.menu.millis.disabled=Disabled (saves flash)
 atxy6o.menu.millis.timera=TCA0 (default on 0-series)
@@ -1225,8 +1215,6 @@ atxy6o.menu.millis.timerb1.build.millistimer=B1
 atxy6o.menu.millis.rtc.build.millistimer=RTC
 atxy6o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy6o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
-
-
 
 atxy6o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy6o.menu.bodvoltage.2v6=2.6V (10 MHz or less)
@@ -1269,13 +1257,11 @@ atxy6o.menu.uartvoltage.3v=Closer to 3v
 atxy6o.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy6o.menu.uartvoltage.3v.build.uartvoltage=3V
 
-
 atxy6o.build.board=attinyxy6
 atxy6o.build.core=megatinycore
 atxy6o.build.variant=txy6
-atxy6o.build.extra_flags={build.millis} -DUARTBAUD{build.uartvoltage}
+atxy6o.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy6o.build.export_merged_output=true
-
 
 atxy6o.menu.resetpinopti.UPDI=UPDI (powercycle to enter bootloader)
 atxy6o.menu.resetpinopti.UPDI.bootloader.file=optiboot_x/optiboot_txy6{bootloader.uartswap}.hex
@@ -1294,9 +1280,12 @@ atxy6o.menu.startuptime.8.bootloader.SYSCFG1=0x03
 atxy6o.menu.startuptime.1.bootloader.SYSCFG1=0x01
 atxy6o.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
+atxy6o.menu.serialevent.no=No (saves space)
+atxy6o.menu.serialevent.yes=Yes
+atxy6o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+atxy6o.menu.serialevent.yes.build.serialevent=
 
 atxy6o.upload.tool=avrdude
-
 
 atxy6o.menu.bootloaderuart.default=TX:7, RX:6
 atxy6o.menu.bootloaderuart.alternate=TX:14, RX:15
@@ -1327,8 +1316,6 @@ atxy4o.build.mcu=attiny{build.attiny}
 atxy4o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy4o.build.f_cpu={build.speed}000000L
 atxy4o.upload.speed=115200
-
-
 
 atxy4o.menu.chip.1614=ATtiny1614
 atxy4o.menu.chip.1614.build.board=ATtiny1614
@@ -1425,7 +1412,6 @@ atxy4o.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy4o.menu.clock.5internal.bootloader.OSCCFG=0x02
 # all others are handled by the default of 16 MHz
 
-
 atxy4o.menu.millis.enabled=Enabled (default timer)
 atxy4o.menu.millis.disabled=Disabled (saves flash)
 atxy4o.menu.millis.timera=TCA0 (default on 0-series)
@@ -1443,8 +1429,6 @@ atxy4o.menu.millis.timerb1.build.millistimer=B1
 atxy4o.menu.millis.rtc.build.millistimer=RTC
 atxy4o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy4o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
-
-
 
 atxy4o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy4o.menu.bodvoltage.2v6=2.6V (10 MHz or less)
@@ -1487,21 +1471,23 @@ atxy4o.menu.uartvoltage.3v=Closer to 3v
 atxy4o.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy4o.menu.uartvoltage.3v.build.uartvoltage=3V
 
-
+atxy4o.menu.serialevent.no=No (saves space)
+atxy4o.menu.serialevent.yes=Yes
+atxy4o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+atxy4o.menu.serialevent.yes.build.serialevent=
 
 atxy4o.upload.tool=avrdude
 
 atxy4o.build.board=attinyxy4
 atxy4o.build.core=megatinycore
 atxy4o.build.variant=txy4
-atxy4o.build.extra_flags={build.millis} -DUARTBAUD{build.uartvoltage}
+atxy4o.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy4o.build.export_merged_output=true
 atxy4o.upload.protocol=arduino
 atxy4o.upload.extra_params=-D
 atxy4o.build.text_section_start=.text=0x200
 atxy4o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
 atxy4o.bootloader.tool=avrdude
-
 
 atxy4o.menu.bootloaderuart.default=TX:5, RX:4
 atxy4o.menu.bootloaderuart.alternate=TX:8, RX:9
@@ -1525,14 +1511,12 @@ atxy4o.menu.startuptime.8.bootloader.SYSCFG1=0x03
 atxy4o.menu.startuptime.1.bootloader.SYSCFG1=0x01
 atxy4o.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
-
 atxy4o.bootloader.WDTCFG=0x00
 atxy4o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy4o.bootloader.TCD0CFG=0x00
 atxy4o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy4o.bootloader.APPEND=0x00
 atxy4o.bootloader.BOOTEND=0x02
-
 
 ##############################################################
 
@@ -1544,8 +1528,6 @@ atxy2o.build.mcu=attiny{build.attiny}
 atxy2o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy2o.build.f_cpu={build.speed}000000L
 atxy2o.upload.speed=115200
-
-
 
 atxy2o.menu.chip.412=ATtiny412
 atxy2o.menu.chip.412.build.board=ATtiny412
@@ -1626,7 +1608,6 @@ atxy2o.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy2o.menu.clock.5internal.bootloader.OSCCFG=0x02
 # all others are handled by the default of 16 MHz
 
-
 atxy2o.menu.millis.enabled=Enabled (default timer)
 atxy2o.menu.millis.disabled=Disabled (saves flash)
 atxy2o.menu.millis.timera=TCA0 (default on 402/202)
@@ -1680,8 +1661,13 @@ atxy2o.menu.bootloaderuart.alternate=TX:2 (PA1), RX:3 (PA2)
 atxy2o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy2o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
+atxy2o.menu.serialevent.no=No (saves space)
+atxy2o.menu.serialevent.yes=Yes
+atxy2o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+atxy2o.menu.serialevent.yes.build.serialevent=
 
 atxy2o.upload.tool=avrdude
+
 atxy2o.upload.protocol=arduino
 atxy2o.upload.extra_params=-D
 atxy2o.build.text_section_start=.text=0x200
@@ -1691,7 +1677,7 @@ atxy2o.bootloader.tool=avrdude
 atxy2o.build.board=attinyxy2
 atxy2o.build.core=megatinycore
 atxy2o.build.variant=txy2
-atxy2o.build.extra_flags={build.millis} -DUARTBAUD{build.uartvoltage}
+atxy2o.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy2o.build.export_merged_output=true
 
 atxy2o.menu.uartvoltage.5v=Closer to 5v

@@ -44,7 +44,9 @@ int main(void)
 
 	for (;;) {
 		loop();
+    #ifndef NOSERIALEVENT
 		if (serialEventRun) serialEventRun();
+    #endif
 	}
 
 	return 0;
