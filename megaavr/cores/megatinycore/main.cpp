@@ -32,23 +32,23 @@ void setupUSB() { }
 
 int main(void)
 {
-	init();
+  init();
 
-	initVariant();
+  initVariant();
 
 #if defined(USBCON)
-	USBDevice.attach();
+  USBDevice.attach();
 #endif
 
-	setup();
+  setup();
 
-	for (;;) {
-		loop();
+  for (;;) {
+    loop();
     #ifndef NOSERIALEVENT
-		if (serialEventRun) serialEventRun();
+    if (serialEventRun) serialEventRun();
     #endif
-	}
+  }
 
-	return 0;
+  return 0;
 }
 

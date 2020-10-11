@@ -145,8 +145,8 @@ bool UartClass::pins(uint8_t tx, uint8_t rx)
   for (_pin_set = 0; _pin_set < SERIAL_PIN_SETS; ++_pin_set) {
     if (tx == _hw_set[_pin_set].tx_pin && rx == _hw_set[_pin_set].rx_pin) {
       // We are good, this set of pins is supported
- 	  return true;
- 	}
+     return true;
+   }
   }
   _pin_set = 0; // Default to standard
   return false;

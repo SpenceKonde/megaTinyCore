@@ -128,9 +128,9 @@ class UartClass : public HardwareSerial
     volatile USART_t * const _hwserial_module;
 
     struct UartPinSet {
- 	    uint8_t const rx_pin;
- 	    uint8_t const tx_pin;
- 	    uint8_t const mux;
+       uint8_t const rx_pin;
+       uint8_t const tx_pin;
+       uint8_t const mux;
     } _hw_set[SERIAL_PIN_SETS];
 
     uint8_t _pin_set;
@@ -176,7 +176,7 @@ class UartClass : public HardwareSerial
     // Interrupt handlers - Not intended to be called externally
     inline void _rx_complete_irq(void);
     void _tx_data_empty_irq(void);
-    
+
   private:
     void _poll_tx_data_empty(void);
 };

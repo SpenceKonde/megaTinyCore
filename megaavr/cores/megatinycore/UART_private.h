@@ -23,7 +23,7 @@
 
 #include "wiring_private.h"
 
-// this next line disables the entire UART.cpp, 
+// this next line disables the entire UART.cpp,
 // this is so I can support Attiny series and any other chip without a uart
 #if defined(HAVE_HWSERIAL0) || defined(HAVE_HWSERIAL1) || defined(HAVE_HWSERIAL2) || defined(HAVE_HWSERIAL3)
 
@@ -40,7 +40,7 @@ UartClass::UartClass(
   volatile uint8_t uart_mux_swap) :
     _hwserial_module(hwserial_module),
     _hw_set { { hwserial_rx_pin, hwserial_tx_pin, uart_mux },
- 	          { hwserial_rx_pin_swap, hwserial_tx_pin_swap, uart_mux_swap } },
+             { hwserial_rx_pin_swap, hwserial_tx_pin_swap, uart_mux_swap } },
     _pin_set(0),
     _written(false),
     _rx_buffer_head(0), _rx_buffer_tail(0),
