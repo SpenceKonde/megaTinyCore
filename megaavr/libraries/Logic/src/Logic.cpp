@@ -308,7 +308,7 @@ static const struct Logic::CCLBlock blocks[] =
   },
   {
   // Note: 40-Pin version doesn't have output_alt, but the parts cannot
-  // be programatically distinguished - it's a 48-pin die in 40-pin package
+  // be programmatically distinguished - it's a 48-pin die in 40-pin package
     1,
     PIN0_bm, PIN1_bm, PIN2_bm, PIN3_bm, PIN6_bm,
     PORTC, PORTC, PORTC,

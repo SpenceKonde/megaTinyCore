@@ -208,7 +208,7 @@ void analogWrite(uint8_t pin, int val)
           cli();
           _PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL|(1<<(6+bit_pos)));
           SREG=sreg;
-          TCD0.CTRLA=TIMERD0_PRESCALER|1; //reenable it
+          TCD0.CTRLA=TIMERD0_PRESCALER|1; //re-enable it
         } else {
           while(!(TCD0.STATUS&0x02)) {;} //if previous sync in progress, wait for it to finish.
           TCD0.CTRLE=0x02; //Synchronize

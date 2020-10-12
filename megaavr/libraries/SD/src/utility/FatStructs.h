@@ -202,12 +202,12 @@ struct biosParmBlock {
   /**
      This field is only defined for FAT32 media and does not exist on
      FAT12 and FAT16 media.
-     Bits 0-3 -- Zero-based number of active FAT.
+     Bits 0-3  -- Zero-based number of active FAT.
                  Only valid if mirroring is disabled.
-     Bits 4-6 -- Reserved.
-     Bit 7	-- 0 means the FAT is mirrored at runtime into all FATs.
-            -- 1 means only one FAT is active; it is the one referenced in bits 0-3.
-     Bits 8-15 	-- Reserved.
+     Bits 4-6  -- Reserved.
+     Bit 7     -- 0 means the FAT is mirrored at runtime into all FATs.
+               -- 1 means only one FAT is active; it is the one referenced in bits 0-3.
+     Bits 8-15 -- Reserved.
   */
   uint16_t fat32Flags;
   /**
