@@ -357,12 +357,12 @@ void setup_timers();
 #error "tinyAVR 2-series parts are not yet supported"
 #endif
 
-#define MEGATINYCORE "2.1.1"
+#define MEGATINYCORE "2.1.2"
 #define MEGATINYCORE_MAJOR 2
 #define MEGATINYCORE_MINOR 1
-#define MEGATINYCORE_PATCH 1
+#define MEGATINYCORE_PATCH 2
 #define MEGATINYCORE_RELEASED 1
-#define MEGATINYCORE_NUM 0x02010001
+#define MEGATINYCORE_NUM 0x02010201
 
 
 

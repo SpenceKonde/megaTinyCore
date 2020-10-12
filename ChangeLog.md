@@ -1,5 +1,5 @@
-### 2.1.1
-* Fix critical compile bug on 20-pin parts due to boards.txt problem.
+### 2.1.1, 2.1.2
+* Fix critical compile bug, then upload bug on 20-pin parts due to boards.txt problem.
 
 ### 2.1.0
 * Improve ADC accuracy when switching references
@@ -12,7 +12,7 @@
 * Writing to flash from app now works on Optiboot parts (Thanks @WestFW) (#212, #233)
 * Add options for SUT, BOD sampling frequency (#202)
 * As part of above, rolled all the bod mode options into one menu; this rules out nonsensical options (ex, enabled hold wake until BOD started, when BOD is not disabled in sleep, or more stringent BOD while in sleep)
-* Wire no longer tries turning on pullups; this caused problems when switching between master and slave, and the internal pullups just arent strong enough for this! (#223)
+* Wire no longer tries turning on pullups; this caused problems when switching between master and slave, and the internal pullups just aren't strong enough for this! (#223)
 * Moved USE_TIMERD_PWM to the variant files instead of boards.txt
 * Corrected maximum sketch size for parts with less than 24 pins when using Optiboot.
 * Added support for reprogrammming UPDI pin on non-Optiboot board definitions (requires HV UPDI)

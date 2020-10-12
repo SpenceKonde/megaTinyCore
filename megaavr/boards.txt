@@ -222,6 +222,14 @@ atxy6.build.export_merged_output=false
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
 
+
+atxy6.menu.serialevent.no=No (saves space)
+atxy6.menu.serialevent.yes=Yes
+atxy6.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+atxy6.menu.serialevent.yes.build.serialevent=
+
+atxy6.upload.tool=avrdude
+
 atxy6.bootloader.tool=avrdude
 atxy6.bootloader.WDTCFG=0x00
 atxy6.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
@@ -399,10 +407,6 @@ atxy6.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
-atxy6.menu.serialevent.no=No (saves space)
-atxy6.menu.serialevent.yes=Yes
-atxy6.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-atxy6.menu.serialevent.yes.build.serialevent=
 
 ##############################################################
 
