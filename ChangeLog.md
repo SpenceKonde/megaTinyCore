@@ -1,5 +1,5 @@
 ### 2.1.1
-* Fix critical compile bug on 20-pin parts
+* Fix critical compile bug on 20-pin parts due to boards.txt problem.
 
 ### 2.1.0
 * Improve ADC accuracy when switching references
