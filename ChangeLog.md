@@ -1,3 +1,6 @@
+### 2.1.1
+* Fix critical compile bug on 20-pin parts
+
 ### 2.1.0
 * Improve ADC accuracy when switching references
 * Fix bug with which parts we thought had the external reference, corrected docs. (#211)

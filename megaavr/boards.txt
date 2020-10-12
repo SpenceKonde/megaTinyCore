@@ -398,6 +398,12 @@ atxy6.menu.uartvoltage.3v=Closer to 3v
 atxy6.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
 
+
+atxy6.menu.serialevent.no=No (saves space)
+atxy6.menu.serialevent.yes=Yes
+atxy6.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+atxy6.menu.serialevent.yes.build.serialevent=
+
 ##############################################################
 
 atxy4.name=ATtiny1614/1604/814/804/414/404/214/204
@@ -764,6 +770,7 @@ atxy2.menu.uartvoltage.3v=Closer to 3v
 atxy2.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy2.menu.uartvoltage.3v.build.uartvoltage=3V
 
+
 atxy2.build.core=megatinycore
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
@@ -855,6 +862,7 @@ Xplained817.build.speed=20
 Xplained817.build.clocksource=0
 Xplained817.build.text_section_start=.text=0x200
 Xplained817.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD5V
+
 Xplained817.menu.serialevent.no=No (saves space)
 Xplained817.menu.serialevent.yes=Yes
 Xplained817.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
