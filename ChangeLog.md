@@ -1,5 +1,5 @@
-### 2.1.1, 2.1.2
-* Fix critical compile bug, then upload bug on 20-pin parts due to boards.txt problem.
+### 2.1.1, 2.1.2, 2.1.3
+Urgent bugfixes for critical regressions introduced in 2.1.0.
 
 ### 2.1.0
 * Improve ADC accuracy when switching references

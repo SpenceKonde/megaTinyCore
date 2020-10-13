@@ -627,6 +627,7 @@ atxy2.build.board=generic_txy2
 atxy2.build.mcu=attiny{build.attiny}
 atxy2.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy2.build.f_cpu={build.speed}000000L
+
 atxy2.menu.serialevent.no=No (saves space)
 atxy2.menu.serialevent.yes=Yes
 atxy2.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
@@ -769,6 +770,20 @@ atxy2.menu.millis.timerd.build.millistimer=D0
 atxy2.menu.millis.timerb0.build.millistimer=B0
 atxy2.menu.millis.rtc.build.millistimer=RTC
 
+atxy2.menu.resetpin.UPDI=UPDI (pick this unless you have an HV UPDI programmer!)
+atxy2.menu.resetpin.UPDI.bootloader.resetpinbits=01
+atxy2.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
+atxy2.menu.resetpin.reset.bootloader.resetpinbits=10
+atxy2.menu.resetpin.gpio=IO (DANGER - Bricks chip w/out HV UPDI programmer! Use PCHV)
+atxy2.menu.resetpin.gpio.bootloader.resetpinbits=00
+
+atxy2.menu.startuptime.8= 8ms - A good default, usually fine
+atxy2.menu.startuptime.1= 1ms - (aggressive/very fast rising power)
+atxy2.menu.startuptime.64= 64ms - (cautious/slow rising power)
+atxy2.menu.startuptime.8.bootloader.SYSCFG1=0x03
+atxy2.menu.startuptime.1.bootloader.SYSCFG1=0x01
+atxy2.menu.startuptime.64.bootloader.SYSCFG1=0x07
+
 atxy2.menu.uartvoltage.5v=Closer to 5v
 atxy2.menu.uartvoltage.3v=Closer to 3v
 atxy2.menu.uartvoltage.5v.build.uartvoltage=5V
@@ -789,8 +804,6 @@ atxy2.bootloader.APPEND=0x00
 atxy2.bootloader.BOOTEND=0x00
 atxy2.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 
-#
-
 # Xplained boards with Tiny-1 chips
 
 Xplained416.name=Attiny416 Xplained Nano (optiboot)
@@ -809,6 +822,7 @@ Xplained416.build.speed=20
 Xplained416.build.clocksource=0
 Xplained416.build.text_section_start=.text=0x200
 Xplained416.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD5V
+
 Xplained416.menu.serialevent.no=No (saves space)
 Xplained416.menu.serialevent.yes=Yes
 Xplained416.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
