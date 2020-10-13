@@ -398,21 +398,21 @@ uint8_t const DIR_ATT_LONG_NAME_MASK = 0X3F;
 /** defined attribute bits */
 uint8_t const DIR_ATT_DEFINED_BITS = 0X3F;
 /** Directory entry is part of a long name */
-static inline uint8_t DIR_IS_LONG_NAME(const dir_t* dir) {
+static inline uint8_t DIR_IS_LONG_NAME(const dir_t *dir) {
   return (dir->attributes & DIR_ATT_LONG_NAME_MASK) == DIR_ATT_LONG_NAME;
 }
 /** Mask for file/subdirectory tests */
 uint8_t const DIR_ATT_FILE_TYPE_MASK = (DIR_ATT_VOLUME_ID | DIR_ATT_DIRECTORY);
 /** Directory entry is for a file */
-static inline uint8_t DIR_IS_FILE(const dir_t* dir) {
+static inline uint8_t DIR_IS_FILE(const dir_t *dir) {
   return (dir->attributes & DIR_ATT_FILE_TYPE_MASK) == 0;
 }
 /** Directory entry is for a subdirectory */
-static inline uint8_t DIR_IS_SUBDIR(const dir_t* dir) {
+static inline uint8_t DIR_IS_SUBDIR(const dir_t *dir) {
   return (dir->attributes & DIR_ATT_FILE_TYPE_MASK) == DIR_ATT_DIRECTORY;
 }
 /** Directory entry is for a file or subdirectory */
-static inline uint8_t DIR_IS_FILE_OR_SUBDIR(const dir_t* dir) {
+static inline uint8_t DIR_IS_FILE_OR_SUBDIR(const dir_t *dir) {
   return (dir->attributes & DIR_ATT_VOLUME_ID) == 0;
 }
 #endif  // FatStructs_h

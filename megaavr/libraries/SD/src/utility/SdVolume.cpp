@@ -23,12 +23,12 @@
 // init cacheBlockNumber_to invalid SD block number
 uint32_t SdVolume::cacheBlockNumber_ = 0XFFFFFFFF;
 cache_t  SdVolume::cacheBuffer_;     // 512 byte cache for Sd2Card
-Sd2Card* SdVolume::sdCard_;          // pointer to SD card object
+Sd2Card *SdVolume::sdCard_;          // pointer to SD card object
 uint8_t  SdVolume::cacheDirty_ = 0;  // cacheFlush() will write block if true
 uint32_t SdVolume::cacheMirrorBlock_ = 0;  // mirror  block for second FAT
 //------------------------------------------------------------------------------
 // find a contiguous group of clusters
-uint8_t SdVolume::allocContiguous(uint32_t count, uint32_t* curCluster) {
+uint8_t SdVolume::allocContiguous(uint32_t count, uint32_t *curCluster) {
   // start of group
   uint32_t bgnCluster;
 
@@ -167,7 +167,7 @@ uint8_t SdVolume::cacheZeroBlock(uint32_t blockNumber) {
 }
 //------------------------------------------------------------------------------
 // return the size in bytes of a cluster chain
-uint8_t SdVolume::chainSize(uint32_t cluster, uint32_t* size) const {
+uint8_t SdVolume::chainSize(uint32_t cluster, uint32_t *size) const {
   uint32_t s = 0;
   do {
     if (!fatGet(cluster, &cluster)) {
@@ -180,7 +180,7 @@ uint8_t SdVolume::chainSize(uint32_t cluster, uint32_t* size) const {
 }
 //------------------------------------------------------------------------------
 // Fetch a FAT entry
-uint8_t SdVolume::fatGet(uint32_t cluster, uint32_t* value) const {
+uint8_t SdVolume::fatGet(uint32_t cluster, uint32_t *value) const {
   if (cluster > (clusterCount_ + 1)) {
     return false;
   }
@@ -272,7 +272,7 @@ uint8_t SdVolume::freeChain(uint32_t cluster) {
    failure include not finding a valid partition, not finding a valid
    FAT file system in the specified partition or an I/O error.
 */
-uint8_t SdVolume::init(Sd2Card* dev, uint8_t part) {
+uint8_t SdVolume::init(Sd2Card *dev, uint8_t part) {
   uint32_t volumeStartBlock = 0;
   sdCard_ = dev;
   // if part == 0 assume super floppy with FAT boot sector in block zero
@@ -284,7 +284,7 @@ uint8_t SdVolume::init(Sd2Card* dev, uint8_t part) {
     if (!cacheRawBlock(volumeStartBlock, CACHE_FOR_READ)) {
       return false;
     }
-    part_t* p = &cacheBuffer_.mbr.part[part - 1];
+    part_t *p = &cacheBuffer_.mbr.part[part - 1];
     if ((p->boot & 0X7F) != 0  ||
         p->totalSectors < 100 ||
         p->firstSector == 0) {
@@ -296,7 +296,7 @@ uint8_t SdVolume::init(Sd2Card* dev, uint8_t part) {
   if (!cacheRawBlock(volumeStartBlock, CACHE_FOR_READ)) {
     return false;
   }
-  bpb_t* bpb = &cacheBuffer_.fbs.bpb;
+  bpb_t *bpb = &cacheBuffer_.fbs.bpb;
   if (bpb->bytesPerSector != 512 ||
       bpb->fatCount == 0 ||
       bpb->reservedSectorCount == 0 ||

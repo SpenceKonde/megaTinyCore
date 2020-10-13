@@ -21,92 +21,86 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-RingBuffer::RingBuffer(rb_index_type size) : size(size)
-{
-    _aucBuffer = (uint8_t*)malloc(size);
-    memset( _aucBuffer, 0, size ) ;
-    clear();
+RingBuffer::RingBuffer(rb_index_type size) : size(size) {
+  _aucBuffer = (uint8_t *)malloc(size);
+  memset(_aucBuffer, 0, size) ;
+  clear();
 }
 
-void RingBuffer::store_char( uint8_t c )
-{
-    rb_index_type i = nextIndex(_iHead);
+void RingBuffer::store_char(uint8_t c) {
+  rb_index_type i = nextIndex(_iHead);
 
-    // if we should be storing the received character into the location
-    // just before the tail (meaning that the head would advance to the
-    // current location of the tail), we're about to overflow the buffer
-    // and so we don't write the character or advance the head.
-    if ( i != _iTail )
-    {
-        if (_iHead < size) {
-            _aucBuffer[_iHead] = c ;
-        } else {
-            additionalBuffer[_iHead - size] = c;
-        }
+  // if we should be storing the received character into the location
+  // just before the tail (meaning that the head would advance to the
+  // current location of the tail), we're about to overflow the buffer
+  // and so we don't write the character or advance the head.
+  if (i != _iTail) {
+    if (_iHead < size) {
+      _aucBuffer[_iHead] = c ;
+    } else {
+      additionalBuffer[_iHead - size] = c;
+    }
     _iHead = i ;
-    }
+  }
 }
 
-void RingBuffer::clear()
-{
-    _iHead = 0;
-    _iTail = 0;
+void RingBuffer::clear() {
+  _iHead = 0;
+  _iTail = 0;
 }
 
-int RingBuffer::read_char()
-{
-    if(_iTail == _iHead)
-        return -1;
+int RingBuffer::read_char() {
+  if (_iTail == _iHead) {
+    return -1;
+  }
 
-    uint8_t value;
-    if (_iTail < size) {
-        value  = _aucBuffer[_iTail];
-    } else {
-        value = additionalBuffer[_iTail - size];
-    }
-    _iTail = nextIndex(_iTail);
+  uint8_t value;
+  if (_iTail < size) {
+    value  = _aucBuffer[_iTail];
+  } else {
+    value = additionalBuffer[_iTail - size];
+  }
+  _iTail = nextIndex(_iTail);
 
-    return value;
+  return value;
 }
 
-int RingBuffer::available()
-{
-    int delta = _iHead - _iTail;
-
-    if(delta < 0)
-        return size + additionalSize + delta;
-    else
-        return delta;
-}
-
-int RingBuffer::availableForStore()
-{
+int RingBuffer::available() {
   int delta = _iHead - _iTail;
-  if (delta >= 0)
+
+  if (delta < 0) {
+    return size + additionalSize + delta;
+  } else {
+    return delta;
+  }
+}
+
+int RingBuffer::availableForStore() {
+  int delta = _iHead - _iTail;
+  if (delta >= 0) {
     return size + additionalSize - 1 - delta;
-  else
+  } else {
     return -delta - 1;
+  }
 }
 
 
-int RingBuffer::peek()
-{
-    if(_iTail == _iHead)
-        return -1;
+int RingBuffer::peek() {
+  if (_iTail == _iHead) {
+    return -1;
+  }
 
-    if (_iTail < size) {
-        return _aucBuffer[_iTail];
-    } else {
-        return additionalBuffer[_iTail - size];
-    }
+  if (_iTail < size) {
+    return _aucBuffer[_iTail];
+  } else {
+    return additionalBuffer[_iTail - size];
+  }
 }
 
-rb_index_type RingBuffer::nextIndex(rb_index_type index)
-{
-    return (rb_index_type)(index + 1) % (size + additionalSize);
+rb_index_type RingBuffer::nextIndex(rb_index_type index) {
+  return (rb_index_type)(index + 1) % (size + additionalSize);
 }
 
-bool RingBuffer::isFull()
-{
-    return (nextIndex(_iHead) == _iTail);
+bool RingBuffer::isFull() {
+  return (nextIndex(_iHead) == _iTail);
 }

@@ -27,7 +27,7 @@
 #include "timers.h"
 
 #if (defined(USE_TIMERD0_PWM) && defined(TCD0))
-#define USE_TIMERD0_PWM
+  #define USE_TIMERD0_PWM
 #endif
 
 #define NUM_DIGITAL_PINS            18

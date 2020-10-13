@@ -38,13 +38,15 @@ void attachInterrupt(uint8_t pin, void (*userFunc)(void), uint8_t mode) {
 
   /* Get bit position and check pin validity */
   uint8_t bit_pos = digitalPinToBitPosition(pin);
-  if(bit_pos == NOT_A_PIN) return;
+  if (bit_pos == NOT_A_PIN) {
+    return;
+  }
 
   /* Get interrupt number from pin */
   uint8_t interruptNum = (digitalPinToPort(pin) * 8) + bit_pos;
 
   /* Check interrupt number and apply function pointer to correct array index */
-  if(interruptNum < EXTERNAL_NUM_INTERRUPTS) {
+  if (interruptNum < EXTERNAL_NUM_INTERRUPTS) {
     intFunc[interruptNum] = userFunc;
 
     // Configure the interrupt mode (trigger on low input, any change, rising
@@ -71,7 +73,7 @@ void attachInterrupt(uint8_t pin, void (*userFunc)(void), uint8_t mode) {
 
     /* Get pointer to correct pin control register */
     PORT_t *port = digitalPinToPortStruct(pin);
-    volatile uint8_t* pin_ctrl_reg = getPINnCTRLregister(port, bit_pos);
+    volatile uint8_t *pin_ctrl_reg = getPINnCTRLregister(port, bit_pos);
 
     /* Clear any previous setting */
     *pin_ctrl_reg &= ~(PORT_ISC_gm);
@@ -84,17 +86,19 @@ void attachInterrupt(uint8_t pin, void (*userFunc)(void), uint8_t mode) {
 void detachInterrupt(uint8_t pin) {
   /* Get bit position and check pin validity */
   uint8_t bit_pos = digitalPinToBitPosition(pin);
-  if(bit_pos == NOT_A_PIN) return;
+  if (bit_pos == NOT_A_PIN) {
+    return;
+  }
 
   /* Get interrupt number from pin */
   uint8_t interruptNum = (digitalPinToPort(pin) * 8) + bit_pos;
 
-  if(interruptNum < EXTERNAL_NUM_INTERRUPTS) {
+  if (interruptNum < EXTERNAL_NUM_INTERRUPTS) {
     // Disable the interrupt.
 
     /* Get pointer to correct pin control register */
     PORT_t *port = digitalPinToPortStruct(pin);
-    volatile uint8_t* pin_ctrl_reg = getPINnCTRLregister(port, bit_pos);
+    volatile uint8_t *pin_ctrl_reg = getPINnCTRLregister(port, bit_pos);
 
     /* Clear ISC setting */
     *pin_ctrl_reg &= ~(PORT_ISC_gm);
@@ -112,16 +116,16 @@ static void port_interrupt_handler(uint8_t port) {
   uint8_t bit_pos = PIN0_bp, bit_mask = PIN0_bm;
 
   /* Iterate through flags */
-  while(bit_pos <= PIN7_bp){
+  while (bit_pos <= PIN7_bp) {
 
     /* Check if flag raised */
-    if(int_flags & bit_mask){
+    if (int_flags & bit_mask) {
 
-    /* Get interrupt */
-    uint8_t interrupt_num = port*8 + bit_pos;
+      /* Get interrupt */
+      uint8_t interrupt_num = port * 8 + bit_pos;
 
       /* Check if function defined */
-      if(intFunc[interrupt_num] != 0){
+      if (intFunc[interrupt_num] != 0) {
 
         /* Call function */
         intFunc[interrupt_num]();
@@ -136,24 +140,24 @@ static void port_interrupt_handler(uint8_t port) {
 }
 
 #define IMPLEMENT_ISR(vect, port) \
-ISR(vect) { \
-  port_interrupt_handler(port);\
-} \
+  ISR(vect) { \
+    port_interrupt_handler(port);\
+  } \
 
 
 IMPLEMENT_ISR(PORTA_PORT_vect, PA)
 #if defined(PORTB_PORT_vect)
-IMPLEMENT_ISR(PORTB_PORT_vect, PB)
+  IMPLEMENT_ISR(PORTB_PORT_vect, PB)
 #endif
 #if defined(PORTC_PORT_vect)
-IMPLEMENT_ISR(PORTC_PORT_vect, PC)
+  IMPLEMENT_ISR(PORTC_PORT_vect, PC)
 #endif
 #if defined(PORTD_PORT_vect)
-IMPLEMENT_ISR(PORTD_PORT_vect, PD)
+  IMPLEMENT_ISR(PORTD_PORT_vect, PD)
 #endif
 #if defined(PORTE_PORT_vect)
-IMPLEMENT_ISR(PORTE_PORT_vect, PE)
+  IMPLEMENT_ISR(PORTE_PORT_vect, PE)
 #endif
 #if defined(PORTF_PORT_vect)
-IMPLEMENT_ISR(PORTF_PORT_vect, PF)
+  IMPLEMENT_ISR(PORTF_PORT_vect, PF)
 #endif

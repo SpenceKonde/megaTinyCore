@@ -1,4 +1,4 @@
-  /***********************************************************************|
+/***********************************************************************|
   | tinyAVR Configurable Custom Logic library                             |
   |                                                                       |
   | Three_input_AND.ino                                                   |
@@ -44,13 +44,13 @@ void setup() {
   Logic0.enable = true;               // Enable logic block 0
 
   //For ATtiny parts, we have to work around PA0 being UPDI
-  pinMode(PIN_PA3,INPUT_PULLUP);                    // Could be done faster with direct port writes
+  pinMode(PIN_PA3, INPUT_PULLUP);                   // Could be done faster with direct port writes
   #ifdef EVSYS_CHANNEL0 //means it's a 2-series, where the event system works like it does on everything other than the tinyAVR 0/1-series
-    EVSYS.CHANNEL0=EVSYS_CHANNEL0_PORTA_PIN3_gc;
-    EVSYS.USERCCLLUT0A=EVSYS_USER_CHANNEL0_gc;
+  EVSYS.CHANNEL0 = EVSYS_CHANNEL0_PORTA_PIN3_gc;
+  EVSYS.USERCCLLUT0A = EVSYS_USER_CHANNEL0_gc;
   #else //it's a tinyAVR 0/1
-    EVSYS.ASYNCCH0 = EVSYS_ASYNCCH0_PORTA_PIN3_gc;    //
-    EVSYS.ASYNCUSER2 = EVSYS_ASYNCUSER2_ASYNCCH0_gc;  // ASYNCUSER2 is LUT0 event 0
+  EVSYS.ASYNCCH0 = EVSYS_ASYNCCH0_PORTA_PIN3_gc;    //
+  EVSYS.ASYNCUSER2 = EVSYS_ASYNCUSER2_ASYNCCH0_gc;  // ASYNCUSER2 is LUT0 event 0
   #endif
   Logic0.input0 = in::event_a;                      // Use LUT event 0/a as input 0
 

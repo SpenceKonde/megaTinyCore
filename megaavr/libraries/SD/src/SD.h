@@ -46,7 +46,7 @@ namespace SDLib {
       uint32_t size();
       void close();
       operator bool();
-      char * name();
+      char *name();
 
       boolean isDirectory(void);
       File openNextFile(uint8_t mode = O_RDONLY);
@@ -116,7 +116,7 @@ namespace SDLib {
       int fileOpenMode;
 
       friend class File;
-      friend boolean callback_openPath(SdFile&, const char *, boolean, void *);
+      friend boolean callback_openPath(SdFile &, const char *, boolean, void *);
   };
 
   extern SDClass SD;

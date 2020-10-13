@@ -211,20 +211,20 @@ class Sd2Card {
     uint8_t partialBlockRead(void) const {
       return partialBlockRead_;
     }
-    uint8_t readBlock(uint32_t block, uint8_t* dst);
+    uint8_t readBlock(uint32_t block, uint8_t *dst);
     uint8_t readData(uint32_t block,
-                     uint16_t offset, uint16_t count, uint8_t* dst);
+                     uint16_t offset, uint16_t count, uint8_t *dst);
     /**
        Read a cards CID register. The CID contains card identification
        information such as Manufacturer ID, Product name, Product serial
        number and Manufacturing date. */
-    uint8_t readCID(cid_t* cid) {
+    uint8_t readCID(cid_t *cid) {
       return readRegister(CMD10, cid);
     }
     /**
        Read a cards CSD register. The CSD contains Card-Specific Data that
        provides information regarding access to the card's contents. */
-    uint8_t readCSD(csd_t* csd) {
+    uint8_t readCSD(csd_t *csd) {
       return readRegister(CMD9, csd);
     }
     void readEnd(void);
@@ -236,8 +236,8 @@ class Sd2Card {
     uint8_t type(void) const {
       return type_;
     }
-    uint8_t writeBlock(uint32_t blockNumber, const uint8_t* src, uint8_t blocking = 1);
-    uint8_t writeData(const uint8_t* src);
+    uint8_t writeBlock(uint32_t blockNumber, const uint8_t *src, uint8_t blocking = 1);
+    uint8_t writeData(const uint8_t *src);
     uint8_t writeStart(uint32_t blockNumber, uint32_t eraseCount);
     uint8_t writeStop(void);
     uint8_t isBusy(void);
@@ -259,7 +259,7 @@ class Sd2Card {
     void error(uint8_t code) {
       errorCode_ = code;
     }
-    uint8_t readRegister(uint8_t cmd, void* buf);
+    uint8_t readRegister(uint8_t cmd, void *buf);
     uint8_t sendWriteCommand(uint32_t blockNumber, uint32_t eraseCount);
     void chipSelectHigh(void);
     void chipSelectLow(void);
@@ -267,7 +267,7 @@ class Sd2Card {
       type_ = value;
     }
     uint8_t waitNotBusy(unsigned int timeoutMillis);
-    uint8_t writeData(uint8_t token, const uint8_t* src);
+    uint8_t writeData(uint8_t token, const uint8_t *src);
     uint8_t waitStartBlock(void);
 };
 #endif  // Sd2Card_h

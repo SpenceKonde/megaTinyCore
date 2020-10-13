@@ -117,8 +117,8 @@ namespace SDLib {
 
 
 
-  boolean walkPath(const char *filepath, SdFile& parentDir,
-                   boolean(*callback)(SdFile& parentDir,
+  boolean walkPath(const char *filepath, SdFile &parentDir,
+                   boolean(*callback)(SdFile &parentDir,
                                       const char *filePathComponent,
                                       boolean isLastComponent,
                                       void *object),
@@ -232,7 +232,7 @@ namespace SDLib {
 
   */
 
-  boolean callback_pathExists(SdFile& parentDir, const char *filePathComponent,
+  boolean callback_pathExists(SdFile &parentDir, const char *filePathComponent,
                               boolean /* isLastComponent */, void * /* object */) {
     /*
 
@@ -255,7 +255,7 @@ namespace SDLib {
 
 
 
-  boolean callback_makeDirPath(SdFile& parentDir, const char *filePathComponent,
+  boolean callback_makeDirPath(SdFile &parentDir, const char *filePathComponent,
                                boolean isLastComponent, void *object) {
     /*
 
@@ -310,7 +310,7 @@ namespace SDLib {
 
 
 
-  boolean callback_remove(SdFile& parentDir, const char *filePathComponent,
+  boolean callback_remove(SdFile &parentDir, const char *filePathComponent,
                           boolean isLastComponent, void * /* object */) {
     if (isLastComponent) {
       return SdFile::remove(parentDir, filePathComponent);
@@ -318,7 +318,7 @@ namespace SDLib {
     return true;
   }
 
-  boolean callback_rmdir(SdFile& parentDir, const char *filePathComponent,
+  boolean callback_rmdir(SdFile &parentDir, const char *filePathComponent,
                          boolean isLastComponent, void * /* object */) {
     if (isLastComponent) {
       SdFile f;

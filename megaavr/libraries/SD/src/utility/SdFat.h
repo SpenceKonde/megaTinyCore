@@ -41,17 +41,17 @@ class SdVolume;
 // SdFile class
 
 #ifdef O_RDONLY //ARDUINO_ARCH_MBED
-#undef O_READ
-#undef O_RDONLY
-#undef O_WRITE
-#undef O_WRONLY
-#undef O_RDWR
-#undef O_ACCMODE
-#undef O_APPEND
-#undef O_SYNC
-#undef O_CREAT
-#undef O_EXCL
-#undef O_TRUNC
+  #undef O_READ
+  #undef O_RDONLY
+  #undef O_WRITE
+  #undef O_WRONLY
+  #undef O_RDWR
+  #undef O_ACCMODE
+  #undef O_APPEND
+  #undef O_SYNC
+  #undef O_CREAT
+  #undef O_EXCL
+  #undef O_TRUNC
 #endif
 
 // flags for ls()
@@ -166,9 +166,9 @@ class SdFile : public Print {
       flags_ &= ~F_FILE_UNBUFFERED_READ;
     }
     uint8_t close(void);
-    uint8_t contiguousRange(uint32_t* bgnBlock, uint32_t* endBlock);
-    uint8_t createContiguous(SdFile* dirFile,
-                             const char* fileName, uint32_t size);
+    uint8_t contiguousRange(uint32_t *bgnBlock, uint32_t *endBlock);
+    uint8_t createContiguous(SdFile *dirFile,
+                             const char *fileName, uint32_t size);
     /** \return The current cluster number for a file or directory. */
     uint32_t curCluster(void) const {
       return curCluster_;
@@ -206,7 +206,7 @@ class SdFile : public Print {
        See the timestamp() function.
     */
     static void dateTimeCallback(
-      void (*dateTime)(uint16_t* date, uint16_t* time)) {
+      void (*dateTime)(uint16_t *date, uint16_t *time)) {
       dateTime_ = dateTime;
     }
     /**
@@ -220,12 +220,12 @@ class SdFile : public Print {
     uint32_t dirBlock(void) const {
       return dirBlock_;
     }
-    uint8_t dirEntry(dir_t* dir);
+    uint8_t dirEntry(dir_t *dir);
     /** \return Index of this file's directory in the block dirBlock. */
     uint8_t dirIndex(void) const {
       return dirIndex_;
     }
-    static void dirName(const dir_t& dir, char* name);
+    static void dirName(const dir_t &dir, char *name);
     /** \return The total number of bytes in a file or directory. */
     uint32_t fileSize(void) const {
       return fileSize_;
@@ -255,12 +255,12 @@ class SdFile : public Print {
       return type_ == FAT_FILE_TYPE_ROOT16 || type_ == FAT_FILE_TYPE_ROOT32;
     }
     void ls(uint8_t flags = 0, uint8_t indent = 0);
-    uint8_t makeDir(SdFile* dir, const char* dirName);
-    uint8_t open(SdFile* dirFile, uint16_t index, uint8_t oflag);
-    uint8_t open(SdFile* dirFile, const char* fileName, uint8_t oflag);
+    uint8_t makeDir(SdFile *dir, const char *dirName);
+    uint8_t open(SdFile *dirFile, uint16_t index, uint8_t oflag);
+    uint8_t open(SdFile *dirFile, const char *fileName, uint8_t oflag);
 
-    uint8_t openRoot(SdVolume* vol);
-    static void printDirName(const dir_t& dir, uint8_t width);
+    uint8_t openRoot(SdVolume *vol);
+    static void printDirName(const dir_t &dir, uint8_t width);
     static void printFatDate(uint16_t fatDate);
     static void printFatTime(uint16_t fatTime);
     static void printTwoDigits(uint8_t v);
@@ -274,9 +274,9 @@ class SdFile : public Print {
       uint8_t b;
       return read(&b, 1) == 1 ? b : -1;
     }
-    int16_t read(void* buf, uint16_t nbyte);
-    int8_t readDir(dir_t* dir);
-    static uint8_t remove(SdFile* dirFile, const char* fileName);
+    int16_t read(void *buf, uint16_t nbyte);
+    int8_t readDir(dir_t *dir);
+    static uint8_t remove(SdFile *dirFile, const char *fileName);
     uint8_t remove(void);
     /** Set the file's current position to zero. */
     void rewind(void) {
@@ -324,12 +324,12 @@ class SdFile : public Print {
       return flags_ & F_FILE_UNBUFFERED_READ;
     }
     /** \return SdVolume that contains this file. */
-    SdVolume* volume(void) const {
+    SdVolume *volume(void) const {
       return vol_;
     }
     size_t write(uint8_t b);
-    size_t write(const void* buf, uint16_t nbyte);
-    size_t write(const char* str);
+    size_t write(const void *buf, uint16_t nbyte);
+    size_t write(const char *str);
     #ifdef __AVR__
     void write_P(PGM_P str);
     void writeln_P(PGM_P str);
@@ -341,15 +341,15 @@ class SdFile : public Print {
     /** \deprecated Use:
        uint8_t SdFile::contiguousRange(uint32_t* bgnBlock, uint32_t* endBlock);
     */
-    uint8_t contiguousRange(uint32_t& bgnBlock, uint32_t& endBlock) {  // NOLINT
+    uint8_t contiguousRange(uint32_t &bgnBlock, uint32_t &endBlock) {  // NOLINT
       return contiguousRange(&bgnBlock, &endBlock);
     }
     /** \deprecated Use:
         uint8_t SdFile::createContiguous(SdFile* dirFile,
           const char* fileName, uint32_t size)
     */
-    uint8_t createContiguous(SdFile& dirFile,  // NOLINT
-                             const char* fileName, uint32_t size) {
+    uint8_t createContiguous(SdFile &dirFile,  // NOLINT
+                             const char *fileName, uint32_t size) {
       return createContiguous(&dirFile, fileName, size);
     }
 
@@ -359,57 +359,57 @@ class SdFile : public Print {
          void (*dateTime)(uint16_t* date, uint16_t* time));
     */
     static void dateTimeCallback(
-      void (*dateTime)(uint16_t& date, uint16_t& time)) {  // NOLINT
+      void (*dateTime)(uint16_t &date, uint16_t &time)) {  // NOLINT
       oldDateTime_ = dateTime;
       dateTime_ = dateTime ? oldToNew : 0;
     }
     /** \deprecated Use: uint8_t SdFile::dirEntry(dir_t* dir); */
-    uint8_t dirEntry(dir_t& dir) {
+    uint8_t dirEntry(dir_t &dir) {
       return dirEntry(&dir); // NOLINT
     }
     /** \deprecated Use:
        uint8_t SdFile::makeDir(SdFile* dir, const char* dirName);
     */
-    uint8_t makeDir(SdFile& dir, const char* dirName) {  // NOLINT
+    uint8_t makeDir(SdFile &dir, const char *dirName) {  // NOLINT
       return makeDir(&dir, dirName);
     }
     /** \deprecated Use:
        uint8_t SdFile::open(SdFile* dirFile, const char* fileName, uint8_t oflag);
     */
-    uint8_t open(SdFile& dirFile, // NOLINT
-                 const char* fileName, uint8_t oflag) {
+    uint8_t open(SdFile &dirFile, // NOLINT
+                 const char *fileName, uint8_t oflag) {
       return open(&dirFile, fileName, oflag);
     }
     /** \deprecated  Do not use in new apps */
-    uint8_t open(SdFile& dirFile, const char* fileName) {  // NOLINT
+    uint8_t open(SdFile &dirFile, const char *fileName) {  // NOLINT
       return open(dirFile, fileName, O_RDWR);
     }
     /** \deprecated Use:
        uint8_t SdFile::open(SdFile* dirFile, uint16_t index, uint8_t oflag);
     */
-    uint8_t open(SdFile& dirFile, uint16_t index, uint8_t oflag) {  // NOLINT
+    uint8_t open(SdFile &dirFile, uint16_t index, uint8_t oflag) {  // NOLINT
       return open(&dirFile, index, oflag);
     }
     /** \deprecated Use: uint8_t SdFile::openRoot(SdVolume* vol); */
-    uint8_t openRoot(SdVolume& vol) {
+    uint8_t openRoot(SdVolume &vol) {
       return openRoot(&vol); // NOLINT
     }
 
     /** \deprecated Use: int8_t SdFile::readDir(dir_t* dir); */
-    int8_t readDir(dir_t& dir) {
+    int8_t readDir(dir_t &dir) {
       return readDir(&dir); // NOLINT
     }
     /** \deprecated Use:
        static uint8_t SdFile::remove(SdFile* dirFile, const char* fileName);
     */
-    static uint8_t remove(SdFile& dirFile, const char* fileName) {  // NOLINT
+    static uint8_t remove(SdFile &dirFile, const char *fileName) {  // NOLINT
       return remove(&dirFile, fileName);
     }
     //------------------------------------------------------------------------------
     // rest are private
   private:
-    static void (*oldDateTime_)(uint16_t& date, uint16_t& time);  // NOLINT
-    static void oldToNew(uint16_t* date, uint16_t* time) {
+    static void (*oldDateTime_)(uint16_t &date, uint16_t &time);  // NOLINT
+    static void oldToNew(uint16_t *date, uint16_t *time) {
       uint16_t d;
       uint16_t t;
       oldDateTime_(d, t);
@@ -444,16 +444,16 @@ class SdFile : public Print {
     uint8_t   dirIndex_;      // index of entry in dirBlock 0 <= dirIndex_ <= 0XF
     uint32_t  fileSize_;      // file size in bytes
     uint32_t  firstCluster_;  // first cluster of file
-    SdVolume* vol_;           // volume where file is located
+    SdVolume *vol_;           // volume where file is located
 
     // private functions
     uint8_t addCluster(void);
     uint8_t addDirCluster(void);
-    dir_t* cacheDirEntry(uint8_t action);
-    static void (*dateTime_)(uint16_t* date, uint16_t* time);
-    static uint8_t make83Name(const char* str, uint8_t* name);
+    dir_t *cacheDirEntry(uint8_t action);
+    static void (*dateTime_)(uint16_t *date, uint16_t *time);
+    static uint8_t make83Name(const char *str, uint8_t *name);
     uint8_t openCachedEntry(uint8_t cacheIndex, uint8_t oflags);
-    dir_t* readDirCache(void);
+    dir_t *readDirCache(void);
 };
 //==============================================================================
 // SdVolume class
@@ -486,7 +486,7 @@ class SdVolume {
     /** Clear the cache and returns a pointer to the cache.  Used by the WaveRP
         recorder to do raw write to the SD card.  Not for normal apps.
     */
-    static uint8_t* cacheClear(void) {
+    static uint8_t *cacheClear(void) {
       cacheFlush();
       cacheBlockNumber_ = 0XFFFFFFFF;
       return cacheBuffer_.data;
@@ -502,10 +502,10 @@ class SdVolume {
        failure include not finding a valid partition, not finding a valid
        FAT file system or an I/O error.
     */
-    uint8_t init(Sd2Card* dev) {
+    uint8_t init(Sd2Card *dev) {
       return init(dev, 1) ? true : init(dev, 0);
     }
-    uint8_t init(Sd2Card* dev, uint8_t part);
+    uint8_t init(Sd2Card *dev, uint8_t part);
 
     // inline functions that return volume info
     /** \return The volume's cluster size in blocks. */
@@ -550,19 +550,19 @@ class SdVolume {
       return rootDirStart_;
     }
     /** return a pointer to the Sd2Card object for this volume */
-    static Sd2Card* sdCard(void) {
+    static Sd2Card *sdCard(void) {
       return sdCard_;
     }
     //------------------------------------------------------------------------------
     #if ALLOW_DEPRECATED_FUNCTIONS
     // Deprecated functions  - suppress cpplint warnings with NOLINT comment
     /** \deprecated Use: uint8_t SdVolume::init(Sd2Card* dev); */
-    uint8_t init(Sd2Card& dev) {
+    uint8_t init(Sd2Card &dev) {
       return init(&dev); // NOLINT
     }
 
     /** \deprecated Use: uint8_t SdVolume::init(Sd2Card* dev, uint8_t vol); */
-    uint8_t init(Sd2Card& dev, uint8_t part) {  // NOLINT
+    uint8_t init(Sd2Card &dev, uint8_t part) {  // NOLINT
       return init(&dev, part);
     }
     #endif  // ALLOW_DEPRECATED_FUNCTIONS
@@ -578,7 +578,7 @@ class SdVolume {
 
     static cache_t cacheBuffer_;        // 512 byte cache for device blocks
     static uint32_t cacheBlockNumber_;  // Logical number of block in the cache
-    static Sd2Card* sdCard_;            // Sd2Card object for cache
+    static Sd2Card *sdCard_;            // Sd2Card object for cache
     static uint8_t cacheDirty_;         // cacheFlush() will write block if true
     static uint32_t cacheMirrorBlock_;  // block number for mirror FAT
     //
@@ -594,7 +594,7 @@ class SdVolume {
     uint16_t rootDirEntryCount_;  // number of entries in FAT16 root dir
     uint32_t rootDirStart_;       // root start block for FAT16, cluster for FAT32
     //----------------------------------------------------------------------------
-    uint8_t allocContiguous(uint32_t count, uint32_t* curCluster);
+    uint8_t allocContiguous(uint32_t count, uint32_t *curCluster);
     uint8_t blockOfCluster(uint32_t position) const {
       return (position >> 9) & (blocksPerCluster_ - 1);
     }
@@ -611,8 +611,8 @@ class SdVolume {
       cacheDirty_ |= CACHE_FOR_WRITE;
     }
     static uint8_t cacheZeroBlock(uint32_t blockNumber);
-    uint8_t chainSize(uint32_t beginCluster, uint32_t* size) const;
-    uint8_t fatGet(uint32_t cluster, uint32_t* value) const;
+    uint8_t chainSize(uint32_t beginCluster, uint32_t *size) const;
+    uint8_t fatGet(uint32_t cluster, uint32_t *value) const;
     uint8_t fatPut(uint32_t cluster, uint32_t value);
     uint8_t fatPutEOC(uint32_t cluster) {
       return fatPut(cluster, 0x0FFFFFFF);
@@ -621,14 +621,14 @@ class SdVolume {
     uint8_t isEOC(uint32_t cluster) const {
       return  cluster >= (fatType_ == 16 ? FAT16EOC_MIN : FAT32EOC_MIN);
     }
-    uint8_t readBlock(uint32_t block, uint8_t* dst) {
+    uint8_t readBlock(uint32_t block, uint8_t *dst) {
       return sdCard_->readBlock(block, dst);
     }
     uint8_t readData(uint32_t block, uint16_t offset,
-                     uint16_t count, uint8_t* dst) {
+                     uint16_t count, uint8_t *dst) {
       return sdCard_->readData(block, offset, count, dst);
     }
-    uint8_t writeBlock(uint32_t block, const uint8_t* dst, uint8_t blocking = 1) {
+    uint8_t writeBlock(uint32_t block, const uint8_t *dst, uint8_t blocking = 1) {
       return sdCard_->writeBlock(block, dst, blocking);
     }
     uint8_t isBusy(void) {

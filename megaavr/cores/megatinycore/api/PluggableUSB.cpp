@@ -20,43 +20,41 @@
 #include "USBAPI.h"
 #include "PluggableUSB.h"
 
-int PluggableUSB_::getInterface(uint8_t* interfaceCount)
-{
+int PluggableUSB_::getInterface(uint8_t *interfaceCount) {
   int sent = 0;
-  PluggableUSBModule* node;
+  PluggableUSBModule *node;
   for (node = rootNode; node; node = node->next) {
     int res = node->getInterface(interfaceCount);
-    if (res < 0)
+    if (res < 0) {
       return -1;
+    }
     sent += res;
   }
   return sent;
 }
 
-int PluggableUSB_::getDescriptor(USBSetup& setup)
-{
-  PluggableUSBModule* node;
+int PluggableUSB_::getDescriptor(USBSetup &setup) {
+  PluggableUSBModule *node;
   for (node = rootNode; node; node = node->next) {
     int ret = node->getDescriptor(setup);
     // ret!=0 -> request has been processed
-    if (ret)
+    if (ret) {
       return ret;
+    }
   }
   return 0;
 }
 
-void PluggableUSB_::getShortName(char *iSerialNum)
-{
-  PluggableUSBModule* node;
+void PluggableUSB_::getShortName(char *iSerialNum) {
+  PluggableUSBModule *node;
   for (node = rootNode; node; node = node->next) {
     iSerialNum += node->getShortName(iSerialNum);
   }
   *iSerialNum = 0;
 }
 
-bool PluggableUSB_::setup(USBSetup& setup)
-{
-  PluggableUSBModule* node;
+bool PluggableUSB_::setup(USBSetup &setup) {
+  PluggableUSBModule *node;
   for (node = rootNode; node; node = node->next) {
     if (node->setup(setup)) {
       return true;
@@ -65,8 +63,7 @@ bool PluggableUSB_::setup(USBSetup& setup)
   return false;
 }
 
-bool PluggableUSB_::plug(PluggableUSBModule *node)
-{
+bool PluggableUSB_::plug(PluggableUSBModule *node) {
   if ((lastEp + node->numEndpoints) > totalEP) {
     return false;
   }
@@ -85,15 +82,14 @@ bool PluggableUSB_::plug(PluggableUSBModule *node)
   node->pluggedEndpoint = lastEp;
   lastIf += node->numInterfaces;
   for (uint8_t i = 0; i < node->numEndpoints; i++) {
-    *(unsigned int*)(epBuffer(lastEp)) = node->endpointType[i];
+    *(unsigned int *)(epBuffer(lastEp)) = node->endpointType[i];
     lastEp++;
   }
   return true;
   // restart USB layer???
 }
 
-PluggableUSB_& PluggableUSB()
-{
+PluggableUSB_ &PluggableUSB() {
   static PluggableUSB_ obj;
   return obj;
 }

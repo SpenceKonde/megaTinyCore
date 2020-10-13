@@ -27,16 +27,19 @@
 #include "pins_arduino.h"
 
 
-void pinMode(uint8_t pin, uint8_t mode)
-{
+void pinMode(uint8_t pin, uint8_t mode) {
   uint8_t bit_mask = digitalPinToBitMask(pin);
 
-  if ((bit_mask == NOT_A_PIN) || (mode > INPUT_PULLUP)) return;
+  if ((bit_mask == NOT_A_PIN) || (mode > INPUT_PULLUP)) {
+    return;
+  }
 
-  PORT_t* port = digitalPinToPortStruct(pin);
-  if(port == NULL) return;
+  PORT_t *port = digitalPinToPortStruct(pin);
+  if (port == NULL) {
+    return;
+  }
 
-  if(mode == OUTPUT){
+  if (mode == OUTPUT) {
 
     /* Configure direction as output */
     port->DIRSET = bit_mask;
@@ -45,7 +48,7 @@ void pinMode(uint8_t pin, uint8_t mode)
 
     uint8_t bit_pos = digitalPinToBitPosition(pin);
     /* Calculate where pin control register is */
-    volatile uint8_t* pin_ctrl_reg = getPINnCTRLregister(port, bit_pos);
+    volatile uint8_t *pin_ctrl_reg = getPINnCTRLregister(port, bit_pos);
 
     /* Save state */
     uint8_t status = SREG;
@@ -55,7 +58,7 @@ void pinMode(uint8_t pin, uint8_t mode)
     port->DIRCLR = bit_mask;
 
     /* Configure pull-up resistor */
-    if(mode == INPUT_PULLUP){
+    if (mode == INPUT_PULLUP) {
 
       /* Enable pull-up */
       *pin_ctrl_reg |= PORT_PULLUPEN_bm;
@@ -85,67 +88,73 @@ void pinMode(uint8_t pin, uint8_t mode)
 //
 //static inline void turnOffPWM(uint8_t timer) __attribute__ ((always_inline));
 //static inline void turnOffPWM(uint8_t timer)
-static void turnOffPWM(uint8_t pin)
-{
+static void turnOffPWM(uint8_t pin) {
   /* Actually turn off compare channel, not the timer */
 
   /* Get pin's timer */
   uint8_t timer = digitalPinToTimer(pin);
-  if(timer == NOT_ON_TIMER) return;
+  if (timer == NOT_ON_TIMER) {
+    return;
+  }
 
   uint8_t bit_pos = digitalPinToBitPosition(pin);
   //TCB_t *timerB;
 
   switch (timer) {
 
-  /* TCA0 */
-  case TIMERA0:
-    /* Bit position will give output channel */
-    #ifdef __AVR_ATtinyxy2__
-    if (bit_pos==7) bit_pos=0; //on the xy2, WO0 is on PA7
-    #endif
-    if (bit_pos>2)   bit_pos++; //there's a blank bit in the middle
-    /* Disable corresponding channel */
-    TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
-    break;
-  /* we don't need the type b timers as this core does not use them for PWM
-  //TCB - only one output
-  case TIMERB0:
-  case TIMERB1:
-  case TIMERB2:
-  case TIMERB3:
+    /* TCA0 */
+    case TIMERA0:
+      /* Bit position will give output channel */
+      #ifdef __AVR_ATtinyxy2__
+      if (bit_pos == 7) {
+        bit_pos = 0;  //on the xy2, WO0 is on PA7
+      }
+      #endif
+      if (bit_pos > 2) {
+        bit_pos++;  //there's a blank bit in the middle
+      }
+      /* Disable corresponding channel */
+      TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
+      break;
+      /* we don't need the type b timers as this core does not use them for PWM
+        //TCB - only one output
+        case TIMERB0:
+        case TIMERB1:
+        case TIMERB2:
+        case TIMERB3:
 
-    timerB = (TCB_t *)&TCB0 + (timer - TIMERB0);
+        timerB = (TCB_t *)&TCB0 + (timer - TIMERB0);
 
-     //Disable TCB compare channel
-    timerB->CTRLB &= ~(TCB_CCMPEN_bm);
+         //Disable TCB compare channel
+        timerB->CTRLB &= ~(TCB_CCMPEN_bm);
 
-    break;
-  */
-  #if defined(DAC0)
-  case DACOUT:
-    DAC0.CTRLA=0x00;
-    break;
-  #endif
-    #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
-  case TIMERD0:
-    // rigmarole that produces a glitch in the PWM
-    TCD0.CTRLA=0x10;//stop the timer
-    while(!(TCD0.STATUS&0x01)) {;}// wait until it's actually stopped
-    _PROTECTED_WRITE(TCD0.FAULTCTRL,TCD0.FAULTCTRL & ~(1<<(6+bit_pos)));
-    TCD0.CTRLA=0x11; //re-enable it
-    break;
-  #endif
-  default:
-    break;
+        break;
+      */
+      #if defined(DAC0)
+    case DACOUT:
+      DAC0.CTRLA = 0x00;
+      break;
+      #endif
+      #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
+    case TIMERD0:
+      // rigmarole that produces a glitch in the PWM
+      TCD0.CTRLA = 0x10; //stop the timer
+      while (!(TCD0.STATUS & 0x01)) {;} // wait until it's actually stopped
+      _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & ~(1 << (6 + bit_pos)));
+      TCD0.CTRLA = 0x11; //re-enable it
+      break;
+      #endif
+    default:
+      break;
   }
 }
 
-void digitalWrite(uint8_t pin, uint8_t val)
-{
+void digitalWrite(uint8_t pin, uint8_t val) {
   /* Get bit mask for pin */
   uint8_t bit_mask = digitalPinToBitMask(pin);
-  if(bit_mask == NOT_A_PIN) return;
+  if (bit_mask == NOT_A_PIN) {
+    return;
+  }
 
   /* Turn off PWM if applicable */
 
@@ -159,7 +168,7 @@ void digitalWrite(uint8_t pin, uint8_t val)
   PORT_t *port = digitalPinToPortStruct(pin);
 
   /* Output direction */
-  if(port->DIR & bit_mask){
+  if (port->DIR & bit_mask) {
 
     /* Set output to value */
     if (val == LOW) { /* If LOW */
@@ -167,29 +176,29 @@ void digitalWrite(uint8_t pin, uint8_t val)
 
     } else if (val == CHANGE) { /* If TOGGLE */
       port->OUTTGL = bit_mask;
-                  /* If HIGH OR  > TOGGLE  */
+      /* If HIGH OR  > TOGGLE  */
     } else {
       port->OUTSET = bit_mask;
     }
 
-  /* Input direction */
+    /* Input direction */
   } else {
     /* Old implementation has side effect when pin set as input -
-    pull up is enabled if this function is called.
-    Should we purposely implement this side effect?
+      pull up is enabled if this function is called.
+      Should we purposely implement this side effect?
     */
 
     /* Get bit position for getting pin ctrl reg */
     uint8_t bit_pos = digitalPinToBitPosition(pin);
 
     /* Calculate where pin control register is */
-    volatile uint8_t* pin_ctrl_reg = getPINnCTRLregister(port, bit_pos);
+    volatile uint8_t *pin_ctrl_reg = getPINnCTRLregister(port, bit_pos);
 
     /* Save system status and disable interrupts */
     uint8_t status = SREG;
     cli();
 
-    if(val == LOW){
+    if (val == LOW) {
       /* Disable pullup */
       *pin_ctrl_reg &= ~PORT_PULLUPEN_bm;
 
@@ -204,11 +213,12 @@ void digitalWrite(uint8_t pin, uint8_t val)
 
 }
 
-int8_t digitalRead(uint8_t pin)
-{
+int8_t digitalRead(uint8_t pin) {
   /* Get bit mask and check valid pin */
   uint8_t bit_mask = digitalPinToBitMask(pin);
-  if(bit_mask == NOT_A_PIN) return -1;
+  if (bit_mask == NOT_A_PIN) {
+    return -1;
+  }
 
   // If the pin that support PWM output, we need to turn it off
   // before getting a digital reading.
@@ -222,7 +232,7 @@ int8_t digitalRead(uint8_t pin)
   PORT_t *port = digitalPinToPortStruct(pin);
 
   /* Read pin value from PORTx.IN register */
-  if(port->IN & bit_mask){
+  if (port->IN & bit_mask) {
     return HIGH;
   } else {
     return LOW;

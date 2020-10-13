@@ -385,7 +385,7 @@ void Sd2Card::partialBlockRead(uint8_t value) {
    \return The value one, true, is returned for success and
    the value zero, false, is returned for failure.
 */
-uint8_t Sd2Card::readBlock(uint32_t block, uint8_t* dst) {
+uint8_t Sd2Card::readBlock(uint32_t block, uint8_t *dst) {
   return readData(block, 0, 512, dst);
 }
 //------------------------------------------------------------------------------
@@ -400,7 +400,7 @@ uint8_t Sd2Card::readBlock(uint32_t block, uint8_t* dst) {
    the value zero, false, is returned for failure.
 */
 uint8_t Sd2Card::readData(uint32_t block,
-                          uint16_t offset, uint16_t count, uint8_t* dst) {
+                          uint16_t offset, uint16_t count, uint8_t *dst) {
   if (count == 0) {
     return true;
   }
@@ -497,8 +497,8 @@ void Sd2Card::readEnd(void) {
 }
 //------------------------------------------------------------------------------
 /** read CID or CSR register */
-uint8_t Sd2Card::readRegister(uint8_t cmd, void* buf) {
-  uint8_t* dst = reinterpret_cast<uint8_t*>(buf);
+uint8_t Sd2Card::readRegister(uint8_t cmd, void *buf) {
+  uint8_t *dst = reinterpret_cast<uint8_t *>(buf);
   if (cardCommand(cmd, 0)) {
     error(SD_CARD_ERROR_READ_REG);
     goto fail;
@@ -612,7 +612,7 @@ fail:
    \return The value one, true, is returned for success and
    the value zero, false, is returned for failure.
 */
-uint8_t Sd2Card::writeBlock(uint32_t blockNumber, const uint8_t* src, uint8_t blocking) {
+uint8_t Sd2Card::writeBlock(uint32_t blockNumber, const uint8_t *src, uint8_t blocking) {
   #if SD_PROTECT_BLOCK_ZERO
   // don't allow write to first block
   if (blockNumber == 0) {
@@ -653,7 +653,7 @@ fail:
 }
 //------------------------------------------------------------------------------
 /** Write one data block in a multiple block write sequence */
-uint8_t Sd2Card::writeData(const uint8_t* src) {
+uint8_t Sd2Card::writeData(const uint8_t *src) {
   // wait for previous write to finish
   if (!waitNotBusy(SD_WRITE_TIMEOUT)) {
     error(SD_CARD_ERROR_WRITE_MULTIPLE);
@@ -664,7 +664,7 @@ uint8_t Sd2Card::writeData(const uint8_t* src) {
 }
 //------------------------------------------------------------------------------
 // send one block of data for write block or write multiple blocks
-uint8_t Sd2Card::writeData(uint8_t token, const uint8_t* src) {
+uint8_t Sd2Card::writeData(uint8_t token, const uint8_t *src) {
   #ifdef OPTIMIZE_HARDWARE_SPI
 
   // send data - optimized loop

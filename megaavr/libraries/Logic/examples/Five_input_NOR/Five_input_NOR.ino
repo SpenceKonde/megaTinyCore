@@ -1,4 +1,4 @@
-  /***********************************************************************|
+/***********************************************************************|
   | tinyAVR Configurable Custom Logic library                             |
   |                                                                       |
   | Five_input_NOR.ino                                                    |
@@ -33,35 +33,35 @@ void setup() {
   // only use this workaround if it's a 20-pin part.
   // Here, PA3 is used as input 1 and PB0 is used as input 2
 
-#if defined(__AVR_ATtinyxy6__)
+  #if defined(__AVR_ATtinyxy6__)
   #ifdef EVSYS_CHANNEL0 //means it's a 2-series, where the event system works like it does on everything other than the tinyAVR 0/1-series
-    EVSYS.CHANNEL0=EVSYS_CHANNEL0_PORTA_PIN3_gc;
-    EVSYS.USERCCLLUT1A=EVSYS_USER_CHANNEL0_gc;
-    EVSYS.CHANNEL1=EVSYS_CHANNEL1_PORTB_PIN0_gc;
-    EVSYS.USERCCLLUT1B=EVSYS_USER_CHANNEL1_gc;
+  EVSYS.CHANNEL0 = EVSYS_CHANNEL0_PORTA_PIN3_gc;
+  EVSYS.USERCCLLUT1A = EVSYS_USER_CHANNEL0_gc;
+  EVSYS.CHANNEL1 = EVSYS_CHANNEL1_PORTB_PIN0_gc;
+  EVSYS.USERCCLLUT1B = EVSYS_USER_CHANNEL1_gc;
   #else //it's a tinyAVR 0/1
-    EVSYS.ASYNCCH0 = EVSYS_ASYNCCH0_PORTA_PIN3_gc;    // PA3 as ASYNC0 generator
-    EVSYS.ASYNCUSER3 = EVSYS_ASYNCUSER3_ASYNCCH0_gc;  // Use Async0 as LUT1 event 0 per Table 14-4 in datasheet
-    EVSYS.ASYNCCH1 = EVSYS_ASYNCCH1_PORTB_PIN0_gc;    // PB0 as ASYNC1 generator
-    EVSYS.ASYNCUSER5 = EVSYS_ASYNCUSER3_ASYNCCH1_gc;  // Use ASYNC1 as LUT1 event 1 per Table 14-4 in datasheet
+  EVSYS.ASYNCCH0 = EVSYS_ASYNCCH0_PORTA_PIN3_gc;    // PA3 as ASYNC0 generator
+  EVSYS.ASYNCUSER3 = EVSYS_ASYNCUSER3_ASYNCCH0_gc;  // Use Async0 as LUT1 event 0 per Table 14-4 in datasheet
+  EVSYS.ASYNCCH1 = EVSYS_ASYNCCH1_PORTB_PIN0_gc;    // PB0 as ASYNC1 generator
+  EVSYS.ASYNCUSER5 = EVSYS_ASYNCUSER3_ASYNCCH1_gc;  // Use ASYNC1 as LUT1 event 1 per Table 14-4 in datasheet
   #endif
-  pinMode(PIN_PA3,INPUT_PULLUP);                    // Could be done faster with direct port writes
-  pinMode(PIN_PB0,INPUT_PULLUP);                    // Could be done faster with direct port writes
+  pinMode(PIN_PA3, INPUT_PULLUP);                   // Could be done faster with direct port writes
+  pinMode(PIN_PB0, INPUT_PULLUP);                   // Could be done faster with direct port writes
 
   Logic0.input1 = in::event_a;                      // Use LUT event 0/A as input 1, which will take input from PA3
   Logic1.input2 = in::event_b;                      // Use LUT event 1/B as input 2, which will take input from PB0
 
-#elif !defined(__AVR_ATtinyxy7__)
-    // If it's neither 20-pin nor 24-pin part, cannot be used.
-    // Well, on the 2-series, it can be... but that's for another day
-    #error "The 8-pin and 14-pin parts do not support this"
-#else
-    // Otherwise it is an ATtiny with 24 pins, and no workaround is needed for
-    // LUT1
-    Logic1.input1 = in::input_pullup;   // Set PC4 as input with pullup
-    Logic1.input2 = in::input_pullup;   // Set PC5 as input with pullup
+  #elif !defined(__AVR_ATtinyxy7__)
+  // If it's neither 20-pin nor 24-pin part, cannot be used.
+  // Well, on the 2-series, it can be... but that's for another day
+#error "The 8-pin and 14-pin parts do not support this"
+  #else
+  // Otherwise it is an ATtiny with 24 pins, and no workaround is needed for
+  // LUT1
+  Logic1.input1 = in::input_pullup;   // Set PC4 as input with pullup
+  Logic1.input2 = in::input_pullup;   // Set PC5 as input with pullup
 
-#endif
+  #endif
   //End of workaround code
 
   Logic1.input0 = in::input_pullup;   // Set PC3 as input with pullup

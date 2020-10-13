@@ -29,33 +29,32 @@
 #define RINGBUFFER_HAS_ADDITIONAL_STORAGE_API
 
 #ifdef RINGBUFFER_FORCE_SMALL_SIZE
-typedef uint8_t rb_index_type;
+  typedef uint8_t rb_index_type;
 #else
-typedef unsigned int rb_index_type;
+  typedef unsigned int rb_index_type;
 #endif
 
-class RingBuffer
-{
-    public:
-    RingBuffer( rb_index_type size = 64 ) ;
-    void store_char( uint8_t c ) ;
+class RingBuffer {
+  public:
+    RingBuffer(rb_index_type size = 64) ;
+    void store_char(uint8_t c) ;
     void clear();
     int read_char();
     int available();
     int availableForStore();
     int peek();
     bool isFull();
-    void addStorage(uint8_t* _buffer, rb_index_type _size) {
-        additionalSize = _size;
-        additionalBuffer = _buffer;
+    void addStorage(uint8_t *_buffer, rb_index_type _size) {
+      additionalSize = _size;
+      additionalBuffer = _buffer;
     };
 
-    private:
+  private:
     rb_index_type nextIndex(rb_index_type index);
-    uint8_t* additionalBuffer;
+    uint8_t *additionalBuffer;
     int additionalSize = 0;
     rb_index_type size;
-    uint8_t* _aucBuffer;
+    uint8_t *_aucBuffer;
     volatile rb_index_type _iHead ;
     volatile rb_index_type _iTail ;
 };

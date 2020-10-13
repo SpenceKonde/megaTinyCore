@@ -1,4 +1,4 @@
-  /***********************************************************************|
+/***********************************************************************|
   | megaAVR Configurable Custom Logic library                             |
   |                                                                       |
   | LatchNoSeq.ino                                                        |
@@ -39,11 +39,11 @@ void setup() {
   Logic0.enable = true;               // Enable logic block 0
 
   #ifdef EVSYS_CHANNEL0 //means it's a 2-series, where the event system works like it does on everything other than the tinyAVR 0/1-series
-    EVSYS.CHANNEL0=EVSYS_CHANNEL0_CCL_LUT0_gc;
-    EVSYS.USERCCLLUT1A=EVSYS_USER_CHANNEL0_gc;
+  EVSYS.CHANNEL0 = EVSYS_CHANNEL0_CCL_LUT0_gc;
+  EVSYS.USERCCLLUT1A = EVSYS_USER_CHANNEL0_gc;
   #else //it's a tinyAVR 0/1
-    EVSYS.ASYNCCH0 = EVSYS_ASYNCCH0_CCL_LUT0_gc;      // Use CCL LUT0 as event generator
-    EVSYS.ASYNCUSER2 = EVSYS_ASYNCUSER2_ASYNCCH0_gc;  // ASYNCUSER2 is LUT0 event 0
+  EVSYS.ASYNCCH0 = EVSYS_ASYNCCH0_CCL_LUT0_gc;      // Use CCL LUT0 as event generator
+  EVSYS.ASYNCUSER2 = EVSYS_ASYNCUSER2_ASYNCCH0_gc;  // ASYNCUSER2 is LUT0 event 0
   #endif
   Logic0.input0 = in::event_0;                      // Use event 0 as input0
   Logic0.input1 = in::input_pullup;                 // PA1 as input1 (RESET)
