@@ -21,4 +21,3 @@
 // This include is added for compatibility, it will be remove on the next
 // major release of the API
 #include "../String.h"
-

@@ -70,6 +70,3 @@ void setup() {
 void loop() {
   // nothing happens after setup finishes.
 }
-
-
-

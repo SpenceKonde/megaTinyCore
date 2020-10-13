@@ -73,12 +73,3 @@ void loop() {
     Serial.println("error opening datalog.txt");
   }
 }
-
-
-
-
-
-
-
-
-
