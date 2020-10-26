@@ -1,9 +1,11 @@
-# See: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
+##############################################################
+#      Tools Submenu Names
+##############################################################
 
 menu.chip=Chip
 menu.clock=Clock (change 20/10/5 int<->other=burn bootloader)
 menu.millis=millis()/micros()
-menu.uartvoltage=Voltage for UART baud calc
+menu.uartvoltage=Voltage for UART baud (ignored for 2k/4k parts)
 menu.serialevent=Support SerialEvent
 menu.bodvoltage=BOD level if enabled (Bootload burn req'd)
 menu.bodmode=BOD Mode Active/Sleeping (Bootload burn req'd)
@@ -13,45 +15,63 @@ menu.bootloaderuart=UART for Bootloader (Bootload burn req'd)
 menu.resetpin=UPDI Pin, READ DOCS or pick UPDI! (Bootload burn req'd)
 menu.resetpinopti=UPDI/reset pin (Bootload burn req'd)
 
+
+##############################################################
+#      Board Names
 ##############################################################
 
 atxy7.name=ATtiny3217/1617/1607/817/807/417
+atxy6.name=ATtiny3216/1616/1606/816/806/416/406
+atxy4.name=ATtiny1614/1604/814/804/414/404/214/204
+atxy2.name=ATtiny412/402/212/202
+Xplained416.name=Attiny416 Xplained Nano (Optiboot)
+Xplained817.name=Attiny817 Xplained Mini (Optiboot)
+atxy7o.name=ATtiny3217/1617/1607/817/807/417 (Optiboot)
+atxy6o.name=ATtiny3216/1616/1606/816/806/416/406 (Optiboot)
+atxy4o.name=ATtiny1614/1604/814/804/414/404/214/204 (Optiboot)
+atxy2o.name=ATtiny412/402/212/202 (Optiboot)
+
+##############################################################
+#      ATtiny3217/1617/1607/817/807/417
+##############################################################
+
 atxy7.upload.workaround=
 atxy7.build.millistimer=D0
 atxy7.build.bootload=
-atxy7.build.board=generic_txy7
+atxy7.build.board=AVR_ATtinyxy7
 atxy7.build.mcu=attiny{build.attiny}
+atxy7.build.serialeventabr=
 atxy7.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy7.build.f_cpu={build.speed}000000L
 
 atxy7.menu.chip.3217=ATtiny3217
-atxy7.menu.chip.3217.build.board=ATtiny3217
+atxy7.menu.chip.3217.build.board=AVR_ATtiny3217
 atxy7.menu.chip.3217.build.attiny=3217
 atxy7.menu.chip.3217.upload.maximum_size=32768
 atxy7.menu.chip.3217.upload.maximum_data_size=2048
 atxy7.menu.chip.1617=ATtiny1617
-atxy7.menu.chip.1617.build.board=ATtiny1617
+atxy7.menu.chip.1617.build.board=AVR_ATtiny1617
 atxy7.menu.chip.1617.build.attiny=1617
 atxy7.menu.chip.1617.upload.maximum_size=16384
 atxy7.menu.chip.1617.upload.maximum_data_size=2048
 atxy7.menu.chip.817=ATtiny817
-atxy7.menu.chip.817.build.board=ATtiny817
+atxy7.menu.chip.817.build.board=AVR_ATtiny817
 atxy7.menu.chip.817.build.attiny=817
 atxy7.menu.chip.817.upload.maximum_size=8192
 atxy7.menu.chip.817.upload.maximum_data_size=512
 atxy7.menu.chip.417=ATtiny417
-atxy7.menu.chip.417.build.board=ATtiny417
+atxy7.menu.chip.417.build.board=AVR_ATtiny417
 atxy7.menu.chip.417.build.attiny=417
 atxy7.menu.chip.417.upload.maximum_size=4096
 atxy7.menu.chip.417.upload.maximum_data_size=256
 atxy7.menu.chip.1607=ATtiny1607
-atxy7.menu.chip.1607.build.board=ATtiny1607
+atxy7.menu.chip.1607.build.board=AVR_ATtiny1607
 atxy7.menu.chip.1607.build.attiny=1607
 atxy7.menu.chip.1607.build.millistimer=A0
 atxy7.menu.chip.1607.upload.maximum_size=16384
 atxy7.menu.chip.1607.upload.maximum_data_size=1024
 atxy7.menu.chip.807=ATtiny807
-atxy7.menu.chip.807.build.board=ATtiny807
+atxy7.menu.chip.807.build.board=AVR_ATtiny807
 atxy7.menu.chip.807.build.attiny=807
 atxy7.menu.chip.807.build.millistimer=A0
 atxy7.menu.chip.807.upload.maximum_size=8192
@@ -126,7 +146,7 @@ atxy7.menu.bodvoltage.2v1.bootloader.bodlevbits=001
 atxy7.menu.bodmode.disabled=Disabled/Disabled
 atxy7.menu.bodmode.enabled=Enabled/Enabled
 atxy7.menu.bodmode.ensampfast=Enabled/Sampled (1kHz)
-atxy7.menu.bodmode.ensampslo=Enabled/Sampled (125Hz)
+atxy7.menu.bodmode.ensampslow=Enabled/Sampled (125Hz)
 atxy7.menu.bodmode.sampledfast=Sampled/Sampled (1kHz)
 atxy7.menu.bodmode.sampledslow=Sampled/Sampled (125Hz)
 atxy7.menu.bodmode.sampdisfast=Sampled/Disabled (1kHz)
@@ -172,11 +192,21 @@ atxy7.menu.resetpin.reset.bootloader.resetpinbits=10
 atxy7.menu.resetpin.gpio=IO (DANGER - Bricks chip w/out HV UPDI programmer! Use PCHV)
 atxy7.menu.resetpin.gpio.bootloader.resetpinbits=00
 
-atxy7.menu.startuptime.8= 8ms - A good default, usually fine
-atxy7.menu.startuptime.1= 1ms - (aggressive/very fast rising power)
-atxy7.menu.startuptime.64= 64ms - (cautious/slow rising power)
-atxy7.menu.startuptime.8.bootloader.SYSCFG1=0x03
+atxy7.menu.startuptime.8=8ms
+atxy7.menu.startuptime.0=0ms
+atxy7.menu.startuptime.1=1ms
+atxy7.menu.startuptime.2=2ms
+atxy7.menu.startuptime.4=4ms
+atxy7.menu.startuptime.16=16ms
+atxy7.menu.startuptime.32=32ms
+atxy7.menu.startuptime.64=64ms
+atxy7.menu.startuptime.0.bootloader.SYSCFG1=0x00
 atxy7.menu.startuptime.1.bootloader.SYSCFG1=0x01
+atxy7.menu.startuptime.2.bootloader.SYSCFG1=0x02
+atxy7.menu.startuptime.4.bootloader.SYSCFG1=0x03
+atxy7.menu.startuptime.8.bootloader.SYSCFG1=0x04
+atxy7.menu.startuptime.16.bootloader.SYSCFG1=0x05
+atxy7.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy7.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 atxy7.menu.uartvoltage.5v=Closer to 5v
@@ -188,13 +218,13 @@ atxy7.menu.serialevent.no=No (saves space)
 atxy7.menu.serialevent.yes=Yes
 atxy7.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
 atxy7.menu.serialevent.yes.build.serialevent=
-
+atxy7.menu.serialevent.yes.build.serialeventabr=E
 atxy7.upload.tool=avrdude
 
 atxy7.build.core=megatinycore
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy7.build.extra_flags=-DARDUINO_attinyxy7 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
@@ -207,17 +237,19 @@ atxy7.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy7.bootloader.flashcommand=
 
 ##############################################################
+#      ATtiny3216/1616/1606/816/806/416/406
+##############################################################
 
-atxy6.name=ATtiny3216/1616/1606/816/806/416/406
 atxy6.upload.workaround=
 atxy6.build.millistimer=D0
 atxy6.build.bootload=
-atxy6.build.board=generic_txy6
+atxy6.build.board=AVR_ATtinyxy6
 atxy6.build.core=megatinycore
 atxy6.build.mcu=attiny{build.attiny}
+atxy6.build.serialeventabr=
 atxy6.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy6.build.f_cpu={build.speed}000000L
-atxy6.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy6.build.extra_flags=-DARDUINO_attinyxy6 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy6.build.export_merged_output=false
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
@@ -227,7 +259,7 @@ atxy6.menu.serialevent.no=No (saves space)
 atxy6.menu.serialevent.yes=Yes
 atxy6.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
 atxy6.menu.serialevent.yes.build.serialevent=
-
+atxy6.menu.serialevent.yes.build.serialeventabr=E
 atxy6.upload.tool=avrdude
 
 atxy6.bootloader.tool=avrdude
@@ -240,39 +272,39 @@ atxy6.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy6.bootloader.flashcommand=
 
 atxy6.menu.chip.3216=ATtiny3216
-atxy6.menu.chip.3216.build.board=ATtiny3216
+atxy6.menu.chip.3216.build.board=AVR_ATtiny3216
 atxy6.menu.chip.3216.build.attiny=3216
 atxy6.menu.chip.3216.upload.maximum_size=32768
 atxy6.menu.chip.3216.upload.maximum_data_size=2048
 atxy6.menu.chip.1616=ATtiny1616
-atxy6.menu.chip.1616.build.board=ATtiny1616
+atxy6.menu.chip.1616.build.board=AVR_ATtiny1616
 atxy6.menu.chip.1616.build.attiny=1616
 atxy6.menu.chip.1616.upload.maximum_size=16384
 atxy6.menu.chip.1616.upload.maximum_data_size=2048
 atxy6.menu.chip.816=ATtiny816
-atxy6.menu.chip.816.build.board=ATtiny816
+atxy6.menu.chip.816.build.board=AVR_ATtiny816
 atxy6.menu.chip.816.build.attiny=816
 atxy6.menu.chip.816.upload.maximum_size=8192
 atxy6.menu.chip.816.upload.maximum_data_size=512
 atxy6.menu.chip.416=ATtiny416
-atxy6.menu.chip.416.build.board=ATtiny416
+atxy6.menu.chip.416.build.board=AVR_ATtiny416
 atxy6.menu.chip.416.build.attiny=416
 atxy6.menu.chip.416.upload.maximum_size=4096
 atxy6.menu.chip.416.upload.maximum_data_size=256
 atxy6.menu.chip.1606=ATtiny1606
-atxy6.menu.chip.1606.build.board=ATtiny1606
+atxy6.menu.chip.1606.build.board=AVR_ATtiny1606
 atxy6.menu.chip.1606.build.attiny=1606
 atxy6.menu.chip.1606.build.millistimer=A0
 atxy6.menu.chip.1606.upload.maximum_size=16384
 atxy6.menu.chip.1606.upload.maximum_data_size=1024
 atxy6.menu.chip.806=ATtiny806
-atxy6.menu.chip.806.build.board=ATtiny806
+atxy6.menu.chip.806.build.board=AVR_ATtiny806
 atxy6.menu.chip.806.build.attiny=806
 atxy6.menu.chip.806.build.millistimer=A0
 atxy6.menu.chip.806.upload.maximum_size=8192
 atxy6.menu.chip.806.upload.maximum_data_size=512
 atxy6.menu.chip.406=ATtiny406
-atxy6.menu.chip.406.build.board=ATtiny406
+atxy6.menu.chip.406.build.board=AVR_ATtiny406
 atxy6.menu.chip.406.build.attiny=406
 atxy6.menu.chip.406.build.millistimer=A0
 atxy6.menu.chip.406.upload.maximum_size=4096
@@ -348,7 +380,7 @@ atxy6.menu.bodvoltage.2v1.bootloader.bodlevbits=001
 atxy6.menu.bodmode.disabled=Disabled/Disabled
 atxy6.menu.bodmode.enabled=Enabled/Enabled
 atxy6.menu.bodmode.ensampfast=Enabled/Sampled (1kHz)
-atxy6.menu.bodmode.ensampslo=Enabled/Sampled (125Hz)
+atxy6.menu.bodmode.ensampslow=Enabled/Sampled (125Hz)
 atxy6.menu.bodmode.sampledfast=Sampled/Sampled (1kHz)
 atxy6.menu.bodmode.sampledslow=Sampled/Sampled (125Hz)
 atxy6.menu.bodmode.sampdisfast=Sampled/Disabled (1kHz)
@@ -394,11 +426,21 @@ atxy6.menu.resetpin.reset.bootloader.resetpinbits=10
 atxy6.menu.resetpin.gpio=IO (DANGER - Bricks chip w/out HV UPDI programmer! Use PCHV)
 atxy6.menu.resetpin.gpio.bootloader.resetpinbits=00
 
-atxy6.menu.startuptime.8= 8ms - A good default, usually fine
-atxy6.menu.startuptime.1= 1ms - (aggressive/very fast rising power)
-atxy6.menu.startuptime.64= 64ms - (cautious/slow rising power)
-atxy6.menu.startuptime.8.bootloader.SYSCFG1=0x03
+atxy6.menu.startuptime.8=8ms
+atxy6.menu.startuptime.0=0ms
+atxy6.menu.startuptime.1=1ms
+atxy6.menu.startuptime.2=2ms
+atxy6.menu.startuptime.4=4ms
+atxy6.menu.startuptime.16=16ms
+atxy6.menu.startuptime.32=32ms
+atxy6.menu.startuptime.64=64ms
+atxy6.menu.startuptime.0.bootloader.SYSCFG1=0x00
 atxy6.menu.startuptime.1.bootloader.SYSCFG1=0x01
+atxy6.menu.startuptime.2.bootloader.SYSCFG1=0x02
+atxy6.menu.startuptime.4.bootloader.SYSCFG1=0x03
+atxy6.menu.startuptime.8.bootloader.SYSCFG1=0x04
+atxy6.menu.startuptime.16.bootloader.SYSCFG1=0x05
+atxy6.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy6.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 atxy6.menu.uartvoltage.5v=Closer to 5v
@@ -409,20 +451,21 @@ atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 ##############################################################
+#      ATtiny1614/1604/814/804/414/404/214/204
+##############################################################
 
-atxy4.name=ATtiny1614/1604/814/804/414/404/214/204
 atxy4.upload.workaround=
 atxy4.build.millistimer=D0
 # We set this here - unless 20/10/5 MHz is selected, we always use the 16 MHz oscillator to start up on
 # This is the safer choice, as automotive parts don't have the 20 MHz oscillator.
 atxy4.bootloader.OSCCFG=0x01
 atxy4.build.bootload=
-atxy4.build.board=generic_txy4
+atxy4.build.board=AVR_ATtinyxy4
 atxy4.menu.serialevent.no=No (saves space)
 atxy4.menu.serialevent.yes=Yes
 atxy4.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
 atxy4.menu.serialevent.yes.build.serialevent=
-
+atxy4.menu.serialevent.yes.build.serialeventabr=E
 atxy4.upload.tool=avrdude
 
 atxy4.bootloader.tool=avrdude
@@ -431,49 +474,50 @@ atxy4.build.core=megatinycore
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
 atxy4.build.mcu=attiny{build.attiny}
+atxy4.build.serialeventabr=
 atxy4.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy4.build.f_cpu={build.speed}000000L
 
 atxy4.menu.chip.1614=ATtiny1614
-atxy4.menu.chip.1614.build.board=ATtiny1614
+atxy4.menu.chip.1614.build.board=AVR_ATtiny1614
 atxy4.menu.chip.1614.build.attiny=1614
 atxy4.menu.chip.1614.upload.maximum_size=16384
 atxy4.menu.chip.1614.upload.maximum_data_size=2048
 atxy4.menu.chip.814=ATtiny814
-atxy4.menu.chip.814.build.board=ATtiny814
+atxy4.menu.chip.814.build.board=AVR_ATtiny814
 atxy4.menu.chip.814.build.attiny=814
 atxy4.menu.chip.814.upload.maximum_size=8192
 atxy4.menu.chip.814.upload.maximum_data_size=512
 atxy4.menu.chip.414=ATtiny414
-atxy4.menu.chip.414.build.board=ATtiny414
+atxy4.menu.chip.414.build.board=AVR_ATtiny414
 atxy4.menu.chip.414.build.attiny=414
 atxy4.menu.chip.414.upload.maximum_size=4096
 atxy4.menu.chip.414.upload.maximum_data_size=256
 atxy4.menu.chip.214=ATtiny214
-atxy4.menu.chip.214.build.board=ATtiny214
+atxy4.menu.chip.214.build.board=AVR_ATtiny214
 atxy4.menu.chip.214.build.attiny=214
 atxy4.menu.chip.214.upload.maximum_size=2048
 atxy4.menu.chip.214.upload.maximum_data_size=128
 atxy4.menu.chip.1604=ATtiny1604
-atxy4.menu.chip.1604.build.board=ATtiny1604
+atxy4.menu.chip.1604.build.board=AVR_ATtiny1604
 atxy4.menu.chip.1604.build.attiny=1604
 atxy4.menu.chip.1604.build.millistimer=A0
 atxy4.menu.chip.1604.upload.maximum_size=16384
 atxy4.menu.chip.1604.upload.maximum_data_size=1024
 atxy4.menu.chip.804=ATtiny804
-atxy4.menu.chip.804.build.board=ATtiny804
+atxy4.menu.chip.804.build.board=AVR_ATtiny804
 atxy4.menu.chip.804.build.attiny=804
 atxy4.menu.chip.804.build.millistimer=A0
 atxy4.menu.chip.804.upload.maximum_size=8192
 atxy4.menu.chip.804.upload.maximum_data_size=512
 atxy4.menu.chip.404=ATtiny404
-atxy4.menu.chip.404.build.board=ATtiny404
+atxy4.menu.chip.404.build.board=AVR_ATtiny404
 atxy4.menu.chip.404.build.attiny=404
 atxy4.menu.chip.404.build.millistimer=A0
 atxy4.menu.chip.404.upload.maximum_size=4096
 atxy4.menu.chip.404.upload.maximum_data_size=256
 atxy4.menu.chip.204=ATtiny204
-atxy4.menu.chip.204.build.board=ATtiny204
+atxy4.menu.chip.204.build.board=AVR_ATtiny204
 atxy4.menu.chip.204.build.attiny=204
 atxy4.menu.chip.204.build.millistimer=A0
 atxy4.menu.chip.204.upload.maximum_size=2048
@@ -549,7 +593,7 @@ atxy4.menu.bodvoltage.2v1.bootloader.bodlevbits=001
 atxy4.menu.bodmode.disabled=Disabled/Disabled
 atxy4.menu.bodmode.enabled=Enabled/Enabled
 atxy4.menu.bodmode.ensampfast=Enabled/Sampled (1kHz)
-atxy4.menu.bodmode.ensampslo=Enabled/Sampled (125Hz)
+atxy4.menu.bodmode.ensampslow=Enabled/Sampled (125Hz)
 atxy4.menu.bodmode.sampledfast=Sampled/Sampled (1kHz)
 atxy4.menu.bodmode.sampledslow=Sampled/Sampled (125Hz)
 atxy4.menu.bodmode.sampdisfast=Sampled/Disabled (1kHz)
@@ -595,11 +639,21 @@ atxy4.menu.resetpin.reset.bootloader.resetpinbits=10
 atxy4.menu.resetpin.gpio=IO (DANGER - Bricks chip w/out HV UPDI programmer! Use PCHV)
 atxy4.menu.resetpin.gpio.bootloader.resetpinbits=00
 
-atxy4.menu.startuptime.8= 8ms - A good default, usually fine
-atxy4.menu.startuptime.1= 1ms - (aggressive/very fast rising power)
-atxy4.menu.startuptime.64= 64ms - (cautious/slow rising power)
-atxy4.menu.startuptime.8.bootloader.SYSCFG1=0x03
+atxy4.menu.startuptime.8=8ms
+atxy4.menu.startuptime.0=0ms
+atxy4.menu.startuptime.1=1ms
+atxy4.menu.startuptime.2=2ms
+atxy4.menu.startuptime.4=4ms
+atxy4.menu.startuptime.16=16ms
+atxy4.menu.startuptime.32=32ms
+atxy4.menu.startuptime.64=64ms
+atxy4.menu.startuptime.0.bootloader.SYSCFG1=0x00
 atxy4.menu.startuptime.1.bootloader.SYSCFG1=0x01
+atxy4.menu.startuptime.2.bootloader.SYSCFG1=0x02
+atxy4.menu.startuptime.4.bootloader.SYSCFG1=0x03
+atxy4.menu.startuptime.8.bootloader.SYSCFG1=0x04
+atxy4.menu.startuptime.16.bootloader.SYSCFG1=0x05
+atxy4.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy4.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 atxy4.menu.uartvoltage.5v=Closer to 5v
@@ -607,7 +661,7 @@ atxy4.menu.uartvoltage.3v=Closer to 3v
 atxy4.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy4.menu.uartvoltage.3v.build.uartvoltage=3V
 
-atxy4.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy4.build.extra_flags=-DARDUINO_attinyxy4 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.WDTCFG=0x00
@@ -618,13 +672,15 @@ atxy4.bootloader.BOOTEND=0x00
 atxy4.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 
 ##############################################################
+#      ATtiny412/402/212/202
+##############################################################
 
-atxy2.name=ATtiny412/402/212/202
 atxy2.upload.workaround=
 atxy2.build.millistimer=D0
 atxy2.build.bootload=
-atxy2.build.board=generic_txy2
+atxy2.build.board=AVR_ATtinyxy2
 atxy2.build.mcu=attiny{build.attiny}
+atxy2.build.serialeventabr=
 atxy2.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy2.build.f_cpu={build.speed}000000L
 
@@ -632,36 +688,37 @@ atxy2.menu.serialevent.no=No (saves space)
 atxy2.menu.serialevent.yes=Yes
 atxy2.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
 atxy2.menu.serialevent.yes.build.serialevent=
-
+atxy2.menu.serialevent.yes.build.serialeventabr=E
 atxy2.upload.tool=avrdude
 
 atxy2.bootloader.flashcommand=
 atxy2.bootloader.tool=avrdude
 
 atxy2.menu.chip.412=ATtiny412
-atxy2.menu.chip.412.build.board=ATtiny412
+atxy2.menu.chip.412.build.board=AVR_ATtiny412
 atxy2.menu.chip.412.build.attiny=412
 atxy2.menu.chip.412.upload.maximum_size=4096
 atxy2.menu.chip.412.upload.maximum_data_size=256
 atxy2.menu.chip.212=ATtiny212
-atxy2.menu.chip.212.build.board=ATtiny212
+atxy2.menu.chip.212.build.board=AVR_ATtiny212
 atxy2.menu.chip.212.build.attiny=212
 atxy2.menu.chip.212.upload.maximum_size=2048
 atxy2.menu.chip.212.upload.maximum_data_size=128
 atxy2.menu.chip.402=ATtiny402
-atxy2.menu.chip.402.build.board=ATtiny402
+atxy2.menu.chip.402.build.board=AVR_ATtiny402
 atxy2.menu.chip.402.build.attiny=402
 atxy2.menu.chip.402.build.millistimer=A0
 atxy2.menu.chip.402.upload.maximum_size=4096
 atxy2.menu.chip.402.upload.maximum_data_size=256
 atxy2.menu.chip.402w=ATtiny402 (bad signature)
-atxy2.menu.chip.402w.build.attiny=402
+atxy2.menu.chip.402w.build.board=AVR_ATtiny402
 atxy2.menu.chip.402w.build.millistimer=A0
+atxy2.menu.chip.402w.build.board=AVR_ATtiny402
 atxy2.menu.chip.402w.upload.maximum_size=4096
 atxy2.menu.chip.402w.upload.maximum_data_size=256
 atxy2.menu.chip.402w.upload.workaround=w
 atxy2.menu.chip.202=ATtiny202
-atxy2.menu.chip.202.build.board=ATtiny202
+atxy2.menu.chip.202.build.board=AVR_ATtiny202
 atxy2.menu.chip.202.build.attiny=202
 atxy2.menu.chip.202.build.millistimer=A0
 atxy2.menu.chip.202.upload.maximum_size=2048
@@ -737,7 +794,7 @@ atxy2.menu.bodvoltage.2v1.bootloader.bodlevbits=001
 atxy2.menu.bodmode.disabled=Disabled/Disabled
 atxy2.menu.bodmode.enabled=Enabled/Enabled
 atxy2.menu.bodmode.ensampfast=Enabled/Sampled (1kHz)
-atxy2.menu.bodmode.ensampslo=Enabled/Sampled (125Hz)
+atxy2.menu.bodmode.ensampslow=Enabled/Sampled (125Hz)
 atxy2.menu.bodmode.sampledfast=Sampled/Sampled (1kHz)
 atxy2.menu.bodmode.sampledslow=Sampled/Sampled (125Hz)
 atxy2.menu.bodmode.sampdisfast=Sampled/Disabled (1kHz)
@@ -777,23 +834,30 @@ atxy2.menu.resetpin.reset.bootloader.resetpinbits=10
 atxy2.menu.resetpin.gpio=IO (DANGER - Bricks chip w/out HV UPDI programmer! Use PCHV)
 atxy2.menu.resetpin.gpio.bootloader.resetpinbits=00
 
-atxy2.menu.startuptime.8= 8ms - A good default, usually fine
-atxy2.menu.startuptime.1= 1ms - (aggressive/very fast rising power)
-atxy2.menu.startuptime.64= 64ms - (cautious/slow rising power)
-atxy2.menu.startuptime.8.bootloader.SYSCFG1=0x03
+atxy2.menu.startuptime.8=8ms
+atxy2.menu.startuptime.0=0ms
+atxy2.menu.startuptime.1=1ms
+atxy2.menu.startuptime.2=2ms
+atxy2.menu.startuptime.4=4ms
+atxy2.menu.startuptime.16=16ms
+atxy2.menu.startuptime.32=32ms
+atxy2.menu.startuptime.64=64ms
+atxy2.menu.startuptime.0.bootloader.SYSCFG1=0x00
 atxy2.menu.startuptime.1.bootloader.SYSCFG1=0x01
+atxy2.menu.startuptime.2.bootloader.SYSCFG1=0x02
+atxy2.menu.startuptime.4.bootloader.SYSCFG1=0x03
+atxy2.menu.startuptime.8.bootloader.SYSCFG1=0x04
+atxy2.menu.startuptime.16.bootloader.SYSCFG1=0x05
+atxy2.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy2.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
-atxy2.menu.uartvoltage.5v=Closer to 5v
-atxy2.menu.uartvoltage.3v=Closer to 3v
-atxy2.menu.uartvoltage.5v.build.uartvoltage=5V
-atxy2.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 atxy2.build.core=megatinycore
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
-atxy2.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy2.build.uartvoltage=-V
+atxy2.build.extra_flags=-DARDUINO_attinyxy2 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
@@ -804,32 +868,34 @@ atxy2.bootloader.APPEND=0x00
 atxy2.bootloader.BOOTEND=0x00
 atxy2.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 
-# Xplained boards with Tiny-1 chips
+##############################################################
+#      Attiny416 Xplained Nano (Optiboot)
+##############################################################
 
-Xplained416.name=Attiny416 Xplained Nano (optiboot)
 Xplained416.upload.workaround=
 Xplained416.build.millistimer=D0
 Xplained416.build.bootload=opti
 Xplained416.build.mcu=attiny{build.attiny}
+Xplained416.build.serialeventabr=
 Xplained416.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 Xplained416.build.f_cpu={build.speed}000000L
 
 Xplained416.build.attiny=416
-Xplained416.build.board=attinyxy6
+Xplained416.build.board=AVR_Xplained416
 Xplained416.build.core=megatinycore
 Xplained416.build.variant=txy6
 Xplained416.build.speed=20
 Xplained416.build.clocksource=0
 Xplained416.build.text_section_start=.text=0x200
-Xplained416.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD5V
+Xplained416.build.extra_flags=-DARDUINO_attinyxy6 -DARDUINO_AVR_ATtiny416 {build.serialevent} {build.millis} -DUARTBAUD5V
 
 Xplained416.menu.serialevent.no=No (saves space)
 Xplained416.menu.serialevent.yes=Yes
 Xplained416.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
 Xplained416.menu.serialevent.yes.build.serialevent=
+Xplained416.menu.serialevent.yes.build.serialeventabr=E
 
 Xplained416.upload.tool=avrdude
-
 Xplained416.upload.speed=57600
 Xplained416.upload.maximum_size=3584
 Xplained416.upload.maximum_data_size=256
@@ -864,30 +930,34 @@ Xplained416.menu.millis.rtc.build.millistimer=RTC
 Xplained416.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 Xplained416.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-Xplained817.name=Attiny817 Xplained Mini (optiboot)
+##############################################################
+#      Attiny817 Xplained Mini (Optiboot)
+##############################################################
+
 Xplained817.upload.workaround=
 Xplained817.build.millistimer=D0
 Xplained817.build.bootload=opti
 Xplained817.build.mcu=attiny{build.attiny}
+Xplained817.build.serialeventabr=
 Xplained817.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 Xplained817.build.f_cpu={build.speed}000000L
 
 Xplained817.build.attiny=817
-Xplained817.build.board=attinyxy7
+Xplained817.build.board=AVR_Xplained817
 Xplained817.build.core=megatinycore
 Xplained817.build.variant=txy7
 Xplained817.build.speed=20
 Xplained817.build.clocksource=0
 Xplained817.build.text_section_start=.text=0x200
-Xplained817.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD5V
+Xplained817.build.extra_flags=-DARDUINO_attinyxy7 -DARDUINO_AVR_ATtiny817 {build.serialevent} {build.millis} -DUARTBAUD5V
 
 Xplained817.menu.serialevent.no=No (saves space)
 Xplained817.menu.serialevent.yes=Yes
 Xplained817.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
 Xplained817.menu.serialevent.yes.build.serialevent=
+Xplained817.menu.serialevent.yes.build.serialeventabr=E
 
 Xplained817.upload.tool=avrdude
-
 Xplained817.upload.speed=57600
 Xplained817.upload.maximum_size=7680
 Xplained817.upload.maximum_data_size=512
@@ -922,45 +992,48 @@ Xplained817.menu.millis.rtc.build.millistimer=RTC
 Xplained817.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 Xplained817.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-# Separate board types for chips with Optiboot.  Reduces menu clutter.
+##############################################################
+#      ATtiny3217/1617/1607/817/807/417 (Optiboot)
+##############################################################
 
-atxy7o.name=ATtiny3217/1617/1607/817/807/417 (Optiboot)
 atxy7o.upload.workaround=
 atxy7o.build.millistimer=D0
 atxy7o.build.bootload=opti
+atxy7o.build.board=AVR_ATtinyxy7
 atxy7o.build.mcu=attiny{build.attiny}
+atxy7o.build.serialeventabr=
 atxy7o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy7o.build.f_cpu={build.speed}000000L
 atxy7o.upload.speed=115200
 
 atxy7o.menu.chip.3217=ATtiny3217
-atxy7o.menu.chip.3217.build.board=ATtiny3217
+atxy7o.menu.chip.3217.build.board=AVR_ATtiny3217
 atxy7o.menu.chip.3217.build.attiny=3217
 atxy7o.menu.chip.3217.upload.maximum_size=32256
 atxy7o.menu.chip.3217.upload.maximum_data_size=2048
 atxy7o.menu.chip.1617=ATtiny1617
-atxy7o.menu.chip.1617.build.board=ATtiny1617
+atxy7o.menu.chip.1617.build.board=AVR_ATtiny1617
 atxy7o.menu.chip.1617.build.attiny=1617
 atxy7o.menu.chip.1617.upload.maximum_size=15872
 atxy7o.menu.chip.1617.upload.maximum_data_size=2048
 atxy7o.menu.chip.817=ATtiny817
-atxy7o.menu.chip.817.build.board=ATtiny817
+atxy7o.menu.chip.817.build.board=AVR_ATtiny817
 atxy7o.menu.chip.817.build.attiny=817
 atxy7o.menu.chip.817.upload.maximum_size=7680
 atxy7o.menu.chip.817.upload.maximum_data_size=512
 atxy7o.menu.chip.417=ATtiny417
-atxy7o.menu.chip.417.build.board=ATtiny417
+atxy7o.menu.chip.417.build.board=AVR_ATtiny417
 atxy7o.menu.chip.417.build.attiny=417
 atxy7o.menu.chip.417.upload.maximum_size=3584
 atxy7o.menu.chip.417.upload.maximum_data_size=256
 atxy7o.menu.chip.1607=ATtiny1607
-atxy7o.menu.chip.1607.build.board=ATtiny1607
+atxy7o.menu.chip.1607.build.board=AVR_ATtiny1607
 atxy7o.menu.chip.1607.build.attiny=1607
 atxy7o.menu.chip.1607.build.millistimer=A0
 atxy7o.menu.chip.1607.upload.maximum_size=15872
 atxy7o.menu.chip.1607.upload.maximum_data_size=1024
 atxy7o.menu.chip.807=ATtiny807
-atxy7o.menu.chip.807.build.board=ATtiny807
+atxy7o.menu.chip.807.build.board=AVR_ATtiny807
 atxy7o.menu.chip.807.build.attiny=807
 atxy7o.menu.chip.807.build.millistimer=A0
 atxy7o.menu.chip.807.upload.maximum_size=7680
@@ -1036,7 +1109,7 @@ atxy7o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
 atxy7o.menu.bodmode.disabled=Disabled/Disabled
 atxy7o.menu.bodmode.enabled=Enabled/Enabled
 atxy7o.menu.bodmode.ensampfast=Enabled/Sampled (1kHz)
-atxy7o.menu.bodmode.ensampslo=Enabled/Sampled (125Hz)
+atxy7o.menu.bodmode.ensampslow=Enabled/Sampled (125Hz)
 atxy7o.menu.bodmode.sampledfast=Sampled/Sampled (1kHz)
 atxy7o.menu.bodmode.sampledslow=Sampled/Sampled (125Hz)
 atxy7o.menu.bodmode.sampdisfast=Sampled/Disabled (1kHz)
@@ -1080,11 +1153,21 @@ atxy7o.menu.resetpinopti.gpio=IO (DANGER - Read docs first! powercycle to enter 
 atxy7o.menu.resetpinopti.gpio.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}.hex
 atxy7o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
-atxy7o.menu.startuptime.8= 8ms - A good default, usually fine
-atxy7o.menu.startuptime.1= 1ms - (aggressive/very fast rising power)
-atxy7o.menu.startuptime.64= 64ms - (cautious/slow rising power)
-atxy7o.menu.startuptime.8.bootloader.SYSCFG1=0x03
+atxy7o.menu.startuptime.8=8ms
+atxy7o.menu.startuptime.0=0ms
+atxy7o.menu.startuptime.1=1ms
+atxy7o.menu.startuptime.2=2ms
+atxy7o.menu.startuptime.4=4ms
+atxy7o.menu.startuptime.16=16ms
+atxy7o.menu.startuptime.32=32ms
+atxy7o.menu.startuptime.64=64ms
+atxy7o.menu.startuptime.0.bootloader.SYSCFG1=0x00
 atxy7o.menu.startuptime.1.bootloader.SYSCFG1=0x01
+atxy7o.menu.startuptime.2.bootloader.SYSCFG1=0x02
+atxy7o.menu.startuptime.4.bootloader.SYSCFG1=0x03
+atxy7o.menu.startuptime.8.bootloader.SYSCFG1=0x04
+atxy7o.menu.startuptime.16.bootloader.SYSCFG1=0x05
+atxy7o.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy7o.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 atxy7o.menu.uartvoltage.5v=Closer to 5v
@@ -1092,8 +1175,8 @@ atxy7o.menu.uartvoltage.3v=Closer to 3v
 atxy7o.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy7o.menu.uartvoltage.3v.build.uartvoltage=3V
 
-atxy7o.menu.bootloaderuart.default=TX:9, RX:8
-atxy7o.menu.bootloaderuart.alternate=TX:18, RX:19
+atxy7o.menu.bootloaderuart.default=TX:9 (PB2), RX:8 (PB3)
+atxy7o.menu.bootloaderuart.alternate=TX:18 (PA1), RX:19 (PA2)
 atxy7o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy7o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
@@ -1101,14 +1184,12 @@ atxy7o.menu.serialevent.no=No (saves space)
 atxy7o.menu.serialevent.yes=Yes
 atxy7o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
 atxy7o.menu.serialevent.yes.build.serialevent=
-
+atxy7o.menu.serialevent.yes.build.serialeventabr=E
 atxy7o.upload.tool=avrdude
 
-atxy7o.build.board=attinyxy7
 atxy7o.build.core=megatinycore
 atxy7o.build.variant=txy7
-atxy7o.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
-atxy7o.build.export_merged_output=true
+atxy7o.build.extra_flags=-DARDUINO_attinyxy7 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 
 atxy7o.bootloader.WDTCFG=0x00
 atxy7o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
@@ -1124,51 +1205,54 @@ atxy7o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bo
 atxy7o.bootloader.tool=avrdude
 
 ##############################################################
+#      ATtiny3216/1616/1606/816/806/416/406 (Optiboot)
+##############################################################
 
-atxy6o.name=ATtiny3216/1616/1606/816/806/416/406 (optiboot)
 atxy6o.upload.workaround=
 atxy6o.build.millistimer=D0
 atxy6o.build.bootload=opti
+atxy6o.build.board=AVR_ATtinyxy6
 atxy6o.build.mcu=attiny{build.attiny}
+atxy6o.build.serialeventabr=
 atxy6o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy6o.build.f_cpu={build.speed}000000L
 atxy6o.upload.speed=115200
 
 atxy6o.menu.chip.3216=ATtiny3216
-atxy6o.menu.chip.3216.build.board=ATtiny3216
+atxy6o.menu.chip.3216.build.board=AVR_ATtiny3216
 atxy6o.menu.chip.3216.build.attiny=3216
 atxy6o.menu.chip.3216.upload.maximum_size=32256
 atxy6o.menu.chip.3216.upload.maximum_data_size=2048
 atxy6o.menu.chip.1616=ATtiny1616
-atxy6o.menu.chip.1616.build.board=ATtiny1616
+atxy6o.menu.chip.1616.build.board=AVR_ATtiny1616
 atxy6o.menu.chip.1616.build.attiny=1616
 atxy6o.menu.chip.1616.upload.maximum_size=15872
 atxy6o.menu.chip.1616.upload.maximum_data_size=2048
 atxy6o.menu.chip.816=ATtiny816
-atxy6o.menu.chip.816.build.board=ATtiny816
+atxy6o.menu.chip.816.build.board=AVR_ATtiny816
 atxy6o.menu.chip.816.build.attiny=816
 atxy6o.menu.chip.816.upload.maximum_size=7680
 atxy6o.menu.chip.816.upload.maximum_data_size=512
 atxy6o.menu.chip.416=ATtiny416
-atxy6o.menu.chip.416.build.board=ATtiny416
+atxy6o.menu.chip.416.build.board=AVR_ATtiny416
 atxy6o.menu.chip.416.build.attiny=416
 atxy6o.menu.chip.416.upload.maximum_size=3584
 atxy6o.menu.chip.416.upload.maximum_data_size=256
 
 atxy6o.menu.chip.1606=ATtiny1606
-atxy6o.menu.chip.1606.build.board=ATtiny1606
+atxy6o.menu.chip.1606.build.board=AVR_ATtiny1606
 atxy6o.menu.chip.1606.build.attiny=1606
 atxy6o.menu.chip.1606.build.millistimer=A0
 atxy6o.menu.chip.1606.upload.maximum_size=15872
 atxy6o.menu.chip.1606.upload.maximum_data_size=1024
 atxy6o.menu.chip.806=ATtiny806
-atxy6o.menu.chip.806.build.board=ATtiny806
+atxy6o.menu.chip.806.build.board=AVR_ATtiny806
 atxy6o.menu.chip.806.build.attiny=806
 atxy6o.menu.chip.806.build.millistimer=A0
 atxy6o.menu.chip.806.upload.maximum_size=7680
 atxy6o.menu.chip.806.upload.maximum_data_size=512
 atxy6o.menu.chip.406=ATtiny406
-atxy6o.menu.chip.406.build.board=ATtiny406
+atxy6o.menu.chip.406.build.board=AVR_ATtiny406
 atxy6o.menu.chip.406.build.attiny=406
 atxy6o.menu.chip.406.build.millistimer=A0
 atxy6o.menu.chip.406.upload.maximum_size=3584
@@ -1262,7 +1346,7 @@ atxy6o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
 atxy6o.menu.bodmode.disabled=Disabled/Disabled
 atxy6o.menu.bodmode.enabled=Enabled/Enabled
 atxy6o.menu.bodmode.ensampfast=Enabled/Sampled (1kHz)
-atxy6o.menu.bodmode.ensampslo=Enabled/Sampled (125Hz)
+atxy6o.menu.bodmode.ensampslow=Enabled/Sampled (125Hz)
 atxy6o.menu.bodmode.sampledfast=Sampled/Sampled (1kHz)
 atxy6o.menu.bodmode.sampledslow=Sampled/Sampled (125Hz)
 atxy6o.menu.bodmode.sampdisfast=Sampled/Disabled (1kHz)
@@ -1283,10 +1367,9 @@ atxy6o.menu.uartvoltage.3v=Closer to 3v
 atxy6o.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy6o.menu.uartvoltage.3v.build.uartvoltage=3V
 
-atxy6o.build.board=attinyxy6
 atxy6o.build.core=megatinycore
 atxy6o.build.variant=txy6
-atxy6o.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy6o.build.extra_flags=-DARDUINO_attinyxy6 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy6o.build.export_merged_output=true
 
 atxy6o.menu.resetpinopti.UPDI=UPDI (powercycle to enter bootloader)
@@ -1299,22 +1382,32 @@ atxy6o.menu.resetpinopti.gpio=IO (DANGER - Read docs first! powercycle to enter 
 atxy6o.menu.resetpinopti.gpio.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}.hex
 atxy6o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
-atxy6o.menu.startuptime.8= 8ms - A good default, usually fine
-atxy6o.menu.startuptime.1= 1ms - (aggressive/very fast rising power)
-atxy6o.menu.startuptime.64= 64ms - (cautious/slow rising power)
-atxy6o.menu.startuptime.8.bootloader.SYSCFG1=0x03
+atxy6o.menu.startuptime.8=8ms
+atxy6o.menu.startuptime.0=0ms
+atxy6o.menu.startuptime.1=1ms
+atxy6o.menu.startuptime.2=2ms
+atxy6o.menu.startuptime.4=4ms
+atxy6o.menu.startuptime.16=16ms
+atxy6o.menu.startuptime.32=32ms
+atxy6o.menu.startuptime.64=64ms
+atxy6o.menu.startuptime.0.bootloader.SYSCFG1=0x00
 atxy6o.menu.startuptime.1.bootloader.SYSCFG1=0x01
+atxy6o.menu.startuptime.2.bootloader.SYSCFG1=0x02
+atxy6o.menu.startuptime.4.bootloader.SYSCFG1=0x03
+atxy6o.menu.startuptime.8.bootloader.SYSCFG1=0x04
+atxy6o.menu.startuptime.16.bootloader.SYSCFG1=0x05
+atxy6o.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy6o.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 atxy6o.menu.serialevent.no=No (saves space)
 atxy6o.menu.serialevent.yes=Yes
 atxy6o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
 atxy6o.menu.serialevent.yes.build.serialevent=
-
+atxy6o.menu.serialevent.yes.build.serialeventabr=E
 atxy6o.upload.tool=avrdude
 
-atxy6o.menu.bootloaderuart.default=TX:7, RX:6
-atxy6o.menu.bootloaderuart.alternate=TX:14, RX:15
+atxy6o.menu.bootloaderuart.default=TX:7 (PB2), RX:6 (PB3)
+atxy6o.menu.bootloaderuart.alternate=TX:14 (PA1), RX:15 (PA2)
 atxy6o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy6o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
@@ -1333,56 +1426,59 @@ atxy6o.bootloader.BOOTEND=0x2
 atxy6o.bootloader.tool=avrdude
 
 ##############################################################
+#      ATtiny1614/1604/814/804/414/404/214/204 (Optiboot)
+##############################################################
 
-atxy4o.name=ATtiny1614/1604/814/804/414/404/214/204 (optiboot)
 atxy4o.upload.workaround=
 atxy4o.build.millistimer=D0
 atxy4o.build.bootload=opti
+atxy4o.build.board=AVR_ATtinyxy4
 atxy4o.build.mcu=attiny{build.attiny}
+atxy4o.build.serialeventabr=
 atxy4o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy4o.build.f_cpu={build.speed}000000L
 atxy4o.upload.speed=115200
 
 atxy4o.menu.chip.1614=ATtiny1614
-atxy4o.menu.chip.1614.build.board=ATtiny1614
+atxy4o.menu.chip.1614.build.board=AVR_ATtiny1614
 atxy4o.menu.chip.1614.build.attiny=1614
 atxy4o.menu.chip.1614.upload.maximum_size=15872
 atxy4o.menu.chip.1614.upload.maximum_data_size=2048
 atxy4o.menu.chip.814=ATtiny814
-atxy4o.menu.chip.814.build.board=ATtiny814
+atxy4o.menu.chip.814.build.board=AVR_ATtiny814
 atxy4o.menu.chip.814.build.attiny=814
 atxy4o.menu.chip.814.upload.maximum_size=7680
 atxy4o.menu.chip.814.upload.maximum_data_size=512
 atxy4o.menu.chip.414=ATtiny414
-atxy4o.menu.chip.414.build.board=ATtiny414
+atxy4o.menu.chip.414.build.board=AVR_ATtiny414
 atxy4o.menu.chip.414.build.attiny=414
 atxy4o.menu.chip.414.upload.maximum_size=3584
 atxy4o.menu.chip.414.upload.maximum_data_size=256
 atxy4o.menu.chip.214=ATtiny214
-atxy4o.menu.chip.214.build.board=ATtiny214
+atxy4o.menu.chip.214.build.board=AVR_ATtiny214
 atxy4o.menu.chip.214.build.attiny=214
 atxy4o.menu.chip.214.upload.maximum_size=1536
 atxy4o.menu.chip.214.upload.maximum_data_size=128
 atxy4o.menu.chip.1604=ATtiny1604
-atxy4o.menu.chip.1604.build.board=ATtiny1604
+atxy4o.menu.chip.1604.build.board=AVR_ATtiny1604
 atxy4o.menu.chip.1604.build.attiny=1604
 atxy4o.menu.chip.1604.build.millistimer=A0
 atxy4o.menu.chip.1604.upload.maximum_size=15872
 atxy4o.menu.chip.1604.upload.maximum_data_size=1024
 atxy4o.menu.chip.804=ATtiny804
-atxy4o.menu.chip.804.build.board=ATtiny804
+atxy4o.menu.chip.804.build.board=AVR_ATtiny804
 atxy4o.menu.chip.804.build.attiny=804
 atxy4o.menu.chip.804.build.millistimer=A0
 atxy4o.menu.chip.804.upload.maximum_size=7680
 atxy4o.menu.chip.804.upload.maximum_data_size=512
 atxy4o.menu.chip.404=ATtiny404
-atxy4o.menu.chip.404.build.board=ATtiny404
+atxy4o.menu.chip.404.build.board=AVR_ATtiny404
 atxy4o.menu.chip.404.build.attiny=404
 atxy4o.menu.chip.404.build.millistimer=A0
 atxy4o.menu.chip.404.upload.maximum_size=3584
 atxy4o.menu.chip.404.upload.maximum_data_size=256
 atxy4o.menu.chip.204=ATtiny204
-atxy4o.menu.chip.204.build.board=ATtiny204
+atxy4o.menu.chip.204.build.board=AVR_ATtiny204
 atxy4o.menu.chip.204.build.attiny=204
 atxy4o.menu.chip.204.build.millistimer=A0
 atxy4o.menu.chip.204.upload.maximum_size=1536
@@ -1476,7 +1572,7 @@ atxy4o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
 atxy4o.menu.bodmode.disabled=Disabled/Disabled
 atxy4o.menu.bodmode.enabled=Enabled/Enabled
 atxy4o.menu.bodmode.ensampfast=Enabled/Sampled (1kHz)
-atxy4o.menu.bodmode.ensampslo=Enabled/Sampled (125Hz)
+atxy4o.menu.bodmode.ensampslow=Enabled/Sampled (125Hz)
 atxy4o.menu.bodmode.sampledfast=Sampled/Sampled (1kHz)
 atxy4o.menu.bodmode.sampledslow=Sampled/Sampled (125Hz)
 atxy4o.menu.bodmode.sampdisfast=Sampled/Disabled (1kHz)
@@ -1501,22 +1597,22 @@ atxy4o.menu.serialevent.no=No (saves space)
 atxy4o.menu.serialevent.yes=Yes
 atxy4o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
 atxy4o.menu.serialevent.yes.build.serialevent=
-
+atxy4o.menu.serialevent.yes.build.serialeventabr=E
 atxy4o.upload.tool=avrdude
 
-atxy4o.build.board=attinyxy4
 atxy4o.build.core=megatinycore
 atxy4o.build.variant=txy4
-atxy4o.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy4o.build.extra_flags=-DARDUINO_attinyxy4 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy4o.build.export_merged_output=true
+
 atxy4o.upload.protocol=arduino
 atxy4o.upload.extra_params=-D
 atxy4o.build.text_section_start=.text=0x200
 atxy4o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
 atxy4o.bootloader.tool=avrdude
 
-atxy4o.menu.bootloaderuart.default=TX:5, RX:4
-atxy4o.menu.bootloaderuart.alternate=TX:8, RX:9
+atxy4o.menu.bootloaderuart.default=TX:5 (PB2), RX:4 (PB3)
+atxy4o.menu.bootloaderuart.alternate=TX:8 (PA1), RX:9 (PA2)
 atxy4o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy4o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
@@ -1530,11 +1626,21 @@ atxy4o.menu.resetpinopti.gpio=IO (DANGER - Read docs first! powercycle to enter 
 atxy4o.menu.resetpinopti.gpio.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}.hex
 atxy4o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
-atxy4o.menu.startuptime.8= 8ms - A good default, usually fine
-atxy4o.menu.startuptime.1= 1ms - (aggressive/very fast rising power)
-atxy4o.menu.startuptime.64= 64ms - (cautious/slow rising power)
-atxy4o.menu.startuptime.8.bootloader.SYSCFG1=0x03
+atxy4o.menu.startuptime.8=8ms
+atxy4o.menu.startuptime.0=0ms
+atxy4o.menu.startuptime.1=1ms
+atxy4o.menu.startuptime.2=2ms
+atxy4o.menu.startuptime.4=4ms
+atxy4o.menu.startuptime.16=16ms
+atxy4o.menu.startuptime.32=32ms
+atxy4o.menu.startuptime.64=64ms
+atxy4o.menu.startuptime.0.bootloader.SYSCFG1=0x00
 atxy4o.menu.startuptime.1.bootloader.SYSCFG1=0x01
+atxy4o.menu.startuptime.2.bootloader.SYSCFG1=0x02
+atxy4o.menu.startuptime.4.bootloader.SYSCFG1=0x03
+atxy4o.menu.startuptime.8.bootloader.SYSCFG1=0x04
+atxy4o.menu.startuptime.16.bootloader.SYSCFG1=0x05
+atxy4o.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy4o.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 atxy4o.bootloader.WDTCFG=0x00
@@ -1545,40 +1651,44 @@ atxy4o.bootloader.APPEND=0x00
 atxy4o.bootloader.BOOTEND=0x02
 
 ##############################################################
+#      ATtiny412/402/212/202 (Optiboot)
+##############################################################
 
-atxy2o.name=ATtiny412/402/212/202 (optiboot)
 atxy2o.upload.workaround=
 atxy2o.build.millistimer=D0
 atxy2o.build.bootload=opti
+atxy2o.build.board=AVR_ATtinyxy2
 atxy2o.build.mcu=attiny{build.attiny}
+atxy2o.build.serialeventabr=
 atxy2o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy2o.build.f_cpu={build.speed}000000L
 atxy2o.upload.speed=115200
 
 atxy2o.menu.chip.412=ATtiny412
-atxy2o.menu.chip.412.build.board=ATtiny412
+atxy2o.menu.chip.412.build.board=AVR_ATtiny412
 atxy2o.menu.chip.412.build.attiny=412
 atxy2o.menu.chip.412.upload.maximum_size=3584
 atxy2o.menu.chip.412.upload.maximum_data_size=256
 atxy2o.menu.chip.212=ATtiny212
-atxy2o.menu.chip.212.build.board=ATtiny212
+atxy2o.menu.chip.212.build.board=AVR_ATtiny212
 atxy2o.menu.chip.212.build.attiny=212
 atxy2o.menu.chip.212.upload.maximum_size=1536
 atxy2o.menu.chip.212.upload.maximum_data_size=128
 atxy2o.menu.chip.402=ATtiny402
-atxy2o.menu.chip.402.build.board=ATtiny402
+atxy2o.menu.chip.402.build.board=AVR_ATtiny402
 atxy2o.menu.chip.402.build.attiny=402
 atxy2o.menu.chip.402.build.millistimer=A0
 atxy2o.menu.chip.402.upload.maximum_size=3584
 atxy2o.menu.chip.402.upload.maximum_data_size=256
 atxy2o.menu.chip.402w=ATtiny402 (bad signature)
 atxy2o.menu.chip.402w.build.attiny=402
+atxy2o.menu.chip.402w.build.board=AVR_ATtiny402
 atxy2o.menu.chip.402w.build.millistimer=A0
 atxy2o.menu.chip.402w.upload.maximum_size=3584
 atxy2o.menu.chip.402w.upload.maximum_data_size=256
 atxy2o.menu.chip.402w.upload.workaround=w
 atxy2o.menu.chip.202=ATtiny202
-atxy2o.menu.chip.202.build.board=ATtiny202
+atxy2o.menu.chip.202.build.board=AVR_ATtiny202
 atxy2o.menu.chip.202.build.attiny=202
 atxy2o.menu.chip.202.build.millistimer=A0
 atxy2o.menu.chip.202.upload.maximum_size=1536
@@ -1666,7 +1776,7 @@ atxy2o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
 atxy2o.menu.bodmode.disabled=Disabled/Disabled
 atxy2o.menu.bodmode.enabled=Enabled/Enabled
 atxy2o.menu.bodmode.ensampfast=Enabled/Sampled (1kHz)
-atxy2o.menu.bodmode.ensampslo=Enabled/Sampled (125Hz)
+atxy2o.menu.bodmode.ensampslow=Enabled/Sampled (125Hz)
 atxy2o.menu.bodmode.sampledfast=Sampled/Sampled (1kHz)
 atxy2o.menu.bodmode.sampledslow=Sampled/Sampled (125Hz)
 atxy2o.menu.bodmode.sampdisfast=Sampled/Disabled (1kHz)
@@ -1691,6 +1801,7 @@ atxy2o.menu.serialevent.no=No (saves space)
 atxy2o.menu.serialevent.yes=Yes
 atxy2o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
 atxy2o.menu.serialevent.yes.build.serialevent=
+atxy2o.menu.serialevent.yes.build.serialeventabr=E
 
 atxy2o.upload.tool=avrdude
 
@@ -1700,16 +1811,11 @@ atxy2o.build.text_section_start=.text=0x200
 atxy2o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
 atxy2o.bootloader.tool=avrdude
 
-atxy2o.build.board=attinyxy2
 atxy2o.build.core=megatinycore
 atxy2o.build.variant=txy2
-atxy2o.build.extra_flags={build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy2o.build.uartvoltage=-V
+atxy2o.build.extra_flags=-DARDUINO_attinyxy2 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy2o.build.export_merged_output=true
-
-atxy2o.menu.uartvoltage.5v=Closer to 5v
-atxy2o.menu.uartvoltage.3v=Closer to 3v
-atxy2o.menu.uartvoltage.5v.build.uartvoltage=5V
-atxy2o.menu.uartvoltage.3v.build.uartvoltage=3V
 
 atxy2o.menu.resetpinopti.UPDI=UPDI (powercycle to enter bootloader)
 atxy2o.menu.resetpinopti.UPDI.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}.hex
@@ -1721,11 +1827,21 @@ atxy2o.menu.resetpinopti.gpio=IO (DANGER - Read docs first! powercycle to enter 
 atxy2o.menu.resetpinopti.gpio.bootloader.file=optiboot_x/optiboot_txy2{bootloader.uartswap}.hex
 atxy2o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
-atxy2o.menu.startuptime.8= 8ms - A good default, usually fine
-atxy2o.menu.startuptime.1= 1ms - (aggressive/very fast rising power)
-atxy2o.menu.startuptime.64= 64ms - (cautious/slow rising power)
-atxy2o.menu.startuptime.8.bootloader.SYSCFG1=0x03
+atxy2o.menu.startuptime.8=8ms
+atxy2o.menu.startuptime.0=0ms
+atxy2o.menu.startuptime.1=1ms
+atxy2o.menu.startuptime.2=2ms
+atxy2o.menu.startuptime.4=4ms
+atxy2o.menu.startuptime.16=16ms
+atxy2o.menu.startuptime.32=32ms
+atxy2o.menu.startuptime.64=64ms
+atxy2o.menu.startuptime.0.bootloader.SYSCFG1=0x00
 atxy2o.menu.startuptime.1.bootloader.SYSCFG1=0x01
+atxy2o.menu.startuptime.2.bootloader.SYSCFG1=0x02
+atxy2o.menu.startuptime.4.bootloader.SYSCFG1=0x03
+atxy2o.menu.startuptime.8.bootloader.SYSCFG1=0x04
+atxy2o.menu.startuptime.16.bootloader.SYSCFG1=0x05
+atxy2o.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy2o.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 atxy2o.bootloader.WDTCFG=0x00
