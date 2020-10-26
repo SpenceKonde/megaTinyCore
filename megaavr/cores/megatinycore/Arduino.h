@@ -357,11 +357,7 @@ void setup_timers();
 #error "tinyAVR 2-series parts are not yet supported"
 #endif
 
-#define MEGATINYCORE "2.1.4-dev"
-#define MEGATINYCORE_MAJOR 2UL
-#define MEGATINYCORE_MINOR 1UL
-#define MEGATINYCORE_PATCH 4UL
-#define MEGATINYCORE_RELEASED 0
+// Version related defines now handled in platform.txt
 #define MEGATINYCORE_NUM ((MEGATINYCORE_MAJOR<<24)+(MEGATINYCORE_MINOR<<16)+(MEGATINYCORE_PATCH<<8)+MEGATINYCORE_RELEASED)
 
 
