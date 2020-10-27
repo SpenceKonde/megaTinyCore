@@ -33,6 +33,10 @@
 // location from which to read.
 // NOTE: a "power of 2" buffer size is recommended to dramatically
 //       optimize all the modulo operations for ring buffers.
+// ... Well, it was missing some optimization, because explicitly doing the
+// optimization saved a bit more flash... I see no compelling reason to permit
+// non-power-of-2 ring buffer length. -Spence
+//
 // WARNING: When buffer sizes are increased to > 256, the buffer index
 // variables are automatically increased in size, but the extra
 // atomicity guards needed for that are not implemented. This will
@@ -61,6 +65,19 @@
   typedef uint16_t rx_buffer_index_t;
 #else
   typedef uint8_t rx_buffer_index_t;
+#endif
+// As noted above, forcing the sizes to be a power of two saves a small
+// amount of flash, and there's no compelling reason to NOT have them be
+// a power of two. If this is a problem, since you're already modifying
+// core, change the lines in UART.cpp where it does & (SERIAL_xX_BUFFERLSIZE-1)
+// and replace them with % SERIAL_xX_BUFFER_SIZE; where xX is TX or RX.
+// There are two of each, and the old ending of the line is even commented
+// out at the end of the line.
+#if (SERIAL_TX_BUFFER_SIZE&(SERIAL_TX_BUFFER_SIZE-1))
+  #error "ERROR: TX buffer size must be a power of two."
+#endif
+#if (SERIAL_RX_BUFFER_SIZE&(SERIAL_RX_BUFFER_SIZE-1))
+  #error "ERROR: RX buffer size must be a power of two."
 #endif
 
 // Define config for Serial.begin(baud, config);
@@ -143,8 +160,6 @@ class UartClass : public HardwareSerial {
     volatile tx_buffer_index_t _tx_buffer_tail;
 
     volatile uint8_t _hwserial_dre_interrupt_vect_num;
-    volatile uint8_t _hwserial_dre_interrupt_elevated;
-    volatile uint8_t _prev_lvl1_interrupt_vect;
 
     // Don't put any members after these buffers, since only the first
     // 32 bytes of this struct can be accessed quickly using the ldd
@@ -161,6 +176,14 @@ class UartClass : public HardwareSerial {
     }
     void begin(unsigned long, uint16_t);
     void end();
+    void printHex(const uint8_t b);
+    void printHex(const uint16_t w, bool swaporder=0);
+    void printHex(const uint32_t l, bool swaporder=0);
+    void printHex(const int8_t b) {printHex((uint8_t)b);}
+    void printHex(const int16_t w, bool swaporder=0) {printHex((uint16_t)w,swaporder);}
+    void printHex(const int32_t l, bool swaporder=0) {printHex((uint16_t)l,swaporder);}
+    uint8_t * printHex(uint8_t* p,uint8_t len, char sep=0);
+    uint16_t * printHex(uint16_t* p, uint8_t len, char sep=0, bool swaporder=0);
     virtual int available(void);
     virtual int peek(void);
     virtual int read(void);

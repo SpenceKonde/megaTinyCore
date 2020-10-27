@@ -49,7 +49,8 @@ UartClass::UartClass(
   _rx_buffer_tail(0),
   _tx_buffer_head(0),
   _tx_buffer_tail(0),
-  _hwserial_dre_interrupt_vect_num(hwserial_dre_interrupt_vect_num)
+  _hwserial_dre_interrupt_vect_num(hwserial_dre_interrupt_vect_num) {
+  }
 
 // Actual interrupt handlers //////////////////////////////////////////////////////////////
 

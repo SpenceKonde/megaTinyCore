@@ -104,7 +104,7 @@ void UartClass::_tx_data_empty_irq(void) {
   // There must be more data in the output
   // buffer. Send the next byte
   unsigned char c = _tx_buffer[_tx_buffer_tail];
-  _tx_buffer_tail = (_tx_buffer_tail + 1) % SERIAL_TX_BUFFER_SIZE;
+  _tx_buffer_tail = (_tx_buffer_tail + 1) & (SERIAL_TX_BUFFER_SIZE-1); //% SERIAL_TX_BUFFER_SIZE;
 
   // clear the TXCIF flag -- "can be cleared by writing a one to its bit
   // location". This makes sure flush() won't return until the bytes
@@ -118,17 +118,23 @@ void UartClass::_tx_data_empty_irq(void) {
     (*_hwserial_module).CTRLA &= (~USART_DREIE_bm);
 
     //Take the DRE interrupt back no normal priority level if it has been elevated
-    if (_hwserial_dre_interrupt_elevated) {
-      CPUINT.LVL1VEC = _prev_lvl1_interrupt_vect;
-      _hwserial_dre_interrupt_elevated = 0;
-    }
+    //if (_hwserial_dre_interrupt_elevated) {
+    //  CPUINT.LVL1VEC = _prev_lvl1_interrupt_vect;
+    //  _hwserial_dre_interrupt_elevated = 0;
+    //}
   }
 }
 
 // To invoke data empty "interrupt" via a call, use this method
 void UartClass::_poll_tx_data_empty(void) {
-  if ((!(SREG & CPU_I_bm)) || (!((*_hwserial_module).CTRLA & USART_DREIE_bm))) {
+  if ((!(SREG & CPU_I_bm)) || (!((*_hwserial_module).CTRLA & USART_DREIE_bm)) || CPUINT.STATUS) {
     // Interrupts are disabled either globally or for data register empty,
+    // or we are in another ISR. (It doesn't matter *which* ISR we are in
+    // whether it's another level 0, the priority one, or heaven help us
+    // the NMI, if the user code says to print something or flush the buffer
+    // we might as well do it. It is entirely plausible that an NMI might
+    // attempt to print out some sort of record of what happened. -Spence 10/23/20
+    //
     // so we'll have to poll the "data register empty" flag ourselves.
     // If it is set, pretend an interrupt has happened and call the handler
     // to free up space for us.
@@ -179,21 +185,30 @@ void UartClass::begin(unsigned long baud, uint16_t config) {
   struct UartPinSet *set = &_hw_set[_pin_set];
 
   int32_t baud_setting = 0;
+  uint8_t rxmode=0;
 
-  //Make sure global interrupts are disabled during initialization
-  uint8_t oldSREG = SREG;
-  cli();
-
-  // Disable CLK2X
-  (*_hwserial_module).CTRLB &= (~USART_RXMODE_CLK2X_gc);
-  //(*_hwserial_module).CTRLB |= USART_RXMODE_NORMAL_gc;
+  // Use CLK2X if appropriate.
+  #if (F_CPU > 2000000)
+  if(baud>=(38400*(F_CPU/1000000))) {
+    rxmode = USART_RXMODE_CLK2X_gc;
+    baud=baud>>1;
+  }
+  //else {
+  //  rxmode = USART_RXMODE_NORMAL_gc;
+  //}
+  #else
+  //if clocked at 1 or 2 MHz, always use CLK2X mode and save a bit of space, we correct for not shifting the baud value below, as it saves a bit of flash
+    rxmode = USART_RXMODE_CLK2X_gc;
+  #endif
 
   _written = false;
 
 
 
   //See #131 for more info on this
-  #if !defined(USE_EXTERNAL_OSCILLATOR)
+  #if (CLOCK_SOURCE==0 && PROGMEM_SIZE>4096 && (defined(UARTBAUD3V)||UARTBAUD5V))
+  // if the flash is 2k or 4k, we really can't spare the flash for the baud rate correction...
+  // it's close enough to work under normal circumstances anyway.
   #if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL) //this means we are on the 20MHz oscillator
   #ifdef UARTBAUD3V
   int8_t sigrow_val = SIGROW.OSC20ERR3V;
@@ -207,15 +222,32 @@ void UartClass::begin(unsigned long baud, uint16_t config) {
   int8_t sigrow_val = SIGROW.OSC16ERR5V;
   #endif
   #endif
+  #if (F_CPU > 2000000)
+  //if we are above 2 MHz, baud was corrected above if CLK2X used.
   baud_setting = ((8 * F_CPU) / baud);
-  baud_setting *= (1024 + sigrow_val);
-  baud_setting += 1024;
-  baud_setting /= 2048;
   #else
-  baud_setting = (((8 * F_CPU) / baud) + 1) / 2;
+  //if clocked at 1 or 2 MHz, always use CLK2X mode and save a bit of flash...
+  baud_setting = ((16 * F_CPU) / baud);
   #endif
-  //baud_setting += (baud_setting * sigrow_val) / 1024;
+  baud_setting *= (1024 + sigrow_val);
+  baud_setting /= 2048;
+  if (baud_setting>65535){
+    baud_setting=65535;
+  }
+  #else
+  #if (F_CPU > 2000000)
+  //if we are above 2 MHz, baud was corrected above if CLK2X used.
+  baud_setting = (((4 * F_CPU) / baud));
+  #else
+  //if clocked at 1 or 2 MHz, always use CLK2X mode and save a bit of flash...
+  baud_setting = (((8 * F_CPU) / baud));
+  #endif
+  #endif
 
+  // Make sure global interrupts are disabled during initialization
+  // no reason to do this before we potentially do all that long division, right?
+  uint8_t oldSREG = SREG;
+  cli();
   // assign the baud_setting, a.k.a. BAUD (USART Baud Rate Register)
   (*_hwserial_module).BAUD = (uint16_t)baud_setting;
 
@@ -223,7 +255,7 @@ void UartClass::begin(unsigned long baud, uint16_t config) {
   (*_hwserial_module).CTRLC = config;
 
   // Enable transmitter and receiver
-  (*_hwserial_module).CTRLB |= (USART_RXEN_bm | USART_TXEN_bm);
+  (*_hwserial_module).CTRLB = ((*_hwserial_module).CTRLB&(~USART_RXMODE_gm)) | rxmode | (USART_RXEN_bm | USART_TXEN_bm);
 
   (*_hwserial_module).CTRLA |= USART_RXCIE_bm;
 
@@ -237,7 +269,7 @@ void UartClass::begin(unsigned long baud, uint16_t config) {
 
   // Set pin state for swapped UART pins
   pinMode(set->rx_pin, INPUT_PULLUP);
-  digitalWrite(set->tx_pin, HIGH);
+  //digitalWrite(set->tx_pin, HIGH);
   pinMode(set->tx_pin, OUTPUT);
 
   // Restore SREG content
@@ -261,7 +293,7 @@ void UartClass::end() {
 }
 
 int UartClass::available(void) {
-  return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) % SERIAL_RX_BUFFER_SIZE;
+  return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) & (SERIAL_RX_BUFFER_SIZE-1); //% SERIAL_RX_BUFFER_SIZE;
 }
 
 int UartClass::peek(void) {
@@ -278,7 +310,7 @@ int UartClass::read(void) {
     return -1;
   } else {
     unsigned char c = _rx_buffer[_rx_buffer_tail];
-    _rx_buffer_tail = (rx_buffer_index_t)(_rx_buffer_tail + 1) % SERIAL_RX_BUFFER_SIZE;
+    _rx_buffer_tail = (rx_buffer_index_t)(_rx_buffer_tail + 1) & (SERIAL_RX_BUFFER_SIZE-1); // % SERIAL_RX_BUFFER_SIZE;
     return c;
   }
 }
@@ -306,15 +338,24 @@ void UartClass::flush() {
   }
 
   //Check if we are inside an ISR already (e.g. connected to a different peripheral then UART), in which case the UART ISRs will not be called.
+  // Spence 10/23/20: Changed _poll_tx_data_empty() to instead call the ISR directly in this case too
+  // Why elevate the interrupt if we're going to go into a busywait loop checking if the interrupt is disabled and if so, check for the bit and
+  // manually call the ISR if the bit is set... *anyway*? Plus, in write(), this mode will be enabled upon a write of a single character from an ISR
+  // and will stay that way until the buffer is empty, which would mean that the fairly long and slow UART TX ISR would have priority over a
+  // potentially very fast interrupt that the user may have set to priority level 1. Just because a whizz-bang feature is there doesn't mean
+  // it's appropriate to use for applications where it has only very small benefits, and significant risk of surprising the user and causing
+  // breakage of code that would otherwise work. Finally, the previous implementation didn't check if it was called from the current lvl1 ISR
+  // and in that case flush(), and write() with full buffer would just straight up hang...
+  //
   //Temporarily elevate the DRE interrupt to allow it to run.
-  if (CPUINT.STATUS & CPUINT_LVL0EX_bm) {
+  //if (CPUINT.STATUS & CPUINT_LVL0EX_bm) {
     //Elevate the priority level of the Data Register Empty Interrupt vector
     //and copy whatever vector number that might be in the register already.
-    _prev_lvl1_interrupt_vect = CPUINT.LVL1VEC;
-    CPUINT.LVL1VEC = _hwserial_dre_interrupt_vect_num;
+  //  _prev_lvl1_interrupt_vect = CPUINT.LVL1VEC;
+  //  CPUINT.LVL1VEC = _hwserial_dre_interrupt_vect_num;
 
-    _hwserial_dre_interrupt_elevated = 1;
-  }
+  //  _hwserial_dre_interrupt_elevated = 1;
+  //}
 
   // Spin until the data-register-empty-interrupt is disabled and TX complete interrupt flag is raised
   while (((*_hwserial_module).CTRLA & USART_DREIE_bm) || (!((*_hwserial_module).STATUS & USART_TXCIF_bm))) {
@@ -327,6 +368,59 @@ void UartClass::flush() {
   // the hardware finished transmission (TXCIF is set).
 }
 
+void UartClass::printHex (const uint8_t b) {
+  char x=(b>>4)|'0';
+  if (x > '9')
+    x += 7;
+  write(x);
+  x=(b&0x0F)|'0';
+  if (x > '9')
+    x += 7;
+  write(x);
+}
+void UartClass::printHex(const uint16_t w, bool swaporder){
+  uint8_t * ptr=(uint8_t*)&w;
+  if (swaporder){
+    printHex(*(ptr++));
+    printHex(*(ptr));
+  }
+  else {
+    printHex(*(ptr+1));
+    printHex(*(ptr));
+  }
+}
+
+void UartClass::printHex(const uint32_t l, bool swaporder){
+  uint8_t * ptr=(uint8_t*)&l;
+  if (swaporder){
+    printHex(*(ptr++));
+    printHex(*(ptr++));
+    printHex(*(ptr++));
+    printHex(*(ptr));
+  }
+  else {
+    ptr+=3;
+    printHex(*(ptr--));
+    printHex(*(ptr--));
+    printHex(*(ptr--));
+    printHex(*(ptr));
+  }
+}
+uint8_t * UartClass::printHex(uint8_t* p,uint8_t len, char sep) {
+  for (byte i=0;i<len;i++) {
+    if (sep && i) write(sep);
+    printHex(*p++);
+  }
+  return p;
+}
+
+uint16_t * UartClass::printHex(uint16_t* p, uint8_t len, char sep, bool swaporder) {
+  for (byte i=0;i<len;i++) {
+    if (sep && i) write(sep);
+    printHex(*p++,swaporder);
+  }
+  return p;
+}
 size_t UartClass::write(uint8_t c) {
   _written = true;
 
@@ -344,19 +438,20 @@ size_t UartClass::write(uint8_t c) {
 
     return 1;
   }
-
+  // See above for reasoning for disabling this functionality and moving the check
+  // to _poll_tx_data_empty()
   //Check if we are inside an ISR already (could be from by a source other than UART),
   // in which case the UART ISRs will be blocked.
-  if (CPUINT.STATUS & CPUINT_LVL0EX_bm) {
+  //if (CPUINT.STATUS & CPUINT_LVL0EX_bm) {
     //Elevate the priority level of the Data Register Empty Interrupt vector
     //and copy whatever vector number that might be in the register already.
-    _prev_lvl1_interrupt_vect = CPUINT.LVL1VEC;
-    CPUINT.LVL1VEC = _hwserial_dre_interrupt_vect_num;
+  //  _prev_lvl1_interrupt_vect = CPUINT.LVL1VEC;
+  //  CPUINT.LVL1VEC = _hwserial_dre_interrupt_vect_num;
 
-    _hwserial_dre_interrupt_elevated = 1;
-  }
+  //  _hwserial_dre_interrupt_elevated = 1;
+  //}
 
-  tx_buffer_index_t i = (_tx_buffer_head + 1) % SERIAL_TX_BUFFER_SIZE;
+  tx_buffer_index_t i = (_tx_buffer_head + 1) & (SERIAL_TX_BUFFER_SIZE-1); // % SERIAL_TX_BUFFER_SIZE;
 
   //If the output buffer is full, there's nothing for it other than to
   //wait for the interrupt handler to empty it a bit (or emulate interrupts)
