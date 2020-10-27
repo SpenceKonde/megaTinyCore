@@ -1,3 +1,20 @@
+### 2.1.4
+* Fix critical bug in alternate pins for Serial (#254)
+* Improve compatibility regarding build.board changes with a compatibility layer in case other libraries are checking for the old version. (#253)
+* Use build.board pattern consistent with other cores (AVR_ATtiny). (#253)
+* In order to reduce flash usage, do not use UART baud correction based on voltage on 2k and 4k parts (it was always close enough for typical use cases anyway), and those parts are very tightly flash constrained. Also, we no longer "correct" externally clocked parts for the speed of the internal oscillator; needless to say, that is not a correction!
+* Remove UART baud voltage menu for 8-pin parts due to above.
+* Automatically use CLKX2 USART option at 2 MHz or less, and on higher speed parts when appropriate for the selected baud rate. Most visible impact of this change is that you can now use 115200 baud at 1 MHz. (#188)
+* Do not apply oscillator voltage correction to baud rate when using external clock.
+* Reduce flash usage of UART (Serial), particularly on smaller chips, through a great many mechanisms. (#252)
+* Serial.print/write/flush will no longer play with interrupt priorities, and those functions can no longer hang indefinitely if called from an elevated ISR (not that one should really be printing to serial while in an ISR), like classic AVRs - they will spin and busywait as needed.
+* Fix build.extra_flags missing entries on in 2.1.x on 24-pin parts with Optiboot.
+* Move version defines to platform.txt, in hopes of reducing incorrect and inconsistent version numbers in releases... (at least now the version number from {version} and the MEGATINYCORE/MEGATINYCORE_* defines will match!)
+* Correct issue with enabled/sampled BOD mode with slow sampling.
+* Include all SUT options in tools submenu, correct issue with 8ms SUT (it was actually setting it to 4ms).
+* Include serialevent and clocksource setting in name of exported .hex and .lst files.
+* Add the Serial.printHex() functions from DxCore; Serial.printHex() can be called with a 1, 2, or 4 byte integer to print out it's value in hexadecimal, with leading zero(s). For 2 and 4 byte integers, optional boolean second argument; if true, will swap the order of the two bytes (endianness); can also be called with a pointer to a uint8_t or uint16_t, a length (uint8_t, ie, max length 255), and, optionally, a separator (a single char/int8_t); this will print that many bytes as hex starting at the given pointer; if it's a pointer to a uint16_t, there's the same optional byte order boolean at the end. If you need to use that, but don't want a separator, pass 0 as the third argument.
+
 ### 2.1.1, 2.1.2, 2.1.3
 Urgent bugfixes for critical regressions introduced in 2.1.0.
 
