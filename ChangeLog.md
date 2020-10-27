@@ -14,6 +14,7 @@
 * Include all SUT options in tools submenu, correct issue with 8ms SUT (it was actually setting it to 4ms).
 * Include serialevent and clocksource setting in name of exported .hex and .lst files.
 * Add the Serial.printHex() functions from DxCore; Serial.printHex() can be called with a 1, 2, or 4 byte integer to print out it's value in hexadecimal, with leading zero(s). For 2 and 4 byte integers, optional boolean second argument; if true, will swap the order of the two bytes (endianness); can also be called with a pointer to a uint8_t or uint16_t, a length (uint8_t, ie, max length 255), and, optionally, a separator (a single char/int8_t); this will print that many bytes as hex starting at the given pointer; if it's a pointer to a uint16_t, there's the same optional byte order boolean at the end. If you need to use that, but don't want a separator, pass 0 as the third argument.
+* Merge in timing fix for TWI in slave mode (#235)
 
 ### 2.1.1, 2.1.2, 2.1.3
 Urgent bugfixes for critical regressions introduced in 2.1.0.
