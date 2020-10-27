@@ -23,7 +23,7 @@ void loop() {
   // step 1: instruct sensor to read echoes
   Wire.beginTransmission(112); // transmit to device #112 (0x70)
   // the address specified in the datasheet is 224 (0xE0)
-  // but i2c adressing uses the high 7 bits so it's 112
+  // but i2c addressing uses the high 7 bits so it's 112
   Wire.write(byte(0x00));      // sets register pointer to the command register (0x00)
   Wire.write(byte(0x50));      // command sensor to measure in "inches" (0x50)
   // use 0x51 for centimeters
@@ -55,11 +55,11 @@ void loop() {
 
 /*
 
-// The following code changes the address of a Devantech Ultrasonic Range Finder (SRF10 or SRF08)
-// usage: changeAddress(0x70, 0xE6);
+  // The following code changes the address of a Devantech Ultrasonic Range Finder (SRF10 or SRF08)
+  // usage: changeAddress(0x70, 0xE6);
 
-void changeAddress(byte oldAddress, byte newAddress)
-{
+  void changeAddress(byte oldAddress, byte newAddress)
+  {
   Wire.beginTransmission(oldAddress);
   Wire.write(byte(0x00));
   Wire.write(byte(0xA0));
@@ -79,6 +79,6 @@ void changeAddress(byte oldAddress, byte newAddress)
   Wire.write(byte(0x00));
   Wire.write(newAddress);
   Wire.endTransmission();
-}
+  }
 
 */

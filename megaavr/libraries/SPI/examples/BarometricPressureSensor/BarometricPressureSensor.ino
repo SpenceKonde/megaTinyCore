@@ -1,26 +1,26 @@
 /*
- SCP1000 Barometric Pressure Sensor Display
+  SCP1000 Barometric Pressure Sensor Display
 
- Shows the output of a Barometric Pressure Sensor on a
- Uses the SPI library. For details on the sensor, see:
- http://www.sparkfun.com/commerce/product_info.php?products_id=8161
- http://www.vti.fi/en/support/obsolete_products/pressure_sensors/
+  Shows the output of a Barometric Pressure Sensor on a
+  Uses the SPI library. For details on the sensor, see:
+  http://www.sparkfun.com/commerce/product_info.php?products_id=8161
+  http://www.vti.fi/en/support/obsolete_products/pressure_sensors/
 
- This sketch adapted from Nathan Seidle's SCP1000 example for PIC:
- http://www.sparkfun.com/datasheets/Sensors/SCP1000-Testing.zip
+  This sketch adapted from Nathan Seidle's SCP1000 example for PIC:
+  http://www.sparkfun.com/datasheets/Sensors/SCP1000-Testing.zip
 
- Circuit:
- SCP1000 sensor attached to pins 6, 7, 10 - 13:
- DRDY: pin 6
- CSB: pin 7
- MOSI: pin 11
- MISO: pin 12
- SCK: pin 13
+  Circuit:
+  SCP1000 sensor attached to pins 6, 7, 10 - 13:
+  DRDY: pin 6
+  CSB: pin 7
+  MOSI: pin 11
+  MISO: pin 12
+  SCK: pin 13
 
- created 31 July 2010
- modified 14 August 2010
- by Tom Igoe
- */
+  created 31 July 2010
+  modified 14 August 2010
+  by Tom Igoe
+*/
 
 // the sensor communicates using SPI, so include the library:
 #include <SPI.h>
@@ -43,7 +43,7 @@ void setup() {
   // start the SPI library:
   SPI.begin();
 
-  // initalize the  data ready and chip select pins:
+  // initialize the  data ready and chip select pins:
   pinMode(dataReadyPin, INPUT);
   pinMode(chipSelectPin, OUTPUT);
 
@@ -140,4 +140,3 @@ void writeRegister(byte thisRegister, byte thisValue) {
   // take the chip select high to de-select:
   digitalWrite(chipSelectPin, HIGH);
 }
-

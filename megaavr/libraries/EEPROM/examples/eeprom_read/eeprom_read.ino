@@ -1,10 +1,10 @@
 /*
- * EEPROM Read
- *
- * Reads the value of each byte of the EEPROM and prints it
- * to the computer.
- * This example code is in the public domain.
- */
+   EEPROM Read
+
+   Reads the value of each byte of the EEPROM and prints it
+   to the computer.
+   This example code is in the public domain.
+*/
 
 #include <EEPROM.h>
 

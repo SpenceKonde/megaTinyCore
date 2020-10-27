@@ -6,4 +6,3 @@ for f in $*; do
     avr-strings -a /tmp/__optiboot_tmp.bin
 done
 rm /tmp/__optiboot_tmp.bin
-

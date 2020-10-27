@@ -1,4 +1,24 @@
-### latest (planned 2.0.6)
+### 2.1.4
+* Fix critical bug in alternate pins for Serial (#254)
+* Improve compatibility regarding build.board changes with a compatibility layer in case other libraries are checking for the old version. (#253)
+* Use build.board pattern consistent with other cores (AVR_ATtiny). (#253)
+* In order to reduce flash usage, do not use UART baud correction based on voltage on 2k and 4k parts (it was always close enough for typical use cases anyway), and those parts are very tightly flash constrained. Also, we no longer "correct" externally clocked parts for the speed of the internal oscillator; needless to say, that is not a correction!
+* Remove UART baud voltage menu for 8-pin parts due to above.
+* Automatically use CLKX2 USART option at 2 MHz or less, and on higher speed parts when appropriate for the selected baud rate. Most visible impact of this change is that you can now use 115200 baud at 1 MHz. (#188)
+* Do not apply oscillator voltage correction to baud rate when using external clock.
+* Reduce flash usage of UART (Serial), particularly on smaller chips, through a great many mechanisms. (#252)
+* Serial.print/write/flush will no longer play with interrupt priorities, and those functions can no longer hang indefinitely if called from an elevated ISR (not that one should really be printing to serial while in an ISR), like classic AVRs - they will spin and busywait as needed.
+* Fix build.extra_flags missing entries on in 2.1.x on 24-pin parts with Optiboot.
+* Move version defines to platform.txt, in hopes of reducing incorrect and inconsistent version numbers in releases... (at least now the version number from {version} and the MEGATINYCORE/MEGATINYCORE_* defines will match!)
+* Correct issue with enabled/sampled BOD mode with slow sampling.
+* Include all SUT options in tools submenu, correct issue with 8ms SUT (it was actually setting it to 4ms).
+* Include serialevent and clocksource setting in name of exported .hex and .lst files.
+* Add the Serial.printHex() functions from DxCore; Serial.printHex() can be called with a 1, 2, or 4 byte integer to print out it's value in hexadecimal, with leading zero(s). For 2 and 4 byte integers, optional boolean second argument; if true, will swap the order of the two bytes (endianness); can also be called with a pointer to a uint8_t or uint16_t, a length (uint8_t, ie, max length 255), and, optionally, a separator (a single char/int8_t); this will print that many bytes as hex starting at the given pointer; if it's a pointer to a uint16_t, there's the same optional byte order boolean at the end. If you need to use that, but don't want a separator, pass 0 as the third argument.
+
+### 2.1.1, 2.1.2, 2.1.3
+Urgent bugfixes for critical regressions introduced in 2.1.0.
+
+### 2.1.0
 * Improve ADC accuracy when switching references
 * Fix bug with which parts we thought had the external reference, corrected docs. (#211)
 * Change handling of reset cause in bootloader, see #213.
@@ -7,7 +27,20 @@
 * Fix EEPROM library, no more USERROW - this is just the standard EEPROM library. (#200, #168)
 * Add USERSIG library for writing to the USERROW (also called USER_SIGNATURE)
 * Writing to flash from app now works on Optiboot parts (Thanks @WestFW) (#212, #233)
-* Move to conservative settings for SUT, lower BOD sampling frequency. (#202)
+* Add options for SUT, BOD sampling frequency (#202)
+* As part of above, rolled all the bod mode options into one menu; this rules out nonsensical options (ex, enabled hold wake until BOD started, when BOD is not disabled in sleep, or more stringent BOD while in sleep)
+* Wire no longer tries turning on pullups; this caused problems when switching between master and slave, and the internal pullups just aren't strong enough for this! (#223)
+* Moved USE_TIMERD_PWM to the variant files instead of boards.txt
+* Corrected maximum sketch size for parts with less than 24 pins when using Optiboot.
+* Added support for reprogrammming UPDI pin on non-Optiboot board definitions (requires HV UPDI)
+* Added support for external 32.768 kHz oscillator as millis source (#238)
+* Actually fix bug with names of exported binaries
+* In order to maintain compatibility, F() macro now behaves just the same as on official boards. This comes at a cost of performance and size, but allows interoperability with major libraries (#216)
+* Fixed bug with millis conversion with RTC (any) as clock source (#327)
+* Added support for external clock sources, including ones that attempt to overclock the device.
+* Added support for ignoring SerialEvent - this little used and ill-conceived feature imposes a significant cost in time on all parts whether they use it or not.
+* Pulled in latest logic library (#224). Did not bring in all the examples, which were really repetitive, and added some new ones that are super cool...
+* Added ModernRevSerial example under megaTinyCore "library" to get silicon rev and serial number and print it to console.
 
 ### 2.0.5
 * Internal change to ADC initialization (saves a bit of flash) and init_ADC1() function for parts that have ADC1.

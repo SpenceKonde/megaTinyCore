@@ -1,5 +1,5 @@
 # Datasheet Links
-The most recent versions of the datasheets for the TinyAVR product line are combined versions across different pin counts. This page collects links to the most recent versions of the datasheets as of July 2020, as well as the "silicon errata" sheets, which describe bugs in different versions of the hardware. There is also a page summarizing the errata including tables listing what issues apply to which parts on the [silicon errata page](Errata.md). 
+The most recent versions of the datasheets for the TinyAVR product line are combined versions across different pin counts. This page collects links to the most recent versions of the datasheets as of July 2020, as well as the "silicon errata" sheets, which describe bugs in different versions of the hardware. There is also a page summarizing the errata including tables listing what issues apply to which parts on the [silicon errata page](Errata.md).
 
 ## 1-series
 
@@ -56,4 +56,3 @@ The most recent versions of the datasheets for the TinyAVR product line are comb
 
 
 [ATtiny807/1607](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny807-1607-DataSheet-DS40002030B.pdf) || [ATtiny807/1607 Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny807_1607-Errata-and-Clarification-DS40002128B.pdf)
-

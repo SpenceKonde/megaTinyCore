@@ -27,7 +27,7 @@
   disabled when the first servo is attached.
   Timers are seized as needed in groups of 12 servos - 24 servos use two
   timers, 48 servos will use four.
-  The sequence used to sieze timers is defined in timers.h
+  The sequence used to seize timers is defined in timers.h
 
   The methods are:
 
@@ -43,7 +43,7 @@
     readMicroseconds()   - Gets the last written servo pulse width in microseconds. (was read_us() in first release)
     attached()  - Returns true if there is a servo attached.
     detach()    - Stops an attached servos from pulsing its i/o pin.
- */
+*/
 
 #ifndef Servo_h
 #define Servo_h
@@ -51,21 +51,21 @@
 #include <inttypes.h>
 
 /*
- * Defines for 16 bit timers used with  Servo library
- *
- * If _useTimerX is defined then TimerX is a 16 bit timer on the current board
- * timer16_Sequence_t enumerates the sequence that the timers should be allocated
- * _Nbr_16timers indicates how many 16 bit timers are available.
- */
+   Defines for 16 bit timers used with  Servo library
+
+   If _useTimerX is defined then TimerX is a 16 bit timer on the current board
+   timer16_Sequence_t enumerates the sequence that the timers should be allocated
+   _Nbr_16timers indicates how many 16 bit timers are available.
+*/
 
 // Architecture specific include
 #if defined(ARDUINO_ARCH_MEGAAVR) && defined(MEGATINYCORE)
-#include "megaavr/ServoTimers.h"
-#if (F_CPU==1000000)
-#warning "Running at 1MHz results in unstable servo signal."
-#endif
+  #include "megaavr/ServoTimers.h"
+  #if (F_CPU==1000000)
+    #warning "Running at 1MHz results in unstable servo signal."
+  #endif
 #else
-#error "This version of the library only supports megaTinyCore-supported processors."
+  #error "This version of the library only supports megaTinyCore-supported processors."
 #endif
 
 #define Servo_VERSION           2     // software version of this library
@@ -83,8 +83,8 @@
 #if !defined(ARDUINO_ARCH_STM32F4)
 
 typedef struct  {
-  uint8_t nbr        :6 ;             // a pin number from 0 to 63
-  uint8_t isActive   :1 ;             // true if this channel is enabled, pin not pulsed if false
+  uint8_t nbr        : 6 ;            // a pin number from 0 to 63
+  uint8_t isActive   : 1 ;            // true if this channel is enabled, pin not pulsed if false
 } ServoPin_t   ;
 
 typedef struct {
@@ -92,22 +92,21 @@ typedef struct {
   volatile unsigned int ticks;
 } servo_t;
 
-class Servo
-{
-public:
-  Servo();
-  uint8_t attach(byte pin);           // attach the given pin to the next free channel, sets pinMode, returns channel number or 0 if failure
-  uint8_t attach(byte pin, int min, int max); // as above but also sets min and max values for writes.
-  void detach();
-  void write(unsigned int value);             // if value is < 200 its treated as an angle, otherwise as pulse width in microseconds
-  void writeMicroseconds(unsigned int value); // Write pulse width in microseconds
-  int read();                        // returns current pulse width as an angle between 0 and 180 degrees
-  int readMicroseconds();            // returns current pulse width in microseconds for this servo (was read_us() in first release)
-  bool attached();                   // return true if this servo is attached, otherwise false
-private:
-   uint8_t servoIndex;               // index into the channel data for this servo
-   int8_t min;                       // minimum is this value times 4 added to MIN_PULSE_WIDTH
-   int8_t max;                       // maximum is this value times 4 added to MAX_PULSE_WIDTH
+class Servo {
+  public:
+    Servo();
+    uint8_t attach(byte pin);           // attach the given pin to the next free channel, sets pinMode, returns channel number or 0 if failure
+    uint8_t attach(byte pin, int min, int max); // as above but also sets min and max values for writes.
+    void detach();
+    void write(unsigned int value);             // if value is < 200 its treated as an angle, otherwise as pulse width in microseconds
+    void writeMicroseconds(unsigned int value); // Write pulse width in microseconds
+    int read();                        // returns current pulse width as an angle between 0 and 180 degrees
+    int readMicroseconds();            // returns current pulse width in microseconds for this servo (was read_us() in first release)
+    bool attached();                   // return true if this servo is attached, otherwise false
+  private:
+    uint8_t servoIndex;               // index into the channel data for this servo
+    int8_t min;                       // minimum is this value times 4 added to MIN_PULSE_WIDTH
+    int8_t max;                       // maximum is this value times 4 added to MAX_PULSE_WIDTH
 };
 
 #endif

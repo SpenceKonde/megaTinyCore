@@ -1,10 +1,10 @@
 /*
- * USERSIG Write
- *
- * Stores values read from analog input 0 into the USERSIG.
- * These values will stay in the USERSIG when the board is
- * turned off and may be retrieved later by another sketch.
- */
+   USERSIG Write
+
+   Stores values read from analog input 0 into the USERSIG.
+   These values will stay in the USERSIG when the board is
+   turned off and may be retrieved later by another sketch.
+*/
 
 #include <USERSIG.h>
 
@@ -32,14 +32,14 @@ void loop() {
 
   USERSIG.write(addr, val);
 
- /***
-    Advance to the next address, when at the end restart at the beginning.
+  /***
+     Advance to the next address, when at the end restart at the beginning.
 
-    All (post 2016) parts have 32 bytes of USERSIG/USERROW space.
+     All (post 2016) parts have 32 bytes of USERSIG/USERROW space.
 
-    Rather than hard-coding the length, you should use the pre-provided length function.
-    This will make your code portable to future AVR processors which may have more.
-  ***/
+     Rather than hard-coding the length, you should use the pre-provided length function.
+     This will make your code portable to future AVR processors which may have more.
+   ***/
 
   addr = addr + 1;
   if (addr == USERSIG.length()) {

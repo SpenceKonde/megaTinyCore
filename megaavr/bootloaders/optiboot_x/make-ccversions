@@ -26,7 +26,7 @@ for c in $COMPS; do
   echo ---------------  make GCCROOT=$c atmega328
   make GCCROOT=$c atmega328
   echo ---------------  make GCCROOT=$c atmega1284
-  make GCCROOT=$c atmega1284 
+  make GCCROOT=$c atmega1284
   echo ---------------  make GCCROOT=$c luminet
   make GCCROOT=$c luminet
   echo ---------------  make GCCROOT=$c mega1280
