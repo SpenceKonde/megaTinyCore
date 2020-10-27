@@ -2,10 +2,10 @@
 * Fix critical bug in alternate pins for Serial (#254)
 * Improve compatibility regarding build.board changes with a compatibility layer in case other libraries are checking for the old version. (#253)
 * Use build.board pattern consistent with other cores (AVR_ATtiny). (#253)
-* In order to reduce flash usage, do not use UART baud correction based on voltage on 2k and 4k parts (it was always close enough for typical use cases anyway), and those parts are very tightly flash constrained. Also, we no longer "correct" externally clocked parts for the speed of the internal oscillator; needless to say, that is not a correction!
+* In order to reduce flash usage, do not use UART baud correction based on voltage on 2k and 4k parts (it was always close enough for typical use cases anyway), and those parts are very tightly flash constrained.
 * Remove UART baud voltage menu for 8-pin parts due to above.
 * Automatically use CLKX2 USART option at 2 MHz or less, and on higher speed parts when appropriate for the selected baud rate. Most visible impact of this change is that you can now use 115200 baud at 1 MHz. (#188)
-* Do not apply oscillator voltage correction to baud rate when using external clock.
+* Do not apply oscillator voltage (in)correction to baud rate when using external clock.
 * Reduce flash usage of UART (Serial), particularly on smaller chips, through a great many mechanisms. (#252)
 * Serial.print/write/flush will no longer play with interrupt priorities, and those functions can no longer hang indefinitely if called from an elevated ISR (not that one should really be printing to serial while in an ISR), like classic AVRs - they will spin and busywait as needed.
 * Fix build.extra_flags missing entries on in 2.1.x on 24-pin parts with Optiboot.
