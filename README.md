@@ -135,7 +135,7 @@ To maximize the accuracy of the baud rate when using the internal oscillator, fr
 
 Bootloaders are available for both UART mappings; the UART bootloader option (prior to 2.0.0, the UART Pins option) selected when you do "burn bootloader" for an Optiboot board definition is the serial port that the uploaded bootloaded will use. You may freely change this when compiling/uploading sketches to use the other pins - the pins used by the bootloader will only change when you do "burn bootloader". **If this is your first time bootloading the board in question, and you want to turn UPDI into a Reset pin, burn bootloader first with the UPDI pin left as UPDI, so you can verify that, with the desired UART option, the bootloader really does try to use the pins you want it to - before you turn UPDI into reset and render the part unprogrammable.**
 
-When operating at 1MHz, as of 2.1.4 the UART can now reach 115200 baud. In previous versions, it could do 57600, but not 115200. Also as of 2.1.4, a series of methods were added for [printing numbers as hex.](extras/printHex.md) 
+When operating at 1MHz, as of 2.1.4 the UART can now reach 115200 baud. In previous versions, it could do 57600, but not 115200. Also as of 2.1.4, a series of methods were added for [printing numbers as hex.](extras/printHex.md)
 
 ### SPI support
 All of these parts have a single hardware SPI peripheral. It works exactly like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. Note that the 8-pin parts (412, 212, 402, 204) do not have a specific SS pin.
@@ -359,12 +359,12 @@ As noted above in the discussion of the shared UPDI/reset pin, these parts suppo
 
 ```
 void resetViaWDT() {
-	_PROTECTED_WRITE(WDT.CTRLA,0x01); //enable the WDT, minimum timeout
-	while (1) ; // spin until reset
+    _PROTECTED_WRITE(WDT.CTRLA,0x01); //enable the WDT, minimum timeout
+    while (1) ; // spin until reset
 }
 
 void resetViaSWR() {
-	_PROTECTED_WRITE(RSTCTRL.SWRR,1);
+    _PROTECTED_WRITE(RSTCTRL.SWRR,1);
 }
 
 ```
