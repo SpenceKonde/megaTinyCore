@@ -230,6 +230,7 @@ atxy7.build.export_merged_output=false
 atxy7.bootloader.tool=avrdude
 atxy7.bootloader.WDTCFG=0x00
 atxy7.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+atxy7.bootloader.OSCCFG=0x01
 atxy7.bootloader.TCD0CFG=0x00
 atxy7.bootloader.APPEND=0x00
 atxy7.bootloader.BOOTEND=0x00
@@ -265,6 +266,7 @@ atxy6.upload.tool=avrdude
 atxy6.bootloader.tool=avrdude
 atxy6.bootloader.WDTCFG=0x00
 atxy6.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+atxy6.bootloader.OSCCFG=0x01
 atxy6.bootloader.TCD0CFG=0x00
 atxy6.bootloader.APPEND=0x00
 atxy6.bootloader.BOOTEND=0x00
@@ -456,9 +458,6 @@ atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
 
 atxy4.upload.workaround=
 atxy4.build.millistimer=D0
-# We set this here - unless 20/10/5 MHz is selected, we always use the 16 MHz oscillator to start up on
-# This is the safer choice, as automotive parts don't have the 20 MHz oscillator.
-atxy4.bootloader.OSCCFG=0x01
 atxy4.build.bootload=
 atxy4.build.board=AVR_ATtinyxy4
 atxy4.menu.serialevent.no=No (saves space)
@@ -666,6 +665,7 @@ atxy4.build.export_merged_output=false
 
 atxy4.bootloader.WDTCFG=0x00
 atxy4.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+atxy4.bootloader.OSCCFG=0x01
 atxy4.bootloader.TCD0CFG=0x00
 atxy4.bootloader.APPEND=0x00
 atxy4.bootloader.BOOTEND=0x00
@@ -863,6 +863,7 @@ atxy2.build.export_merged_output=false
 atxy2.bootloader.tool=avrdude
 atxy2.bootloader.WDTCFG=0x00
 atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+atxy2.bootloader.OSCCFG=0x01
 atxy2.bootloader.TCD0CFG=0x00
 atxy2.bootloader.APPEND=0x00
 atxy2.bootloader.BOOTEND=0x00
@@ -1193,6 +1194,7 @@ atxy7o.build.extra_flags=-DARDUINO_attinyxy7 {build.serialevent} {build.millis} 
 
 atxy7o.bootloader.WDTCFG=0x00
 atxy7o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+atxy7o.bootloader.OSCCFG=0x01
 atxy7o.bootloader.TCD0CFG=0x00
 atxy7o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy7o.bootloader.APPEND=0x00
@@ -1413,6 +1415,7 @@ atxy6o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
 atxy6o.bootloader.WDTCFG=0x00
 atxy6o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+atxy6o.bootloader.OSCCFG=0x01
 atxy6o.bootloader.TCD0CFG=0x00
 atxy6o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy6o.bootloader.APPEND=0x00
@@ -1645,6 +1648,7 @@ atxy4o.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 atxy4o.bootloader.WDTCFG=0x00
 atxy4o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+atxy4o.bootloader.OSCCFG=0x01
 atxy4o.bootloader.TCD0CFG=0x00
 atxy4o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy4o.bootloader.APPEND=0x00
@@ -1846,6 +1850,7 @@ atxy2o.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 atxy2o.bootloader.WDTCFG=0x00
 atxy2o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+atxy2o.bootloader.OSCCFG=0x01
 atxy2o.bootloader.TCD0CFG=0x00
 atxy2o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy2o.bootloader.APPEND=0x00
