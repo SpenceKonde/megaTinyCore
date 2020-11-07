@@ -1,4 +1,4 @@
-# Serial.printHex() 
+# Serial.printHex()
 This core includes my printHex() methods of Serial - these provide an expedient, flash-efficient method print numbers as hexadecimal. Unlike `Serial.print(number,HEX)` these will automatically add the leading zero (if the number is under 16). When passed a 2 or 4 byte value, a third, optional argument allows reversing the byte order, allowing you swap "endian-ness" of a value.
 ```
 printHex(uint8_t b);
