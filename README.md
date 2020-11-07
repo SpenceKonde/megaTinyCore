@@ -180,7 +180,7 @@ The 3216,1616,816,416,3217,1617 and 817 have two additional PWM pins driven by T
 In versions prior to 1.1.7, reconfiguting the TCA0's prescaler adversely effected tone and servo functionality. This is no longer the case.
 
 ### Read & Write EEPROM and USERROW
-The standard EEPROM.h is available here, and as of 2.1.0, it works correctly again (and no longer tries to get clever with supporting the USERROW. Use the USERSIG.h library (same API as EEPROM, though there may be future additions to harmonize with Dx-friendly functions for updating multiple bytes - the Dx-series parts can only erase the whole USERROW, so potentially each byte written could involve erasing and rewriting it all). 
+The standard EEPROM.h is available here, and as of 2.1.0, it works correctly again (and no longer tries to get clever with supporting the USERROW. Use the USERSIG.h library (same API as EEPROM, though there may be future additions to harmonize with Dx-friendly functions for updating multiple bytes - the Dx-series parts can only erase the whole USERROW, so potentially each byte written could involve erasing and rewriting it all).
 
 ### NeoPixel (WS2812) support
 The usual NeoPixel (WS2812) libraries have problems on these parts. This core includes two libraries for this, both of which are tightly based on the Adafruit_NeoPixel library. See the [tinyNeoPixel documentation](megaavr/extras/tinyNeoPixel.md) and included examples for more information.
