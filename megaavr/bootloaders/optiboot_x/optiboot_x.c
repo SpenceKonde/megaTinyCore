@@ -349,11 +349,14 @@ int main(void) {
   #ifdef START_APP_ON_POR
   // If WDRF is set  OR nothing except BORF and PORF are set, that's not bootloader entry condition
   // so jump to app - this is for when UPDI pin is used as reset, so we go straight to app on start.
-  if (ch & RSTCTRL_WDRF_bm || (!(ch & (~(RSTCTRL_BORF_bm | RSTCTRL_PORF_bm))))) {
+  // 11/14: NASTY bug - we also need to check for no reset flags being set (ie, direct entry)
+  // and run bootloader in that case, otherwise bootloader won't run, among other things, after fresh
+  // bootloading!
+  if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~(RSTCTRL_BORF_bm | RSTCTRL_PORF_bm)))))) {
   #else
   // If WDRF is set  OR nothing except BORF is set, that's not bootloader entry condition
   // so jump to app - let's see if this works okay or not...
-  if (ch & RSTCTRL_WDRF_bm || (!(ch & (~RSTCTRL_BORF_bm)))) {
+  if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~RSTCTRL_BORF_bm))))) {
   #endif
     // Start the app.
     // Dont bother trying to stuff it in r2, which requires heroic effort to fish out
