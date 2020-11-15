@@ -861,7 +861,7 @@ atxy2.menu.startuptime.64.bootloader.SYSCFG1=0x07
 atxy2.build.core=megatinycore
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
-atxy2.build.uartvoltage=-V
+atxy2.build.uartvoltage=NA
 atxy2.build.extra_flags=-DARDUINO_attinyxy2 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy2.build.export_merged_output=false
 
@@ -1831,7 +1831,7 @@ atxy2o.bootloader.tool=avrdude
 
 atxy2o.build.core=megatinycore
 atxy2o.build.variant=txy2
-atxy2o.build.uartvoltage=-V
+atxy2o.build.uartvoltage=NA
 atxy2o.build.extra_flags=-DARDUINO_attinyxy2 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy2o.build.export_merged_output=true
 
