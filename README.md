@@ -3,7 +3,7 @@
 
 ### [Wiring](Wiring.md)
 ### [Installation](Installation.md)
-### [Making a cheap UPDI programmer](megaavr/extras/MakeUPDIProgrammer.md)
+### [Making a cheap UPDI programmer](MakeUPDIProgrammer.md)
 
 # megaTinyCore
 Arduino core for the tinyAVR 0-series and 1-series chips. These parts have an improved architecture, with improved peripherals and improved execution time for certain instructions (similar to megaAVR 0-series chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. Moreover, these parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini!) run just over $1 USD, and under $.90 in quantity - less than many 8k classic AVR ATtiny parts (AVR instruction sets, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal, and accurately enough for UART communication!
@@ -178,6 +178,9 @@ The 3216,1616,816,416,3217,1617 and 817 have two additional PWM pins driven by T
 #### [Timers and megaTinyCore](megaavr/extras/PWMandTimers.md)
 
 In versions prior to 1.1.7, reconfiguting the TCA0's prescaler adversely effected tone and servo functionality. This is no longer the case.
+
+### Read & Write EEPROM and USERROW
+The standard EEPROM.h is available here, and as of 2.1.0, it works correctly again (and no longer tries to get clever with supporting the USERROW. Use the USERSIG.h library (same API as EEPROM, though there may be future additions to harmonize with Dx-friendly functions for updating multiple bytes - the Dx-series parts can only erase the whole USERROW, so potentially each byte written could involve erasing and rewriting it all).
 
 ### NeoPixel (WS2812) support
 The usual NeoPixel (WS2812) libraries have problems on these parts. This core includes two libraries for this, both of which are tightly based on the Adafruit_NeoPixel library. See the [tinyNeoPixel documentation](megaavr/extras/tinyNeoPixel.md) and included examples for more information.
