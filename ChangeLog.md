@@ -12,6 +12,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Correct bug with bootloader version used on 14-24 pin parts when UPDI pin is configured as GPIO.
 * add millisClockCyclesPerMicrosecond(); what WAS clockCyclesPerMicrosecond() is now this - differemnce is that the millisClockCyclesPerMicrosecond() gives the number of clock cycles on the timebase for the millis timers (so, for TCD0 as millis clock, the unprescaled internal oscillator, otherwise same as clockCyclesPerMicrosecond()) - apparently other libraries use this for things that depend on the system clock... including my own Servo implementation! (it was tested before that was the default millis source on 3216/3217)... This is *really* nasty when it bites....
 * Fix Servo library - at long last! I never realized just *how* broken it was. (#195, #241)
+* What the heck? When were people going to tell me about the regression on TCD0 PWM pins?! It just didn't happen... botched refactoring of USE_TCD0_PWM AND regression to code from the bad old days before I knew how to get PWM and millis...(#249)
 
 ## Released Versions
 

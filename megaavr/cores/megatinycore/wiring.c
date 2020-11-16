@@ -745,10 +745,10 @@ void setup_timers() {
   // No megaTinyCore parts need to configure this unless used for millis
   #ifdef TCD0
   #if (defined(USE_TIMERD0_PWM) && (!defined(MILLIS_USE_TIMERD0)))
-  TCD0.CMPBCLR = 510; //Count to 510
-  TCD0.CMPACLR = 510;
+  TCD0.CMPBCLR = 509; //510 counts, starts at 0, not 1!
+  TCD0.CMPACLR = 509;
   TCD0.CTRLC = 0x80; //WOD outputs PWM B, WOC outputs PWM A
-  TCD0.CTRLB = 0x00; //One Slope
+  TCD0.CTRLB = TCD_WGMODE_ONERAMP_gc; //One Slope
   TCD0.CTRLA = TIMERD0_PRESCALER; //OSC20M prescaled by 32, gives ~1.2 khz PWM at 20MHz.
   #endif
   #endif

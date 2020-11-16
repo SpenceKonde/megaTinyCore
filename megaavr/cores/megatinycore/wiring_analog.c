@@ -117,26 +117,14 @@ void analogWrite(uint8_t pin, int val) {
     return;
   }
   // We need to make sure the PWM output is enabled for those pins
-  // that support it, as we turn it off when digitally reading or
-  // writing with them.  Also, make sure the pin is in output mode
+  // that support it.  Also, make sure the pin is in output mode
   // for consistently with Wiring, which doesn't require a pinMode
   // call for the analog output pins.
   pinMode(pin, OUTPUT);
 
-  //if(val < 1){  /* if zero or negative drive digital low */
-
-  //  digitalWrite(pin, LOW);
-
-  //} else if(val > 255){  /* if max or greater drive digital high */
-
-  //  digitalWrite(pin, HIGH);
-
-  //} else {  /* handle pwm to generate analog value */
   /* Get timer */
   uint8_t digital_pin_timer =  digitalPinToTimer(pin);
   uint8_t *timer_cmp_out;
-
-  //TCB_t *timer_B;
   /* Find out Port and Pin to correctly handle port mux, and timer. */
   switch (digital_pin_timer) { //use only low nybble which defines which timer it is
 
@@ -164,60 +152,95 @@ void analogWrite(uint8_t pin, int val) {
         }
       }
       break;
-      /* None of these parts have a Timer B that gives us PWM on a pin we don't already have it on.
-        case TIMERB0:
-        case TIMERB1:
-        case TIMERB2:
-        case TIMERB3:
+      // End of TCA case
 
-
-        // Get pointer to timer, TIMERB0 order definition in Arduino.h
-        //assert (((TIMERB0 - TIMERB3) == 2));
-        timer_B = ((TCB_t *)&TCB0 + (digital_pin_timer - (TIMERB0&0x07));
-
-        // set duty cycle
-        timer_B->CCMPH = val;
-
-        ///Enable Timer Output
-        timer_B->CTRLB |= (TCB_CCMPEN_bm);
-
-        break;
-      */
-      #if defined(DAC0)
+  #if defined(DAC0)
     case DACOUT:
+    {
       DAC0.DATA = val;
       DAC0.CTRLA = 0x41; //OUTEN=1, ENABLE=1
       break;
-      #endif
-      #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
+    }
+  #endif
+  #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
     case TIMERD0:
-      if (val < 1) { /* if zero or negative drive digital low */
-        digitalWrite(pin, LOW);
-      } else if (val > 254) { /* if max or greater drive digital high */
-        digitalWrite(pin, HIGH);
-      } else {
-        if (bit_pos) {
-          TCD0.CMPBSET = (255 - val) << 1;
+      {
+      #ifndef NO_GLITCH_TIMERD0
+        if (val < 1) { /* if zero or negative drive digital low */
+          digitalWrite(pin, LOW);
+        } else if (val > 254) { /* if max or greater drive digital high */
+          digitalWrite(pin, HIGH);
         } else {
-          TCD0.CMPASET = (255 - val) << 1;
+      #endif
+        // Calculation of values to write to CMPxSET
+        // val is 1~254, so 255-val is 1~254. so we double it and subtract 1, now we have odd number between 1 and 507, corresponding to an even number of counts.
+        // Timer counts to 509, 510 counts including 0... so this gives us our promised 1/255~254/255 duty cycles, not 2/511th~509/511th...
+        // Simple stuff, how do people get this wrong? Sheesh...
+
+        // Now, if NO_GLITCH_TIMERD0 is defined, val can be anything...
+        #if defined(NO_GLITCH_TIMERD0)
+          uint8_t set_inven=0;
+          if (val < 1) {
+            val=0; //this will "just work", we'll set it to the maximum, it will never match, and will stay LOW
+          } else if (val > 254) {
+            val=0; //here we *also* set it to 0 so it would stay LOW
+            set_inven=1; //but we invert the pin output with INVEN!
+          }
+        #endif
+
+        uint8_t oldSREG=SREG;
+        cli(); //interrupts off... wouldn't due to have this mess interrupted and messed with...
+        while (!(TCD0.STATUS & (TCD_ENRDY_bm | TCD_CMDRDY_bm ))); //if previous sync/enable in progress, wait for it to finish.
+        // with interrupts off since an interrupt could trip these...
+        //set new values
+        if (bit_pos) {  //PIN_PC1
+          TCD0.CMPBSET = ((255 - val) << 1)-1;
+        } else {        //PIN_PC0
+          TCD0.CMPASET = ((255 - val) << 1)-1;
         }
-        if (!(TCD0.FAULTCTRL & (1 << (6 + bit_pos)))) { //bitpos will be 0 or 1 for TIMERD pins
+
+        if (!(TCD0.FAULTCTRL & (1 << (6 + bit_pos)))) {
+          //if it's not active, we need to activate it...
           //if not active, we need to activate it, which produces a glitch in the PWM
-          TCD0.CTRLA = TIMERD0_PRESCALER; //stop the timer
-          while (!(TCD0.STATUS & 0x01)) {;} // wait until it's actually stopped
-          uint8_t sreg = SREG;
-          cli();
+          uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
+          TCD0.CTRLA = TCD0_prescaler; //stop the timer
+          while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it's actually stopped
           _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL | (1 << (6 + bit_pos)));
-          SREG = sreg;
-          TCD0.CTRLA = TIMERD0_PRESCALER | 1; //re-enable it
+          TCD0.CTRLA = (TCD0_prescaler | TCD_ENABLE_bm); //re-enable it
         } else {
-          while (!(TCD0.STATUS & 0x02)) {;} //if previous sync in progress, wait for it to finish.
+          if (bit_pos) {  //PIN_PC1
+            TCD0.CMPBSET = ((255 - val) << 1)-1;
+          } else {        //PIN_PC0
+            TCD0.CMPASET = ((255 - val) << 1)-1;
+          }
           TCD0.CTRLE = 0x02; //Synchronize
         }
+
+        #if defined(NO_GLITCH_TIMERD0)
+          // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts )
+          // so if we're here, we're acting on either PC0 or PC1.
+          if (set_inven==0){
+            // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR)
+            // or somewhere inbetween.
+            if (bit_pos==0){
+              PORTC.PIN0CTRL&=~(PORT_INVEN_bm);
+            } else {
+              PORTC.PIN1CTRL&=~(PORT_INVEN_bm);
+            }
+          } else {
+            // we *are* turning off PWM while forcing pin high - analogwrite(pin,255) was called on TCD0 PWM pin...
+            if (bit_pos==0){
+              PORTC.PIN0CTRL|=PORT_INVEN_bm;
+            } else {
+              PORTC.PIN1CTRL|=PORT_INVEN_bm;
+            }
+          }
+        #endif
+        SREG=oldSREG;
       }
       break;
-
-      #endif
+    #endif
+    //end of TCD0 code
 
     /* If non timer pin, or unknown timer definition.  */
     /* do a digital write  */
@@ -229,5 +252,6 @@ void analogWrite(uint8_t pin, int val) {
         digitalWrite(pin, HIGH);
       }
       break;
-  }
-}
+  } //end of switch/case
+} // end of analogWrite
+

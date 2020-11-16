@@ -26,8 +26,9 @@
 #include <avr/pgmspace.h>
 #include "timers.h"
 
-#if (defined(USE_TIMERD0_PWM) && defined(TCD0))
+#if defined(TCD0)
   #define USE_TIMERD0_PWM
+  #define NO_GLITCH_TIMERD0
 #endif
 
 #define NUM_DIGITAL_PINS            18
@@ -278,7 +279,7 @@ const uint8_t digital_pin_to_timer[] = {
   TIMERA0,    // 8  PB1
   // Right side, bottom to top
   TIMERA0,    // 9  PB0
-  #if (defined(TCD0) && defined(USE_TIMERD0_PWM) &&(!defined(MILLIS_USE_TIMERD0)))
+  #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
   TIMERD0,    // 10 PC0
   TIMERD0,    // 11 PC1
   #else

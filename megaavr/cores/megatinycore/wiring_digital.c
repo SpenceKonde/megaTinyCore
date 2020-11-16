@@ -104,11 +104,12 @@ static void turnOffPWM(uint8_t pin) {
 
     /* TCA0 */
     case TIMERA0:
+    {
       /* Bit position will give output channel */
       #ifdef __AVR_ATtinyxy2__
-      if (bit_pos == 7) {
-        bit_pos = 0;  //on the xy2, WO0 is on PA7
-      }
+        if (bit_pos == 7) {
+          bit_pos = 0;  //on the xy2, WO0 is on PA7
+        }
       #endif
       if (bit_pos > 2) {
         bit_pos++;  //there's a blank bit in the middle
@@ -116,34 +117,50 @@ static void turnOffPWM(uint8_t pin) {
       /* Disable corresponding channel */
       TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
       break;
-      /* we don't need the type b timers as this core does not use them for PWM
-        //TCB - only one output
-        case TIMERB0:
-        case TIMERB1:
-        case TIMERB2:
-        case TIMERB3:
+    }
 
-        timerB = (TCB_t *)&TCB0 + (timer - TIMERB0);
+      /* we don't need the type b timers as this core does not use them for PWM      */
 
-         //Disable TCB compare channel
-        timerB->CTRLB &= ~(TCB_CCMPEN_bm);
-
+    // 1-series parts have a DAC that we can use...
+    #if defined(DAC0)
+      case DACOUT:
+        DAC0.CTRLA = 0x00;
         break;
-      */
-      #if defined(DAC0)
-    case DACOUT:
-      DAC0.CTRLA = 0x00;
-      break;
-      #endif
-      #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
-    case TIMERD0:
-      // rigmarole that produces a glitch in the PWM
-      TCD0.CTRLA = 0x10; //stop the timer
-      while (!(TCD0.STATUS & 0x01)) {;} // wait until it's actually stopped
-      _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & ~(1 << (6 + bit_pos)));
-      TCD0.CTRLA = 0x11; //re-enable it
-      break;
-      #endif
+    #endif
+
+    // 1-series parts also have a wacky async Type D timer, but we only use it on the 20 and 24-pin parts, as it doesn't buy us anything on the 14-pin ones...
+    // In a future update, an option to use TCD0 for PWM on PA4 and PA5 on the 14-pin parts, with TCA0 initialized in SINGLE mode, but this will only be done
+    // if there is user demand; I suspect there is not!
+    #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
+      case TIMERD0:
+      {
+        // rigmarole that produces a glitch in the PWM
+        uint8_t oldSREG=SREG;
+        cli();
+        uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
+        TCD0.CTRLA = TCD0_prescaler; //stop the timer
+        while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it's actually stopped
+        _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL | (1 << (6 + bit_pos)));
+        TCD0.CTRLA = (TCD0_prescaler | TCD_ENABLE_bm); //re-enable it
+
+        // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
+        // So we need to make sure that's off - wouldn't that be fun to debug?
+        #if defined(NO_GLITCH_TIMERD0)
+          // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts )
+          // so if we're here, we're acting on either PC0 or PC1.
+          if (bit_pos==0){
+            PORTC.PIN0CTRL&=~(PORT_INVEN_bm);
+          } else {
+            PORTC.PIN1CTRL&=~(PORT_INVEN_bm);
+          }
+        #endif
+
+        SREG=oldSREG;
+        break;
+      }
+    #endif
+    // END TCD0 handling
+
     default:
       break;
   }
@@ -155,14 +172,6 @@ void digitalWrite(uint8_t pin, uint8_t val) {
   if (bit_mask == NOT_A_PIN) {
     return;
   }
-
-  /* Turn off PWM if applicable */
-
-  // If the pin that support PWM output, we need to turn it off
-  // before doing a digital write.
-  turnOffPWM(pin);
-
-  /* Assuming the direction is already output !! */
 
   /* Get port */
   PORT_t *port = digitalPinToPortStruct(pin);
@@ -210,7 +219,11 @@ void digitalWrite(uint8_t pin, uint8_t val) {
     /* Restore system status */
     SREG = status;
   }
-
+  /* Turn off PWM if applicable */
+  // If the pin supports PWM output, we need to turn it off
+  // Better to do so AFTER we have set PORTx.OUT to what we want it to be when we're done
+  // The glitch would be super short, of course, but why make a glitch we don't have to?
+  turnOffPWM(pin);
 }
 
 int8_t digitalRead(uint8_t pin) {
@@ -219,14 +232,14 @@ int8_t digitalRead(uint8_t pin) {
   if (bit_mask == NOT_A_PIN) {
     return -1;
   }
-
-  // If the pin that support PWM output, we need to turn it off
-  // before getting a digital reading.
+  // Origionbally the Arduino core this was derived from turned off PWM on the pin
+  // I cannot fathom why, insofar as the Arduino team sees Arduino as an educational
+  // tool, and I can't think of a better way to learn about PWM...
+  //
+  // More importantkly, digitialRead() already *crawls*. Hence there is a particularly
+  // high bar for stuff that would make it even slower than it already is.
+  //
   // turnOffPWM(pin);
-  // And why do we "need" to do that? Do we have some obsessive
-  // need to make digitalRead slower than it needs to be?!
-  // or keep people from seeing their own PWM?
-  // digitalRead() should not change the output of the pin!
 
   /* Get port and check valid port */
   PORT_t *port = digitalPinToPortStruct(pin);
