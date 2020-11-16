@@ -13,9 +13,6 @@
   #define TRIM_DURATION  102                                                          // Makes a hell of a lot less difference than you'd think!
 #endif
 
-#define REFRESH_INTERVAL_TICKS (REFRESH_INTERVAL)
-
-
 
 static servo_t servos[MAX_SERVOS];                         // static array of servo structures
 
