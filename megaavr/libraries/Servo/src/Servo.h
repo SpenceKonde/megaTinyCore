@@ -59,32 +59,33 @@
 */
 
 // Architecture specific include
-#if defined(ARDUINO_ARCH_MEGAAVR) && defined(MEGATINYCORE)
+#if defined(ARDUINO_ARCH_MEGAAVR)
   #include "megaavr/ServoTimers.h"
   #if (F_CPU==1000000)
     #warning "Running at 1MHz results in unstable servo signal."
   #endif
 #else
-  #error "This version of the library only supports megaTinyCore-supported processors."
+  #error "This is an architecture specific library for ARDUINO_ARCH_MEGAAVR, but this device is not of that architecture"
 #endif
 
 #define Servo_VERSION           2     // software version of this library
 
-#define MIN_PULSE_WIDTH       544     // the shortest pulse sent to a servo
+#define MIN_PULSE_WIDTH      544     // the shortest pulse sent to a servo
 #define MAX_PULSE_WIDTH      2400     // the longest pulse sent to a servo
 #define DEFAULT_PULSE_WIDTH  1500     // default pulse width when servo is attached
-#define REFRESH_INTERVAL    20000     // minumim time to refresh servos in microseconds
+#define REFRESH_INTERVAL    20000UL   // minumim time to refresh servos in microseconds
 
 #define SERVOS_PER_TIMER       12     // the maximum number of servos controlled by one timer
 #define MAX_SERVOS   (_Nbr_16timers  * SERVOS_PER_TIMER)
 
 #define INVALID_SERVO         255     // flag indicating an invalid servo index
 
-#if !defined(ARDUINO_ARCH_STM32F4)
-
 typedef struct  {
-  uint8_t nbr        : 6 ;            // a pin number from 0 to 63
-  uint8_t isActive   : 1 ;            // true if this channel is enabled, pin not pulsed if false
+  uint8_t nbr        ;            // a pin number from 0 to 63
+  // the original implementation with bitslices and just isActive and nbr in a single byte saved 2 bytes of ram per servo, as a cost of a very small amount of flash.
+  uint8_t isActive   ;            // true if this channel is enabled, pin not pulsed if false
+  uint8_t port ;
+  uint8_t bitmask;
 } ServoPin_t   ;
 
 typedef struct {
@@ -95,19 +96,18 @@ typedef struct {
 class Servo {
   public:
     Servo();
-    uint8_t attach(byte pin);           // attach the given pin to the next free channel, sets pinMode, returns channel number or 0 if failure
+    uint8_t attach(byte pin);                   // attach the given pin to the next free channel, sets pinMode, returns channel number or 0 if failure
     uint8_t attach(byte pin, int min, int max); // as above but also sets min and max values for writes.
     void detach();
     void write(unsigned int value);             // if value is < 200 its treated as an angle, otherwise as pulse width in microseconds
     void writeMicroseconds(unsigned int value); // Write pulse width in microseconds
-    int read();                        // returns current pulse width as an angle between 0 and 180 degrees
-    int readMicroseconds();            // returns current pulse width in microseconds for this servo (was read_us() in first release)
-    bool attached();                   // return true if this servo is attached, otherwise false
+    int read();                                 // returns current pulse width as an angle between 0 and 180 degrees
+    unsigned int readMicroseconds();            // returns current pulse width in microseconds for this servo (was read_us() in first release)
+    bool attached();                            // return true if this servo is attached, otherwise false
   private:
-    uint8_t servoIndex;               // index into the channel data for this servo
-    int8_t min;                       // minimum is this value times 4 added to MIN_PULSE_WIDTH
-    int8_t max;                       // maximum is this value times 4 added to MAX_PULSE_WIDTH
+    uint8_t servoIndex;                         // index into the channel data for this servo
+    int8_t min;                                 // minimum is this value times 4 added to MIN_PULSE_WIDTH
+    int8_t max;                                 // maximum is this value times 4 added to MAX_PULSE_WIDTH
 };
 
-#endif
 #endif

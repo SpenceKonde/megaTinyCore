@@ -43,8 +43,8 @@
   uint16_t fract_inc;
   volatile uint32_t timer_millis = 0;
   #define FRACT_MAX (1000)
-  #define FRACT_INC (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)%1000);
-  #define MILLIS_INC (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/1000);
+  #define FRACT_INC (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)%1000);
+  #define MILLIS_INC (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/1000);
   volatile uint32_t timer_overflow_count = 0;
 #else
   volatile uint16_t timer_overflow_count = 0;
@@ -56,6 +56,19 @@
 #if !defined(MILLIS_USE_TIMERRTC)
 
 inline uint16_t clockCyclesPerMicrosecond() {
+  return ((F_CPU) / 1000000L);
+}
+
+inline unsigned long clockCyclesToMicroseconds(unsigned long cycles) {
+  return (cycles / clockCyclesPerMicrosecond());
+}
+
+inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
+  return (microseconds * clockCyclesPerMicrosecond());
+}
+
+// when TCD0 is used as millis source, this will be different from above, but 99 times out of 10, when a piece of code asks for clockCyclesPerMicrosecond(), they're asking about CLK_PER/CLK_MAIN/etc, not the unprescaled TCD0!
+inline uint16_t millisClockCyclesPerMicrosecond() {
   #ifdef MILLIS_USE_TIMERD0
   #if (F_CPU==20000000UL || F_CPU==10000000UL ||F_CPU==5000000UL)
   return (20);   //this always runs off the 20MHz oscillator
@@ -68,14 +81,13 @@ inline uint16_t clockCyclesPerMicrosecond() {
 }
 
 
-inline unsigned long clockCyclesToMicroseconds(unsigned long cycles) {
+inline unsigned long millisClockCyclesToMicroseconds(unsigned long cycles) {
   return (cycles / clockCyclesPerMicrosecond());
 }
 
-inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
+inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds) {
   return (microseconds * clockCyclesPerMicrosecond());
 }
-
 
 
 #if defined(MILLIS_USE_TIMERD0)
@@ -264,20 +276,20 @@ unsigned long micros() {
   #endif
   #else //TCA0
   #if (F_CPU==20000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==64)
-  microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+  microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
                  + (ticks * 3 + (ticks >> 2) - (ticks >> 4));
   #elif (F_CPU==10000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==64)
-  microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+  microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
                  + (ticks * 6 + (ticks >> 1) - (ticks >> 3));
   #elif (F_CPU==5000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==16)
-  microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+  microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
                  + (ticks * 3 + (ticks >> 2) - (ticks >> 4));
   #else
   #if (TIME_TRACKING_TIMER_DIVIDER%(F_CPU/1000000))
 #warning "Millis timer (TCA0) divider and frequency unsupported, inaccurate micros times will be returned."
   #endif
-  microseconds = ((overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                  + (ticks * (clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF) / TIME_TRACKING_TIMER_PERIOD)));
+  microseconds = ((overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+                  + (ticks * (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF) / TIME_TRACKING_TIMER_PERIOD)));
   #endif
   #endif //end of timer-specific part of micros calculations
   return microseconds;

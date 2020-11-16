@@ -4,14 +4,19 @@
 #include <Servo_megaTinyCore.h>
 
 #if (F_CPU > 10000000)
-  #define usToTicks(_us)    ((( _us / 2) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
-  #define ticksToUs(_ticks) (((unsigned) _ticks * 2) / clockCyclesPerMicrosecond())   // converts from ticks back to microseconds
+  #define usToTicks(_us)    ((( (_us) / 2) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
+  #define ticksToUs(_ticks) (((unsigned) (_ticks) * 2) / clockCyclesPerMicrosecond())   // converts from ticks back to microseconds
   #define TRIM_DURATION  51                                   // compensation ticks to trim adjust for digitalWrite delays
 #else
   #define usToTicks(_us)    ((( _us ) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
-  #define ticksToUs(_ticks) (((unsigned) _ticks ) / clockCyclesPerMicrosecond())   // converts from ticks back to microseconds
-  #define TRIM_DURATION  102                                  // compensation ticks to trim adjust for digitalWrite delays
+  #define ticksToUs(_ticks) (((unsigned) _ticks ) / clockCyclesPerMicrosecond())      // converts from ticks back to microseconds
+  #define TRIM_DURATION  102                                                          // Makes a hell of a lot less difference than you'd think!
 #endif
+
+#define REFRESH_INTERVAL_TICKS (REFRESH_INTERVAL)
+
+
+
 static servo_t servos[MAX_SERVOS];                         // static array of servo structures
 
 uint8_t ServoCount = 0;                                    // the total number of attached servos
@@ -28,12 +33,25 @@ static volatile int8_t currentServoIndex[_Nbr_16timers];   // index for the serv
 #define SERVO_MAX() (MAX_PULSE_WIDTH - this->max * 4)   // maximum value in uS for this servo
 
 void ServoHandler(int timer) {
+  static uint32_t currentCycleTicks=0;
   if (currentServoIndex[timer] < 0) {
-    // Write compare register
-    _timer->CCMP = 0;
+    // we're at servo index -1... but before we go further - we need to see if we've waited through a refresh cycle...
+    if (currentCycleTicks < usToTicks(REFRESH_INTERVAL)) {
+      uint32_t tval=usToTicks(REFRESH_INTERVAL)-currentCycleTicks;
+      uint16_t tval16=(tval>65535)?65535:tval;
+      _timer->CCMP = tval16;
+      currentCycleTicks+=tval16;
+      // wait longer, and terminate the ISR without further action./* Clear flag */
+      _timer->INTFLAGS = TCB_CAPT_bm;
+      return;
+    } else {
+      // current cycle is done, so reset the currentCycleTicks, and run the rest of things...
+      currentCycleTicks=0;
+    }
   } else {
     if (SERVO_INDEX(timer, currentServoIndex[timer]) < ServoCount && SERVO(timer, currentServoIndex[timer]).Pin.isActive == true) {
-      digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, LOW);   // pulse this channel low if activated
+      //digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, LOW);   // pulse this channel low if activated
+      ((PORT_t *)&PORTA + SERVO(timer, currentServoIndex[timer]).Pin.port)->OUTCLR=SERVO(timer, currentServoIndex[timer]).Pin.bitmask;
     }
   }
 
@@ -42,27 +60,25 @@ void ServoHandler(int timer) {
 
   if (SERVO_INDEX(timer, currentServoIndex[timer]) < ServoCount && currentServoIndex[timer] < SERVOS_PER_TIMER) {
     if (SERVO(timer, currentServoIndex[timer]).Pin.isActive == true) {   // check if activated
-      digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, HIGH);   // it's an active channel so pulse it high
+      //digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, HIGH);   // it's an active channel so pulse it high
+      ((PORT_t *)&PORTA + SERVO(timer, currentServoIndex[timer]).Pin.port)->OUTSET=SERVO(timer, currentServoIndex[timer]).Pin.bitmask;
     }
 
     // Get the counter value
-    uint16_t tcCounterValue =  0; //_timer->CCMP;
-    _timer->CCMP = (uint16_t)(tcCounterValue + SERVO(timer, currentServoIndex[timer]).ticks);
+    _timer->CCMP = SERVO(timer, currentServoIndex[timer]).ticks;
+    currentCycleTicks+=SERVO(timer, currentServoIndex[timer]).ticks;
   } else {
     // finished all channels so wait for the refresh period to expire before starting over
-
-    // Get the counter value
-    uint16_t tcCounterValue = _timer->CCMP;
-
-    if (tcCounterValue + 4UL < usToTicks(REFRESH_INTERVAL)) {   // allow a few ticks to ensure the next OCR1A not missed
-      _timer->CCMP = (uint16_t) usToTicks(REFRESH_INTERVAL);
-    } else {
-      _timer->CCMP = (uint16_t)(tcCounterValue + 4UL);    // at least REFRESH_INTERVAL has elapsed
+    if (currentCycleTicks + 100 < usToTicks(REFRESH_INTERVAL)) {   // let's not bother if it's gonna take less than 100 ticks for the next
+      uint32_t tval=usToTicks(REFRESH_INTERVAL)-currentCycleTicks;
+      uint16_t tval16=tval>65535?65535:tval;
+      _timer->CCMP = tval16;
+      currentCycleTicks+=tval16;
+    } else { // in this case it's less than 100 ticks for next interval, so we just set it to that...
+      currentCycleTicks=usToTicks(REFRESH_INTERVAL);
     }
-
     currentServoIndex[timer] = -1;   // this will get incremented at the end of the refresh period to start again at the first channel
   }
-
   /* Clear flag */
   _timer->INTFLAGS = TCB_CAPT_bm;
 }
@@ -130,8 +146,15 @@ uint8_t Servo::attach(byte pin, int min, int max) {
   timer16_Sequence_t timer;
 
   if (this->servoIndex < MAX_SERVOS) {
-    pinMode(pin, OUTPUT);                                   // set servo pin to output
-    servos[this->servoIndex].Pin.nbr = pin;
+    //pinMode(pin, OUTPUT);                                   // set servo pin to output
+    //servos[this->servoIndex].Pin.nbr = pin;
+    uint8_t bitmask=digitalPinToBitMask(pin);
+    if (bitmask==NOT_A_PIN) return NOT_A_PIN;
+    servos[this->servoIndex].Pin.bitmask=bitmask;
+    uint8_t prt=digitalPinToPort(pin);
+    servos[this->servoIndex].Pin.port=prt;
+    PORT_t *port=((PORT_t *)&PORTA + prt);
+    port->DIRSET=bitmask;
     // todo min/max check: abs(min - MIN_PULSE_WIDTH) /4 < 128
     this->min  = (MIN_PULSE_WIDTH - min) / 4; //resolution of min/max is 4 uS
     this->max  = (MAX_PULSE_WIDTH - max) / 4;
@@ -158,9 +181,11 @@ void Servo::detach() {
 void Servo::write(unsigned int value) {
   // treat values less than 544 as angles in degrees (valid values in microseconds are handled as microseconds)
   if (value < MIN_PULSE_WIDTH) {
-    if (value < 0) {
-      value = 0;
-    } else if (value > 180) {
+    // ditch this, the argument is an unsigned int, so this is pointless...
+    //if (value < 0) {
+    //  value = 0;
+    //} else
+    if (value > 180) {
       value = 180;
     }
 
@@ -169,18 +194,20 @@ void Servo::write(unsigned int value) {
   writeMicroseconds(value);
 }
 
+
 void Servo::writeMicroseconds(unsigned int value) {
   // calculate and store the values for the given channel
   byte channel = this->servoIndex;
   if ((channel < MAX_SERVOS)) {  // ensure channel is valid
-    if (value < SERVO_MIN()) {        // ensure pulse width is valid
+    if (value < (uint16_t) SERVO_MIN()) {        // ensure pulse width is valid
       value = SERVO_MIN();
-    } else if (value > SERVO_MAX()) {
+    } else if (value > (uint16_t) SERVO_MAX()) {
       value = SERVO_MAX();
     }
 
+
+    value = usToTicks(value);  // convert to ticks BEFORE compensating for interrupt overhead
     value = value - TRIM_DURATION;
-    value = usToTicks(value);  // convert to ticks after compensating for interrupt overhead
     servos[channel].ticks = value;
   }
 }
@@ -189,14 +216,13 @@ int Servo::read() { // return the value as degrees
   return map(readMicroseconds() + 1, SERVO_MIN(), SERVO_MAX(), 0, 180);
 }
 
-int Servo::readMicroseconds() {
+unsigned int Servo::readMicroseconds() {
   unsigned int pulsewidth;
   if (this->servoIndex != INVALID_SERVO) {
-    pulsewidth = ticksToUs(servos[this->servoIndex].ticks)  + TRIM_DURATION;
+    pulsewidth = ticksToUs(servos[this->servoIndex].ticks + TRIM_DURATION);
   } else {
     pulsewidth  = 0;
   }
-
   return pulsewidth;
 }
 

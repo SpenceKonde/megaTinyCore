@@ -80,10 +80,17 @@ extern "C" {
   values indicating oscillator error provided from the device manufacturer */
 #define PERFORM_SIGROW_CORRECTION_F_CPU 0
 
-uint16_t clockCyclesPerMicrosecondComp(uint32_t clk);
+// We declare it here... we never define it anywhere.... I think I'd rather a user get the more straightforward error message?
+//uint16_t clockCyclesPerMicrosecondComp(uint32_t clk);
+
 uint16_t clockCyclesPerMicrosecond();
 unsigned long clockCyclesToMicroseconds(unsigned long cycles);
 unsigned long microsecondsToClockCycles(unsigned long microseconds);
+
+// Copies of above for internal use, and for the really exotic use cases that want this instead of system clocks (basically never in user-land)
+uint16_t millisClockCyclesPerMicrosecond();
+unsigned long millisClockCyclesToMicroseconds(unsigned long cycles);
+unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
 
 // Get the bit location within the hardware port of the given virtual pin.
 // This comes from the pins_*.c file for the active board configuration.
