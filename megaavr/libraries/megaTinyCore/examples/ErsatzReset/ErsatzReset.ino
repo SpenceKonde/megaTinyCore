@@ -9,7 +9,7 @@
   #define ERSATZ_RESET_PIN PIN_PA4
   // Always arduino pin 0
   #define RESET_MASK 1<<4
-  #define PINCTRL PORTA.PIN3CTRL
+  #define PINCTRL PORTA.PIN4CTRL
 #endif
 
 // We will always use pin 0 as the ersatz reset pin, EXCEPT on the 8-pin parts.
