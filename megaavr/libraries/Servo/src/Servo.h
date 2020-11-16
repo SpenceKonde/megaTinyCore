@@ -81,7 +81,7 @@
 #define INVALID_SERVO         255     // flag indicating an invalid servo index
 
 typedef struct  {
-  uint8_t nbr        ;            // a pin number from 0 to 63
+  //uint8_t nbr        ;            // a pin number from 0 to 63
   // the original implementation with bitslices and just isActive and nbr in a single byte saved 2 bytes of ram per servo, as a cost of a very small amount of flash.
   uint8_t isActive   ;            // true if this channel is enabled, pin not pulsed if false
   uint8_t port ;

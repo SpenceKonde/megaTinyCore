@@ -147,7 +147,7 @@ uint8_t Servo::attach(byte pin, int min, int max) {
 
   if (this->servoIndex < MAX_SERVOS) {
     //pinMode(pin, OUTPUT);                                   // set servo pin to output
-    servos[this->servoIndex].Pin.nbr = pin;
+    //servos[this->servoIndex].Pin.nbr = pin;
     uint8_t bitmask=digitalPinToBitMask(pin);
     if (bitmask==NOT_A_PIN) return NOT_A_PIN;
     servos[this->servoIndex].Pin.bitmask=bitmask;
