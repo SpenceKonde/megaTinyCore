@@ -221,7 +221,7 @@ void analogWrite(uint8_t pin, int val) {
           // so if we're here, we're acting on either PC0 or PC1.
           if (set_inven==0){
             // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR)
-            // or somewhere inbetween.
+            // or somewhere in between.
             if (bit_pos==0){
               PORTC.PIN0CTRL&=~(PORT_INVEN_bm);
             } else {
