@@ -1,0 +1,57 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  timestamped:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  detailed:
+    format: "%(name)s - %(levelname)s - %(message)s"
+  simple:
+    format: "%(message)s"
+
+handlers:
+  # Logging to the console is default to WARNING with detailed output:
+  console:
+    class: logging.StreamHandler
+    level: WARNING
+    formatter: detailed
+    stream: ext://sys.stdout
+
+  # Logging debug output to file
+  # Handler disabled by default - for reference only
+  debug_file_handler:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: timestamped
+    # File path will be user log directory for this application
+    filename: debug.log
+    encoding: utf8
+
+  # Logging errors to file
+  # Handler disabled by default - for reference only
+  error_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: timestamped
+    # File path will be user log directory for this application
+    filename: errors.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    encoding: utf8
+
+loggers:
+  # pyedbglib library should be kept to critical errors to console only
+  pyedbglib:
+    level: ERROR
+    handlers: [console]
+    propagate: no
+
+root:
+  # Default level is warning
+  # this is increased with -v <level> in CLI usage
+  level: WARNING
+  # Default handlers is console only
+  handlers: [console]
+  # Add debug_file_handler for debug output to file
+  # Add error_file_handler for error output to file
+  # See configuration in handlers section above
+  #handlers: [console, debug_file_handler, error_file_handler]
