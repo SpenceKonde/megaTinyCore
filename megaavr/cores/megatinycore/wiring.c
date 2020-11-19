@@ -82,11 +82,11 @@ inline uint16_t millisClockCyclesPerMicrosecond() {
 
 
 inline unsigned long millisClockCyclesToMicroseconds(unsigned long cycles) {
-  return (cycles / clockCyclesPerMicrosecond());
+  return (cycles / millisClockCyclesPerMicrosecond());
 }
 
 inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds) {
-  return (microseconds * clockCyclesPerMicrosecond());
+  return (microseconds * millisClockCyclesPerMicrosecond());
 }
 
 
