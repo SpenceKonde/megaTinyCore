@@ -91,8 +91,10 @@
 #define PIN_A5   (1)
 #define PIN_A6   (2)
 #define PIN_A7   (3)
-#define PIN_A10  (6)
-#define PIN_A11  (7)
+#define PIN_B0   (7
+#define PIN_B1   (6)
+#define PIN_B2   (5)
+#define PIN_B3   (4)
 
 static const uint8_t A0 = PIN_A0;
 static const uint8_t A1 = PIN_A1;
@@ -102,8 +104,10 @@ static const uint8_t A4 = PIN_A4;
 static const uint8_t A5 = PIN_A5;
 static const uint8_t A6 = PIN_A6;
 static const uint8_t A7 = PIN_A7;
-static const uint8_t A10 = PIN_A10;
-static const uint8_t A11 = PIN_A11;
+static const uint8_t B0 = PIN_B0;
+static const uint8_t B1 = PIN_B1;
+static const uint8_t B2 = PIN_B2;
+static const uint8_t B3 = PIN_B3;
 
 static const uint8_t PIN_PA4 = 0;
 static const uint8_t PIN_PA5 = 1;
@@ -245,8 +249,10 @@ const uint8_t digital_pin_to_timer[] = {
   #define PIN_A5   (1)
   #define PIN_A6   (2)
   #define PIN_A7   (3)
-  #define PIN_A10  (6)
-  #define PIN_A11  (7)
+  #define PIN_B0   (7)
+  #define PIN_B1   (6)
+  #define PIN_B2   (4)
+  #define PIN_B3   (4)
 
 */
 #endif
