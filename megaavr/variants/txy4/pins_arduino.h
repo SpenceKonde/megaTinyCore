@@ -91,7 +91,7 @@
 #define PIN_A5   (1)
 #define PIN_A6   (2)
 #define PIN_A7   (3)
-#define PIN_B0   (7
+#define PIN_B0   (7)
 #define PIN_B1   (6)
 #define PIN_B2   (5)
 #define PIN_B3   (4)
