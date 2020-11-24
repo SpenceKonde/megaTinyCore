@@ -1,10 +1,10 @@
 ### Minimal Wiring Requirements:
 
-These are the bare minimum requirements to bring the chip to life and program it using the Arduino IDE. The 0.1uf capacitors are *not* optional - you must use these or the parts will behave erratically, and may not work at all; these should be placed as close to the chip as possible.
+These are the bare minimum requirements to bring the chip to life and program it using the Arduino IDE. The 0.1uf capacitor is *not* optional - you must use these or the parts will behave erratically, and may not work at all; these should be placed as close to the chip as possible.
 
-* Vcc pin(s) connected to supply voltage (1.8~5v depending on part, clock speed, and fuse settings)
-* Gnd pin(s) connected to Ground
-* 0.1uf ceramic capacitor connected between Vcc and Gnd pins, as close to the part as practical.
-* 4.7k resistor from programmer pin 6 to UPDI pin (see: [Making a cheap UPDI programmer](MakeUPDIProgrammer.md))
+* Vcc pin connected to supply voltage (1.8~5v depending on part, planned clock speed, and fuse settings)
+* Gnd pin connected to Ground
+* 0.1uf ceramic capacitor connected between Vcc and Gnd pins, as close to the part as practical. Per datasheet recommendations and best practices, an SMD MLCC capacitor on the same side of the PCB as the part is recommended, though a through-hole capacitor or an MLCC on the opposite of the PCB can be used as long as the leads and trace length are minimized.
+* 470 ohm resistor from programmer to UPDI pin (see: [Making a cheap UPDI programmer](MakeUPDIProgrammer.md)) - This may be omitted if you are certain that the programmer you use will always have such a resistor in place. Total resistance between 220 ohms and around 6k ohms is expected to work; higher resistance may prevent programming, and lower resistance may present a (typically remote) risk of damage to the programmer and/or ATtiny device.
 
-If the power supply is unstable, or the wires from the supply are long, it is highly recommended to put a larger capacitor between power and ground on the board - the appropriate size and type will depend on the loading, voltage, stability of the power supply, and available space; typical values might range from 10 uf to 1000uf. Aluminum electrolytic caps are commonly used for this purpose.
+If the power supply is unstable, or the wires from the supply are long, it is highly recommended to put a larger capacitor between power and ground on the board - the appropriate size and type will depend on the loading, voltage, stability of the power supply, and available space; values used might range from 4.7 uf to 1000uf. Aluminum electrolytic caps are commonly used for this purpose, though modern ceramic capacitors are now available with values up to 100uF, and are smaller (and, up to around 10uF, far cheaper), particularly for SMD configurations. Under typical conditions, 4.7 or 10uF is plenty for this purpose; higher values will present problems if attempting to power the board via a computer USB port due to "inrush current". 
