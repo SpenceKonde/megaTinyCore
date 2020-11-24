@@ -18,7 +18,7 @@ Download and extract, or clone the repo to your local machine.
 
 Now, you should be able to select an ATtiny megaAVR series board from Tools -> Board, and upload a sketch via the IDE. The same programmer can also be used to Burn Bootloader (be sure to select the jtag2updi (megaTinyCore) programmer from Tools -> Programmer menu)
 
-**If the process appears to hang at the start of the upload, press and release the reset button on the UPDI prpgrammer** I pounded on jtag2updi for like a month trying to get rid of all the bugs like this, and after finally getting my fixes merged in, discovered that somehow, this could still happen.
+**If the process appears to hang at the start of the upload, press and release the reset button on the UPDI prpgrammer** I pounded on jtag2updi for like a month trying to get rid of all the bugs like this, and after finally getting my fixes merged in, discovered that somehow, this could still happen. This does appear to be fixed in the latest version of jtag2updi; I never  understood what caused it or how the changes fixed it.
 
 ![Minimal UPDI connections](megaavr/extras/NanoUPDI_Minimal.png "Minimal UPDI connections - no resistors")
 
