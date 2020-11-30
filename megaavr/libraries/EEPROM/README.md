@@ -4,7 +4,7 @@
 
 ### **What is the EEPROM library.**
 
-Th EEPROM library provides an easy to use interface to interact with the internal non-volatile storage found in AVR based Arduino boards. This library will work on many AVR devices like ATtiny and ATmega chips.
+The EEPROM library provides an easy to use interface to interact with the internal non-volatile storage found in AVR based Arduino boards. This library will work on many AVR devices like ATtiny and ATmega chips.
 
 ### **How to use it**
 The EEPROM library is included in your IDE download. To add its functionality to your sketch you'll need to reference the library header file. You do this by adding an include directive to the top of your sketch.
@@ -151,3 +151,6 @@ This function returns an `EEPtr` pointing at the location after the last EEPROM 
 Used with `begin()` to provide custom iteration.
 
 **Note:** The `EEPtr` returned is invalid as it is out of range. See the warning about invalid addresses above.
+
+### EEPROM corruption due to low supply voltage
+If the power supply voltage is insufficient (as in, below operating specifications) while writing to the EEPROM, corruption can result; this includes the case where power is cut entirely while writing to the EEPROM. This phenomenon is described in the "Preventing Flash/EEPROM corruption" section (9.3.3) of the datasheet. Enabling the Brown-Out Detect functionality ("burn bootloader" required after changing those settings to apply them) will prevent this by holding the part in reset when below a minimum supply voltage. If BOD is for some reason unacceptable as a solution, the ADC could be used to read the supply voltage to ensure that it is within a normal operating range prior to writing to the EEPROM. 
