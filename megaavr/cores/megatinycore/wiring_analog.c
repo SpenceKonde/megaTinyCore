@@ -159,11 +159,11 @@ void analogWrite(uint8_t pin, int val) {
           bit_pos -= 3;
           timer_cmp_out = ((uint8_t *)(&TCA0.SPLIT.HCMP0)) + (bit_pos << 1);
           (*timer_cmp_out) = (val);
-          TCA0.SPLIT.CTRLB |= (1 << (TCA_SPLIT_HCMP0EN_bp + bit_pos));
+          TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_HCMP0EN_bp + bit_pos));
         } else {
           timer_cmp_out = ((uint8_t *)(&TCA0.SPLIT.LCMP0)) + (bit_pos << 1);
           (*timer_cmp_out) = (val);
-          TCA0.SPLIT.CTRLB |= (1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
+          TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
         }
       }
       break;
