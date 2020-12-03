@@ -27,7 +27,15 @@
 #include "pins_arduino.h"
 
 
+inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin)
+{
+  if(__builtin_constant_p(pin))
+    if (pin >= NUM_TOTAL_PINS) badArg("Digital pin is constant, but not a valid pin");
+}
+
 void pinMode(uint8_t pin, uint8_t mode) {
+  check_valid_digital_pin(pin);
+
   uint8_t bit_mask = digitalPinToBitMask(pin);
 
   if ((bit_mask == NOT_A_PIN) || (mode > INPUT_PULLUP)) {
@@ -166,7 +174,10 @@ static void turnOffPWM(uint8_t pin) {
   }
 }
 
+
+
 void digitalWrite(uint8_t pin, uint8_t val) {
+  check_valid_digital_pin(pin);
   /* Get bit mask for pin */
   uint8_t bit_mask = digitalPinToBitMask(pin);
   if (bit_mask == NOT_A_PIN) {
@@ -226,7 +237,37 @@ void digitalWrite(uint8_t pin, uint8_t val) {
   turnOffPWM(pin);
 }
 
+inline __attribute__((always_inline)) void digitalWriteFast(uint8_t pin, uint8_t val)
+{
+  check_constant_pin(pin);
+  check_valid_digital_pin(pin);
+  // Mega-0, Tiny-1 style IOPORTs
+  // Assumes VPORTs exist starting at 0 for each PORT structure
+  uint8_t mask = 1 << digital_pin_to_bit_position[pin];
+  uint8_t port = digital_pin_to_port[pin];
+  VPORT_t *vport;
+
+  // Write pin value from VPORTx.OUT register
+  vport = (VPORT_t *)(port * 4);
+/*
+  if (val == HIGH)
+    vport->OUT |= mask;
+  else if (val == LOW)
+    vport->OUT &= ~mask;
+  else // CHANGE
+    vport->IN = mask;
+*/
+  if (val == LOW)
+    vport->OUT &= ~mask;
+  else if (val == CHANGE)
+    vport->IN = mask;
+  else // HIGH
+    vport->OUT |= mask;
+
+}
+
 int8_t digitalRead(uint8_t pin) {
+  check_valid_digital_pin(pin);
   /* Get bit mask and check valid pin */
   uint8_t bit_mask = digitalPinToBitMask(pin);
   if (bit_mask == NOT_A_PIN) {
@@ -250,4 +291,22 @@ int8_t digitalRead(uint8_t pin) {
   } else {
     return LOW;
   }
+}
+
+
+inline __attribute__((always_inline)) int8_t digitalReadFast(uint8_t pin)
+{
+  check_constant_pin(pin);
+  check_valid_digital_pin(pin);
+  // Mega-0, Tiny-1 style IOPORTs
+  // Assumes VPORTs exist starting at 0 for each PORT structure
+  uint8_t mask = 1 << digital_pin_to_bit_position[pin];
+  uint8_t port = digital_pin_to_port[pin];
+  VPORT_t *vport;
+
+  // Old style port logic is a small integer 0 for PORTA, 1 for PORTB etc.
+  vport = (VPORT_t *)(port * 4);
+
+  // Read pin value from VPORTx.IN register
+  return !!(vport->IN & mask);
 }

@@ -91,14 +91,24 @@ typedef uint32_t pin_size_t;
 #else
 typedef uint8_t pin_size_t;
 #endif
+// Constant checks error handler
+void badArg(const char*) __attribute__((error("")));
+inline __attribute__((always_inline)) void check_constant_pin(pin_size_t pin)
+{
+  if(!__builtin_constant_p(pin))
+    badArg("Fast digital pin must be a constant");
+}
+
 
 void pinMode(pin_size_t pinNumber, uint8_t mode);
 void digitalWrite(pin_size_t pinNumber, uint8_t val);
+void digitalWriteFast(pin_size_t pinNumber, uint8_t val);
+int8_t digitalRead(pin_size_t pinNumber);
+int8_t digitalReadFast(pin_size_t pinNumber);
 int analogRead(pin_size_t pinNumber);
 void analogReference(uint8_t mode);
 bool analogReadResolution(uint8_t res);
 void analogWrite(pin_size_t pinNumber, int value);
-int8_t digitalRead(pin_size_t pinNumber);
 void DACReference(uint8_t mode);
 void init_ADC1(void);
 

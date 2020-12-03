@@ -26,13 +26,19 @@
 #include "pins_arduino.h"
 #include "Arduino.h"
 
+
 void analogReference(uint8_t mode) {
+  if (__builtin_constant_p(mode)) {
+    #if defined(EXTERNAL)
+      if (!(mode == EXTERNAL || mode == VDD || mode== INTERNAL0V55 || mode== INTERNAL1V1 || mode== INTERNAL1V5|| mode== INTERNAL2V5|| mode== INTERNAL4V34)) badArg("analogReference called with value that is not a valid analog reference");
+    #else
+      if (!(mode == VDD || mode== INTERNAL0V55 || mode== INTERNAL1V1 || mode== INTERNAL1V5|| mode== INTERNAL2V5|| mode== INTERNAL4V34)) badArg("analogReference called with value that is not a valid analog reference");
+    #endif
+  }
   switch (mode) {
-      #if defined(EXTERNAL)
-    case EXTERNAL:
-      #elif defined(EXTERNAL_EXPERIMENTAL)
-    case EXTERNAL_EXPERIMENTAL:
-      #endif
+    #if defined(EXTERNAL)
+      case EXTERNAL:
+    #endif
     case VDD:
       ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
       // VREF.CTRLA does not need to be reconfigured, as the voltage references only supply their specified voltage when requested to do so by the ADC.
@@ -49,13 +55,17 @@ void analogReference(uint8_t mode) {
       ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v
       break;
     default:
-      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | VDD | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
+      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | VDD | ADC_SAMPCAP_bm; 
   }
 }
+
 #ifdef DAC0
 void DACReference(uint8_t mode) {
+  if (__builtin_constant_p(mode)) {
+    if (mode >= 5) badArg("DACReference called with value that is not a valid DAC reference - VDD is not supported on tinyAVR 1-series");
+  }
   if (mode < 5) {
-    VREF.CTRLA = mode | (VREF.CTRLA & ~7);
+    VREF.CTRLA = mode | (VREF.CTRLA & (~VREF_DAC0REFSEL_gm));
   }
 }
 #endif
@@ -68,6 +78,7 @@ int analogRead(uint8_t pin) {
   {
     pin = digitalPinToAnalogInput(pin);
     if (pin == NOT_A_PIN) {
+      if (__builtin_constant_p(pin)) badArg("analogRead called with pin that is not a valid analog pin"); //I hate to mix compile time checks with code, but we would otherwise duplicate this logic exactly.
       return -1;
     }
   }
@@ -112,22 +123,22 @@ bool analogReadResolution(uint8_t res) {
 // pins_*.c file.  For the rest of the pins, we default
 // to digital output.
 void analogWrite(uint8_t pin, int val) {
+  check_valid_digital_pin(pin);
+  if (__builtin_constant_p(val)) {
+    if (val < 0 || val >255) badArg("analogWrite duty cycle constant, but not within 0 to 255");
+  }
   uint8_t bit_pos  = digitalPinToBitPosition(pin);
   if (bit_pos == NOT_A_PIN) {
     return;
   }
-  // We need to make sure the PWM output is enabled for those pins
-  // that support it.  Also, make sure the pin is in output mode
-  // for consistently with Wiring, which doesn't require a pinMode
-  // call for the analog output pins.
+  // Set pin output because that's what Arduino does
   pinMode(pin, OUTPUT);
 
   /* Get timer */
   uint8_t digital_pin_timer =  digitalPinToTimer(pin);
   uint8_t *timer_cmp_out;
   /* Find out Port and Pin to correctly handle port mux, and timer. */
-  switch (digital_pin_timer) { //use only low nybble which defines which timer it is
-
+  switch (digital_pin_timer) {
     case TIMERA0:
       if (val <= 0) { /* if zero or negative drive digital low */
         digitalWrite(pin, LOW);

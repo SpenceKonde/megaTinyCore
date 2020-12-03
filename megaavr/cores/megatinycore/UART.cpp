@@ -176,6 +176,10 @@ bool UartClass::swap(uint8_t state) {
 }
 
 void UartClass::begin(unsigned long baud, uint16_t config) {
+  if (__builtin_constant_p(baud)) {
+    if (baud > (F_CPU/8)) badArg("Unachievable baud, too high - must be less than F_CPU/8");
+    if (baud < (F_CPU/16800)) badArg("Unachievable baud, too low - must be more than F_CPU/16800 (16384 plus allowable error)");
+  }
   // Make sure no transmissions are ongoing and USART is disabled in case begin() is called by accident
   // without first calling end()
   if (_written) {
