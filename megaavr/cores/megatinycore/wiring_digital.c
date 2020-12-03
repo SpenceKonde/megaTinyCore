@@ -113,17 +113,23 @@ static void turnOffPWM(uint8_t pin) {
     /* TCA0 */
     case TIMERA0:
     {
+      uint8_t *timer_cmp_out;
       /* Bit position will give output channel */
       #ifdef __AVR_ATtinyxy2__
         if (bit_pos == 7) {
           bit_pos = 0;  //on the xy2, WO0 is on PA7
         }
       #endif
-      if (bit_pos > 2) {
-        bit_pos++;  //there's a blank bit in the middle
-      }
-      /* Disable corresponding channel */
-      TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
+        if (bit_pos > 2) {
+          bit_pos -= 3;
+          timer_cmp_out = ((uint8_t *)(&TCA0.SPLIT.HCMP0)) + (bit_pos << 1);
+          (*timer_cmp_out) = 0;
+          TCA0.SPLIT.CTRLB |= (1 << (TCA_SPLIT_HCMP0EN_bp + bit_pos));
+        } else {
+          timer_cmp_out = ((uint8_t *)(&TCA0.SPLIT.LCMP0)) + (bit_pos << 1);
+          (*timer_cmp_out) = 0;
+          TCA0.SPLIT.CTRLB |= (1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
+        }
       break;
     }
 

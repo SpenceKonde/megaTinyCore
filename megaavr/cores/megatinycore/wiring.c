@@ -721,22 +721,28 @@ void setup_timers() {
   TCA0.SPLIT.LPER    = PWM_TIMER_PERIOD;
   TCA0.SPLIT.HPER    = PWM_TIMER_PERIOD;
 
-  /* Default duty 50%, will re-assign in analogWrite() */
-  //TODO: replace with for loop to make this smaller;
-  TCA0.SPLIT.LCMP0 = PWM_TIMER_COMPARE;
-  TCA0.SPLIT.LCMP1 = PWM_TIMER_COMPARE;
-  TCA0.SPLIT.LCMP2 = PWM_TIMER_COMPARE;
-  TCA0.SPLIT.HCMP0 = PWM_TIMER_COMPARE;
-  TCA0.SPLIT.HCMP1 = PWM_TIMER_COMPARE;
-  TCA0.SPLIT.HCMP2 = PWM_TIMER_COMPARE;
+  /* Default duty 0%, will re-assign in analogWrite() */
+  // 12/3/20: I think at most one could save 18 bytes here by
+  // rewriting this in assembly. Not worth it. Removed the
+  // TODO about making it a loop.
+  // 12/3/20: start off with the compare registers set to 0.
 
-  /* Use DIV64 prescaler (giving 250kHz clock), enable TCA timer */
-  #if (F_CPU > 5000000) //use 64 divider
-  TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
+  TCA0.SPLIT.LCMP0 = 0;
+  TCA0.SPLIT.HCMP0 = 0;
+  TCA0.SPLIT.LCMP1 = 0;
+  TCA0.SPLIT.HCMP1 = 0;
+  TCA0.SPLIT.LCMP2 = 0;
+  TCA0.SPLIT.HCMP2 = 0;
+
+  /* Use prescale appropriate for system clock speed */
+  #if (F_CPU > 30000000) //use 256 divider when clocked over 30 MHz - probably not relevant on these parts, but hey, maybe they work at 32 on external clock - haven't tested!
+  TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV256_gc) | (TCA_SPLIT_ENABLE_bm);
+  #elif (F_CPU > 5000000) //use 64 divider
+  TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV64_gc) | (TCA_SPLIT_ENABLE_bm);
   #elif (F_CPU > 1000000)
-  TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV16_gc) | (TCA_SINGLE_ENABLE_bm);
+  TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV16_gc) | (TCA_SPLIT_ENABLE_bm);
   #else //TIME_TRACKING_TIMER_DIVIDER==8
-  TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SINGLE_ENABLE_bm);
+  TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SPLIT_ENABLE_bm);
   #endif
 
 

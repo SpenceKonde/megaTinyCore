@@ -26,7 +26,11 @@
 #include "pins_arduino.h"
 #include "Arduino.h"
 
-
+inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin)
+{
+  if(__builtin_constant_p(pin))
+    if (pin >= NUM_TOTAL_PINS) badArg("Digital pin is constant, but not a valid pin");
+}
 void analogReference(uint8_t mode) {
   if (__builtin_constant_p(mode)) {
     #if defined(EXTERNAL)
@@ -55,7 +59,7 @@ void analogReference(uint8_t mode) {
       ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v
       break;
     default:
-      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | VDD | ADC_SAMPCAP_bm; 
+      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | VDD | ADC_SAMPCAP_bm;
   }
 }
 
