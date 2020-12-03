@@ -260,7 +260,7 @@ inline __attribute__((always_inline)) void digitalWriteFast(uint8_t pin, uint8_t
   if (val == LOW)
     vport->OUT &= ~mask;
   else if (val == CHANGE)
-    vport->IN = mask;
+    vport->IN |= mask;
   else // HIGH
     vport->OUT |= mask;
 
