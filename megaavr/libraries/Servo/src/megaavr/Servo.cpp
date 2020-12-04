@@ -34,8 +34,8 @@ void ServoHandler(int timer) {
   if (currentServoIndex[timer] < 0) {
     // we're at servo index -1... but before we go further - we need to see if we've waited through a refresh cycle...
     if (currentCycleTicks < usToTicks(REFRESH_INTERVAL)) {
-      uint32_t tval = usToTicks(REFRESH_INTERVAL)-currentCycleTicks;
-      uint16_t tval16 = (tval>65535)?65535:tval;
+      uint32_t tval = usToTicks(REFRESH_INTERVAL) - currentCycleTicks;
+      uint16_t tval16 = (tval > 65535) ? 65535 : tval;
       _timer->CCMP = tval16;
       currentCycleTicks += tval16;
       // wait longer, and terminate the ISR without further action./* Clear flag */
@@ -67,8 +67,8 @@ void ServoHandler(int timer) {
   } else {
     // finished all channels so wait for the refresh period to expire before starting over
     if (currentCycleTicks + 100 < usToTicks(REFRESH_INTERVAL)) {   // let's not bother if it's gonna take less than 100 ticks for the next
-      uint32_t tval = usToTicks(REFRESH_INTERVAL)-currentCycleTicks;
-      uint16_t tval16 = tval>65535?65535:tval;
+      uint32_t tval = usToTicks(REFRESH_INTERVAL) - currentCycleTicks;
+      uint16_t tval16 = tval > 65535 ? 65535 : tval;
       _timer->CCMP = tval16;
       currentCycleTicks += tval16;
     } else { // in this case it's less than 100 ticks for next interval, so we just set it to that...
@@ -146,7 +146,9 @@ uint8_t Servo::attach(byte pin, int min, int max) {
     //pinMode(pin, OUTPUT);                                   // set servo pin to output
     //servos[this->servoIndex].Pin.nbr = pin;
     uint8_t bitmask = digitalPinToBitMask(pin);
-    if (bitmask = =NOT_A_PIN) return NOT_A_PIN;
+    if (bitmask = =NOT_A_PIN) {
+      return NOT_A_PIN;
+    }
     servos[this->servoIndex].Pin.bitmask = bitmask;
     uint8_t prt = digitalPinToPort(pin);
     servos[this->servoIndex].Pin.port = prt;
