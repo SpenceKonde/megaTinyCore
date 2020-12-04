@@ -7,7 +7,7 @@
   | Developed in 2019 by MCUdude.                                         |
   | https://github.com/MCUdude/                                           |
   |                                                                       |
-  | In this example, we demonstrate the fact that these are ASYCHRONOUS   |
+  | In this example, we demonstrate the fact that these are ASYNCHRONOUS  |
   | by (ab)using the CCL in a configuration which will oscillate - this   |
   | example uses two logic blocks - though there are plenty of ways to    |
   | make it oscillate with a single one (see if you can come up with some |
@@ -48,7 +48,7 @@ void setup() {
   Logic1.input1 = in::masked;         // masked
   Logic1.input2 = in::masked;         // masked
   Logic1.output = out::enable;        // enable logic block 1 output pin
-  Logic1.filter = filter::disable;     // No output filter enabled
+  Logic1.filter = filter::disable;    // No output filter enabled
   Logic1.truth = 0x02;                // Set truth table - HIGH only if input HIGH
   // Initialize logic block 0
   Logic1.init();
