@@ -104,7 +104,7 @@ However, do note that if you explicitly declare a variable PROGMEM, you must sti
 
 **WARNING** In versions of megaTinyCore 1.0.6 and earlier, the sketch size reported during compilation does not include variables declared const. PROGMEM variables, however, are reported normally. in 1.1.0 and subsequent releases, the flash used by const variables is correctly reported.
 
-#### Ways to refer to pins
+### Ways to refer to pins
 The simple matter of how to refer to a pin for analogRead() and digitalRead(), particularly on non-standard hardware, has been a persistent source of confusion among Arduino users. It's my opinion that much of the blame rests with the decisions made by the Arduino team regarding how pins were to be referred to; the designation of some pins as "analog pins" leads people to think that those pins cannot be used for digital input, and the fact that all of the pins were renumbered fuirther muddies the water. The fact that many classic AVR parts have a confusing mapping of ports to physical pins (which, thankfully, is not an issue here, as we don't have to deal with legacy cores and their wacky pin mappings), and the inconsistent decisions made by authors of subsequent hardwarte packages in an attempt to make those parts "more like an Arduino Uno", or (in some cases) to make the functions to map arduino pin numbers to PORT registers has led to further confusion around this topic.
 
 This core uses a simple scheme for assigning the Arduino pin numbers: Pins are numbered starting from the the I/O pin closest to Vcc as pin 0 and proceeding counterclockwise, skipping the (mostly) non-usable UPDI pin. The UPDI pin is then assigned to the last pin number - as noted above, it is possible to read the voltage on the UPDI pin - we recommend this only as a last resort. On unofficial parts like these, we recommend that pins be referred to by the PIN_Pxn constants - this will maximize portability of your code and make it easier to look up information on the pins you are using in the relevant datasheets should that be necessary.
@@ -174,6 +174,8 @@ The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 2
 #### [Taking over TCA0](megaavr/extras/TakingOverTCA0.md)
 
 #### PWM on TCD0 pins (10,11 on x16, 12,13 on x17)
+**Note: This functionality is broken on 2.1.x versions, it will be corrected in 2.2.0**
+
 The 3216,1616,816,416,3217,1617 and 817 have two additional PWM pins driven by Timer D (PC0 and PC1 - pins 10 and 11 on x16, 12 and 13 on x17). Timer D is an async timer, and the outputs can't be enabled or disabled without briefly stopping the timer. This results in a brief glitch on the other PWM pin (if it is currently outputting PWM), and doing so requires slightly longer - though the duration of this glitch is under 1 us. If TCD is used as the millis timer - which is the default on these parts as of 1.1.9 - this will result in millis losing that much time as well. Note that in versions prior to 1.1.9, these pins could not be used for PWM if TCD0 was used as the millis timekeeping source; that restriction was lifted with 1.1.9. Prior to 2.2.0, this applied to digitalWrite() or analogWrite of 0 or 255 while it is currently outputting PWM, and analogWrite of 1 - 254 while the pin is not currently outputting PWM.
 
 As of 2.2.0, analogWrite of 0 or 255 results in a constant HIGH or LOW without disconnecting the timer (use digitalWrite() for that) - this will also connect the timer to the pin without outputting PWM (yet) - doing this on both pins prior to setting any other duty cycles would allow one to ensure that no glitch of any sort occurs on the other TCD0 pin as a result of switching the other pin between PWM and constant HIGH or LOW output. Only digitalWrite() will disconnect the timer from the pin. When outputting a HIGH in this way, the pin is "inverted"; this means that digitalRead() on it will return 0, not 1 (if you're digitalRead'ing a pin, which you have set to output a constant HIGH, using analogWrite, and it's one of those two pins, it will read LOW. If you do need to correct for this (do consider whether what you are doing makes any sense - I couldn't think of a good use case), check `PORTC.PIN0CONFIG&PORT_INVEN_bm` or`PORTC.PIN1CONFIG&PORT_INVEN_bm` as appropriate for the pin in question. No other pins are impacted.
@@ -296,6 +298,23 @@ These parts officially support BOD trigger levels of 1.8V, 2.6V, and 4.2V, with 
 #### Unofficial BOD levels
 Between the initial header file and preliminary datasheet release, and the most recent versions of each, several BOD settings (which were described as "unqualified" in the release notes- which I believe means they were not tested or guaranteed to behave correctly) were removed from the datasheet and io.h files. These are still supported by the dropdown menu, but (as of 2.0.4 - the first version that has the new headers) are marked as such in the submenu. Note that the new headers no longer provide the `*_gc` enum entries for these BOD levels. *When using these, proper operation should not be counted on without doing your own testing*
 
+### Auto-set safe fuses on upload - New in 2.2.0!
+Whenever a UPDI programmer is used to upload code, all fuses that can be set "safely" (as in, without risk of bricking the board, or bricking the board if one does not have access to an HV programmer), and which have any built-in configuration options, will be set. Thus, except where noted, behavior will always match the selected tools menu! This means:
+```
+WDTCFG will not be changed - not configured by megaTinyCore
+BODCFG will not be changed - not safe
+OSCCFG will be set
+TCD0CFG will not be changed - not configured by megaTinyCore
+SYSCFG0 will not be changed - not safe
+SYSCFG1 will be set
+APPEND will  not be changed - not configured by megaTinyCore (yet)
+BOOTEND will be set
+LOCKBIT will not be changed - not configured by megaTinyCore
+```
+`BODCFG` is not safe, because setting this to a higher voltage than board is running at and enabling it will "brick" the board until a higher operating voltage can be supplied. `SYSCFG0` is not safe because this is where `RSTPINCFG` lives; changing this can leave the board unprogrammable except via HV UPDI programming, and not everyone has an HV UPDI programmer. In the future if/when a programmer that guarantees HV UPDI capability which can be selected as a programmer (ie, it becomes possible to make a tools -> programmer option which will only work with HV programmers) this fuse will be set automatically when using that programmer.
+
+As a result **in 2.2.0 and later, you no longer need to 'burn bootloader' to switch between 16-derived and 20-derived speeds** 
+
 ### Link-time Optimization (LTO) support
 This core *always* uses Link Time Optimization to reduce flash usage - all versions of the compiler which support the 0-series and 1-series ATtiny parts also support LTO, so there is no need to make it optional as was done with ATtinyCore.
 
@@ -396,10 +415,18 @@ If the UPDI/Reset pin option was set to UPDI or IO when bootloading, you must un
 
 If the UPDI/Reset pin option was set to reset, you must reset the chip via the reset pin (or software reset to enter the bootloader, and the bootloader will run for 1 second before jumping to the application). This is the same as how optiboot works on classic AVR boards. The standard DTR-autoreset circuit is recommended (this is how boards I sell on Tindie with Optiboot preloaded are configured).
 
-Serial uploads are all done at 115200 baud, regardless of speed or part.
+Serial uploads are all done at 115200 baud, regardless of port, pin mapping or part.
 
-### Removing Optiboot
-Like classic AVRs with hardware bootloader support (like the ATmega328p, and all other ATmega parts older than the 4809/4808), and unlike ATtiny parts without that, which use "virtual boot" to get bootloader functionality, you must do "burn bootloader" with a non-optiboot part selected in order to reprogram the part normally via UPDI. Unlike classic AVRs with hardware bootloader support, where not doing "burn bootloader" would work until sketch size reached the very end of the flash (where the chip thinks the bootloader is), on these parts, it won't work at all.
+## "Upload using programmer" and removing Optiboot
+Unlike classic AVRs with hardware bootloader support, where not doing "burn bootloader" before switching to uploading via a programmer would work until sketch size reached the very end of the flash (where the chip thinks the bootloader is), on these parts the sketch will fail in strange and bizarre ways if code is compiled with incorrect assumption about the size of the bootloader (`BOOTEND` fuse) - it can be challenging to identify exactally what the cause of the problem is when this happens, as you will typically see pieces of behavior that you recognize, but not in an order that makes sense. The reason for this is that the `BOOTEND` fuse sets the location of the interrupt vectors. If the application is started at 0x200, as it would for code compiled for use with Optiboot, but `BOOTEND` is set to 0, the hardware would, when an interrupt fired, jump to the blank section of flash before the application, execution would run along the blank flash until it hit the reset vector - but it would still think it was in an interrupt, whereas in the inverse scenario, the hardware would jump to the middle of the application code instead of the vector table. Both scenarios are (speaking from experience) confusing when encountered. 
+
+In an effort to prevent these scenarios, starting in 2.2.0, whenever a programmer capable of setting fuses is used to upload (ie, any time except when using the bootloader to upload code), all safe fuses will be set (see above) - including, this includes `BOOTEND`.
+
+### Removing Optiboot - 2.1.5 and earlier
+Like classic AVRs with hardware bootloader support (like the ATmega328p, and all other ATmega parts older than the 4809/4808), and unlike ATtiny parts without that, which use "virtual boot" to get bootloader functionality, you must do "burn bootloader" with a non-optiboot part selected in order to reprogram the part normally via UPDI.
+
+### Removing Optiboot - 2.2.0 and later
+On 2.2.0 and later, whenever "upload using programmer" is used, whether or not the device has been properly bootloaded (like on classic AVRs, upload using programmer will trash any bootloader present), BOOTEND will be set. Similarly, whenever we upload without an optiboot board definition selected, BOOTEND will be cleared.
 
 ### Autoreset circuit
 If using the bootloader with with the UPDI pin set to reset, this is needed for uploading. It will reset the chip when serial connection is opened like on typical Arduino boards. Do not connect an autoreset circuit to the UPDI pin if it is not set to act as reset, as this will not reset the chip, and will just block UPDI programming.
