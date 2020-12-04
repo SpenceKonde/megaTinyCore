@@ -124,11 +124,11 @@ static void turnOffPWM(uint8_t pin) {
           bit_pos -= 3;
           timer_cmp_out = ((uint8_t *)(&TCA0.SPLIT.HCMP0)) + (bit_pos << 1);
           (*timer_cmp_out) = 0;
-          TCA0.SPLIT.CTRLB |= (1 << (TCA_SPLIT_HCMP0EN_bp + bit_pos));
+          TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_HCMP0EN_bp + bit_pos));
         } else {
           timer_cmp_out = ((uint8_t *)(&TCA0.SPLIT.LCMP0)) + (bit_pos << 1);
           (*timer_cmp_out) = 0;
-          TCA0.SPLIT.CTRLB |= (1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
+          TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
         }
       break;
     }
@@ -154,7 +154,7 @@ static void turnOffPWM(uint8_t pin) {
         uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
         TCD0.CTRLA = TCD0_prescaler; //stop the timer
         while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it's actually stopped
-        _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL | (1 << (6 + bit_pos)));
+        _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~(1 << (bit_pos==0?6:7))));
         TCD0.CTRLA = (TCD0_prescaler | TCD_ENABLE_bm); //re-enable it
 
         // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
