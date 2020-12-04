@@ -5,14 +5,14 @@ on:
     paths:
       - ".github/workflows/check-code-formatting.yml"
       - "megaavr/bootloaders/**"
-      #- "megaavr/cores/**"
+#      - "megaavr/cores/**"
       - "megaavr/libraries/**"
       - "megaavr/variants/**"
   push:
     paths:
       - ".github/workflows/check-code-formatting.yml"
       - "megaavr/bootloaders/**"
-      #- "megaavr/cores/**"
+#      - "megaavr/cores/**"
       - "megaavr/libraries/**"
       - "megaavr/variants/**"
   # workflow_dispatch event allows the workflow to be triggered manually
@@ -62,21 +62,21 @@ jobs:
           target-paths: |
             - megaavr/bootloaders
 
-  cores:
-    runs-on: ubuntu-latest
+#  cores:
+#    runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
 
-      - name: Check code formatting
-        uses: per1234/artistic-style-action@main
-        with:
-          options-file-path: ${{ env.OPTIONS_FILE_PATH }}
-          name-patterns: |
-            ${{ env.NAME_PATTERNS }}
-          target-paths: |
-            - megaavr/cores
+#      - name: Check code formatting
+#        uses: per1234/artistic-style-action@main
+#        with:
+#          options-file-path: ${{ env.OPTIONS_FILE_PATH }}
+#          name-patterns: |
+#            ${{ env.NAME_PATTERNS }}
+#          target-paths: |
+#            - megaavr/cores
 
   libraries:
     runs-on: ubuntu-latest
