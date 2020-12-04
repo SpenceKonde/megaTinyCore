@@ -125,7 +125,7 @@ tools.avrdude.upload.params.quiet=-q -q
 # tools.avrdude.upload.verify is needed for backwards compatibility with IDE 1.6.8 or older, IDE 1.6.9 or newer overrides this value
 tools.avrdude.upload.verify=
 tools.avrdude.upload.params.noverify=-V
-tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu}{upload.workaround} -c{upload.protocol} -P{serial.port} {upload.extra_params} -b{upload.speed} "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu}{upload.workaround} -c{upload.protocol} -P{serial.port} {upload.extra_params} -b{upload.speed} "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 
 tools.avrdude.program.params.verbose=-v
 tools.avrdude.program.params.quiet=-q -q
@@ -160,17 +160,8 @@ tools.pymcuprog.erase.pattern=
 
 tools.pymcuprog.bootloader.params.verbose=-v
 tools.pymcuprog.bootloader.params.quiet=
-tools.pymcuprog.bootloader.pattern.windows="{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} erase && "{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -m fuses -l {bootloader.WDTCFG} {bootloader.BODCFG} {bootloader.OSCCFG} 0xFF {bootloader.TCD0CFG} {bootloader.SYSCFG0} {bootloader.SYSCFG1} {bootloader.APPEND} {bootloader.BOOTEND} -d {build.mcu} write
-
-tools.pymcuprog.bootloader.pattern.linux="{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} erase ; "{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -m fuses -l {bootloader.WDTCFG} {bootloader.BODCFG} {bootloader.OSCCFG} 0xFF {bootloader.TCD0CFG} {bootloader.SYSCFG0} {bootloader.SYSCFG1} {bootloader.APPEND} {bootloader.BOOTEND} -d {build.mcu} write
-
-tools.pymcuprog.bootloader.pattern.macos="{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} erase ; "{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -m fuses -l {bootloader.WDTCFG} {bootloader.BODCFG} {bootloader.OSCCFG} 0xFF {bootloader.TCD0CFG} {bootloader.SYSCFG0} {bootloader.SYSCFG1} {bootloader.APPEND} {bootloader.BOOTEND} -d {build.mcu} write
+tools.pymcuprog.bootloader.pattern="{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} erase && "{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -m fuses -l {bootloader.WDTCFG} {bootloader.BODCFG} {bootloader.OSCCFG} 0xFF {bootloader.TCD0CFG} {bootloader.SYSCFG0} {bootloader.SYSCFG1} {bootloader.APPEND} {bootloader.BOOTEND} -d {build.mcu} write
 
 tools.pymcuprog.program.params.verbose=-v
 tools.pymcuprog.program.params.quiet=
-tools.pymcuprog.program.pattern.windows="{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} {program.verbose} --fuses 2:{bootloader.OSCCFG} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write
-
-
-tools.pymcuprog.program.pattern.linux="{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol}  {program.extra_params} -d {build.mcu} erase ; "{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -m fuses -o 2 -l {bootloader.OSCCFG} -d {build.mcu} write ; "{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -m fuses -o 6 -l {bootloader.SYSCFG1} {bootloader.APPEND} {bootloader.BOOTEND} -d {build.mcu} write ; "{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} -f {build.path}/{build.project_name}.hex write --verify
-
-tools.pymcuprog.program.pattern.macos="{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} erase ; "{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -m fuses -o 2 -l {bootloader.OSCCFG} -d {build.mcu} write ; "{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -m fuses -o 6 -l {bootloader.SYSCFG1} {bootloader.APPEND} {bootloader.BOOTEND} -d {build.mcu} write ; "{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} -f {build.path}/{build.project_name}.hex write --verify
+tools.pymcuprog.program.pattern="{cmd}" "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} {program.verbose} --fuses 2:{bootloader.OSCCFG} 6:{bootloader.SYSCFG1} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write
