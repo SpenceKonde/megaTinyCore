@@ -18,28 +18,28 @@
 // will use PA3, arduino pin 4, the pin between UPDI and geound on the chip.
 
 void setup() {
-  pinMode(LED_BUILTIN,OUTPUT);
-  pinMode(ERSATZ_RESET_PIN,INPUT_PULLUP); //on 8-pin parts, this overrides the previous line! No LED blink on these; not enough pins to demo everything here...
-  while((!(VPORTA.IN & RESET_MASK))&&millis() < 10); //wait up to 10 milliseconds for pin to go high...
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(ERSATZ_RESET_PIN, INPUT_PULLUP); //on 8-pin parts, this overrides the previous line! No LED blink on these; not enough pins to demo everything here...
+  while((!(VPORTA.IN & RESET_MASK)) && millis() < 10); //wait up to 10 milliseconds for pin to go high...
   // MUCH longer than we need to wait...
-  if (!(VPORTA.IN&RESET_MASK)){ //if still not high, reset...
-    _PROTECTED_WRITE(RSTCTRL.SWRR,1);
+  if (!(VPORTA.IN & RESET_MASK)){ //if still not high, reset...
+    _PROTECTED_WRITE(RSTCTRL.SWRR, 1);
   } else {
-    PINCTRL=PORT_PULLUPEN_bm|PORT_ISC_LEVEL_gc;
+    PINCTRL=PORT_PULLUPEN_bm | PORT_ISC_LEVEL_gc;
   }
 }
 
 void loop() {
-  digitalWrite(LED_BUILTIN,1);
+  digitalWrite(LED_BUILTIN, 1);
   delay(1000);
-  digitalWrite(LED_BUILTIN,0);
+  digitalWrite(LED_BUILTIN, 0);
   delay(1000);
 }
 
 ISR(PORTA_PORT_vect) {
-  byte flags=PORTA.INTFLAGS;
+  byte flags = PORTA.INTFLAGS;
   PORTA.INTFLAGS=flags; //clear flags
   if (flags & RESET_MASK){
-  _PROTECTED_WRITE(RSTCTRL.SWRR,1);
+    _PROTECTED_WRITE(RSTCTRL.SWRR, 1);
   }
 }

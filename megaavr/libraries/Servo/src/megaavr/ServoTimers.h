@@ -46,7 +46,7 @@
 // sketch, and not always in the same direction... but if you look at the generated assembly... there are differences
 // all over the place! No observed differences in program behavior, though, so with the sketch size being a wash, err on
 // the side of not getting a warning, especially a scary one like that (critically important variable considered unused).
-static volatile __attribute__ ((used))  TCB_t *_timer =
+static volatile __attribute__((used))  TCB_t *_timer =
 #if defined(USE_TIMERB0)
   &TCB0;
 #endif

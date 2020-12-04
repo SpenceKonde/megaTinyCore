@@ -32,25 +32,25 @@ static volatile int8_t currentServoIndex[_Nbr_16timers];   // index for the serv
 #define SERVO_MAX() (MAX_PULSE_WIDTH - this->max * 4)   // maximum value in uS for this servo
 
 void ServoHandler(int timer) {
-  static uint32_t currentCycleTicks=0;
+  static uint32_t currentCycleTicks = 0;
   if (currentServoIndex[timer] < 0) {
     // we're at servo index -1... but before we go further - we need to see if we've waited through a refresh cycle...
     if (currentCycleTicks < usToTicks(REFRESH_INTERVAL)) {
-      uint32_t tval=usToTicks(REFRESH_INTERVAL)-currentCycleTicks;
-      uint16_t tval16=(tval>65535)?65535:tval;
+      uint32_t tval = usToTicks(REFRESH_INTERVAL)-currentCycleTicks;
+      uint16_t tval16 = (tval>65535)?65535:tval;
       _timer->CCMP = tval16;
-      currentCycleTicks+=tval16;
+      currentCycleTicks += tval16;
       // wait longer, and terminate the ISR without further action./* Clear flag */
       _timer->INTFLAGS = TCB_CAPT_bm;
       return;
     } else {
       // current cycle is done, so reset the currentCycleTicks, and run the rest of things...
-      currentCycleTicks=0;
+      currentCycleTicks = 0;
     }
   } else {
-    if (SERVO_INDEX(timer, currentServoIndex[timer]) < ServoCount && SERVO(timer, currentServoIndex[timer]).Pin.isActive == true) {
+    if (SERVO_INDEX(timer, currentServoIndex[timer]) < ServoCount && SERVO(timer, currentServoIndex[timer]).Pin.isActive  = = true) {
       //digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, LOW);   // pulse this channel low if activated
-      ((PORT_t *)&PORTA + SERVO(timer, currentServoIndex[timer]).Pin.port)->OUTCLR=SERVO(timer, currentServoIndex[timer]).Pin.bitmask;
+      ((PORT_t *)&PORTA + SERVO(timer, currentServoIndex[timer]).Pin.port)->OUTCLR = SERVO(timer, currentServoIndex[timer]).Pin.bitmask;
     }
   }
 
@@ -58,23 +58,23 @@ void ServoHandler(int timer) {
   currentServoIndex[timer]++;
 
   if (SERVO_INDEX(timer, currentServoIndex[timer]) < ServoCount && currentServoIndex[timer] < SERVOS_PER_TIMER) {
-    if (SERVO(timer, currentServoIndex[timer]).Pin.isActive == true) {   // check if activated
+    if (SERVO(timer, currentServoIndex[timer]).Pin.isActive  = = true) {   // check if activated
       //digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, HIGH);   // it's an active channel so pulse it high
-      ((PORT_t *)&PORTA + SERVO(timer, currentServoIndex[timer]).Pin.port)->OUTSET=SERVO(timer, currentServoIndex[timer]).Pin.bitmask;
+      ((PORT_t *)&PORTA + SERVO(timer, currentServoIndex[timer]).Pin.port)->OUTSET = SERVO(timer, currentServoIndex[timer]).Pin.bitmask;
     }
 
     // Get the counter value
     _timer->CCMP = SERVO(timer, currentServoIndex[timer]).ticks;
-    currentCycleTicks+=SERVO(timer, currentServoIndex[timer]).ticks;
+    currentCycleTicks += SERVO(timer, currentServoIndex[timer]).ticks;
   } else {
     // finished all channels so wait for the refresh period to expire before starting over
     if (currentCycleTicks + 100 < usToTicks(REFRESH_INTERVAL)) {   // let's not bother if it's gonna take less than 100 ticks for the next
-      uint32_t tval=usToTicks(REFRESH_INTERVAL)-currentCycleTicks;
-      uint16_t tval16=tval>65535?65535:tval;
+      uint32_t tval = usToTicks(REFRESH_INTERVAL)-currentCycleTicks;
+      uint16_t tval16 = tval>65535?65535:tval;
       _timer->CCMP = tval16;
-      currentCycleTicks+=tval16;
+      currentCycleTicks += tval16;
     } else { // in this case it's less than 100 ticks for next interval, so we just set it to that...
-      currentCycleTicks=usToTicks(REFRESH_INTERVAL);
+      currentCycleTicks = usToTicks(REFRESH_INTERVAL);
     }
     currentServoIndex[timer] = -1;   // this will get incremented at the end of the refresh period to start again at the first channel
   }
@@ -119,7 +119,7 @@ static void finISR() {
 static boolean isTimerActive(timer16_Sequence_t timer) {
   // returns true if any servo is active on this timer
   for (uint8_t channel = 0; channel < SERVOS_PER_TIMER; channel++) {
-    if (SERVO(timer, channel).Pin.isActive == true) {
+    if (SERVO(timer, channel).Pin.isActive  = = true) {
       return true;
     }
   }
@@ -147,19 +147,19 @@ uint8_t Servo::attach(byte pin, int min, int max) {
   if (this->servoIndex < MAX_SERVOS) {
     //pinMode(pin, OUTPUT);                                   // set servo pin to output
     //servos[this->servoIndex].Pin.nbr = pin;
-    uint8_t bitmask=digitalPinToBitMask(pin);
-    if (bitmask==NOT_A_PIN) return NOT_A_PIN;
-    servos[this->servoIndex].Pin.bitmask=bitmask;
-    uint8_t prt=digitalPinToPort(pin);
-    servos[this->servoIndex].Pin.port=prt;
-    PORT_t *port=((PORT_t *)&PORTA + prt);
-    port->DIRSET=bitmask;
+    uint8_t bitmask = digitalPinToBitMask(pin);
+    if (bitmask = NOT_A_PIN) return NOT_A_PIN;
+    servos[this->servoIndex].Pin.bitmask = bitmask;
+    uint8_t prt = digitalPinToPort(pin);
+    servos[this->servoIndex].Pin.port = prt;
+    PORT_t *port = ((PORT_t *)&PORTA + prt);
+    port->DIRSET = bitmask;
     // todo min/max check: abs(min - MIN_PULSE_WIDTH) /4 < 128
     this->min  = (MIN_PULSE_WIDTH - min) / 4; //resolution of min/max is 4 uS
     this->max  = (MAX_PULSE_WIDTH - max) / 4;
     // initialize the timer if it has not already been initialized
     timer = SERVO_INDEX_TO_TIMER(servoIndex);
-    if (isTimerActive(timer) == false) {
+    if (isTimerActive(timer)  = = false) {
       initISR();
     }
     servos[this->servoIndex].Pin.isActive = true;  // this must be set after the check for isTimerActive
@@ -172,7 +172,7 @@ void Servo::detach() {
 
   servos[this->servoIndex].Pin.isActive = false;
   timer = SERVO_INDEX_TO_TIMER(servoIndex);
-  if (isTimerActive(timer) == false) {
+  if (isTimerActive(timer)  = = false) {
     finISR();
   }
 }
