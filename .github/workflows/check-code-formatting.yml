@@ -5,14 +5,14 @@ on:
     paths:
       - ".github/workflows/check-code-formatting.yml"
       - "megaavr/bootloaders/**"
-      - "megaavr/cores/**"
+      #- "megaavr/cores/**"
       - "megaavr/libraries/**"
       - "megaavr/variants/**"
   push:
     paths:
       - ".github/workflows/check-code-formatting.yml"
       - "megaavr/bootloaders/**"
-      - "megaavr/cores/**"
+      #- "megaavr/cores/**"
       - "megaavr/libraries/**"
       - "megaavr/variants/**"
   # workflow_dispatch event allows the workflow to be triggered manually
