@@ -46,7 +46,7 @@ void ServoHandler(int timer) {
       currentCycleTicks = 0;
     }
   } else {
-    if (SERVO_INDEX(timer, currentServoIndex[timer]) < ServoCount && SERVO(timer, currentServoIndex[timer]).Pin.isActive  = = true) {
+    if (SERVO_INDEX(timer, currentServoIndex[timer]) < ServoCount && SERVO(timer, currentServoIndex[timer]).Pin.isActive == true) {
       //digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, LOW);   // pulse this channel low if activated
       ((PORT_t *)&PORTA + SERVO(timer, currentServoIndex[timer]).Pin.port)->OUTCLR = SERVO(timer, currentServoIndex[timer]).Pin.bitmask;
     }
@@ -56,7 +56,7 @@ void ServoHandler(int timer) {
   currentServoIndex[timer]++;
 
   if (SERVO_INDEX(timer, currentServoIndex[timer]) < ServoCount && currentServoIndex[timer] < SERVOS_PER_TIMER) {
-    if (SERVO(timer, currentServoIndex[timer]).Pin.isActive  = = true) {   // check if activated
+    if (SERVO(timer, currentServoIndex[timer]).Pin.isActive == true) {   // check if activated
       //digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, HIGH);   // it's an active channel so pulse it high
       ((PORT_t *)&PORTA + SERVO(timer, currentServoIndex[timer]).Pin.port)->OUTSET = SERVO(timer, currentServoIndex[timer]).Pin.bitmask;
     }
@@ -117,7 +117,7 @@ static void finISR() {
 static boolean isTimerActive(timer16_Sequence_t timer) {
   // returns true if any servo is active on this timer
   for (uint8_t channel = 0; channel < SERVOS_PER_TIMER; channel++) {
-    if (SERVO(timer, channel).Pin.isActive  = = true) {
+    if (SERVO(timer, channel).Pin.isActive == true) {
       return true;
     }
   }
@@ -146,7 +146,7 @@ uint8_t Servo::attach(byte pin, int min, int max) {
     //pinMode(pin, OUTPUT);                                   // set servo pin to output
     //servos[this->servoIndex].Pin.nbr = pin;
     uint8_t bitmask = digitalPinToBitMask(pin);
-    if (bitmask = =NOT_A_PIN) {
+    if (bitmask == NOT_A_PIN) {
       return NOT_A_PIN;
     }
     servos[this->servoIndex].Pin.bitmask = bitmask;
@@ -159,7 +159,7 @@ uint8_t Servo::attach(byte pin, int min, int max) {
     this->max  = (MAX_PULSE_WIDTH - max) / 4;
     // initialize the timer if it has not already been initialized
     timer = SERVO_INDEX_TO_TIMER(servoIndex);
-    if (isTimerActive(timer)  = = false) {
+    if (isTimerActive(timer) == false) {
       initISR();
     }
     servos[this->servoIndex].Pin.isActive = true;  // this must be set after the check for isTimerActive
@@ -172,7 +172,7 @@ void Servo::detach() {
 
   servos[this->servoIndex].Pin.isActive = false;
   timer = SERVO_INDEX_TO_TIMER(servoIndex);
-  if (isTimerActive(timer)  = = false) {
+  if (isTimerActive(timer) == false) {
     finISR();
   }
 }
