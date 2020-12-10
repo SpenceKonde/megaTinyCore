@@ -240,7 +240,8 @@ atxy7.bootloader.TCD0CFG=0x00
 atxy7.bootloader.APPEND=0x00
 atxy7.bootloader.BOOTEND=0x00
 atxy7.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
-atxy7.bootloader.flashcommand=
+atxy7.bootloader.avrdudestring=
+atxy7.bootloader.pymcuprogstring=
 
 ##############################################################
 #      ATtiny3216/1616/1606/816/806/416/406
@@ -276,7 +277,8 @@ atxy6.bootloader.TCD0CFG=0x00
 atxy6.bootloader.APPEND=0x00
 atxy6.bootloader.BOOTEND=0x00
 atxy6.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
-atxy6.bootloader.flashcommand=
+atxy6.bootloader.avrdudestring=
+atxy6.bootloader.pymcuprogstring=
 
 atxy6.menu.chip.3216=ATtiny3216
 atxy6.menu.chip.3216.build.board=AVR_ATtiny3216
@@ -473,7 +475,8 @@ atxy4.menu.serialevent.yes.build.serialeventabr=E
 atxy4.upload.tool=avrdude
 
 atxy4.bootloader.tool=avrdude
-atxy4.bootloader.flashcommand=
+atxy4.bootloader.avrdudestring=
+atxy4.bootloader.pymcuprogstring=
 atxy4.build.core=megatinycore
 atxy4.build.variant=txy4
 atxy4.build.text_section_start=.text=0x0
@@ -696,7 +699,8 @@ atxy2.menu.serialevent.yes.build.serialevent=
 atxy2.menu.serialevent.yes.build.serialeventabr=E
 atxy2.upload.tool=avrdude
 
-atxy2.bootloader.flashcommand=
+atxy2.bootloader.avrdudestring=
+atxy2.bootloader.pymcuprogstring=
 atxy2.bootloader.tool=avrdude
 
 atxy2.menu.chip.412=ATtiny412
@@ -908,7 +912,8 @@ Xplained416.upload.maximum_data_size=256
 Xplained416.upload.protocol=arduino
 Xplained416.upload.extra_params=-D
 Xplained416.bootloader.file=optiboot_x/optiboot_xplained416.hex
-Xplained416.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+Xplained416.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+Xplained416.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file}
 Xplained416.bootloader.tool=avrdude
 Xplained416.bootloader.BOOTEND=0x2
 Xplained416.bootloader.OSCCFG=0x02
@@ -970,7 +975,8 @@ Xplained817.upload.maximum_data_size=512
 Xplained817.upload.protocol=arduino
 Xplained817.upload.extra_params=-D
 Xplained817.bootloader.file=optiboot_x/optiboot_xplained817.hex
-Xplained817.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+Xplained817.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+Xplained817.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file}
 Xplained817.bootloader.tool=avrdude
 Xplained817.bootloader.BOOTEND=0x2
 Xplained817.bootloader.OSCCFG=0x02
@@ -1211,7 +1217,8 @@ atxy7o.bootloader.BOOTEND=0x02
 atxy7o.upload.protocol=arduino
 atxy7o.upload.extra_params=-D
 atxy7o.build.text_section_start=.text=0x200
-atxy7o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+atxy7o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+atxy7o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file}
 atxy7o.bootloader.tool=avrdude
 
 ##############################################################
@@ -1435,7 +1442,8 @@ atxy6o.bootloader.BOOTEND=0x02
 atxy6o.upload.protocol=arduino
 atxy6o.upload.extra_params=-D
 atxy6o.build.text_section_start=.text=0x200
-atxy6o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+atxy6o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+atxy6o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file}
 atxy6o.bootloader.BOOTEND=0x2
 atxy6o.bootloader.tool=avrdude
 
@@ -1622,7 +1630,8 @@ atxy4o.build.export_merged_output=true
 atxy4o.upload.protocol=arduino
 atxy4o.upload.extra_params=-D
 atxy4o.build.text_section_start=.text=0x200
-atxy4o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+atxy4o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+atxy4o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file}
 atxy4o.bootloader.tool=avrdude
 
 atxy4o.menu.bootloaderuart.default=TX:5 (PB2), RX:4 (PB3)
@@ -1826,7 +1835,8 @@ atxy2o.upload.tool=avrdude
 atxy2o.upload.protocol=arduino
 atxy2o.upload.extra_params=-D
 atxy2o.build.text_section_start=.text=0x200
-atxy2o.bootloader.flashcommand=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+atxy2o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+atxy2o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file}
 atxy2o.bootloader.tool=avrdude
 
 atxy2o.build.core=megatinycore

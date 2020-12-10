@@ -1,3 +1,18 @@
+jtag2updi.name=jtag2updi (megaTinyCore)
+jtag2updi.communication=serial
+jtag2updi.protocol=jtag2updi
+jtag2updi.program.protocol=jtag2updi
+jtag2updi.program.tool=avrdude
+jtag2updi.program.extra_params=-P{serial.port}
+jtag2updi.program.speed=115200
+
+pyupdi.name=Serial Port and 4.7k (pyupdi style)
+pyupdi.protocol=uart
+pyupdi.program.extra_params=-u {serial.port}
+pyupdi.program.protocol=uart
+pyupdi.program.tool=pymcuprog
+pyupdi.bootloader.tool=pymcuprog
+
 medbg.name=Onboard Atmel mEDBG (ATmega32u4/Xplained Mini) (megaTinyCore)
 medbg.communication=usb
 medbg.protocol=xplainedmini_updi
@@ -19,17 +34,52 @@ nedbg.program.protocol=curiosity_updi
 nedbg.program.tool=avrdude
 nedbg.program.extra_params=-Pusb
 
-jtag2updi.name=jtag2updi (megaTinyCore)
-jtag2updi.communication=serial
-jtag2updi.protocol=jtag2updi
-jtag2updi.program.protocol=jtag2updi
-jtag2updi.program.tool=avrdude
-jtag2updi.program.extra_params=-P{serial.port}
-jtag2updi.program.speed=115200
-
 atmel_ice_updi.name=Atmel-ICE UPDI (megaTinyCore)
 atmel_ice_updi.communication=usb
 atmel_ice_updi.protocol=atmelice_updi
 atmel_ice_updi.program.protocol=atmelice_updi
 atmel_ice_updi.program.tool=avrdude
 atmel_ice_updi.program.extra_params=-Pusb
+
+medbgpy.name=Onboard Atmel mEDBG (ATmega32u4/Xplained Mini via pymcuprog)
+medbgpy.protocol=medbg
+medbgpy.program.extra_params=
+medbgpy.program.protocol=medbg
+medbgpy.program.tool=pymcuprog
+medbgpy.bootloader.tool=pymcuprog
+
+edbgpy.name=Atmel EDBG (AT32UC3A4256/Xplained Pro via pymcuprog)
+edbgpy.protocol=edbg
+edbgpy.program.extra_params=
+edbgpy.program.protocol=edbg
+edbgpy.program.tool=pymcuprog
+edbgpy.bootloader.tool=pymcuprog
+
+nedbgpy.name=Atmel nEDBG (ATSAMD21E18/Curiosity via pymcuprog)
+nedbgpy.protocol=nedbg
+nedbgpy.program.extra_params=
+nedbgpy.program.protocol=nedbg
+nedbgpy.program.tool=pymcuprog
+nedbgpy.bootloader.tool=pymcuprog
+
+atmelice.name=Atmel-ICE via pymcuprog
+atmelice.protocol=atmelice
+atmelice.program.extra_params=
+atmelice.program.protocol=atmelice
+atmelice.program.tool=pymcuprog
+atmelice.bootloader.tool=pymcuprog
+
+snap.name=MPLAB Snap
+snap.protocol=snap
+snap.program.extra_params=
+snap.program.protocol=snap
+snap.program.tool=pymcuprog
+snap.bootloader.tool=pymcuprog
+
+pickit4.name=MPLAB PICkit 4
+pickit4.protocol=pickit4
+pickit4.program.extra_params=
+pickit4.program.protocol=pickit4
+pickit4.program.tool=pymcuprog
+pickit4.bootloader.tool=pymcuprog
+
