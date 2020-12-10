@@ -28,7 +28,12 @@
 #ifndef MILLIS_USE_TIMERNONE
 
 #if (defined(MILLIS_USE_TIMERRTC_XTAL)|defined(MILLIS_USE_TIMERRTC_XOSC))
-  #define MILLIS_USE_TIMERRTC
+  #if (MEGATINYCORE_SERIES==0 || defined(__AVR_ATtinyxy2__))
+    #error "Only the tintAVR 1-series and 2-series parts support external RTC crystal"
+    #define MILLIS_USE_TIMERNONE
+  #else
+    #define MILLIS_USE_TIMERRTC
+  #endif
 #endif
 
 
@@ -517,13 +522,13 @@ void init_millis() {
   // to do: add support for RTC timer initialization
   RTC.PER = 0xFFFF;
   #if defined(MILLIS_USE_TIMERRTC_XTAL)
-  _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA, CLKCTRL_CSUT_16K_gc | CLKCTRL_ENABLE_bm | CLKCTRL_RUNSTDBY_bm);
-  RTC.CLKSEL = 2; //external crystal
+    _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA, CLKCTRL_CSUT_16K_gc | CLKCTRL_ENABLE_bm | CLKCTRL_RUNSTDBY_bm);
+    RTC.CLKSEL = 2; //external crystal
   #elif defined(MILLIS_USE_TIMERRTC_XOSC)
-  _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA, CLKCTRL_SEL_bm | CLKCTRL_ENABLE_bm | CLKCTRL_RUNSTDBY_bm);
-  RTC.CLKSEL = 2; //external crystal
+    _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA, CLKCTRL_SEL_bm | CLKCTRL_ENABLE_bm | CLKCTRL_RUNSTDBY_bm);
+    RTC.CLKSEL = 2; //external crystal
   #else
-  _PROTECTED_WRITE(CLKCTRL.OSC32KCTRLA, CLKCTRL_RUNSTDBY_bm;
+    _PROTECTED_WRITE(CLKCTRL.OSC32KCTRLA, CLKCTRL_RUNSTDBY_bm);
                    //RTC.CLKSEL=0; this is the power on value
   #endif
   RTC.INTCTRL = 0x01; //enable overflow interrupt
