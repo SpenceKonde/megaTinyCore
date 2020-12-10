@@ -30,10 +30,8 @@
 #if (defined(MILLIS_USE_TIMERRTC_XTAL)|defined(MILLIS_USE_TIMERRTC_XOSC))
   #if (MEGATINYCORE_SERIES==0 || defined(__AVR_ATtinyxy2__))
     #error "Only the tintAVR 1-series and 2-series parts support external RTC crystal"
-    #define MILLIS_USE_TIMERNONE
-  #else
-    #define MILLIS_USE_TIMERRTC
   #endif
+  #define MILLIS_USE_TIMERRTC
 #endif
 
 
