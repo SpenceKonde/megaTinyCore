@@ -26,19 +26,69 @@
 #include "pins_arduino.h"
 #include "Arduino.h"
 
-inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin)
-{
-  if(__builtin_constant_p(pin))
-    if (pin >= NUM_TOTAL_PINS) badArg("Digital pin is constant, but not a valid pin");
-}
-void analogReference(uint8_t mode) {
-  if (__builtin_constant_p(mode)) {
-    #if defined(EXTERNAL)
-      if (!(mode == EXTERNAL || mode == VDD || mode== INTERNAL0V55 || mode== INTERNAL1V1 || mode== INTERNAL1V5|| mode== INTERNAL2V5|| mode== INTERNAL4V34)) badArg("analogReference called with value that is not a valid analog reference");
-    #else
-      if (!(mode == VDD || mode== INTERNAL0V55 || mode== INTERNAL1V1 || mode== INTERNAL1V5|| mode== INTERNAL2V5|| mode== INTERNAL4V34)) badArg("analogReference called with value that is not a valid analog reference");
-    #endif
+inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
+  if(__builtin_constant_p(pin)) {
+    if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
+    // Exception made for NOT_A_PIN - code exists which relies on being able to pass this and have nothing happen.
+    // While IMO very poor coding practice, these checks aren't here to prevent lazy programmers from intentionally
+    // taking shortcuts we disapprove of, but to call out things that are virtually guaranteed to be a bug.
+    // Passing -1/255/NOT_A_PIN to the digital I/O functions is most likely intentional.
+      badArg("digital I/O function called  is constant, but not a valid pin");
   }
+}
+
+inline __attribute__((always_inline)) void check_valid_analog_pin(pin_size_t pin) {
+  if(__builtin_constant_p(pin)) {
+    #ifdef ADC_DAC0
+      if (pin != ADC_DAC0 && pin != ADC_INTREF && pin != ADC_TEMPERATURE)
+    #else
+      if (pin != ADC_INTREF && pin != ADC_TEMPERATURE)
+    #endif
+    {
+      pin = digitalPinToAnalogInput(pin);
+      if (pin == NOT_A_PIN) {
+        badArg("analogRead called with constant pin that is not a valid analog pin");
+      }
+    }
+  }
+}
+
+inline __attribute__((always_inline)) void check_valid_analog_ref(uint8_t mode) {
+  if (__builtin_constant_p(mode)) {
+  #if defined(EXTERNAL)
+    if (!(mode == EXTERNAL || mode == VDD || mode== INTERNAL0V55 || mode== INTERNAL1V1 || mode== INTERNAL1V5|| mode== INTERNAL2V5|| mode== INTERNAL4V34))
+      badArg("analogReference called with argument that is not a valid analog reference");
+  #else
+    if (!(mode == VDD || mode== INTERNAL0V55 || mode== INTERNAL1V1 || mode== INTERNAL1V5|| mode== INTERNAL2V5|| mode== INTERNAL4V34))
+      badArg("analogReference called with argument that is not a valid analog reference");
+  #endif
+  }
+}
+
+inline __attribute__((always_inline)) void check_valid_dac_ref(uint8_t mode) {
+  if (__builtin_constant_p(mode)) {
+    if (mode >= 5)
+      badArg("DACReference called with argument that is not a valid DAC reference - VDD is not a valid reference tinyAVR parts!");
+  }
+}
+
+inline __attribute__((always_inline)) void check_valid_duty_cycle(int16_t val) {
+  if (__builtin_constant_p(val)) {
+    if (val < 0 || val >255)
+      badArg("analogWrite duty cycle called with a constant not between 0 and 255");
+  }
+}
+
+#ifdef ADC_LOWLAT_bm
+  // 2-series part with the crazy ADC
+  // need a variable to store the resolution - details will be changed
+  static uint8_t _analog_resolution=10;
+
+#endif
+
+
+void analogReference(uint8_t mode) {
+  check_valid_analog_ref(mode);
   switch (mode) {
     #if defined(EXTERNAL)
       case EXTERNAL:
@@ -65,15 +115,26 @@ void analogReference(uint8_t mode) {
 
 #ifdef DAC0
 void DACReference(uint8_t mode) {
-  if (__builtin_constant_p(mode)) {
-    if (mode >= 5) badArg("DACReference called with value that is not a valid DAC reference - VDD is not supported on tinyAVR 1-series");
-  }
+  check_valid_dac_ref(mode);
   if (mode < 5) {
     VREF.CTRLA = mode | (VREF.CTRLA & (~VREF_DAC0REFSEL_gm));
   }
 }
+#else
+void DACReference(uint8_t mode) {
+  badCall("analogRead() not yet implemented for the 2-series parts");
+}
 #endif
+
+#ifdef ADC_LOWLAT_bm
 int analogRead(uint8_t pin) {
+    badCall("analogRead() not yet implemented for the 2-series parts");
+}
+#else
+int analogRead(uint8_t pin) {
+  check_valid_analog_pin(pin);
+
+
   #ifdef ADC_DAC0
   if (pin != ADC_DAC0 && pin != ADC_INTREF && pin != ADC_TEMPERATURE)
   #else
@@ -82,13 +143,10 @@ int analogRead(uint8_t pin) {
   {
     pin = digitalPinToAnalogInput(pin);
     if (pin == NOT_A_PIN) {
-      if (__builtin_constant_p(pin)) badArg("analogRead called with pin that is not a valid analog pin"); //I hate to mix compile time checks with code, but we would otherwise duplicate this logic exactly.
       return -1;
     }
   }
 
-
-  #if defined(ADC0)
   /* Reference should be already set up */
   /* Select channel */
   ADC0.MUXPOS = (pin << ADC_MUXPOS_gp);
@@ -101,24 +159,28 @@ int analogRead(uint8_t pin) {
 
   /* Combine two bytes */
   return ADC0.RES;
-
-  #else  /* No ADC, return 0 */
-  return 0;
-  #endif
-
 }
+#endif
 
 //analogReadResolution() has two legal values you can pass it, 8 or 10 on these parts. According to the datasheet, you can clock the ADC faster if you set it to 8.
 //like the pinswap functions, if the user passes bogus values, we set it to the default and return false.
 
-bool analogReadResolution(uint8_t res) {
-  if (res == 8) {
-    ADC0.CTRLA |= ADC_RESSEL_bm;
-    return true;
-  }
-  //if argument wasn't 8, we'll be putting it to default value either way
-  ADC0.CTRLA &= ~ADC_RESSEL_bm;
-  return (res == 10); //but only return true if the value passed was the valid option, 10.
+inline void analogReadResolution(uint8_t res) {
+  if (!__builtin_constant_p(res))
+    badArg("analogReadResolution must only be passed constant values");
+  #ifdef ADC_LOWLAT_bm
+    if (res !=8 && res != 10 && res != 12)
+      badArg("analogReadResolution called with invalid argument - valid options are 8, 12, or 10 (compatibility mode).");
+    _analog_resolution=res; //just set that variable? *shrug* is just a standin for now.
+  #else
+    if (res !=8 && res != 10)
+      badArg("analogReadResolution called with invalid argument - valid options are 8 or 10.");
+    if (res == 8) {
+      ADC0.CTRLA |= ADC_RESSEL_bm;
+    } else {
+      ADC0.CTRLA &= ~ADC_RESSEL_bm;
+    }
+  #endif
 }
 
 
@@ -128,9 +190,7 @@ bool analogReadResolution(uint8_t res) {
 // to digital output.
 void analogWrite(uint8_t pin, int val) {
   check_valid_digital_pin(pin);
-  if (__builtin_constant_p(val)) {
-    if (val < 0 || val >255) badArg("analogWrite duty cycle constant, but not within 0 to 255");
-  }
+  check_valid_duty_cycle(val);
   uint8_t bit_pos  = digitalPinToBitPosition(pin);
   if (bit_pos == NOT_A_PIN) {
     return;
