@@ -13,4 +13,6 @@ That is, move that downloaded file to the location of this file in the manually 
 You should end up with a folder with a name starting in python3, followed by a bunch of other stuff (depending on the version for your OS) - for example "python3-3.7.2.post1-embed-win32v2a", and inside that folder, there should be a bunch of files and folders. If there's a single folder in there, move that one level up into the aforementioned tools folder. 
 
 ## Rename that folder to `python3`
+The tools folder should now contain that `python3` folder, a `libs` folder, and `prog.py`
+
 At this point - hopefully - it should now work. My understanding is that the linux one uses the system copy of python3; there may or may not be additional steps required on that end. 
