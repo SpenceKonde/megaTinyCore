@@ -25,9 +25,15 @@ int atexit(void ( * /*func*/)()) {
 }
 
 // Weak empty variant initialization function.
-// May be redefined by variant files.
+// May be redefined by variant files (we don't
+// do that) or other libraries. FreeRTOS is one
+// such library.
+
 void initVariant() __attribute__((weak));
 void initVariant() { }
+
+// these parts don't have USB - but hey, VUSB
+// has been ported to AVRxt, so you never know!
 
 void setupUSB() __attribute__((weak));
 void setupUSB() { }
