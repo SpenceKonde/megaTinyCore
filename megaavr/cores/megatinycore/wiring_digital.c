@@ -30,7 +30,12 @@
 inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin)
 {
   if(__builtin_constant_p(pin))
-    if (pin >= NUM_TOTAL_PINS) badArg("Digital pin is constant, but not a valid pin");
+    if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
+    // Exception made for NOT_A_PIN - code exists which relies on being able to pass this and have nothing happen.
+    // While IMO very poor coding practice, these checks aren't here to prevent lazy programmers from intentionally
+    // taking shortcuts we disapprove of, but to call out things that are virtually guaranteed to be a bug.
+    // Passing -1/255/NOT_A_PIN to the digital I/O functions is most likely intentional.
+      badArg("Digital pin is constant, but not a valid pin");
 }
 
 void pinMode(uint8_t pin, uint8_t mode) {
@@ -70,11 +75,16 @@ void pinMode(uint8_t pin, uint8_t mode) {
 
       /* Enable pull-up */
       *pin_ctrl_reg |= PORT_PULLUPEN_bm;
+      // emulate setting of the port output register on classic AVR
+      port->OUTSET=bit_mask;
 
     } else { /* mode == INPUT (no pullup) */
 
       /* Disable pull-up */
       *pin_ctrl_reg &= ~(PORT_PULLUPEN_bm);
+      // emulate setting of the port output register on classic AVR
+      port->OUTCLR=bit_mask;
+
     }
 
     /* Restore state */
@@ -193,22 +203,35 @@ void digitalWrite(uint8_t pin, uint8_t val) {
   /* Get port */
   PORT_t *port = digitalPinToPortStruct(pin);
 
-  /* Output direction */
-  if (port->DIR & bit_mask) {
 
-    /* Set output to value */
-    if (val == LOW) { /* If LOW */
-      port->OUTCLR = bit_mask;
+  /*
+  Set output to value
+  This now runs even if port set INPUT in order to emulate
+  the behavior of digitalWrite() on classic AVR devices, where
+  you could digitalWrite() a pin while it's an input, to ensure
+  that the value of the port was set correctly when it was
+  changed to an output. Code in the wild relies on this behavior.
+  */
 
-    } else if (val == CHANGE) { /* If TOGGLE */
-      port->OUTTGL = bit_mask;
-      /* If HIGH OR  > TOGGLE  */
-    } else {
-      port->OUTSET = bit_mask;
-    }
-
-    /* Input direction */
+  if (val == LOW) { /* If LOW */
+    port->OUTCLR = bit_mask;
+  } else if (val == CHANGE) { /* If TOGGLE */
+    port->OUTTGL = bit_mask;
+    // Now, for the pullup setting part below
+    // we need to know if it's been set high or low
+    // otherwise the pullup state could get out of
+    // sync with the output bit. Annoying!
+    val=port->OUT & bit_mask;
+    // val will now be 0 (LOW) if the toggling made it LOW
+    // or bit_mask if not. And further down, we only need to
+    // know if it's
+  /* If HIGH OR  > TOGGLE  */
   } else {
+    port->OUTSET = bit_mask;
+  }
+
+  /* Input direction */
+  if (!(port->DIR & bit_mask)) {
     /* Old implementation has side effect when pin set as input -
       pull up is enabled if this function is called.
       Should we purposely implement this side effect?
@@ -227,7 +250,6 @@ void digitalWrite(uint8_t pin, uint8_t val) {
     if (val == LOW) {
       /* Disable pullup */
       *pin_ctrl_reg &= ~PORT_PULLUPEN_bm;
-
     } else {
       /* Enable pull-up */
       *pin_ctrl_reg |= PORT_PULLUPEN_bm;
@@ -247,6 +269,7 @@ inline __attribute__((always_inline)) void digitalWriteFast(uint8_t pin, uint8_t
 {
   check_constant_pin(pin);
   check_valid_digital_pin(pin);
+  if (pin==NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compiletime known so w/e
   // Mega-0, Tiny-1 style IOPORTs
   // Assumes VPORTs exist starting at 0 for each PORT structure
   uint8_t mask = 1 << digital_pin_to_bit_position[pin];

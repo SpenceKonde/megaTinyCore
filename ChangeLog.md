@@ -17,7 +17,11 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * analogWrite() is now interrupt-safe for TCD0-controlled pins (this may be addressed for the other pins in a future update - however, it is "naturally" interrupt safe except when either the interrupted analogWrite or the interrupt is turning pins on or off - in contrast, TCD0 analogWrite could break in a variety of ways in almost any situation where it was interrupted)
 * Also implemented NEW special behavior on the TCD0 PWM pins: analogWrite(pin,0) and analogWrite(pin,255) set pin LOW or HIGH without turning off the PWM. On TCD0, this does not require turning off the timer briefly, which, over time, would cause millis() to lose counts when PWM was also used based on TCD0, in addition to reducing runtime. digitalWrite(), however, does. (also remember that digitalRead(), unlike official cores, NEVER turns off PWM)
 * Add check for compile time known invalid pins passed to Arduino digital/analog API functions, analogReference and DACReference, as well as compile time known unachievable baud rates on Serial.begin() for Serial (#269)
+* Correct bug in digitalPinToAnalogInput() when called with invalid values.
+* analogReadResolution() now requires a constant argument which must be valid - the old implementation was just awful - there are only two (will be a third on the 2-series, as we unfortunately kinda do need to be able to emulate )
 * Add support for digitalReadFast(), digitalWriteFast() functions. They are only valid if the pin is compile time known constant, and optimize down to something very fast (when second argument is compile time known, a single cycle for write. Looks like 4 cycles for read?) (#205)
+* Emulate `digitalWrite` behavior of classic AVRs when pin not OUTPUT, namely, set the PORTx.OUT register so that if it *is* set output, that's the state it will be in.
+* Update Logic library to latest version (as with DxCore).
 
 
 ## Released Versions
