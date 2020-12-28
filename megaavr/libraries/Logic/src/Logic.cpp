@@ -50,8 +50,8 @@ static const struct Logic::CCLBlock blocks[] = {
   defined(__AVR_ATtiny1606__) ||                              \
   defined(__AVR_ATtiny416__) || defined(__AVR_ATtiny816__) || \
   defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny3216__)
-#define PORTMUX_CCL PORTMUX.CTRLA
-#define PORTMUX_ALTOUT_bm (1 << (block.number + 4))
+  #define PORTMUX_CCL PORTMUX.CTRLA
+  #define PORTMUX_ALTOUT_bm (1 << (block.number + 4))
   {
     0,
     PIN0_bm, PIN1_bm, PIN2_bm, PIN6_bm, PIN4_bm,
@@ -68,8 +68,8 @@ static const struct Logic::CCLBlock blocks[] = {
   #if defined(__AVR_ATtiny807__) || defined(__AVR_ATtiny1607__) || \
   defined(__AVR_ATtiny417__) || defined(__AVR_ATtiny817__) ||  \
   defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3217__)
-#define PORTMUX_CCL PORTMUX.CTRLA
-#define PORTMUX_ALTOUT_bm (1 << (block.number + 4))
+  #define PORTMUX_CCL PORTMUX.CTRLA
+  #define PORTMUX_ALTOUT_bm (1 << (block.number + 4))
   {
     0,
     PIN0_bm, PIN1_bm, PIN2_bm, PIN6_bm, PIN4_bm,
@@ -85,8 +85,8 @@ static const struct Logic::CCLBlock blocks[] = {
   #endif
   #if defined(__AVR_ATtiny424__)  || defined(__AVR_ATtiny824__)  ||  \
   defined(__AVR_ATtiny1624__) || defined(__AVR_ATtiny3224__)
-#define PORTMUX_CCL PORTMUX.CCLROUTEA
-#define PORTMUX_ALTOUT_bm (1 << block.number)
+  #define PORTMUX_CCL PORTMUX.CCLROUTEA
+  #define PORTMUX_ALTOUT_bm (1 << block.number)
   {
     0,
     PIN0_bm, PIN1_bm, PIN2_bm, PIN6_bm, 0,
@@ -114,8 +114,8 @@ static const struct Logic::CCLBlock blocks[] = {
   #endif
   #if defined(__AVR_ATtiny426__) || defined(__AVR_ATtiny826__) || \
   defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny3216__)
-#define PORTMUX_CCL PORTMUX.CCLROUTEA
-#define PORTMUX_ALTOUT_bm (1 << block.number)
+  #define PORTMUX_CCL PORTMUX.CCLROUTEA
+  #define PORTMUX_ALTOUT_bm (1 << block.number)
   {
     0,
     PIN0_bm, PIN1_bm, PIN2_bm, PIN6_bm, PIN4_bm,
@@ -143,8 +143,8 @@ static const struct Logic::CCLBlock blocks[] = {
   #endif
   #if defined(__AVR_ATtiny427__) || defined(__AVR_ATtiny827__) ||  \
   defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3217__)
-#define PORTMUX_CCL PORTMUX.CCLROUTEA
-#define PORTMUX_ALTOUT_bm (1 << block.number)
+  #define PORTMUX_CCL PORTMUX.CCLROUTEA
+  #define PORTMUX_ALTOUT_bm (1 << block.number)
   {
     0,
     PIN0_bm, PIN1_bm, PIN2_bm, PIN6_bm, PIN4_bm,
@@ -174,8 +174,8 @@ static const struct Logic::CCLBlock blocks[] = {
   defined(__AVR_AVR32DD20__)  || defined(__AVR_AVR32DD14__)  ||  \
   defined(__AVR_AVR16DD20__)  || defined(__AVR_AVR16DD14__)
 
-#define PORTMUX_CCL PORTMUX.CCLROUTEA
-#define PORTMUX_ALTOUT_bm (1 << block.number)
+  #define PORTMUX_CCL PORTMUX.CCLROUTEA
+  #define PORTMUX_ALTOUT_bm (1 << block.number)
   {
     0,
     PIN0_bm, PIN1_bm, PIN2_bm, PIN3_bm, PIN6_bm,
@@ -216,8 +216,8 @@ static const struct Logic::CCLBlock blocks[] = {
   defined(__AVR_AVR32EA32__)  || defined(__AVR_AVR32EA28__)  ||  \
   defined(__AVR_AVR16EA32__)  || defined(__AVR_AVR16EA28__)  ||  \
   defined(__AVR_AVR8EA32__)   || defined(__AVR_AVR8EA28__)
-#define PORTMUX_CCL PORTMUX.CCLROUTEA
-#define PORTMUX_ALTOUT_bm (1 << block.number)
+  #define PORTMUX_CCL PORTMUX.CCLROUTEA
+  #define PORTMUX_ALTOUT_bm (1 << block.number)
   {
     0,
     PIN0_bm, PIN1_bm, PIN2_bm, PIN3_bm, PIN6_bm,
@@ -235,7 +235,7 @@ static const struct Logic::CCLBlock blocks[] = {
   defined(__AVR_AVR32DB32__)  || defined(__AVR_AVR32DB28__)  ||  \
   defined(__AVR_AVR64DD32__)  || defined(__AVR_AVR64DD28__)  ||  \
   defined(__AVR_AVR32DD32__)  || defined(__AVR_AVR32DD28__)  ||  \
-  defined(__AVR_AVR16DD32__)  || defined(__AVR_AVR16DD28__)  ||  \
+  defined(__AVR_AVR16DD32__)  || defined(__AVR_AVR16DD28__)
   // These have no PD0, because it was sacrificed for VDDIO2
   {
     2,
@@ -296,8 +296,8 @@ static const struct Logic::CCLBlock blocks[] = {
   defined(__AVR_AVR32DB64__)  || defined(__AVR_AVR32DB48__)  || \
   defined(__AVR_AVR64EA48__)  || defined(__AVR_AVR32EA48__)  || \
   defined(__AVR_AVR16EA48__)
-#define PORTMUX_CCL PORTMUX.CCLROUTEA
-#define PORTMUX_ALTOUT_bm (1 << block.number)
+  #define PORTMUX_CCL PORTMUX.CCLROUTEA
+  #define PORTMUX_ALTOUT_bm (1 << block.number)
   {
     0,
     PIN0_bm, PIN1_bm, PIN2_bm, PIN3_bm, PIN6_bm,
@@ -339,8 +339,13 @@ static const struct Logic::CCLBlock blocks[] = {
   },
   {
     5,
-    PIN0_bm, PIN1_bm, PIN2_bm, PIN3_bm, PIN6_bm,
-    PORTG, PORTG, PORTG,
+    #ifdef PORTG
+      PIN0_bm, PIN1_bm, PIN2_bm, PIN3_bm, PIN6_bm,
+      PORTG, PORTG, PORTG,
+    #else
+      0,0,0,0,0,
+      PORTA,PORTA,PORTA,
+    #endif
     CCL.SEQCTRL2, CCL.LUT5CTRLA, CCL.LUT5CTRLB, CCL.LUT5CTRLC, CCL.TRUTH5,
   },
   #endif
@@ -430,21 +435,12 @@ void Logic::initInput(in::input_t &input, PORT_t &port, const uint8_t pin_bm) {
 }
 
 void Logic::init() {
+  // disable the LUT so we can configure it
+  block.LUTCTRLA = 0;
+  // Configure input pins
   initInput(input0, block.PORT_IN, block.input0_bm);
   initInput(input1, block.PORT_IN, block.input1_bm);
   initInput(input2, block.PORT_IN, block.input2_bm);
-
-  // Set inputs modes
-  block.LUTCTRLB = (input1 << CCL_INSEL1_gp) | (input0 << CCL_INSEL0_gp);
-  block.LUTCTRLC = (input2 << CCL_INSEL2_gp);
-
-  // Set truth table
-  block.TRUTH = truth;
-
-  // Set sequencer
-  if (!(block.number & 0x01)) {
-    block.SEQCTRL = sequencer;
-  }
 
   // Set output pin state and output pin swap
   if (output == out::enable) {
@@ -460,6 +456,18 @@ void Logic::init() {
       block.PORT_ALT_OUT.DIRSET = block.output_bm;
     }
   }
+  // Set inputs modes
+  block.LUTCTRLB = (input1 << CCL_INSEL1_gp) | (input0 << CCL_INSEL0_gp);
+  block.LUTCTRLC = (input2 << CCL_INSEL2_gp);
+
+  // Set truth table
+  block.TRUTH = truth;
+
+  // Set sequencer
+  if (!(block.number & 0x01)) {
+    block.SEQCTRL = sequencer;
+  }
+
 
   // Set logic output state and output filter
   block.LUTCTRLA = (output ? CCL_OUTEN_bm : 0)
@@ -472,6 +480,7 @@ void Logic::init() {
                    #endif
                    | (enable ? CCL_ENABLE_bm : 0);
 }
+
 
 #if defined(CCL_CCL_vect)
 void Logic::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
@@ -510,7 +519,7 @@ void Logic::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
 void Logic::detachInterrupt() {
   // Disable interrupt for a given block output
   #if defined(CCL_TRUTH4)
-  if (block_number > 4) {
+  if (block.number > 4) {
     CCL.INTCTRL1 &= ~(CCL_INTMODE1_gm << ((block.number & 3) * 2));
   } else {
     CCL.INTCTRL0 &= ~(CCL_INTMODE0_gm << (block.number * 2));

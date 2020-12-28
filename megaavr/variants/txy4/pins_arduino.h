@@ -236,25 +236,10 @@ const uint8_t digital_pin_to_timer[] = {
 
 
 };
-/*
-  #define PIN_A0   (11)
-  #define PIN_A1   (8)
-  #define PIN_A2   (9)
-  #define PIN_A3   (10)
-  #define PIN_A4   (0)
-  #define PIN_A5   (1)
-  #define PIN_A6   (2)
-  #define PIN_A7   (3)
-  #define PIN_A10  (6)
-  #define PIN_A11  (7)
 
-*/
 #endif
 
-extern const uint8_t analog_pin_to_channel[];
-// #define digitalPinToAnalogInput(p)  ((p < NUM_ANALOG_INPUTS) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN )
-//#define digitalPinToAnalogInput(p)    (((p) < 6 || (p) == 8 || (p) == 9 || (p) > 13) ? pgm_read_byte(analog_pin_to_channel + p) : NOT_A_PIN)
-#define digitalPinToAnalogInput(p)      ((p<4)?(p+4):(p==11?0:((p>7)?(p-7):((p==6)?10:(p==7?11:NOT_A_PIN)))))
+#define digitalPinToAnalogInput(p)      ((p<4)?(p+4):(p==11?0:((p>7 && p<11)?(p-7):((p==6)?10:(p==7?11:NOT_A_PIN)))))
 
 
 // These serial port names are intended to allow libraries and architecture-neutral
