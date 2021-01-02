@@ -20,7 +20,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Correct bug in digitalPinToAnalogInput() when called with invalid values.
 * analogReadResolution() now requires a constant argument which must be valid - the old implementation was just awful - there are only two (will be a third on the 2-series, as we unfortunately kinda do need to be able to emulate )
 * Add support for digitalReadFast(), digitalWriteFast() functions. They are only valid if the pin is compile time known constant, and optimize down to something very fast (when second argument is compile time known, a single cycle for write. Looks like 4 cycles for read?) (#205)
-* Emulate `digitalWrite` behavior of classic AVRs when pin not OUTPUT, namely, set the PORTx.OUT register so that if it *is* set output, that's the state it will be in.
+* Emulate `digitalWrite` behavior of classic AVRs when pin not OUTPUT, namely, set the `PORTx.OUT` register so that if it *is* set output, that's the state it will be in.
 * Update Logic library to latest version (as with DxCore).
 
 
