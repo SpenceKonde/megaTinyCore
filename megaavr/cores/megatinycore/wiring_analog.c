@@ -94,12 +94,14 @@ void analogReference(uint8_t mode) {
       case EXTERNAL:
     #endif
     case VDD:
+      VREF.CTRLB &= ~VREF_ADC0REFEN_bm; //Turn off force-adc-reference-enable
       ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
       // VREF.CTRLA does not need to be reconfigured, as the voltage references only supply their specified voltage when requested to do so by the ADC.
       break;
     case INTERNAL0V55:
       VREF.CTRLA =  VREF.CTRLA & ~(VREF_ADC0REFSEL_gm); //These bits are all 0 for 0.55v reference, so no need to do the mode << VREF_ADC0REFSEL_gp here;
       ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; //per datasheet, recommended SAMPCAP=0 at ref < 1v
+      VREF.CTRLB |= VREF_ADC0REFEN_bm; //Turn off force-adc-reference-enable
       break;
     case INTERNAL1V1:
     case INTERNAL2V5:
@@ -108,8 +110,6 @@ void analogReference(uint8_t mode) {
       VREF.CTRLA = (VREF.CTRLA & ~(VREF_ADC0REFSEL_gm)) | (mode << VREF_ADC0REFSEL_gp);
       ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v
       break;
-    default:
-      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | VDD | ADC_SAMPCAP_bm;
   }
 }
 

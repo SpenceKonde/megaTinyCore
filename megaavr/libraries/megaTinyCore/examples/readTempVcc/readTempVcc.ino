@@ -52,7 +52,7 @@ uint16_t readTemp() {
   ADC0.SAMPCTRL = 0x0E; //14, what we now set it to automatically on startup so we can run the ADC while keeping the same sampling time
   ADC0.CTRLD &= ~(ADC_INITDLY_gm);
   ADC0.CTRLD |= ADC_INITDLY_DLY16_gc;
-  uint32_t temp = adc_reading - sigrow_offset;
+  uint32_t temp = adc_reading + sigrow_offset; // Datasheet is WRONG - the offset from the sigrow is signed; it should be added, not subtracted!
   Serial.println(temp);
   temp *= sigrow_gain; // Result might overflow 16 bit variable (10bit+8bit)
   Serial.println(temp);
