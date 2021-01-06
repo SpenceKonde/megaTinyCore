@@ -269,7 +269,7 @@ inline __attribute__((always_inline)) void digitalWriteFast(uint8_t pin, uint8_t
 {
   check_constant_pin(pin);
   check_valid_digital_pin(pin);
-  if (pin==NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compiletime known so w/e
+  if (pin==NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compile time known so w/e
   // Mega-0, Tiny-1 style IOPORTs
   // Assumes VPORTs exist starting at 0 for each PORT structure
   uint8_t mask = 1 << digital_pin_to_bit_position[pin];
