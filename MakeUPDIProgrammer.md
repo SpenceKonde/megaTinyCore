@@ -1,8 +1,15 @@
-# Step-by-step guide to turn a uno/nano/pro mini into a UPDI programmer
+# As of 2.2.0, you can program these with a serial adapter and a resistor!
+This is the same method as *pyupdi* uses. A simple TTL serial adapter (such as one of the ubiquitous $1 CH340G serial adapters available on ebay) and a 4.7k resistor are required. Connect the TX and RX pins of the serial adapter with the resistor (many serial adapters already have a 1k resistor in series with the TX pin - if yours does, a 3.3~3.9k resistor would be more appropriate. Connect the RX line to the UPDI pin (the 470 ohm resistor often placed in series with the UPDI pin does not interfere), Vcc to Vcc, and Gnd to Gnd. 
+
+If, for some reason, you do prefer to use jtag2updi, our instructions are below. 
+
+## Step-by-step guide to turn a uno/nano/pro mini into a UPDI programmer
 
 The ATtiny 0- and 1-series are programmed through the Unified Program and Debug Interface (UPDI). This is a 1-wire interface using the reset pin on the ATtiny. The ATtiny does not have a bootloader, so a UPDI programmer is required to upload the sketches. The classic ISP programmers cannot be used - only UPDI can be used to program these parts.
 
 An Arduino sketch is available to turn ATmega328(p)-based Arduino’s, like the Arduino UNO and Nano, into an UPDI programmer (it does not work on boards based on other parts, like the 32u4 (Micro/Leo) or any non-AVR board). The following steps show how to make one of these low cost UPDI programmers. We recommend using an Arduino Nano or Pro Mini (a cheap clone from ebay is fine) and hard-wiring it for the task.
+
+**Note** Some people have reported problems using an Arduino Pro Mini when the bootloader is present, but not if the bootloader is removed by uploading jtag2updi using an ISP programmer. I have been unable to reproduce the problem.
 
 ## Part 1: Upload the sketch to your Arduino
 1. The UPDI programmer sketch can be found here: https://github.com/SpenceKonde/jtag2updi
