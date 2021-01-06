@@ -29,6 +29,7 @@ jobs:
 
       available-flash-7_5kB-plus-true-sketch-paths: |
         - megaavr/libraries/EEPROM/examples/eeprom_get
+        - megaavr/libraries/USERSIG/examples/usersig_get
         - megaavr/libraries/SPI/examples/BarometricPressureSensor
         - megaavr/libraries/SoftwareSerial/examples/TwoPortReceive
         - megaavr/libraries/Wire/examples/SFRRanger_reader
@@ -40,6 +41,9 @@ jobs:
         - megaavr/libraries/EEPROM/examples/eeprom_crc
         - megaavr/libraries/EEPROM/examples/eeprom_put
         - megaavr/libraries/EEPROM/examples/eeprom_read
+        - megaavr/libraries/USERSIG/examples/usersig_crc
+        - megaavr/libraries/USERSIG/examples/usersig_put
+        - megaavr/libraries/USERSIG/examples/usersig_read
         - megaavr/libraries/Servo/examples/Knob
         - megaavr/libraries/Servo/examples/ServoMaxTest
         - megaavr/libraries/Servo/examples/Sweep
@@ -63,13 +67,14 @@ jobs:
         - megaavr/libraries/EEPROM/examples/eeprom_iteration
         - megaavr/libraries/EEPROM/examples/eeprom_update
         - megaavr/libraries/EEPROM/examples/eeprom_write
-        - megaavr/libraries/Logic/examples/Interrupt
+        - megaavr/libraries/USERSIG/examples/usersig_clear
+        - megaavr/libraries/USERSIG/examples/usersig_iteration
+        - megaavr/libraries/USERSIG/examples/usersig_update
+        - megaavr/libraries/USERSIG/examples/usersig_write
         - megaavr/libraries/Logic/examples/Three_input_AND
-        - megaavr/libraries/Logic/examples/Three_input_NAND
-        - megaavr/libraries/Logic/examples/Three_input_OR
-        - megaavr/libraries/Logic/examples/Two_input_AND
-        - megaavr/libraries/Logic/examples/Two_input_NAND
-        - megaavr/libraries/Logic/examples/Two_input_OR
+        - megaavr/libraries/Logic/examples/Modulate
+        - megaavr/libraries/Logic/examples/Oscillate
+        - megaavr/libraries/Logic/examples/LatchNoSeq
         - megaavr/libraries/SPI/examples/DigitalPotControl
         - megaavr/libraries/megaTinyCore/examples/TCA0Demo
         - megaavr/libraries/megaTinyCore/examples/TCA0Demo2
