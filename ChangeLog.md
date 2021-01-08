@@ -7,6 +7,9 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Released Versions
 
+### 2.2.1
+* Critical bugfix - somehow, the `upload` and `program` specifications for avrdude were backwards. Optiboot uploads failed because it was attempting to write fuses, and the new feature of writing safe fuses didn't work when avrdude was the programming tool.
+
 ### 2.2.0
 * Add support for programming with just a USB serial adapter and 4.7k resistor like pyupdi does. (#187, #285)
 * On non-Optiboot configurations, set all fuses that the core sets based on menu options, except BODCFG (control brown-out detection) and SYSCFG0 (controls configuration of reset/UPDI pin, as well as whether EEPROM is retained) on all uploads. Changing the reset pin configuration could "brick" a part if the user does not have a high voltage programmer, so setting this fuse is not "safe"; similarly, setting the BOD voltage higher than the operating voltage and enabling it will prevent programming. Since the device may be soldered to devices that are not tolerant of the >4.3V required by the highest BOD setting, this would also constitute "bricking". Other fuses cannot render the device unprogrammable, so there is no reason not to program them. Judging by the content of recent issues, this is a frequent point of confusion particularly with the clock speed, despite the fact that it has worked this way on literally every Arduino core released since the dawn of Arduino! (On classic AVRs, changing any fuse could potentially "brick" the part, so this was the only safe behavior). There are no menu options to configure WDTCFG or TCD0CFG, so those aren't touched on program, only upon burn bootloader - if you manually changed those, you probably don't want an upload to undo them, whereas "burn bootloader" will return the chip to a known configuration.

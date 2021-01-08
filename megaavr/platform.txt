@@ -7,7 +7,7 @@
 name=megaTinyCore
 versionnum.major=2
 versionnum.minor=2
-versionnum.patch=0
+versionnum.patch=1
 versionnum.postfix=
 versionnum.released=1
 
@@ -120,19 +120,19 @@ tools.avrdude.config.path={runtime.platform.path}/avrdude.conf
 
 tools.avrdude.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
 
+tools.avrdude.program.params.verbose=-v
+tools.avrdude.program.params.quiet=-q -q
+# tools.avrdude.upload.verify is needed for backwards compatibility with IDE 1.6.8 or older, IDE 1.6.9 or newer overrides this value
+tools.avrdude.program.verify=
+tools.avrdude.program.params.noverify=-V
+tools.avrdude.program.pattern="{cmd.path}" "-C{config.path}" {program.verbose} -p{build.mcu}{upload.workaround} -c{protocol} {program.extra_params} "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+
 tools.avrdude.upload.params.verbose=-v
 tools.avrdude.upload.params.quiet=-q -q
 # tools.avrdude.upload.verify is needed for backwards compatibility with IDE 1.6.8 or older, IDE 1.6.9 or newer overrides this value
 tools.avrdude.upload.verify=
 tools.avrdude.upload.params.noverify=-V
-tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu}{upload.workaround} -c{upload.protocol} -P{serial.port} {upload.extra_params} -b{upload.speed} "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
-
-tools.avrdude.program.params.verbose=-v
-tools.avrdude.program.params.quiet=-q -q
-# tools.avrdude.program.verify is needed for backwards compatibility with IDE 1.6.8 or older, IDE 1.6.9 or newer overrides this value
-tools.avrdude.program.verify=
-tools.avrdude.program.params.noverify=-V
-tools.avrdude.program.pattern="{cmd.path}" "-C{config.path}" {program.verbose} {program.verify} -p{build.mcu} -c{protocol} {program.extra_params} "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} {program.verify} -p{build.mcu} -c{upload.protocol} {upload.extra_params} -P{serial.port} -b{upload.speed} "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 
 tools.avrdude.erase.params.verbose=-v
 tools.avrdude.erase.params.quiet=-q -q
