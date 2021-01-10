@@ -1,5 +1,0 @@
-The Makefile and omake.bat have been modified.
-
-They will work only from within a subfolder of /hardware/bootloaders inside an Arduino 1.0.6 .zip install, which has had the old compiler (in hardware/tools/avr/) replaced with the 7.3.0 compiler
-
-If you want to build with the toolchain like optiboot normally does, grab Makefile and omake.bat from https://github.com/Optiboot/optiboot/tree/master/optiboot/bootloaders/optiboot
