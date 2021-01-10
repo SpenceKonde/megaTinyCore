@@ -7,7 +7,7 @@
 name=megaTinyCore
 versionnum.major=2
 versionnum.minor=2
-versionnum.patch=2
+versionnum.patch=3
 versionnum.postfix=
 versionnum.released=1
 
