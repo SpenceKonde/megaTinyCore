@@ -7,6 +7,9 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Released Versions
 
+### 2.2.3
+* Add support for MPLAB SNAP and PICkit4 programmers.
+
 ### 2.2.2
 * Critical bugfix for board manager installations on linux/macos.
 
