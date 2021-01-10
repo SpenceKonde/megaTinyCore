@@ -1,4 +1,4 @@
-jtag2updi.name=jtag2updi (megaTinyCore)
+jtag2updi.name=jtag2updi
 jtag2updi.communication=serial
 jtag2updi.protocol=jtag2updi
 jtag2updi.program.protocol=jtag2updi
@@ -13,30 +13,44 @@ pyupdi.program.protocol=uart
 pyupdi.program.tool=pymcuprog
 pyupdi.bootloader.tool=pymcuprog
 
-medbg.name=Onboard Atmel mEDBG (ATmega32u4/Xplained Mini) (megaTinyCore)
+medbg.name=Onboard Atmel mEDBG (ATmega32u4/Xplained Mini)
 medbg.communication=usb
 medbg.protocol=xplainedmini_updi
 medbg.program.protocol=xplainedmini_updi
 medbg.program.tool=avrdude
 medbg.program.extra_params=-Pusb
 
-edbg.name=Atmel EDBG (AT32UC3A4256/Xplained Pro) (megaTinyCore)
+edbg.name=Atmel EDBG (AT32UC3A4256/Xplained Pro)
 edbg.communication=usb
 edbg.protocol=xplainedpro_updi
 edbg.program.protocol=xplainedpro_updi
 edbg.program.tool=avrdude
 edbg.program.extra_params=-Pusb
 
-nedbg.name=Atmel nEDBG (ATSAMD21E18/Curiosity) (megaTinyCore)
+nedbg.name=Atmel nEDBG (ATSAMD21E18/Curiosity)
 nedbg.communication=usb
 nedbg.protocol=curiosity_updi
 nedbg.program.protocol=curiosity_updi
 nedbg.program.tool=avrdude
 nedbg.program.extra_params=-Pusb
 
-atmel_ice_updi.name=Atmel-ICE UPDI (megaTinyCore)
-atmel_ice_updi.communication=usb
-atmel_ice_updi.protocol=atmelice_updi
-atmel_ice_updi.program.protocol=atmelice_updi
-atmel_ice_updi.program.tool=avrdude
-atmel_ice_updi.program.extra_params=-Pusb
+atmelice_updi.name=Atmel-ICE (UPDI)
+atmelice_updi.communication=usb
+atmelice_updi.protocol=atmelice_updi
+atmelice_updi.program.protocol=jtagice3_updi
+atmelice_updi.program.tool=avrdude
+atmelice_updi.program.extra_params=-Pusb
+
+pickit4_updi.name=PICkit4 (UPDI)
+pickit4_updi.communication=usb
+pickit4_updi.protocol=pickit4_updi
+pickit4_updi.program.protocol=jtagice3_updi
+pickit4_updi.program.tool=avrdude
+pickit4_updi.program.extra_params=-Pusb
+
+snap_updi.name=MPLAB SNAP (UPDI)
+snap_updi.communication=usb
+snap_updi.protocol=snap_updi
+snap_updi.program.protocol=jtagice3_updi
+snap_updi.program.tool=avrdude
+snap_updi.program.extra_params=-Pusb
