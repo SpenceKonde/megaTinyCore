@@ -283,11 +283,6 @@ void analogWrite(uint8_t pin, int val) {
           _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL | (1 << (6 + bit_pos)));
           TCD0.CTRLA = (TCD0_prescaler | TCD_ENABLE_bm); //re-enable it
         } else {
-          if (bit_pos) {  //PIN_PC1
-            TCD0.CMPBSET = ((255 - val) << 1)-1;
-          } else {        //PIN_PC0
-            TCD0.CMPASET = ((255 - val) << 1)-1;
-          }
           TCD0.CTRLE = 0x02; //Synchronize
         }
 
