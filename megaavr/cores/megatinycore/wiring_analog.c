@@ -289,20 +289,20 @@ void analogWrite(uint8_t pin, int val) {
         #if defined(NO_GLITCH_TIMERD0)
           // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts )
           // so if we're here, we're acting on either PC0 or PC1.
-          if (set_inven==0){
+          if (set_inven == 0){
             // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR)
             // or somewhere in between.
-            if (bit_pos==0){
-              PORTC.PIN0CTRL&=~(PORT_INVEN_bm);
+            if (bit_pos == 0){
+              PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
             } else {
-              PORTC.PIN1CTRL&=~(PORT_INVEN_bm);
+              PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
             }
           } else {
             // we *are* turning off PWM while forcing pin high - analogwrite(pin,255) was called on TCD0 PWM pin...
-            if (bit_pos==0){
-              PORTC.PIN0CTRL|=PORT_INVEN_bm;
+            if (bit_pos == 0){
+              PORTC.PIN0CTRL |= PORT_INVEN_bm;
             } else {
-              PORTC.PIN1CTRL|=PORT_INVEN_bm;
+              PORTC.PIN1CTRL |= PORT_INVEN_bm;
             }
           }
         #endif
