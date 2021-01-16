@@ -431,6 +431,7 @@ void UartClass::printHex(const uint32_t l, bool swaporder){
     printHex(*(ptr));
   }
 }
+
 uint8_t * UartClass::printHex(uint8_t* p,uint8_t len, char sep) {
   for (byte i=0;i<len;i++) {
     if (sep && i) write(sep);
@@ -438,6 +439,7 @@ uint8_t * UartClass::printHex(uint8_t* p,uint8_t len, char sep) {
   }
   return p;
 }
+
 
 uint16_t * UartClass::printHex(uint16_t* p, uint8_t len, char sep, bool swaporder) {
   for (byte i=0;i<len;i++) {
