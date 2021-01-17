@@ -204,9 +204,12 @@ void TWI_MasterSetBaud(uint32_t frequency) {
     t_rise = 1000;
   }
 
-  uint32_t baud = ((F_CPU / 1000 / freq_khz) - (((F_CPU * t_rise) / 1000) / 1000) / 1000 - 10) / 2;
-  TWI0.MBAUD = (uint8_t)baud;
-
+  // uint32_t baud = ((F_CPU / 1000 / freq_khz) - (((F_CPU * t_rise) / 1000) / 1000) / 1000 - 10) / 2;
+  // TWI0.MBAUD = (uint8_t)baud;
+  // Prevent an integer overflow that can break the baud rate! 
+  // Arduino megaAVR #90.
+  uint32_t baud = (F_CPU / frequency - F_CPU / 1000 / 1000 * t_rise / 1000 - 10) / 2;
+	TWI0.MBAUD = (uint8_t)baud;
 }
 
 /*! \brief TWI write transaction.
