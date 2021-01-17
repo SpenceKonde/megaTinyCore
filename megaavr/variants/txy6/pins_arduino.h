@@ -47,16 +47,17 @@
   #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 7 || (p) == 8 || (p) == 9 || (p) == 16 )
 #endif
 
-
-#define PIN_SPI_MISO  (15)
-#define PIN_SPI_SCK   (16)
-#define PIN_SPI_MOSI  (14)
-#define PIN_SPI_SS    (0)
+#define SPI_MUX                        (0)
+#define PIN_SPI_MISO                  (15)
+#define PIN_SPI_SCK                   (16)
+#define PIN_SPI_MOSI                  (14)
+#define PIN_SPI_SS                     (0)
 #ifdef PORTMUX_SPI0_bm
-  #define PIN_SPI_MISO_PINSWAP_1  (11)
-  #define PIN_SPI_SCK_PINSWAP_1   (10)
-  #define PIN_SPI_MOSI_PINSWAP_1  (12)
-  #define PIN_SPI_SS_PINSWAP_1    (13)
+  #define PIN_SPI_MISO_PINSWAP_1      (11)
+  #define PIN_SPI_SCK_PINSWAP_1       (10)
+  #define PIN_SPI_MOSI_PINSWAP_1      (12)
+  #define PIN_SPI_SS_PINSWAP_1        (13)
+  #define SPI_MUX_PINSWAP_1           (PORTMUX_SPI0_bm)
 #endif
 
 #define SPI_INTERFACES_COUNT  1

@@ -7,6 +7,10 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Released Versions
 
+### 2.2.4
+* Some general tidying turned into significant cleanup of neopixel library.
+* Fix board manager build script - it will now correct the platform.txt during release process.
+
 ### 2.2.3
 * Add support for MPLAB SNAP and PICkit4 programmers.
 

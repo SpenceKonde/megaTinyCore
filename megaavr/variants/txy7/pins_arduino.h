@@ -47,15 +47,17 @@
 #endif
 
 #ifdef PORTMUX_SPI0_bm
-  #define PIN_SPI_MISO_PINSWAP_1    (13)
-  #define PIN_SPI_SCK_PINSWAP_1        (12)
-  #define PIN_SPI_MOSI_PINSWAP_1    (14)
+  #define PIN_SPI_MISO_PINSWAP_1      (13)
+  #define PIN_SPI_SCK_PINSWAP_1       (12)
+  #define PIN_SPI_MOSI_PINSWAP_1      (14)
   #define PIN_SPI_SS_PINSWAP_1        (15)
+  #define SPI_MUX_PINSWAP_1           (PORTMUX_SPI0_bm)
 #endif
-#define PIN_SPI_MISO    (19)
-#define PIN_SPI_SCK        (20)
-#define PIN_SPI_MOSI    (18)
-#define PIN_SPI_SS        (0)
+#define SPI_MUX              (0)
+#define PIN_SPI_MISO        (19)
+#define PIN_SPI_SCK         (20)
+#define PIN_SPI_MOSI        (18)
+#define PIN_SPI_SS           (0)
 
 #define SPI_INTERFACES_COUNT    1
 
