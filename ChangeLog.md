@@ -10,6 +10,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### 2.2.4
 * Some general tidying turned into significant cleanup of neopixel library.
 * Fix board manager build script - it will now correct the platform.txt during release process.
+* Grabbed the default baud rate calculation fix from official megaavr core's Wire library. Maybe this will fix some of the occasional I2C problems people have reported?
 
 ### 2.2.3
 * Add support for MPLAB SNAP and PICkit4 programmers.
