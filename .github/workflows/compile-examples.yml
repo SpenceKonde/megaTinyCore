@@ -76,9 +76,9 @@ jobs:
         - megaavr/libraries/Logic/examples/Oscillate
         - megaavr/libraries/Logic/examples/LatchNoSeq
         - megaavr/libraries/SPI/examples/DigitalPotControl
-        - megaavr/libraries/megaTinyCore/examples/TCA0Demo
-        - megaavr/libraries/megaTinyCore/examples/TCA0Demo2
-        - megaavr/libraries/megaTinyCore/examples/TCA0Demo4
+#        - megaavr/libraries/megaTinyCore/examples/TCA0Demo
+#        - megaavr/libraries/megaTinyCore/examples/TCA0Demo2
+#        - megaavr/libraries/megaTinyCore/examples/TCA0Demo4
         - megaavr/libraries/tinyNeoPixel_Static/examples/simple
 
       IO-class-6-plus-true-sketch-paths: |
