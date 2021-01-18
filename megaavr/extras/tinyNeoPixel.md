@@ -6,7 +6,7 @@ The change in architecture from the classic AVRs (which use the AVRe or AVRe+ va
 Like the normal Adafruit_NeoPixel library, this supports WS2811/WS2812/SK6812 and all the nominally compatible single-wire individually addressable LEDs. It does not support two-wire ones like the APA102 or the countless knockoffs thereof; libraries for those do not pose special compatibility issues with AVRxt because they are not timing critical in the same way.
 
 ### tinyNeoPixel and tinyNeoPixel_Static
-There are two versions of this library provided. `tinyNeoPixel` implements the entire API that Adafruit_NeoPixel does, including setting the length and type of LEDs (color order and whether it's RGB or RGBW) of the string at runtime. This provides maximum portability between code written for use with Adafruit_NeoPixel and tinyNeoPixel (only the constructor and library name need to be changed) - however, the memory used to store the "frame buffer" (the color of every pixel) is not included in the SRAM usage displayed when compiling a sketch because it is "dynamically allocated". This can be a large portion of the memory available on smaller parts (I have seen support inquiries from people trying to control a string of LEDs which would require several times the total memory of the part for this alone); trying to allocate a larger array than will fit in RAM does not generate any sort of error - it just fails to allocate anything at runtime, nothing gets sent to the light string, and no LEDs turn on. This dynamic memory allocation also requires compiling in malloc(), free(), and associated functions; on parts with small flash (ie, tinyAVR), this can be significant. Finally, dynamic memory allocation is arguably bad pratice on small embedded systems like the AVR devices.
+There are two versions of this library provided. `tinyNeoPixel` implements the entire API that Adafruit_NeoPixel does, including setting the length and type of LEDs (color order and whether it's RGB or RGBW) of the string at runtime. This provides maximum portability between code written for use with Adafruit_NeoPixel and tinyNeoPixel (only the constructor and library name need to be changed) - however, the memory used to store the "frame buffer" (the color of every pixel) is not included in the SRAM usage displayed when compiling a sketch because it is "dynamically allocated". This can be a large portion of the memory available on smaller parts (I have seen support inquiries from people trying to control a string of LEDs which would require several times the total memory of the part for this alone); trying to allocate a larger array than will fit in RAM does not generate any sort of error - it just fails to allocate anything at runtime, nothing gets sent to the light string, and no LEDs turn on. This dynamic memory allocation also requires compiling in malloc(), free(), and associated functions; on parts with small flash (ie, tinyAVR), this can be significant. Finally, dynamic memory allocation is arguably bad practice on small embedded systems like the AVR devices.
 
 `tinyNeoPixel_Static` is slightly cutdown, removing the option to change the length or type of pixels at runtime (which relies on dynamic memory allocation), and requires the user to manually declare the pixel array and pass it to the tinyNeoPixel constructor. Additionally, it does not set the pinMode of the pin (the sketch must set this as OUTPUT); this allows severely flash-constrained applications to save a small amount of flash by eliminating calls to pinMode and replacing them with writes to the `PORTx.DIR` or `VPORTx.DIR` registers. Finally, no call to begin() need be made - begin() is removed entirely. These changes reduce sketch size and provide greater visibility on the memory usage. Unless you need to change string length or type at runtime, it is recommended that `tinyNeoPixel_Static` be used.
 
@@ -26,7 +26,7 @@ void setup() {
     leds.show();                   // LED turns on.
 }
 ```
-The equivilant example with the Static version uses only 1076 bytes and reports (accurately) that it uses 330 bytes of RAM.
+The equivalant example with the Static version uses only 1076 bytes and reports (accurately) that it uses 330 bytes of RAM.
 
 
 `tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t=NEO_GRB)` - for `tinyNeoPixel` only.
@@ -57,7 +57,7 @@ void setup() {
 }
 
 ```
-This compiles to 2256 bytes and reports 40 bytes of RAM used as well (but, it is using an additional 150 bytes times whatever number was read from tyhe EEPROM)
+This compiles to 2256 bytes and reports 40 bytes of RAM used as well (but, it is using an additional 150 bytes times whatever number was read from the EEPROM).
 
 ### API Summary
 
@@ -79,7 +79,7 @@ This compiles to 2256 bytes and reports 40 bytes of RAM used as well (but, it is
 
 `clear()` clear the pixel buffer (set all colors on all LEDs to 0).
 
-`setPin(uint8_t p)` Set the pin for output; in `tinyNeoPixel_Static`, it is your responsability to ensure that this pin is set OUTPUT. `tinyNeoPixel` copies the Adafruit behavior, and called pinMode() on it. Be aware
+`setPin(uint8_t p)` Set the pin for output; in `tinyNeoPixel_Static`, it is your responsibility to ensure that this pin is set OUTPUT. `tinyNeoPixel` copies the Adafruit behavior, and called pinMode() on it. Be aware
 
 `updateLength(uint16_t n)` Set the length of the string of LEDs. Not available on tinyNeoPixel_Static.
 
