@@ -7,7 +7,7 @@
 name=megaTinyCore
 versionnum.major=2
 versionnum.minor=2
-versionnum.patch=4
+versionnum.patch=5
 versionnum.postfix=
 versionnum.released=1
 
@@ -148,14 +148,27 @@ tools.avrdude.upload.network_pattern="{network_cmd}" -address {serial.port} -por
 
 # pymcuprog - new in 2.2.0
 
-# This is for the board manager version
-# That is signal to my script of what commeting to remove
-#REMOVE#tools.pymcuprog.cmd={runtime.tools.python3.path}/python3
+#################################
+# This is the line for use with
+#    MANUAL INSTALLATIONS
+#
+# The build script comments out the line (or lines, but
+# there's only one) starting with tools.pymcuprog.cmd
+# See the ManualPython document for information
+# on making this programming option work w/out board manager
 
-# github version
-# the build script will - hopefully - be able to comment this out
-# amd ot ccomments out line starting with tools.pymcuprog.cmd
 tools.pymcuprog.cmd={runtime.platform.path}/tools/python3/python3
+
+################################
+# BOARD MANAGER INSTALLATIONS
+#
+# This is for the board manager version where we can
+# automatically grab and install an appropriate
+# python package; it ends up in a different place:
+# Build script removes all instances of #REMOVE#
+# at the start of a line.
+
+#REMOVE#tools.pymcuprog.cmd={runtime.tools.python3.path}/python3
 
 tools.pymcuprog.erase.params.verbose=-v
 tools.pymcuprog.erase.params.quiet=
