@@ -26,7 +26,7 @@ void setup() {
     leds.show();                   // LED turns on.
 }
 ```
-The equivalant example with the Static version uses only 1076 bytes and reports (accurately) that it uses 330 bytes of RAM.
+The equivalent example with the Static version uses only 1076 bytes and reports (accurately) that it uses 330 bytes of RAM.
 
 
 `tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t=NEO_GRB)` - for `tinyNeoPixel` only.
