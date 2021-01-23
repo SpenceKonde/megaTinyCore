@@ -113,7 +113,7 @@ static const struct Logic::CCLBlock blocks[] = {
   },
   #endif
   #if defined(__AVR_ATtiny426__) || defined(__AVR_ATtiny826__) || \
-  defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny3216__)
+  defined(__AVR_ATtiny1626__) || defined(__AVR_ATtiny3226__)
   #define PORTMUX_CCL PORTMUX.CCLROUTEA
   #define PORTMUX_ALTOUT_bm (1 << block.number)
   {
@@ -142,7 +142,7 @@ static const struct Logic::CCLBlock blocks[] = {
   },
   #endif
   #if defined(__AVR_ATtiny427__) || defined(__AVR_ATtiny827__) ||  \
-  defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3217__)
+  defined(__AVR_ATtiny1627__) || defined(__AVR_ATtiny3227__)
   #define PORTMUX_CCL PORTMUX.CCLROUTEA
   #define PORTMUX_ALTOUT_bm (1 << block.number)
   {
