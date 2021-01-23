@@ -121,8 +121,8 @@ void DACReference(uint8_t mode) {
   }
 }
 #else
-void DACReference(uint8_t mode) {
-  badCall("analogRead() not yet implemented for the 2-series parts");
+void DACReference(__attribute__ ((unused))uint8_t mode) {
+  badCall("DACreference is not available - this part does not have a DAC");
 }
 #endif
 
