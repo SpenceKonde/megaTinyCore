@@ -29,7 +29,9 @@ extern "C" {
 
 #include "Wire.h"
 
+#ifndef DEFAULT_FREQUENCY
 #define DEFAULT_FREQUENCY 100000
+#endif
 
 // Initialize Class Variables //////////////////////////////////////////////////
 
@@ -48,7 +50,8 @@ void (*TwoWire::user_onReceive)(int);
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-TwoWire::TwoWire() {
+TwoWire::TwoWire()
+{
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
@@ -132,6 +135,34 @@ bool TwoWire::swap(uint8_t state) {
   }
   #endif
   return false;
+}
+
+void TwoWire::usePullups(){
+  #ifdef PORTMUX_TWIROUTEA
+    if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == 0x02) {
+      // make sure we don't get errata'ed - make sure their bits in the
+      // PORTx.OUT registers are 0.
+      PORTC.OUTCLR=0x0C; //bits 2 and 3
+    } else {
+      PORTA.OUTCLR=0x0C; //bits 2 and 3
+    }
+  #else // megaTinyCore
+    #if defined(PORTMUX_TWI0_bm)
+      if ((PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
+        PORTA.PIN2CTRL |= PORT_PULLUPEN_bm;
+        PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
+      } else {
+        PORTB.PIN1CTRL |= PORT_PULLUPEN_bm;
+        PORTB.PIN0CTRL |= PORT_PULLUPEN_bm;
+      }
+    #elif defined(__AVR_ATtinyxy2__)
+      PORTA.PIN2CTRL |= PORT_PULLUPEN_bm;
+      PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
+    #else
+      PORTB.PIN1CTRL |= PORT_PULLUPEN_bm;
+      PORTB.PIN0CTRL |= PORT_PULLUPEN_bm;
+    #endif
+  #endif
 }
 
 void TwoWire::begin(void) {

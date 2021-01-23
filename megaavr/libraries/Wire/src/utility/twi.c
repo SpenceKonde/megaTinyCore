@@ -64,15 +64,30 @@ void TWI_MasterInit(uint32_t frequency) {
   if (twi_mode != TWI_MODE_UNKNOWN) {
     return;
   }
-
-  // No longer bother turning on the pullups. You need external ones for reliable operation, and unreliable operation is worse than it just straight up not working.
-  // Most I2C breakout boards have a pair on that board anyway...
-
-  /* This is done in wiring.c if this is needed for the part.
-    #if defined(TWISPIROUTEA)
-    PORTMUX.TWISPIROUTEA |= TWI_MUX;
+  #ifdef PORTMUX_TWIROUTEA
+  if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == PORTMUX_TWI0_ALT2_gc) {
+    // make sure we don't get errata'ed - make sure their bits in the
+    // PORTx.OUT registers are 0.
+    PORTC.OUTCLR=0x0C; //bits 2 and 3
+  } else {
+    PORTA.OUTCLR=0x0C; //bits 2 and 3
+  }
+  #else // megaTinyCore
+    #if defined(PORTMUX_TWI0_bm)
+      if ((PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
+        // make sure we don't get errata'ed - make sure their bits in the
+        // PORTx.OUT registers are 0.
+        PORTA.OUTCLR=0x06; // if swapped it's on PA1, PA2
+      } else {
+        PORTB.OUTCLR=0x03; // else PB0, PB1
+      }
+    #elif defined(__AVR_ATtinyxy2__)
+      PORTA.OUTCLR=0x06; // 8-pin parts always have it on PA1/2
+    #else
+      PORTB.OUTCLR=0x03; // else, zero series, no remapping, it's on PB0, PB1
     #endif
-  */
+  #endif
+
   twi_mode = TWI_MODE_MASTER;
 
   master_bytesRead = 0;
@@ -98,6 +113,17 @@ void TWI_MasterInit(uint32_t frequency) {
 void TWI_SlaveInit(uint8_t address, uint8_t receive_broadcast, uint8_t second_address) {
   if (twi_mode != TWI_MODE_UNKNOWN) {
     return;
+  }
+  #ifdef PORTMUX_TWIROUTEA
+  if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == PORTMUX_TWI0_ALT2_gc) {
+  #else
+  if ((PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
+  #endif
+    // make sure we don't get errata'ed - make sure their bits in the
+    // PORTx.OUT registers are 0.
+    PORTC.OUTCLR=0x0C; //bits 2 and 3
+  } else {
+    PORTA.OUTCLR=0x0C; //bits 2 and 3
   }
 
   twi_mode = TWI_MODE_SLAVE;
@@ -185,34 +211,32 @@ void TWI_MasterSetBaud(uint32_t frequency) {
   //      From 1617 DS: 1000ns @ 100kHz / 300ns @ 400kHz / 120ns @ 1MHz
 
   uint16_t t_rise;
-  uint16_t freq_khz = frequency / 1000;
 
-  if (freq_khz < 200) {
-    freq_khz  = 100;
+  if(frequency < 200000){
+    frequency = 100000;
     t_rise    = 1000;
 
-  } else if (freq_khz < 800) {
-    freq_khz  = 400;
+  } else if (frequency < 800000){
+    frequency = 400000;
     t_rise    = 300;
 
-  } else if (freq_khz < 1200) {
-    freq_khz  = 1000;
+  } else if (frequency < 1200000){
+    frequency = 1000000;
     t_rise    = 120;
 
   } else {
-    freq_khz  = 100;
+    frequency = 100000;
     t_rise    = 1000;
   }
 
-  // uint32_t baud = ((F_CPU / 1000 / freq_khz) - (((F_CPU * t_rise) / 1000) / 1000) / 1000 - 10) / 2;
-  // TWI0.MBAUD = (uint8_t)baud;
   uint32_t baud = (F_CPU / frequency - F_CPU / 1000 / 1000 * t_rise / 1000 - 10) / 2;
   TWI0.MBAUD = (uint8_t)baud;
 
   // 1/16/2021:
   // Prevent an integer overflow that can result in incorrect baud rates.
   // Arduino megaAVR #90.
-
+  // 1/23/2021:
+  // Grab the rest of the fix and add it in here.
 }
 
 /*! \brief TWI write transaction.
@@ -343,8 +367,21 @@ uint8_t TWI_MasterWriteRead(uint8_t slave_address,
       // return bytes really read
       ret = master_bytesRead;
     } else {
-      // return 0 if success, >0 otherwise
-      ret = (master_result == TWIM_RESULT_OK ? 0 : 1);
+      // return 0 if success, >0 otherwise (follow classic AVR conventions)
+      switch (master_result) {
+        case TWIM_RESULT_OK:
+          ret = 0;
+          break;
+        case TWIM_RESULT_BUFFER_OVERFLOW:
+          ret = 1;
+          break;
+        case TWIM_RESULT_NACK_RECEIVED:
+          ret = 3;
+          break;
+        default:
+          ret = 4;
+          break;
+      }
     }
 
     return ret;

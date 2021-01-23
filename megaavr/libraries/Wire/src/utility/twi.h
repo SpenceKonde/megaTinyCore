@@ -25,12 +25,20 @@
 #include "avr/io.h"
 
 /*! Transaction status defines. */
+#ifndef TWIM_STATUS_READY
 #define TWIM_STATUS_READY              0
+#endif
+#ifndef TWIM_STATUS_BUSY
 #define TWIM_STATUS_BUSY               1
+#endif
 
 /* Transaction status defines.*/
+#ifndef TWIS_STATUS_READY
 #define TWIS_STATUS_READY                0
+#endif
+#ifndef TWIS_STATUS_BUSY
 #define TWIS_STATUS_BUSY                 1
+#endif
 
 /*! Transaction result enumeration. */
 typedef enum __attribute__((packed)) TWIM_RESULT_enum {
@@ -66,8 +74,12 @@ typedef enum __attribute__((packed)) TWI_MODE_enum {
 } TWI_MODE_t;
 
 /*! For adding R/_W bit to address */
-#define ADD_READ_BIT(address) (address | 0x01)
+#ifndef ADD_READ_BIT
+#define ADD_READ_BIT(address)	(address | 0x01)
+#endif
+#ifndef ADD_WRITE_BIT
 #define ADD_WRITE_BIT(address)  (address & ~0x01)
+#endif
 
 void TWI_MasterInit(uint32_t frequency);
 void TWI_SlaveInit(uint8_t address, uint8_t receive_broadcast, uint8_t second_address);
@@ -104,23 +116,6 @@ void TWI_SlaveReadHandler(void);
 void TWI_attachSlaveRxEvent(void (*function)(int), uint8_t *read_data, uint8_t bytes_to_read);
 void TWI_attachSlaveTxEvent(uint8_t (*function)(void), uint8_t *write_data);
 void TWI_SlaveTransactionFinished(uint8_t result);
-/*! TWI master interrupt service routine.
-
-    Interrupt service routine for the TWI master. Copy the needed vectors
-    into your code.
-
-
-
-  ISR(TWI0_TWIM_vect){
-    TWI_MasterInterruptHandler();
-  }
-
-  ISR(TWI0_TWIS_vect){
-    TWI_SlaveInterruptHandler();
-  }
-
-
-*/
 
 
 #endif /* TWI_DRIVER_H */
