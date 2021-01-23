@@ -51,11 +51,7 @@ void setup() {
 
   // Start the AVR logic hardware
   Logic::start();
-  #if !defined(__ATtinyxy2__)
-  #define PIN_TCA_WO0 PIN_PB0
-  #else
-  #define PIN_TCA_WO0 PIN_PA7
-  #endif
+
   analogWrite(PIN_TCA_WO0, 128); //start TCA0 WO0 running
   TCB0.CTRLA = 0x01; //enabled with CLKPER as clock source
   TCB0.CTRLB = 0x07; //PWM8 mode, but output pin not enabled
