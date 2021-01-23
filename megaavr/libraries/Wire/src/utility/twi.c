@@ -114,17 +114,30 @@ void TWI_SlaveInit(uint8_t address, uint8_t receive_broadcast, uint8_t second_ad
   if (twi_mode != TWI_MODE_UNKNOWN) {
     return;
   }
+
   #ifdef PORTMUX_TWIROUTEA
   if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == PORTMUX_TWI0_ALT2_gc) {
-  #else
-  if ((PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
-  #endif
     // make sure we don't get errata'ed - make sure their bits in the
     // PORTx.OUT registers are 0.
     PORTC.OUTCLR=0x0C; //bits 2 and 3
   } else {
     PORTA.OUTCLR=0x0C; //bits 2 and 3
   }
+  #else // megaTinyCore
+    #if defined(PORTMUX_TWI0_bm)
+      if ((PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
+        // make sure we don't get errata'ed - make sure their bits in the
+        // PORTx.OUT registers are 0.
+        PORTA.OUTCLR=0x06; // if swapped it's on PA1, PA2
+      } else {
+        PORTB.OUTCLR=0x03; // else PB0, PB1
+      }
+    #elif defined(__AVR_ATtinyxy2__)
+      PORTA.OUTCLR=0x06; // 8-pin parts always have it on PA1/2
+    #else
+      PORTB.OUTCLR=0x03; // else, zero series, no remapping, it's on PB0, PB1
+    #endif
+  #endif
 
   twi_mode = TWI_MODE_SLAVE;
 
