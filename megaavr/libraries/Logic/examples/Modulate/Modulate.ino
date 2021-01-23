@@ -56,7 +56,7 @@ void setup() {
   #else
   #define PIN_TCA_WO0 PIN_PA7
   #endif
-  analogWrite(PIN_PB0, 128); //start TCA0 WO0 running
+  analogWrite(PIN_TCA_WO0, 128); //start TCA0 WO0 running
   TCB0.CTRLA = 0x01; //enabled with CLKPER as clock source
   TCB0.CTRLB = 0x07; //PWM8 mode, but output pin not enabled
   TCB0.CCMPL = 255; //255 counts
