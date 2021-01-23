@@ -31,8 +31,8 @@
 #include <SPI.h>
 
 
-// set pin 10 as the slave select for the digital pot:
-const int slaveSelectPin = 10;
+// set pin 0 as the slave select for the digital pot:
+const int slaveSelectPin = 0;
 
 void setup() {
   // set the slaveSelectPin as an output:

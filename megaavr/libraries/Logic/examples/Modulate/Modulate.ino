@@ -29,6 +29,13 @@ void setup() {
   // we use PA3 via the event system in this example on ATtiny parts
   // It has one output, PA5 on ATtiny, or alternate PB6 on 20 and 24-pin ATtiny.
 
+  #if !defined(__ATtinyxy2__)
+  #define PIN_TCA_WO0 PIN_PB0
+  #else
+  #define PIN_TCA_WO0 PIN_PA7
+  #endif
+
+
   Logic0.enable = true;               // Enable logic block 0
 
   Logic0.input0 = in::tca0;                      // Use TCA WO0 as input0
@@ -44,6 +51,11 @@ void setup() {
 
   // Start the AVR logic hardware
   Logic::start();
+  #if !defined(__ATtinyxy2__)
+  #define PIN_TCA_WO0 PIN_PB0
+  #else
+  #define PIN_TCA_WO0 PIN_PA7
+  #endif
   analogWrite(PIN_PB0, 128); //start TCA0 WO0 running
   TCB0.CTRLA = 0x01; //enabled with CLKPER as clock source
   TCB0.CTRLB = 0x07; //PWM8 mode, but output pin not enabled
@@ -53,17 +65,4 @@ void setup() {
 
 void loop() {
   // When using configurable custom logic the CPU isn't doing anything!
-}
-
-void showHex(const byte b) {
-  char x = (b >> 4) | '0';
-  if (x > '9') {
-    x += 7;
-  }
-  Serial.write(x);
-  x = (b & 0x0F) | '0';
-  if (x > '9') {
-    x += 7;
-  }
-  Serial.write(x);
 }
