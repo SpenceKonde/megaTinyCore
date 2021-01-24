@@ -19,21 +19,17 @@
   | one of the EVOUT pins!                                                |
   |***********************************************************************/
 
+// Make sure this compiles on 8-pin parts for the automated tests...
+#if !defined(__AVR_ATtinyxy2__)
+#define PIN_TCA_WO0 PIN_PB0
+#else
+#define PIN_TCA_WO0 PIN_PA7
+#endif
+
+
 #include <Logic.h>
 
 void setup() {
-  // Initialize logic block 0
-  // Logic block 0 has three inputs, PA0, PA1 and PA2.
-  // These are the pins directly above the UPDI pin
-  // Because PA0 is shared with the UPDI pin and is not usually an option
-  // we use PA3 via the event system in this example on ATtiny parts
-  // It has one output, PA5 on ATtiny, or alternate PB6 on 20 and 24-pin ATtiny.
-
-  #if !defined(__ATtinyxy2__)
-  #define PIN_TCA_WO0 PIN_PB0
-  #else
-  #define PIN_TCA_WO0 PIN_PA7
-  #endif
 
 
   Logic0.enable = true;               // Enable logic block 0
