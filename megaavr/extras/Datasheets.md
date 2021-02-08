@@ -3,19 +3,13 @@ The most recent versions of the datasheets for the TinyAVR product line are comb
 
 ## 1-series
 
-[ATtiny212/412](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-412-DataSheet-DS40001911C.pdf) || [ATtiny212/412 Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212_412-Errata-and-Clarification-DS40002114B.pdf)
+[ATtiny212/214/412/414/416](https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-214-412-414-416-DataSheet-DS40002287A.pdf) || [ATtiny212/214/412/414/416 Silicon Errata](https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-214-412-414-416-SilConErrataClarif-DS80000933A.pdf)
 
 
 [ATtiny212/214/412/414 Automotive](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-14-412-14-Automotive-DS40002229A.pdf) || [ATtiny212/214/412/414 Automotive Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-214-412-414-SilConErrataClarif-DS80000893A.pdf)
 
 
-[ATtiny214/414/814](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny214-414-814-DataSheet-DS40001912C.pdf) || [ATtiny214/414/814 Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny214_414_814-Errata-and-Clarification-DS40002115B.pdf)
-
-
-[ATtiny416/816](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416-816-DataSheet-DS40001913C.pdf) || [ATtiny416/816 Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416_816-Errata-and-Clarification-DS40002116B.pdf)
-
-
-[ATtiny417/817](http://ww1.microchip.com/downloads/en/DeviceDoc/40001934A.pdf) || [ATtiny417/817 Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417_817-Errata-and-Clarification-DS40002117B.pdf)
+[ATtiny417/814/816/817]https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417-814-816-817-DataSheet-DS40002288A.pdf) || [ATtiny417/814/816/817 Silicon Errata](https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417-814-816-817-SilConErrataClarif-DS80000934A.pdf)
 
 
 [ATtiny416/417/814/816/817 Automotive](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416-417-814-816-817-Auto-DataSheet-DS40002014C.pdf) || [ATtiny416/417/814/816/817 Automotive Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416_417_816_817-Auto-Errata-Clarification-DS40002122B.pdf)
