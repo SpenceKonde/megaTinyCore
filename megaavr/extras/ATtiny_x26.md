@@ -1,7 +1,7 @@
 ### ATtiny 426/826/1626/3226
 ![x26 Pin Mapping](ATtiny_x26.gif "Arduino Pin Mapping for ATtiny x26")
 
- Specifications |  ATtiny424|  ATtiny824  |  ATtiny1624  |    ATtiny3224
+ Specifications |  ATtiny426|  ATtiny826  |  ATtiny1626  |    ATtiny3226
 ------------ | ------------- | ------------- | ------------- | -------------
 Flash (program memory)   | 4096 bytes | 8192 bytes | 16384 bytes | 32768 bytes
 Flash w/Optiboot   | 3584 bytes | 7680 bytes | 15872 bytes | 32256 bytes
