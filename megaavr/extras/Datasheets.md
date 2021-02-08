@@ -9,7 +9,7 @@ The most recent versions of the datasheets for the TinyAVR product line are comb
 [ATtiny212/214/412/414 Automotive](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-14-412-14-Automotive-DS40002229A.pdf) || [ATtiny212/214/412/414 Automotive Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-214-412-414-SilConErrataClarif-DS80000893A.pdf)
 
 
-[ATtiny417/814/816/817]https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417-814-816-817-DataSheet-DS40002288A.pdf) || [ATtiny417/814/816/817 Silicon Errata](https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417-814-816-817-SilConErrataClarif-DS80000934A.pdf)
+[ATtiny417/814/816/817](https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417-814-816-817-DataSheet-DS40002288A.pdf) || [ATtiny417/814/816/817 Silicon Errata](https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417-814-816-817-SilConErrataClarif-DS80000934A.pdf)
 
 
 [ATtiny416/417/814/816/817 Automotive](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416-417-814-816-817-Auto-DataSheet-DS40002014C.pdf) || [ATtiny416/417/814/816/817 Automotive Silicon Errata](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny416_417_816_817-Auto-Errata-Clarification-DS40002122B.pdf)
