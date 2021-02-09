@@ -1,4 +1,6 @@
-[![Join the chat at https://gitter.im/SpenceKonde/megaTinyCore](https://badges.gitter.im/SpenceKonde/megaTinyCore.svg)](https://gitter.im/SpenceKonde/megaTinyCore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+## Check it out, we have "discussions" now!
+https://github.com/SpenceKonde/megaTinyCore/discussions
+Let's use that, it seems better integrated than gitter ever was, and it's all on one site.
 
 
 ### [Wiring](Wiring.md)
