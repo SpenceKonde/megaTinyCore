@@ -75,6 +75,9 @@ void pinMode(uint8_t pin, uint8_t mode) {
 
       /* Enable pull-up */
       *pin_ctrl_reg |= PORT_PULLUPEN_bm;
+      /* Considered this, it was in some 2.2.0 releases. This is debatable - it actually broke Wire...
+       * though only because of errata effecting Wire that wasn't explicitly accounted for.
+       */
       // emulate setting of the port output register on classic AVR
       port->OUTSET=bit_mask;
 
@@ -82,7 +85,6 @@ void pinMode(uint8_t pin, uint8_t mode) {
 
       /* Disable pull-up */
       *pin_ctrl_reg &= ~(PORT_PULLUPEN_bm);
-      // emulate setting of the port output register on classic AVR
       port->OUTCLR=bit_mask;
 
     }
@@ -92,33 +94,29 @@ void pinMode(uint8_t pin, uint8_t mode) {
   }
 }
 
-// Forcing this inline keeps the callers from having to push their own stuff
-// on the stack. It is a good performance win and only takes 1 more byte per
-// user than calling. (It will take more bytes on the 168.)
-//
-// But shouldn't this be moved into pinMode? Seems silly to check and do on
-// each digitalread or write.
-//
-// Mark Sproul:
-// - Removed inline. Save 170 bytes on atmega1280
-// - changed to a switch statement; added 32 bytes but much easier to read and maintain.
-// - Added more #ifdefs, now compiles for atmega645
-//
-//static inline void turnOffPWM(uint8_t timer) __attribute__ ((always_inline));
-//static inline void turnOffPWM(uint8_t timer)
-static void turnOffPWM(uint8_t pin) {
+
+void turnOffPWM(uint8_t pin) {
   /* Actually turn off compare channel, not the timer */
 
-  /* Get pin's timer */
-  uint8_t timer = digitalPinToTimer(pin);
-  if (timer == NOT_ON_TIMER) {
+  /* Get pin's timer
+   * megaTinyCore only - assumes only TIMERA0, TIMERD0, or DACOUT
+   * can be returned here, all have only 1 bit set, so we can use
+   * PeripheralControl as a mask to see if they have taken over
+   * any timers with minimum overhead - critical on these parts
+   * Since nothing that will show up here can have more than one
+   * one bit set, binary and will give 0x00 if that bit is cleared
+   * which is NOT_ON_TIMER.
+   */
+  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & PeripheralControl;
+  /* end megaTinyCore-specific section */
+  if (digital_pin_timer== NOT_ON_TIMER) {
     return;
   }
 
   uint8_t bit_pos = digitalPinToBitPosition(pin);
   //TCB_t *timerB;
 
-  switch (timer) {
+  switch (digital_pin_timer) {
 
     /* TCA0 */
     case TIMERA0:
@@ -143,7 +141,7 @@ static void turnOffPWM(uint8_t pin) {
       break;
     }
 
-      /* we don't need the type b timers as this core does not use them for PWM      */
+    /* we don't need the type b timers as this core does not use them for PWM      */
 
     // 1-series parts have a DAC that we can use...
     #if defined(DAC0)
@@ -152,9 +150,13 @@ static void turnOffPWM(uint8_t pin) {
         break;
     #endif
 
-    // 1-series parts also have a wacky async Type D timer, but we only use it on the 20 and 24-pin parts, as it doesn't buy us anything on the 14-pin ones...
-    // In a future update, an option to use TCD0 for PWM on PA4 and PA5 on the 14-pin parts, with TCA0 initialized in SINGLE mode, but this will only be done
-    // if there is user demand; I suspect there is not!
+    /* 1-series parts also have a wacky async Type D timer, but we only use it on the 20 and 24-pin parts, as it doesn't buy us anything on the 14-pin ones...
+     * In a future update, an option to use TCD0 for PWM on PA4 and PA5 on the 14-pin parts, with TCA0 initialized in SINGLE mode is possible, but this would
+     * open a can of worms regarding SINGLE mode. I think we are best off telling people to call takeOverTCA0(), takeOverTCD0() and configure it themselves
+     * to do what they want, because you'll never make everyone happy otherwise. My calculus would be different if they'd made 8-pin parts with more than 4k
+     * of flash to fit the overhead of supporting TCA0 and TCD0 with analogWrite() comfortably - that would give a pin mapping with PWM on all pins - AND
+     * it would be able to buffer. Should do an example of this!
+     */
     #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
       case TIMERD0:
       {
@@ -189,8 +191,6 @@ static void turnOffPWM(uint8_t pin) {
       break;
   }
 }
-
-
 
 void digitalWrite(uint8_t pin, uint8_t val) {
   check_valid_digital_pin(pin);
@@ -338,4 +338,43 @@ inline __attribute__((always_inline)) int8_t digitalReadFast(uint8_t pin)
 
   // Read pin value from VPORTx.IN register
   return !!(vport->IN & mask);
+}
+
+
+void openDrain(uint8_t pin, uint8_t state){
+  check_valid_digital_pin(pin);
+  uint8_t bit_mask = digitalPinToBitMask(pin);
+  if (bit_mask == NOT_A_PIN)  return;
+  /* Get port */
+  PORT_t *port = digitalPinToPortStruct(pin);
+  port->OUTCLR=bit_mask;
+  if (state == LOW)
+    port->DIRSET=bit_mask;
+  else if (state == CHANGE)
+    port->DIRTGL=bit_mask;
+  else // assume FLOAT
+    port->DIRCLR=bit_mask;
+  turnOffPWM(pin);
+  }
+
+inline __attribute__((always_inline)) void openDrainFast(uint8_t pin, uint8_t val)
+{
+  check_constant_pin(pin);
+  check_valid_digital_pin(pin);
+  if (pin==NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compile time known so w/e
+  // Mega-0, Tiny-1 style IOPORTs
+  // Assumes VPORTs exist starting at 0 for each PORT structure
+  uint8_t mask = 1 << digital_pin_to_bit_position[pin];
+  uint8_t port = digital_pin_to_port[pin];
+  VPORT_t *vport;
+  vport = (VPORT_t *)(port * 4);
+  PORT_t *portstr;
+  portstr=(PORT_t *)(0x400+(20*port));
+
+  if (val == LOW)
+    vport->DIR |= mask;
+  else if (val==CHANGE)
+    portstr->DIRTGL = mask;
+  else// FLOAT
+    vport->DIR &= ~mask;
 }

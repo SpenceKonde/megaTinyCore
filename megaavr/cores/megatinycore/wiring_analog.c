@@ -26,6 +26,8 @@
 #include "pins_arduino.h"
 #include "Arduino.h"
 
+
+
 inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
   if(__builtin_constant_p(pin)) {
     if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
@@ -184,9 +186,9 @@ inline void analogReadResolution(uint8_t res) {
 }
 
 
-// Right now, PWM output only works on the pins with
-// hardware support.  These are defined in the appropriate
-// pins_*.c file.  For the rest of the pins, we default
+// PWM output only works on the pins with
+// hardware support.  These are defined in the variant
+// pins_arduino.h file.  For the rest of the pins, we default
 // to digital output.
 void analogWrite(uint8_t pin, int val) {
   check_valid_digital_pin(pin);
@@ -199,7 +201,17 @@ void analogWrite(uint8_t pin, int val) {
   pinMode(pin, OUTPUT);
 
   /* Get timer */
-  uint8_t digital_pin_timer =  digitalPinToTimer(pin);
+  /* megaTinyCore only - assumes only TIMERA0, TIMERD0, or DACOUT
+   * can be returned here, all have only 1 bit set, so we can use
+   * PeripheralControl as a mask to see if they have taken over
+   * any timers with minimum overhead - critical on these parts
+   * Since nothing that will show up here can have more than one
+   * one bit set, binary and will give 0x00 if that bit is cleared
+   * which is NOT_ON_TIMER.
+   */
+  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & PeripheralControl;
+  /* end megaTinyCore-specific section */
+
   uint8_t *timer_cmp_out;
   /* Find out Port and Pin to correctly handle port mux, and timer. */
   switch (digital_pin_timer) {
@@ -279,11 +291,11 @@ void analogWrite(uint8_t pin, int val) {
           //if not active, we need to activate it, which produces a glitch in the PWM
           uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
           TCD0.CTRLA = TCD0_prescaler; //stop the timer
-          while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it's actually stopped
           _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL | (1 << (6 + bit_pos)));
+          while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until we can reenable it
           TCD0.CTRLA = (TCD0_prescaler | TCD_ENABLE_bm); //re-enable it
         } else {
-          TCD0.CTRLE = 0x02; //Synchronize
+          TCD0.CTRLE = TCD_SYNCEOC_bm; //Synchronize
         }
 
         #if defined(NO_GLITCH_TIMERD0)
@@ -324,3 +336,18 @@ void analogWrite(uint8_t pin, int val) {
       break;
   } //end of switch/case
 } // end of analogWrite
+
+void takeOverTCA0() {
+  TCA0.SPLIT.CTRLA = 0;          // Stop TCA0
+  PeripheralControl &= ~TIMERA0; // Mark timer as user controlled
+                                 // Reset TCA0
+  /* Okay, seriously? The datasheets and io headers disagree here */
+  TCA0.SPLIT.CTRLESET = TCA_SPLIT_CMD_RESET_gc; /* |0x03; // do these bits need to be set or don't they? Does this even WORK on tinyAVR?! */
+}
+
+
+void takeOverTCD0() {
+  TCD0.CTRLA = 0;                     // Stop TCD0
+  _PROTECTED_WRITE(TCD0.FAULTCTRL,0); // Turn off all outputs
+  PeripheralControl &= ~TIMERD0;      // Mark timer as user controlled
+}
