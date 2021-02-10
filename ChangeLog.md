@@ -12,12 +12,12 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### 2.2.7
 * Clean up Servo formatting and comments and synchronize with DxCore version of library.
-* We were waiting for ENRDY to be set before changing enable-protected registers of TCD0. That doesn't appear to be needed. We just can't reenable it until ENRDY is set. It makes the glitch when turning PWM off or on... maybe 6 CLK_PER shorter? I think under default settings, the loop goes from one iteration to none....
+* We were waiting for `ENRDY` to be set before changing enable-protected registers of TCD0. That doesn't appear to be needed. We just can't reenable it until `ENRDY` is set. It makes the glitch when turning PWM off or on... maybe 6 CLK_PER shorter? I think under default settings, the loop goes from one iteration to none....
 * Do not initialize the the compare values of TCA0. 1. They are guaranteed by hardware to start up at 0, and we don't CARE what they start up as, because before the core turns any of them on, it sets them to a value. 24 bytes saved! (STS x 6)
 * Add `takeOverTCA0()`, `takeOverTCD0()`. Calling these will set a flag that tells `analogWrite()` and `digitalWrite()` not to try to configure these timers, and instead to act like the pin has no PWM functionality. User assumes responsibility for the management of Waveform Output.
 * Update avrdude.conf to fix support for Snap, PICKit and Curiosity programmer options.
 * Fix macro definitions of `sq()` and `constrain()` which were still vulnerable to stupid stuff caused by macro leading to arguments being evaluated multiple times.
-* Add `openDrain(),` `openDrainFast()` - LOW, FLOAT, and CHANGE are supported. LOW set pin to output, FLOAT (#defined as 1 now) sets it input, and CHANGE toggles it. It *does* turn off PWM, and it *does* set the PORTx.OUT for that pin to 0 so carelessness can't lead you to switching a pin left set to HIGH's output on (on the reasoning that you may be switching a line connected to something that could be damaged if you drove it high). It does not, however, touch the PINnCTRL register (so pullup is left on if you'd already set it that way). However `openDrainFast()` - the fast-I/O version of that function - does NOT touch the PWM or PORTx.OUT register.
+* Add `openDrain(),` `openDrainFast()` - `LOW`, `FLOAT`, and `CHANGE` are supported. LOW set pin to output, `FLOAT` (#defined as 1 now) sets it input, and `CHANGE` toggles it. It *does* turn off PWM, and it *does* set the PORTx.OUT for that pin to 0 so carelessness can't lead you to switching a pin left set to HIGH's output on (on the reasoning that you may be switching a line connected to something that could be damaged if you drove it high). It does not, however, touch the `PINnCTRL` register (so pullup is left on if you'd already set it that way). However `openDrainFast()` - the fast-I/O version of that function - does NOT touch the PWM or PORTx.OUT register.
 * IDE should now highlight a few more keywords associated with megaTinyCore.
 
 ### 2.2.6
@@ -44,8 +44,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### 2.2.0
 * Add support for programming with just a USB serial adapter and 4.7k resistor like pyupdi does. (#187, #285)
-* On non-Optiboot configurations, set all fuses that the core sets based on menu options, except BODCFG (control brown-out detection) and SYSCFG0 (controls configuration of reset/UPDI pin, as well as whether EEPROM is retained) on all uploads. Changing the reset pin configuration could "brick" a part if the user does not have a high voltage programmer, so setting this fuse is not "safe"; similarly, setting the BOD voltage higher than the operating voltage and enabling it will prevent programming. Since the device may be soldered to devices that are not tolerant of the >4.3V required by the highest BOD setting, this would also constitute "bricking". Other fuses cannot render the device unprogrammable, so there is no reason not to program them. Judging by the content of recent issues, this is a frequent point of confusion particularly with the clock speed, despite the fact that it has worked this way on literally every Arduino core released since the dawn of Arduino! (On classic AVRs, changing any fuse could potentially "brick" the part, so this was the only safe behavior). There are no menu options to configure WDTCFG or TCD0CFG, so those aren't touched on program, only upon burn bootloader - if you manually changed those, you probably don't want an upload to undo them, whereas "burn bootloader" will return the chip to a known configuration.
-* On Optiboot configurations, set all fuses except BODCFG and SYSCFG0 when "upload using programmer" is used (this still removes the bootloader, just like on classic AVRs). Uploads through the bootloader will not set fuses; almost all tools submenu options require "burn bootloader" to change.
+* On non-Optiboot configurations, set all fuses that the core sets based on menu options, except `BODCFG`(control brown-out detection) and `SYSCFG0`(controls configuration of reset/UPDI pin, as well as whether EEPROM is retained) on all uploads. Changing the reset pin configuration could "brick" a part if the user does not have a high voltage programmer, so setting this fuse is not "safe"; similarly, setting the BOD voltage higher than the operating voltage and enabling it will prevent programming. Since the device may be soldered to devices that are not tolerant of the >4.3V required by the highest BOD setting, this would also constitute "bricking". Other fuses cannot render the device unprogrammable, so there is no reason not to program them. Judging by the content of recent issues, this is a frequent point of confusion particularly with the clock speed, despite the fact that it has worked this way on literally every Arduino core released since the dawn of Arduino! (On classic AVRs, changing any fuse could potentially "brick" the part, so this was the only safe behavior). There are no menu options to configure `WDTCFG`or `TCD0CFG`, so those aren't touched on program, only upon burn bootloader - if you manually changed those, you probably don't want an upload to undo them, whereas "burn bootloader" will return the chip to a known configuration.
+* On Optiboot configurations, set all fuses except `BODCFG`and `SYSCFG0` when "upload using programmer" is used (this still removes the bootloader, just like on classic AVRs). Uploads through the bootloader will not set fuses; almost all tools submenu options require "burn bootloader" to change.
 * Fix nasty bug with Optiboot entry conditions (#259)
 * Add Ersatz Reset example sketch, and bootloader option.
 * Correct bug with bootloader version used on 14-24 pin parts when UPDI pin is configured as GPIO.
@@ -54,12 +54,12 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * What the heck? When were people going to tell me about the regression on TCD0 PWM pins?! It just didn't happen... botched refactoring of USE_TCD0_PWM AND regression to code from the bad old days before I knew how to get PWM and millis...(#249)
 * Reduced the magnitude of "glitches" possible on PWM pins when turning PWM off. Corrected PWM duty cycle calculations for TCD0 (it was (2 x dutycycle)/511 instead of (2 x dutycycle)/510 - no, it's not *supposed* to be 256ths, though it is very often implemented that way (if you count to 255, you get 256ths, because the timer considered 0 to be one count).
 * `analogWrite()` is now interrupt-safe for TCD0-controlled pins (this may be addressed for the other pins in a future update - however, it is "naturally" interrupt safe except when either the interrupted analogWrite or the interrupt is turning pins on or off - in contrast, TCD0 analogWrite could break in a variety of ways in almost any situation where it was interrupted)
-* Also implemented NEW special behavior on the TCD0 PWM pins: analogWrite(pin,0) and analogWrite(pin,255) set pin LOW or HIGH without turning off the PWM. On TCD0, this does not require turning off the timer briefly, which, over time, would cause `millis()` to lose counts when PWM was also used based on TCD0, in addition to reducing runtime. `digitalWrite()`, however, does. (also remember that `digitalRead()`, unlike official cores, NEVER turns off PWM)
+* Also implemented NEW special behavior on the TCD0 PWM pins: analogWrite(pin,0) and analogWrite(pin,255) set pin LOW or HIGH without turning off the PWM. On TCD0, this does not require turning off the timer briefly, which, over time, would cause `millis()` to lose counts when PWM was also used based on TCD0, in addition to reducing runtime. `digitalWrite()`, however, does. (also remember that `digitalRead()`, unlike official cores, `NEVER` turns off PWM)
 * Add check for compile time known invalid pins passed to Arduino digital/analog API functions, analogReference and DACReference, as well as compile time known unachievable baud rates on `Serial.begin()` for Serial (#269)
 * Correct bug in `digitalPinToAnalogInput()` when called with invalid values.
 * `analogReadResolution()` now requires a constant argument which must be valid - the old implementation was just awful - there are only two (will be a third on the 2-series, as we unfortunately kinda do need to be able to emulate )
 * Add support for `digitalReadFast()`, `digitalWriteFast()` functions. They are only valid if the pin is compile time known constant, and optimize down to something very fast (when second argument is compile time known, a single cycle for write. Looks like 4 cycles for read?) (#205)
-* Emulate `digitalWrite` behavior of classic AVRs when pin not OUTPUT, namely, set the `PORTx.OUT` register so that if it *is* set output, that's the state it will be in.
+* Emulate `digitalWrite` behavior of classic AVRs when pin not `OUTPUT`, namely, set the `PORTx.OUT` register so that if it *is* set output, that's the state it will be in.
 * Update Logic library to latest version (as with DxCore).
 * When using an internal reference for the ADC, forcibly enable it. Adjust the example of reading temperature to add the (signed) sigrow correction instead of subtracting it. This appears to get better values, and it is suspected that the code in the datasheet is wrong.
 
@@ -72,7 +72,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Use build.board pattern consistent with other cores (AVR_ATtiny). (#253)
 * In order to reduce flash usage, do not use UART baud correction based on voltage on 2k and 4k parts (it was always close enough for typical use cases anyway), and those parts are very tightly flash constrained.
 * Remove UART baud voltage menu for 8-pin parts due to above.
-* Automatically use CLKX2 USART option at 2 MHz or less, and on higher speed parts when appropriate for the selected baud rate. Most visible impact of this change is that you can now use 115200 baud at 1 MHz. (#188)
+* Automatically use U2X `USART` option at 2 MHz or less, and on higher speed parts when appropriate for the selected baud rate. Most visible impact of this change is that you can now use 115200 baud at 1 MHz. (#188)
 * Do not apply oscillator voltage (in)correction to baud rate when using external clock.
 * Reduce flash usage of UART (Serial), particularly on smaller chips, through a great many mechanisms. (#252)
 * Serial.print/write/flush will no longer play with interrupt priorities, and those functions can no longer hang indefinitely if called from an elevated ISR (not that one should really be printing to serial while in an ISR), like classic AVRs - they will spin and busywait as needed.
@@ -144,20 +144,20 @@ Urgent bugfixes for critical regressions introduced in 2.1.0.
 * Fix bug in DAC introduced by 2.0.0
 * Switch to 3 separate tinyNeopixel libraries instead of one, and change the examples and documentation accordingly.
 * Renumber interrupt modes for consistency with MegaCoreX
-* Correct EESAVE fuse settings for optiboot boards - it is now always off. With optiboot on the chip, it is likely that the only time chip erase is executed is when UPDI is used to erase the chip to reburn the bootloader, and users would probably expect that to wipe the EEPROM too.
+* Correct `EESAVE` fuse settings for optiboot boards - it is now always off. With optiboot on the chip, it is likely that the only time chip erase is executed is when UPDI is used to erase the chip to reburn the bootloader, and users would probably expect that to wipe the EEPROM too.
 
 ### 2.0.0
 * Remove all the UART/SPI/I2C pin mapping menus from tools submenus. Instead, use the newly added .swap() and .pins() methods on these objects to set the pins to be used.
 * WARNING: POTENTIALLY BREAKING CHANGE: **The default pins used for Serial on 8-pin parts in previous versions are not the "default" pins per datasheet (arduino pins 0 and 1); instead, the "alternate" pins were used by default (arduino pins 2 and 3). Note that on the Rev. - and Rev. A breakouts for these parts from my Tindie store, the serial lines from the FTDI header go to the alternate pins, not the "default" ones.** (this will be corrected in Rev. B of the board). If you have sketches/hardware using this, you will either need to move connections, or add Serial.swap(1); before calling `Serial.begin()`. I realize this is inconvenient, but that previous behavior should never have been the case, and, having finally accepted the fact, it was better to cut over quickly than let more people get used to the previous behavior and then change it later.
 * Improve ADC speed dramatically (it runs in about a quarter of the time it used to!) - I do not expect this to cause any issues with accuracy. The megaavr parts support much higher maximum ADC clock compared to the classic AVRs. We now set the ADC clock near to the top of it's range. In order to prevent this from hurting accuracy when reading high impedance sources, the ADC0.SAMPCTRL is set to SAMPLEN=14 instead of 0. This means samples will be taken for 16 ADC clocks instead of 2. Since the ADC clock is 8 times faster now, this should result in the same sampling time. See the ADC section for more information, including how to get even faster ADC readings from low impedance signals.
 * `digitalRead()`, `pinMode()`, and `digitalWrite()` were changed back to operating on uint8's instead of the PinMode, PinStatus, etc enums like the official megaavr core does (and unlike how every other core does it). Using the enums, while it was defensible from a software architecture perspective, caused a lot of breakage of common Arduino ideoms that have been in widespread use for ages, for very little benefit. This also applies to things that used BitOrder.
-* `digitalRead()`, `pinMode()`, `digitalWrite()` and `analogWrite()` now take advantage of the unified memory architecture of the megaavr parts to improve performance and reduce flash usage by removing the PROGMEM attribute and accompanying pgm_read_byte() calls. This yields a significant improvement in performance of `analogWrite()` and `digitalRead()` in particular.
-* Remove the DAC reference voltage from tools submenu. Now, use the DACReference() function - it can take any of the INTERNAL reference arguments that would be passed to `analogReferece()`.
+* `digitalRead()`, `pinMode()`, `digitalWrite()` and `analogWrite()` now take advantage of the unified memory architecture of the megaavr parts to improve performance and reduce flash usage by removing the `PROGMEM` attribute and accompanying pgm_read_byte() calls. This yields a significant improvement in performance of `analogWrite()` and `digitalRead()` in particular.
+* Remove the DAC reference voltage from tools submenu. Now, use the DACReference() function - it can take any of the `INTERNAL` reference arguments that would be passed to `analogReferece()`.
 * `digitalRead()` no longer turns off PWM and DAC output on the pin that is read. There was no technical need for this, and `digitalRead()` should not change the pin output state!
 * `digitalRead()` now returns an int8_t instead of an int16_t - this saves a tiny amount of flash and slightly improves execution time.
 * `digitalRead()` now returns -1 if called on a pin that doesn't exist, instead of 0 (LOW). This should make debugging easier, without impacting behavior when valid pin is passed to `digitalRead()`.
 * Added support for manipulating the millis timer from within libraries or the sketch: init_millis(), stop_millis(), set_millis(), and restart_millis(). These are not expected to be normally used in sketches; these will be used in the upcoming megaTinySleep library which will "switch" millis timekeeping to the RTC when in sleep, and restore the millis value to whatever other timer is normally used.
-* Fix a bug with the EXTERNAL reference option being defined for the '212 and '412 - the 8-pin parts do not have that reference option, even if they're 1-series and otherwise would
+* Fix a bug with the `EXTERNAL` reference option being defined for the '212 and '412 - the 8-pin parts do not have that reference option, even if they're 1-series and otherwise would
 
 ### 1.1.10
 * Fix bug with Wire introduced by not testing 1.1.9 changes to Wire.
@@ -249,7 +249,7 @@ Urgent bugfixes for critical regressions introduced in 2.1.0.
 * Improve pinout diagrams (#98)
 * Add support for the Optiboot bootloader !!! (#52)
 * Correct sketch size output to account for const variables (#95)
-* Fix EESAVE option (which was backwards - #93)
+* Fix `EESAVE` option (which was backwards - #93)
 * Fix Onboard mEDBG programmer for ATTiny416 Xplained Nano (#96)
 * Add menu options for UART location on all parts (#108)
 
@@ -269,7 +269,7 @@ Urgent bugfixes for critical regressions introduced in 2.1.0.
 * Board manager installation improvements to prevent breaking USBTinyISP on other installed core
 
 ### 1.0.3
-* Fix UART (and I suspect I2C) on 412/402 and general PORTMUX initialization.
+* Fix UART (and I suspect I2C) on 412/402 and general `PORTMUX` initialization.
 * Add tinyNeoPixel and tinyNeoPixel_Static libraries, examples and documentation, add menu option to select port at 8/10MHz (saves flash)
 * Pinout chart correction
 
