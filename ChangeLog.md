@@ -19,6 +19,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Fix macro definitions of `sq()` and `constrain()` which were still vulnerable to stupid stuff caused by macro leading to arguments being evaluated multiple times.
 * Add `openDrain(),` `openDrainFast()` - `LOW`, `FLOAT`, and `CHANGE` are supported. LOW set pin to output, `FLOAT` (#defined as 1 now) sets it input, and `CHANGE` toggles it. It *does* turn off PWM, and it *does* set the PORTx.OUT for that pin to 0 so carelessness can't lead you to switching a pin left set to HIGH's output on (on the reasoning that you may be switching a line connected to something that could be damaged if you drove it high). It does not, however, touch the `PINnCTRL` register (so pullup is left on if you'd already set it that way). However `openDrainFast()` - the fast-I/O version of that function - does NOT touch the PWM or PORTx.OUT register.
 * IDE should now highlight a few more keywords associated with megaTinyCore.
+* Minor formatting improvements in ChangeLog.md.
+* Update avr-gcc toolchain to azduino3.
 
 ### 2.2.6
 * Fix for baud rate in twi.c from 2.2.4 actually broke it was worse than it was before. I'm bopeful that now it should again work.
