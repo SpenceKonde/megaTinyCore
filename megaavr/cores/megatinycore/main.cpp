@@ -38,25 +38,23 @@ void initVariant() { }
 void setupUSB() __attribute__((weak));
 void setupUSB() { }
 
-int main(void) {
-  init();
+int main(void)
+{
+  init(); //Interrupts are turned on just prior to init() returning.
 
   initVariant();
 
-  #if defined(USBCON)
+#if defined(USBCON)
   USBDevice.attach();
-  #endif
+#endif
 
   setup();
-
   for (;;) {
     loop();
     #ifndef NOSERIALEVENT
-    if (serialEventRun) {
-      serialEventRun();
-    }
+    if (serialEventRun) serialEventRun();
     #endif
   }
-
   return 0;
 }
+

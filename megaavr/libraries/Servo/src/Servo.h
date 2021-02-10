@@ -63,24 +63,24 @@
  */
 
 #ifndef Servo_h
-  #define Servo_h
+#define Servo_h
+#include <inttypes.h>
 
-  #include <inttypes.h>
-  #if (!defined(TCB_CLKSEL2_bm))
-      // This means it's a tinyAVR 0/1-series, or a megaAVR 0-series.
-      // Their TCB_CLKSEL enums use different names for the clock settings, for reasons unclear.
-      // To align with the future, we use the Dx-series names for these.
-      #define TCB_CLKSEL_DIV2_gc TCB_CLKSEL_CLKDIV2_gc
-      #define TCB_CLKSEL_DIV1_gc TCB_CLKSEL_CLKDIV1_gc
+#if (!defined(TCB_CLKSEL2_bm))
+  // This means it's a tinyAVR 0/1-series, or a megaAVR 0-series.
+  // Their TCB_CLKSEL enums use different names for the clock settings, for reasons unclear.
+  // To align with the future, we use the Dx-series names for these.
+  #define TCB_CLKSEL_DIV2_gc TCB_CLKSEL_CLKDIV2_gc
+  #define TCB_CLKSEL_DIV1_gc TCB_CLKSEL_CLKDIV1_gc
+#endif
+#if defined(ARDUINO_ARCH_MEGAAVR)
+  #include "megaavr/ServoTimers.h"
+  #if (F_CPU==1000000)
+    #warning "Running at 1MHz results in unstable servo signal."
   #endif
-  #if defined(ARDUINO_ARCH_MEGAAVR)
-    #include "megaavr/ServoTimers.h"
-    #if (F_CPU==1000000)
-      #warning "Running at 1MHz results in unstable servo signal."
-    #endif
-  #else
-    #error "This is an architecture specific library for ARDUINO_ARCH_MEGAAVR, but this device is not of that architecture"
-  #endif
+#else
+  #error "This is an architecture specific library for ARDUINO_ARCH_MEGAAVR, but this device is not of that architecture"
+#endif
 
 
 #define Servo_VERSION              2     // software version of this library
