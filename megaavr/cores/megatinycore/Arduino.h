@@ -71,6 +71,27 @@ extern "C" {
 #define noInterrupts() cli()
 
 
+// NON-STANDARD API
+
+
+void init_ADC0(void);
+void init_ADC1(void);
+void init_millis();
+void stop_millis();
+void restart_millis();
+void set_millis(uint32_t newmillis);
+void init_timers();
+void init_TCA0();
+void init_TCD0();
+
+// Peripheral takeover
+// These will remove things controlled by
+// these timers from analogWrite()/turnOffPWM()
+// 0x40 - TCD0, 0x10 - TCA0
+void takeOverTCA0();
+void takeOverTCD0();
+
+
 // avr-libc defines _NOP() since 1.6.2
 #ifndef _NOP
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
@@ -79,6 +100,8 @@ extern "C" {
 /* Allows performing a correction on the CPU value using the signature row
   values indicating oscillator error provided from the device manufacturer */
 #define PERFORM_SIGROW_CORRECTION_F_CPU 0
+
+// These bits get 0'ed out if user calls appropriate methods to "take over" these.
 
 // We declare it here... we never define it anywhere.... I think I'd rather a user get the more straightforward error message?
 //uint16_t clockCyclesPerMicrosecondComp(uint32_t clk);
@@ -115,7 +138,8 @@ extern const uint8_t digital_pin_to_timer[];
 #define PD 3
 #define PE 4
 #define PF 5
-#define NUM_TOTAL_PORTS 6
+#define PG 6
+#define NUM_TOTAL_PORTS 7
 
 // These are used for two things: identifying the timer on a pin
 // and for the MILLIS_TIMER define that the uses can test which timer
@@ -130,19 +154,17 @@ extern const uint8_t digital_pin_to_timer[];
 // RTC timer is a tiner, but certainly not that kind of timer
 #define NOT_ON_TIMER 0x00
 #define TIMERA0 0x10
-#define TIMERA1 0x11 // Not present on any tinyAVR 0/1-series
+#define TIMERA1 0x11        // Not present on any tinyAVR 0/1/2-series
 #define TIMERB0 0x20
 #define TIMERB1 0x21
-#define TIMERB2 0x22 // Not present on any tinyAVR 0/1-series
-#define TIMERB3 0x23 // Not present on any tinyAVR 0/1-series
-#define TIMERB4 0x23 // Not present on any tinyAVR 0/1-series
-#define TIMERB5 0x23 // Not present on any tinyAVR 0/1-series
-#define TIMERD0 0x40
-#define DACOUT 0x80
-#define TIMERRTC 0x90
-#define TIMERRTC_XTAL 0x91
+#define TIMERB2 0x22        // Not present on any tinyAVR 0/1/2-series
+#define TIMERB3 0x23        // Not present on any tinyAVR 0/1/2-series
+#define TIMERB4 0x24        // Not present on any tinyAVR 0/1/2-series
+#define TIMERD0 0x40        // 1-series only
+#define DACOUT 0x80         // 1-series only. PWM output source only
+#define TIMERRTC 0x90       // millis timing source only
+#define TIMERRTC_XTAL 0x91  // 1/2-series only, millis timing source only
 
-void setup_timers();
 
 #define digitalPinToPort(pin) ( (pin < NUM_TOTAL_PINS) ? digital_pin_to_port[pin] : NOT_A_PIN )
 #define digitalPinToBitPosition(pin) ( (pin < NUM_TOTAL_PINS) ? digital_pin_to_bit_position[pin] : NOT_A_PIN )
