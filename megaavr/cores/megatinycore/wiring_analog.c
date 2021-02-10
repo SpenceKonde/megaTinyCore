@@ -40,30 +40,38 @@ inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pi
 }
 
 inline __attribute__((always_inline)) void check_valid_analog_pin(pin_size_t pin) {
-  if(__builtin_constant_p(pin)) {
-    #ifdef ADC_DAC0
-      if (pin != ADC_DAC0 && pin != ADC_INTREF && pin != ADC_TEMPERATURE)
+    if(__builtin_constant_p(pin)) {
+    #ifdef ADC_LOWLAT_bm
+      badCall("analog functionality not yet available for 2-series");
     #else
-      if (pin != ADC_INTREF && pin != ADC_TEMPERATURE)
-    #endif
-    {
-      pin = digitalPinToAnalogInput(pin);
-      if (pin == NOT_A_PIN) {
-        badArg("analogRead called with constant pin that is not a valid analog pin");
+      #ifdef ADC_DAC0
+        if (pin != ADC_DAC0 && pin != ADC_INTREF && pin != ADC_TEMPERATURE)
+      #else
+        if (pin != ADC_INTREF && pin != ADC_TEMPERATURE)
+      #endif
+      {
+        pin = digitalPinToAnalogInput(pin);
+        if (pin == NOT_A_PIN) {
+          badArg("analogRead called with constant pin that is not a valid analog pin");
+        }
       }
-    }
+    #endif
   }
 }
 
 inline __attribute__((always_inline)) void check_valid_analog_ref(uint8_t mode) {
   if (__builtin_constant_p(mode)) {
-  #if defined(EXTERNAL)
-    if (!(mode == EXTERNAL || mode == VDD || mode== INTERNAL0V55 || mode== INTERNAL1V1 || mode== INTERNAL1V5|| mode== INTERNAL2V5|| mode== INTERNAL4V34))
-      badArg("analogReference called with argument that is not a valid analog reference");
-  #else
-    if (!(mode == VDD || mode== INTERNAL0V55 || mode== INTERNAL1V1 || mode== INTERNAL1V5|| mode== INTERNAL2V5|| mode== INTERNAL4V34))
-      badArg("analogReference called with argument that is not a valid analog reference");
-  #endif
+    #ifdef ADC_LOWLAT_bm
+      badCall("analog functionality not yet available for 2-series");
+    #else
+      #if defined(EXTERNAL)
+        if (!(mode == EXTERNAL || mode == VDD || mode== INTERNAL0V55 || mode== INTERNAL1V1 || mode== INTERNAL1V5|| mode== INTERNAL2V5|| mode== INTERNAL4V34))
+          badArg("analogReference called with argument that is not a valid analog reference");
+      #else
+        if (!(mode == VDD || mode== INTERNAL0V55 || mode== INTERNAL1V1 || mode== INTERNAL1V5|| mode== INTERNAL2V5|| mode== INTERNAL4V34))
+          badArg("analogReference called with argument that is not a valid analog reference");
+      #endif
+    #endif
   }
 }
 
@@ -90,6 +98,9 @@ inline __attribute__((always_inline)) void check_valid_duty_cycle(int16_t val) {
 
 
 void analogReference(uint8_t mode) {
+#ifdef ADC_LOWLAT_bm
+  return badCall("analog functionality not yet available for 2-series");
+#else
   check_valid_analog_ref(mode);
   switch (mode) {
     #if defined(EXTERNAL)
@@ -113,6 +124,7 @@ void analogReference(uint8_t mode) {
       ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v
       break;
   }
+#endif
 }
 
 #ifdef DAC0
@@ -128,12 +140,12 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
 }
 #endif
 
+
+int analogRead(uint8_t pin) {
 #ifdef ADC_LOWLAT_bm
-int analogRead(uint8_t pin) {
-    badCall("analogRead() not yet implemented for the 2-series parts");
-}
+  badCall("analog functionality not yet available for 2-series");
+  return -1;
 #else
-int analogRead(uint8_t pin) {
   check_valid_analog_pin(pin);
 
 
@@ -161,13 +173,16 @@ int analogRead(uint8_t pin) {
 
   /* Combine two bytes */
   return ADC0.RES;
-}
 #endif
+}
 
 //analogReadResolution() has two legal values you can pass it, 8 or 10 on these parts. According to the datasheet, you can clock the ADC faster if you set it to 8.
 //like the pinswap functions, if the user passes bogus values, we set it to the default and return false.
 
 inline void analogReadResolution(uint8_t res) {
+#ifdef ADC_LOWLAT_bm
+  return badCall("analog functionality not yet available for 2-series");
+#else
   if (!__builtin_constant_p(res))
     badArg("analogReadResolution must only be passed constant values");
   #ifdef ADC_LOWLAT_bm
@@ -183,6 +198,7 @@ inline void analogReadResolution(uint8_t res) {
       ADC0.CTRLA &= ~ADC_RESSEL_bm;
     }
   #endif
+#endif
 }
 
 

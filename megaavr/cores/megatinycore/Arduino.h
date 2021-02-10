@@ -42,6 +42,9 @@ extern "C" {
 /* Values shifted to avoid clashing with ADC REFSEL defines
   Will shift back in analog_reference function
 */
+
+#ifndef ADC_LOWLAT_bm
+
 #define INTERNAL0V55 (VREF_ADC0REFSEL_0V55_gc >> VREF_ADC0REFSEL_gp)
 #define INTERNAL1V1 (VREF_ADC0REFSEL_1V1_gc >> VREF_ADC0REFSEL_gp)
 #define INTERNAL2V5 (VREF_ADC0REFSEL_2V5_gc >> VREF_ADC0REFSEL_gp)
@@ -62,6 +65,8 @@ extern "C" {
 
 #define ADC_TEMPERATURE ADC_MUXPOS_TEMPSENSE_gc
 #define ADC_INTREF ADC_MUXPOS_INTREF_gc
+
+#endif
 
 #define VCC_5V0 2
 #define VCC_3V3 1
@@ -383,7 +388,7 @@ extern const uint8_t digital_pin_to_timer[];
 #endif
 
 #if (MEGATINYCORE_SERIES==2)
-#error "tinyAVR 2-series parts are not yet supported"
+#warning "tinyAVR 2-series parts are not yet supported - bad behavior is not unexpected. Please ensure you have latest version of core for testing this!"
 #endif
 
 // Version related defines now handled in platform.txt

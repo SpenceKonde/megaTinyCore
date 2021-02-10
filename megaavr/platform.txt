@@ -6,10 +6,10 @@
 
 name=megaTinyCore
 versionnum.major=2
-versionnum.minor=2
-versionnum.patch=7
-versionnum.postfix=
-versionnum.released=1
+versionnum.minor=3
+versionnum.patch=0
+versionnum.postfix=-dev
+versionnum.released=0
 
 version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}
 

@@ -206,7 +206,7 @@ void UartClass::begin(unsigned long baud, uint16_t config) {
 
 
   //See #131 for more info on this
-  #if (CLOCK_SOURCE==0 && PROGMEM_SIZE > 4096 && (defined(UARTBAUD3V) || defined(UARTBAUD5V)))
+  #if (CLOCK_SOURCE==0 && PROGMEM_SIZE > 4096 && (defined(UARTBAUD3V) || defined(UARTBAUD5V)) && defined(SIGROW_OSC20ERR3V))
     // if the flash is 2k or 4k, we really can't spare the flash for the baud rate correction...
     // it's close enough to work under normal circumstances anyway.
     #if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL) //this means we are on the 20MHz oscillator
