@@ -4,14 +4,25 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-### (planned) 2.2.7
-* Clean up Servo formatting and comments and synchronize with DxCore version of library.
+### 2.3.0
+* This is the first version planned to have 2-series support. I will sketch in the basics (ie, so things will compile and you should be OK as long as you don't want to use new ADC) and try to get that up here ASAP.
+
 
 ## Released Versions
 
+### 2.2.7
+* Clean up Servo formatting and comments and synchronize with DxCore version of library.
+* We were waiting for ENRDY to be set before changing enable-protected registers of TCD0. That doesn't appear to be needed. We just can't reenable it until ENRDY is set. It makes the glitch when turning PWM off or on... maybe 6 CLK_PER shorter? I think under default settings, the loop goes from one iteration to none....
+* Do not initialize the the compare values of TCA0. 1. They are guaranteed by hardware to start up at 0, and we don't CARE what they start up as, because before the core turns any of them on, it sets them to a value. 24 bytes saved! (STS x 6)
+* Add `takeOverTCA0()`, `takeOverTCD0()`. Calling these will set a flag that tells `analogWrite()` and `digitalWrite()` not to try to configure these timers, and instead to act like the pin has no PWM functionality. User assumes responsibility for the management of Waveform Output.
+* Update avrdude.conf to fix support for Snap, PICKit and Curiosity programmer options.
+* Fix macro definitions of `sq()` and `constrain()` which were still vulnerable to stupid stuff caused by macro leading to arguments being evaluated multiple times.
+* Add `openDrain(),` `openDrainFast()` - LOW, FLOAT, and CHANGE are supported. LOW set pin to output, FLOAT (#defined as 1 now) sets it input, and CHANGE toggles it. It *does* turn off PWM, and it *does* set the PORTx.OUT for that pin to 0 so carelessness can't lead you to switching a pin left set to HIGH's output on (on the reasoning that you may be switching a line connected to something that could be damaged if you drove it high). It does not, however, touch the PINnCTRL register (so pullup is left on if you'd already set it that way). However `openDrainFast()` - the fast-I/O version of that function - does NOT touch the PWM or PORTx.OUT register.
+* IDE should now highlight a few more keywords associated with megaTinyCore.
+
 ### 2.2.6
 * Fix for baud rate in twi.c from 2.2.4 actually broke it was worse than it was before. I'm bopeful that now it should again work.
-* SPI library no longer requires knowing the SS pin when you call pins() - the SS pin has no special function with the library.
+* SPI library no longer requires knowing the SS pin when you call `SPI.pins()` - the SS pin has no special function with the library.
 
 ### 2.2.5
 * Another board manager installation fix. Sixth time's the charm!
@@ -38,16 +49,16 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Fix nasty bug with Optiboot entry conditions (#259)
 * Add Ersatz Reset example sketch, and bootloader option.
 * Correct bug with bootloader version used on 14-24 pin parts when UPDI pin is configured as GPIO.
-* add millisClockCyclesPerMicrosecond(); what WAS clockCyclesPerMicrosecond() is now this - differemnce is that the millisClockCyclesPerMicrosecond() gives the number of clock cycles on the timebase for the millis timers (so, for TCD0 as millis clock, the unprescaled internal oscillator, otherwise same as clockCyclesPerMicrosecond()) - apparently other libraries use this for things that depend on the system clock... including my own Servo implementation! (it was tested before that was the default millis source on 3216/3217)... This is *really* nasty when it bites....
+* add `millisClockCyclesPerMicrosecond()`; what WAS `clockCyclesPerMicrosecond()` is now this - differemnce is that the `millisClockCyclesPerMicrosecond()` gives the number of clock cycles on the timebase for the millis timers (so, for TCD0 as millis clock, the unprescaled internal oscillator, otherwise same as `clockCyclesPerMicrosecond()`) - apparently other libraries use this for things that depend on the system clock... including my own Servo implementation! (it was tested before that was the default millis source on 3216/3217)... This is *really* nasty when it bites....
 * Fix Servo library - at long last! I never realized just *how* broken it was. (#195, #241)
 * What the heck? When were people going to tell me about the regression on TCD0 PWM pins?! It just didn't happen... botched refactoring of USE_TCD0_PWM AND regression to code from the bad old days before I knew how to get PWM and millis...(#249)
 * Reduced the magnitude of "glitches" possible on PWM pins when turning PWM off. Corrected PWM duty cycle calculations for TCD0 (it was (2 x dutycycle)/511 instead of (2 x dutycycle)/510 - no, it's not *supposed* to be 256ths, though it is very often implemented that way (if you count to 255, you get 256ths, because the timer considered 0 to be one count).
-* analogWrite() is now interrupt-safe for TCD0-controlled pins (this may be addressed for the other pins in a future update - however, it is "naturally" interrupt safe except when either the interrupted analogWrite or the interrupt is turning pins on or off - in contrast, TCD0 analogWrite could break in a variety of ways in almost any situation where it was interrupted)
-* Also implemented NEW special behavior on the TCD0 PWM pins: analogWrite(pin,0) and analogWrite(pin,255) set pin LOW or HIGH without turning off the PWM. On TCD0, this does not require turning off the timer briefly, which, over time, would cause millis() to lose counts when PWM was also used based on TCD0, in addition to reducing runtime. digitalWrite(), however, does. (also remember that digitalRead(), unlike official cores, NEVER turns off PWM)
-* Add check for compile time known invalid pins passed to Arduino digital/analog API functions, analogReference and DACReference, as well as compile time known unachievable baud rates on Serial.begin() for Serial (#269)
-* Correct bug in digitalPinToAnalogInput() when called with invalid values.
-* analogReadResolution() now requires a constant argument which must be valid - the old implementation was just awful - there are only two (will be a third on the 2-series, as we unfortunately kinda do need to be able to emulate )
-* Add support for digitalReadFast(), digitalWriteFast() functions. They are only valid if the pin is compile time known constant, and optimize down to something very fast (when second argument is compile time known, a single cycle for write. Looks like 4 cycles for read?) (#205)
+* `analogWrite()` is now interrupt-safe for TCD0-controlled pins (this may be addressed for the other pins in a future update - however, it is "naturally" interrupt safe except when either the interrupted analogWrite or the interrupt is turning pins on or off - in contrast, TCD0 analogWrite could break in a variety of ways in almost any situation where it was interrupted)
+* Also implemented NEW special behavior on the TCD0 PWM pins: analogWrite(pin,0) and analogWrite(pin,255) set pin LOW or HIGH without turning off the PWM. On TCD0, this does not require turning off the timer briefly, which, over time, would cause `millis()` to lose counts when PWM was also used based on TCD0, in addition to reducing runtime. `digitalWrite()`, however, does. (also remember that `digitalRead()`, unlike official cores, NEVER turns off PWM)
+* Add check for compile time known invalid pins passed to Arduino digital/analog API functions, analogReference and DACReference, as well as compile time known unachievable baud rates on `Serial.begin()` for Serial (#269)
+* Correct bug in `digitalPinToAnalogInput()` when called with invalid values.
+* `analogReadResolution()` now requires a constant argument which must be valid - the old implementation was just awful - there are only two (will be a third on the 2-series, as we unfortunately kinda do need to be able to emulate )
+* Add support for `digitalReadFast()`, `digitalWriteFast()` functions. They are only valid if the pin is compile time known constant, and optimize down to something very fast (when second argument is compile time known, a single cycle for write. Looks like 4 cycles for read?) (#205)
 * Emulate `digitalWrite` behavior of classic AVRs when pin not OUTPUT, namely, set the `PORTx.OUT` register so that if it *is* set output, that's the state it will be in.
 * Update Logic library to latest version (as with DxCore).
 * When using an internal reference for the ADC, forcibly enable it. Adjust the example of reading temperature to add the (signed) sigrow correction instead of subtracting it. This appears to get better values, and it is suspected that the code in the datasheet is wrong.
@@ -70,7 +81,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Correct issue with enabled/sampled BOD mode with slow sampling.
 * Include all SUT options in tools submenu, correct issue with 8ms SUT (it was actually setting it to 4ms).
 * Include serialevent and clocksource setting in name of exported .hex and .lst files.
-* Add the Serial.printHex() functions from DxCore; Serial.printHex() can be called with a 1, 2, or 4 byte integer to print out it's value in hexadecimal, with leading zero(s). For 2 and 4 byte integers, optional boolean second argument; if true, will swap the order of the two bytes (endianness); can also be called with a pointer to a uint8_t or uint16_t, a length (uint8_t, ie, max length 255), and, optionally, a separator (a single char/int8_t); this will print that many bytes as hex starting at the given pointer; if it's a pointer to a uint16_t, there's the same optional byte order boolean at the end. If you need to use that, but don't want a separator, pass 0 as the third argument.
+* Add the `Serial.printHex()` functions from DxCore; `Serial.printHex()` can be called with a 1, 2, or 4 byte integer to print out it's value in hexadecimal, with leading zero(s). For 2 and 4 byte integers, optional boolean second argument; if true, will swap the order of the two bytes (endianness); can also be called with a pointer to a uint8_t or uint16_t, a length (uint8_t, ie, max length 255), and, optionally, a separator (a single char/int8_t); this will print that many bytes as hex starting at the given pointer; if it's a pointer to a uint16_t, there's the same optional byte order boolean at the end. If you need to use that, but don't want a separator, pass 0 as the third argument.
 * Merge in timing fix for TWI in slave mode (#235)
 
 ### 2.1.1, 2.1.2, 2.1.3
@@ -114,16 +125,16 @@ Urgent bugfixes for critical regressions introduced in 2.1.0.
 * Mark unqualified BOD settings that were removed from datasheet as unofficial, add warning that they may not work correctly (but suspect will be close - they were working for me before I realized they were unsupported! they were listed in io.h before!), and add Microchip's guaranteed operating speeds + BOD levels per datasheet to documentation.
 * Possibly fix #189!
 * Fix problem with millis not being entirely disabled when set to be disabled.
-* Ever so slightly improve baud rate accuracy, reduce space taken by Serial.begin() by a few bytes.
+* Ever so slightly improve baud rate accuracy, reduce space taken by `Serial.begin()` by a few bytes.
 * Fix compile error from Tone() on parts without a second type B timer (ie, everything not a 1614, 3216, 1616, 3217, or 1617) when TCB0 was selected as a millis source. (part of #189)
-* Correct bug in micros() timekeeping when TCA0 is used as millis() timing source (introduced in 1.1.9 - after the exhausive testing for these sorts of issues) (#189)
+* Correct bug in `micros()` timekeeping when TCA0 is used as `millis()` timing source (introduced in 1.1.9 - after the exhausive testing for these sorts of issues) (#189)
 
 ### 2.0.2
 * Fix bug with 1MHz system clock with TCB as milis source (micros was broken)
 * Remove EXTERNAL_EXPERIMENTAL - newer atpack removes ambiguity (note - we don't *use* it yet, but we didn't really need to either).
 * Fix part family defines
 * Add MEGATINYCORE_SERIES definition
-* analogReadResolution() added
+* `analogReadResolution()` added
 * Wire buffer size (broken in 2.0.0) fixed in very general way, with cases for a wide range
 * fix tinyNeoPixel on real WS2812's (it previously was busted on real ones, only worked with SK6812 clones) and unsplit the libraries, because architecture improvements make that possible!
 
@@ -137,33 +148,33 @@ Urgent bugfixes for critical regressions introduced in 2.1.0.
 
 ### 2.0.0
 * Remove all the UART/SPI/I2C pin mapping menus from tools submenus. Instead, use the newly added .swap() and .pins() methods on these objects to set the pins to be used.
-* WARNING: POTENTIALLY BREAKING CHANGE: **The default pins used for Serial on 8-pin parts in previous versions are not the "default" pins per datasheet (arduino pins 0 and 1); instead, the "alternate" pins were used by default (arduino pins 2 and 3). Note that on the Rev. - and Rev. A breakouts for these parts from my Tindie store, the serial lines from the FTDI header go to the alternate pins, not the "default" ones.** (this will be corrected in Rev. B of the board). If you have sketches/hardware using this, you will either need to move connections, or add Serial.swap(1); before calling Serial.begin(). I realize this is inconvenient, but that previous behavior should never have been the case, and, having finally accepted the fact, it was better to cut over quickly than let more people get used to the previous behavior and then change it later.
+* WARNING: POTENTIALLY BREAKING CHANGE: **The default pins used for Serial on 8-pin parts in previous versions are not the "default" pins per datasheet (arduino pins 0 and 1); instead, the "alternate" pins were used by default (arduino pins 2 and 3). Note that on the Rev. - and Rev. A breakouts for these parts from my Tindie store, the serial lines from the FTDI header go to the alternate pins, not the "default" ones.** (this will be corrected in Rev. B of the board). If you have sketches/hardware using this, you will either need to move connections, or add Serial.swap(1); before calling `Serial.begin()`. I realize this is inconvenient, but that previous behavior should never have been the case, and, having finally accepted the fact, it was better to cut over quickly than let more people get used to the previous behavior and then change it later.
 * Improve ADC speed dramatically (it runs in about a quarter of the time it used to!) - I do not expect this to cause any issues with accuracy. The megaavr parts support much higher maximum ADC clock compared to the classic AVRs. We now set the ADC clock near to the top of it's range. In order to prevent this from hurting accuracy when reading high impedance sources, the ADC0.SAMPCTRL is set to SAMPLEN=14 instead of 0. This means samples will be taken for 16 ADC clocks instead of 2. Since the ADC clock is 8 times faster now, this should result in the same sampling time. See the ADC section for more information, including how to get even faster ADC readings from low impedance signals.
-* digitalRead(), pinMode(), and digitalWrite() were changed back to operating on uint8's instead of the PinMode, PinStatus, etc enums like the official megaavr core does (and unlike how every other core does it). Using the enums, while it was defensible from a software architecture perspective, caused a lot of breakage of common Arduino ideoms that have been in widespread use for ages, for very little benefit. This also applies to things that used BitOrder.
-* digitalRead(), pinMode(), digitalWrite() and analogWrite() now take advantage of the unified memory architecture of the megaavr parts to improve performance and reduce flash usage by removing the PROGMEM attribute and accompanying pgm_read_byte() calls. This yields a significant improvement in performance of analogWrite() and digitalRead() in particular.
-* Remove the DAC reference voltage from tools submenu. Now, use the DACReference() function - it can take any of the INTERNAL reference arguments that would be passed to analogReferece().
-* digitalRead() no longer turns off PWM and DAC output on the pin that is read. There was no technical need for this, and digitalRead() should not change the pin output state!
-* digitalRead() now returns an int8_t instead of an int16_t - this saves a tiny amount of flash and slightly improves execution time.
-* digitalRead() now returns -1 if called on a pin that doesn't exist, instead of 0 (LOW). This should make debugging easier, without impacting behavior when valid pin is passed to digitalRead().
+* `digitalRead()`, `pinMode()`, and `digitalWrite()` were changed back to operating on uint8's instead of the PinMode, PinStatus, etc enums like the official megaavr core does (and unlike how every other core does it). Using the enums, while it was defensible from a software architecture perspective, caused a lot of breakage of common Arduino ideoms that have been in widespread use for ages, for very little benefit. This also applies to things that used BitOrder.
+* `digitalRead()`, `pinMode()`, `digitalWrite()` and `analogWrite()` now take advantage of the unified memory architecture of the megaavr parts to improve performance and reduce flash usage by removing the PROGMEM attribute and accompanying pgm_read_byte() calls. This yields a significant improvement in performance of `analogWrite()` and `digitalRead()` in particular.
+* Remove the DAC reference voltage from tools submenu. Now, use the DACReference() function - it can take any of the INTERNAL reference arguments that would be passed to `analogReferece()`.
+* `digitalRead()` no longer turns off PWM and DAC output on the pin that is read. There was no technical need for this, and `digitalRead()` should not change the pin output state!
+* `digitalRead()` now returns an int8_t instead of an int16_t - this saves a tiny amount of flash and slightly improves execution time.
+* `digitalRead()` now returns -1 if called on a pin that doesn't exist, instead of 0 (LOW). This should make debugging easier, without impacting behavior when valid pin is passed to `digitalRead()`.
 * Added support for manipulating the millis timer from within libraries or the sketch: init_millis(), stop_millis(), set_millis(), and restart_millis(). These are not expected to be normally used in sketches; these will be used in the upcoming megaTinySleep library which will "switch" millis timekeeping to the RTC when in sleep, and restore the millis value to whatever other timer is normally used.
 * Fix a bug with the EXTERNAL reference option being defined for the '212 and '412 - the 8-pin parts do not have that reference option, even if they're 1-series and otherwise would
 
 ### 1.1.10
 * Fix bug with Wire introduced by not testing 1.1.9 changes to Wire.
 * Fix bug with EEPROM introduced by not testing 1.1.9 changes to EEPROM
-* Add ability to read from temp sensor, internal reference via ADC, clean up analogReference()
+* Add ability to read from temp sensor, internal reference via ADC, clean up `analogReference()`
 * Add some example sketches, including reading temp and Vc
 
 ### 1.1.9
-* Correct micros() results at 20, 10, and 5 MHz when TCA0 or TCD0 is used as millis source
-* Correct micros() and millis() long term drift at 20, 10, and 5 Mhz when TCD used as millis source
-* Reduce time for micros() to return in many situations
+* Correct `micros()` results at 20, 10, and 5 MHz when TCA0 or TCD0 is used as millis source
+* Correct `micros()` and `millis()` long term drift at 20, 10, and 5 Mhz when TCD used as millis source
+* Reduce time for `micros()` to return in many situations
 * Correct PWM duty cycles when TCD0 is used for PWM
 * Add support for PWM on TCD0 when it is used as millis source
 * Adjust TCBm period when used for millis timekeeping with 1MHz system clock to reduce time spend in the millis ISR (reduces millis resolution to 2ms)
 * Lower prescaler on TCA0 to 16 when system clock is 4 Mhz or 5 MHz and 8 when running at 1 MHz (was 64)
-* Increase prescaler on TCD0 to 64 when used as millis() source with 1 MHz system clock (it still runs from unprescaled 20/16 MHz oscillator) in order to reduce portion of time spent in the ISR. Previously it spent more than 12% of it's time in the ISR.
-* micros() times returned are now as close to the time when micros() was called as possible
+* Increase prescaler on TCD0 to 64 when used as `millis()` source with 1 MHz system clock (it still runs from unprescaled 20/16 MHz oscillator) in order to reduce portion of time spent in the ISR. Previously it spent more than 12% of it's time in the ISR.
+* `micros()` times returned are now as close to the time when `micros()` was called as possible
 * Move millis interrupt to HUNF instead of LUNF when TCA0 is used for timing
 * Don't prescale TCB clock in Servo at 10MHz or lower for smoother output
 * Correct TRIM_DURATION in Servo library
@@ -186,13 +197,13 @@ Urgent bugfixes for critical regressions introduced in 2.1.0.
 
 ### 1.1.6
 * Remove option for RTC using external crystal on 412/212/402/202 - these do not support it.
-* Correct issue with gibberish if using Serial just after Serial.begin()
+* Correct issue with gibberish if using Serial just after `Serial.begin()`
 * Fix issue with disabling DAC on 14-pin parts (#141)
 * Fix issue with missing option to disable DAC on 20-pin optiboot parts.
-* Fix issue with pulseIn() giving incorrect results. (#142)
+* Fix issue with `pulseIn()` giving incorrect results. (#142)
 * Add support for PA0 (UPDI) as IO pin to Optiboot boards (#150)
 * Fix issues with Logic library and examples (#106)
-* Remove dependence of tone() and TCB as millis/micros source TCA0 prescaler (#144)
+* Remove dependence of `tone()` and TCB as millis/micros source TCA0 prescaler (#144)
 * Documentation improvement
 
 ### 1.1.5
@@ -263,7 +274,7 @@ Urgent bugfixes for critical regressions introduced in 2.1.0.
 * Pinout chart correction
 
 ### 1.0.2
-* Fix analogRead(), which was broken on most pins
+* Fix `analogRead()`, which was broken on most pins
 * Fix A11 on ATtiny x04 and x14 parts
 * Fix 1604 (compile and upload both had separate and unrelated issues)
 * Board manager installation will no longer require official megaAVR board package to be installed
