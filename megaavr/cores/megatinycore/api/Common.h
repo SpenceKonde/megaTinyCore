@@ -6,44 +6,45 @@ extern "C" {
 
 void yield(void);
 
-#define LOW              0
-#define HIGH             1
-#define CHANGE           4
-#define FALLING          2
-#define RISING           3
-#define INPUT          0x0
-#define OUTPUT         0x1
-#define INPUT_PULLUP   0x2
-#define LSBFIRST         0
-#define MSBFIRST         1
+#define LOW           0x00
+#define HIGH          0x01
+#define CHANGE        0x04
+#define FALLING       0x02
+#define RISING        0x03
+#define INPUT         0x00
+#define OUTPUT        0x01
+#define INPUT_PULLUP  0x02
+#define LSBFIRST      0x00
+#define MSBFIRST      0x01
+#define FLOAT         HIGH
 
 
-#define PI          3.1415926535897932384626433832795
-#define HALF_PI     1.5707963267948966192313216916398
-#define TWO_PI      6.283185307179586476925286766559
-#define DEG_TO_RAD  0.017453292519943295769236907684886
-#define RAD_TO_DEG  57.295779513082320876798154814105
-#define EULER       2.718281828459045235360287471352
+#define PI            3.1415926535897932384626433832795
+#define HALF_PI       1.5707963267948966192313216916398
+#define TWO_PI        6.283185307179586476925286766559
+#define DEG_TO_RAD    0.017453292519943295769236907684886
+#define RAD_TO_DEG    57.295779513082320876798154814105
+#define EULER         2.718281828459045235360287471352
 
-#define SERIAL      0x0
-#define DISPLAY     0x1
+#define SERIAL        0x00
+#define DISPLAY       0x01
 
-#ifndef min
 #define min(a,b) \
   ({ __typeof__ (a) _a = (a); \
     __typeof__ (b) _b = (b); \
     _a < _b ? _a : _b; })
-#endif
 
-#ifndef max
 #define max(a,b) \
   ({ __typeof__ (a) _a = (a); \
     __typeof__ (b) _b = (b); \
     _a > _b ? _a : _b; })
-#endif
 
 #ifndef constrain
-#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+#define constrain(x,low,high)   ({ \
+  typeof (x) _x = (x);             \
+  typeof (low) _l = (l);           \
+  typeof (high) _h = (h);          \
+  _x < _l ? _l : _x > _h ? _h :_x })
 #endif
 
 #ifndef radians
@@ -55,7 +56,11 @@ void yield(void);
 #endif
 
 #ifndef sq
-#define sq(x) ((x)*(x))
+#define sq(x)        ({ typeof (x) _x = (x); _x * _x; })
+#endif
+
+#ifndef round
+#define round(x)     ({ typeof (x) _x = (x);  _x >= 0 ? (long)x + 0.5 : (long)x - 0.5 })
 #endif
 
 typedef void (*voidFuncPtr)(void);
@@ -105,20 +110,18 @@ inline __attribute__((always_inline)) void check_constant_pin(pin_size_t pin)
 void pinMode(pin_size_t pinNumber, uint8_t mode);
 void digitalWrite(pin_size_t pinNumber, uint8_t val);
 void digitalWriteFast(pin_size_t pinNumber, uint8_t val);
+void openDrain(pin_size_t pin, uint8_t state);
+void openDrainFast(pin_size_t pin, uint8_t state);
 int8_t digitalRead(pin_size_t pinNumber);
 int8_t digitalReadFast(pin_size_t pinNumber);
 int analogRead(pin_size_t pinNumber);
 void analogReference(uint8_t mode);
 void analogReadResolution(uint8_t res);
 void analogWrite(pin_size_t pinNumber, int value);
+void turnOffPWM(pin_size_t pin);
 void DACReference(uint8_t mode);
-void init_ADC1(void);
 
 unsigned long millis(void);
-void init_millis();
-void stop_millis();
-void restart_millis();
-void set_millis(uint32_t newmillis);
 
 unsigned long micros(void);
 
@@ -128,7 +131,7 @@ unsigned long pulseIn(pin_size_t pin, uint8_t state, unsigned long timeout);
 unsigned long pulseInLong(pin_size_t pin, uint8_t state, unsigned long timeout);
 
 void shiftOut(pin_size_t dataPin, pin_size_t clockPin, uint8_t bitOrder, uint8_t val);
-pin_size_t shiftIn(pin_size_t dataPin, pin_size_t clockPin, uint8_t bitOrder);
+uint8_t shiftIn(pin_size_t dataPin, pin_size_t clockPin, uint8_t bitOrder);
 
 void attachInterrupt(pin_size_t interruptNumber, voidFuncPtr callback, uint8_t mode);
 void detachInterrupt(pin_size_t interruptNumber);

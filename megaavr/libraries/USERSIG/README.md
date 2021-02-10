@@ -35,34 +35,34 @@ You can view all the examples [here](examples/).
 
 ### **Library functions**
 
-#### **`USERSIG.read( address )`** [[_example_]](examples/userrow_read/userrow_read.ino)
+#### **`USERSIG.read( address )`** [[_example_]](examples/usersig_read/usersig_read.ino)
 
 This function allows you to read a single byte of data from the USERSIG.
 Its only parameter is an `byte` which should be set to the address you wish to read.
 
 The function returns an `unsigned char` containing the value read.
 
-#### **`USERSIG.write( address, value )`** [[_example_]](examples/userrow_write/userrow_write.ino)
+#### **`USERSIG.write( address, value )`** [[_example_]](examples/usersig_write/usersig_write.ino)
 
 The `write()` method allows you to write a single byte of data to the USERSIG.
 Two parameters are needed. The first is a `byte` containing the address that is to be written, and the second is the data to be written, a `byte`.
 
 This function does not return any value.
 
-#### **`USERSIG.update( address, value )`** [[_example_]](examples/userrow_update/userrow_update.ino)
+#### **`USERSIG.update( address, value )`** [[_example_]](examples/usersig_update/usersig_update.ino)
 
 This function is similar to `USERSIG.write()` however this method will only write data if the cell contents pointed to by `address` is different to `value`. This method can help prevent unnecessary wear on the USERSIG cells.
 
 This function does not return any value.
 
-#### **`USERSIG.get( address, object )`** [[_example_]](examples/userrow_get/userrow_get.ino)
+#### **`USERSIG.get( address, object )`** [[_example_]](examples/usersig_get/usersig_get.ino)
 
 This function will retrieve any object from the USERSIG.
 Two parameters are needed to call this function. The first is a `byte` containing the address that is to be written, and the second is the object you would like to read.
 
 This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
 
-#### **`USERSIG.put( address, object )`** [[_example_]](examples/userrow_put/userrow_put.ino)
+#### **`USERSIG.put( address, object )`** [[_example_]](examples/usersig_put/usersig_put.ino)
 
 This function will write any object to the USERSIG.
 Two parameters are needed to call this function. The first is a `byte` containing the address that is to be written, and the second is the object you would like to write.
@@ -71,7 +71,7 @@ This function uses the _update_ method to write its data, and therefore only rew
 
 This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
 
-#### **Subscript operator: `USERSIG[address]`** [[_example_]](examples/userrow_crc/userrow_crc.ino)
+#### **Subscript operator: `USERSIG[address]`** [[_example_]](examples/usersig_crc/usersig_crc.ino)
 
 This operator allows using the identifier `USERSIG` like an array.
 USERSIG cells can be read _and_ **_written_** directly using this method.
