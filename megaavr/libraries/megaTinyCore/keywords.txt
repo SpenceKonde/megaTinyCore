@@ -1,0 +1,24 @@
+#######################################
+# Syntax Coloring Map SPI
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+_PROTECTED_WRITE	KEYWORD2
+openDrain	KEYWORD2
+openDrainFast 	KEYWORD2
+digitalWriteFast	KEYWORD2
+digitalReadFast	KEYWORD2
+takeOverTCA0	KEYWORD2
+takeOverTCD0	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+FLOAT	LITERAL1
