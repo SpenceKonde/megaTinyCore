@@ -292,7 +292,7 @@ void analogWrite(uint8_t pin, int val) {
           uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
           TCD0.CTRLA = TCD0_prescaler; //stop the timer
           _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL | (1 << (6 + bit_pos)));
-          while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until we can reenable it
+          while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until we can re-enable it
           TCD0.CTRLA = (TCD0_prescaler | TCD_ENABLE_bm); //re-enable it
         } else {
           TCD0.CTRLE = TCD_SYNCEOC_bm; //Synchronize

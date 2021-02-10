@@ -12,7 +12,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### 2.2.7
 * Clean up Servo formatting and comments and synchronize with DxCore version of library.
-* We were waiting for `ENRDY` to be set before changing enable-protected registers of TCD0. That doesn't appear to be needed. We just can't reenable it until `ENRDY` is set. It makes the glitch when turning PWM off or on... maybe 6 CLK_PER shorter? I think under default settings, the loop goes from one iteration to none....
+* We were waiting for `ENRDY` to be set before changing enable-protected registers of TCD0. That doesn't appear to be needed. We just can't re-enable it until `ENRDY` is set. It makes the glitch when turning PWM off or on... maybe 6 CLK_PER shorter? I think under default settings, the loop goes from one iteration to none....
 * Do not initialize the the compare values of TCA0. 1. They are guaranteed by hardware to start up at 0, and we don't CARE what they start up as, because before the core turns any of them on, it sets them to a value. 24 bytes saved! (STS x 6)
 * Add `takeOverTCA0()`, `takeOverTCD0()`. Calling these will set a flag that tells `analogWrite()` and `digitalWrite()` not to try to configure these timers, and instead to act like the pin has no PWM functionality. User assumes responsibility for the management of Waveform Output.
 * Update avrdude.conf to fix support for Snap, PICKit and Curiosity programmer options.

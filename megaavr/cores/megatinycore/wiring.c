@@ -554,7 +554,7 @@ void init_millis()
         _PROTECTED_WRITE(CLKCTRL.OSC32KCTRLA,0x02);
         //RTC.CLKSEL=0; this is the power on value
       #endif
-      RTC.INTCTRL         = 0x01; //enable overflow interupt
+      RTC.INTCTRL         = 0x01; //enable overflow interrupt
       RTC.CTRLA           = (RTC_RUNSTDBY_bm|RTC_RTCEN_bm|RTC_PRESCALER_DIV32_gc);//fire it up, prescale by 32.
     #else //It's a type b timer
       _timer->CCMP = TIME_TRACKING_TIMER_PERIOD;
