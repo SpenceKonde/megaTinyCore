@@ -345,9 +345,10 @@ void takeOverTCA0() {
   TCA0.SPLIT.CTRLESET = TCA_SPLIT_CMD_RESET_gc; /* |0x03; // do these bits need to be set or don't they? Does this even WORK on tinyAVR?! */
 }
 
-
+#if defined(TCD0)
 void takeOverTCD0() {
   TCD0.CTRLA = 0;                     // Stop TCD0
   _PROTECTED_WRITE(TCD0.FAULTCTRL,0); // Turn off all outputs
   PeripheralControl &= ~TIMERD0;      // Mark timer as user controlled
 }
+#endif
