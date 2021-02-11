@@ -1,6 +1,6 @@
-##############################################################
+##########################################################################
 #      Tools Submenu Names
-##############################################################
+##########################################################################
 
 menu.chip=Chip
 menu.clock=Clock
@@ -21,24 +21,24 @@ menu.resetpinopti=UPDI/reset pin (burn bootloader req'd)
 # they function identically, just differ in the
 # information shown in the submenu name.
 
-##############################################################
+##########################################################################
 #      Board Names
-##############################################################
+##########################################################################
 
-atxy7.name=ATtiny3217/1617/1607/817/807/417
-atxy6.name=ATtiny3216/1616/1606/816/806/416/406
-atxy4.name=ATtiny1614/1604/814/804/414/404/214/204
-atxy2.name=ATtiny412/402/212/202
+atxy7.name=24-pin tinyAVR 0/1/2-series (ATtinyxxy7)
+atxy6.name=20-pin tinyAVR 0/1/2-series (ATtinyxxy6)
+atxy4.name=14-pin tinyAVR 0/1/2-series (ATtinyxxy4)
+atxy2.name=8-pin ATtiny412/402/212/202
+atxy7o.name=24-pin tinyAVR 0/1/2-series w/Optiboot (ATtinyxxy7)
+atxy6o.name=20-pin tinyAVR 0/1/2-series w/Optiboot (ATtinyxxy6)
+atxy4o.name=14-pin tinyAVR 0/1/2-series w/Optiboot (ATtinyxxy4)
+atxy2o.name=9-pin ATtiny412/402/212/202 w/Optiboot
 Xplained416.name=Attiny416 Xplained Nano (Optiboot)
 Xplained817.name=Attiny817 Xplained Mini (Optiboot)
-atxy7o.name=ATtiny3217/1617/1607/817/807/417 (Optiboot)
-atxy6o.name=ATtiny3216/1616/1606/816/806/416/406 (Optiboot)
-atxy4o.name=ATtiny1614/1604/814/804/414/404/214/204 (Optiboot)
-atxy2o.name=ATtiny412/402/212/202 (Optiboot)
 
-##############################################################
-#      ATtiny3217/1617/1607/817/807/417
-##############################################################
+##########################################################################
+#      ATtiny3227/3217/1627/1617/1607/827/817/807/427/417
+##########################################################################
 
 atxy7.upload.workaround=
 atxy7.build.millistimer=D0
@@ -265,9 +265,9 @@ atxy7.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy7.bootloader.avrdudestring=
 atxy7.bootloader.pymcuprogstring=-aerase
 
-##############################################################
-#      ATtiny3216/1616/1606/816/806/416/406
-##############################################################
+##########################################################################
+#      ATtiny3226/3216/1626/1616/1606/826/816/806/426/416/406
+##########################################################################
 
 atxy6.upload.workaround=
 atxy6.build.millistimer=D0
@@ -503,9 +503,9 @@ atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 
-##############################################################
-#      ATtiny1614/1604/814/804/414/404/214/204
-##############################################################
+##########################################################################
+#      ATtiny3224/1624/1614/804/824/814/404/214/204424/414
+##########################################################################
 
 atxy4.upload.workaround=
 atxy4.build.millistimer=D0
@@ -743,9 +743,9 @@ atxy4.bootloader.APPEND=0x00
 atxy4.bootloader.BOOTEND=0x00
 atxy4.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 
-##############################################################
+##########################################################################
 #      ATtiny412/402/212/202
-##############################################################
+##########################################################################
 
 atxy2.upload.workaround=
 atxy2.build.millistimer=D0
@@ -942,9 +942,9 @@ atxy2.bootloader.APPEND=0x00
 atxy2.bootloader.BOOTEND=0x00
 atxy2.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 
-##############################################################
+##########################################################################
 #      Attiny416 Xplained Nano (Optiboot)
-##############################################################
+##########################################################################
 
 Xplained416.upload.workaround=
 Xplained416.build.millistimer=D0
@@ -1005,9 +1005,9 @@ Xplained416.menu.millis.rtc.build.millistimer=RTC
 Xplained416.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 Xplained416.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-##############################################################
+##########################################################################
 #      Attiny817 Xplained Mini (Optiboot)
-##############################################################
+##########################################################################
 
 Xplained817.upload.workaround=
 Xplained817.build.millistimer=D0
@@ -1068,9 +1068,9 @@ Xplained817.menu.millis.rtc.build.millistimer=RTC
 Xplained817.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 Xplained817.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-##############################################################
-#      ATtiny3217/1617/1607/817/807/417 (Optiboot)
-##############################################################
+##########################################################################
+#      ATtiny3227/3217/1627/1617/1607/827/817/807/427/417 (Optiboot)
+##########################################################################
 
 atxy7o.upload.workaround=
 atxy7o.build.millistimer=D0
@@ -1308,9 +1308,9 @@ atxy7o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{b
 atxy7o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file} -a write
 atxy7o.bootloader.tool=avrdude
 
-##############################################################
-#      ATtiny3216/1616/1606/816/806/416/406 (Optiboot)
-##############################################################
+##########################################################################
+#      ATtiny3226/3216/1626/1616/1606/826/816/806/426/416/406 (Optiboot)
+##########################################################################
 
 atxy6o.upload.workaround=
 atxy6o.build.millistimer=D0
@@ -1556,9 +1556,9 @@ atxy6o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloa
 atxy6o.bootloader.BOOTEND=0x2
 atxy6o.bootloader.tool=avrdude
 
-##############################################################
-#      ATtiny1614/1604/814/804/414/404/214/204 (Optiboot)
-##############################################################
+##########################################################################
+#      ATtiny3224/1624/1614/804/824/814/404/214/204/424/414 (Optiboot)
+##########################################################################
 
 atxy4o.upload.workaround=
 atxy4o.build.millistimer=D0
@@ -1809,9 +1809,9 @@ atxy4o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy4o.bootloader.APPEND=0x00
 atxy4o.bootloader.BOOTEND=0x02
 
-##############################################################
+##########################################################################
 #      ATtiny412/402/212/202 (Optiboot)
-##############################################################
+##########################################################################
 
 atxy2o.upload.workaround=
 atxy2o.build.millistimer=D0
