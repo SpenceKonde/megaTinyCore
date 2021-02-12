@@ -31,13 +31,13 @@ SPIClass::SPIClass() {
 
 }
 
-bool SPIClass::pins(__attribute__ ((unused))uint8_t pinMOSI,__attribute__ ((unused)) uint8_t pinMISO,__attribute__ ((unused)) uint8_t pinSCK, __attribute__ ((unused)) uint8_t pinSS) {
+bool SPIClass::pins(__attribute__((unused))uint8_t pinMOSI,__attribute__((unused)) uint8_t pinMISO,__attribute__((unused)) uint8_t pinSCK, __attribute__((unused)) uint8_t pinSS) {
   #if defined(PORTMUX_CTRLB)
   #if (defined(PIN_SPI_MOSI_PINSWAP_1) && defined(PIN_SPI_MISO_PINSWAP_1) && defined(PIN_SPI_SCK_PINSWAP_1))
-  if (pinMOSI == PIN_SPI_MOSI_PINSWAP_1 && pinMISO == PIN_SPI_MISO_PINSWAP_1 && pinSCK == PIN_SPI_SCK_PINSWAP_1 /* && pinSS == PIN_SPI_SS_PINSWAP_1 */ ) {
+  if (pinMOSI == PIN_SPI_MOSI_PINSWAP_1 && pinMISO == PIN_SPI_MISO_PINSWAP_1 && pinSCK == PIN_SPI_SCK_PINSWAP_1 /* && pinSS == PIN_SPI_SS_PINSWAP_1 */) {
     _uc_mux = PORTMUX_SPI0_bm;
     return true;
-  } else if (pinMOSI == PIN_SPI_MOSI && pinMISO == PIN_SPI_MISO && pinSCK == PIN_SPI_SCK /*&& pinSS == PIN_SPI_SS */ ) {
+  } else if (pinMOSI == PIN_SPI_MOSI && pinMISO == PIN_SPI_MISO && pinSCK == PIN_SPI_SCK /*&& pinSS == PIN_SPI_SS */) {
     _uc_mux = 0;
     return true;
   } else {
@@ -47,15 +47,15 @@ bool SPIClass::pins(__attribute__ ((unused))uint8_t pinMOSI,__attribute__ ((unus
   #endif
   #elif defined(PORTMUX_SPIROUTEA)
   #if (defined(PIN_SPI_MOSI_PINSWAP_2) && defined(PIN_SPI_MISO_PINSWAP_2) && defined(PIN_SPI_SCK_PINSWAP_2))
-  if (pinMOSI == PIN_SPI_MOSI_PINSWAP_2 && pinMISO == PIN_SPI_MISO_PINSWAP_2 && pinSCK == PIN_SPI_SCK_PINSWAP_2 /* && pinSS == PIN_SPI_SS_PINSWAP_2 */ ) {
+  if (pinMOSI == PIN_SPI_MOSI_PINSWAP_2 && pinMISO == PIN_SPI_MISO_PINSWAP_2 && pinSCK == PIN_SPI_SCK_PINSWAP_2 /* && pinSS == PIN_SPI_SS_PINSWAP_2 */) {
     _uc_mux = 2;
     return true;
   } else
   #endif
-    if (pinMOSI == PIN_SPI_MOSI_PINSWAP_1 && pinMISO == PIN_SPI_MISO_PINSWAP_1 && pinSCK == PIN_SPI_SCK_PINSWAP_1 /* && pinSS == PIN_SPI_SS_PINSWAP_1 */ ) {
+    if (pinMOSI == PIN_SPI_MOSI_PINSWAP_1 && pinMISO == PIN_SPI_MISO_PINSWAP_1 && pinSCK == PIN_SPI_SCK_PINSWAP_1 /* && pinSS == PIN_SPI_SS_PINSWAP_1 */) {
       _uc_mux = 1;
       return true;
-    } else if (pinMOSI == PIN_SPI_MOSI && pinMISO == PIN_SPI_MISO && pinSCK == PIN_SPI_SCK /* && pinSS == PIN_SPI_SS */ ) {
+    } else if (pinMOSI == PIN_SPI_MOSI && pinMISO == PIN_SPI_MISO && pinSCK == PIN_SPI_SCK /* && pinSS == PIN_SPI_SS */) {
       _uc_mux = 0;
       return true;
     } else {
@@ -65,7 +65,7 @@ bool SPIClass::pins(__attribute__ ((unused))uint8_t pinMOSI,__attribute__ ((unus
   #endif
   return false;
 }
-bool SPIClass::swap(__attribute__ ((unused))uint8_t state) {
+bool SPIClass::swap(__attribute__((unused))uint8_t state) {
   #if defined(PORTMUX_CTRLB)
   #if (defined(PIN_SPI_MOSI_PINSWAP_1) && defined(PIN_SPI_MISO_PINSWAP_1) && defined(PIN_SPI_SCK_PINSWAP_1))
   if (state == 1) {
