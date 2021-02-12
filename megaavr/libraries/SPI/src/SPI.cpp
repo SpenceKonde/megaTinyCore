@@ -31,7 +31,7 @@ SPIClass::SPIClass() {
 
 }
 
-bool SPIClass::pins(__attribute__((unused))uint8_t pinMOSI,__attribute__((unused)) uint8_t pinMISO,__attribute__((unused)) uint8_t pinSCK, __attribute__((unused)) uint8_t pinSS) {
+bool SPIClass::pins(__attribute__((unused))uint8_t pinMOSI, __attribute__((unused)) uint8_t pinMISO, __attribute__((unused)) uint8_t pinSCK, __attribute__((unused)) uint8_t pinSS) {
   #if defined(PORTMUX_CTRLB)
   #if (defined(PIN_SPI_MOSI_PINSWAP_1) && defined(PIN_SPI_MISO_PINSWAP_1) && defined(PIN_SPI_SCK_PINSWAP_1))
   if (pinMOSI == PIN_SPI_MOSI_PINSWAP_1 && pinMISO == PIN_SPI_MISO_PINSWAP_1 && pinSCK == PIN_SPI_SCK_PINSWAP_1 /* && pinSS == PIN_SPI_SS_PINSWAP_1 */) {

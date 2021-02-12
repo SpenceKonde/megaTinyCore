@@ -9,8 +9,8 @@
   This library is included with megaTinyCore and DxCore.
 
   This version was designed for and will be included with:
-  megaTinyCore 2.2.7+
-  DxCore 1.3.1+
+  megaTinyCore 2.3.0+
+  DxCore 1.3.2+
 */
 
 /*  OBLIGATORY LEGAL BOILERPLATE

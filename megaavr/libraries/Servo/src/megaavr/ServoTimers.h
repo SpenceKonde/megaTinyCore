@@ -17,8 +17,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
   This version was designed for and will be included with:
-  megaTinyCore 2.2.7+
-  DxCore 1.3.1+
+  megaTinyCore 2.3.0+
+  DxCore 1.3.2+
 */
 
 #ifndef __SERVO_TIMERS_H__
