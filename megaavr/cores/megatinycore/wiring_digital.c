@@ -27,8 +27,7 @@
 #include "pins_arduino.h"
 
 
-inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin)
-{
+inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
   if(__builtin_constant_p(pin))
     if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
     // Exception made for NOT_A_PIN - code exists which relies on being able to pass this and have nothing happen.
@@ -265,8 +264,7 @@ void digitalWrite(uint8_t pin, uint8_t val) {
   turnOffPWM(pin);
 }
 
-inline __attribute__((always_inline)) void digitalWriteFast(uint8_t pin, uint8_t val)
-{
+inline __attribute__((always_inline)) void digitalWriteFast(uint8_t pin, uint8_t val) {
   check_constant_pin(pin);
   check_valid_digital_pin(pin);
   if (pin==NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compile time known so w/e
@@ -323,8 +321,7 @@ int8_t digitalRead(uint8_t pin) {
 }
 
 
-inline __attribute__((always_inline)) int8_t digitalReadFast(uint8_t pin)
-{
+inline __attribute__((always_inline)) int8_t digitalReadFast(uint8_t pin) {
   check_constant_pin(pin);
   check_valid_digital_pin(pin);
   // Mega-0, Tiny-1 style IOPORTs
@@ -341,7 +338,7 @@ inline __attribute__((always_inline)) int8_t digitalReadFast(uint8_t pin)
 }
 
 
-void openDrain(uint8_t pin, uint8_t state){
+void openDrain(uint8_t pin, uint8_t state) {
   check_valid_digital_pin(pin);
   uint8_t bit_mask = digitalPinToBitMask(pin);
   if (bit_mask == NOT_A_PIN)  return;
@@ -355,10 +352,9 @@ void openDrain(uint8_t pin, uint8_t state){
   else // assume FLOAT
     port->DIRCLR=bit_mask;
   turnOffPWM(pin);
-  }
+}
 
-inline __attribute__((always_inline)) void openDrainFast(uint8_t pin, uint8_t val)
-{
+inline __attribute__((always_inline)) void openDrainFast(uint8_t pin, uint8_t val) {
   check_constant_pin(pin);
   check_valid_digital_pin(pin);
   if (pin==NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compile time known so w/e
