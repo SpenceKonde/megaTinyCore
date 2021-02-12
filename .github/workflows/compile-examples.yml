@@ -94,6 +94,7 @@ jobs:
           - 4
           - 2
         peripheral-class:
+          - 2
           - 1
           - 0
         IO-class:
@@ -124,6 +125,12 @@ jobs:
             IO-class: 7
           - flash-class: 2
             IO-class: 6
+          - flash-class: 2
+            peripheral-class: 2
+          - IO-class: 2
+            peripheral-class: 2
+          - flash-class: 32
+            peripheral-class: 2
 
         include:
           - flash-class: 32
