@@ -12,6 +12,7 @@ void setup() {
 }
 
 uint16_t readSupplyVoltage() { //returns value in millivolts to avoid floating point
+  #if MEGATINYCORE_SERIES!=2
   analogReference(VDD);
   VREF.CTRLA = VREF_ADC0REFSEL_1V5_gc;
   // there is a settling time between when reference is turned on, and when it becomes valid.
@@ -27,8 +28,12 @@ uint16_t readSupplyVoltage() { //returns value in millivolts to avoid floating p
   uint32_t intermediate = 1023UL * 1500;
   reading = intermediate / reading;
   return reading;
+  #else
+    return -1;
+  #endif
 }
 void printRegisters() {
+  #if MEGATINYCORE_SERIES!=2
   Serial.print("ADC0.MUXPOS: ");
   showHex(ADC0.MUXPOS);
   Serial.print("  ADC0.CTRLC: ");
@@ -36,9 +41,11 @@ void printRegisters() {
   Serial.print("  VREF.CTRLA: ");
   showHex(VREF.CTRLA);
   Serial.println();
+  #endif
 }
 
 uint16_t readTemp() {
+  #if MEGATINYCORE_SERIES!=2
   //based on the datasheet, in section 30.3.2.5 Temperature Measurement
   int8_t sigrow_offset = SIGROW.TEMPSENSE1; // Read signed value from signature row
   uint8_t sigrow_gain = SIGROW.TEMPSENSE0; // Read unsigned value from signature row
@@ -59,6 +66,9 @@ uint16_t readTemp() {
   temp += 0x80; // Add 1/2 to get correct rounding on division below
   temp >>= 8; // Divide result to get Kelvin
   return temp;
+  #else
+    return -1;
+  #endif
 }
 
 void showHex(const byte b) {

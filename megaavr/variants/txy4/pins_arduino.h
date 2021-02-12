@@ -35,19 +35,6 @@
 
 #define EXTERNAL_NUM_INTERRUPTS     12
 
-static const uint8_t PIN_PA4 = 0;
-static const uint8_t PIN_PA5 = 1;
-static const uint8_t PIN_PA6 = 2;
-static const uint8_t PIN_PA7 = 3;
-static const uint8_t PIN_PB3 = 4;
-static const uint8_t PIN_PB2 = 5;
-static const uint8_t PIN_PB1 = 6;
-static const uint8_t PIN_PB0 = 7;
-static const uint8_t PIN_PA0 = 11;
-static const uint8_t PIN_PA1 = 8;
-static const uint8_t PIN_PA2 = 9;
-static const uint8_t PIN_PA3 = 10;
-
 #define digitalPinHasPWM(p)         ((p) == PIN_PA4 || (p) == PIN_PA5 || (p) == PIN_PB2 || (p) == PIN_PB1 || (p) == PIN_PB0 || (p) == PIN_PA3)
 
 #define PIN_SPI_SS                    (PIN_PA0)
@@ -112,29 +99,40 @@ static const uint8_t PIN_PA3 = 10;
 #endif
 #define LED_BUILTIN     (PIN_PA7)
 
+#define PIN_PA4          (0)
+#define PIN_PA5          (1)
+#define PIN_PA6          (2)
+#define PIN_PA7          (3)
+#define PIN_PB3          (4)
+#define PIN_PB2          (5)
+#define PIN_PB1          (6)
+#define PIN_PB0          (7)
+#define PIN_PA0          (11)
+#define PIN_PA1          (8)
+#define PIN_PA2          (9)
+#define PIN_PA3          (10)
 
-#define PIN_A0   (PIN_PA0)
-#define PIN_A1   (PIN_PA1)
-#define PIN_A2   (PIN_PA2)
-#define PIN_A3   (PIN_PA3)
-#define PIN_A4   (PIN_PA4)
-#define PIN_A5   (PIN_PA5)
-#define PIN_A6   (PIN_PA6)
-#define PIN_A7   (PIN_PA7)
-#define PIN_A10  (PIN_PB1)
-#define PIN_A11  (PIN_PB0)
+#define PIN_A0           (A0)
+#define PIN_A1           (A1)
+#define PIN_A2           (A2)
+#define PIN_A3           (A3)
+#define PIN_A4           (A4)
+#define PIN_A5           (A5)
+#define PIN_A6           (A6)
+#define PIN_A7           (A7)
+#define PIN_A10          (A10)
+#define PIN_A11          (A11)
 
-
-static const uint8_t A0  = PIN_A0;
-static const uint8_t A1  = PIN_A1;
-static const uint8_t A2  = PIN_A2;
-static const uint8_t A3  = PIN_A3;
-static const uint8_t A4  = PIN_A4;
-static const uint8_t A5  = PIN_A5;
-static const uint8_t A6  = PIN_A6;
-static const uint8_t A7  = PIN_A7;
-static const uint8_t A10 = PIN_A10;
-static const uint8_t A11 = PIN_A11;
+static const uint8_t      A0  = PIN_A0;
+static const uint8_t      A1  = PIN_A1;
+static const uint8_t      A2  = PIN_A2;
+static const uint8_t      A3  = PIN_A3;
+static const uint8_t      A4  = PIN_A4;
+static const uint8_t      A5  = PIN_A5;
+static const uint8_t      A6  = PIN_A6;
+static const uint8_t      A7  = PIN_A7;
+static const uint8_t      A10 = PIN_A10;
+static const uint8_t      A11 = PIN_A11;
 
 #define PINS_COUNT    (12u)
 
