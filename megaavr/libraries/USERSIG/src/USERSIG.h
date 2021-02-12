@@ -191,7 +191,7 @@ struct USERSIGClass {
     return length();  //Standards requires this to be the item after the last valid entry. The returned pointer is invalid.
   }
   static constexpr uint8_t length()   {
-    return 32;
+    return USER_SIGNATURES_SIZE;
   }
 
   //Functionality to 'get' and 'put' objects to and from EEPROM.
