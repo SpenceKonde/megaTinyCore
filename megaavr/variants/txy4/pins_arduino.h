@@ -40,89 +40,89 @@
 
 #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 5 || (p) == 6 || (p) == 7 || (p) == 10)
 
-#define PIN_SPI_MISO  (9)
-#define PIN_SPI_SCK   (10)
-#define PIN_SPI_MOSI  (8)
-#define PIN_SPI_SS    (0)
+#define PIN_SPI_SS                    (PIN_PA0)
+#define PIN_SPI_MOSI                  (PIN_PA1)
+#define PIN_SPI_MISO                  (PIN_PA2)
+#define PIN_SPI_SCK                   (PIN_PA3)
 
 #define SPI_INTERFACES_COUNT  1
 
-
-
 #ifdef PORTMUX_TWI0_bm
-  #define PIN_WIRE_SDA_PINSWAP_1        (8)
-  #define PIN_WIRE_SCL_PINSWAP_1        (9)
+  #define PIN_WIRE_SDA_PINSWAP_1      (PIN_PA1)
+  #define PIN_WIRE_SCL_PINSWAP_1      (PIN_PA2)
 #endif
-#define PIN_WIRE_SDA        (6)
-#define PIN_WIRE_SCL        (7)
-
+#define PIN_WIRE_SDA                  (PIN_PB1)
+#define PIN_WIRE_SCL                  (PIN_PB0)
 
 // Mapped to HWSERIAL0 in Serial library
-#define HWSERIAL0                 (&USART0)
-#define HWSERIAL0_DRE_VECTOR     (USART0_DRE_vect)
-#define HWSERIAL0_DRE_VECTOR_NUM (USART0_DRE_vect_num)
-#define HWSERIAL0_RXC_VECTOR     (USART0_RXC_vect)
-#define HWSERIAL0_RXC_VECTOR_NUM (USART0_RXC_vect_num)
-#define HWSERIAL0_TXC_VECTOR     (USART0_TXC_vect)
-#define HWSERIAL0_TXC_VECTOR_NUM (USART0_TXC_vect_num)
-#define HWSERIAL0_MUX_PINSWAP_1             0x01
-#define PIN_HWSERIAL0_RX_PINSWAP_1     (PIN_PA2)
-#define PIN_HWSERIAL0_TX_PINSWAP_1     (PIN_PA1)
-#define PIN_HWSERIAL0_XCK_PINSWAP_1     (PIN_PA3)
-#define PIN_HWSERIAL0_XDIR_PINSWAP_1     (PIN_PA4)
-#define HWSERIAL0_MUX             0x00
-#define PIN_HWSERIAL0_RX     (PIN_PB3)
-#define PIN_HWSERIAL0_TX     (PIN_PB2)
-#define PIN_HWSERIAL0_XCK     (PIN_PB1)
-#define PIN_HWSERIAL0_XDIR     (PIN_PB0)
+#define HWSERIAL0                     (&USART0)
+#define HWSERIAL0_DRE_VECTOR          (USART0_DRE_vect)
+#define HWSERIAL0_DRE_VECTOR_NUM      (USART0_DRE_vect_num)
+#define HWSERIAL0_RXC_VECTOR          (USART0_RXC_vect)
+#define HWSERIAL0_RXC_VECTOR_NUM      (USART0_RXC_vect_num)
+#define HWSERIAL0_TXC_VECTOR          (USART0_TXC_vect)
+#define HWSERIAL0_TXC_VECTOR_NUM      (USART0_TXC_vect_num)
+
+#define HWSERIAL0_MUX                 0x00
+#define PIN_HWSERIAL0_TX              (PIN_PB2)
+#define PIN_HWSERIAL0_RX              (PIN_PB3)
+#define PIN_HWSERIAL0_XCK             (PIN_PB1)
+#define PIN_HWSERIAL0_XDIR            (PIN_PB0)
+
+#define HWSERIAL0_MUX_PINSWAP_1       0x01
+#define PIN_HWSERIAL0_TX_PINSWAP_1    (PIN_PA1)
+#define PIN_HWSERIAL0_RX_PINSWAP_1    (PIN_PA2)
+#define PIN_HWSERIAL0_XCK_PINSWAP_1   (PIN_PA3)
+#define PIN_HWSERIAL0_XDIR_PINSWAP_1  (PIN_PA4)
 
 #if defined(USART1)
   // Mapped to HWSERIAL1 in Serial library
-  #define HWSERIAL1                 (&USART1)
-  #define HWSERIAL1_DRE_VECTOR     (USART1_DRE_vect)
-  #define HWSERIAL1_DRE_VECTOR_NUM (USART1_DRE_vect_num)
-  #define HWSERIAL1_RXC_VECTOR     (USART1_RXC_vect)
-  #define HWSERIAL1_RXC_VECTOR_NUM (USART1_RXC_vect_num)
-  #define HWSERIAL1_TXC_VECTOR     (USART1_TXC_vect)
-  #define HWSERIAL1_TXC_VECTOR_NUM (USART1_TXC_vect_num)
-  #define HWSERIAL1_MUX_PINSWAP_1             0x01
-  #define PIN_HWSERIAL1_RX_PINSWAP_1     (PIN_PA2)
-  #define PIN_HWSERIAL1_TX_PINSWAP_1     (PIN_PA1)
-  #define PIN_HWSERIAL1_XCK_PINSWAP_1     (PIN_PA3)
-  #define PIN_HWSERIAL1_XDIR_PINSWAP_1     (PIN_PA4)
-  #define HWSERIAL1_MUX             0x00
-  #define PIN_HWSERIAL1_RX     (PIN_PA2)
-  #define PIN_HWSERIAL1_TX     (PIN_PA1)
-  #define PIN_HWSERIAL1_XCK     (PIN_PA3)
-  #define PIN_HWSERIAL1_XDIR     (PIN_PA4)
+  #define HWSERIAL1                     (&USART1)
+  #define HWSERIAL1_DRE_VECTOR          (USART1_DRE_vect)
+  #define HWSERIAL1_DRE_VECTOR_NUM      (USART1_DRE_vect_num)
+  #define HWSERIAL1_RXC_VECTOR          (USART1_RXC_vect)
+  #define HWSERIAL1_RXC_VECTOR_NUM      (USART1_RXC_vect_num)
+  #define HWSERIAL1_TXC_VECTOR          (USART1_TXC_vect)
+  #define HWSERIAL1_TXC_VECTOR_NUM      (USART1_TXC_vect_num)
+  #define HWSERIAL1_MUX                 0x00
+  #define PIN_HWSERIAL1_TX              (PIN_PA1)
+  #define PIN_HWSERIAL1_RX              (PIN_PA2)
+  #define PIN_HWSERIAL1_XCK             (PIN_PA3)
+  #define PIN_HWSERIAL1_XDIR            (PIN_PA4)
+
+  #define HWSERIAL1_MUX_PINSWAP_1       0x01
+  #define PIN_HWSERIAL1_TX_PINSWAP_1    (PIN_PA1)
+  #define PIN_HWSERIAL1_RX_PINSWAP_1    (PIN_PA2)
+  #define PIN_HWSERIAL1_XCK_PINSWAP_1   (PIN_PA3)
+  #define PIN_HWSERIAL1_XDIR_PINSWAP_1  (PIN_PA4)
 #endif
 
 #ifdef DAC0
-  #define DAC_PIN PIN_PA6
+  #define DAC_PIN       (PIN_PA6)
 #endif
-#define LED_BUILTIN PIN_PA7
+#define LED_BUILTIN     (PIN_PA7)
 
 
+#define PIN_A0   (PIN_PA0)
+#define PIN_A1   (PIN_PA1)
+#define PIN_A2   (PIN_PA2)
+#define PIN_A3   (PIN_PA3)
+#define PIN_A4   (PIN_PA4)
+#define PIN_A5   (PIN_PA5)
+#define PIN_A6   (PIN_PA6)
+#define PIN_A7   (PIN_PA7)
+#define PIN_A10  (PIN_PB1)
+#define PIN_A11  (PIN_PB0)
 
-#define PIN_A0   (11)
-#define PIN_A1   (8)
-#define PIN_A2   (9)
-#define PIN_A3   (10)
-#define PIN_A4   (0)
-#define PIN_A5   (1)
-#define PIN_A6   (2)
-#define PIN_A7   (3)
-#define PIN_A10  (6)
-#define PIN_A11  (7)
 
-static const uint8_t A0 = PIN_A0;
-static const uint8_t A1 = PIN_A1;
-static const uint8_t A2 = PIN_A2;
-static const uint8_t A3 = PIN_A3;
-static const uint8_t A4 = PIN_A4;
-static const uint8_t A5 = PIN_A5;
-static const uint8_t A6 = PIN_A6;
-static const uint8_t A7 = PIN_A7;
+static const uint8_t A0  = PIN_A0;
+static const uint8_t A1  = PIN_A1;
+static const uint8_t A2  = PIN_A2;
+static const uint8_t A3  = PIN_A3;
+static const uint8_t A4  = PIN_A4;
+static const uint8_t A5  = PIN_A5;
+static const uint8_t A6  = PIN_A6;
+static const uint8_t A7  = PIN_A7;
 static const uint8_t A10 = PIN_A10;
 static const uint8_t A11 = PIN_A11;
 
