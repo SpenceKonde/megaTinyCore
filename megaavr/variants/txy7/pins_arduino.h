@@ -89,7 +89,7 @@
 #define PIN_HWSERIAL0_XDIR     (PIN_PB0)
 
 #if MEGATINYCORE_SERIES == 2
-// Mapped to HWSERIAL1 in Serial library
+  // Mapped to HWSERIAL1 in Serial library
   #define HWSERIAL1                 (&USART1)
   #define HWSERIAL1_DRE_VECTOR     (USART1_DRE_vect)
   #define HWSERIAL1_DRE_VECTOR_NUM (USART1_DRE_vect_num)
