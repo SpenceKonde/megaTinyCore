@@ -16,7 +16,8 @@
   License along with NeoPixel.  If not, see
   <http://www.gnu.org/licenses/>.
   --------------------------------------------------------------------*/
-
+// *INDENT-OFF* astyle hates this file
+// *PAD-OFF* and destroys the lookup tables!
 #ifndef TINYNEOPIXEL_H
 #define TINYNEOPIXEL_H
 

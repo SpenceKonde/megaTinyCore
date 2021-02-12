@@ -60,7 +60,7 @@
   It does not recruit additional timers. Who the hell runs over a dozen
   servos from one board? Complain in the github issues for the core if
   this is actually a problem - I'm inclined to think it's not.
- */
+*/
 
 #ifndef Servo_h
 #define Servo_h
@@ -82,7 +82,7 @@
   #error "This is an architecture specific library for ARDUINO_ARCH_MEGAAVR, but this device is not of that architecture"
 #endif
 
-
+// *INDENT-OFF*
 #define Servo_VERSION              2     // software version of this library
 #define MIN_PULSE_WIDTH          544     // the shortest pulse sent to a servo
 #define MAX_PULSE_WIDTH         2400     // the longest pulse sent to a servo
@@ -92,15 +92,14 @@
                                          // but overflow at higher ones!
 #define SERVOS_PER_TIMER          12     // the maximum number of servos controlled by one timer
 #define INVALID_SERVO            255     // flag indicating an invalid servo index
-
+// *INDENT-ON*
 #define MAX_SERVOS (_Nbr_16timers  * SERVOS_PER_TIMER)
 
 
 typedef struct  {
   uint8_t isActive ;    // true if this channel is enabled, pin not pulsed if false
   uint8_t port;         // port number (A=0, B=1, and so on)
-  uint8_t bitmask;      // output pin bitmask
-                        // port & bitmask used instead of pin number to realize dramatic performance boost
+  uint8_t bitmask;      // port & bitmask used instead of pin number to realize dramatic performance boost
 } ServoPin_t   ;
 
 typedef struct {

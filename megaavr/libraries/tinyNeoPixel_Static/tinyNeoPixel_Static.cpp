@@ -70,7 +70,7 @@ tinyNeoPixel::~tinyNeoPixel() {
   //if (pin >= 0) pinMode(pin, INPUT);
 }
 
-// *INDENT-OFF*   maybe this will keep artisticstyle off our ass!
+// *INDENT-OFF*   astyle don't like assembly
 void tinyNeoPixel::show(void) {
 
   if ((!pixels) || pin >= NUM_DIGITAL_PINS)  {
