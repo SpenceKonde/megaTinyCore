@@ -28,8 +28,6 @@
 
 #define NUM_DIGITAL_PINS            12 //
 #define NUM_ANALOG_INPUTS           9
-//#define NUM_RESERVED_PINS           0 // (TOSC1/2, VREF, RESET, DEBUG USART Rx/Tx)
-//#define NUM_INTERNALLY_USED_PINS    0 // (2 x Chip select + 2 x UART + 4 x IO + LED_BUILTIN + 1 unused pin)
 #define NUM_I2C_PINS                2 // (SDA / SCL)
 #define NUM_SPI_PINS                3 // (MISO / MOSI / SCK)
 #define NUM_TOTAL_FREE_PINS         (NUM_DIGITAL_PINS)
@@ -37,8 +35,20 @@
 
 #define EXTERNAL_NUM_INTERRUPTS     12
 
+static const uint8_t PIN_PA4 = 0;
+static const uint8_t PIN_PA5 = 1;
+static const uint8_t PIN_PA6 = 2;
+static const uint8_t PIN_PA7 = 3;
+static const uint8_t PIN_PB3 = 4;
+static const uint8_t PIN_PB2 = 5;
+static const uint8_t PIN_PB1 = 6;
+static const uint8_t PIN_PB0 = 7;
+static const uint8_t PIN_PA0 = 11;
+static const uint8_t PIN_PA1 = 8;
+static const uint8_t PIN_PA2 = 9;
+static const uint8_t PIN_PA3 = 10;
 
-#define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 5 || (p) == 6 || (p) == 7 || (p) == 10)
+#define digitalPinHasPWM(p)         ((p) == PIN_PA4 || (p) == PIN_PA5 || (p) == PIN_PB2 || (p) == PIN_PB1 || (p) == PIN_PB0 || (p) == PIN_PA3)
 
 #define PIN_SPI_SS                    (PIN_PA0)
 #define PIN_SPI_MOSI                  (PIN_PA1)
@@ -125,19 +135,6 @@ static const uint8_t A6  = PIN_A6;
 static const uint8_t A7  = PIN_A7;
 static const uint8_t A10 = PIN_A10;
 static const uint8_t A11 = PIN_A11;
-
-static const uint8_t PIN_PA4 = 0;
-static const uint8_t PIN_PA5 = 1;
-static const uint8_t PIN_PA6 = 2;
-static const uint8_t PIN_PA7 = 3;
-static const uint8_t PIN_PB3 = 4;
-static const uint8_t PIN_PB2 = 5;
-static const uint8_t PIN_PB1 = 6;
-static const uint8_t PIN_PB0 = 7;
-static const uint8_t PIN_PA0 = 11;
-static const uint8_t PIN_PA1 = 8;
-static const uint8_t PIN_PA2 = 9;
-static const uint8_t PIN_PA3 = 10;
 
 #define PINS_COUNT    (12u)
 

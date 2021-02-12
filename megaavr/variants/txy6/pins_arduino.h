@@ -33,13 +33,30 @@
 
 #define NUM_DIGITAL_PINS            18
 #define NUM_ANALOG_INPUTS           12
-//#define NUM_RESERVED_PINS           0 // (TOSC1/2, VREF, RESET, DEBUG USART Rx/Tx)
-//#define NUM_INTERNALLY_USED_PINS    0 // (2 x Chip select + 2 x UART + 4 x IO + LED_BUILTIN + 1 unused pin)
 #define NUM_I2C_PINS                2 // (SDA / SCL)
 #define NUM_SPI_PINS                3 // (MISO / MOSI / SCK)
 #define NUM_TOTAL_PINS              18
 
 #define EXTERNAL_NUM_INTERRUPTS     20
+
+static const uint8_t PIN_PA4 = 0;
+static const uint8_t PIN_PA5 = 1;
+static const uint8_t PIN_PA6 = 2;
+static const uint8_t PIN_PA7 = 3;
+static const uint8_t PIN_PB5 = 4;
+static const uint8_t PIN_PB4 = 5;
+static const uint8_t PIN_PB3 = 6;
+static const uint8_t PIN_PB2 = 7;
+static const uint8_t PIN_PB1 = 8;
+static const uint8_t PIN_PB0 = 9;
+static const uint8_t PIN_PC0 = 10;
+static const uint8_t PIN_PC1 = 11;
+static const uint8_t PIN_PC2 = 12;
+static const uint8_t PIN_PC3 = 13;
+static const uint8_t PIN_PA0 = 17;
+static const uint8_t PIN_PA1 = 14;
+static const uint8_t PIN_PA2 = 15;
+static const uint8_t PIN_PA3 = 16;
 
 #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
   #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 7 || (p) == 8 || (p) == 9 || (p)==10 || (p)==11 || (p) == 16 )
@@ -52,8 +69,7 @@
 #define PIN_SPI_MOSI                  (PIN_PA1)
 #define PIN_SPI_MISO                  (PIN_PA2)
 #define PIN_SPI_SCK                   (PIN_PA3)
-#if      defined(PORTMUX_SPI0_bm) \
-      || defined(PORTMUX_SPIROUTEA)
+#if defined(PORTMUX_SPI0_bm) || defined(PORTMUX_SPIROUTEA)
   #define PIN_SPI_SCK_PINSWAP_1       (PIN_PC0)
   #define PIN_SPI_MISO_PINSWAP_1      (PIN_PC1)
   #define PIN_SPI_MOSI_PINSWAP_1      (PIN_PC2)
@@ -149,25 +165,6 @@ static const uint8_t A8  = PIN_A8;
 static const uint8_t A9  = PIN_A9;
 static const uint8_t A10 = PIN_A10;
 static const uint8_t A11 = PIN_A11;
-
-static const uint8_t PIN_PA4 = 0;
-static const uint8_t PIN_PA5 = 1;
-static const uint8_t PIN_PA6 = 2;
-static const uint8_t PIN_PA7 = 3;
-static const uint8_t PIN_PB5 = 4;
-static const uint8_t PIN_PB4 = 5;
-static const uint8_t PIN_PB3 = 6;
-static const uint8_t PIN_PB2 = 7;
-static const uint8_t PIN_PB1 = 8;
-static const uint8_t PIN_PB0 = 9;
-static const uint8_t PIN_PC0 = 10;
-static const uint8_t PIN_PC1 = 11;
-static const uint8_t PIN_PC2 = 12;
-static const uint8_t PIN_PC3 = 13;
-static const uint8_t PIN_PA0 = 17;
-static const uint8_t PIN_PA1 = 14;
-static const uint8_t PIN_PA2 = 15;
-static const uint8_t PIN_PA3 = 16;
 
 #define PINS_COUNT    (18u)
 
