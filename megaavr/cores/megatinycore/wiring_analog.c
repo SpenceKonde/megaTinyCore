@@ -143,7 +143,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
 
 int analogRead(uint8_t pin) {
 #ifdef ADC_LOWLAT_bm
-  badCall("analog functionality not yet available for 2-series");
+  //badCall("analog functionality not yet available for 2-series");
   return -1;
 #else
   check_valid_analog_pin(pin);
