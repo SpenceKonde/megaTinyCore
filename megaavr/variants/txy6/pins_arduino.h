@@ -89,6 +89,27 @@
 #define PIN_HWSERIAL0_XCK     (PIN_PB1)
 #define PIN_HWSERIAL0_XDIR     (PIN_PB0)
 
+#if MEGATINYCORE_SERIES == 2
+// Mapped to HWSERIAL1 in Serial library
+  #define HWSERIAL1                 (&USART1)
+  #define HWSERIAL1_DRE_VECTOR     (USART1_DRE_vect)
+  #define HWSERIAL1_DRE_VECTOR_NUM (USART1_DRE_vect_num)
+  #define HWSERIAL1_RXC_VECTOR     (USART1_RXC_vect)
+  #define HWSERIAL1_RXC_VECTOR_NUM (USART1_RXC_vect_num)
+  #define HWSERIAL1_TXC_VECTOR     (USART1_TXC_vect)
+  #define HWSERIAL1_TXC_VECTOR_NUM (USART1_TXC_vect_num)
+  #define HWSERIAL1_MUX_PINSWAP_1             0x01
+  #define PIN_HWSERIAL1_RX_PINSWAP_1     (PIN_PC1)
+  #define PIN_HWSERIAL1_TX_PINSWAP_1     (PIN_PC2)
+  #define PIN_HWSERIAL1_XCK_PINSWAP_1     (PIN_PC0)
+  #define PIN_HWSERIAL1_XDIR_PINSWAP_1     (PIN_PC3)
+  #define HWSERIAL1_MUX             0x00
+  #define PIN_HWSERIAL1_RX     (PIN_PA2)
+  #define PIN_HWSERIAL1_TX     (PIN_PA1)
+  #define PIN_HWSERIAL1_XCK     (PIN_PA3)
+  #define PIN_HWSERIAL1_XDIR     (PIN_PA4)
+#endif
+
 #ifdef DAC0
   #define DAC_PIN PIN_PA6
 #endif
