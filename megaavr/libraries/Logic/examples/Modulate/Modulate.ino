@@ -21,9 +21,9 @@
 
 // Make sure this compiles on 8-pin parts for the automated tests...
 #if !defined(__AVR_ATtinyxy2__)
-#define PIN_TCA_WO0 PIN_PB0
+  #define PIN_TCA_WO0 PIN_PB0
 #else
-#define PIN_TCA_WO0 PIN_PA7
+  #define PIN_TCA_WO0 PIN_PA7
 #endif
 
 
