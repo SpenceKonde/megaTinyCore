@@ -577,6 +577,7 @@ atxy4.menu.chip.824.upload.maximum_size=8192
 atxy4.menu.chip.824.upload.maximum_data_size=1024
 atxy4.menu.chip.424=ATtiny424
 atxy4.menu.chip.424.build.board=AVR_ATtiny424
+atxy4.menu.chip.424.build.millistimer=A0
 atxy4.menu.chip.424.build.attiny=424
 atxy4.menu.chip.424.upload.maximum_size=4096
 atxy4.menu.chip.424.upload.maximum_data_size=512
