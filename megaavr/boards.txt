@@ -777,7 +777,6 @@ atxy2.upload.tool=avrdude
 
 atxy2.bootloader.avrdudestring=
 atxy2.bootloader.pymcuprogstring=-aerase
-atxy2.bootloader.tool=avrdude
 
 atxy2.menu.chip.412=ATtiny412
 atxy2.menu.chip.412.build.board=AVR_ATtiny412
@@ -796,7 +795,6 @@ atxy2.menu.chip.402.build.millistimer=A0
 atxy2.menu.chip.402.upload.maximum_size=4096
 atxy2.menu.chip.402.upload.maximum_data_size=256
 atxy2.menu.chip.402w=ATtiny402 (bad signature)
-atxy2.menu.chip.402w.build.board=AVR_ATtiny402
 atxy2.menu.chip.402w.build.millistimer=A0
 atxy2.menu.chip.402w.build.board=AVR_ATtiny402
 atxy2.menu.chip.402w.upload.maximum_size=4096
