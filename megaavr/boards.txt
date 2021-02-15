@@ -32,7 +32,7 @@ atxy2.name=8-pin ATtiny412/402/212/202
 atxy7o.name=24-pin tinyAVR 0/1/2-series w/Optiboot (ATtinyxxy7)
 atxy6o.name=20-pin tinyAVR 0/1/2-series w/Optiboot (ATtinyxxy6)
 atxy4o.name=14-pin tinyAVR 0/1/2-series w/Optiboot (ATtinyxxy4)
-atxy2o.name=9-pin ATtiny412/402/212/202 w/Optiboot
+atxy2o.name=8-pin ATtiny412/402/212/202 w/Optiboot
 Xplained416.name=Attiny416 Xplained Nano (Optiboot)
 Xplained817.name=Attiny817 Xplained Mini (Optiboot)
 
@@ -953,131 +953,6 @@ atxy2.bootloader.APPEND=0x00
 atxy2.bootloader.BOOTEND=0x00
 atxy2.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 
-##########################################################################
-#      Attiny416 Xplained Nano (Optiboot)
-##########################################################################
-
-Xplained416.upload.workaround=
-Xplained416.build.millistimer=D0
-Xplained416.build.bootload=opti
-Xplained416.build.mcu=attiny{build.attiny}
-Xplained416.build.serialeventabr=
-Xplained416.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
-Xplained416.build.f_cpu={build.speed}000000L
-
-Xplained416.build.attiny=416
-Xplained416.build.board=AVR_Xplained416
-Xplained416.build.core=megatinycore
-Xplained416.build.variant=txy6
-Xplained416.build.speed=20
-Xplained416.build.clocksource=0
-Xplained416.build.text_section_start=.text=0x200
-Xplained416.build.extra_flags=-DARDUINO_attinyxy6 -DARDUINO_AVR_ATtiny416 {build.serialevent} {build.millis} -DUARTBAUD5V
-
-Xplained416.menu.serialevent.no=No (saves space)
-Xplained416.menu.serialevent.yes=Yes
-Xplained416.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-Xplained416.menu.serialevent.yes.build.serialevent=
-Xplained416.menu.serialevent.yes.build.serialeventabr=E
-
-Xplained416.upload.tool=avrdude
-Xplained416.upload.speed=57600
-Xplained416.upload.maximum_size=3584
-Xplained416.upload.maximum_data_size=256
-Xplained416.upload.protocol=arduino
-Xplained416.upload.extra_params=-D
-Xplained416.bootloader.file=optiboot_x/optiboot_xplained416.hex
-Xplained416.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
-Xplained416.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file} -a write
-Xplained416.bootloader.tool=avrdude
-Xplained416.bootloader.BOOTEND=0x2
-Xplained416.bootloader.OSCCFG=0x02
-Xplained416.bootloader.WDTCFG=0x00
-Xplained416.bootloader.BODCFG=0b00000000
-Xplained416.bootloader.TCD0CFG=0x00
-Xplained416.bootloader.SYSCFG0=0xC9
-Xplained416.bootloader.SYSCFG1=0x07
-Xplained416.bootloader.APPEND=0x00
-
-Xplained416.menu.millis.enabled=Enabled (default timer)
-Xplained416.menu.millis.disabled=Disabled (saves flash)
-Xplained416.menu.millis.timera=TCA0
-Xplained416.menu.millis.timerd=TCD0 (default)
-Xplained416.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
-Xplained416.menu.millis.enabled.build.millistimer=D0
-Xplained416.menu.millis.rtc=RTC (no micros)
-Xplained416.menu.millis.rtcxtal=RTC w/w32.768 kHz ext. crystal (no micros)
-Xplained416.menu.millis.rtcxosc=RTC w/w32.768 kHz ext. oscillator (no micros)
-Xplained416.menu.millis.disabled.build.millistimer=NONE
-Xplained416.menu.millis.timera.build.millistimer=A0
-Xplained416.menu.millis.timerd.build.millistimer=D0
-Xplained416.menu.millis.timerb0.build.millistimer=B0
-Xplained416.menu.millis.rtc.build.millistimer=RTC
-Xplained416.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-Xplained416.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
-
-##########################################################################
-#      Attiny817 Xplained Mini (Optiboot)
-##########################################################################
-
-Xplained817.upload.workaround=
-Xplained817.build.millistimer=D0
-Xplained817.build.bootload=opti
-Xplained817.build.mcu=attiny{build.attiny}
-Xplained817.build.serialeventabr=
-Xplained817.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
-Xplained817.build.f_cpu={build.speed}000000L
-
-Xplained817.build.attiny=817
-Xplained817.build.board=AVR_Xplained817
-Xplained817.build.core=megatinycore
-Xplained817.build.variant=txy7
-Xplained817.build.speed=20
-Xplained817.build.clocksource=0
-Xplained817.build.text_section_start=.text=0x200
-Xplained817.build.extra_flags=-DARDUINO_attinyxy7 -DARDUINO_AVR_ATtiny817 {build.serialevent} {build.millis} -DUARTBAUD5V
-
-Xplained817.menu.serialevent.no=No (saves space)
-Xplained817.menu.serialevent.yes=Yes
-Xplained817.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-Xplained817.menu.serialevent.yes.build.serialevent=
-Xplained817.menu.serialevent.yes.build.serialeventabr=E
-
-Xplained817.upload.tool=avrdude
-Xplained817.upload.speed=57600
-Xplained817.upload.maximum_size=7680
-Xplained817.upload.maximum_data_size=512
-Xplained817.upload.protocol=arduino
-Xplained817.upload.extra_params=-D
-Xplained817.bootloader.file=optiboot_x/optiboot_xplained817.hex
-Xplained817.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
-Xplained817.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file} -a write
-Xplained817.bootloader.tool=avrdude
-Xplained817.bootloader.BOOTEND=0x2
-Xplained817.bootloader.OSCCFG=0x02
-Xplained817.bootloader.WDTCFG=0x00
-Xplained817.bootloader.BODCFG=0b00000000
-Xplained817.bootloader.TCD0CFG=0x00
-Xplained817.bootloader.SYSCFG0=0xC9
-Xplained817.bootloader.SYSCFG1=0x07
-Xplained817.bootloader.APPEND=0x00
-
-Xplained817.menu.millis.enabled=Enabled (default timer)
-Xplained817.menu.millis.disabled=Disabled (saves flash)
-Xplained817.menu.millis.timera=TCA0
-Xplained817.menu.millis.timerd=TCD0 (default)
-Xplained817.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
-Xplained817.menu.millis.rtc=RTC (no micros)
-Xplained817.menu.millis.rtcxtal=RTC w/w32.768 kHz ext. crystal (no micros)
-Xplained817.menu.millis.rtcxosc=RTC w/w32.768 kHz ext. oscillator (no micros)
-Xplained817.menu.millis.enabled.build.millistimer=D0
-Xplained817.menu.millis.disabled.build.millistimer=NONE
-Xplained817.menu.millis.timera.build.millistimer=A0
-Xplained817.menu.millis.timerd.build.millistimer=D0
-Xplained817.menu.millis.timerb0.build.millistimer=B0
-Xplained817.menu.millis.rtc.build.millistimer=RTC
-Xplained817.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-Xplained817.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
 ##########################################################################
 #      ATtiny3227/3217/1627/1617/1607/827/817/807/427/417 (Optiboot)
@@ -2036,3 +1911,130 @@ atxy2o.bootloader.TCD0CFG=0x00
 atxy2o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy2o.bootloader.APPEND=0x00
 atxy2o.bootloader.BOOTEND=0x02
+
+
+##########################################################################
+#      Attiny416 Xplained Nano (Optiboot)
+##########################################################################
+
+Xplained416.upload.workaround=
+Xplained416.build.millistimer=D0
+Xplained416.build.bootload=opti
+Xplained416.build.mcu=attiny{build.attiny}
+Xplained416.build.serialeventabr=
+Xplained416.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+Xplained416.build.f_cpu={build.speed}000000L
+
+Xplained416.build.attiny=416
+Xplained416.build.board=AVR_Xplained416
+Xplained416.build.core=megatinycore
+Xplained416.build.variant=txy6
+Xplained416.build.speed=20
+Xplained416.build.clocksource=0
+Xplained416.build.text_section_start=.text=0x200
+Xplained416.build.extra_flags=-DARDUINO_attinyxy6 -DARDUINO_AVR_ATtiny416 {build.serialevent} {build.millis} -DUARTBAUD5V
+
+Xplained416.menu.serialevent.no=No (saves space)
+Xplained416.menu.serialevent.yes=Yes
+Xplained416.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+Xplained416.menu.serialevent.yes.build.serialevent=
+Xplained416.menu.serialevent.yes.build.serialeventabr=E
+
+Xplained416.upload.tool=avrdude
+Xplained416.upload.speed=57600
+Xplained416.upload.maximum_size=3584
+Xplained416.upload.maximum_data_size=256
+Xplained416.upload.protocol=arduino
+Xplained416.upload.extra_params=-D
+Xplained416.bootloader.file=optiboot_x/optiboot_xplained416.hex
+Xplained416.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+Xplained416.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file} -a write
+Xplained416.bootloader.tool=avrdude
+Xplained416.bootloader.BOOTEND=0x2
+Xplained416.bootloader.OSCCFG=0x02
+Xplained416.bootloader.WDTCFG=0x00
+Xplained416.bootloader.BODCFG=0b00000000
+Xplained416.bootloader.TCD0CFG=0x00
+Xplained416.bootloader.SYSCFG0=0xC9
+Xplained416.bootloader.SYSCFG1=0x07
+Xplained416.bootloader.APPEND=0x00
+
+Xplained416.menu.millis.enabled=Enabled (default timer)
+Xplained416.menu.millis.disabled=Disabled (saves flash)
+Xplained416.menu.millis.timera=TCA0
+Xplained416.menu.millis.timerd=TCD0 (default)
+Xplained416.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+Xplained416.menu.millis.enabled.build.millistimer=D0
+Xplained416.menu.millis.rtc=RTC (no micros)
+Xplained416.menu.millis.rtcxtal=RTC w/w32.768 kHz ext. crystal (no micros)
+Xplained416.menu.millis.rtcxosc=RTC w/w32.768 kHz ext. oscillator (no micros)
+Xplained416.menu.millis.disabled.build.millistimer=NONE
+Xplained416.menu.millis.timera.build.millistimer=A0
+Xplained416.menu.millis.timerd.build.millistimer=D0
+Xplained416.menu.millis.timerb0.build.millistimer=B0
+Xplained416.menu.millis.rtc.build.millistimer=RTC
+Xplained416.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
+Xplained416.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+
+##########################################################################
+#      Attiny817 Xplained Mini (Optiboot)
+##########################################################################
+
+Xplained817.upload.workaround=
+Xplained817.build.millistimer=D0
+Xplained817.build.bootload=opti
+Xplained817.build.mcu=attiny{build.attiny}
+Xplained817.build.serialeventabr=
+Xplained817.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
+Xplained817.build.f_cpu={build.speed}000000L
+
+Xplained817.build.attiny=817
+Xplained817.build.board=AVR_Xplained817
+Xplained817.build.core=megatinycore
+Xplained817.build.variant=txy7
+Xplained817.build.speed=20
+Xplained817.build.clocksource=0
+Xplained817.build.text_section_start=.text=0x200
+Xplained817.build.extra_flags=-DARDUINO_attinyxy7 -DARDUINO_AVR_ATtiny817 {build.serialevent} {build.millis} -DUARTBAUD5V
+
+Xplained817.menu.serialevent.no=No (saves space)
+Xplained817.menu.serialevent.yes=Yes
+Xplained817.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
+Xplained817.menu.serialevent.yes.build.serialevent=
+Xplained817.menu.serialevent.yes.build.serialeventabr=E
+
+Xplained817.upload.tool=avrdude
+Xplained817.upload.speed=57600
+Xplained817.upload.maximum_size=7680
+Xplained817.upload.maximum_data_size=512
+Xplained817.upload.protocol=arduino
+Xplained817.upload.extra_params=-D
+Xplained817.bootloader.file=optiboot_x/optiboot_xplained817.hex
+Xplained817.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
+Xplained817.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file} -a write
+Xplained817.bootloader.tool=avrdude
+Xplained817.bootloader.BOOTEND=0x2
+Xplained817.bootloader.OSCCFG=0x02
+Xplained817.bootloader.WDTCFG=0x00
+Xplained817.bootloader.BODCFG=0b00000000
+Xplained817.bootloader.TCD0CFG=0x00
+Xplained817.bootloader.SYSCFG0=0xC9
+Xplained817.bootloader.SYSCFG1=0x07
+Xplained817.bootloader.APPEND=0x00
+
+Xplained817.menu.millis.enabled=Enabled (default timer)
+Xplained817.menu.millis.disabled=Disabled (saves flash)
+Xplained817.menu.millis.timera=TCA0
+Xplained817.menu.millis.timerd=TCD0 (default)
+Xplained817.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+Xplained817.menu.millis.rtc=RTC (no micros)
+Xplained817.menu.millis.rtcxtal=RTC w/w32.768 kHz ext. crystal (no micros)
+Xplained817.menu.millis.rtcxosc=RTC w/w32.768 kHz ext. oscillator (no micros)
+Xplained817.menu.millis.enabled.build.millistimer=D0
+Xplained817.menu.millis.disabled.build.millistimer=NONE
+Xplained817.menu.millis.timera.build.millistimer=A0
+Xplained817.menu.millis.timerd.build.millistimer=D0
+Xplained817.menu.millis.timerb0.build.millistimer=B0
+Xplained817.menu.millis.rtc.build.millistimer=RTC
+Xplained817.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
+Xplained817.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
