@@ -53,16 +53,16 @@ bool SPIClass::pins(__attribute__((unused))uint8_t pinMOSI, __attribute__((unuse
   } else
   #endif
   #if (defined(PIN_SPI_MOSI_PINSWAP_1) && defined(PIN_SPI_MISO_PINSWAP_1) && defined(PIN_SPI_SCK_PINSWAP_1))
-  if (pinMOSI == PIN_SPI_MOSI_PINSWAP_1 && pinMISO == PIN_SPI_MISO_PINSWAP_1 && pinSCK == PIN_SPI_SCK_PINSWAP_1 /* && pinSS == PIN_SPI_SS_PINSWAP_1 */) {
-    _uc_mux = 1;
-    return true;
-  } else if (pinMOSI == PIN_SPI_MOSI && pinMISO == PIN_SPI_MISO && pinSCK == PIN_SPI_SCK /* && pinSS == PIN_SPI_SS */) {
-    _uc_mux = 0;
-    return true;
-  } else {
-    _uc_mux = 0;
-    return false;
-  }
+    if (pinMOSI == PIN_SPI_MOSI_PINSWAP_1 && pinMISO == PIN_SPI_MISO_PINSWAP_1 && pinSCK == PIN_SPI_SCK_PINSWAP_1 /* && pinSS == PIN_SPI_SS_PINSWAP_1 */) {
+      _uc_mux = 1;
+      return true;
+    } else if (pinMOSI == PIN_SPI_MOSI && pinMISO == PIN_SPI_MISO && pinSCK == PIN_SPI_SCK /* && pinSS == PIN_SPI_SS */) {
+      _uc_mux = 0;
+      return true;
+    } else {
+      _uc_mux = 0;
+      return false;
+    }
   #endif
   #endif
   return false;
