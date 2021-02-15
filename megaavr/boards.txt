@@ -1571,7 +1571,6 @@ atxy6o.upload.extra_params=-D
 atxy6o.build.text_section_start=.text=0x200
 atxy6o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i
 atxy6o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/{bootloader.file} -a write
-atxy6o.bootloader.BOOTEND=0x2
 atxy6o.bootloader.tool=avrdude
 
 ##########################################################################
