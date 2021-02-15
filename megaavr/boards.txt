@@ -334,6 +334,7 @@ atxy6.menu.chip.416.upload.maximum_data_size=256
 #atxy6.menu.chip.3226.upload.maximum_data_size=3072
 atxy6.menu.chip.1626=ATtiny1626
 atxy6.menu.chip.1626.build.board=AVR_ATtiny1626
+atxy6.menu.chip.1626.build.millistimer=A0
 atxy6.menu.chip.1626.build.attiny=1626
 atxy6.menu.chip.1626.upload.maximum_size=16384
 atxy6.menu.chip.1626.upload.maximum_data_size=2048

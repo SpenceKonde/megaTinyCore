@@ -29,7 +29,7 @@ uint16_t readSupplyVoltage() { //returns value in millivolts to avoid floating p
   reading = intermediate / reading;
   return reading;
   #else
-    return -1;
+  return -1;
   #endif
 }
 void printRegisters() {
@@ -67,7 +67,7 @@ uint16_t readTemp() {
   temp >>= 8; // Divide result to get Kelvin
   return temp;
   #else
-    return -1;
+  return -1;
   #endif
 }
 
