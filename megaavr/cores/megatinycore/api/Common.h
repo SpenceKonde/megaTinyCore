@@ -40,11 +40,11 @@ void yield(void);
     _a > _b ? _a : _b; })
 
 #ifndef constrain
-#define constrain(x,low,high)   ({ \
-  typeof (x) _x = (x);             \
-  typeof (low) _l = (l);           \
-  typeof (high) _h = (h);          \
-  _x < _l ? _l : _x > _h ? _h :_x })
+#define constrain(x,low,high)   ({            \
+  typeof (x) _x = (x);                        \
+  typeof (low) _low = (low);                  \
+  typeof (high) _high = (high);               \
+  _x < _low ? _low : _x > _high ? _high :_x })
 #endif
 
 #ifndef radians
@@ -122,7 +122,6 @@ void turnOffPWM(pin_size_t pin);
 void DACReference(uint8_t mode);
 
 unsigned long millis(void);
-
 unsigned long micros(void);
 
 void delay(unsigned long);
