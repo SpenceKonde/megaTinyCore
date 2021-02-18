@@ -113,7 +113,7 @@ void turnOffPWM(uint8_t pin) {
     return;
   }
 
-  uint8_t bit_pos = digitalPinToBitPosition(pin);
+  uint8_t bit_mask = digitalPinToBitMask(pin);
   //TCB_t *timerB;
 
   switch (digital_pin_timer) {
@@ -121,23 +121,24 @@ void turnOffPWM(uint8_t pin) {
     /* TCA0 */
     case TIMERA0:
     {
-      uint8_t *timer_cmp_out;
+      // uint8_t *timer_cmp_out;
       /* Bit position will give output channel */
       #ifdef __AVR_ATtinyxy2__
-        if (bit_pos == 7) {
-          bit_pos = 0;  //on the xy2, WO0 is on PA7
+        if (bit_mask == 0x80) {
+          bit_mask = 1;  //on the xy2, WO0 is on PA7
         }
       #endif
-        if (bit_pos > 2) {
-          bit_pos -= 3;
-          timer_cmp_out = ((uint8_t *)(&TCA0.SPLIT.HCMP0)) + (bit_pos << 1);
-          (*timer_cmp_out) = 0;
-          TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_HCMP0EN_bp + bit_pos));
-        } else {
-          timer_cmp_out = ((uint8_t *)(&TCA0.SPLIT.LCMP0)) + (bit_pos << 1);
-          (*timer_cmp_out) = 0;
-          TCA0.SPLIT.CTRLB &= ~(1 << (TCA_SPLIT_LCMP0EN_bp + bit_pos));
-        }
+      //uint8_t offset=0;
+      if (bit_mask > 0x40) { // HCMP
+        bit_mask <<= 1;      // mind the gap
+      //  offset = 1;          // used to find cmp
+      }
+      //Say, why were we bothering with all this? We're turning it off!
+      //if      (bit_mask & 0x44) offset += 4;
+      //else if (bit_mask & 0x22) offset += 2;
+      //timer_cmp_out = ((uint8_t *)(&TCA0.SPLIT.LCMP0)) + (offset);
+      //(*timer_cmp_out) = 0;
+      TCA0.SPLIT.CTRLB &= ~bit_mask;
       break;
     }
 
@@ -163,18 +164,18 @@ void turnOffPWM(uint8_t pin) {
         // rigmarole that produces a glitch in the PWM
         uint8_t oldSREG=SREG;
         cli();
-        uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
-        TCD0.CTRLA = TCD0_prescaler; //stop the timer
-        while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it's actually stopped
-        _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~(1 << (bit_pos==0?6:7))));
-        TCD0.CTRLA = (TCD0_prescaler | TCD_ENABLE_bm); //re-enable it
+        //uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
+        TCD0.CTRLA &= ~TCD_ENABLE_bm;
+        _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~(bit_mask==0x02?0x80:0x40)));
+        while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it can be re-enabled
+        TCD0.CTRLA |= TCD_ENABLE_bm;           // re-enable it
 
         // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
         // So we need to make sure that's off - wouldn't that be fun to debug?
         #if defined(NO_GLITCH_TIMERD0)
           // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts )
           // so if we're here, we're acting on either PC0 or PC1.
-          if (bit_pos==0){
+          if (bit_mask == 0x01){
             PORTC.PIN0CTRL&=~(PORT_INVEN_bm);
           } else {
             PORTC.PIN1CTRL&=~(PORT_INVEN_bm);
@@ -289,7 +290,7 @@ inline __attribute__((always_inline)) void digitalWriteFast(uint8_t pin, uint8_t
   if (val == LOW)
     vport->OUT &= ~mask;
   else if (val == CHANGE)
-    vport->IN |= mask;
+    vport->IN  |= mask;
   else // HIGH
     vport->OUT |= mask;
 
