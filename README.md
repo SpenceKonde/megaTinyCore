@@ -478,7 +478,7 @@ If the chip you will be programming has not been bootloaded, connect your UPDI p
 **WARNING: After doing "Burn Bootloader", if you set the UPDI pin to act as reset or IO, the chip cannot be reprogrammed except via the serial bootloader or using an HV UPDI programmer - it is strongly suggested to first burn the bootloader with the UPDI/Reset pin left as UPDI, verify that sketches can be uploaded, and only then "Burn Bootloader" with the UPDI/Reset pin set to act as Reset**
 
  _Note: some reports indicate burning the bootloader using the "Serial port and 4.7k (pyupdi style)" method is not reliable - see the [jtag2updi](MakeUPDIProgrammer.md) method instead_.
- 
+
 After this, connect a serial adapter to the serial pins (as well as ground and Vcc). On the tinyAVR 0/1-series breakout boards which I sell on Tindie, a standard 6-pin "FTDI" header is provided for this that can be connected directly to many serial adapters.
 
 
