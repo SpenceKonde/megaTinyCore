@@ -7,7 +7,7 @@
 name=megaTinyCore
 versionnum.major=2
 versionnum.minor=2
-versionnum.patch=7
+versionnum.patch=8
 versionnum.postfix=
 versionnum.released=1
 
@@ -176,7 +176,7 @@ tools.pymcuprog.erase.pattern=
 
 tools.pymcuprog.bootloader.params.verbose=-v
 tools.pymcuprog.bootloader.params.quiet=
-tools.pymcuprog.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} {bootloader.verbose} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:{bootloader.OSCCFG} 4:{bootloader.TCD0CFG} 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} "{bootloader.pymcuprogstring}"
+tools.pymcuprog.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} {bootloader.verbose} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:{bootloader.OSCCFG} 4:{bootloader.TCD0CFG} 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} {bootloader.pymcuprogstring}
 
 tools.pymcuprog.program.params.verbose=-v
 tools.pymcuprog.program.params.quiet=
