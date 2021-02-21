@@ -162,27 +162,30 @@ void turnOffPWM(uint8_t pin) {
       case TIMERD0:
       {
         // rigmarole that produces a glitch in the PWM
-        uint8_t oldSREG=SREG;
-        cli();
-        //uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
-        TCD0.CTRLA &= ~TCD_ENABLE_bm;
-        _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~(bit_mask==0x02?0x80:0x40)));
-        while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it can be re-enabled
-        TCD0.CTRLA |= TCD_ENABLE_bm;           // re-enable it
+        uint8_t fc_mask = (bit_mask==0x02?0x80:0x40);
+        if (TCD0.FAULTCTRL & fc_mask) {
+          uint8_t oldSREG=SREG;
+          cli();
+          //uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
+          TCD0.CTRLA &= ~TCD_ENABLE_bm;
+          _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~fc_mask));
+          while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it can be re-enabled
+          TCD0.CTRLA |= TCD_ENABLE_bm;           // re-enable it
 
-        // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
-        // So we need to make sure that's off - wouldn't that be fun to debug?
-        #if defined(NO_GLITCH_TIMERD0)
-          // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts )
-          // so if we're here, we're acting on either PC0 or PC1.
-          if (bit_mask == 0x01){
-            PORTC.PIN0CTRL&=~(PORT_INVEN_bm);
-          } else {
-            PORTC.PIN1CTRL&=~(PORT_INVEN_bm);
-          }
-        #endif
+          // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
+          // So we need to make sure that's off - wouldn't that be fun to debug?
+          #if defined(NO_GLITCH_TIMERD0)
+            // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts )
+            // so if we're here, we're acting on either PC0 or PC1.
+            if (bit_mask == 0x01){
+              PORTC.PIN0CTRL&=~(PORT_INVEN_bm);
+            } else {
+              PORTC.PIN1CTRL&=~(PORT_INVEN_bm);
+            }
+          #endif
 
-        SREG=oldSREG;
+          SREG=oldSREG;
+        }
         break;
       }
     #endif
