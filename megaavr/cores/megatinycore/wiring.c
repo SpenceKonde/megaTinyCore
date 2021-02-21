@@ -184,29 +184,38 @@ unsigned long millis() {
   uint8_t status = SREG;
   cli();
   #if defined(MILLIS_USE_TIMERRTC)
+  uint16_t rtccount=RTC.CNT;
   m = timer_overflow_count;
   if (RTC.INTFLAGS & RTC_OVF_bm) { //there has just been an overflow that hasn't been accounted for by the interrupt
-    m++;
+    // Check if the high bit of counter is set? Might be a better way to do this test; we just basically need to make
+    // sure that it didn't JUST roll over at the last couple of clocks; probably testing that it's not 0xFFFF would work too, but that's more compare instructions.
+    // even a very crude test would work since the RTC is so slow (and if they're leaving interrupts off that long, they shouldn't expect millis to work right!)
+    if (!(rtccount & 0x8000)) m++;
   }
   SREG = status;
-  m = (m << 16);
-  m += RTC.CNT;
+  m = (m << 16); // how gracefully is the compiler implementing this?
+  m += rtccount; // it ought to see that it's starting from a uint16_t, putting it into a uint32_t and just store it in the high 16 bits...
+                 // but I've seen the compiler miss opportunities like that...
   //now correct for there being 1000ms to the second instead of 1024
-  m = m - (m >> 6) - (m >> 7);
+  m = m - (m >> 5) + (m >> 7);
+  // it looks like - (m >> 5) + (m >> 7) is better
+  // than          - (m >> 6) - (m >> 7)
+  // I think their signs want to be opposite, so the integer truncation on each of them works in opposite direction.
+  // though using a m >> 5 term is also using a term while it has more precision, maybe that's what helps?
+  // I just simulated it across 0~1023 and 0~65335 numerically.
   #else
   m = timer_millis;
   SREG = status;
   #endif
   return m;
 }
-
 #ifndef MILLIS_USE_TIMERRTC
 
 unsigned long micros() {
 
   unsigned long overflows, microseconds;
 
-  #if (defined(MILLIS_USE_TIMERD0)||defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1))
+  #if (defined(MILLIS_USE_TIMERD0) || defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
   uint16_t ticks;
   #else
   uint8_t ticks;
@@ -219,7 +228,7 @@ unsigned long micros() {
 
 
   /* Get current number of overflows and timer count */
-  #if !(defined(MILLIS_USE_TIMERB0)  || defined(MILLIS_USE_TIMERB1) )
+  #if !(defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
   overflows = timer_overflow_count;
   #else
   overflows = timer_millis;
@@ -245,7 +254,7 @@ unsigned long micros() {
   #else //timerb
   if ((_timer->INTFLAGS & TCB_CAPT_bm) && !(ticks & 0xFF00)) {
   #endif
-    #if ((defined(MILLIS_USE_TIMERB0)|defined(MILLIS_USE_TIMERB1))&&(F_CPU>1000000))
+    #if ((defined(MILLIS_USE_TIMERB0) | defined(MILLIS_USE_TIMERB1)) && (F_CPU > 1000000))
     overflows++;
     #else
     overflows += 2;
