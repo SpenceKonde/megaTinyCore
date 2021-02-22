@@ -40,11 +40,11 @@ void yield(void);
     _a > _b ? _a : _b; })
 
 #ifndef constrain
-#define constrain(x,low,high)   ({            \
-  typeof (x) _x = (x);                        \
-  typeof (low) _low = (low);                  \
-  typeof (high) _high = (high);               \
-  _x < _low ? _low : _x > _high ? _high :_x })
+#define constrain(x,low,high)   ({  \
+  typeof (x)    _x = (x);           \
+  typeof (low)  _l = (low);         \
+  typeof (high) _h = (high);        \
+  _x < _l ? _l : _x > _h ? _h :_x ;})
 #endif
 
 #ifndef radians
@@ -60,7 +60,7 @@ void yield(void);
 #endif
 
 #ifndef round
-#define round(x)     ({ typeof (x) _x = (x);  _x >= 0 ? (long)x + 0.5 : (long)x - 0.5 })
+#define round(x)     ({ typeof (x) _x = (x);  _x >= 0 ? (long)x + 0.5 : (long)x - 0.5 ;})
 #endif
 
 typedef void (*voidFuncPtr)(void);
