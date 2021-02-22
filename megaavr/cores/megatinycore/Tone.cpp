@@ -50,6 +50,10 @@
   #define USE_TIMERB0
 #endif
 
+#ifndef ADC_LOWLAT_bm
+  #define TCB_CLKSEL_DIV1_gc TCB_CLKSEL_CLKDIV1_gc
+  #define TCB_CLKSEL_DIV2_gc TCB_CLKSEL_CLKDIV2_gc
+#endif
 static volatile TCB_t *_timer =
 #if defined(USE_TIMERB0)
   &TCB0;
@@ -120,9 +124,9 @@ void tone(uint8_t pin, unsigned int frequency, unsigned long duration) {
 
   // Disable for now, set clk to divide by 2 if divisionfactor 2 or more
   if (divisionfactor == 1) {
-    _timer->CTRLA = TCB_CLKSEL_CLKDIV1_gc;
+    _timer->CTRLA = TCB_CLKSEL_DIV1_gc;
   } else { //division factor between 2 and 8
-    _timer->CTRLA = TCB_CLKSEL_CLKDIV2_gc;
+    _timer->CTRLA = TCB_CLKSEL_DIV2_gc;
     divisionfactor--; //now between 1 and 7
   }
   divisionfactor--; //now between 0 and 6

@@ -11,7 +11,7 @@ The USERSIG library provides an easy to use interface to interact with the so-ca
 ### A word about datatypes used
 These are known by many names; `uint8_t`, `byte`, and `unsigned char` - they are all interchangible.
 
-Addresses in the USERSIG area are given by by a `byte`, not an `int`, as all released parts have exactly 32 bytes in the USERSIG.
+Addresses in the USERSIG area are given by by a `byte`, not an `int`, as all released parts have under 256 bytes of memory of this type. The library offsets it as appropriate for your part to get the memory mapped address.
 
 ### **How to use it**
 The USERSIG library is included with megaTinyCore. To add its functionality to your sketch you'll need to reference the library header file. You do this by adding an include directive to the top of your sketch.
@@ -95,7 +95,7 @@ if( val == USERSIG[ 0 ] ){
 
 #### **`USERSIG.length()`**
 
-This function returns a `byte` containing the number of cells in the USERSIG (32).
+This function returns a `byte` containing the number of bytes in the user signature space.
 
 ---
 

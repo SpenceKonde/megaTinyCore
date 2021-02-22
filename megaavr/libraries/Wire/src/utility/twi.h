@@ -26,18 +26,18 @@
 
 /*! Transaction status defines. */
 #ifndef TWIM_STATUS_READY
-#define TWIM_STATUS_READY              0
+  #define TWIM_STATUS_READY              0
 #endif
 #ifndef TWIM_STATUS_BUSY
-#define TWIM_STATUS_BUSY               1
+  #define TWIM_STATUS_BUSY               1
 #endif
 
 /* Transaction status defines.*/
 #ifndef TWIS_STATUS_READY
-#define TWIS_STATUS_READY                0
+  #define TWIS_STATUS_READY                0
 #endif
 #ifndef TWIS_STATUS_BUSY
-#define TWIS_STATUS_BUSY                 1
+  #define TWIS_STATUS_BUSY                 1
 #endif
 
 /*! Transaction result enumeration. */
@@ -75,10 +75,10 @@ typedef enum __attribute__((packed)) TWI_MODE_enum {
 
 /*! For adding R/_W bit to address */
 #ifndef ADD_READ_BIT
-#define ADD_READ_BIT(address)    (address | 0x01)
+  #define ADD_READ_BIT(address)    (address | 0x01)
 #endif
 #ifndef ADD_WRITE_BIT
-#define ADD_WRITE_BIT(address)   (address & ~0x01)
+  #define ADD_WRITE_BIT(address)   (address & ~0x01)
 #endif
 
 void TWI_MasterInit(uint32_t frequency);
