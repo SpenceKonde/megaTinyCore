@@ -31,9 +31,9 @@ Connections:
 
 Choose "Serial Port and 4.7k" from the Tools -> Programmer menu, and select the Serial Port from the Tools -> Port menu.
 
-**WARNING** - presently this is not working for "burn bootloader" for optiboot board definitions (it reports success, but only fuses are set, the bootloader is not written). we are working to resolve this issue and will release 2.2.8 when a fix is available.
+**WARNING** - Prior to 2.2.8 this did not work for "burn bootloader" with Optiboot parts; success was reported, but only fuses were written, not flash.
 
-Note that this does not give you serial monitor - you need to connect a serial adapter the normal way for that (I suggest using two, along with an external serial terminal application (since you don't have autoreset to restart the sketch when open the serial port - you connect before (or during) the upload). This technique works with those $1 CH340 serial adapters from ebay, aliexpress, etc. Did you accidentally buy some that didn't have a DTR pin broken out, and so weren't very useful with the Pro Minis you hoped to use them with?
+Note that this does not give you serial monitor - you need to connect a serial adapter the normal way for that (I suggest using two, along with an external serial terminal application (since you don't have autoreset to restart the sketch when open the serial port - you can connect connect before (or during) the upload). This technique works with those $1 CH340 serial adapters from ebay, aliexpress, etc. Did you accidentally buy some that didn't have a DTR or RTS pin broken out, and so weren't very useful with the Pro Minis you hoped to use them with? Now you have something to do with them - they'll work in either of these roles.
 
 ### Serial adapter requuirements
 Almost any cheaper-than-dirt serial adapter can be use d for pyupdi style programer, as long as you take care to avoid these pitfalls:
