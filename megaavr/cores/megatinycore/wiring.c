@@ -194,8 +194,9 @@ unsigned long millis() {
   }
   SREG = status;
   m = (m << 16); // how gracefully is the compiler implementing this?
+                 // Answer: Not very, but it's not awful - 9 clocks / 18 bytes, which could probably be saved with a union... the problem is
   m += rtccount; // it ought to see that it's starting from a uint16_t, putting it into a uint32_t and just store it in the high 16 bits...
-                 // but I've seen the compiler miss opportunities like that...
+                 // Answer: It's smart enough to avoid a bunch of shifts, but it does store it in wrong half, then move it, and it wastes add instructions when the rtccount is brought in
   //now correct for there being 1000ms to the second instead of 1024
   m = m - (m >> 5) + (m >> 7);
   // it looks like - (m >> 5) + (m >> 7) is better
@@ -203,6 +204,13 @@ unsigned long millis() {
   // I think their signs want to be opposite, so the integer truncation on each of them works in opposite direction.
   // though using a m >> 5 term is also using a term while it has more precision, maybe that's what helps?
   // I just simulated it across 0~1023 and 0~65335 numerically.
+  // Now, this is where the compiler really bungs it - 27 instruction words, executed over 100 clocks to do that!
+  // What one would want to do is to movw the 4 bytes into 4 new registers... followed by one empty one (3 clocks 3 words).
+  // Then leftshift those one each, and shift the carry bit into a fifth register (5 clocks 5 words) the 4 high registers now contain m >> 7, add to m (4 clocks 4 words)
+  // Repeat the leftshift twice more (17 clocks 9 words) giving m >>5, subtract (4 & 4)  and you're done  in 34 clocks, 25 words.
+  // I think this would also save you from 2x push and pop because of inefficient register use; at one point they have r16 ~ r27 filled with m and shifted m's, when you only
+  // need to ever store two copies, the m you're adding to and the m you're shifting. so another 4 words and 6 clocks so like 7 words from the math and 9 from unionizing.
+  // but 72 clocks from the math, and 9 from unionizing. Don't think it's worth the effort to write out in assembly though :-P It's okay if millis takes 6 us to return
   #else
   m = timer_millis;
   SREG = status;
@@ -277,6 +285,14 @@ unsigned long micros() {
                   + (ticks * ((TIME_TRACKING_CYCLES_PER_OVF) / (16) / TIME_TRACKING_TIMER_PERIOD)));
   #endif
   #elif (defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1))
+  // ticks is 0 ~ F_CPU/2000 - 1
+  // we shift 1, 2, or 3 times to get 0 ~ 1249, which we then use bitshift and addition/subtraction multiply by 4/5ths
+  // I wonder how much could be gained from doing it stepwise (copy ticks to a union with byte[2], rightshift by 2, subtract
+  // rightshift 2, add (we know high byte is 0, but it doesn't help because carry), rightshift low byte 2 more (low-only
+  // saves 2 clocks), subtract low byte... wonder if it would be enough to do the final term faster than we currently do the
+  // 4 term approximation? I think that would be exact! We'd also have equal + and -, reaping the reduced rounding noise
+  // currently we end up with, it looks like, 0-995 (+/- 1) instead of 0-999? which I think we'd have with the last term.
+  // Looked at generated assembly, no clue how they get there from here!
   #if (F_CPU==20000000UL)
   ticks = ticks >> 3;
   microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6));
@@ -298,13 +314,15 @@ unsigned long micros() {
   #else //TCA0
   #if (F_CPU==20000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==64)
   microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                 + (ticks * 3 + (ticks >> 2) - (ticks >> 4));
+                 + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
+                 // bafflingly, casting to a uint16_t makes the compiler generate more efficient code...  but
+                 // casting to uint8_t doesn't! I don't understand it. but I'll take a free 8 bytes and 4 clocks any day.
   #elif (F_CPU==10000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==64)
   microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                 + (ticks * 6 + (ticks >> 1) - (ticks >> 3));
+                 + (ticks * 6 + ((uint16_t)(ticks >> 1) - (ticks >> 3)));
   #elif (F_CPU==5000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==16)
   microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                 + (ticks * 3 + (ticks >> 2) - (ticks >> 4));
+                 + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
   #else
   #if (TIME_TRACKING_TIMER_DIVIDER%(F_CPU/1000000))
 #warning "Millis timer (TCA0) divider and frequency unsupported, inaccurate micros times will be returned."
