@@ -809,15 +809,17 @@ void tinyNeoPixel::show(void) {
       [lo]     "r" (lo));
 
 #else
- #error "CPU SPEED NOT SUPPORTED"
+  #error "CPU SPEED NOT SUPPORTED"
 #endif
 
   // END AVR ----------------------------------------------------------------
 
-
   interrupts();
-  #ifndef DISABLEMILLIS
-  endTime = micros(); // Save EOD time for latch on next call
+  #if !defined(DISABLEMILLIS) && !defined(MILLIS_USE_TIMERRTC) && !defined(MILLIS_USE_TIMERRTC_XTAL) && !defined(MILLIS_USE_TIMERRTC_XOSC))
+    endTime = micros();
+    // Save EOD time for latch on next call
+  #else
+    #warning "micros is not available based on timer settings. You must ensure at least 50us between calls to show() or the pixels will never latch"
   #endif
 }
 
