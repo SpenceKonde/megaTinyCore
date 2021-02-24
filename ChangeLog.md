@@ -7,8 +7,13 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### 2.3.0
 * This is the first version planned to have 2-series support. I will sketch in the basics (ie, so things will compile and you should be OK as long as you don't want to use new ADC) and try to get that up here ASAP.
 
-
 ## Released Versions
+### 2.2.9
+* Correct critical regression impacting PWM via TCA0 WO3, WO4, and WO5. (#335)
+* Correct canShow() in tinyNeoPixel to permit use when micros() is not available - skip the test and #warn the user that they must make sure that they don't call show() too frequently. WS2812-alikes neeed 50uS pause in the data to tell them that it's time to latch the data they got, and if they don't see that before you start blasting out more data, they'll think it's part of the same stream and never turn on.
+* Correct bug in RTC millis timekeeping that caused reverse time travel due to improper guarding against overflow during millis() processessing. Also, it's an average of 1-2 us closer to the actual number now (neglecting any contribution from ) (#331)
+
+
 ### 2.2.8
 * Correct critical bug that prevented bootloaders from being installed when using the pyupdi-style serial port and resistor. Would report success, but only fuses were set.
 * Fix bug where the INVEN bit would be unset when doing digitalWrite() on pins that can do TCD PWM; now it is only unset if PWM was actually turned off (which in turn implies that if it was inverted, that was done by analogWrite(pin,255) - that's how we can generate a continuous HIGH output without disconnecting the timer (which would produce a glitch on the other pwm channel)- we set the compare value higher than TOP (which would produce continuous low) and invert the pin.
