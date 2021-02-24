@@ -112,7 +112,7 @@ void tinyNeoPixel::updateType(neoPixelType t) {
   }
 }
 
-// *INDENT-OFF*   astyle don't like assembly
+
 void tinyNeoPixel::show(void) {
 
   if ((!pixels) || pin >= NUM_DIGITAL_PINS )  {

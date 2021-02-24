@@ -122,6 +122,7 @@ void turnOffPWM(pin_size_t pin);
 void DACReference(uint8_t mode);
 
 unsigned long millis(void);
+
 unsigned long micros(void);
 
 void delay(unsigned long);

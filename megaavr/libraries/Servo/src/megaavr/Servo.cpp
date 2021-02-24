@@ -118,11 +118,11 @@ void ServoHandler(int timer) {
 
 static void initISR() {
   #if (F_CPU > 10000000)
-  // As long as it's over 1 MHz, divide CLK_PER by 2
-  _timer->CTRLA = TCB_CLKSEL_DIV2_gc;
+    // As long as it's over 1 MHz, divide CLK_PER by 2
+    _timer->CTRLA = TCB_CLKSEL_DIV2_gc;
   #else
-  // at 1 MHz, we need the resolution.
-  _timer->CTRLA = TCB_CLKSEL_DIV1_gc;
+    // at 1 MHz, we need the resolution.
+    _timer->CTRLA = TCB_CLKSEL_DIV1_gc;
   #endif
 
   // Set timer mode to Periodic Interrupt

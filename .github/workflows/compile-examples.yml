@@ -80,7 +80,7 @@ jobs:
 
       IO-class-6-plus-true-sketch-paths: |
         - megaavr/libraries/Logic/examples/Five_input_NOR
-      IO-class-2-series-1-sketch-paths: |
+      IO-class-2-sketch-paths: |
         - megaavr/libraries/megaTinyCore/examples/TCA0Demo3
 
     strategy:
@@ -94,7 +94,6 @@ jobs:
           - 4
           - 2
         peripheral-class:
-          - 2
           - 1
           - 0
         IO-class:
@@ -125,12 +124,6 @@ jobs:
             IO-class: 7
           - flash-class: 2
             IO-class: 6
-          - flash-class: 2
-            peripheral-class: 2
-          - IO-class: 2
-            peripheral-class: 2
-          - flash-class: 32
-            peripheral-class: 2
 
         include:
           - flash-class: 32
@@ -183,7 +176,7 @@ jobs:
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
 
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
-            ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
+            ${{ env[format('IO-class-{0}-sketch-paths', matrix.IO-class)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json

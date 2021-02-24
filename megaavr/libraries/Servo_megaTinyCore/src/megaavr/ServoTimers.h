@@ -17,8 +17,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
   This version was designed for and will be included with:
-  megaTinyCore 2.3.0+
-  DxCore 1.3.2+
+  megaTinyCore 2.2.7+
+  DxCore 1.3.1+
 */
 
 #ifndef __SERVO_TIMERS_H__
@@ -44,6 +44,7 @@
   #else
     #define USE_TIMERB3
   #endif
+//14 and 20-pin AVR DD-series parts do not have a third type B timer!
 #elif defined(SERVO_USE_TIMERB2)
   #if !defined(TCB2)
     #error "SERVO_USE_TIMERB2 is defined, but there is no TCB2 on selected part."
@@ -52,7 +53,7 @@
   #else
     #define USE_TIMERB2
   #endif
-  // ah, finally cases that might be relevant to tinyAVR
+// All Dx-series parts have at least 2 type B timers
 #elif (defined(TCB1) && defined(SERVO_USE_TIMERB1))
   #if defined(MILLIS_USE_TIMERB1)
     #error "SERVO_USE_TIMERB1 is defined, but so is MILLIS_USE_TIMERB1 - TCB1 can only be used for one of these."
@@ -65,7 +66,7 @@
   #else
     #define USE_TIMERB0
   #endif
-  // No defines try to force a specific timer, use TCB1 if it exists unless it's being used for millis.
+// No defines try to force the timer onto a specific pin, use TCB1 if it exists unless it's being used for millis.
 #elif (defined(TCB1) && !defined(MILLIS_USE_TIMERB1))
   #define USE_TIMERB1
 #elif !defined(MILLIS_USE_TIMERB0)
@@ -74,6 +75,10 @@
   #error "Only one TCB, TCB0 but it is being used for millis - choose a different millis timer."
 #endif
 
+/* #if (!defined(USE_TIMERB0) && !defined(USE_TIMERB1) && !defined(USE_TIMERB2) && !defined(USE_TIMERB3) && !defined(USE_TIMERB4))
+  #error "ServoTimers.h is unable to find an available timer; see other #error above for more details"
+#endif */
+// I think we can safely comment that out - it will always #error if we can't find a timer.
 
 //_timer is obviously used in Servo.cpp; and Servo.cpp works without explicitly telling the compiler this is used...
 // it just generates a spurious warning, which is undesirable, all else being equal. What is really weird is that whether

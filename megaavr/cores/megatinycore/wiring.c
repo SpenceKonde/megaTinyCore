@@ -681,7 +681,7 @@ void init() {
 
 void init_ADC0() {
     /********************************* ADC ****************************************/
-#ifndef ADC_LOWLAT_bm
+
   #if defined(ADC0)
   #ifndef SLOWADC
   /* ADC clock 1 MHz to 1.25 MHz at frequencies supported by megaTinyCore
@@ -726,7 +726,6 @@ void init_ADC0() {
   #ifdef __AVR_ATtinyxy2__
   PORTMUX.CTRLC = 1; //move WO0 output to PA7 so PA3 can be used with WO3
   #endif
-#endif
 }
 
 

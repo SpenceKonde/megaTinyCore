@@ -9,8 +9,8 @@
   This library is included with megaTinyCore and DxCore.
 
   This version was designed for and will be included with:
-  megaTinyCore 2.3.0+
-  DxCore 1.3.2+
+  megaTinyCore 2.2.7+
+  DxCore 1.3.1+
 */
 
 /*  OBLIGATORY LEGAL BOILERPLATE
@@ -65,29 +65,29 @@
   installed - would take preference over a core-supplied library named
   Servo - even though the core-supplied one worked, and the one in library
   folder would just #error about unsupported part.
-*/
+ */
 
 #ifndef Servo_h
-#define Servo_h
+  #define Servo_h
 
-#include <inttypes.h>
-#if (!defined(TCB_CLKSEL2_bm))
-  // This means it's a tinyAVR 0/1-series, or a megaAVR 0-series.
-  // Their TCB_CLKSEL enums use different names for the clock settings, for reasons unclear.
-  // To align with the future, we use the Dx-series names for these.
-  #define TCB_CLKSEL_DIV2_gc TCB_CLKSEL_CLKDIV2_gc
-  #define TCB_CLKSEL_DIV1_gc TCB_CLKSEL_CLKDIV1_gc
-#endif
-#if defined(ARDUINO_ARCH_MEGAAVR)
-  #include "megaavr/ServoTimers.h"
-  #if (F_CPU==1000000)
-    #warning "Running at 1MHz results in unstable servo signal."
+  #include <inttypes.h>
+  #if (!defined(TCB_CLKSEL2_bm))
+      // This means it's a tinyAVR 0/1-series, or a megaAVR 0-series.
+      // Their TCB_CLKSEL enums use different names for the clock settings, for reasons unclear.
+      // To align with the future, we use the Dx-series names for these.
+      #define TCB_CLKSEL_DIV2_gc TCB_CLKSEL_CLKDIV2_gc
+      #define TCB_CLKSEL_DIV1_gc TCB_CLKSEL_CLKDIV1_gc
   #endif
-#else
-  #error "This is an architecture specific library for ARDUINO_ARCH_MEGAAVR, but this device is not of that architecture"
-#endif
+  #if defined(ARDUINO_ARCH_MEGAAVR)
+    #include "megaavr/ServoTimers.h"
+    #if (F_CPU==1000000)
+      #warning "Running at 1MHz results in unstable servo signal."
+    #endif
+  #else
+    #error "This is an architecture specific library for ARDUINO_ARCH_MEGAAVR, but this device is not of that architecture"
+  #endif
 
-// *INDENT-OFF*
+
 #define Servo_VERSION              2     // software version of this library
 #define MIN_PULSE_WIDTH          544     // the shortest pulse sent to a servo
 #define MAX_PULSE_WIDTH         2400     // the longest pulse sent to a servo
@@ -99,12 +99,13 @@
 #define INVALID_SERVO            255     // flag indicating an invalid servo index
 
 #define MAX_SERVOS (_Nbr_16timers  * SERVOS_PER_TIMER)
-// *INDENT-ON*
+
 
 typedef struct  {
   uint8_t isActive ;    // true if this channel is enabled, pin not pulsed if false
   uint8_t port;         // port number (A=0, B=1, and so on)
-  uint8_t bitmask;      // port & bitmask used instead of pin number to realize dramatic performance boost
+  uint8_t bitmask;      // output pin bitmask
+                        // port & bitmask used instead of pin number to realize dramatic performance boost
 } ServoPin_t   ;
 
 typedef struct {
