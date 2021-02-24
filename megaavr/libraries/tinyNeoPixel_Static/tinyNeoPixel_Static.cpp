@@ -817,7 +817,7 @@ void tinyNeoPixel::show(void) {
   // END AVR ----------------------------------------------------------------
 
   interrupts();
-  #if !defined(DISABLEMILLIS) && !defined(MILLIS_USE_TIMERRTC) && !defined(MILLIS_USE_TIMERRTC_XTAL) && !defined(MILLIS_USE_TIMERRTC_XOSC))
+  #if (!defined(DISABLEMILLIS) && !defined(MILLIS_USE_TIMERRTC) && !defined(MILLIS_USE_TIMERRTC_XTAL) && !defined(MILLIS_USE_TIMERRTC_XOSC))
     endTime = micros();
     // Save EOD time for latch on next call
   #else

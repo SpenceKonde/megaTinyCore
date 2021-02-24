@@ -292,7 +292,7 @@ class tinyNeoPixel {
   */
   static uint32_t gamma32(uint32_t x);
 
-  #if !defined(DISABLEMILLIS) && !defined(MILLIS_USE_TIMERRTC) && !defined(MILLIS_USE_TIMERRTC_XTAL) && !defined(MILLIS_USE_TIMERRTC_XOSC)
+  #if (!defined(DISABLEMILLIS) && !defined(MILLIS_USE_TIMERRTC) && !defined(MILLIS_USE_TIMERRTC_XTAL) && !defined(MILLIS_USE_TIMERRTC_XOSC))
     inline bool canShow(void) { return (micros() - endTime) >= 50L; }
   #else
     inline bool canShow(void) {return 1;} //we don't have micros here;
