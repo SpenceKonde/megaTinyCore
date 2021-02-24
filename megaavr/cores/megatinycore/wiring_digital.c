@@ -129,7 +129,7 @@ void turnOffPWM(uint8_t pin) {
         }
       #endif
       //uint8_t offset=0;
-      if (bit_mask > 0x40) { // HCMP
+      if (bit_mask > 0x04) { // HCMP
         bit_mask <<= 1;      // mind the gap
       //  offset = 1;          // used to find cmp
       }
