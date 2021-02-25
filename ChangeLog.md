@@ -10,8 +10,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ## Released Versions
 ### 2.2.9
 * Correct critical regression impacting PWM via TCA0 WO3, WO4, and WO5. (#335)
-* Correct canShow() in tinyNeoPixel to permit use when micros() is not available - skip the test and #warn the user that they must make sure that they don't call show() too frequently. WS2812-alikes neeed 50uS pause in the data to tell them that it's time to latch the data they got, and if they don't see that before you start blasting out more data, they'll think it's part of the same stream and never turn on.
-* Correct bug in RTC millis timekeeping that caused reverse time travel due to improper guarding against overflow during millis() processessing. Also, it's an average of 1-2 us closer to the actual number now (neglecting any contribution from ) (#331)
+* Correct canShow() in tinyNeoPixel to permit use when micros() is not available - skip the test and #warn the user that they must make sure that they don't call show() too frequently. WS2812-alikes need 50us pause (according to datasheet - internet says only 20us) in the data between consecutive frames to tell them that it's time to latch the data they got, and if they don't see that before you start blasting out more data, they'll think it's part of the same stream and never turn on.
+* Correct bug in RTC millis timekeeping that caused reverse time travel due to improper guarding against overflow during millis() processing. Also, it's an average of 1-2 us closer to the actual number now (neglecting any contribution from oscillator inaccuracy - which is of course orders of magnitude higher) (#331)
 
 
 ### 2.2.8
