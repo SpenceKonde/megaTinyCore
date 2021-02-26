@@ -240,7 +240,7 @@ void analogWrite(uint8_t pin, int val) {
         /* Calculate correct compare buffer register */
         #ifdef __AVR_ATtinyxy2__
         if (bit_mask == 0x80) {
-          bit_mask == 1;  //on the xy2, WO0 is on PA7
+          bit_mask = 1;  //on the xy2, WO0 is on PA7
         }
         #endif
         uint8_t offset=0;
