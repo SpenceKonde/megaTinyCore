@@ -214,7 +214,8 @@ void analogWrite(uint8_t pin, int val) {
     return;
   }
   // Set pin output because that's what Arduino does
-  pinMode(pin, OUTPUT);
+  // Moved this way down to the end, why enable output before we have the pin doing the right thing?
+  // pinMode(pin, OUTPUT);
 
   /* Get timer */
   /* megaTinyCore only - assumes only TIMERA0, TIMERD0, or DACOUT
@@ -352,6 +353,9 @@ void analogWrite(uint8_t pin, int val) {
       }
       break;
   } //end of switch/case
+  // Now that everything is said and done, we've set the pin high or low as if it's not a PWM pin, or told the timer to give it PWM if it is - this is a better timwe to finally turn on the output drivers.
+  // True, it is at most 1-2 PWM timer ticks under typical settings, it's probably at least 1 tick, maybe several at 1 MHz (haven't timed analogWrite lately)
+  pinMode(pin, OUTPUT);
 } // end of analogWrite
 
 void takeOverTCA0() {
