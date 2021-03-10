@@ -83,7 +83,7 @@ void loop() {
 
 ISR(PORTA_PORT_vect) {
   byte flags=PORTA.INTFLAGS;
-  PORTA.INTFLAGS=flags; //clear flags
+  PORTA.INTFLAG=0xff // clear all PORTA flags
   if (flags&0x02) {
     interrupt1=1;
   }
