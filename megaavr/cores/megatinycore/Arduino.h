@@ -133,6 +133,8 @@ extern const uint8_t digital_pin_to_timer[];
 //
 // These perform slightly better as macros compared to inline functions
 //
+  
+  
 #define NOT_A_PIN 255
 #define NOT_A_PORT 255
 #define NOT_AN_INTERRUPT 255
@@ -391,6 +393,15 @@ extern const uint8_t digital_pin_to_timer[];
 #warning "tinyAVR 2-series parts are not yet supported - bad behavior is not unexpected. Please ensure you have latest version of core for testing this!"
 #endif
 
+// This define can get black-hole'ed somehow (reported on platformio) likely the ugly syntax to pass a string define from platform.txt via a -D 
+// directive passed to the compiler is getting mangled somehow, though I'm amazed it doesn't cause a  compile error. But checking for defined(MEGATINYCORE) 
+// is the documented method to detect that megaTinyCore is in use, and without it things that tried to do conditional compilation based on that were not 
+// recognizing it as megaTinyCore and hence would fail to compile when that conditional compilation was required to make it build.
+// From: https://github.com/adafruit/Adafruit_BusIO/issues/43
+#ifndef(MEGATINYCORE)
+  #define MEGATINYCORE "unknown"
+#endif
+  
 // Version related defines now handled in platform.txt
 #define MEGATINYCORE_NUM ((MEGATINYCORE_MAJOR<<24)+(MEGATINYCORE_MINOR<<16)+(MEGATINYCORE_PATCH<<8)+MEGATINYCORE_RELEASED)
 
