@@ -184,6 +184,7 @@ board_fuses.SYSCFG0 = [some value]
 board_fuses.SYSCFG1 = [some value]
 board_fuses.APPEND = [some value]
 board_fuses.BOOTEND = [some value]
+board_fuses.LOCKBIT = [some value]
 ```
 
 
