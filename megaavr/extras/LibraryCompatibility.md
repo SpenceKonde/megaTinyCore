@@ -5,12 +5,12 @@ Please include information that uniquely identifies the library, as popular libr
 |-------------|-------------|-------------------------------------------------------|-----------------|------------------|-------------------------|
 | tinyGPS++   |            .|                                                      .|          Yes    |             Yes .|                        .|
 | NeoGPS      |            .|                                                      .| W/Arch. warning |              No .|                        .|
-| VL53L0X    .|            .| "Pololu"                                             .|          Yes   .|             Yes .|                        .|
-| VEML6070   .|            .| 'Adafruit"                                           .|          Yes   .|             Yes .|                        .|
+| VL53L0X     |            .| "Pololu"                                             .|          Yes   .|             Yes .|                        .|
+| VEML6070   .|            .| "Adafruit"                                           .|          Yes   .|             Yes .|                        .|
 | MLX90614   .|            .|https://github.com/adafruit/Adafruit-MLX90614-Library  |          Yes   .|             Yes .|                        .|
-|            .|            .|                                                      .|                .|                 .|                        .|
-|            .|            .|                                                      .|                .|                 .|                        .|
-|            .|            .|                                                      .|                .|                 .|                        .|
+| BMP180     .|            .| "Adafruit"                                           .|                .|                 .|                        .|
+| BME280     .|            .| "Adafruit"                                           .|                .|                 .|                        .|
+| OneWire    .|            .| https://github.com/pstolarz/OneWireNg                 |          Yes   .|             Yes .|                        .|
 |            .|            .|                                                      .|                .|                 .|                        .|
 |            .|            .|                                                      .|                .|                 .|                        .|
 |            .|            .|                                                      .|                .|                 .|                        .|
