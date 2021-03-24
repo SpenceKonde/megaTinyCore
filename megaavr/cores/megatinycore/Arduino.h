@@ -386,25 +386,30 @@ extern const uint8_t digital_pin_to_timer[];
 #define __AVR_ATtinyx02__
 #define __AVR_ATtinyxy2__
 #else
-#error "Can't-happen: unknown chip somehow being used!"
+  #error "Can't-happen: unknown chip somehow being used!"
 #endif
 
 #if (MEGATINYCORE_SERIES==2)
-#warning "tinyAVR 2-series parts are not yet supported - bad behavior is not unexpected. Please ensure you have latest version of core for testing this!"
+  #error "tinyAVR 2-series parts are not yet supported"
+  #define NATIVE_ADC_RESOLUTION 12
+#else
+  #define NATIVE_ADC_RESOLUTION 10
 #endif
 
-// This define can get black-hole'ed somehow (reported on platformio) likely the ugly syntax to pass a string define from platform.txt via a -D 
-// directive passed to the compiler is getting mangled somehow, though I'm amazed it doesn't cause a  compile error. But checking for defined(MEGATINYCORE) 
-// is the documented method to detect that megaTinyCore is in use, and without it things that tried to do conditional compilation based on that were not 
+// This define can get black-hole'ed somehow (reported on platformio) likely the ugly syntax to pass a string define from platform.txt via a -D
+// directive passed to the compiler is getting mangled somehow, though I'm amazed it doesn't cause a  compile error. But checking for defined(MEGATINYCORE)
+// is the documented method to detect that megaTinyCore is in use, and without it things that tried to do conditional compilation based on that were not
 // recognizing it as megaTinyCore and hence would fail to compile when that conditional compilation was required to make it build.
 // From: https://github.com/adafruit/Adafruit_BusIO/issues/43
-#ifndef(MEGATINYCORE)
-  #define MEGATINYCORE "unknown"
+#ifndef MEGATINYCORE
+  #define MEGATINYCORE "Unknown 2.3.0+"
 #endif
-  
+
 // Version related defines now handled in platform.txt
 #define MEGATINYCORE_NUM ((MEGATINYCORE_MAJOR<<24)+(MEGATINYCORE_MINOR<<16)+(MEGATINYCORE_PATCH<<8)+MEGATINYCORE_RELEASED)
 
+#define CORE_HAS_FASTIO 1
+#define CORE_HAS_OPENDRAIN 1
 
 
 
