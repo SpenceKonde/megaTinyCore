@@ -133,8 +133,8 @@ extern const uint8_t digital_pin_to_timer[];
 //
 // These perform slightly better as macros compared to inline functions
 //
-  
-  
+
+
 #define NOT_A_PIN 255
 #define NOT_A_PORT 255
 #define NOT_AN_INTERRUPT 255
@@ -390,7 +390,7 @@ extern const uint8_t digital_pin_to_timer[];
 #endif
 
 #if (MEGATINYCORE_SERIES==2)
-  #error "tinyAVR 2-series parts are not yet supported"
+  #warning "tinyAVR 2-series support is in at pre-beta levels, please help by reporting any issues!"
   #define NATIVE_ADC_RESOLUTION 12
 #else
   #define NATIVE_ADC_RESOLUTION 10

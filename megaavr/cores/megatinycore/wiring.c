@@ -644,7 +644,8 @@ void init() {
 
   /******************************** CLOCK STUFF *********************************/
   #ifndef CLOCK_SOURCE
-    #error "CLOCK_SOURCE must be defined at all. CLOCK_SOURCE must be either 0 (internal) or 2 (external clock)"
+    #error "CLOCK_SOURCE not defined. CLOCK_SOURCE must be either 0 (internal) or 2 (external clock)"
+  #endif
   #if (CLOCK_SOURCE==0)
     #if (F_CPU == 20000000)
       /* No division on clock */
