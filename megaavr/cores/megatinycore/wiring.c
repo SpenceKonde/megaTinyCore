@@ -340,20 +340,42 @@ unsigned long micros() {
 
 #if !(defined(MILLIS_USE_TIMERNONE) || defined(MILLIS_USE_TIMERRTC)) //delay implementation when we do have micros()
 void delay(unsigned long ms) {
-  uint32_t start_time = micros(), delay_time = 1000 * ms;
+  #if (PROGMEM_SIZE < 4096)
+    // Not sure where I got this wacky definition of delay that was being used - It saves 24 whole bytes
+    // Nobody is going to care about 24 bytes on most parts, but I am leaving it in for the 2k parts, where
+    // those 24 bytes are about 1.2% of the total available flash... though it is now guarded with a test
+    // to stop you from passing a value known at compile time to be too long. The 2k parts really are
+    // just that claustrophobic.
+    if (_builtin_constant_p(ms)) {
+      if (ms > 4294000) badCall("delay() does not support periods greater than 4.29 million milliseconds at a time on 2k parts; this saves 24 bytes, which is > 1% of the available flash")
+    }
+    uint32_t start_time = micros(), delay_time = 1000 * ms;
 
-  /* Calculate future time to return */
-  uint32_t return_time = start_time + delay_time;
+    /* Calculate future time to return */
+    uint32_t return_time = start_time + delay_time;
 
-  /* If return time overflows */
-  if (return_time < delay_time) {
-    /* Wait until micros overflows */
-    while (micros() > return_time);
-  }
+    /* If return time overflows */
+    if (return_time < delay_time) {
+      /* Wait until micros overflows */
+      while (micros() > return_time);
+    }
 
-  /* Wait until return time */
-  while (micros() < return_time);
+    /* Wait until return time */
+    while (micros() < return_time);
+  #else
+    //Otherwise, we use the normal implementation of delay which is compatible with all values that fit in uint32_t.
+    uint32_t start = micros();
+
+    while (ms > 0) {
+      yield();
+      while ( ms > 0 && (micros() - start) >= 1000) {
+        ms--;
+        start += 1000;
+      }
+    }
+  #endif
 }
+
 #else //delay implementation when we do not
 void delay(unsigned long ms) {
   while (ms--) {
@@ -583,7 +605,7 @@ void init_millis()
       #endif
       RTC.INTCTRL         = 0x01; //enable overflow interrupt
       RTC.CTRLA           = (RTC_RUNSTDBY_bm|RTC_RTCEN_bm|RTC_PRESCALER_DIV32_gc);//fire it up, prescale by 32.
-    #else //It's a type b timer
+    #else //It's a type b timer - we have already errored out if that wasn't defined
       _timer->CCMP = TIME_TRACKING_TIMER_PERIOD;
       // Enable timer interrupt, but clear the rest of register
       _timer->INTCTRL = TCB_CAPT_bm;
@@ -618,51 +640,46 @@ void set_millis(uint32_t newmillis)
 
 
 void init() {
-  // this needs to be called before setup() or some functions won't
-  // work there
+  // Initializes hardware: First we configure the main clock, then fire up the
 
   /******************************** CLOCK STUFF *********************************/
+  #ifndef CLOCK_SOURCE
+    #error "CLOCK_SOURCE must be defined at all. CLOCK_SOURCE must be either 0 (internal) or 2 (external clock)"
   #if (CLOCK_SOURCE==0)
-  #if (F_CPU == 20000000)
-  /* No division on clock */
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
-
-  #elif (F_CPU == 16000000)
-  /* No division on clock */
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
-
-  #elif (F_CPU == 10000000) //20MHz prescaled by 2
-  /* Clock DIV2 */
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
-
-  #elif (F_CPU == 8000000) //16MHz prescaled by 2
-  /* Clock DIV2 */
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
-
-  #elif (F_CPU == 5000000) //20MHz prescaled by 4
-  /* Clock DIV4 */
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
-
-  #elif (F_CPU == 4000000) //16MHz prescaled by 4
-  /* Clock DIV4 */
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
-
-  #elif (F_CPU == 1000000) //16MHz prescaled by 16
-  /* Clock DIV8 */
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
-  #else
-  #ifndef F_CPU
-#error "F_CPU not defined"
-  #else
-#error "F_CPU defined as an unsupported value"
-  #endif
-  #endif
+    #if (F_CPU == 20000000)
+      /* No division on clock */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+    #elif (F_CPU == 16000000)
+      /* No division on clock */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+    #elif (F_CPU == 10000000) //20MHz prescaled by 2
+      /* Clock DIV2 */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+    #elif (F_CPU == 8000000) //16MHz prescaled by 2
+      /* Clock DIV2 */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+    #elif (F_CPU == 5000000) //20MHz prescaled by 4
+      /* Clock DIV4 */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
+    #elif (F_CPU == 4000000) //16MHz prescaled by 4
+      /* Clock DIV4 */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
+    #elif (F_CPU == 1000000) //16MHz prescaled by 16
+      /* Clock DIV8 */
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
+    #else
+      #ifndef F_CPU
+        #error "F_CPU not defined"
+      #else
+        #error "F_CPU defined as an unsupported value"
+      #endif
+    #endif
   #elif (CLOCK_SOURCE==2)
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, CLKCTRL_CLKSEL_EXTCLK_gc);
-  while (CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm);  //This either works, or hangs the chip - EXTS is pretty much useless here.
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, CLKCTRL_CLKSEL_EXTCLK_gc);
+    while (CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm);  //This either works, or hangs the chip - EXTS is pretty much useless here.
+    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
   #else
-#error "CLOCK_SOURCE isn't 0 (internal) or 2 (external CLOCK); one of these options must be selected for all boards."
+    #error "CLOCK_SOURCE isn't 0 (internal) or 2 (external CLOCK); one of these options must be selected for all boards."
   #endif
 
 
@@ -671,10 +688,10 @@ void init() {
   init_timers();
 
   #ifndef MILLIS_USE_TIMERNONE
-  init_millis();
-  #endif //end #ifndef MILLIS_USE_TIMERNONE
+    init_millis();
+  #endif
   /*************************** ENABLE GLOBAL INTERRUPTS *************************/
-
+  // Finally, after everything is initialized, we go ahead and enable interrupts.
   sei();
 }
 

@@ -47,9 +47,9 @@ static const struct Logic::CCLBlock blocks[] = {
   },
   #endif
   #if defined(__AVR_ATtiny406__) || defined(__AVR_ATtiny806__) || \
-  defined(__AVR_ATtiny1606__) ||                              \
-  defined(__AVR_ATtiny416__) || defined(__AVR_ATtiny816__) || \
-  defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny3216__)
+     defined(__AVR_ATtiny1606__) ||                               \
+      defined(__AVR_ATtiny416__) || defined(__AVR_ATtiny816__) || \
+     defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny3216__)
   #define PORTMUX_CCL PORTMUX.CTRLA
   #define PORTMUX_ALTOUT_bm (1 << (block.number + 4))
   {
@@ -66,8 +66,8 @@ static const struct Logic::CCLBlock blocks[] = {
   },
   #endif
   #if defined(__AVR_ATtiny807__) || defined(__AVR_ATtiny1607__) || \
-  defined(__AVR_ATtiny417__) || defined(__AVR_ATtiny817__) ||  \
-  defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3217__)
+      defined(__AVR_ATtiny417__) ||  defined(__AVR_ATtiny817__) ||  \
+     defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3217__)
   #define PORTMUX_CCL PORTMUX.CTRLA
   #define PORTMUX_ALTOUT_bm (1 << (block.number + 4))
   {
@@ -448,12 +448,12 @@ void Logic::init() {
       #if defined(PORTMUX_CCL)
       PORTMUX_CCL |= PORTMUX_ALTOUT_bm;
       #endif
-      block.PORT_OUT.DIRSET = block.output_alt_bm;
+      block.PORT_ALT_OUT.DIRSET = block.output_alt_bm;
     } else if (output_swap == out::no_swap && block.output_bm) {
       #if defined(PORTMUX_CCL)
       PORTMUX_CCL &= ~PORTMUX_ALTOUT_bm;
       #endif
-      block.PORT_ALT_OUT.DIRSET = block.output_bm;
+      block.PORT_OUT.DIRSET = block.output_bm;
     }
   }
   // Set inputs modes
