@@ -134,7 +134,6 @@ const uint8_t digital_pin_to_port[] = {
   PA,           // 1  PA7
   PA,           // 2  PA1
   PA,           // 3  PA2
-              // skip PA0 UPDI
   PA,           // 4  PA3
   PA            // 5  PA0
 };
@@ -145,7 +144,6 @@ const uint8_t digital_pin_to_bit_position[] = {
   PIN7_bp,      // 1  PA7
   PIN1_bp,      // 2  PA1
   PIN2_bp,      // 3  PA2
-              // skip PA0 UPDI
   PIN3_bp,      // 4  PA3
   PIN0_bp       // 5  PA0
 };
@@ -156,7 +154,6 @@ const uint8_t digital_pin_to_bit_mask[] = {
   PIN7_bm,      // 1  PA7
   PIN1_bm,      // 2  PA1
   PIN2_bm,      // 3  PA2
-              // skip PA0 UPDI
   PIN3_bm,      // 4  PA3
   PIN0_bm       // 5  PA0
 };
@@ -170,7 +167,6 @@ const uint8_t digital_pin_to_timer[] = {
   TIMERA0,      // 1  PA7
   TIMERA0,      // 2  PA1
   TIMERA0,      // 3  PA2
-              // skip PA0 UPDI
   TIMERA0,      // 4  PA3
   NOT_ON_TIMER  // 5  PA0
 };

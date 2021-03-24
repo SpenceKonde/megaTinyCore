@@ -640,7 +640,7 @@ void set_millis(uint32_t newmillis)
 
 
 void init() {
-  // Initializes hardware: First we configure the main clock, then fire up the
+  // Initializes hardware: First we configure the main clock, then fire up the other peripherals
 
   /******************************** CLOCK STUFF *********************************/
   #ifndef CLOCK_SOURCE

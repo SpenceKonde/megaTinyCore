@@ -33,8 +33,6 @@
 
 #define NUM_DIGITAL_PINS            18
 #define NUM_ANALOG_INPUTS           12
-//#define NUM_RESERVED_PINS           0 // (TOSC1/2, VREF, RESET, DEBUG USART Rx/Tx)
-//#define NUM_INTERNALLY_USED_PINS    0 // (2 x Chip select + 2 x UART + 4 x IO + LED_BUILTIN + 1 unused pin)
 #define NUM_I2C_PINS                2 // (SDA / SCL)
 #define NUM_SPI_PINS                3 // (MISO / MOSI / SCK)
 #define NUM_TOTAL_PINS              18
@@ -47,28 +45,32 @@
   #define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 7 || (p) == 8 || (p) == 9 || (p) == 16 )
 #endif
 
-#define SPI_MUX                        (0)
-#define PIN_SPI_MISO                  (15)
-#define PIN_SPI_SCK                   (16)
-#define PIN_SPI_MOSI                  (14)
-#define PIN_SPI_SS                     (0)
-#ifdef PORTMUX_SPI0_bm
-  #define PIN_SPI_MISO_PINSWAP_1      (11)
-  #define PIN_SPI_SCK_PINSWAP_1       (10)
-  #define PIN_SPI_MOSI_PINSWAP_1      (12)
-  #define PIN_SPI_SS_PINSWAP_1        (13)
-  #define SPI_MUX_PINSWAP_1           (PORTMUX_SPI0_bm)
+#define SPI_MUX                       (0)
+#define PIN_SPI_SS                    (PIN_PA0)
+#define PIN_SPI_MOSI                  (PIN_PA1)
+#define PIN_SPI_MISO                  (PIN_PA2)
+#define PIN_SPI_SCK                   (PIN_PA3)
+#if defined(PORTMUX_SPI0_bm) || defined(PORTMUX_SPIROUTEA)
+  #define PIN_SPI_SCK_PINSWAP_1       (PIN_PC0)
+  #define PIN_SPI_MISO_PINSWAP_1      (PIN_PC1)
+  #define PIN_SPI_MOSI_PINSWAP_1      (PIN_PC2)
+  #define PIN_SPI_SS_PINSWAP_1        (PIN_PC3)
+  #ifdef PORTMUX_SPI0_bm
+    #define SPI_MUX_PINSWAP_1         (PORTMUX_SPI0_bm)
+  #else
+    #define SPI_MUX_PINSWAP_1         (PORTMUX_SPI0_ALT1_gc)
+  #endif
 #endif
 
 #define SPI_INTERFACES_COUNT  1
 
 
-#define PIN_WIRE_SDA        (8)
-#define PIN_WIRE_SCL        (9)
 #ifdef PORTMUX_TWI0_bm
-  #define PIN_WIRE_SDA_PINSWAP_1        (14)
-  #define PIN_WIRE_SCL_PINSWAP_1        (15)
+  #define PIN_WIRE_SDA_PINSWAP_1      (PIN_PA1)
+  #define PIN_WIRE_SCL_PINSWAP_1      (PIN_PA2)
 #endif
+#define PIN_WIRE_SDA                  (PIN_PB1)
+#define PIN_WIRE_SCL                  (PIN_PB0)
 
 // Mapped to HWSERIAL0 in Serial library
 #define HWSERIAL0                 (&USART0)
@@ -95,6 +97,50 @@
 #define LED_BUILTIN PIN_PA7
 
 
+#define PIN_PA4        (0)
+#define PIN_PA5        (1)
+#define PIN_PA6        (2)
+#define PIN_PA7        (3)
+#define PIN_PB5        (4)
+#define PIN_PB4        (5)
+#define PIN_PB3        (6)
+#define PIN_PB2        (7)
+#define PIN_PB1        (8)
+#define PIN_PB0        (9)
+#define PIN_PC0        (10)
+#define PIN_PC1        (11)
+#define PIN_PC2        (12)
+#define PIN_PC3        (13)
+#define PIN_PA0        (17)
+#define PIN_PA1        (14)
+#define PIN_PA2        (15)
+#define PIN_PA3        (16)
+
+#define PIN_A0         (A0)
+#define PIN_A1         (A1)
+#define PIN_A2         (A2)
+#define PIN_A3         (A3)
+#define PIN_A4         (A4)
+#define PIN_A5         (A5)
+#define PIN_A6         (A6)
+#define PIN_A7         (A7)
+#define PIN_A8         (A8)
+#define PIN_A9         (A9)
+#define PIN_A10        (A10)
+#define PIN_A11        (A11)
+
+static const uint8_t    A0  = PIN_PA0;
+static const uint8_t    A1  = PIN_PA1;
+static const uint8_t    A2  = PIN_PA2;
+static const uint8_t    A3  = PIN_PA3;
+static const uint8_t    A4  = PIN_PA4;
+static const uint8_t    A5  = PIN_PA5;
+static const uint8_t    A6  = PIN_PA6;
+static const uint8_t    A7  = PIN_PA7;
+static const uint8_t    A8  = PIN_PB5;
+static const uint8_t    A9  = PIN_PB4;
+static const uint8_t    A10 = PIN_PB1;
+static const uint8_t    A11 = PIN_PB0;
 
 #define PIN_A0   (17)
 #define PIN_A1   (14)

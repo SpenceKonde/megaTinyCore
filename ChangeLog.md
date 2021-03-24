@@ -7,7 +7,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### 2.3.0
 * This is the first version planned to have 2-series support. Basics are in the master branch of github. Everything should work, but no testing has ben done oh, and the ADC is totally unsupported
 
-### 2.2.10 or 2.3.0
+### 2.2.10
 * Update pymcuprog bridge tool.
 * Add warnings for #define being used on things that aren't macros, and hence likely generating unexpected behavior. Refuse to compile with implicit definitions, as 99 times out of 10, this is a bug, and it's a waste of time to upload it.
 * delayMicroseconds should now be more accurate at low clock speeds, short delays, and cases where the delay is known at compiletime. Particularly noticible is the case of things like delayMicroseconds(1) at 1 MHz, (for example) where the delay wound wind up being more like 16 us before.

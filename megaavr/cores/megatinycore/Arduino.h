@@ -128,6 +128,8 @@ extern const uint8_t digital_pin_to_timer[];
 //
 // These perform slightly better as macros compared to inline functions
 //
+  
+  
 #define NOT_A_PIN 255
 #define NOT_A_PORT 255
 #define NOT_AN_INTERRUPT 255

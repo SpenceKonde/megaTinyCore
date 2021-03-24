@@ -28,8 +28,6 @@
 
 #define NUM_DIGITAL_PINS            12 //
 #define NUM_ANALOG_INPUTS           9
-//#define NUM_RESERVED_PINS           0 // (TOSC1/2, VREF, RESET, DEBUG USART Rx/Tx)
-//#define NUM_INTERNALLY_USED_PINS    0 // (2 x Chip select + 2 x UART + 4 x IO + LED_BUILTIN + 1 unused pin)
 #define NUM_I2C_PINS                2 // (SDA / SCL)
 #define NUM_SPI_PINS                3 // (MISO / MOSI / SCK)
 #define NUM_TOTAL_FREE_PINS         (NUM_DIGITAL_PINS)
@@ -37,25 +35,23 @@
 
 #define EXTERNAL_NUM_INTERRUPTS     12
 
+#define digitalPinHasPWM(p)         ((p) == PIN_PA4 || (p) == PIN_PA5 || (p) == PIN_PB2 || (p) == PIN_PB1 || (p) == PIN_PB0 || (p) == PIN_PA3)
 
-#define digitalPinHasPWM(p)         ((p) == 0 || (p) == 1 || (p) == 5 || (p) == 6 || (p) == 7 || (p) == 10)
-
-#define PIN_SPI_MISO  (9)
-#define PIN_SPI_SCK   (10)
-#define PIN_SPI_MOSI  (8)
-#define PIN_SPI_SS    (0)
+#define PIN_SPI_SS                    (PIN_PA0)
+#define PIN_SPI_MOSI                  (PIN_PA1)
+#define PIN_SPI_MISO                  (PIN_PA2)
+#define PIN_SPI_SCK                   (PIN_PA3)
 
 #define SPI_INTERFACES_COUNT  1
 
 
 
 #ifdef PORTMUX_TWI0_bm
-  #define PIN_WIRE_SDA_PINSWAP_1        (8)
-  #define PIN_WIRE_SCL_PINSWAP_1        (9)
+  #define PIN_WIRE_SDA_PINSWAP_1      (PIN_PA1)
+  #define PIN_WIRE_SCL_PINSWAP_1      (PIN_PA2)
 #endif
-#define PIN_WIRE_SDA        (6)
-#define PIN_WIRE_SCL        (7)
-
+#define PIN_WIRE_SDA                  (PIN_PB1)
+#define PIN_WIRE_SCL                  (PIN_PB0)
 
 // Mapped to HWSERIAL0 in Serial library
 #define HWSERIAL0                 (&USART0)
