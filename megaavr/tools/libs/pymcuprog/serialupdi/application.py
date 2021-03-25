@@ -18,6 +18,8 @@ def decode_sib(sib):
     """
     sib_info = {}
     logger = getLogger(__name__)
+    
+    sib = sib.replace(b"\x00", b"")
 
     try:
         sib_string = sib.decode('ascii')
