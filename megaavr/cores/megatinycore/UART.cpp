@@ -97,6 +97,7 @@ void UartClass::_tx_data_empty_irq(void) {
   // Check if tx buffer already empty.
   if (_tx_buffer_head == _tx_buffer_tail) {
     // Buffer empty, so disable "data register empty" interrupt
+    //VPORTA.IN |= 0x80;
     (*_hwserial_module).CTRLA &= (~USART_DREIE_bm);
     return;
   }
@@ -110,20 +111,26 @@ void UartClass::_tx_data_empty_irq(void) {
   // location". This makes sure flush() won't return until the bytes
   // actually got written
   (*_hwserial_module).STATUS = USART_TXCIF_bm;
+    //VPORTA.IN |= 0x40;
 
   (*_hwserial_module).TXDATAL = c;
 
   if (_tx_buffer_head == _tx_buffer_tail) {
     // Buffer empty, so disable "data register empty" interrupt
     (*_hwserial_module).CTRLA &= (~USART_DREIE_bm);
+    //VPORTA.IN |= 0x80;
   }
 }
 
 // To invoke data empty "interrupt" via a call, use this method
 void UartClass::_poll_tx_data_empty(void) {
-  if ((!(SREG & CPU_I_bm)) || (!((*_hwserial_module).CTRLA & USART_DREIE_bm)) || CPUINT.STATUS) {
-    // Interrupts are disabled either globally or for data register empty,
-    // or we are in another ISR. (It doesn't matter *which* ISR we are in
+  if (((!(SREG & CPU_I_bm)) || CPUINT.STATUS) && (((*_hwserial_module).CTRLA & USART_DREIE_bm))) {
+    // Interrupts are disabled either globally or we are in another ISR.
+    // the DRE interrupt is enabled so we have more to send and shouod
+    // directly call it. If it's not enabled, sending is done, and the only
+    // reason we might be here is that we're in flush and waiting on the last byte to
+    // finish sending.
+    // (It doesn't matter *which* ISR we are in
     // whether it's another level 0, the priority one, or heaven help us
     // the NMI, if the user code says to print something or flush the buffer
     // we might as well do it. It is entirely plausible that an NMI might
@@ -135,6 +142,8 @@ void UartClass::_poll_tx_data_empty(void) {
 
     // Invoke interrupt handler only if conditions data register is empty
     if ((*_hwserial_module).STATUS & USART_DREIF_bm) {
+
+
       _tx_data_empty_irq();
     }
   }
@@ -352,6 +361,7 @@ void UartClass::flush() {
 
     // If interrupts are globally disabled or the and DR empty interrupt is disabled,
     // poll the "data register empty" interrupt flag to prevent deadlock
+
     _poll_tx_data_empty();
   }
   // When we get here, nothing is queued anymore (DREIE is disabled) and
@@ -366,16 +376,18 @@ size_t UartClass::write(uint8_t c) {
   // significantly improve the effective data rate at high (>
   // 500kbit/s) bit rates, where interrupt overhead becomes a slowdown.
   if ((_tx_buffer_head == _tx_buffer_tail) && ((*_hwserial_module).STATUS & USART_DREIF_bm)) {
-    (*_hwserial_module).TXDATAL = c;
     (*_hwserial_module).STATUS = USART_TXCIF_bm;
-
+    /* Must clear TXCIF BEFORE we feed in the new byte!
+       otherwise if millis interruot fires between these, at high baud rates and slow
+       system clock, the byte will have transferred during millis, and so TXCIF will never get set again,
+       and calls to flush() will hang. https://github.com/SpenceKonde/megaTinyCore/issues/352 */
+    (*_hwserial_module).TXDATAL = c;
     // Make sure data register empty interrupt is disabled to avoid
     // that the interrupt handler is called in this situation
     (*_hwserial_module).CTRLA &= (~USART_DREIE_bm);
 
     return 1;
   }
-
   tx_buffer_index_t i = (_tx_buffer_head + 1) & (SERIAL_TX_BUFFER_SIZE-1); // % SERIAL_TX_BUFFER_SIZE;
 
   //If the output buffer is full, there's nothing for it other than to
