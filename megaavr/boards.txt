@@ -3,18 +3,17 @@
 ##########################################################################
 
 menu.chip=Chip
-menu.clock=Clock
+menu.clock=Clock (burn bootloader NOT req'd)
 menu.clocko=Clock (burn bootloader req'd, or see docs)
-menu.millis=millis()/micros()
-menu.uartvoltage=Voltage for UART baud (ignored for 2k/4k parts)
-menu.serialevent=Support SerialEvent
+menu.millis=millis()/micros() timer
+menu.uartvoltage=Voltage for UART baud (0/1-series only, ignored for 2k/4k parts)
 menu.startuptime=Startup Time
 menu.startuptimeopti=Startup Time (burn bootloader req'd)
 menu.bodvoltage=BOD level if enabled (burn bootloader req'd)
 menu.bodmode=BOD Mode when active/sleeping (burn bootloader req'd)
 menu.eesave=Save EEPROM (burn bootloader req'd)
 menu.bootloaderuart=UART for Bootloader (burn bootloader req'd)
-menu.resetpin=UPDI Pin, READ DOCS or pick UPDI! (burn bootloader req'd)
+menu.resetpin=UPDI/reset pin mode (burn bootloader req'd)
 menu.resetpinopti=UPDI/reset pin (burn bootloader req'd)
 
 # The *opti menus are for Optiboot board definitions;
@@ -245,17 +244,12 @@ atxy7.menu.uartvoltage.3v=Closer to 3v
 atxy7.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy7.menu.uartvoltage.3v.build.uartvoltage=3V
 
-atxy7.menu.serialevent.no=No (saves space)
-atxy7.menu.serialevent.yes=Yes
-atxy7.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-atxy7.menu.serialevent.yes.build.serialevent=
-atxy7.menu.serialevent.yes.build.serialeventabr=E
 atxy7.upload.tool=avrdude
 
 atxy7.build.core=megatinycore
 atxy7.build.variant=txy7
 atxy7.build.text_section_start=.text=0x0
-atxy7.build.extra_flags=-DARDUINO_attinyxy7 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy7.build.extra_flags=-DARDUINO_attinyxy7 {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy7.build.export_merged_output=false
 
 atxy7.bootloader.tool=avrdude
@@ -282,17 +276,11 @@ atxy6.build.mcu=attiny{build.attiny}
 atxy6.build.serialeventabr=
 atxy6.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy6.build.f_cpu={build.speed}000000L
-atxy6.build.extra_flags=-DARDUINO_attinyxy6 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy6.build.extra_flags=-DARDUINO_attinyxy6 {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy6.build.export_merged_output=false
 atxy6.build.variant=txy6
 atxy6.build.text_section_start=.text=0x0
 
-
-atxy6.menu.serialevent.no=No (saves space)
-atxy6.menu.serialevent.yes=Yes
-atxy6.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-atxy6.menu.serialevent.yes.build.serialevent=
-atxy6.menu.serialevent.yes.build.serialeventabr=E
 atxy6.upload.tool=avrdude
 
 atxy6.bootloader.tool=avrdude
@@ -519,11 +507,6 @@ atxy4.upload.workaround=
 atxy4.build.millistimer=D0
 atxy4.build.bootload=
 atxy4.build.board=AVR_ATtinyxy4
-atxy4.menu.serialevent.no=No (saves space)
-atxy4.menu.serialevent.yes=Yes
-atxy4.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-atxy4.menu.serialevent.yes.build.serialevent=
-atxy4.menu.serialevent.yes.build.serialeventabr=E
 atxy4.upload.tool=avrdude
 
 atxy4.bootloader.tool=avrdude
@@ -744,7 +727,7 @@ atxy4.menu.uartvoltage.3v=Closer to 3v
 atxy4.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy4.menu.uartvoltage.3v.build.uartvoltage=3V
 
-atxy4.build.extra_flags=-DARDUINO_attinyxy4 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy4.build.extra_flags=-DARDUINO_attinyxy4 {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy4.build.export_merged_output=false
 
 atxy4.bootloader.WDTCFG=0x00
@@ -768,11 +751,6 @@ atxy2.build.serialeventabr=
 atxy2.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy2.build.f_cpu={build.speed}000000L
 
-atxy2.menu.serialevent.no=No (saves space)
-atxy2.menu.serialevent.yes=Yes
-atxy2.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-atxy2.menu.serialevent.yes.build.serialevent=
-atxy2.menu.serialevent.yes.build.serialeventabr=E
 atxy2.upload.tool=avrdude
 
 atxy2.bootloader.avrdudestring=
@@ -940,7 +918,7 @@ atxy2.build.core=megatinycore
 atxy2.build.variant=txy2
 atxy2.build.text_section_start=.text=0x0
 atxy2.build.uartvoltage=NA
-atxy2.build.extra_flags=-DARDUINO_attinyxy2 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy2.build.extra_flags=-DARDUINO_attinyxy2 {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy2.build.export_merged_output=false
 
 atxy2.bootloader.tool=avrdude
@@ -1171,16 +1149,11 @@ atxy7o.menu.bootloaderuart.alternate=TX:18 (PA1), RX:19 (PA2)
 atxy7o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy7o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
-atxy7o.menu.serialevent.no=No (saves space)
-atxy7o.menu.serialevent.yes=Yes
-atxy7o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-atxy7o.menu.serialevent.yes.build.serialevent=
-atxy7o.menu.serialevent.yes.build.serialeventabr=E
-atxy7o.upload.tool=avrdude
+atxy7o.atxy7o.atxy7o.atxy7o.atxy7o.atxy7o.upload.tool=avrdude
 
 atxy7o.build.core=megatinycore
 atxy7o.build.variant=txy7
-atxy7o.build.extra_flags=-DARDUINO_attinyxy7 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy7o.build.extra_flags=-DARDUINO_attinyxy7 {build.millis} -DUARTBAUD{build.uartvoltage}
 
 atxy7o.bootloader.WDTCFG=0x00
 atxy7o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
@@ -1385,7 +1358,7 @@ atxy6o.menu.uartvoltage.3v.build.uartvoltage=3V
 
 atxy6o.build.core=megatinycore
 atxy6o.build.variant=txy6
-atxy6o.build.extra_flags=-DARDUINO_attinyxy6 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy6o.build.extra_flags=-DARDUINO_attinyxy6 {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy6o.build.export_merged_output=true
 
 atxy6o.menu.resetpinopti.UPDI=UPDI (powercycle to enter bootloader)
@@ -1421,12 +1394,7 @@ atxy6o.menu.startuptimeopti.16.bootloader.SYSCFG1=0x05
 atxy6o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atxy6o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
-atxy6o.menu.serialevent.no=No (saves space)
-atxy6o.menu.serialevent.yes=Yes
-atxy6o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-atxy6o.menu.serialevent.yes.build.serialevent=
-atxy6o.menu.serialevent.yes.build.serialeventabr=E
-atxy6o.upload.tool=avrdude
+atxy6o.atxy6o.atxy6o.atxy6o.atxy6o.atxy6o.upload.tool=avrdude
 
 atxy6o.menu.bootloaderuart.default=TX:7 (PB2), RX:6 (PB3)
 atxy6o.menu.bootloaderuart.alternate=TX:14 (PA1), RX:15 (PA2)
@@ -1640,16 +1608,11 @@ atxy4o.menu.uartvoltage.3v=Closer to 3v
 atxy4o.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy4o.menu.uartvoltage.3v.build.uartvoltage=3V
 
-atxy4o.menu.serialevent.no=No (saves space)
-atxy4o.menu.serialevent.yes=Yes
-atxy4o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-atxy4o.menu.serialevent.yes.build.serialevent=
-atxy4o.menu.serialevent.yes.build.serialeventabr=E
-atxy4o.upload.tool=avrdude
+atxy4o.atxy4o.atxy4o.atxy4o.atxy4o.atxy4o.upload.tool=avrdude
 
 atxy4o.build.core=megatinycore
 atxy4o.build.variant=txy4
-atxy4o.build.extra_flags=-DARDUINO_attinyxy4 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy4o.build.extra_flags=-DARDUINO_attinyxy4 {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy4o.build.export_merged_output=true
 
 atxy4o.upload.protocol=arduino
@@ -1852,12 +1815,6 @@ atxy2o.menu.bootloaderuart.alternate=TX:2 (PA1), RX:3 (PA2)
 atxy2o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy2o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
-atxy2o.menu.serialevent.no=No (saves space)
-atxy2o.menu.serialevent.yes=Yes
-atxy2o.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-atxy2o.menu.serialevent.yes.build.serialevent=
-atxy2o.menu.serialevent.yes.build.serialeventabr=E
-
 atxy2o.upload.tool=avrdude
 
 atxy2o.upload.protocol=arduino
@@ -1870,7 +1827,7 @@ atxy2o.bootloader.tool=avrdude
 atxy2o.build.core=megatinycore
 atxy2o.build.variant=txy2
 atxy2o.build.uartvoltage=NA
-atxy2o.build.extra_flags=-DARDUINO_attinyxy2 {build.serialevent} {build.millis} -DUARTBAUD{build.uartvoltage}
+atxy2o.build.extra_flags=-DARDUINO_attinyxy2 {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy2o.build.export_merged_output=true
 
 atxy2o.menu.resetpinopti.UPDI=UPDI (powercycle to enter bootloader)
@@ -1931,13 +1888,7 @@ Xplained416.build.variant=txy6
 Xplained416.build.speed=20
 Xplained416.build.clocksource=0
 Xplained416.build.text_section_start=.text=0x200
-Xplained416.build.extra_flags=-DARDUINO_attinyxy6 -DARDUINO_AVR_ATtiny416 {build.serialevent} {build.millis} -DUARTBAUD5V
-
-Xplained416.menu.serialevent.no=No (saves space)
-Xplained416.menu.serialevent.yes=Yes
-Xplained416.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-Xplained416.menu.serialevent.yes.build.serialevent=
-Xplained416.menu.serialevent.yes.build.serialeventabr=E
+Xplained416.build.extra_flags=-DARDUINO_attinyxy6 -DARDUINO_AVR_ATtiny416 {build.millis} -DUARTBAUD5V
 
 Xplained416.upload.tool=avrdude
 Xplained416.upload.speed=57600
@@ -1994,13 +1945,7 @@ Xplained817.build.variant=txy7
 Xplained817.build.speed=20
 Xplained817.build.clocksource=0
 Xplained817.build.text_section_start=.text=0x200
-Xplained817.build.extra_flags=-DARDUINO_attinyxy7 -DARDUINO_AVR_ATtiny817 {build.serialevent} {build.millis} -DUARTBAUD5V
-
-Xplained817.menu.serialevent.no=No (saves space)
-Xplained817.menu.serialevent.yes=Yes
-Xplained817.menu.serialevent.no.build.serialevent=-DNOSERIALEVENT
-Xplained817.menu.serialevent.yes.build.serialevent=
-Xplained817.menu.serialevent.yes.build.serialeventabr=E
+Xplained817.build.extra_flags=-DARDUINO_attinyxy7 -DARDUINO_AVR_ATtiny817 {build.millis} -DUARTBAUD5V
 
 Xplained817.upload.tool=avrdude
 Xplained817.upload.speed=57600

@@ -697,7 +697,7 @@ void init() {
 }
 
 
-void init_ADC0() {
+void __attribute__((weak)) init_ADC0() {
     /********************************* ADC ****************************************/
 #ifndef ADC_LOWLAT_bm
   #if defined(ADC0)
@@ -749,7 +749,7 @@ void init_ADC0() {
 
 
 #ifdef ADC1
-void init_ADC1() {
+  __attribute__((weak)) void init_ADC1() {
   #ifndef SLOWADC
   /* ADC clock 1 MHz to 1.25 MHz at frequencies supported by megaTinyCore
     Unlike the classic AVRs, which demand 50~200 kHz, for these, the datasheet
@@ -791,10 +791,9 @@ void init_ADC1() {
 }
 #endif
 
-void init_timers() {
+void __attribute__((weak)) init_timers()  {
 
   init_TCA0();
-
   #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && !defined(MILLIS_USE_TIMERD0))
     init_TCD0();
   #endif
@@ -803,7 +802,7 @@ void init_timers() {
 
 
 #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && !defined(MILLIS_USE_TIMERD0))
-void init_TCD0() {
+void __attribute__((weak)) init_TCD0() {
   TCD0.CMPBCLR  = 509; //510 counts, starts at 0, not 1!
   TCD0.CMPACLR  = 509;
   TCD0.CTRLC    = 0x80; //WOD outputs PWM B, WOC outputs PWM A
@@ -812,7 +811,7 @@ void init_TCD0() {
 }
 #endif
 
-void init_TCA0() {
+void __attribute__((weak)) init_TCA0() {
     /*  TYPE A TIMER   */
 
   /* PORTMUX setting for TCA - don't need to set because using default */

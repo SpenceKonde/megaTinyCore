@@ -39,6 +39,8 @@ compiler.objcopy.cmd=avr-objcopy
 compiler.objcopy.eep.flags=-O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0
 compiler.objdump.cmd=avr-objdump
 compiler.objdump.flags=--disassemble --source --line-numbers --demangle --section=.text
+compiler.nm.cmd=avr-nm
+compiler.nm.flags=--numeric-sort --line-numbers --demangle --print-size --format=s
 compiler.elf2hex.flags=-O ihex -R .eeprom
 compiler.elf2hex.bin.flags=-O binary -R .eeprom
 compiler.elf2hex.cmd=avr-objcopy
@@ -84,19 +86,31 @@ recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf
 
 ## Save disassembler listing
 recipe.hooks.objcopy.postobjcopy.1.pattern.windows=cmd /C "{compiler.path}{compiler.objdump.cmd}" {compiler.objdump.flags} "{build.path}/{build.project_name}.elf" > "{build.path}/{build.project_name}.lst"
-# recipe.hooks.objcopy.postobjcopy.1.pattern.linux=chmod +x "{runtime.platform.path}/create_disassembler_listing.sh"
-# recipe.hooks.objcopy.postobjcopy.1.pattern.macosx=chmod +x "{runtime.platform.path}/create_disassembler_listing.sh"
-recipe.hooks.objcopy.postobjcopy.1.pattern.linux="{runtime.platform.path}/create_disassembler_listing.sh" "{compiler.path}{compiler.objdump.cmd}" "{compiler.objdump.flags}" "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.lst"
-recipe.hooks.objcopy.postobjcopy.1.pattern.macosx="{runtime.platform.path}/create_disassembler_listing.sh" "{compiler.path}{compiler.objdump.cmd}" "{compiler.objdump.flags}" "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.lst"
+recipe.hooks.objcopy.postobjcopy.1.pattern.linux=bash -c "{compiler.path}{compiler.objdump.cmd} {compiler.objdump.flags} {build.path}/{build.project_name}.elf > {build.path}/{build.project_name}.lst"
+recipe.hooks.objcopy.postobjcopy.1.pattern.macosx=bash -c "{compiler.path}{compiler.objdump.cmd} {compiler.objdump.flags} {build.path}/{build.project_name}.elf > {build.path}/{build.project_name}.lst"
+
+## Save memory map
+recipe.hooks.objcopy.postobjcopy.2.pattern.windows=cmd /C "{compiler.path}{compiler.nm.cmd}" {compiler.nm.flags}  "{build.path}/{build.project_name}.elf" > "{build.path}/{build.project_name}.map"
+recipe.hooks.objcopy.postobjcopy.2.pattern.linux=bash -c "{compiler.path}{compiler.nm.cmd} {compiler.nm.flags}  {build.path}/{build.project_name}.elf > {build.path}/{build.project_name}.map"
+recipe.hooks.objcopy.postobjcopy.2.pattern.macosx=bash -c "{compiler.path}{compiler.nm.cmd} {compiler.nm.flags}  {build.path}/{build.project_name}.elf > {build.path}/{build.project_name}.map"
+
+
+## This is the name that memory maps, assembly listings and hex files will be output as
+build.extraassetname={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}{build.serialeventabr}.m{build.millistimer}.hex
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.hex
-recipe.output.save_file={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}{build.serialeventabr}.m{build.millistimer}.hex
+recipe.output.save_file={build.extraassetname}.hex
 
 ## Save lst
-recipe.hooks.savehex.presavehex.1.pattern.windows=cmd /C copy "{build.path}\{build.project_name}.lst" "{sketch_path}\{build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}{build.serialeventabr}.m{build.millistimer}.lst"
-recipe.hooks.savehex.presavehex.1.pattern.linux=cp "{build.path}/{build.project_name}.lst" "{sketch_path}/{build.project_name}t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}{build.serialeventabr}.m{build.millistimer}.lst"
-recipe.hooks.savehex.presavehex.1.pattern.macosx=cp "{build.path}/{build.project_name}.lst" "{sketch_path}/{build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}{build.serialeventabr}.m{build.millistimer}.lst"
+recipe.hooks.savehex.presavehex.1.pattern.windows=cmd /C copy "{build.path}\{build.project_name}.lst" "{sketch_path}\{build.extraassetname}.lst"
+recipe.hooks.savehex.presavehex.1.pattern.linux=cp "{build.path}/{build.project_name}.lst" "{sketch_path}/{build.extraassetname}.lst"
+recipe.hooks.savehex.presavehex.1.pattern.macosx=cp "{build.path}/{build.project_name}.lst" "{sketch_path}/{build.extraassetname}.lst"
+
+## Save map
+recipe.hooks.savehex.presavehex.2.pattern.windows=cmd /C copy "{build.path}\{build.project_name}.map" "{sketch_path}\{build.extraassetname}.map"
+recipe.hooks.savehex.presavehex.2.pattern.linux=cp "{build.path}/{build.project_name}.map" "{sketch_path}/{build.extraassetname}.map"
+recipe.hooks.savehex.presavehex.2.pattern.macosx=cp "{build.path}/{build.project_name}.map" "{sketch_path}/{build.extraassetname}.map"
 
 ## Compute
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"

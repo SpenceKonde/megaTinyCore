@@ -34,13 +34,13 @@
 // this next line disables the entire UART.cpp,
 // this is so I can support Attiny series and any other chip without a uart
 #if defined(HAVE_HWSERIAL0) || defined(HAVE_HWSERIAL1) || defined(HAVE_HWSERIAL2) || defined(HAVE_HWSERIAL3)
-
-// SerialEvent functions are weak, so when the user doesn't define them,
-// the linker just sets their address to 0 (which is checked below).
-// The Serialx_available is just a wrapper around Serialx.available(),
-// but we can refer to it weakly so we don't pull in the entire
-// UART instance if the user doesn't also refer to it.
-#ifndef NOSERIALEVENT
+  // As of 2.3.0 serialevent is no longer exposed through the core. It is deprecated on official core - screw it.
+  // SerialEvent functions are weak, so when the user doesn't define them,
+  // the linker just sets their address to 0 (which is checked below).
+  // The Serialx_available is just a wrapper around Serialx.available(),
+  // but we can refer to it weakly so we don't pull in the entire
+  // UART instance if the user doesn't also refer to it.
+  #if defined(ENABLE_SERIAL_EVENT)
 #if defined(HAVE_HWSERIAL0)
   void serialEvent() __attribute__((weak));
   bool Serial0_available() __attribute__((weak));
@@ -124,7 +124,7 @@ void UartClass::_tx_data_empty_irq(void) {
 
 // To invoke data empty "interrupt" via a call, use this method
 void UartClass::_poll_tx_data_empty(void) {
-  if (((!(SREG & CPU_I_bm)) || CPUINT.STATUS) && (((*_hwserial_module).CTRLA & USART_DREIE_bm))) {
+  if ((!(SREG & CPU_I_bm)) || (!((*_hwserial_module).CTRLA & USART_DREIE_bm)) || CPUINT.STATUS) {
     // Interrupts are disabled either globally or we are in another ISR.
     // the DRE interrupt is enabled so we have more to send and shouod
     // directly call it. If it's not enabled, sending is done, and the only
@@ -372,9 +372,9 @@ size_t UartClass::write(uint8_t c) {
   _written = true;
 
   // If the buffer and the data register is empty, just write the byte
-  // to the data register and be done. This shortcut helps
-  // significantly improve the effective data rate at high (>
-  // 500kbit/s) bit rates, where interrupt overhead becomes a slowdown.
+  // to the data register and be done. This shortcut helps significantly
+  // improve the effective data rate at high (>500kbit/s) bit rates,
+  // where interrupt overhead becomes a slowdown.
   if ((_tx_buffer_head == _tx_buffer_tail) && ((*_hwserial_module).STATUS & USART_DREIF_bm)) {
     (*_hwserial_module).STATUS = USART_TXCIF_bm;
     /* Must clear TXCIF BEFORE we feed in the new byte!
