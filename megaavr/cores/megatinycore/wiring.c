@@ -348,11 +348,11 @@ void delay(unsigned long ms) {
     // those 24 bytes are about 1.2% of the total available flash... though it is now guarded with a test
     // to stop you from passing a value known at compile time to be too long. The 2k parts really are
     // just that claustrophobic.
-    if (_builtin_constant_p(ms)) {
+    if (__builtin_constant_p(ms)) {
       #if !defined(MILLIS_USE_TIMERD0)
-      if (ms > 4294000) badCall("delay() does not support periods greater than 4.29 million milliseconds at a time on 2k parts; this saves 24 bytes, which is > 1% of the available flash")
+      if (ms > 4294000) badCall("delay() does not support periods greater than 4.29 million milliseconds at a time on 2k parts; this saves 24 bytes, which is > 1% of the available flash");
       #else
-      if (ms > 4294000) badCall("delay() does not support periods greater than 4.29 million milliseconds when TCD0 is used for millis timing due to a bug ")
+      if (ms > 4294000) badCall("delay() does not support periods greater than 4.29 million milliseconds when TCD0 is used for millis timing due to a bug ");
       #endif
     }
     uint32_t start_time = micros(), delay_time = 1000 * ms;
