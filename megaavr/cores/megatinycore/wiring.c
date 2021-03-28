@@ -228,44 +228,46 @@ unsigned long micros() {
   #else
   uint8_t ticks;
   #endif
-
+  uint8_t flags;
   /* Save current state and disable interrupts */
   uint8_t status = SREG;
   cli();
 
 
-
+  #if defined(MILLIS_USE_TIMERA0)
+  ticks = TCA0.SPLIT.HCNT;
+  flags = TCA0.SPLIT.INTFLAGS;
+  #elif defined(MILLIS_USE_TIMERD0)
+  TCD0.CTRLE = TCD_SCAPTUREA_bm;
+  flags = TCD0.INTFLAGS;
+  while (!(TCD0.STATUS & TCD_CMDRDY_bm)); //wait for sync - should be only one iteration of this loop
+  ticks = TCD0.CAPTUREA;
+  #else
+  ticks = _timer->CNT;
+  flags = _timer->INTFLAGS;
+  #endif //end getting ticks
+  /* If the timer overflow flag is raised, and the ticks we read are low, then the timer has rolled over but
+    ISR has not fired. If we already read a high value of ticks, either we read it just before the overflow,
+    so we shouldn't increment overflows, or interrupts are disabled and micros isn't expected to work so it doesn't matter
+  */
   /* Get current number of overflows and timer count */
   #if !(defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
   overflows = timer_overflow_count;
   #else
   overflows = timer_millis;
   #endif
-
-  #if defined(MILLIS_USE_TIMERA0)
-  ticks = (TIME_TRACKING_TIMER_PERIOD) - TCA0.SPLIT.HCNT;
-  #elif defined(MILLIS_USE_TIMERD0)
-  TCD0.CTRLE = TCD_SCAPTUREA_bm;
-  while (!(TCD0.STATUS & TCD_CMDRDY_bm)); //wait for sync - should be only one iteration of this loop
-  ticks = TCD0.CAPTUREA;
-  #else
-  ticks = _timer->CNT;
-  #endif //end getting ticks
-  /* If the timer overflow flag is raised, and the ticks we read are low, then the timer has rolled over but
-    ISR has not fired. If we already read a high value of ticks, either we read it just before the overflow,
-    so we shouldn't increment overflows, or interrupts are disabled and micros isn't expected to work so it doesn't matter
-  */
   #if defined(MILLIS_USE_TIMERD0)
-  if ((TCD0.INTFLAGS & TCD_OVF_bm) && !(ticks & 0xFF00)) {
+  if ((flags & TCD_OVF_bm) && (ticks < 0x09)) {
   #elif defined(MILLIS_USE_TIMERA0)
-  if ((TCA0.SPLIT.INTFLAGS & TCA_SPLIT_HUNF_bm) && !(ticks & 0x80)) {
+  ticks = (TIME_TRACKING_TIMER_PERIOD) - ticks;
+  if ((flags & TCA_SPLIT_HUNF_bm) && (ticks < 0x4 )) {
   #else //timerb
-  if ((_timer->INTFLAGS & TCB_CAPT_bm) && !(ticks & 0xFF00)) {
+  if ((flags & TCB_CAPT_bm) && !(ticks & 0xFF00)) {
   #endif
-    #if ((defined(MILLIS_USE_TIMERB0) | defined(MILLIS_USE_TIMERB1)) && (F_CPU > 1000000))
-    overflows++;
-    #else
+    #if ((defined(MILLIS_USE_TIMERB0) | defined(MILLIS_USE_TIMERB1)) && (F_CPU <= 1000000))
     overflows += 2;
+    #else
+    overflows++;
     #endif
   }
 
@@ -340,14 +342,18 @@ unsigned long micros() {
 
 #if !(defined(MILLIS_USE_TIMERNONE) || defined(MILLIS_USE_TIMERRTC)) //delay implementation when we do have micros()
 void delay(unsigned long ms) {
-  #if (PROGMEM_SIZE < 4096)
+  #if (PROGMEM_SIZE < 4096) || defined(MILLIS_USE_TIMERD0)
     // Not sure where I got this wacky definition of delay that was being used - It saves 24 whole bytes
     // Nobody is going to care about 24 bytes on most parts, but I am leaving it in for the 2k parts, where
     // those 24 bytes are about 1.2% of the total available flash... though it is now guarded with a test
     // to stop you from passing a value known at compile time to be too long. The 2k parts really are
     // just that claustrophobic.
     if (_builtin_constant_p(ms)) {
+      #if !defined(MILLIS_USE_TIMERD0)
       if (ms > 4294000) badCall("delay() does not support periods greater than 4.29 million milliseconds at a time on 2k parts; this saves 24 bytes, which is > 1% of the available flash")
+      #else
+      if (ms > 4294000) badCall("delay() does not support periods greater than 4.29 million milliseconds when TCD0 is used for millis timing due to a bug ")
+      #endif
     }
     uint32_t start_time = micros(), delay_time = 1000 * ms;
 
@@ -367,7 +373,6 @@ void delay(unsigned long ms) {
     uint32_t start = micros();
 
     while (ms > 0) {
-      yield();
       while ( ms > 0 && (micros() - start) >= 1000) {
         ms--;
         start += 1000;
