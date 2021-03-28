@@ -82,13 +82,13 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
 // when TCD0 is used as millis source, this will be different from above, but 99 times out of 10, when a piece of code asks for clockCyclesPerMicrosecond(), they're asking about CLK_PER/CLK_MAIN/etc, not the unprescaled TCD0!
 inline uint16_t millisClockCyclesPerMicrosecond() {
   #ifdef MILLIS_USE_TIMERD0
-  #if (F_CPU==20000000UL || F_CPU==10000000UL ||F_CPU==5000000UL)
-  return (20);   //this always runs off the 20MHz oscillator
+    #if (F_CPU==20000000UL || F_CPU==10000000UL ||F_CPU==5000000UL)
+      return (20);   //this always runs off the 20MHz oscillator
+    #else
+      return (16);
+    #endif
   #else
-  return (16);
-  #endif
-  #else
-  return ((F_CPU) / 1000000L);
+    return ((F_CPU) / 1000000L);
   #endif
 }
 
@@ -141,37 +141,37 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
   // (volatile variables must be read from memory on every access)
 
   #if (defined(MILLIS_USE_TIMERB0)|defined(MILLIS_USE_TIMERB1))
-  #if(F_CPU>1000000)
-  timer_millis++; //that's all we need to do!
+    #if(F_CPU>1000000)
+      timer_millis++; //that's all we need to do!
+    #else
+      timer_millis += 2;
+    #endif
   #else
-  timer_millis += 2;
-  #endif
-  #else
-  #if !defined(MILLIS_USE_TIMERRTC) //TCA0 or TCD0
-  uint32_t m = timer_millis;
-  uint16_t f = timer_fract;
-  m += MILLIS_INC;
-  f += FRACT_INC;
-  if (f >= FRACT_MAX) {
+    #if !defined(MILLIS_USE_TIMERRTC) //TCA0 or TCD0
+      uint32_t m = timer_millis;
+      uint16_t f = timer_fract;
+      m += MILLIS_INC;
+      f += FRACT_INC;
+      if (f >= FRACT_MAX) {
 
-    f -= FRACT_MAX;
-    m += 1;
-  }
-  timer_fract = f;
-  timer_millis = m;
-  #endif
-  //if RTC is used as timer, we only increment the overflow count
-  timer_overflow_count++;
+        f -= FRACT_MAX;
+        m += 1;
+      }
+      timer_fract = f;
+      timer_millis = m;
+    #endif
+    //if RTC is used as timer, we only increment the overflow count
+    timer_overflow_count++;
   #endif
   /* Clear flag */
   #if defined(MILLIS_USE_TIMERA0)
-  TCA0.SPLIT.INTFLAGS = TCA_SPLIT_HUNF_bm;
+    TCA0.SPLIT.INTFLAGS = TCA_SPLIT_HUNF_bm;
   #elif defined(MILLIS_USE_TIMERD0)
-  TCD0.INTFLAGS = TCD_OVF_bm;
+    TCD0.INTFLAGS = TCD_OVF_bm;
   #elif defined(MILLIS_USE_TIMERRTC)
-  RTC.INTFLAGS = RTC_OVF_bm;
+    RTC.INTFLAGS = RTC_OVF_bm;
   #else //timerb
-  _timer->INTFLAGS = TCB_CAPT_bm;
+    _timer->INTFLAGS = TCB_CAPT_bm;
   #endif
 }
 
@@ -181,39 +181,39 @@ unsigned long millis() {
 
   // disable interrupts while we read timer0_millis or we might get an
   // inconsistent value (e.g. in the middle of a write to timer0_millis)
-  uint8_t status = SREG;
+  uint8_t oldSREG = SREG;
   cli();
   #if defined(MILLIS_USE_TIMERRTC)
-  uint16_t rtccount=RTC.CNT;
-  m = timer_overflow_count;
-  if (RTC.INTFLAGS & RTC_OVF_bm) { //there has just been an overflow that hasn't been accounted for by the interrupt
-    // Check if the high bit of counter is set? Might be a better way to do this test; we just basically need to make
-    // sure that it didn't JUST roll over at the last couple of clocks; probably testing that it's not 0xFFFF would work too, but that's more compare instructions.
-    // even a very crude test would work since the RTC is so slow (and if they're leaving interrupts off that long, they shouldn't expect millis to work right!)
-    if (!(rtccount & 0x8000)) m++;
-  }
-  SREG = status;
-  m = (m << 16); // how gracefully is the compiler implementing this?
-                 // Answer: Not very, but it's not awful - 9 clocks / 18 bytes, which could probably be saved with a union... the problem is
-  m += rtccount; // it ought to see that it's starting from a uint16_t, putting it into a uint32_t and just store it in the high 16 bits...
-                 // Answer: It's smart enough to avoid a bunch of shifts, but it does store it in wrong half, then move it, and it wastes add instructions when the rtccount is brought in
-  //now correct for there being 1000ms to the second instead of 1024
-  m = m - (m >> 5) + (m >> 7);
-  // it looks like - (m >> 5) + (m >> 7) is better
-  // than          - (m >> 6) - (m >> 7)
-  // I think their signs want to be opposite, so the integer truncation on each of them works in opposite direction.
-  // though using a m >> 5 term is also using a term while it has more precision, maybe that's what helps?
-  // I just simulated it across 0~1023 and 0~65335 numerically.
-  // Now, this is where the compiler really bungs it - 27 instruction words, executed over 100 clocks to do that!
-  // What one would want to do is to movw the 4 bytes into 4 new registers... followed by one empty one (3 clocks 3 words).
-  // Then leftshift those one each, and shift the carry bit into a fifth register (5 clocks 5 words) the 4 high registers now contain m >> 7, add to m (4 clocks 4 words)
-  // Repeat the leftshift twice more (17 clocks 9 words) giving m >>5, subtract (4 & 4)  and you're done  in 34 clocks, 25 words.
-  // I think this would also save you from 2x push and pop because of inefficient register use; at one point they have r16 ~ r27 filled with m and shifted m's, when you only
-  // need to ever store two copies, the m you're adding to and the m you're shifting. so another 4 words and 6 clocks so like 7 words from the math and 9 from unionizing.
-  // but 72 clocks from the math, and 9 from unionizing. Don't think it's worth the effort to write out in assembly though :-P It's okay if millis takes 6 us to return
+    uint16_t rtccount=RTC.CNT;
+    m = timer_overflow_count;
+    if (RTC.INTFLAGS & RTC_OVF_bm) { //there has just been an overflow that hasn't been accounted for by the interrupt
+      // Check if the high bit of counter is set? Might be a better way to do this test; we just basically need to make
+      // sure that it didn't JUST roll over at the last couple of clocks; probably testing that it's not 0xFFFF would work too, but that's more compare instructions.
+      // even a very crude test would work since the RTC is so slow (and if they're leaving interrupts off that long, they shouldn't expect millis to work right!)
+      if (!(rtccount & 0x8000)) m++;
+    }
+    SREG = oldSREG;
+    m = (m << 16); // how gracefully is the compiler implementing this?
+                   // Answer: Not very, but it's not awful - 9 clocks / 18 bytes, which could probably be saved with a union... the problem is
+    m += rtccount; // it ought to see that it's starting from a uint16_t, putting it into a uint32_t and just store it in the high 16 bits...
+                   // Answer: It's smart enough to avoid a bunch of shifts, but it does store it in wrong half, then move it, and it wastes add instructions when the rtccount is brought in
+    //now correct for there being 1000ms to the second instead of 1024
+    m = m - (m >> 5) + (m >> 7);
+    // it looks like - (m >> 5) + (m >> 7) is better
+    // than          - (m >> 6) - (m >> 7)
+    // I think their signs want to be opposite, so the integer truncation on each of them works in opposite direction.
+    // though using a m >> 5 term is also using a term while it has more precision, maybe that's what helps?
+    // I just simulated it across 0~1023 and 0~65335 numerically.
+    // Now, this is where the compiler really bungs it - 27 instruction words, executed over 100 clocks to do that!
+    // What one would want to do is to movw the 4 bytes into 4 new registers... followed by one empty one (3 clocks 3 words).
+    // Then leftshift those one each, and shift the carry bit into a fifth register (5 clocks 5 words) the 4 high registers now contain m >> 7, add to m (4 clocks 4 words)
+    // Repeat the leftshift twice more (17 clocks 9 words) giving m >>5, subtract (4 & 4)  and you're done  in 34 clocks, 25 words.
+    // I think this would also save you from 2x push and pop because of inefficient register use; at one point they have r16 ~ r27 filled with m and shifted m's, when you only
+    // need to ever store two copies, the m you're adding to and the m you're shifting. so another 4 words and 6 clocks so like 7 words from the math and 9 from unionizing.
+    // but 72 clocks from the math, and 9 from unionizing. Don't think it's worth the effort to write out in assembly though :-P It's okay if millis takes 6 us to return
   #else
-  m = timer_millis;
-  SREG = status;
+    m = timer_millis;
+    SREG = oldSREG;
   #endif
   return m;
 }
@@ -224,27 +224,27 @@ unsigned long micros() {
   unsigned long overflows, microseconds;
 
   #if (defined(MILLIS_USE_TIMERD0) || defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
-  uint16_t ticks;
+    uint16_t ticks;
   #else
-  uint8_t ticks;
+    uint8_t ticks;
   #endif
   uint8_t flags;
   /* Save current state and disable interrupts */
-  uint8_t status = SREG;
+  uint8_t oldSREG = SREG;
   cli();
 
 
   #if defined(MILLIS_USE_TIMERA0)
-  ticks = TCA0.SPLIT.HCNT;
-  flags = TCA0.SPLIT.INTFLAGS;
+    ticks = TCA0.SPLIT.HCNT;
+    flags = TCA0.SPLIT.INTFLAGS;
   #elif defined(MILLIS_USE_TIMERD0)
-  TCD0.CTRLE = TCD_SCAPTUREA_bm;
-  flags = TCD0.INTFLAGS;
-  while (!(TCD0.STATUS & TCD_CMDRDY_bm)); //wait for sync - should be only one iteration of this loop
-  ticks = TCD0.CAPTUREA;
+    TCD0.CTRLE = TCD_SCAPTUREA_bm;
+    while (!(TCD0.STATUS & TCD_CMDRDY_bm)); //wait for sync - should be only one iteration of this loop
+    flags = TCD0.INTFLAGS;
+    ticks = TCD0.CAPTUREA;
   #else
-  ticks = _timer->CNT;
-  flags = _timer->INTFLAGS;
+    ticks = _timer->CNT;
+    flags = _timer->INTFLAGS;
   #endif //end getting ticks
   /* If the timer overflow flag is raised, and the ticks we read are low, then the timer has rolled over but
     ISR has not fired. If we already read a high value of ticks, either we read it just before the overflow,
@@ -252,86 +252,88 @@ unsigned long micros() {
   */
   /* Get current number of overflows and timer count */
   #if !(defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
-  overflows = timer_overflow_count;
+    overflows = timer_overflow_count;
   #else
-  overflows = timer_millis;
+    overflows = timer_millis;
   #endif
+  /* Restore state - we're done with all the interrupt-sensitive stuff */
+  SREG = oldSREG;
+
   #if defined(MILLIS_USE_TIMERD0)
-  if ((flags & TCD_OVF_bm) && (ticks < 0x09)) {
+    if ((flags & TCD_OVF_bm) && (ticks < 0x07)) {
   #elif defined(MILLIS_USE_TIMERA0)
-  ticks = (TIME_TRACKING_TIMER_PERIOD) - ticks;
-  if ((flags & TCA_SPLIT_HUNF_bm) && (ticks < 0x4 )) {
+    ticks = (TIME_TRACKING_TIMER_PERIOD) - ticks;
+    if ((flags & TCA_SPLIT_HUNF_bm) && (ticks < 0x4 )) {
   #else //timerb
-  if ((flags & TCB_CAPT_bm) && !(ticks & 0xFF00)) {
+    if ((flags & TCB_CAPT_bm) && !(ticks & 0xFF00)) {
   #endif
-    #if ((defined(MILLIS_USE_TIMERB0) | defined(MILLIS_USE_TIMERB1)) && (F_CPU <= 1000000))
-    overflows += 2;
+    #if ((defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1)) && (F_CPU <= 1000000))
+      overflows += 2;
     #else
-    overflows++;
+      overflows++;
     #endif
   }
 
   //end getting ticks
 
-  /* Restore state */
-  SREG = status;
   #if defined(MILLIS_USE_TIMERD0)
-  #if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL)
-  uint8_t ticks_l = ticks >> 1;
-  ticks = ticks + ticks_l + ((ticks_l >> 2) - (ticks_l >> 4) + (ticks_l >> 7));
-  microseconds = overflows * (TIME_TRACKING_CYCLES_PER_OVF / (20))
-                 + ticks; // speed optimization via doing math with smaller datatypes, since we know high byte is 1 or 0
-  // + ticks +(ticks>>1)+(ticks>>3)-(ticks>>5)+(ticks>>8))
-  #else
-  microseconds = ((overflows * (TIME_TRACKING_CYCLES_PER_OVF / (16)))
-                  + (ticks * ((TIME_TRACKING_CYCLES_PER_OVF) / (16) / TIME_TRACKING_TIMER_PERIOD)));
-  #endif
+    #if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL)
+      uint8_t ticks_l = ticks >> 1;
+      ticks = ticks + ticks_l + ((ticks_l >> 2) - (ticks_l >> 4) + (ticks_l >> 7));
+      // + ticks +(ticks>>1)+(ticks>>3)-(ticks>>5)+(ticks>>8))
+      // speed optimization via doing math with smaller datatypes, since we know high byte is 1 or 0. also saves us some painful
+      microseconds = overflows * (TIME_TRACKING_CYCLES_PER_OVF / (20))
+                   + ticks;
+    #else
+      microseconds = ((overflows * (TIME_TRACKING_CYCLES_PER_OVF / (16)))
+                   + (ticks * ((TIME_TRACKING_CYCLES_PER_OVF) / (16) / TIME_TRACKING_TIMER_PERIOD)));
+    #endif
   #elif (defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1))
-  // ticks is 0 ~ F_CPU/2000 - 1
-  // we shift 1, 2, or 3 times to get 0 ~ 1249, which we then use bitshift and addition/subtraction multiply by 4/5ths
-  // I wonder how much could be gained from doing it stepwise (copy ticks to a union with byte[2], rightshift by 2, subtract
-  // rightshift 2, add (we know high byte is 0, but it doesn't help because carry), rightshift low byte 2 more (low-only
-  // saves 2 clocks), subtract low byte... wonder if it would be enough to do the final term faster than we currently do the
-  // 4 term approximation? I think that would be exact! We'd also have equal + and -, reaping the reduced rounding noise
-  // currently we end up with, it looks like, 0-995 (+/- 1) instead of 0-999? which I think we'd have with the last term.
-  // Looked at generated assembly, no clue how they get there from here!
-  #if (F_CPU==20000000UL)
-  ticks = ticks >> 3;
-  microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6));
-  #elif (F_CPU==10000000UL)
-  ticks = ticks >> 2;
-  microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6));
-  #elif (F_CPU==5000000UL)
-  ticks = ticks >> 1;
-  microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6));
-  #elif (F_CPU==16000000UL)
-  microseconds = overflows * 1000 + (ticks >> 3);
-  #elif (F_CPU==8000000UL)
-  microseconds = overflows * 1000 + (ticks >> 2);
-  #elif (F_CPU==4000000UL)
-  microseconds = overflows * 1000 + (ticks >> 1);
-  #else //(F_CPU==1000000UL - here clock is running at system clock instead of half system clock.
-  microseconds = overflows * 1000 + ticks;
-  #endif
+    // ticks is 0 ~ F_CPU/2000 - 1
+    // we shift 1, 2, or 3 times to get 0 ~ 1249, which we then use bitshift and addition/subtraction multiply by 4/5ths
+    // I wonder how much could be gained from doing it stepwise (copy ticks to a union with byte[2], rightshift by 2, subtract
+    // rightshift 2, add (we know high byte is 0, but it doesn't help because carry), rightshift low byte 2 more (low-only
+    // saves 2 clocks), subtract low byte... wonder if it would be enough to do the final term faster than we currently do the
+    // 4 term approximation? I think that would be exact! We'd also have equal + and -, reaping the reduced rounding noise
+    // currently we end up with, it looks like, 0-995 (+/- 1) instead of 0-999? which I think we'd have with the last term.
+    // Looked at generated assembly, no clue how they get there from here!
+    #if (F_CPU==20000000UL)
+      ticks = ticks >> 3;
+      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6));
+    #elif (F_CPU==10000000UL)
+      ticks = ticks >> 2;
+      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6));
+    #elif (F_CPU==5000000UL)
+      ticks = ticks >> 1;
+      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6));
+    #elif (F_CPU==16000000UL)
+      microseconds = overflows * 1000 + (ticks >> 3);
+    #elif (F_CPU==8000000UL)
+      microseconds = overflows * 1000 + (ticks >> 2);
+    #elif (F_CPU==4000000UL)
+      microseconds = overflows * 1000 + (ticks >> 1);
+    #else //(F_CPU==1000000UL - here clock is running at system clock instead of half system clock.
+      microseconds = overflows * 1000 + ticks;
+    #endif
   #else //TCA0
-  #if (F_CPU==20000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==64)
-  microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                 + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
-                 // bafflingly, casting to a uint16_t makes the compiler generate more efficient code...  but
-                 // casting to uint8_t doesn't! I don't understand it. but I'll take a free 8 bytes and 4 clocks any day.
-  #elif (F_CPU==10000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==64)
-  microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                 + (ticks * 6 + ((uint16_t)(ticks >> 1) - (ticks >> 3)));
-  #elif (F_CPU==5000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==16)
-  microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                 + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
-  #else
-  #if (TIME_TRACKING_TIMER_DIVIDER%(F_CPU/1000000))
-#warning "Millis timer (TCA0) divider and frequency unsupported, inaccurate micros times will be returned."
-  #endif
-  microseconds = ((overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                  + (ticks * (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF) / TIME_TRACKING_TIMER_PERIOD)));
-  #endif
+    #if (F_CPU==20000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==64)
+      microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+                   + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
+                   // bafflingly, casting to a uint16_t makes the compiler generate more efficient code...  but
+                   // casting to uint8_t doesn't! I don't understand it. but I'll take a free 8 bytes and 4 clocks any day.
+    #elif (F_CPU==10000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==64)
+      microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+                   + (ticks * 6 + ((uint16_t)(ticks >> 1) - (ticks >> 3)));
+    #elif (F_CPU==5000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==16)
+      microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+                   + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
+    #else
+      #if (TIME_TRACKING_TIMER_DIVIDER%(F_CPU/1000000))
+        #warning "Millis timer (TCA0) divider and frequency unsupported, inaccurate micros times will be returned."
+      #endif
+      microseconds = ((overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+                    + (ticks * (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF) / TIME_TRACKING_TIMER_PERIOD)));
+    #endif
   #endif //end of timer-specific part of micros calculations
   return microseconds;
 }
@@ -342,18 +344,14 @@ unsigned long micros() {
 
 #if !(defined(MILLIS_USE_TIMERNONE) || defined(MILLIS_USE_TIMERRTC)) //delay implementation when we do have micros()
 void delay(unsigned long ms) {
-  #if (PROGMEM_SIZE < 4096) || defined(MILLIS_USE_TIMERD0)
+  #if (PROGMEM_SIZE < 4096)
     // Not sure where I got this wacky definition of delay that was being used - It saves 24 whole bytes
     // Nobody is going to care about 24 bytes on most parts, but I am leaving it in for the 2k parts, where
     // those 24 bytes are about 1.2% of the total available flash... though it is now guarded with a test
     // to stop you from passing a value known at compile time to be too long. The 2k parts really are
     // just that claustrophobic.
     if (__builtin_constant_p(ms)) {
-      #if !defined(MILLIS_USE_TIMERD0)
       if (ms > 4294000) badCall("delay() does not support periods greater than 4.29 million milliseconds at a time on 2k parts; this saves 24 bytes, which is > 1% of the available flash");
-      #else
-      if (ms > 4294000) badCall("delay() does not support periods greater than 4.29 million milliseconds when TCD0 is used for millis timing due to a bug ");
-      #endif
     }
     uint32_t start_time = micros(), delay_time = 1000 * ms;
 
