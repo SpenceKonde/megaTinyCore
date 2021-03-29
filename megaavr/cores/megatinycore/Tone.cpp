@@ -157,7 +157,7 @@ void noTone(uint8_t pin) {
     timer_toggle_count = 0;
     //disableTimer();
     // Keep pin low after disabling of timer
-    digitalWrite(_pin, LOW);
+    // this is done in the final ISR now.
     _pin = NOT_A_PIN;
   }
 }
@@ -196,13 +196,18 @@ static void disableTimer() {
   if (!(--timer_cycle_per_tgl_count)) { //Are we ready to toggle? pre-decrement, then see if 0 or more
     timer_cycle_per_tgl_count = timer_cycle_per_tgl;
     // toggle the pin
-    *timer_outtgl_reg = timer_bit_mask; //toggle the pin
 
-    if (timer_toggle_count > 0) { //if duration was specified, decrement toggle count.
-      timer_toggle_count--;
-    } else if (timer_toggle_count == 0) {    // If toggle count = 0, stop
+
+    if (timer_toggle_count == 0) {    // If toggle count = 0 time upo or noTone() called, stop WITH PIN LOW
+      *(timer_outtgl_reg-1) = timer_bit_mask; // this gives us the corresponding OUTCLR reg
+      _pin = NOT_A_PIN;
       disableTimer();
-    } //otherwise timer_toggle_count wasn't supplied, go on until noTone() called
+    } else { // timed or infinite...
+      *timer_outtgl_reg = timer_bit_mask; //toggle the pin
+      if (timer_toggle_count > 0) { //if duration was specified, decrement toggle count.
+        timer_toggle_count--;
+      }
+    }//otherwise timer_toggle_count wasn't supplied, go on until noTone() called
   }
   /* Clear flag */
   _timer->INTFLAGS = TCB_CAPT_bm;
