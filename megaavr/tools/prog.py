@@ -151,13 +151,28 @@ def pymcuprog_basic(args, fuses_dict):
         return 1
 
     # start session
-    run_pymcu_action(pymcu._start_session, backend, device_selected,
-                     interface="updi",
-                     clk=False,
-                     high_voltage=False,
-                     user_row_locked_device=False,
-                     chip_erase_locked_device=False,
-                     packpath=False)
+    args_start = argparse.Namespace(interface="updi",
+                                    clk=False,
+                                    high_voltage=False,
+                                    user_row_locked_device=False,
+                                    chip_erase_locked_device=False,
+                                    packpath=False)
+
+    status = pymcu._start_session(backend,
+                                  device_selected,
+                                  args_start)
+
+    if status != pymcu.STATUS_SUCCESS:
+        if status == pymcu.STATUS_FAILURE_LOCKED and args.action in ("write", "erase"):
+            print("Locked state detected, performing chip erase")
+            args_start.chip_erase_locked_device = True
+            status = pymcu._start_session(backend,
+                                          device_selected,
+                                          args_start)
+            if status != pymcu.STATUS_SUCCESS:
+                raise PyMcuException("Failed to unlock!")
+        else:
+            raise PyMcuException("Cannot start session!")
 
     try:
         pymcu._action_ping(backend)

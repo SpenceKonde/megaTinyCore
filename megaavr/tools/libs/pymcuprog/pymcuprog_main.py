@@ -30,6 +30,7 @@ except ImportError:
 
 STATUS_SUCCESS = 0
 STATUS_FAILURE = 1
+STATUS_FAILURE_LOCKED = 2
 
 # Only include memories that can be written when writing memories to hex file
 WRITE_TO_HEX_MEMORIES = [MemoryNames.EEPROM, MemoryNames.FLASH, MemoryNames.FUSES, MemoryNames.CONFIG_WORD]
@@ -541,7 +542,7 @@ def _start_session(backend, device, args):
         print("Locked AVR UPDI devices can:")
         print(" - be unlocked using command: erase --chip-erase-locked-device")
         print(" - write user row values using command: write --user-row-locked-device")
-        status = STATUS_FAILURE
+        status = STATUS_FAILURE_LOCKED
     except PymcuprogNotSupportedError:
         print("Unable to setup stack for device {0:s}".format(sessionconfig.device))
         print("Currently supported devices (in 'devices' folder):")
