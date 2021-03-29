@@ -51,8 +51,8 @@ int main(void)
   setup();
   for (;;) {
     loop();
-    #ifndef NOSERIALEVENT
-    if (serialEventRun) serialEventRun();
+    #ifdef ENABLE_SERIAL_EVENT
+      if (serialEventRun) serialEventRun();
     #endif
   }
   return 0;

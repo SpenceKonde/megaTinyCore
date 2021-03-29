@@ -256,8 +256,9 @@ unsigned long micros() {
   #else
     overflows = timer_millis;
   #endif
-  /* Restore state - we're done with all the interrupt-sensitive stuff */
-  SREG = oldSREG;
+
+    /* Turn interrupts back on, assuming they were on when micros was called. */
+    SREG = oldSREG;
 
   #if defined(MILLIS_USE_TIMERD0)
     if ((flags & TCD_OVF_bm) && (ticks < 0x07)) {
@@ -272,9 +273,7 @@ unsigned long micros() {
     #else
       overflows++;
     #endif
-  }
-
-  //end getting ticks
+  } //end getting ticks
 
   #if defined(MILLIS_USE_TIMERD0)
     #if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL)
