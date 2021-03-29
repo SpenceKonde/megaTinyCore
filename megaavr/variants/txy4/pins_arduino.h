@@ -97,7 +97,10 @@
 #ifdef DAC0
   #define DAC_PIN       (PIN_PA6)
 #endif
-#define LED_BUILTIN     (PIN_PA7)
+
+#ifndef LED_BUILTIN
+  #define LED_BUILTIN    (PIN_PA7)
+#endif
 
 #define PIN_PA4        (0)
 #define PIN_PA5        (1)
