@@ -47,7 +47,7 @@ atxy7.build.mcu=attiny{build.attiny}
 atxy7.build.serialeventabr=
 atxy7.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy7.build.f_cpu={build.speed}000000L
-atxy7.bootloader.altreset=Only suported for 2-series parts
+atxy7.bootloader.altreset=Only supported for 2-series parts
 
 atxy7.menu.chip.3217=ATtiny3217
 atxy7.menu.chip.3217.build.board=AVR_ATtiny3217
@@ -281,7 +281,7 @@ atxy6.build.mcu=attiny{build.attiny}
 atxy6.build.serialeventabr=
 atxy6.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy6.build.f_cpu={build.speed}000000L
-atxy6.bootloader.altreset=Only suported for 2-series parts
+atxy6.bootloader.altreset=Only supported for 2-series parts
 
 atxy6.build.extra_flags=-DARDUINO_attinyxy6 {build.millis} -DUARTBAUD{build.uartvoltage}
 atxy6.build.export_merged_output=false
@@ -954,7 +954,7 @@ atxy7o.build.mcu=attiny{build.attiny}
 atxy7o.build.serialeventabr=
 atxy7o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy7o.build.f_cpu={build.speed}000000L
-atxy7o.bootloader.altreset=Only suported for 2-series parts
+atxy7o.bootloader.altreset=Only supported for 2-series parts
 atxy7o.upload.speed=115200
 
 atxy7o.menu.chip.3217=ATtiny3217
@@ -1199,7 +1199,7 @@ atxy6o.build.mcu=attiny{build.attiny}
 atxy6o.build.serialeventabr=
 atxy6o.build.millis=-DMILLIS_USE_TIMER{build.millistimer}
 atxy6o.build.f_cpu={build.speed}000000L
-atxy6o.bootloader.altreset=Only suported for 2-series parts
+atxy6o.bootloader.altreset=Only supported for 2-series parts
 atxy6o.upload.speed=115200
 
 atxy6o.menu.chip.3216=ATtiny3216

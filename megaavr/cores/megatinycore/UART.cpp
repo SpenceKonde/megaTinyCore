@@ -126,7 +126,7 @@ void UartClass::_tx_data_empty_irq(void) {
 void UartClass::_poll_tx_data_empty(void) {
   if ((!(SREG & CPU_I_bm)) || (!((*_hwserial_module).CTRLA & USART_DREIE_bm)) || CPUINT.STATUS) {
     // Interrupts are disabled either globally or we are in another ISR.
-    // the DRE interrupt is enabled so we have more to send and shouod
+    // the DRE interrupt is enabled so we have more to send and should
     // directly call it. If it's not enabled, sending is done, and the only
     // reason we might be here is that we're in flush and waiting on the last byte to
     // finish sending.

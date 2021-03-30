@@ -50,10 +50,7 @@
   #define USE_TIMERB0
 #endif
 
-#ifndef ADC_LOWLAT_bm
-  #define TCB_CLKSEL_DIV1_gc TCB_CLKSEL_CLKDIV1_gc
-  #define TCB_CLKSEL_DIV2_gc TCB_CLKSEL_CLKDIV2_gc
-#endif
+
 static volatile TCB_t *_timer =
 #if defined(USE_TIMERB0)
   &TCB0;

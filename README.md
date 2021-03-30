@@ -54,7 +54,7 @@ Almost any cheaper-than-dirt serial adapter can be use d for pyupdi style progra
 * [ATtiny402,202](megaavr/extras/ATtiny_x02.md)
 
 ## tinyAVR 2-series
-The tinyAVR 2-series parts have partial support if using the 2.3.0-dev version of megaTinyCore (github master brancb). When part specific docuymentation pages have been written they will be located at the locations below. There is currently no content there. 
+The tinyAVR 2-series parts have partial support if using the 2.3.0-dev version of megaTinyCore (github master brancb). When part specific docuymentation pages have been written they will be located at the locations below. There is currently no content there.
 * [ATtiny3227,1627,827,427](megaavr/extras/ATtiny_x27.md)
 * [ATtiny3226,1626,826,426](megaavr/extras/ATtiny_x26.md)
 * [ATtiny3224,1624,824,424](megaavr/extras/ATtiny_x24.md)
@@ -65,8 +65,8 @@ The tinyAVR 2-series parts have partial support if using the 2.3.0-dev version o
 The automotive versions should also work. You must always select the 16 MHz-derived clock speeds on  these parts. They do not support 20 MHz operation.
 
 # A word on terminology ("megaAVR")
-In the official Arduino board definition for their "megaAVR" hardware package, they imply that the new architecture on the megaAVR 0-series parts (which is nearly the same as used on the tinyAVR 0-series and 1-series) is called "megaavr" - that is not an official term. Microchip uses the term "megaAVR" to refer to any "ATmega" part, whether it has the old style or modern peripherals. There are no official terms to refer to all AVR parts of one family or the other. In this document, prior to 2.0.2, we used the Arduino convention. While that was nearly a year ago, I still keep finding places where I call them megaAVR. Please report them as issues if you see any. 
-Do note that the terms `avr` and `megaavr` are still used internally (for example, in libraries, to mark which parts a given library is compatible with, or separate different versions of a file based on what they will run on). This will continue - we have to stick with this for compatibility with what the Arduino team started with the core for the Uno WiFi Rev. 2 and Nano Every - and in any event, *some word* is needed to refer to the two groups and Microchip hasn't pr9vided one. Not sure how they managed to develop these very different parts without ever talking about then as a group. 
+In the official Arduino board definition for their "megaAVR" hardware package, they imply that the new architecture on the megaAVR 0-series parts (which is nearly the same as used on the tinyAVR 0-series and 1-series) is called "megaavr" - that is not an official term. Microchip uses the term "megaAVR" to refer to any "ATmega" part, whether it has the old style or modern peripherals. There are no official terms to refer to all AVR parts of one family or the other. In this document, prior to 2.0.2, we used the Arduino convention. While that was nearly a year ago, I still keep finding places where I call them megaAVR. Please report them as issues if you see any.
+Do note that the terms `avr` and `megaavr` are still used internally (for example, in libraries, to mark which parts a given library is compatible with, or separate different versions of a file based on what they will run on). This will continue - we have to stick with this for compatibility with what the Arduino team started with the core for the Uno WiFi Rev. 2 and Nano Every - and in any event, *some word* is needed to refer to the two groups and Microchip hasn't pr9vided one. Not sure how they managed to develop these very different parts without ever talking about then as a group.
 
 It is unfortunate that there are not officially sanctioned terms for these two classes of AVR microcontrollers. I have beemn referring the pre-2016 AVR devices (with PORTx, DDRx, etc registers for pins) as "classic AVR" and the ones Arduino calls megaavr as "modern AVR"
 
@@ -83,7 +83,7 @@ I sell breakout boards with regulator, UPDI header, and Serial header in my tind
 ### [ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
 
 
-## TinyAVR 2-series 
+## TinyAVR 2-series
 
 ## Basic specifications
 Datasheet for the new tinyAVR 2-series - at least the 16k ones - http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny1624-26-27-DataSheet-DS40002234A.pdf
@@ -147,7 +147,7 @@ In versions prior to 2.0.0, this was instead configured using the Tools -> UART 
 ### Baud Rates
 To maximize the accuracy of the baud rate when using the internal oscillator, from the Tools -> Voltage for UART Baud menu, select whether the voltage is closer to 5v or 3v - the factory calibration supplies an oscillator error adjustment for the purpose of UART baud calculation for 5v and 3v, and using the right one will produce a baud rate closer to the target value. That said, testing has indicated that either setting is good enough unless you are talking to particularly finicky devices. On parts with 4k or less of flash, this setting is ignored because it adds approx 90 bytes to the size of the compiled binary, and on 2k and 4k parts, it's just not worth the space. This correction factor is never used by the bootloader.
 
-When operating at 1MHz, as of 2.1.4 the UART can now reach 115200 baud (In version 2.1.4 through 2.2.x - Serial.flush() can hang when the baud rate is very high relative to the clock rate (ex, 115200baud and 1 MHz); there was a race condition in the handling of the Transmission Complete flag. The flag was cleared immediately after feeding the next byte to the USART. If the millis interrupt fired at that exact moment, and the baud rate was high enough that it could send the entire byte before the interrupt finished, the code would then continue where it left off, and clear the Transmit complete flag - but with all bytes sent, that would never get set again... but serial.flush waits until that flag is set and the DRE interrupt is not enabled. With no way to send more data because it was stuck in that loop, it would be waiting a very long time. 
+When operating at 1MHz, as of 2.1.4 the UART can now reach 115200 baud (In version 2.1.4 through 2.2.x - Serial.flush() can hang when the baud rate is very high relative to the clock rate (ex, 115200baud and 1 MHz); there was a race condition in the handling of the Transmission Complete flag. The flag was cleared immediately after feeding the next byte to the USART. If the millis interrupt fired at that exact moment, and the baud rate was high enough that it could send the entire byte before the interrupt finished, the code would then continue where it left off, and clear the Transmit complete flag - but with all bytes sent, that would never get set again... but serial.flush waits until that flag is set and the DRE interrupt is not enabled. With no way to send more data because it was stuck in that loop, it would be waiting a very long time.
 
 \\ Maximum baud rate scales directly with the system clock speed; 2 mbaud is just barely possible at 16 MHz (this is the same maximum that was possible on classic AVRs); unlike classic AVRs, these have a "fractional baud rate generator": rather than specifying the bit period in units of 8 (U2X=1) or 16 (U2X=0) clock cycles as on classic AVRs, here it is specified in 64ths of 8 or 16 clock cycles (no, I'm not sure how they pulled that off. Seems to be established technology, but it sure looks like magic to me).  This is a boon at high baud rates - it guarantees that as long as the system is clocked high enough to generate the requested baud rate, worst case, the bit timing will be off by no more than 1/129th - less than 0.77%. At lower speeds, the error is far smaller, often negligible - for the speeds supported by megaTinyCore, the commonly used baud rates (9600, 19200, 57600 and 115200) are all within 0.1% except for 115200 @ 1 MHz (0.64%). Of course, that is error in addition to any inaccuracy due to the internal oscillator being off-target.
 
@@ -160,7 +160,7 @@ On all parts except the 14-pin parts, the SPI pins can be moved to an alternate 
 
 On 2.0.0 and later, this is configured using the SPI.swap() or SPI.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** calling SPI.begin().
 
-`SPI.swap(1) or SPI.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one. On the tinyAVR 
+`SPI.swap(1) or SPI.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one. On the tinyAVR
 
 `SPI.pins(MOSI pin, MISO pin, SCK pin, SS pin);` - this will set the mapping to whichever mapping has the specified pins. If this is not a valid mapping option, it will return false and set the mapping to the default. This uses more flash than SPI.swap(); that method is preferred.
 

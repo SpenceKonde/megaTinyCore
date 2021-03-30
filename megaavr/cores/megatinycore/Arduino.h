@@ -43,29 +43,46 @@ extern "C" {
   Will shift back in analog_reference function
 */
 
-#ifndef ADC_LOWLAT_bm
+#ifndef ADC_LOWLAT_bm /* means it's a 0/1-series */
 
-#define INTERNAL0V55 (VREF_ADC0REFSEL_0V55_gc >> VREF_ADC0REFSEL_gp)
-#define INTERNAL1V1 (VREF_ADC0REFSEL_1V1_gc >> VREF_ADC0REFSEL_gp)
-#define INTERNAL2V5 (VREF_ADC0REFSEL_2V5_gc >> VREF_ADC0REFSEL_gp)
-#define INTERNAL4V3 INTERNAL4V34
-#define INTERNAL4V34 (VREF_ADC0REFSEL_4V34_gc >> VREF_ADC0REFSEL_gp)
-#define INTERNAL1V5 (VREF_ADC0REFSEL_1V5_gc >> VREF_ADC0REFSEL_gp)
+  #define INTERNAL0V55    (VREF_ADC0REFSEL_0V55_gc >> VREF_ADC0REFSEL_gp)
+  #define INTERNAL1V1     (VREF_ADC0REFSEL_1V1_gc >> VREF_ADC0REFSEL_gp)
+  #define INTERNAL2V5     (VREF_ADC0REFSEL_2V5_gc >> VREF_ADC0REFSEL_gp)
+  #define INTERNAL4V3     INTERNAL4V34
+  #define INTERNAL4V34    (VREF_ADC0REFSEL_4V34_gc >> VREF_ADC0REFSEL_gp)
+  #define INTERNAL1V5     (VREF_ADC0REFSEL_1V5_gc >> VREF_ADC0REFSEL_gp)
 
-#define DEFAULT     ADC_REFSEL_VDDREF_gc
-#define INTERNAL    ADC_REFSEL_INTREF_gc
-#define VDD         ADC_REFSEL_VDDREF_gc
-#ifdef DAC0
-#define ADC_DAC0 ADC_MUXPOS_DAC0_gc
+  #define DEFAULT         ADC_REFSEL_VDDREF_gc
+  #define INTERNAL        ADC_REFSEL_INTREF_gc
+  #define VDD             ADC_REFSEL_VDDREF_gc
+  #ifdef DAC0
+    #define ADC_DAC0      ADC_MUXPOS_DAC0_gc
+  #endif
+
+  #if (defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3217__) )
+    #define EXTERNAL      ADC_REFSEL_VREFA_gc
+  #endif
+
+  #define ADC_TEMPERATURE ADC_MUXPOS_TEMPSENSE_gc
+  #define ADC_INTREF      ADC_MUXPOS_INTREF_gc
+
+#else  /* ADC_LOWLAT_bm defined -> 2-series */
+  /* ADC Reference Options for 2-series */
+  #define VDD             (0) /* ADC_REFSEL_VDD_gc    */
+  #define EXTERNAL        (2) /* ADC_REFSEL_VREFA_gc  */
+  #define INTERNAL1V024   (4) /* ADC_REFSEL_1024MV_gc */
+  #define INTERNAL2V048   (5) /* ADC_REFSEL_2048MV_gc */
+  #define INTERNAL2V5     (6) /* ADC_REFSEL_2500MV_gc */
+  #define INTERNAL4V096   (7) /* ADC_REFSEL_4096MV_gc */
+
 #endif
 
-#if (defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3217__) )
-#define EXTERNAL  ADC_REFSEL_VREFA_gc
-#endif
-
-#define ADC_TEMPERATURE ADC_MUXPOS_TEMPSENSE_gc
-#define ADC_INTREF ADC_MUXPOS_INTREF_gc
-
+#if (!defined(TCB_CLKSEL2_bm))
+  // This means it's a tinyAVR 0/1-series, or a megaAVR 0-series.
+  // Their TCB_CLKSEL enums use different names for the clock settings, for reasons unclear.
+  // To align with the future, we use the Dx-series names for these.
+  #define TCB_CLKSEL_DIV2_gc TCB_CLKSEL_CLKDIV2_gc
+  #define TCB_CLKSEL_DIV1_gc TCB_CLKSEL_CLKDIV1_gc
 #endif
 
 #define VCC_5V0 2
@@ -106,10 +123,8 @@ void takeOverTCD0();
   values indicating oscillator error provided from the device manufacturer */
 #define PERFORM_SIGROW_CORRECTION_F_CPU 0
 
-// These bits get 0'ed out if user calls appropriate methods to "take over" these.
-
-// We declare it here... we never define it anywhere.... I think I'd rather a user get the more straightforward error message?
-//uint16_t clockCyclesPerMicrosecondComp(uint32_t clk);
+// We declared it here... we never defined it anywhere, and I'll be damned if I know what it is supposed to do....
+// uint16_t clockCyclesPerMicrosecondComp(uint32_t clk);
 
 uint16_t clockCyclesPerMicrosecond();
 unsigned long clockCyclesToMicroseconds(unsigned long cycles);

@@ -1,20 +1,20 @@
 # PlatformIO
 
-[PlatformIO](https://platformio.org) is an open source ecosystem for embedded development. 
+[PlatformIO](https://platformio.org) is an open source ecosystem for embedded development.
 It has a built-in library manager and is Arduino compatible. It supports most operating systems; Windows, MacOS, Linux 32 and 64-bit, ARM and X86.
 
 * [What is PlatformIO?](http://docs.platformio.org/en/latest/what-is-platformio.html)
 * [PlatformIO IDE](https://platformio.org/platformio-ide)
 * Getting started with [PlatformIO IDE](https://docs.platformio.org/en/latest/integration/ide/visualstudio.html) or [PlatformIO command line interface](https://docs.platformio.org/en/latest/core/index.html)
-* [Advanced functionality](https://docs.platformio.org/en/latest/platforms/atmelmegaavr.html) 
+* [Advanced functionality](https://docs.platformio.org/en/latest/platforms/atmelmegaavr.html)
 * [Project Examples](https://docs.platformio.org/en/latest/platforms/atmelmegaavr.html#examples)
 
 
-## megaTinyCore + PlatformIO 
-megaTinyCore and PlatformIO works great together. You can upload using pyupdi dedicated UPDI programmer, and you can also let PlatformIO calulate the fuse values for you, just like Arduino IDE does!
+## megaTinyCore + PlatformIO
+megaTinyCore and PlatformIO works great together. You can upload using pyupdi dedicated UPDI programmer, and you can also let PlatformIO calculate the fuse values for you, just like Arduino IDE does!
 Note that burning bootloader and uploading using the bootloader is not currently supported.
 
-PlatformIO uses the information provided in platformio.ini to calculate what fuse bits and what bootloader file to load.  
+PlatformIO uses the information provided in platformio.ini to calculate what fuse bits and what bootloader file to load.
 Simply provide enough information and run the following command:
 
 ```ini
@@ -22,15 +22,15 @@ Simply provide enough information and run the following command:
 pio run -t fuses -e set_fuses
 ```
 
-You can find a platformio.ini template you can use when creating a project for a megaTinyCore compatible device below.  
-The most common functionality is available in this template. As you can see, the templated is divided into multiple environments.  
+You can find a platformio.ini template you can use when creating a project for a megaTinyCore compatible device below.
+The most common functionality is available in this template. As you can see, the templated is divided into multiple environments.
 
 * The default build environment are defined under *[platformio]*.
 * All parameters that are common for all environments are defined under *[env]*.
 * Use the *[env:Upload_UPDI]* to upload to your target.
 * Use *[env:set_fuses]* to set the fuses or burn the bootloader.
 
-More information on what each line means can be found futher down on this page.
+More information on what each line means can be found further down on this page.
 
 
 ## platformio.ini template
@@ -68,11 +68,11 @@ board_hardware.oscillator = internal
 
 ; Unflag build flags
 build_unflags =
-; Extra build flags 
+; Extra build flags
 build_flags =
 
 ; Monitor port is auto detected. Override here
-;monitor_port = 
+;monitor_port =
 ; Serial monitor baud rate
 monitor_speed = 9600
 
@@ -105,7 +105,7 @@ PlatformIO requires the `board` parameter to be present. `board` is just the tar
 
 
 ### `board_build.f_cpu`
-Specifies the clock frequency in [Hz]. 
+Specifies the clock frequency in [Hz].
 Used to determine what oscillator option to choose. A capital *L* has to be added to the end of the frequency number.
 Below is a table with supported clocks. Defaults to 16 MHz internal if not specified.
 
@@ -128,7 +128,7 @@ Below is a table with supported clocks. Defaults to 16 MHz internal if not speci
 
 
 ### `board_hardware.oscillator`
-Spefices to use the internal or an external oscillator.
+Specifies to use the internal or an external oscillator.
 
 | Oscillator option    |
 |----------------------|
@@ -196,7 +196,7 @@ This parameter is used to unflag flags automatically set by the PlatformIO build
 
 
 ### `build_flags`
-This parameter is used to set compiler flags. This is useful if you want to for instance want to chage the serial RX or TX buffer. Here's a list of the current available core files flags:
+This parameter is used to set compiler flags. This is useful if you want to for instance want to change the serial RX or TX buffer. Here's a list of the current available core files flags:
 
 | Flag                        | Default size   | Description                                               |
 |-----------------------------|----------------|-----------------------------------------------------------|
@@ -229,11 +229,11 @@ Programmer used for uploading.
 
 
 ### `upload_flags`
-Used to pass extra flags to Avrdude when uploading using a programmer.  
-Typical parameters are `-PUSB` and `-v`.  
+Used to pass extra flags to Avrdude when uploading using a programmer.
+Typical parameters are `-PUSB` and `-v`.
 **Note that every flag has to be on its own line, and they have to be indented with two spaces:**
 ```ini
-upload_flags = 
+upload_flags =
   -PUSB
   -v
 ```
