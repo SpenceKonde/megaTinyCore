@@ -1,0 +1,37 @@
+#######################################
+# Syntax Coloring Map For Wire
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+start	KEYWORD2
+stop	KEYWORD2
+init	KEYWORD2
+attachInterrupt	KEYWORD2
+detachInterrupt	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+Comparator	KEYWORD2
+Comparator0	KEYWORD2
+Comparator1	KEYWORD2
+Comparator2	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+out	LITERAL1
+hyst	LITERAL1
+in_p	LITERAL1
+in_n	LITERAL1
+ref	LITERAL1

@@ -85,7 +85,6 @@ static volatile TCB_t* _timer =
 #endif
 
 volatile uint8_t _pin = NOT_A_PIN;
-static unsigned int _frequency=1;
 // timerx_toggle_count:
 //  > 0 - duration specified
 //  = 0 - stopped
@@ -99,7 +98,6 @@ uint8_t timer_cycle_per_tgl_count;
 
 // helper functions
 static void disableTimer();
-
 
 
 
@@ -158,45 +156,38 @@ void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
         toggle_count = -1;
     }
 
-    if (frequency == _frequency) {
-       //no more math, just stop timer and start assigning stuff below.
-       // otherwise do all this over again:
-      _timer->CTRLA = 0;
-    } else { // do the math...
-      _frequency = frequency;
-      // Calculate compare value
-      uint8_t divisionfactor = 1; //no prescale, toggles at half the frequency
+    // Calculate compare value
+    uint8_t divisionfactor = 1; //no prescale, toggles at half the frequency
 
-      compare_val = ((F_CPU / frequency)>>1);
-      while ((compare_val > 0x10000) && (divisionfactor<8))
-      {
-        compare_val = compare_val >> 1;
-        divisionfactor++;
-      }
-      if (--compare_val > 0xFFFF) {
-        //if still too high, divisionfactor reached 8 (/256), corresponding to 1Hz
-        compare_val = 0xFFFF; //do the best we can.
-      }
-
-
-      // Timer settings -- will be type B
-      // Belive it or not, we still don't need to turn off interrupts!
-      // We're are however disabling the timer. There may be one final interrupt at the moment we do so
-      // but that's not a problem
-      if(divisionfactor==1)
-      {
-        _timer->CTRLA = TCB_CLKSEL_DIV1_gc;
-      } else { //division factor between 2 and 8
-        _timer->CTRLA = TCB_CLKSEL_DIV2_gc;
-        divisionfactor--; //now between 1 and 7 //and while it is disabed, we can reconfigure in peace.
-      }
-      divisionfactor--; //now between 0 and 6
-
-      // Save the results of our calculations
-      timer_cycle_per_tgl = 1 << divisionfactor; //1, 2, 4, 8, 16, 32, or 64 - toggle pin once per this many cycles
-      timer_cycle_per_tgl_count = timer_cycle_per_tgl;
-      _timer->CCMP = compare_val; // and each cycle is this many timer ticks long
+    compare_val = ((F_CPU / frequency)>>1);
+    while ((compare_val > 0x10000) && (divisionfactor<8))
+    {
+      compare_val = compare_val >> 1;
+      divisionfactor++;
     }
+    if (--compare_val > 0xFFFF) {
+      //if still too high, divisionfactor reached 8 (/256), corresponding to 1Hz
+      compare_val = 0xFFFF; //do the best we can.
+    }
+
+
+    // Timer settings -- will be type B
+    // Belive it or not, we still don't need to turn off interrupts!
+    // We're are however disabling the timer. There may be one final interrupt at the moment we do so
+    // but that's not a problem
+    if(divisionfactor==1)
+    {
+      _timer->CTRLA = TCB_CLKSEL_DIV1_gc;
+    } else { //division factor between 2 and 8
+      _timer->CTRLA = TCB_CLKSEL_DIV2_gc;
+      divisionfactor--; //now between 1 and 7 //and while it is disabed, we can reconfigure in peace.
+    }
+    divisionfactor--; //now between 0 and 6
+
+    // Save the results of our calculations
+    timer_cycle_per_tgl = 1 << divisionfactor; //1, 2, 4, 8, 16, 32, or 64 - toggle pin once per this many cycles
+    timer_cycle_per_tgl_count = timer_cycle_per_tgl;
+    _timer->CCMP = compare_val; // and each cycle is this many timer ticks long
     // Timer to Periodic interrupt mode
     _timer->CTRLB = TCB_CNTMODE_INT_gc;
     _timer->CNT = 0; //not strictly necessary
