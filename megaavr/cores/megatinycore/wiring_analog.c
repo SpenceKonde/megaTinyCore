@@ -50,9 +50,15 @@ inline __attribute__((always_inline)) void check_valid_analog_pin(pin_size_t pin
         if (pin != ADC_INTREF && pin != ADC_TEMPERATURE)
       #endif
       {
-        pin = digitalPinToAnalogInput(pin);
-        if (pin == NOT_A_PIN) {
-          badArg("analogRead called with constant pin that is not a valid analog pin");
+        if (pin & 0x80) {
+          if ((pin & 0x7F) >= NUM_ANALOG_INPUTS) {
+            badArg("analogRead called with constant channel number that is not a valid analog channel");
+          }
+        } else {
+          pin = digitalPinToAnalogInput(pin);
+          if (pin == NOT_A_PIN) {
+            badArg("analogRead called with constant pin that is not a valid analog pin");
+          }
         }
       }
     #endif
@@ -140,27 +146,29 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
 }
 #endif
 
-
+#if MEGATINYCORE_SERIES == 2
 int analogRead(uint8_t pin) {
-#ifdef ADC_LOWLAT_bm
-  //badCall("analog functionality not yet available for 2-series");
-  return -1;
+  badCall("analogRead functionality not yet implemented for 2-series")
+}
 #else
+int analogRead(uint8_t pin) {
   check_valid_analog_pin(pin);
 
-
   #ifdef ADC_DAC0
-  if (pin != ADC_DAC0 && pin != ADC_INTREF && pin != ADC_TEMPERATURE)
+  if (pin != ADC_DAC0 && pin != ADC_INTREF && pin != ADC_TEMPERATURE && pin != ADC_GROUND)
   #else
-  if (pin != ADC_INTREF && pin != ADC_TEMPERATURE)
+  if (pin != ADC_INTREF && pin != ADC_TEMPERATURE && pin != ADC_GROUND)
   #endif
   {
-    pin = digitalPinToAnalogInput(pin);
-    if (pin == NOT_A_PIN) {
-      return -1;
+    if (pin & 0x80){
+      pin &= 0x7F;
+    } else {
+      pin = digitalPinToAnalogInput(pin);
     }
   }
-
+  if (pin > 0x1F) { // highest valid mux value for any 0 or 1-series part.
+    return -1;
+  }
   /* Reference should be already set up */
   /* Select channel */
   ADC0.MUXPOS = (pin << ADC_MUXPOS_gp);

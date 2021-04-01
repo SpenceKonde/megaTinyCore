@@ -30,21 +30,16 @@
 extern "C" {
 #endif
 
-/* Analog reference options */
+/* ADC-related stuff */
+/* With 2.3.0, we do the same thing as ATTinyCore and DxCore to specify
+   that something is a channel number: set the high bit 1, since it is
+   incredibly unlikely that a part with more than 127 digital pins will
+   ever be supported by this core */
 
-/* Change in mega4809: two places to define analog reference
-  - VREF peripheral defines internal reference
-  - analog peripherals define internal/Vdd/external
-*/
+  #define ADC_CH(ch)      (0x80 | (ch))
 
-// internal from VREF
-
-/* Values shifted to avoid clashing with ADC REFSEL defines
-  Will shift back in analog_reference function
-*/
-
-#ifndef ADC_LOWLAT_bm /* means it's a 0/1-series */
-
+#ifndef ADC_LOWLAT_bm
+  /* ADC constants for 0/1-series */
   #define INTERNAL0V55    (VREF_ADC0REFSEL_0V55_gc >> VREF_ADC0REFSEL_gp)
   #define INTERNAL1V1     (VREF_ADC0REFSEL_1V1_gc >> VREF_ADC0REFSEL_gp)
   #define INTERNAL2V5     (VREF_ADC0REFSEL_2V5_gc >> VREF_ADC0REFSEL_gp)
@@ -55,25 +50,35 @@ extern "C" {
   #define DEFAULT         ADC_REFSEL_VDDREF_gc
   #define INTERNAL        ADC_REFSEL_INTREF_gc
   #define VDD             ADC_REFSEL_VDDREF_gc
-  #ifdef DAC0
-    #define ADC_DAC0      ADC_MUXPOS_DAC0_gc
-  #endif
 
   #if (defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3217__) )
     #define EXTERNAL      ADC_REFSEL_VREFA_gc
   #endif
 
-  #define ADC_TEMPERATURE ADC_MUXPOS_TEMPSENSE_gc
-  #define ADC_INTREF      ADC_MUXPOS_INTREF_gc
+  #define ADC_TEMPERATURE ADC_CH(ADC_MUXPOS_TEMPSENSE_gc)
+  #define ADC_INTREF      ADC_CH(ADC_MUXPOS_INTREF_gc)
+  #define ADC_GROUND      ADC_CH(ADC_MUXPOS_GND_gc)
+  #ifdef DAC0
+    #define ADC_DAC0      ADC_CH(ADC_MUXPOS_DAC0_gc)
+    #define ADC_DACREF0   ADC_DAC0
+  #endif
+  // DACREF1 and DACREF2 can only be measured with ADC1. ADC1 is not exposed by megaTinyCore.
 
-#else  /* ADC_LOWLAT_bm defined -> 2-series */
-  /* ADC Reference Options for 2-series */
+#else
+  /* ADC constants for 2-series */
   #define VDD             (0) /* ADC_REFSEL_VDD_gc    */
+  #define DEFAULT         VDD /* Gee, I really wish these were named differently */
   #define EXTERNAL        (2) /* ADC_REFSEL_VREFA_gc  */
   #define INTERNAL1V024   (4) /* ADC_REFSEL_1024MV_gc */
   #define INTERNAL2V048   (5) /* ADC_REFSEL_2048MV_gc */
   #define INTERNAL2V5     (6) /* ADC_REFSEL_2500MV_gc */
   #define INTERNAL4V096   (7) /* ADC_REFSEL_4096MV_gc */
+
+  #define ADC_TEMPERATURE ADC_CH(ADC_MUXPOS_TEMPSENSE_gc)
+  #define ADC_GROUND      ADC_CH(ADC_MUXPOS_GND_gc)
+  #define ADC_DACREF0     ADC_CH(ADC_MUXPOS_DACREF0_gc)
+  #define ADC_DAC0        ADC_DACREF0 /* for compatibility, since on tinyAVR 0/1-seies, the DAC0 voltage is also AC DACREF if used */
+  #define ADC_VDDDIV10    ADC_CH(ADC_MUXPOS_VDDDIV10_gc)
 
 #endif
 
@@ -407,9 +412,11 @@ extern const uint8_t digital_pin_to_timer[];
 #if (MEGATINYCORE_SERIES==2)
   #warning "tinyAVR 2-series support is in at pre-beta levels, please help by reporting any issues!"
   #define NATIVE_ADC_RESOLUTION 12
+  #define DIFFERENTIAL_ADC 2
 #else
   #define NATIVE_ADC_RESOLUTION 10
 #endif
+#define NATIVE_ADC_RESOLUTION_LOW 8
 
 // This define can get black-hole'ed somehow (reported on platformio) likely the ugly syntax to pass a string define from platform.txt via a -D
 // directive passed to the compiler is getting mangled somehow, though I'm amazed it doesn't cause a  compile error. But checking for defined(MEGATINYCORE)
@@ -426,6 +433,11 @@ extern const uint8_t digital_pin_to_timer[];
 #define CORE_HAS_FASTIO 1
 #define CORE_HAS_OPENDRAIN 1
 
+#ifndef SUPPORT_LONG_TONES
+  #if (PROGMEM_SIZE > 8192)
+    #define SUPPORT_LONG_TONES 1
+  #endif
+#endif
 
 
 #ifdef __cplusplus
