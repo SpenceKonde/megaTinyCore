@@ -1,6 +1,8 @@
 ## [Check it out, we have "discussions" now!](https://github.com/SpenceKonde/megaTinyCore/discussions)
 Let's use that - it's better than gitter ever was, and it's all on one site.
 
+## [A 2.3.0 version with full functionality is DANGEROUSLY CLOSE](https://github.com/SpenceKonde/megaTinyCore/discussions/377)
+
 ### [Wiring](Wiring.md)
 ### [Installation](Installation.md)
 
