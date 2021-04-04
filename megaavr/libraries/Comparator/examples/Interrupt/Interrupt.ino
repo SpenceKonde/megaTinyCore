@@ -31,12 +31,12 @@ void setup() {
 
   // Configure relevant comparator parameters
   Comparator.input_p = in_p::in0;       // Use positive input 0 (PA7)
-#if MEGATINYCORESERIES == 0
+  #if MEGATINYCORESERIES == 0
   Comparator.input_n = in_n::vref;      // 0-series has no DACREF, so use vref directly.
-#else
+  #else
   Comparator.input_n = in_n::dacref;    // Connect the negative pin to the DACREF voltage
   Comparator.dacref = 255;              // Gives us 2.5V -> (255 / 256) * 2.5V = 2.5V
-#endif
+  #endif
   Comparator.reference = ref::vref_2v5; // Set the DACREF voltage to 2.5V
   Comparator.hysteresis = hyst::large;  // Use a 50mV hysteresis
   Comparator.output = out::disable;     // Use interrupt trigger instead of output pin

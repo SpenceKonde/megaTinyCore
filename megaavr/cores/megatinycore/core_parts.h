@@ -1,3 +1,11 @@
+/* Core Parts - a part of Arduino.h for megaTinyCore 2.3.0 and later
+ * This is directly included by Arduino.h and nothing else; it just moves
+ * a bunch of macros that had started to make Arduino.h hard to read out
+ * of that file - most significantly the part-identification and version
+ * macro handling stuff
+ *
+ * Spence Konde 2021 - megaTinyCore is free software (LGPL 2.1)
+ * See LICENSE.txt for full legal boilerplate if you must */
 
 //#defines to identify part families
 #if defined(__AVR_ATtiny3227__)
