@@ -24,8 +24,8 @@ Class for interfacing with the built-in comparator(s). Use the predefined object
 * Not all pins exist on all parts; if a part does not have a given pin, that input is not available there.
 * On 0-series, only positive and negative input 0 is available, and only AC0 exists.
 * On 1-series with <16k flash, only AC0 and inputs 0 and 1 are available. Input 1 only available on parts with that physical pin.
-* On 1-series with 16k or 32k flash, all positive input options shown are available provided the pin exists (there is no PB6 or PB7 except on 24-pin parts, for example, so an ATtiny3216 cannot choose positive input 3 for AC0), as are `IN- 0` and `IN- 1`. `IN- 2` is not available.
-* On 2-series, all AC0 inputs are available (as long as the pin exists on that part). AC1 and AC2 do not exist.
+* On 1-series with 16k or 32k flash, all positive input options shown are available provided the pin exists (there is no PB6 or PB7 except on 24-pin parts, for example, so an ATtiny3216 cannot choose positive input 3 for AC0). Negative inputs `IN- 0` and `IN- 1` are available, but `IN- 2` is not; the register only allocates 2 bits for selecting the negative side, and the 1-series has both vref and dacref options.
+* On 2-series, all AC0 inputs are available (as long as the pin exists on that part). Only one comparator, AC0, exists.
 
 ### input_p
 Property for setting what input pin the positive input of the comparator should be connected to
@@ -194,7 +194,7 @@ Comparator.init(); // Initialize comparator
 ```
 
 ## start()
-Method for starting the analog comparator - you would normally call this after init() when seting up the comparator, or after you stopped it, and then wish to restart it (if you haven't called init() in the interim, it will be started with the previous settings).
+Method for starting the analog comparator - you would normally call this after init() when setting up the comparator, or after you stopped it, and then wish to restart it (if you haven't called init() in the interim, it will be started with the previous settings).
 ##### Usage
 ```c++
 Comparator.start(); // Start comparator
@@ -202,7 +202,7 @@ Comparator.start(); // Start comparator
 
 
 ## stop()
-Method for stopping the analog comparator; this clears only the enable bit, everything else is left in place. Optionally instead call `stop(true)` to also reenable digital input on the pins used. This is only necessaery if you plan to call digitalRead() on them after disabling the analog comparator (which seems an uncommon use case if they have an analog voltage connected to them!), and costs about 100 bytes of flash on a 1-series part (less on 0-series)
+Method for stopping the analog comparator; this clears only the enable bit, everything else is left in place. Optionally instead call `stop(true)` to also re-enable digital input on the pins used. This is only necessary if you plan to call digitalRead() on them after disabling the analog comparator (which seems an uncommon use case if they have an analog voltage connected to them!), and costs about 100 bytes of flash on a 1-series part (less on 0-series)
 
 ##### Usage
 ```c++
