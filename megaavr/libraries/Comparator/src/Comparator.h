@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 
-
+// *INDENT-OFF* - astyle wants to destroy the formatting.
 
 namespace out {
   enum output_t : uint8_t {

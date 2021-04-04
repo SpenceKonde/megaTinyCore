@@ -31,22 +31,22 @@
 #endif
 
 /* A few notes on adaptations for megaTinyCore
-1. There are two definitions for the comparator objects, one with negative and
- positive inputs 0, used for 8-pin and 0-series parts, and the other with all
- of them. 0-series parts have small flash, and 8-pin parts have small flash, so
- the small amount of flash this saves is worthwhile (you don't just get back
- the flash the constructor above eats; there's also the if/elseif chain below)
-2. Atmel and Microchip are at it again with dartboards, monkeys and feature
- lists. Though broadly similar, the devils are in the details, and there seem
- to be a considerable population of them here. Every series is rather different from the others.
-3. Inversion may be desired even when just using a as an event source, with no
+  1. There are two definitions for the comparator objects, one with negative and
+  positive inputs 0, used for 8-pin and 0-series parts, and the other with all
+  of them. 0-series parts have small flash, and 8-pin parts have small flash, so
+  the small amount of flash this saves is worthwhile (you don't just get back
+  the flash the constructor above eats; there's also the if/elseif chain below)
+  2. Atmel and Microchip are at it again with dartboards, monkeys and feature
+  lists. Though broadly similar, the devils are in the details, and there seem
+  to be a considerable population of them here. Every series is rather different from the others.
+  3. Inversion may be desired even when just using a as an event source, with no
   pin output.... Currently no way to do this!
-4. All this, and no wrapper around getting the current status?
- I added a value() method that returns a boolean indicating the state, just
- because it seemed weird to have wrappers around everything else but not that.
-5. Added optional (defaults to false) argument to stop(), if true, it re-enables
- the digital input buffers on the pins that were used. Doesn't take up any
- space if not used thanks to LTO.
+  4. All this, and no wrapper around getting the current status?
+  I added a value() method that returns a boolean indicating the state, just
+  because it seemed weird to have wrappers around everything else but not that.
+  5. Added optional (defaults to false) argument to stop(), if true, it re-enables
+  the digital input buffers on the pins that were used. Doesn't take up any
+  space if not used thanks to LTO.
 */
 
 
@@ -85,7 +85,6 @@ AnalogComparator::AnalogComparator(
                                      IN0_N(in0_n) { }
 #endif
 
-//*INDENT-ON*
 
 void AnalogComparator::init() {
   // Set voltage reference]
@@ -101,7 +100,7 @@ void AnalogComparator::init() {
         VREF.CTRLB |= VREF_AC0REFEN_bm;
         AC.DACREF = dacref;
       #else
-        VREF.CTRLA  = (VREF.CTRLA & 0xF8)|reference; /* shared with ADC0 reference */
+        VREF.CTRLA  = (VREF.CTRLA & 0xF8) | reference; /* shared with ADC0 reference */
         #ifdef DAC0
           VREF.CTRLB |= VREF_DAC0REFEN_bm;
           DAC0.CTRLA |= DAC_ENABLE_bm;
@@ -110,7 +109,7 @@ void AnalogComparator::init() {
       #endif
     #if defined (AC1)
       } else if (comparator_number == 1) { // Everything with AC1 and AC2 has the DAC.
-        VREF.CTRLC  = (VREF.CTRLC & 0xF8)|reference; /* shared with ADC1 reference */
+        VREF.CTRLC  = (VREF.CTRLC & 0xF8) | reference; /* shared with ADC1 reference */
         VREF.CTRLB |= VREF_DAC1REFEN_bm;
         DAC1.CTRLA |= DAC_ENABLE_bm;
         DAC1.DATA   = dacref;
@@ -202,7 +201,7 @@ void AnalogComparator::init() {
   */
 
   // Set hysteresis, and output, hilwe
-  AC.CTRLA = (AC.CTRLA & ~(AC_HYSMODE_gm|AC_OUTEN_bm)) | hysteresis | (output & 0x40);
+  AC.CTRLA = (AC.CTRLA & ~(AC_HYSMODE_gm | AC_OUTEN_bm)) | hysteresis | (output & 0x40);
 }
 
 void AnalogComparator::start(bool state) {
