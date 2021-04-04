@@ -52,7 +52,7 @@
                        Long tones (where frequency * duration > 2.145 billion resulted in an
                        intermediate overflowing before the divide by 1000. removing the 2* doubled this limit.
                        But high frequencies and long durations (where frequency * duration would overflow
-                       a unsigned long) still break it. I added a way to distribute the divison before
+                       a unsigned long) still break it. I added a way to distribute the division before
                        the multiplication if the duration was long enough to start worrying about. But I
                        decided not to enable by default, it is SUPPORT_LONG_TONES - if defined and 1,
                        when duration is over 2^16, we split that line into (frequency/5) * (duration/100)
@@ -172,7 +172,7 @@ void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
 
 
     // Timer settings -- will be type B
-    // Belive it or not, we still don't need to turn off interrupts!
+    // Believe it or not, we still don't need to turn off interrupts!
     // We're are however disabling the timer. There may be one final interrupt at the moment we do so
     // but that's not a problem
     if(divisionfactor==1)
