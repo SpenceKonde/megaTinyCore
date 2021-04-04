@@ -643,7 +643,20 @@ void set_millis(uint32_t newmillis)
 
 void init() {
   // Initializes hardware: First we configure the main clock, then fire up the other peripherals
+  init_clock();
+  init_ADC0();
 
+  init_timers();
+
+  #ifndef MILLIS_USE_TIMERNONE
+    init_millis();
+  #endif
+  /*************************** ENABLE GLOBAL INTERRUPTS *************************/
+  // Finally, after everything is initialized, we go ahead and enable interrupts.
+  sei();
+}
+
+void __attribute__((weak)) init_clock() {
   /******************************** CLOCK STUFF *********************************/
   #ifndef CLOCK_SOURCE
     #error "CLOCK_SOURCE not defined. CLOCK_SOURCE must be either 0 (internal) or 2 (external clock)"
@@ -684,83 +697,73 @@ void init() {
   #else
     #error "CLOCK_SOURCE isn't 0 (internal) or 2 (external CLOCK); one of these options must be selected for all boards."
   #endif
-
-
-  init_ADC0();
-
-  init_timers();
-
-  #ifndef MILLIS_USE_TIMERNONE
-    init_millis();
-  #endif
-  /*************************** ENABLE GLOBAL INTERRUPTS *************************/
-  // Finally, after everything is initialized, we go ahead and enable interrupts.
-  sei();
 }
 
 
+/********************************* ADC ****************************************/
 void __attribute__((weak)) init_ADC0() {
-    /********************************* ADC ****************************************/
-#ifndef ADC_LOWLAT_bm
-  #if defined(ADC0)
-  #ifndef SLOWADC
-  /* ADC clock 1 MHz to 1.25 MHz at frequencies supported by megaTinyCore
-    Unlike the classic AVRs, which demand 50~200 kHz, for these, the datasheet
-    spec's 50 kHz to 1.5 MHz. We hypothesize that lower clocks provide better
-    response to high impedance signals, since the sample and hold circuit will
-    be connected to the pin for longer, though the datasheet does not explicitly
-    state that this is the case. However, we can use the SAMPLEN register to
-    compensate for this! */
-
-  #if F_CPU >= 12000000 // 16 MHz / 16 = 1 MHz,  20 MHz / 16 = 1.25 MHz
-  ADC0.CTRLC = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 6000000 // 8 MHz / 8 = 1 MHz, 10 MHz / 64 = 1.25 MHz
-  ADC0.CTRLC = ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 3000000 // 4 MHz / 32 = 1 MHz, 5 MHz / 32 = 1.25 MHz
-  ADC0.CTRLC = ADC_PRESC_DIV4_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #else  // 1 MHz / 2 = 500 kHz - the lowest setting
-  ADC0.CTRLC = ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
+  #if MEGATINYCORE_SERIES < 2
+    /* ADC clock 1 MHz to 1.25 MHz at frequencies supported by megaTinyCore
+     * Unlike the classic AVRs, which demand 50~200 kHz, for these, the datasheet
+     * spec's 50 kHz to 1.5 MHz. Slower clocks provide better response to high
+     * impedance signals, since the sample and hold circuit will be connected
+     * to the pin for longer However, we can use the SAMPLEN register to
+     * compensate for this!
+     * SAMPLEN of 14 give us 16 ADC clock sampling time, 12.8 ~ 16 us
+     * which should be about the same amount of *time* as on classic AVRs
+     * As of 2.3.0, this setting is exposed by analogReadDuration()
+     * Note that on 0/1-series, the prescale settings are placed powers-of-two
+     * apart. On the 2-series and Dx-series, they are MUCH closer together.
+     **************************************************************************/
+    #if F_CPU     > 24000000    // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
+      ADC0.CTRLC  = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #elif F_CPU  >= 12000000    // 16 MHz / 16 = 1.0 MHz,  20 MHz / 16 = 1.25 MHz
+      ADC0.CTRLC  = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #elif F_CPU  >=  6000000    //  8 MHz /  8 = 1.0 MHz,  10 MHz /  8 = 1.25 MHz
+      ADC0.CTRLC  = ADC_PRESC_DIV8_gc  | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #elif F_CPU  >=  3000000    //  4 MHz /  4 = 1.0 MHz,   5 MHz /  4 = 1.25 MHz
+      ADC0.CTRLC  = ADC_PRESC_DIV4_gc  | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #else                       //  1 MHz /  2 = 500 kHz - the lowest setting
+      ADC0.CTRLC  = ADC_PRESC_DIV2_gc  | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #endif
+    ADC0.SAMPCTRL = (16); // 16 ADC clocks, 16 us
+    ADC0.CTRLD    = ADC_INITDLY_DLY16_gc;
+    ADC0.CTRLA   |= ADC_ENABLE_bm;
+  #else
+    /* On the 2-series maximum with internal reference is 3 MHz, so we will
+     * target highest speed that doesn't exceed that and 16 ADC clocks sample
+     * duration. */
+    #if F_CPU    >= 24000000            // 25 MHz /10 = 2.50 MHz
+      ADC0.CTRLB  = ADC_PRESC_DIV8_gc;  // 24 MHz /10 = 2.40 MHz
+    #elif F_CPU  >= 20000000
+      ADC0.CTRLB  = ADC_PRESC_DIV8_gc;  // 20 MHz / 8 = 2.50 MHz
+    #elif F_CPU  >= 16000000
+      ADC0.CTRLB  = ADC_PRESC_DIV6_gc;  // 16 MHz / 6 = 2.67 MHz
+    #elif F_CPU  >= 12000000
+      ADC0.CTRLB  = ADC_PRESC_DIV4_gc;  // 12 MHz / 4 = 3.00 MHz
+    #elif F_CPU  >=  6000000            // 10 MHz / 4 = 2.50 MHz
+      ADC0.CTRLB  = ADC_PRESC_DIV4_gc;  //  8 MHz / 4 = 2.00 MHz
+    #else                               //  5 MHz / 2 = 2.50 MHz
+      ADC0.CTRLB  = ADC_PRESC_DIV2_gc;  //  4 MHz / 2 = 2.00 MHz
+    #endif                              //  1 MHz / 2 =  500 kHz
+    ADC0.CTRLE = 15; //15.5 without PGA, 16 with PGA, corresponding to 7.75 or 8 us.
+    ADC0.CTRLA |= ADC_ENABLE_bm | ADC_LOWLAT_bm;
+    /* Default low latency mode on
+     * Users can turn it off if they care about power consumption while ADC is on
+     * and chip is awake, since these parts don't have the perverse ADC-left-on
+     * behavior of classic AVRs. */
+    ADC0.CTRLC = TIMEBASE_1US; //defined in Arduino.h.
+    ADC0.PGACTRL = ADC_PGABIASSEL_3_4X_gc | ADC_ADCPGASAMPDUR_15CLK_gc;
+    /* Note that we don't *enable* it automatically in init().
+     * 3/4th bias is good up to 4 MHz CLK_ADC, 15 ADC Clocks to sample the PGA
+     * up to 5 MHz, so within the regime of speeds that have to be compatible
+     * with internal references, we are in the clear there. */
   #endif
-  ADC0.SAMPCTRL = 14; //16 ADC clock sampling time - should be about the same amount of *time* as originally?
-  #else //if SLOWADC is defined - as of 2.0.0 this option isn't exposed.
-  /* ADC clock around 125 kHz - datasheet spec's 50 kHz to 1.5 MHz */
-  #if F_CPU >= 16000000 // 16 MHz / 128 = 125 kHz,  20 MHz / 128 = 156.250 kHz
-  ADC0.CTRLC = ADC_PRESC_DIV128_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 8000000 // 8 MHz / 64 = 125 kHz, 10 MHz / 64 = 156.25 KHz
-  ADC0.CTRLC = ADC_PRESC_DIV64_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 4000000 // 4 MHz / 32 = 125 kHz, 5 MHz / 32 = 156.25 KHz
-  ADC0.CTRLC = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 2000000 // 2 MHz / 16 = 125 kHz - note that megaTinyCore does not provide support for 2 MHz
-  ADC0.CTRLC = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 1000000 // 1 MHz / 8 = 125 kHz
-  ADC0.CTRLC = ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #else // 128 kHz / 2 = 64 kHz -> This is the closest you can get, the prescaler is 2
-  ADC0.CTRLC = ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #endif
-  #endif
-  ADC0.CTRLD = ADC_INITDLY_DLY16_gc;
-  /* Enable ADC */
-  ADC0.CTRLA |= ADC_ENABLE_bm;
-  #endif
-
-  #ifdef __AVR_ATtinyxy2__
-  PORTMUX.CTRLC = 1; //move WO0 output to PA7 so PA3 can be used with WO3
-  #endif
-#endif
 }
 
 
 #ifdef ADC1
   __attribute__((weak)) void init_ADC1() {
-  #ifndef SLOWADC
-  /* ADC clock 1 MHz to 1.25 MHz at frequencies supported by megaTinyCore
-    Unlike the classic AVRs, which demand 50~200 kHz, for these, the datasheet
-    spec's 50 kHz to 1.5 MHz. We hypothesize that lower clocks provide better
-    response to high impedance signals, since the sample and hold circuit will
-    be connected to the pin for longer, though the datasheet does not explicitly
-    state that this is the case. However, we can use the SAMPLEN register to
-    compensate for this! */
-
   #if F_CPU >= 12000000 // 16 MHz / 16 = 1 MHz,  20 MHz / 16 = 1.25 MHz
   ADC1.CTRLC = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
   #elif F_CPU >= 6000000 // 8 MHz / 8 = 1 MHz, 10 MHz / 64 = 1.25 MHz
@@ -771,22 +774,6 @@ void __attribute__((weak)) init_ADC0() {
   ADC1.CTRLC = ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
   #endif
   ADC1.SAMPCTRL = 14; //16 ADC clock sampling time - should be about the same amount of *time* as originally?
-  #else //if SLOWADC is defined - as of 2.0.0 this option isn't exposed.
-  /* ADC clock around 125 kHz - datasheet spec's 50 kHz to 1.5 MHz */
-  #if F_CPU >= 16000000 // 16 MHz / 128 = 125 kHz,  20 MHz / 128 = 156.250 kHz
-  ADC1.CTRLC = ADC_PRESC_DIV128_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 8000000 // 8 MHz / 64 = 125 kHz, 10 MHz / 64 = 156.25 KHz
-  ADC1.CTRLC = ADC_PRESC_DIV64_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 4000000 // 4 MHz / 32 = 125 kHz, 5 MHz / 32 = 156.25 KHz
-  ADC1.CTRLC = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 2000000 // 2 MHz / 16 = 125 kHz - note that megaTinyCore does not provide support for 2 MHz
-  ADC1.CTRLC = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 1000000 // 1 MHz / 8 = 125 kHz
-  ADC1.CTRLC = ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #else // 128 kHz / 2 = 64 kHz -> This is the closest you can get, the prescaler is 2
-  ADC1.CTRLC = ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #endif
-  #endif
   ADC1.CTRLD = ADC_INITDLY_DLY16_gc;
   /* Enable ADC */
   ADC1.CTRLA |= ADC_ENABLE_bm;
@@ -848,5 +835,8 @@ void __attribute__((weak)) init_TCA0() {
     TCA0.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV16_gc) | (TCA_SPLIT_ENABLE_bm);
   #else //TIME_TRACKING_TIMER_DIVIDER==8
     TCA0.SPLIT.CTRLA   =   (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SPLIT_ENABLE_bm);
+  #endif
+  #ifdef __AVR_ATtinyxy2__
+    PORTMUX.CTRLC = 1; //move WO0 output to PA7 so PA3 can be used with WO3
   #endif
 }
