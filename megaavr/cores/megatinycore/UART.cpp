@@ -382,9 +382,21 @@ size_t UartClass::write(uint8_t c) {
        system clock, the byte will have transferred during millis, and so TXCIF will never get set again,
        and calls to flush() will hang. https://github.com/SpenceKonde/megaTinyCore/issues/352 */
     (*_hwserial_module).TXDATAL = c;
-    // Make sure data register empty interrupt is disabled to avoid
-    // that the interrupt handler is called in this situation
-    (*_hwserial_module).CTRLA &= (~USART_DREIE_bm);
+
+
+
+/*   * I cannot figure out *HOW* the DRE could be enabled at this point (buffer empty and DRE flag up)
+     * When the buffer was emptied, it would have turned off the DREI after it loaded the last byte.
+     * Thus, the only possible way this could happen is if an interrupt also tried to write to serial,
+     * *immediately* after we checked that the buffer was empty, before we made it not empty. And
+     * in that case, without this line it would lose one of the characters... with that line, it could
+     * stop servicing DRE until another serial wright, AND lose a character. I think it's a full 10 bytes
+     * 2 to read with LDS, 1 to modify, 2 to write back with STS. It's gone!    -Spence 4/2021
+     * Original comments:
+     // Make sure data register empty interrupt is disabled to avoid
+     // that the interrupt handler is called in this situation
+     (*_hwserial_module).CTRLA &= (~USART_DREIE_bm);
+*/
 
     return 1;
   }
