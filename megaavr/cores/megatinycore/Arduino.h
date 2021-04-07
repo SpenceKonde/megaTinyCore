@@ -93,7 +93,7 @@ extern "C" {
   #define ADC_TEMPERATURE ADC_CH(ADC_MUXPOS_TEMPSENSE_gc)
   #define ADC_GROUND      ADC_CH(ADC_MUXPOS_GND_gc)
   #define ADC_DACREF0     ADC_CH(ADC_MUXPOS_DACREF0_gc)
-  #define ADC_DAC0        ADC_DACREF0 /* for compatibility, since on tinyAVR 0/1-seies, the DAC0 voltage is also AC DACREF if used */
+  #define ADC_DAC0        ADC_DACREF0 /* for compatibility, since on tinyAVR 0/1-seies, the DAC0 voltage is also AC0 DACREF if used */
   #define ADC_VDDDIV10    ADC_CH(ADC_MUXPOS_VDDDIV10_gc)
 
   /* >= 1us - can't use clockcycles per microsecond from timers.h because
@@ -256,6 +256,7 @@ extern const uint8_t digital_pin_to_timer[];
 #include "pins_arduino.h"
 
 // Based on those, some ugly formulae for "smart-pin" defines that follow the mux regs around:
+
 
 #ifdef PIN_WIRE_SCL_PINSWAP_1
   #define SDA ((uint8_t) (PORTMUX.CTRLB & PORTMUX_TWI0_bm ? PIN_WIRE_SDA_PINSWAP_1 : PIN_WIRE_SDA))
