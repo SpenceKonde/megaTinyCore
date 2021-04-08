@@ -133,6 +133,8 @@ However, do note that if you explicitly declare a variable PROGMEM, you must sti
 ## Serial (UART) Support
 All of the 0/1-series parts have a single hardware serial port (UART or USART); the 2-series parts have two. It works exactly like the one on official Arduino boards (except that there is no auto-reset, unless you've wired it up by fusing the UPDI pin as reset (requiring either HV-UPDI or the Optiboot bootloader to upload code), or set up an "ersatz reset pin" as described elsewhere in this document). See the pinout charts for the locations of the serial pins.
 
+Prior to putting the part into a sleep mode, or otherwise disabling it's ability to transmit, be sure that it has finished sending the data in the buffer by calling `Serial.flush()`, otherwise the serial port will emit corrupted charachters. 
+
 ### Pin Swapping
 On all parts, the UART pins can be swapped to an alternate location. This is configured using the `Serial.swap()` or `Serial.pins()` methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This must be called **before** calling `Serial.begin()`.
 
@@ -173,9 +175,8 @@ This core disables the SS pin when running in SPI master mode. This means that t
 ## I2C (TWI) support
 All of these parts have a single hardware I2C (TWI) peripheral. It works exactly like the one on official Arduino boards using the Wire.h library, except for the additional features noted below. See the pinout charts for the location of these pins. **You must be sure to use external pullup resistors on the SDA and SCL lines if the devices you are connecting do not have those on board** (many Arduino/hobby targeted breakout boards do - typically 10k - though these may need to be enabled with a solder-bridge or jumper). The 30k-50k internal pullup resistors are not suitable for I2C pullup resistors; while they were enabled by megaTinyCore prior to version 2.1.0, this was the worst of both worlds: they often did work with the simple test case, leading the developer on their merry way thinking they were all set, only to discover that when they added another I2C device or two, or moved the device to the end of a longer cable, I2C suddenly no longer worked - it's probably better for it to fail immediately, prompting investigation and subsequent addition of appropriate pullup resistors. Note that there is nothing *preventing* one from enabling the internal pullups manually - you just should do so knowing that even if it happens to work, it's not a robust solution.
 
-On all parts with more than 8 pins, the TWI pins can be swapped to an alternate location.
-
-On 2.0.0 and later, this is configured using the Wire.swap() or Wire.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** Wire.begin(). This implementation of pin swapping is the same as what is used by.
+### TWI pins
+On all 1-series and 2-series parts with at least 14 pins, the TWI can be swapped to an alternate pair of pins. 0-series parts do not have alternate pin locations for the TWI. On 2.0.0 and later, this is configured using the Wire.swap() or Wire.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** Wire.begin(). This implementation of pin swapping is the same as what is used by[DxCore](https://github.com/SpenceKonde/DxCore) and [MegaCoreX](https://github.com/MCUdude/MegaCoreX).
 
 `Wire.swap(1) or Wire.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one.
 
@@ -183,7 +184,13 @@ On 2.0.0 and later, this is configured using the Wire.swap() or Wire.pins() meth
 
 In versions prior to 2.0.0, this was instead configured using the Tools -> I2C Pins submenu; this is set at compile time (reburning bootloader is not required). In these versions, you could see whether the alternate pins are in use by checking if TWIREMAP is #defined - you can, for example, use it to check whether correct options are selected and terminate compilation, so you can select the right option.
 
-As of 1.1.9, courtesey of https://github.com/LordJakson, when the version of Wire.h supplied with megaTinyCore 1.1.9 and later in slave mode, it is now possible to respond to the general call (0x00) address as well. This is controlled by the optional second argument to Wire.begin(). If the argument is supplied amd true, general call broadcasts will also trigger the interrupt. This version also introduces a third optional argument, which is passed unaltered to the `TWI0.SADDRMASK` register. If the low bit is 0, and bits set 1 will cause the I2C hardware to ignore that bit of the address (masked off bits will be treated as matching). If the low bit is 1, it will instead act as a second address that the device can respond to. See the datasheet for more information about this register.
+### General Call and Second Slave Addresses
+When the version of Wire.h supplied with megaTinyCore 1.1.9 and later is used in slave mode, it is now possible to respond to the general call (0x00) address as well. This is controlled by the optional second argument to Wire.begin() (thanks https://github.com/LordJakson!) If the argument is supplied amd true, general call broadcasts will also trigger the interrupt. There is furthermore a third optional argument, which is passed unaltered to the `TWI0.SADDRMASK` register. If the low bit is 0, and bits set 1 will cause the I2C hardware to ignore that bit of the address (masked off bits will be treated as matching). If the low bit is 1, it will instead act as a second address that the device can respond to. See the datasheet for more information about this register.
+
+### TWI buffer size
+The Wire library requires a TX and RX buffer; these are both the same size, determined by how much SRAM the part has. This was revised in 2.3.0 when it was brought to my attention. 
+| ATTiny     | RAM (bytes) | Buffers (2.3.0+) | Buffers (pre-2.3.0) |
+|-----------=|-------------|------------------|---------------------|
 
 ## PWM support
 The core provides hardware PWM (analogWrite) support. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available. On all other parts except 1-series parts with at least 20 pins, 6 PWM pins are available, all driven by Timer A. The 20 and 24 pin 1-series parts have two additional pins, driven by TCD0. The Type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A - however you can take them over if you need to generate PWM at different frequencies. See the pinout charts for a list of which pins support PWM.
