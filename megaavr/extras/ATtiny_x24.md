@@ -27,6 +27,8 @@ The smallest pincount of the tinyAVR 2-series parts. Has been announced in the f
 
 Unlike the higher pincount devices, you can't have alt reset here (the pin it can be moved to doesn't exist here), so these have the same reset-pain as the 1-series. 
 
+The super ADC can accumulate 1024 samples in a single burst read; decimation of the accumulated value so all of the digits are meaningful can give up to 17-bits of accuracy. For advanced ADC functionality, several new functions are provided, see ADC section of the main readme for more information.
+
 ### Buy official megaTinyCore breakouts and support continued development!
 TBD
 
