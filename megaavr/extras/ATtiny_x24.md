@@ -22,8 +22,9 @@ Timer Type D | No |
 Interfaces | UART (2), SPI, I2C |
 Clock options | Internal 20/16/10/8/5/4/1 MHz |
 RTC crystal   | Optional, TOSC1, TOSC2 |
+Package | SOIC-14, SSOP-14
 
-The smallest pincount of the tinyAVR 2-series parts. Has been announced in the full range of flash size options - Hopefully it won't be a repeat of the 3214 which was in the ATpacks, but never actually shipped, and had all references to it removed. Notice that some 1-series features - mostly the extravagances of the "golden" 1-series parts - are gone, while the second type B timer (thankfully) in all sizes. The main features though are the fancy ADC, and the second USART - as well as a 32k version with 3k SRAM, and the expanded RAM on the 4k and 8k parts, making them a lot more practical. 
+The smallest pincount of the tinyAVR 2-series parts. These have been announced in the full range of flash size options - Hopefully it won't be a repeat of the 3214 which was in the ATpacks, but never actually shipped, and had all references to it removed. Notice that some 1-series features - mostly the extravagances of the "golden" 1-series parts - are gone, while the second type B timer (thankfully) in all sizes. The main features though are the fancy ADC, and the second USART - as well as a 32k version with 3k SRAM, and the expanded RAM on the 4k and 8k parts, making them a lot more practical. 
 
 Unlike the higher pincount devices, you can't have alt reset here (the pin it can be moved to doesn't exist here), so these have the same reset-pain as the 1-series. 
 
