@@ -25,9 +25,6 @@
 #define ARDUINO_MAIN
 #include "wiring_private.h"
 #include "pins_arduino.h"
-#if MEGATINYCORE_SERIES == 2
-  #warning "tinyAVR 2-series support is in at pre-beta levels, please help by reporting any issues!"
-#endif
 
 inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
   if(__builtin_constant_p(pin))

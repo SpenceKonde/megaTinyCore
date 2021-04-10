@@ -23,17 +23,28 @@
 #define TwoWire_h
 
 #include <Arduino.h>
+/* The Wire library unfortunately needs TWO buffers, one for TX, and one for RX. That means, multiply these
+ * values by 2 to get the actual amount of RAM they take. You can see that on the smallest ram sizes, all but
+ * the miniscule buffer we provide becomes prohibitive. A mere 16 bit buffer, times 2, is 25% of total RAM on
+ * a 2k part with only 128b of RAM. Same goes for 32b on 4k 0/1-series... 32b is kind of a magic number though
+ * because it's used on the stock uno/etc cores, which sort of sets an expectation, libraries rely on it and
+ * so on... It ofc isn't viable with only 128b RAM, but the Wire library ah, isn't really viable with  2k of
+ * flash anyway - you are basically garanteed not to be happy with the results it would appear! At least not
+ * without considerable amounts of serious optimization work on this library, which would be hard to do
+ * without breaking compatibility with the Arduino API - and you all know my dedication to that! */
 
 #ifndef BUFFER_LENGTH
-  #if ((RAMEND - RAMSTART) < 1023)
-    #define BUFFER_LENGTH 16
-  #elif ((RAMEND - RAMSTART) < 4095)
-    #define BUFFER_LENGTH 32
-  #elif ((RAMEND - RAMSTART) < 8191)
-    #define BUFFER_LENGTH 64
-  #else
-    #define BUFFER_LENGTH 128
-  #endif
+  #if (RAMSIZE < 256)         /* Parts with 128b of RAM wince at pair of 16k buffers         */
+    #define BUFFER_LENGTH 16  /* 2k tinyAVRs: 128b -  25% of available RAM                   */
+  #elif (RAMSIZE < 512)       /* Parts with 256b of RAM shall allocate 24b buffers           */
+    #define BUFFER_LENGTH 32  /* 4k tinyAVRs 0/1: 256b - 25% of available RAM - oof          */
+  #elif (RAMSIZE < 2048)      /* parts with 512b or 1024b of RAM get 32b buffers             */
+    #define BUFFER_LENGTH 32  /* 8k tinyAVRs, 16k 0-series - 6-13% of available RAM          */
+  #elif (RAMSIZE < 4096)      /* 16k AVR DD-series, 16k tinyAVR 1/2-series 48b buffers       */
+    #define BUFFER_LENGTH 32  /* and 32k tinyAVR   - 3-5% of available RAM                   */
+  #else                       /* >=4k: Dx32/m320x (4k) m480x (6k),  Dx64 (8k) Dx128 (16k)    */
+    #define BUFFER_LENGTH 130 /* 130 - 128b on all Dx with >= 4k RAM, to match official      */
+  #endif                      /* 4809 core plux that couple bytes mentioned above.           */
 #endif
 
 // WIRE_HAS_END means Wire has end()

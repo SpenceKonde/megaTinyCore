@@ -180,7 +180,7 @@ void AnalogComparator::init() {
       }
     #endif
   #endif
-  AC.MUXCTRLA = output_initval | (input_p << 3) | input_n | (output & 0x80);
+  AC.MUXCTRLA = (input_p << 3) | input_n | (output & 0x80);
   /* Huh! Okay then.... apparently when you enable output, it takes over the direction control too, so no need to do this!
   // Set output
   if (output != out::disable) { //either enable or invert
@@ -200,7 +200,7 @@ void AnalogComparator::init() {
   }
   */
 
-  // Set hysteresis, and output, hilwe
+  // Set hysteresis, and output,
   AC.CTRLA = (AC.CTRLA & ~(AC_HYSMODE_gm | AC_OUTEN_bm)) | hysteresis | (output & 0x40);
 }
 

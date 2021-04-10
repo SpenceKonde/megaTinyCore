@@ -384,6 +384,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
 
 
   int32_t _analogReadEnh(uint8_t pin, uint8_t neg, uint8_t res, uint8_t gain) {
+
     uint8_t sampnum;
     if (res & 0x80) { //raw accumulation
       sampnum=res & 0x7F;
@@ -399,7 +400,6 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     } else {
       pin &= 0x3F;
     }
-
     #if PROGMEM_SIZE < 8096
       if (pin > 0x33) { //covers most ways a bad channel could come about
     #else
@@ -449,7 +449,6 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     } else {
       ADC0.CTRLF = 0;
     }
-
     uint8_t command = ((neg != SINGLE_ENDED)?0x80:0) | ((res == 8) ? ADC_MODE_SINGLE_8BIT_gc : (res > ADC_NATIVE_RESOLUTION ? ADC_MODE_BURST_gc : ADC_MODE_SINGLE_12BIT_gc)) | 1;
     ADC0.COMMAND=command;
     while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
@@ -482,7 +481,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   inline __attribute__((always_inline)) int32_t analogReadEnh(uint8_t pin, uint8_t res, uint8_t gain) {
     check_valid_enh_res(res);
     check_valid_analog_pin(pin);
-    if (__builtin_constant_p(gain)){
+    if (__builtin_constant_p(gain)) {
       if (gain != 0 && gain != 1 && gain != 2 && gain != 4 && gain != 8 && gain != 16)
         badArg("The requested gain is not available on this part, accepted values are 0, 1, 2, 4, 8 and 16.");
     }

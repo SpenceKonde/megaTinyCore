@@ -8,13 +8,14 @@
 
 namespace out {
   enum output_t : uint8_t {
-    disable = 0x00,
-    enable  = 0x40,
-    invert  = 0x80,
+    disable         = 0x00,
+    disable_invert  = 0x80,
+    enable          = 0x40,
+    invert          = 0x80,
+    enable_invert   = 0xC0,
   };
   enum pinswap_t : uint8_t {
-    no_swap  = 0x00,
-    pin_swap = 0x01,
+    no_swap  = 0x00
   };
   enum initval_t : uint8_t {
     init_low  = 0x00,
@@ -139,7 +140,7 @@ class AnalogComparator {
     void stop(bool restorepins = false);
     void attachInterrupt(voidFuncPtr callback, uint8_t mode);
     void detachInterrupt();
-    inline bool value() {
+    bool read() {
       return !!(AC.STATUS & AC_STATE_bm);
     }
 

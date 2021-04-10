@@ -134,17 +134,23 @@ Comparator.hysteresis = hyst::large;  // Use 50V hysteresis
 
 
 ### output
-Property for setting the comparator output pin (PA7).
+Variable for setting the comparator output - either internal or external, inverted or not (note also that the pin itself could be inverted with the INVEN bit of PORTA.PIN7CTRL (or PORTC.PIN6CTRL if alternate output pin is used; this allows the pin to take a logical state opposite from tne internal (event channel) output, thus allowing every possible combination of external and internal output polarities.
 Accepted values:
 ``` c++
-out::disable; // No output pin
-out::enable;  // Enable output pin (PA7)
-out::invert;  // Invert output pin (PA7)
+out::disable;        // No output pin, signal not inverted internally
+out::disable_invert; // No output pin, signal inverted internally
+out::enable;         // Enable output pin (PA7), signal not inverted internally
+out::invert;         // Enable output pin (PA7), signal inverted internally
+out::enable_invert;  // Identical to out::invert
 ```
+| AC# | AC0 | AC1 | AC2 |
+|-----|-----|-----|-----|
+| PIN | PA5 | PB3 | PB2 |
+
 
 ##### Usage
 ``` c++
-Comparator.output = out::enable; // Enable output pin (PA7)
+Comparator.output = out::enable; // Enable output comparator's output pin. Comparator is AC0, so this is PA5.
 ```
 
 ##### Default state
@@ -152,21 +158,7 @@ Comparator.output = out::enable; // Enable output pin (PA7)
 
 
 ### output_swap
-Property for pin swapping the physical output pin to its alternative position. See the pinout diagrams in the DxCore README for detailed info.
-Accepted values:
-```c++
-out::no_swap;  // Use default pin position
-out::pin_swap; // Use alternative position
-```
-
-##### Usage
-```c++
-Comparator.output_swap = out::no_swap; // No pin swap for output
-```
-
-##### Default state
-`Comparator.output_swap` defaults to `out::no_swap` if not specified in the user program.
-
+The output_swap option is not available on tinyAVR devices; each comparator can only output to a single pin.
 
 ### output_initval
 Initial state the comparator output pin has when initialized.
