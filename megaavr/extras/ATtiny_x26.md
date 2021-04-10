@@ -19,6 +19,7 @@ Comparator | 1 |
 PWM Channels | 6 |
 Timer Type B | 2 |
 Timer Type D | No |
+CCL logic | 4 LUTs  |
 Interfaces | UART (2), SPI, I2C |
 Clock options | Internal 20/16/10/8/5/4/1 MHz |
 RTC crystal   | Optional, TOSC1, TOSC2 |
