@@ -90,6 +90,13 @@ extern "C" {
   #define INTERNAL4V096   (7) /* ADC_REFSEL_4096MV_gc */
   #define INTERNAL4V1     INTERNAL4V096 /* Alias */
 
+  #define AC_REF_1V024    (VREF_AC0REFSEL_1V024_gc)
+  #define AC_REF_2V048    (VREF_AC0REFSEL_2V048_gc)
+  #define AC_REF_2V5      (VREF_AC0REFSEL_2V5_gc)
+  #define AC_REF_4V096    (VREF_AC0REFSEL_4V096_gc)
+  #define AC_REF_VDD      (VREF_AC0REFSEL_AVDD_gc)
+  #define AC_REF_4V1      AC_REF_4V1/* Alias */
+
   #define ADC_TEMPERATURE ADC_CH(ADC_MUXPOS_TEMPSENSE_gc)
   #define ADC_GROUND      ADC_CH(ADC_MUXPOS_GND_gc)
   #define ADC_DACREF0     ADC_CH(ADC_MUXPOS_DACREF0_gc)

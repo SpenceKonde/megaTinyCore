@@ -228,8 +228,7 @@
 // Reasoning these constants are what they are:
 // Low 3 bits are the number of that peripheral
 // other bits specify the type of timer
-// TCA=0x10, TCB=0x20, TCD=0x40 (leaving room in case Microchip ever decides to release a TCC)
-// DAC=0x80, RTC=0x90,
+// TCA=0x10, TCB=0x20, TCD=0x40, DAC=0x80, RTC=0x90
 // Things that aren't hardware timers with output compare are after that
 // DAC output isn't a timer, but has to be treated as such by PINMODE
 
@@ -244,6 +243,28 @@
 #define DACOUT 0x80         // 1-series only. "PWM" output source only
 #define TIMERRTC 0x90       // millis timing source only
 #define TIMERRTC_XTAL 0x91  // 1/2-series only, millis timing source only
+
+
+#if MEGATINYCORE_SERIES == 2
+/* Initial version of the IO headers omits these definitions!
+ * Either that, or the datasheet includes them in error. The calibration
+ * numbers are... maybe not the most useful values though, as the oscillator
+ * error is very small. These are in the 0 to 4 range. Which is to be expected
+ * since the granularityy of the calbyte is half what it was on the 0/1-series.
+ */
+  #if !defined(SIGROW_OSC16ERR3V)
+    #define SIGROW_OSC16ERR3V (SIGROW.reserved_3[0])
+  #endif
+  #if !defined(SIGROW_OSC16ERR5V)
+    #define SIGROW_OSC16ERR5V (SIGROW.reserved_3[1])
+  #endif
+  #if !defined(SIGROW_OSC20ERR3V)
+    #define SIGROW_OSC20ERR3V (SIGROW.reserved_3[2])
+  #endif
+  #if !defined(SIGROW_OSC20ERR5V)
+    #define SIGROW_OSC20ERR5V (SIGROW.reserved_3[3])
+  #endif
+#endif
 
 
 

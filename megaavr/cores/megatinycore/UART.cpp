@@ -215,20 +215,20 @@ void UartClass::begin(unsigned long baud, uint16_t config) {
 
 
   //See #131 for more info on this
-  #if (CLOCK_SOURCE==0 && PROGMEM_SIZE > 4096 && (defined(UARTBAUD3V) || defined(UARTBAUD5V)) && defined(SIGROW_OSC20ERR3V))
-    // if the flash is 2k or 4k, we really can't spare the flash for the baud rate correction...
-    // it's close enough to work under normal circumstances anyway.
+  #if (CLOCK_SOURCE==0 && (defined(UARTBAUD3V) || defined(UARTBAUD5V)) && defined(SIGROW_OSC20ERR3V))
+    // 2.3.0 - I decided to just put the default option for the UART baud rate correction to "None" since rarely
+    // another device so picky about baud rate accuracy that this is needed anyway.
     #if (F_CPU==20000000UL || F_CPU==10000000UL || F_CPU==5000000UL) //this means we are on the 20MHz oscillator
       #ifdef UARTBAUD3V
-        int8_t sigrow_val = SIGROW.OSC20ERR3V;
+        int8_t sigrow_val = SIGROW_OSC20ERR3V;
       #else
-        int8_t sigrow_val = SIGROW.OSC20ERR5V;
+        int8_t sigrow_val = SIGROW_OSC20ERR5V;
       #endif
     #else //we are on 16MHz one
       #ifdef UARTBAUD3V
-        int8_t sigrow_val = SIGROW.OSC16ERR3V;
+        int8_t sigrow_val = SIGROW_OSC16ERR3V;
       #else
-        int8_t sigrow_val = SIGROW.OSC16ERR5V;
+        int8_t sigrow_val = SIGROW_OSC16ERR5V;
       #endif
     #endif
     #if (F_CPU > 2000000)
