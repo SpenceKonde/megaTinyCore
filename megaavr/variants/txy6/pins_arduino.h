@@ -195,7 +195,7 @@ static const uint8_t    A8  = PIN_PB5;
 static const uint8_t    A9  = PIN_PB4;
 static const uint8_t    A10 = PIN_PB1;
 static const uint8_t    A11 = PIN_PB0;
-  #if MEGATINYCORE_SERIES == 2
+#if MEGATINYCORE_SERIES == 2
   static const uint8_t  A12 = PIN_PC0;
   static const uint8_t  A13 = PIN_PC1;
   static const uint8_t  A14 = PIN_PC2;
