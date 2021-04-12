@@ -599,7 +599,7 @@ void analogReference(uint8_t mode) {
     if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
     check_valid_enh_res(res);
     check_valid_analog_pin(pin);
-    if (__builtin_constant_p(gain)){
+    if (__builtin_constant_p(gain)) {
       if (gain != 0)
         badArg("This part does not have an amplifier, gain argument must be omitted or given as 0");
     }
@@ -610,7 +610,7 @@ void analogReference(uint8_t mode) {
     } else {
       if (res < ADC_NATIVE_RESOLUTION_LOW) return ADC_ENH_ERROR_RES_TOO_LOW;
       if (res > 13) return ADC_ENH_ERROR_RES_TOO_HIGH;
-      sampnum = (res > ADC_NATIVE_RESOLUTION ? ((res - ADC_NATIVE_RESOLUTION) << 1) : 0)
+      sampnum = (res > ADC_NATIVE_RESOLUTION ? ((res - ADC_NATIVE_RESOLUTION) << 1) : 0);
     }
     if (pin < 0x80) {
       // If high bit set, it's a channel, otherwise it's a digital pin so we look it up..

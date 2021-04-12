@@ -6,11 +6,12 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### 2.3.0
 * Port analogWrite() to the ADC on the 2-series parts.
-* Implement analogReadEnh(), ADCPowerOptions(), analogSampleDuration() for both tiny 0/1-series and 2-series.
-* Implement  analogReadDiff() for 2-series.
+* Implement analogReadEnh(), for both tiny 0/1-series (suitable for porting to DxCore) and 2-series (suitable for porting to future EA-series core)
+* Implement analogReadDiff() for 2-series (suitable for porting to furture EA-series core)
+* Implement configuration functions for new ADC functionality: ADCPowerOptions() for tinyAVR 2-series, analogSampleDuration() for both tiny 0/1-series and 2-series (separate implementations)
 * Implement ADC error return codes.
 * Document new features. Huge number of tweaks and improvements to the documentation, including large section on the new ADC-related functions. Please read it if you are using the ADC on a 2-series part or want more out of the ADC on a 0/1-series part.
-* Adjust variant pin definitions to account for the 2-series. Correct several long-standing and unnoticed bugs. Does anyone use digitalPinHasPWM()? If so, they don't use the 24-pin 0/1-series parts....
+* Adjust variant pin definitions to account for the 2-series (One added USART, 4 more analog inputs on 20/24 pin parts, A0 not on PA0 on all oparts. ) Correct several long-standing and unnoticed bugs. Does anyone use digitalPinHasPWM()? If so, they don't use the 24-pin 0/1-series parts....
 * Port the Comparator library. (#208)
 * Add capability for Comparator.stop() to restore digital input on the pins it disabled when it was started.
 * Move a bunch of hardware-related macros from Arduino.h the new core_parts.h. These are things that individual users are unlikely to need to reference, (certainly not as likely as anything that's in Arduino.h - which is where people generally know to look for core-related "stuff"

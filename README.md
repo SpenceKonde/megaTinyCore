@@ -3,7 +3,7 @@ Let's use that - it's better than gitter ever was, and it's all on one site.
 
 ## A 2.3.0 version with full functionality is ~DANGEROUSLY CLOSE~ HERE!
 
-Warning: 2.3.0 had changes here, there and everywhere to support one of the most complicated peripherals in the entirety of the Arduino-compatible AVR product line, a peripheral which is only available on the brand new tinyAVR 2-series parts which first shipped less than 2 months ago. Users who are relatively inexperienced with Arduino and/or who are not comfortable reporting bugs using Github Issues should stick with megaTinyCore 2.2.9. There are sure to be things that don't work here - and the sooner they get reported the sooner they get fixed. 
+Warning: 2.3.0 had changes here, there and everywhere to support one of the most complicated peripherals in the entirety of the Arduino-compatible AVR product line, a peripheral which is only available on the brand new tinyAVR 2-series parts which first shipped less than 2 months ago. Users who are relatively inexperienced with Arduino and/or who are not comfortable reporting bugs using Github Issues should stick with megaTinyCore 2.2.9. There are sure to be things that don't work here - and the sooner they get reported the sooner they get fixed.
 
 
 ### [Wiring](Wiring.md)
