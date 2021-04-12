@@ -7,7 +7,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### 2.3.0
 * Port analogWrite() to the ADC on the 2-series parts.
 * Implement analogReadEnh(), for both tiny 0/1-series (suitable for porting to DxCore) and 2-series (suitable for porting to future EA-series core)
-* Implement analogReadDiff() for 2-series (suitable for porting to furture EA-series core)
+* Implement analogReadDiff() for 2-series (suitable for porting to future EA-series core)
 * Implement configuration functions for new ADC functionality: ADCPowerOptions() for tinyAVR 2-series, analogSampleDuration() for both tiny 0/1-series and 2-series (separate implementations)
 * Implement ADC error return codes.
 * Document new features. Huge number of tweaks and improvements to the documentation, including large section on the new ADC-related functions. Please read it if you are using the ADC on a 2-series part or want more out of the ADC on a 0/1-series part.
