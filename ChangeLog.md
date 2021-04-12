@@ -5,7 +5,9 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
 ### 2.3.0
-This is the first version planned to have 2-series support. Basics are in the master branch of github. Everything should work, but no testing has ben done oh, and the ADC is totally unsupported.
+* Port analogWrite() to the ADC on the 2-series parts.
+* Implement analogReadEnh, analogReadDiff, ADCPowerOptions, analogSampleDuration for both tiny 0/1-series and 2-series.
+* Implement ADC error return codes.
 * Port the Comparator library. (#208)
 * Move a bunch of hardware-related macros from Arduino.h the new core_parts.h. These are things that individual users are unlikely to need to reference, (certainly not as likely as Even aside from ADC stuff, I am 100% certain that there are bugs in this core on 2-series parts... Y'all need to find them!)
 * Correct large number of tone() bugs. Tone could leave the pin high. A high pitch and long duration could result in much shorter tones than intended. Frequency of 0 would leave the timer running and generating interrupts in the background for the requested duration (now it stops output if it's on the current pin, otherwise does nothing). while doing nothing. No attempt was made to handle invalid pins: it would get null pointer to port struct.... and proceed to use it without testing if it was valid, or if the bitmask was valid. Now we test for valid bitmask before requesting the port struct. Frequencies over 32768 would overflow an intermediate when called with duration and the duration would be very short. Long durations can also overflow the intermediate. The intermediate is found as `2 * frequency * duration` and both multiplications can overflow (first one is as unsigned int, second as signed long.) Since the result is divided by 1000, remove 2* and change to /500 doubled the limit and removed the problem above 32768 Hz. If SUPPORT_LONG_TONES is defined as 1, then we will take additional steps to support tones longer than a minute; otherwise, when (frequency * duration) > 2^32, it'll overflow, and duratio nwill be way short. If not specified as 0 or 1 (no existing board definition does), this defaults to 1 for any part with more than 8k of flash, as it adds 106 bytes to compiled binary and very few people want to make use of that.
@@ -28,7 +30,7 @@ This is the first version planned to have 2-series support. Basics are in the ma
   * `SUPPORT_LONG_TONES` - This is 1 if the above mentioned long tones are supported.
   * `CORE_HAS_ANALOG_ENH` - This is 1 if the enhanced version of analogRead is available, with automatic oversampling and decimation to extend resolution to 13 or 17 bits (0/1 and 2-series respectively)
   * `CORE_HAS_ANALOG_DIFF` - This is 1 if the differential analogRead is available. It has same features as enhanced, except that it takes a differential measurement.
-  * `MAX_OVERSAMPLED_RESOLUTION` - This is the maximum resolution obtainable via oversampling and decimation using those functions.
+  * `ADC_MAX_OVERSAMPLED_RESOLUTION` - This is the maximum resolution obtainable via oversampling and decimation using those functions.
   * `ADC_MAXIMUM_GAIN` -
 
 ## Released Versions
