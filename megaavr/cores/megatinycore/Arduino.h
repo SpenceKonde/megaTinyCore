@@ -130,9 +130,9 @@ extern "C" {
  * analogRead should never return a negative. Neither should analogReadEnh
  * but I decided to have only 2 sets of ADC errors, not three.  */
 
-#define ADC_ERROR_BAD_PIN_OR_CHANNEL           -1
-#define ADC_ERROR_BUSY                         -2
-
+#define ADC_ERROR_BAD_PIN_OR_CHANNEL                -32765
+#define ADC_ERROR_DISABLED                          -32767
+#define ADC_ERROR_BUSY                              -32766
 #define ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL       -2100000000
 // positive channel is not (0x80 | valid_channel) nor a digital pin number
 // referring to a pin with analog input.
@@ -156,6 +156,8 @@ extern "C" {
 #define ADC_ENH_ERROR_NOT_DIFF_ADC             -2100000006
 // analogReadDiff() called from a part without a differential ADC;
 // Never actually returned, because we give compile error here
+#define ADC_ENH_ERROR_DISABLED                 -2100000007
+// The ADC is not currently enabled.
 
 
 

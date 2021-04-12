@@ -25,11 +25,11 @@
 #include <Arduino.h>
 /* The Wire library unfortunately needs TWO buffers, one for TX, and one for RX. That means, multiply these
  * values by 2 to get the actual amount of RAM they take. You can see that on the smallest ram sizes, all but
- * the miniscule buffer we provide becomes prohibitive. A mere 16 bit buffer, times 2, is 25% of total RAM on
+ * the minuscule buffer we provide becomes prohibitive. A mere 16 bit buffer, times 2, is 25% of total RAM on
  * a 2k part with only 128b of RAM. Same goes for 32b on 4k 0/1-series... 32b is kind of a magic number though
  * because it's used on the stock uno/etc cores, which sort of sets an expectation, libraries rely on it and
  * so on... It ofc isn't viable with only 128b RAM, but the Wire library ah, isn't really viable with  2k of
- * flash anyway - you are basically garanteed not to be happy with the results it would appear! At least not
+ * flash anyway - you are basically guaranteed not to be happy with the results it would appear! At least not
  * without considerable amounts of serious optimization work on this library, which would be hard to do
  * without breaking compatibility with the Arduino API - and you all know my dedication to that! */
 
