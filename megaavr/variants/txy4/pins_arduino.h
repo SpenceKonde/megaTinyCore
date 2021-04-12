@@ -127,7 +127,7 @@
 #define PIN_PA3        (10)
 
 #if MEGATINYCORE_SERIES != 2
-#define PIN_A0         (A0)
+  #define PIN_A0         (A0)
 #endif
 #define PIN_A1         (A1)
 #define PIN_A2         (A2)
@@ -141,7 +141,7 @@
 
 
 #if MEGATINYCORE_SERIES != 2
-static const uint8_t    A0  = PIN_PA0;
+  static const uint8_t    A0  = PIN_PA0;
 #endif
 static const uint8_t    A1  = PIN_PA1;
 static const uint8_t    A2  = PIN_PA2;
