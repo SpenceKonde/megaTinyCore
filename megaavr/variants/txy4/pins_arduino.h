@@ -26,51 +26,60 @@
 #include <avr/pgmspace.h>
 #include "timers.h"
 
-#define NUM_DIGITAL_PINS            12 //
-#define NUM_ANALOG_INPUTS           9
-#define NUM_I2C_PINS                2 // (SDA / SCL)
-#define NUM_SPI_PINS                3 // (MISO / MOSI / SCK)
-#define NUM_TOTAL_FREE_PINS         (NUM_DIGITAL_PINS)
-#define NUM_TOTAL_PINS              (NUM_DIGITAL_PINS)
+#define NUM_DIGITAL_PINS              (12)
+/* Yes, this is actually three more than we have, but the way this is used by the core means that it actually needs to be (highest mux channel for a pin +1) */
+#define NUM_ANALOG_INPUTS             (12)
+#define NUM_I2C_PINS                  (2) // (SDA / SCL)
+#define NUM_SPI_PINS                  (3) // (MISO / MOSI / SCK)
+#define NUM_TOTAL_FREE_PINS           (NUM_DIGITAL_PINS)
+#define NUM_TOTAL_PINS                (NUM_DIGITAL_PINS)
 
-#define EXTERNAL_NUM_INTERRUPTS     12
+#define EXTERNAL_NUM_INTERRUPTS       (12)
 
-#define digitalPinHasPWM(p)         ((p) == PIN_PA4 || (p) == PIN_PA5 || (p) == PIN_PB2 || (p) == PIN_PB1 || (p) == PIN_PB0 || (p) == PIN_PA3)
+#define digitalPinHasPWM(p)           ((p) == PIN_PA4 || (p) == PIN_PA5 || (p) == PIN_PB2 || (p) == PIN_PB1 || (p) == PIN_PB0 || (p) == PIN_PA3)
 
-#define PIN_SPI_SS                    (PIN_PA0)
-#define PIN_SPI_MOSI                  (PIN_PA1)
-#define PIN_SPI_MISO                  (PIN_PA2)
-#define PIN_SPI_SCK                   (PIN_PA3)
 
-#define SPI_INTERFACES_COUNT  1
+#if MEGATINYCORE_SERIES != 2
+  #define digitalPinToAnalogInput(p)  (((p) < 4) ? ((p) + 4) : ((p) == 11 ? 0 : (((p) > 7 && (p) < 11) ? ((p) - 7) : (((p) == 6) ? 10 : ((p) == 7 ? 11 : NOT_A_PIN)))))
+#else
+  /* 2-series MUX tabel says ADC channel 0 is tied to ground, not PA0 */
+  #define digitalPinToAnalogInput(p)  (((p) < 4) ? ((p) + 4) : (((p) > 7 && (p) < 11) ? ((p) - 7) : (((p) == 6) ? 10 : ((p) == 7 ? 11 : NOT_A_PIN))))
+#endif
+
+#define PIN_SPI_SS                      (PIN_PA0)
+#define PIN_SPI_MOSI                    (PIN_PA1)
+#define PIN_SPI_MISO                    (PIN_PA2)
+#define PIN_SPI_SCK                     (PIN_PA3)
+
+#define SPI_INTERFACES_COUNT            (1)
 
 #ifdef PORTMUX_TWI0_bm
-  #define PIN_WIRE_SDA_PINSWAP_1      (PIN_PA1)
-  #define PIN_WIRE_SCL_PINSWAP_1      (PIN_PA2)
+  #define PIN_WIRE_SDA_PINSWAP_1        (PIN_PA1)
+  #define PIN_WIRE_SCL_PINSWAP_1        (PIN_PA2)
 #endif
-#define PIN_WIRE_SDA                  (PIN_PB1)
-#define PIN_WIRE_SCL                  (PIN_PB0)
+#define PIN_WIRE_SDA                    (PIN_PB1)
+#define PIN_WIRE_SCL                    (PIN_PB0)
 
 // Mapped to HWSERIAL0 in Serial library
-#define HWSERIAL0                     (&USART0)
-#define HWSERIAL0_DRE_VECTOR          (USART0_DRE_vect)
-#define HWSERIAL0_DRE_VECTOR_NUM      (USART0_DRE_vect_num)
-#define HWSERIAL0_RXC_VECTOR          (USART0_RXC_vect)
-#define HWSERIAL0_RXC_VECTOR_NUM      (USART0_RXC_vect_num)
-#define HWSERIAL0_TXC_VECTOR          (USART0_TXC_vect)
-#define HWSERIAL0_TXC_VECTOR_NUM      (USART0_TXC_vect_num)
+#define HWSERIAL0                       (&USART0)
+#define HWSERIAL0_DRE_VECTOR            (USART0_DRE_vect)
+#define HWSERIAL0_DRE_VECTOR_NUM        (USART0_DRE_vect_num)
+#define HWSERIAL0_RXC_VECTOR            (USART0_RXC_vect)
+#define HWSERIAL0_RXC_VECTOR_NUM        (USART0_RXC_vect_num)
+#define HWSERIAL0_TXC_VECTOR            (USART0_TXC_vect)
+#define HWSERIAL0_TXC_VECTOR_NUM        (USART0_TXC_vect_num)
 
-#define HWSERIAL0_MUX                 0x00
-#define PIN_HWSERIAL0_TX              (PIN_PB2)
-#define PIN_HWSERIAL0_RX              (PIN_PB3)
-#define PIN_HWSERIAL0_XCK             (PIN_PB1)
-#define PIN_HWSERIAL0_XDIR            (PIN_PB0)
+#define HWSERIAL0_MUX                   (0x00)
+#define PIN_HWSERIAL0_TX                (PIN_PB2)
+#define PIN_HWSERIAL0_RX                (PIN_PB3)
+#define PIN_HWSERIAL0_XCK               (PIN_PB1)
+#define PIN_HWSERIAL0_XDIR              (PIN_PB0)
 
-#define HWSERIAL0_MUX_PINSWAP_1       0x01
-#define PIN_HWSERIAL0_TX_PINSWAP_1    (PIN_PA1)
-#define PIN_HWSERIAL0_RX_PINSWAP_1    (PIN_PA2)
-#define PIN_HWSERIAL0_XCK_PINSWAP_1   (PIN_PA3)
-#define PIN_HWSERIAL0_XDIR_PINSWAP_1  (PIN_PA4)
+#define HWSERIAL0_MUX_PINSWAP_1         (0x01)
+#define PIN_HWSERIAL0_TX_PINSWAP_1      (PIN_PA1)
+#define PIN_HWSERIAL0_RX_PINSWAP_1      (PIN_PA2)
+#define PIN_HWSERIAL0_XCK_PINSWAP_1     (PIN_PA3)
+#define PIN_HWSERIAL0_XDIR_PINSWAP_1    (PIN_PA4)
 
 #if defined(USART1)
   // Mapped to HWSERIAL1 in Serial library
@@ -81,13 +90,13 @@
   #define HWSERIAL1_RXC_VECTOR_NUM      (USART1_RXC_vect_num)
   #define HWSERIAL1_TXC_VECTOR          (USART1_TXC_vect)
   #define HWSERIAL1_TXC_VECTOR_NUM      (USART1_TXC_vect_num)
-  #define HWSERIAL1_MUX                 0x00
+  #define HWSERIAL1_MUX                 (0x00)
   #define PIN_HWSERIAL1_TX              (PIN_PA1)
   #define PIN_HWSERIAL1_RX              (PIN_PA2)
   #define PIN_HWSERIAL1_XCK             (PIN_PA3)
   #define PIN_HWSERIAL1_XDIR            (PIN_PA4)
 
-  #define HWSERIAL1_MUX_PINSWAP_1       0x01
+  #define HWSERIAL1_MUX_PINSWAP_1       (0x01)
   #define PIN_HWSERIAL1_TX_PINSWAP_1    (PIN_PA1)
   #define PIN_HWSERIAL1_RX_PINSWAP_1    (PIN_PA2)
   #define PIN_HWSERIAL1_XCK_PINSWAP_1   (PIN_PA3)
@@ -102,6 +111,8 @@
   #define LED_BUILTIN    (PIN_PA7)
 #endif
 
+#define PINS_COUNT     (12u)
+
 #define PIN_PA4        (0)
 #define PIN_PA5        (1)
 #define PIN_PA6        (2)
@@ -115,10 +126,12 @@
 #define PIN_PA2        (9)
 #define PIN_PA3        (10)
 
+#if MEGATINYCORE_SERIES != 2
 #define PIN_A0         (A0)
+#endif
 #define PIN_A1         (A1)
 #define PIN_A2         (A2)
-#define PIN_A          (A3)
+#define PIN_A3         (A3)
 #define PIN_A4         (A4)
 #define PIN_A5         (A5)
 #define PIN_A6         (A6)
@@ -126,7 +139,10 @@
 #define PIN_A10        (A10)
 #define PIN_A11        (A11)
 
+
+#if MEGATINYCORE_SERIES != 2
 static const uint8_t    A0  = PIN_PA0;
+#endif
 static const uint8_t    A1  = PIN_PA1;
 static const uint8_t    A2  = PIN_PA2;
 static const uint8_t    A3  = PIN_PA3;
@@ -137,7 +153,6 @@ static const uint8_t    A7  = PIN_PA7;
 static const uint8_t    A10 = PIN_PB1;
 static const uint8_t    A11 = PIN_PB0;
 
-#define PINS_COUNT    (12u)
 
 #ifdef ARDUINO_MAIN
 
@@ -257,8 +272,6 @@ const uint8_t digital_pin_to_timer[] = {
 };
 
 #endif
-
-#define digitalPinToAnalogInput(p)      ((p<4)?(p+4):(p==11?0:((p>7 && p<11)?(p-7):((p==6)?10:(p==7?11:NOT_A_PIN)))))
 
 
 // These serial port names are intended to allow libraries and architecture-neutral
