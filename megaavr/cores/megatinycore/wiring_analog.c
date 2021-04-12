@@ -278,13 +278,14 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
  *    channels is more limited.
  *
  ****************************************************************************/
-#define SINGLE_ENDED 254
+
 
 #if MEGATINYCORE_SERIES == 2
 
   /*****************************************************
-  START 0/1-series analogRead/analogReadXxxx functions
+  START 2-series analogRead/analogReadXxxx functions
   *****************************************************/
+  #define SINGLE_ENDED 254
 
   void analogReference(uint8_t mode) {
     check_valid_analog_ref(mode);
@@ -314,6 +315,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     #endif
       return ADC_ERROR_BAD_PIN_OR_CHANNEL;
     }
+    if (!ADC0.CTRLA & 0x01) return ADC_ERROR_DISABLED;
 
     if (ADC0.COMMAND & ADC_START_gm) return ADC_ERROR_BUSY;
     // gotta be careful here - don't want to shit ongoing conversion - unlikle classic AVRs
@@ -384,14 +386,15 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
 
 
   int32_t _analogReadEnh(uint8_t pin, uint8_t neg, uint8_t res, uint8_t gain) {
-
+    if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
     uint8_t sampnum;
-    if (res & 0x80) { //raw accumulation
+    if (res > 0x80) { //raw accumulation
       sampnum=res & 0x7F;
       if (sampnum > 10) return ADC_ENH_ERROR_RES_TOO_HIGH;
     } else {
       if (res < ADC_NATIVE_RESOLUTION_LOW) return ADC_ENH_ERROR_RES_TOO_LOW;
       if (res > 17) return ADC_ENH_ERROR_RES_TOO_HIGH;
+      sampnum = (res > ADC_NATIVE_RESOLUTION ? ((res - ADC_NATIVE_RESOLUTION) << 1) : 0);
     }
 
     if (pin < 0x80) {
@@ -428,7 +431,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     }
     pin &= 0x3F;
 
-    if (ADC0.COMMAND & ADC_START_gm) return ADC_ERROR_BUSY;
+    if (ADC0.COMMAND & ADC_START_gm) return ADC_ENH_ERROR_BUSY;
     if (gain !=0) {
       uint8_t gainbits =0;
       while (gain > 1) {
@@ -442,13 +445,14 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     if (neg != SINGLE_ENDED) {
       ADC0.MUXNEG = (gain ? ADC_VIA_PGA_gc:0) | neg;
     }
-    if (res > 0x80) {
+    //if (res & 0x80) {
       ADC0.CTRLF = sampnum;
+    /*
     } else if (res > ADC_NATIVE_RESOLUTION) {
       ADC0.CTRLF = 2 * (res - ADC_NATIVE_RESOLUTION);
     } else {
       ADC0.CTRLF = 0;
-    }
+    } */
     uint8_t command = ((neg != SINGLE_ENDED)?0x80:0) | ((res == 8) ? ADC_MODE_SINGLE_8BIT_gc : (res > ADC_NATIVE_RESOLUTION ? ADC_MODE_BURST_gc : ADC_MODE_SINGLE_12BIT_gc)) | 1;
     ADC0.COMMAND=command;
     while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
@@ -545,6 +549,7 @@ void analogReference(uint8_t mode) {
         return ADC_ERROR_BAD_PIN_OR_CHANNEL;
       }
     #endif
+    if (!ADC0.CTRLA & 0x01) return ADC_ERROR_DISABLED;
     pin &= 0x1F;
     /* Reference should be already set up */
     /* Select channel */
@@ -585,6 +590,7 @@ void analogReference(uint8_t mode) {
 
 
   int32_t analogReadEnh(uint8_t pin, uint8_t res, uint8_t gain) {
+    if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
     check_valid_enh_res(res);
     check_valid_analog_pin(pin);
     if (__builtin_constant_p(gain)){
@@ -598,6 +604,7 @@ void analogReference(uint8_t mode) {
     } else {
       if (res < ADC_NATIVE_RESOLUTION_LOW) return ADC_ENH_ERROR_RES_TOO_LOW;
       if (res > 13) return ADC_ENH_ERROR_RES_TOO_HIGH;
+      sampnum = (res > ADC_NATIVE_RESOLUTION ? ((res - ADC_NATIVE_RESOLUTION) << 1) : 0)
     }
     if (pin < 0x80) {
       // If high bit set, it's a channel, otherwise it's a digital pin so we look it up..
@@ -617,14 +624,14 @@ void analogReference(uint8_t mode) {
 
     uint8_t _ctrla = ADC0.CTRLA;
     ADC0.CTRLA = ADC_ENABLE_bm | (res == ADC_NATIVE_RESOLUTION_LOW ? ADC_RESSEL_bm : 0);
-    if (res > 0x80) {
+    //if (res > 0x80) {
       ADC0.CTRLB = sampnum;
-    } else
+    /*} else
     if (res > ADC_NATIVE_RESOLUTION) {
       ADC0.CTRLB = 2 * (res - ADC_NATIVE_RESOLUTION);
     } else {
       ADC0.CTRLB = 0;
-    }
+    }*/
 
     ADC0.COMMAND = ADC_STCONV_bm;
     while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
