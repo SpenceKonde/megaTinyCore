@@ -296,6 +296,8 @@
   #define ADC_MAXIMUM_GAIN 16
   // Maximum burst accumulation
   #define ADC_MAXIMUM_ACCUMULATE 1024
+  // Maximum resolution obtainable by using maximum accumulate option and decimating that.
+  #define ADC_MAX_OVERSAMPLED_RESOLUTION 17
   // Maximum SAMPLEN or SAMPDUR
   #define ADC_MAXIMUM_SAMPDUR 0xFF
   // ADC Result Size (bits)
@@ -309,6 +311,8 @@
   #define ADC_MAXIMUM_GAIN 0
   // Maximum burst accumulation
   #define ADC_MAXIMUM_ACCUMULATE 64
+  // Maximum resolution obtainable by using maximum accumulate option and decimating that.
+  #define ADC_MAX_OVERSAMPLED_RESOLUTION 13
   // Maximum SAMPLEN or SAMPDUR
   #define ADC_MAXIMUM_SAMPDUR 0x1F
   // ADC Result Size (bits)
