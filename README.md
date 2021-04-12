@@ -3,15 +3,17 @@ Let's use that - it's better than gitter ever was, and it's all on one site.
 
 ## A 2.3.0 version with full functionality is ~DANGEROUSLY CLOSE~ HERE!
 
-Warning: 2.3.0 had changes here, there and everywhere to support one the second most complicated peripheral* in the entirety of the Arduino-compatible AVR product line, a peripheral which has only been available on the brand new tinyAVR 2-series parts which first shipped less than 2 months ago. Users who are relatively inexperienced with Arduino and/or who are not comfortable reporting bugs using Github Issues should stick with megaTinyCore 2.2.9.
+Warning: 2.3.0 had changes here, there and everywhere to support one the second most complicated peripheral* in the entirety of the Arduino-compatible AVR product line, a peripheral which is only available on the brand new tinyAVR 2-series parts which first shipped less than 2 months ago. Users who are relatively inexperienced with Arduino and/or who are not comfortable reporting bugs using Github Issues should stick with megaTinyCore 2.2.9. There are sure to be things that don't work here.
 
-* First place it
+* First place is the type D timer. The ADC - technically speaking, is certainly far more complicated, but it's operation is as bizarely counterintuitive as TCD9,
 
 ### [Wiring](Wiring.md)
 ### [Installation](Installation.md)
 
 # megaTinyCore
-Arduino core for the tinyAVR 0-series and 1-series chips. These parts have an improved architecture, with improved peripherals and improved execution time for certain instructions (similar to megaAVR 0-series chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. Moreover, these parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini!) run just over $1 USD, and under $.90 in quantity - less than many 8k classic AVR ATtiny parts (AVR instruction set, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal and the internal oscillator is accurate enough for UART communication.
+Arduino core for the tinyAVR 0-series, 1-series, and now 2-series chips. These parts have an improved architecture, with improved peripherals and improved execution time for certain instructions (similar to megaAVR 0-series chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. The 2-series, which has just started to show up on the market, offers a greatly improved 12-bit differential ADC with programmable gain amplifier, a second UART, more RAM, CCL blocks (but no async timner or DAC).
+
+Moreover, the 0/1/2-series parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini) run just over $1 USD, and under $.90 in quantity - less than many 8k classic AVR ATtiny parts (AVR instruction set, at a PIC price). All of these parts will run at 20MHz (at 5v) without an external crystal and the internal oscillator is accurate enough for UART communication.
 
 These use a UPDI programming, not traditional ISP like the classic ATtiny parts did. See below for more information.
 
