@@ -50,7 +50,12 @@ inline __attribute__((always_inline)) void check_valid_analog_pin(pin_size_t pin
     #endif
     {   // above cases cover valid *special channels - opening brace of whichever
       if (pin & 0x80) {
-        if ((pin & 0x79) > NUM_ANALOG_INPUTS) {
+        #if MEGATINYCORE_SERIES == 2
+          if ((pin & 0x7F) >= NUM_ANALOG_INPUTS /* || pin != 0x80 */)  // channel 0 is not connected to PA0 - but let's not block it just yet, if it's actually tied to ground, could it be helpful for offset cal?
+        #else
+          if ((pin & 0x7F) >= NUM_ANALOG_INPUTS)
+        #endif
+        {
           badArg("analogRead called with constant channel that is neither valid analog channel nor valid pin");
         }
       } else {
@@ -129,6 +134,7 @@ inline __attribute__((always_inline)) void check_valid_resolution(uint8_t res) {
 #endif
 
 inline bool analogReadResolution(uint8_t res) {
+  check_valid_resolution(res);
   #if MEGATINYCORE_SERIES == 2
     bool temp = (res == 8 || res == 10 || res == 12);
     _analog_options = (_analog_options & 0xF0) | (temp ? res : 10); //just set that variable, setting the bit is awkward.
