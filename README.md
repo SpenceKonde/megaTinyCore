@@ -263,7 +263,7 @@ In addition to reading from pins, you can read from a number of internal sources
 | tinyAVR 0/1-series                     | tinyAVR 2-series                    |
 |----------------------------------------|-------------------------------------|
 | `ADC_INTREF`                           | `ADC_VDDDIV10`                      |
-| `ADC_TEMPERATURE`                      | `ADC_TEMPERATUIRE`                  |
+| `ADC_TEMPERATURE`                      | `ADC_TEMPERATURE`                   |
 | `ADC_DAC0` (1-series only)             | `ADC_GROUND` (offset calibration?)  |
 | `ADC_GROUND` (offset calibration?)     | `ADC_DACREF0*`                      |
 | `ADC_DACREF0` (alias of ADC_DAC0)      | `ADC_DAC0` (alias of `ADC_DACREF0`) |
