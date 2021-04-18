@@ -56,8 +56,11 @@
                        the multiplication if the duration was long enough to start worrying about. But I
                        decided not to enable by default, it is SUPPORT_LONG_TONES - if defined and 1,
                        when duration is over 2^16, we split that line into (frequency/5) * (duration/100)
-
                        This version was developed for DxCore 1.3.3 and megaTinyCore 2.3.0
+1.3.6                   4/17/21 Fixed bug that would break compilation of all sketches if
+                       TCB0 was used for millis on partss without a TCB1. Now, we intentionally break
+                       the compilation only if the user code actually calls tone() or noTone()
+                       This version was developed for DxCore 1.3.6 and megaTinyCore 2.3.2
   *************************************************/
 
 #include <avr/interrupt.h>
@@ -71,39 +74,45 @@
 #define AVAILABLE_TONE_PINS 1
 
 #if defined(MILLIS_USE_TIMERB0)
-  #define USE_TIMERB1
+  #if defined(TCB1)
+    #define USE_TIMERB1
+  #else
+    #define TONE_UNAVAILABLE
+  #endif
 #else
   #define USE_TIMERB0
 #endif
 
-static volatile TCB_t* _timer =
-#if defined(USE_TIMERB0)
-&TCB0;
+#ifndef TONE_UNAVAILABLE
+  static volatile TCB_t* _timer =
+  #if defined(USE_TIMERB0)
+  &TCB0;
+  #endif
+  #if defined(USE_TIMERB1)
+  &TCB1;
+  #endif
+
+  volatile uint8_t _pin = NOT_A_PIN;
+  // timerx_toggle_count:
+  //  > 0 - duration specified
+  //  = 0 - stopped
+  //  < 0 - infinitely (until stop() method called, or new play() called)
+
+  volatile long timer_toggle_count;
+  volatile uint8_t *timer_outtgl_reg;
+  static uint8_t timer_bit_mask;
+  uint8_t timer_cycle_per_tgl;
+  uint8_t timer_cycle_per_tgl_count;
+
+  // helper functions
+  static void disableTimer();
 #endif
-#if defined(USE_TIMERB1)
-&TCB1;
-#endif
-
-volatile uint8_t _pin = NOT_A_PIN;
-// timerx_toggle_count:
-//  > 0 - duration specified
-//  = 0 - stopped
-//  < 0 - infinitely (until stop() method called, or new play() called)
-
-volatile long timer_toggle_count;
-volatile uint8_t *timer_outtgl_reg;
-static uint8_t timer_bit_mask;
-uint8_t timer_cycle_per_tgl;
-uint8_t timer_cycle_per_tgl_count;
-
-// helper functions
-static void disableTimer();
-
 
 
 // frequency (in hertz) and duration (in milliseconds).
-void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
-{
+#ifndef TONE_UNAVAILABLE
+  void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
+  {
     long toggle_count = 0;
     uint32_t compare_val = 0;
 
@@ -204,11 +213,18 @@ void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
     _timer->CTRLA |= TCB_ENABLE_bm;
      // Enable interrupts
     SREG = oldSREG;
-}
+  }
+#else
+  void tone(__attribute__ ((unused)) uint8_t pin, __attribute__ ((unused)) unsigned int frequency, __attribute__ ((unused)) unsigned long duration)
+  {
+    badCall("TCB0 used for millis, no other TCBs on this part; tone requires exclusive use of a type B timer, use a differemt millis timer or a tinyAVR with a second TCB (any 2-series, or 1-series with 16k+ flash)");
+  }
+#endif
 
 // pin which currently is being used for a tone
+#ifndef TONE_UNAVAILABLE
 void noTone(uint8_t pin)
-{
+  {
     if (pin == _pin) {
         timer_toggle_count = 0;
         //disableTimer();
@@ -216,22 +232,28 @@ void noTone(uint8_t pin)
          *(timer_outtgl_reg-6) = timer_bit_mask; // drive pin low
         _pin = NOT_A_PIN;
     }
-}
+  }
+#else
+void noTone(__attribute__ ((unused)) uint8_t pin)
+  {
+    badCall("TCB0 used for millis, no other TCBs on this part; tone requires exclusive use of a type B timer, use a differemt millis timer or a tinyAVR with a second TCB (any 2-series, or 1-series with 16k+ flash)");
+  }
+#endif
 
 // helper function for noTone()
 /* Works for all timers -- the timer being disabled will go back to the
-    configuration it had to output PWM for analogWrite() */
+    configuration it had on startup */
+#ifndef TONE_UNAVAILABLE
 static void disableTimer()
 {
-    // Reinit back to producing PWM -- timer will be type B
-    // Disable interrupt
-    _timer->INTCTRL = 0;
-    // Disable timer
-    _timer->CTRLA = 0;
-    _pin=NOT_A_PIN;
-
-#if 0
-    // RESTORE PWM FUNCTIONALITY:
+  // Reinit back to producing PWM -- timer will be type B
+  // Disable interrupt
+  _timer->INTCTRL = 0;
+  // Disable timer
+  _timer->CTRLA = 0;
+  _pin=NOT_A_PIN;
+  #if 0
+    // RESTORE PWM FUNCTIONALITY, for use with cores that use the TCBs for PWM.
     /* 8 bit PWM mode, but do not enable output yet, will do in analogWrite() */
     _timer->CTRLB = (TCB_CNTMODE_PWM8_gc);
     /* Assign 8-bit period */
@@ -241,29 +263,32 @@ static void disableTimer()
     /* Use TCA clock (250kHz) and enable */
     /* (sync update commented out, might try to synchronize later */
     _timer->CTRLA = (TCB_CLKSEL_CLKTCA_gc) | (TCB_ENABLE_bm);
-#endif
-}
-
-
-#if defined USE_TIMERB0
-ISR(TCB0_INT_vect)
-#elif defined USE_TIMERB1
-ISR(TCB1_INT_vect)
-#endif
-{
-  if(!(--timer_cycle_per_tgl_count)) //Are we ready to toggle? pre-decrement, then see if 0 or more
-  {
-    timer_cycle_per_tgl_count=timer_cycle_per_tgl;
-    // toggle the pin
-    *timer_outtgl_reg = timer_bit_mask; //toggle the pin
-
-    if (timer_toggle_count > 0){  //if duration was specified, decrement toggle count.
-        timer_toggle_count--;
-    } else if (timer_toggle_count == 0) {    // If toggle count = 0, stop
-      *(timer_outtgl_reg-1) = timer_bit_mask; // this gives us the corresponding OUTCLR reg
-      disableTimer();
-    } //otherwise timer_toggle_count wasn't supplied, go on until noTone() called
+  #endif
   }
-  /* Clear flag */
-  _timer->INTFLAGS = TCB_CAPT_bm;
-}
+#endif
+
+
+#ifndef TONE_UNAVAILABLE
+  #if defined USE_TIMERB0
+  ISR(TCB0_INT_vect)
+  #elif defined USE_TIMERB1
+  ISR(TCB1_INT_vect)
+  #endif
+  {
+    if(!(--timer_cycle_per_tgl_count)) //Are we ready to toggle? pre-decrement, then see if 0 or more
+    {
+      timer_cycle_per_tgl_count=timer_cycle_per_tgl;
+      // toggle the pin
+      *timer_outtgl_reg = timer_bit_mask; //toggle the pin
+
+      if (timer_toggle_count > 0){  //if duration was specified, decrement toggle count.
+          timer_toggle_count--;
+      } else if (timer_toggle_count == 0) {    // If toggle count = 0, stop
+        *(timer_outtgl_reg-1) = timer_bit_mask; // this gives us the corresponding OUTCLR reg
+        disableTimer();
+      } //otherwise timer_toggle_count wasn't supplied, go on until noTone() called
+    }
+    /* Clear flag */
+    _timer->INTFLAGS = TCB_CAPT_bm;
+  }
+#endif
