@@ -4,6 +4,18 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
+### Planned for 2.3.2
+* Expand Keywords.txt to include register names! (#386)
+* Add @MCUDude's Flash.h library (not the same as the DxCore library of same name and big-picture function) (#159)
+* Correct issue with compilation when using TCB0 as millis timing source on parts without TCB1 (#394)
+
+
+
+## Released Versions
+
+### 2.3.1
+* Rerelease to address toolchain bug. No code changes.
+
 ### 2.3.0
 * Port analogWrite() to the ADC on the 2-series parts.
 * Implement analogReadEnh(), for both tiny 0/1-series (suitable for porting to DxCore) and 2-series (suitable for porting to future EA-series core)
