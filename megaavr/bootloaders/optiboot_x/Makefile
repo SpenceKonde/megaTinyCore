@@ -85,7 +85,7 @@ endif
 
 # If we have a PACKS directory specified, we should use it...
 ifdef PACKS
-PACK_OPT= -I $(PACKS)/include/ -B $(PACKS)/gcc/dev/$*
+PACK_OPT= -I $(PACKS)/include/ -B $(PACKS)/gcc/dev/$(TARGET)
 ifndef PRODUCTION
 $(info   and Chip-defining PACKS at ${PACKS})
 endif
