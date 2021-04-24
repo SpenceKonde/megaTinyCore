@@ -3,7 +3,7 @@ Two libraries are used to interface with the "write-to-flash" functionality the 
 
 
 ## Flash()
-Class constructor for interfacing with the "write-to-flash" functionality.  
+Class constructor for interfacing with the "write-to-flash" functionality.
 For arguments has to be present. A reference to the allocated flash space array, the size of the allocated space, a RAM buffer, and its size.
 
 ##### Usage:
@@ -110,7 +110,7 @@ flash.fetch_page(1); // Fetch flash page 1
 
 
 ## fetch_data()
-Fetches a given amount of data from flash. Note that the start and stop address is relative to the start of the flash space array. 
+Fetches a given amount of data from flash. Note that the start and stop address is relative to the start of the flash space array.
 This means that  The span can't be larger than the size of the RAM buffer.
 
 ##### Usage:

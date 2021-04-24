@@ -47,22 +47,19 @@ const uint8_t flashSpace[SPM_PAGESIZE * NUMBER_OF_PAGES] __attribute__ (( aligne
 };
 
 
-void setup()
-{
+void setup() {
   delay(1000);
   // Initialize serial
   Serial.begin(9600);
 
-  if(!optiboot_check_writable())
-  {
+  if(!optiboot_check_writable()) {
     Serial.println("Incompatible or no bootloader present! Please burn the correct bootloader");
     while(1);
   }
 }
 
 
-void loop()
-{
+void loop() {
   // Print main menu
   Serial.println();
   Serial.println("|------------------------------------------------|");
@@ -91,8 +88,7 @@ void loop()
   static char returnToMenu;
 
   // Get menu option from the serial monitor
-  do
-  {
+  do {
     while(!Serial.available());
     menuOption = Serial.read();
     if(menuOption != '1' && menuOption != '2')
@@ -107,8 +103,7 @@ void loop()
 
 
   // Read flash option selected
-  if(menuOption == '1')
-  {
+  if(menuOption == '1') {
     Serial.print("Which page number do you want to read? Page 0 to ");
     Serial.print(NUMBER_OF_PAGES - 1);
     Serial.print(", Page ");
@@ -116,12 +111,10 @@ void loop()
     Serial.print(" to show all pages: ");
 
     //Get page number from the serial monitor
-    do
-    {
+    do {
       while(!Serial.available());
       pageNumber = Serial.read() - 0x30;
-      if(pageNumber > NUMBER_OF_PAGES)
-      {
+      if(pageNumber > NUMBER_OF_PAGES) {
         Serial.print("\nPlease enter a valid page between 0 and ");
         Serial.print(NUMBER_OF_PAGES - 1);
         Serial.println(". The number of pages can be extended by changing NUMBER_OF_PAGES constant");
@@ -140,20 +133,17 @@ void loop()
     uint8_t pageFirst = 0;
     uint8_t pageLast = NUMBER_OF_PAGES;
 
-    if(pageNumber != NUMBER_OF_PAGES)
-    {
+    if(pageNumber != NUMBER_OF_PAGES) {
       pageFirst = pageNumber;
       pageLast = pageNumber;
     }
 
-    for(uint8_t page = pageFirst; page < pageLast; page++)
-    {
+    for(uint8_t page = pageFirst; page < pageLast; page++) {
       optiboot_readPage(flashSpace, ramBuffer, page);
       Serial.print("Page ");
       Serial.print(page);
       Serial.print(": ");
-      for(uint16_t i = 0; i < sizeof(ramBuffer); i++)
-      {
+      for(uint16_t i = 0; i < sizeof(ramBuffer); i++) {
         if(ramBuffer[i] == 0x00 || ramBuffer[i] == 0xff)
           Serial.write('.');
         else
@@ -161,24 +151,16 @@ void loop()
       }
       Serial.println("");
     }
-  }  // End of flash read option
-
-
-
-  // Write flash option selected
-  else if(menuOption == '2')
-  {
+  } else if(menuOption == '2') {
     // Clear pageNumber
     pageNumber = 0xff;
 
     //Get page number from the serial monitor
     Serial.print("\nWhich page do you want to write to? Page: ");
-    do
-    {
+    do {
       while(!Serial.available());
       pageNumber = Serial.read() - 0x30;
-      if(pageNumber > NUMBER_OF_PAGES - 1)
-      {
+      if(pageNumber > NUMBER_OF_PAGES - 1) {
         Serial.print("\nPlease enter a valid page between 0 and ");
         Serial.print(NUMBER_OF_PAGES - 1);
         Serial.println(". The number of pages can be extended by changing NUMBER_OF_PAGES constant");
@@ -198,13 +180,10 @@ void loop()
     // Get all characters from the serial monitor and store it to the ramBuffer
     memset(ramBuffer, 0, sizeof(ramBuffer));
     uint16_t counter = 0;
-    while (counter < SPM_PAGESIZE && charBuffer != terminationChar)
-    {
-      if(Serial.available() > 0)
-      {
+    while (counter < SPM_PAGESIZE && charBuffer != terminationChar) {
+      if(Serial.available() > 0) {
         charBuffer = Serial.read(); // read character from serial
-        if(charBuffer != terminationChar)
-        {
+        if(charBuffer != terminationChar) {
           Serial.write(charBuffer); // echo character back
           ramBuffer[counter] = charBuffer;
           counter++;
@@ -227,8 +206,7 @@ void loop()
 
   //Return to the main menu if 'm' is sent
   Serial.println("\ntype the character 'm' to return to to the main menu");
-  do
-  {
+  do {
     while(!Serial.available());
     returnToMenu = Serial.read();
     if(returnToMenu != 'm')

@@ -4,8 +4,7 @@
 #include <Arduino.h>
 #include <optiboot.h>
 
-class Flash
-{
+class Flash {
   public:
     Flash(const uint8_t *flash_array, const uint16_t flash_array_size, uint8_t *ram_array, const uint16_t ram_array_size = SPM_PAGESIZE);
     #ifdef RAMPZ
@@ -24,8 +23,7 @@ class Flash
     uint8_t& operator[] (int16_t index);
 
     // Template function to 'put' objects in RAM array
-    template <typename T> const T &put(uint16_t idx, const T &t)
-    {
+    template <typename T> const T &put(uint16_t idx, const T &t) {
       const uint8_t *ptr = (const uint8_t*) &t;
       for(uint16_t count = 0; count < sizeof(T); count++)
         _ram_array[idx + count] = *ptr++;
@@ -33,8 +31,7 @@ class Flash
     }
 
     // Template function to 'get' objects from the RAM array
-    template <typename T> T &get(uint16_t idx, T &t)
-    {
+    template <typename T> T &get(uint16_t idx, T &t) {
       uint8_t *ptr = (uint8_t*) &t;
       for(uint16_t count = 0; count < sizeof(T); count++)
         *ptr++ = _ram_array[idx + count];

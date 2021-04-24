@@ -3,13 +3,11 @@
 
 /*
  * The same as do_nvmctrl but with disable/restore interrupts state
- * required to succesfull execution
+ * required to successful execution
  *
  */
-void do_nvmctrl_cli(optiboot_addr_t address, uint8_t command, uint16_t data)
-{
+void do_nvmctrl_cli(optiboot_addr_t address, uint8_t command, uint16_t data) {
   uint8_t sreg_save;
-
   sreg_save = SREG;    // Save old SREG value
   asm volatile("cli"); // Disable interrupts
   do_nvmctrl(address, command, data); // 16 bit address - no problems to pass directly
@@ -25,10 +23,8 @@ void do_nvmctrl_cli(optiboot_addr_t address, uint8_t command, uint16_t data)
  * @return true if compatible bootloader is present
  * @return false if incompatible or no bootloader is present
  */
-bool optiboot_check_writable()
-{
+bool optiboot_check_writable() {
   uint8_t content = pgm_read_byte(0x1FF);
-
   if(content == 9)
     return true;
   else
@@ -41,8 +37,7 @@ bool optiboot_check_writable()
  *
  * @param address flash page start address
  */
-void optiboot_page_erase(optiboot_addr_t address)
-{
+void optiboot_page_erase(optiboot_addr_t address) {
   // Set page by writing to address
   optiboot_page_fill(address, (uint8_t)0xFF);
   do_nvmctrl_cli(0, NVMCTRL_CMD_PAGEERASE_gc, 0); // do actual erase
@@ -60,8 +55,7 @@ void optiboot_page_erase(optiboot_addr_t address)
  * @param address address where to write the 8-bit data
  * @param data data to write
  */
-void optiboot_page_fill(optiboot_addr_t address, uint8_t data)
-{
+void optiboot_page_fill(optiboot_addr_t address, uint8_t data) {
   do_nvmctrl(address, NVMCTRL_CMD_COPY_gc, data);
 }
 
@@ -77,8 +71,7 @@ void optiboot_page_fill(optiboot_addr_t address, uint8_t data)
  * @param address address where to write the 16-bit data
  * @param data data to write
  */
-void optiboot_page_fill(optiboot_addr_t address, uint16_t data)
-{
+void optiboot_page_fill(optiboot_addr_t address, uint16_t data) {
   optiboot_page_fill(address, (uint8_t)(data & 0xFF));
   optiboot_page_fill(++address, (uint8_t)(data >> 8));
 }
@@ -88,8 +81,7 @@ void optiboot_page_fill(optiboot_addr_t address, uint16_t data)
  * @brief Write the temporary, internal buffer to flash
  *
  */
-void optiboot_page_erase_write()
-{
+void optiboot_page_erase_write() {
   do_nvmctrl_cli(0, NVMCTRL_CMD_PAGEERASEWRITE_gc, 0);
 }
 
@@ -99,8 +91,7 @@ void optiboot_page_erase_write()
  *
  * @param address flash page start address
  */
-void optiboot_page_write(optiboot_addr_t address)
-{
+void optiboot_page_write(optiboot_addr_t address) {
   do_nvmctrl_cli(address, NVMCTRL_CMD_PAGEWRITE_gc, 0);
 }
 
@@ -120,10 +111,8 @@ void optiboot_page_write(optiboot_addr_t address)
  * @param start_address the address to start reading from, relative to the flash page number
  * @param stop_address the address where we stop reading, relative to the flash page number
  */
-void optiboot_read(const uint8_t allocated_flash_space[], uint8_t storage_array[], uint16_t page_number, uint16_t start_address, uint16_t stop_address)
-{
-  for(uint16_t j = start_address; j < stop_address; j++)
-  {
+void optiboot_read(const uint8_t allocated_flash_space[], uint8_t storage_array[], uint16_t page_number, uint16_t start_address, uint16_t stop_address) {
+  for(uint16_t j = start_address; j < stop_address; j++) {
     uint8_t read_character = allocated_flash_space[j + SPM_PAGESIZE * (page_number)];
     storage_array[j - start_address] = read_character;
   }
@@ -139,8 +128,7 @@ void optiboot_read(const uint8_t allocated_flash_space[], uint8_t storage_array[
  * @param storage_array the array to store the flash content to
  * @param page_number the flash page number to read from
  */
-void optiboot_readPage(const uint8_t allocated_flash_space[], uint8_t storage_array[], uint16_t page_number)
-{
+void optiboot_readPage(const uint8_t allocated_flash_space[], uint8_t storage_array[], uint16_t page_number) {
   optiboot_read(allocated_flash_space, storage_array, page_number, 0, SPM_PAGESIZE);
 }
 
@@ -154,8 +142,7 @@ void optiboot_readPage(const uint8_t allocated_flash_space[], uint8_t storage_ar
  * @param data_to_store an array that holds the data to store
  * @param page_number the flash page number to write to
  */
-void optiboot_writePage(const uint8_t allocated_flash_space[], uint8_t data_to_store[], uint16_t page_number)
-{
+void optiboot_writePage(const uint8_t allocated_flash_space[], uint8_t data_to_store[], uint16_t page_number) {
   // Copy ram buffer to temporary flash buffer
   for(uint16_t i = 0; i < SPM_PAGESIZE; i++)
     optiboot_page_fill((optiboot_addr_t)&allocated_flash_space[i + SPM_PAGESIZE * page_number], data_to_store[i]);

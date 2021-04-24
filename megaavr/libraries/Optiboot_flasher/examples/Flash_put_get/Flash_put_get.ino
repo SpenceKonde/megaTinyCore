@@ -21,8 +21,7 @@
 
 #include <Flash.h>
 
-struct MyObject
-{
+struct MyObject {
   float field1;
   uint8_t field2;
   char name[10];
@@ -38,8 +37,7 @@ const uint8_t flashSpace[SPM_PAGESIZE * NUMBER_OF_PAGES] __attribute__((aligned(
 // Flash constructor
 Flash flash(flashSpace, sizeof(flashSpace), ram_buffer, sizeof(ram_buffer));
 
-void write_data()
-{
+void write_data() {
   float f = 123.456f;
   uint8_t buffer_address = 0;
 
@@ -52,8 +50,7 @@ void write_data()
   Serial.println("Written float data type!");
 
   // Data to store
-  MyObject customVar =
-  {
+  MyObject customVar = {
     3.14f,
     65,
     "MCUdude"
@@ -75,8 +72,7 @@ void write_data()
   Serial.println("Written custom data type!\nReset your board to view the contents!\n");
 }
 
-void read_data()
-{
+void read_data() {
   Serial.println("Read float from flash: ");
 
   // Fetch first flash page
@@ -101,13 +97,11 @@ void read_data()
   Serial.println(customVar.name);
 }
 
-void setup()
-{
+void setup() {
   delay(2000);
   Serial.begin(9600);
 
-  if(!flash.check_writable())
-  {
+  if(!flash.check_writable()) {
     Serial.println("Incompatible or no bootloader present! Please burn correct bootloader");
     while(1);
   }
@@ -116,13 +110,10 @@ void setup()
   flash.fetch_page(1);
 
   // Check if our flag is present
-  if(flash[5] == 'X')
-  {
+  if(flash[5] == 'X') {
     Serial.println("Content found!");
     read_data();
-  }
-  else
-  {
+  } else {
     Serial.print("Flash page size for this chip: ");
     Serial.print(SPM_PAGESIZE);
     Serial.print(" bytes\nTotal assigned flash space: ");
@@ -134,7 +125,6 @@ void setup()
   }
 }
 
-void loop()
-{
+void loop() {
 
 }

@@ -14,9 +14,7 @@ Flash::Flash(const uint8_t *flash_array, const uint16_t flash_array_size, uint8_
   : _flash_array(flash_array),
     _flash_array_size(flash_array_size),
     _ram_array(ram_array),
-    _ram_array_size(ram_array_size)
-{
-}
+    _ram_array_size(ram_array_size) {}
 
 /**
  * @brief Lets you use the created object as a placeholder for the
@@ -50,8 +48,8 @@ void Flash::set_far_address(uint32_t address)
 
 /**
  * @brief Checks if the microcontroller contains a bootloader that has flash
- * writing capabilities. It does so by checking if a spesific number is placed
- * at the very end of the flash memory
+ * writing capabilities. It does so by checking if a specific number is placed
+ * at the very end of the bootloader section.
  *
  * @return true if compatible bootloader is present
  * @return false if incompatible or no bootloader is present
