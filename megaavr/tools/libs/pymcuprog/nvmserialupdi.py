@@ -124,7 +124,6 @@ class NvmAccessProviderSerial(NvmAccessProvider):
         bar = progress_bar.ProgressBar(n_chunk, hide=n_chunk == 1)
 
         while data_aligned:
-            bar.step()
             if len(data_aligned) < write_chunk_size:
                 write_chunk_size = len(data_aligned)
             chunk = data_aligned[0:write_chunk_size]
@@ -137,6 +136,7 @@ class NvmAccessProviderSerial(NvmAccessProvider):
                 self.avr.nvm.write_flash(offset_aligned, chunk)
             offset_aligned += write_chunk_size
             data_aligned = data_aligned[write_chunk_size:]
+            bar.step()
 
     def read(self, memory_info, offset, numbytes):
         """
@@ -151,6 +151,10 @@ class NvmAccessProviderSerial(NvmAccessProvider):
 
         data = []
         read_chunk_size = 0x100
+
+        n_chunk = math.ceil(numbytes/read_chunk_size)
+        bar = progress_bar.ProgressBar(n_chunk, hide=n_chunk == 1)
+
         while numbytes:
             if numbytes < read_chunk_size:
                 read_chunk_size = numbytes
@@ -158,6 +162,7 @@ class NvmAccessProviderSerial(NvmAccessProvider):
             data += self.avr.read_data(offset, read_chunk_size)
             offset += read_chunk_size
             numbytes -= read_chunk_size
+            bar.step()
 
         return data
 

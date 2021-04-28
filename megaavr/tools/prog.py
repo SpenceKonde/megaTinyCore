@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 # -*- coding: utf-8 -*-
-import re
 import sys
 import os
 import argparse
@@ -63,8 +62,9 @@ def main():
                         help="Tool USB serial (optional).")
 
     parser.add_argument("-v", "--verbose",
-                        action="store_true",
-                        help="Display more info.")
+                        action="count",
+                        default=0,
+                        help="Display more info (can be repeated).")
 
     # Parse args
     args = parser.parse_args()
@@ -98,9 +98,14 @@ def main():
 
     print_report(args)
 
+    logging_level = logging.ERROR
+    if args.verbose == 1:
+        logging_level = logging.INFO
+    elif args.verbose > 1:
+        logging_level = logging.DEBUG
+
     try:
-        if args.verbose:
-            setup_logging(user_requested_level=logging.DEBUG)
+        setup_logging(user_requested_level=logging_level)
         return_code = pymcuprog_basic(args, fuses_dict)
         sys.exit(return_code)
     except PyMcuException as e:
@@ -215,11 +220,6 @@ def pymcuprog_basic(args, fuses_dict):
                          literal=None,
                          verify=True,
                          filename=args.filename)
-
-        run_pymcu_action(pymcu._action_verify, backend,
-                         filename=args.filename,
-                         offset=0,
-                         literal=None)
     elif args.action == "read":
         run_pymcu_action(pymcu._action_read, backend,
                          memory=pymcu.MemoryNames.FLASH,

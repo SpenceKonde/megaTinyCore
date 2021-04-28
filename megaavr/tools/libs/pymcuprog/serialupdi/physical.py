@@ -75,8 +75,8 @@ class UpdiPhysical:
         temporary_serial = serial.Serial(None, 300, parity=serial.PARITY_EVEN, timeout=1,
                                          stopbits=serial.STOPBITS_ONE)
         temporary_serial.port = self.port
-        temporary_serial.dtr = False
-        temporary_serial.rts = False
+        # temporary_serial.dtr = False
+        # temporary_serial.rts = False
         temporary_serial.open()
 
         # Send two break characters, with 1 stop bit in between
