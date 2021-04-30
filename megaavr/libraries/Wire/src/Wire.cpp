@@ -58,7 +58,7 @@ TwoWire::TwoWire() {
 // Special for megaAVR 0-series: Select which pins to use for I2C interface
 // True if pin specification actually exists
 // Note that we do not currently support the dual TWI mode
-bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
+bool TwoWire::pins(__attribute__((unused)) uint8_t sda_pin, __attribute__((unused)) uint8_t scl_pin) {
   #if defined(PORTMUX_CTRLB)
   #if defined(PIN_WIRE_SDA_PINSWAP_1) && defined(PIN_WIRE_SCL_PINSWAP_1)
   if (sda_pin == PIN_WIRE_SDA_PINSWAP_1 && scl_pin == PIN_WIRE_SCL_PINSWAP_1) {
@@ -95,7 +95,7 @@ bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
   return false;
 }
 
-bool TwoWire::swap(uint8_t state) {
+bool TwoWire::swap(__attribute__((unused)) uint8_t state) {
   #if defined(PORTMUX_CTRLB)
   #if defined(PIN_WIRE_SDA_PINSWAP_1) && defined(PIN_WIRE_SCL_PINSWAP_1)
   if (state == 1) {
