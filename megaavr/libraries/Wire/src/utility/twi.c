@@ -282,7 +282,7 @@ void TWI_MasterSetBaud(uint32_t frequency) {
     #if F_CPU >= 8000000
     baud = ((F_CPU / 1000000) - 5);
     #endif
-  } else if (F_CPU < 900000) {
+  } else if (freqiemcy < 900000) {
     // 3/4ths of FMPlus speed
     #if F_CPU >= 10000000
     baud = ((4 * (F_CPU / 1000000) / 6) - 5);
