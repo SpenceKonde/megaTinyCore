@@ -54,13 +54,16 @@ TwoWire::TwoWire() {
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
-
-// Special for megaAVR 0-series: Select which pins to use for I2C interface
 // True if pin specification actually exists
+// We now compile-error if a compiletime known pin mapping is requested that is invalid.
 // Note that we do not currently support the dual TWI mode
-bool TwoWire::pins(__attribute__((unused)) uint8_t sda_pin, __attribute__((unused)) uint8_t scl_pin) {
+bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
   #if defined(PORTMUX_CTRLB)
   #if defined(PIN_WIRE_SDA_PINSWAP_1) && defined(PIN_WIRE_SCL_PINSWAP_1)
+  if (__builtin_constant_p(sda_pin) && __builtin_constant_p(scl_pin)) {
+    if (!((sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL) || (sda_pin == PIN_WIRE_SDA_PINSWAP_1 && scl_pin == PIN_WIRE_SCL_PINSWAP_1)))
+      badArg("Pins passed to Wire.pins() are not a valid pair of SDA and SCL pins");
+  }
   if (sda_pin == PIN_WIRE_SDA_PINSWAP_1 && scl_pin == PIN_WIRE_SCL_PINSWAP_1) {
     // Use pin swap
     PORTMUX.CTRLB |= PORTMUX_TWI0_bm;
@@ -75,9 +78,24 @@ bool TwoWire::pins(__attribute__((unused)) uint8_t sda_pin, __attribute__((unuse
     return false;
   }
   #else //keep compiler happy
-  return (sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL);
+  if (__builtin_constant_p(sda_pin) && __builtin_constant_p(scl_pin)) {
+    /* constant case - error if there's no swap and the swap attempt is known at compiletime */
+    if (sda_pin != PIN_WIRE_SDA || scl_pin != PIN_WIRE_SCL) {
+      badCall("This part does not support alternate Wire pins, if Wire.pins() is called, it must be passed the default pins");
+      return false;
+    } else {
+      return true;
+    }
+  } else { /* Non-constant case */
+    return (sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL);
+  }
   #endif
-  #elif defined(PORTMUX_TWIROUTEA)
+  #elif defined(PORTMUX_TWIROUTEA) && defined(PIN_WIRE_SDA_PINSWAP_2) && defined(PIN_WIRE_SCL_PINSWAP_2)
+  /* Dx-series, megaAVR only, not tinyAVR. If tinyAVR 2's supported alt TWI pins, they would probably have this too */
+  if (__builtin_constant_p(sda_pin) && __builtin_constant_p(scl_pin)) {
+    if (!((sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL) || (sda_pin == PIN_WIRE_SDA_PINSWAP_2 && scl_pin == PIN_WIRE_SCL_PINSWAP_2)))
+      badArg("Pins passed to Wire.pins() known at compile time to be invalid");
+  }
   if (sda_pin == PIN_WIRE_SDA_PINSWAP_2 && scl_pin == PIN_WIRE_SCL_PINSWAP_2) {
     // Use pin swap
     PORTMUX.TWIROUTEA = (PORTMUX.TWIROUTEA & 0xFC) | 0x02;
@@ -91,11 +109,23 @@ bool TwoWire::pins(__attribute__((unused)) uint8_t sda_pin, __attribute__((unuse
     PORTMUX.TWIROUTEA = (PORTMUX.TWIROUTEA & 0xFC);
     return false;
   }
+  #else
+  if (__builtin_constant_p(sda_pin) && __builtin_constant_p(scl_pin)) {
+    /* constant case - error if there's no swap and the swap attempt is known at compiletime */
+    if (sda_pin != PIN_WIRE_SDA || scl_pin != PIN_WIRE_SCL) {
+      badCall("This part does not support alternate Wire pins, if Wire.pins() is called, it must be passed the default pins");
+      return false;
+    } else {
+      return true;
+    }
+  } else { /* Non-constant case */
+    return (sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL);
+  }
   #endif
   return false;
 }
 
-bool TwoWire::swap(__attribute__((unused)) uint8_t state) {
+bool TwoWire::swap(uint8_t state) {
   #if defined(PORTMUX_CTRLB)
   #if defined(PIN_WIRE_SDA_PINSWAP_1) && defined(PIN_WIRE_SCL_PINSWAP_1)
   if (state == 1) {
@@ -112,7 +142,16 @@ bool TwoWire::swap(__attribute__((unused)) uint8_t state) {
     return false;
   }
   #else //keep compiler happy
-  return (state == 0);
+  if __builtin_constant_p(state) {
+        if (state != 0) {
+          badCall("This part does not support alternate TWI pins. If Wire.swap() is called at all, it must be passed 0 only.");
+          return false;
+        } else {
+          return true;
+        }
+  } else {
+    return !state;
+  }
   #endif
   #elif defined(PORTMUX_TWIROUTEA)
   if (state == 2) {
@@ -131,6 +170,17 @@ bool TwoWire::swap(__attribute__((unused)) uint8_t state) {
     // Assume default configuration
     PORTMUX.TWIROUTEA = (PORTMUX.TWIROUTEA & 0xFC);
     return false;
+  }
+  #else
+  if (__builtin_constant_p(state)) {
+    if (state != 0) {
+      badCall("This part does not support alternate TWI pins. If Wire.swap() is called at all, it must be passed 0 only.");
+      return false;
+    } else {
+      return true;
+    }
+  } else {
+    return !state;
   }
   #endif
   return false;
