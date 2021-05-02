@@ -142,7 +142,7 @@ bool TwoWire::swap(uint8_t state) {
     return false;
   }
   #else //keep compiler happy
-  if __builtin_constant_p(state) {
+  if (__builtin_constant_p(state)) {
         if (state != 0) {
           badCall("This part does not support alternate TWI pins. If Wire.swap() is called at all, it must be passed 0 only.");
           return false;
