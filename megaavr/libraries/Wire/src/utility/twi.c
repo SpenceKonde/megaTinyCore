@@ -261,19 +261,19 @@ void TWI_MasterSetBaud(uint32_t frequency) {
     baud = ((F_CPU / 1000000) - 5);
     #endif
     #if F_CPU >= 12000000
-    } else if (frequency < 900000) {
+  } else if (frequency < 900000) {
     #else
-    } else {
+  } else {
     #endif
     // 3/4ths of FMPlus speed
     #if F_CPU >= 10000000
     baud = ((F_CPU / 1500000) - 5);
     #endif
     #if F_CPU >= 16000000
-    } else {
-      // they want to go as fast as they can...
-      // Makes optimistic assumptions about the hardware and bus topology...
-      baud = ((F_CPU / 2000000) - 6);
+  } else {
+    // they want to go as fast as they can...
+    // Makes optimistic assumptions about the hardware and bus topology...
+    baud = ((F_CPU / 2000000) - 6);
     #endif
   }
   if (baud < 1) {
@@ -302,7 +302,7 @@ void TWI_MasterSetBaud(uint32_t frequency) {
        * has plenty of flash so even if the so it's no big deal to waste a couple of words
        * on this */
       baud = 255;
-    } else if ( baud < 3) {
+    } else if (baud < 3) {
     #else
     if (baud < 3) {
     #endif

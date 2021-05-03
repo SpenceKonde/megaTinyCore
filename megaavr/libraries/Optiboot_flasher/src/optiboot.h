@@ -28,6 +28,11 @@
 #include <avr/pgmspace.h>
 #include <stdint.h>
 
+#ifndef USING_OPTIBOOT
+#error "Using the optiboot.h flash writing facility requires that the board be using optiboot, but USING_OPTIBOOT is not defined."
+#endif
+
+
 #define NVMCTRL_CMD_COPY_gc (NVMCTRL_CMD_gm + 1)  // one beyond existing commands.
 #define SPM_PAGESIZE (PROGMEM_PAGE_SIZE)
 
