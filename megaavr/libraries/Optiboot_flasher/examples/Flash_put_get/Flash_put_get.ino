@@ -101,16 +101,16 @@ void setup() {
   delay(2000);
   Serial.begin(9600);
 
-  if(!flash.check_writable()) {
+  if (!flash.check_writable()) {
     Serial.println("Incompatible or no bootloader present! Please burn correct bootloader");
-    while(1);
+    while (1);
   }
 
   // Fetch flash page 1, where we may have a flag
   flash.fetch_page(1);
 
   // Check if our flag is present
-  if(flash[5] == 'X') {
+  if (flash[5] == 'X') {
     Serial.println("Content found!");
     read_data();
   } else {

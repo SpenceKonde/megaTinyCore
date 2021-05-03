@@ -35,9 +35,9 @@ void write_data() {
   flash.clear_buffer();
 
   // Fill buffer with numbers, starting from 0
-  for(uint8_t i = 0; i < 64; i++)
+  for (uint8_t i = 0; i < 64; i++) {
     flash[i] = i + 100;
-
+  }
   // Write buffer to the first allocated flash page (page 0)
   flash.write_page(0);
 
@@ -54,7 +54,7 @@ void read_data() {
   // Fetch first flash page
   flash.fetch_page(0);
 
-  for(uint16_t i = 0; i < flash.buffer_size(); i++) {
+  for (uint16_t i = 0; i < flash.buffer_size(); i++) {
     Serial.print("Addr: ");
     Serial.print(i);
     Serial.print(" \tData: ");
@@ -66,16 +66,16 @@ void setup() {
   delay(2000);
   Serial.begin(9600);
 
-  if(!flash.check_writable()) {
+  if (!flash.check_writable()) {
     Serial.println("Incompatible or no bootloader present! Please burn correct bootloader");
-    while(1);
+    while (1);
   }
 
   // Fetch flash page 1, where we may have a flag
   flash.fetch_page(1);
 
   // Check if our flag is present
-  if(flash[5] == 'X') {
+  if (flash[5] == 'X') {
     Serial.println("Content found!");
     read_data();
   } else {

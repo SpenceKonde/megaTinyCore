@@ -23,8 +23,7 @@ Flash::Flash(const uint8_t *flash_array, const uint16_t flash_array_size, uint8_
  * @param index Array index
  * @return uint8_t&
  */
-uint8_t& Flash::operator[](int16_t index)
-{
+uint8_t& Flash::operator[](int16_t index) {
   return _ram_array[index];
 }
 
@@ -40,8 +39,7 @@ uint8_t& Flash::operator[](int16_t index)
  * You can get the address by using the pgm_get_far_address macro:
  * set_far_address(pgm_get_far_address(flashSpace))
  */
-void Flash::set_far_address(uint32_t address)
-{
+void Flash::set_far_address(uint32_t address) {
   _far_flash_array_addr = address;
 }
 #endif
@@ -54,8 +52,7 @@ void Flash::set_far_address(uint32_t address)
  * @return true if compatible bootloader is present
  * @return false if incompatible or no bootloader is present
  */
-bool Flash::check_writable()
-{
+bool Flash::check_writable() {
   return optiboot_check_writable();
 }
 
@@ -65,8 +62,7 @@ bool Flash::check_writable()
  * @param fill optional parameter to set what content the buffer will be
  * filled with. Defaults to 0x00 if not present
  */
-void Flash::clear_buffer(uint8_t fill)
-{
+void Flash::clear_buffer(uint8_t fill) {
   memset(_ram_array, fill, sizeof(_ram_array_size));
 }
 
@@ -77,8 +73,7 @@ void Flash::clear_buffer(uint8_t fill)
  * @param index memory address
  * @return uint8_t 8-bit value stored in this address space
  */
-uint8_t Flash::read_buffer(uint8_t index)
-{
+uint8_t Flash::read_buffer(uint8_t index) {
   return _ram_array[index];
 }
 
@@ -89,8 +84,7 @@ uint8_t Flash::read_buffer(uint8_t index)
  * @param index memory address
  * @param value 8-bit value to write to the memory location
  */
-void Flash::write_buffer(uint8_t index, uint8_t value)
-{
+void Flash::write_buffer(uint8_t index, uint8_t value) {
   _ram_array[index] = value;
 }
 
@@ -99,8 +93,7 @@ void Flash::write_buffer(uint8_t index, uint8_t value)
  *
  * @return uint16_t RAM buffer size in bytes
  */
-uint16_t Flash::buffer_size()
-{
+uint16_t Flash::buffer_size() {
   return _ram_array_size;
 }
 
@@ -109,11 +102,10 @@ uint16_t Flash::buffer_size()
  *
  * @param flash_page_number page number to write the buffer to
  */
-void Flash::write_page(uint16_t flash_page_number)
-{
+void Flash::write_page(uint16_t flash_page_number) {
   // For devices with 128kiB or more, and data is stored in far progmem
   #ifdef RAMPZ
-  if(_far_flash_array_addr != 0x0000)
+  if (_far_flash_array_addr != 0x0000)
   {
     optiboot_writePage(_far_flash_array_addr, _ram_array, flash_page_number);
   }
@@ -130,11 +122,10 @@ void Flash::write_page(uint16_t flash_page_number)
  *
  * @param flash_page_number page number to read from
  */
-void Flash::fetch_page(uint16_t flash_page_number)
-{
+void Flash::fetch_page(uint16_t flash_page_number) {
   // For devices with 128kiB or more, and data is stored in far progmem
   #ifdef RAMPZ
-  if(_far_flash_array_addr != 0x0000)
+  if (_far_flash_array_addr != 0x0000)
   {
     optiboot_read(_far_flash_array_addr, _ram_array, flash_page_number, 0, _ram_array_size);
   }
@@ -158,16 +149,16 @@ void Flash::fetch_page(uint16_t flash_page_number)
  * @param start_address address to start reading from
  * @param stop_address  address where we stop reading at
  */
-void Flash::fetch_data(uint16_t start_address, uint16_t stop_address)
-{
+void Flash::fetch_data(uint16_t start_address, uint16_t stop_address) {
   uint16_t end_address;
-  if(stop_address - start_address > _ram_array_size)
+  if (stop_address - start_address > _ram_array_size) {
     end_address = _ram_array_size;
-  else
+  } else {
     end_address = stop_address;
+  }
 
   #ifdef RAMPZ
-  if(_far_flash_array_addr != 0x0000)
+  if (_far_flash_array_addr != 0x0000)
   {
     optiboot_read(_far_flash_array_addr, _ram_array, 0, start_address, end_address);
   }

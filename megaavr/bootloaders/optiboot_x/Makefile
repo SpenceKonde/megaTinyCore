@@ -147,7 +147,7 @@ optiboot_%.elf:	optiboot_x.c FORCE
 #---------------------------------------------------------------------------
 # "Board-level Platform" targets.
 # A "Board-level Platform" implies a manufactured platform with a particular
-# AVR_FREQ, LED, and so on.  Parameters are not particularly changable from
+# AVR_FREQ, LED, and so on.  Parameters are not particularly changeable from
 # the "make" command line.
 # Most of the board-level platform builds should envoke make recursively
 #  appropriate specific options
@@ -167,7 +167,7 @@ optiboot_%.elf:	optiboot_x.c FORCE
 # very widely circulated, because I am not the only one who made that mistake.
 # Even in 2020, I've corrected someone who had been using the preliminary
 # datasheet!
-# Anyway, 2-series parts use the same binaries as eachother. 3 serial options.
+# Anyway, 2-series parts use the same binaries as each other. 3 serial options.
 # 2 USARTs but USART0's alt pins are USART1's default ones.... (presumably
 # sharing some underlying hardware...)
 #---------------------------------------------------------------------------

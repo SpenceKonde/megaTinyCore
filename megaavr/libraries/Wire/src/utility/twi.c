@@ -227,7 +227,7 @@ void TWI_MasterSetBaud(uint32_t frequency) {
    *
    * What a godawful mess that was. It didn't catch rollovers from trying to use too high of a
    * SCL frequency. The following is ugly - but it's efficient and I think it works.
-   * Correllations used found by hand in Excel via numerical methods.
+   * Correlations used found by hand in Excel via numerical methods.
    * Issues openedd to complain about this halfassed method without a test case that passes in
    * megaTinyCore 2.3.1 and fails in megaTinyCore 2.3.2 (DxCore 1.3.5 and 1.3.6) will not
    * be entertained unless the reporting user has written a better implementation and tested it!
@@ -327,7 +327,7 @@ void TWI_MasterSetBaud(uint32_t frequency) {
   // 1/23/2021:
   // Grab the rest of the fix and add it in here.
   // 4/28/2021:
-  // I give up. Use numerically determinined linearizations which will be calculated at compiletime. And make sure to permit a bucket slow enough that 1 MHz parts work on it.
+  // I give up. Use numerically determinined linearizations which will be calculated at compile time. And make sure to permit a bucket slow enough that 1 MHz parts work on it.
   // If we can't make the speed bucket requested, try to use fastest one we can. 2 speeds for each mode, half and full, that is 50 kHz and 100 kHz, 200kHz, and 400kHz, and 750 kHz and 1 MHz.
   // If TWI isn't yet enabled, and user calls a function that initializes the master baud rate to an FMP speed, we will now enable it.
 }

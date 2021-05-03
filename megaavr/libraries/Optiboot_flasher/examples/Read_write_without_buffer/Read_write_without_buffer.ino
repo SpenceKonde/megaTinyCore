@@ -44,16 +44,18 @@ void flash_write_byte(const uint8_t base_addr[], uint16_t offset_addr, uint8_t d
   // Write the 8-bit value to the buffer
   optiboot_page_fill((uint16_t)base_addr + offset_addr, data);
 
-  if ((offset_addr & 0xFF) == (SPM_PAGESIZE - 2))
+  if ((offset_addr & 0xFF) == (SPM_PAGESIZE - 2)) {
     optiboot_page_erase_write();
+  }
 }
 
 
 // Function to force a flash page write operation
 void flash_end_write(uint16_t offset_addr) {
   // Write the buffer to flash if there are any contents in the buffer
-  if ((offset_addr & 0xFF) != 0x00)
+  if ((offset_addr & 0xFF) != 0x00) {
     optiboot_page_erase_write();
+  }
 }
 
 
@@ -65,7 +67,7 @@ void setup() {
 
   Serial.print("Filling up flash page 0 with 16-bit values...\n");
   // Fill the first flash page (page 0) with 16-bit values (0x100 to 0x01FF)
-  for(uint8_t data = 0; data < (SPM_PAGESIZE / 2); data++) {
+  for (uint8_t data = 0; data < (SPM_PAGESIZE / 2); data++) {
     flash_write_int(flashSpace, addr, data + 0x0100); // Write data
     addr += 2; // Increase memory address by two since we're writing 16-bit values
   }
@@ -74,7 +76,7 @@ void setup() {
 
   Serial.print("Filling up flash page 1 with 8-bit values...\n");
   // Fill the second flash page (page 1) with 0-bit values (0x00 to 0x0FF)
-  for(uint16_t data = 0; data < SPM_PAGESIZE; data++) {
+  for (uint16_t data = 0; data < SPM_PAGESIZE; data++) {
     addr++; // Increase memory address by one since we're writing 8-bit values
     flash_write_byte(flashSpace, addr, data); // Write data
   }
@@ -82,12 +84,14 @@ void setup() {
   flash_end_write(addr);
 
   Serial.print("Flash pages filled. Reading back their content.\nPage 0:\n");
-  for(uint16_t i = 0; i < SPM_PAGESIZE; i += 2)
+  for (uint16_t i = 0; i < SPM_PAGESIZE; i += 2) {
     Serial.printf("Flash mem addr: 0x%04x, content: 0x%04x\n", flashSpace + i, (pgm_read_byte(flashSpace + i + 1) << 8) + (pgm_read_byte(flashSpace + i)));
+  }
 
   Serial.println(F("\n\nPage 1:"));
-  for(uint16_t i = 0; i < SPM_PAGESIZE; i++)
+  for (uint16_t i = 0; i < SPM_PAGESIZE; i++) {
     Serial.printf("Flash mem addr: 0x%04x, content: 0x%02x\n", flashSpace + SPM_PAGESIZE + i, pgm_read_byte(flashSpace + SPM_PAGESIZE + i));
+  }
 }
 
 

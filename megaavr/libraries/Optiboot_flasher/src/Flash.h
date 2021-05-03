@@ -8,7 +8,7 @@ class Flash {
   public:
     Flash(const uint8_t *flash_array, const uint16_t flash_array_size, uint8_t *ram_array, const uint16_t ram_array_size = SPM_PAGESIZE);
     #ifdef RAMPZ
-      void set_far_address(uint32_t address);
+    void set_far_address(uint32_t address);
     #endif
     bool check_writable();
     void clear_buffer(uint8_t fill = 0x00);
@@ -20,21 +20,23 @@ class Flash {
     void fetch_data(uint16_t start_address, uint16_t stop_address);
 
     // Operator overload to be able to read and write directly to the RAM array from a byte level
-    uint8_t& operator[] (int16_t index);
+    uint8_t &operator[](int16_t index);
 
     // Template function to 'put' objects in RAM array
     template <typename T> const T &put(uint16_t idx, const T &t) {
-      const uint8_t *ptr = (const uint8_t*) &t;
-      for(uint16_t count = 0; count < sizeof(T); count++)
+      const uint8_t *ptr = (const uint8_t *) &t;
+      for (uint16_t count = 0; count < sizeof(T); count++) {
         _ram_array[idx + count] = *ptr++;
+      }
       return t;
     }
 
     // Template function to 'get' objects from the RAM array
     template <typename T> T &get(uint16_t idx, T &t) {
       uint8_t *ptr = (uint8_t*) &t;
-      for(uint16_t count = 0; count < sizeof(T); count++)
+      for (uint16_t count = 0; count < sizeof(T); count++) {
         *ptr++ = _ram_array[idx + count];
+      }
       return t;
     }
 

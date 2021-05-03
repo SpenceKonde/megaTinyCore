@@ -52,9 +52,9 @@ void setup() {
   // Initialize serial
   Serial.begin(9600);
 
-  if(!optiboot_check_writable()) {
+  if (!optiboot_check_writable()) {
     Serial.println("Incompatible or no bootloader present! Please burn the correct bootloader");
-    while(1);
+    while (1);
   }
 }
 
@@ -89,12 +89,12 @@ void loop() {
 
   // Get menu option from the serial monitor
   do {
-    while(!Serial.available());
+    while (!Serial.available());
     menuOption = Serial.read();
-    if(menuOption != '1' && menuOption != '2')
+    if (menuOption != '1' && menuOption != '2') {
       Serial.print("\nPlease enter a valid option! ");
-  }
-  while(menuOption != '1' && menuOption != '2');
+    }
+  } while (menuOption != '1' && menuOption != '2');
 
   Serial.print("\nOption ");
   Serial.print(menuOption);
@@ -103,7 +103,7 @@ void loop() {
 
 
   // Read flash option selected
-  if(menuOption == '1') {
+  if (menuOption == '1') {
     Serial.print("Which page number do you want to read? Page 0 to ");
     Serial.print(NUMBER_OF_PAGES - 1);
     Serial.print(", Page ");
@@ -112,18 +112,18 @@ void loop() {
 
     //Get page number from the serial monitor
     do {
-      while(!Serial.available());
+      while (!Serial.available());
       pageNumber = Serial.read() - 0x30;
-      if(pageNumber > NUMBER_OF_PAGES) {
+      if (pageNumber > NUMBER_OF_PAGES) {
         Serial.print("\nPlease enter a valid page between 0 and ");
         Serial.print(NUMBER_OF_PAGES - 1);
         Serial.println(". The number of pages can be extended by changing NUMBER_OF_PAGES constant");
       }
-    }
-    while(pageNumber > NUMBER_OF_PAGES);
+    } while (pageNumber > NUMBER_OF_PAGES);
 
-    if(pageNumber <= NUMBER_OF_PAGES)
+    if (pageNumber <= NUMBER_OF_PAGES){
       Serial.println(pageNumber);
+    }
 
     // READ SELECTED PAGE AND STORE THE CONTENT IN THE ramBuffer ARRAY
     // flash_buffer is where the data is stored (contains the memory addresses)
@@ -133,40 +133,40 @@ void loop() {
     uint8_t pageFirst = 0;
     uint8_t pageLast = NUMBER_OF_PAGES;
 
-    if(pageNumber != NUMBER_OF_PAGES) {
+    if (pageNumber != NUMBER_OF_PAGES) {
       pageFirst = pageNumber;
       pageLast = pageNumber;
     }
 
-    for(uint8_t page = pageFirst; page < pageLast; page++) {
+    for (uint8_t page = pageFirst; page < pageLast; page++) {
       optiboot_readPage(flashSpace, ramBuffer, page);
       Serial.print("Page ");
       Serial.print(page);
       Serial.print(": ");
-      for(uint16_t i = 0; i < sizeof(ramBuffer); i++) {
-        if(ramBuffer[i] == 0x00 || ramBuffer[i] == 0xff)
+      for (uint16_t i = 0; i < sizeof(ramBuffer); i++) {
+        if (ramBuffer[i] == 0x00 || ramBuffer[i] == 0xff){
           Serial.write('.');
-        else
+        } else {
           Serial.write(ramBuffer[i]);
+        }
       }
       Serial.println("");
     }
-  } else if(menuOption == '2') {
+  } else if (menuOption == '2') {
     // Clear pageNumber
     pageNumber = 0xff;
 
     //Get page number from the serial monitor
     Serial.print("\nWhich page do you want to write to? Page: ");
     do {
-      while(!Serial.available());
+      while (!Serial.available());
       pageNumber = Serial.read() - 0x30;
-      if(pageNumber > NUMBER_OF_PAGES - 1) {
+      if (pageNumber > NUMBER_OF_PAGES - 1) {
         Serial.print("\nPlease enter a valid page between 0 and ");
         Serial.print(NUMBER_OF_PAGES - 1);
         Serial.println(". The number of pages can be extended by changing NUMBER_OF_PAGES constant");
       }
-    }
-    while(pageNumber >= NUMBER_OF_PAGES);
+    } while (pageNumber >= NUMBER_OF_PAGES);
     Serial.println(pageNumber);
 
     // Print prompt to enter some new characters to write to flash
@@ -181,9 +181,9 @@ void loop() {
     memset(ramBuffer, 0, sizeof(ramBuffer));
     uint16_t counter = 0;
     while (counter < SPM_PAGESIZE && charBuffer != terminationChar) {
-      if(Serial.available() > 0) {
+      if (Serial.available() > 0) {
         charBuffer = Serial.read(); // read character from serial
-        if(charBuffer != terminationChar) {
+        if (charBuffer != terminationChar) {
           Serial.write(charBuffer); // echo character back
           ramBuffer[counter] = charBuffer;
           counter++;
@@ -207,12 +207,11 @@ void loop() {
   //Return to the main menu if 'm' is sent
   Serial.println("\ntype the character 'm' to return to to the main menu");
   do {
-    while(!Serial.available());
+    while (!Serial.available());
     returnToMenu = Serial.read();
-    if(returnToMenu != 'm')
+    if (returnToMenu != 'm')
       Serial.print("\nPlease type a valid character! ");
-  }
-  while(returnToMenu != 'm');
+  } while (returnToMenu != 'm');
   returnToMenu = 0;
 
 } // End of loop

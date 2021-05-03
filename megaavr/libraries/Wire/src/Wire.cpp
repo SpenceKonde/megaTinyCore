@@ -55,7 +55,7 @@ TwoWire::TwoWire() {
 
 // Public Methods //////////////////////////////////////////////////////////////
 // True if pin specification actually exists
-// We now compile-error if a compiletime known pin mapping is requested that is invalid.
+// We now compile-error if a compile time known pin mapping is requested that is invalid.
 // Note that we do not currently support the dual TWI mode
 bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
   #if defined(PORTMUX_CTRLB) /* tinyAVR 0/1 with TWI mux options */
@@ -157,7 +157,7 @@ bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
     #endif
   #else // No TWI pin options - why call this?
     if (__builtin_constant_p(sda_pin) && __builtin_constant_p(scl_pin)) {
-      /* constant case - error if there's no swap and the swap attempt is known at compiletime */
+      /* constant case - error if there's no swap and the swap attempt is known at compile time */
       if (sda_pin != PIN_WIRE_SDA || scl_pin != PIN_WIRE_SCL) {
         badCall("This part does not support alternate Wire pins, if Wire.pins() is called, it must be passed the default pins");
         return false;

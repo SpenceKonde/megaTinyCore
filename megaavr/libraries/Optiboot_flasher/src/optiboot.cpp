@@ -25,10 +25,11 @@ void do_nvmctrl_cli(optiboot_addr_t address, uint8_t command, uint16_t data) {
  */
 bool optiboot_check_writable() {
   uint8_t content = pgm_read_byte(0x1FF);
-  if(content == 9)
+  if (content == 9) {
     return true;
-  else
+  } else {
     return false;
+  }
 }
 
 
@@ -100,7 +101,7 @@ void optiboot_page_write(optiboot_addr_t address) {
 
 
 /**
- * @brief Read bytes from a given page and futher out in memory. It will
+ * @brief Read bytes from a given page and further out in memory. It will
  * continue to fill the storage_array until the stop_address is reached. Note
  * that this function will only work for data stored in near progmem, below
  * 64kiB.
@@ -112,7 +113,7 @@ void optiboot_page_write(optiboot_addr_t address) {
  * @param stop_address the address where we stop reading, relative to the flash page number
  */
 void optiboot_read(const uint8_t allocated_flash_space[], uint8_t storage_array[], uint16_t page_number, uint16_t start_address, uint16_t stop_address) {
-  for(uint16_t j = start_address; j < stop_address; j++) {
+  for (uint16_t j = start_address; j < stop_address; j++) {
     uint8_t read_character = allocated_flash_space[j + SPM_PAGESIZE * (page_number)];
     storage_array[j - start_address] = read_character;
   }
@@ -144,8 +145,9 @@ void optiboot_readPage(const uint8_t allocated_flash_space[], uint8_t storage_ar
  */
 void optiboot_writePage(const uint8_t allocated_flash_space[], uint8_t data_to_store[], uint16_t page_number) {
   // Copy ram buffer to temporary flash buffer
-  for(uint16_t i = 0; i < SPM_PAGESIZE; i++)
+  for (uint16_t i = 0; i < SPM_PAGESIZE; i++) {
     optiboot_page_fill((optiboot_addr_t)&allocated_flash_space[i + SPM_PAGESIZE * page_number], data_to_store[i]);
+  }
 
   // Erase and then write page
   optiboot_page_erase_write();
