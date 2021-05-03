@@ -23,7 +23,7 @@ Flash::Flash(const uint8_t *flash_array, const uint16_t flash_array_size, uint8_
  * @param index Array index
  * @return uint8_t&
  */
-uint8_t& Flash::operator[](int16_t index) {
+uint8_t &Flash::operator[](int16_t index) {
   return _ram_array[index];
 }
 
@@ -105,8 +105,7 @@ uint16_t Flash::buffer_size() {
 void Flash::write_page(uint16_t flash_page_number) {
   // For devices with 128kiB or more, and data is stored in far progmem
   #ifdef RAMPZ
-  if (_far_flash_array_addr != 0x0000)
-  {
+  if (_far_flash_array_addr != 0x0000) {
     optiboot_writePage(_far_flash_array_addr, _ram_array, flash_page_number);
   }
   // For devices with where flash space is allocated in near progmem, <64kiB
@@ -125,8 +124,7 @@ void Flash::write_page(uint16_t flash_page_number) {
 void Flash::fetch_page(uint16_t flash_page_number) {
   // For devices with 128kiB or more, and data is stored in far progmem
   #ifdef RAMPZ
-  if (_far_flash_array_addr != 0x0000)
-  {
+  if (_far_flash_array_addr != 0x0000) {
     optiboot_read(_far_flash_array_addr, _ram_array, flash_page_number, 0, _ram_array_size);
   }
   // For devices with where flash space is allocated in near progmem, <64kiB
@@ -158,8 +156,7 @@ void Flash::fetch_data(uint16_t start_address, uint16_t stop_address) {
   }
 
   #ifdef RAMPZ
-  if (_far_flash_array_addr != 0x0000)
-  {
+  if (_far_flash_array_addr != 0x0000) {
     optiboot_read(_far_flash_array_addr, _ram_array, 0, start_address, end_address);
   }
   // For devices with where flash space is allocated in near progmem, <64kiB

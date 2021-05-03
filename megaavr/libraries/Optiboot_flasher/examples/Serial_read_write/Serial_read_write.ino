@@ -42,7 +42,7 @@ const char terminationChar = '@';
 uint8_t ramBuffer[SPM_PAGESIZE];
 
 // This array allocates the space you'll be able to write to
-const uint8_t flashSpace[SPM_PAGESIZE * NUMBER_OF_PAGES] __attribute__ (( aligned(SPM_PAGESIZE) )) = {
+const uint8_t flashSpace[SPM_PAGESIZE * NUMBER_OF_PAGES] __attribute__((aligned(SPM_PAGESIZE))) = {
   "This some default content stored on page one"
 };
 
@@ -121,7 +121,7 @@ void loop() {
       }
     } while (pageNumber > NUMBER_OF_PAGES);
 
-    if (pageNumber <= NUMBER_OF_PAGES){
+    if (pageNumber <= NUMBER_OF_PAGES) {
       Serial.println(pageNumber);
     }
 
@@ -144,7 +144,7 @@ void loop() {
       Serial.print(page);
       Serial.print(": ");
       for (uint16_t i = 0; i < sizeof(ramBuffer); i++) {
-        if (ramBuffer[i] == 0x00 || ramBuffer[i] == 0xff){
+        if (ramBuffer[i] == 0x00 || ramBuffer[i] == 0xff) {
           Serial.write('.');
         } else {
           Serial.write(ramBuffer[i]);
@@ -209,8 +209,9 @@ void loop() {
   do {
     while (!Serial.available());
     returnToMenu = Serial.read();
-    if (returnToMenu != 'm')
+    if (returnToMenu != 'm') {
       Serial.print("\nPlease type a valid character! ");
+    }
   } while (returnToMenu != 'm');
   returnToMenu = 0;
 

@@ -242,7 +242,7 @@ void TWI_MasterSetBaud(uint32_t frequency) {
    */
 
 
-  int16_t baud=0;
+  int16_t baud = 0;
   if (frequency < 80000) {// they want to run it slowly. Half-speed standard mode, ~50 kHz
     baud = (F_CPU / 100000) - 5;
   } else if (frequency <= 150000) {
@@ -258,16 +258,16 @@ void TWI_MasterSetBaud(uint32_t frequency) {
     //
     // 400 kHz fast mode. 8 MHz is the slowest that can do it.
     #if F_CPU >= 8000000
-      baud = ((F_CPU / 1000000) - 5);
+    baud = ((F_CPU / 1000000) - 5);
     #endif
     #if F_CPU >= 12000000
-      } else if (frequency < 900000) {
+    } else if (frequency < 900000) {
     #else
-      } else {
+    } else {
     #endif
     // 3/4ths of FMPlus speed
     #if F_CPU >= 10000000
-      baud = ((F_CPU / 1500000) - 5);
+    baud = ((F_CPU / 1500000) - 5);
     #endif
     #if F_CPU >= 16000000
     } else {
@@ -276,35 +276,35 @@ void TWI_MasterSetBaud(uint32_t frequency) {
       baud = ((F_CPU / 2000000) - 6);
     #endif
   }
-  if  (baud < 1) {
+  if (baud < 1) {
     // Requested speed exceeded hardware capabilities.
     // use the fastest one that F_CPU should work with...
     #if (F_CPU >= 8000000)
-      // FM full speed
-      baud = ((F_CPU / 1000000) - 5);
+    // FM full speed
+    baud = ((F_CPU / 1000000) - 5);
     #elif (F_CPU >= 4000000)
-      // half speed FM
-      baud = ((F_CPU / 1000000) * 3) - 5;
+    // half speed FM
+    baud = ((F_CPU / 1000000) * 3) - 5;
     #else
-      baud = 5;
-      // 50 kHz @ 1 MHz, 100kHz @ 2 MHz.
-      // should always work/
+    baud = 5;
+    // 50 kHz @ 1 MHz, 100kHz @ 2 MHz.
+    // should always work/
     #endif
   } else {
     // Baud is 1 or higher
     #if defined(DXCORE) && F_CPU >= 28000000
-      if (baud > 255) {
-        /* has to fit in 8-bit register; this is reachable for the slowest speed, and only with
-         * F_CPU >= 28 MHz so we only include this on overclocked Dx-series parts (the tinyAVR
-         * and megaAVR devices are generally not usable at 28 MHz, and I don't want to run risk
-         * of the optimizer not realizing this is unreachable with current F_CPU and building
-         * this test for the flash-constrained tiny parts, Dx is usually good up to 32, and
-         * has plenty of flash so even if the so it's no big deal to waste a couple of words
-         * on this */
-        baud = 255;
-      } else if ( baud < 3) {
+    if (baud > 255) {
+      /* has to fit in 8-bit register; this is reachable for the slowest speed, and only with
+       * F_CPU >= 28 MHz so we only include this on overclocked Dx-series parts (the tinyAVR
+       * and megaAVR devices are generally not usable at 28 MHz, and I don't want to run risk
+       * of the optimizer not realizing this is unreachable with current F_CPU and building
+       * this test for the flash-constrained tiny parts, Dx is usually good up to 32, and
+       * has plenty of flash so even if the so it's no big deal to waste a couple of words
+       * on this */
+      baud = 255;
+    } else if ( baud < 3) {
     #else
-      if (baud < 3) {
+    if (baud < 3) {
     #endif
       baud = 3;
     }

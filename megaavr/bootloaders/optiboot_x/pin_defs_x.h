@@ -11,6 +11,7 @@
  * See optiboot.c for details.
  */
 
+// *INDENT-OFF* don't stylecheck the indents here.
 
 /*
  * ------------------------------------------------------------------------
@@ -20,6 +21,17 @@
  * and do pre-processor tests to see if there's a match.  This ends up
  * being very verbose, but it is pretty easy to generate semi-automatically.
  * (We wouldn't need this if the preprocessor could do string compares.)
+ *
+ * Comment - dear god, what an ugly mess. I would certainly have made it
+ * a compile error to request, say, D4 as the LED on a board without a
+ * PORTD!
+ * in fact, I would have done this whole thing very differently. My defines
+ * would have the low byte equal to the bitmask, and the high byte equal to
+ * the address of the VPORT register, ex, B4 would be 0x0410
+ * then you'd just have a:
+ *    #define LED_PORT (*(VPORT_t *) ((LED_ARG & 0xFF00) >> 8))
+ *    #define LED (LED_ARG & 0xFF)
+ * but I'm not about to reinvent a wheel here....
  */
 
 // Symbols for each PortA bit.

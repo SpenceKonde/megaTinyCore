@@ -33,7 +33,7 @@ class Flash {
 
     // Template function to 'get' objects from the RAM array
     template <typename T> T &get(uint16_t idx, T &t) {
-      uint8_t *ptr = (uint8_t*) &t;
+      uint8_t *ptr = (uint8_t *) &t;
       for (uint16_t count = 0; count < sizeof(T); count++) {
         *ptr++ = _ram_array[idx + count];
       }
