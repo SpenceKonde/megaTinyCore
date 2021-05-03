@@ -46,7 +46,7 @@ extern "C" {
 
   #define ADC_CH(ch)      (0x80 | (ch))
 
-#ifndef ADC_LOWLAT_bm
+#if MEGATINYCORE_SERIES < 2
   /* ADC constants for 0/1-series */
   #define INTERNAL0V55    (VREF_ADC0REFSEL_0V55_gc >> VREF_ADC0REFSEL_gp)
   #define INTERNAL1V1     (VREF_ADC0REFSEL_1V1_gc >> VREF_ADC0REFSEL_gp)
@@ -79,10 +79,12 @@ extern "C" {
   #define ADC_ACC32       0x85
   #define ADC_ACC64       0x86
 
+  #define getAnalogSampleDuration()   (ADC0.SAMPCTRL)
+
 #else
   /* ADC constants for 2-series */
   #define VDD             (0) /* ADC_REFSEL_VDD_gc    */
-  #define DEFAULT         VDD /* Gee, I really wish these were named differently */
+  #define DEFAULT         VDD /* Gee, I really wish these were named differently - both names are horrendously generic and could mean lots of different things that should be distinguished. */
   #define EXTERNAL        (2) /* ADC_REFSEL_VREFA_gc  */
   #define INTERNAL1V024   (4) /* ADC_REFSEL_1024MV_gc */
   #define INTERNAL2V048   (5) /* ADC_REFSEL_2048MV_gc */
@@ -118,6 +120,9 @@ extern "C" {
   #define ADC_ACC256      0x88
   #define ADC_ACC512      0x89
   #define ADC_ACC1024     0x8A
+
+  #define getAnalogSampleDuration()   (ADC0.CTRLE)
+
 #endif
 
 /* Errors in analogReadEnh and analogReadDiff are large negative numbers,
@@ -158,6 +163,9 @@ extern "C" {
 // Never actually returned, because we give compile error here
 #define ADC_ENH_ERROR_DISABLED                 -2100000007
 // The ADC is not currently enabled.
+#define ADC_ERROR_INVALID_CLOCK                     -32764
+// Returned by analogClockSpeedif the value in the register is currently unknown, or if an invaloid frequency is requested.
+
 
 
 
@@ -192,6 +200,7 @@ void init_TCA0();
 void init_TCD0();
 int32_t analogReadEnh( uint8_t pin,              uint8_t res, uint8_t gain);
 int32_t analogReadDiff(uint8_t pos, uint8_t neg, uint8_t res, uint8_t gain);
+int16_t analogClockSpeed(int16_t frequency, uint8_t options);
 void ADCPowerOptions(uint8_t options); /* 2-series only */
 // Peripheral takeover
 // These will remove things controlled by
@@ -199,6 +208,8 @@ void ADCPowerOptions(uint8_t options); /* 2-series only */
 // 0x40 - TCD0, 0x10 - TCA0
 void takeOverTCA0();
 void takeOverTCD0();
+
+
 
 
 // avr-libc defines _NOP() since 1.6.2
@@ -259,6 +270,7 @@ extern const uint8_t digital_pin_to_timer[];
   #include "UART.h"
   int32_t analogReadEnh( uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int32_t analogReadDiff(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
+  int16_t analogClockSpeed(int16_t frequency = 0, uint8_t options = 0);
 #endif
 
 // Include the variants

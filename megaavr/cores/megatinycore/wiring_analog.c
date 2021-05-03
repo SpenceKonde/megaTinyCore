@@ -48,7 +48,7 @@ inline __attribute__((always_inline)) void check_valid_analog_pin(pin_size_t pin
     #else // 0-series.
       if (pin != ADC_INTREF && pin != ADC_TEMPERATURE && pin != ADC_GROUND)
     #endif
-    {   // above cases cover valid *special channels - opening brace of whichever
+    {   // above cases cover valid internal sources.
       if (pin & 0x80) {
         #if MEGATINYCORE_SERIES == 2
           if ((pin & 0x7F) >= NUM_ANALOG_INPUTS /* || pin != 0x80 */)  // channel 0 is not connected to PA0 - but let's not block it just yet, if it's actually tied to ground, could it be helpful for offset cal?
@@ -451,28 +451,22 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     if (neg != SINGLE_ENDED) {
       ADC0.MUXNEG = (gain ? ADC_VIA_PGA_gc:0) | neg;
     }
-    //if (res & 0x80) {
-      ADC0.CTRLF = sampnum;
-    /*
-    } else if (res > ADC_NATIVE_RESOLUTION) {
-      ADC0.CTRLF = 2 * (res - ADC_NATIVE_RESOLUTION);
-    } else {
-      ADC0.CTRLF = 0;
-    } */
+    ADC0.CTRLF = sampnum;
     uint8_t command = ((neg != SINGLE_ENDED)?0x80:0) | ((res == 8) ? ADC_MODE_SINGLE_8BIT_gc : (res > ADC_NATIVE_RESOLUTION ? ADC_MODE_BURST_gc : ADC_MODE_SINGLE_12BIT_gc)) | 1;
     ADC0.COMMAND=command;
     while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
     int32_t result = ADC0.RESULT;
 
     if (res < 0x80 && res > ADC_NATIVE_RESOLUTION) {
-      uint8_t shift = res - ADC_NATIVE_RESOLUTION - 1;
+      uint8_t shift = res - ADC_NATIVE_RESOLUTION ; // - 1;
       while (shift) {
         result >>= 1;
         shift--;
       }
-      uint8_t roundup=result&0x01;
-      result >>= 1;
-      result += roundup;
+      // Sanity checks
+      //uint8_t roundup=result&0x01;
+      //result >>= 1;
+      //result += roundup;
     } else if (res == 8) {
       ; // do nothing
     } else if (res < ADC_NATIVE_RESOLUTION) {
@@ -480,8 +474,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       result >>= shift;
     }
 
-    // res > 0x80 (raw accumulate) or res == 8, res == 12 need no adjustment;though needed a donothing clause for res=8 above.
-    ADC0.CTRLB = 0;
+    // res > 0x80 (raw accumulate) or res == 8, res == 12 need no adjustment.
     if (_analog_options & 0x80) {
       ADC0.PGACTRL &= ~ADC_PGAEN_bm;
     }
@@ -508,6 +501,45 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     }
     return _analogReadEnh(pos, neg, res, gain);
   }
+
+  static const int16_t adc_prescale_to_clkadc[0x11] =  {(F_CPU /  2000L),(F_CPU /  4000L),(F_CPU /  6000L),(F_CPU /  8000L),
+  /* Doesn't get copied to ram because these all */     (F_CPU / 10000L),(F_CPU / 12000L),(F_CPU / 14000L),(F_CPU / 16000L),
+  /* have fully memory mapped flash. Calculated  */     (F_CPU / 20000L),(F_CPU / 24000L),(F_CPU / 28000L),(F_CPU / 32000L),
+  /* at compile time (we get to use division!)   */     (F_CPU / 40000L),(F_CPU / 48000L),(F_CPU / 56000L),(F_CPU / 64000L),1};
+
+
+  /*
+  Frequency in kHz.
+  If options & 1 == 1, will set frequencies outside of safe operating range
+  Otherwise, will be constrained to between 300 and 3000 (if internal reference used) or 300 and 6000 if not.
+  Note: analogReference does NOT check this! So set the clock speed after reference if you want that guardrail.
+  0 takes action, and -1 sets to default.
+  */
+  int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
+    if (frequency == -1) {
+      frequency = 2750;
+    }
+    if (frequency > 0 ) {
+      if ((options & 0x01) == 0) {
+        frequency = constrain(frequency, 300, ((ADC0.CTRLC & 0x04) ? 3000 : 6000));
+      }
+      uint8_t prescale = 0;
+      for (uint8_t i =0; i < 16; i++) {
+        int16_t clkadc = adc_prescale_to_clkadc[i];
+        prescale = i;
+        if ((frequency >= clkadc) || /* i == 15 || */ (adc_prescale_to_clkadc[i+1] < ((options & 0x01) ? 2 : 300))) {
+          ADC0.CTRLB = prescale;
+          break;
+        }
+      }
+    }
+    if (frequency < 0) {
+      return ADC_ERROR_INVALID_CLOCK;
+    }
+    return adc_prescale_to_clkadc[ADC0.CTRLB];
+  }
+
+
 /*---------------------------------------------------
  * END 2-series analogRead/analogReadXxxx functions
  *--------------------------------------------------*/
@@ -663,6 +695,46 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     badCall("This part does not have a differential ADC");
     return ADC_ENH_ERROR_NOT_DIFF_ADC;
   }
+
+  static const int16_t adc_prescale_to_clkadc[0x09] =  {(F_CPU /  2000UL),(F_CPU /  4000UL),(F_CPU /  8000UL),(F_CPU / 16000UL),
+  /* Doesn't get copied to ram because these all */     (F_CPU / 32000UL),(F_CPU / 64000UL),(F_CPU /128000UL),(F_CPU /256000UL),1};
+
+
+  /*
+  Frequency in kHz.
+  If (options & 1) == 1, will set frequencies outside of safe operating range
+  Otherwise, will be constrained to between 300 and 3000 (if internal reference used) or 300 and 6000 if not.
+  Note: analogReference does NOT check this! So set the clock speed after reference if you want that guardrail.
+  0 takes action, and -1 sets to default.
+  */
+
+
+  int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
+    if (frequency == -1) {
+      frequency = 1450;
+    }
+    if (frequency > 0 ) {
+      bool using_0v55 = !(VREF.CTRLA & VREF_ADC0REFSEL_gm || ADC0.CTRLC & ADC_REFSEL_gm);
+      if ((options & 0x01) == 0) {
+        frequency = constrain(frequency, (using_0v55 ? 100: 200), (using_0v55 ? 260 : 1500));
+      }
+      uint8_t prescale = 0;
+      for (uint8_t i =0; i < 8; i++) {
+        int16_t clkadc = adc_prescale_to_clkadc[i];
+        prescale = i;
+        if ((frequency >= clkadc) || (adc_prescale_to_clkadc[i+1] < ((options & 0x01) ? 2 : (using_0v55 ? 100 : 200)))) {
+          ADC0.CTRLC = (ADC0.CTRLC & ~ADC_PRESC_gm) | prescale;
+          break;
+        }
+      }
+    }
+    if (frequency < 0) {
+      return ADC_ERROR_INVALID_CLOCK;
+    }
+    return adc_prescale_to_clkadc[(ADC0.CTRLC & ADC_PRESC_gm)];
+  }
+
+
   /*****************************************************
    END 0/1-series analogRead/analogReadXxxx functions
   *****************************************************/
