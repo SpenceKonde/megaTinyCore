@@ -1,4 +1,15 @@
-/* Minimal demo of uaing the ADC to read temperature and operating voltage */
+/* Minimal demo of uaing the ADC to read temperature and operating voltage
+ * This has not yet been updated to cover temperature on the new 2-series parts
+ *
+ * Reading Vdd on the 2-series is VERY easy though, because there's a channel
+ * called VDDDIV10, and the core presents it as ADC_VDDDIV10. Care to guess
+ * what voltage analogRead(ADC_VDDDIV10) measures?
+ *    Maybe... the supply voltage, Vdd, divided by 10?
+ * So you can just switch to the internal 1.024V reference (or the others if
+ * you prefer less accurate measurements) and read it. The math is even much
+ * easier... with the reference voltages as multiples of 1024, the 1.024v
+ * reference is in units of 0.25 mV. To get millivolts, just divide by 4.
+ */
 
 #define RESULTCOUNT 4
 int16_t results[RESULTCOUNT];
@@ -29,17 +40,27 @@ uint16_t readSupplyVoltage() { //returns value in millivolts to avoid floating p
   reading = intermediate / reading;
   return reading;
   #else
-  return -1;
+  analogReference(INTERNAL1V024);
+  Serial.print(analogReadEnh(ADC_VDDDIV10, 12)); //throwaway reading just for goood measure.
+  Serial.println(" (discarded)");
+  int32_t vddmeasure = analogReadEnh(ADC_VDDDIV10, 12); // Take it at 12 bits
+  Serial.println(vddmeasure);
+  int16_t returnval = vddmeasure >> 2; //divide by 4 to get into millivolts.
+  if (vddmeasure & 0x02) {
+    //if last two digits were 0b11 or 0b10 we should round up
+    returnval++;
+  }
+  return returnval;
   #endif
 }
 void printRegisters() {
   #if MEGATINYCORE_SERIES!=2
   Serial.print("ADC0.MUXPOS: ");
-  showHex(ADC0.MUXPOS);
+  Serial.printHex(ADC0.MUXPOS);
   Serial.print("  ADC0.CTRLC: ");
-  showHex(ADC0.CTRLC);
+  Serial.printHex(ADC0.CTRLC);
   Serial.print("  VREF.CTRLA: ");
-  showHex(VREF.CTRLA);
+  Serial.printHex(VREF.CTRLA);
   Serial.println();
   #endif
 }
@@ -69,17 +90,6 @@ uint16_t readTemp() {
   #else
   return -1;
   #endif
-}
-
-void showHex(const byte b) {
-  char buf [3] = { ((b >> 4) & 0x0F) | '0', (b & 0x0F) | '0', 0};
-  if (buf [0] > '9') {
-    buf [0] += 7;
-  }
-  if (buf [1] > '9') {
-    buf [1] += 7;
-  }
-  Serial.print(buf);
 }
 void loop() {
   int16_t reading = readSupplyVoltage();

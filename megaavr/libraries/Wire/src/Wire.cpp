@@ -177,7 +177,7 @@ bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
 
 bool TwoWire::swap(uint8_t state) {
   #if defined(PORTMUX_CTRLB) /* tinyAVR 0/1-series */
-    #if defined(PIN_WIRE_SDA_PINSWAP_1))
+    #if (defined(PIN_WIRE_SDA_PINSWAP_1))
       if (state == 1) {
         // Use pin swap
         PORTMUX.CTRLB |= PORTMUX_TWI0_bm;
