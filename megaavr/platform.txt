@@ -96,7 +96,7 @@ recipe.hooks.objcopy.postobjcopy.2.pattern.macosx=bash -c "{compiler.path}{compi
 
 
 ## This is the name that memory maps, assembly listings and hex files will be output as
-build.extraassetname={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}{build.serialeventabr}.m{build.millistimer}.hex
+build.extraassetname={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}.m{build.millistimer}.hex
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.hex
