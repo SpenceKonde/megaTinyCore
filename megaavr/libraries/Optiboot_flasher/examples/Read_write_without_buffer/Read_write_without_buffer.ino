@@ -34,7 +34,7 @@ void flash_write_int(const uint8_t base_addr[], uint16_t offset_addr, int16_t da
   optiboot_page_fill((uint16_t)base_addr + offset_addr, (uint16_t)data);
 
   // Write the buffer to flash when the buffer is full
-if ((offset_addr & 0xFF) == (SPM_PAGESIZE - 2)) {
+  if ((offset_addr & 0xFF) == (SPM_PAGESIZE - 2)) {
     optiboot_page_erase_write();
   }
 }
