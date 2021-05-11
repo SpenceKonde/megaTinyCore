@@ -1,15 +1,47 @@
 ##########################################################################
-#      Tools Submenu Names
+#                                                                        #
+#                       ########                 #####                   #
+#                          ##                   ##```                    #
+#  #   # ####  ###   ##    ##   ### #   # #   # ##      ###  ####  ####  #
+#  ## ## #    #     #  #   ##    #  ##  #  # #  ##     #   # #   # #     #
+#  # # # ###  #  ## ####   ##    #  # # #   #   ##     #   # ####  ###   #
+#  #   # #    #   # #  #   ##    #  #  ##   #   ##___  #   # # #   #     #
+#  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
+#________________________________________________________________________#
+#                                                                        #
+#  Copyright Spence Konde and other             ##       ###        ##   #
+#  contributors 2018-2021                      #  #         #      #  #  #
+#  megaTinyCore is free software.        # #     #        ##         #   #
+#  (LGPL v2.1) see LICENSE.md and        # #    #    ##     #  ##   #    #
+#  License section of README.md           #    ####  ##  ###   ##  ####  #
+#________________________________________________________________________#
+#                                                                        #
+#  Now reformatted for easy navigation with text editing tools which     #
+#  have the zoomed out view that you can scroll through.                 #
+#  The board section headings have a triangle along the right edge       #
+#  if they are a non-bootloader definition. Optiboot sections have a     #
+#  line inside the right edge if they are for the 2-series parts.        #
+#                                                                        #
 ##########################################################################
+#                                                                        #
+#          ###  #   #  ####   #   #  ####  #   #  #   #   ###            #
+#         #     #   #  #   #  ## ##  #     ##  #  #   #  #               #
+#          ###  #   #  ####   # # #  ###   # # #  #   #   ###            #
+#             # #   #  #   #  #   #  #     #  ##  #   #      #           #
+#          ###   ###   ####   #   #  ####  #   #   ###    ###            #
+#________________________________________________________________________#
+# The *opti menus are for Optiboot board definitions - We name them
+# differently when the option takes on different meaning for a bootloaded
+# board. Eg - UPDI can set fuses, so OSCCFG is set on all uploads and
+# you don't need to burn bootloader to change clock speed.
 
-### CHIP
-menu.chip=Chip
+menu.chip=Chip or Board
 menu.clock=Clock (burn bootloader NOT req'd)
 menu.clocko=Clock (burn bootloader req'd, or see docs)
 menu.millis=millis()/micros() Timer
 menu.startuptime=Startup Time
 menu.startuptimeopti=Startup Time (burn bootloader req'd)
-menu.bodvoltage=BOD Level (if enabled - burn bootloader req'd)
+menu.bodvoltage=BOD Voltage Level (burn bootloader req'd)
 menu.bodmode=BOD Mode when Active/Sleeping (burn bootloader req'd)
 menu.eesave=Save EEPROM (burn bootloader req'd)
 menu.bootloaderuart=UART for Bootloader (burn bootloader req'd)
@@ -18,13 +50,16 @@ menu.resetpinopti=UPDI/Reset Pin and Optiboot Entry (burn bootloader req'd)
 menu.resetpinopti_2=UPDI/alt-RST pins and Optiboot Entry (burn bootloader req'd)
 menu.uartvoltage=Voltage Baud Correction
 
-# The *opti menus are for Optiboot board definitions;
-# they function identically, just differ in the
-# information shown in the submenu name.
-
 ##########################################################################
-#      Board Names
+#                                                                        #
+###              ####    ###    ###   ####   ####    ###               ###
+#####            #   #  #   #  #   #  #   #  #   #  #                #####
+#######          ####   #   #  #####  ####   #   #   ###           #######
+#####            #   #  #   #  #   #  #  #   #   #      #            #####
+###              ####    ###   #   #  #   #  ####    ###               ###
+#________________________________________________________________________#
 ##########################################################################
+# Names listed at the top so they can be kept in consistent format
 
 atxy7.name=ATtiny3227/3217/1627/1617/1607/827/817/807/427/417
 atxy6.name=ATtiny3226/3216/1626/1616/1606/826/816/806/426/416/406
@@ -39,30 +74,34 @@ atx24o.name=ATtiny3224/1624/824/424 w/Optiboot
 atxy2o.name=ATtiny412/402/212/202 w/Optiboot
 
 ##########################################################################
-#      ATtiny3227/3217/1627/1617/1607/827/817/807/427/417
-##########################################################################
+#  Non-bootloader                                                        #
+#                                ##   #  #     ####   ###  #   #       ###
+#  ATtiny3227/3217              #  #  #  #     #   #   #   ##  #     #####
+#  ATtiny1627/1617/1607           #   #### === ####    #   # # #   #######
+#  ATtiny827/817/807             #       #     #       #   #  ##     #####
+#  ATtiny427/417/407            ####     #     #      ###  #   #       ###
+#________________________________________________________________________#
 
 ### BUILD PARAMETERS
+atxy7.build.text_section_start=.text=0x0
 atxy7.build.millistimer=D0
 atxy7.build.bootload=
 atxy7.build.board=AVR_ATtinyxy7
-atxy7.build.mcu=attiny{build.attiny}
-atxy7.build.serialeventabr=
-atxy7.build.f_cpu={build.speed}000000L
 atxy7.build.core=megatinycore
 atxy7.build.variant=txy7
+atxy7.build.mcu=attiny{build.attiny}
+atxy7.build.f_cpu={build.speed}000000L
 atxy7.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage}
 atxy7.build.export_merged_output=false
-atxy7.build.text_section_start=.text=0x0
 
 ### BOOTLOADING PARAMETERS (FUSES)
 atxy7.bootloader.WDTCFG=0x00
 atxy7.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy7.bootloader.OSCCFG=0x01
 atxy7.bootloader.TCD0CFG=0x00
+atxy7.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy7.bootloader.APPEND=0x00
 atxy7.bootloader.BOOTEND=0x00
-atxy7.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy7.bootloader.tool=avrdude
 atxy7.bootloader.avrdudestring=
 atxy7.bootloader.pymcuprogstring=-aerase
@@ -283,31 +322,35 @@ atxy7.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy7.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ##########################################################################
-#      ATtiny3226/3216/1626/1616/1606/826/816/806/426/416/406
-##########################################################################
+#  Non-bootloader                                                        #
+#                                ##    ###      ####   ###  #   #      ###
+#  ATtiny3226/3216              #  #  #   #     #   #   #   ##  #    #####
+#  ATtiny1626/1616/1606           #   #   # === ####    #   # # #  #######
+#  ATtiny826/816/806             #    #   #     #       #   #  ##    #####
+#  ATtiny427/416/406            ####   ###      #      ###  #   #      ###
+#________________________________________________________________________#
 
 ### BUILD PARAMETERS
+atxy6.build.text_section_start=.text=0x0
 atxy6.build.millistimer=D0
 atxy6.build.bootload=
 atxy6.build.board=AVR_ATtinyxy6
 atxy6.build.core=megatinycore
+atxy6.build.variant=txy6
 atxy6.build.mcu=attiny{build.attiny}
 atxy6.build.f_cpu={build.speed}000000L
 atxy6.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage}
 atxy6.build.export_merged_output=false
-atxy6.build.variant=txy6
-atxy6.build.text_section_start=.text=0x0
-
 
 ### BOOTLOADING PARAMETERS (FUSES)
-atxy6.bootloader.tool=avrdude
 atxy6.bootloader.WDTCFG=0x00
 atxy6.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy6.bootloader.OSCCFG=0x01
 atxy6.bootloader.TCD0CFG=0x00
+atxy6.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy6.bootloader.APPEND=0x00
 atxy6.bootloader.BOOTEND=0x00
-atxy6.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
+atxy6.bootloader.tool=avrdude
 atxy6.bootloader.avrdudestring=
 atxy6.bootloader.pymcuprogstring=-aerase
 
@@ -533,23 +576,35 @@ atxy6.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ##########################################################################
-#      ATtiny3224/1624/1614/1604/824/814/804/424/414/404/214/204
-##########################################################################
+#  Non-bootloader                                                        #
+#                                #    #  #     ####   ###  #   #       ###
+#  ATtiny3224/1614/1604         ##    #  #     #   #   #   ##  #     #####
+#  ATtiny1624/814/804            #    #### === ####    #   # # #   #######
+#  ATtiny824/414/404             #       #     #       #   #  ##     #####
+#  ATtiny424/214/204            ###      #     #      ###  #   #       ###
+#________________________________________________________________________#
 
 ### BUILD PARAMETERS
+atxy4.build.text_section_start=.text=0x0
 atxy4.build.millistimer=D0
 atxy4.build.bootload=
 atxy4.build.board=AVR_ATtinyxy4
 atxy4.build.core=megatinycore
 atxy4.build.variant=txy4
 atxy4.build.mcu=attiny{build.attiny}
-atxy4.build.f_cpu={build.speed}000000Latxy4.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage}
+atxy4.build.f_cpu={build.speed}000000L
+atxy4.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage}
 atxy4.build.export_merged_output=false
-atxy4.build.text_section_start=.text=0x0
-
 
 
 ### BOOTLOADING PARAMETERS (FUSES)
+atxy4.bootloader.WDTCFG=0x00
+atxy4.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+atxy4.bootloader.OSCCFG=0x01
+atxy4.bootloader.TCD0CFG=0x00
+atxy4.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
+atxy4.bootloader.APPEND=0x00
+atxy4.bootloader.BOOTEND=0x00
 atxy4.bootloader.tool=avrdude
 atxy4.bootloader.avrdudestring=
 atxy4.bootloader.pymcuprogstring=-aerase
@@ -776,19 +831,23 @@ atxy4.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy4.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ##########################################################################
-#      ATtiny412/402/212/202
-##########################################################################
+#  Non-bootloader                                                        #
+#                                     ###      ####   ###  #   #       ###
+#  ATtiny412                         #   #     #   #   #   ##  #     #####
+#  ATtiny402                          ###  === ####    #   # # #   #######
+#  ATtiny212                         #   #     #       #   #  ##     #####
+#  ATtiny202                          ###      #      ###  #   #       ###
+#________________________________________________________________________#
 
 ### BUILD PARAMETERS
+atxy2.build.text_section_start=.text=0x0
 atxy2.build.millistimer=D0
 atxy2.build.bootload=
 atxy2.build.board=AVR_ATtinyxy2
-atxy2.build.mcu=attiny{build.attiny}
-atxy2.build.serialeventabr=
-atxy2.build.f_cpu={build.speed}000000L
 atxy2.build.core=megatinycore
 atxy2.build.variant=txy2
-atxy2.build.text_section_start=.text=0x0
+atxy2.build.mcu=attiny{build.attiny}
+atxy2.build.f_cpu={build.speed}000000L
 atxy2.build.extra_flags=-DARDUINO_attinyxy2 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage}
 atxy2.build.export_merged_output=false
 
@@ -797,9 +856,9 @@ atxy2.bootloader.WDTCFG=0x00
 atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy2.bootloader.OSCCFG=0x01
 atxy2.bootloader.TCD0CFG=0x00
+atxy2.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy2.bootloader.APPEND=0x00
 atxy2.bootloader.BOOTEND=0x00
-atxy2.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy2.bootloader.tool=avrdude
 atxy2.bootloader.avrdudestring=
 atxy2.bootloader.pymcuprogstring=-aerase
@@ -980,18 +1039,34 @@ atxy2.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy2.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ##########################################################################
-#      ATtiny3217/1617/1607/817/807/417 (Optiboot)
 ##########################################################################
+#                                                                        #
+#           ###   ####   #####  ###  ####    ###    ###   #####          #
+#          #   #  #   #    #     #   #   #  #   #  #   #    #            #
+#          #   #  ####     #     #   ####   #   #  #   #    #            #
+#          #   #  #        #     #   #   #  #   #  #   #    #            #
+#           ###   #        #    ###  ####    ###    ###     #            #
+#________________________________________________________________________#
+##########################################################################
+
+##########################################################################
+#  WITH OPTIBOOT                                                         #
+#  0/1-series                    ##   #  #     ####   ###  #   #         #
+#                               #  #  #  #     #   #   #   ##  #         #
+#  ATtiny3217/1617                #   #### === ####    #   # # #         #
+#  ATtiny1607/817                #       #     #       #   #  ##         #
+#  ATtiny807/417                ####     #     #      ###  #   #         #
+#________________________________________________________________________#
 
 ### BUILD PARAMETERS
 atxy7o.build.text_section_start=.text=0x200
 atxy7o.build.millistimer=D0
 atxy7o.build.bootload=opti
 atxy7o.build.board=AVR_ATtinyxy7
-atxy7o.build.mcu=attiny{build.attiny}
-atxy7o.build.f_cpu={build.speed}000000L
 atxy7o.build.core=megatinycore
 atxy7o.build.variant=txy7
+atxy7o.build.mcu=attiny{build.attiny}
+atxy7o.build.f_cpu={build.speed}000000L
 atxy7o.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DUSING_OPTIBOOT
 atxy7o.build.export_merged_output=true
 
@@ -1202,18 +1277,23 @@ atxy7o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy7o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
 ##########################################################################
-#      ATtiny3227/1627/827/427 (Optiboot)
-##########################################################################
+#  WITH OPTIBOOT                                                     #   #
+#  2-series                      ##   #  #     ####   ###  #   #     #   #
+#                               #  #  #  #     #   #   #   ##  #     #   #
+#  ATtiny3227/1627                #   #### === ####    #   # # #     #   #
+#  ATtiny827/427                 #       #     #       #   #  ##     #   #
+#                               ####     #     #      ###  #   #     #   #
+#____________________________________________________________________#___#
 
 ### BUILD PARAMETERS
 atx27o.build.text_section_start=.text=0x200
 atx27o.build.millistimer=B1
 atx27o.build.bootload=opti
 atx27o.build.board=AVR_ATtinyxy7
-atx27o.build.mcu=attiny{build.attiny}
-atx27o.build.f_cpu={build.speed}000000L
 atx27o.build.core=megatinycore
 atx27o.build.variant=txy7
+atx27o.build.mcu=attiny{build.attiny}
+atx27o.build.f_cpu={build.speed}000000L
 atx27o.build.extra_flags=-DARDUINO_attinyx27 -DMILLIS_USE_TIMER{build.millistimer} -DUSING_OPTIBOOT
 atx27o.build.export_merged_output=true
 atx27o.build.uartvoltage=
@@ -1222,6 +1302,7 @@ atx27o.build.uartvoltage=
 atx27o.bootloader.WDTCFG=0x00
 atx27o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atx27o.bootloader.OSCCFG=0x01
+atx27o.bootloader.TCD0CFG=0x00
 atx27o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atx27o.bootloader.APPEND=0x00
 atx27o.bootloader.BOOTEND=0x02
@@ -1367,7 +1448,7 @@ atx27o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 atx27o.menu.resetpinopti_2.UPDIaltrst=UPDI on PA0, RST on PB4 (Optiboot for 1 sec after reset)
 atx27o.menu.resetpinopti_2.UPDIaltrst.bootloader.file=optiboot_tx2z{bootloader.uartswap}_rst.hex
 atx27o.menu.resetpinopti_2.UPDIaltrst.bootloader.resetpinbits=11
-atx27o.menu.resetpinopti_2.UPDI=Optiboot for 8 sec. after power-on & SW reset, no RST pin
+atx27o.menu.resetpinopti_2.UPDI=No RST, UPDI enabled, 8 sec Optiboot after power on or SW reset
 atx27o.menu.resetpinopti_2.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
 atx27o.menu.resetpinopti_2.UPDI.bootloader.resetpinbits=01
 atx27o.menu.resetpinopti_2.UPDIFastBoot=Optiboot for 1 sec. after power-on & SW reset, no RST pin
@@ -1407,18 +1488,23 @@ atx27o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 atx27o.menu.bootloaderuart.alternate1.bootloader.uartswap=_u1alt
 
 ##########################################################################
-#      ATtiny3216/1616/1606/816/806/416/406 (Optiboot)
-##########################################################################
+#  WITH OPTIBOOT                                                         #
+#  0/1-series                    ##    ###      ####   ###  #   #        #
+#                               #  #  #   #     #   #   #   ##  #        #
+#  ATtiny3216/1616/1606           #   #   # === ####    #   # # #        #
+#  ATtiny816/806                 #    #   #     #       #   #  ##        #
+#  ATtiny416/406                ####   ###      #      ###  #   #        #
+#________________________________________________________________________#
 
 ### BUILD PARAMETERS
 atxy6o.build.text_section_start=.text=0x200
 atxy6o.build.millistimer=D0
 atxy6o.build.bootload=opti
 atxy6o.build.board=AVR_ATtinyxy6
-atxy6o.build.mcu=attiny{build.attiny}
-atxy6o.build.f_cpu={build.speed}000000L
 atxy6o.build.core=megatinycore
 atxy6o.build.variant=txy6
+atxy6o.build.mcu=attiny{build.attiny}
+atxy6o.build.f_cpu={build.speed}000000L
 atxy6o.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DUSING_OPTIBOOT
 atxy6o.build.export_merged_output=true
 
@@ -1640,18 +1726,23 @@ atxy6o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy6o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
 ##########################################################################
-#      ATtiny3226/1626/826/426 (Optiboot)
-##########################################################################
+#  WITH OPTIBOOT                                                    ##   #
+#  2-series                      ##    ###      ####   ###  #   #   ##   #
+#                               #  #  #   #     #   #   #   ##  #   ##   #
+#  ATtiny3226/1626                #   #   # === ####    #   # # #   ##   #
+#  ATtiny826/426                 #    #   #     #       #   #  ##   ##   #
+#                               ####   ###      #      ###  #   #   ##   #
+#___________________________________________________________________##___#
 
 ### BUILD PARAMETERS
 atx26o.build.text_section_start=.text=0x200
 atx26o.build.millistimer=B1
 atx26o.build.bootload=opti
 atx26o.build.board=AVR_ATtinyxy6
-atx26o.build.mcu=attiny{build.attiny}
-atx26o.build.f_cpu={build.speed}000000L
 atx26o.build.core=megatinycore
 atx26o.build.variant=txy6
+atx26o.build.mcu=attiny{build.attiny}
+atx26o.build.f_cpu={build.speed}000000L
 atx26o.build.extra_flags=-DARDUINO_attinyx26 -DMILLIS_USE_TIMER{build.millistimer} -DUSING_OPTIBOOT
 atx26o.build.export_merged_output=true
 atx26o.build.uartvoltage=
@@ -1660,6 +1751,7 @@ atx26o.build.uartvoltage=
 atx26o.bootloader.WDTCFG=0x00
 atx26o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atx26o.bootloader.OSCCFG=0x01
+atxy6o.bootloader.TCD0CFG=0x00
 atx26o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atx26o.bootloader.APPEND=0x00
 atx26o.bootloader.BOOTEND=0x02
@@ -1802,19 +1894,19 @@ atx26o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atx26o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
 ### UPDI/RESET PIN CONFIGURATION & OPTIBOOT ENTRY
+atx26o.menu.resetpinopti_2.UPDI=No RST, UPDI enabled, 8 sec Optiboot after power on or SW reset
+atx26o.menu.resetpinopti_2.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
+atx26o.menu.resetpinopti_2.UPDI.bootloader.resetpinbits=01
 atx26o.menu.resetpinopti_2.UPDIaltrst=UPDI on PA0, RST on PB4 (Optiboot for 1 sec after reset)
 atx26o.menu.resetpinopti_2.UPDIaltrst.bootloader.file=optiboot_tx2z{bootloader.uartswap}_rst.hex
 atx26o.menu.resetpinopti_2.UPDIaltrst.bootloader.resetpinbits=11
-atx26o.menu.resetpinopti_2.UPDI=Optiboot for 8 sec. after power-on & SW reset, no RST pin
-atx26o.menu.resetpinopti_2.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
-atx26o.menu.resetpinopti_2.UPDI.bootloader.resetpinbits=01
 atx26o.menu.resetpinopti_2.UPDIFastBoot=Optiboot for 1 sec. after power-on & SW reset, no RST pin
 atx26o.menu.resetpinopti_2.UPDIFastBoot.bootloader.file=optiboot_tx2z{bootloader.uartswap}_1sec.hex
 atx26o.menu.resetpinopti_2.UPDIFastBoot.bootloader.resetpinbits=01
 atx26o.menu.resetpinopti_2.reset=RST on PA0, Optiboot for 1 sec. after reset *DANGER* HV UPDI programmer req'd for reprogramming!
 atx26o.menu.resetpinopti_2.reset.bootloader.file=optiboot_tx2z{bootloader.uartswap}_rst.hex
 atx26o.menu.resetpinopti_2.reset.bootloader.resetpinbits=10
-atx26o.menu.resetpinopti_2.gpio=PA0 is GPIO, Optiboot for 8 sec. after power-on & SW reset, no RST pin. *DANGER* HV programmer req'd for reprogramming! (PCHV)
+atx26o.menu.resetpinopti_2.gpio=PA0 is GPIO, Optiboot for 8 sec, no RST, no UPDI - *DANGER* HV programmer req'd for reprogramming! (PCHV)
 atx26o.menu.resetpinopti_2.gpio.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
 atx26o.menu.resetpinopti_2.gpio.bootloader.resetpinbits=00
 
@@ -1845,18 +1937,23 @@ atx26o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 atx26o.menu.bootloaderuart.alternate1.bootloader.uartswap=_u1alt
 
 ##########################################################################
-#      ATtiny1614/1604/814/804/414/404/214/204 (Optiboot)
-##########################################################################
+#  WITH OPTIBOOT                                                         #
+#  0/1-series                    #    #  #     ####   ###  #   #         #
+#                               ##    #  #     #   #   #   ##  #         #
+#  ATtiny1614/1604               #    #### === ####    #   # # #         #
+#  ATtiny814/804/414             #       #     #       #   #  ##         #
+#  ATtiny404/214/204            ###      #     #      ###  #   #         #
+#________________________________________________________________________#
 
 ### BUILD PARAMETERS
 atxy4o.build.text_section_start=.text=0x200
 atxy4o.build.millistimer=D0
 atxy4o.build.bootload=opti
 atxy4o.build.board=AVR_ATtinyxy4
-atxy4o.build.mcu=attiny{build.attiny}
-atxy4o.build.f_cpu={build.speed}000000L
 atxy4o.build.core=megatinycore
 atxy4o.build.variant=txy4
+atxy4o.build.mcu=attiny{build.attiny}
+atxy4o.build.f_cpu={build.speed}000000L
 atxy4o.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DUSING_OPTIBOOT
 atxy4o.build.export_merged_output=true
 
@@ -2079,26 +2176,35 @@ atxy4o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atxy4o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
 ##########################################################################
-#      ATtiny3224/1624/824/424 (Optiboot)
-##########################################################################
+#  WITH OPTIBOOT                                                    ##   #
+#  2-series                      #    #  #     ####   ###  #   #    ##   #
+#                               ##    #  #     #   #   #   ##  #    ##   #
+#  ATtiny3224/804                #    #### ### ####    #   # # #    ##   #
+#  ATtiny824/424                 #       #     #       #   #  ##    ##   #
+#                               ###      #     #      ###  #   #    ##   #
+#___________________________________________________________________##___#
 
 ### BUILD PARAMETERS
 atx24o.build.text_section_start=.text=0x200
 atx24o.build.millistimer=B1
 atx24o.build.bootload=opti
 atx24o.build.board=AVR_ATtinyxy4
-atx24o.build.mcu=attiny{build.attiny}
-atx24o.build.f_cpu={build.speed}000000L
 atx24o.build.core=megatinycore
 atx24o.build.variant=txy4
+atx24o.build.mcu=attiny{build.attiny}
+atx24o.build.f_cpu={build.speed}000000L
 atx24o.build.extra_flags=-DARDUINO_attinyx24 -DMILLIS_USE_TIMER{build.millistimer} -DUSING_OPTIBOOT
 atx24o.build.export_merged_output=true
-atx26o.build.uartvoltage=
 
-### BOOTLOADING PARAMETERS
+##############################
+###     FUSE VALUES AND    ###
+### BOOTLOADING PARAMETERS ###
+##############################
+
 atx24o.bootloader.WDTCFG=0x00
 atx24o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atx24o.bootloader.OSCCFG=0x01
+atxy6o.bootloader.TCD0CFG=0x00
 atx24o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atx24o.bootloader.APPEND=0x00
 atx24o.bootloader.BOOTEND=0x02
@@ -2106,12 +2212,18 @@ atx24o.bootloader.tool=avrdude
 atx24o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/hex/{bootloader.file}:i
 atx24o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/hex/{bootloader.file} -a write
 
-### UPLOAD VIA OPTIBOOT
+###########################
+### UPLOAD VIA OPTIBOOT ###
+###########################
+
 atx24o.upload.workaround=
 atx24o.upload.tool=avrdude
 atx24o.upload.speed=115200
 atx24o.upload.protocol=arduino
 atx24o.upload.extra_params=-D
+
+
+
 
 ### CHIP
 atx24o.menu.chip.3224=ATtiny3224
@@ -2279,18 +2391,23 @@ atx24o.menu.bootloaderuart.default.bootloader.uartswap=
 atx24o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
 ##########################################################################
-#      ATtiny412/402/212/202 (Optiboot)
-##########################################################################
+#                                                                        #
+#  WITH OPTIBOOT                      ###      ####   ###  #   #         #
+#  ATtiny412                         #   #     #   #   #   ##  #         #
+#  ATtiny402                          ###  === ####    #   # # #         #
+#  ATtiny212                         #   #     #       #   #  ##         #
+#  ATtiny202                          ###      #      ###  #   #         #
+#________________________________________________________________________#
 
 ### BUILD PARAMETERS
 atxy2o.build.text_section_start=.text=0x200
 atxy2o.build.millistimer=D0
 atxy2o.build.bootload=opti
 atxy2o.build.board=AVR_ATtinyxy2
-atxy2o.build.mcu=attiny{build.attiny}
-atxy2o.build.serialeventabr=
-atxy2o.build.f_cpu={build.speed}000000Latxy2o.build.core=megatinycore
+atxy2o.build.core=megatinycore
 atxy2o.build.variant=txy2
+atxy2o.build.mcu=attiny{build.attiny}
+atxy2o.build.f_cpu={build.speed}000000L
 atxy2o.build.extra_flags=-DARDUINO_attinyxy2 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DUSING_OPTIBOOT
 atxy2o.build.export_merged_output=true
 
@@ -2446,11 +2563,11 @@ atxy2o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy2o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
 ### BOOTLOADER UART PINS
+# Weird thing - non-alt-0pin bootloaders for 2-series are separate binaries because of LED pin
+# But when altgernate pins are used, it can use the same binary as all other 0/1-series!
 atxy2o.menu.bootloaderuart.default=TX:0 (PA6), RX:1 (PA7)
 atxy2o.menu.bootloaderuart.alternate=TX:2 (PA1), RX:3 (PA2)
-#Weird thing - non-alt-0pin bootloaders for 2-series are separate binaries because of LED pin
 atxy2o.menu.bootloaderuart.default.bootloader.uartswap=2
-#But when altgernate pins are used, it can use the same binary as all other 0/1-series!
 atxy2o.menu.bootloaderuart.alternate.bootloader.uartswap=z_alt
 
 ### VOLTAGE FOR UART BAUD CORRECTION
