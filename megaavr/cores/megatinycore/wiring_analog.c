@@ -832,7 +832,7 @@ void analogWrite(uint8_t pin, int val) {
 
         uint8_t oldSREG=SREG;
         cli(); //interrupts off... wouldn't due to have this mess interrupted and messed with...
-        while (!(TCD0.STATUS & (TCD_ENRDY_bm | TCD_CMDRDY_bm ))); //if previous sync/enable in progress, wait for it to finish.
+        while ((TCD0.STATUS & (TCD_ENRDY_bm | TCD_CMDRDY_bm )) != (TCD_ENRDY_bm | TCD_CMDRDY_bm )); //if previous sync/enable in progress, wait for it to finish.
         // with interrupts off since an interrupt could trip these...
         //set new values
         uint8_t fc_mask;
@@ -846,7 +846,6 @@ void analogWrite(uint8_t pin, int val) {
 
         if (!(TCD0.FAULTCTRL & fc_mask)) {
           //if it's not active, we need to activate it... which produces a glitch in the PWM
-
           TCD0.CTRLA &= ~TCD_ENABLE_bm; //stop the timer
           _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL | fc_mask);
           while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until we can re-enable it
