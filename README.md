@@ -1,11 +1,11 @@
 ## [Check it out, we have "discussions" now!](https://github.com/SpenceKonde/megaTinyCore/discussions)
 Let's use that - it's better than gitter ever was, and it's all on one site.
 
-## The 2-series is here!
-Please report any bugs you find. We will be releasing a fix for the improper ADC configuration (results is poor accuracy) bug this week.
-
 ### [Wiring](Wiring.md)
 ### [Installation](Installation.md)
+
+## The 2-series is here!
+Please report any bugs you find. We will be releasing a fix for the improper ADC configuration (results is poor accuracy) bug this week.
 
 # megaTinyCore
 Arduino core for the tinyAVR 0-series, 1-series, and now 2-series chips. These parts have an improved architecture, with improved peripherals and improved execution time for certain instructions (similar to megaAVR 0-series chips like the ATmega4809 as used on Nano Every and Uno Wifi Rev. 2) in low-cost, small packages of the ATtiny line. All of these parts feature a full hardware UART, SPI and TWI interface, and the 1-series parts have a DAC for analog output as well. The 2-series, which has just started to show up on the market, offers a greatly improved 12-bit differential ADC with programmable gain amplifier, a second UART, more RAM, CCL blocks (but no async timer or DAC).
@@ -23,13 +23,15 @@ This core depends on the 7.3.0-atmel3.6.1-arduino7 version of the toolchain. For
 # UPDI programming
 The UPDI programming interface is a single-wire interface for programming (and debugging - **U**niversal **P**rogramming and **D**ebugging **I**nterface) used on the tinyAVR 0/1/2-series, as well as all other modern AVR microcontrollers. In addition to purchasing a purpose-made UPDI programmer (such as the ones produced by Microchip), there are two very low-cost approaches to creating a UPDI programmer:
 
-## With an Arduino (jtag2updi)
-One can be made from a classic AVR Uno/Nano/Pro Mini; inexpensive Nano clones are the usual choice, being cheap enough that one can be wired up and then left like that - see [Making a UPDI programmer](https://github.com/SpenceKonde/AVR-Guidance/blob/master/UPDI/jtag2updi.md); using these, you should select jtag2updi from the tools->programmer menu. As of 2.3.0 this is still the recommended method, despite the balky jtag2updi firmware and incompatibility with converting an Arduino Micro, however, with recent recognition of the potential for use of a diode + resistor (which is usually already part of the serial adapter) that method may soon be proven reliable enough to recommend over jtag2updi.
-
-## From a USB-Serial adapter (pyupdi-style)
+## From a USB-Serial adapter (pyupdi-style - recommended)
 Before megaTinyCore existed, there was a tool called [pyupdi](https://github.com/mraardvark/pyupdi) - a simple python program for uploading to UPDI-equipped microcontrollers using a serial adapter modified by the addition of a single resistor. But pyupdi was not readily usable from the Arduino IDE, and so this was not an option. As of 2.2.0, megaTinyCore brings in a portable Python implementation, which opens a great many doors; Originally we were planning to adapt pyupdi, but at the urging of its author and several Microchip employees, we have instead based this functionality on [pymcuprog](https://pypi.org/project/pymcuprog/), a more robust tool developed and maintained by Microchip which includes the same serial-port upload mechanism. **If installing manually** you must [add the python package](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/tools/ManualPython.md) appropriate to your operating system in order to use this upload method (a system python installation is not sufficient, nor is one necessary).
 
+As of 2.3.2, with the dramatic improvements in performance, and the proven reliability of the wiring scheme using a diode instead of a resistor, and in light of the flakiness of the jtag2updi firmware, this is now the recommended programming method. As of this version, programming speed has been increased by as much as a factor of 20, and now far exceeds what was possible with jtag2updi (programming via jtag2updi is roughly comparable in speed to programming via serial-updi on the "SLOW" speed option, 57600 baud; the normal 230400 baud version programs about three times faster than the SLOW version or jtag2updi, while the "TURBO" option (runs at 460800 baud and increases upload speed by approximately 50% over the normal one. The TURBO speed version should only be used with devices running at 4.5v or more, as we have to run the UPDI clock faster to keep up, but it allows for upload and verification of a 32kb sketch in 4 seconds))
+
 The connections needed to [convert a serial adapter to a UPDI programmer are detailed here](https://github.com/SpenceKonde/AVR-Guidance/blob/master/UPDI/jtag2updi.md)
+
+## With an Arduino (jtag2updi)
+One can be made from a classic AVR Uno/Nano/Pro Mini; inexpensive Nano clones are the usual choice, being cheap enough that one can be wired up and then left like that - see [Making a UPDI programmer](https://github.com/SpenceKonde/AVR-Guidance/blob/master/UPDI/jtag2updi.md); using these, you should select jtag2updi from the tools->programmer menu.
 
 # Supported Parts (click link for pinout diagram and details)
 * [ATtiny3217,1617,817,417](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x17.md)
@@ -111,12 +113,33 @@ These parts do not support using an external crystal like the classic ATtiny par
 As usual for AVR parts, the internal oscillator's compliance covers a far wider range than the datasheet describes. In my testing on 1-series parts, it appeared that both the 16 MHz and 20 MHz oscillator can be calibrated to as low as approximately 5/8 of their nominal speed or as high as 1-5/8 of their nominal speed
 
 ### tinyAVR 2-series internal oscillator
-The oscillator on the tinyAVR 2-series parts has gotten another upgrade an extra bit. The 128 settings cover the same range, just with twice the granularity (hey, if they keep it up by the next series they could have a full 256 cal settings! Imagine that! In fact, you don't have to imagine it - because it was like that nearly every AVR made until the 2016 revolution, when for some reason calibration bits were suddenly in shortage. At least the tinies are going the right direction - the Dx-series lost another bit, so the frequency compliance is minimal and granularity poor. They have autotune to turne internal oscillator from watch crystal, but it doesn't do much because it's limited by the granularity of the cal register...)
+The oscillator on the tinyAVR 2-series parts has gotten an upgrade in the form of the calibration register getting an additional byte - it now has 7 bit, instead of 6 (the high bit indicates whether the center frequency is 16 or 20 MHz). The 128 settings cover the same range, just with twice the granularity (hey, if they keep it up by the next series they could have a full 256 cal settings! Imagine that! (*"Before 2016 we didn't need to imagine!"*). Apparently in 2016, for some reason, oscillator calibration bits were suddenly in short supply. At least the tinies are going the right direction - the Dx-series lost another bit (compared to tiny 0/1 and mega 0 series), so the frequency compliance is only +/- 12.5% or so, and the granularity is still poor.
+
+### Internal oscillator tuning (coming soon)
+It is planned that a version in the near future will include a sketch that will await an external timebase (either the timing of bits over UART, which would be required to send a specific character at a specific baud rate until it had finished calibrating itself or a 500 Hz squarewave on a certain pin). Either way, it will cyclethrough all of the calibration values until it has either found a match for all of the prospective frequencies, or gone all the way to the top without finding all of them.  As they are found, they will be written to the end of the USERROW - the last 8 bytes will get 20 MHz tuning values, and the 8 before those will get 16 MHz tuning values (20 or 16 refers to the center frequency). The values the tuning sketch looks for are shown below. The ones at the extremes are not found for all chips. Ensure that the part is running at the desired voltage and temperature when running the tuning for highest accuracy. If you are using the tuning features, be sure that your application code does not overwrite the calibration data.
+
+|    |   16 MHz |   20 MHz |
+|----|----------|----------|
+| 1  |   10 MHz |   12 MHz |
+| 1  |   12 MHz | 12.8 MHz |
+| 1  | 12.8 MHz |   16 MHz |
+| 1  |   16 MHz |   20 MHz |
+| 1  |   20 MHz |   24 MHz |
+| 1  |   24 MHz |   25 MHz |
+| 1  |   25 MHz |   28 MHz |
+| 1  |   28 MHz |   32 MHz |
+
+The middle 6 options can be achieved by most parts. Not all parts can make it all the way to their maximum tuning value before the chip becomes unstable; generally, they make it to 32 MHz at 5V at room temperature, but begin failing dramatically just above that. I would not recommend running code at anything above 25 MHz, except to investigate the behavior of overclocked AVRs, and I would never run them above 20 MHz if a hang or crash would be inconvenient. 24 MHz is a particularly useful frequency, as that is the top rated speed for the Dx-series parts (although they will generally do 32 MHz...), and code written for 24 MHz Dx-series would run at that same speed on an overclocked tinyAVR at 24 MHz. Assuming it was stable of course, which is not guaranteed!
+
+Yes, this means that the 16-MHz-center oscillator can be tuned to 20 MHz and the other way around. No, they don't just load different calibration constants in for the two, they each have 128 values, centered around their respective frequencies, which overlap (and no, they're not the same list of values offset from eachother). Not only that, sometimes the other setting has a calibration value that's closer to a target frequency (eg, the 16 MHz oscillator tuned up to 20 MHz gets closer to 20 than any setting on the 20 MHz oscillator does). I am sure there is a logical reason for this. I cannot imagine what it is.
+
+Once this is implemented, there will be an option to use tuned internal oscillator frequencies if available; it is expected that this will be particularly helpful with Optiboot boards, as sketches could run at the speed they were compiled for - regardless of what the fuse is set for.
+
 
 ## Memory-mapped flash: No need to declare PROGMEM
-Unlike classic AVRs, on the these parts, the flash is within the same address space as the main memory. This means `pgm_read_*_near()` is not needed to read directly from flash. Because of this, the compiler automatically puts any variable declared `const` into PROGMEM, and accesses it appropriately - you no longer need to explicitly declare them as PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either (As of 2.1.0, F() once more explicitly declares things as living in PROGMEM (ie, it is slightly less efficient) in order to ensure compatibility with third party libraries).
+Unlike classic AVRs, on the these parts, *the flash is within the same address space as the rest of the memory*. This means `pgm_read_*_near()` is not needed to read directly from flash. Because of this, the compiler automatically puts any variable declared `const` into PROGMEM, and accesses it appropriately - you no longer need to explicitly declare them as PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either (As of 2.1.0, F() once more explicitly declares things as living in PROGMEM (ie, it is slightly less efficient) in order to ensure compatibility with third party libraries).
 
-However, do note that if you explicitly declare a variable PROGMEM, you must still use the pgm_read functions to read it, just like on classic AVRs - when a variable is declared PROGMEM on parts with memory mapped flash, the pointer is offset (address is relative to start of flash, not start of address space); this same offset is applied when using the `pgm_read_*_near()` macros. Do note that declaring things PROGMEM and accessing with `pgm_read_*_near` functions, although it works fine, is slower and wastes a small amount of flash (compared to simply declaring the variables const); the same goes for the F() macro with constant strings in 2.1.0 and later. On the other hand, this may be necessary for compatibility with some third party libraries (hence why we returned the F() macro to the old approach). A better approach may be forthcoming in future versions pending quantification of the benefits.
+However, do note that if you explicitly declare a variable PROGMEM, you must still use the pgm_read functions to read it, just like on classic AVRs - when a variable is declared PROGMEM on parts with memory mapped flash, the pointer is offset (address is relative to start of flash, not start of address space); this same offset is applied when using the `pgm_read_*_near()` macros. Do note that declaring things PROGMEM and accessing with `pgm_read_*_near` functions, although it works fine, is slower and wastes a small amount of flash (compared to simply declaring the variables const); the same goes for the F() macro with constant strings in 2.1.0 and later (for a period of time before 2.1.0, `F()` did nothing - but that caused problems for third party libraries, and the authors maintained that the problem was with the core, not the library, and my choice was to accept less efficiency, or deny my users access to popular libraries). Using the `F()` macro may be necessary for compatibility with some third party libraries (the specific cases that forced the return of `F()` upon us were not of that sort - we were actually able to make the ones I knew of work with the F()-as-noop code, and they took up a few bytes less flash as a result)
 
 ## Fast digital I/O
 For timing-critical operations, we now support `digitalWriteFast()` and `digitalReadFast()`. The pin numbers passed to these functions **must** be a compile-time known constant; for best results, when using `digitalWriteFast()`, the pin value to be written should as well. Under those conditions, `digitalWriteFast()` will optimize down to a single instruction which executes in a single system clock cycle, and `digitalReadFast()` will optimize to 4 instructions (note that `if (VPORTx.IN&(1<n))` is still faster and smaller than `if (digitalReadFast(PIN_Pxn)==HIGH)` because testing a single bit within an I/O register and using that as the argument for a conditional branch can be optimized down to an SBIS/SBIC (**S**kip if **B**it in **I**/o register **S**et/**C**lear), while it requires several instructions to check that bit, and convert it to a boolean for further processing.
@@ -445,7 +468,7 @@ Written by @MCUDude, this provides a more accessible (much more accessible!) wra
 
 [Optiboot_flasher documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Optiboot_flasher/README.md)
 
-**Warning** As noted above, there is a library for DxCore that is also named `Flash.h`. Both allow an application to write to the flash using Optiboot if present. *That is the only similarity they have*. The API, NVM hardware, method used to call the bootloader, and basically *everything about these libraries is different*. Be sure you write code for the one that matches the hardware you're using.
+**Warning** As noted above, there is a library for DxCore that is also named `Flash.h`. Both allow an application to write to the flash using Optiboot if present. *That is the only similarity they have*. The API, NVM hardware, method used to call the bootloader, and basically *everything about these libraries is different*. Be sure you write code for the one that matches the hardware you're using. While I (Spence Konde) wrote the DxCore one, I don't have a particularly strong opinion about which way is "right" - we made them independently, not because we each thought the other one's idea of how it should be done was wrong, and they reflect the way the hardware interacts with it's flash; the one for megaTinyCore is page-oriented, with page buffers, while the DxCore one only cares about pages when you erase just like the hardware!
 
 ## Logic
 All of these parts have at least a pair of Configurable Custom Logic (CCL) blocks. Each block allows you to supply an arbitrary 3-input truth table, as well as configuring other aspects of the logic block. CCL can operate *asynchronously* - meaning that things can happen faster than the clock speed, or it can be synchronized to an event input or the system clock. The inputs can come from pins, events, or other peripherals; there's a feedback input (so you can make latches and oscillators) and a "sequencer" that can act like a latch or flip-flop using the outputs of the logic blocks as it's inputs. This is an incredibly powerful peripheral - especially on the 2-series parts, which have a second pair of logic blocks, as well as the capability to trigger an interrupt when the state of one changes.
@@ -598,7 +621,7 @@ Each timer has a number associated with it, as shown below. This may be used by 
 ```
 
 # Bootloader (Optiboot) Support
-A new version of Optiboot (Optibootx) now runs on the tinyAVR 0-series and 1-series chips.  It's under 512 bytes, and works on all 0 and 1-series parts allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini) - except for the detail about not having autoreset, which is a bit of a bummer. Support for 2-series parts is coming soon; changes required are minor.
+A new version of Optiboot (Optiboot_x) now runs on the tinyAVR 0-series, 1-series and 2-series chips.  It's under 512 bytes, and works on all parts supported by this core allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini) - except for the detail about not having autoreset unless you disable UPDI (except for the 20 and 24-pin 2-series parts which can put reset on PB4 instead), which is a bit of a bummer.
 
 To use the serial bootloader, select a board definition with (optiboot) after it (note - this might be cut off due to the width of the menu; the second set of board definitions are the optiboot ones).
 
@@ -610,7 +633,23 @@ After this, connect a serial adapter to the serial pins (as well as ground and V
 
 If the UPDI/Reset pin option was set to UPDI or IO when bootloading, you must unplug/replug the board (or use a software reset - see note near start of readme; you can make an ersatz reset button this way) to enter the bootloader - after this the bootloader will be active for 8 seconds.
 
-If the UPDI/Reset pin option was set to reset, you must reset the chip via the reset pin (or software reset to enter the bootloader, and the bootloader will run for 1 second before jumping to the application). This is the same as how optiboot works on classic AVR boards. The standard DTR-autoreset circuit is recommended (this is how boards I sell on Tindie with Optiboot preloaded are configured).
+If the UPDI/Reset pin option was set to reset, you must reset the chip via the reset pin (or software reset to enter the bootloader, and the bootloader will run for 1 second before jumping to the application). This is the same as how optiboot works on classic AVR boards. The standard DTR-autoreset circuit is recommended. If you use the alternate reset pin option on a 2-series part, connect that pin (PB4) to the autoreset circuit, and all should work normally.
+
+### Entry Conditions
+The bootloader will wait for 1 or 8 seconds for an upload if it resets and the entry conditions are met:
+* If a configuration with a reset pin was selected, the `_rst` version will be installed. It will run after a hardware (reset pin), software reset (see above), or UPDI-reset (ie, immediately after bootloading) only.
+* Otherwise, it will run after any of those, as well as power on reset.
+* A brownout which causes the BOD to trigger, but where the voltage on the power rails does not fall below approx. 1.25v (which would trigger the "POR rearm") is NOT an entry condition. Yes, this could be from someone attempting to power cycle it to start the bootloader and underestimating how long their capacitors would hold a charge for, which is a time when we would want to enter the bootloader. It could also indicate a flaky power supply or weak batteries, which most definitely is not.
+* A software reset is always an entry condition. If you need a reset from software that doesn't run the bootloader, trigger a watchdog reset instead (covered in same section of this readme as software resets).
+* A watchdog reset is never an entry condition. The WDT is how Optiboot resets when it's either timed out (actually, the thing that times out *is* the watchdog timer) or finished uploading.
+* Optiboot clears the reset flag register, and stashes the reset flags in `GPIOR0` - if you need to know the cause of a reset
+```c
+#ifdef USING_OPTIBOOT
+resetflags = GPIOR0;
+#else
+resetflags = RSTCTRL.RSTFR;
+#endif
+```
 
 Serial uploads are all done at 115200 baud, regardless of port, pin mapping or part.
 
