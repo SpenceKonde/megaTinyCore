@@ -96,11 +96,11 @@ recipe.hooks.objcopy.postobjcopy.2.pattern.macosx=bash -c "{compiler.path}{compi
 
 
 ## This is the name that memory maps, assembly listings and hex files will be output as
-build.extraassetname={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}.m{build.millistimer}.hex
+build.extraassetname={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}.m{build.millistimer}
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.hex
-recipe.output.save_file={build.extraassetname}.hex
+recipe.output.save_file={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}.m{build.millistimer}.hex
 
 ## Save lst
 recipe.hooks.savehex.presavehex.1.pattern.windows=cmd /C copy "{build.path}\{build.project_name}.lst" "{sketch_path}\{build.extraassetname}.lst"
