@@ -21,7 +21,7 @@
 */
 
 #include "wiring_private.h"
-
+#include "util/delay.h"
 /* Declared in wiring_private.h
  * PeripheralControl is used to mark peripherals as being "taken over" by the user
  * 0x40 = TIMERD0
@@ -386,9 +386,15 @@ void delay(unsigned long ms) {
 }
 #endif
 
-
+inline __attribute__((always_inline)) void delayMicroseconds(unsigned int us) {
+  if (__builtin_constant_p(us)) { //if it's compile time known, the whole thing optimizes away to a call to _delay_us()
+    _delay_us(us);
+  } else { // amd if it is not, then it gets optimized to just this:
+    _delayMicroseconds(us);
+  }
+}
 /* Delay for the given number of microseconds.  Assumes a 1, 4, 5, 8, 10, 16, or 20 MHz clock. */
-void delayMicroseconds(unsigned int us) {
+__attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
   // call = 4 cycles + 2 to 4 cycles to init us(2 for constant delay, 4 for variable)
 
   // calling avrlib's delay_us() function with low values (e.g. 1 or

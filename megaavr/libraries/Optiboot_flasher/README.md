@@ -1,6 +1,11 @@
 # Optiboot Flash
 Two libraries are used to interface with the "write-to-flash" functionality the Optiboot bootloader has. Flash.h/cpp is a high-level library that makes it easy to store strings, variables, structs, etc. to the flash memory and easily retrieve them. optiboot.h/cpp is a low-level read/write library that does the actual reading and writing to flash. If your application needs more storage than the EEPROM can offer, Flash is the library for you. If you're very memory constrained and want to do the heavy lifting yourself, optiboot is the library for you. See the examples of how you can interface with these two libraries.
 
+## This is not the same library as the DxCore Flash.h
+Dx-series and the tinyAVR/megaAVR 0/1/2-series parts have different versions of NVMCTRL; among other things, you need to both fill the page buffer and give the command to write it from within the bootloader section on tinyAVR/megaAVR - but on Dx-series parts, only the calls to `SPM`, and `ST Z` are protected, and there is no page buffer at all. The different hardware requirements, as well as the relative abundance of available flash in the bootloader section of the tinyAVR/megaAVR parts (they have 36 bytes left; on the Dx-series ) set the stage for drastically different implementations - and the two authors were unfamiliar with the other's work until after it was complete, and took radically different approaches to essentially every aspect of the design.
+
+
+# API Reference
 
 ## Flash()
 Class constructor for interfacing with the "write-to-flash" functionality.
