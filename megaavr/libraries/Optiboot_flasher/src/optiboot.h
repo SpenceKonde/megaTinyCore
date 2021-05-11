@@ -29,7 +29,7 @@
 #include <stdint.h>
 
 #ifndef USING_OPTIBOOT
-#error "Using the optiboot.h flash writing facility requires that the board be using optiboot, but USING_OPTIBOOT is not defined."
+  #error "Using the optiboot.h flash writing facility requires that the board be using optiboot, but USING_OPTIBOOT is not defined."
 #endif
 
 
