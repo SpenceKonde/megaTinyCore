@@ -1307,8 +1307,8 @@ atx27o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atx27o.bootloader.APPEND=0x00
 atx27o.bootloader.BOOTEND=0x02
 atx27o.bootloader.tool=avrdude
-atx27o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/hex/{bootloader.file}:i
-atx27o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/hex/{bootloader.file} -a write
+atx27o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
+atx27o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ### UPLOAD VIA OPTIBOOT
 atx27o.upload.workaround=
@@ -1751,13 +1751,13 @@ atx26o.build.uartvoltage=
 atx26o.bootloader.WDTCFG=0x00
 atx26o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atx26o.bootloader.OSCCFG=0x01
-atxy6o.bootloader.TCD0CFG=0x00
+atx26o.bootloader.TCD0CFG=0x00
 atx26o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atx26o.bootloader.APPEND=0x00
 atx26o.bootloader.BOOTEND=0x02
 atx26o.bootloader.tool=avrdude
-atx26o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/hex/{bootloader.file}:i
-atx26o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/hex/{bootloader.file} -a write
+atx26o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
+atx26o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ### UPLOAD VIA OPTIBOOT
 atx26o.upload.workaround=
@@ -2179,7 +2179,7 @@ atxy4o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 #  WITH OPTIBOOT                                                    ##   #
 #  2-series                      #    #  #     ####   ###  #   #    ##   #
 #                               ##    #  #     #   #   #   ##  #    ##   #
-#  ATtiny3224/804                #    #### ### ####    #   # # #    ##   #
+#  ATtiny3224/1624               #    #### ### ####    #   # # #    ##   #
 #  ATtiny824/424                 #       #     #       #   #  ##    ##   #
 #                               ###      #     #      ###  #   #    ##   #
 #___________________________________________________________________##___#
@@ -2204,13 +2204,13 @@ atx24o.build.export_merged_output=true
 atx24o.bootloader.WDTCFG=0x00
 atx24o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atx24o.bootloader.OSCCFG=0x01
-atxy6o.bootloader.TCD0CFG=0x00
+atx24o.bootloader.TCD0CFG=0x00
 atx24o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atx24o.bootloader.APPEND=0x00
 atx24o.bootloader.BOOTEND=0x02
 atx24o.bootloader.tool=avrdude
-atx24o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/hex/{bootloader.file}:i
-atx24o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/hex/{bootloader.file} -a write
+atx24o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
+atx24o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ###########################
 ### UPLOAD VIA OPTIBOOT ###
