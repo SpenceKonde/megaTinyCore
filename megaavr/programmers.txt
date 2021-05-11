@@ -1,4 +1,3 @@
-
 pyupdi.name=Serial-UPDI with 4.7k resistor or diode (pyupdi - 230400 baud)
 pyupdi.protocol=uart
 pyupdi.program.extra_params=-u {serial.port} -b 230400

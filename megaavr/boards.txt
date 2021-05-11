@@ -596,7 +596,6 @@ atxy4.build.f_cpu={build.speed}000000L
 atxy4.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage}
 atxy4.build.export_merged_output=false
 
-
 ### BOOTLOADING PARAMETERS (FUSES)
 atxy4.bootloader.WDTCFG=0x00
 atxy4.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
@@ -2221,9 +2220,6 @@ atx24o.upload.tool=avrdude
 atx24o.upload.speed=115200
 atx24o.upload.protocol=arduino
 atx24o.upload.extra_params=-D
-
-
-
 
 ### CHIP
 atx24o.menu.chip.3224=ATtiny3224
