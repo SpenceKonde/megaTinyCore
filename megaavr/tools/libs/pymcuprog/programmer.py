@@ -149,7 +149,7 @@ class Programmer:
             memory_info = self.device_memory_info.memory_info_by_name(memory_name)
         self.device_model.erase(memory_info=memory_info, address=address)
 
-    def write_memory(self, data, memory_name, offset=0):
+    def write_memory(self, data, memory_name, offset=0, blocksize=0):
         """
         Write memory on the device
 
@@ -184,7 +184,10 @@ class Programmer:
 
         # Write the data to NVM
         self.logger.info("Writing %d bytes of data to %s...", len(data), memory[DeviceMemoryInfoKeys.NAME])
-        self.device_model.write(memory, offset, data)
+        if blocksize == 0:
+            self.device_model.write(memory, offset, data)
+        else:
+            self.device_model.write(memory, offset, data, blocksize=blocksize)
         self.logger.info("Write complete.")
         return True
 

@@ -18,7 +18,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Revise Logic library docs, add quick pin reference table to the readme.
 * Correct Wire library clock generation (#400). Enhance and correct Wire.pins() and Wire.swap() to work with new hardware and reject constant invalid arguments.
 * Also create memory map when doing export compiled binary
-* Massive improvement to speed of serial-updi (like, 8-20x faster, programming time under 5 sec is normal)
+* Massive improvement to speed of serial-updi (like, 8-20x faster, programming time under 5 sec is normal). Three speed options are available normal, a SLOW version that runs at 1/4 of normal (57600 baud), and a TURBO, at 460800 baud (double speed); TURBO should only be used when Vcc > 4.5V.
+* Disable Verbose serial-updi output. It would generate output about 4 times the size of the file being uploaded, and it was so detailed that almost nobody could decipher it. It was also incredibly repetitive; so much so that zipping it compressed it over 100:1. Since that was not useful, and without a way to get something in the middle, I just don't request verbose output, regardless of what is checked in the options. The verbose output was really only useful when modifying the upload tool.
 
 ## Released Versions
 

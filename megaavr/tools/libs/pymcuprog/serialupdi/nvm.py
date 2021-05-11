@@ -108,13 +108,13 @@ class NvmUpdiTinyMega(NvmUpdi):
 
         return True
 
-    def write_flash(self, address, data):
+    def write_flash(self, address, data, blocksize=2, bulkwrite=0):
         """
         Writes data to flash (v0)
         :param address: address to write to
         :param data: data to write
         """
-        return self.write_nvm(address, data, use_word_access=True)
+        return self.write_nvm(address, data, use_word_access=True, blocksize=blocksize,  bulkwrite=bulkwrite)
 
     def write_eeprom(self, address, data):
         """
@@ -152,7 +152,8 @@ class NvmUpdiTinyMega(NvmUpdi):
         if not self.wait_flash_ready():
             raise PymcuprogError("Timeout waiting for flash ready before page buffer clear ")
 
-    def write_nvm(self, address, data, use_word_access, nvmcommand=constants.UPDI_V0_NVMCTRL_CTRLA_WRITE_PAGE):
+    def write_nvm(self, address, data, use_word_access, nvmcommand=constants.UPDI_V0_NVMCTRL_CTRLA_WRITE_PAGE,
+                  blocksize=2,  bulkwrite=0):
         """
         Writes a page of data to NVM (v0)
 
@@ -163,33 +164,47 @@ class NvmUpdiTinyMega(NvmUpdi):
         :param data: data to write
         :param use_word_access: write whole words?
         :param nvmcommand: command to use for commit
+        :param bulkwrite: Passed down from nvmserialupdi 0 = normal or single write.
+            1 means it's part of writing the whole flash.
+            In that case we only st ptr if address = 0.
+
         """
 
-        # Check that NVM controller is ready
-        if not self.wait_flash_ready():
-            raise PymcuprogError("Timeout waiting for flash ready before page buffer clear ")
+        # unless we are in a bulk (whole flash) write, in which case we skip almost everything.
+        if (bulkwrite == 0 ) or address == 0x8000 or address == 0x4000 or not use_word_access:
+            # Check that NVM controller is ready
+            # I will grudgingly check this at the very start. I am extremely skeptical about the usefulness of this test.
+            # If it's not ready, they'll get another error will they not? Every command like this costs about a half second
+            # on every upload when using serialupdi - at any bsaud rate, assuming 256 pages. It's all USB latency.
+            if not self.wait_flash_ready():
+                raise PymcuprogError("Timeout waiting for flash ready before page buffer clear ")
+                # Clear the page buffer
+            self.logger.debug("Clear page buffer")
+            self.execute_nvm_command(constants.UPDI_V0_NVMCTRL_CTRLA_PAGE_BUFFER_CLR)
 
-        # Clear the page buffer
-        self.logger.debug("Clear page buffer")
-        self.execute_nvm_command(constants.UPDI_V0_NVMCTRL_CTRLA_PAGE_BUFFER_CLR)
-
-        # Wait for NVM controller to be ready
-        if not self.wait_flash_ready():
-            raise PymcuprogError("Timeout waiting for flash ready after page buffer clear")
+             # Wait for NVM controller to be ready
+            if not self.wait_flash_ready():
+                raise PymcuprogError("Timeout waiting for flash ready after page buffer clear")
 
         # Load the page buffer by writing directly to location
         if use_word_access:
-            self.readwrite.write_data_words(address, data)
+            self.readwrite.write_data_words(address, data, blocksize)
         else:
             self.readwrite.write_data(address, data)
 
         # Write the page to NVM, maybe erase first
         self.logger.debug("Committing data")
-        self.execute_nvm_command(nvmcommand)
 
-        # Wait for NVM controller to be ready again
-        if not self.wait_flash_ready():
-            raise PymcuprogError("Timeout waiting for flash ready after page write ")
+        self.execute_nvm_command(nvmcommand)
+            # I examine the logs, there are never any cases whee more than one read of this is done.
+            # So since this isn't meeded to handle normal operations, only error conditions,
+            # we can let verify catch those - it's worth less helpful information on rare errors - difference in upload speed can be up to 15%
+            # every USB Latency Period that is removed from the stuff that haoppens every page cuts more than a half second off the upload time!
+        if not bulkwrite ==1:
+            # do a final NVM status check only if not doing a bulk write, or after the last chunk (when bulkwrite = 2)
+            # not doing this every page made uploads about 15% faster
+            if not self.wait_flash_ready():
+                raise PymcuprogError("Timeout waiting for flash ready after page write ")
 
 
 class NvmUpdiAvrDx(NvmUpdi):
@@ -223,14 +238,14 @@ class NvmUpdiAvrDx(NvmUpdi):
 
         return True
 
-    def write_flash(self, address, data):
+    def write_flash(self, address, data, blocksize=2, bulkwrite =0 ):
         """
         Writes data to flash (v1)
         :param address: address to write to
         :param data: data to write
         :return:
         """
-        return self.write_nvm(address, data, use_word_access=True)
+        return self.write_nvm(address, data, use_word_access=True, blocksize=blocksize, bulkwrite=bulkwrite)
 
     def write_eeprom(self, address, data):
         """
@@ -268,7 +283,7 @@ class NvmUpdiAvrDx(NvmUpdi):
         """
         return self.write_eeprom(address, data)
 
-    def write_nvm(self, address, data, use_word_access):
+    def write_nvm(self, address, data, use_word_access, blocksize=2, bulkwrite=0):
         """
         Writes data to NVM (version 1)
         This version of the NVM block has no page buffer, so words are written directly.
@@ -278,24 +293,26 @@ class NvmUpdiAvrDx(NvmUpdi):
         """
         nvm_command = constants.UPDI_V1_NVMCTRL_CTRLA_FLASH_WRITE
 
-        # Check that NVM controller is ready
-        if not self.wait_flash_ready():
-            raise Exception("Timeout waiting for flash ready before page buffer clear ")
+        if bulkwrite == 0 or address == 0x800000:
+            # Check that NVM controller is ready
+            if not self.wait_flash_ready():
+                raise Exception("Timeout waiting for flash ready before page buffer clear ")
 
-        # Write the command to the NVM controller
-        self.logger.info("NVM write command")
-        self.execute_nvm_command(nvm_command)
+            # Write the command to the NVM controller
+            self.logger.info("NVM write command")
+            self.execute_nvm_command(nvm_command)
 
         # Write the data
         if use_word_access:
-            self.readwrite.write_data_words(address, data)
+            self.readwrite.write_data_words(address, data, blocksize)
         else:
             self.readwrite.write_data(address, data)
 
         # Wait for NVM controller to be ready again
-        if not self.wait_flash_ready():
-            raise Exception("Timeout waiting for flash ready after data write")
+        if bulkwrite != 1:
+            if not self.wait_flash_ready():
+                raise Exception("Timeout waiting for flash ready after data write")
 
-        # Remove command from NVM controller
-        self.logger.info("Clear NVM command")
-        self.execute_nvm_command(constants.UPDI_V1_NVMCTRL_CTRLA_NOCMD)
+            # Remove command from NVM controller
+            self.logger.info("Clear NVM command")
+            self.execute_nvm_command(constants.UPDI_V1_NVMCTRL_CTRLA_NOCMD)

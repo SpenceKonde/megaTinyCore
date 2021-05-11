@@ -337,7 +337,10 @@ def _action_write(backend, args):
 
             print("Writing from hex file...")
 
-            _write_memory_segments(backend, result, args.verify)
+            if args.blocksize:
+                _write_memory_segments(backend, result, args.verify, blocksize=args.blocksize)
+            else:
+                _write_memory_segments(backend, result, args.verify)
         else:
             with open(filepath, "rb") as binfile:
                 data_from_file = bytearray(binfile.read())
@@ -366,7 +369,7 @@ def _action_write(backend, args):
     return STATUS_SUCCESS
 
 
-def _write_memory_segments(backend, memory_segments, verify):
+def _write_memory_segments(backend, memory_segments, verify, blocksize = 0):
     """
     Write content of list of memory segments
 
@@ -375,11 +378,18 @@ def _write_memory_segments(backend, memory_segments, verify):
         raw data bytes and memory_info is a dictionary with memory information (as defined in
         deviceinfo.deviceinfo.DeviceMemoryInfo).
     :param verify: If True verify the written data by reading it back and compare
+    :param blocksize: this is a signal to write_memory for updiserial when writing flash; if 0 or not supplied
+        do not use blocks (equivalent to blocksize == 2 bytes or 1 word). If -1, it will set tje blocksize to
+        the page size of the target chip, which can imcrease write speed more than 10:1. Any other number will
+        be used as supplied. Even numbers up to the page size are recommended.
+        Any other negative number is invalid, and is zero'ed out.
     """
+    if blocksize < -1:
+        blocksize = 0
     for segment in memory_segments:
         memory_name = segment.memory_info[DeviceMemoryInfoKeys.NAME]
         print("Writing {}...".format(memory_name))
-        backend.write_memory(segment.data, memory_name, segment.offset)
+        backend.write_memory(segment.data, memory_name, segment.offset, blocksize=blocksize)
         if verify:
             print("Verifying {}...".format(memory_name))
             verify_ok = backend.verify_memory(segment.data, memory_name, segment.offset)

@@ -74,6 +74,7 @@ class UpdiReadWrite(object):
         if size > constants.UPDI_MAX_REPEAT_SIZE:
             raise PymcuprogError("Cant read that many bytes in one go")
 
+
         # Store the address
         self.datalink.st_ptr(address)
 
@@ -93,24 +94,25 @@ class UpdiReadWrite(object):
         self.logger.debug("Reading %d words from 0x%04X", words, address)
 
         # Range check
-        if words > constants.UPDI_MAX_REPEAT_SIZE >> 1:
+        if words > constants.UPDI_MAX_REPEAT_SIZE:
             raise PymcuprogError("Cant read that many words in one go")
 
-        # Store the address
+        # special case for single word - so we can optimize ld_ptr_inc16 for >1 word to improve performance.
+        if words == 1:
+            return self.datalink.ld16(self,address)
+
+        # Otherwise, store the address
         self.datalink.st_ptr(address)
 
-        # Fire up the repeat
-        if words > 1:
-            self.datalink.repeat(words)
-
-        # Do the read
+        # For performance, managing repeat count is done in ld_ptr_inc16()
         return self.datalink.ld_ptr_inc16(words)
 
-    def write_data_words(self, address, data):
+    def write_data_words(self, address, data, blocksize):
         """
         Writes a number of words to memory
         :param address: address to write to
         :param data: data to write
+        :blocksize: max number of bytes being sent
         """
         # Special-case of 1 word
         if len(data) == 2:
@@ -124,9 +126,13 @@ class UpdiReadWrite(object):
         # Store the address
         self.datalink.st_ptr(address)
 
-        # Fire up the repeat
-        self.datalink.repeat(len(data) >> 1)
-        return self.datalink.st_ptr_inc16(data)
+
+        # For performance, we want to do this with Response Signature Disable set, otherwise the USB Serial latency kills you
+        # Just setting RSD here then turning it off at the end - it helps a lot, but you run up against the USB latency. So
+        # now, EVERYTHING was moved into the st_ptr_inc16_RSD() function. Unless blocksize precludes it, the whole thing
+        # is sent to the serial adapter in a single transfer.
+        # the st_pty_inc16_RSD routine does the repeat and rsd enable/disable stu
+        return self.datalink.st_ptr_inc16_RSD(data, blocksize)
 
     def write_data(self, address, data):
         """

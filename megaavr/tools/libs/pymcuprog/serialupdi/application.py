@@ -65,7 +65,9 @@ class UpdiApplication:
         self.device = device
         # Build the UPDI stack:
         # Create a physical
-        self.phy = UpdiPhysical(serialport, baud)
+
+        baud_temp = min(baud, 115200)
+        self.phy = UpdiPhysical(serialport, baud_temp)
 
         # Create a DL - use 16-bit until otherwise known
         datalink = UpdiDatalink16bit()
@@ -75,6 +77,9 @@ class UpdiApplication:
 
         # Init (active) the datalink
         datalink.init_datalink()
+
+        # set the actual baud
+        datalink.change_baud(baud)
 
         # Create a read write access layer using this data link
         self.readwrite = UpdiReadWrite(datalink)

@@ -97,7 +97,7 @@ class NvmAccessProviderSerial(NvmAccessProvider):
             self.logger.error("Device is locked. Performing unlock with chip erase.\nError: ('%s')", inst)
             self.avr.unlock()
 
-    def write(self, memory_info, offset, data):
+    def write(self, memory_info, offset, data, blocksize=0):
         """
         Write the memory with data
 
@@ -122,7 +122,6 @@ class NvmAccessProviderSerial(NvmAccessProvider):
 
         n_chunk = math.ceil(len(data_aligned)/write_chunk_size)
         bar = progress_bar.ProgressBar(n_chunk, hide=n_chunk == 1)
-
         while data_aligned:
             if len(data_aligned) < write_chunk_size:
                 write_chunk_size = len(data_aligned)
@@ -133,7 +132,49 @@ class NvmAccessProviderSerial(NvmAccessProvider):
             elif memtype_string == MemoryNames.EEPROM:
                 self.avr.nvm.write_eeprom(offset_aligned, chunk)
             else:
-                self.avr.nvm.write_flash(offset_aligned, chunk)
+                # Spence Konde, 5/8/2021:
+                # As far as I can tell, this is the only point where, we're writing a hex file, we know both the page size
+                # AND are in the path of blocksize parameter. So - if its 0 or not given  we should "do the old behavior", then
+                # blocksize=2. The special value -1 tells us to have it write blocks equal to chunk/page size. Any other number
+                # will be used as blocksize. Negative numbers beyond -1 were replaced with zero way at the beginning, as they would
+                # result in crazy behavior and make everything fall over.
+                # megaTinyCore and DxCore will always pass -1 as blocksize unless we find something where that doesn't work.
+                #
+                # Also, we are now finally in the section of the code specific to serialupdi. Up until we get here, 0 is the default
+                # and if that's what we got, we omit it when making other calls, because there are almost certainly calls elsewhere
+                # that. Now that we are here, the default value is 2 (ie, one word at a time) but that won'ty be something we see often.
+                #
+                # It strikes me that here is *ALSO* where we know whether we are on the first, a middle, or the last page. Say we
+                # kept count of how many pages had been written already - if it was 0 and nChunk > 1, we would pass an argument that says
+                # This is the first page we are writing, do all that stuff we need to do at the start of a bulk write.
+                # if it was nChunk - 1, we would send a different value for that argumennt, saying it was the last one of a bulk write
+                # so it should do the stuff to end the bulk write mode. And otherwise, it gets a third value that gets treated as
+                # a signal to omit all of those. for the streamlined write protocol, which could improve performance by another 22-45%
+                # If you agree, we should do that.
+                # What we currently do is grossly inefficient, because (due to the penalty for small packets) we spend half of our time
+                # for every page: Setting the address pointer (only need to do this at the beginning  - when reading second and subsequent pages
+                # the previous writes left the pointer at exactly the location we then set it to.). Setting NVM cmd to FLWR - only needs to be done
+                # at the start of a bulk write, assuming we also stop setting NVM command to NOOP after every page. Setting RSD - if we
+                # do all I'm talking about here, we can set it at start of bulk write. And we can juyst check for for NVM errors before
+                # the first and after the last page, not before and after every page. My models suggest this should improve performance
+                # by 22% at 115200 baud, and 44% and 345600 baud (which is 1.5x 230400 baud - and happens to be about the fastest you can
+                # do a bulk write that is consistent with the datasheet flash write time spec.
+                #
+                # See also my comment below in read() - these two places are where we can achieve the last noticable performance leaps.
+                # -Spence
+                bulk = 1
+                if n_chunk == 1:
+                    #if omly one chunk, it is NOT a bulk write.
+                    bulk = 0
+                elif len(data_aligned) <= write_chunk_size:
+                    # We are on the last page of a bulk write
+                    bulk = 2
+                if blocksize == 0:
+                    self.avr.nvm.write_flash(offset_aligned, chunk, blocksize=2)
+                elif blocksize == -1:
+                    self.avr.nvm.write_flash(offset_aligned, chunk, blocksize=-1, bulkwrite = bulk)
+                else:
+                    self.avr.nvm.write_flash(offset_aligned, chunk, blocksize=blocksize, bulkwrite = bulk)
             offset_aligned += write_chunk_size
             data_aligned = data_aligned[write_chunk_size:]
             bar.step()
@@ -149,8 +190,16 @@ class NvmAccessProviderSerial(NvmAccessProvider):
         """
         offset += memory_info[DeviceMemoryInfoKeys.ADDRESS]
 
+        # if reading from flash, we want to read words if it would reduce number of USB serial transactions.
+        # this function is called for everything though, so be careful not to use it for memories read one byte at a time, like fuses
         data = []
         read_chunk_size = 0x100
+        use_word_access = False
+        memtype_string = memory_info[DeviceMemoryInfoKeys.NAME]
+        if memtype_string in (MemoryNames.FLASH):
+            if numbytes > 0x100:
+                read_chunk_size=0x200
+                use_word_access=True
 
         n_chunk = math.ceil(numbytes/read_chunk_size)
         bar = progress_bar.ProgressBar(n_chunk, hide=n_chunk == 1)
@@ -159,7 +208,10 @@ class NvmAccessProviderSerial(NvmAccessProvider):
             if numbytes < read_chunk_size:
                 read_chunk_size = numbytes
             self.logger.debug("Reading %d bytes from address 0x%06X", read_chunk_size, offset)
-            data += self.avr.read_data(offset, read_chunk_size)
+            if use_word_access:
+                data += self.avr.read_data_words(offset, read_chunk_size>> 1)
+            else:
+                data += self.avr.read_data(offset, read_chunk_size)
             offset += read_chunk_size
             numbytes -= read_chunk_size
             bar.step()
