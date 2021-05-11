@@ -44,7 +44,7 @@ extern "C" {
    incredibly unlikely that a part with more than 127 digital pins will
    ever be supported by this core */
 
-  #define ADC_CH(ch)      (0x80 | (ch))
+#define ADC_CH(ch)      (0x80 | (ch))
 
 #if MEGATINYCORE_SERIES < 2
   /* ADC constants for 0/1-series */
@@ -97,7 +97,7 @@ extern "C" {
   #define AC_REF_2V5      (VREF_AC0REFSEL_2V5_gc)
   #define AC_REF_4V096    (VREF_AC0REFSEL_4V096_gc)
   #define AC_REF_VDD      (VREF_AC0REFSEL_AVDD_gc)
-  #define AC_REF_4V1      AC_REF_4V1/* Alias */
+  #define AC_REF_4V1      AC_REF_4V096/* Alias */
 
   #define ADC_TEMPERATURE ADC_CH(ADC_MUXPOS_TEMPSENSE_gc)
   #define ADC_GROUND      ADC_CH(ADC_MUXPOS_GND_gc)
@@ -232,7 +232,7 @@ unsigned long microsecondsToClockCycles(unsigned long microseconds);
 uint16_t millisClockCyclesPerMicrosecond();
 unsigned long millisClockCyclesToMicroseconds(unsigned long cycles);
 unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
-
+__attribute__ ((noinline)) void _delayMicroseconds(unsigned int us);
 // Get the bit location within the hardware port of the given virtual pin.
 // This comes from the pins_*.c file for the active board configuration.
 
@@ -255,6 +255,7 @@ extern const uint8_t digital_pin_to_timer[];
 #define analogPinToBitPosition(pin)         ((digitalPinToAnalogInput(pin) != NOT_A_PIN) ? digital_pin_to_bit_position[pin] : NOT_A_PIN )
 #define analogPinToBitMask(pin)             ((digitalPinToAnalogInput(pin) != NOT_A_PIN) ? digital_pin_to_bit_mask[pin]     : NOT_A_PIN )
 #define getPINnCTRLregister(port, bit_pos)  (((port != NULL) && (bit_pos < NOT_A_PIN)) ? ((volatile uint8_t *)&(port->PIN0CTRL) + bit_pos) : NULL )
+
 #define digitalPinToInterrupt(P) (P)
 
 #define portOutputRegister(P) ((volatile uint8_t *)(&portToPortStruct(P)->OUT))
@@ -280,24 +281,30 @@ extern const uint8_t digital_pin_to_timer[];
 
 
 #ifdef PIN_WIRE_SCL_PINSWAP_1
-  #define SDA ((uint8_t) (PORTMUX.CTRLB & PORTMUX_TWI0_bm ? PIN_WIRE_SDA_PINSWAP_1 : PIN_WIRE_SDA))
-  #define SCL ((uint8_t) (PORTMUX.CTRLB & PORTMUX_TWI0_bm ? PIN_WIRE_SCL_PINSWAP_1 : PIN_WIRE_SCL))
-#else
-  static const uint8_t SDA = PIN_WIRE_SDA;
-  static const uint8_t SCL = PIN_WIRE_SCL;
+  #define SDA_NOW ((uint8_t) (PORTMUX.CTRLB & PORTMUX_TWI0_bm ? PIN_WIRE_SDA_PINSWAP_1 : PIN_WIRE_SDA))
+  #define SCL_NOW ((uint8_t) (PORTMUX.CTRLB & PORTMUX_TWI0_bm ? PIN_WIRE_SCL_PINSWAP_1 : PIN_WIRE_SCL))
+  static const uint8_t SDA_ALT = PIN_WIRE_SDA_PINSWAP_1;
+  static const uint8_t SCL_ALT = PIN_WIRE_SCL_PINSWAP_1;
 #endif
+static const uint8_t SDA = PIN_WIRE_SDA;
+static const uint8_t SCL = PIN_WIRE_SCL;
+
 
 #ifdef PIN_SPI_SCK_PINSWAP_1
-  #define SS    ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_SS_PINSWAP_1    : PIN_SPI_SS))
-  #define MOSI  ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_MOSI_PINSWAP_1  : PIN_SPI_MOSI))
-  #define MISO  ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_MISO_PINSWAP_1  : PIN_SPI_MISO))
-  #define SCK   ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_SCK_PINSWAP_1   : PIN_SPI_SCK))
-#else
-  static const uint8_t SS   = PIN_SPI_SS;
-  static const uint8_t MOSI = PIN_SPI_MOSI;
-  static const uint8_t MISO = PIN_SPI_MISO;
-  static const uint8_t SCK  = PIN_SPI_SCK;
+  #define SS_NOW    ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_SS_PINSWAP_1    : PIN_SPI_SS))
+  #define MOSI_NOW  ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_MOSI_PINSWAP_1  : PIN_SPI_MOSI))
+  #define MISO_NOW  ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_MISO_PINSWAP_1  : PIN_SPI_MISO))
+  #define SCK_NOW   ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_SCK_PINSWAP_1   : PIN_SPI_SCK))
+  static const uint8_t SS_ALT   = PIN_SPI_SS_PINSWAP_1;
+  static const uint8_t MOSI_ALT = PIN_SPI_MOSI_PINSWAP_1;
+  static const uint8_t MISO_ALT = PIN_SPI_MISO_PINSWAP_1;
+  static const uint8_t SCK_ALT  = PIN_SPI_SCK_PINSWAP_1;
 #endif
+static const uint8_t SS   = PIN_SPI_SS;
+static const uint8_t MOSI = PIN_SPI_MOSI;
+static const uint8_t MISO = PIN_SPI_MISO;
+static const uint8_t SCK  = PIN_SPI_SCK;
+
 
 
 #define CORE_HAS_FASTIO 1
