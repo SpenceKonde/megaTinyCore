@@ -1,5 +1,5 @@
 # Changelog
-This page documents (nearly) all bugfixes and enhancements that produce visible changes in behavior throughout the history of megaTinyCore. Note that this document is maintained by a human, who is - by nature - imperfect; sometimes the changelog may not be updated at the same time as the changes go in, and occasionally a change is missed entirely in the changelog, though this is rare.
+This page documents (nearly) all bugfixes and enhancements that produce visible changes in behavior throughout the history of megaTinyCore. Note that this document is maintained by a human, who is - by nature - imperfect (this is also why there are so many bugs to fix); sometimes the changelog may not be updated at the same time as the changes go in, and occasionally a change is missed entirely in the changelog, though this is rare. Change descriptions may be incomplete or unclear; this is not meant to be an indepth reference.
 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
@@ -8,8 +8,17 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Expand Keywords.txt to include register names! (#386)
 * Add @MCUDude's Flash.h library (not the same as the DxCore library of same name and big-picture function) (#159)
 * Correct issue with compilation when using TCB0 as millis timing source on parts without TCB1 (#394)
-
-
+* Correct huge bug in tinyAVR 2-series analogReadEnh which adverselty impacted accuracy of readings by inadvertantkly setting CLK_ADC to F_CPU/2, which exceeds the spec by 33-233%.
+* add analogClockSpeed(int16_t frequency = 0, uint8_t options = 0). Call with no arguments or 0, and it will just return the current CLK_ADC speed. -1 will set it to the core defaults, and a number will set it to the fastest speed that does not exceed the supplied value. Speed is expressed as kHz. Set analogReference first, as this impacts the maximum and minimum ADC clock (0.55V reference requires much slower clock). This will respect the minimum and maximum clock speeds stated in the datasheet, and if you request something outside that range, it will not set it.  unless the lowest bit in `options` is set (that is cuerrently the only option).
+* Add bootloaders for 2-series parts. Correct a weakness in optiboot's implementation of the prime directive ("The application code shall not impact operation of the bootloader"). Poorly written code which jumped to the bootloader directly (or which malfunctioned and wound up running off the end of the flash or otherwise ending up with the program counter at 0x0000 without a reset) could, if it left peripheral registers in an adverse state, interfere with the operation of Optiboot; thus it is theoretically possible that if entry on POR was not enabled, and the app did this quickly enough, and the specifics of the adverse peripheral configuration also resulted in a hang or non-entry condition, the part could only be reprogrammed via UPDI. Now, very early in the initialization process, we check reset cause and if it's 0 (no reset since we cleared it before jumping to app after previous boot), we trigger a software reset, which is always an entry condition.
+* Add boards.txt entries for 2-series optiboot boards.
+* MASSIVE formatting overhaul in boards.txt - big headings that can be seen in the miniature view used to scroll on many editors. Everything is in the same order for all boards so I can add and remove lines with regexes.
+* Removed the board definitions for specific Microchip boards. These will be reimplemented as specific options in the other groups (eg, Curiosity1627 will show up wherever the 1627 is listed; difference will be that it will alwayus use the onboard debugger to upload (for non-bootloader configurations) and that LED_BUILTIN will match that hardware.
+* Remove 8-pin alternate serial pin bootloaders. That configuration does not require a separate bootloader - they were binary identical to the 14-24 pin alternate serial pins version.
+* Revise Logic library docs, add quick pin reference table to the readme.
+* Correct Wire library clock generation (#400). Enhance and correct Wire.pins() and Wire.swap() to work with new hardware and reject constant invalid arguments.
+* Also create memory map when doing export compiled binary
+* Massive improvement to speed of serial-updi (like, 8-20x faster, programming time under 5 sec is normal)
 
 ## Released Versions
 
@@ -23,7 +32,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Implement configuration functions for new ADC functionality: ADCPowerOptions() for tinyAVR 2-series, analogSampleDuration() for both tiny 0/1-series and 2-series (separate implementations)
 * Implement ADC error return codes.
 * Document new features. Huge number of tweaks and improvements to the documentation, including large section on the new ADC-related functions. Please read it if you are using the ADC on a 2-series part or want more out of the ADC on a 0/1-series part.
-* Adjust variant pin definitions to account for the 2-series (One added USART, 4 more analog inputs on 20/24 pin parts, A0 not on PA0 on all oparts. ) Correct several long-standing and unnoticed bugs. Does anyone use digitalPinHasPWM()? If so, they don't use the 24-pin 0/1-series parts....
+* Adjust variant pin definitions to account for the 2-series (One added USART, 4 more analog inputs on 20/24 pin parts). Correct several long-standing and unnoticed bugs. Does anyone use digitalPinHasPWM()? If so, they don't use the 24-pin 0/1-series parts....
 * Port the Comparator library. (#208)
 * Add capability for Comparator.stop() to restore digital input on the pins it disabled when it was started.
 * Move a bunch of hardware-related macros from Arduino.h the new core_parts.h. These are things that individual users are unlikely to need to reference, (certainly not as likely as anything that's in Arduino.h - which is where people generally know to look for core-related "stuff"
