@@ -7,7 +7,7 @@
 name=megaTinyCore
 versionnum.major=2
 versionnum.minor=3
-versionnum.patch=0
+versionnum.patch=2
 versionnum.postfix=
 versionnum.released=1
 
@@ -184,14 +184,14 @@ tools.pymcuprog.cmd={runtime.platform.path}/tools/python3/python3
 
 #REMOVE#tools.pymcuprog.cmd={runtime.tools.python3.path}/python3
 
-tools.pymcuprog.erase.params.verbose=-v
+tools.pymcuprog.erase.params.verbose=
 tools.pymcuprog.erase.params.quiet=
 tools.pymcuprog.erase.pattern=
 
-tools.pymcuprog.bootloader.params.verbose=-v
+tools.pymcuprog.bootloader.params.verbose=
 tools.pymcuprog.bootloader.params.quiet=
 tools.pymcuprog.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} {bootloader.verbose} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:{bootloader.OSCCFG} 4:{bootloader.TCD0CFG} 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} {bootloader.pymcuprogstring}
 
-tools.pymcuprog.program.params.verbose=-v
+tools.pymcuprog.program.params.verbose=
 tools.pymcuprog.program.params.quiet=
 tools.pymcuprog.program.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} {program.verbose} --fuses 2:{bootloader.OSCCFG} 6:{bootloader.SYSCFG1} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write
