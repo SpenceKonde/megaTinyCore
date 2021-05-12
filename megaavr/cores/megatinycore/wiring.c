@@ -687,7 +687,7 @@ void __attribute__((weak)) init_clock() {
       /* Clock DIV4 */
       _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
     #elif (F_CPU == 1000000) //16MHz prescaled by 16
-      /* Clock DIV8 */
+      /* Clock DIV16 */
       _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
     #else
       #ifndef F_CPU
