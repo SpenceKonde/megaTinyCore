@@ -64,7 +64,7 @@ void TWI_MasterInit(uint32_t frequency) {
   if (twi_mode != TWI_MODE_UNKNOWN) {
     return;
   }
-  #ifdef PORTMUX_TWIROUTEA
+#ifdef PORTMUX_TWIROUTEA
   if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == PORTMUX_TWI0_ALT2_gc) {
     // make sure we don't get errata'ed - make sure their bits in the
     // PORTx.OUT registers are 0.
@@ -72,8 +72,8 @@ void TWI_MasterInit(uint32_t frequency) {
   } else {
     PORTA.OUTCLR = 0x0C; // bits 2 and 3
   }
-  #else // megaTinyCore
-  #if defined(PORTMUX_TWI0_bm)
+#else // megaTinyCore
+#if defined(PORTMUX_TWI0_bm)
   if ((PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
     // make sure we don't get errata'ed - make sure their bits in the
     // PORTx.OUT registers are 0.
@@ -81,12 +81,12 @@ void TWI_MasterInit(uint32_t frequency) {
   } else {
     PORTB.OUTCLR = 0x03; // else PB0, PB1
   }
-  #elif defined(__AVR_ATtinyxy2__)
+#elif defined(__AVR_ATtinyxy2__)
   PORTA.OUTCLR = 0x06; // 8-pin parts always have it on PA1/2
-  #else
+#else
   PORTB.OUTCLR = 0x03; // else, zero series, no remapping, it's on PB0, PB1
-  #endif
-  #endif
+#endif
+#endif
 
   twi_mode = TWI_MODE_MASTER;
 
@@ -115,7 +115,7 @@ void TWI_SlaveInit(uint8_t address, uint8_t receive_broadcast, uint8_t second_ad
     return;
   }
 
-  #ifdef PORTMUX_TWIROUTEA
+#ifdef PORTMUX_TWIROUTEA
   if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == PORTMUX_TWI0_ALT2_gc) {
     // make sure we don't get errata'ed - make sure their bits in the
     // PORTx.OUT registers are 0.
@@ -123,8 +123,8 @@ void TWI_SlaveInit(uint8_t address, uint8_t receive_broadcast, uint8_t second_ad
   } else {
     PORTA.OUTCLR = 0x0C; // bits 2 and 3
   }
-  #else // megaTinyCore
-  #if defined(PORTMUX_TWI0_bm)
+#else // megaTinyCore
+#if defined(PORTMUX_TWI0_bm)
   if ((PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
     // make sure we don't get errata'ed - make sure their bits in the
     // PORTx.OUT registers are 0.
@@ -132,12 +132,12 @@ void TWI_SlaveInit(uint8_t address, uint8_t receive_broadcast, uint8_t second_ad
   } else {
     PORTB.OUTCLR = 0x03; // else PB0, PB1
   }
-  #elif defined(__AVR_ATtinyxy2__)
+#elif defined(__AVR_ATtinyxy2__)
   PORTA.OUTCLR = 0x06; // 8-pin parts always have it on PA1/2
-  #else
+#else
   PORTB.OUTCLR = 0x03; // else, zero series, no remapping, it's on PB0, PB1
-  #endif
-  #endif
+#endif
+#endif
 
   twi_mode = TWI_MODE_SLAVE;
 
@@ -226,40 +226,40 @@ void TWI_MasterSetBaud(uint32_t frequency) {
 
   // The nonlinearity of the frequency coupled with the processor frequency a general offset has been calculated and tested for different frequency bands
 #if F_CPU > 16000000
-  if(frequency <= 100000){
+  if (frequency <= 100000) {
     TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
     t_rise = 1000;
-    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 6; // Offset +6
-  } else if (frequency <= 400000){
+    baud = (F_CPU / (2 * frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 6; // Offset +6
+  } else if (frequency <= 400000) {
     TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
     t_rise = 300;
-    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 1; // Offset +1
-  } else if (frequency <= 800000){
+    baud = (F_CPU / (2 * frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 1; // Offset +1
+  } else if (frequency <= 800000) {
     TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
     t_rise = 120;
-    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000));
+    baud = (F_CPU / (2 * frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000));
   } else {
     TWI0.CTRLA |= TWI_FMPEN_bm; // Enable fast mode plus
     t_rise = 120;
-    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) - 1; // Offset -1
+    baud = (F_CPU / (2 * frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) - 1; // Offset -1
   }
 #else
-  if(frequency <= 100000){
+  if (frequency <= 100000) {
     TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
     t_rise = 1000;
-    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 8; // Offset +8
-  } else if (frequency <= 400000){
+    baud = (F_CPU / (2 * frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 8; // Offset +8
+  } else if (frequency <= 400000) {
     TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
     t_rise = 300;
-    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 1; // Offset +1
-  } else if (frequency <= 800000){
+    baud = (F_CPU / (2 * frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 1; // Offset +1
+  } else if (frequency <= 800000) {
     TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
     t_rise = 120;
-    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000));
+    baud = (F_CPU / (2 * frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000));
   } else {
     TWI0.CTRLA |= TWI_FMPEN_bm; // Enable fast mode plus
     t_rise = 120;
-    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) - 1; // Offset -1
+    baud = (F_CPU / (2 * frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) - 1; // Offset -1
   }
 #endif
 
@@ -356,7 +356,7 @@ uint8_t TWI_MasterWriteRead(uint8_t slave_address,
     master_sendStop = send_stop;
     master_slaveAddress = slave_address << 1;
 
-  trigger_action:
+trigger_action:
 
     /* If write command, send the START condition + Address +
        'R/_W = 0'
