@@ -220,52 +220,51 @@ uint8_t TWI_MasterReady(void) {
 void TWI_MasterSetBaud(uint32_t frequency) {
   TWI0.MCTRLA &= ~TWI_ENABLE_bm; // The TWI master should be disabled while changing the baud rate
 
+  // Use (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) to calculate the baud rate with t_rise (max) in ns and the frequencies in Hz
+  uint16_t t_rise;
+  uint8_t baud;
 
-    // Use (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) to calculate the baud rate with t_rise (max) in ns and the frequencies in Hz
-    uint16_t t_rise;
-    uint8_t baud;
-
-    // The nonlinearity of the frequency coupled with the processor frequency a general offset has been calculated and tested for different frequency bands
+  // The nonlinearity of the frequency coupled with the processor frequency a general offset has been calculated and tested for different frequency bands
 #if F_CPU > 16000000
-    if(frequency <= 100000){
-        TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
-        t_rise = 1000;
-        baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 6; // Offset +6
-    } else if (frequency <= 400000){
-        TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
-        t_rise = 300;
-        baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 1; // Offset +1
-    } else if (frequency <= 800000){
-        TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
-        t_rise = 120;
-        baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000));
-    } else {
-        TWI0.CTRLA |= TWI_FMPEN_bm; // Enable fast mode plus
-        t_rise = 120;
-        baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) - 1; // Offset -1
-    }
+  if(frequency <= 100000){
+    TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
+    t_rise = 1000;
+    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 6; // Offset +6
+  } else if (frequency <= 400000){
+    TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
+    t_rise = 300;
+    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 1; // Offset +1
+  } else if (frequency <= 800000){
+    TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
+    t_rise = 120;
+    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000));
+  } else {
+    TWI0.CTRLA |= TWI_FMPEN_bm; // Enable fast mode plus
+    t_rise = 120;
+    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) - 1; // Offset -1
+  }
 #else
-    if(frequency <= 100000){
-        TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
-        t_rise = 1000;
-        baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 8; // Offset +8
-    } else if (frequency <= 400000){
-        TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
-        t_rise = 300;
-        baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 1; // Offset +1
-    } else if (frequency <= 800000){
-        TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
-        t_rise = 120;
-        baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000));
-    } else {
-        TWI0.CTRLA |= TWI_FMPEN_bm; // Enable fast mode plus
-        t_rise = 120;
-        baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) - 1; // Offset -1
-    }
+  if(frequency <= 100000){
+    TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
+    t_rise = 1000;
+    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 8; // Offset +8
+  } else if (frequency <= 400000){
+    TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
+    t_rise = 300;
+    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) + 1; // Offset +1
+  } else if (frequency <= 800000){
+    TWI0.CTRLA &= ~TWI_FMPEN_bm; // Disable fast mode plus
+    t_rise = 120;
+    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000));
+  } else {
+    TWI0.CTRLA |= TWI_FMPEN_bm; // Enable fast mode plus
+    t_rise = 120;
+    baud = (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) - 1; // Offset -1
+  }
 #endif
 
-    TWI0.MBAUD = (uint8_t)baud;
-    TWI0.MCTRLA |= TWI_ENABLE_bm;
+  TWI0.MBAUD = (uint8_t)baud;
+  TWI0.MCTRLA |= TWI_ENABLE_bm;
 }
 
 /*! \brief TWI write transaction.
