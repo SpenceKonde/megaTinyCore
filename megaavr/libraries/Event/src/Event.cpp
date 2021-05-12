@@ -73,9 +73,9 @@ int8_t Event::get_user_channel(user::user_t event_user) {
   uint8_t event_user_mask = event_user & 0x7F;
   // Figure out what user register to read from to based on the passed parameter
   #if MEGATINYCORE_SERIES == 2
-    volatile uint8_t *user_register = &EVSYS_USERCCLLUT0A + (volatile uint8_t &)event_user_mask;
+  volatile uint8_t *user_register = &EVSYS_USERCCLLUT0A + (volatile uint8_t &)event_user_mask;
   #else
-    volatile uint8_t *user_register = &EVSYS_ASYNCUSER0 + (volatile uint8_t &)event_user_mask;
+  volatile uint8_t *user_register = &EVSYS_ASYNCUSER0 + (volatile uint8_t &)event_user_mask;
   #endif
   // Return what channel the user is connected to
   return *user_register - 1;
@@ -114,22 +114,22 @@ void Event::set_user(user::user_t event_user) {
   // Figure out what user register to write to based on the passed parameter
   uint8_t event_user_mask = event_user & 0x7F;
   #if MEGATINYCORE_SERIES == 2
-    volatile uint8_t *user_register = &EVSYS_USERCCLLUT0A + (volatile uint8_t &)event_user_mask;
+  volatile uint8_t *user_register = &EVSYS_USERCCLLUT0A + (volatile uint8_t &)event_user_mask;
   #else
-    volatile uint8_t *user_register = &EVSYS_ASYNCUSER0 + (volatile uint8_t &)event_user_mask;
+  volatile uint8_t *user_register = &EVSYS_ASYNCUSER0 + (volatile uint8_t &)event_user_mask;
   #endif
   // Connect user to the channel we're working with
   *user_register = channel_number + 1;
 
   // Set PORTMUX pin swap for EVOUT if selected as channel generator
   #if defined(PORTMUX_EVSYSROUTEA)
-    if (event_user & 0x80) {
-      PORTMUX_EVSYSROUTEA |= (1 << ((event_user & 0x7F) - 0x09));
-    }
+  if (event_user & 0x80) {
+    PORTMUX_EVSYSROUTEA |= (1 << ((event_user & 0x7F) - 0x09));
+  }
   #elif defined(PORTMUX_CTRLA)
-    if ((event_user >= 8) && (event_user <= 0x0D)) {
-      PORTMUX_CTRLA |= (1 << ((event_user & 0x7F) - 0x09));
-    }
+  if ((event_user >= 8) && (event_user <= 0x0D)) {
+    PORTMUX_CTRLA |= (1 << ((event_user & 0x7F) - 0x09));
+  }
   #endif
 }
 
@@ -143,9 +143,9 @@ void Event::clear_user(user::user_t event_user) {
   // Figure out what user register to write to based on the passed parameter
   uint8_t event_user_mask = event_user & 0x7F;
   #if MEGATINYCORE_SERIES == 2
-    volatile uint8_t *user_register = &EVSYS_USERCCLLUT0A + (volatile uint8_t &)event_user_mask;
+  volatile uint8_t *user_register = &EVSYS_USERCCLLUT0A + (volatile uint8_t &)event_user_mask;
   #else
-    volatile uint8_t *user_register = &EVSYS_ASYNCUSER0 + (volatile uint8_t &)event_user_mask;
+  volatile uint8_t *user_register = &EVSYS_ASYNCUSER0 + (volatile uint8_t &)event_user_mask;
   #endif
   // Disconnect from event generator
   *user_register = 0x00;
@@ -170,8 +170,8 @@ void Event::clear_user(user::user_t event_user) {
 void Event::soft_event() {
   // Write to the bit that represent the channel in the strobe register
   #if defined(EVSYS_STROBE)
-    // megaAVR 0-series
-    EVSYS.STROBE = (1 << channel_number);
+  // megaAVR 0-series
+  EVSYS.STROBE = (1 << channel_number);
   #elif defined (EVSYS_ASYNCSTROBE)
   // tinyAVR 0/1-series
   if (channel_number < 2) {
