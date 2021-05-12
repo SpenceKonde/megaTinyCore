@@ -356,7 +356,7 @@ uint8_t TWI_MasterWriteRead(uint8_t slave_address,
     master_sendStop = send_stop;
     master_slaveAddress = slave_address << 1;
 
-    trigger_action:
+  trigger_action:
 
     /* If write command, send the START condition + Address +
        'R/_W = 0'
