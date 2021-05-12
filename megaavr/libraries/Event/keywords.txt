@@ -1,0 +1,54 @@
+#######################################
+# Syntax Coloring Map For Wire
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+get_channel_number	KEYWORD2
+get_user_channel	KEYWORD2
+set_generator	KEYWORD2
+get_generator	KEYWORD2
+set_user	KEYWORD2
+clear_user	KEYWORD2
+soft_event	KEYWORD2
+start	KEYWORD2
+stop	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+Event	KEYWORD2
+Event0	KEYWORD2
+Event1	KEYWORD2
+Event2	KEYWORD2
+Event3	KEYWORD2
+Event4	KEYWORD2
+Event5	KEYWORD2
+Event6	KEYWORD2
+Event7	KEYWORD2
+Event8	KEYWORD2
+Event9	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+gen	LITERAL1
+gen0	LITERAL1
+gen1	LITERAL1
+gen2	LITERAL1
+gen3	LITERAL1
+gen4	LITERAL1
+gen5	LITERAL1
+gen6	LITERAL1
+gen7	LITERAL1
+gen8	LITERAL1
+gen9	LITERAL1
+user	LITERAL1
