@@ -222,7 +222,7 @@ void TWI_MasterSetBaud(uint32_t frequency) {
 
   // Use (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) to calculate the baud rate with t_rise (max) in ns and the frequencies in Hz
   uint16_t t_rise;
-  uint8_t baud;
+  int16_t baud;
 
   // The nonlinearity of the frequency coupled with the processor frequency a general offset has been calculated and tested for different frequency bands
   #if F_CPU > 16000000
@@ -262,6 +262,12 @@ void TWI_MasterSetBaud(uint32_t frequency) {
     baud = (F_CPU / (2 * frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) - 1; // Offset -1
   }
   #endif
+
+  if (baud < 1) {
+    baud = 1;
+  } else if (baud > 255) {
+    baud = 255;
+  }
 
   TWI0.MBAUD = (uint8_t)baud;
   TWI0.MCTRLA |= TWI_ENABLE_bm;
