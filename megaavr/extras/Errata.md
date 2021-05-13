@@ -3,6 +3,16 @@ Microcontrollers, like any other product, often have bugs which are discovered o
 
 The tinyAVR 0-series and 1-series parts have a particularly large number of errata - likely because these were some of the first parts released with many of the new peripherals (though the megaAVR 0-series had come out slightly earlier - in many cases with similar issues - the 1-series had many peripherals not featured in the megaAVR 0-series). The specific errata relevant to a given part vary depending on the part and silicon revision. The silicon revision can be read from the `SYSCFG.REVID` register (0 = A, 1 = B, etc). It is also marked on the chip - though determining how to decipher the markings can be challenging.
 
+The list of errata from Microchip has been updated since this was written. Nothing specific to any given part. A few universal ones were added (these impact even the latest AVR DA and DB parts in many cases):
+* CCMPL and CCMPH are supposed to be independent when a TCB is set to 8-bit PWM mode. They are not. You either need to write both in the correct order, or else pack both values into a 16-bit type and writeTHHAT to CCMP
+* Apparently it's not intended that you have to disable the whole CCL to disable any given LUT so that you can reconfigure it. the LUTs are supposed to be protected based on theire own enable bit, but it's not supposed to be required to turn off the whole CCL (which may be used for other things) to reconfigbure one LUT.
+* This one only hits the tinys, and if you can get your claws on a Rev C 3216 or 3217 it's fixed there (and in the Automotive version of same) - but it is NASTTY if you are using the RTC. The parts they own up to in the errata sheet is bad: Don't disable the RTC or the PIT if you need to use either one of them. stopping one will break both. And writing RTC.CTRLA resets prescaler coumt (as in the time before it ticks over again, so current tick is prolonged). What they do *not* mention is...
+ * (reported by user on ATtiny412) Set RTC clock source. and enable the pit with desired period. 
+ * PIT is now working correctly! buuuuut.... RTC.CNTBUSY is stuck on. 
+ * ensuring that RTC.CTRLA is enabled fixes that much... but if ou write a 1 to RTCEN more than once, they report the PIT running at double speed. https://github.com/SpenceKonde/megaTinyCore/issues/420#issuecomment-838572798
+
+Note that Rev. C if the 32k parts is apparently the only revision that fixes a substantial amount of errata. It fixes some of the RTC stuff, it fixes the CCL D-latch and the fact that you had to enable pin output to use the link output source on a downstream LUT. the pending event stuck issue on the ADC, and the thhing where if you kept reading the USART quickly after receiving frame errors, it would keep corrupting the next character, which might thus end up misframed and trigger the same bug.
+
 ```
 Serial.print("Silicon revision is: ");
 Serial.println(SYSCFG.REVID);
