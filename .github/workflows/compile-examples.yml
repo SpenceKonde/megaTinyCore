@@ -7,12 +7,14 @@ on:
       - "megaavr/libraries/**"
       - "megaavr/cores/**"
       - "megaavr/variants/**"
+      - "megaavr/*.txt"
   push:
     paths:
       - ".github/workflows/compile-examples.yml"
       - "megaavr/libraries/**"
       - "megaavr/cores/**"
       - "megaavr/variants/**"
+      - "megaavr/*.txt"
   # workflow_dispatch event allows the workflow to be triggered manually
   # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch
   workflow_dispatch:
