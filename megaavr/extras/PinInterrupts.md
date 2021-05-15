@@ -7,12 +7,18 @@ The system for interrupts on tinyAVR 0/1-series parts is different from, and vas
 ### Enabling the interrupt
 The pin interrupt control is handled by the PORTx.PINnCTRL register.
 Bits 0-2 control interrupt and sense behavior:
-000 = no interrupt, normal operation
-001 = interrupt on change
-010 = interrupt on rising
-011 = interrupt on falling
-100 = digital input buffer disabled entirely (equivalent of DIDR register on classic AVRs that have it)
-101 = interrupt on LOW level
+
+    000 = no interrupt, normal operation
+
+    001 = interrupt on change
+
+    010 = interrupt on rising
+
+    011 = interrupt on falling
+
+    100 = digital input buffer disabled entirely (equivalent of DIDR register on classic AVRs that have it)
+
+    101 = interrupt on LOW level
 
 Bit 3 controls the pullup.
 
