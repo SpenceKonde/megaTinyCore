@@ -79,7 +79,7 @@ To stop taking samples in free running mode, simply clear the `ADC_FREERUN_bm` b
 It is recommended to stop free running mode prior to changing the channel. On some tinyAVR parts, most ADC settings cannot be changed without first turning off free running mode. See [the table of silicon errata](Errata.md)
 
 # Automatic Accumulation
-One of the most common applications of multiple consecutive ADC reads is to sum multiple readings to take an average, or for the purpose of inccreasing accuracy through the technique of oversampling and decimation. The modern AVR devices have an automatic accumulator feature to do this for you to make this process easier; it is controlled by `ADCn.CTRLB`. This is the only thing controlled by this register, so you can set it directly. Valid options are:
+One of the most common applications of multiple consecutive ADC reads is to sum multiple readings to take an average, or for the purpose of increasing accuracy through the technique of oversampling and decimation. The modern AVR devices have an automatic accumulator feature to do this for you to make this process easier; it is controlled by `ADCn.CTRLB`. This is the only thing controlled by this register, so you can set it directly. Valid options are:
 * `ADC_SAMPNUM_ACC1_gc`
 * `ADC_SAMPNUM_ACC2_gc`
 * `ADC_SAMPNUM_ACC4_gc`
