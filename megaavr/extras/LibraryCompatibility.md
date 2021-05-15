@@ -3,14 +3,14 @@ Please include information that uniquely identifies the library, as popular libr
 
 | Library      | Version | Library URL or reference                              | Status                               | Notes                                                     |
 |--------------|---------|-------------------------------------------------------|--------------------------------------|-----------------------------------------------------------|
-| tinyGPS++    |         | https://github.com/mikalhart/TinyGPSPlus              |                 Compiles amd works   |                                                           |
+| tinyGPS++    |         | https://github.com/mikalhart/TinyGPSPlus              |                 Compiles and works   |                                                           |
 | ~NeoGPS~     |         |                                                       |  Architecture warning, doesn't work  |                                                           |
-| VL53L0X      |         | Pololu                                                |                 Compiles amd works   |                                                           |
-| VEML6070     |         | Adafruit                                              |                 Compiles amd works   |                                                           |
-| MLX90614     |         | https://github.com/adafruit/Adafruit-MLX90614-Library |                 Compiles amd works   |                                                           |
-| BMP180       |         | Adafruit                                              |                 Compiles amd works   |                                                           |
-| BME280       |         | Adafruit                                              |                 Compiles amd works   |                                                           |
-| OneWireNg    |         | https://github.com/pstolarz/OneWireNg                 |                 Compiles amd works   |                                                           |
+| VL53L0X      |         | Pololu                                                |                 Compiles and works   |                                                           |
+| VEML6070     |         | Adafruit                                              |                 Compiles and works   |                                                           |
+| MLX90614     |         | https://github.com/adafruit/Adafruit-MLX90614-Library |                 Compiles and works   |                                                           |
+| BMP180       |         | Adafruit                                              |                 Compiles and works   |                                                           |
+| BME280       |         | Adafruit                                              |                 Compiles and works   |                                                           |
+| OneWireNg    |         | https://github.com/pstolarz/OneWireNg                 |                 Compiles and works   |                                                           |
 | ~OneWire~    | Original| ~https://github.com/PaulStoffregen/OneWire~           |                   Does not compile   | Not compatible with modern AVRs other than the ATmega4809 |
 | OneWire      | Forked  | https://github.com/SpenceKonde/OneWire                | I added support for modern AVRs, works | Tested PR submitted August 2020. No response from Paul.   |
 | ~Neopixel~   |         | ~Adafruit~                                            |                   Does not compile   | Use included tinyNeoPixel - Same API, adapted for these   |
