@@ -86,7 +86,7 @@ inline __attribute__((always_inline)) void check_valid_enh_res(uint8_t res) {
     if (res < 0x80){
       if (res < ADC_NATIVE_RESOLUTION_LOW) {
             badArg("When a resolution is passed to analogReadEnh, it must be at least the minimum native resolution (8 bits)");
-      } else if (res > MAX_OVERSAMPLED_RESOLUTION) {
+      } else if (res > ADC_MAX_OVERSAMPLED_RESOLUTION) {
         badArg("The highest resolution obtainable on these parts through oversampling and decimation with a single ADC operation 13 bits on 0/1-series or 17 on 2-series");
       }
   #if MEGATINYCORE_SERIES == 2

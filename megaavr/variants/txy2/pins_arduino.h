@@ -71,6 +71,7 @@
 #define PIN_HWSERIAL0_TX                  (PIN_PA6)
 #define PIN_HWSERIAL0_XCK                 (PIN_PA3)
 #define PIN_HWSERIAL0_XDIR                (PIN_PA0)
+
 #ifdef DAC0
   #define DAC_PIN                         (PIN_PA6)
 #endif
@@ -79,28 +80,29 @@
   #define LED_BUILTIN    (PIN_PA7)
 #endif
 
+#define PIN_PA6   (0)
+#define PIN_PA7   (1)
+#define PIN_PA0   (5)
+#define PIN_PA1   (2)
+#define PIN_PA2   (3)
+#define PIN_PA3   (4)
 
 
-#define PIN_A0                            (5)
-#define PIN_A1                            (2)
-#define PIN_A2                            (3)
-#define PIN_A3                            (4)
-#define PIN_A6                            (0)
-#define PIN_A7                            (1)
+#define PIN_A0   (A0)
+#define PIN_A1   (A1)
+#define PIN_A2   (A2)
+#define PIN_A3   (A3)
+#define PIN_A6   (A6)
+#define PIN_A7   (A7)
 
-static const uint8_t A0 = PIN_A0;
-static const uint8_t A1 = PIN_A1;
-static const uint8_t A2 = PIN_A2;
-static const uint8_t A3 = PIN_A3;
-static const uint8_t A6 = PIN_A6;
-static const uint8_t A7 = PIN_A7;
+static const uint8_t A0 = PIN_PA0;
+static const uint8_t A1 = PIN_PA1;
+static const uint8_t A2 = PIN_PA2;
+static const uint8_t A3 = PIN_PA3;
+static const uint8_t A6 = PIN_PA6;
+static const uint8_t A7 = PIN_PA7;
 
-static const uint8_t PIN_PA6 = 0;
-static const uint8_t PIN_PA7 = 1;
-static const uint8_t PIN_PA0 = 5;
-static const uint8_t PIN_PA1 = 2;
-static const uint8_t PIN_PA2 = 3;
-static const uint8_t PIN_PA3 = 4;
+
 
 #define PINS_COUNT    (6u)
 
@@ -111,9 +113,9 @@ static const uint8_t PIN_PA3 = 4;
 // pins are a separate set.
 
 // ATtiny412 / ARDUINO
-//                                    _____
+//                                     _____
 //                             VDD   1|*    |20  GND
-//           (DAC)   (AIN6) PA6  0   2|     |19  4~  PA3 (AIN3)(SCK)(EXTCLK)
+//             (DAC) (AIN6) PA6  0   2|     |19  4~  PA3 (AIN3)(SCK)(EXTCLK)
 //                   (AIN7) PA7  1   3|     |18  5   PA0 (nRESET/UPDI)
 // (MOSI)(TXD*)(SDA) (AIN1) PA1  2   4|_____|17  3   PA2 (AIN2)(MISO)(RXD*)(SCL)
 //

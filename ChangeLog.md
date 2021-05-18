@@ -4,7 +4,14 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-### Planned for 2.3.2
+### Planned for 2.3.3 or 2.4.0
+* Finally port Event.h to tinyAVR. The event system they shipped on the 0/1-series is, to use a technical term a shitshow. Users planning projects which depend heavily on the event system are urged to use a 2-series part unless the project also requires a type D timer, but the AVR DD-series is for some reason not an acceptable alternativew.
+* Even better TWI Baud formula (#422 - thanks @rneurink!!)
+
+
+## Released Versions
+
+### 2.3.2
 * Expand Keywords.txt to include register names! (#386)
 * Add @MCUDude's Flash.h library (not the same as the DxCore library of same name and big-picture function) (#159)
 * Correct issue with compilation when using TCB0 as millis timing source on parts without TCB1 (#394)
@@ -22,7 +29,6 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Disable Verbose serial-updi output. It would generate output about 4 times the size of the file being uploaded, and it was so detailed that almost nobody could decipher it. It was also incredibly repetitive; so much so that zipping it compressed it over 100:1. Since that was not useful, and without a way to get something in the middle, I just don't request verbose output, regardless of what is checked in the options. The verbose output was really only useful when modifying the upload tool.
 * Correct issue when the two pins controlled by TCD were written to in rapid succession (#414)
 
-## Released Versions
 
 ### 2.3.1
 * Rerelease to address toolchain bug. No code changes.

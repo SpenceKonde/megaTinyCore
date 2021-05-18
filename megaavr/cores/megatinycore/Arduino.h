@@ -164,7 +164,7 @@ extern "C" {
 #define ADC_ENH_ERROR_DISABLED                 -2100000007
 // The ADC is not currently enabled.
 #define ADC_ERROR_INVALID_CLOCK                     -32764
-// Returned by analogClockSpeedif the value in the register is currently unknown, or if an invaloid frequency is requested.
+// Returned by analogClockSpeed if the value in the register is currently unknown, or if an invalid frequency is requested.
 
 
 
@@ -312,20 +312,11 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 // #define CORE_HAS_PINCONFIG 1
 
 #if (MEGATINYCORE_SERIES == 2)
-  // If CORE_HAS_ANALOG_ENH or CORE_HAS_ANALOG_DIFF defined 1, this is the
-  // maximum ADC resolution it can obtain through oversampling and decimation.
-  // (ie log base 4 of ADC_MAXIMUM_ACCUMULATE + ADC_NATIVE_RESOLUTION)
-  #define MAX_OVERSAMPLED_RESOLUTION 17
   // if analogReadEnh() supplied, this is defined as 1
-  // #define CORE_HAS_ANALOG_ENH 1
+  #define CORE_HAS_ANALOG_ENH 1
   // if analogReadDiff() supplied, this is defined as 1
-  // #define CORE_HAS_ANALOG_DIFF 1
+  #define CORE_HAS_ANALOG_DIFF 1
 #else
-  // If CORE_HAS_ANALOG_ENH or CORE_HAS_ANALOG_DIFF defined 1, this is the
-  // maximum ADC resolution it can obtain through oversampling and decimation.
-  // (ie log base 4 of ADC_MAXIMUM_ACCUMULATE + ADC_NATIVE_RESOLUTION)
-  #define MAX_OVERSAMPLED_RESOLUTION 13
-  // if analogReadEnh() supplied, this is defined as 1
   #define CORE_HAS_ANALOG_ENH 1
   // if analogReadDiff() supplied, this is defined as 1
   // #define CORE_HAS_ANALOG_DIFF 1

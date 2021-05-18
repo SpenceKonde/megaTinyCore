@@ -734,7 +734,7 @@ void __attribute__((weak)) init_ADC0() {
     #endif
     ADC0.SAMPCTRL = (16); // 16 ADC clocks, 16 us
     ADC0.CTRLD    = ADC_INITDLY_DLY16_gc;
-    ADC0.CTRLA   |= ADC_ENABLE_bm;
+    ADC0.CTRLA    = ADC_ENABLE_bm;
   #else
     /* On the 2-series maximum with internal reference is 3 MHz, so we will
      * target highest speed that doesn't exceed that and 16 ADC clocks sample

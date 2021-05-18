@@ -1,9 +1,9 @@
-pyupdi.name=Serial-UPDI with 4.7k resistor or diode (pyupdi - 230400 baud)
-pyupdi.protocol=uart
-pyupdi.program.extra_params=-u {serial.port} -b 230400
-pyupdi.program.protocol=uart
-pyupdi.program.tool=pymcuprog
-pyupdi.bootloader.tool=pymcuprog
+serialupdi.name=Serial-UPDI with 4.7k resistor or diode (like pyupdi - 230400 baud)
+serialupdi.protocol=uart
+serialupdi.program.extra_params=-u {serial.port} -b 230400
+serialupdi.program.protocol=uart
+serialupdi.program.tool=pymcuprog
+serialupdi.bootloader.tool=pymcuprog
 
 jtag2updi.name=jtag2updi
 jtag2updi.communication=serial
@@ -13,12 +13,12 @@ jtag2updi.program.tool=avrdude
 jtag2updi.program.extra_params=-P{serial.port}
 jtag2updi.program.speed=115200
 
-pyupdi460k.name=Serial-UPDI with 4.7k resistor or diode TURBO 4.5v+ (pyupdi- 460800 baud)
-pyupdi460k.protocol=uart
-pyupdi460k.program.extra_params=-u {serial.port} -b 460800
-pyupdi460k.program.protocol=uart
-pyupdi460k.program.tool=pymcuprog
-pyupdi460k.bootloader.tool=pymcuprog
+serialupdi460k.name=Serial-UPDI with 4.7k resistor or diode TURBO 4.5v+ (like pyupdi - 460800 baud)
+serialupdi460k.protocol=uart
+serialupdi460k.program.extra_params=-u {serial.port} -b 460800
+serialupdi460k.program.protocol=uart
+serialupdi460k.program.tool=pymcuprog
+serialupdi460k.bootloader.tool=pymcuprog
 
 medbg.name=Xplained Mini (mEDBG, debug chip: ATmega32u4)
 medbg.communication=usb
@@ -62,9 +62,9 @@ snap_updi.program.protocol=jtagice3_updi
 snap_updi.program.tool=avrdude
 snap_updi.program.extra_params=-Pusb
 
-pyupdi57k.name=Serial-UPDI with 4.7k resistor or diode SLOW (pyupdi- 57600 baud)
-pyupdi57k.protocol=uart
-pyupdi57k.program.extra_params=-u {serial.port} -b 57600
-pyupdi57k.program.protocol=uart
-pyupdi57k.program.tool=pymcuprog
-pyupdi57k.bootloader.tool=pymcuprog
+serialupdi57k.name=Serial-UPDI with 4.7k resistor or diode SLOW (like pyupdi - 57600 baud)
+serialupdi57k.protocol=uart
+serialupdi57k.program.extra_params=-u {serial.port} -b 57600
+serialupdi57k.program.protocol=uart
+serialupdi57k.program.tool=pymcuprog
+serialupdi57k.bootloader.tool=pymcuprog
