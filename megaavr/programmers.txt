@@ -1,4 +1,4 @@
-serialupdi.name=Serial-UPDI with 4.7k resistor or diode (like pyupdi - 230400 baud)
+serialupdi.name=SerialUPDI with 4.7k resistor or diode (230400 baud)
 serialupdi.protocol=uart
 serialupdi.program.extra_params=-u {serial.port} -b 230400
 serialupdi.program.protocol=uart
@@ -13,7 +13,7 @@ jtag2updi.program.tool=avrdude
 jtag2updi.program.extra_params=-P{serial.port}
 jtag2updi.program.speed=115200
 
-serialupdi460k.name=Serial-UPDI with 4.7k resistor or diode TURBO 4.5v+ (like pyupdi - 460800 baud)
+serialupdi460k.name=SerialUPDI with 4.7k resistor or diode (TURBO 4.5v+ 460800 baud)
 serialupdi460k.protocol=uart
 serialupdi460k.program.extra_params=-u {serial.port} -b 460800
 serialupdi460k.program.protocol=uart
@@ -62,7 +62,7 @@ snap_updi.program.protocol=jtagice3_updi
 snap_updi.program.tool=avrdude
 snap_updi.program.extra_params=-Pusb
 
-serialupdi57k.name=Serial-UPDI with 4.7k resistor or diode SLOW (like pyupdi - 57600 baud)
+serialupdi57k.name=SerialUPDI with 4.7k resistor or diode SLOW (57600 baud)
 serialupdi57k.protocol=uart
 serialupdi57k.program.extra_params=-u {serial.port} -b 57600
 serialupdi57k.program.protocol=uart
