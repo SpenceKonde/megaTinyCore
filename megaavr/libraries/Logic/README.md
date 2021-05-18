@@ -109,10 +109,10 @@ Notes specific to ATtiny 0/1-series:
 #### Accepted values for tinyAVR 2-series:
 ``` c++
 in::masked;           // Pin not in use
-in::unused;           // Synonym for masked
-in::disable;          // Synonym for masked
-in::feedback;         // Connect output of logic block 0/2, or their sequencer if in use, to this input
-in::link;             // Connect output of logic block n+1 to this input
+in::unused;           // Pin not in use
+in::disable;          // Pin not in use
+in::feedback;         // Connect output of sequencer (if used) or even logic block (n or n-1) to this input
+in::link;             // Connect output of logic block n+1 to this input, or block 0 for the last block.
 in::event_0;          // Connect input to event a
 in::event_a;          // Connect input to event a (preferred)
 in::event_1;          // Connect input to event b
@@ -203,7 +203,7 @@ See also [Prescaling Clocks with CCLs](https://github.com/SpenceKonde/AVR-Guidan
 
 
 ### clocksource
-Proprty to set the clock source for the logic block; this is used for the synchronizer and filter only (otherwise, the logic blocks are asynchronous - and shockingly fast. You can rig them up so that they oscillate, and with the most direct approaches, it can reach upwards of 100 MHz!). Note that 32kHz-derived and unprescaled clock options are not available on 0-series and 1-series parts; keep this in mind if backwards portability is important. If sequential logic is used, it is clocked from the clock source used by the even-numbered logic block, if it uses a clock.
+Property to set the clock source for the logic block; this is used for the synchronizer and filter only (otherwise, the logic blocks are asynchronous - and shockingly fast. You can rig them up so that they oscillate, and with the most direct approaches, it can reach upwards of 100 MHz!). Note that 32kHz-derived and unprescaled clock options are not available on 0-series and 1-series parts; keep this in mind if backwards portability is important. If sequential logic is used, it is clocked from the clock source used by the even-numbered logic block, if it uses a clock.
 Accepted values:
 ```c++
 clocksource::clk_per;      // Clock from the peripheral clock (ie, system clock)

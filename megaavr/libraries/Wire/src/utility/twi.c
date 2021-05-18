@@ -213,7 +213,7 @@ uint8_t TWI_MasterReady(void) {
 
 /*! \brief Set the TWI baud rate.
 
-    Sets the baud rate used by TWI Master.
+    Sets the baud rate used by TWI Master. Note that this makes assumptions about the bus topology, including capacitance, and rise time when one of the lines is released, so these values will not be exact. 
 
     \param frequency            The required baud.
 */

@@ -55,6 +55,10 @@
   |***********************************************************************/
 
 #include <Logic.h>
+#include <Event.h>
+
+//#define SHOW_TCD_DEMO
+
 
 void setup() {
   // Initialize logic block 0 and 1. Very simple configuration!

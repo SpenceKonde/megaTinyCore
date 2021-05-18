@@ -11,6 +11,7 @@
 #######################################
 
 begin	KEYWORD2
+usePullups	KEYWORD2
 pins	KEYWORD2
 swap	KEYWORD2
 setClock	KEYWORD2

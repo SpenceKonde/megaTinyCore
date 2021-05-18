@@ -20,7 +20,7 @@
   Modified 2017 by Chuck Todd (ctodd@cableone.net) to correct Unconfigured Slave Mode reboot
   Modified 2019-2021 by Spence Konde for megaTinyCore and DxCore.
   This version is part of megaTinyCore and DxCore; it is not expected
-  to work with other hardware or cores without modifications. .
+  to work with other hardware or cores without modifications.
 */
 
 extern "C" {
