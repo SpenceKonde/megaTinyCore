@@ -380,8 +380,12 @@ void delay(unsigned long ms) {
 
 #else //delay implementation when we do not
 void delay(unsigned long ms) {
-  while (ms--) {
-    delayMicroseconds(1000);
+  if (__builtin_constant_p(ms)) {
+    _delay_ms(ms);
+  } else {
+    while (ms--) {
+      delayMicroseconds(1000);
+    }
   }
 }
 #endif
