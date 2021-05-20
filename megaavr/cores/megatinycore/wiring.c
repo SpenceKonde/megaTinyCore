@@ -341,8 +341,18 @@ unsigned long micros() {
 
 #endif //end of non-MILLIS_USE_TIMERNONE code
 
-#if !(defined(MILLIS_USE_TIMERNONE) || defined(MILLIS_USE_TIMERRTC)) //delay implementation when we do have micros()
+#if !(defined(MILLIS_USE_TIMERNONE)) //|| defined(MILLIS_USE_TIMERRTC)) //delay implementation when we do have micros()
 void delay(unsigned long ms) {
+    if (ms < 16) {
+      while(ms--) {
+        _delay_ms(1);
+      }
+    } else {
+      uint32_t start=millis();
+      while (millis() - start < ms);
+    }
+
+  /*
   #if (PROGMEM_SIZE < 4096)
     // Not sure where I got this wacky definition of delay that was being used - It saves 24 whole bytes
     // Nobody is going to care about 24 bytes on most parts, but I am leaving it in for the 2k parts, where
@@ -354,21 +364,20 @@ void delay(unsigned long ms) {
     }
     uint32_t start_time = micros(), delay_time = 1000 * ms;
 
-    /* Calculate future time to return */
+    // Calculate future time to return
     uint32_t return_time = start_time + delay_time;
 
-    /* If return time overflows */
+    // If return time overflows
     if (return_time < delay_time) {
-      /* Wait until micros overflows */
+      // Wait until micros overflows
       while (micros() > return_time);
     }
 
-    /* Wait until return time */
+    // Wait until return time
     while (micros() < return_time);
   #else
     //Otherwise, we use the normal implementation of delay which is compatible with all values that fit in uint32_t.
     uint32_t start = micros();
-
     while (ms > 0) {
       while ( ms > 0 && (micros() - start) >= 1000) {
         ms--;
@@ -376,6 +385,7 @@ void delay(unsigned long ms) {
       }
     }
   #endif
+  */
 }
 
 #else //delay implementation when we do not

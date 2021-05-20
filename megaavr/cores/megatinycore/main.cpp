@@ -38,8 +38,8 @@ void initVariant() { }
 void setupUSB() __attribute__((weak));
 void setupUSB() { }
 
-int main(void)
-{
+int main()  __attribute__((weak));
+int main() {
   init(); //Interrupts are turned on just prior to init() returning.
 
   initVariant();
