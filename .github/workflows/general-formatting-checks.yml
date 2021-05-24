@@ -86,10 +86,18 @@ jobs:
   markdown-lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v2
-      - uses: xt0rted/markdownlint-problem-matcher@v1
-      - name: install markdownlint
-        run: npm install -g markdownlint-cli
-      - name: Check for markdown errors with markdownlint
-        run: markdownlint **/*.md
+        with:
+          # Full git history is needed to get a proper list of changed files within `super-linter`
+          fetch-depth: 0
+
+      ################################
+      # Run Linter against code base #
+      ################################
+      - name: Lint Code Base
+        uses: github/super-linter@v3
+        env:
+          VALIDATE_MARKDOWN: true
+          
+          
