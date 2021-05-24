@@ -90,4 +90,5 @@ jobs:
         uses: actions/checkout@v2
       - uses: xt0rted/markdownlint-problem-matcher@v1
       - name: Check for markdown errors with markdownlint
-        run: markdownlint **/*.md
+      - run: npm install -g markdownlint-cli
+      - run: markdownlint **/*.md
