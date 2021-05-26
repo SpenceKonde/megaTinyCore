@@ -264,6 +264,20 @@
   #if !defined(SIGROW_OSC20ERR5V)
     #define SIGROW_OSC20ERR5V (SIGROW.reserved_3[3])
   #endif
+#else
+  /* 0/1-series, on the other hand, doesm't jave these.... */
+  #if !defined(SIGROW_OSCCAL16M0)
+    #define SIGROW_OSCCAL16M0 _SFR_MEM8(0x1118)
+  #endif
+  #if !defined(SIGROW_OSCCAL16M1)
+    #define SIGROW_OSCCAL16M1 _SFR_MEM8(0x1119)
+  #endif
+  #if !defined(SIGROW_OSCCAL20M0)
+    #define SIGROW_OSCCAL20M0 _SFR_MEM8(0x111A)
+  #endif
+  #if !defined(SIGROW_OSCCAL20M1)
+    #define SIGROW_OSCCAL20M1 _SFR_MEM8(0x111B)
+  #endif
 #endif
 
 
