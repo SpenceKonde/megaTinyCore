@@ -290,10 +290,12 @@ atxy7.menu.resetpin.UPDI=UPDI (no reset pin)
 atxy7.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy7.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
 atxy7.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
-atxy7.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
-atxy7.menu.resetpin.reset.bootloader.resetpinbits=10
-atxy7.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
-atxy7.menu.resetpin.gpio.bootloader.resetpinbits=00
+#Expert mode - if you understand what these mean, uncomment them to enable.
+#there are a few lines like this in platform.txt too that can be uncommented to enable for uploads, not just when burning bootloader
+#atxy7.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
+#atxy7.menu.resetpin.reset.bootloader.resetpinbits=10
+#atxy7.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
+#atxy7.menu.resetpin.gpio.bootloader.resetpinbits=00
 
 ### STARTUP TIME (SUT)
 atxy7.menu.startuptime.8=8ms
@@ -334,6 +336,7 @@ atxy7.menu.uartvoltage.3v.build.uartvoltage=3V
 atxy6.build.text_section_start=.text=0x0
 atxy6.build.millistimer=D0
 atxy6.build.bootload=
+atxy6.bootloader.resetpinbits=01
 atxy6.build.board=AVR_ATtinyxy6
 atxy6.build.core=megatinycore
 atxy6.build.variant=txy6
@@ -544,10 +547,12 @@ atxy6.menu.resetpin.UPDI=UPDI (no reset pin)
 atxy6.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy6.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
 atxy6.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
-atxy6.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
-atxy6.menu.resetpin.reset.bootloader.resetpinbits=10
-atxy6.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
-atxy6.menu.resetpin.gpio.bootloader.resetpinbits=00
+#Expert mode - if you understand what these mean, uncomment them to enable.
+#there are a few lines like this in platform.txt too that can be uncommented to enable for uploads, not just when burning bootloader
+#atxy6.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
+#atxy6.menu.resetpin.reset.bootloader.resetpinbits=10
+#atxy6.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
+#atxy6.menu.resetpin.gpio.bootloader.resetpinbits=00
 
 ### STARTUP TIME (SUT)
 atxy6.menu.startuptime.8=8ms
@@ -588,6 +593,7 @@ atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
 atxy4.build.text_section_start=.text=0x0
 atxy4.build.millistimer=D0
 atxy4.build.bootload=
+atxy4.bootloader.resetpinbits=01
 atxy4.build.board=AVR_ATtinyxy4
 atxy4.build.core=megatinycore
 atxy4.build.variant=txy4
@@ -796,12 +802,15 @@ atxy4.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy4.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
 ### UPDI/RESET PIN CONFIGURATION
-atxy4.menu.resetpin.UPDI=UPDI (no reset pin)
-atxy4.menu.resetpin.UPDI.bootloader.resetpinbits=01
-atxy4.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
-atxy4.menu.resetpin.reset.bootloader.resetpinbits=10
-atxy4.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
-atxy4.menu.resetpin.gpio.bootloader.resetpinbits=00
+#Expert mode - if you understand what these mean, uncomment them to enable.
+#there are a few lines like this in platform.txt too that can be uncommented to enable for uploads, not just when burning bootloader
+#atxy4.menu.resetpin.UPDI=UPDI (no reset pin)
+#atxy4.menu.resetpin.UPDI.bootloader.resetpinbits=01
+#atxy4.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
+#atxy4.menu.resetpin.reset.bootloader.resetpinbits=10
+#atxy4.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
+#atxy4.menu.resetpin.gpio.bootloader.resetpinbits=00
+
 
 ### STARTUP TIME (SUT)
 atxy4.menu.startuptime.8=8ms
@@ -842,6 +851,7 @@ atxy4.menu.uartvoltage.3v.build.uartvoltage=3V
 atxy2.build.text_section_start=.text=0x0
 atxy2.build.millistimer=D0
 atxy2.build.bootload=
+atxy2.bootloader.resetpinbits=01
 atxy2.build.board=AVR_ATtinyxy2
 atxy2.build.core=megatinycore
 atxy2.build.variant=txy2
@@ -1004,12 +1014,14 @@ atxy2.menu.millis.timerb0.build.millistimer=B0
 atxy2.menu.millis.rtc.build.millistimer=RTC
 
 ### UPDI/RESET PIN CONFIGURATION
-atxy2.menu.resetpin.UPDI=UPDI (no reset pin)
-atxy2.menu.resetpin.UPDI.bootloader.resetpinbits=01
-atxy2.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
-atxy2.menu.resetpin.reset.bootloader.resetpinbits=10
-atxy2.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
-atxy2.menu.resetpin.gpio.bootloader.resetpinbits=00
+#Expert mode - if you understand what these mean, uncomment them to enable.
+#there are a few lines like this in platform.txt too that can be uncommented to enable for uploads, not just when burning bootloader
+#atxy2.menu.resetpin.UPDI=UPDI (no reset pin)
+#atxy2.menu.resetpin.UPDI.bootloader.resetpinbits=01
+#atxy2.menu.resetpin.reset=Reset (DANGER - Bricks chip w/out HV UPDI programmer!)
+#atxy2.menu.resetpin.reset.bootloader.resetpinbits=10
+#atxy2.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
+#atxy2.menu.resetpin.gpio.bootloader.resetpinbits=00
 
 ### STARTUP TIME (SUT)
 atxy2.menu.startuptime.8=8ms
