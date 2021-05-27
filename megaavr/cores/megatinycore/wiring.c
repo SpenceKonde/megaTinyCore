@@ -186,31 +186,32 @@ unsigned long millis() {
   #if defined(MILLIS_USE_TIMERRTC)
     uint16_t rtccount=RTC.CNT;
     m = timer_overflow_count;
-    if (RTC.INTFLAGS & RTC_OVF_bm) { //there has just been an overflow that hasn't been accounted for by the interrupt
-      // Check if the high bit of counter is set? Might be a better way to do this test; we just basically need to make
-      // sure that it didn't JUST roll over at the last couple of clocks; probably testing that it's not 0xFFFF would work too, but that's more compare instructions.
-      // even a very crude test would work since the RTC is so slow (and if they're leaving interrupts off that long, they shouldn't expect millis to work right!)
+    if (RTC.INTFLAGS & RTC_OVF_bm) {
+      /* There has just been an overflow that hasn't been accounted for by the interrupt. Check if the high bit of counter is set.
+       * We just basically need to make sure that it didn't JUST roll over at the last couple of clocks. But this merthod is
+       * implemented very efficiently (just an sbrs) so it is more efficient than other approaches. If user code is leaving
+       * interrupts off nearly long enough for this to be wrong, they shouldn't expect millis to work right. */
       if (!(rtccount & 0x8000)) m++;
     }
     SREG = oldSREG;
-    m = (m << 16); // how gracefully is the compiler implementing this?
-                   // Answer: Not very, but it's not awful - 9 clocks / 18 bytes, which could probably be saved with a union... the problem is
-    m += rtccount; // it ought to see that it's starting from a uint16_t, putting it into a uint32_t and just store it in the high 16 bits...
-                   // Answer: It's smart enough to avoid a bunch of shifts, but it does store it in wrong half, then move it, and it wastes add instructions when the rtccount is brought in
-    //now correct for there being 1000ms to the second instead of 1024
+    m = (m << 16);
+    m += rtccount;
     m = m - (m >> 5) + (m >> 7);
-    // it looks like - (m >> 5) + (m >> 7) is better
-    // than          - (m >> 6) - (m >> 7)
-    // I think their signs want to be opposite, so the integer truncation on each of them works in opposite direction.
-    // though using a m >> 5 term is also using a term while it has more precision, maybe that's what helps?
-    // I just simulated it across 0~1023 and 0~65335 numerically.
-    // Now, this is where the compiler really bungs it - 27 instruction words, executed over 100 clocks to do that!
-    // What one would want to do is to movw the 4 bytes into 4 new registers... followed by one empty one (3 clocks 3 words).
-    // Then leftshift those one each, and shift the carry bit into a fifth register (5 clocks 5 words) the 4 high registers now contain m >> 7, add to m (4 clocks 4 words)
-    // Repeat the leftshift twice more (17 clocks 9 words) giving m >>5, subtract (4 & 4)  and you're done  in 34 clocks, 25 words.
-    // I think this would also save you from 2x push and pop because of inefficient register use; at one point they have r16 ~ r27 filled with m and shifted m's, when you only
-    // need to ever store two copies, the m you're adding to and the m you're shifting. so another 4 words and 6 clocks so like 7 words from the math and 9 from unionizing.
-    // but 72 clocks from the math, and 9 from unionizing. Don't think it's worth the effort to write out in assembly though :-P It's okay if millis takes 6 us to return
+    /* the compiler is incorrigible - it cannot be convinced not to copy m twice, shifting one 7 times and the other 5 times
+     * and wasting 35 clock cycles and several precious instruction words.
+     * This ends up with the exact same implementation
+    uint32_t n = (m >> 5);
+    m -= n;
+    n = n >> 2;
+    m += n;
+     * What one would want to do is, first load the overflowcount into the high bytes in the first place, (4 words 6 clocks)
+     * followed by the count (4 & 6) Do the check for recent overflow as it's done now essentially (7 & 9). Then, we'd move
+     * to the 1024->1000-ifier. So: movw the 4 bytes into 4 new registers... and clear the register after it, (3 clocks 3 words).
+     * This would form a 5 byte register, in effect. Then leftshift those one each, and shift the carry bit into a fifth register
+     * like it was all one (5 clocks 5 words). It now contain m >> 7, add to m (4 & 4).
+     * Repeat the leftshift twice more (17 clocks 9 words) giving m >> 5, subtract (4 & 4)  and you're done.
+     * This not only is more efficient in and of itself, but it  ALSO saves you 4 words and 6 clocks in the prologue and epilogue
+     * because you don't need to save and restore r16 and r17 because you don't piss away 4 registers. */
   #else
     m = timer_millis;
     SREG = oldSREG;
@@ -220,9 +221,7 @@ unsigned long millis() {
 #ifndef MILLIS_USE_TIMERRTC
 
 unsigned long micros() {
-
   unsigned long overflows, microseconds;
-
   #if (defined(MILLIS_USE_TIMERD0) || defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
     uint16_t ticks;
   #else
@@ -231,9 +230,7 @@ unsigned long micros() {
   uint8_t flags;
   /* Save current state and disable interrupts */
   uint8_t oldSREG = SREG;
-  cli();
-
-
+  cli(); /* INTERRUPTS OFF */
   #if defined(MILLIS_USE_TIMERA0)
     ticks = TCA0.SPLIT.HCNT;
     flags = TCA0.SPLIT.INTFLAGS;
@@ -247,19 +244,17 @@ unsigned long micros() {
     flags = _timer->INTFLAGS;
   #endif //end getting ticks
   /* If the timer overflow flag is raised, and the ticks we read are low, then the timer has rolled over but
-    ISR has not fired. If we already read a high value of ticks, either we read it just before the overflow,
-    so we shouldn't increment overflows, or interrupts are disabled and micros isn't expected to work so it doesn't matter
-  */
-  /* Get current number of overflows and timer count */
+   * ISR has not fired. If we already read a high value of ticks, either we read it just before the overflow,
+   * so we shouldn't increment overflows, or interrupts are disabled and micros isn't expected to work so it
+   * doesn't matter.
+   * Get current number of overflows and timer count */
   #if !(defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
     overflows = timer_overflow_count;
   #else
     overflows = timer_millis;
   #endif
-
-    /* Turn interrupts back on, assuming they were on when micros was called. */
-    SREG = oldSREG;
-
+  /* Turn interrupts back on, assuming they were on when micros was called. */
+  SREG = oldSREG; /* INTERRUPTS ON */
   #if defined(MILLIS_USE_TIMERD0)
     if ((flags & TCD_OVF_bm) && (ticks < 0x07)) {
   #elif defined(MILLIS_USE_TIMERA0)
@@ -280,12 +275,14 @@ unsigned long micros() {
       uint8_t ticks_l = ticks >> 1;
       ticks = ticks + ticks_l + ((ticks_l >> 2) - (ticks_l >> 4) + (ticks_l >> 7));
       // + ticks +(ticks>>1)+(ticks>>3)-(ticks>>5)+(ticks>>8))
-      // speed optimization via doing math with smaller datatypes, since we know high byte is 1 or 0. also saves us some painful
-      microseconds = overflows * (TIME_TRACKING_CYCLES_PER_OVF / (20))
-                   + ticks;
+      // speed optimization via doing math with smaller datatypes, since we know high byte is 1 or 0.
+      microseconds =   overflows * (TIME_TRACKING_CYCLES_PER_OVF / 20) + ticks; //ticks value corrected above.
     #else
-      microseconds = ((overflows * (TIME_TRACKING_CYCLES_PER_OVF / (16)))
-                   + (ticks * ((TIME_TRACKING_CYCLES_PER_OVF) / (16) / TIME_TRACKING_TIMER_PERIOD)));
+      microseconds = ((overflows * (TIME_TRACKING_CYCLES_PER_OVF / 16))
+                        + (ticks * (TIME_TRACKING_CYCLES_PER_OVF / 16 / TIME_TRACKING_TIMER_PERIOD)));
+      #if defined(CLOCK_TUNE_INTERNAL) && !(F_CPU == 16000000UL || F_CPU ==  8000000UL || F_CPU ==  4000000UL || F_CPU ==  1000000UL || F_CPU ==  2000000UL)
+        #warning "TCD is not supported as a millis timing source when the oscillator is tuned to a frequency other than 16 or 20 MHz. Timing results will be wrong - use TCA0 or a TCB."
+      #endif
     #endif
   #elif (defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1))
     // ticks is 0 ~ F_CPU/2000 - 1
@@ -296,39 +293,57 @@ unsigned long micros() {
     // 4 term approximation? I think that would be exact! We'd also have equal + and -, reaping the reduced rounding noise
     // currently we end up with, it looks like, 0-995 (+/- 1) instead of 0-999? which I think we'd have with the last term.
     // Looked at generated assembly, no clue how they get there from here!
-    #if (F_CPU==20000000UL)
+    #if   (F_CPU  == 30000000UL)
+      ticks = ticks >> 4;
+      microseconds = overflows * 1000 + (ticks + (ticks >> 3) - (ticks >> 4) + (ticks >> 8)); // Damned near perfect.
+    #elif (F_CPU  == 20000000UL)
       ticks = ticks >> 3;
-      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6));
-    #elif (F_CPU==10000000UL)
+      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
+    #elif (F_CPU  == 10000000UL)
       ticks = ticks >> 2;
-      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6));
-    #elif (F_CPU==5000000UL)
+      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
+    #elif (F_CPU  ==  5000000UL)
       ticks = ticks >> 1;
-      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6));
-    #elif (F_CPU==16000000UL)
+      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
+    #elif (F_CPU  == 24000000UL)
+      ticks = ticks >> 4;
+      microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
+    #elif (F_CPU  == 12000000UL)
+      ticks = ticks >> 3;
+      microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
+    #elif (F_CPU  == 32000000UL || F_CPU > 24000000UL)
+      microseconds = overflows * 1000 + (ticks >> 4);
+    #elif (F_CPU  == 16000000UL || F_CPU > 12000000UL)
       microseconds = overflows * 1000 + (ticks >> 3);
-    #elif (F_CPU==8000000UL)
+    #elif (F_CPU  ==  8000000UL || F_CPU >  6000000UL)
       microseconds = overflows * 1000 + (ticks >> 2);
-    #elif (F_CPU==4000000UL)
+    #elif (F_CPU  ==  4000000UL || F_CPU >  3000000UL)
       microseconds = overflows * 1000 + (ticks >> 1);
-    #else //(F_CPU==1000000UL - here clock is running at system clock instead of half system clock.
+    #else // (F_CPU  ==  1000000UL || F_CPU  == 2000000UL);
       microseconds = overflows * 1000 + ticks;
     #endif
+
+    #if !(F_CPU == 30000000UL || F_CPU == 20000000UL || F_CPU == 10000000UL || F_CPU ==  5000000UL || \
+          F_CPU == 24000000UL || F_CPU == 12000000UL || F_CPU == 32000000UL || F_CPU == 16000000UL || \
+          F_CPU ==  8000000UL || F_CPU ==  4000000UL || F_CPU ==  1000000UL || F_CPU ==  2000000UL)
+      #warning "Millis timer (TCBn) at this frequency unsupported, micros() will return totally bogus values."
+    #endif
   #else //TCA0
-    #if (F_CPU==20000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==64)
+    #if (F_CPU == 20000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
       microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
                    + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
                    // bafflingly, casting to a uint16_t makes the compiler generate more efficient code...  but
                    // casting to uint8_t doesn't! I don't understand it. but I'll take a free 8 bytes and 4 clocks any day.
-    #elif (F_CPU==10000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==64)
+                   // I also cannot fathom how the compiler generates what it does from this input....
+    #elif (F_CPU == 10000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
       microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
                    + (ticks * 6 + ((uint16_t)(ticks >> 1) - (ticks >> 3)));
-    #elif (F_CPU==5000000UL && TIME_TRACKING_TICKS_PER_OVF==255 && TIME_TRACKING_TIMER_DIVIDER==16)
+    #elif (F_CPU == 5000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 16)
       microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
                    + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
     #else
       #if (TIME_TRACKING_TIMER_DIVIDER%(F_CPU/1000000))
-        #warning "Millis timer (TCA0) divider and frequency unsupported, inaccurate micros times will be returned."
+        #warning "Millis timer (TCA0) at this frequency unsupported, micros() will return bogus values."
       #endif
       microseconds = ((overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
                     + (ticks * (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF) / TIME_TRACKING_TIMER_PERIOD)));
@@ -341,9 +356,56 @@ unsigned long micros() {
 
 #endif //end of non-MILLIS_USE_TIMERNONE code
 
-#if !(defined(MILLIS_USE_TIMERNONE)) //|| defined(MILLIS_USE_TIMERRTC)) //delay implementation when we do have micros()
-void delay(unsigned long ms) {
-    if (ms < 16) {
+/* So what do you WANT in a good delay function? First, obviously you want it to delay things. You do not want it to
+    block interruots (then a long one would throw off timekeeping, miss inputs, and so on).
+ * the reason it's so important wrt. interrupts is that in Arduino standard delay(), if an interrupt fires in the middle,
+    will still end at the same time - it is "interrupt insensitive". Whenever a delay is using the builtin _delay_ms()
+    if that is interrupted it has no way of knowing timke has passed. Now hopefully you're not
+    spending so much time in an ISR that this is significant, but it is still undesirable.
+ * For the unfortunate souls using 4k and 2k parts, the flash usage becomes a major problem - why is it such a space-hog?
+    Because it has to pull in micros, which is bulky even with the division turned into bitshifts... And with RTC millis,
+    millis() is bad for the same reason, the conversion of 1024 to 1000 is a killer....
+Now we will use one of three delay() implementations:
+ * If you have 16k+ your delay is the standard one, it pulls in micros, yes, but you may well already have grabbed
+    that for your sketch already, and the delay is more accurate and fully interrupt insensitive, and you can afford
+    the memory. For RTC users they will get the analogous implementation that is based on millis.
+ * Users with millis disabled, or with less than 16k flash and using RTC will get the implementation based on _delay_ms().
+ * Everyone else (flash under 16k but millis enabled via non-RTC timer) will get the light version which calls _delay_ms()
+    if the delay is under 16 ms to get less flash usage, and calculates the delay using **millis** not micros otherwise,
+    saving over 100b of flash. The reason for the split is that the limited granularity of millis introduces an error in
+    the delay duration of up to 1ms. That doesn't matter much when you call delay(1000) on an internal clock that's within
+    1% on a good day. It matters greatly when you call delay(1);
+*/
+
+
+
+
+#if defined(MILLIS_USE_TIMERNONE) || (PROGMEM_SIZE < 16384 && defined(MILLIS_USE_TIMERRTC))
+  void delay(uint32_t ms) {
+    if (__builtin_constant_p(ms)) {
+      _delay_ms(ms);
+    } else {
+      while (ms--) {
+        _delay_ms(1);
+      }
+    }
+  }
+#elif (PROGMEM_SIZE >= 16384 && !defined(MILLIS_USE_TIMERRTC))
+  void delay(uint32_t ms)
+  {
+    uint16_t start = (uint16_t)micros();
+    while (ms > 0) {
+      while (((uint16_t)micros() - start) >= 1000 && ms) {
+        ms-- ;
+        start += 1000;
+      }
+    }
+  }
+#else
+  void delay(uint32_t ms) {
+    if (__builtin_constant_p(ms) && ms < 16) {
+      _delay_ms(ms);
+    } else if (ms < 16) {
       while(ms--) {
         _delay_ms(1);
       }
@@ -351,54 +413,18 @@ void delay(unsigned long ms) {
       uint32_t start=millis();
       while (millis() - start < ms);
     }
-
-  /*
-  #if (PROGMEM_SIZE < 4096)
-    // Not sure where I got this wacky definition of delay that was being used - It saves 24 whole bytes
-    // Nobody is going to care about 24 bytes on most parts, but I am leaving it in for the 2k parts, where
-    // those 24 bytes are about 1.2% of the total available flash... though it is now guarded with a test
-    // to stop you from passing a value known at compile time to be too long. The 2k parts really are
-    // just that claustrophobic.
+  }
+#endif
+  /* Historical method without millis
+  void delay(uint32_t ms) {
     if (__builtin_constant_p(ms)) {
-      if (ms > 4294000) badCall("delay() does not support periods greater than 4.29 million milliseconds at a time on 2k parts; this saves 24 bytes, which is > 1% of the available flash");
-    }
-    uint32_t start_time = micros(), delay_time = 1000 * ms;
-
-    // Calculate future time to return
-    uint32_t return_time = start_time + delay_time;
-
-    // If return time overflows
-    if (return_time < delay_time) {
-      // Wait until micros overflows
-      while (micros() > return_time);
-    }
-
-    // Wait until return time
-    while (micros() < return_time);
-  #else
-    //Otherwise, we use the normal implementation of delay which is compatible with all values that fit in uint32_t.
-    uint32_t start = micros();
-    while (ms > 0) {
-      while ( ms > 0 && (micros() - start) >= 1000) {
-        ms--;
-        start += 1000;
+      _delay_ms(ms);
+    } else {
+      while (ms--) {
+        delayMicroseconds(1000);
       }
     }
-  #endif
-  */
-}
-
-#else //delay implementation when we do not
-void delay(unsigned long ms) {
-  if (__builtin_constant_p(ms)) {
-    _delay_ms(ms);
-  } else {
-    while (ms--) {
-      delayMicroseconds(1000);
-    }
-  }
-}
-#endif
+  }*/
 
 inline __attribute__((always_inline)) void delayMicroseconds(unsigned int us) {
   if (__builtin_constant_p(us)) { //if it's compile time known, the whole thing optimizes away to a call to _delay_us()
@@ -639,7 +665,7 @@ void init_millis()
   #endif
 }
 
-void set_millis(uint32_t newmillis)
+void set_millis(__attribute__((unused))uint32_t newmillis)
 {
   #if defined(MILLIS_USE_TIMERNONE)
     badCall("set_millis() is only valid with millis timekeeping enabled.");
@@ -676,38 +702,46 @@ void init() {
   sei();
 }
 
-void __attribute__((weak)) init_clock() {
   /******************************** CLOCK STUFF *********************************/
+#if defined(CLOCK_TUNE_INTERNAL)
+  void tune_internal(void);
+#endif
+
+void __attribute__((weak)) init_clock() {
   #ifndef CLOCK_SOURCE
     #error "CLOCK_SOURCE not defined. CLOCK_SOURCE must be either 0 (internal) or 2 (external clock)"
   #endif
   #if (CLOCK_SOURCE==0)
-    #if (F_CPU == 20000000)
-      /* No division on clock */
-      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
-    #elif (F_CPU == 16000000)
-      /* No division on clock */
-      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
-    #elif (F_CPU == 10000000) //20MHz prescaled by 2
-      /* Clock DIV2 */
-      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
-    #elif (F_CPU == 8000000) //16MHz prescaled by 2
-      /* Clock DIV2 */
-      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
-    #elif (F_CPU == 5000000) //20MHz prescaled by 4
-      /* Clock DIV4 */
-      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
-    #elif (F_CPU == 4000000) //16MHz prescaled by 4
-      /* Clock DIV4 */
-      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
-    #elif (F_CPU == 1000000) //16MHz prescaled by 16
-      /* Clock DIV16 */
-      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
+    #if (defined(CLOCK_TUNE_INTERNAL))
+      tune_internal(); // Will be inlined as only called once. Just too long and ugly to put two implementations in middle of this.
     #else
-      #ifndef F_CPU
-        #error "F_CPU not defined"
+      #if (F_CPU == 20000000)
+        /* No division on clock */
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+      #elif (F_CPU == 16000000)
+        /* No division on clock */
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+      #elif (F_CPU == 10000000) //20MHz prescaled by 2
+        /* Clock DIV2 */
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+      #elif (F_CPU == 8000000) //16MHz prescaled by 2
+        /* Clock DIV2 */
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+      #elif (F_CPU == 5000000) //20MHz prescaled by 4
+        /* Clock DIV4 */
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
+      #elif (F_CPU == 4000000) //16MHz prescaled by 4
+        /* Clock DIV4 */
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
+      #elif (F_CPU == 1000000) //16MHz prescaled by 16
+        /* Clock DIV16 */
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
       #else
-        #error "F_CPU defined as an unsupported value"
+        #ifndef F_CPU
+          #error "F_CPU not defined"
+        #else
+          #error "F_CPU defined as an unsupported value for untuned internal oscillator"
+        #endif
       #endif
     #endif
   #elif (CLOCK_SOURCE==2)
@@ -715,10 +749,267 @@ void __attribute__((weak)) init_clock() {
     while (CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm);  //This either works, or hangs the chip - EXTS is pretty much useless here.
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
   #else
-    #error "CLOCK_SOURCE isn't 0 (internal) or 2 (external CLOCK); one of these options must be selected for all boards."
+    #error "CLOCK_SOURCE is defined, but it isn't 0 (internal) or 2 (external CLOCK), but those are the only clock sources supported by this part."
   #endif
 }
 
+
+
+
+#if defined(CLOCK_TUNE_INTERNAL)
+  #if (MEGATINYCORE_SERIES == 2
+    #define CLOCK_TUNE_START (USER_SIGNATURES_SIZE - 12)
+    void tune_internal() {
+      uint8_t osccfg=FUSE.OSCCFG-1;
+      uint8_t tunedval;
+      #if (F_CPU == 32000000)
+        #warning "Internal Osc. tuned to 32 MHz selected, likely unstable. If chip is not tuned, guess may be off 2% or more. 32 MHz requires fuse set for 20 MHz."
+        if (osccfg == 0) {
+          // Cannot reach 32 MHz; give up, sketch will run at 2.66 MHz and user will be aware that their clock setting isn't working.
+            GPIOR0 |= 0x80;
+            GPIOR0 |= 0x40;
+          return;
+        } else {
+          tunedval = _SFR_MEM8(0x1300 + (USER_SIGNATURES_SIZE - 1))
+          if (tunedval == 0xFF) {
+            if (_SFR_MEM8(0x1300 + (USER_SIGNATURES_SIZE - 3)) != 0xFF)
+              tunedval=0x80; //this implies that an ATTEMPT was made to tune it, and not only did we not find a setting that hit the target, we crashed before we wreapped around!
+          }
+          if(tunedval == 0xFF) {
+            GPIOR0 |= 0x40;
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 + 62);
+          } else if (tunedvalue == 0x80 || ) {
+            // tuning was performed... and we can't hit it.
+            GPIOR0 |= 0x80;
+            return;
+          } else {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+          }
+        }
+      #elif (F_CPU == 30000000)
+        #warning "Internal Osc. tuned to 30 MHz selected, likely unstable. If chip is not tuned, guess may be off 2% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 10) : (CLOCK_TUNE_START + 5)));
+        if(tunedval == 0xFF) {
+          GPIOR0 |= 0x40;
+          if (osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 + 52);
+          } else {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 90);
+          }
+        } else {
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+        }
+      #elif (F_CPU == 25000000)
+        #warning "Internal Osc. tuned to 25 MHz selected, if chip is not tuned, guess may be off 2% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 9) : (CLOCK_TUNE_START + 4)));
+        if(tunedval == 0xFF) {
+          GPIOR0 |= 0x40;
+          if (osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 + 27);
+          } else {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 59);
+          }
+        } else {
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+        }
+      #elif (F_CPU == 24000000)
+        #warning "Internal Osc. tuned to 24 MHz selected, if chip is not tuned, guess may be off 2% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 8) : (CLOCK_TUNE_START + 3)));
+        if(tunedval == 0xFF) {
+          GPIOR0 |= 0x40;
+          if (osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 + 23);
+          } else {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 53);
+          }
+        } else {
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+        }
+      #elif (F_CPU == 20000000)
+        #warning "Internal Osc. tuned to 20 MHz selected, if chip is not tuned, guess may be off 2% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 7) : (CLOCK_TUNE_START + 2)));
+        if(tunedval == 0xFF) { // reversed test, since when osccfg != 0, we're on 20 MHz base.
+          GPIOR0 |= 0x40;
+          if (!osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 27);
+          }
+        } else {
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+        }
+      #elif (F_CPU == 16000000)
+        #warning "Internal Osc. tuned to 16 MHz selected, if chip is not tuned, guess may be off 2% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 6) : (CLOCK_TUNE_START + 1)));
+        if(tunedval == 0xFF) {
+          GPIOR0 |= 0x40;
+          if (osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 - 23);
+          }
+          // else nothing to do, no manual cal, and factory cal is for 16 MHz
+        } else {
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+        }
+      #elif (F_CPU == 12000000)
+        #warning "Internal Osc. tuned to 12 MHz selected, if chip is not tuned, guess may be off 2% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 9) : (CLOCK_TUNE_START)));
+        if(tunedval == 0xFF) {
+          GPIOR0 |= 0x40;
+          if (osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 + 52);
+            _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+            return; // don't hit the prescale to 0 on the way out.
+          } else {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 - 28);
+          }
+        } else {
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+        }
+      #else
+        #error "Tuned internal osc. on 2-series supported only for 12, 16, 20, 24, 25, 30, and 32 MHz."
+      #endif
+      // if we needed a prescaler because we couldn't go low enough we we return'ed already so this isn't called.
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+    }
+  #else // 0/1-series
+    #define CLOCK_TUNE_START (USER_SIGNATURES_SIZE - 12)
+    void tune_internal() {
+      uint8_t osccfg=FUSE.OSCCFG-1;
+      uint8_t tunedval;
+      #if (F_CPU == 32000000)
+        #error "Internal Osc. tuned to 32 MHz selected, but this is a 0/1-series part; their oscillators barely hit 30 most of the time, and the rare ones that can hit 32 are hopelessly unstable"
+      #elif (F_CPU == 30000000)
+        #warning "Internal Osc. tuned to 30 MHz selected, likely unstable. If chip is not tuned, guess may be off 4% or more. 30 MHz requires fuse set for 20 MHz."
+        if (osccfg == 0) {
+          // Cannot reach 30 MHz; give up, sketch will run at 2.66 MHz and user will be aware that their clock setting isn't working.
+          GPIOR0 |= 0x40;
+          GPIOR0 |= 0x80;
+          return;
+        } else {
+          tunedval = _SFR_MEM8(0x1300 + (USER_SIGNATURES_SIZE - 1))
+          if (tunedval == 0xFF) {
+            if (_SFR_MEM8(0x1300 + (USER_SIGNATURES_SIZE - 3)) != 0xFF)
+              tunedval=0x80; //this implies that an ATTEMPT was made to tune it, and not only did we not find a setting that hit the target, we crashed before we wreapped around!
+          }
+          if(tunedval == 0xFF) {
+            GPIOR0 |= 0x40;
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,min(SIGROW_OSCCAL20M0 + 33,63));
+            GPIOR0 |= 0x40;
+          } else {
+            if (tunedval == 0x80) {
+              GPIOR0 |= 0x80;
+              return; // this chip was tuned and it's oscillator found to be unable to reach 30.
+            }
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+          }
+        }
+      #elif (F_CPU == 25000000)
+        #warning "Internal Osc. tuned to 25 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 10) : (CLOCK_TUNE_START + 5)));
+        if(tunedval == 0xFF) {
+          GPIOR0 |= 0x40;
+          if (osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 + 17);
+          } else {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,min(SIGROW_OSCCAL16M0 + 35,63));
+          }
+        } else {
+          if (tunedval == 0x80) {
+            GPIOR0 |= 0x80;
+            return; // this chip was tuned and it's oscillator found to be unable to reach 30.
+          }
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+        }
+      #elif (F_CPU == 24000000)
+        #warning "Internal Osc. tuned to 24 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 9) : (CLOCK_TUNE_START + 4)));
+        if(tunedval == 0xFF) {
+          GPIOR0 |= 0x40;
+          if (osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 + 13);
+          } else {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,min(SIGROW_OSCCAL16M0 + 31,63));
+          }
+        } else {
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+        }
+      #elif (F_CPU == 20000000)
+        #warning "Internal Osc. tuned to 20 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 8) : (CLOCK_TUNE_START + 3)));
+        if(tunedval == 0xFF) { // reversed test, since when osccfg != 0, we're on 20 MHz base.
+          GPIOR0 |= 0x40;
+          if (!osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 16);
+          }
+        } else {
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+        }
+      #elif (F_CPU == 16000000)
+        #warning "Internal Osc. tuned to 16 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 7) : (CLOCK_TUNE_START + 2)));
+        if(tunedval == 0xFF) {
+          GPIOR0 |= 0x40;
+          if (osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 - 14);
+            GPIOR0 |= 0x40;
+          }
+          // else nothing to do, no manual cal, and factory cal is for 16 MHz
+        } else {
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+        }
+      #elif (F_CPU == 12000000)
+        #warning "Internal Osc. tuned to 12 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 6) : (CLOCK_TUNE_START+1)));
+        prescale = osccfg;
+        if(tunedval == 0xFF) {
+          GPIOR0 |= 0x40;
+          if (osccfg)
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,(SIGROW_OSCCAL20M0 > 28 ? SIGROW_OSCCAL20M0 - 28 : 0));
+          else {
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 - 18);
+          }
+        } else {
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+          if (tunedval > 0x40) {
+            _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+            return;
+          }
+        }
+      #elif (F_CPU == 10000000)
+        #warning "Internal Osc. tuned to 10 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        tunedval = _SFR_MEM8(0x1300 + (osccfg ? CLOCK_TUNE_START + 8 : CLOCK_TUNE_START));
+        prescale = osccfg;
+        if(tunedval == 0xFF) {
+          GPIOR0 |= 0x40;
+          if ((!osccfg) && CLKCTRL_OSC20MCALIBA >= 26) {
+            // Can we tune it down? If so yes.
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 - 26);
+          } else {
+            if (!osccfg) {
+              // if we can't, shoot for 20 and prescale.
+              _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 16);
+            }
+            _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+            return; // Just prescale 2:1 and return, the damned fool user has OSCCFG set to 20MHz base on an untuned chip, and asked for 10 MHz via tuning!.
+          }
+        } else {
+          if (tunedval == 0x40 || osccfg) {
+            if (tunedval == 0x40) { //osccfg set for 16.
+              tunedval == (CLOCK_TUNE_START + 3)
+            }
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+            _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+            return;
+          } else { //16 MHz that will go that low.
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+          }
+        }
+      #else
+        #error "Tuned internal osc. on 0/1-series supported only for 10, 12, 16, 20, 24, 25, 30, and 30 MHz."
+      #endif
+      // if we needed a prescaler because we couldn't go low enough we we return'ed already so this isn't called.
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+    }
+  #endif
+#endif
 
 /********************************* ADC ****************************************/
 void __attribute__((weak)) init_ADC0() {
