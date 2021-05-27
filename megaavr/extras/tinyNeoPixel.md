@@ -13,9 +13,7 @@ There are two versions of this library provided. `tinyNeoPixel` implements the e
 
 ### Constructors
 The constructor is the declaration that you call outside of any function, to create the global tinyNeoPixel object.
-
-
-```
+```c++
 #include <tinyNeoPixel_Static.h>
 #define NUMLEDS 100
 byte pixels[NUMLEDS*3];
@@ -30,7 +28,7 @@ The equivalent example with the Static version uses only 1076 bytes and reports 
 
 
 `tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t=NEO_GRB)` - for `tinyNeoPixel` only.
-```
+```c++
 #include <tinyNeoPixel.h>
 #define NUMLEDS 100
 tinyNeoPixel leds = tinyNeoPixel(NUMLEDS, 5, NEO_GRB);
@@ -43,7 +41,7 @@ void setup() {
 This non-static tinyNeoPixel example uses 2236 bytes of flash, and reports using only 40 bytes of RAM (it actually uses 340 - and if you didn't have enough free memory the call to leds.begin() would fail, the LEDs would not be enabled, bnut the rest of the sketch would continue to run, which could be confusing to debug.
 
 `tinyNeoPixel()` -  Empty constructor for `tinyNeoPixel` only - for when you won't even know the type of LEDs, or how many of them, until your sketch starts running. You set pin and length later with `setPin()`, `updateLength()`, and `updateType()`, which must be set before you can control any LEDs. You might have the same code running a number of lighting displays, and store the specifics in EEPROM, as shown below:
-```
+```c++
 #include <tinyNeoPixel.h>
 #include <EEPROM.h>
 tinyNeoPixel leds = tinyNeoPixel();
@@ -109,7 +107,7 @@ This compiles to 2256 bytes and reports 40 bytes of RAM used as well (but, it is
 In order to specify the order of the colors on each LED, the third argument passed to the constructor should be one of these constants; a define is provided for every possible permutation, however only a small subset of those are widespread in the wild. GRB and
 
 #### For RGB LEDs
-```
+```c++
     NEO_RGB
     NEO_RBG
     NEO_GRB
@@ -118,7 +116,7 @@ In order to specify the order of the colors on each LED, the third argument pass
     NEO_BGR
 ```
 #### For RGBW LEDs
-```
+```c++
     NEO_WRGB
     NEO_WRBG
     NEO_WGRB

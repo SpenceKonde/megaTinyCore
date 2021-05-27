@@ -50,7 +50,7 @@ Almost all flags *can* be manually cleared - the ones that can be cleared automa
 * The NMI is a very special interrupt - on tinyAVR it can only be triggered by CRC check failure; it can be configured to be a normal interrupt *or* a Non-maskable Interrupt. In NMI mode, the part will sit there running the interrupt instead of almost-working with damaged firmware, potentially creating a dangerous situation when it fails at a critical moment. No matter what the damaged firmware tries to do, it cannot disable or bypass the NMI. Onlu loading working firmware and resetting it will clear the NMI. This is of particular relevance in life-safety-critical applications which these parts (but NOT this software package nor Arduino in genberal) are certified for. Not something likely to be used in Arduino-land.
 
 ### Example
-```
+```c++
 ISR(PORTA_PORT_vect) {
   //ISR code goes here
 }
