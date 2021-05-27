@@ -4,8 +4,7 @@ All of these parts have a single I2C/TWI module, and Wire.h provides the usual A
 ## Pin Mappings
 Like most peripherals, an alternatie pin mapping is available for TWI on all 1-series parts with at least 14 pins; this is configured using the Wire.swap() or Wire.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** Wire.begin().
 
-The available pins will depend on the specific part.
-Pins shown in the order SCL, SDA.
+
 
 | Series           | Default (0) | Alternate (1) |
 |------------------|-------------|---------------|
@@ -20,7 +19,7 @@ Pins shown in the order SCL, SDA.
 
 
 ## Pullups
-The I2C standard absolutely does require external pullups. The fact that I2C ever works with just the internal pullups is somewhat surprising - but wires get longer and/or slave devices more numerous, the bus capacitance increases and the internal pullups will no longer be reliable. By popular demand we have added a method to enable the pullups - but if this fixes I2C problems, we strongly recommend installing physical pullup resistors. After selecting the desired mapping if not using the default, call:
+The I2C standard absolutely does require external pullups. The fact that I2C ever works with just the internal pullups is somewhat surprising - but the protocol is designed to be resiliant to mildly adverse hardware conditions. However, as wires get longer and/or slave devices more numerous, the bus capacitance increases and the internal pullups will no longer be sufficient for proper functioning. By popular demand we have added a method to enable the pullups; we suggest using this only as a debugging aid: *if this fixes any problems, you should install external pullup resistors* (in the absence of other devices on the bus having their own pullups breakout boards often do), 4.7k is a good default value for standard speed I2C). After selecting the desired pin mapping (if not the default) call:
 ```
 Wire.usePullups();
 ```
