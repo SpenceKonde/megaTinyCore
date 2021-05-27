@@ -54,7 +54,7 @@ When working with timers, I constantly found myself calculating periods, resolut
 ## RTC - 16-bit Real Time Clock and Programmable Interrupt Timer
 This is covered separately because it is a very different sort of timer. More information will be available after I have comopleted the sleep and RTC timing library whenever that ends up being.
 
-When working with the RTC **be certain to read the relevant [errata](errata.md)** - most tinyAVR 0/1-series parts have a silicon bug that forces both RTC and PIT to be enabled if either is to work, and one symptom of this is that RTC registers will never sync. So the usual `while (RTC.STATUS); ` will hang.
+When working with the RTC **be certain to read the relevant [errata](Errata.md)** - most tinyAVR 0/1-series parts have a silicon bug that forces both RTC and PIT to be enabled if either is to work, and one symptom of this is that RTC registers will never sync. So the usual `while (RTC.STATUS); ` will hang.
 
 ## Usage of Timers by megaTinyCore
 This section applies only to megaTinyCore. A summary of the settings used for millis()/micros() timekeeping and their ramifications for the the frequency of generated PWM, time taken for micros() to return, and the percentage of time the microcontroller will spend in the millis() ISR - both before and after the changes introduced in 1.1.9, see the [summary chart in google sheets](https://docs.google.com/spreadsheets/d/1W6XAChKxozjN87hF34xwsb6TCKHA1KMztx8wL_UbLmk/edit?usp=sharing)
