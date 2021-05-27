@@ -1,10 +1,10 @@
-# Manual/Github use of pymcuprog (pyupdi-style)
+# Manual/Github use of SerialUPDI (pyupdi-style upload with serial adapter and a resistor (or, preferably, a diode))
 In order to use the pyupdi-style uploading, with just a serial adapter and a resistor as a UPDI programmer, on a manual/github installation, it is necessary to also manually provide a copy of python3.
 
 ## Download the Python3 package for your OS:
-* Windows: https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-3.7.2.post1-embed-win32v2a.zip
-* MacOS: https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-macosx-portable.tar.gz
-* All Linux: https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz
+* Windows: [github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-3.7.2.post1-embed-win32v2a.zip](https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-3.7.2.post1-embed-win32v2a.zip)
+* MacOS: [github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-macosx-portable.tar.gz](https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-macosx-portable.tar.gz)
+* All Linux: [github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz](https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz)
 
 ## Move/Copy to this location
 That is, move that downloaded file to the location of this file in the manually installed core: `(sketchbook)/hardware/megaTinyCore/megaavr/tools`

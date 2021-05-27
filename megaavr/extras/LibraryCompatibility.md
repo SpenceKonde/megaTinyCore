@@ -1,6 +1,6 @@
 # Library Compatibility
 Please include information that uniquely identifies the library, as popular libraries have dozens of forks all over the internet, and it is often difficult to identify which is the "right one". Bonus points if you include a version number too - but I've given up on that!
-
+<!-- markdownlint-disable-file MD034 -->
 | Library      | Version | Library URL or reference                              | Status                               | Notes                                                     |
 |--------------|---------|-------------------------------------------------------|--------------------------------------|-----------------------------------------------------------|
 | tinyGPS++    |         | https://github.com/mikalhart/TinyGPSPlus              |                 Compiles and works   |                                                           |
