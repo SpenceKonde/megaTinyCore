@@ -218,7 +218,10 @@ uint8_t TWI_MasterReady(void) {
     \param frequency            The required baud.
 */
 void TWI_MasterSetBaud(uint32_t frequency) {
-  TWI0.MCTRLA &= ~TWI_ENABLE_bm; // The TWI master should be disabled while changing the baud rate
+  uint8_t restore = TWI0.MCTRLA;
+  if (restore & TWI_ENABLE_bm) {
+    TWI0.MCTRLA = 0; // The TWI master should be disabled while changing the baud rate
+  }
 
   // Use (F_CPU/(2*frequency)) - (5 + (((F_CPU / 1000000) * t_rise) / 2000)) to calculate the baud rate with t_rise (max) in ns and the frequencies in Hz
   uint16_t t_rise;
@@ -270,7 +273,10 @@ void TWI_MasterSetBaud(uint32_t frequency) {
   }
 
   TWI0.MBAUD = (uint8_t)baud;
-  TWI0.MCTRLA |= TWI_ENABLE_bm;
+  if (restore & TWI_ENABLE_bm) {
+    TWI0.MCTRLA  = restore;
+    TWI0.MSTATUS = TWI_BUSSTATE_IDLE_gc;
+  }
 }
 
 /*! \brief TWI write transaction.

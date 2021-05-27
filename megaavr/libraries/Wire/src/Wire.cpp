@@ -144,6 +144,15 @@ bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
         return true;
       } else
     #endif
+    /*     Not needed, because this is only looking at master pins not dual mode ones, and those are same for ALT_1 and default
+    #if defined(PIN_WIRE_SDA_PINSWAP_1)
+      if (sda_pin == PIN_WIRE_SDA_PINSWAP_1 && scl_pin == PIN_WIRE_SCL_PINSWAP_1) {
+        // Use pin swap
+        PORTMUX.TWIROUTEA = (PORTMUX.TWIROUTEA & 0xFC) | 0x02;
+        return true;
+      } else
+    #endif
+    */
     #if defined(PIN_WIRE_SDA)
       if (sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL) {
         // Use default configuration
@@ -204,9 +213,27 @@ bool TwoWire::swap(uint8_t state) {
       }
     #endif
   #elif defined(PORTMUX_TWIROUTEA) /* AVR Dx-series */
-    #if defined(PIN_WIRE_SDA_PINSWAP_3)
-      if (state == 3) {
-        // Use pin swap
+    #if !defined(PIN_WIRE_SDA_PINSWAP_3)
+      if (__builtin_constant_p(state)) {
+        if (state == 3) { badArg("This part does not support alternate TWI pinset 3. Refer to the datasheet or library documentation included with the core to find valid values"); }
+      }
+    #endif
+    #if !defined(PIN_WIRE_SDA_PINSWAP_2)
+      if (__builtin_constant_p(state)) {
+        if (state == 2) { badArg("This part does not support alternate TWI pinset 2. Refer to the datasheet or library documentation included with the core to find valid values"); }
+      }
+    #endif
+    #if !defined(PIN_WIRE_SDA_PINSWAP_1)
+      if (__builtin_constant_p(state)) {
+        if (state == 1) { badArg("This part does not support alternate TWI pinset 1. Refer to the datasheet or library documentation included with the core to find valid values"); }
+      }
+    #endif
+    if (__builtin_constant_p(state)) {
+      if (state > 3) { badArg("No parts supported by any version of this core have pinsets higher than pin set 3, thus the requested pinset is invalid."); }
+    }
+    // There, done with the damned input checking.
+    #if defined(PIN_WIRE_SDA_PINSWAP_3) && defined(PIN_WIRE_SCL_PINSWAP_3)
+      if (state == 3) { // Use pin swap 3
         PORTMUX.TWIROUTEA = (PORTMUX.TWIROUTEA & 0xFC) | 0x03;
         return true;
       } else
@@ -239,7 +266,7 @@ bool TwoWire::swap(uint8_t state) {
   #else /* tinyAVR 2-series with neither CTRLB nor TWIROUTEA*/
     if (__builtin_constant_p(state)) {
       if (state != 0) {
-        badCall("This part does not support alternate TWI pins. If Wire.swap() is called at all, it must be passed 0 only.");
+        badArg("This part does not support alternate TWI pins. If Wire.swap() is called at all, it must be passed 0 only.");
         return false;
       } else {
         return true;
