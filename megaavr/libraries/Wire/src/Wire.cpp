@@ -131,7 +131,7 @@ bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
       } /* end of error conditionally generated when pins requested known at compile time and wrong */
     } /* End of test for compile time known SDA and SCL pins requested */
     #if defined(PIN_WIRE_SDA_PINSWAP_3)
-      if (sda_pin == PIN_WIRE_SDA_PINSWAP_2 && scl_pin == PIN_WIRE_SCL_PINSWAP_2) {
+      if (sda_pin == PIN_WIRE_SDA_PINSWAP_3 && scl_pin == PIN_WIRE_SCL_PINSWAP_3) {
         // Use pin swap
         PORTMUX.TWIROUTEA = (PORTMUX.TWIROUTEA & 0xFC) | 0x03;
         return true;
@@ -223,15 +223,12 @@ bool TwoWire::swap(uint8_t state) {
         // Use pin swap
         PORTMUX.TWIROUTEA = (PORTMUX.TWIROUTEA & 0xFC) | 0x01;
         return true;
-      } else if (state == 0) {
+      } else {
         // Use default configuration
         PORTMUX.TWIROUTEA = (PORTMUX.TWIROUTEA & 0xFC);
-        return true;
-      } else {
-        // Assume default configuration
-        PORTMUX.TWIROUTEA = (PORTMUX.TWIROUTEA & 0xFC);
-        return false;
-      }
+        // return false if we did that because the state they asked for didn't exist
+        return  (state == 0);
+      } else
     #else
       {
         // Assume default configuration
@@ -266,7 +263,7 @@ void TwoWire::usePullups() {
     // with the constrained pinout.
     #ifndef __AVR_DD__
       PORT_t *port = portToPortStruct(PORTMUX.TWIROUTEA & 0x02);
-      #else
+    #else
       uint8_t temp = PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm;
       PORT_t *port = portToPortStruct(temp==2?PC:PA);
       if (temp==3) {
@@ -279,7 +276,7 @@ void TwoWire::usePullups() {
       port->PIN2CTRL |= PORT_PULLUPEN_bm;
       port->PIN3CTRL |= PORT_PULLUPEN_bm;
     #ifdef __AVR_DD__
-    }
+      }
     #endif
   #else // megaTinyCore
     #if defined(PORTMUX_TWI0_bm)

@@ -4,7 +4,7 @@ void setup() {
 
 void loop() {
   /* Test PIN_PA0 */
-  #ifdef PIN_PA0 
+  #ifdef PIN_PA0
     pinMode(PIN_PA0,OUTPUT);
     pinMode(PIN_PA0,INPUT);
     pinMode(PIN_PA0,INPUT_PULLUP);
@@ -24,7 +24,7 @@ void loop() {
   #endif
 
   /* Test PIN_PA1 */
-  #ifdef PIN_PA1 
+  #ifdef PIN_PA1
     pinMode(PIN_PA1,OUTPUT);
     pinMode(PIN_PA1,INPUT);
     pinMode(PIN_PA1,INPUT_PULLUP);
@@ -44,7 +44,7 @@ void loop() {
   #endif
 
   /* Test PIN_PA2 */
-  #ifdef PIN_PA2 
+  #ifdef PIN_PA2
     pinMode(PIN_PA2,OUTPUT);
     pinMode(PIN_PA2,INPUT);
     pinMode(PIN_PA2,INPUT_PULLUP);
@@ -64,7 +64,7 @@ void loop() {
   #endif
 
   /* Test PIN_PA3 */
-  #ifdef PIN_PA3 
+  #ifdef PIN_PA3
     pinMode(PIN_PA3,OUTPUT);
     pinMode(PIN_PA3,INPUT);
     pinMode(PIN_PA3,INPUT_PULLUP);
@@ -84,7 +84,7 @@ void loop() {
   #endif
 
   /* Test PIN_PA4 */
-  #ifdef PIN_PA4 
+  #ifdef PIN_PA4
     pinMode(PIN_PA4,OUTPUT);
     pinMode(PIN_PA4,INPUT);
     pinMode(PIN_PA4,INPUT_PULLUP);
@@ -104,7 +104,7 @@ void loop() {
   #endif
 
   /* Test PIN_PA5 */
-  #ifdef PIN_PA5 
+  #ifdef PIN_PA5
     pinMode(PIN_PA5,OUTPUT);
     pinMode(PIN_PA5,INPUT);
     pinMode(PIN_PA5,INPUT_PULLUP);
@@ -124,7 +124,7 @@ void loop() {
   #endif
 
   /* Test PIN_PA6 */
-  #ifdef PIN_PA6 
+  #ifdef PIN_PA6
     pinMode(PIN_PA6,OUTPUT);
     pinMode(PIN_PA6,INPUT);
     pinMode(PIN_PA6,INPUT_PULLUP);
@@ -144,7 +144,7 @@ void loop() {
   #endif
 
   /* Test PIN_PA7 */
-  #ifdef PIN_PA7 
+  #ifdef PIN_PA7
     pinMode(PIN_PA7,OUTPUT);
     pinMode(PIN_PA7,INPUT);
     pinMode(PIN_PA7,INPUT_PULLUP);
@@ -164,7 +164,7 @@ void loop() {
   #endif
 
   /* Test PIN_PB0 */
-  #ifdef PIN_PB0 
+  #ifdef PIN_PB0
     pinMode(PIN_PB0,OUTPUT);
     pinMode(PIN_PB0,INPUT);
     pinMode(PIN_PB0,INPUT_PULLUP);
@@ -184,7 +184,7 @@ void loop() {
   #endif
 
   /* Test PIN_PB1 */
-  #ifdef PIN_PB1 
+  #ifdef PIN_PB1
     pinMode(PIN_PB1,OUTPUT);
     pinMode(PIN_PB1,INPUT);
     pinMode(PIN_PB1,INPUT_PULLUP);
@@ -204,7 +204,7 @@ void loop() {
   #endif
 
   /* Test PIN_PB2 */
-  #ifdef PIN_PB2 
+  #ifdef PIN_PB2
     pinMode(PIN_PB2,OUTPUT);
     pinMode(PIN_PB2,INPUT);
     pinMode(PIN_PB2,INPUT_PULLUP);
@@ -224,7 +224,7 @@ void loop() {
   #endif
 
   /* Test PIN_PB3 */
-  #ifdef PIN_PB3 
+  #ifdef PIN_PB3
     pinMode(PIN_PB3,OUTPUT);
     pinMode(PIN_PB3,INPUT);
     pinMode(PIN_PB3,INPUT_PULLUP);
@@ -244,7 +244,7 @@ void loop() {
   #endif
 
   /* Test PIN_PB4 */
-  #ifdef PIN_PB4 
+  #ifdef PIN_PB4
     pinMode(PIN_PB4,OUTPUT);
     pinMode(PIN_PB4,INPUT);
     pinMode(PIN_PB4,INPUT_PULLUP);
@@ -264,7 +264,7 @@ void loop() {
   #endif
 
   /* Test PIN_PB5 */
-  #ifdef PIN_PB5 
+  #ifdef PIN_PB5
     pinMode(PIN_PB5,OUTPUT);
     pinMode(PIN_PB5,INPUT);
     pinMode(PIN_PB5,INPUT_PULLUP);
@@ -284,7 +284,7 @@ void loop() {
   #endif
 
   /* Test PIN_PB6 */
-  #ifdef PIN_PB6 
+  #ifdef PIN_PB6
     pinMode(PIN_PB6,OUTPUT);
     pinMode(PIN_PB6,INPUT);
     pinMode(PIN_PB6,INPUT_PULLUP);
@@ -304,7 +304,7 @@ void loop() {
   #endif
 
   /* Test PIN_PB7 */
-  #ifdef PIN_PB7 
+  #ifdef PIN_PB7
     pinMode(PIN_PB7,OUTPUT);
     pinMode(PIN_PB7,INPUT);
     pinMode(PIN_PB7,INPUT_PULLUP);
@@ -324,7 +324,7 @@ void loop() {
   #endif
 
   /* Test PIN_PC0 */
-  #ifdef PIN_PC0 
+  #ifdef PIN_PC0
     pinMode(PIN_PC0,OUTPUT);
     pinMode(PIN_PC0,INPUT);
     pinMode(PIN_PC0,INPUT_PULLUP);
@@ -344,7 +344,7 @@ void loop() {
   #endif
 
   /* Test PIN_PC1 */
-  #ifdef PIN_PC1 
+  #ifdef PIN_PC1
     pinMode(PIN_PC1,OUTPUT);
     pinMode(PIN_PC1,INPUT);
     pinMode(PIN_PC1,INPUT_PULLUP);
@@ -364,7 +364,7 @@ void loop() {
   #endif
 
   /* Test PIN_PC2 */
-  #ifdef PIN_PC2 
+  #ifdef PIN_PC2
     pinMode(PIN_PC2,OUTPUT);
     pinMode(PIN_PC2,INPUT);
     pinMode(PIN_PC2,INPUT_PULLUP);
@@ -384,7 +384,7 @@ void loop() {
   #endif
 
   /* Test PIN_PC3 */
-  #ifdef PIN_PC3 
+  #ifdef PIN_PC3
     pinMode(PIN_PC3,OUTPUT);
     pinMode(PIN_PC3,INPUT);
     pinMode(PIN_PC3,INPUT_PULLUP);
@@ -404,7 +404,7 @@ void loop() {
   #endif
 
   /* Test PIN_PC4 */
-  #ifdef PIN_PC4 
+  #ifdef PIN_PC4
     pinMode(PIN_PC4,OUTPUT);
     pinMode(PIN_PC4,INPUT);
     pinMode(PIN_PC4,INPUT_PULLUP);
@@ -424,7 +424,7 @@ void loop() {
   #endif
 
   /* Test PIN_PC5 */
-  #ifdef PIN_PC5 
+  #ifdef PIN_PC5
     pinMode(PIN_PC5,OUTPUT);
     pinMode(PIN_PC5,INPUT);
     pinMode(PIN_PC5,INPUT_PULLUP);
@@ -444,7 +444,7 @@ void loop() {
   #endif
 
   /* Test PIN_PC6 */
-  #ifdef PIN_PC6 
+  #ifdef PIN_PC6
     pinMode(PIN_PC6,OUTPUT);
     pinMode(PIN_PC6,INPUT);
     pinMode(PIN_PC6,INPUT_PULLUP);
@@ -464,7 +464,7 @@ void loop() {
   #endif
 
   /* Test PIN_PC7 */
-  #ifdef PIN_PC7 
+  #ifdef PIN_PC7
     pinMode(PIN_PC7,OUTPUT);
     pinMode(PIN_PC7,INPUT);
     pinMode(PIN_PC7,INPUT_PULLUP);
@@ -484,7 +484,7 @@ void loop() {
   #endif
 
   /* Test PIN_PD0 */
-  #ifdef PIN_PD0 
+  #ifdef PIN_PD0
     pinMode(PIN_PD0,OUTPUT);
     pinMode(PIN_PD0,INPUT);
     pinMode(PIN_PD0,INPUT_PULLUP);
@@ -504,7 +504,7 @@ void loop() {
   #endif
 
   /* Test PIN_PD1 */
-  #ifdef PIN_PD1 
+  #ifdef PIN_PD1
     pinMode(PIN_PD1,OUTPUT);
     pinMode(PIN_PD1,INPUT);
     pinMode(PIN_PD1,INPUT_PULLUP);
@@ -524,7 +524,7 @@ void loop() {
   #endif
 
   /* Test PIN_PD2 */
-  #ifdef PIN_PD2 
+  #ifdef PIN_PD2
     pinMode(PIN_PD2,OUTPUT);
     pinMode(PIN_PD2,INPUT);
     pinMode(PIN_PD2,INPUT_PULLUP);
@@ -544,7 +544,7 @@ void loop() {
   #endif
 
   /* Test PIN_PD3 */
-  #ifdef PIN_PD3 
+  #ifdef PIN_PD3
     pinMode(PIN_PD3,OUTPUT);
     pinMode(PIN_PD3,INPUT);
     pinMode(PIN_PD3,INPUT_PULLUP);
@@ -564,7 +564,7 @@ void loop() {
   #endif
 
   /* Test PIN_PD4 */
-  #ifdef PIN_PD4 
+  #ifdef PIN_PD4
     pinMode(PIN_PD4,OUTPUT);
     pinMode(PIN_PD4,INPUT);
     pinMode(PIN_PD4,INPUT_PULLUP);
@@ -584,7 +584,7 @@ void loop() {
   #endif
 
   /* Test PIN_PD5 */
-  #ifdef PIN_PD5 
+  #ifdef PIN_PD5
     pinMode(PIN_PD5,OUTPUT);
     pinMode(PIN_PD5,INPUT);
     pinMode(PIN_PD5,INPUT_PULLUP);
@@ -604,7 +604,7 @@ void loop() {
   #endif
 
   /* Test PIN_PD6 */
-  #ifdef PIN_PD6 
+  #ifdef PIN_PD6
     pinMode(PIN_PD6,OUTPUT);
     pinMode(PIN_PD6,INPUT);
     pinMode(PIN_PD6,INPUT_PULLUP);
@@ -624,7 +624,7 @@ void loop() {
   #endif
 
   /* Test PIN_PD7 */
-  #ifdef PIN_PD7 
+  #ifdef PIN_PD7
     pinMode(PIN_PD7,OUTPUT);
     pinMode(PIN_PD7,INPUT);
     pinMode(PIN_PD7,INPUT_PULLUP);
@@ -644,7 +644,7 @@ void loop() {
   #endif
 
   /* Test PIN_PE0 */
-  #ifdef PIN_PE0 
+  #ifdef PIN_PE0
     pinMode(PIN_PE0,OUTPUT);
     pinMode(PIN_PE0,INPUT);
     pinMode(PIN_PE0,INPUT_PULLUP);
@@ -664,7 +664,7 @@ void loop() {
   #endif
 
   /* Test PIN_PE1 */
-  #ifdef PIN_PE1 
+  #ifdef PIN_PE1
     pinMode(PIN_PE1,OUTPUT);
     pinMode(PIN_PE1,INPUT);
     pinMode(PIN_PE1,INPUT_PULLUP);
@@ -684,7 +684,7 @@ void loop() {
   #endif
 
   /* Test PIN_PE2 */
-  #ifdef PIN_PE2 
+  #ifdef PIN_PE2
     pinMode(PIN_PE2,OUTPUT);
     pinMode(PIN_PE2,INPUT);
     pinMode(PIN_PE2,INPUT_PULLUP);
@@ -704,7 +704,7 @@ void loop() {
   #endif
 
   /* Test PIN_PE3 */
-  #ifdef PIN_PE3 
+  #ifdef PIN_PE3
     pinMode(PIN_PE3,OUTPUT);
     pinMode(PIN_PE3,INPUT);
     pinMode(PIN_PE3,INPUT_PULLUP);
@@ -724,7 +724,7 @@ void loop() {
   #endif
 
   /* Test PIN_PE4 */
-  #ifdef PIN_PE4 
+  #ifdef PIN_PE4
     pinMode(PIN_PE4,OUTPUT);
     pinMode(PIN_PE4,INPUT);
     pinMode(PIN_PE4,INPUT_PULLUP);
@@ -744,7 +744,7 @@ void loop() {
   #endif
 
   /* Test PIN_PE5 */
-  #ifdef PIN_PE5 
+  #ifdef PIN_PE5
     pinMode(PIN_PE5,OUTPUT);
     pinMode(PIN_PE5,INPUT);
     pinMode(PIN_PE5,INPUT_PULLUP);
@@ -764,7 +764,7 @@ void loop() {
   #endif
 
   /* Test PIN_PE6 */
-  #ifdef PIN_PE6 
+  #ifdef PIN_PE6
     pinMode(PIN_PE6,OUTPUT);
     pinMode(PIN_PE6,INPUT);
     pinMode(PIN_PE6,INPUT_PULLUP);
@@ -784,7 +784,7 @@ void loop() {
   #endif
 
   /* Test PIN_PE7 */
-  #ifdef PIN_PE7 
+  #ifdef PIN_PE7
     pinMode(PIN_PE7,OUTPUT);
     pinMode(PIN_PE7,INPUT);
     pinMode(PIN_PE7,INPUT_PULLUP);
@@ -804,7 +804,7 @@ void loop() {
   #endif
 
   /* Test PIN_PF0 */
-  #ifdef PIN_PF0 
+  #ifdef PIN_PF0
     pinMode(PIN_PF0,OUTPUT);
     pinMode(PIN_PF0,INPUT);
     pinMode(PIN_PF0,INPUT_PULLUP);
@@ -824,7 +824,7 @@ void loop() {
   #endif
 
   /* Test PIN_PF1 */
-  #ifdef PIN_PF1 
+  #ifdef PIN_PF1
     pinMode(PIN_PF1,OUTPUT);
     pinMode(PIN_PF1,INPUT);
     pinMode(PIN_PF1,INPUT_PULLUP);
@@ -844,7 +844,7 @@ void loop() {
   #endif
 
   /* Test PIN_PF2 */
-  #ifdef PIN_PF2 
+  #ifdef PIN_PF2
     pinMode(PIN_PF2,OUTPUT);
     pinMode(PIN_PF2,INPUT);
     pinMode(PIN_PF2,INPUT_PULLUP);
@@ -864,7 +864,7 @@ void loop() {
   #endif
 
   /* Test PIN_PF3 */
-  #ifdef PIN_PF3 
+  #ifdef PIN_PF3
     pinMode(PIN_PF3,OUTPUT);
     pinMode(PIN_PF3,INPUT);
     pinMode(PIN_PF3,INPUT_PULLUP);
@@ -884,7 +884,7 @@ void loop() {
   #endif
 
   /* Test PIN_PF4 */
-  #ifdef PIN_PF4 
+  #ifdef PIN_PF4
     pinMode(PIN_PF4,OUTPUT);
     pinMode(PIN_PF4,INPUT);
     pinMode(PIN_PF4,INPUT_PULLUP);
@@ -904,7 +904,7 @@ void loop() {
   #endif
 
   /* Test PIN_PF5 */
-  #ifdef PIN_PF5 
+  #ifdef PIN_PF5
     pinMode(PIN_PF5,OUTPUT);
     pinMode(PIN_PF5,INPUT);
     pinMode(PIN_PF5,INPUT_PULLUP);
@@ -924,7 +924,7 @@ void loop() {
   #endif
 
   /* Test PIN_PG0 */
-  #ifdef PIN_PG0 
+  #ifdef PIN_PG0
     pinMode(PIN_PG0,OUTPUT);
     pinMode(PIN_PG0,INPUT);
     pinMode(PIN_PG0,INPUT_PULLUP);
@@ -944,7 +944,7 @@ void loop() {
   #endif
 
   /* Test PIN_PG1 */
-  #ifdef PIN_PG1 
+  #ifdef PIN_PG1
     pinMode(PIN_PG1,OUTPUT);
     pinMode(PIN_PG1,INPUT);
     pinMode(PIN_PG1,INPUT_PULLUP);
@@ -964,7 +964,7 @@ void loop() {
   #endif
 
   /* Test PIN_PG2 */
-  #ifdef PIN_PG2 
+  #ifdef PIN_PG2
     pinMode(PIN_PG2,OUTPUT);
     pinMode(PIN_PG2,INPUT);
     pinMode(PIN_PG2,INPUT_PULLUP);
@@ -984,7 +984,7 @@ void loop() {
   #endif
 
   /* Test PIN_PG3 */
-  #ifdef PIN_PG3 
+  #ifdef PIN_PG3
     pinMode(PIN_PG3,OUTPUT);
     pinMode(PIN_PG3,INPUT);
     pinMode(PIN_PG3,INPUT_PULLUP);
@@ -1004,7 +1004,7 @@ void loop() {
   #endif
 
   /* Test PIN_PG4 */
-  #ifdef PIN_PG4 
+  #ifdef PIN_PG4
     pinMode(PIN_PG4,OUTPUT);
     pinMode(PIN_PG4,INPUT);
     pinMode(PIN_PG4,INPUT_PULLUP);
@@ -1024,7 +1024,7 @@ void loop() {
   #endif
 
   /* Test PIN_PG5 */
-  #ifdef PIN_PG5 
+  #ifdef PIN_PG5
     pinMode(PIN_PG5,OUTPUT);
     pinMode(PIN_PG5,INPUT);
     pinMode(PIN_PG5,INPUT_PULLUP);
@@ -1044,7 +1044,7 @@ void loop() {
   #endif
 
   /* Test PIN_PG6 */
-  #ifdef PIN_PG6 
+  #ifdef PIN_PG6
     pinMode(PIN_PG6,OUTPUT);
     pinMode(PIN_PG6,INPUT);
     pinMode(PIN_PG6,INPUT_PULLUP);
@@ -1064,7 +1064,7 @@ void loop() {
   #endif
 
   /* Test PIN_PG7 */
-  #ifdef PIN_PG7 
+  #ifdef PIN_PG7
     pinMode(PIN_PG7,OUTPUT);
     pinMode(PIN_PG7,INPUT);
     pinMode(PIN_PG7,INPUT_PULLUP);
@@ -1084,7 +1084,7 @@ void loop() {
   #endif
 
   /* Test PIN_PF6 */
-  #ifdef PIN_PF6 
+  #ifdef PIN_PF6
     pinMode(PIN_PF6,OUTPUT);
     pinMode(PIN_PF6,INPUT);
     pinMode(PIN_PF6,INPUT_PULLUP);
@@ -1104,7 +1104,7 @@ void loop() {
   #endif
 
   /* Test PIN_PF7 */
-  #ifdef PIN_PF7 
+  #ifdef PIN_PF7
     pinMode(PIN_PF7,OUTPUT);
     pinMode(PIN_PF7,INPUT);
     pinMode(PIN_PF7,INPUT_PULLUP);
