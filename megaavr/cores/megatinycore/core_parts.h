@@ -1,8 +1,6 @@
 /* Core Parts - a part of Arduino.h for megaTinyCore 2.3.0 and later
  * This is directly included by Arduino.h and nothing else; it just moves
- * a bunch of macros that had started to make Arduino.h hard to read out
- * of that file - most significantly the part-identification and version
- * macro handling stuff
+ * clutter out of that file.
  *
  * Spence Konde 2021 - megaTinyCore is free software (LGPL 2.1)
  * See LICENSE.txt for full legal boilerplate if you must */
@@ -265,7 +263,7 @@
     #define SIGROW_OSC20ERR5V (SIGROW.reserved_3[3])
   #endif
 #else
-  /* 0/1-series, on the other hand, doesm't jave these.... */
+  /* 0/1-series, on the other hand, doesm't have these.... */
   #if !defined(SIGROW_OSCCAL16M0)
     #define SIGROW_OSCCAL16M0 _SFR_MEM8(0x1118)
   #endif

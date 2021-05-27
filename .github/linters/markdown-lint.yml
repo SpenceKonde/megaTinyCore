@@ -20,7 +20,7 @@
 ###############
 MD004: false                  # Unordered list style
 MD007:
-  indent: 2                   # Unordered list indentation
+  indent: 8                   # Unordered list indentation
 MD013:
   line-length: 4000           # Every viewer has wordwrap.... why do we care how long a line is unless they all are supposed to fit on one screen, which they won't,
 MD026:
