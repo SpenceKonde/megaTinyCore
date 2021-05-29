@@ -759,15 +759,17 @@ The earlier versions of the avr-gcc toolchain contained several issues relevant 
 
 ## Very low-level differences
 There are two classes of significant low level architetural differences
-### Instruction Set (AVRe/AVRe+ vs AVRxt)
-The classic AVR devices all use the venerable `AVRe` (ATtiny) or `AVRe+` (ATmega) instruction set (`AVRe+` differs from `AVRe` in that it has hardware multiplication and supports devices with more than 64k of flash). Modern AVR devices (with the exception of ones with minuscule flash and memory, such as the ATtiny10, which use the reduced core `AVRrc`) the latest iteration of the AVR instruction set `AVRxt`. `AVRxt` has much in common with `AVRxm` (used in XMega parts) in terms of instruction timing - and in the few places where they differ, `AVRxt ` is faster (SBIC, as well as LDD, and LD with predecrement, are all 1 clock slower on `AVRxm` vs `AVRxt` or `AVRe`), however `AVRxt` doesn't have the single-instruction-two-clock read-and-write instructions for memory access LAT, LAC, LAS, and XCH - the last one being the only one I can imagine myself wanting to use). The difference between subspecies of the AVR instruction set is unimportant for 99.9% of users - but if you happen to be working with hand-tuned assembly (or are using a library that does so, and are wondering why the timing is messed up), the changes are:
+
+## Instruction Set (AVRe/AVRe+ vs AVRxt)
+The classic AVR devices all use the venerable `AVRe` (ATtiny) or `AVRe+` (ATmega) instruction set (`AVRe+` differs from `AVRe` in that it has hardware multiplication and supports devices with more than 64k of flash). Modern AVR devices (with the exception of ones with minuscule flash and memory, such as the ATtiny10, which use the reduced core `AVRrc`) all use  the latest iteration of the AVR instruction set, `AVRxt`. `AVRxt` has much in common with `AVRxm` (used in XMega parts) in terms of instruction timing - and in the few places where they differ, `AVRxt ` is faster (SBIC, as well as LDD, and LD with predecrement, are all 1 clock slower on `AVRxm` vs `AVRxt` or `AVRe`), however `AVRxt` doesn't have the single-instruction-two-clock read-and-write instructions for memory access LAT, LAC, LAS, and XCH. The difference between subspecies of the AVR instruction set is unimportant for 99.9% of users - but if you happen to be working with hand-tuned assembly (or are using a library that does so, and are wondering why the timing is messed up), the changes are:
 * Like AVRe+ and unlike AVRe (used in older tinyAVR), these do have the hardware multiplication.
 * PUSH is 1 cycle vs 2 on classic AVR (POP is still 2)
 * CBI and SBI are 1 cycle vs 2 on classic AVR
 * LDS is 3 cycles vs 2 on classic AVR :disappointed: LD and LDD are still two cycle instructions.
 * RCALL and ICALL are 2 cycles vs 3 on classic AVR
 * CALL is 3 cycles instead of 4 on classic AVR
-* (Saving the best for last) ST and STD is 1 cycle vs 2 on classic AVR! (STS is still 2)
+* ST and STD is 1 cycle vs 2 on classic AVR (STS is still 2 - as any two word instruction must be)
+
 Note that the improvement to PUSH can make interrupts respond significantly faster (since they often have to push the contents of registers onto the stack at the beginning of the ISR), though the corresponding POP's at the end aren't any faster. The change with ST impacted tinyNeoPixel. Prior to my realizing this, the library worked on SK6812 LEDs (which happened to be what I tested with) at 16/20 MHz, but not real WS2812's. However, once I discovered this, I was able to leverage it to use a single tinyNeoPixel library instead of a different one for each port like was needed with ATTinyCore (for 8 MHz, they need to use the single cycle OUT on classic AVRs to meet timing requirements, the two cycle ST was just too slow; hence the port had to be known at compile time, or there must be one copy of the routine for each port, an extravagance that the ATtiny parts cannot afford. But with single cycle ST, that issue vanished).
 
 ### The high-I/O registers are barely used
