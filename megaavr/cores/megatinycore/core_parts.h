@@ -278,6 +278,7 @@
   #endif
 #endif
 
+#define CLOCK_TUNE_START (USER_SIGNATURES_SIZE - 12)
 
 
 // This define can get black-hole'ed somehow (reported on platformio) likely the ugly syntax to pass a string define from platform.txt via a -D
@@ -286,7 +287,7 @@
 // recognizing it as megaTinyCore and hence would fail to compile when that conditional compilation was required to make it build.
 // From: https://github.com/adafruit/Adafruit_BusIO/issues/43
 #ifndef MEGATINYCORE
-  #define MEGATINYCORE "Unknown 2.3.0+"
+  #define MEGATINYCORE "Unknown 2.4.0+"
 #endif
 
 // Version related defines now handled in platform.txt

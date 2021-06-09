@@ -34,6 +34,20 @@ uint8_t PeripheralControl = 0xFF;
 // the prescaler is set so that timer ticks every 64 clock cycles, and the
 // the overflow handler is called every 256 ticks.
 
+
+inline uint16_t clockCyclesPerMicrosecond() {
+  return ((F_CPU) / 1000000L);
+}
+
+inline unsigned long clockCyclesToMicroseconds(unsigned long cycles) {
+  return (cycles / clockCyclesPerMicrosecond());
+}
+
+inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
+  return (microseconds * clockCyclesPerMicrosecond());
+}
+
+
 #ifndef MILLIS_USE_TIMERNONE
 
 #if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_XOSC))
@@ -67,17 +81,6 @@ uint8_t PeripheralControl = 0xFF;
 
 #if !defined(MILLIS_USE_TIMERRTC)
 
-inline uint16_t clockCyclesPerMicrosecond() {
-  return ((F_CPU) / 1000000L);
-}
-
-inline unsigned long clockCyclesToMicroseconds(unsigned long cycles) {
-  return (cycles / clockCyclesPerMicrosecond());
-}
-
-inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
-  return (microseconds * clockCyclesPerMicrosecond());
-}
 
 // when TCD0 is used as millis source, this will be different from above, but 99 times out of 10, when a piece of code asks for clockCyclesPerMicrosecond(), they're asking about CLK_PER/CLK_MAIN/etc, not the unprescaled TCD0!
 inline uint16_t millisClockCyclesPerMicrosecond() {
@@ -296,6 +299,9 @@ unsigned long micros() {
     #if   (F_CPU  == 30000000UL)
       ticks = ticks >> 4;
       microseconds = overflows * 1000 + (ticks + (ticks >> 3) - (ticks >> 4) + (ticks >> 8)); // Damned near perfect.
+    #elif (F_CPU  == 25000000UL)
+      ticks = ticks >> 4;
+      microseconds = overflows * 1000 + (ticks + (ticks >> 2) - (ticks >> 5)); // Damned near perfect.
     #elif (F_CPU  == 20000000UL)
       ticks = ticks >> 3;
       microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
@@ -305,6 +311,9 @@ unsigned long micros() {
     #elif (F_CPU  ==  5000000UL)
       ticks = ticks >> 1;
       microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
+    #elif (F_CPU  == 24000000UL)
+      ticks = ticks >> 4;
+      microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
     #elif (F_CPU  == 24000000UL)
       ticks = ticks >> 4;
       microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
@@ -323,9 +332,10 @@ unsigned long micros() {
       microseconds = overflows * 1000 + ticks;
     #endif
 
-    #if !(F_CPU == 30000000UL || F_CPU == 20000000UL || F_CPU == 10000000UL || F_CPU ==  5000000UL || \
-          F_CPU == 24000000UL || F_CPU == 12000000UL || F_CPU == 32000000UL || F_CPU == 16000000UL || \
-          F_CPU ==  8000000UL || F_CPU ==  4000000UL || F_CPU ==  1000000UL || F_CPU ==  2000000UL)
+    #if !(F_CPU == 30000000UL || F_CPU == 20000000UL || F_CPU == 10000000UL || F_CPU ==  5000000UL   || \
+          F_CPU == 24000000UL || F_CPU == 12000000UL || F_CPU == 32000000UL || F_CPU == 16000000UL   || \
+          F_CPU ==  8000000UL || F_CPU ==  4000000UL || F_CPU ==  1000000UL || F_CPU ==  2000000UL   || \
+          F_CPU == 25000000UL)
       #warning "Millis timer (TCBn) at this frequency unsupported, micros() will return totally bogus values."
     #endif
   #else //TCA0
@@ -625,7 +635,7 @@ void restart_millis()
   #endif
 }
 
-void init_millis()
+void __attribute__((weak)) init_millis()
 {
   #if defined(MILLIS_USE_TIMERNONE)
     badCall("init_millis() is only valid with millis time keeping enabled.");
@@ -746,8 +756,13 @@ void __attribute__((weak)) init_clock() {
     #endif
   #elif (CLOCK_SOURCE==2)
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, CLKCTRL_CLKSEL_EXTCLK_gc);
-    while (CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm);  //This either works, or hangs the chip - EXTS is pretty much useless here.
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+    // while (CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm);  //This either works, or hangs the chip - EXTS is pretty much useless here.
+    // w/out CFD, easier to determine what happened if we don't just hang here.
+    uint8_t count=10;
+    while (CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm && count--);
+    if (CLKCTRL.MCLKSTATUS & CLKCTRL_EXTS_bm) {
+      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
+    }
   #else
     #error "CLOCK_SOURCE is defined, but it isn't 0 (internal) or 2 (external CLOCK), but those are the only clock sources supported by this part."
   #endif
@@ -757,37 +772,31 @@ void __attribute__((weak)) init_clock() {
 
 
 #if defined(CLOCK_TUNE_INTERNAL)
-  #if (MEGATINYCORE_SERIES == 2
-    #define CLOCK_TUNE_START (USER_SIGNATURES_SIZE - 12)
+  #if (MEGATINYCORE_SERIES == 2)
     void tune_internal() {
       uint8_t osccfg=FUSE.OSCCFG-1;
       uint8_t tunedval;
       #if (F_CPU == 32000000)
-        #warning "Internal Osc. tuned to 32 MHz selected, likely unstable. If chip is not tuned, guess may be off 2% or more. 32 MHz requires fuse set for 20 MHz."
+        #warning "Will set Internal to stored 32 MHz calibration, likely unstable. If chip is not tuned, we will guess and may be off by >2%. 32 MHz requires fuse set for 20 MHz."
         if (osccfg == 0) {
           // Cannot reach 32 MHz; give up, sketch will run at 2.66 MHz and user will be aware that their clock setting isn't working.
             GPIOR0 |= 0x80;
             GPIOR0 |= 0x40;
           return;
         } else {
-          tunedval = _SFR_MEM8(0x1300 + (USER_SIGNATURES_SIZE - 1))
-          if (tunedval == 0xFF) {
-            if (_SFR_MEM8(0x1300 + (USER_SIGNATURES_SIZE - 3)) != 0xFF)
-              tunedval=0x80; //this implies that an ATTEMPT was made to tune it, and not only did we not find a setting that hit the target, we crashed before we wreapped around!
-          }
+          tunedval = _SFR_MEM8(0x1300 + (USER_SIGNATURES_SIZE - 1));
           if(tunedval == 0xFF) {
             GPIOR0 |= 0x40;
             _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 + 62);
-          } else if (tunedvalue == 0x80 || ) {
-            // tuning was performed... and we can't hit it.
+          } else if (tunedval & 0x80) {
             GPIOR0 |= 0x80;
-            return;
+            return; // this chip was tuned and it's oscillator found to be unable to reach 32.
           } else {
             _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
           }
         }
       #elif (F_CPU == 30000000)
-        #warning "Internal Osc. tuned to 30 MHz selected, likely unstable. If chip is not tuned, guess may be off 2% or more."
+        #warning "Will set Internal to stored 30 MHz calibration, likely unstable. If chip is not tuned, we will guess and may be off by >2%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 10) : (CLOCK_TUNE_START + 5)));
         if(tunedval == 0xFF) {
           GPIOR0 |= 0x40;
@@ -797,10 +806,14 @@ void __attribute__((weak)) init_clock() {
             _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 90);
           }
         } else {
+          if (tunedval & 0x80) {
+            GPIOR0 |= 0x80;
+            return; // this chip was tuned and it's oscillator found to be unable to reach 30.
+          }
           _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
         }
       #elif (F_CPU == 25000000)
-        #warning "Internal Osc. tuned to 25 MHz selected, if chip is not tuned, guess may be off 2% or more."
+        #warning "Will set Internal to stored 25 MHz calibration. If chip is not tuned, we will guess and may be off by >2%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 9) : (CLOCK_TUNE_START + 4)));
         if(tunedval == 0xFF) {
           GPIOR0 |= 0x40;
@@ -810,10 +823,14 @@ void __attribute__((weak)) init_clock() {
             _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 59);
           }
         } else {
+          if (tunedval & 0x80) {
+            GPIOR0 |= 0x80;
+            return; // this chip was tuned and it's oscillator found to be unable to reach 25.
+          }
           _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
         }
       #elif (F_CPU == 24000000)
-        #warning "Internal Osc. tuned to 24 MHz selected, if chip is not tuned, guess may be off 2% or more."
+        #warning "Will set Internal to stored 24 MHz calibration. If chip is not tuned, we will guess and may be off by >2%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 8) : (CLOCK_TUNE_START + 3)));
         if(tunedval == 0xFF) {
           GPIOR0 |= 0x40;
@@ -823,10 +840,14 @@ void __attribute__((weak)) init_clock() {
             _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 53);
           }
         } else {
+          if (tunedval & 0x80) {
+            GPIOR0 |= 0x80;
+            return; // this chip was tuned and it's oscillator found to be unable to reach 24.
+          }
           _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
         }
       #elif (F_CPU == 20000000)
-        #warning "Internal Osc. tuned to 20 MHz selected, if chip is not tuned, guess may be off 2% or more."
+        #warning "Will set Internal to stored 20 MHz calibration. If chip is not tuned, we will guess and may be off by >2%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 7) : (CLOCK_TUNE_START + 2)));
         if(tunedval == 0xFF) { // reversed test, since when osccfg != 0, we're on 20 MHz base.
           GPIOR0 |= 0x40;
@@ -834,10 +855,14 @@ void __attribute__((weak)) init_clock() {
             _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 27);
           }
         } else {
+          if (tunedval & 0x80) {
+            GPIOR0 |= 0x80;
+            return; // this chip was tuned and it's oscillator found to be unable to reach 20.
+          }
           _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
         }
       #elif (F_CPU == 16000000)
-        #warning "Internal Osc. tuned to 16 MHz selected, if chip is not tuned, guess may be off 2% or more."
+        #warning "Will set Internal to stored 16 MHz calibration. If chip is not tuned, we will guess and may be off by >2%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 6) : (CLOCK_TUNE_START + 1)));
         if(tunedval == 0xFF) {
           GPIOR0 |= 0x40;
@@ -846,10 +871,14 @@ void __attribute__((weak)) init_clock() {
           }
           // else nothing to do, no manual cal, and factory cal is for 16 MHz
         } else {
+          if (tunedval & 0x80) {
+            GPIOR0 |= 0x80;
+            return; // this chip was tuned and it's oscillator found to be unable to reach 16.
+          }
           _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
         }
       #elif (F_CPU == 12000000)
-        #warning "Internal Osc. tuned to 12 MHz selected, if chip is not tuned, guess may be off 2% or more."
+        #warning "Will set Internal to stored 12 MHz calibration. If chip is not tuned, we will guess and may be off by >2%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 9) : (CLOCK_TUNE_START)));
         if(tunedval == 0xFF) {
           GPIOR0 |= 0x40;
@@ -860,7 +889,13 @@ void __attribute__((weak)) init_clock() {
           } else {
             _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 - 28);
           }
-        } else {
+        } else if (tunedval & 0x80) {
+            GPIOR0 |= 0x80;
+              return; // this chip was tuned and it's oscillator found to be unable to get down to 12MHz (if at 16)
+            // has been marked by the user as unreachable at 20 (where the internal clock is set to the accessible 24 MHz and then halved)
+            if (osccfg) {
+            _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
+            }
           _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
         }
       #else
@@ -870,136 +905,145 @@ void __attribute__((weak)) init_clock() {
       _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
     }
   #else // 0/1-series
-    #define CLOCK_TUNE_START (USER_SIGNATURES_SIZE - 12)
     void tune_internal() {
-      uint8_t osccfg=FUSE.OSCCFG-1;
+      uint8_t osccfg = FUSE.OSCCFG - 1;
       uint8_t tunedval;
       #if (F_CPU == 32000000)
-        #error "Internal Osc. tuned to 32 MHz selected, but this is a 0/1-series part; their oscillators barely hit 30 most of the time, and the rare ones that can hit 32 are hopelessly unstable"
+        #error "Clock source is internal tuned to 32 MHz - but this is a 0/1-series part; their oscillators barely hit 30 most of the time, and the rare ones that can hit 32 are hopelessly unstable at that speed."
       #elif (F_CPU == 30000000)
-        #warning "Internal Osc. tuned to 30 MHz selected, likely unstable. If chip is not tuned, guess may be off 4% or more. 30 MHz requires fuse set for 20 MHz."
+        #warning "Will set Internal to stored 30 MHz calibration, likely unstable. If chip is not tuned, we will guess and may be off by >4%. 30 MHz requires fuse set for 20 MHz."
         if (osccfg == 0) {
           // Cannot reach 30 MHz; give up, sketch will run at 2.66 MHz and user will be aware that their clock setting isn't working.
           GPIOR0 |= 0x40;
           GPIOR0 |= 0x80;
           return;
         } else {
-          tunedval = _SFR_MEM8(0x1300 + (USER_SIGNATURES_SIZE - 1))
-          if (tunedval == 0xFF) {
-            if (_SFR_MEM8(0x1300 + (USER_SIGNATURES_SIZE - 3)) != 0xFF)
-              tunedval=0x80; //this implies that an ATTEMPT was made to tune it, and not only did we not find a setting that hit the target, we crashed before we wreapped around!
-          }
+          tunedval = _SFR_MEM8(0x1300 + (USER_SIGNATURES_SIZE - 1));
           if(tunedval == 0xFF) {
             GPIOR0 |= 0x40;
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,min(SIGROW_OSCCAL20M0 + 33,63));
-            GPIOR0 |= 0x40;
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, min(SIGROW_OSCCAL20M0 + 33,63));
           } else {
-            if (tunedval == 0x80) {
+            if (tunedval & 0x80) {
               GPIOR0 |= 0x80;
               return; // this chip was tuned and it's oscillator found to be unable to reach 30.
             }
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, tunedval);
           }
         }
       #elif (F_CPU == 25000000)
-        #warning "Internal Osc. tuned to 25 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        #warning "Will set Internal to stored 25 MHz calibration. If chip is not tuned, we will guess and may be off by >4%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 10) : (CLOCK_TUNE_START + 5)));
         if(tunedval == 0xFF) {
           GPIOR0 |= 0x40;
           if (osccfg) {
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 + 17);
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, SIGROW_OSCCAL20M0 + 17);
           } else {
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,min(SIGROW_OSCCAL16M0 + 35,63));
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, min(SIGROW_OSCCAL16M0 + 35,63));
           }
         } else {
-          if (tunedval == 0x80) {
+          if (tunedval & 0x80) {
             GPIOR0 |= 0x80;
             return; // this chip was tuned and it's oscillator found to be unable to reach 30.
           }
-          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, tunedval);
         }
       #elif (F_CPU == 24000000)
-        #warning "Internal Osc. tuned to 24 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        #warning "Will set Internal to stored 24 MHz calibration. If chip is not tuned, we will guess and may be off by >4%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 9) : (CLOCK_TUNE_START + 4)));
         if(tunedval == 0xFF) {
           GPIOR0 |= 0x40;
           if (osccfg) {
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 + 13);
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, SIGROW_OSCCAL20M0 + 13);
           } else {
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,min(SIGROW_OSCCAL16M0 + 31,63));
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, min(SIGROW_OSCCAL16M0 + 31,63));
           }
         } else {
-          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+          if (tunedval & 0x80) {
+            GPIOR0 |= 0x80;
+            return; // this chip was tuned and it's oscillator found to be unable to reach 30.
+          }
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, tunedval);
         }
       #elif (F_CPU == 20000000)
-        #warning "Internal Osc. tuned to 20 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        #warning "Will set Internal to stored 20 MHz calibration. If chip is not tuned, we will guess and may be off by >4%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 8) : (CLOCK_TUNE_START + 3)));
         if(tunedval == 0xFF) { // reversed test, since when osccfg != 0, we're on 20 MHz base.
           GPIOR0 |= 0x40;
           if (!osccfg) {
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 16);
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, SIGROW_OSCCAL16M0 + 16);
           }
         } else {
-          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+          if (tunedval & 0x80) {
+            GPIOR0 |= 0x80;
+            return; // this chip was tuned and it's oscillator found to be unable to reach 30.
+          }
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, tunedval);
         }
       #elif (F_CPU == 16000000)
-        #warning "Internal Osc. tuned to 16 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        #warning "Will set Internal to stored 16 MHz calibration. If chip is not tuned, we will guess and may be off by >4%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 7) : (CLOCK_TUNE_START + 2)));
         if(tunedval == 0xFF) {
           GPIOR0 |= 0x40;
           if (osccfg) {
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL20M0 - 14);
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, SIGROW_OSCCAL20M0 - 14);
             GPIOR0 |= 0x40;
           }
           // else nothing to do, no manual cal, and factory cal is for 16 MHz
         } else {
-          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+          if (tunedval & 0x80) {
+            GPIOR0 |= 0x80;
+            return; // this chip was tuned and it's oscillator found to be unable to reach 30.
+          }
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, tunedval);
         }
       #elif (F_CPU == 12000000)
-        #warning "Internal Osc. tuned to 12 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        #warning "Will set Internal to stored 12 MHz calibration. If chip is not tuned, we will guess and may be off by >4%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? (CLOCK_TUNE_START + 6) : (CLOCK_TUNE_START+1)));
         prescale = osccfg;
         if(tunedval == 0xFF) {
           GPIOR0 |= 0x40;
           if (osccfg)
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,(SIGROW_OSCCAL20M0 > 28 ? SIGROW_OSCCAL20M0 - 28 : 0));
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, (SIGROW_OSCCAL20M0 > 28 ? SIGROW_OSCCAL20M0 - 28 : 0));
           else {
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 - 18);
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, SIGROW_OSCCAL16M0 - 18);
           }
         } else {
-          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+          if (tunedval == 0x40) {
+            tunedval= _SFR_MEM8(0x1300 + (osccfg ? CLOCK_TUNE_START + 9 : CLOCK_TUNE_START + 4));
+          }
+          _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, tunedval & 0x3F);
           if (tunedval > 0x40) {
             _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
             return;
           }
         }
       #elif (F_CPU == 10000000)
-        #warning "Internal Osc. tuned to 10 MHz selected, if chip is not tuned, guess may be off 4% or more."
+        #warning "Will set Internal to stored 10 MHz calibration. If chip is not tuned, we will guess and may be off by >4%."
         tunedval = _SFR_MEM8(0x1300 + (osccfg ? CLOCK_TUNE_START + 8 : CLOCK_TUNE_START));
         prescale = osccfg;
         if(tunedval == 0xFF) {
           GPIOR0 |= 0x40;
           if ((!osccfg) && CLKCTRL_OSC20MCALIBA >= 26) {
             // Can we tune it down? If so yes.
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 - 26);
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, SIGROW_OSCCAL16M0 - 26);
           } else {
             if (!osccfg) {
               // if we can't, shoot for 20 and prescale.
-              _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,SIGROW_OSCCAL16M0 + 16);
+              _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, SIGROW_OSCCAL16M0 + 16);
             }
             _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
             return; // Just prescale 2:1 and return, the damned fool user has OSCCFG set to 20MHz base on an untuned chip, and asked for 10 MHz via tuning!.
           }
         } else {
           if (tunedval == 0x40 || osccfg) {
-            if (tunedval == 0x40) { //osccfg set for 16.
-              tunedval == (CLOCK_TUNE_START + 3)
+            if (tunedval == 0x40) { //osccfg set for 16
+              tunedval == _SFR_MEM8(0x1300 + (CLOCK_TUNE_START + 3));
             }
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, tunedval);
             _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
             return;
           } else { //16 MHz that will go that low.
-            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+            _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, tunedval);
           }
         }
       #else
@@ -1020,24 +1064,33 @@ void __attribute__((weak)) init_ADC0() {
      * impedance signals, since the sample and hold circuit will be connected
      * to the pin for longer However, we can use the SAMPLEN register to
      * compensate for this!
-     * SAMPLEN of 14 give us 16 ADC clock sampling time, 12.8 ~ 16 us
-     * which should be about the same amount of *time* as on classic AVRs
+     * We target a sampling time of 12us, which is a little shorter than the
+     * classic AVRs, but the sampling cap is is 5pf instead of 14
+     * At clock speeds of 12, 24, and 25 MHz when we are forced to use an divider
+     * that leaves us with a markedly slower ADC clock (~750 kHz), we instead use
+     * a value of 7, giving us 8 ADC clocks or... around 12us. .
      * As of 2.3.0, this setting is exposed by analogReadDuration()
      * Note that on 0/1-series, the prescale settings are placed powers-of-two
      * apart. On the 2-series and Dx-series, they are MUCH closer together.
      **************************************************************************/
-    #if F_CPU     > 24000000    // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
-      ADC0.CTRLC  = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #if   F_CPU   > 24000000    // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
+      ADC0.CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >= 12000000    // 16 MHz / 16 = 1.0 MHz,  20 MHz / 16 = 1.25 MHz
       ADC0.CTRLC  = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >=  6000000    //  8 MHz /  8 = 1.0 MHz,  10 MHz /  8 = 1.25 MHz
-      ADC0.CTRLC  = ADC_PRESC_DIV8_gc  | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      ADC0.CTRLC  =  ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >=  3000000    //  4 MHz /  4 = 1.0 MHz,   5 MHz /  4 = 1.25 MHz
-      ADC0.CTRLC  = ADC_PRESC_DIV4_gc  | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      ADC0.CTRLC  =  ADC_PRESC_DIV4_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #else                       //  1 MHz /  2 = 500 kHz - the lowest setting
-      ADC0.CTRLC  = ADC_PRESC_DIV2_gc  | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      ADC0.CTRLC  =  ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #endif
-    ADC0.SAMPCTRL = (16); // 16 ADC clocks, 16 us
+    #if   (F_CPU == 6000000 || F_CPU == 12000000 || F_CPU == 24000000 || F_CPU ==25000000)
+      ADC0.SAMPCTRL = (7); // 9 ADC clocks, 12 us
+    #elif (F_CPU == 5000000 || F_CPU == 10000000 || F_CPU == 20000000 )
+      ADC0.SAMPCTRL = 13;   // 15 ADC clock,s 12 us
+    #else
+      ADC0.SAMPCTRL = (10); // 12 ADC clocks, 12 us
+    #endif
     ADC0.CTRLD    = ADC_INITDLY_DLY16_gc;
     ADC0.CTRLA    = ADC_ENABLE_bm;
   #else
@@ -1058,7 +1111,7 @@ void __attribute__((weak)) init_ADC0() {
       ADC0.CTRLB  = ADC_PRESC_DIV2_gc;  //  4 MHz / 2 = 2.00 MHz
     #endif                              //  1 MHz / 2 =  500 kHz
     ADC0.CTRLE = 15; //15.5 without PGA, 16 with PGA, corresponding to 7.75 or 8 us.
-    ADC0.CTRLA |= ADC_ENABLE_bm | ADC_LOWLAT_bm;
+    ADC0.CTRLA = ADC_ENABLE_bm | ADC_LOWLAT_bm;
     /* Default low latency mode on
      * Users can turn it off if they care about power consumption while ADC is on
      * and chip is awake, since these parts don't have the perverse ADC-left-on

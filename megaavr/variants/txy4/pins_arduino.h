@@ -33,7 +33,7 @@
 #define NUM_SPI_PINS                  (3) // (MISO / MOSI / SCK)
 #define NUM_TOTAL_FREE_PINS           (NUM_DIGITAL_PINS)
 #define NUM_TOTAL_PINS                (NUM_DIGITAL_PINS)
-
+#define PINS_COUNT                    (NUM_DIGITAL_PINS)
 #define EXTERNAL_NUM_INTERRUPTS       (12)
 
 #define digitalPinHasPWM(p)           ((p) == PIN_PA4 || (p) == PIN_PA5 || (p) == PIN_PB2 || (p) == PIN_PB1 || (p) == PIN_PB0 || (p) == PIN_PA3)
@@ -46,6 +46,21 @@
   #define digitalPinToAnalogInput(p)  (((p) < 4) ? ((p) + 4) : (((p) > 7 && (p) < 11) ? ((p) - 7) : (((p) == 6) ? 10 : ((p) == 7 ? 11 : NOT_A_PIN))))
 #endif
 
+#ifdef DAC0
+  #define DAC_PIN       (PIN_PA6)
+#endif
+
+#ifndef LED_BUILTIN
+  #define LED_BUILTIN    (PIN_PA7)
+#endif
+
+/*
+      ####   ###  ####  ##### #   # #   # #   #
+      #   # #   # #   #   #   ## ## #   #  # #
+      ####  #   # ####    #   # # # #   #   #
+      #     #   # # #     #   #   # #   #  # #
+      #      ###  #  #    #   #   #  ###  #   #
+*/
 #define PIN_SPI_SS                      (PIN_PA0)
 #define PIN_SPI_MOSI                    (PIN_PA1)
 #define PIN_SPI_MISO                    (PIN_PA2)
@@ -103,16 +118,13 @@
   #define PIN_HWSERIAL1_XDIR_PINSWAP_1  (PIN_PA4)
 #endif
 
-#ifdef DAC0
-  #define DAC_PIN       (PIN_PA6)
-#endif
-
-#ifndef LED_BUILTIN
-  #define LED_BUILTIN    (PIN_PA7)
-#endif
-
-#define PINS_COUNT     (12u)
-
+/*
+       ##  #   #  ##  #     ###   ###      ####  ### #   #  ###
+      #  # ##  # #  # #    #   # #         #   #  #  ##  # #
+      #### # # # #### #    #   # #  ##     ####   #  # # #  ###
+      #  # #  ## #  # #    #   # #   #     #      #  #  ##     #
+      #  # #   # #  # ####  ###   ###      #     ### #   #  ###
+*/
 #define PIN_PA4        (0)
 #define PIN_PA5        (1)
 #define PIN_PA6        (2)
@@ -153,7 +165,13 @@ static const uint8_t    A7  = PIN_PA7;
 static const uint8_t    A10 = PIN_PB1;
 static const uint8_t    A11 = PIN_PB0;
 
-
+/*
+            ####  ### #   #      ##  ####  ####   ##  #   #  ###
+            #   #  #  ##  #     #  # #   # #   # #  #  # #  #
+            ####   #  # # #     #### ####  ####  ####   #    ###
+            #      #  #  ##     #  # # #   # #   #  #   #       #
+            #     ### #   #     #  # #  #  #  #  #  #   #    ###
+*/
 #ifdef ARDUINO_MAIN
 
 // On the Arduino board, digital pins are also used

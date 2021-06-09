@@ -23,7 +23,6 @@ compiler.warning_flags.none=-w
 compiler.warning_flags.default=
 compiler.warning_flags.more=-Wall
 compiler.warning_flags.all=-Wall -Wextra
-
 # Default "compiler.path" is correct, change only if you want to override the initial value
 compiler.path={runtime.tools.avr-gcc.path}/bin/
 compiler.c.cmd=avr-gcc
@@ -99,6 +98,7 @@ recipe.hooks.objcopy.postobjcopy.2.pattern.macosx=bash -c "{compiler.path}{compi
 build.extraassetname={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}.m{build.millistimer}
 
 ## Save hex
+# Needs to be specified separately completely, because otherwise some parts of it don't resolve for reasons I dont understand.
 recipe.output.tmp_file={build.project_name}.hex
 recipe.output.save_file={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}.m{build.millistimer}.hex
 

@@ -14,6 +14,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Expand interrupt vector name document.
 * Further corrections to Wire library behavior and documentation mirroring DxCore.
 * Dead code removal and cleanup of main.cpp
+* clockcycle <-> microsecond macros were available with millis off.  Nevermindthe fact that with millis disabled, that's the only timebase you have. I just sorta grouped all the timing stuff together and disabled it...
 
 ## Released Versions
 

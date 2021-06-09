@@ -33,8 +33,32 @@
 #define NUM_TOTAL_FREE_PINS               (NUM_DIGITAL_PINS)
 #define NUM_TOTAL_PINS                    (6)
 #define EXTERNAL_NUM_INTERRUPTS           (8)
+#define PINS_COUNT                        (6)
+
+#define PIN_PA6   (0)
+#define PIN_PA7   (1)
+#define PIN_PA0   (5)
+#define PIN_PA1   (2)
+#define PIN_PA2   (3)
+#define PIN_PA3   (4)
 
 #define digitalPinHasPWM(p)               ((p) != 0 && (p) != 5)
+
+#ifdef DAC0
+  #define DAC_PIN                         (PIN_PA6)
+#endif
+
+#ifndef LED_BUILTIN
+  #define LED_BUILTIN    (PIN_PA7)
+#endif
+
+/*
+      ####   ###  ####  ##### #   # #   # #   #
+      #   # #   # #   #   #   ## ## #   #  # #
+      ####  #   # ####    #   # # # #   #   #
+      #     #   # # #     #   #   # #   #  # #
+      #      ###  #  #    #   #   #  ###  #   #
+*/
 
 #ifdef PORTMUX_SPI0_bm
   #define PIN_SPI_MISO_PINSWAP_1          (1)
@@ -53,7 +77,6 @@
 #define PIN_WIRE_SCL                      (3)
 
 
-// Mapped to HWSERIAL0 in Serial library
 #define HWSERIAL0                         (&USART0)
 #define HWSERIAL0_DRE_VECTOR              (USART0_DRE_vect)
 #define HWSERIAL0_DRE_VECTOR_NUM          (USART0_DRE_vect_num)
@@ -72,21 +95,13 @@
 #define PIN_HWSERIAL0_XCK                 (PIN_PA3)
 #define PIN_HWSERIAL0_XDIR                (PIN_PA0)
 
-#ifdef DAC0
-  #define DAC_PIN                         (PIN_PA6)
-#endif
-
-#ifndef LED_BUILTIN
-  #define LED_BUILTIN    (PIN_PA7)
-#endif
-
-#define PIN_PA6   (0)
-#define PIN_PA7   (1)
-#define PIN_PA0   (5)
-#define PIN_PA1   (2)
-#define PIN_PA2   (3)
-#define PIN_PA3   (4)
-
+/*
+       ##  #   #  ##  #     ###   ###      ####  ### #   #  ###
+      #  # ##  # #  # #    #   # #         #   #  #  ##  # #
+      #### # # # #### #    #   # #  ##     ####   #  # # #  ###
+      #  # #  ## #  # #    #   # #   #     #      #  #  ##     #
+      #  # #   # #  # ####  ###   ###      #     ### #   #  ###
+*/
 
 #define PIN_A0   (A0)
 #define PIN_A1   (A1)
@@ -103,8 +118,13 @@ static const uint8_t A6 = PIN_PA6;
 static const uint8_t A7 = PIN_PA7;
 
 
-
-#define PINS_COUNT    (6u)
+/*
+            ####  ### #   #      ##  ####  ####   ##  #   #  ###
+            #   #  #  ##  #     #  # #   # #   # #  #  # #  #
+            ####   #  # # #     #### ####  ####  ####   #    ###
+            #      #  #  ##     #  # # #   # #   #  #   #       #
+            #     ### #   #     #  # #  #  #  #  #  #   #    ###
+*/
 
 #ifdef ARDUINO_MAIN
 

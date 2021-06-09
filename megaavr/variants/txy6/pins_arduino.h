@@ -31,8 +31,6 @@
   #define NO_GLITCH_TIMERD0
 #endif
 
-#define NUM_DIGITAL_PINS              (18)
-
 #if MEGATINYCORE_SERIES == 2
   /* Yes, this is actually one more than we have, but the way this is used by the code means that it actually needs to be (highest mux channel for a pin +1) */
   #define NUM_ANALOG_INPUTS           (16)
@@ -40,10 +38,11 @@
   #define NUM_ANALOG_INPUTS           (12)
 #endif
 
-
 #define NUM_I2C_PINS                  (2) // (SDA / SCL)
 #define NUM_SPI_PINS                  (3) // (MISO / MOSI / SCK)
 #define NUM_TOTAL_PINS                (18)
+#define NUM_DIGITAL_PINS              (18)
+#define PINS_COUNT                    (18)
 
 #define EXTERNAL_NUM_INTERRUPTS       (20)
 
@@ -54,6 +53,15 @@
 #endif
 
 
+#ifdef DAC0
+  #define DAC_PIN      (PIN_PA6)
+#endif
+
+#ifndef LED_BUILTIN
+  #define LED_BUILTIN  (PIN_PA7)
+#endif
+
+
 #if MEGATINYCORE_SERIES != 2
   #define digitalPinToAnalogInput(p)  (((p) < 6) ? ((p) + 4) : ((p) == 17 ? 0 : (((p) > 13 && (p) < 17) ? ((p) - 13) : (((p) == 8) ? 10 : ((p) == 9 ? 11 : NOT_A_PIN)))))
 #else
@@ -61,6 +69,13 @@
   #define digitalPinToAnalogInput(p)  (((p) < 6) ? ((p) + 4) : (((p) > 13 && (p) < 17) ? ((p) - 13) : ((((p) >= 8) && ((p) < 14)) ? ((p) + 2) :  NOT_A_PIN)))
 #endif
 
+/*
+      ####   ###  ####  ##### #   # #   # #   #
+      #   # #   # #   #   #   ## ## #   #  # #
+      ####  #   # ####    #   # # # #   #   #
+      #     #   # # #     #   #   # #   #  # #
+      #      ###  #  #    #   #   #  ###  #   #
+*/
 #define SPI_MUX                       (0)
 #define PIN_SPI_SS                    (PIN_PA0)
 #define PIN_SPI_MOSI                  (PIN_PA1)
@@ -131,15 +146,13 @@
   #define PIN_HWSERIAL1_XDIR_PINSWAP_1  (PIN_PC3)
 #endif
 
-#ifdef DAC0
-  #define DAC_PIN      (PIN_PA6)
-#endif
-
-#ifndef LED_BUILTIN
-  #define LED_BUILTIN  (PIN_PA7)
-#endif
-
-#define PINS_COUNT     (18u)
+/*
+       ##  #   #  ##  #     ###   ###      ####  ### #   #  ###
+      #  # ##  # #  # #    #   # #         #   #  #  ##  # #
+      #### # # # #### #    #   # #  ##     ####   #  # # #  ###
+      #  # #  ## #  # #    #   # #   #     #      #  #  ##     #
+      #  # #   # #  # ####  ###   ###      #     ### #   #  ###
+*/
 
 #define PIN_PA4        (0)
 #define PIN_PA5        (1)
@@ -202,6 +215,13 @@ static const uint8_t    A11 = PIN_PB0;
   static const uint8_t  A15 = PIN_PC3;
 #endif
 
+/*
+            ####  ### #   #      ##  ####  ####   ##  #   #  ###
+            #   #  #  ##  #     #  # #   # #   # #  #  # #  #
+            ####   #  # # #     #### ####  ####  ####   #    ###
+            #      #  #  ##     #  # # #   # #   #  #   #       #
+            #     ### #   #     #  # #  #  #  #  #  #   #    ###
+*/
 #ifdef ARDUINO_MAIN
 
 // On the Arduino board, digital pins are also used

@@ -9,11 +9,11 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other             ##       ###        ##   #
-#  contributors 2018-2021                      #  #         #      #  #  #
-#  megaTinyCore is free software.        # #     #        ##         #   #
-#  (LGPL v2.1) see LICENSE.md and        # #    #    ##     #  ##   #    #
-#  License section of README.md           #    ####  ##  ###   ##  ####  #
+#  Copyright Spence Konde and other             ##       #  #      ###   #
+#  contributors 2018-2021                      #  #      #  #     #   #  #
+#  megaTinyCore is free software.        # #     #       ####     # # #  #
+#  (LGPL v2.1) see LICENSE.md and        # #    #    ##     #  ## #   #  #
+#  License section of README.md           #    ####  ##     #  ##  ###   #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
@@ -87,6 +87,7 @@ atxy7.build.text_section_start=.text=0x0
 atxy7.build.millistimer=D0
 atxy7.build.bootload=
 atxy7.build.board=AVR_ATtinyxy7
+atxy7.build.clocksource=0
 atxy7.build.core=megatinycore
 atxy7.build.variant=txy7
 atxy7.build.mcu=attiny{build.attiny}
@@ -338,6 +339,7 @@ atxy6.build.millistimer=D0
 atxy6.build.bootload=
 atxy6.bootloader.resetpinbits=01
 atxy6.build.board=AVR_ATtinyxy6
+atxy6.build.clocksource=0
 atxy6.build.core=megatinycore
 atxy6.build.variant=txy6
 atxy6.build.mcu=attiny{build.attiny}
@@ -595,12 +597,16 @@ atxy4.build.millistimer=D0
 atxy4.build.bootload=
 atxy4.bootloader.resetpinbits=01
 atxy4.build.board=AVR_ATtinyxy4
+atxy4.build.clocksource=0
+atxy4.build.clocksource=0
 atxy4.build.core=megatinycore
 atxy4.build.variant=txy4
+atxy4.build.tuned=
 atxy4.build.mcu=attiny{build.attiny}
 atxy4.build.f_cpu={build.speed}000000L
-atxy4.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage}
+atxy4.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} {build.tuned}
 atxy4.build.export_merged_output=false
+atxy4.build.tuned=
 
 ### BOOTLOADING PARAMETERS (FUSES)
 atxy4.bootloader.WDTCFG=0x00
@@ -696,14 +702,22 @@ atxy4.menu.clock.8internal=8 MHz internal
 atxy4.menu.clock.5internal=5 MHz internal
 atxy4.menu.clock.4internal=4 MHz internal
 atxy4.menu.clock.1internal=1 MHz internal
+atxy4.menu.clock.20internaltuned=20 MHz internal - tuned
+atxy4.menu.clock.16internaltuned=16 MHz internal - tuned
+atxy4.menu.clock.12internaltuned=12 MHz internal - tuned
 atxy4.menu.clock.20extclock=20 MHz external clock
 atxy4.menu.clock.16extclock=16 MHz external clock
 atxy4.menu.clock.12extclock=12 MHz external clock
 atxy4.menu.clock.10extclock=10 MHz external clock
 atxy4.menu.clock.8extclock=8 MHz external clock
-atxy4.menu.clock.24extclock=24 MHz external clock (overclocked)
-atxy4.menu.clock.28extclock=28 MHz external clock (overclocked)
-atxy4.menu.clock.32extclock=32 MHz external clock (overclocked)
+atxy4.menu.clock.24internaltuned=24 MHz internal - tuned, overclocked
+atxy4.menu.clock.25internaltuned=25 MHz internal - tuned, overclocked
+atxy4.menu.clock.30internaltuned=30 MHz internal - tuned, overclocked, may be unstable, req. 20 MHz fuse
+atxy4.menu.clock.32internaltuned=32 MHz internal - tuned, 2-series, overclocked, may be unstable, req. 20 MHz fuse
+atxy4.menu.clock.24extclock=24 MHz external clock - overclocked
+atxy4.menu.clock.25extclock=25 MHz external clock - overclocked
+atxy4.menu.clock.28extclock=30 MHz external clock - overclocked, may be unstable
+atxy4.menu.clock.32extclock=32 MHz external clock - overclocked, may be unstable
 atxy4.menu.clock.20internal.build.speed=20
 atxy4.menu.clock.20internal.build.clocksource=0
 atxy4.menu.clock.16internal.build.speed=16
@@ -730,10 +744,38 @@ atxy4.menu.clock.8extclock.build.speed=8
 atxy4.menu.clock.8extclock.build.clocksource=2
 atxy4.menu.clock.24extclock.build.speed=24
 atxy4.menu.clock.24extclock.build.clocksource=2
-atxy4.menu.clock.28extclock.build.speed=28
-atxy4.menu.clock.28extclock.build.clocksource=2
+atxy4.menu.clock.25extclock.build.speed=24
+atxy4.menu.clock.25extclock.build.clocksource=2
+atxy4.menu.clock.30extclock.build.speed=30
+atxy4.menu.clock.30extclock.build.clocksource=2
 atxy4.menu.clock.32extclock.build.speed=32
 atxy4.menu.clock.32extclock.build.clocksource=2
+atxy4.menu.clock.20internaltuned.build.speed=20
+atxy4.menu.clock.20internaltuned.build.clocksource=0
+atxy4.menu.clock.20internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy4.menu.clock.16internaltuned.build.speed=16
+atxy4.menu.clock.16internaltuned.build.clocksource=0
+atxy4.menu.clock.16internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy4.menu.clock.12internaltuned.build.speed=12
+atxy4.menu.clock.12internaltuned.build.clocksource=0
+atxy4.menu.clock.12internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy4.menu.clock.24internaltuned.build.speed=24
+atxy4.menu.clock.24internaltuned.build.clocksource=0
+atxy4.menu.clock.24internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy4.menu.clock.25internaltuned.build.speed=25
+atxy4.menu.clock.25internaltuned.build.clocksource=0
+atxy4.menu.clock.25internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy4.menu.clock.30internaltuned.build.speed=30
+atxy4.menu.clock.30internaltuned.build.clocksource=0
+atxy4.menu.clock.30internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy4.menu.clock.32internaltuned.build.speed=32
+atxy4.menu.clock.32internaltuned.build.clocksource=0
+atxy4.menu.clock.32internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy4.menu.clock.20internaltuned.bootloader.OSCCFG=0x02
+atxy4.menu.clock.24internaltuned.bootloader.OSCCFG=0x02
+atxy4.menu.clock.25internaltuned.bootloader.OSCCFG=0x02
+atxy4.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
+atxy4.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
 atxy4.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy4.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy4.menu.clock.5internal.bootloader.OSCCFG=0x02
@@ -853,6 +895,7 @@ atxy2.build.millistimer=D0
 atxy2.build.bootload=
 atxy2.bootloader.resetpinbits=01
 atxy2.build.board=AVR_ATtinyxy2
+atxy2.build.clocksource=0
 atxy2.build.core=megatinycore
 atxy2.build.variant=txy2
 atxy2.build.mcu=attiny{build.attiny}
@@ -1074,6 +1117,7 @@ atxy7o.build.text_section_start=.text=0x200
 atxy7o.build.millistimer=D0
 atxy7o.build.bootload=opti
 atxy7o.build.board=AVR_ATtinyxy7
+atxy7o.build.clocksource=0
 atxy7o.build.core=megatinycore
 atxy7o.build.variant=txy7
 atxy7o.build.mcu=attiny{build.attiny}
@@ -1301,6 +1345,7 @@ atx27o.build.text_section_start=.text=0x200
 atx27o.build.millistimer=B1
 atx27o.build.bootload=opti
 atx27o.build.board=AVR_ATtinyxy7
+atx27o.build.clocksource=0
 atx27o.build.core=megatinycore
 atx27o.build.variant=txy7
 atx27o.build.mcu=attiny{build.attiny}
@@ -1512,6 +1557,7 @@ atxy6o.build.text_section_start=.text=0x200
 atxy6o.build.millistimer=D0
 atxy6o.build.bootload=opti
 atxy6o.build.board=AVR_ATtinyxy6
+atxy6o.build.clocksource=0
 atxy6o.build.core=megatinycore
 atxy6o.build.variant=txy6
 atxy6o.build.mcu=attiny{build.attiny}
@@ -1693,6 +1739,7 @@ atxy6o.menu.uartvoltage.3v=Closer to 3v
 atxy6o.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy6o.menu.uartvoltage.3v.build.uartvoltage=3V
 
+atxy6o.build.clocksource=0
 atxy6o.build.core=megatinycore
 atxy6o.build.variant=txy6
 atxy6o.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage}
@@ -1750,6 +1797,7 @@ atx26o.build.text_section_start=.text=0x200
 atx26o.build.millistimer=B1
 atx26o.build.bootload=opti
 atx26o.build.board=AVR_ATtinyxy6
+atx26o.build.clocksource=0
 atx26o.build.core=megatinycore
 atx26o.build.variant=txy6
 atx26o.build.mcu=attiny{build.attiny}
@@ -1961,6 +2009,7 @@ atxy4o.build.text_section_start=.text=0x200
 atxy4o.build.millistimer=D0
 atxy4o.build.bootload=opti
 atxy4o.build.board=AVR_ATtinyxy4
+atxy4o.build.clocksource=0
 atxy4o.build.core=megatinycore
 atxy4o.build.variant=txy4
 atxy4o.build.mcu=attiny{build.attiny}
@@ -2200,6 +2249,7 @@ atx24o.build.text_section_start=.text=0x200
 atx24o.build.millistimer=B1
 atx24o.build.bootload=opti
 atx24o.build.board=AVR_ATtinyxy4
+atx24o.build.clocksource=0
 atx24o.build.core=megatinycore
 atx24o.build.variant=txy4
 atx24o.build.mcu=attiny{build.attiny}
@@ -2412,6 +2462,7 @@ atxy2o.build.text_section_start=.text=0x200
 atxy2o.build.millistimer=D0
 atxy2o.build.bootload=opti
 atxy2o.build.board=AVR_ATtinyxy2
+atxy2o.build.clocksource=0
 atxy2o.build.core=megatinycore
 atxy2o.build.variant=txy2
 atxy2o.build.mcu=attiny{build.attiny}

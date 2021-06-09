@@ -17,7 +17,7 @@ Timer Type D | Yes | Yes | Yes | Yes
 Interfaces | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C
 Clock options | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz
 
-## Buy official megaTinyCore breakouts and support continued development!
+## Buy official megaTinyCore breakouts and support continued development
 [ATtiny1614 assembled](https://www.tindie.com/products/17598/)
 
 [ATtiny1614/814/414/1604/804/404 bare board](https://www.tindie.com/products/17748/)
