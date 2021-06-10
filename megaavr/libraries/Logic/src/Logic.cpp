@@ -410,14 +410,14 @@ static volatile register8_t &PINCTRL(PORT_t &port, const uint8_t pin_bm) {
   if (pin_bm == PIN3_bm) {
     return port.PIN3CTRL;
   }
-#ifdef MEGATINYCORE
+  #ifdef MEGATINYCORE
   if (pin_bm == PIN4_bm) {
     return port.PIN4CTRL;
   }
   if (pin_bm == PIN5_bm) {
     return port.PIN5CTRL;
   }
-#endif
+  #endif
   if (pin_bm == PIN6_bm) {
     return port.PIN6CTRL;
   }

@@ -17,6 +17,8 @@ Timer Type D | Yes | Yes | Yes | Yes
 Interfaces | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C
 Clock options | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz
 
+The type D timer is not used for PWM, but is the default millis timekeeping source.
+
 ## Buy official megaTinyCore breakouts and support continued development
 [ATtiny1614 assembled](https://www.tindie.com/products/17598/)
 
