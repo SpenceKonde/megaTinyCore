@@ -213,9 +213,20 @@ void takeOverTCD0();
 
 
 // avr-libc defines _NOP() since 1.6.2
+// It does? Better tell; avr-gcc, because it insists otherwise... -Spence 5/30/21
 #ifndef _NOP
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
+#ifndef _NOPNOP
+// rjmp to current address is 1 instruction for a 2 cycle delay, as opposed for 2 for pair of NOPs.
+#define _NOPNOP() do { __asm__ volatile ("rjmp .+0"); } while (0)
+#endif
+/* note also that rcall .+2, cpse r0, r0, ret should do 8 (2 + 4 + 2) cycles in 3 words
+ * assuming I'm not missing something, then, this would also work
+ * rcall .+4, rcall .+2 cpse r0, r0, ret  ->> 2 + 4 + 2 + 4 + 2 = 14 cycles in 4 words.
+ * 2 + n words = 2 + 6n cycles. But best of all, if you have an assembly function with ret naturally a part of it in range
+ * rcall the 'ing the already used ret is a 6 cycle NOP ;-) */
+
 
 /* Allows performing a correction on the CPU value using the signature row
   values indicating oscillator error provided from the device manufacturer */
@@ -283,8 +294,10 @@ extern const uint8_t digital_pin_to_timer[];
 #ifdef PIN_WIRE_SCL_PINSWAP_1
   #define SDA_NOW ((uint8_t) (PORTMUX.CTRLB & PORTMUX_TWI0_bm ? PIN_WIRE_SDA_PINSWAP_1 : PIN_WIRE_SDA))
   #define SCL_NOW ((uint8_t) (PORTMUX.CTRLB & PORTMUX_TWI0_bm ? PIN_WIRE_SCL_PINSWAP_1 : PIN_WIRE_SCL))
-  static const uint8_t SDA_ALT = PIN_WIRE_SDA_PINSWAP_1;
-  static const uint8_t SCL_ALT = PIN_WIRE_SCL_PINSWAP_1;
+  static const uint8_t SDA_ALT __attribute__ ((deprecated("Use SDA_ALT1 to match the conventions used in DxCore"))) = PIN_WIRE_SDA_PINSWAP_1; /* deprecated */
+  static const uint8_t SCL_ALT __attribute__ ((deprecated("Use SCL_ALT1 to match the conventions used in DxCore"))) = PIN_WIRE_SCL_PINSWAP_1; /* deprecated */
+  static const uint8_t SDA_ALT1 = PIN_WIRE_SCL_PINSWAP_1;
+  static const uint8_t SCL_ALT1 = PIN_WIRE_SCL_PINSWAP_1;
 #endif
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
@@ -295,10 +308,14 @@ static const uint8_t SCL = PIN_WIRE_SCL;
   #define MOSI_NOW  ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_MOSI_PINSWAP_1  : PIN_SPI_MOSI))
   #define MISO_NOW  ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_MISO_PINSWAP_1  : PIN_SPI_MISO))
   #define SCK_NOW   ((uint8_t) (PORTMUX.CTRLB & PORTMUX_SPI0_bm ? PIN_SPI_SCK_PINSWAP_1   : PIN_SPI_SCK))
-  static const uint8_t SS_ALT   = PIN_SPI_SS_PINSWAP_1;
-  static const uint8_t MOSI_ALT = PIN_SPI_MOSI_PINSWAP_1;
-  static const uint8_t MISO_ALT = PIN_SPI_MISO_PINSWAP_1;
-  static const uint8_t SCK_ALT  = PIN_SPI_SCK_PINSWAP_1;
+  static const uint8_t SS_ALT    __attribute__ ((deprecated("Use SS_ALT1 to match the conventions used in DxCore"  ))) = PIN_SPI_SS_PINSWAP_1; /* deprecated */
+  static const uint8_t MOSI_ALT  __attribute__ ((deprecated("Use MOSI_ALT1 to match the conventions used in DxCore"))) = PIN_SPI_MOSI_PINSWAP_1; /* deprecated */
+  static const uint8_t MISO_ALT  __attribute__ ((deprecated("Use MISO_ALT1 to match the conventions used in DxCore"))) = PIN_SPI_MISO_PINSWAP_1; /* deprecated */
+  static const uint8_t SCK_ALT   __attribute__ ((deprecated("Use SCK_ALT1 to match the conventions used in DxCore" ))) = PIN_SPI_SCK_PINSWAP_1; /* deprecated */
+  static const uint8_t SS_ALT1   = PIN_SPI_SS_PINSWAP_1;
+  static const uint8_t MOSI_ALT1 = PIN_SPI_MOSI_PINSWAP_1;
+  static const uint8_t MISO_ALT1 = PIN_SPI_MISO_PINSWAP_1;
+  static const uint8_t SCK_ALT1  = PIN_SPI_SCK_PINSWAP_1;
 #endif
 static const uint8_t SS   = PIN_SPI_SS;
 static const uint8_t MOSI = PIN_SPI_MOSI;

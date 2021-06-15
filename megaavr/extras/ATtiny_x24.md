@@ -25,6 +25,23 @@ CCL logic     |                          4 LUTs |
 Interfaces    |              UART (2), SPI, I2C |
 Millis Timer  | TCA0, TCB0, TCB1 (default), RTC |
 RTC crystal   |  Optional 32KHz on TOSC1, TOSC2 |
+Feature               |             Specification                   |
+----------------------|---------------------------------------------|
+GPIO Pins             |                              12 (11 usable) |
+ADC                   |                  12-bit, differential w/PGA |
+ADC Channels          |       9, 7 of which  can be neg. diff. pin. |
+DAC                   |                    Internal for AC ref only |
+Comparator            |                                           1 |
+PWM Channels **       |                                           6 |
+Timer Type B          |                                           2 |
+Timer Type D          |                                          No |
+CCL logic             |                     4 LUTs, 12 of 12 inputs |
+Interfaces            |                          UART (2), SPI, I2C |
+Millis Timer          |             TCA0, TCB0, TCB1 (default), RTC |
+RTC crystal           |                Optional  32KHz TOSC1, TOSC2 |
+Clock Sources         |   Internal osc @ 16 or 20 MHz or ext. clock |
+Frequency (rated)     |    Up to 5 MHz @ 1.8V, 10 @ 2.7V, 20 @ 4.5V |
+Frequwncy (max * )    |   Internal runs @ ~36, chip works @ ~32 MHz |
 Package       |                SOIC-14, SSOP-14 |
 
 ## Overview

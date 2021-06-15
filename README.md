@@ -15,7 +15,7 @@ These use UPDI programming, not traditional ISP like the classic ATtiny parts di
 
 A serial bootloader, Optiboot_x (based on the same codebase as the classical Arduino Uno bootloader) is supported on these parts (0/1-series support is currently live, 2-series is expected by the first week of May; adjustments for the new parts are trivial), allowing them to be programmed over a traditional serial port. See the Optiboot section below for more information on this, and the relevant options. Installing the bootloader does require a UPDI programmer. The assembled breakout boards I sell on Tindie are available pre-bootloaded (they are bootloaded on demand). **That being said** the user experience with Optiboot is a little disaoppointing on the 0/1-series parts as well as the 14-pin 2-series parts due to their lack of a hardware reset pin that could be used with the usual autoreset circuit to automatically reset into the bootloader when the serial port is opened - you need to either disable UPDI programming entirely (requiring an HV programmer if fuse settings or bootloader need to be change after initial bootloading) or leave UPDI enabbled, but start any upload within 8 seconds of applying power. The 20-pin and 24-pin 2-series parts support an "alternate reset pin" allowing these to act more like a traditional Arduino.
 
-**Arduino 1.8.13 is recommended**
+**Arduino 1.8.13+ is recommended**
 
 This core depends on the 7.3.0-atmel3.6.1-arduino7 version of the toolchain **when installed manually**, and even this version does not have support for 2-series parts with 4k, 8k, or 32k of flash. You must have either the latest official Arduino AVR board package, 1.8.3 (included with Arduino 1.8.13, and available for older versions of the IDE by upgrade through board manager) .  When megaTinyCore is installed through board manager, the required version of the toolchain is always installed automatically.
 
@@ -48,7 +48,40 @@ The tinyAVR 2-series support is basically complete in 2.3.0, however, expect to 
 * [ATtiny3226,1626,826,426](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x26.md)
 * [ATtiny3224,1624,824,424](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x24.md)
 
-### Overall Part Comparison
+## Overall Part Comparison
+| tinyAVR series      |     0-series   |     1-series        |      2-series       |
+|---------------------|----------------|---------------------|---------------------|
+| Pincounts           |  8, 14, 20, 24 |       8, 14, 20, 24 |          14, 20, 24 |
+| Flash (max)         |         32768b |              32768b |    (planned) 32768b |
+| RAM (max)           |          1024b |               2048b |              3072b  |
+| Separate reset pin? |            NO  |                  NO |  20/24-pin optional |
+| PWM pins (Arduino)  | 8pin: 4 else 6 |    8p:4, >=20p:8, 6 |                   6 |
+| Type A timers       |              1 |                   1 |                   1 |
+| Type B timers       |             1  |    <16k: 1 >=16k: 2 |                   2 |
+| Type D timer        |            MO  |                 Yes |                  No |
+| Real Time Clock     | Yes, 32k xtal  |                 Yes |                 Yes |
+| USARTs    (pin options) |      1 (2) |               1 (2) |               2 (3) |
+| SPI ports (pin options) |         1  | 1 (2 except 14-pin) |   1 (2 on 20/24pin) |
+| TWI ports (pin options) |         1  |               1 (2) |                  1  |
+| Maximum rated speed |         20 MHz |              20 MHz |              20 MHz |
+| Overclocking (internal @ 5v) |   ??? |           25-30 MHz |              32 MHz |
+| Overclocking (ext. clk @ 5v) |   ??? |              32 MHz |           >= 32 MHz |
+| External crystal    |            NO  |                  NO |                  NO |
+| Event Channels      | 1 sync 2 async |      2 sync 4 async |    6, no sync/async |
+| CCL Logic Blocks    |     2 (1 pair) |          2 (1 pair) |         4 (2 pairs) |
+| Analog Comparators  |  1, no DAC REF |        3, w/DAC REF |        1, w/DAC REF |
+| ADC                 |         10-bit |   10-bit (>=16: 2x) |   12-bit diff w/PGA |
+| Analog References   | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | 1.024V, 2.048V, 2.5V, 4.096V |
+
+Overclocked speeds are typical maximum speeds that can be reached with basic functionality intact. Not all parts will reach or function at these speeds, and the operating temperature range is likely far narrower than it is at the rated speeds.
+
+The ADC on the 2-series is arguably the best ADC that has shipped on an AVR yet. The closest comparisons are the classic AVRs that got differential ADCs (the t841, mega2560 and t861 come to mind as having very good differential ADCs). While it isn't capable of the insane 100x and 200x gain that some parts bragged of in the classic AVR days, I'm under the impression that much of that was just being used to very precisely measure noise - and the flexibility of the new ADC miles beyond what the classicAVRs were capable of: 7 pina capavble of being negative inputs, and no restrictions on what inputs they can be paired with, gain selectable to every power of 2, and the autoaccumulation for decimation.
+
+The type D timer is only used for PWM on 20/24 pin 1-series parts - on the smaller parts, they don't let us increase the total number of PWM pins, and the binary bloat from the more complex analogWrite makes TCD PWM slightly worse than alternatives ,
+The type B timers are lousy at generating PWM for a variety of reasons,
+
+I'm aware of nobody having played with overclocking the 0-series, but as it was released at the same time as the 1-series and appears to be a 1-series with fewer features, I weould expect them to be the same.
+
 
 ### Automotive (VAO) versions
 The automotive versions should also work. You must always select the 16 MHz-derived clock speeds on these parts. They do not support 20 MHz operation.

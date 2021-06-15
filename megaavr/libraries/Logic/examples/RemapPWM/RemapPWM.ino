@@ -1,22 +1,26 @@
 /***********************************************************************|
 | tinyAVR Configurable Custom Logic library                             |
-| Modulate.ino                                                          |
+| RemapPWM.ino                                                          |
 |                                                                       |
 | A library for interfacing with the megaAVR Configurable Custom Logic. |
 | Developed in 2019 by MCUdude.       Example by Spence Konde 2020-2021 |
 | https://github.com/MCUdude/            https://github.com/SpenceKonde |
 |                                                                       |
-| In this example we use the configurable logic peripherals of the      |
-| tinyAVR to achieve the "modulate one timer's wave output with another"|
-| behavior like some of the more full-featured classic megaAVR parts    |
-| We set one input to TCA0 WO1, the other to TCB0 WO, and mask the third|
-| and set the truth table so that the output is only HIGH when both are |
-| As can be immediately seen, this is vastly more powerful than what the|
-| classic AVRs were capable of, where this could be done only with two  |
-| timers on a single pin.                                               |
-| We could even use the CCL as an event generator to move the output to |
-| one of the EVOUT pins!                                                |
-|***********************************************************************/
+| In this example we use the configurable logic peripheral to direct a  |
+| PWM Waveform Output (WO) to an arbitrary, different pin.              |
+|
+| Consider an ATtiny 0, 1, or 2 series, and maximizing the number of    |
+| 8-bit PWM channels. On the 14-pin parts, we can get at most 6 from    |
+| TCA0, and that's it - the other timer PWM pins are the same as those! |
+| TCB0, and (on parts that have it) TCB1 are both sghared with TCA0 pins|
+| and so are TCD0 WOA and WOB pins. If we are desperate for another PWM |
+| channel (such that we would resort to using a TCB for PW< - they're   |
+| lousy for PWM generation - or figure out how to work with TCD0 which  |
+| is pretty ugly (actually, since you don't need to enable pin output   |
+| TCD is significantly easier to handle here, but still beyond the scope|
+| of the example) - you can use the CCL to reroute a PWM signal that    |
+| wouldn't have a pin to call it's own onto the logic output pin        |
+************************************************************************/
 
 // Make sure this compiles on 8-pin parts for the automated tests...
 #if !defined(__AVR_ATtinyxy2__)
@@ -34,11 +38,11 @@ void setup() {
   Logic0.enable = true;               // Enable logic block 0
   Logic0.input0 = in::tcb;            // TCB channel - TCB0. On everything except 0/1-series tinyAVR, that's because this is input 0.
                                       // On those, it's because there's a in::tcb1 option too...
-  Logic0.input1 = in::tca0;           // Use TCA0 WO1 as input0
+  Logic0.input1 = in::masked;         // mask input 1
   Logic0.input2 = in::masked;         // mask input 2
   Logic0.output = out::enable;        // Enable logic block 0 output pin or PA4 (ATtiny))
   Logic0.filter = filter::disable;    // No output filter enabled
-  Logic0.truth = 0x08;                // Set truth table - HIGH only if both high
+  Logic0.truth = 0x02;                // Set truth table - HIGH if input is HIGH.
 
   // Initialize logic block 0
   Logic0.init();
@@ -46,7 +50,6 @@ void setup() {
   // Start the AVR logic hardware
   Logic::start();
 
-  analogWrite(PIN_TCA_WO1, 128); //start TCA0 WO0 running
   TCB0.CTRLA = 0x01; //enabled with CLKPER as clock source
   TCB0.CTRLB = 0x07; //PWM8 mode, but output pin not enabled
   TCB0.CCMPL = 255; //255 counts

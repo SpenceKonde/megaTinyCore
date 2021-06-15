@@ -1,4 +1,4 @@
-### GNU LESSER GENERAL PUBLIC LICENSE
+# GNU LESSER GENERAL PUBLIC LICENSE
 
 Version 2.1, February 1999
 
@@ -12,7 +12,7 @@ Version 2.1, February 1999
      as the successor of the GNU Library Public License, version 2, hence
      the version number 2.1.]
 
-### Preamble
+## Preamble
 
 The licenses for most software are designed to take away your freedom
 to share and change it. By contrast, the GNU General Public Licenses
@@ -115,7 +115,7 @@ modification follow. Pay close attention to the difference between a
 former contains code derived from the library, whereas the latter must
 be combined with the library in order to run.
 
-### TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+## TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
 **0.** This License Agreement applies to any software library or other
 program which contains a notice placed by the copyright holder or
@@ -166,13 +166,13 @@ portion of it, thus forming a work based on the Library, and copy and
 distribute such modifications or work under the terms of Section 1
 above, provided that you also meet all of these conditions:
 
--   **a)** The modified work must itself be a software library.
--   **b)** You must cause the files modified to carry prominent
+- **a)** The modified work must itself be a software library.
+- **b)** You must cause the files modified to carry prominent
     notices stating that you changed the files and the date of
     any change.
--   **c)** You must cause the whole of the work to be licensed at no
+- **c)** You must cause the whole of the work to be licensed at no
     charge to all third parties under the terms of this License.
--   **d)** If a facility in the modified Library refers to a function
+- **d)** If a facility in the modified Library refers to a function
     or a table of data to be supplied by an application program that
     uses the facility, other than as an argument passed when the
     facility is invoked, then you must make a good faith effort to
@@ -283,7 +283,7 @@ copyright notice for the Library among them, as well as a reference
 directing the user to the copy of this License. Also, you must do one
 of these things:
 
--   **a)** Accompany the work with the complete corresponding
+- **a)** Accompany the work with the complete corresponding
     machine-readable source code for the Library including whatever
     changes were used in the work (which must be distributed under
     Sections 1 and 2 above); and, if the work is an executable linked
@@ -294,7 +294,7 @@ of these things:
     the user who changes the contents of definitions files in the
     Library will not necessarily be able to recompile the application
     to use the modified definitions.)
--   **b)** Use a suitable shared library mechanism for linking with
+- **b)** Use a suitable shared library mechanism for linking with
     the Library. A suitable mechanism is one that (1) uses at run time
     a copy of the library already present on the user's computer
     system, rather than copying library functions into the executable,
@@ -302,14 +302,14 @@ of these things:
     library, if the user installs one, as long as the modified version
     is interface-compatible with the version that the work was
     made with.
--   **c)** Accompany the work with a written offer, valid for at least
+- **c)** Accompany the work with a written offer, valid for at least
     three years, to give the same user the materials specified in
     Subsection 6a, above, for a charge no more than the cost of
     performing this distribution.
--   **d)** If distribution of the work is made by offering access to
+- **d)** If distribution of the work is made by offering access to
     copy from a designated place, offer equivalent access to copy the
     above specified materials from the same place.
--   **e)** Verify that the user has already received a copy of these
+- **e)** Verify that the user has already received a copy of these
     materials or that you have already sent this user a copy.
 
 For an executable, the required form of the "work that uses the
@@ -334,11 +334,11 @@ library, provided that the separate distribution of the work based on
 the Library and of the other library facilities is otherwise
 permitted, and provided that you do these two things:
 
--   **a)** Accompany the combined library with a copy of the same work
+- **a)** Accompany the combined library with a copy of the same work
     based on the Library, uncombined with any other
     library facilities. This must be distributed under the terms of
     the Sections above.
--   **b)** Give prominent notice with the combined library of the fact
+- **b)** Give prominent notice with the combined library of the fact
     that part of it is a work based on the Library, and explaining
     where to find the accompanying uncombined form of the same work.
 
@@ -453,9 +453,9 @@ FAILURE OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
 SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGES.
 
-### END OF TERMS AND CONDITIONS
+## END OF TERMS AND CONDITIONS
 
-### How to Apply These Terms to Your New Libraries
+## How to Apply These Terms to Your New Libraries
 
 If you develop a new library, and you want it to be of the greatest
 possible use to the public, we recommend making it free software that
