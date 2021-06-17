@@ -16,7 +16,7 @@ Please include information that uniquely identifies the library, as popular libr
 | ~Neopixel~   |         | ~Adafruit~                                            |                   Does not compile   | Use included tinyNeoPixel - Same API, adapted for these   |
 | LED Backpack |   1.1.8 | https://github.com/adafruit/Adafruit_LED_Backpack     |                 Compiles and works   |                                                           |
 | Tiny4kOLED   |         | https://github.com/datacute/Tiny4kOLED                |                 Compiles and works   | SSD1306, not just for tiny - anything with Wire.h lib     |
-| U8x8 and U8g2    |         | https://github.com/olikraus/u8g2                      | U8x8 works. People disgree on U8g2   | The more memory-intensive U8g2 may work on only the largest-memory parts |
+| U8x8 and U8g2 |2.28.10 | https://github.com/olikraus/u8g2                      | U8x8 works. People disgree on U8g2   | The more memory-intensive U8g2 may work on only the largest-memory parts |
 | rc-switch    |         | https://github.com/sui77/rc-switch  (TX mode)         |                 Compiles and works   | A surprise. I don't expect RX will work                   |
 | ~FAB-LED~    | Original| ~https://github.com/sonyhome/FAB_LED~                 |        Architecture is unsupported   | FAB-LED is a WS2812 w/out buffer library; impressive      |
 | FAB-LED      | Forked  | https://github.com/SpenceKonde/FAB_LED                | I added support for "megaavr", works | No response to my PR to get my fix into his version :-/   |
