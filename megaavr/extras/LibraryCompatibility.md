@@ -1,5 +1,9 @@
 # Library Compatibility
 Please include information that uniquely identifies the library, as popular libraries have dozens of forks all over the internet, and it is often difficult to identify which is the "right one". Bonus points if you include a version number too - but I've given up on that!
+
+## DxCore vs megaTinyCore
+This page is linked to from the DxCore documentation as well, for the simple reason that the similarity of the underlying hardware is such that something that works with one will work withthe other unless it's using spexcific features that are onlyt present on one of the two, or if it is pooerly written and checks for specific parts, rather than peripeherals or things that are truefor a whole host of partt (ie, trsdting for #if defined(__ATtint3216__) || defined(__ATtiny1614__) - the two thingsthe author tested on, when the exact same code would work on any modern AVR if they had instead tested #if (__AVR_ARCH__>=102 && AVR_ARCH <= 104) - which poicks up all modern AVRs with 64k of flash (102), 128k of flash (104) or 32/48k or less (103, meaning fuilly memory-mapped flash)
+
 <!-- markdownlint-disable-file MD034 -->
 | Library      | Version | Library URL or reference                              | Status                               | Notes                                                     |
 |--------------|---------|-------------------------------------------------------|--------------------------------------|-----------------------------------------------------------|
