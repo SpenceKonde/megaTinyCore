@@ -15,7 +15,7 @@ These use UPDI programming, not traditional ISP like the classic ATtiny parts di
 
 A serial bootloader, Optiboot_x (based on the same codebase as the classical Arduino Uno bootloader) is supported on these parts (0/1-series support is currently live, 2-series is expected by the first week of May; adjustments for the new parts are trivial), allowing them to be programmed over a traditional serial port. See the Optiboot section below for more information on this, and the relevant options. Installing the bootloader does require a UPDI programmer. The assembled breakout boards I sell on Tindie are available pre-bootloaded (they are bootloaded on demand). **That being said** the user experience with Optiboot is a little disaoppointing on the 0/1-series parts as well as the 14-pin 2-series parts due to their lack of a hardware reset pin that could be used with the usual autoreset circuit to automatically reset into the bootloader when the serial port is opened - you need to either disable UPDI programming entirely (requiring an HV programmer if fuse settings or bootloader need to be change after initial bootloading) or leave UPDI enabbled, but start any upload within 8 seconds of applying power. The 20-pin and 24-pin 2-series parts support an "alternate reset pin" allowing these to act more like a traditional Arduino.
 
-**Arduino 1.8.13+ is recommended**
+**Arduino 1.8.13 is recommended**
 
 This core depends on the 7.3.0-atmel3.6.1-arduino7 version of the toolchain **when installed manually**, and even this version does not have support for 2-series parts with 4k, 8k, or 32k of flash. You must have either the latest official Arduino AVR board package, 1.8.3 (included with Arduino 1.8.13, and available for older versions of the IDE by upgrade through board manager) .  When megaTinyCore is installed through board manager, the required version of the toolchain is always installed automatically.
 
@@ -122,6 +122,7 @@ Oh, and one more thing... the UPDI pin configuration has the old options - UPDI,
 These parts provide an excellent toolbox of versatile and powerful peripherals; the top-end ones are nearly on a par with classic megaAVR parts - for a tinyAVR price. One of the guiding principles of the design of megaTinyCore, as with my other cores, is to allow the supported parts to reach their full potential - or as close to that as possible within the limitations of Arduino. This (very large) section covers the features of these parts and how they are exposed by megaTinyCore, as well as features of the core itself.
 
 ### Supported Clock Speeds
+**Important - Read about [Tuning](megaavr/extras/Tuning.md) before selecting any tuned option!**
 * 20MHz Internal (4.5v-5.5v - typical for 5v systems)
 * 16MHz Internal (4.5v-5.5v - typical for 5v systems)
 * 10MHz Internal (2.7v-5.5v - typical for 3.3v systems)
@@ -151,36 +152,7 @@ See [Speed Grades](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaa
 
 These parts do not support using an external crystal like the classic ATtiny parts do, however the internal oscillator is tightly calibrated enough that the internal clock will work for UART communication; Like the megaAVR 0-series, it includes clock corrections at 3V and 5V in the signature row, and megaTinyCore uses them for serial communication. These parts also support an external **clock** (that can come from an external oscillator - available from the usual suspects, the CLKOUT from another processor, and so on).
 
-As usual for AVR parts, the internal oscillator's compliance covers a far wider range than the datasheet describes. In my testing on 1-series parts, it appeared that both the 16 MHz and 20 MHz oscillator can be calibrated to as low as approximately 5/8 of their nominal speed or as high as 1-5/8 of their nominal speed The oscillator on the tinyAVR 2-series parts has gotten an upgrade in the form of the calibration register getting an additional byte - it now has 7 bit granularity instead of 6. (the high bit indicates whether the center frequency is 16 or 20 MHz). The 128 settings cover a similarly sized range, of speeds, though both the top and bottom ends of this range are higher.
 
-#### Internal oscillator tuning
-As of 2.4.0, tuned internal oscillator at frequencies listed above is supported. Load the 500 Hz timebase sketch onto a working AVR microcontroller that uses a crystal or external clock for it's main clock (uhnless you want inaccurate numbers, and the tuning sketch itself to the target tinyAVR, and then connect the output of timebase to the input of tuning sketch (see comments at top of files for more info). It will cycle through all of the calibration values until it has either found a match for all of the prospective frequencies, or gone all the way to the top without finding all of them. As they are found, they will be written to the end of the USERROW - the last 6 bytes will get 20 MHz tuning values, and the 6 before those will get 16 MHz tuning values (20 or 16 refers to the center frequency). The values the tuning sketch looks for are shown below. Ensure that the part is running at the desired voltage and temperature when running the tuning for highest accuracy. If you are using the tuning features, be sure that your application code does not overwrite the calibration data after tuning.
-
-**The "tuned" clock source options exceed Microchiop's rated maximum speed - these parts are not guaranteed to function reliably or at all** under these conditions! As a reminder, when programmed using Arduino (or any other tools that use megaTinyCore), these parts should absolutely not be used for any application where thjey could cause a safety hazard by malfunctioning, period - but especially not when overclockwe like this. Anything that the parts do beyond 20 MHz should be treated as
-
-
-
-| Speed  | 0/1-series @ 16 | 0/1-series @ 20  |  2-series @ 16 |    2-series @ 20 |
-|--------|-----------------|------------------|----------------|------------------|
-| 10 MHz |    Yes, natural | Yes, prescale 20 |             No |               No |
-| 12 MHz |    Yes, natural |     Yes, natural |   Yes, natural | Yes, prescale 24 |
-| 16 MHz |  Yes, of course |     Yes, natural | Yes, of course |     Yes, natural |
-| 20 MHz |    Yes, natural |   Yes, of course |   Yes, natural |   Yes, of course |
-| 24 MHz |    Yes, natural |     Yes, natural |   Yes, natural |     Yes, natural |
-| 25 MHz |    Yes, natural |     Yes, natural |   Yes, natural |     Yes, natural |
-| 30 MHz |   No - can't do |   Often Unstable |     Some parts |     Yes, natural |
-| 32 MHz | No way in hell! |     No, can't do |  No, can't do  |   Often Unstable |
-
-Here "natural" means that it's coming out of the internal oscillator at that frequency, as opposed to, say, twice the frequency and getting divided with the prescaler.
-
-
-The middle 6 options can be achieved by most parts. Not all parts can make it all the way to their maximum tuning value before the chip becomes unstable; generally, they make it to 32 MHz at 5V at room temperature, but begin failing dramatically just above that; some conk out a little earlier; . I would not recommend running code at anything above 25 MHz, except to investigate the behavior of overclocked AVRs, and I would never run them above 20 MHz if a hang or crash would be inconvenient. 24 MHz is a particularly useful frequency, as that is the top rated speed for the Dx-series parts (although they will generally do 32 MHz+), and code written for 24 MHz Dx-series would run at that same speed on an overclocked tinyAVR at 24 MHz. Assuming it was stable of course, which is not guaranteed/
-
-Yes, this ALSO means that the 16-MHz-center oscillator ca nbe tuned to 20 MHz and the other way around. No, they don't just load different calibration constants in for the two, they each have 64 or 128 values, centered around their respective frequencies, which overlap (and no, they're not the same list of values offset from each other). Not only that, sometimes the other oscillator has a calibration value that's closer to a target frequency (eg, the 16 MHz oscillator tuned up to 20 MHz gets closer to 20 than any setting on the 20 MHz oscillator does). I am sure there is a logical reason for this design. I cannot imagine what it is.
-
-It is possible to take a reasonable guess if there is no tuning data saved on the part; this is what we do when tuned options are requested but the chip hasn't been tuned (what, you want me to read the chip before uploading to make sure it has been tuned? Dream on - if you want that, give me a PR, that's a ton of work) of what the best value for a frequency might be . If we see there is no hope (eg, we're targeting 32 (and 30 on 0/1) but oscillator is set with 16 MHz center, or it's a high frequency, but the stock cal is already high, such that we know there's no chance we'll be able to hit it) we will stay at the startup frequency (3.33 or 2.66 MHz) making it obvious to the user that the clock isn't set right instead of trying to set as close as we can (eg, 0x7F or 0x3F for above examples) - one of my guiding principles is that if I know I can't give the user the behavior they ask for and that nothing that is possible is good enough in current conditions, I should try to make the failure obvious and hard to miss.
-
-See the oscillator debug sketch for more information on troubleshooting oscillator problems - it examines the state of the part and prints oiut that the name of the error is.  The two high bits in GPIOR0 are used to pass notice of errors in tuning to the user code (the lower 6 bits are used to communicate reset cause when optiboot is in use) since there is no other guaranteed way to communicate error messages; you may well not even have a serial port set up. But if you see it runninmg at a fraction of the expected speed, you're going to suspect the problem is related to that new tuned clock speed option you chose, right? You might even come looking at the documentation and see this explanation - that's the hope, at least.
 
 ### Memory-mapped flash: No need to declare PROGMEM
 Unlike classic AVRs, on the these parts, *the flash is within the same address space as the rest of the memory*. This means `pgm_read_*_near()` is not needed to read directly from flash. Because of this, the compiler automatically puts any variable declared `const` into PROGMEM, and accesses it appropriately - you no longer need to explicitly declare them as PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either (As of 2.1.0, F() once more explicitly declares things as living in PROGMEM (ie, it is slightly less efficient) in order to ensure compatibility with third party libraries).
