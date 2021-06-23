@@ -2,7 +2,7 @@
 megaTinyCore requires a version of the IDE later than 1.6.3; - it may require a much more recent version of the IDE; this has not been tested. It has been tested with 1.8.9 and 1.8.13
 
 
-## Boards Manager Installation
+##[Arduino IDE] Boards Manager Installation
 
 This board package can be installed via the board manager. The boards manager URL is:
 
@@ -26,3 +26,5 @@ For installing megaTinyCore, there are two options:
 Option 1: Download the .zip package (either the "released" version, or by downloading the .zip of master repo), extract, and place in the hardware folder inside your sketchbook folder (if there is no hardware folder, create it). You can find/set the location of the sketchbook folder in the Arduino IDE at File > Preferences -> Sketchbook location.
 
 Option 2: Download the github client, and sync this repo to the hardware subfolder of your sketchbook folder.
+
+##[Arduino cli]
