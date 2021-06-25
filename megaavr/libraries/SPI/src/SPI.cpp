@@ -296,7 +296,7 @@ void SPIClass::setDataMode(uint8_t mode) {
 
 void SPIClass::setClockDivider(uint8_t div) {
   SPI0.CTRLA = ((SPI0.CTRLA &
-                 ((~SPI_PRESC_gm) | (~SPI_CLK2X_bm)))   // mask out values
+                 (~(SPI_PRESC_gm | SPI_CLK2X_bm)))   // mask out values
                 | div);                           // write value
 }
 
