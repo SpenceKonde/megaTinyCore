@@ -111,7 +111,7 @@
   #define PIN_HWSERIAL1_XCK             (PIN_PA3)
   #define PIN_HWSERIAL1_XDIR            (PIN_PA4)
 
-  #define HWSERIAL1_MUX_PINSWAP_1       (0x01)
+  #define HWSERIAL1_MUX_PINSWAP_1       (0x00)
   #define PIN_HWSERIAL1_TX_PINSWAP_1    (PIN_PA1)
   #define PIN_HWSERIAL1_RX_PINSWAP_1    (PIN_PA2)
   #define PIN_HWSERIAL1_XCK_PINSWAP_1   (PIN_PA3)
