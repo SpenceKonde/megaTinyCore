@@ -110,7 +110,7 @@ atxy7.bootloader.pymcuprogstring=-aerase
 ### ALL UPLOADING VIA UPDI
 atxy7.upload.tool=avrdude
 atxy7.upload.workaround=
-atxy7.program.not_available_for_bootloader=
+atxy7.upload.with_programmer_not_available_for_bootloader_boards=
 
 ### CHIP
 atxy7.menu.chip.3217=ATtiny3217
@@ -363,7 +363,7 @@ atxy6.bootloader.pymcuprogstring=-aerase
 ### ALL UPLOADING VIA UPDI
 atxy6.upload.tool=avrdude
 atxy6.upload.workaround=
-atxy6.program.not_available_for_bootloader=
+atxy6.upload.with_programmer_not_available_for_bootloader_boards=
 
 ### CHIP
 atxy6.menu.chip.3216=ATtiny3216
@@ -625,7 +625,7 @@ atxy4.bootloader.pymcuprogstring=-aerase
 ### ALL UPLOADING VIA UPDI
 atxy4.upload.tool=avrdude
 atxy4.upload.workaround=
-atxy4.program.not_available_for_bootloader=
+atxy4.upload.with_programmer_not_available_for_bootloader_boards=
 
 ### CHIP
 atxy4.menu.chip.1614=ATtiny1614
@@ -921,7 +921,7 @@ atxy2.bootloader.pymcuprogstring=-aerase
 ### ALL UPLOADING VIA UPDI
 atxy2.upload.tool=avrdude
 atxy2.upload.workaround=
-atxy2.program.not_available_for_bootloader=
+atxy2.upload.with_programmer_not_available_for_bootloader_boards=
 
 ### CHIP
 atxy2.menu.chip.412=ATtiny412
