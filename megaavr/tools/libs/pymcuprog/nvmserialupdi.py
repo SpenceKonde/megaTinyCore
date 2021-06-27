@@ -193,14 +193,14 @@ class NvmAccessProviderSerial(NvmAccessProvider):
         # if reading from flash, we want to read words if it would reduce number of USB serial transactions.
         # this function is called for everything though, so be careful not to use it for memories read one byte at a time, like fuses
         data = []
-        read_chunk_size = 0x100
+        read_chunk_size = 0xB0
         use_word_access = False
         memtype_string = memory_info[DeviceMemoryInfoKeys.NAME]
         if memtype_string in (MemoryNames.FLASH):
-            if numbytes > 0x100:
-                read_chunk_size=0x200
-                use_word_access=True
-
+            if numbytes >= 0x40:
+                 use_word_access=True
+        #         read_chunk_size=0x200
+        # SACRIFICES SPEED FOR COMPATIBILITY - above line should happen whenever --limitreads=1  command line parameter is not passed, so we cam turn it off in turbo mode.. I couldn't propagate it through this mess!
         n_chunk = math.ceil(numbytes/read_chunk_size)
         bar = progress_bar.ProgressBar(n_chunk, hide=n_chunk == 1)
 

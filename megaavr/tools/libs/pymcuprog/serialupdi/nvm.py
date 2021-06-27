@@ -5,7 +5,7 @@ from logging import getLogger
 from pymcuprog.pymcuprog_errors import PymcuprogError
 from . import constants
 from .timeout import Timeout
-
+from time import sleep
 
 class NvmUpdi(object):
     """
@@ -196,10 +196,11 @@ class NvmUpdiTinyMega(NvmUpdi):
         self.logger.debug("Committing data")
 
         self.execute_nvm_command(nvmcommand)
-            # I examine the logs, there are never any cases whee more than one read of this is done.
-            # So since this isn't meeded to handle normal operations, only error conditions,
-            # we can let verify catch those - it's worth less helpful information on rare errors - difference in upload speed can be up to 15%
-            # every USB Latency Period that is removed from the stuff that haoppens every page cuts more than a half second off the upload time!
+        sleep(0.001)
+        # SACRIFICES SPEED FOR COMPATIBILITY - above line should execute only when --pagepause command line parameter is 1 or more (default 0), so we can adjust it externally
+        #  it should sleep for that many milliseconds (the granularity of this is low enough enough that 0.001 vs 0.005 makes no difference in my testing)
+        # I couldn't propagate it through this mess, and I really tried, because it is a 2:1 performance hit on CH340 on some parts, which is brutal, but it breaks too many adapters to not have it
+        # this should only ever happen for tinyAVR/megaAVR, NEVER Dx-series parts.
         if not bulkwrite ==1:
             # do a final NVM status check only if not doing a bulk write, or after the last chunk (when bulkwrite = 2)
             # not doing this every page made uploads about 15% faster

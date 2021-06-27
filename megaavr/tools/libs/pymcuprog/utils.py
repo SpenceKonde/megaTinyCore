@@ -155,7 +155,7 @@ def compare(data0, data1, offset, verify_mask=None):
 
     # Check first that lengths match
     if len(data0) != len(data1):
-        raise ValueError("Length mismatch on verify")
+        raise ValueError("Length mismatch on verify, expect 0x{:04X} but got 0x{:04X}".format(len(data0),len(data1)))
 
     mask_len = len(verify_mask)
 
