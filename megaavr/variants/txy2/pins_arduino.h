@@ -37,10 +37,10 @@
 
 #define PIN_PA6   (0)
 #define PIN_PA7   (1)
-#define PIN_PA0   (5)
 #define PIN_PA1   (2)
 #define PIN_PA2   (3)
 #define PIN_PA3   (4)
+#define PIN_PA0   (5)
 
 #define digitalPinHasPWM(p)               ((p) != 0 && (p) != 5)
 
@@ -61,20 +61,20 @@
 */
 
 #ifdef PORTMUX_SPI0_bm
-  #define PIN_SPI_MISO_PINSWAP_1          (1)
-  #define PIN_SPI_SCK_PINSWAP_1           (4)
-  #define PIN_SPI_MOSI_PINSWAP_1          (0)
-  #define PIN_SPI_SS_PINSWAP_1            (0)
+  #define PIN_SPI_MISO_PINSWAP_1          (PIN_PA7)
+  #define PIN_SPI_SCK_PINSWAP_1           (PIN_PA3)
+  #define PIN_SPI_MOSI_PINSWAP_1          (PIN_PA6)
+  #define PIN_SPI_SS_PINSWAP_1            (PIN_PA6)
 #endif
-#define PIN_SPI_MISO                      (3)
-#define PIN_SPI_SCK                       (4)
-#define PIN_SPI_MOSI                      (2)
-#define PIN_SPI_SS                        (0)
+#define PIN_SPI_MISO                      (PIN_PA2)
+#define PIN_SPI_SCK                       (PIN_PA3)
+#define PIN_SPI_MOSI                      (PIN_PA1)
+#define PIN_SPI_SS                        (PIN_PA6)
 
 #define SPI_INTERFACES_COUNT              (1)
 
-#define PIN_WIRE_SDA                      (2)
-#define PIN_WIRE_SCL                      (3)
+#define PIN_WIRE_SDA                      (PIN_PA1)
+#define PIN_WIRE_SCL                      (PIN_PA2)
 
 
 #define HWSERIAL0                         (&USART0)
