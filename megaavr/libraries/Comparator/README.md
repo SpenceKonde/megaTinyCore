@@ -1,31 +1,36 @@
 # Comparator
 A library for interfacing with the analog comparator peripheral in the AVR DA and DB series MCUs.
 Developed by [MCUdude](https://github.com/MCUdude/).
-The tinyAVR 0-series, 2-series, and 1-series parts with less than 16k of flash have a single analog comparator, with either 1 or 2 options each for the positive and negative input pins. 1-series parts with 16k or 32k flash instead have three comparators, which have up to 4 options for the positive input. The internal voltage reference can also be used as the negative side; on the 1-series and 2-series parts, that reference can be scaled by an internal 8-bit DAC.
+The tinyAVR 0-series, 2-series, and 1-series parts with less than 16k of flash have a single analog comparator, with either 1 or 2 options each for the positive and negative input pins. 1-series parts with 16k or 32k flash instead have three comparators, which have up to 4 options for the positive input. The internal voltage reference can also be used as the negative side; on the 1-series and 2-series parts, that reference can be scaled by an internal 8-bit DAC. This librarty provides a wrapper class, `Comparator` that exposes the full functionality of these peripherals without having to manually manipulate registers.
 
-## Comparator
-Class for interfacing with the built-in comparator(s). Use the predefined objects `Comparator`/`Comparator0` and for parts that have them, `Comparator1` or `Comparator2`. (`Comparator` is #defined as `Comparator0` to permit compatibility with parts that have only a single comparator and use the same or similar library). Only the ATtiny3216, 3217, 1614, 1616, and 1617 have three comparators. The rest of the parts have only the one.
+An analog comparator, as the name implies, compares two analog voltages. If the "positive" input is higher than the "negative" one, the output is 1/HIGH, otherwise it is low. These can be configured to invert their value, and the output pins themselves can be inverted if desired (this library does not do that for you though - you want the builtin pinConfigure() for that)
 
+Use the predefined object(s) `Comparator` or `Comparator0` and for parts that have them, `Comparator1` or `Comparator2`. (`Comparator` is #defined as `Comparator0` to permit compatibility code written for older versions of this library written for single-comparator parts). **Only the ATtiny3216, 3217, 1614, 1616, and 1617 have three comparators.** The rest of the parts have only one.
 
-| Pin     |  AC0  |  AC1  |  AC2  | Availability    |
-|---------|-------|-------|-------|-----------------|
-| PIN_PA5 |  OUT  | IN- 0 |   -   |        -        |
-| PIN_PA6 | IN- 0 | IN+ 1 | IN+ 0 |        -        |
-| PIN_PA7 | IN+ 0 | IN+ 0 | IN- 0 |        -        |
-| PIN_PB0 | IN- 2 | IN+ 2 | IN+ 1 |    14+ pin only |
-| PIN_PB1 | IN+ 2 |   -   |   -   |    14+ pin only |
-| PIN_PB2 |   -   |   -   |  OUT  |    14+ pin only |
-| PIN_PB3 |   -   |  OUT  |   -   |    14+ pin only |
-| PIN_PB4 | IN- 1 | IN+ 3 |   -   |  20/24 pin only |
-| PIN_PB5 | IN+ 1 |   -   | IN+ 2 |  20/24 pin only |
-| PIN_PB6 | IN+ 3 |   -   | IN- 1 |     24 pin only |
-| PIN_PB7 |   -   | IN- 1 | IN+ 3 |     24 pin only |
+## Pin Assignments
+
+| Pin     |  On |  AC0  |  AC1  |  AC2  |  Pincounts on   |
+|---------|-----|-------|-------|-------|-----------------|
+| PIN_PA5 | 012 |  OUT  | IN- 0 |   -   | OUT PA3 on 8pin |
+| PIN_PA6 | 012 | IN- 0 | IN+ 1 | IN+ 0 |        -        |
+| PIN_PA7 | 012 | IN+ 0 | IN+ 0 | IN- 0 |        -        |
+| PIN_PB0 |   2 | IN- 2 | IN+ 2 | IN+ 1 |    14+ pin only |
+| PIN_PB1 |**1**2|IN+ 2 |   -   |   -   |    14+ pin only |
+| PIN_PB2 |  -  |   -   |   -   |  OUT  |    14+ pin only |
+| PIN_PB3 |  -  |   -   |  OUT  |   -   |    14+ pin only |
+| PIN_PB4 |  12 | IN- 1 | IN+ 3 |   -   |  20/24 pin only |
+| PIN_PB5 |  12 | IN+ 1 |   -   | IN+ 2 |  20/24 pin only |
+| PIN_PB6 |**1**2|IN+ 3 |   -   | IN- 1 |     24 pin only |
+| PIN_PB7 |     |   -   | IN- 1 | IN+ 3 |     24 pin only |
+
 
 * Not all pins exist on all parts; if a part does not have a given pin, that input is not available there.
-* On 0-series, only positive and negative input 0 is available, and only AC0 exists.
-* On 1-series with <16k flash, only AC0 and inputs 0 and 1 are available. Input 1 only available on parts with that physical pin.
-* On 1-series with 16k or 32k flash, all positive input options shown are available provided the pin exists (there is no PB6 or PB7 except on 24-pin parts, for example, so an ATtiny3216 cannot choose positive input 3 for AC0). Negative inputs `IN- 0` and `IN- 1` are available, but `IN- 2` is not; the register only allocates 2 bits for selecting the negative side, and the 1-series has both vref and dacref options.
-* On 2-series, all AC0 inputs are available (as long as the pin exists on that part). Only one comparator, AC0, exists.
+  * On 8-pin parts, AC0 OUT is on PA3 instead of PA5, since there is no PA5.
+* "On" column shows which AC0 pins are available for each series.
+  * On 0-series, only positive and negative input 0 are available for AC0.
+  * On 1-series with <16k flash, only AC0 and inputs 0 and 1 are available. Input 1 only available on parts with that physical pin.
+  * On 1-series with 16k or 32k flash, all positive input options shown are available provided the pin exists. Negative inputs `IN- 0` and `IN- 1` are available, but `IN- 2` is not; the register only allocates 2 bits for selecting the negative side, and the 1-series has both vref and dacref options.
+  * On 2-series, all AC0 inputs are available (as long as the pin exists on that part). Only one comparator, AC0, exists.
 
 ### input_p
 Property for setting what input pin the positive input of the comparator should be connected to
@@ -37,12 +42,12 @@ in_p::in2; // Use positive input pin 2 as input
 in_p::in3; // Use positive input pin 3 as input
 ```
 
-##### Usage
+#### Usage
 ``` c++
-Comparator.input_p = in_p::in0;  // Connect positive input pin 0 to the positive pin of the comparator
+Comparator.input_p = in_p::in0;  // Connect positive input pin 0 to the positive input of the comparator
 ```
 
-##### Default state
+#### Default state
 `Comparator.input_p` defaults to `in_p::in0` if not specified in the user program.
 
 
@@ -57,12 +62,12 @@ in_n::vref;   // Use the voltage reference w/out DAC (0/1-series only)
 in_n::dacref; // Use DACREF as input (1/2-series only)
 ```
 
-##### Usage
+#### Usage
 ``` c++
-Comparator.input_n = in_n::in0;  // Connect negative input pin 0 to the negative pin of the comparator
+Comparator.input_n = in_n::vref;  // Connect voltage referemceto the negative input of the comparator
 ```
 
-##### Default state
+#### Default state
 `Comparator.input_n` defaults to `in_n::in0` if not specified in the user program.
 
 
@@ -90,32 +95,32 @@ ref::vref_4v096; // 4.1V internal reference
 ref::vref_vdd;   // VDD as reference
 ```
 
-##### Usage
+#### Usage
 ``` c++
 Comparator.reference = ref::vref_4v096;  // Use the internal 4.096V reference for the DACREF
 ```
 
-##### Default state
+#### Default state
 `Comparator.reference` defaults to `ref::disable` if not specified in the user program.
 
 
 ### dacref (not available on 0-series parts)
-Property for setting the DACREF value - this voltage can be selected as the input for the negative side of the comparator. On 1-series devices, AC0 uses the same DAC for this as is used to generate analog output on PA6! That means that calling Comparator0.init() with dacref set will change the voltage on that pin if you have previously set it to output an analog voltage, and that analogWrite() on that pin will change the reference voltage being used by the comparator. It is advised that users not use the dacref option with AC0 if they are also using the DAC output (though it could be useful during debugging to be able to measure the voltage on that pin and know exactly what voltage the comparator is comparing too)
+Property for setting the DACREF value - this voltage can be selected as the input for the negative side of the comparator. **On 1-series devices, AC0 uses the same DAC for this as is used to generate analog output on PA6!** That means that calling Comparator0.init() with dacref set will change the voltage on that pin if you have previously set it to output an analog voltage, and that analogWrite() on that pin will change the reference voltage being used by the comparator. It is advised that users not use the dacref option with AC0 if they are also using the DAC output (though it could be useful during debugging to be able to measure the voltage on that pin and know exactly what voltage the comparator is comparing to)
 This is the formula for the DACREF output voltage:
 
 <img src="http://latex.codecogs.com/svg.latex?V_{DACREF} = \frac{Comparator.dacref}{256} * Comparator.reference" border="0"/>
 
-##### Usage
+#### Usage
 ``` c++
-Comparator.dacref = 127;  // Divide the reference voltage by two
+Comparator.dacref = 127;  // the DACREF input will by a a voltage one half of the selected reference voltage.
 ```
 
-##### Default state
+#### Default state
 `Comparator.dacref` defaults to `255` if not specified in the user program.
 
 
 ### hysteresis
-Property for setting the comparator input hysteresis. Useful for eliminating "bouncing" - multiple spurious transitions as a slowly changing input with some noise (which is hard to eliminate) passes the constant voltage, or when the two voltages are nearly the same.
+Property for setting the comparator input hysteresis. Useful for eliminating "bouncing" - multiple spurious transitions as a slowly changing input with some noise (which is hard to eliminate) passes the constant voltage, or even in the steady state with equal or nearly equal voltages.
 Accepted values:
 ``` c++
 hyst::disable; // No hysteresis
@@ -124,17 +129,17 @@ hyst::medium;  // 25mV hysteresis (±12.5mV)
 hyst::large;   // 50mV hysteresis (±25mV)
 ```
 
-##### Usage
+#### Usage
 ``` c++
-Comparator.hysteresis = hyst::large;  // Use 50V hysteresis
+Comparator.hysteresis = hyst::large;  // Use 50mV hysteresis
 ```
 
-##### Default state
+#### Default state
 `Comparator.hysteresis` defaults to `hyst::disable` if not specified in the user program.
 
 
 ### output
-Variable for setting the comparator output - either internal or external, inverted or not (note also that the pin itself could be inverted with the INVEN bit of PORTA.PIN7CTRL (or PORTC.PIN6CTRL if alternate output pin is used; this allows the pin to take a logical state opposite from tne internal (event channel) output, thus allowing every possible combination of external and internal output polarities.
+Property for setting the comparator output - either internal or external, inverted or not (note also that the pin itself could be inverted with the INVEN bit of PORTA.PIN7CTRL (or PORTC.PIN6CTRL if alternate output pin is used; this allows the pin to take a logical state opposite from tne internal (event channel) output, thus allowing every possible combination of external and internal output polarities.
 Accepted values:
 ``` c++
 out::disable;        // No output pin, signal not inverted internally
@@ -143,22 +148,22 @@ out::enable;         // Enable output pin (PA7), signal not inverted internally
 out::invert;         // Enable output pin (PA7), signal inverted internally
 out::enable_invert;  // Identical to out::invert
 ```
-| AC# | AC0 | AC1 | AC2 |
-|-----|-----|-----|-----|
-| PIN | PA5 | PB3 | PB2 |
+| AC# | AC0 | AC1 | AC2 | AC0 on 8-pin parts |
+|-----|-----|-----|-----|--------------------|
+| PIN | PA5 | PB3 | PB2 |         PA5        |
 
 
-##### Usage
+#### Usage
 ``` c++
 Comparator.output = out::enable; // Enable output comparator's output pin. Comparator is AC0, so this is PA5.
 ```
 
-##### Default state
+#### Default state
 `Comparator.output` defaults to `out::disable` if not specified in the user program.
 
 
 ### output_swap
-The output_swap option is not available on tinyAVR devices; each comparator can only output to a single pin.
+The output_swap option is not available on tinyAVR devices; each comparator can only output to a single pin. On some parts, there are multiple output pin options (don't be too jealous - all three of their comparators to choose betweeen the same 2 pins. Which are also the pins that the ZCD's use.)
 
 ### output_initval
 Initial state the comparator output pin has when initialized.
@@ -168,35 +173,46 @@ out::init_low;  // Output pin low after initialization
 out::init_high; // Output pin high after initialization
 ```
 
-##### Usage
+#### Usage
 ```c++
 Comparator.output_initval = out::init_high;
 ```
 
-##### Default state
+#### Default state
 `Comparator.output_initval` defaults to `out::init_low` if not specified in the user program.
 
+## Methods of Comparator
+Also known as "member functions" in C++ parlance.
 
-## init()
-Method for initializing the comparator. This copies the properties described above into the hardware registers for the comparators (until this method is called, the hardware registers are untouched). Note that if you change settings, you must call init() to apply these changes (unlike some peripherals, you do not need to disable the peripheral to do that). In accordance with the manufacturer recommendations, init() also disables the digital input buffers on the pins used as inputs.
+### init()
+Method for initializing the comparator. This copies the properties described above into the hardware registers for the comparators (until this method is called, the hardware registers are untouched). Note that if you change settings, you must call init() to apply these changes (unlike some peripherals, you do not need to disable the peripheral to do that). *In accordance with the manufacturer recommendations, init() also disables the digital input buffers on the pins used as inputs.*
 
-##### Usage
+#### Usage
 ```c++
 Comparator.init(); // Initialize comparator
 ```
 
-## start()
-Method for starting the analog comparator - you would normally call this after init() when setting up the comparator, or after you stopped it, and then wish to restart it (if you haven't called init() in the interim, it will be started with the previous settings).
-##### Usage
+### start()
+Method to actually start the analog comparator (the init() method configures it, start() turns it on) - you would normally call this after init() when setting up the comparator, or after you had called it's stop() method and now wish to restart it (if you haven't called init() in the interim, it will be started with the previous settings).
+#### Usage
 ```c++
 Comparator.start(); // Start comparator
 ```
+### read()
+Method to get the current state of the comparator's output as a boolean. This allows you to, among other things, poll the comparators instead of useing them with interrupts.
+
+#### Usage
+```c++
+if (Comparator.read()) {
+  takeSomeAction(); //positive input higher than reference on negative input - take appropriate action to fix it
+}
+```
 
 
-## stop()
+### stop()
 Method for stopping the analog comparator; this clears only the enable bit, everything else is left in place. Optionally instead call `stop(true)` to also re-enable digital input on the pins used. This is only necessary if you plan to call digitalRead() on them after disabling the analog comparator (which seems an uncommon use case if they have an analog voltage connected to them!), and costs about 100 bytes of flash on a 1-series part (less on 0-series)
 
-##### Usage
+#### Usage
 ```c++
 Comparator.stop(); // Stop comparator, digitalRead() on the pins it used as inputs remains disabled.
 
@@ -204,11 +220,11 @@ Comparator.stop(true); //Stop comparator, digitalRead() on pins it used as input
 ```
 
 
-## attachInterrupt()
+### attachInterrupt()
 Method for enabling analog comparator interrupt. The interrupt will trigger when the the comparator output changes.
 Valid arguments for the third parameters are `RISING`, `FALLING` and `CHANGE`. Clearing of the INTFLAG is handled by the library, and does not need to be done in your interrupt code.
 
-##### Usage
+#### Usage
 ```c++
 Comparator.attachInterrupt(blinkLED, RISING); // Run the blinkLED function when the comparator output goes high
 
@@ -218,10 +234,10 @@ void blinkLED() {
 ```
 
 
-## detachInterrupt()
+### detachInterrupt()
 Method for disabling analog comparator interrupt.
 
-##### Usage
+#### Usage
 ```c++
 Comparator.detachInterrupt(); // Disable interrupt
 ```
