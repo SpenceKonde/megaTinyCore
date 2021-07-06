@@ -149,7 +149,7 @@ class Programmer:
             memory_info = self.device_memory_info.memory_info_by_name(memory_name)
         self.device_model.erase(memory_info=memory_info, address=address)
 
-    def write_memory(self, data, memory_name, offset=0, blocksize=0):
+    def write_memory(self, data, memory_name, offset=0, blocksize=0, pagewrite_delay=0):
         """
         Write memory on the device
 
@@ -185,13 +185,13 @@ class Programmer:
         # Write the data to NVM
         self.logger.info("Writing %d bytes of data to %s...", len(data), memory[DeviceMemoryInfoKeys.NAME])
         if blocksize == 0:
-            self.device_model.write(memory, offset, data)
+            self.device_model.write(memory, offset, data, pagewrite_delay=pagewrite_delay)
         else:
-            self.device_model.write(memory, offset, data, blocksize=blocksize)
+            self.device_model.write(memory, offset, data, blocksize=blocksize, pagewrite_delay=pagewrite_delay)
         self.logger.info("Write complete.")
         return True
 
-    def verify_memory(self, data, memory_name, offset=0):
+    def verify_memory(self, data, memory_name, offset=0, max_read_chunk=None):
         """
         Verify memory content
 
@@ -205,7 +205,7 @@ class Programmer:
         verify_mask = memory[DeviceMemoryInfoKeys.VERIFY_MASK]
 
         # Read back and compare the data to verify
-        data_verify = self.read_memory(memory_name, offset, len(data))[0].data
+        data_verify = self.read_memory(memory_name, offset, len(data), max_read_chunk=max_read_chunk)[0].data
 
         self.logger.info("Verifying...")
         try:
@@ -216,7 +216,7 @@ class Programmer:
             return False
         return True
 
-    def read_memory(self, memory_name, offset, numbytes=0):
+    def read_memory(self, memory_name, offset, numbytes=0, max_read_chunk=None):
         """
         Read device memory
 
@@ -287,7 +287,7 @@ class Programmer:
 
             # Read the data
             self.logger.info("Reading %d bytes from %s...", numbytes_adjusted, meminfo[DeviceMemoryInfoKeys.NAME])
-            data = self.device_model.read(meminfo, offset_adjusted, numbytes_adjusted)
+            data = self.device_model.read(meminfo, offset_adjusted, numbytes_adjusted, max_read_chunk=max_read_chunk)
 
             # Strip the extra data that was read
             memory_read_tuple.data = data[page_offset:numbytes_adjusted - extra]

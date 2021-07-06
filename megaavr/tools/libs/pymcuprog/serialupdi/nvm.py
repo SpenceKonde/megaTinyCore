@@ -108,13 +108,13 @@ class NvmUpdiTinyMega(NvmUpdi):
 
         return True
 
-    def write_flash(self, address, data, blocksize=2, bulkwrite=0):
+    def write_flash(self, address, data, blocksize=2, bulkwrite=0, pagewrite_delay=0):
         """
         Writes data to flash (v0)
         :param address: address to write to
         :param data: data to write
         """
-        return self.write_nvm(address, data, use_word_access=True, blocksize=blocksize,  bulkwrite=bulkwrite)
+        return self.write_nvm(address, data, use_word_access=True, blocksize=blocksize,  bulkwrite=bulkwrite, pagewrite_delay=pagewrite_delay)
 
     def write_eeprom(self, address, data):
         """
@@ -153,7 +153,7 @@ class NvmUpdiTinyMega(NvmUpdi):
             raise PymcuprogError("Timeout waiting for flash ready before page buffer clear ")
 
     def write_nvm(self, address, data, use_word_access, nvmcommand=constants.UPDI_V0_NVMCTRL_CTRLA_WRITE_PAGE,
-                  blocksize=2,  bulkwrite=0):
+                  blocksize=2,  bulkwrite=0, pagewrite_delay=0):
         """
         Writes a page of data to NVM (v0)
 
@@ -167,6 +167,7 @@ class NvmUpdiTinyMega(NvmUpdi):
         :param bulkwrite: Passed down from nvmserialupdi 0 = normal or single write.
             1 means it's part of writing the whole flash.
             In that case we only st ptr if address = 0.
+        :param pagewrite_delay: (ms) delay before pagewrite
 
         """
 
@@ -196,12 +197,14 @@ class NvmUpdiTinyMega(NvmUpdi):
         self.logger.debug("Committing data")
 
         self.execute_nvm_command(nvmcommand)
-        sleep(0.001)
+
+        if pagewrite_delay > 0:
+            sleep(pagewrite_delay/1000.0)
         # SACRIFICES SPEED FOR COMPATIBILITY - above line should execute only when --pagepause command line parameter is 1 or more (default 0), so we can adjust it externally
         #  it should sleep for that many milliseconds (the granularity of this is low enough enough that 0.001 vs 0.005 makes no difference in my testing)
         # I couldn't propagate it through this mess, and I really tried, because it is a 2:1 performance hit on CH340 on some parts, which is brutal, but it breaks too many adapters to not have it
         # this should only ever happen for tinyAVR/megaAVR, NEVER Dx-series parts.
-        if not bulkwrite ==1:
+        if not bulkwrite == 1:
             # do a final NVM status check only if not doing a bulk write, or after the last chunk (when bulkwrite = 2)
             # not doing this every page made uploads about 15% faster
             if not self.wait_flash_ready():
@@ -239,14 +242,14 @@ class NvmUpdiAvrDx(NvmUpdi):
 
         return True
 
-    def write_flash(self, address, data, blocksize=2, bulkwrite =0 ):
+    def write_flash(self, address, data, blocksize=2, bulkwrite=0, pagewrite_delay=0):
         """
         Writes data to flash (v1)
         :param address: address to write to
         :param data: data to write
         :return:
         """
-        return self.write_nvm(address, data, use_word_access=True, blocksize=blocksize, bulkwrite=bulkwrite)
+        return self.write_nvm(address, data, use_word_access=True, blocksize=blocksize, bulkwrite=bulkwrite, pagewrite_delay=pagewrite_delay)
 
     def write_eeprom(self, address, data):
         """
@@ -284,7 +287,7 @@ class NvmUpdiAvrDx(NvmUpdi):
         """
         return self.write_eeprom(address, data)
 
-    def write_nvm(self, address, data, use_word_access, blocksize=2, bulkwrite=0):
+    def write_nvm(self, address, data, use_word_access, blocksize=2, bulkwrite=0, pagewrite_delay=0):
         """
         Writes data to NVM (version 1)
         This version of the NVM block has no page buffer, so words are written directly.

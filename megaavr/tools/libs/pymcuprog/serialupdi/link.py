@@ -6,7 +6,6 @@ from logging import getLogger
 from pymcuprog.pymcuprog_errors import PymcuprogError
 from . import constants
 
-
 class UpdiDatalink:
     """
     UPDI data link class handles the UPDI data protocol within the device
@@ -166,7 +165,7 @@ class UpdiDatalink:
         """
         Store a 16-bit word value to the pointer location with pointer post-increment
         :param data: data to store
-        :blocksize: max number of bytes being sent -1 for all.
+        :blocksize: max number of bytes being sent, None for all.
                     Warning: This does not strictly honor blocksize for values < 6
                     We always glob together the STCS(RSD) and REP commands.
                     But this should pose no problems for compatibility, because your serial adapter can't deal with 6b chunks,
@@ -178,7 +177,7 @@ class UpdiDatalink:
         repnumber= ((len(data) >> 1) -1)
         data = [*data, *[constants.UPDI_PHY_SYNC, constants.UPDI_STCS | constants.UPDI_CS_CTRLA, 0x06]]
 
-        if blocksize == -1 :
+        if blocksize is None:
             # Send whole thing at once stcs + repeat + st + (data + stcs)
             blocksize = 3 + 3 + 2 + len(data)
         num = 0
@@ -195,11 +194,44 @@ class UpdiDatalink:
                             *[constants.UPDI_PHY_SYNC, constants.UPDI_ST | constants.UPDI_PTR_INC | constants.UPDI_DATA_16],
                             *data[:blocksize - 8]]
             num = blocksize - 8
+            if len(firstpacket) == 64 and blocksize != 64:
+                firstpacket = firstpacket[:32]
+                num = 32-8
+                # workaround bug in D11C as serial adapter compiled with the USB implementation used in the mattairtech core;
+                # this chokes on any block of exactly (!!) 64 bytes. Nobody seems to understand the reason for this bizzare issue.
+                # The D11C as serial adapter is important because the fablab at MIT uses them heavilly, and wishes to upload Arduino sketches to tinyAVR 0/1/2-series
+                # and AVR-Dx-series parts with them. It was desirable from their perspective to have an more accessible firmware (like that Arduino one) as opposed
+                # to a pure-C one. Hence, a workaround is implemented to avoid triggering it. Thankfully, 64-byte blocks being written are not as natural as one might
+                # expect for a power-of-two, since we combine the data with the commands on either side.
+                # This workaround will only be invoked under unusual conditions, specifically if one of these is true:
+                #   A. The last page of the hex file has a length of 53 bytes exactly OR
+                #   B. The last page of the hex file has a length modulo the write chunk size, of 53 bytes exactly OR
+                #   C. A write chunk is specified which is exactly 53 bytes shorter than the page OR
+                #   D. The write chunk is specified as 153 when writing to a part with a page size of 512 OR
+                #   E. Situations like D in the event that a future product permits REPEAT with 2 bytes of data to support pages larger than 512b.
+                # Conditions C-E will invoke it on the last chunk of every page; For E, here are 6 cursed numbers for 1024b pages with 2 byte repeats, and 2 for 2048b pages
+                # (in addition to pagelength - 52), however, there is no specific reason to expect such a part will be made. In any event, for those conditions, the
+                # performance impact is on the order of 1-4ms per page, the same as the the penalty for each chunk that a write is divided into, hence the speed penalty of
+                # using that write chunk size will be (1-4ms * ceil(page size/chunk size) + 1 instead of 1-4ms * ceil(page size/chunk size), which is always smaller than the
+                # penalty already being accepted for the write chunking.
+                # Conditions A and B will happen at most once per upload; thus the performance penalty would be acceptable even if they happened frequently. However
+                # avr-gcc rarely, if ever, generates odd size hex files. I was not able to get it to by tweaking the sketch I was compiling, so they will occur on
+                # considerably less than 1/64th of the time, if it is even possible for avr-gcc to generate such a file, which is unclear.
+                # In summary, the performance impact is small but noticable in remote corner cases (where chunk size is chosen randomly, or intentionally in an effort to provoke
+                # this bug, and is negligible (at worst 4 ms for 1 out of 32 uploads, assuming upload size modulo page size are evenly distributed and even ) in unlikely cases
+                # (requiring an odd write chunk size such that B could be provoked from an even-length hex file) as well as -possibly- case A if there is indeed a programming
+                # construct that results in a non-even length hex file. It is (barely) worth noting that for a hypothetical part that used a 2 byte REPEAT argument, this could
+                # be provoked with an even sketch size, and so would impose a penalty of less than 4ms on 1 out of 32 uploads.
+                # In light of the fact write chunking is intended as a workaround for an ill-mannered serial adapter in the first place (ex: HT42 workaround in DxCore), this
+                # performance impact is not a concern.
+                # If a write chunk size of 64 is specified, we will not activate this workaround.
+                # -Spence 6/29/21
         self.updi_phy.send( firstpacket )
-
         # if finite block size, this is used.
         while num < len(data):
             data_slice = data[num:num+blocksize]
+            if len(data_slice) == 64 and blocksize != 64:
+                data_slice=data[num:num+32] # workaround as above.
             self.updi_phy.send(data_slice)
             num += len(data_slice)
 

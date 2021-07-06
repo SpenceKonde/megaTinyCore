@@ -32,12 +32,17 @@ def main():
     parser.add_argument("-b", "--baudrate",
                         type=str,
                         default="115200",
-                        help="baudrate, if applicable, (default: 115200).")
+                        help="Serial baud rate, if applicable, (default: 115200).")
 
-    parser.add_argument("--blocksize",
+    parser.add_argument("-wc", "--write_chunk",
                         type=int,
                         default=-1,
-                        help="Max number of bytes /usb packet. -1 (whole page) is recommended. serialupdi only. (default: -1)")
+                        help="Max number of bytes of serial data to write per usb packet. -1 (whole page) is recommended. (Default: -1 (no write chunking)) Intended as workaround for specific serial adapters. ")
+
+    parser.add_argument("-rc", "--read_chunk",
+                        type=int,
+                        default=-1,
+                        help="Max number of bytes to request from the device at a time when reading or verifying. (Default: -1 (maximum - usually 512b)) Intended as a workaround for specific serial adapters.")
 
     parser.add_argument("-d", "--device",
                         type=str,
@@ -58,20 +63,25 @@ def main():
                         default="",
                         help="Hex file to read/write.")
 
+    parser.add_argument("-wd", "--writedelay",
+                        type=float,
+                        default=0,
+                        help="Page write delay [ms] for tinyAVR and megaAVR. USB latency is usually sufficient without this. (Default: 0 - this severely impacts write performance)")
+
     parser.add_argument("-t", "--tool",
                         type=str,
                         default="uart",
-                        help="Tool name, defaults to 'uart' (serialupdi) mode")
+                        help="Tool name, defaults to 'uart' (SerialUPDI) mode. The other options are neither tested nor maintained.")
 
     parser.add_argument("-u", "--uart",
                         type=str,
                         default="",
-                        help="Uart port to use if tool is uart.")
+                        help="Serial port to use if tool is uart.")
 
     parser.add_argument("-s", "--serialnumber",
                         type=str,
                         default="",
-                        help="Tool USB serial (optional, for non-Serial UPDI programmers only).")
+                        help="Tool USB serial (optional, for non-Serial UPDI programmers only. This feature is neither tested nor maintained.).")
 
     parser.add_argument("-v", "--verbose",
                         action="count",
@@ -138,8 +148,11 @@ def run_pymcu_action(func, backend, *args, **kwargs):
 
 
 def print_report(args):
-    print("Arduino <---> pymcuprog bridge by Quentin Bolsee and Spence Konde")
-    print("Version 1.1.0 - May 2021")
+    print("SerialUPDI")
+    print("UPDI programming for Arduino using a serial adapter")
+    print("Based on pymcuprog, with significant modifications")
+    print("By Quentin Bolsee and Spence Konde")
+    print("Version 1.2.0 - June 2021")
     print("Using serial port {} at {} baud.".format(args.uart, args.baudrate))
     print("Target: {}".format(args.device))
     if args.fuses != "":
@@ -237,20 +250,23 @@ def pymcuprog_basic(args, fuses_dict):
                          literal=None,
                          verify=False,
                          filename=args.filename,
-                         blocksize=args.blocksize)
+                         blocksize=None if args.write_chunk <= 0 else args.write_chunk,
+                         pagewrite_delay=args.writedelay)
 
         run_pymcu_action(pymcu._action_verify, backend,
                          memory=pymcu.MemoryNameAliases.ALL,
                          offset=0,
                          literal=None,
-                         filename=args.filename)
+                         filename=args.filename,
+                         max_read_chunk=None if args.read_chunk <= 0 else args.read_chunk)
 
     elif args.action == "read":
         run_pymcu_action(pymcu._action_read, backend,
                          memory=pymcu.MemoryNames.FLASH,
                          offset=0,
                          bytes=0,
-                         filename=args.filename)
+                         filename=args.filename,
+                         max_read_chunk=None if args.read_chunk <= 0 else args.read_chunk)
     elif args.action == "erase":
         run_pymcu_action(pymcu._action_erase, backend,
                          memory=pymcu.MemoryNameAliases.ALL,

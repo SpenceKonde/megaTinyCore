@@ -198,7 +198,7 @@ def _action_read(backend, args):
         return STATUS_FAILURE
 
     print("Reading...")
-    result = backend.read_memory(args.memory, args.offset, args.bytes)
+    result = backend.read_memory(args.memory, args.offset, args.bytes, args.max_chunk_size)
 
     # If a filename is specified, write to it
     hexfile = False
@@ -264,17 +264,17 @@ def _action_verify(backend, args):
 
     if hexfile:
         print("Verifying...")
-        verify_status = verify_flash_from_hex(args.filename, backend)
+        verify_status = verify_flash_from_hex(args.filename, backend, max_read_chunk=args.max_read_chunk)
         if verify_status is True:
             print("Verify successful. Data in flash matches data in specified hex-file")
     elif binary:
         print("Verifying...")
-        verify_status = verify_flash_from_bin(args.filename, backend, args.offset)
+        verify_status = verify_flash_from_bin(args.filename, backend, args.offset, max_read_chunk=args.max_read_chunk)
         if verify_status is True:
             print("Verify successful. Data in flash matches data in specified bin-file")
     elif literal:
         print("Verifying...")
-        flash_data = backend.read_memory('flash', args.offset, len(args.literal))[0].data
+        flash_data = backend.read_memory('flash', args.offset, len(args.literal), max_read_chunk=args.max_read_chunk)[0].data
         compare(flash_data, args.literal, args.offset)
         print("Verify successful. Data in flash matches literal data specified")
     else:
@@ -337,10 +337,7 @@ def _action_write(backend, args):
 
             print("Writing from hex file...")
 
-            if args.blocksize:
-                _write_memory_segments(backend, result, args.verify, blocksize=args.blocksize)
-            else:
-                _write_memory_segments(backend, result, args.verify)
+            _write_memory_segments(backend, result, args.verify, blocksize=args.blocksize, pagewrite_delay=args.pagewrite_delay)
         else:
             with open(filepath, "rb") as binfile:
                 data_from_file = bytearray(binfile.read())
@@ -369,7 +366,7 @@ def _action_write(backend, args):
     return STATUS_SUCCESS
 
 
-def _write_memory_segments(backend, memory_segments, verify, blocksize = 0):
+def _write_memory_segments(backend, memory_segments, verify, blocksize = 0, pagewrite_delay=0):
     """
     Write content of list of memory segments
 
@@ -384,12 +381,10 @@ def _write_memory_segments(backend, memory_segments, verify, blocksize = 0):
         be used as supplied. Even numbers up to the page size are recommended.
         Any other negative number is invalid, and is zero'ed out.
     """
-    if blocksize < -1:
-        blocksize = 0
     for segment in memory_segments:
         memory_name = segment.memory_info[DeviceMemoryInfoKeys.NAME]
         print("Writing {}...".format(memory_name))
-        backend.write_memory(segment.data, memory_name, segment.offset, blocksize=blocksize)
+        backend.write_memory(segment.data, memory_name, segment.offset, blocksize=blocksize, pagewrite_delay=pagewrite_delay)
         if verify:
             print("Verifying {}...".format(memory_name))
             verify_ok = backend.verify_memory(segment.data, memory_name, segment.offset)

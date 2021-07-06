@@ -97,7 +97,7 @@ class NvmAccessProviderSerial(NvmAccessProvider):
             self.logger.error("Device is locked. Performing unlock with chip erase.\nError: ('%s')", inst)
             self.avr.unlock()
 
-    def write(self, memory_info, offset, data, blocksize=0):
+    def write(self, memory_info, offset, data, blocksize=0, pagewrite_delay=0):
         """
         Write the memory with data
 
@@ -170,22 +170,21 @@ class NvmAccessProviderSerial(NvmAccessProvider):
                     # We are on the last page of a bulk write
                     bulk = 2
                 if blocksize == 0:
-                    self.avr.nvm.write_flash(offset_aligned, chunk, blocksize=2)
-                elif blocksize == -1:
-                    self.avr.nvm.write_flash(offset_aligned, chunk, blocksize=-1, bulkwrite = bulk)
+                    self.avr.nvm.write_flash(offset_aligned, chunk, pagewrite_delay=pagewrite_delay)
                 else:
-                    self.avr.nvm.write_flash(offset_aligned, chunk, blocksize=blocksize, bulkwrite = bulk)
+                    self.avr.nvm.write_flash(offset_aligned, chunk, blocksize=blocksize, bulkwrite = bulk, pagewrite_delay=pagewrite_delay)
             offset_aligned += write_chunk_size
             data_aligned = data_aligned[write_chunk_size:]
             bar.step()
 
-    def read(self, memory_info, offset, numbytes):
+    def read(self, memory_info, offset, numbytes, max_read_chunk=None):
         """
         Read the memory in chunks
 
         :param memory_info: dictionary for the memory as provided by the DeviceMemoryInfo class
         :param offset: relative offset in the memory type
         :param numbytes: number of bytes to read
+        :param max_read_chunk: <=256
         :return: array of bytes read
         """
         offset += memory_info[DeviceMemoryInfoKeys.ADDRESS]
@@ -193,14 +192,20 @@ class NvmAccessProviderSerial(NvmAccessProvider):
         # if reading from flash, we want to read words if it would reduce number of USB serial transactions.
         # this function is called for everything though, so be careful not to use it for memories read one byte at a time, like fuses
         data = []
-        read_chunk_size = 0xB0
+
+        if max_read_chunk is None:
+            read_chunk_size = 0x100
+        else:
+            read_chunk_size = max_read_chunk
+
         use_word_access = False
         memtype_string = memory_info[DeviceMemoryInfoKeys.NAME]
         if memtype_string in (MemoryNames.FLASH):
-            if numbytes >= 0x40:
-                 use_word_access=True
-        #         read_chunk_size=0x200
-        # SACRIFICES SPEED FOR COMPATIBILITY - above line should happen whenever --limitreads=1  command line parameter is not passed, so we cam turn it off in turbo mode.. I couldn't propagate it through this mess!
+            if numbytes > 0x100 and max_read_chunk is None:
+                use_word_access = True
+                read_chunk_size = 0x200
+
+        # SACRIFICES SPEED FOR COMPATIBILITY - above line should happen whenever --limitreadsize=1  command line parameter is not passed, so we can only turn it on for specific tools -> programmer options that have this weird limitation. I couldn't propagate it through this mess!
         n_chunk = math.ceil(numbytes/read_chunk_size)
         bar = progress_bar.ProgressBar(n_chunk, hide=n_chunk == 1)
 

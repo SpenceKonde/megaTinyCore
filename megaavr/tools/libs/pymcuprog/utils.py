@@ -255,7 +255,7 @@ def enum(**enums):
     return type('Enum', (), enums)
 
 
-def verify_flash_from_bin(bin_filename, backend, offset=0):
+def verify_flash_from_bin(bin_filename, backend, offset=0, max_read_chunk=None):
     """
     Verify the contents of flash against a bin-file
 
@@ -269,7 +269,7 @@ def verify_flash_from_bin(bin_filename, backend, offset=0):
     for line in bin_file.readlines():
         bin_data.extend(line)
 
-    verify_status = backend.verify_memory(bin_data, 'flash', offset)
+    verify_status = backend.verify_memory(bin_data, 'flash', offset, max_read_chunk=max_read_chunk)
     if verify_status is False:
         return False
     return True

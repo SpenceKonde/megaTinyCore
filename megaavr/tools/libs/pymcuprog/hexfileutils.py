@@ -100,7 +100,7 @@ def read_memories_from_hex(filename, device_memory_info):
     return memory_segments
 
 
-def verify_flash_from_hex(hex_filename, backend):
+def verify_flash_from_hex(hex_filename, backend, max_read_chunk=None):
     """
     Verify the contents of flash against a hex-file
 
@@ -117,7 +117,7 @@ def verify_flash_from_hex(hex_filename, backend):
         for j in range(segments[i][1]-segments[i][0]):
             segment_data.append(hexfile[segments[i][0]+j])
 
-        verify_status = backend.verify_memory(segment_data, 'flash', segments[i][0])
+        verify_status = backend.verify_memory(segment_data, 'flash', segments[i][0], max_read_chunk=max_read_chunk)
         if verify_status is False:
             return False
     return True
