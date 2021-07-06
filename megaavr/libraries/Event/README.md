@@ -7,14 +7,14 @@ Developed by [MCUdude](https://github.com/MCUdude/).
 
 More information about the Event system and how it works can be found in the [Microchip Application Note AN2451](http://ww1.microchip.com/downloads/en/AppNotes/DS00002451B.pdf) and in the [megaAVR-0 family data sheet](http://ww1.microchip.com/downloads/en/DeviceDoc/megaAVR0-series-Family-Data-Sheet-DS40002015B.pdf).
 
-### Level vs. Pulse events
-There are two types of events - a "pulse" interrupt, which lasts for the duration of a single clock cycle (either `CLK_PER` or a relevant (slower) clock - for example, the USART XCK generator provides a pulse event which lasts one XCK period, whuich is far slower than CLK_PER), or a "level" interrupt which lasts for the duration of some condition. Often for a given even generator or user only one or the other makes sense. Less often, for some reason or another, you may need a level event, but all you have is a pulse event - or the other way around. A[CCL module (Logic.h)](../Logic/README.md) event between the two at the cost of the logic module and one event channel. In the case of timer WO (PWM) channels, the CCL already has level inputs to match the pulse inputs that the event system can get on compare match. Many of the pulse interrupts are generated at the same moment that interrupt flags get set - except that where an interrupt bit sticks around until serviced, the pulse bit is present generally for only a single clock cycle (meaning they are only *usable* for triggering other event system things or peripherals. s can be (they often let you do similar things faster with less CPU involvement, too), but unlike interrupts, they won't stick around until you explicitly clear them
+## Level vs. Pulse events
+There are two types of events - a "pulse" interrupt, which lasts for the duration of a single clock cycle (either `CLK_PER` or a relevant (slower) clock - for example, the USART XCK generator provides a pulse event which lasts one XCK period, whuich is far slower than CLK_PER)q1                                                                                                               , or a "level" interrupt which lasts for the duration of some condition. Often for a given even generator or user only one or the other makes sense. Less often, for some reason or another, you may need a level event, but all you have is a pulse event - or the other way around. A[CCL module (Logic.h)](../Logic/README.md) event between the two at the cost of the logic module and one event channel. In the case of timer WO (PWM) channels, the CCL already has level inputs to match the pulse inputs that the event system can get on compare match. Many of the pulse interrupts are generated at the same moment that interrupt flags get set - except that where an interrupt bit sticks around until serviced, the pulse bit is present generally for only a single clock cycle (meaning they are only *usable* for triggering other event system things or peripherals. s can be (they often let you do similar things faster with less CPU involvement, too), but unlike interrupts, they won't stick around until you explicitly clear them
 
 
-### Synchronization
+## Synchronization
 The 0/1-series are weird here - read the 2-series section first.
 
-#### 2-series
+### 2-series
 The event system, under the hood, is asynchronous - it can react faster than the system clock (often a lot faster). On the 2-series, these work like the Dx-series and presumably future releases will. Per the datasheet for the 2-series:
 
 >Events can be either synchronous or asynchronous to the peripheral clock. Each Event System channel has two subchannels: one asynchronous and one synchronous.
@@ -26,76 +26,39 @@ The event system, under the hood, is asynchronous - it can react faster than the
 
 The fact that it is asynchronous usually doesn't matter - it's either "faster than anything else" (if the user is async), or "2-3 clock cycles behind", but it is one of the things one should keep in mind when using these features, because every so often it does.
 
-#### 0/1-series
-So... there are no hidden subchannels here There are two channels with synchronizers and 4 without. Two of the peripherals care: USART0 and TCA0 can only use the sync channels. Everything else can use async or sync channels.
+### 0/1-series
+Unlike the 2-series, where sync vs async is handled transparently, there are no hidden subchannels here. There are two channels with synchronizers and 4 without. Two of the peripherals care: USART0 and TCA0 can only use the sync channels. Everything else can use either kind. The layout of channels is also totally different.
 
-### Some of these events seem kinda... weird?
-At first glance, more than half of the users and generators seem, at best, odd - and a good few of them might appear entirely useless. *That was certainly my first impression! -Spence* Most of the event system can only truly be understood when considering the full range of generators and users - including the CCL and it's inputs. One of the tragedies of a datasheet is that it - generally - lacks a "why". Behind every mysterious event generator or user, and every crazy register option, there is a use case - maybe an obscure one - for which that functionality is a big deal.
-
-### How do I read the levels of the event channels?
-From your code? As far as I can tell, short of piping them to a pin and reading that, you don't (and no, I really don't understand why they couldn't have tied those synchronizers that connect the internal async channels to the sync ones to the bits of a register - but I'm not Microchip engineeer).
-
-## Event
-Class for interfacing with the Event systemn (`EVSYS`). Each event channel has its own object.
-Use the predefined objects `Event0`, `Event1`, `Event2`, `Event3`, `Event4`, `Event5`. These, alternately, are known as `EventSync0`, `EventSync1`, `EventAsync0`, `EventAsync1`, `EventAsync2`, `EventAsync3` on the tinyAVR 0-series and 1-series. Note that not all generators are available on all channels, so make sure you use the right channel for the task. When you need to pick a channel on the 2-series, when in doubt, use the highest numbered channel.
-
-## get_channel_number()
-Function to get the current channel number. Useful if the channel object has been passed to a function as reference.
-
-### Usage
-``` c++
-uint8_t this_channel = Event0.get_channel_number();  // In this case, get_channel_number will return 0
-```
-
-## get_user_channel()
-Function to get what event channel a user is connected to. Returns -1 if not connected to any channel. Note that we use `user::` as prefix when we refer to event users. Also, note that we don't have to specify an object to determine what channel the user is connected to.
-An event generator can have multiple event users, but an event user can only have one event generator.
-
-### Usage
-```c++
-uint8_t connected_to = Event::get_user_channel(user::ccl0_event_a); // Returns the channel number ccl0_event_a is connected to
-```
-
-
-## set_generator()
-Function to assign an event generator to a channel. Note that we use the prefix genN:: (where N is the channel number) when referring to generators unique to this particular channel. we use gen:: when referring to generators available on all generators.
-
-### Usage
-```c++
-Event0.set_generator(gen::ccl0_out); // Use the output of logic block 0 (CCL0) as an event generator for Event0
-Event2.set_generator(gen2::pin_pc0); // Use pin PC0 as an event generator for Event2
-```
-
-### Generator table
+## Generator table
 Below is a table with all possible generators for each channel. The event system on the 0/1-series and on the 2-series is very different in this regard
 The generators associated with pins are only available on parts that have that pin, and those associated with a peripheral. Similarly are only defined where that peripheral exists. .
 
-#### 0-series and 1-series
+### 0-series and 1-series
 Yes, this is a terribly messy setup compared to the 2-series (and every other product line with an event system - this was the first, and they realized their mistake - albeit too late for these). There are two kinds of generators, synchronous and asynchronous. Synchronous users (TCA0, USART0) can only use synchronous generators, while async. users can use any generator. The synchronization or lack thereof is w/regards to `CLK_PER`Note that in cases where the same generator is listed for multiple channels, but prefixed with gen followed by a number, they are NOT interchangible. `gen4::ac1_out` is not the same as `gen2::ac2_out`... the values are all over the place.
 
 Only the 1-series parts have Event1 (Sync channel 1), Event4, and Event5;
 
-Many parts with lower pincount do not have any options specific to a channel available.
+Many parts with lower pincount do not have any options specific to a channel available. Level events are marked with an `L` on this chart; all others are pulses, `P` indicates a "pulse" event, but one of a non-
 
-| Sync. Event (Event0,1)  | Event0 (EventSync0)      | Event1 (EventSync1)     | Async. Event (Event2-5) |   Event2 (EventAsync0)  |  Event3 (EventAsync1)   |  Event4 (EventAsync2)   |  Event5 (EventAsync3)   |
-|-------------------------|--------------------------|-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
-| `gens::disable`         | `gen0::disable`          | `gen1::disable`         | `gen::disable`          | `gen2::disable`         | `gen3::disable`         | `gen4::disable`         | `gen5::disable`         |
-| `gens::tcb0_capt`       | `gen0::pin_pc0`          | `gen1::pin_pb0`         | `gen::ccl_lut0`         | `gen2::pin_pa0`         | `gen3::pin_pb0`         | `gen4::pin_pc0`         | `gen5::rtc_div8192`     |
-| `gens::tca0_ovf_lunf`   | `gen0::pin_pc1`          | `gen1::pin_pb1`         | `gen::ccl_lut1`         | `gen2::pin_pa1`         | `gen3::pin_pb1`         | `gen4::pin_pc1`         | `gen5::rtc_div4096`     |
-| `gens::tca0_hunf`       | `gen0::pin_pc2`          | `gen1::pin_pb2`         | `gen::ac0_out`          | `gen2::pin_pa2`         | `gen3::pin_pb2`         | `gen4::pin_pc2`         | `gen5::rtc_div2048`     |
-| `gens::tca0_cmp0`       | `gen0::pin_pc3`          | `gen1::pin_pb3`         | `gen::tcd0_cmpbclr`     | `gen2::pin_pa3`         | `gen3::pin_pb3`         | `gen4::pin_pc3`         | `gen5::rtc_div1024`     |
-| `gens::tca0_cmp1`       | `gen0::pin_pc4`          | `gen1::pin_pb4`         | `gen::tcd0_cmpaset`     | `gen2::pin_pa4`         | `gen3::pin_pb4`         | `gen4::pin_pc4`         | `gen5::rtc_div512`      |
-| `gens::tca0_cmp2`       | `gen0::pin_pc5`          | `gen1::pin_pb5`         | `gen::tcd0_cmpbset`     | `gen2::pin_pa5`         | `gen3::pin_pb5`         | `gen4::pin_pc5`         | `gen5::rtc_div256`      |
-|                         | `gen0::pin_pa0`          | `gen1::pin_pb6`         | `gen::tcd0_progev`      | `gen2::pin_pa6`         | `gen3::pin_pb6`         | `gen4::ac1_out`         | `gen5::rtc_div128`      |
-|                         | `gen0::pin_pa1`          | `gen1::pin_pb7`         | `gen::rtc_ovf`          | `gen2::pin_pa7`         | `gen3::pin_pb7`         | `gen4::ac2_out`         | `gen5::rtc_div64`       |
-|                         | `gen0::pin_pa2`          | `gen1::tcb1_capt`       | `gen::rtc_cmp`          | `gen2::updi`            | `gen3::ac1_out`         |                         | `gen5::ac1_out`         |
-|                         | `gen0::pin_pa3`          |                         |                         | `gen2::ac1_out`         | `gen3::ac2_out`         |                         | `gen5::ac2_out`         |
-|                         | `gen0::pin_pa4`          |                         |                         | `gen2::ac2_out`         |                         |                         |                         |
-|                         | `gen0::pin_pa5`          |                         |                         |                         |                         |                         |                         |
-|                         | `gen0::pin_pa6`          |                         |                         |                         |                         |                         |                         |
-|                         | `gen0::pin_pa7`          |                         |                         |                         |                         |                         |                         |
-|                         | `gen0::pin_pa2`          |                         |                         |                         |                         |                         |                         |
-|                         | `gen0::tcb1_capt`        |                         |                         |                         |                         |                         |                         |
+| All Sync. (Event0 & Event1)| Event0 (EventSync0)      | Event1 (EventSync1)     | All Async. (Event2-5)   |   Event2 (EventAsync0)  |  Event3 (EventAsync1)   |  Event4 (EventAsync2)   |  Event5 (EventAsync3)   |
+|----------------------------|--------------------------|-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
+| `gens::disable`            | `gen0::disable`          | `gen1::disable`         | `gen::disable`          | `gen2::pin_pa0` L       | `gen3::pin_pb0` L       | `gen4::pin_pc0`         | `gen5::rtc_div8192`     |
+| `gens::tcb0_capt`          | `gen0::pin_pc0`          | `gen1::pin_pb0`         | `gen::ccl_lut0`         | `gen2::pin_pa1` L       | `gen3::pin_pb1` L       | `gen4::pin_pc1`         | `gen5::rtc_div4096`     |
+| `gens::tca0_ovf_lunf`      | `gen0::pin_pc1`          | `gen1::pin_pb1`         | `gen::ccl_lut1`         | `gen2::pin_pa2` L       | `gen3::pin_pb2` L       | `gen4::pin_pc2`         | `gen5::rtc_div2048`     |
+| `gens::tca0_hunf`          | `gen0::pin_pc2`          | `gen1::pin_pb2`         | `gen::ac0_out`          |
+| `gens::tca0_cmp0`          | `gen0::pin_pc3`          | `gen1::pin_pb3`         | `gen::tcd0_cmpbclr`     |
+| `gens::tca0_cmp1`          | `gen0::pin_pc4`          | `gen1::pin_pb4`         | `gen::tcd0_cmpaset`     | `gen2::pin_pa4` L       | `gen3::pin_pb4` L       | `gen4::pin_pc4`         | `gen5::rtc_div512`      |
+| `gens::tca0_cmp2`          | `gen0::pin_pc5`          | `gen1::pin_pb5`         | `gen::tcd0_cmpbset`     | `gen2::pin_pa5` L       | `gen3::pin_pb5` L       | `gen4::pin_pc5`         | `gen5::rtc_div256`      |
+|                            | `gen0::pin_pa0`          | `gen1::pin_pb6`         | `gen::tcd0_progev`      | `gen2::pin_pa6` L       | `gen3::pin_pb6` L       | `gen4::ac1_out`         | `gen5::rtc_div128`      |
+|                            | `gen0::pin_pa1`          | `gen1::pin_pb7`         | `gen::rtc_ovf` P        | `gen2::pin_pa7` L       | `gen3::pin_pb7` L       | `gen4::ac2_out`         | `gen5::rtc_div64`       |
+|                            | `gen0::pin_pa2`          | `gen1::tcb1_capt`       | `gen::rtc_cmp` P        | `gen2::updi`    L       | `gen3::ac1_out` L       |                         | `gen5::ac1_out`         |
+|                            | `gen0::pin_pa3`          |                         |                         | `gen2::ac1_out` L       | `gen3::ac2_out` L       |                         | `gen5::ac2_out`         |
+|                            | `gen0::pin_pa4`          |                         |                         | `gen2::ac2_out` L       |                         |                         |                         |
+|                            | `gen0::pin_pa5`          |                         |                         |                         |                         |                         |                         |
+|                            | `gen0::pin_pa6`          |                         |                         |                         |                         |                         |                         |
+|                            | `gen0::pin_pa7`          |                         |                         |                         |                         |                         |                         |
+|                            | `gen0::pin_pa2`          |                         |                         |                         |                         |                         |                         |
+|                            | `gen0::tcb1_capt`        |                         |                         |                         |                         |                         |                         |
 
 
 #### 2-series
@@ -130,6 +93,40 @@ On the 2-series parts, they put synchronizer onto each channel, making it into t
 | `gen::tcb1_ovf`          |                         |                         |                         |                         |                         |                         |
 
 
+
+## Classes
+
+### Event class
+Class for interfacing with the Event systemn (`EVSYS`). Each event channel has its own object.
+Use the predefined objects `Event0`, `Event1`, `Event2`, `Event3`, `Event4`, `Event5`. These, alternately, are known as `EventSync0`, `EventSync1`, `EventAsync0`, `EventAsync1`, `EventAsync2`, `EventAsync3` on the tinyAVR 0-series and 1-series. Note that not all generators are available on all channels, so make sure you use the right channel for the task.
+
+#### get_channel_number()
+Function to get the current channel number. Useful if the channel object has been passed to a function as reference.
+
+##### Usage
+``` c++
+uint8_t what_channel(Event& event_chan) {
+  event_chan.get_channel_number();
+}
+```
+
+#### get_user_channel()
+Function to get what event channel a user is connected to. Returns -1 if not connected to any channel. Note that we use `user::` as prefix when we refer to event users. This is a static method - you don't have to specify an object to determine what channel the user is connected to. An event channel, and hence an event generator, can have as many event users are you want - but an event user can only have one event generator. You cannot get a list or count of all users connected to a generator except by iterating over the list.
+
+##### Usage
+```c++
+uint8_t connected_to = Event::get_user_channel(user::ccl0_event_a); // Returns the channel number ccl0_event_a is connected to
+```
+
+
+#### set_generator()
+Function to assign an event generator to a channel. Note that we use the prefix genN:: (where N is the channel number) when referring to generators unique to this particular channel. we use gen:: when referring to generators available on all generators.
+
+##### Usage
+```c++
+Event0.set_generator(gen::ccl0_out); // Use the output of logic block 0 (CCL0) as an event generator for Event0
+Event2.set_generator(gen2::pin_pc0); // Use pin PC0 as an event generator for Event2
+```
 
 ## get_generator()
 Function to get the generator used for a particular channel.
