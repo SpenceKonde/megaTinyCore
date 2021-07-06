@@ -167,8 +167,6 @@ extern "C" {
 // Returned by analogClockSpeed if the value in the register is currently unknown, or if an invalid frequency is requested.
 
 
-
-
 #if (!defined(TCB_CLKSEL2_bm))
   // This means it's a tinyAVR 0/1-series, or a megaAVR 0-series.
   // Their TCB_CLKSEL enums use different names for the clock settings, for reasons unclear.
@@ -188,20 +186,14 @@ extern "C" {
 // NON-STANDARD API
 
 
-void init_ADC0(void);
-void init_ADC1(void);
-void init_clock(void);
-void init_millis();
-void stop_millis();
-void restart_millis();
-void set_millis(uint32_t newmillis);
-void init_timers();
-void init_TCA0();
-void init_TCD0();
-int32_t analogReadEnh( uint8_t pin,              uint8_t res, uint8_t gain);
-int32_t analogReadDiff(uint8_t pos, uint8_t neg, uint8_t res, uint8_t gain);
-int16_t analogClockSpeed(int16_t frequency, uint8_t options);
-void ADCPowerOptions(uint8_t options); /* 2-series only */
+void init_ADC0(void); /* Called by init() after clock is set */
+void init_ADC1(void); /* Called by init() on parts with ADC1 */
+void init_clock(void);/* called by init() first  */
+void init_millis();   /* called by init() last   */
+void init_timers();   /* called by init()        */
+void init_TCA0();     /* called by init_timers() */
+void init_TCD0();     /* called by init_timers() */
+
 // Peripheral takeover
 // These will remove things controlled by
 // these timers from analogWrite()/turnOffPWM()
@@ -209,8 +201,39 @@ void ADCPowerOptions(uint8_t options); /* 2-series only */
 void takeOverTCA0();
 void takeOverTCD0();
 
+// millis() timer control
+void stop_millis();                   // Disable the interrupt and stop counting millis.
+void restart_millis();                // Reinitialize the timer and start counting millis again
+void set_millis(uint32_t newmillis);  // set current millis time.
+/* Expected usage:
+ * uint32_t oldmillis=millis();
+ * stop_millis();
+ * user_code_that_messes with timer
+ * set_millis(oldmillis+estimated_time_spent_above)
+ * restart millis();
+ *
+ * Also, this might at times be appropriate
+ * set_millis(millis() + known_offset); //after doing something that we know will block too long for millis to keep time
+ */
 
 
+// DIGITAL I/O EXTENDED FUNCTIONS
+// Covered in documentation.
+int32_t     analogReadEnh(        uint8_t pin, /* no neg */ uint8_t res, uint8_t gain);
+int32_t     analogReadDiff(       uint8_t pos, uint8_t neg, uint8_t res, uint8_t gain);
+int16_t     analogClockSpeed(     int16_t frequency,        uint8_t options);
+bool        analogSampleDuration( uint8_t dur);
+void        DACReference(         uint8_t mode);
+void        ADCPowerOptions(      uint8_t options); /* 2-series only */
+
+// DIGITAL I/O EXTENDED FUNCTIONS
+// Covered in documentation.
+void           openDrain(uint8_t pinNumber,   uint8_t val);
+int8_t   digitalReadFast(uint8_t pinNumber               );
+void    digitalWriteFast(uint8_t pinNumber,   uint8_t val);
+void       openDrainFast(uint8_t pinNumber,   uint8_t val);
+void        pinConfigure(uint8_t pinNumber, uint16_t mode);
+void          turnOffPWM(uint8_t pinNumber               );
 
 // avr-libc defines _NOP() since 1.6.2
 // It does? Better tell; avr-gcc, because it insists otherwise... -Spence 5/30/21
@@ -274,6 +297,53 @@ extern const uint8_t digital_pin_to_timer[];
 #define portModeRegister(P)   ((volatile uint8_t *)(&portToPortStruct(P)->DIR))
 
 
+
+/* These are used as the second argument to pinConfigure(pin,  configuration)
+ * You can bitwise OR as many of these as you want, or just do one. Very
+ * flexible function; not the world's fastest though. Directives are handled
+ * in the order that their non-alias representations are shown in this list.
+ * There is no ordering for directives effecting the same bitfield. A bitwise
+ * combination of these will instead generate a different result - both
+ * setting and clearing the same configuration bit at once will generally
+ * toggle it if that option is available. If that option is not available
+ * the directive is invalid; this core makes no claims relating to the behavior
+ * of pinConfigure() when configuration is invalid. */
+#define PIN_DIR_OUTPUT       0x0001 // Alias
+#define PIN_DIR_INPUT        0x0002 // Alias
+#define PIN_DIR_OUT          0x0001 // Alias
+#define PIN_DIR_IN           0x0002 // Alias
+#define PIN_DIR_TOGGLE       0x0003 // Alias
+#define PIN_OUT_HIGH         0x0004 // Alias
+#define PIN_OUT_LOW          0x0008 // Alias
+#define PIN_OUT_TOGGLE       0x000C // Alias
+#define PIN_DIRSET           0x0001
+#define PIN_DIRCLR           0x0002
+#define PIN_DIRTGL           0x0003
+#define PIN_OUTSET           0x0004
+#define PIN_OUTCLR           0x0008
+#define PIN_OUTTGL           0x000C
+#define PIN_INPUT_ENABLE     0x0080
+#define PIN_INT_CHANGE       0x0090
+#define PIN_INT_RISE         0x00A0
+#define PIN_INT_FALL         0x00B0
+#define PIN_INPUT_DISABLE    0x00C0
+#define PIN_INT_LEVEL        0x00D0
+#define PIN_PULLUP           0x0100 // Alias
+#define PIN_NOPULLUP         0x0200 // Alias
+#define PIN_PULLUP_ON        0x0100
+#define PIN_PULLUP_OFF       0x0200
+#define PIN_PULLUP_TGL       0x0300 // I suppose I can see uses for this
+#define PIN_INVERT_ON        0x4000
+#define PIN_INVERT_OFF       0x8000
+#define PIN_INVERT_TGL       0xC000 // One of the less useful ones...
+#define PIN_INLVL_TTL        0x1000 // MVIO parts only
+#define PIN_INLVL_SCHMIT     0x2000 // MVIO parts only
+#define PIN_INLVL_ON         0x1000 // MVIO parts only
+#define PIN_INLVL_OFF        0x2000 // MVIO parts only
+// Used for openDrain()
+#define FLOATING      HIGH
+
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
@@ -326,7 +396,7 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 
 #define CORE_HAS_FASTIO 1
 #define CORE_HAS_OPENDRAIN 1
-// #define CORE_HAS_PINCONFIG 1
+#define CORE_HAS_PINCONFIG 1
 
 #if (MEGATINYCORE_SERIES == 2)
   // if analogReadEnh() supplied, this is defined as 1
