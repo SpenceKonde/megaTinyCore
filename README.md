@@ -676,10 +676,11 @@ resetflags = RSTCTRL.RSTFR;
 
 Serial uploads are all done at 115200 baud, regardless of port, pin mapping or part.
 
-### "Upload using programmer" and removing Optiboot
+### "Upload using programmer" and Optiboot
+This upload method is NOT SUPPORTED by megaTinyCore. If you want to upload via programer, and accept that the bootloader will be lost, use the non-optiboot board definition.
 
 #### Removing Optiboot - 2.2.0 and later
-On 2.2.0 and later, whenever code is uploaded via UPDI ("upload" from non-optiboot board definition, or "upload using programmer" from optiboot one), whether or not the device has been bootloaded (like on classic AVRs, "upload using programmer" will trash any bootloader present), `BOOTEND` will be set to match what the code was compiled for; with an optiboot board definition selected, this will result in the first 512b of flash being blank (since we erased any bootloader present), `BOOTEND=2` (512b bootloader section, as application expects), and a working sketch. With a non-optiboot board definition selected, this will result in `BOOTEND=0`, no gap at the start of the sketch, and a working sketch.
+On 2.2.0 and later, whenever code is uploaded via UPDI ("upload" from non-optiboot board definitio), whether or not the device has been bootloaded (like on classic AVRs, "upload using programmer" will trash any bootloader present), `BOOTEND` will be set to match what the code was compiled for; with an optiboot board definition selected, this will result in the first 512b of flash being blank (since we erased any bootloader present), `BOOTEND=2` (512b bootloader section, as application expects), and a working sketch. With a non-optiboot board definition selected, this will result in `BOOTEND=0`, no gap at the start of the sketch, and a working sketch.
 
 #### Removing Optiboot - 2.1.5 and earlier
 Like classic AVRs with hardware bootloader support (like the ATmega328p, and all other ATmega parts older than the 4809/4808), and unlike ATtiny parts without that, which use "virtual boot" to get bootloader functionality, you must do "burn bootloader" with a non-optiboot part selected in order to reprogram the part normally via UPDI.
