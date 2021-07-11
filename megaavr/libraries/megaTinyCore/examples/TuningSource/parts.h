@@ -1,4 +1,5 @@
 #ifndef  PARTS_H_
+// *INDENT-OFF* The indentation that it demands =is stupid and wrong.
   #define  PARTS_H_
   
   #include <avr/io.h>

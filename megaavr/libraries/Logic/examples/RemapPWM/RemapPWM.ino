@@ -37,7 +37,7 @@ void setup() {
 
   Logic0.enable = true;               // Enable logic block 0
   Logic0.input0 = in::tcb;            // TCB channel - TCB0. On everything except 0/1-series tinyAVR, that's because this is input 0.
-                                      // On those, it's because there's a in::tcb1 option too...
+  //                                     On those, it's because there's a in::tcb1 option too...
   Logic0.input1 = in::masked;         // mask input 1
   Logic0.input2 = in::masked;         // mask input 2
   Logic0.output = out::enable;        // Enable logic block 0 output pin or PA4 (ATtiny))

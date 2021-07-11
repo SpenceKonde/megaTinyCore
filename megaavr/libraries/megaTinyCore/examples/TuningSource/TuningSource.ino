@@ -143,7 +143,6 @@ void setup(){
       }
       TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; //enable the timer with no prescaling
     #endif
-
     pinMode(LED_BUILTIN,OUTPUT);
   }
 #else //this is for tuning another chip from a watch crystal on this chip.
@@ -166,15 +165,12 @@ void invalidPin() {
 }
 #else 
   /* In this case it's a classic AVR */
-  
   // Target pulse length, in us. 
   #define TARGET_OC1 1000
-  
   //#define TARGET_OC2 1000
   //#define TARGET_OC3 2000
   //#define TARGET_OC4 2000
   //#define TARGET_OC5 2000
-  
   // clocks per microsecond times microseconds times 2 gives period (since each cycle consists of a high and low pulse.)
   #define OC1PERIOD ((TARGET_OC1 * (F_CPU/1000000) * 2))
   
@@ -188,7 +184,6 @@ void invalidPin() {
   #endif
   #define OC1LENGTH ((TARGET_OC1 * (F_CPU/1000000)))
   #define WGM1 0x0E /* = 14, TOP = ICR1 */
-  
   void setup() {
     // put your setup code here, to run once:
     Serial.begin(19200);
