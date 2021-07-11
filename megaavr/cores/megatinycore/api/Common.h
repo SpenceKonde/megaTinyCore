@@ -98,7 +98,7 @@ typedef uint8_t pin_size_t;
 void    pinMode(         pin_size_t pinNumber, uint8_t mode);
 void    digitalWrite(    pin_size_t pinNumber, uint8_t val);
 int8_t  digitalRead(     pin_size_t pinNumber);
-void    analogWrite(     pin_size_t pinNumber, int value)
+void    analogWrite(     pin_size_t pinNumber, int value);
 int     analogRead(      pin_size_t pinNumber);
 void    analogReference(         uint8_t mode);
 bool    analogReadResolution(     uint8_t res);
