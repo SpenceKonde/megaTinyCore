@@ -134,7 +134,7 @@ void printTuningStatus() {
     for (uint8_t i = 0; i < 6; i++) {
       Serial.print(speeds[i + speedlist_offset]);
       Serial.print(" MHz: ");
-      int16_t temp = getTunedOSCCAL(16,speeds[i + speedlist_offset]);
+      int16_t temp = getTunedOSCCAL(16, speeds[i + speedlist_offset]);
       if (temp == 0xFF) {
         Serial.println("Blank");
         blank++;

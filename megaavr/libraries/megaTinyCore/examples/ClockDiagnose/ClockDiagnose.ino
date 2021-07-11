@@ -30,20 +30,17 @@ void setup() {
         errortype |= 4;
       }
       errortype |= 128; //using fallback clock.
-
-    else {
+    } else {
       _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
-      }
     }
   }
   #elif (CLOCKSOURCE == 0) //internal oscillator
   if ((CLKCTRL_MCLKCTRLA & 0x03) !=  CLKCTRL_CLKSEL_OSC20M_gc) {
-    //core thinks it is using iinternal, but hardware set for external, likely to do user modification of initialization routines.
+    //core thinks it is using iinternal, but hardware set for external, likely due to user modification of initialization routines.
     // set it back to to the configured frequency
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, CLKCTRL_CLKSEL_OSC20M_gc);
-    while(CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm);
-
+    while (CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm);
     #if (F_CPU == 20000000)
     /* No division on clock */
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
@@ -70,7 +67,7 @@ void setup() {
     errortype |= 4;
   }
   #endif
-  uint8_t errormgs=GPIOR0 & 0xC0;
+  uint8_t errormgs = GPIOR0 & 0xC0;
   if (errormsgs == 0x80) {
     // Tuning determined this specimen cannot reach or does not run at this speed.
     errortype |= 128;
@@ -107,7 +104,7 @@ void setup() {
       Serial.end();
     }
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_6X_gc));
-    _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,(FUSE.OSCCFG == 1 ? SIGROW_OSCCAL16M0 : SIGROW_OSCCAL20M0))
+    _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, (FUSE.OSCCFG == 1 ? SIGROW_OSCCAL16M0 : SIGROW_OSCCAL20M0))
     // make sure we are REALLY in fallback mode!
     Serial.begin(FUSE.OSCCFG == 1 ? FALLBACK16 : FALLBACK20);
     Serial.println("Oscillator in fallback mode");
@@ -116,7 +113,7 @@ void setup() {
       if (errortype & 4) {
         Serial.println("it isn't running from it now either but still wants to - Sounds like your oscillator isn't oscillating, probably a connection problem.");
         Serial.println("Reminder: These parts do not work with a crystal. only with an external clock, also called a \"oscillator\" or \"active crystal\".");
-      } else if (errortype & 2 ) {
+      } else if (errortype & 2) {
         Serial.println("It's not running from external now - but it also looks like it may not have even tried, or tried and then switched back.\r\nThese parts don't have CFD. Have you modified the initialization routines?");
       }
     } else if (errortype & 2) {

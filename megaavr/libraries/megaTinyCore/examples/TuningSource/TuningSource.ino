@@ -1,6 +1,6 @@
 #include "parts.h"
 #include <util/delay.h>
-
+// *INDENT-OFF*  this code is unreadable of you follow astyle's conventions!
 #if __AVR_ARCH__ >=100
 /* FOR MODERN AVRs:
  *  tinyAVR must use PB0, PB1 or PB2 (PB2 is by default a serial pin though. 
