@@ -1,7 +1,10 @@
+#include "parts.h"
+#include <util/delay.h>
+
 #if __AVR_ARCH__ >=100
 /* FOR MODERN AVRs:
  *  tinyAVR must use PB0, PB1 or PB2 (PB2 is by default a serial pin though. 
- *  In order for these to be good toning sourcesm you should have an external clock chip on them.
+ *  In order for these to be good tuning sources you should have an external clock chip on them, or have a watch crystal connected to them and use RTC tuning mode, and use the adjusted RTC-tuning  version of the tuning sketch as well
  *  Same goes for AVR DA and megaAVR 0-series. 
  *  
  *  AVR DB-series and DD-series parts can use a simple crystal. 
@@ -9,26 +12,67 @@
  *  Your tuning will never be better than the thing you're ruimning it from, so don't use something 
  *  with an internal oscillator!
  */
-   #ifndef MEGATINYCORE
-    // All modern AVRs that are not tinyAVR
-    #define OUTPUT_PIN PIN_PB1 /* This must be a pin that exists, and which is numbered 0 through 2. */
-    /* The pin - this uses TCA0 to generate the tuning signal, and hence you can't use it for millis
-     *  and need to use it on a pin that can generate 16-bit PWM from it, not split_mode 3-5 won't work. 
-     *  In theory this could be extended to more pins with the CCL, but just use a pin one that's valid
-     *  to begin with. Every part like this has a PC1 that can output PWM.
-     */
-  #else /* tinyAVR */
-    #define OUTPUT_PIN PIN_B0 /* pins B1 and B2 also work. No other pins are supported. */
-  #endif
+#ifndef TUNE_OUTPUT_PIN // If not defined in parts.h, need to pick default pin
+  #ifndef TUNE_WITH_RTC // First the non-RTC version
+    #if defined(MEGATINYCORE)
+    #elif !defined(DD_14_PINS))
+      #define TUNE_OUTPUT_PIN PIN_PA2
+    #else
+      #define TUNE_OUTPUT_PIN PIN_PC1
+      /* This must be a pin that exists, and which is numbered 0-2 in the port; we will use TCA0 to
+       * generate it and set PORTMUX.TCAROUTEA appropriately.
+       * This sketch uses TCA0 to generate the tuning signal, and hence you can't use it for millis
+       * Well - you can, and it will still tune parts perfectly well, but only because we don't rely on
+       * millis in any way shape or form to get our timing.
+       * and need to use it on a pin that can generate 16-bit PWM from it, not split_mode 3-5 won't work.
+       * In theory this could be extended to more pins with the CCL, but just use a pin one that's valid
+       * to begin with. Every part like this has a PC1 that can output PWM.
+       */
+    #else /* tinyAVR */
+      #define TUNE_OUTPUT_PIN PIN_PB0 /* pins B1 and B2 also work. No other pins are supported. */
+    #endif
+  #else
 
-#else
+    #if (defined(MEGATINYCORE) || !defined(DD_14_PINS))
+      #define TUNE_OUTPUT_PIN PIN_PA2
+    #else
+      #define TUNE_OUTPUT_PIN PIN_PD7
+    #endif
+  #endif
+#else //TUNE_OUTPUT_PIN defined
+  #ifndef TUNE_WITH_RTC
+    #if !((((defined(PIN_PA0) && TUNE_OUTPUT_PIN == PIN_PA0) || (defined(PIN_PA1) && TUNE_OUTPUT_PIN == PIN_PA1) ||  (defined(PIN_PA2) && TUNE_OUTPUT_PIN == PIN_PA2)  || \
+            (defined(PIN_PC0) && TUNE_OUTPUT_PIN == PIN_PC0) || (defined(PIN_PC1) && TUNE_OUTPUT_PIN == PIN_PC1) ||  (defined(PIN_PC2) && TUNE_OUTPUT_PIN == PIN_PC2)  || \
+            (defined(PIN_PD1) && TUNE_OUTPUT_PIN == PIN_PD1) || (defined(PIN_PD2) && TUNE_OUTPUT_PIN == PIN_PD2) || ((defined(PIN_PD0) && TUNE_OUTPUT_PIN == PIN_PD0)  && PIN_D0 != NOT_A_PIN ) || \
+            (defined(PIN_PE0) && TUNE_OUTPUT_PIN == PIN_PE0) || (defined(PIN_PE1) && TUNE_OUTPUT_PIN == PIN_PE1) ||  (defined(PIN_PE2) && TUNE_OUTPUT_PIN == PIN_PE2)  || \
+            (defined(PIN_PF0) && TUNE_OUTPUT_PIN == PIN_PF0) || (defined(PIN_PF1) && TUNE_OUTPUT_PIN == PIN_PF1) ||  (defined(PIN_PF2) && TUNE_OUTPUT_PIN == PIN_PF2)  || \
+            (defined(PIN_PG0) && TUNE_OUTPUT_PIN == PIN_PG0) || (defined(PIN_PG1) && TUNE_OUTPUT_PIN == PIN_PG1) ||  (defined(PIN_PG2) && TUNE_OUTPUT_PIN == PIN_PG2)) && !defined(MEGATINYCORE)) || \
+           ((defined(PIN_PB0) && TUNE_OUTPUT_PIN == PIN_PB0) || (defined(PIN_PB1) && TUNE_OUTPUT_PIN == PIN_PB1) ||  (defined(PIN_PB2) && TUNE_OUTPUT_PIN == PIN_PB2)))
+      #error "Invalid or unusable custom output pin defined"
+    #endif
+  #else //TUNE_WITH_RTC
+    #if (defined(MEGATINYCORE) && MEGATINYCORESERIES < 2)
+      #if  (!((defined(PIN_PA2) && TUNE_OUTPUT_PIN == PIN_PA2) || (defined(PIN_PB2) && TUNE_OUTPUT_PIN == PIN_PB2) || (defined(PIN_PC2) && TUNE_OUTPUT_PIN == PIN_PC2)))
+        #error "Cannot use RTC derved tuning signal on this pin"
+      #endif
+    #else
+      #if (!((defined(PIN_PA2) && TUNE_OUTPUT_PIN == PIN_PA2) || (defined(PIN_PA7) && TUNE_OUTPUT_PIN == PIN_PA7) || \
+             (defined(PIN_PB2) && TUNE_OUTPUT_PIN == PIN_PB2) || (defined(PIN_PB7) && TUNE_OUTPUT_PIN == PIN_PB7) || \
+             (defined(PIN_PC2) && TUNE_OUTPUT_PIN == PIN_PC2) || (defined(PIN_PC7) && TUNE_OUTPUT_PIN == PIN_PC7) || \
+             (defined(PIN_PD2) && TUNE_OUTPUT_PIN == PIN_PD2) || (defined(PIN_PD7) && TUNE_OUTPUT_PIN == PIN_PD7) || \
+             (defined(PIN_PE2) && TUNE_OUTPUT_PIN == PIN_PE2) || (defined(PIN_PE7) && TUNE_OUTPUT_PIN == PIN_PE7) || \
+             (defined(PIN_PF2) && TUNE_OUTPUT_PIN == PIN_PF2) || (defined(PIN_PF7) && TUNE_OUTPUT_PIN == PIN_PF7) || \
+             (defined(PIN_PG2) && TUNE_OUTPUT_PIN == PIN_PG2) || (defined(PIN_PG7) && TUNE_OUTPUT_PIN == PIN_PG7)))
+        #error "cannout use RTC derived tuning signal on this pin."
+      #endif
+    #endif
+  #endif // end check tuning pins
+#endif // end tuning pin select or check.
 /* FOR CLASSIC AVRs:
- *  Unxomment which comopare channel you wish to enable (sorry not done by pins here...
+ *  Uncomment which comopare channel you wish to enable (sorry not done by pins here...
  *  default will come out pin 9 on a 328p or 328pb... Hell you can even use an MHET Micronucleus t88.
- *  Anything with a 160bit timer and a crystal or external clock (though for weird options you may have 
- *  to tell it the pins.
- *  
- *  
+ *  Anything with a 16-bit timer and a crystal or external clock (though for weird options you may have
+ *  you will have to add the pins to parts.h
  */
   #define ENABLEOC1A 1
   #define ENABLEOC1B 0
@@ -37,76 +81,91 @@
 
 
 #if __AVR_ARCH__ >= 100
+#if (!defined(TUNE_WITH_RTC) && defined(MILLIS_USE_TIMERA0) || (defined(TUNE_WITH_RTC) && defined(MILLIS_USE_TIMERRTC))
+  void init_millis() {
+    ;// do nothing -
+  }
+  #warning "If RTC is used to generate the tuning signal, it must not be used for millis, otherwise TCA0 must not be - millis has now been uncleanly disabled and built-in timekeeping cannot be used."
+  // ; millis will never advance, delay() may never return, and micros will return wrong values. Use util/delay.h's _delay_ms() and _delay_us() instead.
+#endif
 void setup(){
   /* Modern AVR */
-  #ifndef MEGATINYCORE
-    // All modern AVRs that are not tinyAVR
-    
-    byte port = digitalPinToPort(OUTPUT_PIN);
-    PORTMUX.TCAROUTEA=port;
-  #endif
-  
-  pinMode(OUTPUT_PIN,OUTPUT);
-  TCA0.SPLIT.CTRLA = 0; //disable TCA0 and set divider to 1
-  TCA0.SPLIT.CTRLESET=TCA_SPLIT_CMD_RESET_gc|0x03; //set CMD to RESET, and enable on both pins.
-  TCA0.SPLIT.CTRLD=0; //Split mode now off, CMPn = 0, CNT = 0, PER = 255
-  TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
-  #if (F_CPU > 32000000) //Some lunatic has is using a chiop that's way overlcocked as timeing reference!
-    TCA0.SINGLE.PER   = (F_CPU/1000) - 1; // 
-    switch (digitalPinToBitPosition(OUTPUT_PIN)) {
-      case 0:
-        TCA0.SINGLE.CMP0  = (F_CPU/2000) - 1; // 50% duty cycle,
-        TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
-        break;
-      case 1:
-        TCA0.SINGLE.CMP1  = (F_CPU/2000) - 1; // 50% duty cycle,
-        TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
-        break;
-      case 2:
-        TCA0.SINGLE.CMP2  = (F_CPU/2000) - 1; // 50% duty cycle,
-        TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP2EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
-        break;
-      default:
-        invalidPin();
-    }
-    TCA0.SINGLE.CTRLA = 0x02|TCA_SINGLE_ENABLE_bm; 
-  #else
-    TCA0.SINGLE.PER   = (F_CPU/500)  - 1; //
-    switch (digitalPinToBitPosition(OUTPUT_PIN)) {
-      case 0:
-        TCA0.SINGLE.CMP0  = (F_CPU/1000) - 1; // 50% duty cycle,
-        TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
-        break;
-      case 1:
-        TCA0.SINGLE.CMP1  = (F_CPU/1000) - 1; // 50% duty cycle,
-        TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
-        break;
-      case 2:
-        TCA0.SINGLE.CMP2  = (F_CPU/1000) - 1; // 50% duty cycle,
-        TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP2EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
-        break;
-      default:
-        invalidPin();
-    }
-    TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; //enable the timer with no prescaling
-  #endif
-  #if MILLIS_USE_TIMERA0     
-    #error "You must uae a different timer than TCA0 for millis()"
-  #endif
-  pinMode(LED_BUILTIN,OUTPUT);
-}
+  #ifndef TUNE_WITH_RTC
+    #ifndef MEGATINYCORE
+      // All modern AVRs that are not tinyAVR
+
+      byte port = digitalPinToPort(TUNE_OUTPUT_PIN);
+      PORTMUX.TCAROUTEA=port;
+
+    #endif
+
+    pinMode(TUNE_OUTPUT_PIN,OUTPUT);
+    TCA0.SPLIT.CTRLA = 0; //disable TCA0 and set divider to 1
+    TCA0.SPLIT.CTRLESET=TCA_SPLIT_CMD_RESET_gc|0x03; //set CMD to RESET, and enable on both pins.
+    TCA0.SPLIT.CTRLD=0; //Split mode now off, CMPn = 0, CNT = 0, PER = 255
+    TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+    #if (F_CPU > 32000000) //Some lunatic has is using a chip that's way overlcocked as timing reference!
+      TCA0.SINGLE.PER   = (F_CPU/1000) - 1; //
+      switch (digitalPinToBitPosition(TUNE_OUTPUT_PIN)) {
+        case 0:
+          TCA0.SINGLE.CMP0  = (F_CPU/2000) - 1; // 50% duty cycle,
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          break;
+        case 1:
+          TCA0.SINGLE.CMP1  = (F_CPU/2000) - 1; // 50% duty cycle,
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          break;
+        case 2:
+          TCA0.SINGLE.CMP2  = (F_CPU/2000) - 1; // 50% duty cycle,
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP2EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          break;
+        default:
+          invalidPin();
+      }
+      TCA0.SINGLE.CTRLA = 0x02|TCA_SINGLE_ENABLE_bm;
+    #else
+      TCA0.SINGLE.PER   = (F_CPU/500)  - 1; //
+      switch (digitalPinToBitPosition(TUNE_OUTPUT_PIN)) {
+        case 0:
+          TCA0.SINGLE.CMP0  = (F_CPU/1000) - 1; // 50% duty cycle,
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          break;
+        case 1:
+          TCA0.SINGLE.CMP1  = (F_CPU/1000) - 1; // 50% duty cycle,
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          break;
+        case 2:
+          TCA0.SINGLE.CMP2  = (F_CPU/1000) - 1; // 50% duty cycle,
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP2EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          break;
+        default:
+          invalidPin();
+      }
+      TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; //enable the timer with no prescaling
+    #endif
+
+    pinMode(LED_BUILTIN,OUTPUT);
+  }
+#else //this is for tuning another chip from a watch crystal on this chip.
+  // Self-tuning with watch crystal may also be supported in the future,
+  // but that woukd be it's own sketch, and is not a priority because of how
+  // unpleasant they made using a crystal on these parts by virtue of their
+  // sharing pins with both USART0 and one of the PWM outputs...
+  // and not even one of the "bad" ones, but one of the ones that output 16-bit
+  // pwm, and it's alternate pin isn't present on the most popular, 14-pin, parts!
+  // Though I suspect that the alt reset - also not supported on 14-pin parts and
+  // the non-QFN package option that isn't nearly the size of a brick will help
+  // the popularity of the 20-pin 2-series parts.
+  #error "RTC tuning is not supported at this time."
+#endif
 void invalidPin() {
   while(1) {
-    delay(100);
+    _delay_ms(100);
     digitalWrite(LED_BUILTIN,CHANGE);
   }
 }
 #else 
   /* In this case it's a classic AVR */
-  #include "parts.h"
-  
-  #define ENABLEOC1A 1
-  #define ENABLEOC1B 0
   
   // Target pulse length, in us. 
   #define TARGET_OC1 1000
@@ -116,13 +175,14 @@ void invalidPin() {
   //#define TARGET_OC4 2000
   //#define TARGET_OC5 2000
   
-  // clocks per microsecond times microseconds times 2 
+  // clocks per microsecond times microseconds times 2 gives period (since each cycle consists of a high and low pulse.)
   #define OC1PERIOD ((TARGET_OC1 * (F_CPU/1000000) * 2))
   
   #define OC1LENGTH ((TARGET_OC1 * (F_CPU/1000000))) 
   #if (OC1PERIOD > 65535) 
     #if (OC1PERIOD & 0x07 != 0)
-      #error "Cannot generate accurate 1ms pulses from this timebase"
+      #error "Cannot generate accurate pulses of desired length from this timebase"
+      // Mad props for the overclock if you run into this for 1ms pulses!
     #endif
     #define PRESCALE8
   #endif
@@ -161,11 +221,10 @@ void invalidPin() {
     Serial.println(OCR1A);
   }
 #endif
-  void loop() {
-    // put your main code here, to run repeatedly:
-    delay(1800);
-    digitalWrite(LED_BUILTIN,1);
-    delay(200);
-    digitalWrite(LED_BUILTIN,0);
-  }
-  
+void loop() {
+  // put your main code here, to run repeatedly:
+  _delay_ms(400);
+  digitalWrite(LED_BUILTIN,1);
+  _delay_ms(100);
+  digitalWrite(LED_BUILTIN,0);
+}

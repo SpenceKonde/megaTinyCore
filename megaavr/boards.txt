@@ -35,7 +35,7 @@
 # board. Eg - UPDI can set fuses, so OSCCFG is set on all uploads and
 # you don't need to burn bootloader to change clock speed.
 
-menu.chip=Chip or Board
+menu.chip=Chip
 menu.clock=Clock (burn bootloader NOT req'd)
 menu.clocko=Clock (burn bootloader req'd, or see docs)
 menu.millis=millis()/micros() Timer
@@ -49,6 +49,9 @@ menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
 menu.resetpinopti=UPDI/Reset Pin and Optiboot Entry (burn bootloader req'd)
 menu.resetpinopti_2=UPDI/alt-RST pins and Optiboot Entry (burn bootloader req'd)
 menu.uartvoltage=Voltage Baud Correction
+#used in place of the chip menu for official Microchip boards
+menu.board_name=Board Name
+
 
 ##########################################################################
 #                                                                        #
@@ -65,6 +68,7 @@ atxy7.name=ATtiny3227/3217/1627/1617/1607/827/817/807/427/417
 atxy6.name=ATtiny3226/3216/1626/1616/1606/826/816/806/426/416/406
 atxy4.name=ATtiny3224/1624/1614/1604/824/814/804/424/414/404/214/204
 atxy2.name=ATtiny412/402/212/202
+microchip.name=Official Microchip Board
 atxy7o.name=ATtiny3217/1617/1607/817/807/417 w/Optiboot
 atx27o.name=ATtiny3227/1627/827/427 w/Optiboot
 atxy6o.name=ATtiny3216/1616/1606/816/806/416/406 w/Optiboot
@@ -72,6 +76,7 @@ atx26o.name=ATtiny3226/1627/826/426 w/Optiboot
 atxy4o.name=ATtiny1614/1604/814/804/414/404 w/Optiboot
 atx24o.name=ATtiny3224/1624/824/424 w/Optiboot
 atxy2o.name=ATtiny412/402/212/202 w/Optiboot
+microchipo.name=Official Microchip Board w/Optiboot
 
 ##########################################################################
 #  Non-bootloader                                                        #
@@ -182,27 +187,32 @@ atxy7.menu.clock.8internal=8 MHz internal
 atxy7.menu.clock.5internal=5 MHz internal
 atxy7.menu.clock.4internal=4 MHz internal
 atxy7.menu.clock.1internal=1 MHz internal
+atxy7.menu.clock.20internaltuned=20 MHz internal - tuned
+atxy7.menu.clock.16internaltuned=16 MHz internal - tuned
+atxy7.menu.clock.12internaltuned=12 MHz internal - tuned
 atxy7.menu.clock.20extclock=20 MHz external clock
 atxy7.menu.clock.16extclock=16 MHz external clock
 atxy7.menu.clock.12extclock=12 MHz external clock
 atxy7.menu.clock.10extclock=10 MHz external clock
 atxy7.menu.clock.8extclock=8 MHz external clock
-atxy7.menu.clock.24extclock=24 MHz external clock (overclocked)
-atxy7.menu.clock.28extclock=28 MHz external clock (overclocked)
-atxy7.menu.clock.32extclock=32 MHz external clock (overclocked)
+atxy7.menu.clock.24internaltuned=24 MHz internal - tuned, overclocked
+atxy7.menu.clock.25internaltuned=25 MHz internal - tuned, overclocked
+atxy7.menu.clock.30internaltuned=30 MHz internal - tuned, overclocked, may be unstable, req. 20 MHz fuse
+atxy7.menu.clock.32internaltuned=32 MHz internal - tuned, 2-series, overclocked, may be unstable, req. 20 MHz fuse
+atxy7.menu.clock.24extclock=24 MHz external clock - overclocked
+atxy7.menu.clock.25extclock=25 MHz external clock - overclocked
+atxy7.menu.clock.28extclock=30 MHz external clock - overclocked, may be unstable
+atxy7.menu.clock.32extclock=32 MHz external clock - overclocked, may be unstable
 atxy7.menu.clock.20internal.build.speed=20
 atxy7.menu.clock.20internal.build.clocksource=0
-atxy7.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy7.menu.clock.16internal.build.speed=16
 atxy7.menu.clock.16internal.build.clocksource=0
 atxy7.menu.clock.10internal.build.speed=10
 atxy7.menu.clock.10internal.build.clocksource=0
-atxy7.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy7.menu.clock.8internal.build.speed=8
 atxy7.menu.clock.8internal.build.clocksource=0
 atxy7.menu.clock.5internal.build.speed=5
 atxy7.menu.clock.5internal.build.clocksource=0
-atxy7.menu.clock.5internal.bootloader.OSCCFG=0x02
 atxy7.menu.clock.4internal.build.speed=4
 atxy7.menu.clock.4internal.build.clocksource=0
 atxy7.menu.clock.1internal.build.speed=1
@@ -219,10 +229,41 @@ atxy7.menu.clock.8extclock.build.speed=8
 atxy7.menu.clock.8extclock.build.clocksource=2
 atxy7.menu.clock.24extclock.build.speed=24
 atxy7.menu.clock.24extclock.build.clocksource=2
-atxy7.menu.clock.28extclock.build.speed=28
-atxy7.menu.clock.28extclock.build.clocksource=2
+atxy7.menu.clock.25extclock.build.speed=24
+atxy7.menu.clock.25extclock.build.clocksource=2
+atxy7.menu.clock.30extclock.build.speed=30
+atxy7.menu.clock.30extclock.build.clocksource=2
 atxy7.menu.clock.32extclock.build.speed=32
 atxy7.menu.clock.32extclock.build.clocksource=2
+atxy7.menu.clock.20internaltuned.build.speed=20
+atxy7.menu.clock.20internaltuned.build.clocksource=0
+atxy7.menu.clock.20internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.16internaltuned.build.speed=16
+atxy7.menu.clock.16internaltuned.build.clocksource=0
+atxy7.menu.clock.16internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.12internaltuned.build.speed=12
+atxy7.menu.clock.12internaltuned.build.clocksource=0
+atxy7.menu.clock.12internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.24internaltuned.build.speed=24
+atxy7.menu.clock.24internaltuned.build.clocksource=0
+atxy7.menu.clock.24internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.25internaltuned.build.speed=25
+atxy7.menu.clock.25internaltuned.build.clocksource=0
+atxy7.menu.clock.25internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.30internaltuned.build.speed=30
+atxy7.menu.clock.30internaltuned.build.clocksource=0
+atxy7.menu.clock.30internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.32internaltuned.build.speed=32
+atxy7.menu.clock.32internaltuned.build.clocksource=0
+atxy7.menu.clock.32internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.20internaltuned.bootloader.OSCCFG=0x02
+atxy7.menu.clock.24internaltuned.bootloader.OSCCFG=0x02
+atxy7.menu.clock.25internaltuned.bootloader.OSCCFG=0x02
+atxy7.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
+atxy7.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
+atxy7.menu.clock.20internal.bootloader.OSCCFG=0x02
+atxy7.menu.clock.10internal.bootloader.OSCCFG=0x02
+atxy7.menu.clock.5internal.bootloader.OSCCFG=0x02
 
 ### BOD VOLTAGE
 atxy7.menu.bodvoltage.1v8=1.8V (5 MHz or less)
@@ -441,14 +482,22 @@ atxy6.menu.clock.8internal=8 MHz internal
 atxy6.menu.clock.5internal=5 MHz internal
 atxy6.menu.clock.4internal=4 MHz internal
 atxy6.menu.clock.1internal=1 MHz internal
+atxy6.menu.clock.20internaltuned=20 MHz internal - tuned
+atxy6.menu.clock.16internaltuned=16 MHz internal - tuned
+atxy6.menu.clock.12internaltuned=12 MHz internal - tuned
 atxy6.menu.clock.20extclock=20 MHz external clock
 atxy6.menu.clock.16extclock=16 MHz external clock
 atxy6.menu.clock.12extclock=12 MHz external clock
 atxy6.menu.clock.10extclock=10 MHz external clock
 atxy6.menu.clock.8extclock=8 MHz external clock
-atxy6.menu.clock.24extclock=24 MHz external clock (overclocked)
-atxy6.menu.clock.28extclock=28 MHz external clock (overclocked)
-atxy6.menu.clock.32extclock=32 MHz external clock (overclocked)
+atxy6.menu.clock.24internaltuned=24 MHz internal - tuned, overclocked
+atxy6.menu.clock.25internaltuned=25 MHz internal - tuned, overclocked
+atxy6.menu.clock.30internaltuned=30 MHz internal - tuned, overclocked, may be unstable, req. 20 MHz fuse
+atxy6.menu.clock.32internaltuned=32 MHz internal - tuned, 2-series, overclocked, may be unstable, req. 20 MHz fuse
+atxy6.menu.clock.24extclock=24 MHz external clock - overclocked
+atxy6.menu.clock.25extclock=25 MHz external clock - overclocked
+atxy6.menu.clock.28extclock=30 MHz external clock - overclocked, may be unstable
+atxy6.menu.clock.32extclock=32 MHz external clock - overclocked, may be unstable
 atxy6.menu.clock.20internal.build.speed=20
 atxy6.menu.clock.20internal.build.clocksource=0
 atxy6.menu.clock.16internal.build.speed=16
@@ -475,10 +524,38 @@ atxy6.menu.clock.8extclock.build.speed=8
 atxy6.menu.clock.8extclock.build.clocksource=2
 atxy6.menu.clock.24extclock.build.speed=24
 atxy6.menu.clock.24extclock.build.clocksource=2
-atxy6.menu.clock.28extclock.build.speed=28
-atxy6.menu.clock.28extclock.build.clocksource=2
+atxy6.menu.clock.25extclock.build.speed=24
+atxy6.menu.clock.25extclock.build.clocksource=2
+atxy6.menu.clock.30extclock.build.speed=30
+atxy6.menu.clock.30extclock.build.clocksource=2
 atxy6.menu.clock.32extclock.build.speed=32
 atxy6.menu.clock.32extclock.build.clocksource=2
+atxy6.menu.clock.20internaltuned.build.speed=20
+atxy6.menu.clock.20internaltuned.build.clocksource=0
+atxy6.menu.clock.20internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.16internaltuned.build.speed=16
+atxy6.menu.clock.16internaltuned.build.clocksource=0
+atxy6.menu.clock.16internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.12internaltuned.build.speed=12
+atxy6.menu.clock.12internaltuned.build.clocksource=0
+atxy6.menu.clock.12internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.24internaltuned.build.speed=24
+atxy6.menu.clock.24internaltuned.build.clocksource=0
+atxy6.menu.clock.24internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.25internaltuned.build.speed=25
+atxy6.menu.clock.25internaltuned.build.clocksource=0
+atxy6.menu.clock.25internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.30internaltuned.build.speed=30
+atxy6.menu.clock.30internaltuned.build.clocksource=0
+atxy6.menu.clock.30internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.32internaltuned.build.speed=32
+atxy6.menu.clock.32internaltuned.build.clocksource=0
+atxy6.menu.clock.32internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.20internaltuned.bootloader.OSCCFG=0x02
+atxy6.menu.clock.24internaltuned.bootloader.OSCCFG=0x02
+atxy6.menu.clock.25internaltuned.bootloader.OSCCFG=0x02
+atxy6.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
+atxy6.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
 atxy6.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy6.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy6.menu.clock.5internal.bootloader.OSCCFG=0x02
@@ -961,14 +1038,22 @@ atxy2.menu.clock.8internal=8 MHz internal
 atxy2.menu.clock.5internal=5 MHz internal
 atxy2.menu.clock.4internal=4 MHz internal
 atxy2.menu.clock.1internal=1 MHz internal
+atxy2.menu.clock.20internaltuned=20 MHz internal - tuned
+atxy2.menu.clock.16internaltuned=16 MHz internal - tuned
+atxy2.menu.clock.12internaltuned=12 MHz internal - tuned
 atxy2.menu.clock.20extclock=20 MHz external clock
 atxy2.menu.clock.16extclock=16 MHz external clock
 atxy2.menu.clock.12extclock=12 MHz external clock
 atxy2.menu.clock.10extclock=10 MHz external clock
 atxy2.menu.clock.8extclock=8 MHz external clock
-atxy2.menu.clock.24extclock=24 MHz external clock (overclocked)
-atxy2.menu.clock.28extclock=28 MHz external clock (overclocked)
-atxy2.menu.clock.32extclock=32 MHz external clock (overclocked)
+atxy2.menu.clock.24internaltuned=24 MHz internal - tuned, overclocked
+atxy2.menu.clock.25internaltuned=25 MHz internal - tuned, overclocked
+atxy2.menu.clock.30internaltuned=30 MHz internal - tuned, overclocked, may be unstable, req. 20 MHz fuse
+atxy2.menu.clock.32internaltuned=32 MHz internal - tuned, 2-series, overclocked, may be unstable, req. 20 MHz fuse
+atxy2.menu.clock.24extclock=24 MHz external clock - overclocked
+atxy2.menu.clock.25extclock=25 MHz external clock - overclocked
+atxy2.menu.clock.28extclock=30 MHz external clock - overclocked, may be unstable
+atxy2.menu.clock.32extclock=32 MHz external clock - overclocked, may be unstable
 atxy2.menu.clock.20internal.build.speed=20
 atxy2.menu.clock.20internal.build.clocksource=0
 atxy2.menu.clock.16internal.build.speed=16
@@ -995,10 +1080,38 @@ atxy2.menu.clock.8extclock.build.speed=8
 atxy2.menu.clock.8extclock.build.clocksource=2
 atxy2.menu.clock.24extclock.build.speed=24
 atxy2.menu.clock.24extclock.build.clocksource=2
-atxy2.menu.clock.28extclock.build.speed=28
-atxy2.menu.clock.28extclock.build.clocksource=2
+atxy2.menu.clock.25extclock.build.speed=24
+atxy2.menu.clock.25extclock.build.clocksource=2
+atxy2.menu.clock.30extclock.build.speed=30
+atxy2.menu.clock.30extclock.build.clocksource=2
 atxy2.menu.clock.32extclock.build.speed=32
 atxy2.menu.clock.32extclock.build.clocksource=2
+atxy2.menu.clock.20internaltuned.build.speed=20
+atxy2.menu.clock.20internaltuned.build.clocksource=0
+atxy2.menu.clock.20internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy2.menu.clock.16internaltuned.build.speed=16
+atxy2.menu.clock.16internaltuned.build.clocksource=0
+atxy2.menu.clock.16internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy2.menu.clock.12internaltuned.build.speed=12
+atxy2.menu.clock.12internaltuned.build.clocksource=0
+atxy2.menu.clock.12internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy2.menu.clock.24internaltuned.build.speed=24
+atxy2.menu.clock.24internaltuned.build.clocksource=0
+atxy2.menu.clock.24internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy2.menu.clock.25internaltuned.build.speed=25
+atxy2.menu.clock.25internaltuned.build.clocksource=0
+atxy2.menu.clock.25internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy2.menu.clock.30internaltuned.build.speed=30
+atxy2.menu.clock.30internaltuned.build.clocksource=0
+atxy2.menu.clock.30internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy2.menu.clock.32internaltuned.build.speed=32
+atxy2.menu.clock.32internaltuned.build.clocksource=0
+atxy2.menu.clock.32internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy2.menu.clock.20internaltuned.bootloader.OSCCFG=0x02
+atxy2.menu.clock.24internaltuned.bootloader.OSCCFG=0x02
+atxy2.menu.clock.25internaltuned.bootloader.OSCCFG=0x02
+atxy2.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
+atxy2.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
 atxy2.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy2.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy2.menu.clock.5internal.bootloader.OSCCFG=0x02
@@ -1097,6 +1210,269 @@ atxy2.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy2.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ##########################################################################
+#  Non-bootloader                                                        #
+# Curiosity Nano    #   # ###  ### ####   ###   ### #  # ### ####      ###
+# Xplained Mini     ## ##  #  #    #   # #   # #    #  #  #  #   #   #####
+# Xplained Pro      # # #  #  #    ####  #   # #    ####  #  ####  #######
+#                   #   #  #  #    # #   #   # #    #  #  #  #       #####
+#                   #   # ###  ### #  ##  ###   ### #  # ### #         ###
+#________________________________________________________________________#
+
+### BUILD PARAMETERS
+microchip.build.text_section_start=.text=0x0
+microchip.build.millistimer=D0
+microchip.build.bootload=
+microchip.build.clocksource=0
+microchip.build.core=megatinycore
+microchip.build.variant=txy7
+microchip.build.mcu=attiny{build.attiny}
+microchip.build.f_cpu={build.speed}000000L
+microchip.build.export_merged_output=false
+microchip.build.board=Microchip Placeholder
+
+### BOOTLOADING PARAMETERS (FUSES)
+microchip.bootloader.WDTCFG=0x00
+microchip.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+microchip.bootloader.OSCCFG=0x01
+microchip.bootloader.TCD0CFG=0x00
+microchip.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
+microchip.bootloader.APPEND=0x00
+microchip.bootloader.BOOTEND=0x00
+microchip.bootloader.tool=avrdude
+
+### ALL UPLOADING VIA UPDI
+microchip.upload.tool=avrdude
+microchip.upload.workaround=
+microchip.upload.with_programmer_not_available_for_bootloader_boards=
+microchip.upload.extra_params=-Pusb
+microchip.upload.serialparams=
+
+### CHIP
+microchip.menu.board_name.cn3217=Curiosity Nano ATtiny3217
+microchip.menu.board_name.cn3217.build.board=AVR_CuriosityNano3217
+microchip.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 -DARDUINO_CuriosityNano3217
+microchip.menu.board_name.cn3217.build.attiny=3217
+microchip.menu.board_name.cn3217.upload.protocol=curiosity_updi
+microchip.menu.board_name.cn3217.upload.maximum_size=32768
+microchip.menu.board_name.cn3217.upload.maximum_data_size=2048
+
+microchip.menu.board_name.cn1627=Curiosity Nano ATtiny1627
+microchip.menu.board_name.cn1627.build.board=AVR_CuriosityNano1627
+microchip.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7
+microchip.menu.board_name.cn1627.build.millistimer=B1
+microchip.menu.board_name.cn1627.build.attiny=1627
+microchip.menu.board_name.cn1627.upload.protocol=curiosity_updi
+microchip.menu.board_name.cn1627.upload.maximum_size=16384
+microchip.menu.board_name.cn1627.upload.maximum_data_size=2048
+
+microchip.menu.board_name.cn1607=Curiosity Nano ATtiny1607
+microchip.menu.board_name.cn1607.build.board=AVR_CuriosityNano1607
+microchip.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7
+microchip.menu.board_name.cn1607.build.attiny=1607
+microchip.menu.board_name.cn1607.build.millistimer=A0
+microchip.menu.board_name.cn1607.upload.protocol=curiosity_updi
+microchip.menu.board_name.cn1607.upload.extra_params=-Pusb
+microchip.menu.board_name.cn1607.upload.maximum_size=16384
+microchip.menu.board_name.cn1607.upload.maximum_data_size=1024
+
+microchip.menu.board_name.xp3217=Xplained Pro ATtiny3217
+microchip.menu.board_name.xp3217.build.board=AVR_CuriosityNano3217
+microchip.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
+microchip.menu.board_name.xp3217.build.attiny=3217
+microchip.menu.board_name.xp3217.build.millistimer=D0
+microchip.menu.board_name.xp3217.upload.protocol=xplainedpro_updi
+microchip.menu.board_name.xp3217.build.variant=atxy7
+microchip.menu.board_name.xp3217.upload.maximum_size=32768
+microchip.menu.board_name.xp3217.upload.maximum_data_size=2048
+
+microchip.menu.board_name.xp817=Xplained Pro ATtiny817
+microchip.menu.board_name.xp817.build.board=AVR_Xplained_Pro
+microchip.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
+microchip.menu.board_name.xp817.build.attiny=817
+microchip.menu.board_name.xp817.build.millistimer=D0
+microchip.menu.board_name.xp817.upload.protocol=xplainedpro_updi
+microchip.menu.board_name.xp817.upload.maximum_size=8192
+microchip.menu.board_name.xp817.upload.maximum_data_size=512
+
+microchip.menu.board_name.xm817=Xplained Mini ATtiny817
+microchip.menu.board_name.xm817.build.board=AVR_XplainedMini817
+microchip.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5
+microchip.menu.board_name.xm817.build.attiny=817
+microchip.menu.board_name.xm817.build.millistimer=D0
+microchip.menu.board_name.xm817.upload.protocol=xplainedmini_updi
+microchip.menu.board_name.xm817.upload.maximum_size=8192
+microchip.menu.board_name.xm817.upload.maximum_data_size=512
+
+microchip.menu.board_name.xn416=Xplained Nano ATtiny416
+microchip.menu.board_name.xn416.build.board=AVR_XplainedNano416
+microchip.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP
+microchip.menu.board_name.xn416.build.attiny=416
+microchip.menu.board_name.xn416.build.variant=txy6
+microchip.menu.board_name.xn416.build.millistimer=A0
+microchip.menu.board_name.xn416.upload.protocol=xplainedmini_updi
+microchip.menu.board_name.xn416.upload.maximum_size=4096
+microchip.menu.board_name.xn416.upload.maximum_data_size=256
+
+### CLOCK SOURCE
+microchip.menu.clock.20internal=20 MHz internal
+microchip.menu.clock.16internal=16 MHz internal
+microchip.menu.clock.10internal=10 MHz internal
+microchip.menu.clock.8internal=8 MHz internal
+microchip.menu.clock.5internal=5 MHz internal
+microchip.menu.clock.4internal=4 MHz internal
+microchip.menu.clock.1internal=1 MHz internal
+microchip.menu.clock.20internaltuned=20 MHz internal - tuned
+microchip.menu.clock.16internaltuned=16 MHz internal - tuned
+microchip.menu.clock.12internaltuned=12 MHz internal - tuned
+microchip.menu.clock.24internaltuned=24 MHz internal - tuned, overclocked
+microchip.menu.clock.25internaltuned=25 MHz internal - tuned, overclocked
+microchip.menu.clock.30internaltuned=30 MHz internal - tuned, overclocked, may be unstable, req. 20 MHz fuse
+microchip.menu.clock.32internaltuned=32 MHz internal - tuned, 2-series, overclocked, may be unstable, req. 20 MHz fuse
+microchip.menu.clock.20internal.build.speed=20
+microchip.menu.clock.20internal.build.clocksource=0
+microchip.menu.clock.16internal.build.speed=16
+microchip.menu.clock.16internal.build.clocksource=0
+microchip.menu.clock.10internal.build.speed=10
+microchip.menu.clock.10internal.build.clocksource=0
+microchip.menu.clock.8internal.build.speed=8
+microchip.menu.clock.8internal.build.clocksource=0
+microchip.menu.clock.5internal.build.speed=5
+microchip.menu.clock.5internal.build.clocksource=0
+microchip.menu.clock.4internal.build.speed=4
+microchip.menu.clock.4internal.build.clocksource=0
+microchip.menu.clock.1internal.build.speed=1
+microchip.menu.clock.1internal.build.clocksource=0
+microchip.menu.clock.20internaltuned.build.speed=20
+microchip.menu.clock.20internaltuned.build.clocksource=0
+microchip.menu.clock.20internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchip.menu.clock.16internaltuned.build.speed=16
+microchip.menu.clock.16internaltuned.build.clocksource=0
+microchip.menu.clock.16internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchip.menu.clock.12internaltuned.build.speed=12
+microchip.menu.clock.12internaltuned.build.clocksource=0
+microchip.menu.clock.12internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchip.menu.clock.24internaltuned.build.speed=24
+microchip.menu.clock.24internaltuned.build.clocksource=0
+microchip.menu.clock.24internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchip.menu.clock.25internaltuned.build.speed=25
+microchip.menu.clock.25internaltuned.build.clocksource=0
+microchip.menu.clock.25internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchip.menu.clock.30internaltuned.build.speed=30
+microchip.menu.clock.30internaltuned.build.clocksource=0
+microchip.menu.clock.30internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchip.menu.clock.32internaltuned.build.speed=32
+microchip.menu.clock.32internaltuned.build.clocksource=0
+microchip.menu.clock.32internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchip.menu.clock.20internaltuned.bootloader.OSCCFG=0x02
+microchip.menu.clock.24internaltuned.bootloader.OSCCFG=0x02
+microchip.menu.clock.25internaltuned.bootloader.OSCCFG=0x02
+microchip.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
+microchip.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
+microchip.menu.clock.20internal.bootloader.OSCCFG=0x02
+microchip.menu.clock.10internal.bootloader.OSCCFG=0x02
+microchip.menu.clock.5internal.bootloader.OSCCFG=0x02
+
+### BOD VOLTAGE
+microchip.menu.bodvoltage.1v8=1.8V (5 MHz or less)
+microchip.menu.bodvoltage.2v6=2.6V (10 MHz or less)
+microchip.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
+microchip.menu.bodvoltage.2v1=2.1V
+microchip.menu.bodvoltage.2v9=2.9V
+microchip.menu.bodvoltage.3v3=3.3V
+microchip.menu.bodvoltage.3v7=3.7V
+microchip.menu.bodvoltage.4v0=4.0V
+microchip.menu.bodvoltage.1v8.bootloader.bodlevbits=000
+microchip.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+microchip.menu.bodvoltage.4v2.bootloader.bodlevbits=111
+microchip.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+microchip.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+microchip.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+microchip.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+microchip.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+
+### BOD MODE
+microchip.menu.bodmode.disabled=Disabled/Disabled
+microchip.menu.bodmode.enabled=Enabled/Enabled
+microchip.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
+microchip.menu.bodmode.ensampslow=Enabled/Sampled (125 Hz)
+microchip.menu.bodmode.sampledfast=Sampled/Sampled (1 kHz)
+microchip.menu.bodmode.sampledslow=Sampled/Sampled (125 Hz)
+microchip.menu.bodmode.sampdisfast=Sampled/Disabled (1 kHz)
+microchip.menu.bodmode.sampdisslow=Sampled/Disabled (125 Hz)
+microchip.menu.bodmode.endisholdwake=Enabled hold wakeup/Disabled
+microchip.menu.bodmode.disabled.bootloader.BODCFG=0x00
+microchip.menu.bodmode.enabled.bootloader.bodmodebits=00101
+microchip.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
+microchip.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
+microchip.menu.bodmode.samplefast.bootloader.bodmodebits=01010
+microchip.menu.bodmode.sampleslow.bootloader.bodmodebits=11010
+microchip.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
+microchip.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
+microchip.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
+
+### EEPROM RETAIN
+microchip.menu.eesave.enable=EEPROM retained
+microchip.menu.eesave.enable.bootloader.eesavebit=1
+microchip.menu.eesave.disable=EEPROM not retained
+microchip.menu.eesave.disable.bootloader.eesavebit=0
+
+### MILLIS TIMER
+microchip.menu.millis.enabled=Enabled (default timer)
+microchip.menu.millis.disabled=Disabled (saves flash)
+microchip.menu.millis.timera=TCA0 (default on 0-series)
+microchip.menu.millis.timerd=TCD0 (1-series only, default there)
+microchip.menu.millis.timerb0=TCB0 (breaks tone() and Servo)
+microchip.menu.millis.timerb1=TCB1 (3217,1617, 2-series only)
+microchip.menu.millis.rtc=RTC (no micros)
+microchip.menu.millis.rtcxtal=RTC w/w32.768 kHz ext. crystal (1/2-series only, no micros)
+microchip.menu.millis.rtcxosc=RTC w/w32.768 kHz ext. oscillator (1/2-series only, no micros)
+microchip.menu.millis.disabled.build.millistimer=NONE
+microchip.menu.millis.timera.build.millistimer=A0
+microchip.menu.millis.timerd.build.millistimer=D0
+microchip.menu.millis.timerb0.build.millistimer=B0
+microchip.menu.millis.timerb1.build.millistimer=B1
+microchip.menu.millis.rtc.build.millistimer=RTC
+microchip.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
+microchip.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+
+### UPDI/RESET PIN CONFIGURATION
+microchip.menu.resetpin.UPDI=UPDI (no reset pin)
+microchip.menu.resetpin.UPDI.bootloader.resetpinbits=01
+microchip.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
+microchip.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
+# the microchip debuggers are not 12v tolerant so nothing that would need hv programming to reset is supported. And if you cut the straps to debugger, you shouldn't be using this board definition.
+
+
+### STARTUP TIME (SUT)
+microchip.menu.startuptime.8=8ms
+microchip.menu.startuptime.0=0ms
+microchip.menu.startuptime.1=1ms
+microchip.menu.startuptime.2=2ms
+microchip.menu.startuptime.4=4ms
+microchip.menu.startuptime.16=16ms
+microchip.menu.startuptime.32=32ms
+microchip.menu.startuptime.64=64ms
+microchip.menu.startuptime.0.bootloader.SYSCFG1=0x00
+microchip.menu.startuptime.1.bootloader.SYSCFG1=0x01
+microchip.menu.startuptime.2.bootloader.SYSCFG1=0x02
+microchip.menu.startuptime.4.bootloader.SYSCFG1=0x03
+microchip.menu.startuptime.8.bootloader.SYSCFG1=0x04
+microchip.menu.startuptime.16.bootloader.SYSCFG1=0x05
+microchip.menu.startuptime.32.bootloader.SYSCFG1=0x06
+microchip.menu.startuptime.64.bootloader.SYSCFG1=0x07
+
+### VOLTAGE FOR UART BAUD CORRECTION
+microchip.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+microchip.menu.uartvoltage.skip.build.uartvoltage=NA
+microchip.menu.uartvoltage.5v=Closer to 5v
+microchip.menu.uartvoltage.3v=Closer to 3v
+microchip.menu.uartvoltage.5v.build.uartvoltage=5V
+microchip.menu.uartvoltage.3v.build.uartvoltage=3V
+
+
+
+
+##########################################################################
 ##########################################################################
 #                                                                        #
 #           ###   ####   #####  ###  ####    ###    ###   #####          #
@@ -1144,7 +1520,7 @@ atxy7o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{boo
 ### UPLOAD VIA OPTIBOOT
 atxy7o.upload.workaround=
 atxy7o.upload.tool=avrdude
-atxy7o.upload.speed=115200
+atxy7o.upload.serialparams=-P{serial.port} -b115200
 atxy7o.upload.protocol=arduino
 atxy7o.upload.extra_params=-D
 
@@ -1373,7 +1749,7 @@ atx27o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{boo
 ### UPLOAD VIA OPTIBOOT
 atx27o.upload.workaround=
 atx27o.upload.tool=avrdude
-atx27o.upload.speed=115200
+atx27o.upload.serialparams=-P{serial.port} -b115200
 atx27o.upload.protocol=arduino
 atx27o.upload.extra_params=-D
 
@@ -1584,7 +1960,7 @@ atxy6o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{boo
 ### UPLOAD VIA OPTIBOOT
 atxy6o.upload.workaround=
 atxy6o.upload.tool=avrdude
-atxy6o.upload.speed=115200
+atxy6o.upload.serialparams=-P{serial.port} -b115200
 atxy6o.upload.protocol=arduino
 atxy6o.upload.extra_params=-D
 
@@ -1825,7 +2201,7 @@ atx26o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{boo
 ### UPLOAD VIA OPTIBOOT
 atx26o.upload.workaround=
 atx26o.upload.tool=avrdude
-atx26o.upload.speed=115200
+atx26o.upload.upload.serialparams=-P{serial.port} -b115200
 atx26o.upload.protocol=arduino
 atx26o.upload.extra_params=-D
 
@@ -2036,7 +2412,7 @@ atxy4o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{boo
 ### UPLOAD VIA OPTIBOOT
 atxy4o.upload.workaround=
 atxy4o.upload.tool=avrdude
-atxy4o.upload.speed=115200
+atxy4o.upload.serialparams=-P{serial.port} -b115200
 atxy4o.upload.protocol=arduino
 atxy4o.upload.extra_params=-D
 
@@ -2283,7 +2659,7 @@ atx24o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{boo
 
 atx24o.upload.workaround=
 atx24o.upload.tool=avrdude
-atx24o.upload.speed=115200
+atx24o.upload.serialparams=-P{serial.port} -b115200
 atx24o.upload.protocol=arduino
 atx24o.upload.extra_params=-D
 
@@ -2488,7 +2864,7 @@ atxy2o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{boo
 
 ### UPLOAD VIA OPTIBOOT
 atxy2o.upload.workaround=
-atxy2o.upload.speed=115200
+atxy2o.upload.upload.serialparams=-P{serial.port} -b115200
 atxy2o.upload.tool=avrdude
 atxy2o.upload.protocol=arduino
 atxy2o.upload.extra_params=-D
@@ -2672,3 +3048,256 @@ atxy2o.menu.startuptimeopti.8.bootloader.SYSCFG1=0x04
 atxy2o.menu.startuptimeopti.16.bootloader.SYSCFG1=0x05
 atxy2o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atxy2o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
+
+
+
+##########################################################################
+#                                                                        #
+# Curiosity Nano    #   # ###  ### ####   ###   ### #  # ### ####      ###
+# Xplained Mini     ## ##  #  #    #   # #   # #    #  #  #  #   #   #####
+# Xplained Pro      # # #  #  #    ####  #   # #    ####  #  ####  #######
+# WITH OPTIBOOT     #   #  #  #    # #   #   # #    #  #  #  #       #####
+#                   #   # ###  ### #  ##  ###   ### #  # ### #         ###
+#________________________________________________________________________#
+
+### BUILD PARAMETERS
+microchipo.build.text_section_start=.text=0x200
+microchipo.build.board=AVR_MicrochipOfficial
+microchipo.build.millistimer=D0
+microchipo.build.bootload=opti
+microchipo.build.clocksource=0
+microchipo.build.core=megatinycore
+microchipo.build.mcu=attiny{build.attiny}
+microchipo.build.f_cpu={build.speed}000000L
+microchipo.build.export_merged_output=false
+microchipo.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
+microchipo.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+
+### BOOTLOADING PARAMETERS (FUSES)
+microchipo.bootloader.WDTCFG=0x00
+microchipo.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
+microchipo.bootloader.OSCCFG=0x01
+microchipo.bootloader.TCD0CFG=0x00
+microchipo.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
+microchipo.bootloader.APPEND=0x00
+microchipo.bootloader.BOOTEND=0x00
+microchipo.bootloader.tool=avrdude
+
+### UPLOAD VIA OPTIBOOT
+microchipo.upload.workaround=
+microchipo.upload.upload.serialparams=-P{serial.port} -b115200
+microchipo.upload.tool=avrdude
+microchipo.upload.protocol=arduino
+microchipo.upload.extra_params=-D
+
+### CHIP
+microchipo.menu.board_name.cn3217=Curiosity Nano ATtiny3217
+microchipo.menu.board_name.cn3217.build.board=AVR_CuriosityNano3217
+microchipo.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7
+microchipo.menu.board_name.cn3217.bootloader.file=optiboot_Curiosity3217.hex
+microchipo.menu.board_name.cn3217.build.attiny=3217
+microchipo.menu.board_name.cn3217.build.variant=txy7
+microchipo.menu.board_name.cn3217.upload.maximum_size=32768
+microchipo.menu.board_name.cn3217.upload.maximum_data_size=2048
+
+microchipo.menu.board_name.cn1627=Curiosity Nano ATtiny1627
+microchipo.menu.board_name.cn1627.build.board=AVR_CuriosityNano1627
+microchipo.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7
+microchipo.menu.board_name.cn1627.bootloader.file=optiboot_Curiosity1627.hex
+microchipo.menu.board_name.cn1627.build.millistimer=B1
+microchipo.menu.board_name.cn1627.build.attiny=1627
+microchipo.menu.board_name.cn1627.build.variant=txy7
+microchipo.menu.board_name.cn1627.upload.maximum_size=16384
+microchipo.menu.board_name.cn1627.upload.maximum_data_size=2048
+
+microchipo.menu.board_name.cn1607=Curiosity Nano ATtiny1607
+microchipo.menu.board_name.cn1607.build.board=AVR_CuriosityNano1607
+microchipo.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7
+microchipo.menu.board_name.cn1607.bootloader.file=optiboot_Curiosity1607.hex
+microchipo.menu.board_name.cn1607.build.attiny=1607
+microchipo.menu.board_name.cn1607.build.variant=txy7
+microchipo.menu.board_name.cn1607.build.millistimer=A0
+microchipo.menu.board_name.cn1607.upload.maximum_size=16384
+microchipo.menu.board_name.cn1607.upload.maximum_data_size=1024
+
+microchipo.menu.board_name.xp3217=Xplained Pro ATtiny3217
+microchipo.menu.board_name.xp3217.build.board=AVR_XplainedPro3217
+microchipo.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
+microchipo.menu.board_name.xp3217.bootloader.file=optiboot_XplainedPro3217.hex
+microchipo.menu.board_name.xp3217.build.attiny=3217
+microchipo.menu.board_name.xp3217.build.variant=txy7
+microchipo.menu.board_name.xp3217.build.millistimer=D0
+microchipo.menu.board_name.xp3217.upload.maximum_size=32768
+microchipo.menu.board_name.xp3217.upload.maximum_data_size=2048
+
+microchipo.menu.board_name.xp817=Xplained Pro ATtiny817
+microchipo.menu.board_name.xp817.build.board=AVR_XplainedPro817
+microchipo.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
+microchipo.menu.board_name.xp817.bootloader.file=optiboot_XplainedPro817.hex
+microchipo.menu.board_name.xp817.build.attiny=817
+microchipo.menu.board_name.xp817.build.variant=txy7
+microchipo.menu.board_name.xp817.build.millistimer=D0
+microchipo.menu.board_name.xp817.upload.maximum_size=8192
+microchipo.menu.board_name.xp817.upload.maximum_data_size=512
+
+microchipo.menu.board_name.xm817=Xplained Mini ATtiny817
+microchipo.menu.board_name.xm817.build.board=AVR_XplainedMini817
+microchipo.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5
+microchipo.menu.board_name.xm817.bootloader.file=optiboot_XplainedMini817.hex
+microchipo.menu.board_name.xm817.build.attiny=817
+microchipo.menu.board_name.xm817.build.variant=txy7
+microchipo.menu.board_name.xm817.build.millistimer=D0
+microchipo.menu.board_name.xm817.upload.maximum_size=8192
+microchipo.menu.board_name.xm817.upload.maximum_data_size=512
+
+microchipo.menu.board_name.xn416=Xplained Nano ATtiny416
+microchipo.menu.board_name.xn416.build.board=AVR_XplainedNano416
+microchipo.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP
+microchipo.menu.board_name.xn416.bootloader.file=optiboot_XplainedNano416.hex
+microchipo.menu.board_name.xn416.build.attiny=416
+microchipo.menu.board_name.xn416.build.variant=txy6
+microchipo.menu.board_name.xn416.build.millistimer=D0
+microchipo.menu.board_name.xn416.upload.maximum_size=4096
+microchipo.menu.board_name.xn416.upload.maximum_data_size=256
+
+
+### CLOCK SOURCE
+microchipo.menu.clock.20internal=20 MHz internal
+microchipo.menu.clock.16internal=16 MHz internal
+microchipo.menu.clock.10internal=10 MHz internal
+microchipo.menu.clock.8internal=8 MHz internal
+microchipo.menu.clock.5internal=5 MHz internal
+microchipo.menu.clock.4internal=4 MHz internal
+microchipo.menu.clock.1internal=1 MHz internal
+microchipo.menu.clock.20internaltuned=20 MHz internal - tuned
+microchipo.menu.clock.16internaltuned=16 MHz internal - tuned
+microchipo.menu.clock.12internaltuned=12 MHz internal - tuned
+microchipo.menu.clock.24internaltuned=24 MHz internal - tuned, overclocked
+microchipo.menu.clock.25internaltuned=25 MHz internal - tuned, overclocked
+microchipo.menu.clock.30internaltuned=30 MHz internal - tuned, overclocked, may be unstable, req. 20 MHz fuse
+microchipo.menu.clock.32internaltuned=32 MHz internal - tuned, 2-series, overclocked, may be unstable, req. 20 MHz fuse
+microchipo.menu.clock.20internal.build.speed=20
+microchipo.menu.clock.20internal.build.clocksource=0
+microchipo.menu.clock.16internal.build.speed=16
+microchipo.menu.clock.16internal.build.clocksource=0
+microchipo.menu.clock.10internal.build.speed=10
+microchipo.menu.clock.10internal.build.clocksource=0
+microchipo.menu.clock.8internal.build.speed=8
+microchipo.menu.clock.8internal.build.clocksource=0
+microchipo.menu.clock.5internal.build.speed=5
+microchipo.menu.clock.5internal.build.clocksource=0
+microchipo.menu.clock.4internal.build.speed=4
+microchipo.menu.clock.4internal.build.clocksource=0
+microchipo.menu.clock.1internal.build.speed=1
+microchipo.menu.clock.1internal.build.clocksource=0
+microchipo.menu.clock.20internaltuned.build.speed=20
+microchipo.menu.clock.20internaltuned.build.clocksource=0
+microchipo.menu.clock.20internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchipo.menu.clock.16internaltuned.build.speed=16
+microchipo.menu.clock.16internaltuned.build.clocksource=0
+microchipo.menu.clock.16internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchipo.menu.clock.12internaltuned.build.speed=12
+microchipo.menu.clock.12internaltuned.build.clocksource=0
+microchipo.menu.clock.12internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchipo.menu.clock.24internaltuned.build.speed=24
+microchipo.menu.clock.24internaltuned.build.clocksource=0
+microchipo.menu.clock.24internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchipo.menu.clock.25internaltuned.build.speed=25
+microchipo.menu.clock.25internaltuned.build.clocksource=0
+microchipo.menu.clock.25internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchipo.menu.clock.30internaltuned.build.speed=30
+microchipo.menu.clock.30internaltuned.build.clocksource=0
+microchipo.menu.clock.30internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchipo.menu.clock.32internaltuned.build.speed=32
+microchipo.menu.clock.32internaltuned.build.clocksource=0
+microchipo.menu.clock.32internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+microchipo.menu.clock.20internaltuned.bootloader.OSCCFG=0x02
+microchipo.menu.clock.24internaltuned.bootloader.OSCCFG=0x02
+microchipo.menu.clock.25internaltuned.bootloader.OSCCFG=0x02
+microchipo.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
+microchipo.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
+microchipo.menu.clock.20internal.bootloader.OSCCFG=0x02
+microchipo.menu.clock.10internal.bootloader.OSCCFG=0x02
+microchipo.menu.clock.5internal.bootloader.OSCCFG=0x02
+
+### BOD VOLTAGE
+microchipo.menu.bodvoltage.1v8=1.8V (5 MHz or less)
+microchipo.menu.bodvoltage.2v6=2.6V (10 MHz or less)
+microchipo.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
+microchipo.menu.bodvoltage.2v1=2.1V
+microchipo.menu.bodvoltage.2v9=2.9V
+microchipo.menu.bodvoltage.3v3=3.3V
+microchipo.menu.bodvoltage.3v7=3.7V
+microchipo.menu.bodvoltage.4v0=4.0V
+microchipo.menu.bodvoltage.1v8.bootloader.bodlevbits=000
+microchipo.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+microchipo.menu.bodvoltage.4v2.bootloader.bodlevbits=111
+microchipo.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+microchipo.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+microchipo.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+microchipo.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+microchipo.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+
+### BOD MODE
+microchipo.menu.bodmode.disabled=Disabled/Disabled
+microchipo.menu.bodmode.enabled=Enabled/Enabled
+microchipo.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
+microchipo.menu.bodmode.ensampslow=Enabled/Sampled (125 Hz)
+microchipo.menu.bodmode.sampledfast=Sampled/Sampled (1 kHz)
+microchipo.menu.bodmode.sampledslow=Sampled/Sampled (125 Hz)
+microchipo.menu.bodmode.sampdisfast=Sampled/Disabled (1 kHz)
+microchipo.menu.bodmode.sampdisslow=Sampled/Disabled (125 Hz)
+microchipo.menu.bodmode.endisholdwake=Enabled hold wakeup/Disabled
+microchipo.menu.bodmode.disabled.bootloader.BODCFG=0x00
+microchipo.menu.bodmode.enabled.bootloader.bodmodebits=00101
+microchipo.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
+microchipo.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
+microchipo.menu.bodmode.samplefast.bootloader.bodmodebits=01010
+microchipo.menu.bodmode.sampleslow.bootloader.bodmodebits=11010
+microchipo.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
+microchipo.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
+microchipo.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
+
+### MILLIS TIMER
+microchipo.menu.millis.enabled=Enabled (default timer)
+microchipo.menu.millis.disabled=Disabled (saves flash)
+microchipo.menu.millis.timera=TCA0 (default on 0-series)
+microchipo.menu.millis.timerd=TCD0 (1-series only, default there)
+microchipo.menu.millis.timerb0=TCB0 (breaks tone() and Servo except on 1627, 3217)
+microchipo.menu.millis.timerb1=TCB1 (3217 and 1627 only, default 2-series)
+microchipo.menu.millis.rtc=RTC (no micros)
+microchipo.menu.millis.rtcxtal=RTC w/w32.768 kHz ext. crystal (1/2-series only, no micros)
+microchipo.menu.millis.disabled.build.millistimer=NONE
+microchipo.menu.millis.timera.build.millistimer=A0
+microchipo.menu.millis.timerd.build.millistimer=D0
+microchipo.menu.millis.timerb0.build.millistimer=B0
+microchipo.menu.millis.timerb1.build.millistimer=B1
+microchipo.menu.millis.rtc.build.millistimer=RTC
+microchipo.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
+microchipo.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+
+### STARTUP TIME (SUT)
+microchipo.menu.startuptime.8=8ms
+microchipo.menu.startuptime.0=0ms
+microchipo.menu.startuptime.1=1ms
+microchipo.menu.startuptime.2=2ms
+microchipo.menu.startuptime.4=4ms
+microchipo.menu.startuptime.16=16ms
+microchipo.menu.startuptime.32=32ms
+microchipo.menu.startuptime.64=64ms
+microchipo.menu.startuptime.0.bootloader.SYSCFG1=0x00
+microchipo.menu.startuptime.1.bootloader.SYSCFG1=0x01
+microchipo.menu.startuptime.2.bootloader.SYSCFG1=0x02
+microchipo.menu.startuptime.4.bootloader.SYSCFG1=0x03
+microchipo.menu.startuptime.8.bootloader.SYSCFG1=0x04
+microchipo.menu.startuptime.16.bootloader.SYSCFG1=0x05
+microchipo.menu.startuptime.32.bootloader.SYSCFG1=0x06
+microchipo.menu.startuptime.64.bootloader.SYSCFG1=0x07
+
+### VOLTAGE FOR UART BAUD CORRECTION
+microchipo.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+microchipo.menu.uartvoltage.skip.build.uartvoltage=NA
+microchipo.menu.uartvoltage.5v=Closer to 5v
+microchipo.menu.uartvoltage.3v=Closer to 3v
+microchipo.menu.uartvoltage.5v.build.uartvoltage=5V
+microchipo.menu.uartvoltage.3v.build.uartvoltage=3V

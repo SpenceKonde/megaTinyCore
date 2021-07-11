@@ -5,7 +5,7 @@ All of the 0/1/2-series tinyAVR devices have an internal high-frequency oscillat
 There are many good reasons not to use it on the Dx-series; the factory cal is pretty much dead on, and you can crank it up to 32 MHz without doing anything with the cal. I certainly have no plans to support tuning over there. I also would be disinclined towards tuining support if these parts would work with a crystal.
 
 ## Don't use chips with extreme tuning for safety critical tasks
-I know I say this all over the place, but most of the speeds enabled by tuning are overclocks. While these chips are rated for safety critical applications, neither the Arduino libraries, nor anything related to this core are. Parts used outside their specified operating range may malfunction with unpredictable results. Almost any arbitrary result is possible, from crashes to incorrect results for arithmatic and logic, to making demons fly out of your nostrisls. That is obviously not acceptable for safety critical aoplicatoins,
+I know I say this all over the place, but most of the speeds enabled by tuning are overclocks. While these chips are rated for safety critical applications, neither the Arduino libraries, nor anything related to this core are. Parts used outside their specified operating range may malfunction with unpredictable results. Almost any arbitrary result is possible, from crashes to incorrect results for arithmetic and logic, to making demons fly out of your nostrisls. That is obviously not acceptable for safety critical aoplicatoins,
 
 ## General Concepts
 As usual for AVR parts, the internal oscillator's compliance covers a far wider range than the datasheet describes. In my testing on 1-series parts, it appeared that both the 16 MHz and 20 MHz oscillator can be calibrated to as low as approximately 5/8 of their nominal speed or as high as 1-5/8 of their nominal speed The oscillator on the tinyAVR 2-series parts has gotten an upgrade in the form of the calibration register getting an additional bit - it now has 7 bit granularity instead of 6! (the high bit indicates whether the center frequency is 16 or 20 MHz). The 128 settings cover a similarly sized range, of speeds, though both the top and bottom ends of this range are higher. The 2-series parts also reach higher speeds beforethey start to fail.
@@ -16,7 +16,7 @@ This section is about how to "tune" a chip and automatically store those magic O
 
 
 ### Why not an external clock
-External clocks are great, with very accurate timing, better overclocking (the 1-series parts run at 32 MHz like that), etc. but it's and extra part - oh - and it needs it's own 0.01uf decoupling capacitor so 2 extra parts to place... and ordered from the cheapeast chinese electronics vendors on aliexpress, prices bottom out at 50 cents or so, all told, and if you want to know the what the specs are like , you're going to end uo paying more for the oscillatoer than the chip it's clocking. Amd on  top of all that they take up a pin (Note that the tinyAVR 0/1/2-series Rev. C boards from my Tindie shop will cover this!)
+External clocks are great, with very accurate timing, better overclocking (the 1-series parts run at 32 MHz like that), etc. but it's and extra part - oh - and it needs it's own 0.01uf decoupling capacitor so 2 extra parts to place... and ordered from the cheapest chinese electronics vendors on aliexpress, prices bottom out at 50 cents or so, all told, and if you want to know the what the specs are like , you're going to end uo paying more for the oscillatoer than the chip it's clocking. Amd on  top of all that they take up a pin (Note that the tinyAVR 0/1/2-series Rev. C boards from my Tindie shop will cover this!)
 
 If you don't need *perfect* clock accuracy, but do need a significiantly different (probably higher) clock speed for whatever reason ("my sketch is running slowly" is not a good reason to overclock unless you know why it is slow and expect it to be slow at that clockspeed - and all you need is 50% more clock cycles and you'd be able to process that data fast enough
 
@@ -28,7 +28,7 @@ If you don't need *perfect* clock accuracy, but do need a significiantly differe
 
 
 #### Requirements
-* An Arduino wih a crystal for it's main system clock (Or, if you happen to have a 500 Hz signal generator compatible with 5v)
+* An Arduino with a crystal for it's main system clock (Or, if you happen to have a 500 Hz signal generator compatible with 5v)
   * Alternately. most oscilloscopes have a 1 kHz output. if this is the case, uncomment `#define ONEKHZMODE` - note that while this is a more accurate signal, there is more sampling noise due to the low granularity of the the rather unsophisticated way we measure the time.
 * A tinyAVR 0-series, 1-series, or 2-series part. The 2-series overclock better.
 * A UPDI programming method (jtag2updi, or just serial adapter + resistor or schottky diode)
@@ -66,7 +66,7 @@ PC1 and PC2 are the only applicable pins found on all devices in the AVR Dx-seri
 * You can power the reference board and target from the same power source.
 
 #### Step 2: Load the tuner
-If you arent sure that nothing uses pin0 (including for serial or some other interface), upload something inoffensive like bare minimum first
+If you aren't sure that nothing uses pin0 (including for serial or some other interface), upload something inoffensive like bare minimum first
 
 Open the megaTinyTune example (under megaTinyCore)
 Select the target chip, set it for 16 or 20 MHz, and disable millis.
@@ -118,7 +118,7 @@ As of 2.4.0, tuned internal oscillator at frequencies listed above is supported.
 | 10 MHz |    Yes, natural | Yes, prescale 20 | Yes, prescale 20 |               No | can't tune 20 MHz OSC down to 10, but just prescale tuned 20 MHz,16 MHz will usually get there. None of the 2-series can achieve 10 naturally, just set it for 20 and prescale |
 | 12 MHz |    Yes, natural |     Yes, natural |   Yes, natural   | Yes, prescale 24 | 2-series 20 can'dt be tuned down to 12, but we can tune it up tp 24 and divide by 2.
 | 16 MHz |  Yes, of course |     Yes, natural | Yes, of course   |     Yes, natural |
-| 20 MHz |    Yes, natural |   Yes, of course |   Yes, natural   |   Yes, of course | On all parts, the 16 MHz oscillator can be turned up to 20, and ther 20 down t0 16.
+| 20 MHz |    Yes, natural |   Yes, of course |   Yes, natural   |   Yes, of course | On all parts, the 16 MHz oscillator can be turned up to 20, and other 20 down t0 16.
 | 24 MHz |    Yes, natural |     Yes, natural |   Yes, natural   |     Yes, natural | Use with Optiboot to not care whether the clock speed matches settings from bootloading-time -Any UPDI upload sets 16-vs-20 fuse so was never a problem except on optiboot) |
 | 25 MHz |    Yes, natural |     Yes, natural |   Yes, natural   |     Yes, natural |
 | 30 MHz |   No - can't do |   Often Unstable |     Some parts   |     Yes, natural | The 0/1 at 16 center cannot reach 30 MHz, and with 20 center barely can - if it doesn't crash before that speed. Most 2-series seem to run here at least at 5v and some can even hit it with their lower frequency oscillator.

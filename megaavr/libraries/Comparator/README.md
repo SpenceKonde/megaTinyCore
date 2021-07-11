@@ -163,7 +163,7 @@ Comparator.output = out::enable; // Enable output comparator's output pin. Compa
 
 
 ### output_swap
-The output_swap option is not available on tinyAVR devices; each comparator can only output to a single pin. On some parts, there are multiple output pin options (don't be too jealous - all three of their comparators to choose betweeen the same 2 pins. Which are also the pins that the ZCD's use.)
+The output_swap option is not available on tinyAVR devices; each comparator can only output to a single pin. On some parts, there are multiple output pin options (don't be too jealous - all three of their comparators to choose between the same 2 pins. Which are also the pins that the ZCD's use.)
 
 ### output_initval
 Initial state the comparator output pin has when initialized.
@@ -199,7 +199,7 @@ Method to actually start the analog comparator (the init() method configures it,
 Comparator.start(); // Start comparator
 ```
 ### read()
-Method to get the current state of the comparator's output as a boolean. This allows you to, among other things, poll the comparators instead of useing them with interrupts.
+Method to get the current state of the comparator's output as a boolean. This allows you to, among other things, poll the comparators instead of using them with interrupts.
 
 #### Usage
 ```c++

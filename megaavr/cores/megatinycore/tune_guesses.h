@@ -32,7 +32,7 @@
   #define GUESS_16_10 -26
   #define MAX_TUNING   63
   /* These last two are ugly - sorry: Some parts need to tune up to 24 and    *
-   * halve it, others cant hit 24, but can be tuned down . All 16 can hit 20  *
+   * halve it, others can't hit 24, but can be tuned down . All 16 can hit 20 *
    * to be scaled down, but we do gather number for 10 itself. No 20 can be   *
    * tuned down to 10, just scale.                                            */
   #define GUESS_20_12_DIRECT -28

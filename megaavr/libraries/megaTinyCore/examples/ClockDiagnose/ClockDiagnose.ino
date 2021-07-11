@@ -83,7 +83,7 @@ void setup() {
     errortype |= 64;
   }
   #endif //if tuning enabled.
-  #endif //end of clock-source dependand diagostics
+  #endif //end of clock-source dependent diagostics
 
   // Now that we know what, if anything, is wrong, let's set up serial so it works and tell the user.
   if (!(errortype & (128 | 64))) {
@@ -102,7 +102,7 @@ void setup() {
   if (errortype & (128 | 64)) { //would be an else except we need to end up here if 128 not set and 16 is......
     if (errortype & 64) {
       Serial.begin(19200);
-      Serial.println("Tuned internal selected, but tuning sketch has not run successfully. If you can read this, our guess was close enoguh for UART to work though!");
+      Serial.println("Tuned internal selected, but tuning sketch has not run successfully. If you can read this, our guess was close enough for UART to work though!");
       Serial.flush();
       Serial.end();
     }

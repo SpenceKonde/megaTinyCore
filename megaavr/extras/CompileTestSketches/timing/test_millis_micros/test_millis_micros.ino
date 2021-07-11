@@ -13,7 +13,7 @@ void setup() {
     millis_stop();
     millis_set(_SFR_MEM32(0x001C));
     millis_restart();
-  }
+  #endif
 }
 void loop() {
   #ifndef MILLIS_USE_TIMERNONE
@@ -21,5 +21,5 @@ void loop() {
     #ifndef MILLIS_USE_TIMERRTC
       _SFR_MEM32(0x001C)=micros();
     #endif
-    
+  #endif
 }

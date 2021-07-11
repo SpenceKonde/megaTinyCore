@@ -779,7 +779,7 @@ void __attribute__((weak)) init_clock() {
       GPIOR0 |= 0x80;
       GPIOR0 |= 0x40;
       return; //we can't do that speed at all with this oscillator fuse! Hopefully users notice theiur skwetch is slow instead of fast, and will read the docs,
-      // and determine the cause of hte problem.
+      // and determine the cause of the problem.
     } else {
       uint8_t tunedval=_SFR_MEM8(0x1300 + (osccfg ? 6 : 0) + CLOCK_TUNE_START + TUNED_CALIBRATION_OFFSET);
       if (tunedval & 0x80) {
