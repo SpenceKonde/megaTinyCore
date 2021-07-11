@@ -45,7 +45,7 @@
 #include <util/delay_basic.h>
 
 //
-// Statics
+// Static methods
 //
 SoftwareSerial *SoftwareSerial::active_object = 0;
 uint8_t SoftwareSerial::_receive_buffer[_SS_MAX_RX_BUFF];
