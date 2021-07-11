@@ -354,7 +354,7 @@ The PGA is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that s
 * `PP = 11` Disable PGA now, and in future turn if off after use
 
 Example:
-```
+```c
 ADCPowerOptions(0x0B); //0x0F = 0b 0000 1011 LL = 11, so low latency on. PP = 10, so PGA on, automatic shut off disabled. Maximum power consumption, minimum ADC delays.
 ADCPowerOptions(0x02); //0x02 = 0b 0000 0010 LL = 10, so low latency off. PP = 10, turn off the PGA and enable automatic shut off.
 ```
@@ -544,7 +544,7 @@ As noted above in the discussion of the shared UPDI/reset pin, these parts suppo
 
 This allows the application a convenient mechanism to restart itself without having to potentially wait through the bootloader attempting to communicate with whatever is connected to the serial port. The method shown below also resets the part significantly faster utilizing the "window" WDT functionality - that is, by telling the chip to reset if it receives a WDR instruction too soon - and then repeatedly sending that instruction until it resets.
 
-```
+```c++
 void resetViaWDT() {
     _PROTECTED_WRITE(WDT.CTRLA,0x01); //enable the WDT, minimum timeout
     while (1) ; // spin until reset
@@ -602,10 +602,10 @@ Additionally, `MILLIS_TIMER` is defined to that timer - see `Identifying Timers`
 #### Checking that correct menu option is selected
 If your sketch requires that the TCB0 is used as the millis timer
 
-```
-##ifndef MILLIS_USE_TIMERB0
-##error "This sketch is written for use with TCB0 as the millis timing source"
-##endif
+```c
+#ifndef MILLIS_USE_TIMERB0
+#error "This sketch is written for use with TCB0 as the millis timing source"
+#endif
 ```
 
 #### Core feature detection
@@ -627,20 +627,20 @@ There are a number of macros for determining what (if any) features the core sup
 #### Identifying Timers
 Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statenebts to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro.
 
-```
-##define NOT_ON_TIMER 0x00
-##define TIMERA0 0x10
-##define TIMERA1 0x08 // Not present on any tinyAVR
-##define TIMERB0 0x20
-##define TIMERB1 0x21
-##define TIMERB2 0x22 // Not present on any tinyAVR
-##define TIMERB3 0x23 // Not present on any tinyAVR
-##define TIMERB4 0x23 // Not present on any tinyAVR
-##define TIMERB5 0x23 // Not present on any tinyAVR
-##define TIMERD0 0x40
-##define DACOUT 0x80  // Not a timer - but used like one by analogWrite()
-##define TIMERRTC 0x90
-##define TIMERRTC_XTAL 0x91
+```c
+#define NOT_ON_TIMER 0x00
+#define TIMERA0 0x10
+#define TIMERA1 0x08 // Not present on any tinyAVR
+#define TIMERB0 0x20
+#define TIMERB1 0x21
+#define TIMERB2 0x22 // Not present on any tinyAVR
+#define TIMERB3 0x23 // Not present on any tinyAVR
+#define TIMERB4 0x23 // Not present on any tinyAVR
+#define TIMERB5 0x23 // Not present on any tinyAVR
+#define TIMERD0 0x40
+#define DACOUT 0x80  // Not a timer - but used like one by analogWrite()
+#define TIMERRTC 0x90
+#define TIMERRTC_XTAL 0x91
 ```
 
 ## Bootloader (Optiboot) Support
@@ -678,6 +678,8 @@ Serial uploads are all done at 115200 baud, regardless of port, pin mapping or p
 
 ### "Upload using programmer" and Optiboot
 This upload method is NOT SUPPORTED by megaTinyCore. If you want to upload via programer, and accept that the bootloader will be lost, use the non-optiboot board definition.
+
+### Removing Optiboot
 
 #### Removing Optiboot - 2.2.0 and later
 On 2.2.0 and later, whenever code is uploaded via UPDI ("upload" from non-optiboot board definitio), whether or not the device has been bootloaded (like on classic AVRs, "upload using programmer" will trash any bootloader present), `BOOTEND` will be set to match what the code was compiled for; with an optiboot board definition selected, this will result in the first 512b of flash being blank (since we erased any bootloader present), `BOOTEND=2` (512b bootloader section, as application expects), and a working sketch. With a non-optiboot board definition selected, this will result in `BOOTEND=0`, no gap at the start of the sketch, and a working sketch.
