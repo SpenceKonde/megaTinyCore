@@ -544,7 +544,7 @@ As noted above in the discussion of the shared UPDI/reset pin, these parts suppo
 
 This allows the application a convenient mechanism to restart itself without having to potentially wait through the bootloader attempting to communicate with whatever is connected to the serial port. The method shown below also resets the part significantly faster utilizing the "window" WDT functionality - that is, by telling the chip to reset if it receives a WDR instruction too soon - and then repeatedly sending that instruction until it resets.
 
-```c
+```c++
 void resetViaWDT() {
     _PROTECTED_WRITE(WDT.CTRLA,0x01); //enable the WDT, minimum timeout
     while (1) ; // spin until reset
@@ -603,9 +603,9 @@ Additionally, `MILLIS_TIMER` is defined to that timer - see `Identifying Timers`
 If your sketch requires that the TCB0 is used as the millis timer
 
 ```c
-##ifndef MILLIS_USE_TIMERB0
-##error "This sketch is written for use with TCB0 as the millis timing source"
-##endif
+#ifndef MILLIS_USE_TIMERB0
+#error "This sketch is written for use with TCB0 as the millis timing source"
+#endif
 ```
 
 #### Core feature detection
@@ -628,19 +628,19 @@ There are a number of macros for determining what (if any) features the core sup
 Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statenebts to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro.
 
 ```c
-##define NOT_ON_TIMER 0x00
-##define TIMERA0 0x10
-##define TIMERA1 0x08 // Not present on any tinyAVR
-##define TIMERB0 0x20
-##define TIMERB1 0x21
-##define TIMERB2 0x22 // Not present on any tinyAVR
-##define TIMERB3 0x23 // Not present on any tinyAVR
-##define TIMERB4 0x23 // Not present on any tinyAVR
-##define TIMERB5 0x23 // Not present on any tinyAVR
-##define TIMERD0 0x40
-##define DACOUT 0x80  // Not a timer - but used like one by analogWrite()
-##define TIMERRTC 0x90
-##define TIMERRTC_XTAL 0x91
+#define NOT_ON_TIMER 0x00
+#define TIMERA0 0x10
+#define TIMERA1 0x08 // Not present on any tinyAVR
+#define TIMERB0 0x20
+#define TIMERB1 0x21
+#define TIMERB2 0x22 // Not present on any tinyAVR
+#define TIMERB3 0x23 // Not present on any tinyAVR
+#define TIMERB4 0x23 // Not present on any tinyAVR
+#define TIMERB5 0x23 // Not present on any tinyAVR
+#define TIMERD0 0x40
+#define DACOUT 0x80  // Not a timer - but used like one by analogWrite()
+#define TIMERRTC 0x90
+#define TIMERRTC_XTAL 0x91
 ```
 
 ## Bootloader (Optiboot) Support
@@ -676,10 +676,13 @@ resetflags = RSTCTRL.RSTFR;
 
 Serial uploads are all done at 115200 baud, regardless of port, pin mapping or part.
 
-### "Upload using programmer" and removing Optiboot
+### "Upload using programmer" and Optiboot
+This upload method is NOT SUPPORTED by megaTinyCore. If you want to upload via programer, and accept that the bootloader will be lost, use the non-optiboot board definition.
+
+### Removing Optiboot
 
 #### Removing Optiboot - 2.2.0 and later
-On 2.2.0 and later, whenever code is uploaded via UPDI ("upload" from non-optiboot board definition, or "upload using programmer" from optiboot one), whether or not the device has been bootloaded (like on classic AVRs, "upload using programmer" will trash any bootloader present), `BOOTEND` will be set to match what the code was compiled for; with an optiboot board definition selected, this will result in the first 512b of flash being blank (since we erased any bootloader present), `BOOTEND=2` (512b bootloader section, as application expects), and a working sketch. With a non-optiboot board definition selected, this will result in `BOOTEND=0`, no gap at the start of the sketch, and a working sketch.
+On 2.2.0 and later, whenever code is uploaded via UPDI ("upload" from non-optiboot board definitio), whether or not the device has been bootloaded (like on classic AVRs, "upload using programmer" will trash any bootloader present), `BOOTEND` will be set to match what the code was compiled for; with an optiboot board definition selected, this will result in the first 512b of flash being blank (since we erased any bootloader present), `BOOTEND=2` (512b bootloader section, as application expects), and a working sketch. With a non-optiboot board definition selected, this will result in `BOOTEND=0`, no gap at the start of the sketch, and a working sketch.
 
 #### Removing Optiboot - 2.1.5 and earlier
 Like classic AVRs with hardware bootloader support (like the ATmega328p, and all other ATmega parts older than the 4809/4808), and unlike ATtiny parts without such support (those use "virtual boot" to get bootloader functionality) you must do "burn bootloader" with a non-optiboot part selected in order to reprogram the part normally via UPDI.
