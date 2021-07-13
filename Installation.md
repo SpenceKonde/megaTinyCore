@@ -1,7 +1,7 @@
 # Installing megaTinyCore
 
 ## Supported IDE versions
-megaTinyCore requires a version of the IDE later than 1.6.3; - it may require a much more recent version of the IDE; this has not been tested. It has been tested with 1.8.9 and 1.8.13. Due to a regression in 1.8.15 megaTinyCore is not compatible with that IDE version. It bombs ouit because it says there's no version, when the version as specified in platform.txt has been confirmed to be entirely valid.
+megaTinyCore requires a version of the IDE later than 1.6.3; - it may require a much more recent version of the IDE; this has not been tested. It has been tested with 1.8.9 and 1.8.13. Due to a regression in 1.8.15 megaTinyCore is not compatible with that IDE version. It errors out because it says there's no version, when the version as specified in platform.txt has been confirmed to be entirely valid.
 
 
 ## Boards Manager Installation (now strongly recommended unless helping with core developoment)
@@ -22,8 +22,8 @@ Manual installation allows the latest version of the core to be installed, with 
 * You must update the toolchain. Search the .json file above for the latest version, and it will list under tools-dependencies a version of avr-gcc. Search the file for that and you'll wind up at a block of links.
   * Download and decompress the version for your OS.
   * You will find an 'avr' folder containing several more folders.
-    * The directory structure is verty confusing. There are a hell of a lot of nested "avr" folders/directories.
-  * Copy this into (ardino instance which has never had board manager installations root folder)/hardware/tools - if you did this right, you'll be told that hundreds of files are different. Replase them all!
+    * The directory structure is very confusing. There are a hell of a lot of nested "avr" folders/directories.
+  * Copy this into `(arduino instance which has never had board manager installations root folder)/hardware/tools` - if you did this right, you'll be told that hundreds of files are different. Replace them all!
   * **NOTE:** if you also intend to use DxCore manually installed, check that one too, and see if it specifies a later toolchain version. Use whichever one has higher version (Azduinio4 is higher than Azduino3)
 
 * If you want SerialUPFI, you need to also follow megaavr/tools/ManualPython.md.
