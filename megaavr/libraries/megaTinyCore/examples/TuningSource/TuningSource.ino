@@ -3,14 +3,14 @@
 // *INDENT-OFF*  this code is unreadable of you follow astyle's conventions!
 #if __AVR_ARCH__ >=100
 /* FOR MODERN AVRs:
- *  tinyAVR must use PB0, PB1 or PB2 (PB2 is by default a serial pin though. 
+ *  tinyAVR must use PB0, PB1 or PB2 (PB2 is by default a serial pin though.
  *  In order for these to be good tuning sources you should have an external clock chip on them, or have a watch crystal connected to them and use RTC tuning mode, and use the adjusted RTC-tuning  version of the tuning sketch as well
- *  Same goes for AVR DA and megaAVR 0-series. 
- *  
- *  AVR DB-series and DD-series parts can use a simple crystal. 
- *  
- *  Your tuning will never be better than the thing you're ruimning it from, so don't use something 
- *  with an internal oscillator!
+ *  Same goes for AVR DA and megaAVR 0-series.
+ *
+ *  AVR DB-series and DD-series parts can use a simple crystal.
+ *
+ *  Your tuning will never be better than the thing you're ruimning it from, so don't use something
+ *  running on an internal oscillator!
  */
 #ifndef TUNE_OUTPUT_PIN // If not defined in parts.h, need to pick default pin
   #ifndef TUNE_WITH_RTC // First the non-RTC version
@@ -163,20 +163,19 @@ void invalidPin() {
     digitalWrite(LED_BUILTIN,CHANGE);
   }
 }
-#else 
-  /* In this case it's a classic AVR */
-  // Target pulse length, in us. 
-  #define TARGET_OC1 1000
+#else
+ /* In this case it's a classic AVR */
+  // Target pulse length, in us.
+ #define TARGET_OC1 1000
   //#define TARGET_OC2 1000
   //#define TARGET_OC3 2000
   //#define TARGET_OC4 2000
   //#define TARGET_OC5 2000
   // clocks per microsecond times microseconds times 2 gives period (since each cycle consists of a high and low pulse.)
   #define OC1PERIOD ((TARGET_OC1 * (F_CPU/1000000) * 2))
-  
-  #define OC1LENGTH ((TARGET_OC1 * (F_CPU/1000000))) 
-  #if (OC1PERIOD > 65535) 
-    #if (OC1PERIOD & 0x07 != 0)
+  #define OC1LENGTH ((TARGET_OC1 * (F_CPU/1000000)))
+ #if (OC1PERIOD > 65535)
+   #if (OC1PERIOD & 0x07 != 0)
       #error "Cannot generate accurate pulses of desired length from this timebase"
       // Mad props for the overclock if you run into this for 1ms pulses!
     #endif

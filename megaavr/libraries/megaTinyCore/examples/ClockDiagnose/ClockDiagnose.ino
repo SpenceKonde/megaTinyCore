@@ -135,6 +135,6 @@ void setup() {
   printTuningStatus();
 }
 
-void loop(){
+void loop() {
   ;
 }
