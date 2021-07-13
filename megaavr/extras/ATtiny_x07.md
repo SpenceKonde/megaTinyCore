@@ -18,7 +18,7 @@ Interfaces | UART, SPI, I2C | UART, SPI, I2C
 Clock options | Internal 20/16/10/8/5/4/1 MHz | Internal 20/16/10/8/5/4/1 MHz
 
 
-## Buy official megaTinyCore breakouts and support continued development!
+## Buy official megaTinyCore breakouts and support continued development
 [ATtiny1607 assembled](https://www.tindie.com/products/17523/)
 [ATtiny3217/1617/817/417/1607/807 bare board](https://www.tindie.com/products/17613/)
 

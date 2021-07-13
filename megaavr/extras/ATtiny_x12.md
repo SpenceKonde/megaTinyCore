@@ -23,7 +23,7 @@ This matches the megaTinyCore 412/402 Rev. - and Rev. A breakout boards below.. 
 ## LED_BUILTIN
 The `LED_BUILTIN` macro point to pin 4 (PA3); on pre-Rev. B versions of my development board it was on pin 1 (PA7). matching the port and bit used for the higher pin count devices supported by this core, but as one of those pins is used for serial when the pins are not swapped, it was moved tp PA3.
 
-## Buy official megaTinyCore breakouts and support continued development!
+## Buy official megaTinyCore breakouts and support continued development
 [ATtiny412/402 assembled](https://www.tindie.com/products/17685/)
 [ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
 

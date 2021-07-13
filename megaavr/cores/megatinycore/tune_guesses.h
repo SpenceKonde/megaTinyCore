@@ -1,7 +1,7 @@
 /* These are the gusses at cal change needed to get these speeds untuned     *
  * They are concatenated with the sigrow reference, so + or - operator works.*
  * Putting them all in one place allows better calculation of them as more   *
- * data is gathered and analyzed. 
+ * data is gathered and analyzed.
  */
 
 #if MEGATINYCORESERIES == 2
@@ -37,7 +37,7 @@
    * tuned down to 10, just scale.                                            */
   #define GUESS_20_12_DIRECT -28
   #define GUESS_20_12 + (SIGROW_OSCCAL20M0 >= (-1*GUESS_20_12_DIRECT) ? GUESS_20_12_DIRECT : GUESS_20_24)
-  #define GUESS_16_10_DIRECT -26 
+  #define GUESS_16_10_DIRECT -26
   #define GUESS_16_10 + (SIGROW_OSCCAL16M0 >= (-1*GUESS_16_10_DIRECT) ? GUESS_16_10_DIRECT : GUESS_16_20)
 #endif
 /* Here we pick the correct one to use for the requested frequency.           *
@@ -86,7 +86,7 @@
       #else
         #error "Unsupported clock speed"
       #endif
-    #else 
+    #else
       #error "Unsupported clock speed"
     #endif
   #endif
@@ -131,7 +131,7 @@
       #define GUESSCAL (osccfg ?                          -1  : SIGROW_OSCCAL16M0 + GUESS_16_10)
       #define TUNED_CALIBRATION_OFFSET (osccfg ? 4 : 5)
       #define TUNE_PRESCALE ((osccfg || GUESSCAL == GUESS_16_20) ? (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc) : 0)
-    #else 
+    #else
       #error "Unsupported clock speed"
     #endif
   #endif

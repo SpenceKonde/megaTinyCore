@@ -3,13 +3,14 @@
 
  Specifications       |    ATtiny427   |   ATtiny827   |   ATtiny1627  |  ATtiny3227   |
 ----------------------|----------------|---------------|---------------|---------------|
-Availability          |  since Q2 2021 | since Q2 2021 | Since Q1 2021 |        Future |
+Availability          |  Since Q2 2021 | Since Q2 2021 | Since Q1 2021 |    late 2021? |
 Flash (program memory)|     4096 bytes |    8192 bytes |   16384 bytes |   32768 bytes |
 Flash w/Optiboot      |     3584 bytes |    7680 bytes |   15872 bytes |   32256 bytes |
 RAM                   |      512 bytes |    1024 bytes |    2048 bytes |    3072 bytes |
 EEPROM                |      128 bytes |     128 bytes |     256 bytes |     256 bytes |
 Bootloader (optional) | Optiboot (not recommended) | Optiboot | Optiboot |    Optiboot |
 
+## Flash-independant specs
 
 Feature               |             Specification                   |
 ----------------------|---------------------------------------------|
@@ -30,6 +31,33 @@ Frequency (rated)     |    Up to 5 MHz @ 1.8V, 10 @ 2.7V, 20 @ 4.5V |
 Frequwncy (max*)      |   Internal runs @ ~36, chip works @ ~32 MHz |
 Package               |             QFN-24, 4mm x 4mm (0.5mm pitch) |
 
+## Clock Options
+These parts do not support an external HF crystal, only an external clock,  and/or a watch crystak for the RTC.
+ MHz | Source
+  20 | Internal, no tuning
+  16 | Internal, no tuning
+  10 | Internal, no tuning
+   8 | Internal, no tuning
+   5 | Internal, no tuning
+   4 | Internal, no tuning
+   1 | Internal, no tuning
+  20 | Internal, tuned using previously gathered settings (see docs)
+  16 | Internal, tuned using previously gathered settings (see docs)
+  12 | Internal, tuned using previously gathered settings (see docs)
+  20 | External Clock
+  16 | External Clock
+  10 | External Clock
+   8 | External Clock
+  24 | Internal, tuned OVERCLOCKED (see docs)
+  25 | Internal, tuned OVERCLOCKED (see docs)
+  30 | Internal, tuned OVERCLOCKED (see docs, osc. must be in 20 MHz mode)
+  32 | Internal, tuned OVERCLOCKED (see docs, osc. must be in 20 MHz mode)
+  32 | Internal, tuned OVERCLOCKED, likely unstable)
+  24 | External Clock OVERCLOCKED
+  25 | External Clock OVERCLOCKED
+  30 | Internal, tuned  OVERCLOCKED
+  32 | Internal, tuned  OVERCLOCKED, likely unstable)
+
 The 24-pin 2-series benefit from fact that the Reset function can be moved to pin PB4, allowing PA0 to remain UPDI, while also having a proper hardware reset! Like the 24-pin 0/1-series, the VQFN-24 package is the only option, no doubt a disappointment to those hoping to assemble them at home.
 
 As with the rest of the 2-series, the DAC, TCD, and the extra analog comparators have been removed in favor of a second UART, and the super ADC, which can accumulate 1024 samples in a single burst read (for 17 bit decimated values, and hence in theory 17-bits of resolution. For advanced ADC functionality, several new functions are provided, see ADC section of the main readme for more information.
@@ -47,7 +75,7 @@ To be designed in the future, if people suddenly start showing interest in the 2
 
 
 ## Notes on Tables
-`* `Maximum frequency that the the internal oscillator will reach when tuned upwards until it crashes, and the maximum frequency the part actually runs at (based on cursory, not rigorous testing - the parts that ran for a few milliseconds without crashing were considered "working") are reported. Both are at 5.0V and are typical values determined experimentally, and the parts may not function reliably at those speeds. Maximums vary between individual specimens. Don't rely on parts exceweding manufacturer specifications.
+`*`Maximum frequency that the the internal oscillator will reach when tuned upwards until it crashes, and the maximum frequency the part actually runs at (based on cursory, not rigorous testing - the parts that ran for a few milliseconds without crashing were considered "working") are reported. Both are at 5.0V and are typical values determined experimentally, and the parts may not function reliably at those speeds. Maximums vary between individual specimens. Don't rely on parts exceweding manufacturer specifications.
 
 
 ## Datasheets and Errata

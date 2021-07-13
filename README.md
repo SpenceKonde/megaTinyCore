@@ -17,7 +17,7 @@ A serial bootloader, Optiboot_x (based on the same codebase as the classical Ard
 
 **Arduino 1.8.13 is recommended**
 
-This core depends on the 7.3.0-atmel3.6.1-arduino7 version of the toolchain **when installed manually**, and even this version does not have support for 2-series parts with 4k, 8k, or 32k of flash. You must have either the latest official Arduino AVR board package, 1.8.3 (included with Arduino 1.8.13, and available for older versions of the IDE by upgrade through board manager) .  When megaTinyCore is installed through board manager, the required version of the toolchain is always installed automatically.
+This core depends on the 7.3.0-atmel3.6.1-arduino7 version of the toolchain **when installed manually**, and even this version does not have support for 2-series parts with 4k, 8k, or 32k of flash. You must have either the latest official Arduino AVR board package, 1.8.3 (included with Arduino 1.8.13, and available for older versions of the IDE by upgrade through board manager) or you must manually update the toolchain - see the installation guide for more information.  When megaTinyCore is installed through board manager, the required version of the toolchain is always installed automatically, and you don't have to worry about it.
 
 ## UPDI programming
 The UPDI programming interface is a single-wire interface for programming (and debugging - **U**niversal **P**rogramming and **D**ebugging **I**nterface) used on the tinyAVR 0/1/2-series, as well as all other modern AVR microcontrollers. In addition to purchasing a purpose-made UPDI programmer (such as the ones produced by Microchip), there are two very low-cost approaches to creating a UPDI programmer:
@@ -354,9 +354,9 @@ The PGA is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that s
 * `PP = 11` Disable PGA now, and in future turn if off after use
 
 Example:
-```
+```c
 ADCPowerOptions(0x0B); //0x0F = 0b 0000 1011 LL = 11, so low latency on. PP = 10, so PGA on, automatic shut off disabled. Maximum power consumption, minimum ADC delays.
-ADCPowerOptions(0x02); //0x02 = 0b 0000 0010 LL = 10, so low latency off. PP = 10, turn off the PGA and enable automatic shut off.
+ADCPowerOptions(0x0E); //0x02 = 0b 0000 1110 LL = 10, so low latency off. PP = 11, turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays.
 ```
 
 ##### analogReadEnh(pin, res=ADC_NATIVE_RESOLUTION, gain=0)
@@ -378,7 +378,7 @@ Differential `analogRead()` - returns a `long` (`int32_t`), not an `int` (`int16
 ```
 
 #### Offset error *2-series only*
-Particularly with small reference voltages, measuring very small voltage differences, the offset error was higher than I expected. Perhaps I should have expected differently, as the datasheet does spec this up to 10 LSB. To see the magnitude of this offset error in your differential readings, take one differential measurement, then switch positive and negative and take the measurement again, and sum the two results. If there were no offset error, and assuming the voltages did not change, that would be zero; taking the average of the absolute value of the two measurements, should be what you would have gotten without (most of) that offset error. It will be important to see if methods can be used to correct for the offset. Also, remember that oversampling does not do anything to help with offset error - adding a bunch of measurements, all of which are high or low by the same amount will yield a sum that is proportionately just as high or low! Increasing the gain, however, does help,
+Particularly with small reference voltages, measuring very small voltage differences, the offset error was higher than I expected (though not as bad as I feared when I wrote this initially - there was a bug analogReadEnh() that set the ADC prescaler to the minimum after every measurement). To see the magnitude of this offset error in your differential readings, take one differential measurement, then switch positive and negative and take the measurement again, and sum the two results. If there were no offset error, and assuming the voltages did not change, that would be zero. It will be important to see if methods can be used to correct for the offset. Also, remember that **oversampling does not do anything to help with offset error** - adding a bunch of measurements, all of which are high or low by the same amount will yield a sum that is proportionately just as high or low, and can increase the apparent size of the offset error  Increasing the gain, however, does help,
 ```c++
   analogReference(INTERNAL1V024); //minimum reference
   // Make PA1 and PA2 really close in voltage - we want to see this new ADC shine right?
@@ -406,11 +406,11 @@ The requested reading could not be made because the ADC is currently busy taking
 The requested reading could not be made because the ADC is currently disabled. Did you disable it when you put the device to sleep and never turn it back on?
 
 ##### `ADC_ENH_ERROR_RES_TOO_LOW` (-2100000003)
-Resolution must not be lower than the lowest native resolution that the part supports (Core presents this as ADC_NATIVE_RESOLUTION_LOW). If you require that, get 8 bit value  and divide it. This is a rare use-case, and it is not appropriate to force the overhead on everyone else.
+Resolution must not be lower than the lowest native resolution that the part supports (Core presents this as ADC_NATIVE_RESOLUTION_LOW). If you require lower resolution, that is what the `>>` operator is for.
 
 ##### `ADC_ENH_ERROR_RES_TOO_HIGH` (-2100000004)
 The 0/1-series can get 3 extra bits by oversampling 64x and right- shifting 3 times. The 2-series can get 5 by oversampling by a whopping 1024x (taking 13-160 ms depending on options)
-and then right-shifting 5 times. Thus, maximums are 13 and 17. Alternately, one of the `ADC_ACC_n` constants may be used, where `n` is 2, 4, 8, 16, 32, 64, or on 2-series only, 128, 256, 512, or 1024 - in this case, that many samples will be taken through burst/accumulation mode and returned without decimation.
+and then right-shifting 5 times. Thus, maximums are 13 and 17. If you want the raw result before decimation (being aware that the lowest bits are mostly noise), one of the `ADC_ACC_n` constants may be used, where `n` is 2, 4, 8, 16, 32, 64, or on 2-series only, 128, 256, 512, or 1024 - in this case, that many samples will be taken through burst/accumulation mode and returned without decimation.
 
 ##### `ADC_ENH_ERROR_BAD_NEG_PIN` (-2100000005)
 Returned by analogReadDiff when the requested pin for the negative input is not valid as a negative input. Negative pins can only be on PORTA (for tinyAVR) or PORTD/PORTE (for Dx-series), so there are significantly fewer channels to choose from.
@@ -450,7 +450,7 @@ Between the initial header file and preliminary datasheet release, and the more 
 
 ### Auto-set safe fuses on UPDI upload - New in 2.2.0!
 Whenever a UPDI programmer is used to upload code, all fuses that can be set "safely" (as in, without risk of bricking the board, or bricking the board if one does not have access to an HV programmer), and which have any built-in configuration options, will be set. Thus, except where noted, behavior will always match the selected tools menu! This means:
-```
+```c
 WDTCFG will not be changed - not configured by megaTinyCore
 BODCFG will not be changed - not safe
 OSCCFG will be set
@@ -544,7 +544,7 @@ As noted above in the discussion of the shared UPDI/reset pin, these parts suppo
 
 This allows the application a convenient mechanism to restart itself without having to potentially wait through the bootloader attempting to communicate with whatever is connected to the serial port. The method shown below also resets the part significantly faster utilizing the "window" WDT functionality - that is, by telling the chip to reset if it receives a WDR instruction too soon - and then repeatedly sending that instruction until it resets.
 
-```
+```c
 void resetViaWDT() {
     _PROTECTED_WRITE(WDT.CTRLA,0x01); //enable the WDT, minimum timeout
     while (1) ; // spin until reset
@@ -602,7 +602,7 @@ Additionally, `MILLIS_TIMER` is defined to that timer - see `Identifying Timers`
 #### Checking that correct menu option is selected
 If your sketch requires that the TCB0 is used as the millis timer
 
-```
+```c
 ##ifndef MILLIS_USE_TIMERB0
 ##error "This sketch is written for use with TCB0 as the millis timing source"
 ##endif
@@ -627,7 +627,7 @@ There are a number of macros for determining what (if any) features the core sup
 #### Identifying Timers
 Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statenebts to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro.
 
-```
+```c
 ##define NOT_ON_TIMER 0x00
 ##define TIMERA0 0x10
 ##define TIMERA1 0x08 // Not present on any tinyAVR
@@ -682,7 +682,7 @@ Serial uploads are all done at 115200 baud, regardless of port, pin mapping or p
 On 2.2.0 and later, whenever code is uploaded via UPDI ("upload" from non-optiboot board definition, or "upload using programmer" from optiboot one), whether or not the device has been bootloaded (like on classic AVRs, "upload using programmer" will trash any bootloader present), `BOOTEND` will be set to match what the code was compiled for; with an optiboot board definition selected, this will result in the first 512b of flash being blank (since we erased any bootloader present), `BOOTEND=2` (512b bootloader section, as application expects), and a working sketch. With a non-optiboot board definition selected, this will result in `BOOTEND=0`, no gap at the start of the sketch, and a working sketch.
 
 #### Removing Optiboot - 2.1.5 and earlier
-Like classic AVRs with hardware bootloader support (like the ATmega328p, and all other ATmega parts older than the 4809/4808), and unlike ATtiny parts without that, which use "virtual boot" to get bootloader functionality, you must do "burn bootloader" with a non-optiboot part selected in order to reprogram the part normally via UPDI.
+Like classic AVRs with hardware bootloader support (like the ATmega328p, and all other ATmega parts older than the 4809/4808), and unlike ATtiny parts without such support (those use "virtual boot" to get bootloader functionality) you must do "burn bootloader" with a non-optiboot part selected in order to reprogram the part normally via UPDI.
 
 #### Background, 2.1.5 and earlier
 Unlike classic AVRs with hardware bootloader support, where not doing "burn bootloader" before switching to uploading via a programmer would work until sketch size reached the very end of the flash (where the chip thinks the bootloader is), on these parts the sketch would fail in strange and bizarre ways if code is compiled with incorrect assumption about the size or presence of a bootloader (`BOOTEND` fuse) - it could be challenging to identify what the cause of the problem was when this happened - you would typically see pieces of behavior that you recognize, but not in an order that made sense. The reason for this is that the `BOOTEND` fuse sets the location of the interrupt vectors. If the application is started at 0x200, as it would for code compiled for use with Optiboot, but `BOOTEND` is set to 0, the hardware would, when an interrupt fired, jump to the blank section of flash before the application, execution would run along the blank flash until it hit the actual sketch... but it would still think it was in an interrupt, whereas in the inverse scenario, the hardware would jump to the middle of the application code instead of the vector table. Both scenarios are (speaking from experience) incredibly confusing when encountered.

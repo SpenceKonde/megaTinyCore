@@ -1,136 +1,137 @@
 # Optiboot Flash
 Two libraries are used to interface with the "write-to-flash" functionality the Optiboot bootloader has. Flash.h/cpp is a high-level library that makes it easy to store strings, variables, structs, etc. to the flash memory and easily retrieve them. optiboot.h/cpp is a low-level read/write library that does the actual reading and writing to flash. If your application needs more storage than the EEPROM can offer, Flash is the library for you. If you're very memory constrained and want to do the heavy lifting yourself, optiboot is the library for you. See the examples of how you can interface with these two libraries.
 
-## This is not the same library as the DxCore Flash.h
-Dx-series and the tinyAVR/megaAVR 0/1/2-series parts have different versions of NVMCTRL; among other things, you need to both fill the page buffer and give the command to write it from within the bootloader section on tinyAVR/megaAVR - but on Dx-series parts, only the calls to `SPM`, and `ST Z` are protected, and there is no page buffer at all. The different hardware requirements, as well as the relative abundance of available flash in the bootloader section of the tinyAVR/megaAVR parts (they have 36 bytes left; on the Dx-series ) set the stage for drastically different implementations - and the two authors were unfamiliar with the other's work until after it was complete, and took radically different approaches to essentially every aspect of the design.
+**This is not the same library as the DxCore Flash.h**
 
+Dx-series and the tinyAVR/megaAVR 0/1/2-series parts have different versions of NVMCTRL; among other things, you need to both fill the page buffer and give the command to write it from within the bootloader section on tinyAVR/megaAVR - but on Dx-series parts, only the calls to `SPM`, and `ST Z` are protected, and there is no page buffer at all. The different hardware requirements, as well as the relative abundance of available flash in the bootloader section of the tinyAVR/megaAVR parts (they have 36 bytes left; on the Dx-series
+I was rewriting ever larger chunks in assembly to get an extra 2-4 bytes so I could fit it into 512b) set the stage for drastically different implementations - and the two authors were unfamiliar with the other's work until after it was complete, and took radically different approaches to essentially every aspect of the design.
 
-# API Reference
+## API Reference - Flash library
 
-## Flash()
+### Flash()
 Class constructor for interfacing with the "write-to-flash" functionality.
 For arguments has to be present. A reference to the allocated flash space array, the size of the allocated space, a RAM buffer, and its size.
 
-##### Usage:
+#### Usage
 ```c++
 // Create object 'flash' with flash_space_array and ram_buffer
 Flash flash(flash_space_array, sizeof(flash_space_array), ram_buffer, sizeof(ram_buffer));
 ```
 
 
-## Flash[]
+### Flash[]
 Operator overloaded object. This lets you use the object itself to access the RAM buffer.
 
-##### Usage:
+#### Usage
 ```cpp
 uint8_t data = flash[0x00]; // Read data from address 0x00 in the buffer
 flash[0x00] = data;         // Write the contents of 'data' to address 0x00
 ```
 
 
-## check_writable()
+### check_writable()
 Checks if a bootloader that has "write-to-flash" functionality is present
 
-##### Usage:
+#### Usage
 ```cpp
 bool valid_bootloader = flash.check_writable();
 ```
 
-##### Returns:
+#### Returns
 `bool` valid bootloader present
 
 
-## clear_buffer()
+### clear_buffer()
 Clears the RAM buffer. Sets all values to 0x00 if no parameter is present
 
-##### Usage:
+#### Usage
 ```cpp
 flash.clear_buffer();     // Write all zeros to the RAM buffer
 flash.clear:buffer(0xff); // Write all 0xff's to the RAM buffer
 ```
 
-##### Returns:
+#### Returns
 `void`
 
 
-## read_buffer()
+### read_buffer()
 **Alternative to `flash[]`**. Reads a byte from the RAM buffer.
 
-##### Usage:
+#### Usage
 ```cpp
 uint8_t data = flash.read_buffer(0x00); // Read data from place 0x00 in the buffer
 uint8_t data = flash.read_buffer(0x40); // Read data from place 0x40
 ```
 
-##### Returns:
+#### Returns
 `uint8_t` data in buffer place *N*
 
 
-## write_buffer()
+### write_buffer()
 **Alternative to `flash[]`**. Writes a byte to the RAM buffer
 
-##### Usage:
+#### Usage
 ```cpp
 flash.write_buffer(0x00, 'H'); // Write character 'H' to buffer place 0x00
 ```
 
-##### Returns:
+#### Returns
 `void`
 
 
-## buffer_size()
+### buffer_size()
 Returns the size of the allocated RAM buffer in bytes
 
-##### Usage:
+#### Usage
 ```cpp
 uint16_t allocated_buffer = flash.buffer_size();
 ```
 
-##### Returns:
+#### Returns
 `uint16_t` buffer size in bytes
 
 
-## write_page()
+### write_page()
 Writes the RAM buffer to flash
 
-##### Usage:
+#### Usage
 ```cpp
 flash.write_page(1); // Write buffer to flash page 1
 ```
 
-##### Returns:
+#### Returns
 `void`
 
 
-## fetch_page()
+### fetch_page()
 Fetches a flash page and stores it in the RAM buffer
 
-##### Usage:
+#### Usage
 ```cpp
 flash.fetch_page(1); // Fetch flash page 1
 ```
 
-##### Returns:
+#### Returns
 `void`
 
 
-## fetch_data()
+### fetch_data()
 Fetches a given amount of data from flash. Note that the start and stop address is relative to the start of the flash space array.
 This means that  The span can't be larger than the size of the RAM buffer.
 
-##### Usage:
+#### Usage
 ```cpp
 flash.fetch_data(128, 192); // Read 64 bytes of data from beginning of flash page one (128 bytes flash page size)
 ```
 
-##### Returns:
+#### Returns
 `void`
 
 
-## put()
+### put()
 Write any data type or object to flash
 
-##### Usage:
+#### Usage
 ```cpp
 float f = 123.456f;
 char text[13] = "Hello World!";
@@ -139,10 +140,10 @@ flash.put(sizeof(float), text); // Store text after the float variable
 ```
 
 
-## get()
+### get()
 Read any data type or object from flash
 
-##### Usage:
+#### Usage
 ```cpp
 float f;
 char text[13];
@@ -151,52 +152,51 @@ flash.getsizeof(float), text); // Fetch text after the float variable
 ```
 
 
-Optiboot
-======
+## API Reference - Optiboot library
 
-## optiboot_check_writable()
+### optiboot_check_writable()
 Checks if a bootloader that has "write-to-flash" functionality is present
 
-##### Usage:
+#### Usage
 ```cpp
 bool valid_bootloader = optiboot_check_writable();
 ```
 
-##### Returns:
+#### Returns
 `bool` valid bootloader present
 
 
-## optiboot_read()
+### optiboot_read()
 Reads data from the flash memory into a buffer
 
-##### Usage:
+#### Usage
 ```cpp
 optiboot_read(flash_space_array, ram_buffer, page_number, page_start_address, page_stop_address);
 ```
 
-##### Returns:
+#### Returns
 `void`
 
 
-## optiboot_readPage()
+### optiboot_readPage()
 Reads an entire flash page into a buffer
 
-##### Usage:
+#### Usage
 ```cpp
 optiboot_readPage(flash_space_array, ram_buffer, page_number);
 ```
 
-##### Returns:
+#### Returns
 `void`
 
 
-## optiboot_writePage()
+### optiboot_writePage()
 Writes data to a flash page
 
-##### Usage:
+#### Usage
 ```cpp
 optiboot_writePage(flash_space_array, ram_buffer, page_number);
 ```
 
-##### Returns:
+#### Returns
 `void`
