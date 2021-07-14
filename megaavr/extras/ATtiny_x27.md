@@ -19,7 +19,7 @@ ADC                   |                  12-bit, differential w/PGA |
 ADC Channels          |      15, 7 of which  can be neg. diff. pin. |
 DAC                   |                    Internal for AC ref only |
 Comparator            |                                           1 |
-PWM Channels          |                        6 out of potential 8 |
+PWM Channels (**)     |                        6 out of potential 8 |
 Timer Type B          |                                           2 |
 Timer Type D          |                                          No |
 CCL logic             |                     4 LUTs, 12 of 12 inputs |
@@ -77,6 +77,7 @@ To be designed in the future, if people suddenly start showing interest in the 2
 ## Notes on Tables
 `*`Maximum frequency that the the internal oscillator will reach when tuned upwards until it crashes, and the maximum frequency the part actually runs at (based on cursory, not rigorous testing - the parts that ran for a few milliseconds without crashing were considered "working") are reported. Both are at 5.0V and are typical values determined experimentally, and the parts may not function reliably at those speeds. Maximums vary between individual specimens. Don't rely on parts exceweding manufacturer specifications.
 
+`**` PWM channels exposed with default configuration via analogWrite(). TCA0 is in split mode, and the type B timer(s) are not used for PWM; those could be configured by user code to get two additional channels.
 
 ## Datasheets and Errata
 See [Datasheet Listing](Datasheets.md)

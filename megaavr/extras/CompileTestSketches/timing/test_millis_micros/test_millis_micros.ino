@@ -10,9 +10,9 @@
 void setup() {
   /* test manipulation functions */
   #ifndef MILLIS_USE_TIMERNONE
-    millis_stop();
-    millis_set(_SFR_MEM32(0x001C));
-    millis_restart();
+    stop_millis();
+    set_millis(_SFR_MEM32(0x001C));
+    restart_millis();
   #endif
 }
 void loop() {

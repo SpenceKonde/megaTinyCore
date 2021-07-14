@@ -10,7 +10,7 @@ Bootloader | Optiboot (optional, not recommended) | Optiboot (optional, not reco
 GPIO Pins       | 18/17 avail | 18/17 avail |     18/17 avail | 18/17 avail
 ADC Channels    | 11 usable   | 11 usable   |       11 usable |   11 usable
 DAC             |         Yes |         Yes |             Yes |         Yes
-PWM Channels    |           8 |           8 |               8 |           8
+PWM Channels *  |           8 |           8 |               8 |           8
 Timer type B    |           1 |           1 |               2 |           2
 Timer Type D    |         Yes |         Yes |             Yes |         Yes
 Interfaces | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C
@@ -46,6 +46,9 @@ The tuned options are new in 2.4.0 - see the readme amd associated pages for exh
 [ATtiny3216 assembled](https://www.tindie.com/products/17597/)
 
 [ATtiny3216/1616/816/416/1606/806/406 bare board](https://www.tindie.com/products/17614/)
+
+## Notes on Tables
+`*` PWM channels exposed with default configuration via analogWrite(); TCA0 is in split mode, TCD0 used for two PWM channels, and the type B timer(s) are not used for PWM.
 
 ## Datasheets and Errata
 See [Datasheet Listing](Datasheets.md)

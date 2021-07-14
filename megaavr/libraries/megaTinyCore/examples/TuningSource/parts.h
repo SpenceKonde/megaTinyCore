@@ -45,7 +45,7 @@
     #endif
     #define CONFIG_OK
   #endif
-  // we can handle the others without mess like what is seen below. 
+  // we can handle the others without mess like what is seen below.
 
   /*
   #elif (defined(__AVR_ATmega808__) ||defined(__AVR_ATmega1608__) ||defined(__AVR_ATmega3208__) ||defined(__AVR_ATmega4808__) || \
@@ -53,9 +53,9 @@
 
     #define __AVR_ATmega_Zero__
 
-  #else 
+  #else
     #if !(defined(MEGATINYCORE) || defined(DXCORE) || defined(ATTINYCORE))
-      // Well then what the heck is it? 
+      // Well then what the heck is it?
       #if  (defined(__AVR_ATtiny3217__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny1604__) || defined(__AVR_ATtiny1607__) || \
           defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny1606__) || defined(__AVR_ATtiny1614__))
 
@@ -84,17 +84,17 @@
              defined(__AVR_AVR32DD28__)  ||defined(__AVR_AV32DDA32__)  ||defined(__AVR_AVR32DD20__)  ||defined(__AVR_AVR64DD14__))
 
         #define __AVR_DD__
-      #else 
+      #else
         error "Unknown or unsupported part"
       #endif
     #else //DXCore, megaTinyCore, ATTinyCore
-      #if (CLOCK_SOURCE & 0x0F) != 1 && ((CLOCK_SOURCE & 0x0F) != 2) 
+      #if (CLOCK_SOURCE & 0x0F) != 1 && ((CLOCK_SOURCE & 0x0F) != 2)
         #error "This is a TIMING REFERENCE. Using the internal oscillator would defeat the whole point!"
       #endif
     #endif // for the what if it's not a classic mega
   #endif
   #ifndef CONFIG_OK
-    #error "Part unknown, or known but unsupported." 
+    #error "Part unknown, or known but unsupported."
   #endif
 */
 #endif

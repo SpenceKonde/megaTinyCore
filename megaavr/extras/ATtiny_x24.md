@@ -3,7 +3,7 @@
 
  Specifications       |    ATtiny424   |   ATtiny824   |   ATtiny1627  |  ATtiny3224   |
 ----------------------|----------------|---------------|---------------|---------------|
-Availability          |    Q2/Q3 2021  |    Q2/Q3 2021 | Since Q1 2021 |   after 4k/8k |
+Availability          |  Since Q2 2021 | Since Q2 2021 | Since Q1 2021 |    late 2021? |
 Flash (program memory)|     4096 bytes |    8192 bytes |   16384 bytes |   32768 bytes |
 Flash w/Optiboot      |     3584 bytes |    7680 bytes |   15872 bytes |   32256 bytes |
 RAM                   |      512 bytes |    1024 bytes |    2048 bytes |    3072 bytes |
@@ -59,7 +59,7 @@ These parts do not support an external HF crystal, only an external clock,  and/
   32 | Internal, tuned  OVERCLOCKED, likely unstable)
 
 ## Overview
-The smallest pincount of the tinyAVR 2-series parts - so far there is no word on what Microchip's plans are for the 8-pin package, but everyone I've spoken to is worried about the future of AVRs in 8-pin packages.. These have been announced in the full range of flash size options - Hopefully it won't be a repeat of the 3214 which was in the ATpacks, but never actually shipped, and had all references to it removed. Notice that some 1-series features - mostly the extravagances of the "golden" 1-series parts - are gone, while the second type B timer (thankfully) is present in all sizes. The main features though are the fancy ADC, and the second USART - as well as a 32k version with 3k SRAM. The expanded RAM on the 4k and 8k parts goes a long way to making those parts more practical option.
+The smallest pincount of the tinyAVR 2-series parts - so far there is no word on what Microchip's plans are for the 8-pin package, but everyone I've spoken to is worried about the future of AVRs in 8-pin packages.. These have been announced in the full range of flash size options - Hopefully it won't be a repeat of the 3214 which was in the ATpacks, but never actually shipped, and had all references to it removed. Notice that some 1-series features - mostly the extravagances of the "golden" 1-series parts,  but also the type D timer - are gone, while the second type B timer (thankfully) is present in all sizes. The main features though are the fancy ADC, and the second USART - as well as a 32k version with 3k SRAM. The expanded RAM on the 4k and 8k parts goes a long way to making those parts more practical option.
 
 The super ADC can accumulate 1024 samples in a single burst read; decimation of the accumulated value so all of the digits are meaningful can give up to 17-bits of accuracy. For advanced ADC functionality, several new functions are provided, see ADC section of the main readme for more information.
 
@@ -75,6 +75,8 @@ With no critical hardware differences, the same breakout boards we have been sel
 
 ## Notes on Tables
 `*`Maximum frequency that the the internal oscillator will reach when tuned upwards until it crashes, and the maximum frequency the part actually runs at (based on cursory, not rigorous testing - the parts that ran for a few milliseconds without crashing were considered "working") are reported. Both are at 5.0V and are typical values determined experimentally, and the parts may not function reliably at those speeds. Maximums vary between individual specimens. Don't rely on parts exceweding manufacturer specifications.
+
+`**` PWM channels exposed with default configuration via analogWrite(). TCA0 is in split mode, and the type B timer(s) are not used for PWM.
 
 
 ## Datasheets and Errata
