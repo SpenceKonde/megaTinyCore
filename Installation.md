@@ -19,14 +19,15 @@ This board package can be installed via the board manager. The boards manager UR
 Manual installation allows the latest version of the core to be installed, with fixes that may not yet be available in the board manager version of the core. Manual installation is recommended if you are working on developing or modifying the core - however, the reqirements are brutal.
 
 * You must be using a copy of the Arduino IDE that has never had an AVR board definition package installed on it (typically this means the .zip archive, extract, and create a portable folder inside before first run)
-* You must update the toolchain. Search the .json file above for the latest version, and it will list under tools-dependencies a version of avr-gcc. Search the file for that and you'll wind up at a block of links.
-  * Download and decompress the version for your OS.
-  * You will find an 'avr' folder containing several more folders.
-    * The directory structure is very confusing. There are a hell of a lot of nested "avr" folders/directories.
-  * Copy this into `(arduino instance which has never had board manager installations root folder)/hardware/tools` - if you did this right, you'll be told that hundreds of files are different. Replace them all!
-  * **NOTE:** if you also intend to use DxCore manually installed, check that one too, and see if it specifies a later toolchain version. Use whichever one has higher version (Azduinio4 is higher than Azduino3)
+* You must update the toolchain. Search the .json file above `"tools": [` Of the 4 hits, you're looking for the avr-gcc one.
+  * Scroll down to the most recent version (currently azduino4b)
+  * Download and decompress the version for your OS. If the most recent version has no listing for your OS, go to the next most recent (this happens when I release a bad package for certain OS's and have to release a fixed version for those OS's only).
+  * You will find an 'avr' directory containing several subdirectories. This may or may not be enclosed in one or more directories depending on what program is used to decompress it..
+    * The directory structure is *very* confusing; I have botched this three times in released versions. There are a hell of a lot of nested "avr" directories.
+  * Copy this into `arduino root folder)/hardware/tools` - if you did this right, you'll be told that hundreds of files are different. Replace them all!
+  * **NOTE:** if you also intend to use DxCore manually installed, check the json entries for that one too, and see if it specifies a later toolchain version. Use whichever one has higher version (Azduinio4 is higher than Azduino3)
 
-* If you want SerialUPFI, you need to also follow megaavr/tools/ManualPython.md.
+* If you want SerialUPFI, you need to also follow (megaavr/tools/ManualPython.md)[megaavr/tools/ManualPython.md].
 
 Once that all is done, you've only got a minor step or two left - you need to create a "hardware" folder inside the sketchbook folder (inside portable assumingh you went that route, which you should) amd then and only then should you instll the core.
 
