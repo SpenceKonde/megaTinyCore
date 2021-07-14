@@ -26,6 +26,7 @@ MD013:
 MD020: false                  # This was flagging the Usage headings that are ubiquitous in library readme's.
 MD026:
   punctuation: ".,;:!。，；:"  # List of not allowed
+MD024: false                  # more trouble than it's worth
 MD029: false                  # Ordered list item prefix
 MD033: false                  # Allow inline HTML
 MD036: false                  # Emphasis used instead of a heading
