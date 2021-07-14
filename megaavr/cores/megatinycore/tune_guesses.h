@@ -44,7 +44,8 @@
  * First TUNE_PRESCALE is determined so you can tune 4, 5, 8 and on 2-series, *
  * 10 MHz speeds. _CLOCKSPERUS is thus based on unprescaled clock, which is   *
  * what we are calibrating. This gets checked for -1 then stored to tuneval   *
- * so the 0x80 is "unreachable) "                                             */
+ * so the 0x80 is "unreachable) "
+ * Note the _ - outside of this file, we don't want anyone to know about this */
 
 #if MEGATINYCORESERIES == 2
   #if F_CPU == 1000000
@@ -57,7 +58,7 @@
     #elif F_CPU < 12000000
       #define _CLOCKSPERUS (F_CPU/500000)
       #define TUNE_PRESCALE (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc)
-    #else   
+    #else
       #define _CLOCKSPERUS (F_CPU/1000000)
     #endif
     #if _CLOCKSPERUS == 32
@@ -101,7 +102,7 @@
     #elif F_CPU < 10000000
       #define _CLOCKSPERUS (F_CPU/500000)
       #define TUNE_PRESCALE (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc)
-    #else   
+    #else
       #define _CLOCKSPERUS (F_CPU/1000000)
     #endif
     #if _CLOCKSPERUS == 30
