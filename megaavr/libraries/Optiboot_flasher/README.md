@@ -148,7 +148,7 @@ Read any data type or object from flash
 float f;
 char text[13];
 flash.get(0x00, f);            // Fetch float variable from flash address 0 and store it to variable f
-flash.getsizeof(float), text); // Fetch text after the float variable
+flash.get(sizeof(float), text); // Fetch text after the float variable
 ```
 
 
