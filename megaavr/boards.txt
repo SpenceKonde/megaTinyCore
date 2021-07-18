@@ -36,6 +36,8 @@
 # you don't need to burn bootloader to change clock speed.
 
 menu.chip=Chip
+# used in place of the chip menu for official Microchip boards
+menu.board_name=Board Name
 menu.clock=Clock (burn bootloader NOT req'd)
 menu.clocko=Clock (burn bootloader req'd, or see docs)
 menu.millis=millis()/micros() Timer
@@ -49,8 +51,6 @@ menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
 menu.resetpinopti=UPDI/Reset Pin and Optiboot Entry (burn bootloader req'd)
 menu.resetpinopti_2=UPDI/alt-RST pins and Optiboot Entry (burn bootloader req'd)
 menu.uartvoltage=Voltage Baud Correction
-#used in place of the chip menu for official Microchip boards
-menu.board_name=Board Name
 
 
 ##########################################################################
@@ -1250,7 +1250,7 @@ microchip.upload.serialparams=
 ### CHIP
 microchip.menu.board_name.cn3217=Curiosity Nano ATtiny3217
 microchip.menu.board_name.cn3217.build.board=AVR_CuriosityNano3217
-microchip.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 -DARDUINO_CuriosityNano3217
+microchip.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7
 microchip.menu.board_name.cn3217.build.attiny=3217
 microchip.menu.board_name.cn3217.upload.protocol=curiosity_updi
 microchip.menu.board_name.cn3217.upload.maximum_size=32768
@@ -1276,7 +1276,7 @@ microchip.menu.board_name.cn1607.upload.maximum_size=16384
 microchip.menu.board_name.cn1607.upload.maximum_data_size=1024
 
 microchip.menu.board_name.xp3217=Xplained Pro ATtiny3217
-microchip.menu.board_name.xp3217.build.board=AVR_CuriosityNano3217
+microchip.menu.board_name.xp3217.build.board=AVR_Xplained_Pro_3217
 microchip.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
 microchip.menu.board_name.xp3217.build.attiny=3217
 microchip.menu.board_name.xp3217.build.millistimer=D0
@@ -1286,7 +1286,7 @@ microchip.menu.board_name.xp3217.upload.maximum_size=32768
 microchip.menu.board_name.xp3217.upload.maximum_data_size=2048
 
 microchip.menu.board_name.xp817=Xplained Pro ATtiny817
-microchip.menu.board_name.xp817.build.board=AVR_Xplained_Pro
+microchip.menu.board_name.xp817.build.board=AVR_Xplained_Pro_817
 microchip.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
 microchip.menu.board_name.xp817.build.attiny=817
 microchip.menu.board_name.xp817.build.millistimer=D0
