@@ -107,7 +107,11 @@ extern "C" {
 
   /* >= 1us - can't use clockcycles per microsecond from timers.h because
   this needs to always round up */
-  #define TIMEBASE_1US (((F_CPU + 999999UL)/1000000UL) << ADC_TIMEBASE_gp)
+  #if !(F_CPU >= 32000000)
+    #define TIMEBASE_1US (((F_CPU + 999999UL)/1000000UL) << ADC_TIMEBASE_gp)
+  #else
+    #define TIMEBASE_1US (31 << ADC_TIMEBASE_gp)
+  #endif
 
   #define ADC_DEFAULT_SAMPLE_LENGTH 15
   #define ADC_ACC2        0x81
