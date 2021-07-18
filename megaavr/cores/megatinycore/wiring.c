@@ -284,7 +284,7 @@ unsigned long micros() {
       microseconds = ((overflows * (TIME_TRACKING_CYCLES_PER_OVF / 16))
                         + (ticks * (TIME_TRACKING_CYCLES_PER_OVF / 16 / TIME_TRACKING_TIMER_PERIOD)));
     #endif
-    #if defined(CLOCK_TUNE_INTERNAL) || !(F_CPU == 16000000UL || F_CPU ==  8000000UL || F_CPU ==  4000000UL || F_CPU ==  5000000UL || F_CPU ==  1000000UL || F_CPU ==  2000000UL)
+    #if defined(CLOCK_TUNE_INTERNAL) && !(F_CPU == 16000000UL || F_CPU ==  20000000UL || F_CPU ==  8000000UL || F_CPU ==  10000000UL || F_CPU ==  4000000UL || F_CPU ==  5000000UL)
       #warning "TCD is not supported as a millis timing source when the oscillator is tuned to a frequency other than 16 or 20 MHz. Timing results will be wrong - use TCA0 or a TCB."
     #endif
   #elif (defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1))
@@ -336,7 +336,7 @@ unsigned long micros() {
           F_CPU == 20000000UL || F_CPU == 16000000UL || F_CPU == 12000000UL || F_CPU == 10000000UL || \
           F_CPU ==  8000000UL || F_CPU ==  5000000UL || F_CPU ==  4000000UL || F_CPU ==  2000000UL || \
           F_CPU ==  1000000UL)
-      #warning "Millis timer (TCBn) at this frequency unsupported, micros() will return totally bogus values."
+      #warning "Millis timer (TCBn) at this frequency is unsupported, micros() will return totally bogus values."
     #endif
   #else //TCA0
     #if (F_CPU == 20000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
@@ -347,7 +347,7 @@ unsigned long micros() {
                    // I also cannot fathom how the compiler generates what it does from this input....
     #elif (F_CPU == 10000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
       microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                   + (ticks * 6 + ((uint16_t)(ticks >> 1) - (ticks >> 3)));
+                   + (ticks * 3 + ((uint16_t)(ticks >> 1) - (ticks >> 3)));
     #elif (F_CPU == 5000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 16)
       microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
                    + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
@@ -362,21 +362,20 @@ unsigned long micros() {
   return microseconds;
 }
 #endif //end of non-RTC micros code
-
-
 #endif //end of non-MILLIS_USE_TIMERNONE code
 
-/* So what do you WANT in a good delay function? First, obviously you want it to delay things. You do not want it to
-    block interruots (then a long one would throw off timekeeping, miss inputs, and so on).
+/* So what do you WANT in a good delay function?
+    First, obviously you want it to delay things. You do not want it to block interruots (then a long one would throw off
+    timekeeping, miss inputs, and so on). And you want the compiled size to not be prohibitive for the part.
  * the reason it's so important wrt. interrupts is that in Arduino standard delay(), if an interrupt fires in the middle,
     will still end at the same time - it is "interrupt insensitive". Whenever a delay is using the builtin _delay_ms()
-    if that is interrupted it has no way of knowing timke has passed. Now hopefully you're not
-    spending so much time in an ISR that this is significant, but it is still undesirable.
+    if that is interrupted it has no way of knowing timke has passed. Now hopefully you're not spending so much time in
+    an ISR that this is significant, but it is still undesirable.
  * For the unfortunate souls using 4k and 2k parts, the flash usage becomes a major problem - why is it such a space-hog?
-    Because it has to pull in micros, which is bulky even with the division turned into bitshifts... And with RTC millis,
-    millis() is bad for the same reason, the conversion of 1024 to 1000 is a killer....
+    Because it has to pull in micros(), which is bulky even with the division turned into bitshifts... And with RTC millis,
+    millis() is bad for the same reason: the conversion of 1024 to 1000 is a killer....
 Now we will use one of three delay() implementations:
- * If you have 16k+ your delay is the standard one, it pulls in micros, yes, but you may well already have grabbed
+ * If you have 16k+ your delay is the standard one, it pulls in micros(), yes, but you may well already have grabbed
     that for your sketch already, and the delay is more accurate and fully interrupt insensitive, and you can afford
     the memory. For RTC users they will get the analogous implementation that is based on millis.
  * Users with millis disabled, or with less than 16k flash and using RTC will get the implementation based on _delay_ms().
@@ -437,34 +436,136 @@ Now we will use one of three delay() implementations:
   }*/
 
 inline __attribute__((always_inline)) void delayMicroseconds(unsigned int us) {
-  if (__builtin_constant_p(us)) { //if it's compile time known, the whole thing optimizes away to a call to _delay_us()
-    _delay_us(us);
-  } else { // amd if it is not, then it gets optimized to just this:
+  // This function gets optimized away, but to what depends on whether us is constant.
+  if (__builtin_constant_p(us)) {
+    _delay_us(us); // Constant microseconds use the avr-libc _delay_us() which is highly accurate for all values and efficient.
+  } else { // If it is not, we have to use the Arduino style implementation.
     _delayMicroseconds(us);
   }
 }
-/* Delay for the given number of microseconds.  Assumes a 1, 4, 5, 8, 10, 16, or 20 MHz clock. */
+/* Delay for the given number of microseconds. This is UGLY AS SIN and explicitly depends on function call overhead for
+ * very short delays.
+ * First, we get 1 us in and return if that's what was asked for.
+ * Then we use a minimal number of bitshifts to calculate the number of passes through the delay loop
+ * and subtract the number of loop-cycles of time we burned doing so. But need to be careful that sane values
+ * don't get so much bigger that they overflow the unsigned int we're storing it in. To that end, we use
+ * a longer loop at faster clock speeds.
+ * In the inline assembly, when a delay of 8 clocks or longer is required, we save flash with a clever trick:
+ *  "rjmp .+2" "\n\t"     // 2 cycles - jump over the return.
+ *  "ret" "\n\t"          // 4 cycles - rjmped over initially...
+ *  "rcall .-4" "\n\t"    // 2 cycles - ... but then called here...
+ * This exploits the fact that return is a 4-clock instruction (even on AVRxt) by first hopping over a return
+ * then immediately calling that return instruction - 8 clocks in 3 words. Once the ret is there, additional
+ * rcall instructions can get 6 clocks in a single word, though we only get to take advantage of that once for the 30 MHz case.
+ */
+
+#if F_CPU >= 32000000L
+  // 16 MHz math, 8-cycle loop
+  #define DELAYMICROS_EIGHT
+#elif F_CPU >= 30000000L
+  // 12 MHz math, 10-cycle loop
+  #define DELAYMICROS_TEN
+#elif F_CPU >= 28000000L
+  // 16 MHz math, 7-cycle loop
+  #define DELAYMICROS_SEVEN
+#elif F_CPU >= 24000000L
+  // 12 MHz math, 8-cycle loop
+  #define DELAYMICROS_EIGHT
+#endif
+
 __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
-  // call = 4 cycles + 2 to 4 cycles to init us(2 for constant delay, 4 for variable)
+  // call = 4 cycles + 4 cycles to init us
+  #if F_CPU >= 32000000L
+  // here, we only take half a us at the start!
+  __asm__ __volatile__ ("rjmp .+0"); //just waiting 2 cycles - so we're half a us in
 
-  // calling avrlib's delay_us() function with low values (e.g. 1 or
-  // 2 microseconds) gives delays longer than desired.
-  //delay_us(us);
-  #if F_CPU >= 20000000L
-  // for the 20 MHz clock on rare Arduino boards
+  // the loop takes 1/4 of a microsecond (8 cycles)
+  // per iteration, so execute it four times for each microsecond of
+  // delay requested.
+  us <<= 2; // x4 us, = 4 cycles
 
+  // account for the time taken in the preceding commands.
+  // we only burned ~14 cycles above, subtraction takes another 2 - so we've lost half a us,
+  // and only need to drop 2 rounds through the loop!
+  us -= 2; // = 2 cycles
+
+
+#elif F_CPU >= 30000000L
+  // for the 30 MHz clock
+
+  // for a one-microsecond delay, burn 14 cycles and return
+  __asm__ __volatile__ (
+    "rjmp .+2" "\n\t"     // 2 cycles - jump over the return.
+    "ret" "\n\t"          // 4 cycles - rjmped over initially...
+    "rcall .-4" "\n\t"    // 2 cycles - ... but then called here...
+    "rcall .-6");         // 2+4 cycles - ... and here again!
+                          // Waiting 14 cycles - in only 4 words!
+  if (us <= 1) return; // = 3 cycles, (4 when true)
+
+  // the loop takes 1/3 of a microsecond (10 cycles)
+  // per iteration, so execute it three times for each microsecond of
+  // delay requested.
+  us = (us << 1) + us; // x3 us, = 5 cycles
+
+  // account for the time taken in the preceding commands.
+  // we just burned 28 (30) cycles above, remove 3
+  us -= 3; //2 cycles
+
+#elif F_CPU >= 28000000L
+
+  // for a one-microsecond delay, burn 12 cycles and return
+  __asm__ __volatile__ (
+    "rjmp .+2" "\n\t"     // 2 cycles - jump over next instruction.
+    "ret" "\n\t"          // 4 cycles - rjmped over initially....
+    "rcall .-4" "\n\t"    // 2 cycles - ... but then called here);
+    "rjmp .+0" "\n\t"     // 2 cycles
+    "rjmp .+0");          // 2 cycles
+                          // Wait 12 cycles with 5 words
+  if (us <= 1) return; //  = 3 cycles, (4 when true)
+
+  // the loop takes 1/4 of a microsecond (7 cycles)
+  // per iteration, so execute it four times for each microsecond of
+  // delay requested.
+  us <<= 2; // x4 us, = 4 cycles
+
+  // account for the time taken in the preceding commands.
+  // we just burned 27 (29) cycles above, remove 4, (7*4=28)
+  // us is at least 8 so we can subtract 5
+  us -= 4; // = 2 cycles,
+
+
+#elif F_CPU >= 24000000L
+  // for the 24 MHz clock
+
+  // for a one-microsecond delay, burn 8 cycles and return
+  __asm__ __volatile__ (
+    "rjmp .+2" "\n\t"     // 2 cycles - jump over next instruction.
+    "ret" "\n\t"          // 4 cycles - rjmped over initially....
+    "rcall .-4");         // 2 cycles - ... but then called here);
+                          // wait 8 cycles with 3 words
+  if (us <= 1) return;    //  = 3 cycles, (4 when true)
+
+  // the loop takes 1/3 of a microsecond (8 cycles)
+  // per iteration, so execute it three times for each microsecond of
+  // delay requested.
+  us = (us << 1) + us; // x3 us, = 5 cycles
+
+  // account for the time taken in the preceding commands.
+  // we just burned 24 (22) cycles above, remove 3
+  us -= 3; //2 cycles
+
+
+#elif F_CPU >= 20000000L
   // for a one-microsecond delay, simply return.  the overhead
   // of the function call takes 18 (20) cycles, which is 1us
   __asm__ __volatile__(
-    "nop" "\n\t"
-    "nop" "\n\t"
-    "nop" "\n\t"
-    "nop"); //just waiting 4 cycles
+    "rjmp .+0" "\n\t"
+    "rjmp .+0" "\n\t"); //just waiting 4 cycles
   if (us <= 1) {
     return;  //  = 3 cycles, (4 when true)
   }
 
-  // the following loop takes a 1/5 of a microsecond (4 cycles)
+  // the loop takes a 1/5 of a microsecond (4 cycles)
   // per iteration, so execute it five times for each microsecond of
   // delay requested.
   us = (us << 2) + us; // x5 us, = 7 cycles
@@ -483,7 +584,7 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
     return;  //  = 3 cycles, (4 when true)
   }
 
-  // the following loop takes 1/4 of a microsecond (4 cycles)
+  // the loop takes 1/4 of a microsecond (4 cycles)
   // per iteration, so execute it four times for each microsecond of
   // delay requested.
   us <<= 2; // x4 us, = 4 cycles
@@ -502,7 +603,7 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
     return;  //  = 3 cycles, (4 when true)
   }
 
-  // the following loop takes 2/5 of a microsecond (4 cycles)
+  // the loop takes 2/5 of a microsecond (4 cycles)
   // per iteration, so execute it 2.5 times for each microsecond of
   // delay requested.
   us = (us << 1) + (us >> 1); // x2.5 us, = 5 cycles
@@ -521,7 +622,7 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
     return;  //  = 3 cycles, (4 when true)
   }
 
-  // the following loop takes 1/2 of a microsecond (4 cycles)
+  // the loop takes 1/2 of a microsecond (4 cycles)
   // per iteration, so execute it twice for each microsecond of
   // delay requested.
   us <<= 1; //x2 us, = 2 cycles
@@ -539,7 +640,7 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
     return;  //  = 3 cycles, (4 when true)
   }
 
-  // the following loop takes 4/5th microsecond (4 cycles)
+  // the loop takes 4/5th microsecond (4 cycles)
   // per iteration, so we want to add it to 1/4th of itself
   us += us >> 2;
   us -= 2; // = 2 cycles
@@ -553,7 +654,7 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
     return;  //  = 3 cycles, (4 when true)
   }
 
-  // the following loop takes 1 microsecond (4 cycles)
+  // the loop takes 1 microsecond (4 cycles)
   // per iteration, so nothing to do here! \o/
 
   us -= 2; // = 2 cycles
@@ -571,7 +672,7 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
 
   // compensate for the time taken by the preceding and next commands (about 22 cycles)
   us -= 22; // = 2 cycles
-  // the following loop takes 4 microseconds (4 cycles)
+  // the loop takes 4 microseconds (4 cycles)
   // per iteration, so execute it us/4 times
   // us is at least 4, divided by 4 gives us 1 (no zero delay bug)
   us >>= 2; // us div 4, = 4 cycles
@@ -580,12 +681,44 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
   #endif
 
 
-
-  // busy wait
-  __asm__ __volatile__(
+#if defined(DELAYMICROS_TWELVE)
+  __asm__ __volatile__ (
     "1: sbiw %0,1" "\n\t" // 2 cycles
-    "brne 1b" : "=w"(us) : "0"(us)   // 2 cycles
+    "rjmp .+2" "\n\t"     // 2 cycles - jump over next instruction.
+    "ret" "\n\t"          // 4 cycles - rjmped over initially....
+    "rcall .-4" "\n\t"    // 2 cycles - ... but then called here
+    "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
   );
+#elif defined(DELAYMICROS_TEN)
+  __asm__ __volatile__ (
+    "1: sbiw %0,1" "\n\t" // 2 cycles
+    "rjmp .+0" "\n\t"     // 2 cycles each;
+    "rjmp .+0" "\n\t"     // 2 cycles each;
+    "rjmp .+0" "\n\t"     // 2 cycles each;
+    "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+  );
+#elif defined(DELAYMICROS_EIGHT)
+  __asm__ __volatile__ (
+    "1: sbiw %0,1" "\n\t" // 2 cycles
+    "rjmp .+0" "\n\t"     // 2 cycles each;
+    "rjmp .+0" "\n\t"     // 2 cycles each;
+    "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+  );
+#elif defined(DELAYMICROS_SEVEN)
+  __asm__ __volatile__ (
+    "1: sbiw %0,1" "\n\t" // 2 cycles
+    "rjmp .+0" "\n\t"     // 2 cycles
+    "nop"      "\n\t"     // 1 cyc;e
+    "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+  );
+#else
+  // the classic 4 cycle delay loop...
+  // busy wait
+  __asm__ __volatile__ (
+    "1: sbiw %0,1" "\n\t" // 2 cycles
+    "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+  );
+#endif
   // return = 4 cycles
 }
 
