@@ -4,7 +4,7 @@
  * data is gathered and analyzed.
  */
 
-#if MEGATINYCORESERIES == 2
+#if MEGATINYCORE_SERIES == 2
   #define GUESS_20_32  62
   #define GUESS_20_30  52
   #define GUESS_16_30  90
@@ -36,9 +36,9 @@
    * to be scaled down, but we do gather number for 10 itself. No 20 can be   *
    * tuned down to 10, just scale.                                            */
   #define GUESS_20_12_DIRECT -28
-  #define GUESS_20_12 + (SIGROW_OSCCAL20M0 >= (-1*GUESS_20_12_DIRECT) ? GUESS_20_12_DIRECT : GUESS_20_24)
+  #define GUESS_20_12 (SIGROW_OSCCAL20M0 >= (-1*GUESS_20_12_DIRECT) ? GUESS_20_12_DIRECT : GUESS_20_24)
   #define GUESS_16_10_DIRECT -26
-  #define GUESS_16_10 + (SIGROW_OSCCAL16M0 >= (-1*GUESS_16_10_DIRECT) ? GUESS_16_10_DIRECT : GUESS_16_20)
+  #define GUESS_16_10 (SIGROW_OSCCAL16M0 >= (-1*GUESS_16_10_DIRECT) ? GUESS_16_10_DIRECT : GUESS_16_20)
 #endif
 /* Here we pick the correct one to use for the requested frequency.           *
  * First TUNE_PRESCALE is determined so you can tune 4, 5, 8 and on 2-series, *
@@ -47,7 +47,7 @@
  * so the 0x80 is "unreachable) "
  * Note the _ - outside of this file, we don't want anyone to know about this */
 
-#if MEGATINYCORESERIES == 2
+#if MEGATINYCORE_SERIES == 2
   #if F_CPU == 1000000
     #define TUNE_PRESCALE (CLKCTRL_PEN_bm | (osccfg ? CLKCTRL_PDIV_20X_gc : CLKCTRL_PDIV_16X_gc)
     #define GUESSCAL -1
