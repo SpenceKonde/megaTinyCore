@@ -61,7 +61,7 @@
       #     #   # # #     #   #   # #   #  # #
       #      ###  #  #    #   #   #  ###  #   #
 */
-#define PIN_SPI_SS                      (PIN_PA0)
+#define PIN_SPI_SS                      (PIN_PA4)
 #define PIN_SPI_MOSI                    (PIN_PA1)
 #define PIN_SPI_MISO                    (PIN_PA2)
 #define PIN_SPI_SCK                     (PIN_PA3)
@@ -125,43 +125,43 @@
       #  # #  ## #  # #    #   # #   #     #      #  #  ##     #
       #  # #   # #  # ####  ###   ###      #     ### #   #  ###
 */
-#define PIN_PA4        (0)
-#define PIN_PA5        (1)
-#define PIN_PA6        (2)
-#define PIN_PA7        (3)
-#define PIN_PB3        (4)
-#define PIN_PB2        (5)
-#define PIN_PB1        (6)
-#define PIN_PB0        (7)
-#define PIN_PA0        (11)
-#define PIN_PA1        (8)
-#define PIN_PA2        (9)
-#define PIN_PA3        (10)
+#define PIN_PA4          (0)
+#define PIN_PA5          (1)
+#define PIN_PA6          (2)
+#define PIN_PA7          (3)
+#define PIN_PB3          (4)
+#define PIN_PB2          (5)
+#define PIN_PB1          (6)
+#define PIN_PB0          (7)
+#define PIN_PA0         (11)
+#define PIN_PA1          (8)
+#define PIN_PA2          (9)
+#define PIN_PA3         (10)
 
 #if MEGATINYCORE_SERIES != 2
-  #define PIN_A0         (A0)
+  #define PIN_A0        (A0)
 #endif
-#define PIN_A1         (A1)
-#define PIN_A2         (A2)
-#define PIN_A3         (A3)
-#define PIN_A4         (A4)
-#define PIN_A5         (A5)
-#define PIN_A6         (A6)
-#define PIN_A7         (A7)
+#define PIN_A1          (A1)
+#define PIN_A2          (A2)
+#define PIN_A3          (A3)
+#define PIN_A4          (A4)
+#define PIN_A5          (A5)
+#define PIN_A6          (A6)
+#define PIN_A7          (A7)
 #define PIN_A10        (A10)
 #define PIN_A11        (A11)
 
 
 #if MEGATINYCORE_SERIES != 2
-  static const uint8_t    A0  = PIN_PA0;
+  static const uint8_t   A0 = PIN_PA0;
 #endif
-static const uint8_t    A1  = PIN_PA1;
-static const uint8_t    A2  = PIN_PA2;
-static const uint8_t    A3  = PIN_PA3;
-static const uint8_t    A4  = PIN_PA4;
-static const uint8_t    A5  = PIN_PA5;
-static const uint8_t    A6  = PIN_PA6;
-static const uint8_t    A7  = PIN_PA7;
+static const uint8_t     A1 = PIN_PA1;
+static const uint8_t     A2 = PIN_PA2;
+static const uint8_t     A3 = PIN_PA3;
+static const uint8_t     A4 = PIN_PA4;
+static const uint8_t     A5 = PIN_PA5;
+static const uint8_t     A6 = PIN_PA6;
+static const uint8_t     A7 = PIN_PA7;
 static const uint8_t    A10 = PIN_PB1;
 static const uint8_t    A11 = PIN_PB0;
 
@@ -198,7 +198,7 @@ static const uint8_t    A11 = PIN_PB0;
   3      A3           PA7                 AIN7      AIN3      X3/Y3     AINP0     AINP0     AINN0                                                                           LUT1-OUT
   4      RX           PB3       TOSC1                                             OUT                           RxD                           *WO0
   5      TX           PB2       TOSC2 /                                                     OUT                 TxD                           WO2
-                              EVOUT1
+                                EVOUT1
   6      SDA          PB1                 AIN10               X4/Y4     AINP2                                   XCK                 SDA       WO1
   7      SCL          PB0                 AIN11               X5/Y5               AINP2     AINP1               XDIR                SCL       WO0
   8      MOSI         PA1                 AIN1                                                                  *TxD      MOSI      *SDA                                    LUT0-IN1
@@ -211,20 +211,20 @@ static const uint8_t    A11 = PIN_PB0;
 
 const uint8_t digital_pin_to_port[] = {
   // Left side, top to bottom
-  PA, // 0  PA4
-  PA, // 1  PA5
-  PA, // 2  PA6
-  PA, // 3  PA7
-  PB, // 4  PB3
-  PB, // 5  PB2
+  PA, //  0 PA4
+  PA, //  1 PA5
+  PA, //  2 PA6
+  PA, //  3 PA7
+  PB, //  4 PB3
+  PB, //  5 PB2
   // Right side, bottom to top
-  PB, // 6  PB1
-  PB, // 7  PB0
+  PB, //  6 PB1
+  PB, //  7 PB0
   // skip PA0 UPDI
-  PA, // 8  PA1
-  PA, // 9  PA2
+  PA, //  8 PA1
+  PA, //  9 PA2
   PA, // 10 PA3
-  PA  // 11 PA0
+  PA  // 11 PA0 - come back to it.
 };
 
 /* Use this for accessing PINnCTRL register */
@@ -267,23 +267,23 @@ const uint8_t digital_pin_to_bit_mask[] = {
 
 const uint8_t digital_pin_to_timer[] = {
   // Left side, top to bottom
-  TIMERA0,    // 0  PA4
-  TIMERA0,    // 1  PA5
+  TIMERA0,        // 0  PA4
+  TIMERA0,        // 1  PA5
   #if defined(DAC0)
-  DACOUT, // 2  PA6
+  DACOUT,         // 2  PA6
   #else
-  NOT_ON_TIMER, // 2  PA6
+  NOT_ON_TIMER,   // 2  PA6
   #endif
   NOT_ON_TIMER,   // 3  PA7
   NOT_ON_TIMER,   // 4  PB3
-  TIMERA0,    // 5  PB2
+  TIMERA0,        // 5  PB2
   // Right side, bottom to top
-  TIMERA0,    // 6  PB1
-  TIMERA0,    // 7  PB0
+  TIMERA0,        // 6  PB1
+  TIMERA0,        // 7  PB0
   //skip PA0 UPDI
   NOT_ON_TIMER,   // 8  PA1
-  NOT_ON_TIMER,     // 9  PA2
-  TIMERA0,    // 10 PA3
+  NOT_ON_TIMER,   // 9  PA2
+  TIMERA0,        // 10 PA3
   NOT_ON_TIMER    // 11 PA0
 
 

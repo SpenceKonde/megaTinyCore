@@ -77,10 +77,10 @@
       #      ###  #  #    #   #   #  ###  #   #
 */
 #define SPI_MUX                       (0)
-#define PIN_SPI_SS                    (PIN_PA0)
 #define PIN_SPI_MOSI                  (PIN_PA1)
 #define PIN_SPI_MISO                  (PIN_PA2)
 #define PIN_SPI_SCK                   (PIN_PA3)
+#define PIN_SPI_SS                    (PIN_PA4)
 #if defined(PORTMUX_SPI0_bm) || defined(PORTMUX_SPIROUTEA)
   #define PIN_SPI_SCK_PINSWAP_1       (PIN_PC0)
   #define PIN_SPI_MISO_PINSWAP_1      (PIN_PC1)

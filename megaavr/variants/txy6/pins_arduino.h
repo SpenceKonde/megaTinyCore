@@ -77,7 +77,7 @@
       #      ###  #  #    #   #   #  ###  #   #
 */
 #define SPI_MUX                       (0)
-#define PIN_SPI_SS                    (PIN_PA0)
+#define PIN_SPI_SS                    (PIN_PA4)
 #define PIN_SPI_MOSI                  (PIN_PA1)
 #define PIN_SPI_MISO                  (PIN_PA2)
 #define PIN_SPI_SCK                   (PIN_PA3)
@@ -154,16 +154,16 @@
       #  # #   # #  # ####  ###   ###      #     ### #   #  ###
 */
 
-#define PIN_PA4        (0)
-#define PIN_PA5        (1)
-#define PIN_PA6        (2)
-#define PIN_PA7        (3)
-#define PIN_PB5        (4)
-#define PIN_PB4        (5)
-#define PIN_PB3        (6)
-#define PIN_PB2        (7)
-#define PIN_PB1        (8)
-#define PIN_PB0        (9)
+#define PIN_PA4         (0)
+#define PIN_PA5         (1)
+#define PIN_PA6         (2)
+#define PIN_PA7         (3)
+#define PIN_PB5         (4)
+#define PIN_PB4         (5)
+#define PIN_PB3         (6)
+#define PIN_PB2         (7)
+#define PIN_PB1         (8)
+#define PIN_PB0         (9)
 #define PIN_PC0        (10)
 #define PIN_PC1        (11)
 #define PIN_PC2        (12)
@@ -185,27 +185,27 @@
 #define PIN_A7         (A7)
 #define PIN_A8         (A8)
 #define PIN_A9         (A9)
-#define PIN_A10        (A10)
-#define PIN_A11        (A11)
+#define PIN_A10       (A10)
+#define PIN_A11       (A11)
 #if MEGATINYCORE_SERIES == 2
-  #define PIN_A12      (A12)
-  #define PIN_A13      (A13)
-  #define PIN_A14      (A14)
-  #define PIN_A15      (A15)
+  #define PIN_A12     (A12)
+  #define PIN_A13     (A13)
+  #define PIN_A14     (A14)
+  #define PIN_A15     (A15)
 #endif
 
 #if MEGATINYCORE_SERIES != 2
-  static const uint8_t  A0  = PIN_PA0;
+  static const uint8_t   A0 = PIN_PA0;
 #endif
-static const uint8_t    A1  = PIN_PA1;
-static const uint8_t    A2  = PIN_PA2;
-static const uint8_t    A3  = PIN_PA3;
-static const uint8_t    A4  = PIN_PA4;
-static const uint8_t    A5  = PIN_PA5;
-static const uint8_t    A6  = PIN_PA6;
-static const uint8_t    A7  = PIN_PA7;
-static const uint8_t    A8  = PIN_PB5;
-static const uint8_t    A9  = PIN_PB4;
+static const uint8_t     A1 = PIN_PA1;
+static const uint8_t     A2 = PIN_PA2;
+static const uint8_t     A3 = PIN_PA3;
+static const uint8_t     A4 = PIN_PA4;
+static const uint8_t     A5 = PIN_PA5;
+static const uint8_t     A6 = PIN_PA6;
+static const uint8_t     A7 = PIN_PA7;
+static const uint8_t     A8 = PIN_PB5;
+static const uint8_t     A9 = PIN_PB4;
 static const uint8_t    A10 = PIN_PB1;
 static const uint8_t    A11 = PIN_PB0;
 #if MEGATINYCORE_SERIES == 2
