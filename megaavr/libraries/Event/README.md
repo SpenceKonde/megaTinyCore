@@ -21,10 +21,8 @@ The 0/1-series are weird here - read the 2-series section first.
 The event system, under the hood, is asynchronous - it can react faster than the system clock (often a lot faster). On the 2-series, these work like the Dx-series and presumably future releases will. Per the datasheet for the 2-series:
 
 >Events can be either synchronous or asynchronous to the peripheral clock. Each Event System channel has two subchannels: one asynchronous and one synchronous.
-
 >The asynchronous subchannel is identical to the event output from the generator. If the event generator generates a signal asynchronous to the peripheral clock, the signal on the asynchronous subchannel will be asynchronous. If the event generator generates a signal synchronous to the peripheral clock, the signal on the asynchronous subchannel
 >will also be synchronous.
-
 >The synchronous subchannel is identical to the event output from the generator, if the event generator generates a signal synchronous to the peripheral clock. If the event generator generates a signal asynchronous to the peripheral clock, this signal is first synchronized before being routed onto the synchronous subchannel. Depending on when the event occurs, synchronization will delay the it by two to three clock cycles. The Event System automatically perform this synchronization if an asynchronous generator is selected for an event channel.
 
 The fact that it is asynchronous usually doesn't matter - it's either "faster than anything else" (if the user is async), or "2-3 clock cycles behind", but it is one of the things one should keep in mind when using these features, because every so often it does.
@@ -137,7 +135,7 @@ Below is a table with all of the event users for the tinyAVR 0/1/2-series parts
 | `user::tcd0_in_a`       | input 0, 1-series only             |
 | `user::tcd0_in_b`       | input 1, 1-series only             |
 
-### Notes:
+### Notes
 * The `evoutN_pin_pN7` is the same as `evoutN_pin_pN2` but where the pin is swapped from 2 to 7. This means that for instance, `evouta_pin_pa2` can't be used in combination with `evouta_pin_pa7`.
 * Many of these refer to specific pins or peripherals - on smaller pin-count devices, some of these event users are not available; Attempting to set a user that doesn't exist will result in a compile error.
 * This library papers over the fact that the 0/1-series numbered event channels to a peripheral 0 and 1, and everything else uses a and b. a and b are used here exclusively to refer to what the 0/1-series datasheets call 0 and 1.

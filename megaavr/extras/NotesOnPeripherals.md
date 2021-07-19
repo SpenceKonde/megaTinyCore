@@ -39,10 +39,11 @@ ISR(TCB0_INT_vect){
 As it happens the "test2" PA7 transitions 10 times for each time PA6 does - and sure enough in the assembly listing (sketch -> export compiled binary with this core exports it to sketch folder!), there are 10 instructions. **And the ISR takes a whopping 50 instructions!** (Lots of POPs and the RETI at the end; loading a byte from RAM into registers is also 3 cycles, and storing it back is 2 more. So it is surprisingly slow). Just like you'd expect (`20,000,000/(2^16*51)`), it transitionas once per 167mS or so.
 
 #### Corollary
-Accessing variables in an ISR is extra expensive because it has to save and restore the register used hold it's variable, since it doesn't know what it might be interrupting so it has to assume all registers are used and preserve them. The prologue and epilogue of an ISR is surprisingly costly. In this example, all we're doing is incrementing one unsigned integer, testing if the result is 0 and if it is executing a single instruction, and we're at 50 clock cycles! Well, yeah... loading that 2 byte global is 2x LDS, and saving it is 2x STS (2x3 + 2x2), the math and test is 4?, then the normal required prologue and epilogue is 3 push, 1 in, 1 clr, 3 pop, 1 out - another 12, and we needed 3 registers? So there's another 3 push 3 pop, 9 more clocks there, reti is 4, it takes 5 to actually start executing the ISR at all (2 to store the program counter to stack and three to execute the jmp from the vector to the routine - so without even having to look at the assembly listing, I can count up 40 clocks. Your brain should translate this to an extra-bold underline under the frequent admonation to **keep ISRs as small and short as possible** and that that includes the number of variables they access!
+Something you don't hear talked about much, either: Accessing variables in an ISR is more expensive than normal because it has to save and restore the register used hold a variable, since it doesn't know what it might be interrupting so it has to assume all registers are used and preserve them. The prologue and epilogue of an ISR are often surprisingly costly. In this example, all we're doing is incrementing one unsigned integer, testing if the result is 0 and if it is, executing a single instruction, and we're at 50 clock cycles! Well, yeah... loading that 2 byte global is 2x LDS, and saving it is 2x STS (2x3 + 2x2), the math and test is 4?, then the normal required prologue and epilogue is 3 push, 1 in, 1 clr, 3 pop, 1 out - another 12, and we needed 3 registers? So there's another 3 push 3 pop, 9 more clocks there, reti is 4, it takes 5 to actually start executing the ISR at all (2 to store the program counter to stack and three to execute the jmp from the vector to the routine - so without even having to look at the assembly listing, I can count up 40 clocks. *It's an extra 3 clocks and 4 bytes per working register* that the ISR uses at it's peak and *this often takes more time than the rest of the ISR* does to execute.
 
+Now you're not expected to think about it in that level of detail necessarily, but it's just another reason to **keep ISRs as small and short as possible** and know that "small and short" that that includes the number of variables they access.
 
-### Watch out for the optimizer...
+### Watch out for the optimizer
 You may be wondering about the nop instruction there.
 That's because there's another wacky thing demonstrated there: The compiler can get awfully clever when optimizing - as in, too clever. Without that, it will perform loop unrolling - replacing the loop with with all the values test2 will hold:
 
@@ -68,5 +69,4 @@ while(1){
   PORTA.OUTTGL=0x40;
 }
 ```
-
-Which is why one normally writes busy-wait and cycle-counting stuff using inline assembly!
+This is a shining example of why one normally writes busy-wait and cycle-counting stuff using inline assembly. The optimizer is very hard to intentionally confuse to make it not optimize something (and very easy to unintentionally confuse such that it either misses obvious optimizations or breaks in places where you were playing fast and loose with the C standard).

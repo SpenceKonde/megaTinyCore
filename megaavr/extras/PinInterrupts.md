@@ -37,7 +37,7 @@ Each port has one interrupt vector; their names are:
 When the interrupt condition occurs, the bit int PORTx.INTFLAGS corresponding to the interrupt will be set. If multiple pins in a port are used for interrupts corresponding to different things, you can use this to determine which pin triggered the interrupt. **YOU MUST CLEAR THIS BIT WITHIN THE ISR** - the interrupt will continue to be generated as long as the flag is set, so if you do not unset it, the ISR will run continuously after it was triggered once. To clear the bit, write a 1 to it; writing 255 to it will clear all of them.
 
 ### A basic example for the x16/x06
-
+This code demonstrates using pin interrupts - it should run on any part with more than 8 pins supported by this core.
 ```cpp
 unsigned long previousMillis;
 byte ledState;

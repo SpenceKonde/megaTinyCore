@@ -4,8 +4,8 @@ There are several solutions to reduce the power consumption on the ATtiny. Here 
 ## Reducing the clock speed
 The clock speed is very important for the following two reasons:
 
-1.  Slower clock speeds will reduce the power consumption
-1.  Minimum voltage to keep the CPU running is lower with a slower clock speed
+1. Slower clock speeds will reduce the power consumption
+1. Minimum voltage to keep the CPU running is lower with a slower clock speed
 
 The clock speed can be set from the Arduino IDE. Go to Tools -> Clock Speed, and pick one of the 7 options.  After selecting the required clock speed, go to Tools -> Burn Bootloader. Every time you change a clock, make sure you burn the bootloader - otherwise it is not applied, and timing will be off.
 
@@ -27,9 +27,9 @@ There is a significant difference between running the MCU at 5V or just 2V. Acco
 ## Use Sleep Mode
 The absolute minimum power consumption of the device, when all the peripherals are stopped, is 0.1μA. This can be achieved in power-down sleep mode; enabling the WDT and/or RTC (to keep track of time) but will continue where it left off after it receives an interrupt. While the CPU is not running, the device itself is still monitoring all the interrupts out there and to do so has to keep the peripherals running. Which peripherals are running depends on the sleep mode setting selected before entering sleep mode. The following 3 options are available:
 
-1.  Idle, only the CPU is turned off. All peripherals continue to run.  This does not save very much power.
-1.  Standby, the CPU is turned off as are most Peripherals. All unneeded clock sources are also turned off. Most periphrals can be set to remain active in standby - the specific implications of that may vary depending on the peripheral, and some peripherals can account for a large portion of the power consumption - especially if they keep the main oscillator running. On these parts, standby sleep mode is far more useful than it was on classic AVRs, where it was "Like power-down, only you don't save as much power" . Being able to select which peripherals you leave on, and the wealth of configuration options available for them, has made a world of difference.
-1.  Power Down, the CPU is turned off and all Peripherals (except the WDT and RTC) are shut down. Only the PIT (RTC), Pin change and TWI Address Match<sup>1</sup> interrupts can wake up the device. The same mode was available on classic AVRs with similar effects.
+1. Idle, only the CPU is turned off. All peripherals continue to run.  This does not save very much power.
+1. Standby, the CPU is turned off as are most Peripherals. All unneeded clock sources are also turned off. Most periphrals can be set to remain active in standby - the specific implications of that may vary depending on the peripheral, and some peripherals can account for a large portion of the power consumption - especially if they keep the main oscillator running. On these parts, standby sleep mode is far more useful than it was on classic AVRs, where it was "Like power-down, only you don't save as much power" . Being able to select which peripherals you leave on, and the wealth of configuration options available for them, has made a world of difference.
+1. Power Down, the CPU is turned off and all Peripherals (except the WDT and RTC) are shut down. Only the PIT (RTC), Pin change and TWI Address Match<sup>1</sup> interrupts can wake up the device. The same mode was available on classic AVRs with similar effects.
 
 Waking from Idle sleep mode is almost instantaneous - only 6 clock cycles. Waking from  a sleep mode where the oscillator is stopped (power down, or standby if nothing requiring the oscillator is left running) takes 8 uS + 10 clock cycles.
 
@@ -68,7 +68,7 @@ sleep_cpu();
 This can be in your loop() section of your sketch.
 Now the device will enter sleep mode and you will notice (depending on your sleep mode setting) the power consumption is less than 1μA (very difficult to measure). Waking it up with the real time counter is described next.
 
-### Unused pins and Sleep modes
+### Unused pins and sleep modes
 **IMPORTANT** In order to minimize power consumption, you *must* eliminate or disable all floating pins. A floating pin is any pin which is not being driven high or low (by this or another device) nor held in a specific state (for example by pullup resistors). Because these pins transition randomly in response to ambient noise, those digital input buffers are consuming power with every trasition. To minimize power consumption, one or more of the following must apply to every pin:
 * It is set as an OUTPUT
 * It is set INPUT_PULLUP or the internal pullups are otherwise enabled
@@ -121,11 +121,11 @@ void loop() {
 ### RTC and Synchronization
 The RTC is in it's own "clock domain" and the microcontroller has to "synchronize" configuration changes between the registers controlling the RTC, and the RTC itself. The RTC itself is also - compared to the CPU - SLOW (32.768 kHz vs 20 MHz). While this is not the only peripheral with such synchronization concerns, they are *very* prominent here due to that speed difference. Always check RTC.STATUS before writing to RTC/PIT registers. If you test a sketch that uses these and it doesn't work, one of your first thoughts should be "Is the RTC configured correctly? Do I KNOW that it is? Maybe I'd better make sure by reading the values out of the registers after I think I've set them..." - Generally the consequence of failing to wait for synchronization is that writes to the register in question will be ignored; when the setting in question is what makes the chip wake up after you put it to sleep, and it goes to sleep upon start-up, there may not be much functionality left.
 
-# Sleep and Serial ports
+## Sleep and Serial ports
 If there are any serial ports which you print output to, before going to sleep, be sure to let them finish printing everything in their transmit buffer by calling `Serial.flush()`.
 
-# Future Development
+## Future Development
 There are plans for a library to provide improved wrappers around sleep modes, particularly regarding timekeeping. This will also provide a means to handle serial ports automatically - including waking the part upon seeing an incoming character on the serial port. The latter is more complicated than the datasheet implies due to a widespread silicon bug with SFD (Start-of-Frame Detection).
 
-# Notes
-1. "Pin change with restrictions? Like always, sure. RTC? But of course, that's what it's here for. TWI address match? Whaaat?" If your first thought is "one of these things looks out of place here" - that was mine too. One presumes that this can be implemented asynchronously at a low cost (it is, effectively, just a shift register and 7-bit binary comparator...). I don't know how difficult of an engineering task it was, or what compromises were made for it, but if you imagine building an I2C device with one of these as it's core, this is functionality has a very high payback.
+## Notes
+1. "Pin change with restrictions? Like always, sure. RTC? But of course, that's what it's here for. TWI address match? Wait, we can wake from deepest sleep modes on that?" If your first thought is "one of these things looks out of place here" - that was mine too. One presumes that this can be implemented asynchronously at a low cost (it is, effectively, just a shift register and 7-bit binary comparator...). I don't know how difficult of an engineering task it was, or what compromises were made for it, but if you imagine building an I2C device with one of these as it's core, this is functionality has a very high payback.

@@ -31,23 +31,23 @@ If there is a list of the names defined for the interrupt vectors is present som
 | TCA0_CMP2_vect    | X | X | X | Manually        | Alias: TCA0_LCMP2_vect                      |
 | TCA0_HUNF_vect    | X | X | X | Manually        |                                             |
 | TCA0_OVF_vect     | X | X | X | Manually        | Alias: TCA0_LUNF_vect                       |
-| TCB0_INT_vect     | X | X | X | Depends on mode | Two flags on 2 series. 8 modes on all       |
-| TCB1_INT_vect     |   | * | X | Depends on mode | 1-series with 16k or 32k flash only         |
+| TCB0_INT_vect     | X | X | X | Depends on mode | Two flags on 2 series only. Behavior depends on mode, see datasheet |      |
+| TCB1_INT_vect     |   | * | X | Depends on mode | 1-series with 16k or 32k flash or 2-series  |
 | TCD0_OVF_vect     |   | X |   | Manually        |                                             |
 | TCD0_TRIG_vect    |   | X |   | Manually        |                                             |
-| TWI0_TWIM_vect    | X | X | X | Usually Auto    | See datasheet for list of what clears it    |
-| TWI0_TWIS_vect    | X | X | X | Usually Auto    | See datasheet for list of what clears it    |
+| TWI0_TWIM_vect    | X | X | X | Usually Auto    | See datasheet, flag clearing is complicated |
+| TWI0_TWIS_vect    | X | X | X | Usually Auto    | See datasheet, flag clearing is complicated |
 | USART0_DRE_vect   | X | X | X | Write/Disable   | ISR must write data or disable interrupt    |
-| USART0_RXC_vect   | X | X | X | RXCIF, on read  | Error flags, if enabled only clear manually |
-| USART0_TXC_vect   | X | X | X | Manually        |                                             |
+| USART0_RXC_vect   | X | X | X | RXCIF, on read  | Error flags, if enabled, only cleared manually |
+| USART0_TXC_vect   | X | X | X | Manually        | Often used without the interrupt enabled    |
 
-#### Clearing flags - why so complicated?
-Almost all flags *can* be manually cleared - the ones that can be cleared automatically generally do that to be helpful:
-* when the purpose of the flag is to tell you that something is ready to be read, reading it clears the flag. ADC, serial interfaces, and TCB input capture do that.
+#### Clearing flags - why it's so complicated
+Almost all flags *can* be manually cleared - the ones that can be cleared automatically generally do that to be helpful. The datasheet will explicitly list under what conditions a flag is cleared.
+* When the purpose of the flag is to tell you that something is ready to be read, reading it clears the flag. ADC, serial interfaces, and TCB input capture do that.
 * The TWI interrupts work the same way - you need to read, write, or ack/nack something to respond to the bus event; doing so clears the flag too.
 * Sometimes interrupts like that can have error flags that can trigger them enabled too; those typically have to be manually cleared - by enabling them, you declare an intent to do something about them, so you're responsible for telling the hardware you did it.
-* USART, and buffered SPI have DRE interrupt that can only be cleared by writing more data - otherwise you need to disable the interurpt from within the ISR. The TXC (transfer/transmit complete) flags are freqently polled rather than used to fire interrupts. It's not entirley clear from the datasheet if the EEPROM ready interrupt is like that, or can be cleared manually.
-* The NMI is a very special interrupt - on tinyAVR it can only be triggered by CRC check failure; it can be configured to be a normal interrupt *or* a Non-maskable Interrupt. In NMI mode, the part will sit there running the interrupt instead of almost-working with damaged firmware, potentially creating a dangerous situation when it fails at a critical moment. No matter what the damaged firmware tries to do, it cannot disable or bypass the NMI. Onlu loading working firmware and resetting it will clear the NMI. This is of particular relevance in life-safety-critical applications which these parts (but NOT this software package nor Arduino in genberal) are certified for. Not something likely to be used in Arduino-land.
+* USART, and SPI in buffered mode, have DRE interrupts whose flag can only be cleared by writing more data - otherwise you need to disable the interurpt from within the ISR. The TXC (transfer/transmit complete) flags are freqently polled rather than used to fire interrupts. It's not entirley clear from the datasheet if the EEPROM ready interrupt is like the DRE ones, or can be cleared manually.
+* The NMI is a very special interrupt - on tinyAVR it can only be triggered by `CRCSCAN` failure. It can be configured to be a normal interrupt *or* a so called non-maskable interrupt. In NMI mode, the part will sit there running the interrupt handler instead of running the corrupted firmware. This is very important for industrial users, who put these parts into cars or safety-critical equipment, because the corrupted part of the firmware might be the part that only gets called in a life-safety-critical moment. For example, imagine an airbag control chip in a car - the car could just ask it if it was working but without performing a CRC check on the flash, there would be no way to tell whether it's *actually* working - only that the part of the code which responds to the inquiries from the vehicles computer was. This lets you positively ensure that such partial functionality situations can never happen due to flash corruption or programming failure. The software can of course still have (literally) fatal bugs - but if you're making airbag controllers, you've got review teams and processes in place to checm that too. No matter what the damaged firmware tries to do, it cannot disable or bypass the NMI. Only loading working firmware and resetting it will clear the NMI. *Neither this software package nor Arduino in general are certified for or should ever be used for life-safety-critical applications* so this is not something likely to be or seen in Arduino-land.
 
 ### Example
 ```c++

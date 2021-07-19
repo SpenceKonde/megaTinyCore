@@ -20,7 +20,7 @@ Like most peripherals, an alternatie pin mapping is available for TWI on all 1-s
 
 ## Pullups
 The I2C standard absolutely does require external pullups. The fact that I2C ever works with just the internal pullups is somewhat surprising - but the protocol is designed to be resiliant to mildly adverse hardware conditions. However, as wires get longer and/or slave devices more numerous, the bus capacitance increases and the internal pullups will no longer be sufficient for proper functioning. By popular demand we have added a method to enable the pullups; we suggest using this only as a debugging aid: *if this fixes any problems, you should install external pullup resistors* (in the absence of other devices on the bus having their own pullups breakout boards often do), 4.7k is a good default value for standard speed I2C). After selecting the desired pin mapping (if not the default) call:
-```
+```c
 Wire.usePullups();
 ```
 
@@ -31,7 +31,7 @@ Prior to 5/2021, `Wire.setClock()` did not work correctly and TWI baud rates cou
 
 ## Extra Features in Slave mode
 In slave mode, it is  possible to respond to the general call (0x00) address as well (Thanks [@LordJakson](https://github.com/LordJakson)!). This is controlled by the optional second argument to Wire.begin(). If the argument is supplied amd true, general call broadcasts will also trigger the interrupt. These parts also support optionally having a second address, or masking (ignoring) some bits in the address. The optional third argument, if supplied, is passed unaltered to the TWI0.SADDRMASK register. If the low bit is 0, any bits set 1 will be ignored (masked off bits will be treated as matching). If the low bit is 1, it will instead act as a second address that the device can respond to. See the datasheet for more details. An everyday example of a part that does that sort of address masking is the 24-series of I2C EEPROMs (any 8-pin I2C EEPROM with 24 in the part number - many vendors make indistinguishable EEPROMs): When the size of the address of any cell within the EEPROM exceeds a multiple of 8 by 3 or less, it will use that many bits of the I2C address to address the memory; those bits are otherwise set by input pins. Hence with maximum options, the slave mode begin() call is:
-```
+```c
 Wire.begin(uint8_t address, bool receive_broadcast, uint8_t second_address)
 ```
 

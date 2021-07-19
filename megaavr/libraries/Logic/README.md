@@ -66,7 +66,7 @@ General notes:
 * See the version of this file distributed with MegaCoreX or DxCore for information on the corresponding options on those parts.
 * The point of `in::pin` to enable you to use a pin which is configured as an **output** too - either as a way to manually switch behavior, or when a pin is being controlled by a peripheral that is not directly accessible as an input. There are only a few cases like this that apply to tinyAVR parts (USART XDIR, TCA WO3-5 in split mode) and anything TWI come to mind)
 
-#### Accepted values for tinyAVR 0/1-series parts:
+#### Accepted values for tinyAVR 0/1-series parts
 
 ``` c++
 in::masked;           // Pin not in use
@@ -110,7 +110,7 @@ Notes specific to ATtiny 0/1-series:
   * Parts with two TCBs or three ACs give them their own channel. The other parts that have multiples of these (2-series and Dx) have one channel for this, and the input number selects which one is used.
 
 
-#### Accepted values for tinyAVR 2-series:
+#### Accepted values for tinyAVR 2-series
 ``` c++
 in::masked;           // Pin not in use
 in::unused;           // Pin not in use

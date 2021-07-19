@@ -31,18 +31,18 @@ All of these tables have in common that they run from the system clock or in the
 ### Timer Prescaler Availability
 The below table summarized which powers of 2 can be used to prescale which timers. In the case of TCD0, sync and count are multiplied together. TCD0 dela
 
-Prescaler    | TCA0   | TCBn  | TCD0   | TCD0 sync | TCD0 counter|
------------- | -------|-------| -------| -------| -------|
-CLK          |  YES   |  YES  |  YES   |  YES   |  YES   |
-CLK2         |  YES   |  YES  |  YES*  |  YES   |  NO    |
-CLK/4        |  YES   |  TCA  |  YES   |  YES   |  YES   |
-CLK/8        |  YES   |  TCA  |  YES   |  YES   |  NO    |
-CLK/16       |  YES   |  TCA  |  YES*  |  NO    |  NO    |
-CLK/32       |  NO    |  NO   |  YES   |  NO    |  YES   |
-CLK/64       |  YES   |  TCA  |  YES*  |  NO    |  NO    |
-CLK/128      |  NO    |  NO   |  YES*  |  NO    |  NO    |
-CLK/256      |  YES   |  TCA  |  YES*  |  NO    |  NO    |
-CLK/1024     |  YES   |  TCA  |  NO    |  NO    |  NO    |
+Prescaler    | TCA0 | TCBn | TCD0 | TCD0 sync | TCD0 counter|
+-------------|------|------|------|-----------|-------------|
+CLK          |  YES |  YES | YES  |  YES      |       YES   |
+CLK2         |  YES |  YES | YES* |  YES      |        NO   |
+CLK/4        |  YES |  TCA | YES  |  YES      |       YES   |
+CLK/8        |  YES |  TCA | YES  |  YES      |        NO   |
+CLK/16       |  YES |  TCA | YES* |  NO       |        NO   |
+CLK/32       |   NO |   NO | YES  |  NO       |       YES   |
+CLK/64       |  YES |  TCA | YES* |  NO       |        NO   |
+CLK/128      |   NO |   NO | YES* |  NO       |        NO   |
+CLK/256      |  YES |  TCA | YES* |  NO       |        NO   |
+CLK/1024     |  YES |  TCA |  NO  |  NO       |        NO   |
 
 * Requires using the synchronizer prescaler as well. My understanding is that this results in synch cycles taking longer.
 
@@ -54,7 +54,7 @@ When working with timers, I constantly found myself calculating periods, resolut
 ## RTC - 16-bit Real Time Clock and Programmable Interrupt Timer
 This is covered separately because it is a very different sort of timer. More information will be available after I have comopleted the sleep and RTC timing library whenever that ends up being.
 
-When working with the RTC **be certain to read the relevant [errata](Errata.md)** - most tinyAVR 0/1-series parts have a silicon bug that forces both RTC and PIT to be enabled if either is to work, and one symptom of this is that RTC registers will never sync. So the usual `while (RTC.STATUS); ` will hang.
+When working with the RTC **be certain to read the relevant [errata](Errata.md)** - most tinyAVR 0/1-series parts have a silicon bug that forces both RTC and PIT to be enabled if either is to work, and one symptom of this is that RTC registers will never sync. So the usual `while(RTC.STATUS);` will hang.
 
 ## Usage of Timers by megaTinyCore
 This section applies only to megaTinyCore. A summary of the settings used for millis()/micros() timekeeping and their ramifications for the the frequency of generated PWM, time taken for micros() to return, and the percentage of time the microcontroller will spend in the millis() ISR - both before and after the changes introduced in 1.1.9, see the [summary chart in google sheets](https://docs.google.com/spreadsheets/d/1W6XAChKxozjN87hF34xwsb6TCKHA1KMztx8wL_UbLmk/edit?usp=sharing)

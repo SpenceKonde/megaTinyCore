@@ -61,7 +61,7 @@ $: Ext. Clock recommended. DA-series, particularly with autotune is probably goo
 
 PC1 and PC2 are the only applicable pins found on all devices in the AVR Dx-series - Everything also has A0 and A1, but they are needed for the crystal, and AVR DD-series has parts with only A0, A1, and C1, C2, C3, PD4-7 and PF6 (Reset), PF7 (UPDI).
 
-##### Hints:
+##### Hints
 * As always, if you can dedicate a board to this so it's ready whenever you need it, you'll be happier.
 * You can power the reference board and target from the same power source.
 
@@ -73,7 +73,7 @@ Select the target chip, set it for 16 or 20 MHz, and disable millis.
 Select your UPDI programming method and port. Verify that it compiles to make sure you haven't missed anything.
 There are a few notes about the sketch below
 
-#### Step 3: Tune it!
+#### Step 3: Tune it
 
 Make the following connections:
 Output pin of timebase to pin 1 (PA5) of the target.
@@ -82,7 +82,7 @@ Ground of timebase to ground of target.
 
 Connect your UPDI programmer (or serial port for Optiboot upload). Now everything is powered (that's why you uploaded bare minimum or blink - so it and the timebase won't be fighting over that pin)
 
-And upload megaTinyTunrr to the target.
+And upload megaTinyTuner to the target.
 After a few seconds, LED will blink quickly during the tuning process. and then either finish or crash (hangs in one state or the other, and then gets rebooted by the
 WDT, after which it indicates that it has been tuned with the)
 Wait until the LED (LED_BUILTIN, the same pin the Blink uses; PA7 on most parts) turns on.
@@ -90,7 +90,7 @@ Wait until the LED (LED_BUILTIN, the same pin the Blink uses; PA7 on most parts)
 Unless you are using Optiboot (and hence cannot change fuse without reburning bootloader, so you are wedded to either 16 or 20 MHz), you can tune both of them, and it's probably more convenient to do so.
 If you previously tuned at 16 MHz, select 20 MHz and repeat step 3.Otherwise, select 16 MHz and repeat.
 
-#### Step 4: Done!
+#### Step 4: Done
 Disconnect the tuner from your target and now the (tuned) options will be far more accurate.
 
 The tuning will persist unless you explicitly erase the USERROW (also known as a the User Signature Space). It can be manipulated with the USERSIG.h library. Even across bootloading - so if you wanted to put Optiboot onto it, you can do that, and a sketch uploaded through Optiboot with Internal 20MHz (tuned) would run at 20 MHz, and with Internal 16 MHz (tuned) would run at 16 MHz.

@@ -250,7 +250,7 @@ Sets the serial monitor baud rate. Defaults to 9600 if not defined.
 ## pyupdi
 [pyupdi](https://github.com/mraardvark/pyupdi) is a Python-based tool for programming tinyAVR and megaAVR devices with UPDI interface via a standard serial port. It can be installed directly in the PlatformIO virtual environment using the following command:
 
-```
+```bash
 pip install https://github.com/mraardvark/pyupdi/archive/master.zip
 ```
 

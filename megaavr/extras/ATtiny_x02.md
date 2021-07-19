@@ -24,7 +24,7 @@ This matches the megaTinyCore 412/402 Rev. - and Rev. A breakout boards below. *
 There exist ATtiny402's in the wild where the last byte of the signature is 0x25, instead of 0x27. Currently shipping parts from Atmel/Microchip have the correct signature, and this problem appears to be in the past, for the most part. Hoerver, if you're stuck with wrong-signature ATtiny402's, choose ATtiny402 (bad signature) from the tools -> chip menu.
 
 
-## Buy official megaTinyCore breakouts and support continued development!
+## Buy official megaTinyCore breakouts and support continued development
 [ATtiny402 assembled](https://www.tindie.com/products/17685/)
 [ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
 
