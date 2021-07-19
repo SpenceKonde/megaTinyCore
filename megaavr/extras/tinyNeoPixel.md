@@ -147,7 +147,7 @@ In order to specify the order of the colors on each LED, the third argument pass
 This library is supplied with support for speeds up to 48 MHz which is far in excess of what the tinyAVR series can reach (but - amazingly - is within reach of the Dx-series).
 
 ### Library name
-While this library was initially created in order to both ensure compatibility with, and through the Static version, fit within the flash and memory constraints of, the tinyAVR line of parts, **this library is entirely suitable for non-tiny devices**; It offers all the functionality of the Adafruit version on the library, with the addition of the Static mode. Where appropriate, core-specific matters are accounted for (not relevant for modern AVR versions). This library is code compatible with the version distributed with ATTinyCore, though that has additional dependancies on menu options.
+While this library was initially created in order to both ensure compatibility with, and through the Static version, fit within the flash and memory constraints of, the tinyAVR line of parts, **this library is entirely suitable for non-tiny devices**; It offers all the functionality of the Adafruit version on the library, with the addition of the Static mode. Where appropriate, core-specific matters are accounted for (not relevant for modern AVR versions). This library is code compatible with the version distributed with ATTinyCore, though that has additional dependencies on menu options.
 
 Dynamic allocation has no place on an 8-bit microcontroller. Since almost all of the other pixel libraries *dont* work, considering the popularity of WS2812 LEDs, I decided it would be improve the UX with the core to distribute a known working '2812 library with a standard API along with the cores.
 
