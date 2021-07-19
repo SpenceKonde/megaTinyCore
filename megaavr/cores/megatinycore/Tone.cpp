@@ -96,7 +96,7 @@
   // timerx_toggle_count:
   //  > 0 - duration specified
   //  = 0 - stopped
-  //  < 0 - infinitely (until stop() method called, or new play() called)
+  //  < 0 - infinitely (until stop() method called, or new tone() called)
 
   volatile long timer_toggle_count;
   volatile uint8_t *timer_outtgl_reg;
@@ -112,10 +112,8 @@
 // frequency (in hertz) and duration (in milliseconds).
 #ifndef TONE_UNAVAILABLE
   void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
+    // Believe it or not, we don't need to turn off interrupts!
   {
-    long toggle_count = 0;
-    uint32_t compare_val = 0;
-
     if (frequency == 0) {
       noTone(pin);
       /* turn it off (frequency 0, right? Note that this won't do anything
@@ -129,90 +127,95 @@
        * do useless things instead. */
       return;
     }
-
-    // Get pin related stuff
+    // Get pin related info
     uint8_t bit_mask = digitalPinToBitMask(pin);
     if (bit_mask == NOT_A_PIN) return;
-      /* Same logic as above holds here except what it did was actively
-       * disruptive. When library code takes user supplied pins and looks
-       * up bitmasks and position, always check that one of them isn;t
-       * NOT_A_PIN - before you get the PORT struct. Because the port
-       * struct - yes it returns a null pointer, 0x0000. The start of the
-       * low I/O space.... so anything you do with that could scribble
-       * over (in modernAVR's case) VPORT registers! */
+    /* Same logic as above holds here except what it did was actively
+     * disruptive. When library code takes user supplied pins and looks
+     * up bitmasks and position, always check that one of them isn;t
+     * NOT_A_PIN - before you get the PORT struct. Because the port
+     * struct function cannot have it's result used safely. For bad 
+     * pins, yes it returns a null pointer, 0x0000. But not only is
+     * that a valid register, it's an SFR (VPORTA.DIR)! So we don't
+     * want to end up writing to that. The convention of NULL pointers
+     * being invalid to work with is NOT safe to assume on embedded
+     * systems. */
 
-    // Now that we know it's a pin, we can get the register to toggle output.
-    PORT_t *port = digitalPinToPortStruct(pin);
-    volatile uint8_t *port_outtgl = (volatile uint8_t *)&(port->OUTTGL);
 
-    if (_pin != pin) {
-        *(port_outtgl-1) = bit_mask; // digitalWrite(pin,LOW); (set outclr for new pin)
-        *(port_outtgl-6) = bit_mask; // pinMode(pin, OUTPUT); (set dirset for new pin)
-    }
-
+    long toggle_count;
     // Calculate the toggle count
     if (duration > 0) {    // Duration defined
       #if defined(SUPPORT_LONG_TONES) && SUPPORT_LONG_TONES == 1
       if (duration > 65536) {
-        toggle_count =  (frequency/5) * (duration / 100);
+        toggle_count =  (frequency / 5) * (duration / 100);
       } else {
         toggle_count =  (frequency * duration) / 500;
       }
       #else
         toggle_count = (frequency * duration) / 500;
       #endif
-    } else {            // Duration not defined -- tone until noTone() call
-        toggle_count = -1;
+    } else { 
+      // Duration not specified -> infinite
+      // Represented internally by toggle_count = -1
+      toggle_count = -1;
     }
-
     // Calculate compare value
-    uint8_t divisionfactor = 1; //no prescale, toggles at half the frequency
+    int8_t divisionfactor = 1; //no prescale, toggles at twice the frequency
 
-    compare_val = ((F_CPU / frequency)>>1);
-    while ((compare_val > 0x10000) && (divisionfactor<8))
-    {
+    // Timer settings -- will be type B timer or bust....
+    uint32_t compare_val = ((F_CPU / frequency) >> 1);
+    // We're are however disabling the timer. There may be one final interrupt at the moment we do so
+    // but that's not a problem
+    if (compare_val < 0x10000) { /* previously this tested for divisionfactor == 1,
+      * but that relied on us having already gone through the while loop to
+      * adjust it, which we haven't done yet, but we want to do this *after* the
+      * timeconsuming division operation, but *before* we actually change any 
+      * other settings, because this is the point at which we stop the timer - 
+      * hence it needs to be the first to be set if we want to leave interrupts on*/
+      _timer->CTRLA = TCB_CLKSEL_DIV1_gc;
+    } else {
+      _timer->CTRLA = TCB_CLKSEL_DIV2_gc;
+      divisionfactor--;
+    }
+    divisionfactor--; //now either 0 or -1, but..... 
+    while ((compare_val > 0x10000) && (divisionfactor < 6)) {
+      // If the "else" branch above was followed, this is always true initially.
       compare_val = compare_val >> 1;
       divisionfactor++;
     }
     if (--compare_val > 0xFFFF) {
-      //if still too high, divisionfactor reached 8 (/256), corresponding to 1Hz
-      compare_val = 0xFFFF; //do the best we can.
+      // if still too high, divisionfactor reached 6 (each phase lasts 64 overflows), meaning the
+      // user is using tone() to generate something that is not, by any stretch of the word, a
+      // "tone", and they should be generating it through other means.
+      compare_val = 0xFFFF; // do the best we can
     }
 
-
-    // Timer settings -- will be type B
-    // Believe it or not, we still don't need to turn off interrupts!
-    // We're are however disabling the timer. There may be one final interrupt at the moment we do so
-    // but that's not a problem
-    if(divisionfactor==1)
-    {
-      _timer->CTRLA = TCB_CLKSEL_DIV1_gc;
-    } else { //division factor between 2 and 8
-      _timer->CTRLA = TCB_CLKSEL_DIV2_gc;
-      divisionfactor--; //now between 1 and 7 //and while it is disabed, we can reconfigure in peace.
+    // Anyway - so we know that the new pin is valid....
+    if (_pin != pin) {  // ...let's see if we're using it already.
+      if (_pin != NOT_A_PIN) { // If not - were we using one before?
+        // If we are we're gonna be in a world of hurt if we don'rt
+        // turn it off before we actually start reconfiguring stuff
+        *(timer_outtgl_reg - 5) = timer_bit_mask; // pinMode(_pin, INPUT);    (write dirclr for old pin)
+        *(timer_outtgl_reg - 1) = timer_bit_mask; // digitalWrite(_pin, LOW); (write outclr for old pin)
+      }
+      // whether or not we _were_ using a pin, we are now, so configure the new one as an output...
+      PORT_t *port = digitalPinToPortStruct(pin);
+      timer_bit_mask = bit_mask; // we no longer care what the old pin was
+      timer_bit_mask = bit_mask; // nor it's bitmask/ 
+      timer_outtgl_reg = (volatile uint8_t *) &(port->OUTTGL);
+      *(timer_outtgl_reg - 1) = bit_mask; // digitalWrite(pin, LOW); (write outclr for new pin)
+      *(timer_outtgl_reg - 6) = bit_mask; // pinMode(pin, OUTPUT);   (write dirset for new pin)
     }
-    divisionfactor--; //now between 0 and 6
-
     // Save the results of our calculations
-    timer_cycle_per_tgl = 1 << divisionfactor; //1, 2, 4, 8, 16, 32, or 64 - toggle pin once per this many cycles
+    timer_toggle_count        = toggle_count;
+    timer_cycle_per_tgl       = 1 << divisionfactor; //1, 2, 4, 8, 16, 32, or 64 - toggle pin once per this many cycles
     timer_cycle_per_tgl_count = timer_cycle_per_tgl;
-    _timer->CCMP = compare_val; // and each cycle is this many timer ticks long
-    // Timer to Periodic interrupt mode
-    _timer->CTRLB = TCB_CNTMODE_INT_gc;
-    _timer->CNT = 0; //not strictly necessary
-    // Write compare register
-    uint8_t oldSREG = SREG;
-    cli();
-    _pin = pin; // now we can finally safely set this!
-    _timer->INTCTRL = TCB_CAPTEI_bm; //enable the interrupt
-    // Store these values for this call to tone in the variables the ISR uses.
-    timer_outtgl_reg = port_outtgl;
-    timer_bit_mask = bit_mask;
-    timer_toggle_count = toggle_count;
-    // Enable timer
-    _timer->CTRLA |= TCB_ENABLE_bm;
-     // Enable interrupts
-    SREG = oldSREG;
+    _timer->CCMP              = compare_val; // and each cycle is this many timer ticks long
+    _timer->CTRLB             = TCB_CNTMODE_INT_gc;
+    _timer->CNT               = 0; //not strictly necessary, but ensures there's no glitch. 
+    _pin                      = pin; 
+    _timer->INTCTRL           = TCB_CAPTEI_bm; // Enable the interrupt (flag is already cleared)
+    _timer->CTRLA            |= TCB_ENABLE_bm; // Enable timer
   }
 #else
   void tone(__attribute__ ((unused)) uint8_t pin, __attribute__ ((unused)) unsigned int frequency, __attribute__ ((unused)) unsigned long duration)

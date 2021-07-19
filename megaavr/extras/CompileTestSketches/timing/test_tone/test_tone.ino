@@ -1,25 +1,23 @@
-/* _SFR_MEM32(0x001C) is a dummy value. 0x001C is the first GPIOR.
- *  but in practice, it doesn't matter since
- *  #define _SFR_MEM32(mem_addr) _MMIO_DWORD(mem_addr)
- *  and
- *  _MMIO_DWORD(mem_addr) (*(volatile uint32_t *)(mem_addr))
- *
- *  any volatile variable should do the trick just as well.
- */
+
 
 void setup() {
-  /* test manipulation functions */
-  #ifndef MILLIS_USE_TIMERNONE
-    stop_millis();
-    set_millis(_SFR_MEM32(0x001C));
-    restart_millis();
+  /* test variations of tone functions */
+  #if defined(MILLIS_USE_TIMERB0) & !defined(TCB1)
+    #warning "Skipped - tone() is unavailable when the only type B timer is used for millis instead."
+  #else
+    tone(PIN_PA1,1000); 
+    delay(500);
+    noTone(PIN_PA1);
+    delay(500);
+    tone(PIN_PA1,2000); 
+    delay(500);
+    noTone(PIN_PA2); //doesn't match, should do nothing.
+    delay(1000);
+    noTone(PIN_PA1); //does match, should turn off
+    delay(500);
+    tone(PIN_PA1,3000,1000); 
+    delay(500);
   #endif
 }
 void loop() {
-  #ifndef MILLIS_USE_TIMERNONE
-    _SFR_MEM32(0x001C)=millis();
-    #ifndef MILLIS_USE_TIMERRTC
-      _SFR_MEM32(0x001C)=micros();
-    #endif
-  #endif
 }
