@@ -963,8 +963,7 @@ void __attribute__((weak)) init_ADC0() {
      **************************************************************************/
 
 
-    // 25 MHz / 32 = 780 kHz, 30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz. ADC clock would
-    // remain in spec until 48 MHz, but the core is luckyto run at 32, so we don't need to worry about the higher frequencies
+    // 25 MHz / 32 = 780 kHz, 30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz.
     #if   F_CPU   > 24000000    // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
       ADC0.CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >= 12000000    // 16 MHz / 16 = 1.0 MHz,  20 MHz / 16 = 1.25 MHz
@@ -1024,7 +1023,9 @@ void __attribute__((weak)) init_ADC0() {
 
 #ifdef ADC1
   __attribute__((weak)) void init_ADC1() {
-  #if F_CPU >= 12000000 // 16 MHz / 16 = 1 MHz,  20 MHz / 16 = 1.25 MHz
+  #if   F_CPU > 24000000    // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
+    ADC0.CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+  #elif F_CPU >= 12000000 // 16 MHz / 16 = 1 MHz,  20 MHz / 16 = 1.25 MHz
   ADC1.CTRLC = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
   #elif F_CPU >= 6000000 // 8 MHz / 8 = 1 MHz, 10 MHz / 64 = 1.25 MHz
   ADC1.CTRLC = ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
