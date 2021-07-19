@@ -16,7 +16,7 @@ The list of errata from Microchip has been updated since this was written. There
   * You can wait until the cows come home, sleep a full night in your bed and go back to work... that while loop ain't gonna terminate: RTC.CNTBUSY is stuck on until the RTC is enabled..
 
 Note that Rev. C of the 32k parts has been released and fixes a substantial amount of errata. It fixes some of the RTC stuff, it fixes the CCL D-latch and the fact that you had to enable pin output to use the link output source on a downstream LUT as well as assorted other issues. Hopefully we will see these changes brought to other parts in the tinyAVR 0/1-series in the future.
-```
+```c
 Serial.print("Silicon revision is: ");
 Serial.println(SYSCFG.REVID);
 ```
