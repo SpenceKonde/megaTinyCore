@@ -1,5 +1,3 @@
-
-
 void setup() {
   /* test variations of tone functions */
   #if defined(MILLIS_USE_TIMERB0) & !defined(TCB1)

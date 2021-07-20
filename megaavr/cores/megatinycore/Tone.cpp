@@ -134,7 +134,7 @@
      * disruptive. When library code takes user supplied pins and looks
      * up bitmasks and position, always check that one of them isn;t
      * NOT_A_PIN - before you get the PORT struct. Because the port
-     * struct function cannot have it's result used safely. For bad 
+     * struct function cannot have it's result used safely. For bad
      * pins, yes it returns a null pointer, 0x0000. But not only is
      * that a valid register, it's an SFR (VPORTA.DIR)! So we don't
      * want to end up writing to that. The convention of NULL pointers
@@ -154,13 +154,13 @@
       #else
         toggle_count = (frequency * duration) / 500;
       #endif
-    } else { 
+    } else {
       // Duration not specified -> infinite
       // Represented internally by toggle_count = -1
       toggle_count = -1;
     }
     // Calculate compare value
-    int8_t divisionfactor = 1; //no prescale, toggles at twice the frequency
+    int8_t divisionfactor = 0; //no prescale, toggles at twice the frequency
 
     // Timer settings -- will be type B timer or bust....
     uint32_t compare_val = ((F_CPU / frequency) >> 1);
@@ -169,15 +169,14 @@
     if (compare_val < 0x10000) { /* previously this tested for divisionfactor == 1,
       * but that relied on us having already gone through the while loop to
       * adjust it, which we haven't done yet, but we want to do this *after* the
-      * timeconsuming division operation, but *before* we actually change any 
-      * other settings, because this is the point at which we stop the timer - 
+      * timeconsuming division operation, but *before* we actually change any
+      * other settings, because this is the point at which we stop the timer -
       * hence it needs to be the first to be set if we want to leave interrupts on*/
       _timer->CTRLA = TCB_CLKSEL_DIV1_gc;
     } else {
       _timer->CTRLA = TCB_CLKSEL_DIV2_gc;
       divisionfactor--;
     }
-    divisionfactor--; //now either 0 or -1, but..... 
     while ((compare_val > 0x10000) && (divisionfactor < 6)) {
       // If the "else" branch above was followed, this is always true initially.
       compare_val = compare_val >> 1;
@@ -200,8 +199,7 @@
       }
       // whether or not we _were_ using a pin, we are now, so configure the new one as an output...
       PORT_t *port = digitalPinToPortStruct(pin);
-      timer_bit_mask = bit_mask; // we no longer care what the old pin was
-      timer_bit_mask = bit_mask; // nor it's bitmask/ 
+      timer_bit_mask = bit_mask; // nor it's bitmask/
       timer_outtgl_reg = (volatile uint8_t *) &(port->OUTTGL);
       *(timer_outtgl_reg - 1) = bit_mask; // digitalWrite(pin, LOW); (write outclr for new pin)
       *(timer_outtgl_reg - 6) = bit_mask; // pinMode(pin, OUTPUT);   (write dirset for new pin)
@@ -212,8 +210,8 @@
     timer_cycle_per_tgl_count = timer_cycle_per_tgl;
     _timer->CCMP              = compare_val; // and each cycle is this many timer ticks long
     _timer->CTRLB             = TCB_CNTMODE_INT_gc;
-    _timer->CNT               = 0; //not strictly necessary, but ensures there's no glitch. 
-    _pin                      = pin; 
+    _timer->CNT               = 0; //not strictly necessary, but ensures there's no glitch.
+    _pin                      = pin;
     _timer->INTCTRL           = TCB_CAPTEI_bm; // Enable the interrupt (flag is already cleared)
     _timer->CTRLA            |= TCB_ENABLE_bm; // Enable timer
   }
