@@ -1,21 +1,13 @@
-# tinyAVR 0/1-series Errata Summary
-This list does not cover several newly discovered errata nor the 2-series (at least so far, the list of 2-series errata is far shorter, which is a welcome change)
+# tinyAVR 0/1/2-series Errata Summary
 
 Microcontrollers, like any other product, often have bugs which are discovered only after the product is released. Sometimes these are fixed in later "silicon revisions" - other times they are not. Frequently, silicon revisions for a given part may be released with no apparent changes to any of the issues with the part in question. These defects are documented in the "Silicon Errata" provided by the manufacturer. On the classic AVR parts, this was often a chapter near the end of the datasheet - and was generally quite short (off the top of my head, the only classic AVR that I can think of where it's frequently an issue is the ATtiny1634, where one pin can't be used as an input if the WDT is not running).
 
-Well, particularly for the tinyAVR 0/1-series, the list of issues is a tiny bit longer. By which I mean, the index of errata is longer than the entire errata section of most classic AVRs - likely because these were some of the first parts released with many of the new peripherals (though the megaAVR 0-series had come out slightly earlier, the 1-series had many peripherals not featured in the megaAVR 0-series, and where a peripheral was on both series, it is broken the same way over there too). Clearly, just to make it easier for us, so we don't have to skip over such a large amount of text in the datasheet, (they're totally not trying to hush up bugs until you've made the buying decision or anything, nosiree) - they've ~hidden~ moved the errata to a separate document. The specific errata relevant to a given part vary depending on the part and silicon revision. The silicon revision can be read from the `SYSCFG.REVID` register (0 = A, 1 = B, etc). It is also marked on the chip - though my understanding is that us mere mortals are not trusted with the secret of how to do so, and must have Microchip folks help with that.
+Well, for the tinyAVR 0/1-series, the list of issues is a tiny bit longer. By which I mean, the index of errata is longer than the entire errata section of most classic AVRs - likely because these were some of the first parts released with many of the new peripherals (though the megaAVR 0-series had come out slightly earlier, the 1-series had many peripherals not featured in the megaAVR 0-series, and where a peripheral was on both series, it is broken the same way over there too).
 
-The list of errata from Microchip has been updated since this was written. There are no new issues of note specific to any given part. A few universal ones were added (these impact even the latest AVR DA and DB parts in many cases):
-* CCMPL and CCMPH are supposed to be independent when a TCB is set to 8-bit PWM mode. They are not. You either need to write both in the correct order, or else pack both values into a 16-bit type and writeTHHAT to CCMP
-* Apparently it's not intended that you have to disable the whole CCL to disable any given LUT so that you can reconfigure it. the LUTs are supposed to be protected based on their own enable bit, but it's not supposed to be required to turn off the whole CCL (which may be used for other things) to reconfigbure one LUT. *the pre-release errata sheets for AVR64DB and AVR32DB do not list it* - are they just incomplete, or is that actually fixed? That would be fabulous news if so.
-* This one only hits the tinys, and if you can get your claws on a Rev C 3216 or 3217 it's fixed there (and in the Automotive version of same) - but it can be profoundly baffling and very nasty when using the RTC, and impacts every other device. The pieces of the bug which they own up to in the errata sheet is bad enough: Don't disable the RTC or the PIT if you need to use either one of them - stopping one will break both. While writing RTC.CTRLA resets prescaler count (as in the time before it ticks over again, so current tick is prolonged). What they do *not* mention is that the broken behavior can be weird. This was reported by a user on ATtiny412:
-  * Set RTC clock source.
-  * Enable the PIT with desired period.
-  * Be surprised that the PIT is now working, since this errata says it shouldn't!
-  * Attempt to reconfigure the RTC, doing the usual while(RTC.STATUS) to check that it's not busy syncing before changing RTC settings.
-  * You can wait until the cows come home, sleep a full night in your bed and go back to work... that while loop ain't gonna terminate: RTC.CNTBUSY is stuck on until the RTC is enabled..
+The lists of errata are ~hidden~ located in a separate docukent, the "Errata and datasheet clarification" sheet for the part now, instead of being in the datasheet proper like it was on classic AVRs. You know, just to make it easier for the users, so we don't have to skip over a few pages of highly relevant information on errata if we have one of the non-existent versions that doesn't have all these problems. Nope, they're _totally_ not trying to hush up the bugs until you've made the buying decision and gotten too deep in the design process to switch MCUs to a competitors' one or anything, nosiree - it's just to make things easier you you, the users! The specific errata relevant to a given part vary depending on the specific part and and silicon revision. The silicon revision can be read from the `SYSCFG.REVID` register (0 = A, 1 = B, etc). It is also marked on the chip - though my understanding is that us mere mortals are not trusted with the secret of how to do so, and must have Microchip folks help with that.
 
 Note that Rev. C of the 32k parts has been released and fixes a substantial amount of errata. It fixes some of the RTC stuff, it fixes the CCL D-latch and the fact that you had to enable pin output to use the link output source on a downstream LUT as well as assorted other issues. Hopefully we will see these changes brought to other parts in the tinyAVR 0/1-series in the future.
+
 ```c
 Serial.print("Silicon revision is: ");
 Serial.println(SYSCFG.REVID);
@@ -23,62 +15,84 @@ Serial.println(SYSCFG.REVID);
 
 Thankfully, most of these issues will not be encountered by most Arduino users. The impact column indicates the liklihood that someone working with an effected part through megaTinyCore and Arduino would encounter it.
 * 0 - Impact extremely unlikely
-* 1 - Impact only when using exotic features for which megaTinyCore does not provide wrappers
+* 1 - Impact only when using exotic features
 * 2 - Impact likely when using normal features which may be used through libraries or register configuration.
 * 3 - Issue impacted functions provided by megaTinyCore or included libraries in previous versions, but worked around in current version, and will impact users of this functionality if reconfigured manually, or unavoidably impacts functionality exposed by core or included libraries, but can be worked around.
-* 4 - Issue impacts functions provided by megaTinyCore or included libraries in the current released version, but will be worked around in future versions.
+* 4 - Issue impacts functions provided by megaTinyCore or included libraries in the current released version, but can be worked around.
 * 5 - Issue impacts functions provided by megaTinyCore or included libraries and cannot be worked around.
-* * - Issure is high impact but effected devices are rare
+* `*` - Issue is high impact but effected devices are rare
+
+
+## tinyAVR 2-series
+Unlike the other devices this core supports, the list of errata for the 2-series a real treat, wouldn't you say?
+
+Erratum                                                               | Impact | 4/8k rev. B | 16k rev. E | Notes
+----------------------------------------------------------------------|--------|-------------|------------|-------
+IDD Power-Down Current Consumption                                    |    3   |      -      |      X     | 16k parts only? Sounds like it was fixed between 16k release and 4/8k releases.
+The CCL Must be Disabled to Change the Configuration of a Single LUT  |    4   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
+CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode  |    2   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
+Restart Will Reset TCA Counter Direction in NORMAL and FRQ Mode       |    1   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
+Open-Drain Mode Does Not Work When TXD is Configured as Output        |    2   |      X      |      X     | Universally present on modern AVRs.
+Start-of-Frame Detection Can Be Enabled in Active Mode When RXCIF Is 0|    2   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
+
+Note that a very different errata sheet for a Rev. D of the 16k parts was distributed, with a number of issues impacting the new ADC. However, after that was published, the relevant decision makers came to their senses (whether due to customer backlash, the discovery of a more troubling issue that they never publically disclosed in Rev. D, or saner heads prevailing in general is left to our imagination). The Rev. D "was not released to production", and those issues are all gone from the released Rev. E.
+
 
 ## tinyAVR 1-series
  . | . |ATtiny212 | . |ATtiny214/414 | . |ATtiny417|ATtiny1614|ATtiny3216 | .
 ---| --- | --- | --- | --- | --- | --- | --- | --- | ---
  . | . |ATtiny412 | . |ATtiny416 | . |ATtiny816|ATtiny1616|ATtiny3217 | .
  . | Impact | .  | . |ATtiny814 | . |ATtiny817|ATtiny1617  | . | .
-Silicon Revision | . |A|B|A|B|A,B|A|A|C
+Silicon Revision                                                                         | . |A|B|A|B|A,B|A|A|C
 Device  | . | .  | . | .  | . | .  | . | . |.
-Writing the OSCLOCK Fuse in FUSE.OSCCFG to ‘1’ Prevents Automatic Loading of Calibration Values | 0 |-|-|-|-|-|X|X|X
-The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28) | 1 |-|X|-|X|-|-|-|-
+OSCLOCK Fuse Prevents Automatic Loading of Calibration Values                            | 0 |-|-|-|-| - |X|X|X
+Temperature Sensor Not Calibrated on Parts w/Date Code 727, 728 and 1728                 | 1 |-|X|-|X| - |-|-|-
 **AC**  | . | .  | . | .  | . | .  | . | . |.
-Coupling Through AC Pins | 2 |-|-|-|-|X|-|-|-
-AC Interrupt Flag Not Set Unless Interrupt is Enabled  | 2 |X|-|X|-|X|X|-|-
-False Triggers May Occur Under Certain Conditions  | 1 |X|-|X|-|X|X|-|-
-False Triggering When Sweeping Negative Input of the AC When the Low Power Mode is Disabled  | 1 |-|-|-|-|X|X|-|-
+Coupling Through AC Pins                                                                 | ? |-|-|-|-| X |-|-|-
+AC Interrupt Flag Not Set Unless Interrupt is Enabled                                    | 1 |X|-|X|-| X |X|-|-
+False Triggers May Occur Under Certain Conditions                                        | 2 |X|-|X|-| X |X|-|-
+False Triggering When Sweeping Negative Input of the AC When Low Power Mode is Disabled  | 2 |-|-|-|-| X |X|-|-
 **ADC**  | . | .  | . | .  | . | .  | . | . |.
-ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle | 1 |X|X|X|X|X|X|X|X
-ADC Interrupt Flags Cleared When Reading RESH | 1 |-|-|-|-|X|X|-|-
-ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V | 1 |X|X|X|X|X|X|X|X
-ADC Wake-Up with WCOMP | 1 |X|-|X|-|X|X|-|-
-Changing ADC Control Bits During Free-Running Mode not Working | 2 |X|-|X|-|X|X|-|-
-One Extra Measurement Performed After Disabling ADC FreeRunning Mode | 2 |X|X|X|X|X|X|X|X
-Pending Event Stuck When Disabling the ADC | 2 |-|-|-|-|X|X|X|-
-SAMPDLY and ASDV Does Not Work Together With SAMPLEN | 2 |X|-|X|-|-|X|-|-
+ADC Functionality Cannot be Ensured with CLKADC > 1.5 MHz and a Setting of 25% Duty Cycle| 1 |X|X|X|X| X |X|X|X
+ADC Interrupt Flags Cleared When Reading RESH                                            | 1 |-|-|-|-| X |X|-|-
+ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V                        | 1 |X|X|X|X| X |X|X|X
+ADC Wake-Up with WCOMP                                                                   | 1 |X|-|X|-| X |X|-|-
+Changing ADC Control Bits During Free-Running Mode not Working                           | 2 |X|-|X|-| X |X|-|-
+One Extra Measurement Performed After Disabling ADC FreeRunning Mode                     | 2 |X|X|X|X| X |X|X|X
+Pending Event Stuck When Disabling the ADC                                               | 2 |-|-|-|-| X |X|X|-
+SAMPDLY and ASDV Does Not Work Together With SAMPLEN                                     | 2 |X|-|X|-| - |X|-|-
 **CCL**  | . | .  | . | .  | . | .  | . | . |.
-Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’ | 4 |X|X|X|X|X|X|X|-
-D-latch is Not Functional | 4 |X|X|X|X|X|X|X|-
+The CCL Must be Disabled to Change the Configuration of a Single LUT                     | 4 |X|X|X|X| X |X|X|X
+Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’                                 | 4 |X|X|X|X| X |X|X|-
+D-latch is Not Functional                                                                | 4 |X|X|X|X| X |X|X|-
 **PORTMUX**  | . | .  | . | .  | . | .  | . | . |.
-Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5 | 3 |-|-|X|X|-|-|-|-
+Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5                     | 2 |-|-|X|X| - |-|-|-
 **RTC**  | . | .  | . | .  | . | .  | . | . |.
-Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler | 2 |X|X|X|X|X|X|X|-
-Disabling the RTC Stops the PIT | 2 |X|X|X|X|X|X|X|-
+Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler                     | 2 |X|X|X|X| X |X|X|-
+Disabling the RTC Stops the PIT                                                          | 2 |X|X|X|X| X |X|X|-
+**TCA**  | . | .  | . | .  | . | .  | . | . |.
+Restart Will Reset Counter Direction in NORMAL and FRQ Mode                              | 1 |X|X|X|X| X |X|X|X
 **TCB**  | . | .  | . | .  | . | .  | . | . |.
-Minimum Event Duration Must Exceed the Selected Clock Period | 1 |X|X|X|X|X|X|X|X
-The TCB Interrupt Flag is Cleared When Reading CCMPH | 2 |X|-|X|-|X|X|-|-
-TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working with Prescaled Clock | 1 |X|-|X|-|X|X|-|-
-The TCA Restart Command Does Not Force a Restart of TCB | 1 |X|X|X|X|X|X|X|X
+CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode                     | 2 |X|X|X|X| X |X|X|X
+Minimum Event Duration Must Exceed the Selected Clock Period                             | 1 |X|X|X|X| X |X|X|X
+The TCB Interrupt Flag is Cleared When Reading CCMPH                                     | 2 |X|-|X|-| X |X|-|-
+TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working w/Prescaled Clock| 1|X|-|X|-| X |X|-|-
+The TCA Restart Command Does Not Force a Restart of TCB                                  | 1 |X|X|X|X| X |X|X|X
 **TCD**  | . | .  | . | .  | . | .  | . | . |.
-TCD Auto-Update Not Working | 3 |-|-|-|-|X|X|-|-
-TCD Event Output Lines May Give False Events | 1 |-|-|-|-|X|X|-|-
+TCD Auto-Update Not Working                                                              | 3 |-|-|-|-| X |X|-|-
+TCD Event Output Lines May Give False Events                                             | 1 |-|-|-|-| X |X|-|-
+Asynchronous Input Events Not Working When TCD Counter Prescaler is Used                 | 2 |X|X|X|X| X |X|X|X
 **TWI**  | . | .  | . | .  | . | .  | . | . |.
-TIMEOUT Bits in the TWI.MCTRLB Register are Not Accessible | 1 |X|-|X|-|X|X|-|-
-TWI Smart Mode Gives Extra Clock Pulse | 2 |X|-|X|-|X|X|-|-
-TWI Master Mode Wrongly Detects the Start Bit as a Stop Bit | 2 |X|-|X|-|X|X|-|-
-The TWI Master Enable Quick Command is Not Accessible | 1 |X|-|X|-|X|X|-|-
+TIMEOUT Bits in the TWI.MCTRLB Register are Not Accessible                               | 1 |X|-|X|-| X |X|-|-
+TWI Smart Mode Gives Extra Clock Pulse                                                   | 2 |X|-|X|-| X |X|-|-
+TWI Master Mode Wrongly Detects the Start Bit as a Stop Bit                              | 2 |X|-|X|-| X |X|-|-
+The TWI Master Enable Quick Command is Not Accessible                                    | 1 |X|-|X|-| X |X|-|-
 **USART**  | . | .  | . | .  | . | .  | . | . |.
-TXD Pin Override Not Released When Disabling the Transmitter | 4 |X|X|X|X|X|X|X|X
-Full Range Duty Cycle Not Supported When Validating LIN Sync Field | 1 |-|-|-|-|-|X|-|-
-Frame Error on a Previous Message May Cause False Start Bit Detection | 3 |X|X|X|X|X|X|X|-
-Open-Drain Mode Does Not Work When TXD is Configured as Output | 3 |-|-|-|-|-|X|X|X
+TXD Pin Override Not Released When Disabling the Transmitter                             | 4 |X|X|X|X| X |X|X|X
+Full Range Duty Cycle Not Supported When Validating LIN Sync Field                       | 1 |-|-|-|-| - |X|-|-
+Frame Error on a Previous Message May Cause False Start Bit Detection                    | 3 |X|X|X|X| X |X|X|-
+Open-Drain Mode Does Not Work When TXD is Configured as Output                           | 2 |X|X|X|X| X |X|X|X
+Start-of-Frame Detection Can Unintentionally Be Enabled in Active Mode When RXCIF Is ‘0’ | 2 |X|X|X|X| X |X|X|X
 
 
 
@@ -89,83 +103,95 @@ Open-Drain Mode Does Not Work When TXD is Configured as Output | 3 |-|-|-|-|-|X|
 --- | --- | --- | --- | --- | --- | ---
  . |. | ATtiny412/414 | . | ATtiny816/817 | ATtiny1616 | ATtiny3217
  . | Impact | . | . | . | ATtiny1617  | . | .
-Silicon Revision | . | B | A, B | A, B | A | B
+Silicon Revision                                                       | . | B |A,B|A,B| A | B
 Device  | . | . | . | . | . | .
-On 24-Pin Automotive Devices Pin PC5 is Not Available  | * | - | - | - | X | -
-Writing the OSCLOCK Fuse in FUSE.OSCCFG to ‘1’ Prevents Automatic Loading of Calibration Values  | 0 | X | - | - | X | X
-The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)  | 1 | X | - | - | - | -
+On 24-Pin Automotive Devices Pin PC5 is Not Available                  | * | - | - | - | X | -
+OSCLOCK Fuse Prevents Automatic Loading of Calibration Values          | 0 | X | - | - | X | X
+Temp Sensor Not Calibrated on Parts w/Date Code 727, 728 and 1728      | 1 | X | - | - | - | -
 **AC**  | . | . | . | . | . | .
-Coupling Through AC Pins  | 2 | - | X | X | - | -
-AC Interrupt Flag Not Set Unless Interrupt is Enabled  | 2 | - | X | X | X | -
-False Triggers May Occur Under Certain Conditions  | 2 | - | X | X | X | -
-False Triggering When Sweeping Negative Input of the AC When the Low Power Mode is Disabled  | 1 | - | X | X | X | -
+Coupling Through AC Pins                                               | 2 | - | X | X | - | -
+AC Interrupt Flag Not Set Unless Interrupt is Enabled                  | 2 | - | X | X | X | -
+False Triggers May Occur Under Certain Conditions                      | 2 | - | X | X | X | -
+False Triggering When Sweeping Negative Input of the AC w/out LPMODE   | 1 | - | X | X | X | -
 **ADC**  | . | . | . | . | . | .
-ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle  | 1 | X | X | X | X | X
-ADC Interrupt Flags Cleared When Reading RESH  | 1 | - | X | X | X | -
-ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V  | 1 | - | X | - | - | -
-ADC Wake-Up with WCOMP  | . | - | X | X | X | -
-Changing ADC Control Bits During Free-Running Mode not Working  | 2 | - | X | X | X | -
-One Extra Measurement Performed After Disabling ADC FreeRunning Mode  | 2 | X | X | X | X | X
-Pending Event Stuck When Disabling the ADC  | 1 | - | X | X | X | -
-SAMPDLY and ASDV Does Not Work Together With SAMPLEN  | 2 | - | - | - | X | -
+ADC Functionality w/CLKADC > 1.5 MHz and a Setting of 25% Duty Cycle   | 1 | X | X | X | X | X
+ADC Interrupt Flags Cleared When Reading RESH                          | 1 | - | X | X | X | -
+ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V      | 1 | - | X | - | - | -
+ADC Wake-Up with WCOMP                                                 | . | - | X | X | X | -
+Changing ADC Control Bits During Free-Running Mode not Working         | 2 | - | X | X | X | -
+One Extra Measurement Performed After Disabling ADC FreeRunning Mode   | 2 | X | X | X | X | X
+Pending Event Stuck When Disabling the ADC                             | 1 | - | X | X | X | -
+SAMPDLY and ASDV Does Not Work Together With SAMPLEN                   | 2 | - | - | - | X | -
 **CCL**  | . | . | . | . | . | .
-Connecting LUTs in Linked Mode Requires OUTEN Set to '1'  | 5 | X | X | X | X | -
-D-latch is Not Functional  | 3 | X | X | X | X | -
+The CCL Must be Disabled to Change the Configuration of a Single LUT   | 4 | X | X | X | X | X
+Connecting LUTs in Linked Mode Requires OUTEN Set to '1'               | 5 | X | X | X | X | -
+D-latch is Not Functional                                              | 3 | X | X | X | X | -
 **PORTMUX**  | . | . | . | . | . | .
-Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5  | 3 | X | - | - | - | -
+Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5   | 3 | X | - | - | - | -
 **RTC**  | . | . | . | . | . | .
-Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler  | . | X | X | X | X | -
-Disabling the RTC Stops the PIT  | . | X | X | X | X | -
+Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler   | 2 | X | X | X | X | -
+Disabling the RTC Stops the PIT                                        | 2 | X | X | X | X | -
+**TCA**  | . | .  | . | .  | . | .  | .
+Restart Will Reset Counter Direction in NORMAL and FRQ Mode            | 1 | X | X | X | X | X
 **TCB**  | . | . | . | . | . | .
-Minimum Event Duration Must Exceed the Selected Clock Period  | 3 | X | X | X | X | X
-The TCB Interrupt Flag is Cleared When Reading CCMPH  | 2 | - | X | X | X | -
-TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working with Prescaled Clock  | 2 | - | X | X | X | -
-The TCA Restart Command Does Not Force a Restart of TCB  | 1 | X | X | X | X | X
+CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode   | 2 | X | X | X | X | X
+Minimum Event Duration Must Exceed the Selected Clock Period           | 3 | X | X | X | X | X
+The TCB Interrupt Flag is Cleared When Reading CCMPH                   | 2 | - | X | X | X | -
+Input Capture Frequency and Pulse-Width Mode Not Working w/Prescaled Clk|2 | - | X | X | X | -
+The TCA Restart Command Does Not Force a Restart of TCB                | 1 | X | X | X | X | X
 **TCD**  | . | . | . | . | . | .
-TCD Auto-Update Not Working  | 3 | - | X | X | X | -
-TCD Event Output Lines May Give False Events  | 1 | - | X | X | X | -
+TCD Auto-Update Not Working                                            | 3 | - | X | X | X | -
+TCD Event Output Lines May Give False Events                           | 1 | - | X | X | X | -
+Asynchronous Input Events Not Working When TCD Counter Prescaler is Used|2 | X | X | X | X | X
 **TWI**  | . | . | . | . | . | .
-TIMEOUT Bits in the TWI.MCTRLB Register are Not Accessible  | 1 | - | X | X | X | -
-TWI Smart Mode Gives Extra Clock Pulse  | 1 | - | X | X | X | -
-TWI Master Mode Wrongly Detects the Start Bit as a Stop Bit  | 1 | - | X | X | X | -
-The TWI Master Enable Quick Command is Not Accessible  | 1 | - | X | X | X | -
+TIMEOUT Bits in the TWI.MCTRLB Register are Not Accessible             | 1 | - | X | X | X | -
+TWI Smart Mode Gives Extra Clock Pulse                                 | 1 | - | X | X | X | -
+TWI Master Mode Wrongly Detects the Start Bit as a Stop Bit            | 1 | - | X | X | X | -
+The TWI Master Enable Quick Command is Not Accessible                  | 1 | - | X | X | X | -
 **USART**  | . | . | . | . | . | .
-TXD Pin Override Not Released When Disabling the Transmitter  | 4 | X | X | X | X | X
-Full Range Duty Cycle Not Supported When Validating LIN Sync Field  | 1 | X | - | - | X | -
+TXD Pin Override Not Released When Disabling the Transmitter           | 4 | X | X | X | X | X
+Full Range Duty Cycle Not Supported When Validating LIN Sync Field     | 1 | X | - | - | X | -
 Frame Error on a Previous Message May Cause False Start Bit Detection  | 1 | X | X | X | X | -
-Open-Drain Mode Does Not Work When TXD is Configured as Output  | 2 | X | - | - | X | X
+Open-Drain Mode Does Not Work When TXD is Configured as Output         | 2 | X | X | X | X | X
+Start-of-Frame Detection Can Be Enabled in Active Mode When RXCIF Is 0 | 2 | X | X | X | X | X
 
 ## tinyAVR 0-series Errata
  . | . |ATtiny202|ATtiny204|ATtiny202/204|ATtiny804/806/807
 ---  |---| --- | --- | --- | ---
  . |. |ATtiny402|ATtiny404|ATtiny402/404/406|ATtiny1604/1606/1607
  . | Impact | . |ATtiny406|Automotive|Both
-Silicon Revision | . |B|B|B|A
+Silicon Revision                                                          | . | B | B | B | A
 Device | . | . | . | . | .
-The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28) | 1 |X|X|X|-
+Temp Sensor Not Calibrated on Parts w/Date Code 727, 728 and 1728         | 1 | X | X | X | -
 **ADC**  | . | . | . | . | .
-ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle | 1 |X|X|X|X
-ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V | 1 |X|X|-|X
-One Extra Measurement Performed After Disabling ADC FreeRunning Mode | 1 |X|X|X|X
-Pending Event Stuck When Disabling the ADC | 1 |-|-|-|X
+ADC Functionality Cannot be Ensured with CLKADC > 1.5 MHz & 25% Duty Cycle| 1 | X | X | X | X
+ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V         | 1 | X | X | - | X
+One Extra Measurement Performed After Disabling ADC FreeRunning Mode      | 1 | X | X | X | X
+Pending Event Stuck When Disabling the ADC                                | 1 | - | - | - | X
 **CCL**  | . | . | . | . | .
-Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’ | 5 |X|X|X|X
-D-latch is Not Functional | 3 |X|X|X|X
+The CCL Must be Disabled to Change the Configuration of a Single LUT      | 4 | X | X | X | X
+Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’                  | 5 | X | X | X | X
+D-latch is Not Functional                                                 | 3 | X | X | X | X
 **PORTMUX**  | . | . | . | . | .
-Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5 | 3 |-|X|X|-
+Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5      | 3 | - | X | X | -
 **RTC**  | . | . | . | . | .
-Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler | 2 |X|X|X|X
-Disabling the RTC Stops the PIT | 2 |X|X|X|X
+Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler      | 2 | X | X | X | X
+Disabling the RTC Stops the PIT                                           | 2 | X | X | X | X
+**TCA**  | . | .  | . | .  | . | .
+Restart Will Reset Counter Direction in NORMAL and FRQ Mode               | 1 | X | X | X | X
 **TCB**  | . | . | . | . | .
-Minimum Event Duration Must Exceed the Selected Clock Period | 2 |X|X|X|X
-The TCA Restart Command Does Not Force a Restart of TCB | 1 |X|X|X|X
+CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode      | 2 | X | X | X | X
+Minimum Event Duration Must Exceed the Selected Clock Period              | 2 | X | X | X | X
+The TCA Restart Command Does Not Force a Restart of TCB                   | 1 | X | X | X | X
 **USART**  | . | . | . | . | .
-TXD Pin Override Not Released When Disabling the Transmitter | 4 |X|X|X|X
-Frame Error on a Previous Message May Cause False Start Bit Detection | 1 |X|X|X|-
+TXD Pin Override Not Released When Disabling the Transmitter              | 4 | X | X | X | X
+Frame Error on a Previous Message May Cause False Start Bit Detection     | 1 | X | X | X | -
+Open-Drain Mode Does Not Work When TXD is Configured as Output            | 2 | X | X | X | X
+Start-of-Frame Detection Can  Be Enabled in Active Mode When RXCIF Is ‘0’ | 2 | X | X | X | X
 
 
 
-## tinyAVR 0/1-series Errata Details
+## tinyAVR 0/1/2-series Errata Details
 
 These errata details are taken verbatim from the Silicon Errata and Datasheet Clarification documents except as noted below - see the links in the [datasheet pages](Datasheets.md) - they have only been formatted for markdown, and gathered from the multiple errata sheets into a single document for ease of comparison and reference. Be sure to check that a given item applies to the part you are working with on the above tables.
 
@@ -173,6 +199,11 @@ For each issue, we have added a **megaTinyCore note** describing impact on megaT
 
 
 ### Device
+#### IDD Power-Down Current Consumption (16k 2-series, Rev. E only)
+The IDD power-down leakage can exceed the targeted maximum value of 2 µA. Note that this maximum value is a target and not documented in the preliminary data sheet.
+
+**Workaround:** None.
+
 #### On ~24-Pin~ *ATtiny1617* Automotive Devices Pin PC5 is Not Available
 On ~24-pin~ *ATtiny1617* automotive devices pin PC5 is not available.
 
@@ -181,12 +212,11 @@ On ~24-pin~ *ATtiny1617* automotive devices pin PC5 is not available.
 **megaTinyCore note:** The effected part is unlikely to be used with megaTinyCore
 
 #### Writing the OSCLOCK Fuse in `FUSE.OSCCFG` to '1' Prevents Automatic Loading of Calibration
-Values Writing the OSCLOCK fuse in `FUSE.OSCCFG` to '1' prevents the automatic loading of calibration values from the signature row. The device will run with an uncalibrated OSC20M oscillator.
+Writing the OSCLOCK fuse in `FUSE.OSCCFG` to '1' prevents the automatic loading of calibration values from the signature row. The device will run with an uncalibrated OSC20M oscillator.
 
-**Workaround:** Do not use OSCLOCK for locking the oscillator calibration value. The oscillator calibration value can be locked by
-writing LOCK in `CLKCTRL.OSC`20MCALIBB to '1'.
+**Workaround:** Do not use OSCLOCK for locking the oscillator calibration value. The oscillator calibration value can be locked by writing LOCK in `CLKCTRL.OSC`20MCALIBB to '1'.
 
-**megaTinyCore note:** No concern
+**megaTinyCore note:** No concern. We do not set that fuse.
 
 #### The Temperature Sensor is Not Calibrated on Parts with Date Code 727, 728 and 1728 (Year 2017, Week 27/28)
 The temperature sensor is not calibrated on parts with date code 727/728 (used on QFN packages) and 1728 (used on SOIC packages).
@@ -200,14 +230,14 @@ There is a capacitive coupling through the Analog Comparator. Toggling the selec
 
 **Workaround:** When the AC is disabled, configure AC.MUXCTRLA.MUXNEG to DAC or internal reference.
 
-**megaTinyCore note:** megaTinyCore does not provide any functionality related to the analog comparators. If your code or libraries do, and you disable them and use the input pins for other purposes, you must take account of this.
+**megaTinyCore note:** It is not clear when this is relevant or how large the effect is, but it isn't present on very many parts.
 
 #### AC Interrupt Flag Not Set Unless Interrupt is Enabled
 `ACn.STATUS.CMP` is not set if the `ACn.INTCTRL.CMP` is not set.
 
 **Workaround:** Enable `ACn.INTCTRL.CMP` or use `ACn.STATUS.STATE` for polling.
 
-**megaTinyCore note:** megaTinyCore does not provide any functionality related to the analog comparators. If your code or libraries do, you cannot poll the interrupt flag to see whether it has been triggered. You can poll `ACn.STATUS.CMP` (though if the comparison condition becomes true, and then false again, between the occasions on which you check this bit, you would miss it).
+**megaTinyCore note:** The included Comparator library does not poll the interrupt flag.
 
 #### False Triggers May Occur Under Certain Conditions
 False triggers may occur on falling input pin:
@@ -223,7 +253,7 @@ A false trigger may occur if sweeping the negative input of the AC with a negati
 
 **Workaround:** Enable Low-Power mode in `AC.CTRLA.LPMODE`.
 
-**megaTinyCore note:** megaTinyCore does not provide any functionality related to the analog comparators. If your code or libraries do, this must be accounted for)
+**megaTinyCore note:** These two issues are potentially relevant now that we have a comparator library. Note that they do not impact all parts.
 
 ### ADC - Analog-to-Digital Converter
 #### SAMPDLY and ASDV Does Not Work Together With SAMPLEN
@@ -245,14 +275,14 @@ The ADC functionality cannot be ensured if CLKADC > 1.5 MHz with `ADCn.CALIB.DUT
 
 **Workaround:** If ADC is operated with CLKADC > 1.5 MHz, `ADCn.CALIB.DUTYCYC` must be set to '0' (50% duty cycle).
 
-**megaTinyCore note:** megaTinyCore sets CLKADC at 1.0 - 1.25 MHz. Suggest not clocking ADC above 1.5 MHz.
+**megaTinyCore note:** megaTinyCore sets CLKADC at 1.0 - 1.25 MHz. It is unclear to me where they ever said > 1.5 MHz was okay for the ADC clock!
 
 #### ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V
 The ADC INL performance degrades if CLKADC > 1.5 MHz and `ADCn.CALIB.DUTYCYC` set to '0' for VDD < 2.7V.
 
 **Workaround:** None.
 
-**megaTinyCore note:** megaTinyCore sets CLKADC at 1.0 - 1.25 MHz.  Suggest not clocking ADC above 1.5 MHz.
+**megaTinyCore note:** megaTinyCore sets CLKADC at 1.0 - 1.25 MHz. It is unclear to me where they ever said > 1.5 MHz was okay for the ADC clock!
 
 #### ADC Interrupt Flags Cleared When Reading RESH
 `ADCn.INTFLAGS.RESRDY` and `ADCn.INTFLAGS.WCOMP` are cleared when reading `ADCn.RESH`.
@@ -267,14 +297,14 @@ If control signals are changed during Free-Running mode, the new configuration i
 **Workaround:** Disable ADC Free-Running mode before updating the `ADC.CTRLB`, `ADC.CTRLC`, `ADC.SAMPCTRL`,
 `ADC.MUXPOS`, `ADC.WINLT` or `ADC.WINHT` registers.
 
-**megaTinyCore note:** If you reconfigure the ADC for free running mode, you must be aware of this.
+**megaTinyCore note:** If you reconfigure the ADC for free running mode and were hoping to configure it while it was live, you must be aware of this.
 
 #### One Extra Measurement Performed After Disabling ADC Free-Running Mode
 The ADC may perform one additional measurement after clearing `ADCn.CTRLA.FREERUN`.
 
 **Workaround:** Write `ADCn.CTRLA.ENABLE` to '0' to stop the Free-Running mode immediately.
 
-**megaTinyCore note:** If you reconfigure the ADC for free running mode, you must be aware of this.
+**megaTinyCore note:** If you reconfigure the ADC for free running mode, you should be aware of this.
 
 #### ADC Wake-Up with WCOMP
 When waking up from STANDBY sleep mode with ADC WCOMP interrupt, the ADC is disabled for a few cycles
@@ -289,10 +319,19 @@ Selecting alternative output pin for TCA0 in PORTMUX.CTRLC does not work as desc
 * Writing PORTMUX.CTRLC bit 1 to '1' will shift the pin position for both WO1 and WO4
 * Writing PORTMUX.CTRLC bit 2 to '1' will shift the pin position for both WO2 and WO5
 PORTMUX.CTRLC[5:3] are non-functional.
+
 **Workaround:** None.
+
 **megaTinyCore note:** megaTinyCore only reconfigures the output pins by default on the 8-pin parts, none of those are impacted by this.
 
 ### CCL - Configurable Custom Logic
+#### The CCL Must be Disabled to Change the Configuration of a Single LUT
+To reconfigure a LUT, the CCL peripheral must be disabled (write ENABLE in CCL.CTRLA to ‘0’). Writing ENABLE to ‘0’ will disable all the LUTs, and affects the LUTs not under reconfiguration.
+
+**Workaround:** None
+
+**megaTinyCore note:** I had assumed this annoying behavior was intended. It is present in literally every part that has a CCL in all silicon revisions available as of July 2021
+
 #### Connecting LUTs in Linked Mode Requires OUTEN Set to '1'
 Connecting the LUTs in linked mode requires `LUTnCTRLA.OUTEN` set to '1' for the LUT providing the input source.
 
@@ -303,7 +342,7 @@ The CCL D-latch is not functional.
 
 **Workaround:** None.
 
-**megaTinyCore note:** This is broken almost everywhere, don't try to use the D-latch sequential logic. The D Flip Flop can be used instead for almost all use cases (as far as I can tell, the only difference is the R signal, which is not there on the D-latch). It's not like many people are using the CCL's at all, let alone sequential logic, however nifty the functionality is.
+**megaTinyCore note:** This is broken on anything released before 2020. Don't try to use the D-latch sequential logic on 0/1-series parts. The D Flip-Flop can be used instead for many use cases, though it is clocked, which may make it less convenient than the latch.
 
 ### RTC - Real-Time Counter
 #### Any Write to the `RTC.CTRLA` Register Resets the RTC and PIT Prescaler
@@ -319,9 +358,29 @@ Writing `RTC.PITCTRLA.PITEN` to '0' will stop the RTC.
 
 **Workaround:** Do not disable the RTC or the PIT if any of the modules are used.
 
-**megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted; users manually configuring these timers on effected parts must take account of this.
+**megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted; users manually configuring these timers on effected parts must take account of this. This behaves less simply than they describe, and it can be profoundly baffling and very nasty when using the RTC. This was reported by a user on ATtiny412; it stands to reason that on impacted parts, when one but not the other is enabled, the behavior probably is not "clean":
+  1. Set RTC clock source but don't enable it.
+  2. Enable the PIT with desired period.
+  3. Notice that PIT is working, while RTC is not enabled.
+  4. Attempt to reconfigure the RTC, doing the usual while(RTC.STATUS) to check that it's not busy syncing before changing RTC settings.
+  5. Sketch will hang in that while loop forever because RTC.CNTBUSY will read 1 until the RTC is enabled.
+
+### TCA - Timer/Counter A
+#### Restart Will Reset Counter Direction in NORMAL and FRQ Mode
+When the TCA is configured to a NORMAL or FRQ mode (WGMODE in TCAn.CTRLB is ‘0x0’ or ‘0x1’), a RESTART command or Restart event will reset the count direction to default. The default is counting upwards.
+
+**Workaround:** None.
+
+**megaTinyCore note:** Only impacts users who reconfigure TCA0 and use RESTART commands or events as described. Impacts every released part with a TCB as if July 2021.
 
 ### TCB - Timer/Counter B
+####CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode
+When the TCB is operating in 8-bit PWM mode (CNTMODE in TCBn.CTRLB is ‘0x7’), the low and high bytes for the CNT and CCMP registers operate as 16-bit registers for read and write. They cannot be read or written independently.
+
+**Work Around:** Use 16-bit register access. Refer to the data sheet for further information.
+
+**megaTinyCore note:** Only impacts users who reconfigure a Type B timer to get PWM - which isn't terribly useful on these parts anyway, especially considering competing demands for TCBs. Impacts every released part with a TCB as if July 2021.
+
 #### Minimum Event Duration Must Exceed the Selected Clock Period
 Event detection will fail if TCBn receives an input event with a high/low period shorter than the period of the selected clock source (CLKSEL in `TCBn.CTRLA`). This applies to the TCB modes (CNTMODE in `TCBn.CTRLB`) Time-Out Check and Input Capture Frequency and Pulse-Width Measurement mode.
 
@@ -366,6 +425,13 @@ The TCD auto-update feature is not working.
 **Workaround:** None.
 
 **megaTinyCore note:** This is accounted for in by the analogWrite() function on pins controlled by TCD0 after it was discovered the hard way.
+
+#### Asynchronous Input Events Not Working When TCD Counter Prescaler is Used
+When the TCD is configured to use asynchronous input events (CFG in TCDn.EVCTRLx is ‘0x2’) and the TCDCounter Prescaler (CNTPRES in TCDn.CTRLA) is different from ‘0x0’ events can be missed.
+
+**Workaround:** Use the TCD Synchronization Prescaler (SYNCPRES in TCDn.CTRLA) instead of the TCD Counter Prescaler. Alternatively, use synchronous input events (CFG in TCDn.EVCTRLx is not ‘0x2’) if the input events are longer than one CLK_TCD_CNT cycle.
+
+**megaTinyCore note:** This only matters if you're reconfiguring the type D timer in very deep ways. Impacts every available device with a TCD as of July 2021.
 
 ### TWI - Two-Wire Interface
 #### TIMEOUT Bits in the `TWI.MCTRLB` Register are Not Accessible
@@ -431,4 +497,11 @@ When the USART TXD pin is configured as an output, it can drive the pin high reg
 
 **Workaround:** Configure the TXD pin as an input by writing the corresponding bit in PORTx.DIR to '0' when using Open-Drain
 mode.
-**megaTinyCore note:** We don't provide a wrapper around this mode, though it could be enabled manually, in which case it would be an issue on effected parts.
+**megaTinyCore note:** We don't provide a wrapper around this mode - yet - though it could be enabled manually, in which case it would be an issue on effected parts; the workaround is trivial - AS LONG AS YOU KNOW ABOUT IT.
+
+#### Start-of-Frame Detection Can Unintentionally Be Enabled in Active Mode When RXCIF Is ‘0’
+The Start-of-Frame Detector can unintentionally be enabled when the device is in Active mode and when the Receive Complete Interrupt Flag (RXCIF) in the USARTn.STATUS register is ‘0’. If the Receive Data (RXDATA) registers are read while receiving new data, RXCIF is cleared, and the Start-of-Frame Detector will be enabled and falsely detects the following falling edge as a start bit. When the Start-of-Frame Detector detects a start condition, the frame reception is restarted, resulting in corrupt received data. Note that the USART Receive Start Interrupt Flag (RXSIF) always is ‘0’ when in Active mode. No interrupt will be triggered.
+
+**Workaround:** Disable Start-of-Frame Detection by writing ‘0’ to the Start-of-Frame Detection Enable (SFDEN) bit in the USART Control B (USARTn.CTRLB) register when the device is in Active mode. Re-enable it by writing the bit to ‘1’ before transitioning to Standby sleep mode. This work around depends on a protocol preventing a new incoming frame when re-enabling Start-of-Frame Detection. Re-enabling Start-of-Frame Detection, while a new frame is already incoming, will result in corrupted received data.
+
+**megaTinyCore note:** If you're configuring the part to wake using start of frame detection, you need to be aware of this. Impacts every available modern AVR device as of July 2021.
