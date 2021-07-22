@@ -147,12 +147,12 @@
     if (duration > 0) {    // Duration defined
       #if defined(SUPPORT_LONG_TONES) && SUPPORT_LONG_TONES == 1
       if (duration > 65536) {
-        toggle_count =  (frequency / 5) * (duration / 100);
+        toggle_count = (frequency / 5) * (duration / 100);
       } else {
-        toggle_count =  (frequency * duration) / 500;
+        toggle_count = (frequency      * duration) / 500;
       }
       #else
-        toggle_count = (frequency * duration) / 500;
+        toggle_count = (frequency      * duration) / 500;
       #endif
     } else {
       // Duration not specified -> infinite
@@ -198,9 +198,9 @@
         *(timer_outtgl_reg - 1) = timer_bit_mask; // digitalWrite(_pin, LOW); (write outclr for old pin)
       }
       // whether or not we _were_ using a pin, we are now, so configure the new one as an output...
-      PORT_t *port = digitalPinToPortStruct(pin);
-      timer_bit_mask = bit_mask; // nor it's bitmask/
-      timer_outtgl_reg = (volatile uint8_t *) &(port->OUTTGL);
+      PORT_t *port            = digitalPinToPortStruct(pin);
+      timer_bit_mask          = bit_mask; // nor it's bitmask/
+      timer_outtgl_reg        = (volatile uint8_t *) &(port->OUTTGL);
       *(timer_outtgl_reg - 1) = bit_mask; // digitalWrite(pin, LOW); (write outclr for new pin)
       *(timer_outtgl_reg - 6) = bit_mask; // pinMode(pin, OUTPUT);   (write dirset for new pin)
     }
@@ -230,7 +230,7 @@ void noTone(uint8_t pin)
         timer_toggle_count = 0;
         //disableTimer();
         // Keep pin low after disabling of timer
-         *(timer_outtgl_reg-6) = timer_bit_mask; // drive pin low
+         *(timer_outtgl_reg - 6) = timer_bit_mask; // drive pin low
         _pin = NOT_A_PIN;
     }
   }
@@ -249,20 +249,21 @@ static void disableTimer()
 {
   // Reinit back to producing PWM -- timer will be type B
   // Disable interrupt
-  _timer->INTCTRL = 0;
+  _timer->CTRLA     = 0;
+  _timer->INTCTRL   = 0;
+  _timer->INTFLAGS  = _timer->INTFLAGS;
   // Disable timer
-  _timer->CTRLA = 0;
-  _pin=NOT_A_PIN;
-  #if 0
+  _pin              = NOT_A_PIN;
+  #if 1
     // RESTORE PWM FUNCTIONALITY, for use with cores that use the TCBs for PWM.
+    // Depending on if the
     /* 8 bit PWM mode, but do not enable output yet, will do in analogWrite() */
     _timer->CTRLB = (TCB_CNTMODE_PWM8_gc);
     /* Assign 8-bit period */
-    _timer->CCMPL = PWM_TIMER_PERIOD;
-    /* default duty 50%, set when output enabled */
-    _timer->CCMPH = PWM_TIMER_COMPARE;
+    _timer->CCMPL = PWM_TIMER_PERIOD; // default duty 50%, set when output enabled
+    _timer->CCMPH = PWM_TIMER_COMPARE; // legal even with errata because low written before high
     /* Use TCA clock (250kHz) and enable */
-    /* (sync update commented out, might try to synchronize later */
+    /* no sync update - errata has left the TCA <-> TCB syncing has silicon bugs on most hardware anyway */
     _timer->CTRLA = (TCB_CLKSEL_CLKTCA_gc) | (TCB_ENABLE_bm);
   #endif
   }
