@@ -497,11 +497,11 @@ When the USART TXD pin is configured as an output, it can drive the pin high reg
 
 **Workaround:** Configure the TXD pin as an input by writing the corresponding bit in PORTx.DIR to '0' when using Open-Drain
 mode.
-**megaTinyCore note:** We don't provide a wrapper around this mode - yet - though it could be enabled manually, in which case it would be an issue on effected parts; the workaround is trivial - AS LONG AS YOU KNOW ABOUT IT.
+**megaTinyCore note:** We don't provide a wrapper around this mode - yet - though it could be enabled manually, in which case it would be an issue on effected parts; the workaround is trivial - AS LONG AS YOU KNOW ABOUT IT. This bug was known very early on. They really ought to mention this in the actual datasheet instead of the errata!
 
 #### Start-of-Frame Detection Can Unintentionally Be Enabled in Active Mode When RXCIF Is ‘0’
 The Start-of-Frame Detector can unintentionally be enabled when the device is in Active mode and when the Receive Complete Interrupt Flag (RXCIF) in the USARTn.STATUS register is ‘0’. If the Receive Data (RXDATA) registers are read while receiving new data, RXCIF is cleared, and the Start-of-Frame Detector will be enabled and falsely detects the following falling edge as a start bit. When the Start-of-Frame Detector detects a start condition, the frame reception is restarted, resulting in corrupt received data. Note that the USART Receive Start Interrupt Flag (RXSIF) always is ‘0’ when in Active mode. No interrupt will be triggered.
 
 **Workaround:** Disable Start-of-Frame Detection by writing ‘0’ to the Start-of-Frame Detection Enable (SFDEN) bit in the USART Control B (USARTn.CTRLB) register when the device is in Active mode. Re-enable it by writing the bit to ‘1’ before transitioning to Standby sleep mode. This work around depends on a protocol preventing a new incoming frame when re-enabling Start-of-Frame Detection. Re-enabling Start-of-Frame Detection, while a new frame is already incoming, will result in corrupted received data.
 
-**megaTinyCore note:** If you're configuring the part to wake using start of frame detection, you need to be aware of this. Impacts every available modern AVR device as of July 2021.
+**megaTinyCore note:** If you're configuring the part to wake using start of frame detection, you need to be aware of this. Impacts every available modern AVR device as of July 2021. One really wonders how this went unnoticed until 2020. 
