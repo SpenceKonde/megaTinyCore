@@ -374,12 +374,12 @@ When the TCA is configured to a NORMAL or FRQ mode (WGMODE in TCAn.CTRLB is ‘0
 **megaTinyCore note:** Only impacts users who reconfigure TCA0 and use RESTART commands or events as described. Impacts every released part with a TCB as if July 2021.
 
 ### TCB - Timer/Counter B
-####CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode
+#### CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode
 When the TCB is operating in 8-bit PWM mode (CNTMODE in TCBn.CTRLB is ‘0x7’), the low and high bytes for the CNT and CCMP registers operate as 16-bit registers for read and write. They cannot be read or written independently.
 
 **Work Around:** Use 16-bit register access. Refer to the data sheet for further information.
 
-**megaTinyCore note:** Only impacts users who reconfigure a Type B timer to get PWM - which isn't terribly useful on these parts anyway, especially considering competing demands for TCBs. Impacts every released part with a TCB as if July 2021.
+**megaTinyCore note:** Only impacts users who reconfigure a Type B timer to get PWM - which isn't terribly useful on these parts anyway, especially considering competing demands for TCBs. Impacts every released part with a TCB as if July 2021. I had run into this several times and been confused by it, but somehow never figured out what was going on until a few weeks before it was added to errata sheets.
 
 #### Minimum Event Duration Must Exceed the Selected Clock Period
 Event detection will fail if TCBn receives an input event with a high/low period shorter than the period of the selected clock source (CLKSEL in `TCBn.CTRLA`). This applies to the TCB modes (CNTMODE in `TCBn.CTRLB`) Time-Out Check and Input Capture Frequency and Pulse-Width Measurement mode.

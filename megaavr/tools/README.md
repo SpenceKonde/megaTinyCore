@@ -48,7 +48,7 @@ And because most of the alternatives have problems:
 ### A note on breakout boards
 Some tinyAVR and other UPDI-based part breakout boards have an on-board resistor. Sometimes this is a 4.7k one. That is NOT appropriate. I was part of the problem for a while. I think the original mistake came from people conflating the pyupdi resistor with a generally appropriate one. When I started megaTinyCore, my early collaborator was making hardware with a 4.7k resistor; I assumed he was doing it right. While this does work with dedicated programmers, including jtag2updi, it doesn't work with serial UPDI. It will work with dedicated programmers like jtag2updi, as long as they don't have their own resistor. Suffice to say, for a time it was a very common belief. I use 470 ohms now, but I can't find fault with a design over it not having the resistor. Expecting the programmer to be able to provide series resistance is not an unfair expectation,
 
-### Connections:
+### Connections
 * Vcc, Gnd of serial adapter to Vcc, Gnd of target
 * Add either a resistor or schottky diode between Tx and Rx (in the case of unmusual serial adapters without their own TX series resistor, an external one is needed. See the charts below.
 * Many adapters have a built-in 1k, 1.5k, or 2.2k resistor in series with Tx.
@@ -58,7 +58,7 @@ Some tinyAVR and other UPDI-based part breakout boards have an on-board resistor
 * Rx of adapter to UPDI pin of target. A small resistor (under 1k - like the 470 ohm one we generally use) in series with this on the target board is fine.
 
 
-```
+```text
 USB Serial Adapter
 With internal 1-2k resistor on TX
 This is the case in 90% of USB serial adapters.
@@ -249,7 +249,7 @@ Because of the smaller page sizes, ATtiny parts are slower to program; the small
 460800        |10.4,15.6 W / 28.2 R |        Not tested  | 6.0,  10.4 w  / 26.8 R | Requires SerialUPDI 1.2.0 |
 * The CP2102 does not, by default, support any speeds between 256kbaud and 460800 baud - but a free configuration utility from Silicon Labs enables customization of the baud rates in each range of requested speeds (though unfortunately, you can't define those ranges). I reconfigured mine for 345600 baud for development of with the Dx-series parts, which don't work at 460800, and did not bother to set it back to factory settings just to fill in the table; I would expect to see approximately 10kb/s and 15kb/s write speeds and around 26kb/s read speed.
 
-##### Note - those numbers were taken with SerialUPDI 1.1.0
+#### Note - those numbers were taken with SerialUPDI 1.1.0
 Versions of the cores with later versions (megaTinyCore 2.4.0 and DxCore 1.4.0) will have slower write performance on tinyAVR due to changes made in order to guarantee that the part is given enough time to write each page. This is not enabled for TURBO mode; on Windows, an FT232 on minimum lastency timer and a CH340G have enough latency to do it without explicitly "waiting" for a page write to complete. Python's delay function, time.sleep() has a fairly coarse granularity, and is not well suited for this. We will continue to explore ways to reclaim as much of that lost speed as possible.
 
 #### Observations on Speed

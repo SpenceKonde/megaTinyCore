@@ -4,6 +4,7 @@ If there is a list of the names defined for the interrupt vectors present somewh
 
 **WARNING** If you misspell the name of a vector, you will get a compiler warning BUT NOT AN ERROR! Hence, you can upload the bad code... in this case the chip will freeze the instant the ISR is called, as it jumps to BAD_ISR, which in turn jumps to the reset vector... but since the interrupt flag never gets cleared, as soon as interrupts are enabled, it will do it all over again, so the chip will be hung. Encountering this (and the annoying lack of a nice list anywhere outside of the io.h) was the impetus for creating this list.
 
+## The List
 
 | Vector Name       | 0 | 1 | 2 | Flag Cleared on | Notes                                       |
 |-------------------|---|---|---|-----------------|---------------------------------------------|
@@ -31,7 +32,7 @@ If there is a list of the names defined for the interrupt vectors present somewh
 | TCA0_CMP2_vect    | X | X | X | Manually        | Alias: TCA0_LCMP2_vect                      |
 | TCA0_HUNF_vect    | X | X | X | Manually        |                                             |
 | TCA0_OVF_vect     | X | X | X | Manually        | Alias: TCA0_LUNF_vect                       |
-| TCB0_INT_vect     | X | X | X | Depends on mode | Two flags on 2 series only. Behavior depends on mode, see datasheet |      |
+| TCB0_INT_vect     | X | X | X | Depends on mode | Two flags on 2 series only. Behavior depends on mode, see datasheet |
 | TCB1_INT_vect     |   | * | X | Depends on mode | 1-series with 16k or 32k flash or 2-series  |
 | TCD0_OVF_vect     |   | X |   | Manually        |                                             |
 | TCD0_TRIG_vect    |   | X |   | Manually        |                                             |
@@ -41,7 +42,7 @@ If there is a list of the names defined for the interrupt vectors present somewh
 | USART0_RXC_vect   | X | X | X | RXCIF, on read  | Error flags, if enabled, only cleared manually |
 | USART0_TXC_vect   | X | X | X | Manually        | Often used without the interrupt enabled    |
 
-#### Clearing flags - why it's so complicated
+### Clearing flags - why it's so complicated
 Almost all flags *can* be manually cleared - the ones that can be cleared automatically generally do that to be helpful. The datasheet will explicitly list under what conditions a flag is cleared.
 * When the purpose of the flag is to tell you that something is ready to be read, reading it clears the flag. ADC, serial interfaces, and TCB input capture do that.
 * The TWI interrupts work the same way - you need to read, write, or ack/nack something to respond to the bus event; doing so clears the flag too.
@@ -53,6 +54,12 @@ Almost all flags *can* be manually cleared - the ones that can be cleared automa
 ```c++
 ISR(PORTA_PORT_vect) {
   //ISR code goes here
+  VPORTA.INTFLAGS=VPORTA.INTFLAGS; // do this first - copy it to another variable if you have multiple possible ones and need to do different things with it.
+  // otherwise if another interrupt condition happens when in the ISR, you'll miss that.
+  // and VPORTs are faster than PORTSs. (saves 3 clocks and 4 bytes of flash to clear like that vs same thing with PORT.INTFLAGS...).
+  // Or if you know the flag that it is (only one pin has the interrupt enabled, say PA2)
+  // VPORTA |= 1<<2; is fastest and smallerst (2 bytes 1 clock)
+  // remembrt to clear the interrupt flag that triggered it, if needed. In this case it is:
 }
 ```
 ### Reminders
@@ -70,34 +77,8 @@ ISR(SOME_INT_vect) {
 } // This actually generates 20 bytes of code taking 16 cycles to execute for a total of 20 bytes and 21-22 clocks!
 
 EMPTY_INTERRUPT(SOME_INT_vect); // this generates 2 bytes if code, just the single RETI instruction, so execution will be back to where it was before the interrupt condition within only 9-10 clocks, and saving 18 bytes of flash and a dozen clocks!
-
-/* Almost-empty interrupt:
-     For the very special case where there is only one pin on a port with the pin change interrupt enabled, you
-     can use a "naked" ISR, and code which you know can execute without disrupting the state of any working
-     registers. Here is an example for a pin interrupt which one might use to wake from sleep.
-     You MUST use VPORTx.INTFLAGS... not PORTx.INTFLAGS. */
-ISR(PORTx_PORT_vect, ISR_NAKED) {
-                                    // 5-6 clocks to reach the ISR
-  VPORTx.INTFLAGS |= 1 << bit_pos;  // 1 word,  1 clock. Clear the interrupt flag by writing 1 to it with sbi.
-  reti();                           // 1 word,  4 clocks. Return from the interrupt.
-}                   // This results in 2 words, 5 clocks. Total execution time (5 + (5 or 6) = ) 10 or 11 clocks
-/*This can be extended only slightly before things get much more complicated....
-
-  The only things you can do within a naked interrupt without writing inline assembly are:
-  - VPORTx.OUT, VPORTx.DIR, VPORTx.IN, VPORTx.INTFLAGS, or GPIORn |= 1 << constant.
-  - VPORTx.OUT, VPORTx.DIR, or GPIORn &= ~(1 << constant).
-  - if (VPORTx.OUT, VPORTx.DIR, VPORTx.IN, VPORTx.INTFLAGS, or GPIORn & (1 << constant)) {other allowed statement(s);}.
-  - if (!(VPORTx.OUT, VPORTx.DIR, VPORTx.IN, VPORTx.INTFLAGS, or GPIORn & (1 << constant))) {other allowed statement(s);}.
-  - You must end it with reti();
-
-  Departing even slightly from this list leaves you in nasal-demon territory!
-
-  Behavior will be undefined which is overwhelmingly likely to manifest as a complete and total failure of the impacted
-  sketch the instant the ISR first fires. I chose to include this only due to the extremne frequency with which one
-  will find themselves needing the sort of nearly empty ISR shown above to wake from sleep, and the magnitude of the
-  improvement in efficiency from such a small change. */
-
 ```
+
 ### One ISR for multiple interrupts
 If you have one ISR that needs to be used for more than one vector, there's also a simple macro which imposes ZERO overhead for the second and further vectors which call the same ISR.
 ```c++
@@ -110,6 +91,37 @@ ISR(SOME_INT_vect) {
 ISR_ALIAS(OTHER_INT_vect, SOME_INT_vect); // Zero overhead to point, it will simply point that vector to the same ISR as the other.
 ```
 
+### Advanced Techniques: Almost empty interrupts
+You've got a pin interrupt to wake the part. So yher interrupt is almost empty, except for the damned intflag you  need to clear! But you're using a 2k part, and your're trying to scavenge a couple of bytes to make everything fit. Could you do something about the almost empty interrupt has to just clear the flag? If that's all you're doing, yes, for around 16 bytes of flash in return.
+```c++
+
+/* Almost-empty interrupt:
+     For the very special case where there is only one pin on a port with the pin change interrupt enabled, you
+     can use a "naked" ISR, and code which you know can execute without disrupting the state of any working
+     registers. Here is an example for a pin interrupt which one might use to wake from sleep.
+     You MUST use VPORTx.INTFLAGS... not PORTx.INTFLAGS. */
+ISR(PORTx_PORT_vect, ISR_NAKED) {
+                                    // 5-6 clocks to reach the ISR
+  VPORTx.INTFLAGS |= 1 << bit_pos;  // 1 word,  1 clock. Clear the interrupt flag by writing 1 to it with sbi.
+  reti();                           // 1 word,  4 clocks. Return from the interrupt.
+}                   // This results in 2 words, 5 clocks. Total execution time (5 + (5 or 6) = ) 10 or 11 clocks
+/*This can be extended only slightly before things get much more complicated....
+  The only things you can do within a naked interrupt without writing inline assembly are:
+  - VPORTx.OUT, VPORTx.DIR, VPORTx.IN, VPORTx.INTFLAGS, or GPIORn |= 1 << constant.
+  - VPORTx.OUT, VPORTx.DIR, or GPIORn &= ~(1 << constant).
+  - Those have the io register and bit number encoded in the function, and do not involve messign with working registers or SREG
+  - if (VPORTx.OUT, VPORTx.DIR, VPORTx.IN, VPORTx.INTFLAGS, or GPIORn & (1 << constant)) {other allowed statement(s);}.
+  - if (!(VPORTx.OUT, VPORTx.DIR, VPORTx.IN, VPORTx.INTFLAGS, or GPIORn & (1 << constant))) {other allowed statement(s);}.
+  - those compile to sbic or sbis, skip next instruction if bit in IO register clear/set, the bit and register number are encoded in the instruction, so no working registers or SREG touched.
+  - You must end it with reti();
+
+  Departing EVEN SLIGHTLY from this list will leave you in nasal-demon territory!
+  Behavior will be undefined which is overwhelmingly likely to manifest as a complete and total failure of the impacted
+  sketch the instant the ISR first fires, though unpredictable behavior later on as wel. I chose to include this only due to the extremne frequency with which one
+  will find themselves needing the sort of nearly empty ISR shown above to wake from sleep, and the fact that it saves nearly 1% of the available flash when you do it on a 2k part. 2k flash is painful!
+
+```
+
 ### Assorted notes
 * Despite the fact that no PORTB/C_PORT_vect is defined for parts without those ports, there are unused vector slots where they would go on all parts. Same goes for the TCD0 vectors, even on 0-series parts.
-* The 5 vectors associated with the "good" 1-series parts take up vector slots on all parts with at least 8k of flash, but not on smaller ones; This means that hex files are not binary-compatible between 4k and 8k parts if they define interrupt vectors above the auspicious interrupt number 13. Note that binaries compiled for 8k or smaller parts, and for 16k and larger parts is never compatible if it uses any interrupts, because the vector size changes when you pass 8k. It strikes me as peciliar that the 8k parts waste that extra 10 bytes on vectors that no 8k parts use. The Optiboot_x binaries included with megaTinyCore *are* portable across the entire product line because they do not make use of interrupts.
+* The 5 vectors associated with the "good" 1-series parts take up vector slots on all parts with at least 8k of flash, but not on smaller ones; This means that hex files are not binary-compatible between 4k and 8k parts if they define interrupt vectors above the auspicious interrupt number 13. Note that binaries compiled for 8k or smaller parts, and for 16k and larger parts is never compatible if it uses any interrupts, because the vector size changes when you pass 8k. It strikes me as peciliar that the 8k parts waste that extra 10 bytes on vectors that no 8k parts use. Reclaiming that space to use for something - anything - else is nigh impossible, too. The Optiboot_x binaries included with megaTinyCore *are* portable across the entire product line because they do not make use of interrupts.

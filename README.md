@@ -18,6 +18,9 @@ A serial bootloader, Optiboot_x (based on the same codebase as the classical Ard
 
 When megaTinyCore is installed through board manager, the required version of the toolchain is installed automatically. Manual installation - assuming you want support for the 2-series is more complicated; see the [Installation guide for more information](Installation.md).
 
+## Using this document
+This document is best viewed online if you isntalled via board manager - [https://githup.com/SpenceKonde/megaTinyCore](https://githup.com/SpenceKonde/megaTinyCore)
+
 ## UPDI programming
 The UPDI programming interface is a single-wire interface for programming (and debugging - **U**niversal **P**rogramming and **D**ebugging **I**nterface) used on the tinyAVR 0/1/2-series, as well as all other modern AVR microcontrollers. While one can always purchase a purpose-made UPDI programmer from Microchip, there are two very low-cost approaches to creating a UPDI programmer, both of which the Arduino community has more experience with than those official programmers.
 
