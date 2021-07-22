@@ -6,7 +6,8 @@ Well, for the tinyAVR 0/1-series, the list of issues is a tiny bit longer. By wh
 
 The lists of errata are ~hidden~ located in a separate docukent, the "Errata and datasheet clarification" sheet for the part now, instead of being in the datasheet proper like it was on classic AVRs. You know, just to make it easier for the users, so we don't have to skip over a few pages of highly relevant information on errata if we have one of the non-existent versions that doesn't have all these problems. Nope, they're _totally_ not trying to hush up the bugs until you've made the buying decision and gotten too deep in the design process to switch MCUs to a competitors' one or anything, nosiree - it's just to make things easier you you, the users! The specific errata relevant to a given part vary depending on the specific part and and silicon revision. The silicon revision can be read from the `SYSCFG.REVID` register (0 = A, 1 = B, etc). It is also marked on the chip - though my understanding is that us mere mortals are not trusted with the secret of how to do so, and must have Microchip folks help with that.
 
-Note that Rev. C of the 32k parts has been released and fixes a substantial amount of errata. It fixes some of the RTC stuff, it fixes the CCL D-latch and the fact that you had to enable pin output to use the link output source on a downstream LUT as well as assorted other issues. Hopefully we will see these changes brought to other parts in the tinyAVR 0/1-series in the future.
+Note that Rev. C of the 32k parts has been released and fixes a substantial amount of errata. It fixes some of the RTC stuff, it fixes the 
+D-latch and the fact that you had to enable pin output to use the link output source on a downstream LUT as well as assorted other issues. Hopefully we will see these changes brought to other parts in the tinyAVR 0/1-series in the future.
 
 ```c
 Serial.print("Silicon revision is: ");
@@ -18,8 +19,8 @@ Thankfully, most of these issues will not be encountered by most Arduino users. 
 * 1 - Impact only when using exotic features
 * 2 - Impact likely when using normal features which may be used through libraries or register configuration.
 * 3 - Issue impacted functions provided by megaTinyCore or included libraries in previous versions, but worked around in current version, and will impact users of this functionality if reconfigured manually, or unavoidably impacts functionality exposed by core or included libraries, but can be worked around.
-* 4 - Issue impacts functions provided by megaTinyCore or included libraries in the current released version, but can be worked around.
-* 5 - Issue impacts functions provided by megaTinyCore or included libraries and cannot be worked around.
+* 4 - Issue impacts functions provided by megaTinyCore or included libraries in the current released version, or within a commonly used peripheral, but mitigation is straightforward. In many cases, simply knowing of the issue can be enough to not be troubled by it. 
+* 5 - Issue impacts functions provided by megaTinyCore or included libraries, or within a commonly used peripheral, and the impact is severely disruptive. 
 * `*` - Issue is high impact but effected devices are rare
 
 
@@ -29,7 +30,7 @@ Unlike the other devices this core supports, the list of errata for the 2-series
 Erratum                                                               | Impact | 4/8k rev. B | 16k rev. E | Notes
 ----------------------------------------------------------------------|--------|-------------|------------|-------
 IDD Power-Down Current Consumption                                    |    3   |      -      |      X     | 16k parts only? Sounds like it was fixed between 16k release and 4/8k releases.
-The CCL Must be Disabled to Change the Configuration of a Single LUT  |    4   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
+The CCL Must be Disabled to Change the Configuration of a Single LUT  |    5   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
 CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode  |    2   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
 Restart Will Reset TCA Counter Direction in NORMAL and FRQ Mode       |    1   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
 Open-Drain Mode Does Not Work When TXD is Configured as Output        |    2   |      X      |      X     | Universally present on modern AVRs.
@@ -62,9 +63,9 @@ One Extra Measurement Performed After Disabling ADC FreeRunning Mode            
 Pending Event Stuck When Disabling the ADC                                               | 2 |-|-|-|-| X |X|X|-
 SAMPDLY and ASDV Does Not Work Together With SAMPLEN                                     | 2 |X|-|X|-| - |X|-|-
 **CCL**  | . | .  | . | .  | . | .  | . | . |.
-The CCL Must be Disabled to Change the Configuration of a Single LUT                     | 4 |X|X|X|X| X |X|X|X
-Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’                                 | 4 |X|X|X|X| X |X|X|-
-D-latch is Not Functional                                                                | 4 |X|X|X|X| X |X|X|-
+The CCL Must be Disabled to Change the Configuration of a Single LUT                     | 5 |X|X|X|X| X |X|X|X
+Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’                                 | 3 |X|X|X|X| X |X|X|-
+D-latch is Not Functional                                                                | 3 |X|X|X|X| X |X|X|-
 **PORTMUX**  | . | .  | . | .  | . | .  | . | . |.
 Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5                     | 2 |-|-|X|X| - |-|-|-
 **RTC**  | . | .  | . | .  | . | .  | . | . |.
@@ -123,8 +124,8 @@ One Extra Measurement Performed After Disabling ADC FreeRunning Mode   | 2 | X |
 Pending Event Stuck When Disabling the ADC                             | 1 | - | X | X | X | -
 SAMPDLY and ASDV Does Not Work Together With SAMPLEN                   | 2 | - | - | - | X | -
 **CCL**  | . | . | . | . | . | .
-The CCL Must be Disabled to Change the Configuration of a Single LUT   | 4 | X | X | X | X | X
-Connecting LUTs in Linked Mode Requires OUTEN Set to '1'               | 5 | X | X | X | X | -
+The CCL Must be Disabled to Change the Configuration of a Single LUT   | 5 | X | X | X | X | X
+Connecting LUTs in Linked Mode Requires OUTEN Set to '1'               | 3 | X | X | X | X | -
 D-latch is Not Functional                                              | 3 | X | X | X | X | -
 **PORTMUX**  | . | . | . | . | . | .
 Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5   | 3 | X | - | - | - | -
@@ -169,7 +170,7 @@ ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V         | 1 | 
 One Extra Measurement Performed After Disabling ADC FreeRunning Mode      | 1 | X | X | X | X
 Pending Event Stuck When Disabling the ADC                                | 1 | - | - | - | X
 **CCL**  | . | . | . | . | .
-The CCL Must be Disabled to Change the Configuration of a Single LUT      | 4 | X | X | X | X
+The CCL Must be Disabled to Change the Configuration of a Single LUT      | 5 | X | X | X | X
 Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’                  | 5 | X | X | X | X
 D-latch is Not Functional                                                 | 3 | X | X | X | X
 **PORTMUX**  | . | . | . | . | .
@@ -337,12 +338,14 @@ Connecting the LUTs in linked mode requires `LUTnCTRLA.OUTEN` set to '1' for the
 
 **Workaround:** Use an event channel to link the LUTs or do not use the corresponding I/O pin for other purposes.
 
+**megaTinyCore note:** - I have rated the severity a 3 on 1-series and 5 on 0-series, because they only have 2 event channels total that can carry async signal.
+
 #### D-latch is Not Functional
 The CCL D-latch is not functional.
 
 **Workaround:** None.
 
-**megaTinyCore note:** This is broken on anything released before 2020. Don't try to use the D-latch sequential logic on 0/1-series parts. The D Flip-Flop can be used instead for many use cases, though it is clocked, which may make it less convenient than the latch.
+**megaTinyCore note:** This is broken on anything released before 2020. Don't try to use the D-latch sequential logic on 0/1-series parts. The D Flip-Flop can be used instead for many use cases, though it is clocked, which may make it less convenient than the latch. In any case, that's the less useful kind of latch anyway. 
 
 ### RTC - Real-Time Counter
 #### Any Write to the `RTC.CTRLA` Register Resets the RTC and PIT Prescaler
