@@ -68,8 +68,8 @@ D-latch is Not Functional                                                       
 **PORTMUX**  | . | .  | . | .  | . | .  | . | . |.
 Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5                     | 2 |-|-|X|X| - |-|-|-
 **RTC**  | . | .  | . | .  | . | .  | . | . |.
-Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler                     | 2 |X|X|X|X| X |X|X|-
-Disabling the RTC Stops the PIT                                                          | 2 |X|X|X|X| X |X|X|-
+Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler                     | 4 |X|X|X|X| X |X|X|-
+Disabling the RTC Stops the PIT                                                          | 5 |X|X|X|X| X |X|X|-
 **TCA**  | . | .  | . | .  | . | .  | . | . |.
 Restart Will Reset Counter Direction in NORMAL and FRQ Mode                              | 1 |X|X|X|X| X |X|X|X
 **TCB**  | . | .  | . | .  | . | .  | . | . |.
@@ -129,8 +129,8 @@ D-latch is Not Functional                                              | 3 | X |
 **PORTMUX**  | . | . | . | . | . | .
 Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5   | 3 | X | - | - | - | -
 **RTC**  | . | . | . | . | . | .
-Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler   | 2 | X | X | X | X | -
-Disabling the RTC Stops the PIT                                        | 2 | X | X | X | X | -
+Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler   | 4 | X | X | X | X | -
+Disabling the RTC Stops the PIT                                        | 5 | X | X | X | X | -
 **TCA**  | . | .  | . | .  | . | .  | .
 Restart Will Reset Counter Direction in NORMAL and FRQ Mode            | 1 | X | X | X | X | X
 **TCB**  | . | . | . | . | . | .
@@ -175,8 +175,8 @@ D-latch is Not Functional                                                 | 3 | 
 **PORTMUX**  | . | . | . | . | .
 Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5      | 3 | - | X | X | -
 **RTC**  | . | . | . | . | .
-Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler      | 2 | X | X | X | X
-Disabling the RTC Stops the PIT                                           | 2 | X | X | X | X
+Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler      | 4 | X | X | X | X
+Disabling the RTC Stops the PIT                                           | 5 | X | X | X | X
 **TCA**  | . | .  | . | .  | . | .
 Restart Will Reset Counter Direction in NORMAL and FRQ Mode               | 1 | X | X | X | X
 **TCB**  | . | . | . | . | .
@@ -350,7 +350,7 @@ Any write to the `RTC.CTRLA` register resets the RTC and PIT prescaler.
 
 **Workaround:** None.
 
-**megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted; users manually configuring these timers on effected parts must take account of this.
+**megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted. However, any use of the RTC other than those provided by the core has a high chance of encountering this. Additionally, the behavior that results is just wacky. We had a user who was just going nuts with this and the other RTC bug. 
 
 #### Disabling the RTC Stops the PIT
 Writing `RTC.CTRLA.RTCEN` to '0' will stop the PIT.
@@ -358,7 +358,7 @@ Writing `RTC.PITCTRLA.PITEN` to '0' will stop the RTC.
 
 **Workaround:** Do not disable the RTC or the PIT if any of the modules are used.
 
-**megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted; users manually configuring these timers on effected parts must take account of this. This behaves less simply than they describe, and it can be profoundly baffling and very nasty when using the RTC. This was reported by a user on ATtiny412; it stands to reason that on impacted parts, when one but not the other is enabled, the behavior probably is not "clean":
+**megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted. **Any manual configuration of the RTC will be unsuccessful if this issue is not taken into account** This behaves far less simply than they describe, and it can be profoundly baffling and very nasty when using the RTC. This was reported by a user on ATtiny412; it stands to reason that on impacted parts, the other one doesn't "stop" - but rather "behaves in a manner inconsistent with documentation"
   1. Set RTC clock source but don't enable it.
   2. Enable the PIT with desired period.
   3. Notice that PIT is working, while RTC is not enabled.
@@ -371,10 +371,10 @@ When the TCA is configured to a NORMAL or FRQ mode (WGMODE in TCAn.CTRLB is ‘0
 
 **Workaround:** None.
 
-**megaTinyCore note:** Only impacts users who reconfigure TCA0 and use RESTART commands or events as described. Impacts every released part with a TCB as if July 2021.
+**megaTinyCore note:** Only impacts users who reconfigure TCA0 and use RESTART commands or events as described. Impacts every released part with a TCA as if July 2021.
 
 ### TCB - Timer/Counter B
-####CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode
+#### CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode
 When the TCB is operating in 8-bit PWM mode (CNTMODE in TCBn.CTRLB is ‘0x7’), the low and high bytes for the CNT and CCMP registers operate as 16-bit registers for read and write. They cannot be read or written independently.
 
 **Work Around:** Use 16-bit register access. Refer to the data sheet for further information.
