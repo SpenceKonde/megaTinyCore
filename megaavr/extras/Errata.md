@@ -6,7 +6,7 @@ Well, for the tinyAVR 0/1-series, the list of issues is a tiny bit longer. By wh
 
 The lists of errata are ~hidden~ located in a separate docukent, the "Errata and datasheet clarification" sheet for the part now, instead of being in the datasheet proper like it was on classic AVRs. You know, just to make it easier for the users, so we don't have to skip over a few pages of highly relevant information on errata if we have one of the non-existent versions that doesn't have all these problems. Nope, they're _totally_ not trying to hush up the bugs until you've made the buying decision and gotten too deep in the design process to switch MCUs to a competitors' one or anything, nosiree - it's just to make things easier you you, the users! The specific errata relevant to a given part vary depending on the specific part and and silicon revision. The silicon revision can be read from the `SYSCFG.REVID` register (0 = A, 1 = B, etc). It is also marked on the chip - though my understanding is that us mere mortals are not trusted with the secret of how to do so, and must have Microchip folks help with that.
 
-Note that Rev. C of the 32k parts has been released and fixes a substantial amount of errata. It fixes some of the RTC stuff, it fixes the 
+Note that Rev. C of the 32k parts has been released and fixes a substantial amount of errata. It fixes some of the RTC stuff, it fixes the
 D-latch and the fact that you had to enable pin output to use the link output source on a downstream LUT as well as assorted other issues. Hopefully we will see these changes brought to other parts in the tinyAVR 0/1-series in the future.
 
 ```c
@@ -19,8 +19,8 @@ Thankfully, most of these issues will not be encountered by most Arduino users. 
 * 1 - Impact only when using exotic features
 * 2 - Impact likely when using normal features which may be used through libraries or register configuration.
 * 3 - Issue impacted functions provided by megaTinyCore or included libraries in previous versions, but worked around in current version, and will impact users of this functionality if reconfigured manually, or unavoidably impacts functionality exposed by core or included libraries, but can be worked around.
-* 4 - Issue impacts functions provided by megaTinyCore or included libraries in the current released version, or within a commonly used peripheral, but mitigation is straightforward. In many cases, simply knowing of the issue can be enough to not be troubled by it. 
-* 5 - Issue impacts functions provided by megaTinyCore or included libraries, or within a commonly used peripheral, and the impact is severely disruptive. 
+* 4 - Issue impacts functions provided by megaTinyCore or included libraries in the current released version, or within a commonly used peripheral, but mitigation is straightforward. In many cases, simply knowing of the issue can be enough to not be troubled by it.
+* 5 - Issue impacts functions provided by megaTinyCore or included libraries, or within a commonly used peripheral, and the impact is severely disruptive.
 * `*` - Issue is high impact but effected devices are rare
 
 
@@ -345,7 +345,7 @@ The CCL D-latch is not functional.
 
 **Workaround:** None.
 
-**megaTinyCore note:** This is broken on anything released before 2020. Don't try to use the D-latch sequential logic on 0/1-series parts. The D Flip-Flop can be used instead for many use cases, though it is clocked, which may make it less convenient than the latch. In any case, that's the less useful kind of latch anyway. 
+**megaTinyCore note:** This is broken on anything released before 2020. Don't try to use the D-latch sequential logic on 0/1-series parts. The D Flip-Flop can be used instead for many use cases, though it is clocked, which may make it less convenient than the latch. In any case, that's the less useful kind of latch anyway.
 
 ### RTC - Real-Time Counter
 #### Any Write to the `RTC.CTRLA` Register Resets the RTC and PIT Prescaler
@@ -353,7 +353,7 @@ Any write to the `RTC.CTRLA` register resets the RTC and PIT prescaler.
 
 **Workaround:** None.
 
-**megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted. However, any use of the RTC other than those provided by the core has a high chance of encountering this. Additionally, the behavior that results is just wacky. We had a user who was just going nuts with this and the other RTC bug. 
+**megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted. However, any use of the RTC other than those provided by the core has a high chance of encountering this. Additionally, the behavior that results is just wacky. We had a user who was just going nuts with this and the other RTC bug.
 
 #### Disabling the RTC Stops the PIT
 Writing `RTC.CTRLA.RTCEN` to '0' will stop the PIT.
@@ -507,4 +507,4 @@ The Start-of-Frame Detector can unintentionally be enabled when the device is in
 
 **Workaround:** Disable Start-of-Frame Detection by writing ‘0’ to the Start-of-Frame Detection Enable (SFDEN) bit in the USART Control B (USARTn.CTRLB) register when the device is in Active mode. Re-enable it by writing the bit to ‘1’ before transitioning to Standby sleep mode. This work around depends on a protocol preventing a new incoming frame when re-enabling Start-of-Frame Detection. Re-enabling Start-of-Frame Detection, while a new frame is already incoming, will result in corrupted received data.
 
-**megaTinyCore note:** If you're configuring the part to wake using start of frame detection, you need to be aware of this. Impacts every available modern AVR device as of July 2021. One really wonders how this went unnoticed until 2020. 
+**megaTinyCore note:** If you're configuring the part to wake using start of frame detection, you need to be aware of this. Impacts every available modern AVR device as of July 2021. One really wonders how this went unnoticed until 2020.

@@ -5152,4 +5152,3 @@ IO Module Instances. Mapped to memory.
 
 
 #endif /* #ifdef _AVR_ATTINY824_H_INCLUDED */
-
