@@ -263,7 +263,7 @@ My tentative ruling is that:
 
 // pin which currently is being used for a tone
 #ifndef TONE_UNAVAILABLE
-void noTone(uint8_t pin) {
+  void noTone(uint8_t pin) {
     if (pin == _pin) {
       uint8_t old_SREG = SREG;  // Save SREG
       cli();                    // Interrupts off
@@ -274,7 +274,7 @@ void noTone(uint8_t pin) {
     }
   }
 #else
-void noTone(__attribute__ ((unused)) uint8_t pin) {
+  void noTone(__attribute__ ((unused)) uint8_t pin) {
     badCall("TCB0 used for millis, no other TCBs on this part; tone requires exclusive use of a type B timer, use a differemt millis timer or a tinyAVR with a second TCB (any 2-series, or 1-series with 16k+ flash)");
   }
 #endif
