@@ -101,8 +101,8 @@ My tentative ruling is that:
     the most important part, that being turning the noisy thing off - basically, whether to implement multiTone() and
     noMultiTone(pin), or to have things like `toneTimerTCB0.tone()/toneTimerTCB0.noTone()`. I am inclined
     to think the second approach is a more sound one. If anytone wants to write such a librarty, I'm haoppy to adcise
-  B. For the default noTone() that does not involve a library, pin should he required. Arguanbly there should be  two
-    versions of it, with and without a pin argument, where ther latter would shut down tone wherever it is.
+  B. For the default noTone() that does not involve a library, pin should he required. Arguanbly there should be two
+    versions of it, with and without a pin argument, where the latter would shut down tone wherever it is.
     ************************************************************************************************************/
 
 #include <avr/interrupt.h>
@@ -233,7 +233,8 @@ My tentative ruling is that:
         // If we were, we're gonna be in a world of hurt if we don't
         // turn it off before we actually start reconfiguring stuff
         // *(timer_outtgl_reg - 5) = timer_bit_mask; // pinMode(_pin, INPUT);    (write dirclr for old pin)
-        // Apparently maybe it is indended for the pin to be left as an output?
+        // Apparently maybe it is intended for the pin to be left as an output?
+        // It does need to be LOW though, otherwise it can damage some speakers!
         *(timer_outtgl_reg - 1) = timer_bit_mask; // digitalWrite(_pin, LOW); (write outclr for old pin)
       }
       // whether or not we _were_ using a pin, we are now, so configure the new one as an output...
