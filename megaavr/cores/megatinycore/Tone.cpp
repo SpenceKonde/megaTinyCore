@@ -302,10 +302,10 @@ static void disableTimer() {
 #endif
 
 
-#ifndef TONE_UNAVAILABLE
-  #if defined USE_TIMERB0
+#if !defined(TONE_UNAVAILABLE)
+  #if defined(USE_TIMERB0)
   ISR(TCB0_INT_vect)
-  #elif defined USE_TIMERB1
+  #elif defined(USE_TIMERB1)
   ISR(TCB1_INT_vect)
   #endif
   {
