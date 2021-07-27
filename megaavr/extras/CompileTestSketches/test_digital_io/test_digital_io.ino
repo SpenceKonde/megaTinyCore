@@ -11,7 +11,7 @@ void loop() {
     digitalWrite(PIN_PA0,HIGH);
     digitalWrite(PIN_PA0,LOW);
     openDrain(PIN_PA0,LOW);
-    openDrain(PIN_PA0,FLOAT);
+    openDrain(PIN_PA0,FLOATING);
     digitalRead(PIN_PA0);
     analogWrite(PIN_PA0,0);
     analogWrite(PIN_PA0,128);
@@ -19,7 +19,7 @@ void loop() {
     digitalWriteFast(PIN_PA0,HIGH);
     digitalWriteFast(PIN_PA0,LOW);
     openDrainFast(PIN_PA0,LOW);
-    openDrainFast(PIN_PA0,FLOAT);
+    openDrainFast(PIN_PA0,FLOATING);
     digitalReadFast(PIN_PA0);
   #endif
 
@@ -31,7 +31,7 @@ void loop() {
     digitalWrite(PIN_PA1,HIGH);
     digitalWrite(PIN_PA1,LOW);
     openDrain(PIN_PA1,LOW);
-    openDrain(PIN_PA1,FLOAT);
+    openDrain(PIN_PA1,FLOATING);
     digitalRead(PIN_PA1);
     analogWrite(PIN_PA1,0);
     analogWrite(PIN_PA1,128);
@@ -39,7 +39,7 @@ void loop() {
     digitalWriteFast(PIN_PA1,HIGH);
     digitalWriteFast(PIN_PA1,LOW);
     openDrainFast(PIN_PA1,LOW);
-    openDrainFast(PIN_PA1,FLOAT);
+    openDrainFast(PIN_PA1,FLOATING);
     digitalReadFast(PIN_PA1);
   #endif
 
@@ -51,7 +51,7 @@ void loop() {
     digitalWrite(PIN_PA2,HIGH);
     digitalWrite(PIN_PA2,LOW);
     openDrain(PIN_PA2,LOW);
-    openDrain(PIN_PA2,FLOAT);
+    openDrain(PIN_PA2,FLOATING);
     digitalRead(PIN_PA2);
     analogWrite(PIN_PA2,0);
     analogWrite(PIN_PA2,128);
@@ -59,7 +59,7 @@ void loop() {
     digitalWriteFast(PIN_PA2,HIGH);
     digitalWriteFast(PIN_PA2,LOW);
     openDrainFast(PIN_PA2,LOW);
-    openDrainFast(PIN_PA2,FLOAT);
+    openDrainFast(PIN_PA2,FLOATING);
     digitalReadFast(PIN_PA2);
   #endif
 
@@ -71,7 +71,7 @@ void loop() {
     digitalWrite(PIN_PA3,HIGH);
     digitalWrite(PIN_PA3,LOW);
     openDrain(PIN_PA3,LOW);
-    openDrain(PIN_PA3,FLOAT);
+    openDrain(PIN_PA3,FLOATING);
     digitalRead(PIN_PA3);
     analogWrite(PIN_PA3,0);
     analogWrite(PIN_PA3,128);
@@ -79,7 +79,7 @@ void loop() {
     digitalWriteFast(PIN_PA3,HIGH);
     digitalWriteFast(PIN_PA3,LOW);
     openDrainFast(PIN_PA3,LOW);
-    openDrainFast(PIN_PA3,FLOAT);
+    openDrainFast(PIN_PA3,FLOATING);
     digitalReadFast(PIN_PA3);
   #endif
 
@@ -91,7 +91,7 @@ void loop() {
     digitalWrite(PIN_PA4,HIGH);
     digitalWrite(PIN_PA4,LOW);
     openDrain(PIN_PA4,LOW);
-    openDrain(PIN_PA4,FLOAT);
+    openDrain(PIN_PA4,FLOATING);
     digitalRead(PIN_PA4);
     analogWrite(PIN_PA4,0);
     analogWrite(PIN_PA4,128);
@@ -99,7 +99,7 @@ void loop() {
     digitalWriteFast(PIN_PA4,HIGH);
     digitalWriteFast(PIN_PA4,LOW);
     openDrainFast(PIN_PA4,LOW);
-    openDrainFast(PIN_PA4,FLOAT);
+    openDrainFast(PIN_PA4,FLOATING);
     digitalReadFast(PIN_PA4);
   #endif
 
@@ -111,7 +111,7 @@ void loop() {
     digitalWrite(PIN_PA5,HIGH);
     digitalWrite(PIN_PA5,LOW);
     openDrain(PIN_PA5,LOW);
-    openDrain(PIN_PA5,FLOAT);
+    openDrain(PIN_PA5,FLOATING);
     digitalRead(PIN_PA5);
     analogWrite(PIN_PA5,0);
     analogWrite(PIN_PA5,128);
@@ -119,7 +119,7 @@ void loop() {
     digitalWriteFast(PIN_PA5,HIGH);
     digitalWriteFast(PIN_PA5,LOW);
     openDrainFast(PIN_PA5,LOW);
-    openDrainFast(PIN_PA5,FLOAT);
+    openDrainFast(PIN_PA5,FLOATING);
     digitalReadFast(PIN_PA5);
   #endif
 
@@ -131,7 +131,7 @@ void loop() {
     digitalWrite(PIN_PA6,HIGH);
     digitalWrite(PIN_PA6,LOW);
     openDrain(PIN_PA6,LOW);
-    openDrain(PIN_PA6,FLOAT);
+    openDrain(PIN_PA6,FLOATING);
     digitalRead(PIN_PA6);
     analogWrite(PIN_PA6,0);
     analogWrite(PIN_PA6,128);
@@ -139,7 +139,7 @@ void loop() {
     digitalWriteFast(PIN_PA6,HIGH);
     digitalWriteFast(PIN_PA6,LOW);
     openDrainFast(PIN_PA6,LOW);
-    openDrainFast(PIN_PA6,FLOAT);
+    openDrainFast(PIN_PA6,FLOATING);
     digitalReadFast(PIN_PA6);
   #endif
 
@@ -151,7 +151,7 @@ void loop() {
     digitalWrite(PIN_PA7,HIGH);
     digitalWrite(PIN_PA7,LOW);
     openDrain(PIN_PA7,LOW);
-    openDrain(PIN_PA7,FLOAT);
+    openDrain(PIN_PA7,FLOATING);
     digitalRead(PIN_PA7);
     analogWrite(PIN_PA7,0);
     analogWrite(PIN_PA7,128);
@@ -159,7 +159,7 @@ void loop() {
     digitalWriteFast(PIN_PA7,HIGH);
     digitalWriteFast(PIN_PA7,LOW);
     openDrainFast(PIN_PA7,LOW);
-    openDrainFast(PIN_PA7,FLOAT);
+    openDrainFast(PIN_PA7,FLOATING);
     digitalReadFast(PIN_PA7);
   #endif
 
@@ -171,7 +171,7 @@ void loop() {
     digitalWrite(PIN_PB0,HIGH);
     digitalWrite(PIN_PB0,LOW);
     openDrain(PIN_PB0,LOW);
-    openDrain(PIN_PB0,FLOAT);
+    openDrain(PIN_PB0,FLOATING);
     digitalRead(PIN_PB0);
     analogWrite(PIN_PB0,0);
     analogWrite(PIN_PB0,128);
@@ -179,7 +179,7 @@ void loop() {
     digitalWriteFast(PIN_PB0,HIGH);
     digitalWriteFast(PIN_PB0,LOW);
     openDrainFast(PIN_PB0,LOW);
-    openDrainFast(PIN_PB0,FLOAT);
+    openDrainFast(PIN_PB0,FLOATING);
     digitalReadFast(PIN_PB0);
   #endif
 
@@ -191,7 +191,7 @@ void loop() {
     digitalWrite(PIN_PB1,HIGH);
     digitalWrite(PIN_PB1,LOW);
     openDrain(PIN_PB1,LOW);
-    openDrain(PIN_PB1,FLOAT);
+    openDrain(PIN_PB1,FLOATING);
     digitalRead(PIN_PB1);
     analogWrite(PIN_PB1,0);
     analogWrite(PIN_PB1,128);
@@ -199,7 +199,7 @@ void loop() {
     digitalWriteFast(PIN_PB1,HIGH);
     digitalWriteFast(PIN_PB1,LOW);
     openDrainFast(PIN_PB1,LOW);
-    openDrainFast(PIN_PB1,FLOAT);
+    openDrainFast(PIN_PB1,FLOATING);
     digitalReadFast(PIN_PB1);
   #endif
 
@@ -211,7 +211,7 @@ void loop() {
     digitalWrite(PIN_PB2,HIGH);
     digitalWrite(PIN_PB2,LOW);
     openDrain(PIN_PB2,LOW);
-    openDrain(PIN_PB2,FLOAT);
+    openDrain(PIN_PB2,FLOATING);
     digitalRead(PIN_PB2);
     analogWrite(PIN_PB2,0);
     analogWrite(PIN_PB2,128);
@@ -219,7 +219,7 @@ void loop() {
     digitalWriteFast(PIN_PB2,HIGH);
     digitalWriteFast(PIN_PB2,LOW);
     openDrainFast(PIN_PB2,LOW);
-    openDrainFast(PIN_PB2,FLOAT);
+    openDrainFast(PIN_PB2,FLOATING);
     digitalReadFast(PIN_PB2);
   #endif
 
@@ -231,7 +231,7 @@ void loop() {
     digitalWrite(PIN_PB3,HIGH);
     digitalWrite(PIN_PB3,LOW);
     openDrain(PIN_PB3,LOW);
-    openDrain(PIN_PB3,FLOAT);
+    openDrain(PIN_PB3,FLOATING);
     digitalRead(PIN_PB3);
     analogWrite(PIN_PB3,0);
     analogWrite(PIN_PB3,128);
@@ -239,7 +239,7 @@ void loop() {
     digitalWriteFast(PIN_PB3,HIGH);
     digitalWriteFast(PIN_PB3,LOW);
     openDrainFast(PIN_PB3,LOW);
-    openDrainFast(PIN_PB3,FLOAT);
+    openDrainFast(PIN_PB3,FLOATING);
     digitalReadFast(PIN_PB3);
   #endif
 
@@ -251,7 +251,7 @@ void loop() {
     digitalWrite(PIN_PB4,HIGH);
     digitalWrite(PIN_PB4,LOW);
     openDrain(PIN_PB4,LOW);
-    openDrain(PIN_PB4,FLOAT);
+    openDrain(PIN_PB4,FLOATING);
     digitalRead(PIN_PB4);
     analogWrite(PIN_PB4,0);
     analogWrite(PIN_PB4,128);
@@ -259,7 +259,7 @@ void loop() {
     digitalWriteFast(PIN_PB4,HIGH);
     digitalWriteFast(PIN_PB4,LOW);
     openDrainFast(PIN_PB4,LOW);
-    openDrainFast(PIN_PB4,FLOAT);
+    openDrainFast(PIN_PB4,FLOATING);
     digitalReadFast(PIN_PB4);
   #endif
 
@@ -271,7 +271,7 @@ void loop() {
     digitalWrite(PIN_PB5,HIGH);
     digitalWrite(PIN_PB5,LOW);
     openDrain(PIN_PB5,LOW);
-    openDrain(PIN_PB5,FLOAT);
+    openDrain(PIN_PB5,FLOATING);
     digitalRead(PIN_PB5);
     analogWrite(PIN_PB5,0);
     analogWrite(PIN_PB5,128);
@@ -279,7 +279,7 @@ void loop() {
     digitalWriteFast(PIN_PB5,HIGH);
     digitalWriteFast(PIN_PB5,LOW);
     openDrainFast(PIN_PB5,LOW);
-    openDrainFast(PIN_PB5,FLOAT);
+    openDrainFast(PIN_PB5,FLOATING);
     digitalReadFast(PIN_PB5);
   #endif
 
@@ -291,7 +291,7 @@ void loop() {
     digitalWrite(PIN_PB6,HIGH);
     digitalWrite(PIN_PB6,LOW);
     openDrain(PIN_PB6,LOW);
-    openDrain(PIN_PB6,FLOAT);
+    openDrain(PIN_PB6,FLOATING);
     digitalRead(PIN_PB6);
     analogWrite(PIN_PB6,0);
     analogWrite(PIN_PB6,128);
@@ -299,7 +299,7 @@ void loop() {
     digitalWriteFast(PIN_PB6,HIGH);
     digitalWriteFast(PIN_PB6,LOW);
     openDrainFast(PIN_PB6,LOW);
-    openDrainFast(PIN_PB6,FLOAT);
+    openDrainFast(PIN_PB6,FLOATING);
     digitalReadFast(PIN_PB6);
   #endif
 
@@ -311,7 +311,7 @@ void loop() {
     digitalWrite(PIN_PB7,HIGH);
     digitalWrite(PIN_PB7,LOW);
     openDrain(PIN_PB7,LOW);
-    openDrain(PIN_PB7,FLOAT);
+    openDrain(PIN_PB7,FLOATING);
     digitalRead(PIN_PB7);
     analogWrite(PIN_PB7,0);
     analogWrite(PIN_PB7,128);
@@ -319,7 +319,7 @@ void loop() {
     digitalWriteFast(PIN_PB7,HIGH);
     digitalWriteFast(PIN_PB7,LOW);
     openDrainFast(PIN_PB7,LOW);
-    openDrainFast(PIN_PB7,FLOAT);
+    openDrainFast(PIN_PB7,FLOATING);
     digitalReadFast(PIN_PB7);
   #endif
 
@@ -331,7 +331,7 @@ void loop() {
     digitalWrite(PIN_PC0,HIGH);
     digitalWrite(PIN_PC0,LOW);
     openDrain(PIN_PC0,LOW);
-    openDrain(PIN_PC0,FLOAT);
+    openDrain(PIN_PC0,FLOATING);
     digitalRead(PIN_PC0);
     analogWrite(PIN_PC0,0);
     analogWrite(PIN_PC0,128);
@@ -339,7 +339,7 @@ void loop() {
     digitalWriteFast(PIN_PC0,HIGH);
     digitalWriteFast(PIN_PC0,LOW);
     openDrainFast(PIN_PC0,LOW);
-    openDrainFast(PIN_PC0,FLOAT);
+    openDrainFast(PIN_PC0,FLOATING);
     digitalReadFast(PIN_PC0);
   #endif
 
@@ -351,7 +351,7 @@ void loop() {
     digitalWrite(PIN_PC1,HIGH);
     digitalWrite(PIN_PC1,LOW);
     openDrain(PIN_PC1,LOW);
-    openDrain(PIN_PC1,FLOAT);
+    openDrain(PIN_PC1,FLOATING);
     digitalRead(PIN_PC1);
     analogWrite(PIN_PC1,0);
     analogWrite(PIN_PC1,128);
@@ -359,7 +359,7 @@ void loop() {
     digitalWriteFast(PIN_PC1,HIGH);
     digitalWriteFast(PIN_PC1,LOW);
     openDrainFast(PIN_PC1,LOW);
-    openDrainFast(PIN_PC1,FLOAT);
+    openDrainFast(PIN_PC1,FLOATING);
     digitalReadFast(PIN_PC1);
   #endif
 
@@ -371,7 +371,7 @@ void loop() {
     digitalWrite(PIN_PC2,HIGH);
     digitalWrite(PIN_PC2,LOW);
     openDrain(PIN_PC2,LOW);
-    openDrain(PIN_PC2,FLOAT);
+    openDrain(PIN_PC2,FLOATING);
     digitalRead(PIN_PC2);
     analogWrite(PIN_PC2,0);
     analogWrite(PIN_PC2,128);
@@ -379,7 +379,7 @@ void loop() {
     digitalWriteFast(PIN_PC2,HIGH);
     digitalWriteFast(PIN_PC2,LOW);
     openDrainFast(PIN_PC2,LOW);
-    openDrainFast(PIN_PC2,FLOAT);
+    openDrainFast(PIN_PC2,FLOATING);
     digitalReadFast(PIN_PC2);
   #endif
 
@@ -391,7 +391,7 @@ void loop() {
     digitalWrite(PIN_PC3,HIGH);
     digitalWrite(PIN_PC3,LOW);
     openDrain(PIN_PC3,LOW);
-    openDrain(PIN_PC3,FLOAT);
+    openDrain(PIN_PC3,FLOATING);
     digitalRead(PIN_PC3);
     analogWrite(PIN_PC3,0);
     analogWrite(PIN_PC3,128);
@@ -399,7 +399,7 @@ void loop() {
     digitalWriteFast(PIN_PC3,HIGH);
     digitalWriteFast(PIN_PC3,LOW);
     openDrainFast(PIN_PC3,LOW);
-    openDrainFast(PIN_PC3,FLOAT);
+    openDrainFast(PIN_PC3,FLOATING);
     digitalReadFast(PIN_PC3);
   #endif
 
@@ -411,7 +411,7 @@ void loop() {
     digitalWrite(PIN_PC4,HIGH);
     digitalWrite(PIN_PC4,LOW);
     openDrain(PIN_PC4,LOW);
-    openDrain(PIN_PC4,FLOAT);
+    openDrain(PIN_PC4,FLOATING);
     digitalRead(PIN_PC4);
     analogWrite(PIN_PC4,0);
     analogWrite(PIN_PC4,128);
@@ -419,7 +419,7 @@ void loop() {
     digitalWriteFast(PIN_PC4,HIGH);
     digitalWriteFast(PIN_PC4,LOW);
     openDrainFast(PIN_PC4,LOW);
-    openDrainFast(PIN_PC4,FLOAT);
+    openDrainFast(PIN_PC4,FLOATING);
     digitalReadFast(PIN_PC4);
   #endif
 
@@ -431,7 +431,7 @@ void loop() {
     digitalWrite(PIN_PC5,HIGH);
     digitalWrite(PIN_PC5,LOW);
     openDrain(PIN_PC5,LOW);
-    openDrain(PIN_PC5,FLOAT);
+    openDrain(PIN_PC5,FLOATING);
     digitalRead(PIN_PC5);
     analogWrite(PIN_PC5,0);
     analogWrite(PIN_PC5,128);
@@ -439,7 +439,7 @@ void loop() {
     digitalWriteFast(PIN_PC5,HIGH);
     digitalWriteFast(PIN_PC5,LOW);
     openDrainFast(PIN_PC5,LOW);
-    openDrainFast(PIN_PC5,FLOAT);
+    openDrainFast(PIN_PC5,FLOATING);
     digitalReadFast(PIN_PC5);
   #endif
 
@@ -451,7 +451,7 @@ void loop() {
     digitalWrite(PIN_PC6,HIGH);
     digitalWrite(PIN_PC6,LOW);
     openDrain(PIN_PC6,LOW);
-    openDrain(PIN_PC6,FLOAT);
+    openDrain(PIN_PC6,FLOATING);
     digitalRead(PIN_PC6);
     analogWrite(PIN_PC6,0);
     analogWrite(PIN_PC6,128);
@@ -459,7 +459,7 @@ void loop() {
     digitalWriteFast(PIN_PC6,HIGH);
     digitalWriteFast(PIN_PC6,LOW);
     openDrainFast(PIN_PC6,LOW);
-    openDrainFast(PIN_PC6,FLOAT);
+    openDrainFast(PIN_PC6,FLOATING);
     digitalReadFast(PIN_PC6);
   #endif
 
@@ -471,7 +471,7 @@ void loop() {
     digitalWrite(PIN_PC7,HIGH);
     digitalWrite(PIN_PC7,LOW);
     openDrain(PIN_PC7,LOW);
-    openDrain(PIN_PC7,FLOAT);
+    openDrain(PIN_PC7,FLOATING);
     digitalRead(PIN_PC7);
     analogWrite(PIN_PC7,0);
     analogWrite(PIN_PC7,128);
@@ -479,7 +479,7 @@ void loop() {
     digitalWriteFast(PIN_PC7,HIGH);
     digitalWriteFast(PIN_PC7,LOW);
     openDrainFast(PIN_PC7,LOW);
-    openDrainFast(PIN_PC7,FLOAT);
+    openDrainFast(PIN_PC7,FLOATING);
     digitalReadFast(PIN_PC7);
   #endif
 
@@ -491,7 +491,7 @@ void loop() {
     digitalWrite(PIN_PD0,HIGH);
     digitalWrite(PIN_PD0,LOW);
     openDrain(PIN_PD0,LOW);
-    openDrain(PIN_PD0,FLOAT);
+    openDrain(PIN_PD0,FLOATING);
     digitalRead(PIN_PD0);
     analogWrite(PIN_PD0,0);
     analogWrite(PIN_PD0,128);
@@ -499,7 +499,7 @@ void loop() {
     digitalWriteFast(PIN_PD0,HIGH);
     digitalWriteFast(PIN_PD0,LOW);
     openDrainFast(PIN_PD0,LOW);
-    openDrainFast(PIN_PD0,FLOAT);
+    openDrainFast(PIN_PD0,FLOATING);
     digitalReadFast(PIN_PD0);
   #endif
 
@@ -511,7 +511,7 @@ void loop() {
     digitalWrite(PIN_PD1,HIGH);
     digitalWrite(PIN_PD1,LOW);
     openDrain(PIN_PD1,LOW);
-    openDrain(PIN_PD1,FLOAT);
+    openDrain(PIN_PD1,FLOATING);
     digitalRead(PIN_PD1);
     analogWrite(PIN_PD1,0);
     analogWrite(PIN_PD1,128);
@@ -519,7 +519,7 @@ void loop() {
     digitalWriteFast(PIN_PD1,HIGH);
     digitalWriteFast(PIN_PD1,LOW);
     openDrainFast(PIN_PD1,LOW);
-    openDrainFast(PIN_PD1,FLOAT);
+    openDrainFast(PIN_PD1,FLOATING);
     digitalReadFast(PIN_PD1);
   #endif
 
@@ -531,7 +531,7 @@ void loop() {
     digitalWrite(PIN_PD2,HIGH);
     digitalWrite(PIN_PD2,LOW);
     openDrain(PIN_PD2,LOW);
-    openDrain(PIN_PD2,FLOAT);
+    openDrain(PIN_PD2,FLOATING);
     digitalRead(PIN_PD2);
     analogWrite(PIN_PD2,0);
     analogWrite(PIN_PD2,128);
@@ -539,7 +539,7 @@ void loop() {
     digitalWriteFast(PIN_PD2,HIGH);
     digitalWriteFast(PIN_PD2,LOW);
     openDrainFast(PIN_PD2,LOW);
-    openDrainFast(PIN_PD2,FLOAT);
+    openDrainFast(PIN_PD2,FLOATING);
     digitalReadFast(PIN_PD2);
   #endif
 
@@ -551,7 +551,7 @@ void loop() {
     digitalWrite(PIN_PD3,HIGH);
     digitalWrite(PIN_PD3,LOW);
     openDrain(PIN_PD3,LOW);
-    openDrain(PIN_PD3,FLOAT);
+    openDrain(PIN_PD3,FLOATING);
     digitalRead(PIN_PD3);
     analogWrite(PIN_PD3,0);
     analogWrite(PIN_PD3,128);
@@ -559,7 +559,7 @@ void loop() {
     digitalWriteFast(PIN_PD3,HIGH);
     digitalWriteFast(PIN_PD3,LOW);
     openDrainFast(PIN_PD3,LOW);
-    openDrainFast(PIN_PD3,FLOAT);
+    openDrainFast(PIN_PD3,FLOATING);
     digitalReadFast(PIN_PD3);
   #endif
 
@@ -571,7 +571,7 @@ void loop() {
     digitalWrite(PIN_PD4,HIGH);
     digitalWrite(PIN_PD4,LOW);
     openDrain(PIN_PD4,LOW);
-    openDrain(PIN_PD4,FLOAT);
+    openDrain(PIN_PD4,FLOATING);
     digitalRead(PIN_PD4);
     analogWrite(PIN_PD4,0);
     analogWrite(PIN_PD4,128);
@@ -579,7 +579,7 @@ void loop() {
     digitalWriteFast(PIN_PD4,HIGH);
     digitalWriteFast(PIN_PD4,LOW);
     openDrainFast(PIN_PD4,LOW);
-    openDrainFast(PIN_PD4,FLOAT);
+    openDrainFast(PIN_PD4,FLOATING);
     digitalReadFast(PIN_PD4);
   #endif
 
@@ -591,7 +591,7 @@ void loop() {
     digitalWrite(PIN_PD5,HIGH);
     digitalWrite(PIN_PD5,LOW);
     openDrain(PIN_PD5,LOW);
-    openDrain(PIN_PD5,FLOAT);
+    openDrain(PIN_PD5,FLOATING);
     digitalRead(PIN_PD5);
     analogWrite(PIN_PD5,0);
     analogWrite(PIN_PD5,128);
@@ -599,7 +599,7 @@ void loop() {
     digitalWriteFast(PIN_PD5,HIGH);
     digitalWriteFast(PIN_PD5,LOW);
     openDrainFast(PIN_PD5,LOW);
-    openDrainFast(PIN_PD5,FLOAT);
+    openDrainFast(PIN_PD5,FLOATING);
     digitalReadFast(PIN_PD5);
   #endif
 
@@ -611,7 +611,7 @@ void loop() {
     digitalWrite(PIN_PD6,HIGH);
     digitalWrite(PIN_PD6,LOW);
     openDrain(PIN_PD6,LOW);
-    openDrain(PIN_PD6,FLOAT);
+    openDrain(PIN_PD6,FLOATING);
     digitalRead(PIN_PD6);
     analogWrite(PIN_PD6,0);
     analogWrite(PIN_PD6,128);
@@ -619,7 +619,7 @@ void loop() {
     digitalWriteFast(PIN_PD6,HIGH);
     digitalWriteFast(PIN_PD6,LOW);
     openDrainFast(PIN_PD6,LOW);
-    openDrainFast(PIN_PD6,FLOAT);
+    openDrainFast(PIN_PD6,FLOATING);
     digitalReadFast(PIN_PD6);
   #endif
 
@@ -631,7 +631,7 @@ void loop() {
     digitalWrite(PIN_PD7,HIGH);
     digitalWrite(PIN_PD7,LOW);
     openDrain(PIN_PD7,LOW);
-    openDrain(PIN_PD7,FLOAT);
+    openDrain(PIN_PD7,FLOATING);
     digitalRead(PIN_PD7);
     analogWrite(PIN_PD7,0);
     analogWrite(PIN_PD7,128);
@@ -639,7 +639,7 @@ void loop() {
     digitalWriteFast(PIN_PD7,HIGH);
     digitalWriteFast(PIN_PD7,LOW);
     openDrainFast(PIN_PD7,LOW);
-    openDrainFast(PIN_PD7,FLOAT);
+    openDrainFast(PIN_PD7,FLOATING);
     digitalReadFast(PIN_PD7);
   #endif
 
@@ -651,7 +651,7 @@ void loop() {
     digitalWrite(PIN_PE0,HIGH);
     digitalWrite(PIN_PE0,LOW);
     openDrain(PIN_PE0,LOW);
-    openDrain(PIN_PE0,FLOAT);
+    openDrain(PIN_PE0,FLOATING);
     digitalRead(PIN_PE0);
     analogWrite(PIN_PE0,0);
     analogWrite(PIN_PE0,128);
@@ -659,7 +659,7 @@ void loop() {
     digitalWriteFast(PIN_PE0,HIGH);
     digitalWriteFast(PIN_PE0,LOW);
     openDrainFast(PIN_PE0,LOW);
-    openDrainFast(PIN_PE0,FLOAT);
+    openDrainFast(PIN_PE0,FLOATING);
     digitalReadFast(PIN_PE0);
   #endif
 
@@ -671,7 +671,7 @@ void loop() {
     digitalWrite(PIN_PE1,HIGH);
     digitalWrite(PIN_PE1,LOW);
     openDrain(PIN_PE1,LOW);
-    openDrain(PIN_PE1,FLOAT);
+    openDrain(PIN_PE1,FLOATING);
     digitalRead(PIN_PE1);
     analogWrite(PIN_PE1,0);
     analogWrite(PIN_PE1,128);
@@ -679,7 +679,7 @@ void loop() {
     digitalWriteFast(PIN_PE1,HIGH);
     digitalWriteFast(PIN_PE1,LOW);
     openDrainFast(PIN_PE1,LOW);
-    openDrainFast(PIN_PE1,FLOAT);
+    openDrainFast(PIN_PE1,FLOATING);
     digitalReadFast(PIN_PE1);
   #endif
 
@@ -691,7 +691,7 @@ void loop() {
     digitalWrite(PIN_PE2,HIGH);
     digitalWrite(PIN_PE2,LOW);
     openDrain(PIN_PE2,LOW);
-    openDrain(PIN_PE2,FLOAT);
+    openDrain(PIN_PE2,FLOATING);
     digitalRead(PIN_PE2);
     analogWrite(PIN_PE2,0);
     analogWrite(PIN_PE2,128);
@@ -699,7 +699,7 @@ void loop() {
     digitalWriteFast(PIN_PE2,HIGH);
     digitalWriteFast(PIN_PE2,LOW);
     openDrainFast(PIN_PE2,LOW);
-    openDrainFast(PIN_PE2,FLOAT);
+    openDrainFast(PIN_PE2,FLOATING);
     digitalReadFast(PIN_PE2);
   #endif
 
@@ -711,7 +711,7 @@ void loop() {
     digitalWrite(PIN_PE3,HIGH);
     digitalWrite(PIN_PE3,LOW);
     openDrain(PIN_PE3,LOW);
-    openDrain(PIN_PE3,FLOAT);
+    openDrain(PIN_PE3,FLOATING);
     digitalRead(PIN_PE3);
     analogWrite(PIN_PE3,0);
     analogWrite(PIN_PE3,128);
@@ -719,7 +719,7 @@ void loop() {
     digitalWriteFast(PIN_PE3,HIGH);
     digitalWriteFast(PIN_PE3,LOW);
     openDrainFast(PIN_PE3,LOW);
-    openDrainFast(PIN_PE3,FLOAT);
+    openDrainFast(PIN_PE3,FLOATING);
     digitalReadFast(PIN_PE3);
   #endif
 
@@ -731,7 +731,7 @@ void loop() {
     digitalWrite(PIN_PE4,HIGH);
     digitalWrite(PIN_PE4,LOW);
     openDrain(PIN_PE4,LOW);
-    openDrain(PIN_PE4,FLOAT);
+    openDrain(PIN_PE4,FLOATING);
     digitalRead(PIN_PE4);
     analogWrite(PIN_PE4,0);
     analogWrite(PIN_PE4,128);
@@ -739,7 +739,7 @@ void loop() {
     digitalWriteFast(PIN_PE4,HIGH);
     digitalWriteFast(PIN_PE4,LOW);
     openDrainFast(PIN_PE4,LOW);
-    openDrainFast(PIN_PE4,FLOAT);
+    openDrainFast(PIN_PE4,FLOATING);
     digitalReadFast(PIN_PE4);
   #endif
 
@@ -751,7 +751,7 @@ void loop() {
     digitalWrite(PIN_PE5,HIGH);
     digitalWrite(PIN_PE5,LOW);
     openDrain(PIN_PE5,LOW);
-    openDrain(PIN_PE5,FLOAT);
+    openDrain(PIN_PE5,FLOATING);
     digitalRead(PIN_PE5);
     analogWrite(PIN_PE5,0);
     analogWrite(PIN_PE5,128);
@@ -759,7 +759,7 @@ void loop() {
     digitalWriteFast(PIN_PE5,HIGH);
     digitalWriteFast(PIN_PE5,LOW);
     openDrainFast(PIN_PE5,LOW);
-    openDrainFast(PIN_PE5,FLOAT);
+    openDrainFast(PIN_PE5,FLOATING);
     digitalReadFast(PIN_PE5);
   #endif
 
@@ -771,7 +771,7 @@ void loop() {
     digitalWrite(PIN_PE6,HIGH);
     digitalWrite(PIN_PE6,LOW);
     openDrain(PIN_PE6,LOW);
-    openDrain(PIN_PE6,FLOAT);
+    openDrain(PIN_PE6,FLOATING);
     digitalRead(PIN_PE6);
     analogWrite(PIN_PE6,0);
     analogWrite(PIN_PE6,128);
@@ -779,7 +779,7 @@ void loop() {
     digitalWriteFast(PIN_PE6,HIGH);
     digitalWriteFast(PIN_PE6,LOW);
     openDrainFast(PIN_PE6,LOW);
-    openDrainFast(PIN_PE6,FLOAT);
+    openDrainFast(PIN_PE6,FLOATING);
     digitalReadFast(PIN_PE6);
   #endif
 
@@ -791,7 +791,7 @@ void loop() {
     digitalWrite(PIN_PE7,HIGH);
     digitalWrite(PIN_PE7,LOW);
     openDrain(PIN_PE7,LOW);
-    openDrain(PIN_PE7,FLOAT);
+    openDrain(PIN_PE7,FLOATING);
     digitalRead(PIN_PE7);
     analogWrite(PIN_PE7,0);
     analogWrite(PIN_PE7,128);
@@ -799,7 +799,7 @@ void loop() {
     digitalWriteFast(PIN_PE7,HIGH);
     digitalWriteFast(PIN_PE7,LOW);
     openDrainFast(PIN_PE7,LOW);
-    openDrainFast(PIN_PE7,FLOAT);
+    openDrainFast(PIN_PE7,FLOATING);
     digitalReadFast(PIN_PE7);
   #endif
 
@@ -811,7 +811,7 @@ void loop() {
     digitalWrite(PIN_PF0,HIGH);
     digitalWrite(PIN_PF0,LOW);
     openDrain(PIN_PF0,LOW);
-    openDrain(PIN_PF0,FLOAT);
+    openDrain(PIN_PF0,FLOATING);
     digitalRead(PIN_PF0);
     analogWrite(PIN_PF0,0);
     analogWrite(PIN_PF0,128);
@@ -819,7 +819,7 @@ void loop() {
     digitalWriteFast(PIN_PF0,HIGH);
     digitalWriteFast(PIN_PF0,LOW);
     openDrainFast(PIN_PF0,LOW);
-    openDrainFast(PIN_PF0,FLOAT);
+    openDrainFast(PIN_PF0,FLOATING);
     digitalReadFast(PIN_PF0);
   #endif
 
@@ -831,7 +831,7 @@ void loop() {
     digitalWrite(PIN_PF1,HIGH);
     digitalWrite(PIN_PF1,LOW);
     openDrain(PIN_PF1,LOW);
-    openDrain(PIN_PF1,FLOAT);
+    openDrain(PIN_PF1,FLOATING);
     digitalRead(PIN_PF1);
     analogWrite(PIN_PF1,0);
     analogWrite(PIN_PF1,128);
@@ -839,7 +839,7 @@ void loop() {
     digitalWriteFast(PIN_PF1,HIGH);
     digitalWriteFast(PIN_PF1,LOW);
     openDrainFast(PIN_PF1,LOW);
-    openDrainFast(PIN_PF1,FLOAT);
+    openDrainFast(PIN_PF1,FLOATING);
     digitalReadFast(PIN_PF1);
   #endif
 
@@ -851,7 +851,7 @@ void loop() {
     digitalWrite(PIN_PF2,HIGH);
     digitalWrite(PIN_PF2,LOW);
     openDrain(PIN_PF2,LOW);
-    openDrain(PIN_PF2,FLOAT);
+    openDrain(PIN_PF2,FLOATING);
     digitalRead(PIN_PF2);
     analogWrite(PIN_PF2,0);
     analogWrite(PIN_PF2,128);
@@ -859,7 +859,7 @@ void loop() {
     digitalWriteFast(PIN_PF2,HIGH);
     digitalWriteFast(PIN_PF2,LOW);
     openDrainFast(PIN_PF2,LOW);
-    openDrainFast(PIN_PF2,FLOAT);
+    openDrainFast(PIN_PF2,FLOATING);
     digitalReadFast(PIN_PF2);
   #endif
 
@@ -871,7 +871,7 @@ void loop() {
     digitalWrite(PIN_PF3,HIGH);
     digitalWrite(PIN_PF3,LOW);
     openDrain(PIN_PF3,LOW);
-    openDrain(PIN_PF3,FLOAT);
+    openDrain(PIN_PF3,FLOATING);
     digitalRead(PIN_PF3);
     analogWrite(PIN_PF3,0);
     analogWrite(PIN_PF3,128);
@@ -879,7 +879,7 @@ void loop() {
     digitalWriteFast(PIN_PF3,HIGH);
     digitalWriteFast(PIN_PF3,LOW);
     openDrainFast(PIN_PF3,LOW);
-    openDrainFast(PIN_PF3,FLOAT);
+    openDrainFast(PIN_PF3,FLOATING);
     digitalReadFast(PIN_PF3);
   #endif
 
@@ -891,7 +891,7 @@ void loop() {
     digitalWrite(PIN_PF4,HIGH);
     digitalWrite(PIN_PF4,LOW);
     openDrain(PIN_PF4,LOW);
-    openDrain(PIN_PF4,FLOAT);
+    openDrain(PIN_PF4,FLOATING);
     digitalRead(PIN_PF4);
     analogWrite(PIN_PF4,0);
     analogWrite(PIN_PF4,128);
@@ -899,7 +899,7 @@ void loop() {
     digitalWriteFast(PIN_PF4,HIGH);
     digitalWriteFast(PIN_PF4,LOW);
     openDrainFast(PIN_PF4,LOW);
-    openDrainFast(PIN_PF4,FLOAT);
+    openDrainFast(PIN_PF4,FLOATING);
     digitalReadFast(PIN_PF4);
   #endif
 
@@ -911,7 +911,7 @@ void loop() {
     digitalWrite(PIN_PF5,HIGH);
     digitalWrite(PIN_PF5,LOW);
     openDrain(PIN_PF5,LOW);
-    openDrain(PIN_PF5,FLOAT);
+    openDrain(PIN_PF5,FLOATING);
     digitalRead(PIN_PF5);
     analogWrite(PIN_PF5,0);
     analogWrite(PIN_PF5,128);
@@ -919,7 +919,7 @@ void loop() {
     digitalWriteFast(PIN_PF5,HIGH);
     digitalWriteFast(PIN_PF5,LOW);
     openDrainFast(PIN_PF5,LOW);
-    openDrainFast(PIN_PF5,FLOAT);
+    openDrainFast(PIN_PF5,FLOATING);
     digitalReadFast(PIN_PF5);
   #endif
 
@@ -931,7 +931,7 @@ void loop() {
     digitalWrite(PIN_PG0,HIGH);
     digitalWrite(PIN_PG0,LOW);
     openDrain(PIN_PG0,LOW);
-    openDrain(PIN_PG0,FLOAT);
+    openDrain(PIN_PG0,FLOATING);
     digitalRead(PIN_PG0);
     analogWrite(PIN_PG0,0);
     analogWrite(PIN_PG0,128);
@@ -939,7 +939,7 @@ void loop() {
     digitalWriteFast(PIN_PG0,HIGH);
     digitalWriteFast(PIN_PG0,LOW);
     openDrainFast(PIN_PG0,LOW);
-    openDrainFast(PIN_PG0,FLOAT);
+    openDrainFast(PIN_PG0,FLOATING);
     digitalReadFast(PIN_PG0);
   #endif
 
@@ -951,7 +951,7 @@ void loop() {
     digitalWrite(PIN_PG1,HIGH);
     digitalWrite(PIN_PG1,LOW);
     openDrain(PIN_PG1,LOW);
-    openDrain(PIN_PG1,FLOAT);
+    openDrain(PIN_PG1,FLOATING);
     digitalRead(PIN_PG1);
     analogWrite(PIN_PG1,0);
     analogWrite(PIN_PG1,128);
@@ -959,7 +959,7 @@ void loop() {
     digitalWriteFast(PIN_PG1,HIGH);
     digitalWriteFast(PIN_PG1,LOW);
     openDrainFast(PIN_PG1,LOW);
-    openDrainFast(PIN_PG1,FLOAT);
+    openDrainFast(PIN_PG1,FLOATING);
     digitalReadFast(PIN_PG1);
   #endif
 
@@ -971,7 +971,7 @@ void loop() {
     digitalWrite(PIN_PG2,HIGH);
     digitalWrite(PIN_PG2,LOW);
     openDrain(PIN_PG2,LOW);
-    openDrain(PIN_PG2,FLOAT);
+    openDrain(PIN_PG2,FLOATING);
     digitalRead(PIN_PG2);
     analogWrite(PIN_PG2,0);
     analogWrite(PIN_PG2,128);
@@ -979,7 +979,7 @@ void loop() {
     digitalWriteFast(PIN_PG2,HIGH);
     digitalWriteFast(PIN_PG2,LOW);
     openDrainFast(PIN_PG2,LOW);
-    openDrainFast(PIN_PG2,FLOAT);
+    openDrainFast(PIN_PG2,FLOATING);
     digitalReadFast(PIN_PG2);
   #endif
 
@@ -991,7 +991,7 @@ void loop() {
     digitalWrite(PIN_PG3,HIGH);
     digitalWrite(PIN_PG3,LOW);
     openDrain(PIN_PG3,LOW);
-    openDrain(PIN_PG3,FLOAT);
+    openDrain(PIN_PG3,FLOATING);
     digitalRead(PIN_PG3);
     analogWrite(PIN_PG3,0);
     analogWrite(PIN_PG3,128);
@@ -999,7 +999,7 @@ void loop() {
     digitalWriteFast(PIN_PG3,HIGH);
     digitalWriteFast(PIN_PG3,LOW);
     openDrainFast(PIN_PG3,LOW);
-    openDrainFast(PIN_PG3,FLOAT);
+    openDrainFast(PIN_PG3,FLOATING);
     digitalReadFast(PIN_PG3);
   #endif
 
@@ -1011,7 +1011,7 @@ void loop() {
     digitalWrite(PIN_PG4,HIGH);
     digitalWrite(PIN_PG4,LOW);
     openDrain(PIN_PG4,LOW);
-    openDrain(PIN_PG4,FLOAT);
+    openDrain(PIN_PG4,FLOATING);
     digitalRead(PIN_PG4);
     analogWrite(PIN_PG4,0);
     analogWrite(PIN_PG4,128);
@@ -1019,7 +1019,7 @@ void loop() {
     digitalWriteFast(PIN_PG4,HIGH);
     digitalWriteFast(PIN_PG4,LOW);
     openDrainFast(PIN_PG4,LOW);
-    openDrainFast(PIN_PG4,FLOAT);
+    openDrainFast(PIN_PG4,FLOATING);
     digitalReadFast(PIN_PG4);
   #endif
 
@@ -1031,7 +1031,7 @@ void loop() {
     digitalWrite(PIN_PG5,HIGH);
     digitalWrite(PIN_PG5,LOW);
     openDrain(PIN_PG5,LOW);
-    openDrain(PIN_PG5,FLOAT);
+    openDrain(PIN_PG5,FLOATING);
     digitalRead(PIN_PG5);
     analogWrite(PIN_PG5,0);
     analogWrite(PIN_PG5,128);
@@ -1039,7 +1039,7 @@ void loop() {
     digitalWriteFast(PIN_PG5,HIGH);
     digitalWriteFast(PIN_PG5,LOW);
     openDrainFast(PIN_PG5,LOW);
-    openDrainFast(PIN_PG5,FLOAT);
+    openDrainFast(PIN_PG5,FLOATING);
     digitalReadFast(PIN_PG5);
   #endif
 
@@ -1051,7 +1051,7 @@ void loop() {
     digitalWrite(PIN_PG6,HIGH);
     digitalWrite(PIN_PG6,LOW);
     openDrain(PIN_PG6,LOW);
-    openDrain(PIN_PG6,FLOAT);
+    openDrain(PIN_PG6,FLOATING);
     digitalRead(PIN_PG6);
     analogWrite(PIN_PG6,0);
     analogWrite(PIN_PG6,128);
@@ -1059,7 +1059,7 @@ void loop() {
     digitalWriteFast(PIN_PG6,HIGH);
     digitalWriteFast(PIN_PG6,LOW);
     openDrainFast(PIN_PG6,LOW);
-    openDrainFast(PIN_PG6,FLOAT);
+    openDrainFast(PIN_PG6,FLOATING);
     digitalReadFast(PIN_PG6);
   #endif
 
@@ -1071,7 +1071,7 @@ void loop() {
     digitalWrite(PIN_PG7,HIGH);
     digitalWrite(PIN_PG7,LOW);
     openDrain(PIN_PG7,LOW);
-    openDrain(PIN_PG7,FLOAT);
+    openDrain(PIN_PG7,FLOATING);
     digitalRead(PIN_PG7);
     analogWrite(PIN_PG7,0);
     analogWrite(PIN_PG7,128);
@@ -1079,7 +1079,7 @@ void loop() {
     digitalWriteFast(PIN_PG7,HIGH);
     digitalWriteFast(PIN_PG7,LOW);
     openDrainFast(PIN_PG7,LOW);
-    openDrainFast(PIN_PG7,FLOAT);
+    openDrainFast(PIN_PG7,FLOATING);
     digitalReadFast(PIN_PG7);
   #endif
 
@@ -1091,7 +1091,7 @@ void loop() {
     digitalWrite(PIN_PF6,HIGH);
     digitalWrite(PIN_PF6,LOW);
     openDrain(PIN_PF6,LOW);
-    openDrain(PIN_PF6,FLOAT);
+    openDrain(PIN_PF6,FLOATING);
     digitalRead(PIN_PF6);
     analogWrite(PIN_PF6,0);
     analogWrite(PIN_PF6,128);
@@ -1099,7 +1099,7 @@ void loop() {
     digitalWriteFast(PIN_PF6,HIGH);
     digitalWriteFast(PIN_PF6,LOW);
     openDrainFast(PIN_PF6,LOW);
-    openDrainFast(PIN_PF6,FLOAT);
+    openDrainFast(PIN_PF6,FLOATING);
     digitalReadFast(PIN_PF6);
   #endif
 
@@ -1111,7 +1111,7 @@ void loop() {
     digitalWrite(PIN_PF7,HIGH);
     digitalWrite(PIN_PF7,LOW);
     openDrain(PIN_PF7,LOW);
-    openDrain(PIN_PF7,FLOAT);
+    openDrain(PIN_PF7,FLOATING);
     digitalRead(PIN_PF7);
     analogWrite(PIN_PF7,0);
     analogWrite(PIN_PF7,128);
@@ -1119,7 +1119,7 @@ void loop() {
     digitalWriteFast(PIN_PF7,HIGH);
     digitalWriteFast(PIN_PF7,LOW);
     openDrainFast(PIN_PF7,LOW);
-    openDrainFast(PIN_PF7,FLOAT);
+    openDrainFast(PIN_PF7,FLOATING);
     digitalReadFast(PIN_PF7);
   #endif
   for (uint8_t pin=0;pin < NUM_DIGITAL_PINS;pin++) {
@@ -1129,7 +1129,7 @@ void loop() {
     digitalWrite(pin,HIGH);
     digitalWrite(pin,LOW);
     openDrain(pin,LOW);
-    openDrain(pin,FLOAT);
+    openDrain(pin,FLOATING);
     digitalRead(pin);
     analogWrite(pin,0);
     analogWrite(pin,128);
