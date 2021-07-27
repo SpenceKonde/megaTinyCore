@@ -593,7 +593,6 @@ Or
 #define wdt_reset() __asm__ __volatile__ ("wdr"::)
 ```
 
-```
 ### The wrong way to reset from software
 I have seen people throw around `asm volatile("jmp 0");` as a solution to a need to reset from software. Don't do that - all compiled C code makes assumptions about the state from which it is run. Jumping to 0 from a running application violates several of them unless you take care to avoid those pitfalls. Both Optiboot and the init() method of megaTinyCore make assumptions about the state of peripheral registers as well (namely, that they're in their reset configuration when it starts). Now that we finally have a right way to do software reset, use it!
 
