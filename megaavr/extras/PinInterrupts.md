@@ -12,7 +12,7 @@ If your sketch or any library it included calls attachInterrupt(), it takes cont
 
 The most problematic library that uses attachInterrupt is SoftwareSerial (simply because it is most widely used - also it's awful in many ways).
 
-Note that this means that any library that needs to directly define a pin interrupt (for example, to minimize code size or meet response time requirements) is incompatible with any library that uses attachInterrupt, and vise versa. This is an unfortunate consequence of the design decisions made when the attachInterrupt API was written by Arduino. Short of a time machine, there is no hope to change this other than adapting one of them to use the same method as the other one does to create pin interrupts.
+Note that this means that any library that needs to directly define a pin interrupt (for example, to minimize code size or meet response time requirements) is incompatible with any library that uses attachInterrupt, and vice versa. This is an unfortunate consequence of the design decisions made when the attachInterrupt API was written by Arduino. Short of a time machine, there is no hope to change this other than adapting one of them to use the same method as the other one does to create pin interrupts.
 
 **The methods described below are for manually implementing performant flash-efficient pin interrupts that do not use attachInterrupt(), which is fully is covered by the official Arduino reference** except that they don't talk about the response time or the flash usage compared to doing it yourself.
 

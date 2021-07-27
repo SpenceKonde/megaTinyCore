@@ -1,4 +1,3 @@
-
 #include <USERSIG.h>
 #define watchdogReset()  __asm__ __volatile__ ("wdr\n");
 #include "util/delay.h"

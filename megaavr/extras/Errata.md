@@ -36,7 +36,7 @@ Restart Will Reset TCA Counter Direction in NORMAL and FRQ Mode       |    1   |
 Open-Drain Mode Does Not Work When TXD is Configured as Output        |    2   |      X      |      X     | Universally present on modern AVRs.
 Start-of-Frame Detection Can Be Enabled in Active Mode When RXCIF Is 0|    2   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
 
-Note that a very different errata sheet for a Rev. D of the 16k parts was distributed, with a number of issues impacting the new ADC. However, after that was published, the relevant decision makers came to their senses (whether due to customer backlash, the discovery of a more troubling issue that they never publically disclosed in Rev. D, or saner heads prevailing in general is left to our imagination). The Rev. D "was not released to production", and those issues are all gone from the released Rev. E.
+Note that a very different errata sheet for a Rev. D of the 16k parts was distributed, with a number of issues impacting the new ADC. However, after that was published, the relevant decision makers came to their senses (whether due to customer backlash, the discovery of a more troubling issue that they never publicly disclosed in Rev. D, or saner heads prevailing in general is left to our imagination). The Rev. D "was not released to production", and those issues are all gone from the released Rev. E.
 
 
 ## tinyAVR 1-series

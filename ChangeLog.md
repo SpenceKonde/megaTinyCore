@@ -31,7 +31,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Important info links to almiost all important info.
 * Readme covers watchdog timer more thoroughly, including how to reset it.
 * Added page from which you can view the io headers through the github documentation, because it's a pain to dig for them on your local machine, and you'll inevitably want to have them at the ready.
-* Errata section upatend with recently discovered bugs. Chenged my asssment of the severity of a number of the bugs (for example, the RTC bugs are much higher severity now, because I have watched someone trying to figurte out how the hell the RTC worked; it wasnt pretty.)
+* Errata section upatend with recently discovered bugs. Changed my asssment of the severity of a number of the bugs (for example, the RTC bugs are much higher severity now, because I have watched someone trying to figurte out how the hell the RTC worked; it wasn't pretty.)
 
 ### 2.3.2
 * Expand Keywords.txt to include register names! (#386)

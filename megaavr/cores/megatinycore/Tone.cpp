@@ -89,7 +89,7 @@ My tentative ruling is that:
     that would have to be used before the library is #included; that file could check for ARDUINO_MAIN, and define
     the ISRs if and only if it is (otherwise it would cause multiple definition error if included by sketch and other library).
     Another approach would have the functions to control the tone output driven by each timer each in a separate file, or have
-    multiple instances of a TCB tone class, each instantiated in it's own file. The stock core has done thsi with the
+    multiple instances of a TCB tone class, each instantiated in it's own file. The stock core has done this with the
     HardwareSerial class since the dawn of time. Thus also not creating ISRs for timers we're not 'tone()ing' with.
     The separate files would also provide an efficient means of keeping the variables that track the state of each
     timer's tons separate..
@@ -237,7 +237,7 @@ My tentative ruling is that:
         *(timer_outtgl_reg - 1) = timer_bit_mask; // digitalWrite(_pin, LOW); (write outclr for old pin)
       }
       // whether or not we _were_ using a pin, we are now, so configure the new one as an output...
-      PORT_t *port             = digitalPinToPortStruct(pin);           // Since not known at compiletime, use PORTs not VPORTS.
+      PORT_t *port             = digitalPinToPortStruct(pin);           // Since not known at compile time, use PORTs not VPORTS.
       timer_bit_mask           = bit_mask;                              // We no longer need old pin's bit_mask
       timer_outtgl_reg         = (volatile uint8_t *) &(port->OUTTGL);  // or toggle register.
       *(timer_outtgl_reg - 1)  = bit_mask;                              // digitalWrite(pin, LOW);

@@ -1,5 +1,5 @@
 # [Arduino CLI] Installation & Management through CLI
-If you are using the Arduino-cli, megaTinyCore can be used without much difficulty. The only complication is that you need to select values from all the tools menus... from the command line. This is done using the FQBN. It is not recommended to omit menus from that list. The rest of the core is written under the assumption that all are specified. Some have implicit default. Others do not. Any implicit default may not match normal menu default or your expectations. Furture versions of the core may explicitly prevent compilation when menus are omitted in this way, as it suggests an invalid core configuration.
+If you are using the Arduino-cli, megaTinyCore can be used without much difficulty. The only complication is that you need to select values from all the tools menus... from the command line. This is done using the FQBN. It is not recommended to omit menus from that list. The rest of the core is written under the assumption that all are specified. Some have implicit default. Others do not. Any implicit default may not match normal menu default or your expectations. Future versions of the core may explicitly prevent compilation when menus are omitted in this way, as it suggests an invalid core configuration.
 Credit for the following guide goes to @dattasaurabh82 - THANKS!
 
 ## 1. Install latest Arduino-cli
@@ -73,7 +73,7 @@ Now we have to basically chain these key value pairs, comma separating each key 
 
 `...FQBN:<fuse_uption1>=<fuse_uotion1_value>,<fuse_uption2>=<fuse_uotion2_value>,..`
 
-3.3. So expanding on the example further, the options that I listed above, if I had to chain the specific fuse detail), following will be the command to compile teh sketch in the sketch directory:
+3.3. So expanding on the example further, the options that I listed above, if I had to chain the specific fuse detail), following will be the command to compile the sketch in the sketch directory:
 
 ```
 arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,uartvoltage=skip --output-dir ./build/
