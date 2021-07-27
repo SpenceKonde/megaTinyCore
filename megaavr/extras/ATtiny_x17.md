@@ -29,17 +29,18 @@ These parts do not support an external HF crystal, only an external clock, and/o
   20 | Internal, tuned |
   16 | Internal, tuned |
   12 | Internal, tuned |
-  20 | External Clock  |
-  16 | External Clock  |
-  10 | External Clock  |
-   8 | External Clock  |
+  20 | External Clock  | External clock goes to CLKI (PA3). Minimize any load on this pin, including even short wires. HF stuff is very picky.
+  16 | External Clock  | As above.
+  10 | External Clock  | As above.
+   8 | External Clock  | As above.
   24 | Internal, tuned | OVERCLOCKED, usually fine @ 5v and room temperature.
   25 | Internal, tuned | OVERCLOCKED, usually fine @ 5v and room temperature.
   30 | Internal, tuned | OVERCLOCKED, may be unstable.
-  24 | External Clock  | OVERCLOCKED, usually fine @ 5v and room temperature.
-  25 | External Clock  | OVERCLOCKED, usually fine @ 5v and room temperature.
-  30 | External Clock  | OVERCLOCKED, may be unstable.
-  32 | External Clock  | OVERCLOCKED, may be unstable.
+  24 | External Clock  | OVERCLOCKED, usually fine @ 5v and room temperature. Uses CLKI/PA3 as above.
+  25 | External Clock  | OVERCLOCKED, usually fine @ 5v and room temperature. Uses CLKI/PA3 as above.
+  30 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
+  32 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
+When external clock is used as system clock source, it cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
 
 * The overclocked options at 24/25 MHz have been found to generally work around room temperature when running at 5v. The faster ones - while they can be stable with solid 5v supply at room temperature, this is right on the edge of what these parts can do. I have specimens that will run at 5.0v but not at 4.8, for example, meaning that it would work powered by some USB ports, but not others (those range from 4.7 to 5.3v) and they are of course extremely sensitive to noise on power rails. External oscillators work more reliably than the internal one when overclocking, but they generally cost about as much as the microcontroller itself and are gross overkill (in terms of accuracy) for what most arduino folks want from them.
 

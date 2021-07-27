@@ -17,29 +17,31 @@ Timer Type D | Yes | Yes
 Interfaces | UART, SPI, I2C | UART, SPI, I2C
 
 ## Clock Options
-These parts do not support an external HF crystal, only an external clock, and/or a watch crystak for the RTC.
- MHz | Source
-  20 | Internal, no tuning
-  16 | Internal, no tuning
-  10 | Internal, no tuning
-   8 | Internal, no tuning
-   5 | Internal, no tuning
-   4 | Internal, no tuning
-   1 | Internal, no tuning
-  20 | Internal, tuned
-  16 | Internal, tuned
-  12 | Internal, tuned
-  20 | External Clock
-  16 | External Clock
-  10 | External Clock
-   8 | External Clock
-  24 | Internal, tuned OVERCLOCKED
-  25 | Internal, tuned OVERCLOCKED
-  30 | Internal, tuned OVERCLOCKED
-  24 | External Clock (OVERCLOCKED)
-  25 | External Clock (OVERCLOCKED)
-  30 | External Clock (OVERCLOCKED)
-  32 | External Clock (OVERCLOCKED, likely unstable)
+These parts do not support an external HF crystal, only an external clock. No watch crystal on 8-pin parts.
+ MHz | Source          | Notes
+ ----|-----------------|-------
+  20 | Internal        |
+  16 | Internal        |
+  10 | Internal        |
+   8 | Internal        |
+   5 | Internal        |
+   4 | Internal        |
+   1 | Internal        |
+  20 | Internal, tuned |
+  16 | Internal, tuned |
+  12 | Internal, tuned |
+  20 | External Clock  | External clock goes to CLKI (PA3). Minimize any load on this pin, including even short wires. HF stuff is very picky.
+  16 | External Clock  | As above.
+  10 | External Clock  | As above.
+   8 | External Clock  | As above.
+  24 | Internal, tuned | OVERCLOCKED, usually fine @ 5v and room temperature.
+  25 | Internal, tuned | OVERCLOCKED, usually fine @ 5v and room temperature.
+  30 | Internal, tuned | OVERCLOCKED, may be unstable.
+  24 | External Clock  | OVERCLOCKED, usually fine @ 5v and room temperature. Uses CLKI/PA3 as above.
+  25 | External Clock  | OVERCLOCKED, usually fine @ 5v and room temperature. Uses CLKI/PA3 as above.
+  30 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
+  32 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
+When external clock is used as system clock source, it cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
 
 The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Tuning.md) for more information before using these options.
 
