@@ -284,9 +284,9 @@ void noTone(__attribute__ ((unused)) uint8_t pin) {
     configuration it had on startup */
 static void disableTimer() {
   _timer->CTRLA     = 0; // disable timer
-  _timer->INTCTRL   = 0; // disable the timer  interrupts, otherwise if something else configures it and assumes that it's in the reset configuration
-  // and so doesn't write INTCTRL (because it doesn't use interrupts), a nonexistent interrupt vector would be called, ungracefully hanging the system.
-  _timer->INTFLAGS  = 0xFF; // Make sure the flags are cleared (flags can be set without their interrupt being enabled, these will fire as soon as it is.
+  _timer->INTCTRL   = 0; // disable the timer interrupts, otherwise if something else configures it and assumes that it's in the reset configuration
+  // and so doesn't write INTCTRL (because it doesn't use interrupts), the tone ISR could be called inappropriately.
+  _timer->INTFLAGS  = 0xFF; // Make sure the flags are cleared (flags can be set without their interrupt being enabled, these will fire as soon as it is)
   _pin              = NOT_A_PIN; // and clear _pin.
   #if defined(ENABLE_TCB_PWM) && ENABLE_TCB_PWM == 1
     // RESTORE PWM FUNCTIONALITY, for use with cores that use the TCBs for PWM.
@@ -298,9 +298,7 @@ static void disableTimer() {
     _timer->CTRLA = (TCB_CLKSEL_CLKTCA_gc) | (TCB_ENABLE_bm); // Use TCA clock (250kHz) and enable
   #endif
   *(timer_outtgl_reg - 1) = timer_bit_mask; // Write OUTCLR, so we are sure to end with pin LOW.
-  }
-#endif
-
+}
 
 #if !defined(TONE_UNAVAILABLE)
   #if defined(USE_TIMERB0)
