@@ -18,7 +18,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-  -------- ----------- -------- --------
+  -------- ----------- --------------------------------------------------------------------------------------
    0001    B Hagman    09/08/02 Initial coding
    0002    B Hagman    09/08/18 Multiple pins
    0003    B Hagman    09/08/18 Moved initialization from constructor to begin()
@@ -50,27 +50,66 @@
                        - simply reoved the 2* altogether and divide by 500 at end instead
                        of 1000.
                        Long tones (where frequency * duration > 2.145 billion resulted in an
-                       intermediate overflowing before the divide by 1000. removing the 2* doubled this limit.
-                       But high frequencies and long durations (where frequency * duration would overflow
-                       a unsigned long) still break it. I added a way to distribute the division before
-                       the multiplication if the duration was long enough to start worrying about. But I
-                       decided not to enable by default, it is SUPPORT_LONG_TONES - if defined and 1,
-                       when duration is over 2^16, we split that line into (frequency/5) * (duration/100)
-                       This version was developed for DxCore 1.3.3 and megaTinyCore 2.3.0
-1.3.6                   4/17/21 Fixed bug that would break compilation of all sketches if
-                       TCB0 was used for millis on partss without a TCB1. Now, we intentionally break
+                       intermediate overflowing before the divide by 1000. removing the
+                       2* doubled this limit. But high frequencies and long durations (where
+                       frequency * duration would overflow a unsigned long) still break it.
+                       I added a way to distribute the division before the multiplication
+                       if the duration was long enough to start worrying about. But I decided
+                       not to enable by on all parts - it is SUPPORT_LONG_TONES - if defined
+                       and 1, when duration is over 2^16, we split that line into
+                       (frequency/5) * (duration/100) This version was developed for DxCore
+                        1.3.3 and megaTinyCore 2.3.0. The former always uses the bulkier
+                       implementation, while the latter does only on parts with 16k+ flash.
+1.3.6      S Konde      4/17/21 Fixed bug that would break compilation of all sketches if TCB0
+                       was used for millis on parts without a TCB1. Now, we intentionally break
                        the compilation only if the user code actually calls tone() or noTone()
                        This version was developed for DxCore 1.3.6 and megaTinyCore 2.3.2
-  *************************************************/
+1.3.7      S Konde      7/21/21 reorganized code, improved comments. caught a couple of corner
+                       cases which could cause odd behavior in obscure cases. Added a check
+                       for ENABLE_TCB_PWM which will turn the restoration of PWM mode on and
+                       off - will make it easier to move this to DxCore without breakage.
+                       I think the cleanup more or less exactly got enough flash back that
+                       the coverage of corner cases cost.
+  **********************************************************************************************************/
+/************************************************************************************************************
+    S. Konde 7/21/21:
+I have to wonder a few things here:
+  1. We have option for available tone pins, though very little of whatever else
+      would have been needed to support it is present. I guess on DxCore, that *could*
+      be increased, but a great deal of plumbing for it would also be needed - multiple pins, multiple timers...
+      Generally "a damned big deal" to implement, with a large number of design decisions.
+      What is strange is that I can find no sign of Arduino having supported more than one simultaneous tone pin, which
+      is the only case where this #define makes sense. to have.
+  2. In light of the fact that tone does not let you output multiple tones on multiple pins at once, one could
+      argue that noTone() should shut off the tone and ignore the argument. But the official API says ignore
+      noTone(wrong_pin)
+My tentative ruling is that:
+  A. Any polyphonic tone functionality belongs in a library, tone should never have AVAILABLE_TONE_PINS =/= 1.
+    - or possibly several libraries. One approach would be to conditionally compile the ISRs for timers based on a #define
+    that would have to be used before the library is #included; that file could check for ARDUINO_MAIN, and define
+    the ISRs if and only if it is (otherwise it would cause multiple definition error if included by sketch and other library).
+    Another approach would have the functions to control the tone output driven by each timer each in a separate file, or have
+    multiple instances of a TCB tone class, each instantiated in it's own file. The stock core has done thsi with the
+    HardwareSerial class since the dawn of time. Thus also not creating ISRs for timers we're not 'tone()ing' with.
+    The separate files would also provide an efficient means of keeping the variables that track the state of each
+    timer's tons separate..
+    I suspect that one could do worse than using this file, with liberal addition of the static keyword, as a basis
+    for those timer-specific tone() libraries. Personally, I don't feel like I have a good idea of what features
+    would be desirable for a tone library of that sort. I'm not an audio guy, and I have never connected a buzzer to
+    an MCU. I test these libraries with the 'scope (hell, I wouldn't be able to tell a 1kHz tone from a hole in the
+    ground without looking at it). In that hypothetical library, one design decision would have to be how to deal with
+    the most important part, that being turning the noisy thing off - basically, whether to implement multiTone() and
+    noMultiTone(pin), or to have things like `toneTimerTCB0.tone()/toneTimerTCB0.noTone()`. I am inclined
+    to think the second approach is a more sound one. If anytone wants to write such a librarty, I'm haoppy to adcise
+  B. For the default noTone() that does not involve a library, pin should he required. Arguanbly there should be  two
+    versions of it, with and without a pin argument, where ther latter would shut down tone wherever it is.
+    ************************************************************************************************************/
 
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include "Arduino.h"
 #include "pins_arduino.h"
 
-/* For more than one tone, change AVAILABLE_TONE_PINS and uncomment the correct
-    number of timers
-*/
 #define AVAILABLE_TONE_PINS 1
 
 #if defined(MILLIS_USE_TIMERB0)
@@ -111,9 +150,8 @@
 
 // frequency (in hertz) and duration (in milliseconds).
 #ifndef TONE_UNAVAILABLE
-  void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
+  void tone(uint8_t pin, unsigned int frequency, unsigned long duration) {
     // Believe it or not, we don't need to turn off interrupts!
-  {
     if (frequency == 0) {
       noTone(pin);
       /* turn it off (frequency 0, right? Note that this won't do anything
@@ -192,80 +230,73 @@
     // Anyway - so we know that the new pin is valid....
     if (_pin != pin) {  // ...let's see if we're using it already.
       if (_pin != NOT_A_PIN) { // If not - were we using one before?
-        // If we are we're gonna be in a world of hurt if we don'rt
+        // If we were, we're gonna be in a world of hurt if we don't
         // turn it off before we actually start reconfiguring stuff
-        *(timer_outtgl_reg - 5) = timer_bit_mask; // pinMode(_pin, INPUT);    (write dirclr for old pin)
+        // *(timer_outtgl_reg - 5) = timer_bit_mask; // pinMode(_pin, INPUT);    (write dirclr for old pin)
+        // Apparently maybe it is indended for the pin to be left as an output?
         *(timer_outtgl_reg - 1) = timer_bit_mask; // digitalWrite(_pin, LOW); (write outclr for old pin)
       }
       // whether or not we _were_ using a pin, we are now, so configure the new one as an output...
-      PORT_t *port            = digitalPinToPortStruct(pin);
-      timer_bit_mask          = bit_mask; // nor it's bitmask/
-      timer_outtgl_reg        = (volatile uint8_t *) &(port->OUTTGL);
-      *(timer_outtgl_reg - 1) = bit_mask; // digitalWrite(pin, LOW); (write outclr for new pin)
-      *(timer_outtgl_reg - 6) = bit_mask; // pinMode(pin, OUTPUT);   (write dirset for new pin)
+      PORT_t *port             = digitalPinToPortStruct(pin);           // Since not known at compiletime, use PORTs not VPORTS.
+      timer_bit_mask           = bit_mask;                              // We no longer need old pin's bit_mask
+      timer_outtgl_reg         = (volatile uint8_t *) &(port->OUTTGL);  // or toggle register.
+      *(timer_outtgl_reg - 1)  = bit_mask;                              // digitalWrite(pin, LOW);
+      *(timer_outtgl_reg - 6)  = bit_mask;                              // pinMode(pin, OUTPUT);
     }
     // Save the results of our calculations
-    timer_toggle_count        = toggle_count;
-    timer_cycle_per_tgl       = 1 << divisionfactor; //1, 2, 4, 8, 16, 32, or 64 - toggle pin once per this many cycles
-    timer_cycle_per_tgl_count = timer_cycle_per_tgl;
-    _timer->CCMP              = compare_val; // and each cycle is this many timer ticks long
-    _timer->CTRLB             = TCB_CNTMODE_INT_gc;
-    _timer->CNT               = 0; //not strictly necessary, but ensures there's no glitch.
-    _pin                      = pin;
-    _timer->INTCTRL           = TCB_CAPTEI_bm; // Enable the interrupt (flag is already cleared)
-    _timer->CTRLA            |= TCB_ENABLE_bm; // Enable timer
+    timer_toggle_count         = toggle_count;
+    timer_cycle_per_tgl        = 1 << divisionfactor;     // 1, 2, 4, 8, 16, 32, or 64 - toggle pin once per this many cycles...
+    timer_cycle_per_tgl_count  = timer_cycle_per_tgl;     // running count of remaining toggle cycles.
+    _timer->CCMP               = compare_val;             // ...and each cycle is this many timer ticks long
+    _timer->CTRLB              = TCB_CNTMODE_INT_gc;      // Set mode to Periodic Interrupt mode.
+    _timer->CNT                = 0;                       // Not strictly necessary, but ensures there's no glitch.
+    _pin                       = pin;                     // Record new pin number.
+    _timer->INTCTRL            = TCB_CAPTEI_bm;           // Enable the interrupt (flag is already cleared)
+    _timer->CTRLA             |= TCB_ENABLE_bm;           // Everything is ready - Enable timer!
   }
 #else
-  void tone(__attribute__ ((unused)) uint8_t pin, __attribute__ ((unused)) unsigned int frequency, __attribute__ ((unused)) unsigned long duration)
-  {
+  void tone(__attribute__ ((unused)) uint8_t pin, __attribute__ ((unused)) unsigned int frequency, __attribute__ ((unused)) unsigned long duration) {
     badCall("TCB0 used for millis, no other TCBs on this part; tone requires exclusive use of a type B timer, use a differemt millis timer or a tinyAVR with a second TCB (any 2-series, or 1-series with 16k+ flash)");
   }
 #endif
 
 // pin which currently is being used for a tone
 #ifndef TONE_UNAVAILABLE
-void noTone(uint8_t pin)
-  {
+void noTone(uint8_t pin) {
     if (pin == _pin) {
-        timer_toggle_count = 0;
-        //disableTimer();
-        // Keep pin low after disabling of timer
-         *(timer_outtgl_reg - 6) = timer_bit_mask; // drive pin low
-        _pin = NOT_A_PIN;
+      uint8_t old_SREG = SREG;  // Save SREG
+      cli();                    // Interrupts off
+      timer_toggle_count = 0;   // clear this one
+      _pin = NOT_A_PIN;
+      disableTimer(); // End with pin LOW, otherwise can damage some speakers.
+      SREG = old_SREG;
     }
   }
 #else
-void noTone(__attribute__ ((unused)) uint8_t pin)
-  {
+void noTone(__attribute__ ((unused)) uint8_t pin) {
     badCall("TCB0 used for millis, no other TCBs on this part; tone requires exclusive use of a type B timer, use a differemt millis timer or a tinyAVR with a second TCB (any 2-series, or 1-series with 16k+ flash)");
   }
 #endif
 
-// helper function for noTone()
+// helper functiodn for ending tone.
 /* Works for all timers -- the timer being disabled will go back to the
     configuration it had on startup */
-#ifndef TONE_UNAVAILABLE
-static void disableTimer()
-{
-  // Reinit back to producing PWM -- timer will be type B
-  // Disable interrupt
-  _timer->CTRLA     = 0;
-  _timer->INTCTRL   = 0;
-  _timer->INTFLAGS  = _timer->INTFLAGS;
-  // Disable timer
-  _pin              = NOT_A_PIN;
-  #if 1
+static void disableTimer() {
+  _timer->CTRLA     = 0; // disable timer
+  _timer->INTCTRL   = 0; // disable the timer  interrupts, otherwise if something else configures it and assumes that it's in the reset configuration
+  // and so doesn't write INTCTRL (because it doesn't use interrupts), a nonexistent interrupt vector would be called, ungracefully hanging the system.
+  _timer->INTFLAGS  = 0xFF; // Make sure the flags are cleared (flags can be set without their interrupt being enabled, these will fire as soon as it is.
+  _pin              = NOT_A_PIN; // and clear _pin.
+  #if defined(ENABLE_TCB_PWM) && ENABLE_TCB_PWM == 1
     // RESTORE PWM FUNCTIONALITY, for use with cores that use the TCBs for PWM.
-    // Depending on if the
-    /* 8 bit PWM mode, but do not enable output yet, will do in analogWrite() */
-    _timer->CTRLB = (TCB_CNTMODE_PWM8_gc);
-    /* Assign 8-bit period */
-    _timer->CCMPL = PWM_TIMER_PERIOD; // default duty 50%, set when output enabled
-    _timer->CCMPH = PWM_TIMER_COMPARE; // legal even with errata because low written before high
-    /* Use TCA clock (250kHz) and enable */
-    /* no sync update - errata has left the TCA <-> TCB syncing has silicon bugs on most hardware anyway */
-    _timer->CTRLA = (TCB_CLKSEL_CLKTCA_gc) | (TCB_ENABLE_bm);
+    // This section adds 12 words of flash and as many clock cycles, and could probably be done less expensively if the compiler was smarter about
+    // using ldd/std when it offered a speed/flash advantage. But it isn't, so it doesn't. =
+    _timer->CTRLB = (TCB_CNTMODE_PWM8_gc); // 8 bit PWM mode, but do not enable output yet, will do in analogWrite()
+    _timer->CCMPL = PWM_TIMER_PERIOD;      // Assign 8-bit period, probably 254.
+    _timer->CCMPH = PWM_TIMER_COMPARE;     // We need to set low byte in order for high byte to be written (see silicon errata).
+    _timer->CTRLA = (TCB_CLKSEL_CLKTCA_gc) | (TCB_ENABLE_bm); // Use TCA clock (250kHz) and enable
   #endif
+  *(timer_outtgl_reg - 1) = timer_bit_mask; // Write OUTCLR, so we are sure to end with pin LOW.
   }
 #endif
 
@@ -277,20 +308,15 @@ static void disableTimer()
   ISR(TCB1_INT_vect)
   #endif
   {
-    if(!(--timer_cycle_per_tgl_count)) //Are we ready to toggle? pre-decrement, then see if 0 or more
-    {
-      timer_cycle_per_tgl_count=timer_cycle_per_tgl;
-      // toggle the pin
-      *timer_outtgl_reg = timer_bit_mask; //toggle the pin
-
-      if (timer_toggle_count > 0){  //if duration was specified, decrement toggle count.
+    if (!(--timer_cycle_per_tgl_count)) { //Are we ready to toggle? pre-decrement, then see if we're at 0 yet.
+      timer_cycle_per_tgl_count   = timer_cycle_per_tgl;  // reset countdown
+      *timer_outtgl_reg           = timer_bit_mask;       // toggle the pin
+      if (timer_toggle_count > 0) {  //if duration was specified, decrement toggle count.
           timer_toggle_count--;
-      } else if (timer_toggle_count == 0) {    // If toggle count = 0, stop
-        *(timer_outtgl_reg-1) = timer_bit_mask; // this gives us the corresponding OUTCLR reg
+      } else if (timer_toggle_count == 0) {       // If toggle count = 0 we are done.
         disableTimer();
-      } //otherwise timer_toggle_count wasn't supplied, go on until noTone() called
+      } //  otherwise timer_toggle_count wasn't supplied, go on until noTone() called
     }
-    /* Clear flag */
-    _timer->INTFLAGS = TCB_CAPT_bm;
+    _timer->INTFLAGS = TCB_CAPT_bm; // Clear flag
   }
 #endif

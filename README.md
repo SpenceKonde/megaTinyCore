@@ -549,19 +549,47 @@ The core also provides An and PIN_An constants (where n is a number from 0 to 11
 
 ## Triggering a reset from software
 
-As noted above in the discussion of the shared UPDI/reset pin, these parts support a native software reset operation; on classic AVRs, the only way was to enable the watchdog timer, and then wait for it to time out. With the "modern" AVR devices, there are two ways to trigger a reset from software: A watchdog timer reset (as before), and the native software reset. Unlike classic AVRs, after a WDT reset, the watchdog timer is not forced on. These two methods of resetting the chip allow you to signal to the application or bootloader what sort of condition triggered the reset. Additionally, while the bootloader, if used (see below) will run after a software reset, it will NOT run after a watchdog reset (well - it will run, but only for an instant before it sees that it was restarted by the WDT, meaning either the bootloader just ran, finished, and reset the device (better jump to app code, that the application suffered from a WDT timeout or that the application intentionally triggered a WDT reset. None of those are "entry conditions" for Optiboot - in that case, Optiboot jumps to the app immediately.
+As noted above in the discussion of the shared UPDI/reset pin, these parts support a native software reset operation; on classic AVRs, the only way was to enable the watchdog timer, and then wait for it to time out. With the "modern" AVR devices, there are two ways to trigger a reset from software: A watchdog timer reset (as before), and the native software reset. Unlike classic AVRs, after a WDT reset, the watchdog timer is not forced on with the minimum timeout (on classic devices, this is why doing a WDT restart wirh very old bootloaders instead hung the board - the bootloader wasn't smart enough to turn it off before it was reset by it.). These two methods of resetting the chip allow you to signal to the application or bootloader what sort of condition triggered the reset.
 
-This allows the application a convenient mechanism to restart itself without having to potentially wait through the bootloader attempting to communicate with whatever is connected to the serial port. The method shown below also resets the part significantly faster utilizing the "window" WDT functionality - that is, by telling the chip to reset if it receives a WDR instruction too soon - and then repeatedly sending that instruction until it resets.
+Additionally, while the bootloader, if used (see below) will run after a software reset, it will NOT run after a watchdog reset (well - it will run, but only long enough to read the reset flag register and see that it was restarted by the WDT: That means that either the bootloader just ran, finished, and reset the device (If we didn't jump to the app in this case, we'd just sit in the bootloader doing WDT resets forever), that the application suffered from a WDT timeout due to a bug or adverse conditions (that's not the bootloader's business to get involved in) or that the application intentionally triggered a WDT reset. None of those are "entry conditions" for Optiboot - so Optiboot jumps to the app immediately).This allows the application a convenient mechanism to restart itself without having to potentially wait through the bootloader attempting to communicate with whatever is connected to the serial port.
 
+
+Note: While the windowed mode would at first seem to suggest that you could reset much faster by setting it and then executing `WDR` until it resets from missing the window, you don't gain nearly as much as you'd think. First, the initial WDR needs to be syncronized - 2-3 WDT clocks, ie, 2-3 ms. Additional WDRs executed while this is happening are ignored. Only when the second WDR makes it to the watchdog timer domain will it reset the system. So the overall time to restart is 6-9ms. Instead 10-11 ms (sync delay + minimum timeout).
 ```c++
 void resetViaWDT() {
-    _PROTECTED_WRITE(WDT.CTRLA,0x01); //enable the WDT, minimum timeout
-    while (1) ; // spin until reset
+  _PROTECTED_WRITE(WDT.CTRLA,WDT_PERIOD_8CLK_gc); //enable the WDT, minimum timeout
+  while (1); // spin until reset
+}
+
+```c++
+void resetViaWDTFaster() {
+  _PROTECTED_WRITE(WDT.CTRLA,WDT_WINDOW_8CLK_gc | WDT_PERIOD_8CLK_gc); //enable the WDT, minimum timeout, minimum window.
+  while (1) __asm__ __volatile__ ("wdr"::); // execute WDR's until reset. The loop should in total take 3 clocks (the compiler will implement it as wdr, rjmp .-4), but because of the sync to the relatively slow
 }
 
 void resetViaSWR() {
-    _PROTECTED_WRITE(RSTCTRL.SWRR,1);
+  _PROTECTED_WRITE(RSTCTRL.SWRR,1);
 }
+```
+
+### Using watchdog to reset when hung
+If you only worked with the watchdog timer as an Arduino user - you might not even know why it's called that, or what the original concept was, and just know it as that trick to do a software reset on classic AVRs, and as a way to generate periodic interrupts. The "purpose" of a watchdog timer is to detect when the part has become hung - either because it's wound up in an infinite loop due to a bug, or because it wound up in a bad state due to a glitch on the power supply or other adverse hardware event, has been left without a clock by an external clock source failing, went to sleep waiting for some event which doesn't end up happening (or without correctly enabling whatever is supposed to wake it up) - and issue a reset. It is often anthropomorphized as a dog, who needs to be "fed" or "pet" periodically, or else he will "bite" (commonly seen in comments - the latter generally only when intentionally triggering it, as in `while (1); //wait for the watchdog to bite`).
+
+A typical use of this is to have the main loop (generally loop() in an Arduino sketch) reset the watchdog at the start or end of each loop, so when a function it calls ends up hung, we can
+
+
+
+```c
+// As a function
+void wdt_reset() {
+  __asm__ __volatile__ ("wdr"::);
+}
+```
+Or
+```c
+// as a macro (which is all that wdt.h does)
+#define wdt_reset() __asm__ __volatile__ ("wdr"::)
+```
 
 ```
 ### The wrong way to reset from software
@@ -670,16 +698,23 @@ If the UPDI/Reset pin option was set to reset, you must reset the chip via the r
 The bootloader will wait for 1 or 8 seconds for an upload if it resets and the entry conditions are met:
 * If a configuration with a reset pin was selected, the `_rst` version will be installed. It will run after a hardware (reset pin), software reset (see above), or UPDI-reset (ie, immediately after bootloading) only.
 * Otherwise, it will run after any of those, as well as power on reset.
-* A brownout which causes the BOD to trigger, but where the voltage on the power rails does not fall below approx. 1.25v (which would trigger the "POR rearm") is NOT an entry condition. Yes, this could be from someone attempting to power cycle it to start the bootloader and underestimating how long their capacitors would hold a charge for, which is a time when we would want to enter the bootloader. It could also indicate a flaky power supply or weak batteries, which most definitely is not.
+* A brownout which causes the BOD to trigger, but where the voltage on the power rails does not fall below approx. 1.25v (which would trigger the "POR rearm") is NOT an entry condition. Yes, this could be from someone attempting to power cycle it to start the bootloader and underestimating how long their capacitors would hold a charge for, which is a time when we would want to enter the bootloader - however, it could also indicate a flaky power supply or weak batteries, in which case we probably don't want to enter the bootloader.
 * A software reset is always an entry condition. If you need a reset from software that doesn't run the bootloader, trigger a watchdog reset instead (covered in same section of this readme as software resets).
-* A watchdog reset is never an entry condition. The WDT is how Optiboot resets when it's either timed out (actually, the thing that times out *is* the watchdog timer) or finished uploading.
+* A watchdog reset is never an entry condition. The WDT is how Optiboot resets when it's either timed out (actually, the thing that times out *is* the watchdog timer) or finished uploading (at which point it sets timeout to minimum and waits for reset).
 * Optiboot clears the reset flag register, and stashes the reset flags in `GPIOR0` - if you need to know the cause of a reset
 ```c
-##ifdef USING_OPTIBOOT
+#ifdef USING_OPTIBOOT
 resetflags = GPIOR0;
-##else
+GPIOR0 = 0; // omit this line if you don't need to use GPIOR0 to save 2-4 bytes of flash.
+#else
 resetflags = RSTCTRL.RSTFR;
-##endif
+RSRTCTRL.RSTFR = 0;
+#endif
+if (resetflags & MY_CONDITION_1) {
+  // Reset was from cause X, which means something important, so do something differently
+} else {
+  // do the normal things.
+}
 ```
 
 Serial uploads are all done at 115200 baud, regardless of port, pin mapping or part.

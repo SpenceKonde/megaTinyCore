@@ -1,9 +1,20 @@
 # Pin interrupts
-While the usual `attachInterrupt()` functionality is provided by megaTinyCore (and works on every pin, with every type of trigger), these will take longer to run, and use more flash, than an equivalent interrupt implemented manually (due to the need to check for all 8 pins - while a manually implemented scheme would know that only the pins configured to generate interrupts need to be checked; that takes both time and flash space). Additionally, there are common use cases (for example, reading rotary encoders, particularly more than one) where each pin being handled separately prevents convenient shortcuts from being taken. Worst of all, attaching any pin interrupt through the API causes the core to glom onto EVERY pin change interrupt. I need to fix this, or improve it, or something, but it's a very tricky problem! It is of course even more of a problem on the Dx-series parts where they block off all 56 interrupts instead of just 22 at most.
+While the usual `attachInterrupt()` functionality is provided by megaTinyCore (and works on every pin, with every type of trigger), these will take longer to run, and use more flash, than an equivalent interrupt implemented manually (due to the need to check for all 8 pins - while a manually implemented scheme would know that only the pins configured to generate interrupts need to be checked; that takes both time and flash space). Additionally, there are common use cases (for example, reading rotary encoders, particularly more than one) where each pin being handled separately prevents convenient shortcuts from being taken. Worst of all, attaching any pin interrupt through the API causes the core to glom onto EVERY pin change interrupt. I need to fix this, or improve it, or something, but it's a very tricky problem!
 
-See also: [InterruptVectorNames.md](InterruptVectorNames.md)
+It is of course even more of a problem on the Dx-series parts any call to attachInterrupt will block off all 56 interrupts, instead of just 22 at most.
+
+See also: [InterruptVectorNames.md](InterruptVectorNames.md.md)
 
 For these reasons, it is usually desirable and often necessary to manually implement a pin interrupt instead of using `attachInterrupt();`
+
+## The big attachInterrupt() issue
+If your sketch or any library it included calls attachInterrupt(), it takes control of all pin interrupt vectors! Any use of `ISR()` to manually define one of those vectors will fail to compile. Do not use attachInterrupt unless you absolutely have to. And if you do, that's all you can use. Interrupts that fire through attachInterrupt have over 40 clock cycles more overhead compared to a manually defined interrupt!
+
+The most problematic library that uses attachInterrupt is SoftwareSerial (simply because it is most widely used - also it's awful in many ways).
+
+Note that this means that any library that needs to directly define a pin interrupt (for example, to minimize code size or meet response time requirements) is incompatible with any library that uses attachInterrupt, and vise versa. This is an unfortunate consequence of the design decisions made when the attachInterrupt API was written by Arduino. Short of a time machine, there is no hope to change this other than adapting one of them to use the same method as the other one does to create pin interrupts.
+
+**The methods described below are for manually implementing performant flash-efficient pin interrupts that do not use attachInterrupt(), which is fully is covered by the official Arduino reference** except that they don't talk about the response time or the flash usage compared to doing it yourself.
 
 ## Manually implementing pin interrupts
 The system for interrupts on tinyAVR 0/1-series parts is different from, and vastly more powerful than that of the classic AVR parts. Unlike classic AVR parts, there are no special interrupt pins (INT0, INT1, etc.) - instead, all pins can be configured to generate an interrupt on change, rising, falling or LOW level. While all pins on a port are handled by the same ISR (like classic AVR PCINT's), the pin that triggered the interrupt is recorded in the INTFLAGS register, making it easy to determine which pin triggered the interrupt.
@@ -17,7 +28,7 @@ Bits 0-2 control interrupt and sense behavior:
 * 010 = interrupt on rising
 * 011 = interrupt on falling
 * 100 = digital input buffer disabled entirely (equivalent of DIDR register on classic AVRs that have it)
-* 101 = interrupt on LOW leve - fires continuously as long as low level is held. This is quite common, and is why in most consumer electronics, holding a button has no effect until you release it.
+* 101 = interrupt on LOW level - fires continuously as long as low level is held. This is quite common in the world at large; in many consumer electronics, holding a button has no effect until you release it - this is the simplest implementation that leads to this behavior (though some debounce algorithms do too)
 
 Bit 3 controls the pullup.
 

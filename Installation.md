@@ -3,6 +3,15 @@
 ## Supported IDE versions
 megaTinyCore requires a version of the IDE later than 1.6.3; - it may require a much more recent version of the IDE; this has not been tested. It has been tested with 1.8.9 and 1.8.13. Due to a regression in 1.8.15 megaTinyCore is not compatible with that IDE version. It errors out because it says there's no version, when the version as specified in platform.txt has been confirmed to be entirely valid.
 
+### Alternative development environments
+There are a number of other alternatives to the Arduino IDE as such, with their users making unflattering (and occasionally profane) comments about the Arduino IDE and it's myriad shortcomings. It is known that the core can be used on the following alternative platforms. Where these are links, this link describes use of this core on that IDE. If no link is probvided, that's because I don't use that IDE, and nobody who does have volunteered a guide to installation, use, and any additional complications.
+* [PlatformIO](megaavr/extras/PlatformIO.md) is very popular. You can thank @MCUDude for most of the work to get this core supported over there, and this guide. I don't know anything about PIO, other than that it's users often express disbelief that I could use the Arduino IDE and not go nute. I do not make any claim to be sane, but any insanity predated my use of Arduino; if there is any causal relationship, it must have gone the other direction.
+* [Arduino-cli](megaavr/extras/Arduino-cli.md) is a command line version of the Arduino IDE. It's still official Arduino, but is far more conducive to scripting and semi-automated use.
+* VisualMicro is some alternative IDE. Numerous individuals here seem to use it and prefer it over Arduino. If any of you would like to write up more info, I welcome contributions - but I don't have time to learn a new IDE just to tell people how to use it. Cut me some slack, I'm running a business, working a day job, maintaining three cores.... and unlike most core authors I write real documentation, too, which takes an incredible amount of time.
+
+If you use an alternative development environment, be aware that no official testing is performed on those platforms, and I am not capable of providing technical support (no knowledge of the relevant IDE) - though if you report a bug with enough information that you're telling me how to fix it, I will happilly do so. Ideally, you would fix it for yourself and then provide a PR to fix it for everyone else. Be sure to check the version of the core when using Platform IO - the version they normally distribute is much older than the latest release, and many bugs have been fixed since then, so you should probably first try updating the core.
+
+Of course, bugs in that are discovered in PlatformIO or VisualMicro, but also reproduce on Arduino IDE are normal bugs, and can be reported without that additional requirement!
 
 ## Boards Manager Installation (now strongly recommended unless helping with core developoment)
 
