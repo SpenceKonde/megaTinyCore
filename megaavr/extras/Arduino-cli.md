@@ -34,7 +34,7 @@ arduino-cli core search megaTinyCore
 arduino-cli core install megaTinyCore:megaavr
 ```
 
-## 3. Compile using `arduino-cli` for a `megaTinyCore` based chip:
+## 3. Compile using `arduino-cli` for a `megaTinyCore` based chip
 Migrate to your sketch folder.
 
 You can find `FQBN`(necessary for compiling) for your speecific ATtiny using:
@@ -81,7 +81,7 @@ arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodv
 Here I chose the build directory to be inside my sketch directory, where all the hex files etc will be exported.
 
 
-## 4. Upload using `arduino-cli`:
+## 4. Upload using `arduino-cli`
 
 When we used the command `arduino-cli board details -b <YOUR FQBN>` above, to see possible fuses and chip selection options, if we scroll down further and look for `Programmers:` section, we will see the programmers available for our specified FQBN. This information will come handy for uploading code.
 i would be using `pyupdi57k` as my programmer option.
@@ -98,7 +98,7 @@ For our example:
 arduino-cli upload -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,uartvoltage=skip -p /dev/tty.usbserial-A10KHTR4 -P pyupdi57k -t
 ```
 
-## If you want to compile and then upload right after compilation:
+## If you want to compile and then upload right after compilation
 Do the following. From your sketch directory:
 ```sh
 arduino-cli compile -b FQBN:fuseKey=fuseValue,fuseKey=fuseValue,.. --output-dir ./build/ -u -p <Serial UPDI uploader PORT> -P <PROGRAMMER> -t

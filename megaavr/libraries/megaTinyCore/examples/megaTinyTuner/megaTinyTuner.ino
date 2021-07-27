@@ -1,7 +1,7 @@
 #include <USERSIG.h>
 #define watchdogReset()  __asm__ __volatile__ ("wdr\n");
 #include "util/delay.h"
-
+// *INDENT-OFF* astyle check wants this to be formatted in an unreadable and useless manner.
 #if !defined(MILLIS_USE_TIMERNONE)
   #warning "millis needs to be disabled while tuning - preventing millis initialization, Sketch does not depend on it if it was not modified."
   void init_millis() {
