@@ -9,6 +9,7 @@ The files in this location are NOT used by the core in any way, nor are they inc
 
 ## Header file license
 **These files are not part of the core and I had no hand in their development**
+They have been modified only by running codespell over them in order to make the repo pass CI spellcheck.
 
 This is the license notice displayed when downloading these files. It (and only it) applies to all files in this directory with the exception of README.md itself.
 
