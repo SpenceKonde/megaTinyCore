@@ -13,18 +13,19 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Add some sketches to assist in aforementioned tuning feature, see megaTinyTuner (runs on chip being tuned) and TuningSource (runs on chip - hopefully one with a crystal - being used to tune) as well as megaTinyDeTune which erases them and documented them in Tuning.md
 * New version of SerialUPDI to fix issues some experienced at speeds above SLOW - those should now be fixed at 230400 baud. All speeds are a bit slower now with the CH340 adapter most severely impacted (this is what I use, so I am reminded of how serious this issue is every time I upload anything) Turbo does NOT have this change, and it is not compatible with all serial adapters. This is expected.
 * Correct tone() issues and improve efficiency of tone while catching out several corner cases that could malfunction. That file now includes a discussion in comments that should be helpful to someone who wants a way to output multiple tones at once.
-* clockcycle <-> microsecond macros were unavailable with millis off.  Nevermind the fact that with millis disabled, that's the only timebase you have. I just sorta grouped all the timing stuff together and disabled it without realizing some were used elsewhere, that is no longer the case.
-* Correct issue with SPI.setClockDivider().
-* Correct issue with Serial1.swap(1) swapping Serial instead of Serial onth TinyAVR 2-series.
+* clockcycle <-> microsecond macros were unavailable with millis off.  Nevermind the fact that with millis disabled, that's the only timebase you have. I just sorta grouped all the timing stuff together and disabled it without realizing some were used elsewhere, that is no longer the case. (#496, also found internally)
+* Correct issue with SPI.setClockDivider().  (#458)
+* Correct issue with Serial1.swap(1) swapping Serial instead of Serial onth TinyAVR 2-series. (#470)
 * Further corrections to Wire library behavior and documentation mirroring DxCore. No multi-master (ie, master/slave support) yet - needs too mcuh test for this timeframe.
 * Removed menu options for converting UPDI pin to something else (except alt reset pin on 2-series) on non-optiboot boards. Expert users who have the necessary exotic programming tools can reenabling it by uncommenting lines in boards.txt (to get it to apply after every programming, part of your workflow if you use one device to do the HV reset, and a normal programmer to program it subsequently - not sure how common this is - I know less common than classic AVRs). This was never supposed to be an option.
 * Dead code removal and cleanup of main.cpp
-* Fixes to Print api missing a few standard api functions (oops).
+* Fixes to Print api missing a few standard api functions (#485)
 * Fix bug with new/new.h - it was missing a method and the dummy file to allow including it like `#include <new>` - which is as far as I'm concerned perverse and wrong, but the C standard guys seem to feel otherwise.
 * Add more markdown linting to the CI checks.
 * **Major doc improvements** which I spent far too long writing.
 * Expand interrupt vector name document.
 * **Massive improvements to part-specific docs**
+* Fixed pinout charts (#442)
 * Installation now covers toolchain upgrade needed for manual installation.
 * PlatformIO moved to Extras.
 * New instructions for use with Arduino-cli
