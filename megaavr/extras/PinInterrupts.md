@@ -3,7 +3,7 @@ While the usual `attachInterrupt()` functionality is provided by megaTinyCore (a
 
 It is of course even more of a problem on the Dx-series parts any call to attachInterrupt will block off all 56 interrupts, instead of just 22 at most.
 
-See also: [InterruptVectorNames.md](InterruptVectorNames.md.md)
+See also: [InterruptVectorNames.md](InterruptVectorNames.md)
 
 For these reasons, it is usually desirable and often necessary to manually implement a pin interrupt instead of using `attachInterrupt();`
 

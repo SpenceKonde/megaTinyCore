@@ -33,7 +33,7 @@ These pages contain pinout charts, specs, and datasheet links. Just like the pin
 We only officially support (and test on) the Arduino IDE. Other IDEs are often used and are well thought of, but I do not have time to learn them; issues reported which only reproduce on alternative IDEs must include some information on what I'm supposed to do to fix it; I have no relevant knowledge of those platforms.
 * [Arduino IDE](../../Installation.md) is the only platform tested internally.
 * [PlatformIO](PlatformIO.md) is very popular. You can thank @MCUDude for most of the work to get this core supported over there, and that guide
-* [Arduino-cli](megaavr/extras/Arduino-cli.md) is an official command-line version of Arduino. This guide was submitted by @dattasaurabh82 - THANKS!
+* [Arduino-cli](Arduino-cli.md) is an official command-line version of Arduino. This guide was submitted by @dattasaurabh82 - THANKS!
 
 ## General information
 * [Change Log](../../ChangeLog.md) weith listings of all changes that I remembered to record.
