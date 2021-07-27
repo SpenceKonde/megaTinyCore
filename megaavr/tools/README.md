@@ -222,14 +222,27 @@ Note that this does not give you serial monitor - you need to connect a serial a
 
 
 ### Upload and verify performance
+#### AVR128DA
 
-    BAUD    |    FT232RL    kb/s   |     CP2102    kb/s |     CH340    kb/s  |    HT42B534    kb/s  |
-------------|----------------------|--------------------|--------------------|----------------------|
-115200      |     8.7 W /    8.8 R |     8.7 W /  8.8 R |  8.4 W /  8.5 R    |     9.0 W /  9.1 R   |
-230400      |    16.6.W /   16.4 R |    16.3 W / 16.5 R | 14.6 W / 16.6 R    |    17.7 W / 17.9 R   |
-345600*     |    24.3 W /   23.4 R |    23.2 W / 23.0 R | 22.5 W / 22.1 R    |        UNSUPPORTED   |
-460800**    |             N/A      |                N/A |             N/A    |     24.7W / 32.7 R   |
+|  BAUD   |  FT232RL,  kb/s | CP2102,    kb/s |   CH340,   kb/s |   HT42B534, kb/s  |
+|---------|-----------------|-----------------|-----------------|-------------------|
+|115200   |  8.7 W /  8.8 R |  8.7 W /  8.8 R |  8.4 W /  8.5 R |  9.0 W /  9.1 R   |
+|230400   | 16.6.W / 16.4 R | 16.3 W / 16.5 R | 14.6 W / 16.6 R | 17.7 W / 17.9 R   |
+|345600*  | 24.3 W / 23.4 R | 23.2 W / 23.0 R | 22.5 W / 22.1 R |   UNSUPPORTED     |
+|460800** |        N/A      |             N/A |             N/A |  24.7W / 32.7 R   |
 ** HT42B534 was run using a 32-byte block size, running with finite block size resulted in successful transfers for other parts, though the threshold block size varied - but a massive decrease in overall speed, similar to 115200 baud., as one will outrun the NVM controller writing at 460800 baud - I just had to see how it compared to the FT232RL. Both of them are running right up at the limit of the chip's ability to write data to the flash - and the FT232RL doesn't need any special measures taken and works with the tinyAVR parts too. On the other hand, the HT42B534 leads the pack at the (new as of 1.3.6) default of 230400 baud, and is dirt cheap (CH340-level prices).
+
+#### tinyAVR 0/1/2-series
+Because of the smaller page sizes, ATtiny parts are slower to program; the smaller the pages, the slower the data rate - but the time for programming the entire flash is still less for smaller parts because there is less data to write. The two write numbers are for parts with 64 byte and 128 byte pages, respectively.
+
+| BAUD  |     FT232RL    kb/s  |     CP2102* kb/s    |       CH340    kb/s  |    HT42B534    kb/s       |
+|-------|----------------------|---------------------|----------------------|---------------------------|
+|115200 | 4.6,  6.2 W /  8.8 R | 4.3, 6.2 W /  8.8 R | 3.6,  5.2 W /  8.5 R |     3.6,  7.2 W  /  9.1 R |
+|230400 | 7.5, 10.0 W / 16.5 R | 7.1, 9.6 W / 16.4 R | 4.9,  7.8 W / 15.6 R | Requires SerialUPDI 1.2.0 |
+|345600*| 9.1, 13.6 W / 23.4 R | 8.5, 13.2W / 23.1 R | 5.6,  9.5 W / 22.0 R |         UNSUPPORTED       |
+|460800 |10.4, 15.6 W / 28.2 R |         Not tested  | 6.0, 10.4 W / 26.8 R | Requires SerialUPDI 1.2.0 |
+
+* The CP2102 does not, by default, support any speeds between 256kbaud and 460800 baud - but a free configuration utility from Silicon Labs enables customization of the baud rates in each range of requested speeds (though unfortunately, you can't define those ranges). I reconfigured mine for 345600 baud for development of with the Dx-series parts, which don't work at 460800, and did not bother to set it back to factory settings just to fill in the table; I would expect to see approximately 10kb/s and 15kb/s write speeds and around 26kb/s read speed.
 
 For comparison, on the Dx-series parts (which are easier to use as test subjects since they have more flash, so uploads take longer and are easier to time. These numbers were taken using a 128k test image, which is an optimal situation.
 
@@ -239,15 +252,6 @@ jtag2updi       | 6.6 kb/s | 5.9 kb/s | Running on 16 MHz Nano                  
 Curiosity Nano  | 5.9 kb/s | 3.3 kb/s | Via avrdude - which is likely (hopefully!) not ideal  |
 Optiboot Dx     |10.6 kb/s | 6.9 kb/s | 115200 baud as supplied by DxCore        |
 
-Because of the smaller page sizes, ATtiny parts are slower to program; the smaller the pages, the slower the data rate - but the time for programming the entire flash is still less for smaller parts because there is less data to write. The two write numbers are for parts with 64 byte and 128 byte pages, respectively.
-
-    BAUD      |     FT232RL    kb/s |     CP2102* kb/s   |     -   CH340    kb/s  |    HT42B534    kb/s       |
---------------|---------------------|--------------------|------------------------|---------------------------|
-115200        | 4.6, 6.2 W /  8.8 R | 4.3,6.2 W / 8.8 R  | 3.6,   5.2 W  /  8.5 R |     3.6,  7.2 W  /  9.1 R |
-230400        | 7.5,10.0 W / 16.5 R | 7.1,9.6 W / 16.4 R | 4.9,   7.8 W  / 15.6 R | Requires SerialUPDI 1.2.0 |
-345600*       | 9.1,13.6 W / 23.4 R |8.5,13.2 W / 23.1 R | 5.6,   9.5 W  / 22.0 R |   345600 baud unsupported |
-460800        |10.4,15.6 W / 28.2 R |        Not tested  | 6.0,  10.4 w  / 26.8 R | Requires SerialUPDI 1.2.0 |
-* The CP2102 does not, by default, support any speeds between 256kbaud and 460800 baud - but a free configuration utility from Silicon Labs enables customization of the baud rates in each range of requested speeds (though unfortunately, you can't define those ranges). I reconfigured mine for 345600 baud for development of with the Dx-series parts, which don't work at 460800, and did not bother to set it back to factory settings just to fill in the table; I would expect to see approximately 10kb/s and 15kb/s write speeds and around 26kb/s read speed.
 
 #### Note - those numbers were taken with SerialUPDI 1.1.0
 Versions of the cores with later versions (megaTinyCore 2.4.0 and DxCore 1.4.0) will have slower write performance on tinyAVR due to changes made in order to guarantee that the part is given enough time to write each page. This is not enabled for TURBO mode; on Windows, an FT232 on minimum lastency timer and a CH340G have enough latency to do it without explicitly "waiting" for a page write to complete. Python's delay function, time.sleep() has a fairly coarse granularity, and is not well suited for this. We will continue to explore ways to reclaim as much of that lost speed as possible.

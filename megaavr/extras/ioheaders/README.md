@@ -33,7 +33,7 @@ limitations under the License.
 ## Representative Headers
 These examples are from the highest pincount version of each series. This much smaller handful of files is enough to find everything you'd need to copy/paste into your code.
 * [1607 - good for any 0-series](iotn1607.h)
-* [ 817 - good for any 1-series with less than 16k of flash](iotn817.h)
+* [817 - good for any 1-series with less than 16k of flash](iotn817.h)
 * [3217 - good for any 1-series with at least 16k of flash](iotn3217.h)
 * [1627 - good for any 2-series](iotn1627.h)
 
