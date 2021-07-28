@@ -190,81 +190,6 @@ jobs:
 
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-          platforms: |
-            # Install megaTinyCore via Boards Manager for the toolchain
-            - source-url: http://drazzy.com/package_drazzy.com_index.json
-              name: ${{ env.platform-name }}
-            # Overwrite the megaTinyCore release version with the platform from the local path
-            - source-path: megaavr
-              name: ${{ env.platform-name }}
-          libraries: |
-            # The sketches don't have any external library dependencies, so just define an empty array
-            -
-          verbose: false
-          enable-deltas-report: true
-          enable-warnings-report: true
-          sketches-report-path: sketches-reports
-      - name: Compile examples (disable millis)
-        uses: arduino/compile-sketches@main
-        with:
-          fqbn: ${{ env.platform-name }}:atxy${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }}
-          sketch-paths: |
-            # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
-            # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
-            ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
-            ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
-            ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
-            ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
-            ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
-
-            ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
-            ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-          libraries: |
-            # The sketches don't have any external library dependencies, so just define an empty array
-            -
-          verbose: false
-          enable-deltas-report: true
-          enable-warnings-report: true
-          sketches-report-path: sketches-reports
-      - name: Compile examples (disable millis)
-        uses: arduino/compile-sketches@main
-        with:
-          fqbn: ${{ env.platform-name }}:atxy${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},millis=disabled
-          sketch-paths: |
-            # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
-            # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
-            ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
-            ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
-            ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
-            ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
-            ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
-
-            ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
-            ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-          libraries: |
-            # The sketches don't have any external library dependencies, so just define an empty array
-            -
-          verbose: false
-          enable-deltas-report: true
-          enable-warnings-report: true
-          sketches-report-path: sketches-reports
-      - name: Compile examples (TCB0 millis)
-        uses: arduino/compile-sketches@main
-        with:
-          fqbn: ${{ env.platform-name }}:atxy${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},millis=timerb0
-          sketch-paths: |
-            # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
-            # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
-            ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
-            ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
-            ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
-            ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
-            ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
-
-            ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
-            ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-          platforms: |
-            # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json
               name: ${{ env.platform-name }}
             # Overwrite the megaTinyCore release version with the platform from the local path
@@ -294,11 +219,11 @@ jobs:
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
-            - source-url: http://drazzy.com/package_drazzy.com_index.json
-              name: ${{ env.platform-name }}
+            # assume done- source-url: http://drazzy.com/package_drazzy.com_index.json
+            #  name: ${{ env.platform-name }}
             # Overwrite the megaTinyCore release version with the platform from the local path
-            - source-path: megaavr
-              name: ${{ env.platform-name }}
+            #- source-path: megaavr
+            #  name: ${{ env.platform-name }}
           libraries: |
             # The sketches don't have any external library dependencies, so just define an empty array
             -
