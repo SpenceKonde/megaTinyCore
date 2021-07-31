@@ -70,6 +70,8 @@
                        off - will make it easier to move this to DxCore without breakage.
                        I think the cleanup more or less exactly got enough flash back that
                        the coverage of corner cases cost.
+2.4.0      S Konde     Spotted amd fixed a few improperly handled corner cases, and a lot of reorganization of questionable value.
+
   **********************************************************************************************************/
 /************************************************************************************************************
     S. Konde 7/21/21:
@@ -79,20 +81,21 @@ I have to wonder a few things here:
       be increased, but a great deal of plumbing for it would also be needed - multiple pins, multiple timers...
       Generally "a damned big deal" to implement, with a large number of design decisions.
       What is strange is that I can find no sign of Arduino having supported more than one simultaneous tone pin, which
-      is the only case where this #define makes sense. to have.
+      is the only case where this #define makes sense. Unless there were in the past arduinos withonly certain pinsthat could play tone or something
+      have.
   2. In light of the fact that tone does not let you output multiple tones on multiple pins at once, one could
       argue that noTone() should shut off the tone and ignore the argument. But the official API says ignore
       noTone(wrong_pin)
 My tentative ruling is that:
-  A. Any polyphonic tone functionality belongs in a library, tone should never have AVAILABLE_TONE_PINS =/= 1.
-    - or possibly several libraries. One approach would be to conditionally compile the ISRs for timers based on a #define
+  A. Any polyphonic tone functionality belongs in a library, tone should never have AVAILABLE_TONE_PINS =/= 1
+    One approach would be to conditionally compile the ISRs for timers based on a #define
     that would have to be used before the library is #included; that file could check for ARDUINO_MAIN, and define
     the ISRs if and only if it is (otherwise it would cause multiple definition error if included by sketch and other library).
     Another approach would have the functions to control the tone output driven by each timer each in a separate file, or have
     multiple instances of a TCB tone class, each instantiated in it's own file. The stock core has done this with the
     HardwareSerial class since the dawn of time. Thus also not creating ISRs for timers we're not 'tone()ing' with.
     The separate files would also provide an efficient means of keeping the variables that track the state of each
-    timer's tons separate..
+    timer's tone separate..
     I suspect that one could do worse than using this file, with liberal addition of the static keyword, as a basis
     for those timer-specific tone() libraries. Personally, I don't feel like I have a good idea of what features
     would be desirable for a tone library of that sort. I'm not an audio guy, and I have never connected a buzzer to
@@ -179,7 +182,7 @@ My tentative ruling is that:
      * being invalid to work with is NOT safe to assume on embedded
      * systems. */
 
-
+    Serial.println(frequency);
     long toggle_count;
     // Calculate the toggle count
     if (duration > 0) {    // Duration defined
@@ -226,7 +229,8 @@ My tentative ruling is that:
       // "tone", and they should be generating it through other means.
       compare_val = 0xFFFF; // do the best we can
     }
-
+    Serial.println(compare_val);
+    Serial.println(divisionfactor);
     // Anyway - so we know that the new pin is valid....
     if (_pin != pin) {  // ...let's see if we're using it already.
       if (_pin != NOT_A_PIN) { // If not - were we using one before?
