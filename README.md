@@ -86,7 +86,7 @@ The addition of 1024-sample accumulation for the purposes of oversampling and de
 
 It would appear that the first full sized chip featuring this ADC will be the EA-series parts, which will be available in 28-48 pin packages with up to 64k flash, according to the available information, from the product brief. Considering that each sub-generation of modern AVRs has featured tweaks to the ADC (which are mostly papered over by the Arduino API), it will be very interesting to see what surprises, if any, are in store for us with the EA-series.
 
-#### Type D timer - 1-series only.
+#### Type D timer - 1-series only
 The type D timer is only used for PWM on 20/24 pin 1-series parts - on the smaller parts, it wouldn't let us increase the total number of PWM pins - Only the WOC and WOD pins (on PC0 and PC1 respectively) don't already have TCA-driven PWM on them. As such, since analogWrite() does not support any features that would be enabled by turning off split mode (like 16-bit PWM) or enhanced by using the type D timer (like adjusting the frequency), it would just be worse, because it would require additional space to store the routine to turn on and off PWM from two types of timer, instead of one.
 
 #### 1-series parts with 16k or 32k of flash
