@@ -22,14 +22,15 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Fixes to Print api missing a few standard api functions (#485)
 * Fix bug with new/new.h - it was missing a method and the dummy file to allow including it like `#include <new>` - which is as far as I'm concerned perverse and wrong, but the C standard guys seem to feel otherwise.
 * Add more markdown linting to the CI checks.
+* Add a few test sketches to verify compilation works for API functions not covered by the examples, these are not included in board manager distributions as they are not educational samples.
 * **Major doc improvements** which I spent far too long writing.
-* Expand interrupt vector name document.
+* Expand interrupt vector name document with general interrupt information
 * **Massive improvements to part-specific docs**
 * Fixed pinout charts (#442)
 * Installation now covers toolchain upgrade needed for manual installation.
-* PlatformIO moved to Extras.
+* PlatformIO docs moved to Extras.
 * New instructions for use with Arduino-cli
-* Important info links to almiost all important info.
+* Important info links to almost all important info.
 * Readme covers watchdog timer more thoroughly, including how to reset it.
 * Added page from which you can view the io headers through the github documentation, because it's a pain to dig for them on your local machine, and you'll inevitably want to have them at the ready.
 * Errata section upatend with recently discovered bugs. Changed my asssment of the severity of a number of the bugs (for example, the RTC bugs are much higher severity now, because I have watched someone trying to figurte out how the hell the RTC worked; it wasn't pretty.)

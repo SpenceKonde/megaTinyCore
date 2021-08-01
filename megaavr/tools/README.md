@@ -22,18 +22,36 @@ The TX resistor is ubiquitous on CH340-based adapters. On FT232 adapters, it is 
 3. Some serial adapters have a dedicated LED to indicate Rx. While some fancy chips have an I/O pin that drives the RX led (the FT232, for example), a cheap adapter with an RX LED may have just put an LED and resistor on the RX line (in fact that's what that above mentioned green boards with switch and microusb port did).. The load from an LED on the UPDI line will overwhelm any signal from the target and prevent communication (a LED on TX is fine - the adapter has plenty of drive strength.)
 4. Devices that do not output a 5v HIGH level sometimes will work at low speed but not higher speeds. A 10k pullup between the UPDI/RX line and 5v will usually sort this out.
 
-I recommend the CH340 as the go-to serial adapter for several reasons:
-* They are dirt cheap and readily available on ebay/aliexpress/amazon. 7/$5 shipped on aliexpress for the most basic design (the black kind with the stupid voltage jumper on the end. The wider ones with rounded corners and ENIG surface treatment are no better electrically, though the build quality is better (if you buy the black ones described above, it is recommended to solder the tabs ofg the USB connector in place - their wave soldering process fails to solder these most of the time), and are significantly bulkier. The better kind are what you find on ebay when you search for "CH340 6pin" - you want the black ones with the voltage switch. Until, that is, I bring my own design into production - it'll have voltage switching done *right* and a micro USB connector instead of a stuipid full sized USB-A, full-sized 1117 3.3v regulator, and a color-coded power light to indicate the current voltage setting, and a general absence of gross design flaws.
+I recommend the CH340 OR an FT232RL as the go-to serial adapter for several reasons:
+#### Advantages of CH340G
+* They are dirt cheap and readily available on ebay/aliexpress/amazon. 7/$5 shipped on aliexpress for the most basic design (the black kind with the stupid voltage jumper on the end for CH340G's, while the good ones are like $1.25-$1.50 The wider ones with rounded corners and ENIG surface treatment are no better electrically than the bad ones, though the build quality is better (if you buy the black ones described above, it is recommended to solder the tabs ofg the USB connector in place - their wave soldering process fails to solder these most of the time), and are significantly bulkier. The better kind are what you find on ebay when you search for "CH340 6pin" - you want the black ones with the voltage switch.
 * The bare chips are dirt cheap and readily available - and also dead simple to design with. Anyone, even the clown who designed those green boards I've been badmouthing, can do it (it looked like someone's first board, frankly). Heck, a working CH340G serial adapter was the first board I designed, too (at least I didn't try to sell my first version!).
 * They are - at most - a half second slower to write a full flash image with. For the price of one real FT232RL adapter, you could have half a dozen CH340's.
 * They generally work at the maximum speed with just the addition of the diode
+
+#### Disadvantages of the CH340
+* Build quality of most boards available online ranges from mediocre to poor. Gross design flaws are often present. I am planning to bring a superior option to marke - it'll have voltage switching done *right* and a micro USB connector instead of a stuipid full sized USB-A, full-sized 1117 3.3v regulator, and a color-coded power light to indicate the current voltage setting, and a general absence of flagrant design flaws.
+* When I do bring it to market, I will not be able to compete on price with the crap ones.
+
+#### Advantages if the FT232RL
+* Slightly faster. Fewer adapters are complete and utter trash.
+* They work at the maximum speed reliably (but see below)
+* RX and TX leds are independent and don't load the data lines.
+* We recommend the blue ones that have "Deek Robot" written on the bottom, and have a mysterious 2x3 pin header. That header is an ISP programming header that can be used through AVR dude, using the FT232 in BigBang mode!
+* There also exist FT2232 and FT4232 adapters (sold on breakout boards) with 2 and 4 channels respectively.
+
+#### Disadvantages of the FT232RL
+* They are a bit more expensive.
+* The build quality is just as marginal as the CH340 adapters. I often end up reflowing solder joints I don't like the looks of on either sort.
+* The chips are almost certainly counterfeit, if that bothers you; FTDI backed down after consumer outcry and the drivers work fine now.
+* I have found that for reliable operation in turbo mode, (460800 baud for tinyAVR) a small resistor - 10k or so - between RX and 5v is necessary (this is often the case with 3.3v adapters in general).
+* For each port, you must follow the steps described above to set the latency timer to 1ms, as the default of 16 ms is about 10-14 times slower - on Dx-series it's not as bad, but tinyAVR programming time is latency dominated already even with the minimum setting.
+
 
 And because most of the alternatives have problems:
 * The CP2102 doesn't support the top speed for Dx-series (345600 baud) - or, if you configure it to support that with the utility from Silicon Labs, you lose support for 460800 for tinyAVR.
 * The PL2303 you have to downgrade the drivers for, because they're all counterfeit versions of an ancient version.
   * One PL2303 adapter I got had virtually no capacitance on Vcc - there was 0.5v ripple on the 3.3v line. Adding a capacitor fixed that, but seeing as they aren't evenh cheaper, there's no reason to use them.
-* The FT232 requires you to change the timeout setting to get acceptable performance.
-  * Most FT232RL's are said to be counterfeit; the "FTDI-gate" driver debacle in far behind us, but this may matter to you for other reasons.
 * As noted above, very few serial adapters output an actual 5v HIGH level, and these are sometimes flaky at higher speeds, and need an added pullup on the UPDI line. This is not needed for CH340.
 
 * The HT42B534 has a variety of unusual attributes, some good, some bad.
@@ -65,14 +83,14 @@ This is the case in 90% of USB serial adapters.
 
 
 Ideal:
-internal resistor in adapter: 2.2k >= Ra
+internal resistor in adapter: not more than 1k
 
 --------------------                                 To Target device
                 DTR|                                  __________________
     internal    Rx |--------------,------------------| UPDI---\/\/---------->
   Tx---/\/\/\---Tx |-------|<|---'          .--------| Gnd    470 ohm (100 ~ 1k)
     resistor    Vcc|---------------------------------| Vcc
-  typ 1-2k      CTS|                     .`          |__________________
+  typ. 1k       CTS|                     .`          |__________________
                 Gnd|--------------------'             If you make a 3-pin connector, use this pinout
 --------------------
 
@@ -83,13 +101,25 @@ or
     internal    Rx |--------------,------------------| UPDI----------------->
   Tx---/\/\/\---Tx |-------|<|---'          .--------| Gnd
     resistor    Vcc|---------------------------------| Vcc
-  typ 1-2k      CTS|                     .`          |__________________
+  typ 1k        CTS|                     .`          |__________________
                 Gnd|--------------------'
 --------------------
 
 
 
-Also works great, convenient if still using jtag2updi without resistor built into it. Resistorss should sum to less than 4.7k, preferalby much less
+Or with no internal resistor on adapter - as long as target has one
+
+--------------------                                 To Target device
+                DTR|                                  __________________
+      no        Rx |--------------,------------------| UPDI---\/\/---------->
+    internal    Tx |-------|<|---'          .--------| Gnd    470 ohm (100 ~ 1k)
+    resistor    Vcc|---------------------------------| Vcc
+                CTS|                     .`          |__________________
+                Gnd|--------------------'
+--------------------
+
+
+Also works great, convenient if still using jtag2updi without resistor built into it. Resistorss should sum to less than 4.7k, not more than 2.2k
 
 --------------------                                   To Target device
                 DTR|                                  __________________
@@ -116,16 +146,6 @@ This will often by 4.7k: it must be bypassed, replaced with a smaller one or sho
 
 
 
-No internal resistor on adapter.
-Yes resistor on target >= 100 ohms and not more than a few k.
-
---------------------                                   To Target device
-                DTR|                                  __________________
- No resistor?   Rx |--------------,------------------| UPDI----\/\/\/------>
-  Are you sure? Tx |----|<|------`          .--------| Gnd     > 100
- This is rare!  Vcc|---------------------------------| Vcc     < 2.2k
-                CTS|                     .`          |__________________    Resistor of around a few hundred to a few k
-                Gnd|--------------------'
 --------------------
 
 
