@@ -15,13 +15,14 @@ Serial.println(SYSCFG.REVID);
 ```
 
 Thankfully, most of these issues will not be encountered by most Arduino users. The impact column indicates the liklihood that someone working with an effected part through megaTinyCore and Arduino would encounter it.
-* 0 - Impact extremely unlikely
-* 1 - Impact only when using exotic features
-* 2 - Impact likely when using normal features which may be used through libraries or register configuration.
-* 3 - Issue impacted functions provided by megaTinyCore or included libraries in previous versions, but worked around in current version, and will impact users of this functionality if reconfigured manually, or unavoidably impacts functionality exposed by core or included libraries, but can be worked around.
-* 4 - Issue impacts functions provided by megaTinyCore or included libraries in the current released version, or within a commonly used peripheral, but mitigation is straightforward. In many cases, simply knowing of the issue can be enough to not be troubled by it.
-* 5 - Issue impacts functions provided by megaTinyCore or included libraries, or within a commonly used peripheral, and the impact is severely disruptive.
+* 0 - Impact unlikely and non-serious if it does occur.
+* 1 - Impact unlikely to cause issue or degrade functionality under ordinary conditions. Things that can only manifest under extreme corner cases are usaually in this category. There are usually a number of approaches to working around these, as well,
+* 2 - Impact likely when using features that are not particularly exotic, but has viable workaround and is not visible through the API provided by the core. This includes cases where the feature is inoperable but the workaround is truly trivial.
+* 3 - Issue impacted functions provided by megaTinyCore or included libraries in previous versions, but worked around in current version, and will impact users of this functionality if reconfigured manually, or unavoidably impacts functionality exposed by core or included libraries, but can be worked around with little overall mipact..
+* 4 - Issue has a large impact on the relevant functionality in configurations other than the most common ones, without requiring an exotic corner case to trigger. In cases where the impacted features are exposed by the core or included libraries, it may not be possible to hide the issue.
+* 5 - Issue has a large impact on the relevant functionality in all or the most common configurations. If that is provided by the core or library, we may be unable to hide the issue. If it involves manual configuration, that functionality will be completely and totally unusable without workarounds, and those may not hide it entirely.
 * `*` - Issue is high impact but effected devices are rare
+* ? - Issue appears consistent with the datasheet....
 
 
 ## tinyAVR 2-series
@@ -31,8 +32,8 @@ Erratum                                                               | Impact |
 ----------------------------------------------------------------------|--------|-------------|------------|-------
 IDD Power-Down Current Consumption                                    |    3   |      -      |      X     | 16k parts only? Sounds like it was fixed between 16k release and 4/8k releases.
 The CCL Must be Disabled to Change the Configuration of a Single LUT  |    5   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
-CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode  |    2   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
-Restart Will Reset TCA Counter Direction in NORMAL and FRQ Mode       |    1   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
+CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode  |    4   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
+Restart Will Reset TCA Counter Direction in NORMAL and FRQ Mode       |    1?  |      X      |      X     | Announced late 2020 and universally present on modern AVR.
 Open-Drain Mode Does Not Work When TXD is Configured as Output        |    2   |      X      |      X     | Universally present on modern AVRs.
 Start-of-Frame Detection Can Be Enabled in Active Mode When RXCIF Is 0|    2   |      X      |      X     | Announced late 2020 and universally present on modern AVR.
 
@@ -72,9 +73,9 @@ Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5            
 Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler                     | 4 |X|X|X|X| X |X|X|-
 Disabling the RTC Stops the PIT                                                          | 5 |X|X|X|X| X |X|X|-
 **TCA**  | . | .  | . | .  | . | .  | . | . |.
-Restart Will Reset Counter Direction in NORMAL and FRQ Mode                              | 1 |X|X|X|X| X |X|X|X
+Restart Will Reset Counter Direction in NORMAL and FRQ Mode                              | 1?|X|X|X|X| X |X|X|X
 **TCB**  | . | .  | . | .  | . | .  | . | . |.
-CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode                     | 2 |X|X|X|X| X |X|X|X
+CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode                     | 4 |X|X|X|X| X |X|X|X
 Minimum Event Duration Must Exceed the Selected Clock Period                             | 1 |X|X|X|X| X |X|X|X
 The TCB Interrupt Flag is Cleared When Reading CCMPH                                     | 2 |X|-|X|-| X |X|-|-
 TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working w/Prescaled Clock| 1|X|-|X|-| X |X|-|-
@@ -89,9 +90,9 @@ TWI Smart Mode Gives Extra Clock Pulse                                          
 TWI Master Mode Wrongly Detects the Start Bit as a Stop Bit                              | 2 |X|-|X|-| X |X|-|-
 The TWI Master Enable Quick Command is Not Accessible                                    | 1 |X|-|X|-| X |X|-|-
 **USART**  | . | .  | . | .  | . | .  | . | . |.
-TXD Pin Override Not Released When Disabling the Transmitter                             | 4 |X|X|X|X| X |X|X|X
+TXD Pin Override Not Released When Disabling the Transmitter                             | 3 |X|X|X|X| X |X|X|X
 Full Range Duty Cycle Not Supported When Validating LIN Sync Field                       | 1 |-|-|-|-| - |X|-|-
-Frame Error on a Previous Message May Cause False Start Bit Detection                    | 3 |X|X|X|X| X |X|X|-
+Frame Error on a Previous Message May Cause False Start Bit Detection                    | 1 |X|X|X|X| X |X|X|-
 Open-Drain Mode Does Not Work When TXD is Configured as Output                           | 2 |X|X|X|X| X |X|X|X
 Start-of-Frame Detection Can Unintentionally Be Enabled in Active Mode When RXCIF Is ‘0’ | 2 |X|X|X|X| X |X|X|X
 
@@ -133,9 +134,9 @@ Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5   | 3 | X |
 Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler   | 4 | X | X | X | X | -
 Disabling the RTC Stops the PIT                                        | 5 | X | X | X | X | -
 **TCA**  | . | .  | . | .  | . | .  | .
-Restart Will Reset Counter Direction in NORMAL and FRQ Mode            | 1 | X | X | X | X | X
+Restart Will Reset Counter Direction in NORMAL and FRQ Mode            | 1?| X | X | X | X | X
 **TCB**  | . | . | . | . | . | .
-CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode   | 2 | X | X | X | X | X
+CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode   | 4 | X | X | X | X | X
 Minimum Event Duration Must Exceed the Selected Clock Period           | 3 | X | X | X | X | X
 The TCB Interrupt Flag is Cleared When Reading CCMPH                   | 2 | - | X | X | X | -
 Input Capture Frequency and Pulse-Width Mode Not Working w/Prescaled Clk|2 | - | X | X | X | -
@@ -150,7 +151,7 @@ TWI Smart Mode Gives Extra Clock Pulse                                 | 1 | - |
 TWI Master Mode Wrongly Detects the Start Bit as a Stop Bit            | 1 | - | X | X | X | -
 The TWI Master Enable Quick Command is Not Accessible                  | 1 | - | X | X | X | -
 **USART**  | . | . | . | . | . | .
-TXD Pin Override Not Released When Disabling the Transmitter           | 4 | X | X | X | X | X
+TXD Pin Override Not Released When Disabling the Transmitter           | 3 | X | X | X | X | X
 Full Range Duty Cycle Not Supported When Validating LIN Sync Field     | 1 | X | - | - | X | -
 Frame Error on a Previous Message May Cause False Start Bit Detection  | 1 | X | X | X | X | -
 Open-Drain Mode Does Not Work When TXD is Configured as Output         | 2 | X | X | X | X | X
@@ -179,13 +180,13 @@ Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5      | 3 | 
 Any Write to the RTC.CTRLA Register Resets the RTC and PIT Prescaler      | 4 | X | X | X | X
 Disabling the RTC Stops the PIT                                           | 5 | X | X | X | X
 **TCA**  | . | .  | . | .  | . | .
-Restart Will Reset Counter Direction in NORMAL and FRQ Mode               | 1 | X | X | X | X
+Restart Will Reset Counter Direction in NORMAL and FRQ Mode               | 1?| X | X | X | X
 **TCB**  | . | . | . | . | .
-CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode      | 2 | X | X | X | X
+CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode      | 4 | X | X | X | X
 Minimum Event Duration Must Exceed the Selected Clock Period              | 2 | X | X | X | X
 The TCA Restart Command Does Not Force a Restart of TCB                   | 1 | X | X | X | X
 **USART**  | . | . | . | . | .
-TXD Pin Override Not Released When Disabling the Transmitter              | 4 | X | X | X | X
+TXD Pin Override Not Released When Disabling the Transmitter              | 3 | X | X | X | X
 Frame Error on a Previous Message May Cause False Start Bit Detection     | 1 | X | X | X | -
 Open-Drain Mode Does Not Work When TXD is Configured as Output            | 2 | X | X | X | X
 Start-of-Frame Detection Can  Be Enabled in Active Mode When RXCIF Is ‘0’ | 2 | X | X | X | X
@@ -305,13 +306,15 @@ The ADC may perform one additional measurement after clearing `ADCn.CTRLA.FREERU
 
 **Workaround:** Write `ADCn.CTRLA.ENABLE` to '0' to stop the Free-Running mode immediately.
 
-**megaTinyCore note:** If you reconfigure the ADC for free running mode, you should be aware of this.
+**megaTinyCore note:** If you reconfigure the ADC for free running mode, you should be aware of this, the workaround is easy.
 
 #### ADC Wake-Up with WCOMP
 When waking up from STANDBY sleep mode with ADC WCOMP interrupt, the ADC is disabled for a few cycles
 before the device enters ACTIVE mode. A new INITDLY is required before the next conversion.
 
 **Workaround:** Use INITDLY before the next conversion.
+
+**megaTinyCore note:** And how do you force it to wait for another INITDLY?
 
 ### PORTMUX - Port Multiplexer
 #### Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5
@@ -361,7 +364,7 @@ Writing `RTC.PITCTRLA.PITEN` to '0' will stop the RTC.
 
 **Workaround:** Do not disable the RTC or the PIT if any of the modules are used.
 
-**megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted. **Any manual configuration of the RTC will be unsuccessful if this issue is not taken into account** This behaves far less simply than they describe, and it can be profoundly baffling and very nasty when using the RTC. This was reported by a user on ATtiny412; it stands to reason that on impacted parts, the other one doesn't "stop" - but rather "behaves in a manner inconsistent with documentation"
+**megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted, HOWEVER **Any manual configuration of the RTC will be unsuccessful if this issue is not taken into account** This behaves far less simply than they describe, and it can be profoundly baffling and very nasty when using the RTC. This was reported by a user on ATtiny412; it stands to reason that on impacted parts, the other one doesn't "stop" - but rather "behaves in a manner inconsistent with documentation"
   1. Set RTC clock source but don't enable it.
   2. Enable the PIT with desired period.
   3. Notice that PIT is working, while RTC is not enabled.
@@ -374,7 +377,7 @@ When the TCA is configured to a NORMAL or FRQ mode (WGMODE in TCAn.CTRLB is ‘0
 
 **Workaround:** None.
 
-**megaTinyCore note:** Only impacts users who reconfigure TCA0 and use RESTART commands or events as described. Impacts every released part with a TCA as if July 2021.
+**megaTinyCore note:** Only impacts users who reconfigure TCA0 and use RESTART commands or events while the timer is counting down, a small crosssection of all users, and especally megaTinyCore users. Impacts every released part with a TCA as if July 2021. What I do not understand is why this is considered errata at all, as the datasheet for these parts says, of that command, *"The software can force a restart of the current waveform period by issuing a RESTART command. In this case, the counter, **direction**, and all compare outputs are set to '0'."*
 
 ### TCB - Timer/Counter B
 #### CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode
@@ -397,7 +400,7 @@ Event detection will fail if TCBn receives an input event with a high/low period
 
 **Workaround:** Read both `TCBn.CCMPL` and `TCBn.CCMPH`.
 
-**megaTinyCore note:** Only impacts users who reconfigure a Type B timer for input capture and tried to read only the low byte of CCMP; impact on someone who tried that would be severe if workaround above not used. Manually clearing the interrupt flag should also work.
+**megaTinyCore note:** Only impacts users who reconfigure a Type B timer for input capture, but only cares about the low byte, not the high byte, and doesn't immediately recognize that when running into the bug that the interrupt flag isn't getting cleared and clear it manually (which is the most obvious cause and something to check first whenever sketch activity nearly hangs as soon as an interrupt is triggered, especially if it's only "nearly" hung). In addition to the suggested workaround of reading both bytes, you can also just manually clear the interrupt flag. Under typical conditions, whether you readthe second byte or manually clear the flag will have the same run time - but manually clearing it will typically take 3 extra words of flash, while reading it will only take 1. `uint8_t val=TCBn.CCMP`will generate correct code.
 
 #### TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working with Prescaled
 Clock The TCB Input Capture Frequency and Pulse-Width Measurement mode may lock to Freeze state if CLKSEL in
@@ -420,7 +423,7 @@ The TCD event output lines can give out false events.
 
 **Workaround:** Use the delayed event functionality with a minimum of one cycle delay.
 
-**megaTinyCore note:** Only an issue if using TCD0 as an event source.
+**megaTinyCore note:** Only an issue if using TCD0 as an event source, and fixed on some versions of these parts. Does anyone have any idea under WHAT conditions false outputs were generated?
 
 #### TCD Auto-Update Not Working
 The TCD auto-update feature is not working.
@@ -448,21 +451,21 @@ If TWI is enabled in Master mode followed by an immediate write to the MADDR reg
 
 **Workaround:** Wait for a minimum of two clock cycles from `TWI.MCTRLA.ENABLE` until `TWI.MADDR` is written.
 
-**megaTinyCore note:** No concern for megaTinyCore users unless you write your own I2C implementation.
+**megaTinyCore note:** No concern for megaTinyCore users unless you write your own I2C implementation and it's particularly fast; Wire.h does not run into this issue.
 
 #### TWI Smart Mode Gives Extra Clock Pulse
 TWI Master with Smart mode enabled gives an extra clock pulse on the SCL line after sending NACK.
 
 **Workaround:** None.
 
-**megaTinyCore note:** No concern for megaTinyCore users unless you write your own I2C implementation, our Wire implementation doesn't use Smart Mode.
+**megaTinyCore note:** No concern for megaTinyCore users unless you write your own I2C implementation, Wire.h uses the TWI hardware in dumb mode.
 
 #### The TWI Master Enable Quick Command is Not Accessible
 `TWI.MCTRLA.QCEN` is not accessible from software.
 
 **Workaround:** None.
 
-**megaTinyCore note:** No concern for megaTinyCore users unless you write your own I2C implementation, our Wire implementation doesn't use that either.
+**megaTinyCore note:** No concern for megaTinyCore users unless you write your own I2C implementation, our Wire implementation doesn't quick command either.
 
 ### USART - Universal Synchronous and Asynchronous Receiver and Transmitter
 #### TXD Pin Override Not Released When Disabling the Transmitter
@@ -479,28 +482,28 @@ in `USART.CTRLB` to '0')
 * Writing to any register in the USART after disabling the transmitter will start the USART for long enough to
 release the pin override of the TXD pin
 
-**megaTinyCore note:** This impacts versions of megaTinyCore prior to 2.0.6 when calling Serial.end() on effected devices.
+**megaTinyCore note:** Despite the issue being trivial to work around, and frequently implicitly hidden (by the second clause of the workaround above), this impacts versions of megaTinyCore prior to 2.0.6 when calling Serial.end() on effected devices.
 
 #### Full Range Duty Cycle Not Supported When Validating LIN Sync Field
 For the LIN sync field, the USART is validating each bit to be within ±15% instead of the time between falling edges as described in the LIN specification. This allows a minimum duty cycle of 43.5% and a maximum duty cycle of 57.5%.
 
 **Workaround:** None.
 
-**megaTinyCore note:** Only a concern if reconfiguring USART for LIN.
+**megaTinyCore note:** Only a concern if reconfiguring USART for LIN, and using the sync field for autobaud, relying upon the threshold being exactly what the standard required.
 
 #### Frame Error on a Previous Message May Cause False Start Bit Detection
 A false start bit detection will trigger if receiving a frame with `RXDATAH.FERR` set and reading the RXDATAL before the RxD line goes high.
 
 **Workaround:** Wait for the RXD pin to go high before reading RXDATA, for instance, by polling the bit in `PORTn.IN` where the RXD
 pin is located.
-**megaTinyCore note:** This impacts our serial implementation on effected parts - we don't even read RXDATAH or report framing errors - but if you are receiving framing errors, the baud rates are probably mismatched, so it is likely that the received data garbage anyway.
+**megaTinyCore note:** This, technically, impacts our serial implementation on effected parts. However, if you are receiving framing errors, the baud rates or port settings are wrong on one or both side - so instead of receiving one byte of garbage, you'd receive two bytes of slightly different garbage. I do not belive there are cases where this can result in data that would have otherwise been inteligible coming out as garbage short of a transient framing error in a long string of continuous data, where it never has a change to regain it's bearings.
 
 #### Open-Drain Mode Does Not Work When TXD is Configured as Output
 When the USART TXD pin is configured as an output, it can drive the pin high regardless of whether the Open-Drain mode is enabled or not.
 
 **Workaround:** Configure the TXD pin as an input by writing the corresponding bit in PORTx.DIR to '0' when using Open-Drain
 mode.
-**megaTinyCore note:** We don't provide a wrapper around this mode - yet - though it could be enabled manually, in which case it would be an issue on effected parts; the workaround is trivial - AS LONG AS YOU KNOW ABOUT IT. This bug was known very early on. They really ought to mention this in the actual datasheet instead of the errata!
+**megaTinyCore note:** We don't provide a wrapper around this mode - yet - though it could be enabled manually, in which case it would be an issue on effected parts; the workaround is trivial - AS LONG AS YOU KNOW ABOUT IT. This bug was known very early on; They really ought to mention this in the actual datasheet instead of the errata!
 
 #### Start-of-Frame Detection Can Unintentionally Be Enabled in Active Mode When RXCIF Is ‘0’
 The Start-of-Frame Detector can unintentionally be enabled when the device is in Active mode and when the Receive Complete Interrupt Flag (RXCIF) in the USARTn.STATUS register is ‘0’. If the Receive Data (RXDATA) registers are read while receiving new data, RXCIF is cleared, and the Start-of-Frame Detector will be enabled and falsely detects the following falling edge as a start bit. When the Start-of-Frame Detector detects a start condition, the frame reception is restarted, resulting in corrupt received data. Note that the USART Receive Start Interrupt Flag (RXSIF) always is ‘0’ when in Active mode. No interrupt will be triggered.

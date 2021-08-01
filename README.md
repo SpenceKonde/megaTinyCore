@@ -51,39 +51,51 @@ One can be made from a classic AVR Uno/Nano/Pro Mini; inexpensive Nano clones ar
   * [ATtiny402,202](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x02.md)
 
 ## Overall Part Comparison
-| tinyAVR series      |     0-series   |     1-series        |      2-series       |
-|---------------------|----------------|---------------------|---------------------|
-| Pincounts           |  8, 14, 20, 24 |       8, 14, 20, 24 |          14, 20, 24 |
-| Flash (max)         |         32768b |              32768b |    (planned) 32768b |
-| RAM (max)           |          1024b |               2048b |              3072b  |
-| Separate reset pin? |            NO  |                  NO |  20/24-pin optional |
-| PWM pins (Arduino)  | 8pin: 4 else 6 |    8p:4, >=20p:8, 6 |                   6 |
-| Type A timers       |              1 |                   1 |                   1 |
-| Type B timers       |             1  | 1 for < 16k, else 2 |                   2 |
-| Type D timer        |            MO  |                 Yes |                  No |
-| Real Time Clock     | Yes, 32k xtal  |                 Yes |                 Yes |
-| USARTs    (pin options) |      1 (2) |               1 (2) |               2 (3) |
-| SPI ports (pin options) |         1  | 1(2 on 8/14/20-pin) |   1 (2 on 20/24pin) |
-| TWI ports (pin options) |         1  |               1 (2) |                  1  |
-| Maximum rated speed |         20 MHz |              20 MHz |              20 MHz |
-| Overclocking (internal @ 5v) |   ??? |           25-30 MHz |              32 MHz |
-| Overclocking (ext. clk @ 5v) |   ??? |              32 MHz |           >= 32 MHz |
-| External crystal    |            NO  |                  NO |                  NO |
-| Event Channels      | 1 sync 2 async |      2 sync 4 async |    6, no sync/async |
-| CCL Logic Blocks    |     2 (1 pair) |          2 (1 pair) |         4 (2 pairs) |
-| Analog Comparators  |  1, no DAC REF |        3, w/DAC REF |        1, w/DAC REF |
-| ADC                 |  single 10-bit | 1 or 2x 10-bit ADCs |   12-bit diff w/PGA |
-| Analog References   | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | 1.024V, 2.048V, 2.5V, 4.096V |
+| tinyAVR series      |     0-series   |     1-series    | 1-series 16+k  |      2-series       |
+|---------------------|----------------|-----------------|------|---------|---------------------|
+| Pincounts           | 8*  14, 20, 24 |  8*  14, 20, 24 |     14, 20, 24 |          14, 20, 24 |
+| Flash               |  2, 4, 8, 16k  |        2, 4, 8k |     16k or 32k |    (planned) 32768b |
+| RAM                 | 128,256,512,1k |    128,256,512b |          2048b |              3072b  |
+| Separate reset pin? |            NO  |              NO |             NO |  20/24-pin optional |
+| PWM pins (Arduino)  | 8pin: 4 else 6 | 8p:4,14p6,else8 |     >=20p:8, 6 |                   6 |
+| Type A timers       |              1 |               1 |              1 |                   1 |
+| Type B timers       |              1 |               1 |    16k, else 2 |                   2 |
+| Type D timer        |             NO |             Yes |            Yes |                  No |
+| Real Time Clock     |  Yes, no xtal  |             Yes |            Yes |                 Yes |
+| USARTs    (pin options) |      1 (2) |           1 (2) |          1 (2) |               2 (3) |
+| SPI ports (pin options) |         1  |  2 except 14pin | 2 except 14pin |   1 (2 on 20/24pin) |
+| TWI ports (pin options) |         1  |           1 (2) |          1 (2) |                  1  |
+| Maximum rated speed |         20 MHz |            20Mz |         20 MHz |              20 MHz |
+| Overclocking (internal @ 5v) |   ??? |       25-30 MHz |      25-30 MHz |              32 MHz |
+| Overclocking (ext. clk @ 5v) |   ??? |          32 MHz |         32 MHz |           >= 32 MHz |
+| External crystal    |            NO  |              NO |             NO |                  NO |
+| Event Channels      | 1 sync 2 async |  2 sync 4 async | 2 sync 4 async |    6, no sync/async |
+| CCL Logic Blocks    |     2 (1 pair) |     2 (1 pair)  |     2 (1 pair) |         4 (2 pairs) |
+| Analog Comparators  |  1, no DAC REF |   1, w/DAC REF  |   3, w/DAC REF |        1, w/DAC REF |
+| ADC                 |     10-bit ADC |     10-bit ADC  | 2x 10-bit ADCs |   12-bit diff w/PGA |
+| Analog References   | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | 1.024V, 2.048V, 2.5V, 4.096V |
 
-Overclocked speeds are typical maximum speeds that can be reached with basic functionality intact. Not all parts will reach or function at these speeds, and the operating temperature range is likely far narrower than it is at the rated speeds. I'm aware of nobody who has played with overclocking the 0-series, but as it was released at the same time as the 1-series and appears to be a 1-series with fewer features, I would expect them to be the same - though if they turned out not to be, I could rationalize a difference in either direction equally easily (and even phrase it in a way that makes someone who assumed otherwise look silly: "they're budget parts, likely made with a less advanced process, of course they don't overclock as well!" or "without all those wacky features hanging off the clock, of course they overclock better!").
+### Notes and highlights
+#### 8-pin parts are 2k or 4k only
+Very disappointing news - I can see why this is though - adapting the pinout to match the small number of pins means that the pins that things are on for the 8-pin parts isn't the same. It breaks the consistency that the rest of the parts have, where each pin has the same functionality on all parts that have that pin. Let us all just hope that there is a series of 8-pin tinyAVR parts on Microchip's roadmap, and they just decided that they could get
 
-The ADC on the 2-series is arguably the best ADC that has shipped on an AVR to date (not counting the xMega line, which is outside the scope of this document and the concerns of the Arduino world, and possibly those of the world in general). Certainly, outside of the xMega line there is little meaningful competition. The closest comparisons are the classic AVRs that got differential ADCs with top-notch features (the t841, mega2560 and (surprisingly) the t861 being the strongest competitors). While it isn't capable of the insane 100x and 200x gain that some parts bragged of in the classic AVR days, I'm pretty sure that was mostly an "on paper" capability, rather than something that could be used in practice (you're telling me the 841 with is going to be making accurate differential ADC measurements with 100x gain? So I can get a resolution of about 10 nanovolts, with a single supply, from a 90-cent chip, under any vaguely realistic conditions? I find the claims of the t861 more credible - with at most 32x gain, with a separate analog supply specifying certain bypassing requirements). This new ADC is certainly highly capable, with true differential capability (unlike the DA and DB series had), and one which rises head and shoulders above anything available on a modern AVR. The programmable gain amplifier is a new capability, and it remains to be seen what sort of feats of analog measurement people are able to get out of it; it certainly appears promising. It will be epecially interesting to understand the differences between using the PGA at 0x gain, vs not using the PGA, and the benefits and disadvantages of doing so. (Microchip would be well-served by a documement that discussed how to choose the right ADC configuration for a task in the general case. I am aware of no such document for ANY version of the ADC.)
+#### 2-series ADC
+The ADC on the 2-series is arguably the best ADC that has shipped on an AVR to date (not counting the xMega line, which is outside the scope of this document and the concerns of the Arduino world). Certainly, outside of the xMega line there is little meaningful competition. The closest comparisons are the classic AVRs that got differential ADCs with top-notch features (the t841, mega2560 and (surprisingly) the t861 being the strongest competitors). While it isn't capable of the insane 100x and 200x gain that some parts bragged of in the classic AVR days, it was never clear to me how much of what was being amplified was simply noise. This new ADC is certainly highly capable, with true differential capability (unlike the DA and DB series had), and one which rises head and shoulders above anything available on any other modern AVRs to date. The programmable gain amplifier is a new capability, and it remains to be seen what sort of feats of analog measurement people are able to get out of it; it certainly appears promising. It will be epecially interesting to understand the differences between using the PGA at 0x gain, vs not using the PGA, and the benefits and disadvantages of doing so. (Microchip would be well-served by a documement that discussed how to choose the right ADC configuration for a task in the general case. I am aware of no such document for ANY version of the ADC.)
 
 The addition of 1024-sample accumulation for the purposes of oversampling and decimation is a welcome addition, though one which also risks understating the magnitude and relevance of offset error. (Taking 1024 samples, (all of which have a given offset error), then decimating the sum to yield a 17-bit ADC measurement makes it easy to imagine that any error would be confined to the lowest couple of bits. But if the error was a constant offset, it's magntiude as a fraction of full scale does not change with oversampling and decimation. Software may  be able to correct for ADC offset error under various conditions.
 
+It would appear that the first full sized chip featuring this ADC will be the EA-series parts, which will be available in 28-48 pin packages with up to 64k flash, according to the available information, from the product brief. Considering that each sub-generation of modern AVRs has featured tweaks to the ADC (which are mostly papered over by the Arduino API), it will be very interesting to see what surprises, if any, are in store for us with the EA-series.
+
+#### Type D timer - 1-series only.
 The type D timer is only used for PWM on 20/24 pin 1-series parts - on the smaller parts, it wouldn't let us increase the total number of PWM pins - Only the WOC and WOD pins (on PC0 and PC1 respectively) don't already have TCA-driven PWM on them. As such, since analogWrite() does not support any features that would be enabled by turning off split mode (like 16-bit PWM) or enhanced by using the type D timer (like adjusting the frequency), it would just be worse, because it would require additional space to store the routine to turn on and off PWM from two types of timer, instead of one.
 
-The type B timers are lousy at generating PWM for a variety of reasons, and with the type B timers being so incredibly useful for other purposes, TCB-driven PWM is not supported on megaTinyCore, nor is that planned for a future version. If I thought people would stand for this, I'd drop it from DxCore too.
+#### 1-series parts with 16k or 32k of flash
+Unlike almost every other AVR ever, the 16k and 32k versions (only) have a few extra features - they all have 2k of ram, whether 16k or 32k, they have 3 analog comparators (including a windoww mode), a second - desperately needed - type B timer - and weirdest of all they have a second ADC, differing only in which pins the channels correspond to!
+
+#### What the overclocking numbers mean
+Overclocked speeds are typical maximum speeds that can be reached with basic functionality intact. Not all parts will reach or function at these speeds, and the operating temperature range is likely far narrower than it is at the rated speeds. I'm aware of nobody who has played with overclocking the 0-series, but as it was released at the same time as the 1-series and appears to be a 1-series with fewer features, I would expect them to be the same - though if they turned out not to be, I could rationalize a difference in either direction equally easily (and even phrase it in a way that makes someone who assumed otherwise look silly: "they're budget parts, likely made with a less advanced process, of course they don't overclock as well!" or "without all those wacky features hanging off the clock, of course they overclock better!").
+
+The internal oscillator speeds can be reached (on most but not all specimens) with [tuning](megaavr/extras/Tuning.md). Best results however are obtained with an external oscillator. Never use an overclocked part in any critical application. neither stability nor correctness of artithmatic can be guaranteed!!
 
 ### Automotive (VAO) versions
 The automotive versions should also work. You must always select the 16 MHz-derived clock speeds on these parts. They do not support 20 MHz operation.
@@ -100,17 +112,17 @@ Do note that the terms `avr` and `megaavr` are still used internally (for exampl
 
 It is unfortunate that there are not officially sanctioned terms for these two classes of AVR microcontrollers. I have been referring the pre-2016 AVR devices (with PORTx, DDRx, etc registers for pins) as "classic AVR" and the ones Arduino calls megaavr as "modern AVR"
 
-## Don't buy modern AVRs on AliExpress or from eBay international sellers
+## **WARNING** Don't buy modern AVRs on AliExpress or from eBay international sellers
 I buy a lot of electronics stuff on aliexpress. It's a great marketplace for things that are made by Chinese companies and are mostly generic. It is not a great place for the latest semiconductor product lines from major western manufacturers, especially in the midst of a historic shortage of said chips. The modern AVR devices people have bought on there (when they have been found at all - they're rarely offered) have been reported to be fake or defective (like ATtiny412s that think they're 416s). For that matter, you probablty don't want to buy any AVR microcontrollers on aliexpress... Assembled boards, like Arduino Nano clones, generally work if you avoid the ones with the third party LGT8 chips and watch out for the ones with the ATmega168p instead of the '328p - but there are a lot of reports of bogus microcontrollers (I have heard of fake ATtiny85s that were actually remarked ATtiny13s, for example). Buy them from reputable distributors like Digikey or Mouser (if in a hurry, and they're on backorder - which is the case for almost everything in QFN package as of July 2021 - buy from a USA/EU-based scalper).
 
 ## Buying tinyAVR 1-series and 2-series Breakout Boards
 I sell breakout boards with regulator, UPDI header, and Serial header in my tindie shop, as well as the bare boards. Buying from my store helps support further development on the core, and is a great way to get started using these exciting new parts with Arduino. Currently ATtiny1624 boards are available, but the 20 and 24-pin parts will not be sold as an assembled board until a newly revised PCB design is back from the board house to enable autoreset on the alt-reset pin. There is also a 14-pin board revision coming - thought it is largely cosmetic. The yellow solder mask has got to go, as the readability seemed to get worse in the last several batches. The new boards also standardize a 0.6" spacing between the rows of pins, instead of the current 0.7" spacing, so you will be able to, for example, put machined pin header onto them and plug them into a wide-DIP socket, or use them with our prototyping board optimized for that row spacing. Assembled 0-series boards are being discontinued, and will not be restocked once they sell out. The same will happen for the 16k 2-series parts once the 32k ones are available.
 
-### [ATtiny3217, 1607 assembled](https://www.tindie.com/products/17523/)
+### [ATtiny3217, 1607 (while supplies last) assembled](https://www.tindie.com/products/17523/)
 ### [ATtiny3217/1617/817/417/1607/807 bare board](https://www.tindie.com/products/17613/)
-### [ATtiny3216, 1606 assembled](https://www.tindie.com/products/17597/)
+### [ATtiny3216, 1606 (while supplies last) assembled](https://www.tindie.com/products/17597/)
 ### [ATtiny3216/1616/816/416/1606/806/406 bare board](https://www.tindie.com/products/17614/)
-### [ATtiny1624, 1614, and 1604 assembled](https://www.tindie.com/products/17598/)
+### [ATtiny1624, 1614, and 1604 (while supplies last) assembled](https://www.tindie.com/products/17598/)
 ### [ATtiny1614/814/414/1604/804/404 bare board](https://www.tindie.com/products/17748/)
 ### [ATtiny412, 402 assembled](https://www.tindie.com/products/17685/)
 ### [ATtiny412/212/402/202 bare board](https://www.tindie.com/products/17749/)
@@ -161,7 +173,7 @@ See [Speed Grades](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaa
 
 These parts do not support using an external crystal like the classic ATtiny parts do, however the internal oscillator is tightly calibrated enough that the internal clock will work for UART communication without issue; Like the megaAVR 0-series, it includes clock corrections at 3V and 5V in the signature row. If you need particularly accurate UART baud rates more than you need the flash this option uses, you can enable it from the Tools submenu.
 
-These parts also support an external **clock** (that can come from an external oscillator or - available from the usual suspects for a price nearly as high as the ATtiny itself, or from aliexpress for only prices that are slightly less exorbitant (search for "active crystal"), the CLKOUT from another processor, and so on).
+These parts do support an external **clock** (that can come from an external oscillator or - available from the usual suspects for a price nearly as high as the ATtiny itself, or from aliexpress for only prices that are slightly less exorbitant (search for "active crystal"), the CLKOUT from another processor, and so on).
 
 ### Memory-mapped flash: No need to declare PROGMEM
 Unlike classic AVRs, on the these parts, *the flash is within the same address space as the rest of the memory*. This means `pgm_read_*_near()` is not needed to read directly from flash. Because of this, the compiler automatically puts any variable declared `const` into PROGMEM, and accesses it appropriately - you no longer need to explicitly declare them as PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either (As of 2.1.0, F() once more explicitly declares things as living in PROGMEM (ie, it is slightly less efficient) in order to ensure compatibility with third party libraries).
@@ -239,24 +251,27 @@ The Wire library requires a TX and RX buffer; these are both the same size, dete
 #### *almost?*
 There is one other rather significant change, though it is transparent to almost everyone. The official Arduino megaavr core has TwoWire extending HardwareI2C, which extends Stream. We just extend Stream. HardwareI2C defines a considerable number of virtual member functions. This results in all of those methods being included in the final binary *regardless of whether they are called*. A master needs all the slave functions even if it never operates as a slave. A slave needs all the master functions, even if it never operates as a master. And the 4k parts can just forget about using Wire.h. Nobody has been able to express how this benefits the user, or why it was done other than that the 4809 is all that core was written to support and it has enough flash to get away with doing that, nor has anyone reported any problems caused by it.
 
-| Parts                  |   SRAM   | Buffers (2.3.0+) | Buffers (pre-2.3.0) | Notes:                                                                            |
-|------------------------|----------|------------------|---------------------|-----------------------------------------------------------------------------------|
-| 2k 0/1-series          |     128b |              16b |                 16b | Wire is basically unusable w/2k flash anyway, so this is largely academic         |
-| 4-8k 0/1, 4k 2-series  | under 1k |              32b |                 16b | 32b buffer is really rough even w/256b - but 16b breaks libraries in confusing    |
-| other tinyAVR, AVR16DD |     1-4k |              32b |                 32b | ways. Now all tinyAVR with >128b ram has 32b I2C TX and RX buffers                |
-| AVR32DA/DB/DD parts    | Under 8k |             130b |                 64b | Official 4809 core does 128b, we add 2 more to allow for 128 byte page writes to  |
-| AVR128Dx and AVR64Dx   | 8 or 16k |             130b |                128b | 512kbit+ (64KByte) AT24 I2C memory/eeprom chips which require 2 address bytes     |
+| Parts                  |   SRAM   | Buffers (2.3.0+) | Buffers (pre-2.3.0) |
+|------------------------|----------|------------------|---------------------|
+| 2k 0/1-series          |     128b |              16b |                 16b |
+| 4-8k 0/1, 4k 2-series  | under 1k |              32b |                 16b |
+| other tinyAVR, AVR16DD | under 4k |              32b |                 32b |
+| AVR32DA/DB/DD parts    | under 8k |             130b |                 64b |
+| AVR128Dx and AVR64Dx   | 8 or 16k |             130b |                128b |
 
-| Parts           | Wire instances   | Master/slave         |    Arduino support? |
+Wire is basically unusable w/2k flash anyway, so the smaller buffer is largely academic. The 32b buffer is really rough with 256b - ways. Now all tinyAVR with >128b ram have 32b I2C TX and RX buffers. The Wire codebase is used for DxCore as well; on these larger parts, we need to be compatible with the official m4809 core which does 128b; we add 2 more to allow for a 128 byte page write to 512kbit+ (64KByte) AT24 I2C memory/eeprom chips, since those require two address bytes followed by the data.
+
+#### Use with multiple masters
+
+| Parts           | Wire instances   | Bus Topology         |    Arduino support? |
 |-----------------|------------------|----------------------|------------------
 | Classic ATmega  | 1 (rarely 2) TWI | Multimaster          | Maybe via libraries, has been done.
-| Classoic Timy   | USI or slave ony | Multimaster          | Not to my knwoledge. and I'd think I'd knoqw.
+| Classoic Timy   | USI or slave only| Multimaster          | No, coming soon!
 | Moderm Tiny     | 1 full TWI       | Multimaster          | No, coming soon!
-| mega 0-series   | 1                | Dual mode supported  | No.
-| AVR Dx-series   | 2 (see note :(  )| Dual mode supported  | No, coming soon!
+| mega 0-series   | 1                | Dual mode supported  | No, probable after we get it here.
+| AVR Dx-series   | 2 but see note   | Dual mode supported  | No, coming soon! Currently support for only one TWI peripheral.
 *Note: On classic AVRs, multimaster had a bad reputation*
-Multimaster puts both functionalities on one pair of pins Many complications and caveats are introduced.. Dual mode lets a single TWI be master of one bus via one set of pins while being a slave on another, without the rolls fightign. Ths appears to be a functionality of "full size" parts only - which is unfortunate, because it's *really* the one you want. But multimaster shiuld should work once the librariers are dine  everywhere, and is thought ro be more robuast now.
-there is a major rewrite of Wire coming which will add multimaster and dual mode as well as reduce flash. I conwsider it high enough risk that it can't be in 2.4.0. but it will be here before 2.5.0!
+Multimaster puts both functionalities on one pair of pins. Many complications and caveats are introduced, though the standard does provide for bus arbitration. Dual mode lets a single TWI be master of one bus via one set of pins while being a slave on another, without the rolls fightign. Ths appears to be a functionality of "full size" parts only - which is unfortunate, because it's *really* the one you want. We are hopeful that the hardware of the modern AVR parts should make this work better; there is a major rewrite of Wire coming which will add multimaster (and dual mode where applicable) as well as reduce flash usage. I consider it high enough risk that it is being deferred until early 2.4.x
 
 ### PWM support
 The core provides hardware PWM via the standard `analogWrite()` function. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available. On all other parts except 1-series parts with 20 or 24 pins, 6 PWM pins are available, all driven by Timer A. The 20 and 24 pin 1-series parts have two additional pins, driven by TCD0. The 2-series apparently traded TCD0 for a second serial port and a super-fancy ADC - those parts also all have 6 PWM pins. The Type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A and they are often too useful to justify using a whole TCB for  - however you can take them over if you need to generate PWM at different frequencies, though the fact that the prescaler cannot differ from the type A timer limits this use as well. See the pinout charts for a list of which pins support PWM.

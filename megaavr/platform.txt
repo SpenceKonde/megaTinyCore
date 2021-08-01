@@ -160,18 +160,18 @@ tools.avrdude_remote.upload.pattern=/usr/bin/run-avrdude /tmp/sketch.hex {upload
 
 tools.avrdude.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -d -v
 
-# pymcuprog - new in 2.2.0
+# SerialUPDI - new in 2.2.0, renamed to SerialUPDI since 2.4.0 because a lot of the unused functionality of pymcuprog is no longer present, though still based on the same pymcuprog codebase.
 
 #################################
 # This is the line for use with
 #    MANUAL INSTALLATIONS
 #
 # The build script comments out the line (or lines, but
-# there's only one) starting with tools.pymcuprog.cmd
+# there's only one) starting with tools.serialupdi.cmd
 # See the ManualPython document for information
 # on making this programming option work w/out board manager
 
-tools.pymcuprog.cmd={runtime.platform.path}/tools/python3/python3
+tools.serialupdi.cmd={runtime.platform.path}/tools/python3/python3
 
 ################################
 # BOARD MANAGER INSTALLATIONS
@@ -182,20 +182,20 @@ tools.pymcuprog.cmd={runtime.platform.path}/tools/python3/python3
 # Build script removes all instances of #REMOVE#
 # at the start of a line.
 
-#REMOVE#tools.pymcuprog.cmd={runtime.tools.python3.path}/python3
+#REMOVE#tools.serialupdi.cmd={runtime.tools.python3.path}/python3
 
-tools.pymcuprog.erase.params.verbose=
-tools.pymcuprog.erase.params.quiet=
-tools.pymcuprog.erase.pattern=
+tools.serialupdi.erase.params.verbose=
+tools.serialupdi.erase.params.quiet=
+tools.serialupdi.erase.pattern=
 
-tools.pymcuprog.bootloader.params.verbose=
-tools.pymcuprog.bootloader.params.quiet=
-tools.pymcuprog.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:{bootloader.OSCCFG} 4:{bootloader.TCD0CFG} 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} {bootloader.pymcuprogstring}
+tools.serialupdi.bootloader.params.verbose=
+tools.serialupdi.bootloader.params.quiet=
+tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:{bootloader.OSCCFG} 4:{bootloader.TCD0CFG} 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} {bootloader.serialupdistring}
 
-tools.pymcuprog.program.params.verbose=
-tools.pymcuprog.program.params.quiet=
-tools.pymcuprog.program.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol}{upload.with_programmer_not_available_for_bootloader_boards} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 2:{bootloader.OSCCFG} 6:{bootloader.SYSCFG1} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write
+tools.serialupdi.program.params.verbose=
+tools.serialupdi.program.params.quiet=
+tools.serialupdi.program.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol}{upload.with_programmer_not_available_for_bootloader_boards} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 2:{bootloader.OSCCFG} 6:{bootloader.SYSCFG1} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write
 
 #Expert mode (allows disabling the UPDI pin, outside the context of burning a bootloader. Hence it can only be reprogrammed with an HV UPDI programmer) Uncomment these recipes to enable.
 #tools.avrdude.program.pattern="{cmd.path}" "-C{config.path}" -p{build.mcu}{upload.workaround} -c{protocol} {program.extra_params} "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
-#tools.pymcuprog.program.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} --fuses 2:{bootloader.OSCCFG} 5:{bootloader.SYSCFG0}  6:{bootloader.SYSCFG1} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write
+#tools.serialupdi.program.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} --fuses 2:{bootloader.OSCCFG} 5:{bootloader.SYSCFG0}  6:{bootloader.SYSCFG1} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write
