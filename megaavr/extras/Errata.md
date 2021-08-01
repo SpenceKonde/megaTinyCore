@@ -377,7 +377,7 @@ When the TCA is configured to a NORMAL or FRQ mode (WGMODE in TCAn.CTRLB is ‘0
 
 **Workaround:** None.
 
-**megaTinyCore note:** Only impacts users who reconfigure TCA0 and use RESTART commands or events while the timer is counting down, a small crosssection of all users, and especally megaTinyCore users. Impacts every released part with a TCA as if July 2021. What I do not understand is why this is considered errata at all, as the datasheet for these parts says, of that command, *"The software can force a restart of the current waveform period by issuing a RESTART command. In this case, the counter, **direction**, and all compare outputs are set to '0'."*
+**megaTinyCore note:** Only impacts users who reconfigure TCA0 and use RESTART commands or events while the timer is counting down, a small crosssection of all users, and especially megaTinyCore users. Impacts every released part with a TCA as if July 2021. What I do not understand is why this is considered errata at all, as the datasheet for these parts says, of that command, *"The software can force a restart of the current waveform period by issuing a RESTART command. In this case, the counter, **direction**, and all compare outputs are set to '0'."*
 
 ### TCB - Timer/Counter B
 #### CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode
@@ -496,7 +496,7 @@ A false start bit detection will trigger if receiving a frame with `RXDATAH.FERR
 
 **Workaround:** Wait for the RXD pin to go high before reading RXDATA, for instance, by polling the bit in `PORTn.IN` where the RXD
 pin is located.
-**megaTinyCore note:** This, technically, impacts our serial implementation on effected parts. However, if you are receiving framing errors, the baud rates or port settings are wrong on one or both side - so instead of receiving one byte of garbage, you'd receive two bytes of slightly different garbage. I do not belive there are cases where this can result in data that would have otherwise been inteligible coming out as garbage short of a transient framing error in a long string of continuous data, where it never has a change to regain it's bearings.
+**megaTinyCore note:** This, technically, impacts our serial implementation on effected parts. However, if you are receiving framing errors, the baud rates or port settings are wrong on one or both side - so instead of receiving one byte of garbage, you'd receive two bytes of slightly different garbage. I do not believe there are cases where this can result in data that would have otherwise been inteligible coming out as garbage short of a transient framing error in a long string of continuous data, where it never has a change to regain it's bearings.
 
 #### Open-Drain Mode Does Not Work When TXD is Configured as Output
 When the USART TXD pin is configured as an output, it can drive the pin high regardless of whether the Open-Drain mode is enabled or not.
