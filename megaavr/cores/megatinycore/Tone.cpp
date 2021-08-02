@@ -322,4 +322,8 @@ static void disableTimer() {
     }
     _timer->INTFLAGS = TCB_CAPT_bm; // Clear flag
   }
+#else
+  void disableTimer() {
+    badCall("TCB0 used for millis, no other TCBs on this part; tone requires exclusive use of a type B timer, use a differemt millis timer or a tinyAVR with a second TCB (any 2-series, or 1-series with 16k+ flash)");
+  }
 #endif

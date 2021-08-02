@@ -63,8 +63,10 @@ jobs:
         - megaavr/libraries/tinyNeoPixel/examples/strandtest
         - megaavr/libraries/tinyNeoPixel_Static/examples/buttoncycler
         - megaavr/libraries/tinyNeoPixel_Static/examples/strandtest
+        - megaavr/extras/CompileTestSketches/timing/test_tone
       available-flash-2kB-plus-true-sketch-paths: |
         - megaavr/libraries/Wire/examples/slave_sender
+        - megaavr/extras/CompileTestSketches/test_digital_io
       available-flash-1_5kB-plus-true-sketch-paths: |
         - megaavr/libraries/EEPROM/examples/eeprom_clear
         - megaavr/libraries/EEPROM/examples/eeprom_iteration
@@ -80,9 +82,7 @@ jobs:
         - megaavr/libraries/Logic/examples/LatchNoSeq
         - megaavr/libraries/SPI/examples/DigitalPotControl
         - megaavr/libraries/tinyNeoPixel_Static/examples/simple
-        - megaavr/extras/CompileTestSketches/test_digital_io
         - megaavr/extras/CompileTestSketches/timing/test_millis_micros
-        - megaavr/extras/CompileTestSketches/timing/test_tone
 
       IO-class-6-plus-true-sketch-paths: |
         - megaavr/libraries/Logic/examples/Five_input_NOR
