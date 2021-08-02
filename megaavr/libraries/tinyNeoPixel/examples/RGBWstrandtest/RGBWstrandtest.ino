@@ -172,7 +172,7 @@ void whiteOverRainbow(uint8_t wait, uint8_t whiteSpeed, uint8_t whiteLength) {
           strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
         }
       }
-
+      #if !defined(MILLIS_USE_TIMERNONE)
       if (millis() - lastTime > whiteSpeed) {
         head++;
         tail++;
@@ -181,6 +181,9 @@ void whiteOverRainbow(uint8_t wait, uint8_t whiteSpeed, uint8_t whiteLength) {
         }
         lastTime = millis();
       }
+      #else
+      #warning "WhiteOverRainbow() function of this sketch require millis, which is not currently enabled. This function will not operate correctly "
+      #endif
 
       if (loopNum == loops) {
         return;
