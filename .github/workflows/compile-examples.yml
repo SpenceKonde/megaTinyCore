@@ -63,7 +63,6 @@ jobs:
         - megaavr/libraries/tinyNeoPixel/examples/strandtest
         - megaavr/libraries/tinyNeoPixel_Static/examples/buttoncycler
         - megaavr/libraries/tinyNeoPixel_Static/examples/strandtest
-        - megaavr/extras/CompileTestSketches/timing/test_tone
       available-flash-2kB-plus-true-sketch-paths: |
         - megaavr/libraries/Wire/examples/slave_sender
         - megaavr/extras/CompileTestSketches/test_digital_io
@@ -83,7 +82,10 @@ jobs:
         - megaavr/libraries/SPI/examples/DigitalPotControl
         - megaavr/libraries/tinyNeoPixel_Static/examples/simple
         - megaavr/extras/CompileTestSketches/timing/test_millis_micros
-
+      free-TCB-flash-3.5kB-plus-true-sketch-paths: |
+        - megaavr/extras/CompileTestSketches/timing/test_tone
+      # this tests for >= 3.5k flash so it runs on 4k parts EXCEPT for the TCB millis test, where it checks if flash > 8 and peripheral class > 0; there's no need to verify 4 and 8k 2 series, and yaml logic syntax sucks enough already.
+      }
       IO-class-6-plus-true-sketch-paths: |
         - megaavr/libraries/Logic/examples/Five_input_NOR
       IO-class-2-series-1-sketch-paths: |
@@ -111,6 +113,9 @@ jobs:
         bootloader-code:
           -
           - o
+        bootloader-series:
+          - y
+          - 2
 
         # Filter out these matrix combinations
         exclude:
@@ -137,35 +142,49 @@ jobs:
             peripheral-class: 2
           - flash-class: 32
             peripheral-class: 2
+          - peripheral-class: 2
+            bootloader-code: o
+            bootloader-series: y
+          - peripheral-class: 1
+            bootloader-code: o
+            bootloader-series: 2
+          - peripheral-class: 0
+            bootloader-code: o
+            bootloader-series: 2
 
         include:
           - flash-class: 32
             bootloader-code:
             available-flash-kB: 32
+            bootloader-series: y
           - flash-class: 32
             bootloader-code: o
             available-flash-kB: 31.5
           - flash-class: 16
             bootloader-code:
             available-flash-kB: 16
+            bootloader-series: y
           - flash-class: 16
             bootloader-code: o
             available-flash-kB: 15.5
           - flash-class: 8
             bootloader-code:
             available-flash-kB: 8
+            bootloader-series: y
           - flash-class: 8
             bootloader-code: o
             available-flash-kB: 7.5
           - flash-class: 4
             bootloader-code:
             available-flash-kB: 4
+            bootloader-series: y
           - flash-class: 4
             bootloader-code: o
             available-flash-kB: 3.5
           - flash-class: 2
             bootloader-code:
             available-flash-kB: 2
+            bootloader-series: y
           - flash-class: 2
             bootloader-code: o
             available-flash-kB: 1.5
@@ -188,7 +207,7 @@ jobs:
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
-
+            ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
@@ -247,6 +266,7 @@ jobs:
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
+            ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
 
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
@@ -276,6 +296,7 @@ jobs:
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
+            # ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', ["or", [matrix.peripheral-class, 2, [matrix.peripheral-class, 1, matrix.available-flash-kb > 8]]], matrix.available-flash-kB > 8)] }}
 
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
@@ -296,7 +317,7 @@ jobs:
       - name: Compile examples (RTC millis)
         uses: arduino/compile-sketches@main
         with:
-          fqbn: ${{ env.platform-name }}:atxy${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},millis=RTC
+          fqbn: ${{ env.platform-name }}:atxy${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},millis=rtc
           sketch-paths: |
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
@@ -305,6 +326,7 @@ jobs:
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
+            ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
 
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
@@ -322,10 +344,10 @@ jobs:
           enable-deltas-report: true
           enable-warnings-report: true
           sketches-report-path: sketches-reports
-      - name: Compile examples (RTC millis)
+      - name: Compile examples (RTC crystal millis)
         uses: arduino/compile-sketches@main
         with:
-          fqbn: ${{ env.platform-name }}:atxy${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},millis=RTC
+          fqbn: ${{ env.platform-name }}:atxy${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},millis=rtcxtal
           sketch-paths: |
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
@@ -334,6 +356,7 @@ jobs:
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
+            ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
 
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
@@ -392,6 +415,7 @@ jobs:
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
+            ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
 
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
@@ -421,6 +445,7 @@ jobs:
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
+            ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
