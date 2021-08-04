@@ -294,8 +294,6 @@ jobs:
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
-            # ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', ["or", [matrix.peripheral-class, 2, [matrix.peripheral-class, 1, matrix.available-flash-kb > 8]]], matrix.available-flash-kB > 8)] }}
-
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
