@@ -1,21 +1,24 @@
 void setup() {
 
-  pinMode(PIN_PA7, OUTPUT);
-  pinMode(PIN_PB1, OUTPUT);
+  pinMode(PIN_PA1, OUTPUT);
+  pinMode(PIN_PA3, OUTPUT);
   Serial.begin(115200);
 }
 void loop() {
-  wdt_reset();
+
+#if (defined(TCB1 || !defined(MILLIS_TIMER_NONE)))
   //VPORTA.OUT |= 128;
-  tone(PIN_PB1,1000);
-  delay(3000);
-  tone(PIN_PB1,2000);
+  tone(PIN_PA1,1000);
+  delay(1000);
+  noTone(PIN_PA1);
+  tone(PIN_PA1,2000);
   delay(3000);
   tone(PIN_PA3,3000);
-  delay(6000);
-  tone(PIN_PB1,4500);
+  delay(2000);
+  noTone(PIN_PA2)
+  tone(PIN_PA1,4500);
   delay(3000);
-  tone(PIN_PB1,7000);
+  tone(PIN_PA1,7000);
   delay(3000);
   /*
     Serial.pritln('N`);
@@ -31,7 +34,7 @@ void loop() {
     tone(PIN_PA2,5000,1000);
     VPORTA.OUT &= ~128;
   */
-}
-void wdt_reset() {
-  asm volatile ("wdr"::);
+#else
+  #warning "Tone reqires a type B timer but the only one we have is in use. Skip"
+#endif
 }
