@@ -108,12 +108,12 @@ jobs:
           - 6
           - 4
           - 2
-        bootloader-code:
-          -
-          - o
         bootloader-series:
           - y
           - 2
+        bootloader-code:
+          -
+          - o
 
         # Filter out these matrix combinations
         exclude:
@@ -141,7 +141,11 @@ jobs:
           - flash-class: 32
             peripheral-class: 2
           - peripheral-class: 2
+            bootloader-code: o
             bootloader-series: y
+          - peripheral-class: 2
+            bootloader-code:
+            bootloader-series: 2
           - peripheral-class: 1
             bootloader-series: 2
           - peripheral-class: 0

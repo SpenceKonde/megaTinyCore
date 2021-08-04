@@ -283,27 +283,28 @@ My tentative ruling is that:
   }
 #endif
 
-// helper functiodn for ending tone.
-/* Works for all timers -- the timer being disabled will go back to the
-    configuration it had on startup */
-static void disableTimer() {
-  _timer->CTRLA     = 0; // disable timer
-  _timer->INTCTRL   = 0; // disable the timer interrupts, otherwise if something else configures it and assumes that it's in the reset configuration
-  // and so doesn't write INTCTRL (because it doesn't use interrupts), the tone ISR could be called inappropriately.
-  _timer->INTFLAGS  = 0xFF; // Make sure the flags are cleared (flags can be set without their interrupt being enabled, these will fire as soon as it is)
-  _pin              = NOT_A_PIN; // and clear _pin.
-  #if defined(ENABLE_TCB_PWM) && ENABLE_TCB_PWM == 1
-    // RESTORE PWM FUNCTIONALITY, for use with cores that use the TCBs for PWM.
-    // This section adds 12 words of flash and as many clock cycles, and could probably be done less expensively if the compiler was smarter about
-    // using ldd/std when it offered a speed/flash advantage. But it isn't, so it doesn't. =
-    _timer->CTRLB = (TCB_CNTMODE_PWM8_gc); // 8 bit PWM mode, but do not enable output yet, will do in analogWrite()
-    _timer->CCMPL = PWM_TIMER_PERIOD;      // Assign 8-bit period, probably 254.
-    _timer->CCMPH = PWM_TIMER_COMPARE;     // We need to set low byte in order for high byte to be written (see silicon errata).
-    _timer->CTRLA = (TCB_CLKSEL_CLKTCA_gc) | (TCB_ENABLE_bm); // Use TCA clock (250kHz) and enable
-  #endif
-  *(timer_outtgl_reg - 1) = timer_bit_mask; // Write OUTCLR, so we are sure to end with pin LOW.
-}
-
+#ifndef TONE_UNAVAILABLE
+  // helper functiodn for ending tone.
+  /* Works for all timers -- the timer being disabled will go back to the
+      configuration it had on startup */
+  static void disableTimer() {
+    _timer->CTRLA     = 0; // disable timer
+    _timer->INTCTRL   = 0; // disable the timer interrupts, otherwise if something else configures it and assumes that it's in the reset configuration
+    // and so doesn't write INTCTRL (because it doesn't use interrupts), the tone ISR could be called inappropriately.
+    _timer->INTFLAGS  = 0xFF; // Make sure the flags are cleared (flags can be set without their interrupt being enabled, these will fire as soon as it is)
+    _pin              = NOT_A_PIN; // and clear _pin.
+    #if defined(ENABLE_TCB_PWM) && ENABLE_TCB_PWM == 1
+      // RESTORE PWM FUNCTIONALITY, for use with cores that use the TCBs for PWM.
+      // This section adds 12 words of flash and as many clock cycles, and could probably be done less expensively if the compiler was smarter about
+      // using ldd/std when it offered a speed/flash advantage. But it isn't, so it doesn't. =
+      _timer->CTRLB = (TCB_CNTMODE_PWM8_gc); // 8 bit PWM mode, but do not enable output yet, will do in analogWrite()
+      _timer->CCMPL = PWM_TIMER_PERIOD;      // Assign 8-bit period, probably 254.
+      _timer->CCMPH = PWM_TIMER_COMPARE;     // We need to set low byte in order for high byte to be written (see silicon errata).
+      _timer->CTRLA = (TCB_CLKSEL_CLKTCA_gc) | (TCB_ENABLE_bm); // Use TCA clock (250kHz) and enable
+    #endif
+    *(timer_outtgl_reg - 1) = timer_bit_mask; // Write OUTCLR, so we are sure to end with pin LOW.
+  }
+#endif
 #if !defined(TONE_UNAVAILABLE)
   #if defined(USE_TIMERB0)
   ISR(TCB0_INT_vect)
