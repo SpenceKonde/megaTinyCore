@@ -84,8 +84,6 @@ jobs:
         - megaavr/extras/CompileTestSketches/timing/test_millis_micros
       free-TCB-flash-3.5kB-plus-true-sketch-paths: |
         - megaavr/extras/CompileTestSketches/timing/test_tone
-      # this tests for >= 3.5k flash so it runs on 4k parts EXCEPT for the TCB millis test, where it checks if flash > 8 and peripheral class > 0; there's no need to verify 4 and 8k 2 series, and yaml logic syntax sucks enough already.
-      }
       IO-class-6-plus-true-sketch-paths: |
         - megaavr/libraries/Logic/examples/Five_input_NOR
       IO-class-2-series-1-sketch-paths: |
