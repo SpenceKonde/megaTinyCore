@@ -241,6 +241,7 @@
 #define DACOUT 0x80         // 1-series only. "PWM" output source only
 #define TIMERRTC 0x90       // millis timing source only
 #define TIMERRTC_XTAL 0x91  // 1/2-series only, millis timing source only
+#define TIMERRTC_XOSC 0x92  // 1/2-series only, millis timing source only
 
 
 #if MEGATINYCORE_SERIES == 2
@@ -293,7 +294,12 @@
 // Version related defines now handled in platform.txt
 #define MEGATINYCORE_NUM ((MEGATINYCORE_MAJOR<<24)+(MEGATINYCORE_MINOR<<16)+(MEGATINYCORE_PATCH<<8)+MEGATINYCORE_RELEASED)
 
-
+#if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_XOSC))
+  #if (MEGATINYCORE_SERIES==0 || defined(__AVR_ATtinyxy2__))
+    #error "Only the tinyAVR 1-series and 2-series parts with at least 8 pins support external RTC timebase"
+  #endif
+  #define MILLIS_USE_TIMERRTC
+#endif
 
  /* HARDWARE FEATURES - Used by #ifdefs and as constants in calculations in
   * the core and in libraries; it is hoped that these are at least somewhat

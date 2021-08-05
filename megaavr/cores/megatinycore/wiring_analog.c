@@ -897,11 +897,14 @@ void analogWrite(uint8_t pin, int val) {
 } // end of analogWrite
 
 void takeOverTCA0() {
-  TCA0.SPLIT.CTRLA = 0;          // Stop TCA0
-  PeripheralControl &= ~TIMERA0; // Mark timer as user controlled
-                                 // Reset TCA0
+  TCA0.SPLIT.CTRLA = 0;                                 // Stop TCA0
+  PeripheralControl &= ~TIMERA0;                        // Mark timer as user controlled
   /* Okay, seriously? The datasheets and io headers disagree here */
-  TCA0.SPLIT.CTRLESET = TCA_SPLIT_CMD_RESET_gc | 0x03;
+  TCA0.SPLIT.CTRLESET = TCA_SPLIT_CMD_RESET_gc | 0x03;  // Reset TCA0
+}
+
+uint8_t digitalPinToTimerNow(uint8_t pin) {
+  return digitalPinToTimer(pin) & PeripheralControl;
 }
 
 #if defined(TCD0)

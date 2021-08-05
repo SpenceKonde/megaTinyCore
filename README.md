@@ -663,8 +663,9 @@ The option used for the millis/micros timekeeping is given by a define of the fo
 * USE_MILLIS_TIMERB0
 * USE_MILLIS_TIMERB1
 * USE_MILLIS_TIMERD0
-* USE_MILLIS_TIMERRTC (defined if RTC is used for millis - whether or not external crystal is used)
+* USE_MILLIS_TIMERRTC (defined if RTC is used for millis - whether or not external crystal or oscillator is used)
 * USE_MILLIS_TIMERRTC_XTAL (only defined if RTC is used with external crystal)
+* USE_MILLIS_TIMERRTC_XOSC (only defined if RTC is used with external oscillator)
 * USE_MILLIS_TIMERNONE (defined if millis timekeeping is disabled)
 * DISABLE_MILLIS (synonym for above, for backwards compatibility)
 Additionally, `MILLIS_TIMER` is defined to that timer - see `Identifying Timers` below
@@ -695,22 +696,25 @@ There are a number of macros for determining what (if any) features the core sup
 * `ADC_MAXIMUM_GAIN` (0 or 16) - Some parts have an amplifier, often used for differential readings. The Dx-series are not among them (right now it's only the 2-series). If this is defined as a positive number, it is the maximum gain available. If this is defined as -1, there are one or more `OPAMP` peripherals available which could be directed towards the same purpose, though more deliberation would be needed. If it is defined as -128 (which may come out as 128 if converted to an unsigned integer), there is a gain stage on the differential ADC, but it is a classic AVR, so the available gain options depend on which pins are being measured, and there is a different procedure as detailed in the core documentation (ex, ATTinyCore 2.0.0 and later). If it is 0 or undefined, there is no built-in analog gain stage for the ADC, or it is not exposed through the core.
 
 #### Identifying Timers
-Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statements to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro.
+Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statements to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro. Defines are available on all parts that the core supports, whether or not the timer in question is present on the part (ie, it is safe to use them in tests/code without making sure that the part has that timer). There are two very closely related macros for determining pin timers:
+* `digitalPinToTimer()` tells you what timer (if any) the pin is associated with by default. This is a constant, when the argument is constant, the optimizer will optimize it away.
+* `digitalPinToTimerNow()` tells you what timer (if any) the pin is associated with currently. On megaTinyCore, this is either the result of `digitalPinToTimer()` unless that timer has been "taken over" by user code with `takeOverTCA0()` or `takeOverTCD0()`. On modern AVR cores like Dx-core which support use of `analogWrite()` even when the `PORTMUX.TCxROUTEA` register (where `x` is `A` or `D`) has been changed, this will return the timer currently associated with that pin. megaTinyCore does NOT support non-default timer pin mappings with `analogWrite()`- so if `PORTMUX.TCAROUTEA` (2-series) or `PORTMUX.CTRLC` (0/1-series) has been altered, this will not not reflect that.
 
 ```c
-#define NOT_ON_TIMER 0x00
-#define TIMERA0 0x10
-#define TIMERA1 0x08 // Not present on any tinyAVR
-#define TIMERB0 0x20
-#define TIMERB1 0x21
-#define TIMERB2 0x22 // Not present on any tinyAVR
-#define TIMERB3 0x23 // Not present on any tinyAVR
-#define TIMERB4 0x23 // Not present on any tinyAVR
-#define TIMERB5 0x23 // Not present on any tinyAVR
-#define TIMERD0 0x40
-#define DACOUT 0x80  // Not a timer - but used like one by analogWrite()
-#define TIMERRTC 0x90
-#define TIMERRTC_XTAL 0x91
+#define NOT_ON_TIMER 0x00   // if MILLIS_TIMER set to this, millis is disabled. If digitalPinToTimer() gives this, it is not a PWM pin
+#define TIMERA0 0x10        // Present on all modern AVRs
+#define TIMERA1 0x08        // Not present on any tinyAVR; only on AVR DA and DB-series parts with at least 48 pins and AVR EA-series parts
+#define TIMERB0 0x20        // Present on all modern AVRs
+#define TIMERB1 0x21        // Not present on any tinyAVR 0-series or tinyAVR 1-series parts with 2, 4, or 8k of flash
+#define TIMERB2 0x22        // Not present on any tinyAVR
+#define TIMERB3 0x23        // Not present on any tinyAVR
+#define TIMERB4 0x24        // Not present on any tinyAVR
+#define TIMERB5 0x25        // Not present on any tinyAVR
+#define TIMERD0 0x40        // Present only on tinyAVR 1-series and AVR Dx-series parts.
+#define DACOUT 0x80         // Not a timer, obviously - but used like one by analogWrite()
+#define TIMERRTC 0x90       // Usable for millis only
+#define TIMERRTC_XTAL 0x91  // Usable for millis only
+#define TIMERRTC_XOSC 0x92  // Usable for millis only
 ```
 
 ## Bootloader (Optiboot) Support

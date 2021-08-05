@@ -4,7 +4,9 @@
  *  and
  *  _MMIO_DWORD(mem_addr) (*(volatile uint32_t *)(mem_addr))
  *
- *  any volatile variable should do the trick just as well.
+ *  any volatile variable should do the trick just as well
+ * _SFR_MEM32(0x001C) = (some 32-bit value) will store a 32-bit value in the 4 GPIO registers, which under typical circumstances takes
+ * 4 words instead of 8 words.
  */
 
 void setup() {
