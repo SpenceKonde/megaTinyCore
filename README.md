@@ -52,7 +52,7 @@ One can be made from a classic AVR Uno/Nano/Pro Mini; inexpensive Nano clones ar
 
 ## Overall Part Comparison
 | tinyAVR series      |     0-series   |     1-series    | 1-series 16+k  |      2-series       |
-|---------------------|----------------|-----------------|------|---------|---------------------|
+|---------------------|----------------|-----------------|----------------|---------------------|
 | Pincounts           | 8*  14, 20, 24 |  8*  14, 20, 24 |     14, 20, 24 |          14, 20, 24 |
 | Flash               |  2, 4, 8, 16k  |        2, 4, 8k |     16k or 32k |    (planned) 32768b |
 | RAM                 | 128,256,512,1k |    128,256,512b |          2048b |              3072b  |
