@@ -6,7 +6,7 @@ void setup() {
 }
 void loop() {
 
-#if (defined(TCB1 || !defined(MILLIS_TIMER_NONE)))
+//#if (defined(TCB1) || !defined(MILLIS_TIMERB0)))
   //VPORTA.OUT |= 128;
   tone(PIN_PA1,1000);
   delay(1000);
@@ -34,7 +34,7 @@ void loop() {
     tone(PIN_PA2,5000,1000);
     VPORTA.OUT &= ~128;
   */
-#else
+//#else
   #warning "Tone reqires a type B timer but the only one we have is in use. Skip"
-#endif
+//#endif
 }
