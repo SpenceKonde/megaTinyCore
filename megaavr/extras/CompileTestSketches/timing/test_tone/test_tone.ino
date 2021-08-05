@@ -15,7 +15,7 @@ void loop() {
   delay(3000);
   tone(PIN_PA3,3000);
   delay(2000);
-  noTone(PIN_PA2)
+  noTone(PIN_PA2);
   tone(PIN_PA1,4500);
   delay(3000);
   tone(PIN_PA1,7000);
