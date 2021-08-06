@@ -47,12 +47,6 @@ jobs:
         - megaavr/libraries/USERSIG/examples/usersig_crc
         - megaavr/libraries/USERSIG/examples/usersig_put
         - megaavr/libraries/USERSIG/examples/usersig_read
-        - megaavr/libraries/Servo/examples/Knob
-        - megaavr/libraries/Servo/examples/ServoMaxTest
-        - megaavr/libraries/Servo/examples/Sweep
-        - megaavr/libraries/Servo_megaTinyCore/examples/Knob
-        - megaavr/libraries/Servo_megaTinyCore/examples/ServoMaxTest
-        - megaavr/libraries/Servo_megaTinyCore/examples/Sweep
         - megaavr/libraries/Wire/examples/digital_potentiometer
         - megaavr/libraries/Wire/examples/master_writer
         - megaavr/libraries/Wire/examples/slave_receiver
@@ -84,6 +78,12 @@ jobs:
         - megaavr/extras/CompileTestSketches/timing/test_millis_micros
       free-TCB-flash-3.5kB-plus-true-sketch-paths: |
         - megaavr/extras/CompileTestSketches/timing/test_tone
+        - megaavr/libraries/Servo/examples/Knob
+        - megaavr/libraries/Servo/examples/ServoMaxTest
+        - megaavr/libraries/Servo/examples/Sweep
+        - megaavr/libraries/Servo_megaTinyCore/examples/Knob
+        - megaavr/libraries/Servo_megaTinyCore/examples/ServoMaxTest
+        - megaavr/libraries/Servo_megaTinyCore/examples/Sweep
       IO-class-6-plus-true-sketch-paths: |
         - megaavr/libraries/Logic/examples/Five_input_NOR
       IO-class-2-series-1-sketch-paths: |

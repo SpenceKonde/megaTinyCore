@@ -2227,12 +2227,6 @@ atxy6o.menu.uartvoltage.3v=Closer to 3v
 atxy6o.menu.uartvoltage.5v.build.uartvoltage=5V
 atxy6o.menu.uartvoltage.3v.build.uartvoltage=3V
 
-atxy6o.build.clocksource=0
-atxy6o.build.core=megatinycore
-atxy6o.build.variant=txy6
-atxy6o.build.tuned=
-atxy6o.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage}
-atxy6o.build.export_merged_output=true
 
 ### UPDI/RESET PIN CONFIGURATION & OPTIBOOT ENTRY
 atxy6o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
