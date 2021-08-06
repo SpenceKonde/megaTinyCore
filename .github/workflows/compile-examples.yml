@@ -138,8 +138,6 @@ jobs:
             peripheral-class: 2
           - IO-class: 2
             peripheral-class: 2
-          - flash-class: 32
-            peripheral-class: 2
           - peripheral-class: 2
             bootloader-code: o
             bootloader-series: y
