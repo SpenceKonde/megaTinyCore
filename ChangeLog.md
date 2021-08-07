@@ -21,7 +21,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Dead code removal and cleanup of main.cpp
 * Fixes to Print api missing a few standard api functions (#485)
 * Fix bug with new/new.h - it was missing a method and the dummy file to allow including it like `#include <new>` - which is as far as I'm concerned perverse and wrong, but the C standard guys seem to feel otherwise.
-* Add more markdown linting to the CI checks.
+* Enable C++ 11.
+* Add more markdown linting to the CI checks. CI now runs for most boards with meaningful options selected.
 * Add a few test sketches to verify compilation works for API functions not covered by the examples, these are not included in board manager distributions as they are not educational samples.
 * **Major doc improvements** which I spent far too long writing.
 * Expand interrupt vector name document with general interrupt information
@@ -32,7 +33,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * New instructions for use with Arduino-cli
 * Important info links to almost all important info.
 * Readme covers watchdog timer more thoroughly, including how to reset it.
-* Added page from which you can view the io headers through the github documentation, because it's a pain to dig for them on your local machine, and you'll inevitably want to have them at the ready.
+* Added page from which you can view the io headers from the github documentation, because it's a pain to dig for them on your local machine, and you'll inevitably want to have them at the ready.
 * Errata section upatend with recently discovered bugs. Changed my asssment of the severity of a number of the bugs (for example, the RTC bugs are much higher severity now, because I have watched someone trying to figurte out how the hell the RTC worked; it wasn't pretty.)
 * Correct bug when compiling tinyNeoPixel when no micros function is available.. **as the compile warning says, you are responsible for giving the LEDs enough time to update** in those cases. since we cannot ensure it without millis it. Previously this worked with the RTC options, but a typo prevented it from working with millis disabled entirely.
 * add `digitalPinToTimerNow()` to match DxCore; this is like digitalPinToTimer() only it will return NOT_ON_TIMER if you have used the timer takeover functions to assume full responsibility for management of a timer. Tie up some loose ends around the millis timer related defines when RTC with external source is in use.
