@@ -754,7 +754,7 @@ void restart_millis()
     #elif defined(MILLIS_USE_TIMERD0)
       TCD0.CTRLA          = 0x00;
       while (TCD0.STATUS & 0x01);
-    #elif (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1)|| defined(MILLIS_USE_TIMERB2)|| defined(MILLIS_USE_TIMERB3)|| defined(MILLIS_USE_TIMERB4)) //It's a type b timer
+    #elif (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)) //It's a type b timer
       _timer->CTRLB       = 0;
     #endif
     init_millis();
@@ -890,7 +890,7 @@ void __attribute__((weak)) init_clock() {
       _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
     }
   #else
-    #error "CLOCK_SOURCE is defined, but it isn't 0 (internal) or 2 (external CLOCK), but those are the only clock sources supported by this part."
+    #error "CLOCK_SOURCE is defined, but it isn't 0 (internal) or 2 (external clock), and those are the only clock sources supported by this part."
   #endif
 }
 
@@ -904,27 +904,26 @@ void __attribute__((weak)) init_clock() {
     if (TUNED_CALIBRATION_OFFSET == -1) {
       GPIOR0 |= 0x80;
       GPIOR0 |= 0x40;
-      return; //we can't do that speed at all with this oscillator fuse! Hopefully users notice theiur skwetch is slow instead of fast, and will read the docs,
-      // and determine the cause of the problem.
+      return; //we can't do that speed at all with this part and oscillator setting! Hopefully users notice their sketch is running
+      // way too slow, and will read the docs which contain further instructions for diagnosis of these sort of problems.
     } else {
       uint8_t tunedval=_SFR_MEM8(0x1300 + (osccfg ? 6 : 0) + CLOCK_TUNE_START + TUNED_CALIBRATION_OFFSET);
-      if (tunedval & 0x80) {
-        GPIOR0 |= 0x80;
-        return; // this chip was tuned and it's oscillator found to be unable to reach target and/or the chip ceased to be opprate before reaching that speed
-        // such that either the tuning sketch crashed or the incredilbly crude sanity check turned up an error.
-      }
       if (tunedval == 0xFF) {
         GPIOR0 |= 0x40;
         int temp = GUESSCAL;
-        if (temp > MAX_TUNING) {
-          if (MAX_TUNING - temp > 5) return; // too far off, we can't do it.
+        if (temp > MAX_TUNING) {             // uhoh, if we apply the default guess, we'd be setting it higher than it's maximum value!
+          if (MAX_TUNING - temp > 5) return; // How far away are we? If it's more than 5, give up - better to be obviously broken than non-obviously broken
           tunedval = MAX_TUNING;
-        } else if (temp < 0) {
-          if (temp < -5) return; // too far off, we can't do it.
+        } else if (temp < 0) {               // uhoh, if we apply the default guess, we'd be setting it to a negative value (which would wrap around, resulting in the value being too high..
+          if (temp < -5) return;             // How far away are we? If it's more than 5, give up - better to be obviously broken than non-obviously broken
           tunedval = 0;
         } else {
           tunedval = temp;
         }
+      } else if (tunedval & 0x80) {
+        GPIOR0 |= 0x80;
+        return; // this chip was tuned and it's oscillator found to be unable to reach target and/or the chip ceased to be opprate before reaching that speed
+        // such that either the tuning sketch crashed or the incredilbly crude sanity check turned up an error.
       }
       _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
       _NOP();
@@ -937,25 +936,21 @@ void __attribute__((weak)) init_clock() {
 /********************************* ADC ****************************************/
 void __attribute__((weak)) init_ADC0() {
   #if MEGATINYCORE_SERIES < 2
-    /* ADC clock 1 MHz to 1.25 MHz at frequencies supported by megaTinyCore
-     * Unlike the classic AVRs, which demand 50~200 kHz, for these, the datasheet
-     * spec's 50 kHz to 1.5 MHz. Slower clocks provide better response to high
-     * impedance signals, since the sample and hold circuit will be connected
-     * to the pin for longer However, we can use the SAMPLEN register to
-     * compensate for this!
-     * We target a sampling time of 12us, which is a little shorter than the
-     * classic AVRs, but the sampling cap is is 5pf instead of 14
-     * At clock speeds of 12, 24, and 25 MHz when we are forced to use an divider
-     * that leaves us with a markedly slower ADC clock (~750 kHz), we instead use
-     * a value of 7, giving us 8 ADC clocks or... around 12us. .
-     * As of 2.3.0, this setting is exposed by analogReadDuration()
-     * Note that on 0/1-series, the prescale settings are placed powers-of-two
-     * apart. On the 2-series and Dx-series, they are MUCH closer together.
-     *
-     *
-     **************************************************************************/
-
-
+  /* ADC clock 1 MHz to 1.25 MHz at frequencies supported by megaTinyCore
+   * Unlike the classic AVRs, which demand 50~200 kHz, for these, the datasheet
+   * spec's 50 kHz to 1.5 MHz. Slower clocks provide better response to high
+   * impedance signals, since the sample and hold circuit will be connected
+   * to the pin for longer However, we can use the SAMPLEN register to
+   * compensate for this!
+   * We target a sampling time of 12us, which is a little shorter than the
+   * classic AVRs, but the sampling cap is is 5pf instead of 14
+   * At clock speeds of 12, 24, and 25 MHz when we are forced to use an divider
+   * that leaves us with a markedly slower ADC clock (~750 kHz), we instead use
+   * a value of 7, giving us 8 ADC clocks or... around 12us. .
+   * As of 2.3.0, this setting is exposed by analogReadDuration()
+   * Note that on 0/1-series, the prescale settings are placed powers-of-two
+   * apart. On the 2-series and Dx-series, they are MUCH closer together.
+   **************************************************************************/
     // 25 MHz / 32 = 780 kHz, 30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz.
     #if   F_CPU   > 24000000    // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
       ADC0.CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
@@ -1070,15 +1065,15 @@ void __attribute__((weak)) init_TCA0() {
   TCA0.SPLIT.HPER    = PWM_TIMER_PERIOD;
 
   /* Default duty 0%, will re-assign in analogWrite() */
-  // 2/1/2021: Why the heck are we bothering to set these AT ALL?! The duty cycles for *non-active* type A timers
-/*
-  TCA0.SPLIT.LCMP0 = 0;
-  TCA0.SPLIT.HCMP0 = 0;
-  TCA0.SPLIT.LCMP1 = 0;
-  TCA0.SPLIT.HCMP1 = 0;
-  TCA0.SPLIT.LCMP2 = 0;
-  TCA0.SPLIT.HCMP2 = 0;
-*/
+  // 2/1/2021: Why the heck are we bothering to set these AT ALL?! The duty cycles for *non-active* type A timer channels? Which are already initialized to 0 automatically?
+  /*
+    TCA0.SPLIT.LCMP0 = 0;
+    TCA0.SPLIT.HCMP0 = 0;
+    TCA0.SPLIT.LCMP1 = 0;
+    TCA0.SPLIT.HCMP1 = 0;
+    TCA0.SPLIT.LCMP2 = 0;
+    TCA0.SPLIT.HCMP2 = 0;
+  */
 
   /* Use prescale appropriate for system clock speed */
 
