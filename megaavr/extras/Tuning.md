@@ -74,9 +74,9 @@ If you aren't sure that nothing uses pin0 (including for serial or some other in
 #### Step 3: Tune it
 
 1. Make the following connections:
-  * Output pin of timebase to pin 1 (PA5) of the target.
-  * Ground of timebase to ground of target.
-  * 5v of timebase to 5v of target
+  a. Output pin of timebase to pin 1 (PA5) of the target.
+  b. Ground of timebase to ground of target.
+  c. 5v of timebase to 5v of target
 2. Connect your UPDI programmer (or serial port for Optiboot upload). Now everything is powered (that's why you uploaded bare minimum or blink - so it and the timebase won't be fighting over that pin)
 3. upload megaTinyTuner to the target.
 After a few seconds, LED will blink quickly during the tuning process. and then either finish or crash (hangs in one state or the other, and then gets rebooted by the
