@@ -907,7 +907,7 @@ void __attribute__((weak)) init_clock() {
       return; //we can't do that speed at all with this part and oscillator setting! Hopefully users notice their sketch is running
       // way too slow, and will read the docs which contain further instructions for diagnosis of these sort of problems.
     } else {
-      uint8_t tunedval=_SFR_MEM8(0x1300 + (osccfg ? 6 : 0) + CLOCK_TUNE_START + TUNED_CALIBRATION_OFFSET);
+      uint8_t tunedval=_SFR_MEM8(osccfg ? (0x1306 +  CLOCK_TUNE_START + TUNED_CALIBRATION_OFFSET) : (0x1300 +  CLOCK_TUNE_START + TUNED_CALIBRATION_OFFSET));
       if (tunedval == 0xFF) {
         GPIOR0 |= 0x40;
         int temp = GUESSCAL;
