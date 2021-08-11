@@ -5,22 +5,25 @@ void setup() {
 void loop() {
   /* Test PIN_PA0 */
   #ifdef PIN_PA0
-    pinMode(PIN_PA0,OUTPUT);
-    pinMode(PIN_PA0,INPUT);
-    pinMode(PIN_PA0,INPUT_PULLUP);
-    digitalWrite(PIN_PA0,HIGH);
-    digitalWrite(PIN_PA0,LOW);
-    openDrain(PIN_PA0,LOW);
-    openDrain(PIN_PA0,FLOATING);
-    digitalRead(PIN_PA0);
-    analogWrite(PIN_PA0,0);
-    analogWrite(PIN_PA0,128);
-    analogWrite(PIN_PA0,255);
-    digitalWriteFast(PIN_PA0,HIGH);
-    digitalWriteFast(PIN_PA0,LOW);
-    openDrainFast(PIN_PA0,LOW);
-    openDrainFast(PIN_PA0,FLOATING);
-    digitalReadFast(PIN_PA0);
+    /* Unless it's a tinyAVR part with 2k of flash, in which case we don't have the space. */
+    #if (!defined(MEGATINYCORE) || PROGMEM_SIZE > 2048)
+      pinMode(PIN_PA0,OUTPUT);
+      pinMode(PIN_PA0,INPUT);
+      pinMode(PIN_PA0,INPUT_PULLUP);
+      digitalWrite(PIN_PA0,HIGH);
+      digitalWrite(PIN_PA0,LOW);
+      openDrain(PIN_PA0,LOW);
+      openDrain(PIN_PA0,FLOATING);
+      digitalRead(PIN_PA0);
+      analogWrite(PIN_PA0,0);
+      analogWrite(PIN_PA0,128);
+      analogWrite(PIN_PA0,255);
+      digitalWriteFast(PIN_PA0,HIGH);
+      digitalWriteFast(PIN_PA0,LOW);
+      openDrainFast(PIN_PA0,LOW);
+      openDrainFast(PIN_PA0,FLOATING);
+      digitalReadFast(PIN_PA0);
+    #endif
   #endif
 
   /* Test PIN_PA1 */
