@@ -736,6 +736,8 @@ void stop_millis()
   #endif
 }
 
+
+
 void restart_millis()
 {
   // Call this to restart millis after it has been stopped and/or millis timer has been molested by other routines.
@@ -744,11 +746,31 @@ void restart_millis()
     badCall("restart_millis() is only valid with millis time keeping enabled.");
   #else
     #if defined(MILLIS_USE_TIMERA0)
-      TCA0.SPLIT.CTRLA    = 0x00;
-      TCA0.SPLIT.CTRLD    = TCA_SPLIT_SPLITM_bm;
-      TCA0.SPLIT.HPER     = PWM_TIMER_PERIOD;
+        /* The type A timers need to be restored to the state they were in at the start of restore  */
+      TCA0.SPLIT.CTRLA = 0;                       // timer off (might need that for next steps)
+      TCA0.SPLIT.CTRLD    = TCA_SPLIT_SPLITM_bm;  // because this will not work if it's enabled.
+      TCA0.SPLIT.HPER     = PWM_TIMER_PERIOD;     // What was left behind
+      #if (F_CPU > 25000000) //   use 256 divider when clocked over 25 MHz
+        TCA0.SPLIT.CTRLA   = (TCA_SPLIT_CLKSEL_DIV256_gc) | (TCA_SPLIT_ENABLE_bm);
+      #elif (F_CPU > 5000000) //  use 64 divider for everything in the middle
+        TCA0.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV64_gc) | (TCA_SPLIT_ENABLE_bm);
+      #elif (F_CPU > 1000000) // and use 16...
+        TCA0.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV16_gc) | (TCA_SPLIT_ENABLE_bm);
+      #else                   // or even 8 otherwise for really slow system clocks.
+        TCA0.SPLIT.CTRLA   =   (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SPLIT_ENABLE_bm);
+      #endif
     #elif defined(MILLIS_USE_TIMERA1)
-      TCA1.SPLIT.CTRLA    = 0x00;
+        /* Use prescale appropriate for system clock speed */
+
+      #if (F_CPU > 25000000) //   use 256 divider when clocked over 25 MHz
+        TCA1.SPLIT.CTRLA   = (TCA_SPLIT_CLKSEL_DIV256_gc) | (TCA_SPLIT_ENABLE_bm);
+      #elif (F_CPU > 5000000) //  use 64 divider for everything in the middle
+        TCA1.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV64_gc) | (TCA_SPLIT_ENABLE_bm);
+      #elif (F_CPU > 1000000) // and use 16...
+        TCA1.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV16_gc) | (TCA_SPLIT_ENABLE_bm);
+      #else                   // or even 8 otherwise for really slow system clocks.
+        TCA1.SPLIT.CTRLA   =   (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SPLIT_ENABLE_bm);
+      #endif
       TCA1.SPLIT.CTRLD    = TCA_SPLIT_SPLITM_bm;
       TCA1.SPLIT.HPER     = PWM_TIMER_PERIOD;
     #elif defined(MILLIS_USE_TIMERD0)
@@ -761,6 +783,9 @@ void restart_millis()
   #endif
 }
 
+
+
+
 void __attribute__((weak)) init_millis()
 {
   #if defined(MILLIS_USE_TIMERNONE)
@@ -772,9 +797,9 @@ void __attribute__((weak)) init_millis()
       TCA1.SPLIT.INTCTRL |= TCA_SPLIT_HUNF_bm;
     #elif defined(MILLIS_USE_TIMERD0)
       TCD0.CMPBCLR        = TIME_TRACKING_TIMER_PERIOD; //essentially, this is TOP
-      TCD0.INTCTRL        = 0x01;//enable interrupt
-      TCD0.CTRLB          = 0x00; //oneramp mode
+      TCD0.CTRLB          = 0x00; // oneramp mode
       TCD0.CTRLC          = 0x80;
+      TCD0.INTCTRL        = 0x01; // enable interrupt
       TCD0.CTRLA          = TIMERD0_PRESCALER | 0x01; //set clock source and enable!
     #elif defined(MILLIS_USE_TIMERRTC)
       while(RTC.STATUS); //if RTC is currently busy, spin until it's not.
@@ -807,17 +832,27 @@ void set_millis(__attribute__((unused))uint32_t newmillis)
     badCall("set_millis() is only valid with millis timekeeping enabled.");
   #else
     #if defined(MILLIS_USE_TIMERRTC)
-      //timer_overflow_count=newmillis>>16;
-      // millis = 61/64(timer_overflow_count<<16 + RTC.CNT)
-      uint16_t temp=(newmillis%61)<<6;
-      newmillis=(newmillis/61)<<6;
-      temp=temp/61;
-      newmillis+=temp;
-      timer_overflow_count=newmillis>>16;
+      // timer_overflow_count = newmillis >> 16;
+      // millis = 61/64(timer_overflow_count << 16 + RTC.CNT)
+      uint8_t oldSREG=SREG; // save SREG
+      cli();                // interrupts off
+      uint16_t temp=(newmillis % 61) << 6;
+      newmillis=(newmillis / 61) << 6;
+      temp=temp / 61;
+      newmillis += temp;
+      timer_overflow_count = newmillis >> 16;
       while(RTC.STATUS&RTC_CNTBUSY_bm); //wait if RTC busy
-      RTC.CNT=newmillis&0xFFFF;
+      RTC.CNT = newmillis & 0xFFFF;
+      SREG = oldSREG; // reemable oimterripts if we killed them,
     #else
-      timer_millis=newmillis;
+      /* farting around with micros via overflow count was ugly and buggy.
+       * may implent again, better, in the future - but millis and micros
+       * will get out of sync when you use set_millis
+       * I think the way to do it is to make this implementation (but not big one)
+       * inline, so if newmillis is constant, we can calculate the (compiletime known)
+       * number of overflows using all the floating point math we want, and otherwise,
+       * document that it will zero out micros.*/
+      timer_millis = newmillis;
     #endif
   #endif
 }

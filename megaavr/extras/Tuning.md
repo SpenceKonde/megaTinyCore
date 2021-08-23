@@ -62,29 +62,25 @@ PC1 and PC2 are the only applicable pins found on all devices in the AVR Dx-seri
 
 ##### Hints
 * As always, if you can dedicate a board to this so it's ready whenever you need it, you'll be happier.
-* You can power the reference board and target from the same power source.
+* You can power the reference board and target from the same power source, and if possible, you should.
 
 #### Step 2: Load the tuner
 If you aren't sure that nothing uses pin0 (including for serial or some other interface), upload something inoffensive like bare minimum first
 
-1. Open the megaTinyTune example (under megaTinyCore)
+1. Open the megaTinyTuner example (under megaTinyCore)
 2. Select the target chip, set it for 16 or 20 MHz, and disable millis.
 3. Select your UPDI programming method and port. Verify that it compiles to make sure you haven't missed anything.
 
 #### Step 3: Tune it
-
+If a separate power supply is to be used for the timebase, it's voltage must be no more than 0.5V higher than the targets' operating voltage, and a HIGH output by the timebase must be of a voltage high enough to be recognized as a HIGH by the ATtiny (meaning 3.3v logic is just barely good enough when the target is running at 5v). Running the timebase from the UPDI programmer power supply by way of the target is recommended, that way you can't accidentally power the timebase when the chip isn't powered, and the timebase will always be the same voltage.
 1. Make the following connections:
-  a. Output pin of timebase to pin 1 (PA5) of the target.
-  b. Ground of timebase to ground of target.
-  c. 5v of timebase to 5v of target
+  a. Ground of timebase to ground of target.
+  b. Vcc of target to either
+  c. Output pin of timebase to pin 1 (PA5) of the target.
 2. Connect your UPDI programmer (or serial port for Optiboot upload). Now everything is powered (that's why you uploaded bare minimum or blink - so it and the timebase won't be fighting over that pin)
-3. upload megaTinyTuner to the target.
-After a few seconds, LED will blink quickly during the tuning process. and then either finish or crash (hangs in one state or the other, and then gets rebooted by the
-WDT, after which it indicates that it has been tuned with the)
-Wait until the LED (LED_BUILTIN, the same pin the Blink uses; PA7 on most parts) turns on.
+3. upload megaTinyTuner to the target. After a few seconds, the LED should blink quickly during the tuning process, and then either finish, indicated by solid-on. It is possible (in fact, quite common) for this to crash, and get rebooted by the WDT 8 seconds thereafter, after which it will similarly indicate that the part is tuned. Wait until the LED (LED_BUILTIN, the same pin the Blink uses; PA7 on most parts) turns on.
 
-Unless you are using Optiboot (and hence cannot change fuse without reburning bootloader; this may not be worth the effort, depending on your application), you can tune both of them, and it's probably more convenient to do so.
-If you previously tuned at 16 MHz, select 20 MHz and repeat step 3.1 - 3.3; Otherwise, select 16 MHz and repeat.
+Unless you are using Optiboot (and hence cannot change fuse without reburning bootloader; this may not be worth the effort, depending on your application), you can tune both of them, and it's probably more convenient to do so at the same time; If you previously tuned at 16 MHz, select 20 MHz and repeat step 3; Otherwise, select 16 MHz and repeat.
 
 #### Step 4: Done
 Disconnect the tuner from your target and now the (tuned) options will be far more accurate.
@@ -155,7 +151,7 @@ As of 2.4.0, tuned internal oscillator at frequencies listed below is supported.
 
 For comparison, 0/1-series typically work at 32 @ 5v with external clock, and 2-series may be stable into the mid 30's with an external clock.
 
-The middle 6 options can be achieved by most parts. Not all parts can make it all the way to their maximum tuning value before the chip becomes unstable; generally, they make it to 32 MHz at 5V at room temperature, but begin failing dramatically just above that; some conk out a little earlier. I would not recommend running these at more than 20 MHz where a failure would result in any inconvenience, and would not run anything where failure wuold be even a nuisance at over 25 MHz. It's worth noting that 24 MHz is a particularly useful frequency, as that is 3x the classic AVR internal oscillator speed, 1.5x what classic AVRs are most often run at from crystal, and the top rated speed for the Dx-series parts (though they can also be run a higher than rated speed. Significantly so, actually....), and code written for 24 MHz Dx-series would run at that same speed on an overclocked tinyAVR at 24 MHz. Assuming it was stable of course
+The middle 6 options can be achieved by most parts. Not all parts can make it all the way to their maximum tuning value before the chip becomes unstable; generally, they make it to 32 MHz at 5V at room temperature, but begin failing dramatically just above that; some conk out a little earlier. I would not recommend running these at more than 20 MHz where a failure would result in any inconvenience, and would not run anything where failure would be even a nuisance at over 25 MHz. It's worth noting that 24 MHz is a particularly useful frequency, as that is 3x the classic AVR internal oscillator speed, 1.5x what classic AVRs are most often run at from crystal, and the top rated speed for the Dx-series parts (though they can also be run higher than rated speed. Actually, they have more margin for overclocking than these parts do in both absolute and relative terms), and code written for 24 MHz Dx-series would run at that same speed on an overclocked tinyAVR at 24 MHz. Assuming it was stable of course
 
 *Yes, this ALSO means that the 16-MHz-center oscillator can be tuned to 20 MHz and the other way around.* No, they don't just load different calibration constants in for the two, they each have 64 or 128 values, "centered" around their respective frequencies, which overlap (and no, I checked, it's not a single list of frequency options with some offset - I checked). Not only that, sometimes the other oscillator has a calibration value that's closer to a target frequency (eg, the 16 MHz oscillator tuned up to 20 MHz gets closer to 20 than any setting on the 20 MHz oscillator does). I am sure there is a logical reason for this design. I cannot imagine what it is.
 
