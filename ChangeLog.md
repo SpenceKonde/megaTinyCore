@@ -37,7 +37,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Errata section upatend with recently discovered bugs. Changed my asssment of the severity of a number of the bugs (for example, the RTC bugs are much higher severity now, because I have watched someone trying to figurte out how the hell the RTC worked; it wasn't pretty.)
 * Correct bug when compiling tinyNeoPixel when no micros function is available.. **as the compile warning says, you are responsible for giving the LEDs enough time to update** in those cases. since we cannot ensure it without millis it. Previously this worked with the RTC options, but a typo prevented it from working with millis disabled entirely.
 * add `digitalPinToTimerNow()` to match DxCore; this is like digitalPinToTimer() only it will return NOT_ON_TIMER if you have used the timer takeover functions to assume full responsibility for management of a timer. Tie up some loose ends around the millis timer related defines when RTC with external source is in use.
-* Add support for using a pre-compiled library (that is, one distributed with .a files in place of the interesting parts of soruce code, generally by a secretive commerciasl company)
+* Add support for using a pre-compiled library (that is, one distributed with .a files in place of the interesting parts of source code, typically as part of a proprietary license)
 
 ### 2.3.2
 * Expand Keywords.txt to include register names! (#386)
