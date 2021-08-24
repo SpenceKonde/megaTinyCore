@@ -38,6 +38,9 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Correct bug when compiling tinyNeoPixel when no micros function is available.. **as the compile warning says, you are responsible for giving the LEDs enough time to update** in those cases. since we cannot ensure it without millis it. Previously this worked with the RTC options, but a typo prevented it from working with millis disabled entirely.
 * add `digitalPinToTimerNow()` to match DxCore; this is like digitalPinToTimer() only it will return NOT_ON_TIMER if you have used the timer takeover functions to assume full responsibility for management of a timer. Tie up some loose ends around the millis timer related defines when RTC with external source is in use.
 * Add support for using a pre-compiled library (that is, one distributed with .a files in place of the interesting parts of source code, typically as part of a proprietary license)
+* Correct bug in `restart_millis()` when a TCA is used for millis timekeeping.
+* Add human readable macros for the options passed to ADCPowerOptions() which provides control over some power management functionality of the 2-series parts.
+* Add `openDrain()`, `openDrainFast()` and `pinConfigure()` for advanced digital IO functionality.
 
 ### 2.3.2
 * Expand Keywords.txt to include register names! (#386)

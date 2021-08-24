@@ -205,8 +205,61 @@ Unlike classic AVRs, on the these parts, *the flash is within the same address s
 
 However, do note that if you explicitly declare a variable PROGMEM, you must still use the pgm_read functions to read it, just like on classic AVRs - when a variable is declared PROGMEM on parts with memory mapped flash, the pointer is offset (address is relative to start of flash, not start of address space); this same offset is applied when using the `pgm_read_*_near()` macros. Do note that declaring things PROGMEM and accessing with `pgm_read_*_near` functions, although it works fine, is slower and wastes a small amount of flash (compared to simply declaring the variables const); the same goes for the F() macro with constant strings in 2.1.0 and later (for a period of time before 2.1.0, `F()` did nothing - but that caused problems for third party libraries, and the authors maintained that the problem was with the core, not the library, and my choice was to accept less efficiency, or deny my users access to popular libraries). Using the `F()` macro may be necessary for compatibility with some third party libraries (the specific cases that forced the return of `F()` upon us were not of that sort - we were actually able to make the ones I knew of work with the F()-as-noop code, and they took up a few bytes less flash as a result).
 
-### Fast digital I/O
-For timing-critical operations, we now support `digitalWriteFast()` and `digitalReadFast()`. The pin numbers passed to these functions **must** be a compile-time known constant; for best results, when using `digitalWriteFast()`, the pin value to be written should as well. Under those conditions, `digitalWriteFast()` will optimize down to a single instruction which executes in a single system clock cycle, and `digitalReadFast()` will optimize to 4 instructions (note that `if (VPORTx.IN&(1<n))` is still faster and smaller than `if (digitalReadFast(PIN_Pxn)==HIGH)` because testing a single bit within an I/O register and using that as the argument for a conditional branch can be optimized down to an SBIS/SBIC (**S**kip if **B**it in **I**/o register **S**et/**C**lear), while it requires several instructions to check that bit, and convert it to a boolean for further processing.
+### Improved digital I/O
+
+#### openDrain()
+It has always been possible to get the benefit of an "open drain" configuration on an AVR - you set a pin's output value to 0 and toggle it between input and output. For reasons which were never clear to me, Arduino never exposed this to users. This core provides a slightly smoother (also faster) wrapper around this than using pinMode (since pinMode must also concern itself with configuring the pullup, whether it needs to be changed or not, every time, it is slow even compared to the already slow digital I/O functions). The openDrain() function takes a pin and a value - `LOW`, `FLOATING` (`HIGH` has the same effect, but is discouraged) or `CHANGE`. openDrain() always makes sure the output buffer is not set to drive the pin high; often the other end of a pin you're using in open drain mode may be connected to something running from a lower supply voltage, where setting it OUTPUT with the pin set high could damage the other device. openDrainFast() is also provided. Like the most recent versions of DxCore, it also writes the pin LOW prior to setting it output or toggling it with change. `CHANGE` is slightly slower and takes an extra 2 words of flash because the VPORT register only has set bit index and clear bit index, so we have to use a full STS instruction to write to the `PORT.DIRTGL` register. Use pinMode() to set the pin `INPUT_PULLUP` before you start using `openDrain()`, or use `pinConfigure()` if you need the pullup enabled too'; this donesn't touch it. We do not prevent you from setting a pin with a pullup on it as output and driving it low with this (or in general). That is non-destructive (it's not like, say bridging two pins and driving one high and the other low) but it doesn't exactly help with power consumption.
+
+```c++
+openDrain(PIN_PA1, LOW); // sets pin output, LOW.
+openDrain(PIN_PA1, FLOATING); // sets pin input and lets it float.
+```
+
+#### Fast Digital I/O
+This core includes the Fast Digital I/O functions, digitalReadFast(), digitalWriteFast() and openDrainFast(). These are always inlined, but still take up less flash than the normal version of the function, and execute the in a single clock cycle. The catch is that the pin MUST be a known constant at compile time. For the fastest, least flash-hungry results, you should use a compile-time known constant for the pin value as well. Remember than there are three options here, not just two. If you only want it to choose between two of the options, you will get smaller binaries that run faster by using the ternary operator to explicitly tell the compiler that the value is only ever going to be those two values, and then it can optimize away the third case. See the second example below.
+
+```c++
+digitalWriteFast(PIN_PD0,val); // This one is slower than the one below:
+digitalWriteFast(PIN_PD0,val?HIGH:LOW); // Ternary operator used to explicitly tell the compiler to only treat the incoming value as HIGH or LOW.
+
+```
+
+| function            | Any value | HIGH/LOW |   fixed |
+|---------------------|-----------|----------|---------|
+| openDrainFast()     | 14 words  | 7 words  | 2 words if LOW<br/>1 if FLOATING<br/>3 if CHANGE |
+| digitalWriteFast()  | 10 words  | 6 words  | 1 words |
+
+Execution time is 1 or 2 clocks per word that is actually executed (not all of them are in the multiple possibility options. in the case of the "any option" digitalWrite, if it's LOW, if change, 6, and if HIGH, 7
+Note that the HIGH/LOW numbers include the overhead of a val?HIGH:LOW statement. That is how the numbers were generated - you can use a variable of volatile uint8_t and that will prevent the compiler from making; 3 and 5 for the two word case. Which highlights one problem: the execution times now depend on the values, qand rather strongly. Another reason to, as much as possible, to get your assumptions about it's value - even if you never set it-  so you can see how large the the binary is while keeping the test case as simple as possible.
+
+1 word is 2 bytes; when openDrainFast is not setting the pin FLOATING, it needs an extra word to set the output to low level as well (just in case); if CHANGE is an option, it also uses an extra 2 words because instead of a single instruction against VPORT.IN, it needs to load the pin bit mask into a register (1 word) and use STS to write it (2 words) - and it also does the clearing of the output value - hence how we end up with the penalty of 4 for the unrestricted case vs digitalWriteFast.
+
+
+#### pinConfigure()
+pinConfigure is a somewhat ugly function to expose all options that can be configured on a per-pin basis. It is called as shown here; you can bitwise-or any number of the constants shown in the table below. All of those pin options will be configured as specified. Pin functions that don't have a corresponding option OR'ed into the second argument will not be changed.  There are very few guard rails here: This function will happily enable pin interrupts that you don't have a handler for (but when they fire it'll crash the sketch), or waste power with pins driven low while connected to the pullup and so on.
+
+```c++
+pinConfigure(PIN_PA4,(PIN_DIR_INPUT | PIN_PULLUP_ON | PIN_OUT_LOW | PIN_INLVL_TTL));
+// Set PIN_PA4 to input, with pullup enabled and output value of LOW (ready for openDrainFast() and using TTL logic levels. Do not change settings on invert or input sense.
+// This might be used for some sort of bi-directional open-drain communication protocol with a device operating at lower voltage.
+
+pinConfigure(PIN_PD4,(PIN_DIR_INPUT | PIN_OUT_LOW | PIN_PULLUP_OFF | PIN_INVERT_OFF | PIN_INLVL_SCHMITT | PIN_INPUT_ENABLE));
+// Set PD4 inpit, with output register set low, pullup, invert, and alternate levels off, and digital input enabled. Ie, the reset condition!
+
+```
+
+
+| Functionality               | Enable              | Disable             | Toggle             |
+|-----------------------------|---------------------|---------------------|--------------------|
+| Direction, pinMode()        | `PIN_DIR_OUTPUT`<br/>`PIN_DIR_OUT`<br/>`PIN_DIRSET` | `PIN_DIR_INPUT`<br/>`PIN_DIR_IN`<br/>`PIN_DIRCLR`       | `PIN_DIR_TOGGLE`<br/>`PIN_DIRTGL` |
+| Pin output, HIGH or LOW     | `PIN_OUT_HIGH`<br/>`PIN_OUTSET`           | `PIN_OUT_LOW`<br/>`PIN_OUTCLR`          | `PIN_OUT_TOGGLE`<br/>`PIN_OUTTGL`       |
+| Internal Pullup             | `PIN_PULLUP_ON`<br/>`PIN_PULLUP`          | `PIN_PULLUP_OFF`<br/>`PIN_NOPULLUP`       | `PIN_PULLUP_TGL`       |
+| Invert HIGH and LOW         |`PIN_INVERT_ON`      | `PIN_INVERT_OFF`    | `PIN_INVERT_TGL`       |
+| Digital input buffer        | `PIN_INPUT_ENABLE`  | `PIN_INPUT_DISABLE` | Not supported<br/>No plausible use case |
+| Interrupt on change         | `PIN_INT_CHANGE`    | `PIN_INPUT_ENABLE` or<br/>`PIN_INPUT_DISABLE` | Not applicable |
+| Interrupt on Rise           | `PIN_INT_RISE`      | `PIN_INPUT_ENABLE` or<br/>`PIN_INPUT_DISABLE` | Not applicable |
+| Interrupt on Fall           | `PIN_INT_FALL`      | `PIN_INPUT_ENABLE` or<br/>`PIN_INPUT_DISABLE` | Not applicable |
+| Interrupt on LOW            | `PIN_INT_LEVEL`     | `PIN_INPUT_ENABLE` or<br/>`PIN_INPUT_DISABLE` | Not applicable |
 
 ### Serial (UART) Support
 All of the 0/1-series parts have a single hardware serial port (UART or USART); the 2-series parts have two. It works exactly like the one on official Arduino boards (except that there is no auto-reset, unless you've wired it up by fusing the UPDI pin as reset (requiring either HV-UPDI or the Optiboot bootloader to upload code), or set up an "ersatz reset pin" as described elsewhere in this document). See the pinout charts for the locations of the serial pins.
