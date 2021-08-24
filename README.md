@@ -100,12 +100,6 @@ The internal oscillator speeds can be reached (on most but not all specimens) wi
 ### Automotive (VAO) versions
 The automotive versions should also work. You must always select the 16 MHz-derived clock speeds on these parts. They do not support 20 MHz operation.
 
-## Support for official Microchip developmenmt boards
-As of version 2.4.0, we now provide an "Official Microchip Board" option. This doesn't do anything special other than defining `LED_BUILTIN` to be the pin that has the LED on that board, instead of A7, and defining a macro `PIN_BUTTON_BUILTIN` defined as the pin with the user button on it and making "upload" with the non-optiboot version always use the onboard programmer/debugger, and tools -> programmer will be used only for "burn bootloader" and "upload using programmer". In the case of the ATtiny416 XPlained Nano, it also selects the version of the bootloader that uses the alternate pins for the serial port - it does not automatically use the alternate pins for USART0 as if you'd done Serial.swap(1) yet - functionality to support default swapping of serial pins will come in a future update, alongside some other changes in the machinery underlying the pinswap mechanism which will hopefully also reduce flash usage.
-
-### Why does blink take more flash on the XPlained Mini vs the XPlained Pro? Even when both have the same ATtiny817
-For the same reason that blink will take more flash if you change it to use `PIN_PC0` directly instead of letting the board definition to it for you via `LED_BUILTIN`: PC0, used on the XPlained Mini is a PWM pin, while PB4, used by the XPlained Pro is not. Since that is the only pin that digitalWrite() is being used on, the compiler is free to optimize away anything that isn't needed for digitalWrite() on that pin, including the functionality to turn off PWM output on a pin that supports PWM. The diference vanishes if digitalWrite() is also used on a pin that supports PWM on both devices (or if digitalWrite() is replaced with digitalWriteFast, which assumes that you won't call it on a pin outputting PWM).
-
 ## A word on terminology ("megaAVR")
 In the official Arduino board definition for their "megaAVR" hardware package, they imply that the new architecture on the megaAVR 0-series parts (which is nearly the same as used on the tinyAVR 0-series and 1-series) is called "megaavr" - that is not an official term. Microchip uses the term "megaAVR" to refer to any "ATmega" part, whether it has the old style or modern peripherals. There are no official terms to refer to all AVR parts of one family or the other. In this document, prior to 2.0.2, we used the Arduino convention, and despite well over a year having passed since then, I still keep finding places where I call them megaAVR. Please report this using a github issue if you see any.
 Do note that the terms `avr` and `megaavr` are still used internally (for example, in libraries, to mark which parts a given library is compatible with, or separate different versions of a file based on what they will run on). This will continue - we have to stick with this for compatibility with what the Arduino team started with the core for the Uno WiFi Rev. 2 and Nano Every - and in any event, *some word* is needed to refer to the two groups and Microchip hasn't provided one. Not sure how they managed to develop these very different parts without ever talking about them generally.
@@ -114,6 +108,12 @@ It is unfortunate that there are not officially sanctioned terms for these two c
 
 ## **WARNING** Don't buy modern AVRs on AliExpress or from eBay international sellers
 I buy a lot of electronics stuff on aliexpress. It's a great marketplace for things that are made by Chinese companies and are mostly generic. It is not a great place for the latest semiconductor product lines from major western manufacturers, especially in the midst of a historic shortage of said chips. The modern AVR devices people have bought on there (when they have been found at all - they're rarely offered) have been reported to be fake or defective (like ATtiny412s that think they're 416s). For that matter, you probablty don't want to buy any AVR microcontrollers on aliexpress... Assembled boards, like Arduino Nano clones, generally work if you avoid the ones with the third party LGT8 chips and watch out for the ones with the ATmega168p instead of the '328p - but there are a lot of reports of bogus microcontrollers (I have heard of fake ATtiny85s that were actually remarked ATtiny13s, for example). Buy them from reputable distributors like Digikey or Mouser (if in a hurry, and they're on backorder - which is the case for almost everything in QFN package as of July 2021 - buy from a USA/EU-based scalper).
+
+## Support for official Microchip developmenmt boards
+As of version 2.4.0, we now provide an "Official Microchip Board" option. This doesn't do anything special other than defining `LED_BUILTIN` to be the pin that has the LED on that board, instead of A7, and defining a macro `PIN_BUTTON_BUILTIN` defined as the pin with the user button on it and making "upload" with the non-optiboot version always use the onboard programmer/debugger, and tools -> programmer will be used only for "burn bootloader" and "upload using programmer". In the case of the ATtiny416 XPlained Nano, it also selects the version of the bootloader that uses the alternate pins for the serial port - it does not automatically use the alternate pins for USART0 as if you'd done Serial.swap(1) yet - functionality to support default swapping of serial pins will come in a future update, alongside some other changes in the machinery underlying the pinswap mechanism which will hopefully also reduce flash usage.
+
+### Why does blink take more flash on the XPlained Mini vs the XPlained Pro? Even when both have the same ATtiny817
+For the same reason that blink will take more flash if you change it to use `PIN_PC0` directly instead of letting the board definition to it for you via `LED_BUILTIN`: PC0, used on the XPlained Mini is a PWM pin, while PB4, used by the XPlained Pro is not. Since that is the only pin that digitalWrite() is being used on, the compiler is free to optimize away anything that isn't needed for digitalWrite() on that pin, including the functionality to turn off PWM output on a pin that supports PWM. The diference vanishes if digitalWrite() is also used on a pin that supports PWM on both devices (or if digitalWrite() is replaced with digitalWriteFast, which assumes that you won't call it on a pin outputting PWM).
 
 ## Buying tinyAVR 1-series and 2-series Breakout Boards
 I sell breakout boards with regulator, UPDI header, and Serial header in my tindie shop, as well as the bare boards. Buying from my store helps support further development on the core, and is a great way to get started using these exciting new parts with Arduino. Currently ATtiny1624 boards are available, but the 20 and 24-pin parts will not be sold as an assembled board until a newly revised PCB design is back from the board house to enable autoreset on the alt-reset pin. There is also a 14-pin board revision coming - thought it is largely cosmetic. The yellow solder mask has got to go, as the readability seemed to get worse in the last several batches. The new boards also standardize a 0.6" spacing between the rows of pins, instead of the current 0.7" spacing, so you will be able to, for example, put machined pin header onto them and plug them into a wide-DIP socket, or use them with our prototyping board optimized for that row spacing. Assembled 0-series boards are being discontinued, and will not be restocked once they sell out. The same will happen for the 16k 2-series parts once the 32k ones are available.
@@ -144,36 +144,42 @@ These parts (well, the 1/2-series at least - the 0-series is more of a budget op
 
 ### Supported Clock Speeds
 **Important - Read about [Tuning](megaavr/extras/Tuning.md) before selecting any tuned option!**
-* 20MHz Internal (4.5v-5.5v - typical for 5v systems)
-* 16MHz Internal (4.5v-5.5v - typical for 5v systems)
-* 10MHz Internal (2.7v-5.5v - typical for 3.3v systems)
-* 8MHz Internal (2.7v-5.5v - typical for 3.3v systems)
-* 5MHz Internal (1.8v-5.5v)
-* 4MHz Internal (1.8v-5.5v)
-* 1MHz Internal (1.8v-5.5v)
-* 20 MHz internal (tuned)
-* 16 MHz internal (tuned)
-* 12 MHz internal (tuned)
-* 20MHz External Clock (4.5v-5.5v)
-* 16MHz External Clock (4.5v-5.5v)
-* 12MHz External Clock (2.7v-5.5v)
-* 10MHz External Clock (2.7v-5.5v)
-* 8MHz  External Clock (2.7v-5.5v)
-* 24 MHz internal (tuned, overclocked)
-* 25 MHz internal (tuned, overclocked)
-* 30 MHz internal (tuned, overclocked) - 0/1-series require "20MHz" OSCCFG fuse setting; 2-series parts may or may not be able to reach 30 with "16 MHz" selected.
-* 32 MHz internal (tuned, overclocked - 2-series only, and a very optimistic overclocking, may be unstable)
-* 24MHz External Clock (Overclocked)
-* 25MHz External Clock (Overclocked)
-* 30MHz External Clock (Overclocked aggressively)
-* 32MHz External Clock (Overclocked aggressively)
+* 20 MHz Internal (4.5v-5.5v - typical for 5v systems)
+* 16 MHz Internal (4.5v-5.5v - typical for 5v systems)
+* 10 MHz Internal (2.7v-5.5v - typical for 3.3v systems)
+* 8  MHz Internal (2.7v-5.5v - typical for 3.3v systems)
+* 5  MHz Internal (1.8v-5.5v)
+* 4  MHz Internal (1.8v-5.5v)
+* 1  MHz Internal (1.8v-5.5v)
+* 20 MHz Internal (tuned)
+* 16 MHz Internal (tuned)
+* 12 MHz Internal (tuned)
+* 20 MHz External Clock (4.5v-5.5v)
+* 16 MHz External Clock (4.5v-5.5v)
+* 12 MHz External Clock (2.7v-5.5v)
+* 10 MHz External Clock (2.7v-5.5v)
+* 8  MHz External Clock (2.7v-5.5v)
+* 24 MHz Internal (tuned, overclocked)
+* 25 MHz Internal (tuned, overclocked)
+* 30 MHz Internal (tuned, overclocked) - 0/1-series require "20MHz" OSCCFG fuse setting; 2-series parts may or may not be able to reach 30 with "16 MHz" selected.
+* 32 MHz Internal (tuned, overclocked) - 2-series only, very optimistic overclocking, may be unstable.
+* 24 MHz External clock (Overclocked)
+* 25 MHz External clock (Overclocked)
+* 30 MHz External clock (Overclocked aggressively)
+* 32 MHz External clock (Overclocked aggressively)
 
+Voltages shown are those guaranteed by to work by manufacturer specifications. Unless pushing the bounds of the operating temperature range, these parts do far better (2-series generally work at 32 MHz and 5v @ room temperature even from internal oscillator; the 0/1-series will likewise usually work at 32 MHz with external clock provided the power supply is a stable 5.0-5.5V).
 
-See [Speed Grades](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/SpeedGrades.md) for more information on the manufacturer's speed grades. Note that those are the voltages and clock speeds at which it is guaranteed to work, where an unexpected glitch of some description could pose a hazard to persons or property. Under favorable temperatures (ie, room temperature), and with higher tolerance for potential stability issues than a commercial customer, the speed grades can easily be beaten. *Our testing has found that the official speed grades are extremely conservative* - I was able to run the 1-series parts I tested at 32MHz at room temperature at 5V with external oscillator (though it was sensitive to supply voltage changes), and it's been widely observed that they seem to work fine at their full 20 MHz 4.5V ~ 5.5V speed running from 3.3V. I make no claims as to their stability under conditions outside the manufacturer specifications, nor did I exhaustively test all peripherals, but there was nothing obviously broken, and adding 2 and 2 did still get a result of 4. From tuned internal oscillator, 30 MHz on 0/1 and 32 MHz on 2-series may even be stable (though much above that results in instability, and 2 + 2 sometimes is equal to 0). If you must run it outside the manufacturer specifications, I would suggest using the watchdog timer to reset it in the event that it hangs.  A part being run outside of the manufacturer specified operating conditions should never be used for any sort of critical task or even one where a failure would be inconvenient to recover from (such as a device which was difficult to access for maintenance or replacement).
+No action is required to set the OSCCFG fuse when the sketch is uploaded via UPDI. When uploaded through Optiboot, the fuse cannot be changed, so whatever was chosen when the bootloader was burned is what is used, and only "burn bootloader" or uploading a sketch via UPDI will change that.
 
-These parts do not support using an external crystal like the classic ATtiny parts do, however the internal oscillator is tightly calibrated enough that the internal clock will work for UART communication without issue; Like the megaAVR 0-series, it includes clock corrections at 3V and 5V in the signature row. If you need particularly accurate UART baud rates more than you need the flash this option uses, you can enable it from the Tools submenu.
+All internal oscillator clock speed options use the factory default calibration unless a "tuned" option is selected, in which case the calibration is adjusted as documented in the [tuning documentation.](megaavr/extras/Tuning.md)
 
-These parts do support an external **clock** (that can come from an external oscillator or - available from the usual suspects for a price nearly as high as the ATtiny itself, or from aliexpress for only prices that are slightly less exorbitant (search for "active crystal"), the CLKOUT from another processor, and so on).
+See [Speed Grades](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/SpeedGrades.md) for more information on the manufacturer's speed grades. Note that those are the voltages and clock speeds at which it is guaranteed to work, where an unexpected glitch of some description could pose a hazard to persons or property. Under favorable temperatures (ie, room temperature), and with higher tolerance for potential stability issues than a commercial customer, the speed grades can easily be beaten. *Our testing has found that the official speed grades are extremely conservative* - I was able to run the 1-series parts I tested at 32MHz at room temperature at 5V with external oscillator (though it was very sensitive to supply voltage changes), and it's been widely observed that they seem to work fine at their full 20 MHz 4.5V ~ 5.5V speed running from 3.3V. I make no claims as to their stability under conditions outside the manufacturer specifications, nor did I exhaustively test all peripherals - I can say only that there was nothing obviously broken, and adding 2 and 2 did still get a result of 4 (well, the test specifically was subtraction, and the variables were unsigned longs, which is harder - but the result was correct). From tuned internal oscillator, 30 MHz on 0/1 and 32 MHz on 2-series may even be stable (though much above that results in unstable or incorrect operation, most frequently resulting in logical and/or mathematical operations yielding 0 when they should not (ie, 2 + 2 = 0 - that I know this stems from Serial continuing to work and printing out `0`s even while the CPU was making frequent math errors due to the excessive clock speed; in other words, the speed limit seems to be in the AVR CPU itself, not the memory or peripheral bus; note that ASCII `0` is `0x30`, not 0.
+
+If you must run it outside the manufacturer specifications, I would suggest using the watchdog timer to reset it in the event that it hangs. A part being run outside of the manufacturer specified operating conditions should never be used for any sort of critical task or even those tasks where a failure would be inconvenient to recover from (such as a device which was difficult to access for maintenance or replacement).
+
+These parts do not support using an external crystal like the classic ATtiny parts do, though they do support an external **clock** (that can come from an external oscillator or - available from the usual suspects for a price nearly as high as the ATtiny itself, or from aliexpress only slightly less exorbitant (search for "active crystal" - it turns up fewer crystals in the results, because all the crystals use the word "oscillator" in the listing title), the CLKOUT from another processor, and so on). For the vast majority of use cases, there is no need for an external clock - the internal oscillator is tightly calibrated enough that the internal clock will work for UART communication without issue, and even if overclocking is required, megaTinyCore 2.4.0 supports that by tuning the internal oscillactor. Like the megaAVR 0-series, the tinyAVR parts include oscillator speed corrections at 3V and 5V in the signature row. If you need particularly accurate UART baud rates more than you need the flash this option uses, you can enable it from the Tools submenu (note that this option is never used by the bootloader, only the application, and it is not used when a "tuned" speed selected - changing to that speed causes the correction to no longer be applicable. There are no plans to provide a replacement mechanism for precise baud rate generation when the oscillator is tuned; supporting a need for such bizarely high UART baud rate accuracy while running at a weird speed is well outside the intended uses cases that the core supports; if that applies to you, an external clock is the appropriate solution - provided, of course, that a review of the requirements reaffirms the need for both of those conditions).
+
 
 ### Memory-mapped flash: No need to declare PROGMEM
 Unlike classic AVRs, on the these parts, *the flash is within the same address space as the rest of the memory*. This means `pgm_read_*_near()` is not needed to read directly from flash. Because of this, the compiler automatically puts any variable declared `const` into PROGMEM, and accesses it appropriately - you no longer need to explicitly declare them as PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either (As of 2.1.0, F() once more explicitly declares things as living in PROGMEM (ie, it is slightly less efficient) in order to ensure compatibility with third party libraries).
@@ -329,6 +335,8 @@ When it's an oscillator not a crystal,It can be fed to either TOSC0 or CLKI
 
 ### ADC Support
 These parts all have a large number of analog inputs (11 pins on 20 and 24-pin 0/1-series, 15 on 2-series, 9 on 14-pin parts and 5 on 8-pin parts.) - plus the one on the UPDI pin which is not totally usable because the UPDI functionality). They can be read with analogRead() like on a normal AVR. While the `An` constants (ex, `A3`) are supported, and will read from the ADC channel of that number, they are in fact defined as then digital pin shared with that channel. Using the `An` constants is deprecated - the recommended practice is to just use the digital pin number, or better yet, use `PIN_Pxn` notation when calling analogRead(). Particularly with the release of 2.3.0 and tinyAVR 2-series support, a number of enhanced ADC features have been added to expose more of the power of the sophisticated ADC in these parts.
+
+**Be sure to disable to the ADC prior to putting the part to sleep if low power consumption is required!**
 
 #### Reference Voltages
 Analog reference voltage can be selected as usual using analogReference(). Supported reference voltages are listed below:
@@ -515,6 +523,7 @@ In the future, we hope to provide a way for an application to run at 16 MHz when
 This core *always* uses Link Time Optimization to reduce flash usage - all versions of the compiler which support the tinyAVR 0/1/2-series parts also support LTO, so there is no need to make it optional as was done with ATTinyCore.
 
 ## Included Libraries
+In addition to these included libraries, most existing Arduino libraries work (see )
 
 ### tinyNeoPixel (WS2812)
 The usual NeoPixel (WS2812) libraries, including the popular FastLED as well as AdafruitNeoPixel, have problems on these parts - they depend on hand-tuned assembly, but the execution time of several key instructions has been improved; the improvements enable significant simplification of the code for driving these LEDs. This core includes a compatible version of the tinyNeoPixel library for interfacing with these ubiquitous addressable LEDs. There are two versions,  both tightly based on the Adafruit_NeoPixel library - one implements a truly identical API, and differs only in name.  The other realizes significant flash savings in exchange for minor restrictions (length must be constant and known at compile time) and a slightly different syntax for the constructor. See the [tinyNeoPixel documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/tinyNeoPixel.md) and included examples for more information.

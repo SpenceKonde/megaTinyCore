@@ -846,10 +846,10 @@ void set_millis(__attribute__((unused))uint32_t newmillis)
       SREG = oldSREG; // reemable oimterripts if we killed them,
     #else
       /* farting around with micros via overflow count was ugly and buggy.
-       * may implent again, better, in the future - but millis and micros
+       * may implement again, better, in the future - but millis and micros
        * will get out of sync when you use set_millis
        * I think the way to do it is to make this implementation (but not big one)
-       * inline, so if newmillis is constant, we can calculate the (compiletime known)
+       * inline, so if newmillis is constant, we can calculate the (compile-time known)
        * number of overflows using all the floating point math we want, and otherwise,
        * document that it will zero out micros.*/
       timer_millis = newmillis;

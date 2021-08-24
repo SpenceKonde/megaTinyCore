@@ -6,17 +6,17 @@ This page is linked to from the DxCore documentation as well, for the simple rea
 
 ### A few plausible fault lines within the modern AVRs
 Within the realm of modern AVRs (tinyAVR 0/1/2, megaAVR 0-series. Dx-series and Ex-series), there are only a limited number of plausible divding lines that are not just due to a lazy or sloppy author doing a check that doesn't catch all compatible parts.
-  * Almost all of these only ever apply to stuff that interacts directly with a peripheral:
-  * Cases where a library's function is to interact with a specific peripheral not present on all parts will never work on parts without that peripheral.
-  * Things that directly manipulate the event system will have trouble on either tinyAVR 0/1-series or everything else. The event system on 0/1-series is different (and significantly worse) than that on all other modern AVRs (which different from eachother only in numbers of channels quantity of peripherals to act as users and generators. These require two implementations - but you always need a bunch of part-specific stuff when using the event syste, Our attempt to provide an abstraction has yet to reach a point where I can recommend it, but that is the goal - an abstraction with consistent API for using the event system.
-  * PORTMUX registers are packed tighter (more peripherals per register in some cases) than elsewhere, and the names are different.
-  * tinyAVR 0/1-series and megaAVR 0-series have a few differences from the later models regarding timers and thier interaction with the event system.
-    * They only had 1 event input for TCA0. More recent parts had 2.
-    * Only TCA0 can count on event. On more recent parts, TCBs can  as well.
-  * Things that manipulate the inner workings of the ADC will trip up, as each generation's ADC got subtle changes. tinyAVR 0/1 and megaAVR 0 are almost identical, Dx-series has 2 extra bits of resolutio, and the option for (kind of) differential measurements, but it otherwise is similar. The 2-series and Ex-series have an all new much more capable ADC, which behaves quite differently.
-  * Code written to interact with the RTC and developed on Dx-series or tinyAVR 2-series may not work on older parts, because of the severity of the silicon bugs there. Even basic operation requires use of (thankfully simple) workarounds. Those workarounds are nearly harmless (causing only very slight increase in powerdown sleep current) if used the parts without the bug, so moving forward isn't generally a problem
-  * Code that manipulates the system clock controller may pose challenges.
-  * Direct port manupulation counts as working with a peripheral (the PORT peripheral has it's own chapter, doesn't it?). All Dx-series parts get the multipin configuration for for settng PINnCTRL *on masse* and the DB and DD series (and likely any future opart with MVIO) has a TTL input level option, so you can tell them to have definitions of HIGH and LOW that don't depend on supply voltage.
+* Almost all of these only ever apply to stuff that interacts directly with a peripheral:
+* Cases where a library's function is to interact with a specific peripheral not present on all parts will never work on parts without that peripheral.
+* Things that directly manipulate the event system will have trouble on either tinyAVR 0/1-series or everything else. The event system on 0/1-series is different (and significantly worse) than that on all other modern AVRs (which different from eachother only in numbers of channels quantity of peripherals to act as users and generators. These require two implementations - but you always need a bunch of part-specific stuff when using the event syste, Our attempt to provide an abstraction has yet to reach a point where I can recommend it, but that is the goal - an abstraction with consistent API for using the event system.
+* PORTMUX registers are packed tighter (more peripherals per register in some cases) than elsewhere, and the names are different.
+* tinyAVR 0/1-series and megaAVR 0-series have a few differences from the later models regarding timers and thier interaction with the event system.
+  * They only had 1 event input for TCA0. More recent parts had 2.
+  * Only TCA0 can count on event. On more recent parts, TCBs can as well.
+* Things that manipulate the inner workings of the ADC will trip up, as each generation's ADC got subtle changes. tinyAVR 0/1 and megaAVR 0 are almost identical, Dx-series has 2 extra bits of resolutio, and the option for (kind of) differential measurements, but it otherwise is similar. The 2-series and Ex-series have an all new much more capable ADC, which behaves quite differently.
+* Code written to interact with the RTC and developed on Dx-series or tinyAVR 2-series may not work on older parts, because of the severity of the silicon bugs there. Even basic operation requires use of (thankfully simple) workarounds. Those workarounds are nearly harmless (causing only very slight increase in powerdown sleep current) if used the parts without the bug, so moving forward isn't generally a problem
+* Code that manipulates the system clock controller may pose challenges.
+* Direct port manupulation counts as working with a peripheral (the PORT peripheral has it's own chapter, doesn't it?). All Dx-series parts get the multipin configuration for for settng PINnCTRL *on masse* and the DB and DD series (and likely any future opart with MVIO) has a TTL input level option, so you can tell them to have definitions of HIGH and LOW that don't depend on supply voltage.
 
 
 

@@ -91,7 +91,7 @@ void setup() {
   #elif  (F_CPU==16000000L)
     stockCal = (*(uint8_t *)(0x1100 + 24));
   #else
-    #error "This sketch must be compiled for 16 MHz or 20 MHz only (and should be run once at each speed)"
+    #error "This sketch must be compiled for 16 MHz or 20 MHz only (and should be uploaded and tuned once at each)"
   #endif
   #ifdef FORCE_PIN
     pinMode(FORCE_PIN, INPUT_PULLUP);
