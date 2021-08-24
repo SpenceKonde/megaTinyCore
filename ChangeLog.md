@@ -21,7 +21,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Dead code removal and cleanup of main.cpp
 * Fixes to Print api missing a few standard api functions (#485)
 * Fix bug with new/new.h - it was missing a method and the dummy file to allow including it like `#include <new>` - which is as far as I'm concerned perverse and wrong, but the C standard guys seem to feel otherwise.
-* Enable C++ 11.
+* Enable C++ 17.
 * Add more markdown linting to the CI checks. CI now runs for most boards with meaningful options selected.
 * Add a few test sketches to verify compilation works for API functions not covered by the examples, these are not included in board manager distributions as they are not educational samples.
 * **Major doc improvements** which I spent far too long writing.
