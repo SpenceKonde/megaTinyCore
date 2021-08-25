@@ -34,7 +34,7 @@ DEVICE_INFO = {
     'internal_sram_page_size_bytes': 1,
     'internal_sram_read_size_bytes': 1,
     'internal_sram_write_size_bytes': 1,
-    'internal_sram_chiperase_effect': ChiperaseEffect.ALWAYS_ERASED,
+    'internal_sram_chiperase_effect': ChiperaseEffect.NOT_ERASED,
     'internal_sram_isolated_erase': False,
 
     # lockbits
