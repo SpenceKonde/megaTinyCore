@@ -77,7 +77,11 @@ void loop() {
     //Read the pressure data lower 16 bits:
     unsigned int pressure_data_low = readRegister(0x20, 2);
     //combine the two parts into one 19-bit number:
-    long pressure = ((pressure_data_high << 16) | pressure_data_low) / 4;
+    long pressure = ((((unsigned long)pressure_data_high) << 16) | pressure_data_low) >> 2;
+    // SK 2021: Unfamiliar with this sensor, so not sure if divididing this by 4 was the correct thing to do (seems dubious)
+    // but 2 rightshifts are no worse, and generally better practice in case the compiler decides to do something dumb.
+    // No matter what, it is key to cast the high byte to a 32-bit datatype before we leftshift it 16 times, otherwise
+    // it will get zero'ed out because we shifted all those bits so far they fell off the end... (this is why you should leave warnings on, folks).
 
     // display the temperature:
     Serial.println("\tPressure [Pa]=" + String(pressure));
