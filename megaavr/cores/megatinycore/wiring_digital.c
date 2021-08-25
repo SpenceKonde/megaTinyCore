@@ -426,7 +426,7 @@ inline __attribute__((always_inline)) void openDrainFast(uint8_t pin, uint8_t va
   VPORT_t *vport;
   vport = (VPORT_t *)(port * 4);
   PORT_t *portstr;
-  portstr=(PORT_t *)(0x400+(20*port));
+  portstr=(PORT_t *)(0x400+(0x20*port));
 
   if (val == LOW)
     vport->DIR |= mask;
