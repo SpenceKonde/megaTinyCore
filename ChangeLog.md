@@ -9,7 +9,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Add a whole bunch of missing devices to SerialUPDI, this will likely prompt a panic re-release in the next week.
 * Fix a few examples so they dont throw warnings and could theoretically produce correct results.
 * Instruct linker to use rcall and rjmp when possible (-mrelax). This should always have been the case, and it's absence had significant negative impact.
-
+* Fix burn bootloader with SerialUPDI (#506).
 
 ## Released Versions
 

@@ -111,7 +111,7 @@ atxy7.bootloader.APPEND=0x00
 atxy7.bootloader.BOOTEND=0x00
 atxy7.bootloader.tool=avrdude
 atxy7.bootloader.avrdudestring=
-atxy7.bootloader.pymcuprogstring=-aerase
+atxy7.bootloader.serialupdistring=-aerase
 
 ### ALL UPLOADING VIA UPDI
 atxy7.upload.tool=avrdude
@@ -401,7 +401,7 @@ atxy6.bootloader.APPEND=0x00
 atxy6.bootloader.BOOTEND=0x00
 atxy6.bootloader.tool=avrdude
 atxy6.bootloader.avrdudestring=
-atxy6.bootloader.pymcuprogstring=-aerase
+atxy6.bootloader.serialupdistring=-aerase
 
 ### ALL UPLOADING VIA UPDI
 atxy6.upload.tool=avrdude
@@ -700,7 +700,7 @@ atxy4.bootloader.APPEND=0x00
 atxy4.bootloader.BOOTEND=0x00
 atxy4.bootloader.tool=avrdude
 atxy4.bootloader.avrdudestring=
-atxy4.bootloader.pymcuprogstring=-aerase
+atxy4.bootloader.serialupdistring=-aerase
 
 ### ALL UPLOADING VIA UPDI
 atxy4.upload.tool=avrdude
@@ -997,7 +997,7 @@ atxy2.bootloader.APPEND=0x00
 atxy2.bootloader.BOOTEND=0x00
 atxy2.bootloader.tool=avrdude
 atxy2.bootloader.avrdudestring=
-atxy2.bootloader.pymcuprogstring=-aerase
+atxy2.bootloader.serialupdistring=-aerase
 
 ### ALL UPLOADING VIA UPDI
 atxy2.upload.tool=avrdude
@@ -1522,7 +1522,7 @@ atxy7o.bootloader.APPEND=0x00
 atxy7o.bootloader.BOOTEND=0x02
 atxy7o.bootloader.tool=avrdude
 atxy7o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
-atxy7o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy7o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ### UPLOAD VIA OPTIBOOT
 atxy7o.upload.workaround=
@@ -1784,7 +1784,7 @@ atx27o.bootloader.APPEND=0x00
 atx27o.bootloader.BOOTEND=0x02
 atx27o.bootloader.tool=avrdude
 atx27o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
-atx27o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atx27o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ### UPLOAD VIA OPTIBOOT
 atx27o.upload.workaround=
@@ -2032,7 +2032,7 @@ atxy6o.bootloader.APPEND=0x00
 atxy6o.bootloader.BOOTEND=0x02
 atxy6o.bootloader.tool=avrdude
 atxy6o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
-atxy6o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy6o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ### UPLOAD VIA OPTIBOOT
 atxy6o.upload.workaround=
@@ -2300,7 +2300,7 @@ atx26o.bootloader.APPEND=0x00
 atx26o.bootloader.BOOTEND=0x02
 atx26o.bootloader.tool=avrdude
 atx26o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
-atx26o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atx26o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ### UPLOAD VIA OPTIBOOT
 atx26o.upload.workaround=
@@ -2548,7 +2548,7 @@ atxy4o.bootloader.APPEND=0x00
 atxy4o.bootloader.BOOTEND=0x02
 atxy4o.bootloader.tool=avrdude
 atxy4o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
-atxy4o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy4o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ### UPLOAD VIA OPTIBOOT
 atxy4o.upload.workaround=
@@ -2831,7 +2831,7 @@ atx24o.bootloader.APPEND=0x00
 atx24o.bootloader.BOOTEND=0x02
 atx24o.bootloader.tool=avrdude
 atx24o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
-atx24o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atx24o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ###########################
 ### UPLOAD VIA OPTIBOOT ###
@@ -3077,7 +3077,7 @@ atxy2o.bootloader.APPEND=0x00
 atxy2o.bootloader.BOOTEND=0x02
 atxy2o.bootloader.tool=avrdude
 atxy2o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
-atxy2o.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy2o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ### UPLOAD VIA OPTIBOOT
 atxy2o.upload.workaround=
@@ -3324,7 +3324,7 @@ microchipo.build.f_cpu={build.speed}000000L
 microchipo.build.tuned=
 microchipo.build.export_merged_output=false
 microchipo.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
-microchipo.bootloader.pymcuprogstring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+microchipo.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
 ### BOOTLOADING PARAMETERS (FUSES)
 microchipo.bootloader.WDTCFG=0x00
