@@ -15,7 +15,6 @@
   #endif
 #elif defined(MILLIS_USE_TIMERD0)
   #define TIME_TRACKING_TIMER_PERIOD    0x1FD
-  #define TIME_TRACKING_TICKS_PER_OVF    (TIME_TRACKING_TIMER_PERIOD + 2)
   #if (F_CPU==1000000UL)
     #define TIME_TRACKING_TIMER_DIVIDER    64    /* Clock divider for TCD0 */
   #else
@@ -23,7 +22,6 @@
   #endif
 #else //Otherwise TCA0
   #define TIME_TRACKING_TIMER_PERIOD    0xFE
-  #define TIME_TRACKING_TICKS_PER_OVF    (TIME_TRACKING_TIMER_PERIOD + 1)
 
   #if (F_CPU==5000000UL)||(F_CPU==4000000UL)
     #define TIME_TRACKING_TIMER_DIVIDER   16
@@ -43,6 +41,7 @@
   #define TIMERD0_PRESCALER (TCD_CLKSEL_20MHZ_gc | TCD_CNTPRES_DIV32_gc)
 #endif
 
+#define TIME_TRACKING_TICKS_PER_OVF    (TIME_TRACKING_TIMER_PERIOD + 1)
 #define TIME_TRACKING_CYCLES_PER_OVF  (TIME_TRACKING_TICKS_PER_OVF * TIME_TRACKING_TIMER_DIVIDER)
 
 //For a type B timer as millis, these #defines aren't needed!
