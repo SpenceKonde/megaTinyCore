@@ -67,7 +67,7 @@ typedef void (*voidFuncPtr)(void);
 // interrupts() / noInterrupts() must be defined by the core
 
 // a bunch of really silly hand-holding macros!
-#define lowByte (w) ((uint8_t) ((w)    &  0xff))
+#define lowByte(w)  ((uint8_t) ((w)    &  0xff))
 #define highByte(w) ((uint8_t) ((w)    >>    8))
 #define  bitRead(value, bit) (((value) >> (bit)) & 0x01)
 #define   bitSet(value, bit)  ((value) |= (1UL << (bit)))
