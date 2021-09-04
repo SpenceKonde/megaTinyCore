@@ -60,6 +60,7 @@ jobs:
       available-flash-2kB-plus-true-sketch-paths: |
         - megaavr/libraries/Wire/examples/slave_sender
         - megaavr/extras/CompileTestSketches/test_digital_io
+        - megaavr/extras/CompileTestSketches/test_macros
       available-flash-1_5kB-plus-true-sketch-paths: |
         - megaavr/libraries/EEPROM/examples/eeprom_clear
         - megaavr/libraries/EEPROM/examples/eeprom_iteration
