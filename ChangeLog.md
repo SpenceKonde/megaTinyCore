@@ -6,14 +6,15 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Released Versions
 
-### 2.4.1
+### 2.4.2
 * Correct bug with openDrainFast(pin,CHANGE); This was a really nasty one, albeit for a rare corner case. Using CHANGE on a pin that was not on PORTA would alter other settings for other pins seemingly at random instead due to a missing '0x' in a memory offset.
 * Add a whole bunch of missing devices to SerialUPDI.
-* Fix a few examples so they dont throw warnings and could theoretically produce correct results.
+* Fix a few examples so they dont throw warnings or demonstrate the wrong way to do things.
 * Instruct linker to use rcall and rjmp when possible (-mrelax). This should always have been the case, and it's absence had significant negative impact that had until now gone unnoticed.
-* Correct longstading bug with micros() when TCD is used as millis source; values co
 * Fix burn bootloader with SerialUPDI (#506)
 * Spelling and grammar corrections - thanks! (#508)
+* Fix issue with lowByte() macro and add test sketch to exercise all macros. (#515)
+* Fix issue with some macros caused by switch to C++17 standard. Typeof being an extension, it must be `__typeof__` if compiled with standard C++ 17.
 
 ### 2.4.0
 * Finally port Event.h to tinyAVR. The event system they shipped on the 0/1-series is, to use a technical term, a shitshow. Users planning projects which depend heavily on the event system are urged to use a 2-series part unless the project also requires a type D timer, but the AVR DD-series is for some reason not an acceptable alternative.
