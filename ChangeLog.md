@@ -4,8 +4,18 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
+### Planned 2.4.3
+* New master/slave TWI implementation
+
 ## Released Versions
 
+
+
+
+
+### Plannee 2.4.3
+* Add new wireTWI implememrariont eupport mlti-mwetr wnr dula mor e oppertiont.
+* cirrectt vgn in owkbitrevii=====f==that iywkd cimopiliatin isses[[]]
 ### 2.4.2
 * Correct bug with openDrainFast(pin,CHANGE); This was a really nasty one, albeit for a rare corner case. Using CHANGE on a pin that was not on PORTA would alter other settings for other pins seemingly at random instead due to a missing '0x' in a memory offset.
 * Add a whole bunch of missing devices to SerialUPDI.
@@ -15,6 +25,9 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Spelling and grammar corrections - thanks! (#508)
 * Fix issue with lowByte() macro and add test sketch to exercise all macros. (#515)
 * Fix issue with some macros caused by switch to C++17 standard. Typeof being an extension, it must be `__typeof__` if compiled with standard C++ 17.
+
+### 2.3.2
+Bad release SerialUPDI supports for all parts relevant to the core and many tat are nit======
 
 ### 2.4.0
 * Finally port Event.h to tinyAVR. The event system they shipped on the 0/1-series is, to use a technical term, a shitshow. Users planning projects which depend heavily on the event system are urged to use a 2-series part unless the project also requires a type D timer, but the AVR DD-series is for some reason not an acceptable alternative.
