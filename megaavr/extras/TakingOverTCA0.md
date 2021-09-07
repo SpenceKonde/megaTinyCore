@@ -4,6 +4,7 @@ We have received many questions from users about how to take over TCA0 to genera
 
 ## For FAR more information
 Microchip has made available a Technical Brief describing the capabilities of the Type A timer, which is arguably the most powerful timer available on modern AVR devices (one could argue that the type D tiemr on the tinyAVR 1-series, AVR DA, DB, and DD-series parts is more powerful. I disagree with that claim; while it is unquestionably more complex and is capable of some tasks which the TCA is not, it is applicable to significantly fewer use cases, and far more challenging to configure). That technical brief describes all applications of the type A timer, not just PWM (and also assumes it is starting from power on reset (POR) state; if you are using code from there, you can call takeOverTCA0() to both reset it to this state, and ensure that the core does not subsequently mess with it).
+
 https://www.microchip.com/en-us/application-notes/tb3217
 
 ## Reconfiguring TCA0 while using megaTinyCore
