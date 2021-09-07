@@ -1,7 +1,12 @@
-# Taking over TCA0 for your owm PWM
+# Reconfiguring a Type A timer (like TCA0)
 
-We have received many questions from users about how to take over TCA0 to generate 16-bit PWM or change the output frequency. There are a few non-obvious complications here, and this page aims to clear this up. First, before you begin, make sure you have megaTinyCore 1.1.6 - in prior versions, the type B timer(s) are clocked from the prescaled clock of TCA0 when they are used as a millis/micros source or for low frequency output with tone() - which meant that reconfiguring TCA0 would break that functionality as well. In 1.1.6, the only thing included with the core that is broken by reconfiguring the TCA0 prescaler is the Servo library, and that is fixed for 1.1.7.
+We have received many questions from users about how to take over TCA0 to generate 16-bit PWM or change the output frequency. There are a few non-obvious complications here, and this document aims to clear up these confusions. First, before you begin, make sure you have a recemt version of megaTinyCore installed. This document references functions added in the 2.3.x versions; pre-2.x versions further contain significant differences that render much of this document inapplicable. What is written here largely applies to TCA1 on the AVR Dx-series parts, and is expected to apply to the AVR EA-series as well, though no definitive information on those parts beyond their mention in the AVR EA-series technical brief has been released. It it unlikely that any relevant changes will be madem but not impossible. 
 
+## For FAR more information
+Microchip has made available a Technical Brief describing the capabilities of the Type A timer, which is arguably the most powerful timer available on modern AVR devices (one could argue that the type D tiemr on the tinyAVR 1-series, AVR DA, DB, and DD-series parts is more powerful. I disagree with that claim; while it is unquestionably more complex and is capable of some tasks which the TCA is not, it is applicable to significantly fewer use cases, and far more challenging to configure). That technical brief describes all applications of the type A timer, not just PWM (and also assumes it is starting from power on reset (POR) state; if you are using code from there, you can call takeOverTCA0() to both reset it to this state, and ensure that the core does not subsequently mess with it).
+https://www.microchip.com/en-us/application-notes/tb3217
+
+## Reconfiguring TCA0 while using megaTinyCore
 The most common point of confusion is the fact that megaTinyCore, out of the box, configures TCA0 for use in "Split Mode" - this allows it to generate 6 8-bit PWM signals. This provides 2 additional PWM pins (3 if TCB0 is needed for other purposes) - and since analogWrite() only supports 8-bit PWM anyway, when using the Arduino API functions, there is no loss of functionality imposed by this. You must disable the timer when switching between modes, and Microchip recommends that you issue a reset command - this will reset the period, count, and compare registers to their default values. Note that in split mode, the two low bits must also be 1, or the command is ignored. The intent of those bits is unclear, as only 00 (none) and 11 (both) are listed as valid.
 ```c++
   TCA0.SPLIT.CTRLA=0; //disable TCA0 and set divider to 1
@@ -182,7 +187,7 @@ void loop() { //Lets generate some output just to prove it works
 ```
 
 ### Example 4: Quick bit of fun with split mode
-A quick example of how cool split mode can be - You can get two different PWM frequencies out of the same timer. Split mode only has one mode - both halves of the timer independently count down.
+A quick example of how cool split mode can be - You can get two different PWM frequencies out of the same timer! Split mode only has one mode - both halves of the timer independently count down.
 ```c++
 #if defined(MILLIS_USE_TIMERA0)||defined(__AVR_ATtinyxy2__)
 #error "This sketch takes over TCA0, don't use for millis here.  Pin mappings on 8-pin parts are different"
