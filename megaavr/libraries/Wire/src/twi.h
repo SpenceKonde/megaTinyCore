@@ -36,12 +36,31 @@ SOFTWARE.
   #define ADD_WRITE_BIT(address)   (address & ~0x01)
 #endif
 
-#define USING_WIRE1    //On devices with two TWIs, this identifies if the user wants to use Wire1
-#define TWI_DUALCTRL   //This identifies if the device supports dual mode, where slave pins are different from the master pins
-#define TWI_MANDS      //This enables the simultaneous use of the Master and Slave functionality - where supported
-//#define TWI_MERGE_BUFFERS //Merges the tx and rx buffers - this option will break the TWI when any rx occurs between beginTransmission and endTransmission!
-                            //It is not advised to use this define. Only use this when you need the RAM **really** badly
+/* These options are or will be controlled by boards.txt menu options
+#define USING_WIRE1       // On devices with two TWIs, this identifies if the user wants to use Wire1
+#define TWI_MANDS         // This enables the simultaneous use of the Master and Slave functionality - where supported
+#define TWI_MERGE_BUFFERS // Merges the tx and rx buffers - this option will break the TWI when any rx occurs between beginTransmission and endTransmission!
+                          // It is not advised to use this define. Only use this when you need the RAM **really** badly
+                          // Spence: Isn't that situation only relevant on parts with dual mode? I didn't think you
+                          // could receive between beginTransmission and endTransmission... except on a part with dual mode
+                          */
 
+
+#if ((defined(TWI0_DUALCTRL) && !defined(USING_WIRE1)) || (defined(TWI1_DUALCTRL) && defined(USING_WIRE1)))
+  /* Instead of requiring changes to the library to switch between DxCore and megaTinyCore, we can check
+   * if the part supports dual mode. Goal is that the identical library can be used on both, so updates in one can
+   * be propagated to the other by just copying files. */
+  #define TWI_DUALCTRL   //This identifies if the device supports dual mode, where slave pins are different from the master pins
+#endif
+
+#if defined(ARDUINO_AVR_ATtiny202) || defined (ARDUINO_AVR_ATtiny402)
+  #if defined (TWI_MANDS) //202 and 402 do not support independent master and slave.
+    //#undef TWI_MANDS
+    #error "Master + Slave mode is not supported on the 202 or 402."
+    // If a user enables master + slave mode on a part where we know it won't we should error
+    // so that they know what's wrong instead of silently disobeyingh
+  #endif
+#endif
 
 
 #ifndef BUFFER_LENGTH
@@ -55,7 +74,7 @@ SOFTWARE.
     #define BUFFER_LENGTH 32  /* and 32k tinyAVR   - 3-5% of available RAM                   */
   #else                        /* >=4k: Dx32/m320x (4k) m480x (6k),  Dx64 (8k) Dx128 (16k)    */
     #define BUFFER_LENGTH 130  /* 130 - 128b on all Dx with >= 4k RAM, to match official      */
-  #define BUFFER_NOT_POWER_2  
+  #define BUFFER_NOT_POWER_2
   #endif                      /* 4809 core plus that couple bytes mentioned above.           */
 #endif
 
@@ -64,7 +83,7 @@ struct twiDataBools {          //using a struct so the compiler can use skip if 
   bool _toggleStreamFn:1;     //used to toggle between Slave and Master elements when TWI_MANDS defined
   bool _masterEnabled:1;
   bool _slaveEnabled:1;
-  bool _ackMatters:1;          
+  bool _ackMatters:1;
   };
 
 /*My original idea was to pass the whole TwoWire class as a  */
@@ -74,50 +93,50 @@ struct twiDataBools {          //using a struct so the compiler can use skip if 
 /*and pass that as a pointer? So now this exists and it      */
 /*seems to work.                                             */
 
-struct twiData {                  
-  TWI_t *_module;                 
-  
+struct twiData {
+  TWI_t *_module;
+
   struct twiDataBools _bools;      //the structure to hold the bools for the class
-  
-  uint8_t _slaveAddress;  
-  #if defined (TWI_MERGE_BUFFERS)  
+
+  uint8_t _slaveAddress;
+  #if defined (TWI_MERGE_BUFFERS)
     uint8_t _trHead;
     uint8_t _trTail;
   #else
-    uint8_t _txHead;                
-    uint8_t _txTail;                    
+    uint8_t _txHead;
+    uint8_t _txTail;
     uint8_t _rxHead;
     uint8_t _rxTail;
   #endif
-  
+
   #if defined (TWI_MANDS)
-    uint8_t _incomingAddress;  
-    #if defined (TWI_MERGE_BUFFERS)  
+    uint8_t _incomingAddress;
+    #if defined (TWI_MERGE_BUFFERS)
       uint8_t _trHeadS;
       uint8_t _trTailS;
     #else
-      uint8_t _txHeadS;                    
-      uint8_t _txTailS;                    
+      uint8_t _txHeadS;
+      uint8_t _txTailS;
       uint8_t _rxHeadS;
       uint8_t _rxTailS;
     #endif
   #endif
-   
-  void (*user_onRequest)(void);      
-  void (*user_onReceive)(int);    
-  
+
+  void (*user_onRequest)(void);
+  void (*user_onReceive)(int);
+
   #if defined (TWI_MERGE_BUFFERS)
     uint8_t _trBuffer[BUFFER_LENGTH];
   #else
     uint8_t _txBuffer[BUFFER_LENGTH];
     uint8_t _rxBuffer[BUFFER_LENGTH];
   #endif
-   
+
   #if defined (TWI_MANDS)        //Putting the arrays in the end because the first 32 bytes can
     #if defined (TWI_MERGE_BUFFERS)   //be accessed easier and faster
       uint8_t _trBufferS[BUFFER_LENGTH];
     #else
-      uint8_t _txBufferS[BUFFER_LENGTH];  
+      uint8_t _txBufferS[BUFFER_LENGTH];
       uint8_t _rxBufferS[BUFFER_LENGTH];
     #endif
   #endif
