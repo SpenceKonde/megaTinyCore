@@ -67,21 +67,35 @@ class TwoWire: public Stream {
     void setClock(uint32_t);
 
     void begin();
-    void begin(uint8_t address, bool receive_broadcast, uint8_t second_address);
-    void begin(int     address, bool receive_broadcast, uint8_t second_address)  {begin((uint8_t)address, receive_broadcast,second_address);}
-    void begin(uint8_t address, bool receive_broadcast)                          {begin(         address, receive_broadcast, 0);}
-    void begin(int     address, bool receive_broadcast)                          {begin((uint8_t)address, receive_broadcast, 0);}
-    void begin(uint8_t address)                                                  {begin(         address, 0, 0);}
-    void begin(int     address)                                                  {begin((uint8_t)address, 0, 0);}
+    void begin(uint8_t  address, bool receive_broadcast, uint8_t second_address);
+    void begin(int16_t  address, bool receive_broadcast, uint8_t second_address) {
+      begin(  (uint8_t) address,      receive_broadcast,         second_address);
+    }
+    void begin(uint8_t  address, bool receive_broadcast) {
+      begin(            address,      receive_broadcast, 0);
+    }
+    void begin(int16_t  address, bool receive_broadcast) {
+      begin(  (uint8_t) address,      receive_broadcast, 0);
+    }
+    void begin(uint8_t  address) {
+      begin(            address, 0, 0);
+    }
+    void begin(int16_t  address) {
+      begin(  (uint8_t) address, 0, 0);
+    }
 
     void end();
     void endMaster(void);
     void endSlave(void);
 
     void beginTransmission(uint8_t address);
-    void beginTransmission(int     address)     {beginTransmission((uint8_t)address);}
+    void beginTransmission(int16_t address) {
+      beginTransmission(  (uint8_t)address);
+    }
     uint8_t endTransmission(bool);
-    uint8_t endTransmission(void)               {return endTransmission(true);}
+    uint8_t endTransmission(void) {
+      return endTransmission(true);
+    }
 
     uint8_t requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop);
     uint8_t requestFrom(uint8_t address, uint8_t quantity);
@@ -103,10 +117,18 @@ class TwoWire: public Stream {
     void onReceive(void (*)(int));
     void onRequest(void (*)(void));
 
-    inline size_t write(unsigned long n)  {return write((uint8_t)n);}
-    inline size_t write(long n)           {return write((uint8_t)n);}
-    inline size_t write(unsigned int n)   {return write((uint8_t)n);}
-    inline size_t write(int n)            {return write((uint8_t)n);}
+    inline size_t write(unsigned long n) {
+      return      write((uint8_t)     n);
+    }
+    inline size_t write(long          n) {
+      return      write((uint8_t)     n);
+    }
+    inline size_t write(uint16_t      n) {
+      return      write((uint8_t)     n);
+    }
+    inline size_t write(int16_t       n) {
+      return      write((uint8_t)     n);
+    }
     using Print::write;
 
     void    TWI_onReceiveService(int numBytes);
