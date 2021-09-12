@@ -23,7 +23,7 @@
   to work with other hardware or cores without modifications.
   Modified 2021 by MX682X for the Wire library rewriting project
 */
-
+// *INDENT-OFF*   astyle wants this file to be completely unreadable with no indentation for the many preprocessor conditionals!
 #ifndef TWI_PINS_H
 #define TWI_PINS_H
 
@@ -114,7 +114,7 @@ bool TWI_checkPins(const uint8_t sda_pin, const uint8_t scl_pin) {
       #if    defined(PIN_WIRE1_SDA_PINSWAP_2) &&     defined(PIN_WIRE1_SCL_PINSWAP_2)
         ((sda_pin == PIN_WIRE1_SDA_PINSWAP_2) && (scl_pin == PIN_WIRE1_SCL_PINSWAP_2)) ||
       #endif
-        false)){  //this false is just there to have something to OR with.
+        false)) {  //this false is just there to have something to OR with.
           #if defined(TWI1)
             badArg("Pins passed to Wire(1).pins() known at compile time to be invalid");
           #else
@@ -320,7 +320,7 @@ bool TWI0_swap(uint8_t state) {
 }
 
 
-void TWI0_usePullups(){
+void TWI0_usePullups() {
   // make sure we don't get errata'ed - make sure their bits in the output registers are off!
   #ifdef DXCORE
     // if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == 0x02) {
