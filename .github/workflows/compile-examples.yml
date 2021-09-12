@@ -37,7 +37,7 @@ jobs:
         - megaavr/libraries/Wire/examples/SFRRanger_reader
         - megaavr/libraries/tinyNeoPixel/examples/RGBWstrandtest
         - megaavr/extras/CompileTestSketches/test_analog_read
-        - megaavr/libraries/Wire/examples/master_and_slave
+        - megaavr/libraries/Wire/examples/DualAddress
       available-flash-4kB-plus-true-sketch-paths: |
         - megaavr/libraries/SoftwareSerial/examples/SoftwareSerialExample
         - megaavr/libraries/Wire/examples/master_reader
@@ -60,8 +60,6 @@ jobs:
         - megaavr/libraries/tinyNeoPixel_Static/examples/strandtest
       available-flash-2kB-plus-true-sketch-paths: |
         - megaavr/libraries/Wire/examples/slave_sender
-        - megaavr/libraries/Wire/examples/sizetest_mands_212
-        - megaavr/libraries/Wire/examples/sizetest_202
         - megaavr/extras/CompileTestSketches/test_digital_io
         - megaavr/extras/CompileTestSketches/test_macros
       available-flash-1_5kB-plus-true-sketch-paths: |
