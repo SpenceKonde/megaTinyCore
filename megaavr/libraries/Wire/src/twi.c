@@ -20,7 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// *INDENT-OFF*   astyle wants this file to be completely unreadable with no indentation for the many preprocessor conditionals!
 
 #include "Arduino.h"
 #include "twi.h"
@@ -30,7 +29,7 @@ SOFTWARE.
   Variable that holds the pointer to the static function "onSlaveIRQ"
   in the TwoWire class, if the slave functionality is used.
 */
-static void (*TWI_onSlaveISR) (TWI_t *module) __attribute__((unused));
+static void (*TWI_onSlaveISR)(TWI_t *module) __attribute__((unused));
 
 
 
@@ -55,27 +54,27 @@ void TWI_SlaveInterruptHandler(TWI_t *module);
  */
 void TWI_MasterInit(struct twiData *_data) {
 
-#if defined(TWI_MANDS)                            // Check if the user wants to use Master AND Slave
-  if (_data->_bools._masterEnabled == 1) {        // Slave is allowed to be enabled, don't re-enable the master though
-    return;
-  }
-#else                                             // Master OR Slave
-  if (_data->_bools._masterEnabled == 1 ||        // If Master was enabled
-      _data->_bools._slaveEnabled  == 1) {        // or Slave was enabled
-    return;                                       // return and do nothing
-  }
-#endif
+  #if defined(TWI_MANDS)                            // Check if the user wants to use Master AND Slave
+    if (_data->_bools._masterEnabled == 1) {        // Slave is allowed to be enabled, don't re-enable the master though
+      return;
+    }
+  #else                                             // Master OR Slave
+    if (_data->_bools._masterEnabled == 1 ||        // If Master was enabled
+        _data->_bools._slaveEnabled  == 1) {        // or Slave was enabled
+      return;                                       // return and do nothing
+    }
+  #endif
 
 
-#if defined(TWI1)                                 // More then one TWI used
-  if      (&TWI0 == _data->_module) {             // check which one this function is working with
-    TWI0_ClearPins();
-  } else if (&TWI1 == _data->_module) {
-    TWI1_ClearPins();
-  }
-#else                                             // Only one TWI is used
-  TWI0_ClearPins();                               // Only one option is possible
-#endif
+  #if defined(TWI1)                                 // More then one TWI used
+    if      (&TWI0 == _data->_module) {             // check which one this function is working with
+      TWI0_ClearPins();
+    } else if (&TWI1 == _data->_module) {
+      TWI1_ClearPins();
+    }
+  #else                                             // Only one TWI is used
+    TWI0_ClearPins();                               // Only one option is possible
+  #endif
 
   _data->_bools._masterEnabled  = 1;
   _data->_module->MCTRLA        = TWI_ENABLE_bm;  // Master Interrupt flags stay disabled
@@ -102,26 +101,26 @@ void TWI_MasterInit(struct twiData *_data) {
  */
 void TWI_SlaveInit(struct twiData *_data, uint8_t address, uint8_t receive_broadcast, uint8_t second_address) {
 
-#if defined(TWI_MANDS)                      // Check if the user wants to use Master AND Slave
-  if (_data->_bools._slaveEnabled  == 1) {  // Master is allowed to be enabled, don't re-enable the slave though
-    return;
-  }
-#else                                       // Master or Slave
-  if (_data->_bools._masterEnabled == 1 ||  // If Master was enabled
-      _data->_bools._slaveEnabled  == 1) {  // or Slave was enabled
-  return;                                   // return and do nothing
-  }
-#endif
+  #if defined(TWI_MANDS)                      // Check if the user wants to use Master AND Slave
+    if (_data->_bools._slaveEnabled  == 1) {  // Master is allowed to be enabled, don't re-enable the slave though
+      return;
+    }
+  #else                                       // Master or Slave
+    if (_data->_bools._masterEnabled == 1 ||  // If Master was enabled
+        _data->_bools._slaveEnabled  == 1) {  // or Slave was enabled
+    return;                                   // return and do nothing
+    }
+  #endif
 
-#if defined(TWI1)
-  if (&TWI0 == _data->_module) {
+  #if defined(TWI1)
+    if (&TWI0 == _data->_module) {
+      TWI0_ClearPins();
+    } else if (&TWI1 == _data->_module) {
+      TWI1_ClearPins();
+    }
+  #else
     TWI0_ClearPins();
-  } else if (&TWI1 == _data->_module) {
-    TWI1_ClearPins();
-  }
-#else
-  TWI0_ClearPins();
-#endif
+  #endif
 
   _data->_bools._slaveEnabled = 1;
   _data->_module->SADDR       = address << 1 | receive_broadcast;
@@ -173,8 +172,8 @@ void TWI_Disable(struct twiData *_data) {
  *@return     void
  */
 void TWI_DisableMaster(struct twiData *_data) {
-  if(true == _data->_bools._masterEnabled) {
-    if(false == _data->_bools._slaveEnabled) {
+  if (true == _data->_bools._masterEnabled) {
+    if (false == _data->_bools._slaveEnabled) {
       _data->_module->MCTRLA    = 0x00;  // has to stay enabled for bus error circuitry
     }
   _data->_module->MBAUD         = 0x00;
@@ -193,8 +192,8 @@ void TWI_DisableMaster(struct twiData *_data) {
  *@return     void
  */
 void TWI_DisableSlave(struct twiData *_data) {
-  if(true == _data->_bools._slaveEnabled) {
-    if(false == _data->_bools._masterEnabled) {
+  if (true == _data->_bools._slaveEnabled) {
+    if (false == _data->_bools._masterEnabled) {
       _data->_module->MCTRLA    = 0x00;      // might be enabled for bus error circuitry
     }
     _data->_module->SADDR       = 0x00;
@@ -289,15 +288,15 @@ uint8_t TWI_Available(struct twiData *_data) {
 
   num = (BUFFER_LENGTH + (*rxHead) - (*rxTail));
 
-#if defined(BUFFER_NOT_POWER_2)
-  if (num <  BUFFER_LENGTH) {
-    return  num;
-  } else {
-    return (num - BUFFER_LENGTH);
-  }
-#else
-  return (num & (BUFFER_LENGTH - 1));             // a bitwise AND is more space-efficient but needs power of 2 buffer lengths
-#endif
+  #if defined(BUFFER_NOT_POWER_2)
+    if (num <  BUFFER_LENGTH) {
+      return  num;
+    } else {
+      return (num - BUFFER_LENGTH);
+    }
+  #else
+    return (num & (BUFFER_LENGTH - 1));             // a bitwise AND is more space-efficient but needs power of 2 buffer lengths
+  #endif
 }
 
 

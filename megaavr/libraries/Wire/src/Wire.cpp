@@ -74,7 +74,7 @@ TwoWire::TwoWire(TWI_t *twi_module) {
  */
 bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
   #if defined(TWI1)
-    if        (&TWI0 == vars._module)  {
+    if (&TWI0 == vars._module)  {
       return TWI0_Pins(sda_pin, scl_pin);
     } else if (&TWI1 == vars._module)  {
       return TWI1_Pins(sda_pin, scl_pin);
@@ -484,8 +484,7 @@ int TwoWire::read(void) {
 
   if ((*rxHead) == (*rxTail)) { // if the head isn't ahead of the tail, we don't have any characters
     return -1;
-  }
-  else {
+  } else {
     uint8_t c = rxBuffer[(*rxTail)];
     (*rxTail) = TWI_advancePosition(*rxTail);
     return c;
