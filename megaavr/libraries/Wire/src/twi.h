@@ -58,7 +58,7 @@ SOFTWARE.
     //#undef TWI_MANDS
     #error "Master + Slave mode is not supported on the 202 or 402."
     // If a user enables master + slave mode on a part where we know it won't we should error
-    // so that they know what's wrong instead of silently disobeyingh
+    // so that they know what's wrong instead of silently disobeying
   #endif
 #endif
 
@@ -144,17 +144,17 @@ struct twiData {
 
 uint8_t  TWI_advancePosition(uint8_t pos);  //returns the next Position with Round-Robin functionality
 
-void     TWI_MasterInit(    struct twiData *_data);
-void     TWI_SlaveInit(     struct twiData *_data, uint8_t address, uint8_t receive_broadcast, uint8_t second_address);
-void     TWI_Flush(         struct twiData *_data);
-void     TWI_Disable(       struct twiData *_data);
-void     TWI_DisableMaster( struct twiData *_data);
-void     TWI_DisableSlave(  struct twiData *_data);
-void     TWI_MasterSetBaud( struct twiData *_data, uint32_t frequency);
-uint8_t  TWI_Available(     struct twiData *_data);
-uint8_t  TWI_MasterWrite(   struct twiData *_data, bool send_stop);
-uint8_t  TWI_MasterRead(    struct twiData *_data, uint8_t bytesToRead, bool send_stop);
-void     TWI_HandleSlaveIRQ(struct twiData *_data);
+void     TWI_MasterInit(struct      twiData *_data);
+void     TWI_SlaveInit(struct       twiData *_data, uint8_t address, uint8_t receive_broadcast, uint8_t second_address);
+void     TWI_Flush(struct           twiData *_data);
+void     TWI_Disable(struct         twiData *_data);
+void     TWI_DisableMaster(struct   twiData *_data);
+void     TWI_DisableSlave(struct    twiData *_data);
+void     TWI_MasterSetBaud(struct   twiData *_data, uint32_t frequency);
+uint8_t  TWI_Available(struct       twiData *_data);
+uint8_t  TWI_MasterWrite(struct     twiData *_data, bool send_stop);
+uint8_t  TWI_MasterRead(struct      twiData *_data, uint8_t bytesToRead, bool send_stop);
+void     TWI_HandleSlaveIRQ(struct  twiData *_data);
 
 /*uint8_t  TWI_MasterCalcBaud(uint32_t frequency); //moved to twi_pins.h due to license incompatibilities */
 void     TWI_RegisterSlaveISRcallback(void (*function)(TWI_t *module));
