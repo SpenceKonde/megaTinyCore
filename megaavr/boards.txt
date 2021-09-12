@@ -10,9 +10,9 @@
 #________________________________________________________________________#
 #                                                                        #
 #  Copyright Spence Konde and other             ##       #  #      ###   #
-#  contributors 2018-2021                      #  #      #  #     #   #  #
-#  megaTinyCore is free software.        # #     #       ####     # # #  #
-#  (LGPL v2.1) see LICENSE.md and        # #    #    ##     #  ## #   #  #
+#  contributors 2018-2021                      #  #      #  #         #  #
+#  megaTinyCore is free software.        # #     #       ####       ##   #
+#  (LGPL v2.1) see LICENSE.md and        # #    #    ##     #  ##     #  #
 #  License section of README.md           #    ####  ##     #  ##  ###   #
 #________________________________________________________________________#
 #                                                                        #
