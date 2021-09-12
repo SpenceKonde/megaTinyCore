@@ -24,7 +24,7 @@
   Modified extensively 2021 by MX682X for megaTinyCore and DxCore.
   Added Support for Simultaneous master/slave, dual mode and Wire1.
 */
-
+// *INDENT-OFF*   astyle wants this file to be completely unreadable with no indentation for the many preprocessor conditionals!
 extern "C" {
   #include <stdlib.h>
   #include <string.h>
@@ -606,7 +606,7 @@ uint8_t TwoWire::getIncomingAddress(void) {
   }
 #else
   void TwoWire::enableDualMode( __attribute__((unused)) bool fmp_enable) {
-    badCall("DualMode is not supported on this device.")
+    badCall("DualMode is not supported on this device.");
   }
 #endif
 
