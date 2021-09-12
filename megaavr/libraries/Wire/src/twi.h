@@ -53,8 +53,8 @@ SOFTWARE.
   #define TWI_DUALCTRL   //This identifies if the device supports dual mode, where slave pins are different from the master pins
 #endif
 
-#if defined(ARDUINO_AVR_ATtiny202) || defined (ARDUINO_AVR_ATtiny402)
-  #if defined (TWI_MANDS) //202 and 402 do not support independent master and slave.
+#if defined(ARDUINO_AVR_ATtiny202) || defined(ARDUINO_AVR_ATtiny402)
+  #if defined(TWI_MANDS) //202 and 402 do not support independent master and slave.
     //#undef TWI_MANDS
     #error "Master + Slave mode is not supported on the 202 or 402."
     // If a user enables master + slave mode on a part where we know it won't we should error
@@ -78,20 +78,20 @@ SOFTWARE.
   #endif                      /* 4809 core plus that couple bytes mentioned above.           */
 #endif
 
-struct twiDataBools {          //using a struct so the compiler can use skip if bit is set/cleared
-  uint8_t reserved:4;          //reserved for Future use, maybe error codes?
-  bool _toggleStreamFn:1;     //used to toggle between Slave and Master elements when TWI_MANDS defined
-  bool _masterEnabled:1;
-  bool _slaveEnabled:1;
-  bool _ackMatters:1;
+struct twiDataBools {       // using a struct so the compiler can use skip if bit is set/cleared
+  uint8_t reserved:     4;  // reserved for Future use, maybe error codes?
+  bool _toggleStreamFn: 1;  // used to toggle between Slave and Master elements when TWI_MANDS defined
+  bool _masterEnabled:  1;
+  bool _slaveEnabled:   1;
+  bool _ackMatters:     1;
   };
 
-/*My original idea was to pass the whole TwoWire class as a  */
-/*Pointer to this functions but this didn't work of course.  */
-/*But I had the idea: since the class is basically just a    */
-/*struct, why not just put the relevant variables in one     */
-/*and pass that as a pointer? So now this exists and it      */
-/*seems to work.                                             */
+/* My original idea was to pass the whole TwoWire class as a  */
+/* Pointer to this functions but this didn't work of course.  */
+/* But I had the idea: since the class is basically just a    */
+/* struct, why not just put the relevant variables in one     */
+/* and pass that as a pointer? So now this exists and it      */
+/* seems to work.                                             */
 
 struct twiData {
   TWI_t *_module;
@@ -99,7 +99,7 @@ struct twiData {
   struct twiDataBools _bools;      //the structure to hold the bools for the class
 
   uint8_t _slaveAddress;
-  #if defined (TWI_MERGE_BUFFERS)
+  #if defined(TWI_MERGE_BUFFERS)
     uint8_t _trHead;
     uint8_t _trTail;
   #else
@@ -109,9 +109,9 @@ struct twiData {
     uint8_t _rxTail;
   #endif
 
-  #if defined (TWI_MANDS)
+  #if defined(TWI_MANDS)
     uint8_t _incomingAddress;
-    #if defined (TWI_MERGE_BUFFERS)
+    #if defined(TWI_MERGE_BUFFERS)
       uint8_t _trHeadS;
       uint8_t _trTailS;
     #else
@@ -125,15 +125,15 @@ struct twiData {
   void (*user_onRequest)(void);
   void (*user_onReceive)(int);
 
-  #if defined (TWI_MERGE_BUFFERS)
+  #if defined(TWI_MERGE_BUFFERS)
     uint8_t _trBuffer[BUFFER_LENGTH];
   #else
     uint8_t _txBuffer[BUFFER_LENGTH];
     uint8_t _rxBuffer[BUFFER_LENGTH];
   #endif
 
-  #if defined (TWI_MANDS)        //Putting the arrays in the end because the first 32 bytes can
-    #if defined (TWI_MERGE_BUFFERS)   //be accessed easier and faster
+  #if defined(TWI_MANDS)        //Putting the arrays in the end because the first 32 bytes can
+    #if defined(TWI_MERGE_BUFFERS)   //be accessed easier and faster
       uint8_t _trBufferS[BUFFER_LENGTH];
     #else
       uint8_t _txBufferS[BUFFER_LENGTH];
@@ -144,23 +144,19 @@ struct twiData {
 
 uint8_t  TWI_advancePosition(uint8_t pos);  //returns the next Position with Round-Robin functionality
 
-void     TWI_MasterInit(struct twiData *_data);
-void     TWI_SlaveInit(struct twiData *_data, uint8_t address, uint8_t receive_broadcast, uint8_t second_address);
-void     TWI_Flush(struct twiData *_data);
-void     TWI_Disable(struct twiData *_data);
-void     TWI_DisableMaster(struct twiData *_data);
-void     TWI_DisableSlave(struct twiData *_data);
-
-void     TWI_MasterSetBaud(struct twiData *_data, uint32_t frequency);
-/*uint8_t  TWI_MasterCalcBaud(uint32_t frequency); //moved to twi_pins.h due to license incompatibilities */
-
-uint8_t  TWI_Available(struct twiData *_data);
-
-uint8_t  TWI_MasterWrite(struct twiData *_data, bool send_stop);
-uint8_t  TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_stop);
-
-void     TWI_RegisterSlaveISRcallback(void (*function)(TWI_t *module));
+void     TWI_MasterInit(    struct twiData *_data);
+void     TWI_SlaveInit(     struct twiData *_data, uint8_t address, uint8_t receive_broadcast, uint8_t second_address);
+void     TWI_Flush(         struct twiData *_data);
+void     TWI_Disable(       struct twiData *_data);
+void     TWI_DisableMaster( struct twiData *_data);
+void     TWI_DisableSlave(  struct twiData *_data);
+void     TWI_MasterSetBaud( struct twiData *_data, uint32_t frequency);
+uint8_t  TWI_Available(     struct twiData *_data);
+uint8_t  TWI_MasterWrite(   struct twiData *_data, bool send_stop);
+uint8_t  TWI_MasterRead(    struct twiData *_data, uint8_t bytesToRead, bool send_stop);
 void     TWI_HandleSlaveIRQ(struct twiData *_data);
 
+/*uint8_t  TWI_MasterCalcBaud(uint32_t frequency); //moved to twi_pins.h due to license incompatibilities */
+void     TWI_RegisterSlaveISRcallback(void (*function)(TWI_t *module));
 
 #endif

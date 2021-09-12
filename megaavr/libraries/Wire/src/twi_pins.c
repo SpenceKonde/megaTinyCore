@@ -24,11 +24,6 @@
   Modified 2021 by MX682X for the Wire library rewriting project
 */
 
-
-
-
-
-
 #ifndef TWI_PINS_H
 #define TWI_PINS_H
 
@@ -120,7 +115,7 @@ bool TWI_checkPins(const uint8_t sda_pin, const uint8_t scl_pin) {
         ((sda_pin == PIN_WIRE1_SDA_PINSWAP_2) && (scl_pin == PIN_WIRE1_SCL_PINSWAP_2)) ||
       #endif
         false)){  //this false is just there to have something to OR with.
-          #if defined (TWI1)
+          #if defined(TWI1)
             badArg("Pins passed to Wire(1).pins() known at compile time to be invalid");
           #else
             badArg("Pins passed to Wire.pins() known at compile time to be invalid");
@@ -140,7 +135,7 @@ void TWI0_ClearPins() {
     } else {
       PORTA.OUTCLR = 0x0C; // bits 2 and 3
     }
-    #if defined (TWI_DUALCTRL)
+    #if defined(TWI_DUALCTRL)
       if (TWI0.DUALCTRL & TWI_ENABLE_bm) {
         if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == PORTMUX_TWI0_DEFAULT_gc) {
           PORTC.OUTCLR = 0x0C; // bits 2 and 3
@@ -192,7 +187,6 @@ bool TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin) {
         #else /* tinyAVR 0/1 without TWI mux options */
            return (sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL);
         #endif
-
       #elif defined(PORTMUX_TWIROUTEA)
       uint8_t portmuxTWI = (PORTMUX.TWIROUTEA & ~PORTMUX_TWI0_gm);
         #if      defined(PIN_WIRE_SDA_PINSWAP_3)
@@ -329,13 +323,13 @@ bool TWI0_swap(uint8_t state) {
 void TWI0_usePullups(){
   // make sure we don't get errata'ed - make sure their bits in the output registers are off!
   #ifdef DXCORE
-      // if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == 0x02) {
-      // below achieves same more efficiently, since only the master/slave pins are supported by Wire.h
-      // and those are only ever on PA2/PA3, or PC2/PC3 for PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm == 0x02.
-      // but portToPortStruct takes a port number... and PC is 2 while PA is 0. So PORTMUX.TWIROUTEA& 0x02
-      // is the number that portToPortStruct would want, directly, to get that all important port struct.
-      // Slightly more complicated on DD-series since they added a fourth option to the portmux to help
-      // with the constrained pinout.
+    // if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == 0x02) {
+    // below achieves same more efficiently, since only the master/slave pins are supported by Wire.h
+    // and those are only ever on PA2/PA3, or PC2/PC3 for PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm == 0x02.
+    // but portToPortStruct takes a port number... and PC is 2 while PA is 0. So PORTMUX.TWIROUTEA& 0x02
+    // is the number that portToPortStruct would want, directly, to get that all important port struct.
+    // Slightly more complicated on DD-series since they added a fourth option to the portmux to help
+    // with the constrained pinout.
     #ifndef __AVR_DD__
       PORT_t *port = portToPortStruct(PORTMUX.TWIROUTEA & 0x02);
     #else
@@ -347,13 +341,13 @@ void TWI0_usePullups(){
         port->PIN1CTRL |= PORT_PULLUPEN_bm;
       } else {
     #endif
-        port->OUTCLR = 0x0C; //bits 2 and 3
-        port->PIN2CTRL |= PORT_PULLUPEN_bm;
-        port->PIN3CTRL |= PORT_PULLUPEN_bm;
+      port->OUTCLR = 0x0C; //bits 2 and 3
+      port->PIN2CTRL |= PORT_PULLUPEN_bm;
+      port->PIN3CTRL |= PORT_PULLUPEN_bm;
     #ifdef __AVR_DD__
       }
     #endif
-    #if defined (TWI_DUALCTRL)
+    #if defined(TWI_DUALCTRL)
       if (TWI0.DUALCTRL & TWI_ENABLE_bm) {
         if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm)==0) {
           PORTC.OUTCLR = 0x0C; //bits 2 and 3
@@ -389,9 +383,7 @@ void TWI0_usePullups(){
   #endif
 }
 
-
-
-#if defined (TWI1)
+#if defined(TWI1)
 void TWI1_ClearPins() {
   #ifdef PORTMUX_TWIROUTEA
     if ((PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm) == PORTMUX_TWI1_ALT2_gc) {
@@ -401,7 +393,7 @@ void TWI1_ClearPins() {
     } else {
       PORTF.OUTCLR = 0x0C; // bits 2 and 3
     }
-    #if defined (TWI_DUALCTRL)
+    #if defined(TWI_DUALCTRL)
       if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
         if ((PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm) == PORTMUX_TWI1_DEFAULT_gc) {
           PORTB.OUTCLR = 0x0C; // bits 2 and 3
@@ -507,7 +499,7 @@ bool TWI1_swap(uint8_t state) {
 
 
 void TWI1_usePullups() {
-  #if defined (TWI1)
+  #if defined(TWI1)
     uint8_t temp = PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm;
     PORT_t *port = portToPortStruct(temp==8?PB:PF);
     if (temp==3) {
@@ -519,7 +511,7 @@ void TWI1_usePullups() {
       port->PIN2CTRL |= PORT_PULLUPEN_bm;
       port->PIN3CTRL |= PORT_PULLUPEN_bm;
     }
-    #if defined (TWI_DUALCTRL)
+    #if defined(TWI_DUALCTRL)
       if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
         if (temp==0) {
           PORTB.OUTCLR = 0x0C; //bits 2 and 3
