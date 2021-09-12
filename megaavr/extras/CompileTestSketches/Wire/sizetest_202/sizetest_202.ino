@@ -1,8 +1,9 @@
 #include "Wire.h"
 
+//A small sketch to test the minimal size requirements of the Wire library
+
 void setup() {
    Wire.begin();
-
 }
 
 void loop() {

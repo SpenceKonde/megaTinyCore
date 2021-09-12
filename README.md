@@ -3,7 +3,7 @@
 Let's use that - it's better than gitter ever was, and it's all on one site.
 
 ### **WARNING** Github version (2.4.3 development) has sigificant differences from the released library (2.4.2) relating to the Wire library
-For all wire issues, please try the other verion the most important type of wire issue for us is something that worked before and doesn't now, and the reverse.
+For all wire issues, please try the other version - the most important type of wire issue for us is something that worked before and doesn't now, and the reverse.
 
 **(2.4.1 and 2.4.0 are bad releases. Use 2.4.2).**
 
