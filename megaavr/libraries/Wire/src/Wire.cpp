@@ -21,14 +21,14 @@
   Modified 2019-2021 by Spence Konde for megaTinyCore and DxCore.
   This version is part of megaTinyCore and DxCore; it is not expected
   to work with other hardware or cores without modifications.
-  Modified 2021 by MX682X for megaTinyCore and DxCore.
+  Modified extensively 2021 by MX682X for megaTinyCore and DxCore.
   Added Support for Simultaneous master/slave, dual mode and Wire1.
 */
 
 extern "C" {
-#include <stdlib.h>
-#include <string.h>
-#include <inttypes.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include <inttypes.h>
 }
 
 
@@ -36,9 +36,9 @@ extern "C" {
 #include "Wire.h"
 
 
-extern "C" {    //compiler was complaining when I put twi.h into the upper C include part
-#include "twi.h"
-#include "twi_pins.h"
+extern "C" {    // compiler was complaining when I put twi.h into the upper C include part
+  #include "twi.h"
+  #include "twi_pins.h"
 }
 
 #ifndef DEFAULT_FREQUENCY
@@ -46,9 +46,8 @@ extern "C" {    //compiler was complaining when I put twi.h into the upper C inc
 #endif
 
 
-// Initialize Class Variables //////////////////////////////////////////////////
-
-// Constructors ////////////////////////////////////////////////////////////////
+// Initialize Class Variables // /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+// Constructors   // /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
 /**
  *@brief      TwoWire creates a Wire object
  *
@@ -58,11 +57,11 @@ extern "C" {    //compiler was complaining when I put twi.h into the upper C inc
  */
 TwoWire::TwoWire(TWI_t *twi_module) {
   vars._module = twi_module;
-  vars.user_onRequest = NULL;  //Make sure to initialize this pointers
-  vars.user_onReceive = NULL;  //This avoids weird jumps should something unexpected happen
+  vars.user_onRequest = NULL;  // Make sure to initialize this pointers
+  vars.user_onReceive = NULL;  // This avoids weird jumps should something unexpected happen
 }
 
-// Public Methods //////////////////////////////////////////////////////////////
+// Public Methods // /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
 /**
  *@brief      pins changes the PINMUX to correspond to the desired pins
  *
@@ -74,10 +73,14 @@ TwoWire::TwoWire(TWI_t *twi_module) {
  *@retval     true if change was successful
  */
 bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
-  #if defined (TWI1)
-    if      (&TWI0 == vars._module)  {return TWI0_Pins(sda_pin, scl_pin);}
-    else if (&TWI1 == vars._module)  {return TWI1_Pins(sda_pin, scl_pin);}
-    else                             {return false;}
+  #if defined(TWI1)
+    if        (&TWI0 == vars._module)  {
+      return TWI0_Pins(sda_pin, scl_pin);
+    } else if (&TWI1 == vars._module)  {
+      return TWI1_Pins(sda_pin, scl_pin);
+    } else {
+      return false;
+    }
   #else
     return TWI0_Pins(sda_pin, scl_pin);
   #endif
@@ -94,10 +97,14 @@ bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
  *@retval     true if change was successful
  */
 bool TwoWire::swap(uint8_t state) {
-  #if defined (TWI1)
-    if      (&TWI0 == vars._module) {return TWI0_swap(state);}
-    else if (&TWI1 == vars._module) {return TWI1_swap(state);}
-    else                            {return false;}
+  #if defined(TWI1)
+    if (&TWI0 == vars._module) {
+      return TWI0_swap(state);
+    } else if (&TWI1 == vars._module) {
+      return TWI1_swap(state);
+    } else {
+      return false;
+    }
   #else
     return TWI0_swap(state);
   #endif
@@ -114,9 +121,12 @@ bool TwoWire::swap(uint8_t state) {
  *@return     void
  */
 void TwoWire::usePullups(void) {
-  #if defined (TWI1)
-    if      (&TWI0 == vars._module) {TWI0_usePullups();}
-    else if (&TWI1 == vars._module) {TWI1_usePullups();}
+  #if defined(TWI1)
+    if (&TWI0 == vars._module) {
+      TWI0_usePullups();
+    } else if (&TWI1 == vars._module) {
+      TWI1_usePullups();
+    }
   #else
     TWI0_usePullups();
   #endif
@@ -135,18 +145,18 @@ void TwoWire::usePullups(void) {
  *@retval     true if change was successful
  */
 bool TwoWire::swapModule(TWI_t *twi_module) {
-  #if defined (TWI1)
-    #if defined (USING_TWI1)
+  #if defined(TWI1)
+    #if defined(USING_TWI1)
       badCall("swapModule() can only be used if TWI1 is not used");
     #else
-      if (vars._module->MCTRLA == 0) {   //slave and master initialisations enable MCTRLA, so just check for that
+      if (vars._module->MCTRLA == 0) {    // slave and master initialisations enable MCTRLA, so just check for that
         vars._module = twi_module;
-        return true;         //Success
+        return true;                      // Success
       }
-      #endif
+    #endif
   #else
-      badCall("Only one TWI module available, nothing to switch with");
-      (void)twi_module; //Remove warning unused variable
+    badCall("Only one TWI module available, nothing to switch with");
+    (void)twi_module; // Remove warning unused variable
   #endif
   return false;
 }
@@ -181,7 +191,7 @@ void TwoWire::begin(void) {
  */
 void TwoWire::begin(uint8_t address, bool receive_broadcast, uint8_t second_address) {
   TWI_SlaveInit(&vars, address, receive_broadcast, second_address);
-  TWI_RegisterSlaveISRcallback(onSlaveIRQ);                          //give the C part of the program a pointer to call back to.
+  TWI_RegisterSlaveISRcallback(onSlaveIRQ);                          // give the C part of the program a pointer to call back to.
 }
 
 
@@ -218,7 +228,7 @@ void TwoWire::end(void) {
  *
  *@return     void
  */
-#if defined (TWI_MANDS)
+#if defined(TWI_MANDS)
 void TwoWire::endMaster(void) {
   TWI_DisableMaster(&vars);
 }
@@ -232,7 +242,7 @@ void TwoWire::endMaster(void) {
  *
  *@return     void
  */
-#if defined (TWI_MANDS)
+#if defined(TWI_MANDS)
 void TwoWire::endSlave(void) {
   TWI_DisableSlave(&vars);
 }
@@ -254,19 +264,26 @@ void TwoWire::endSlave(void) {
  *@return     uint8_t
  *@retval     amount of bytes that were actually read. If 0, no read took place due to a bus error.
  */
-uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity)                   {return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)1);}
-uint8_t TwoWire::requestFrom(uint8_t address, size_t  quantity, bool    sendStop) {return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)sendStop);}
-uint8_t TwoWire::requestFrom(uint8_t address, size_t  quantity)                   {return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)1);}
-uint8_t TwoWire::requestFrom(int     address, int     quantity, int     sendStop) {return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)sendStop);}
-uint8_t TwoWire::requestFrom(int     address, int     quantity)                   {return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)1);}
-
-uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop) {
+uint8_t TwoWire::requestFrom(uint8_t  address,  uint8_t  quantity)                   {
+         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) 1);
+}
+uint8_t TwoWire::requestFrom(uint8_t  address,  size_t   quantity,  bool     sendStop) {
+         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) sendStop);
+}
+uint8_t TwoWire::requestFrom(uint8_t  address,  size_t   quantity)                   {
+         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) 1);
+}
+uint8_t TwoWire::requestFrom(int16_t  address,  int16_t  quantity,  int16_t  sendStop) {
+         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) sendStop);
+}
+uint8_t TwoWire::requestFrom(int16_t  address,  int16_t  quantity)                   {
+         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) 1);
+}
+uint8_t TwoWire::requestFrom(uint8_t  address,  uint8_t  quantity,  uint8_t sendStop) {
   if (quantity > BUFFER_LENGTH) {
     quantity = BUFFER_LENGTH;
   }
-
   vars._slaveAddress = address << 1;
-
   return TWI_MasterRead(&vars, quantity, sendStop);
 }
 
@@ -284,16 +301,16 @@ uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop
  *@return     void
  */
 void TwoWire::beginTransmission(uint8_t address) {
-  #if defined (TWI_MERGE_BUFFERS)                 //Same Buffers for tx/rx
+  #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
     uint8_t* txHead  = &(vars._trHead);
     uint8_t* txTail  = &(vars._trTail);
-  #else                                           //Separate tx/rx Buffers
+  #else                                           // Separate tx/rx Buffers
     uint8_t* txHead  = &(vars._txHead);
     uint8_t* txTail  = &(vars._txTail);
   #endif
   // set address of targeted slave
   vars._slaveAddress = address << 1;
-  (*txTail) = (*txHead);  //reset transmitBuffer
+  (*txTail) = (*txHead);  // reset transmitBuffer
 }
 
 
@@ -342,39 +359,39 @@ size_t TwoWire::write(uint8_t data) {
   uint8_t* txTail;
   uint8_t* txBuffer;
 
-  #if defined (TWI_MANDS)                           //Add following if master and slave are split
+  #if defined(TWI_MANDS)                   // Add following if master and slave are split
     if (vars._bools._toggleStreamFn == 0x01) {
-      #if defined (TWI_MERGE_BUFFERS)                 //Separate tx/rx Buffers
-        txHead  = &(vars._trHeadS);
-        txTail  = &(vars._trTailS);
-        txBuffer = vars._trBufferS;
-      #else                                           //Same Buffers for tx/rx
-        txHead  = &(vars._txHeadS);
-        txTail  = &(vars._txTailS);
-        txBuffer = vars._txBufferS;
+      #if defined(TWI_MERGE_BUFFERS)       // Separate tx/rx Buffers
+        txHead   = &(vars._trHeadS);
+        txTail   = &(vars._trTailS);
+        txBuffer =   vars._trBufferS;
+      #else                                // Same Buffers for tx/rx
+        txHead   = &(vars._txHeadS);
+        txTail   = &(vars._txTailS);
+        txBuffer =   vars._txBufferS;
       #endif
-    }
-    else
+    } else
   #endif
   {
-    #if defined (TWI_MERGE_BUFFERS)               //Same Buffers for tx/rx
-      txHead  = &(vars._trHead);
-      txTail  = &(vars._trTail);
-      txBuffer = vars._trBuffer;
-    #else                                         //Separate tx/rx Buffers
-      txHead  = &(vars._txHead);
-      txTail  = &(vars._txTail);
-      txBuffer = vars._txBuffer;
+    #if defined(TWI_MERGE_BUFFERS)         // Same Buffers for tx/rx
+      txHead   = &(vars._trHead);
+      txTail   = &(vars._trTail);
+      txBuffer =   vars._trBuffer;
+    #else                                  // Separate tx/rx Buffers
+      txHead   = &(vars._txHead);
+      txTail   = &(vars._txTail);
+      txBuffer =   vars._txBuffer;
     #endif
   }
 
   /* Put byte in txBuffer */
   nextHead = TWI_advancePosition(*txHead);
 
-  if (nextHead == (*txTail)) return 0;          //Buffer full, stop accepting data
-
-  txBuffer[(*txHead)] = data;             //Load data into the buffer
-  (*txHead) = nextHead;                   //advancing the head
+  if (nextHead == (*txTail)) {
+   return 0;                              // Buffer full, stop accepting data
+  }
+  txBuffer[(*txHead)] = data;             // Load data into the buffer
+  (*txHead) = nextHead;                   // advancing the head
 
   return 1;
 }
@@ -439,29 +456,28 @@ int TwoWire::read(void) {
   uint8_t* rxTail;
   uint8_t* rxBuffer;
 
-  #if defined (TWI_MANDS)                           //Add following if master and slave are split
+  #if defined(TWI_MANDS)                         // Add following if master and slave are split
     if (vars._bools._toggleStreamFn == 0x01) {
-      #if defined (TWI_MERGE_BUFFERS)                 //Same Buffers for tx/rx
-        rxHead  = &(vars._trHeadS);
-        rxTail  = &(vars._trTailS);
-        rxBuffer = vars._trBufferS;
-      #else                                           //Separate tx/rx Buffers
-        rxHead  = &(vars._rxHeadS);
-        rxTail  = &(vars._rxTailS);
-        rxBuffer = vars._rxBufferS;
+      #if defined(TWI_MERGE_BUFFERS)             // Same Buffers for tx/rx
+        rxHead   = &(vars._trHeadS);
+        rxTail   = &(vars._trTailS);
+        rxBuffer =   vars._trBufferS;
+      #else                                      // Separate tx/rx Buffers
+        rxHead   = &(vars._rxHeadS);
+        rxTail   = &(vars._rxTailS);
+        rxBuffer =   vars._rxBufferS;
       #endif
-    }
-    else
+    } else
   #endif
   {
-    #if defined (TWI_MERGE_BUFFERS)               //Same Buffers for tx/rx
-      rxHead  = &(vars._trHead);
-      rxTail  = &(vars._trTail);
-      rxBuffer = vars._trBuffer;
-    #else                                         //Separate tx/rx Buffers
-      rxHead  = &(vars._rxHead);
-      rxTail  = &(vars._rxTail);
-      rxBuffer = vars._rxBuffer;
+    #if defined(TWI_MERGE_BUFFERS)               // Same Buffers for tx/rx
+      rxHead   = &(vars._trHead);
+      rxTail   = &(vars._trTail);
+      rxBuffer =   vars._trBuffer;
+    #else                                        // Separate tx/rx Buffers
+      rxHead   = &(vars._rxHead);
+      rxTail   = &(vars._rxTail);
+      rxBuffer =   vars._rxBuffer;
     #endif
   }
 
@@ -495,34 +511,35 @@ int TwoWire::peek(void) {
   uint8_t* rxTail;
   uint8_t* rxBuffer;
 
-  #if defined (TWI_MANDS)                           //Add following if master and slave are split
+  #if defined(TWI_MANDS)                          // Add following if master and slave are split
     if (vars._bools._toggleStreamFn == 0x01) {
-      #if defined (TWI_MERGE_BUFFERS)                 //Separate tx/rx Buffers
-        rxHead  = &(vars._trHeadS);
-        rxTail  = &(vars._trTailS);
-        rxBuffer = vars._trBufferS;
-      #else                                           //Same Buffers for tx/rx
-        rxHead  = &(vars._rxHeadS);
-        rxTail  = &(vars._rxTailS);
-        rxBuffer = vars._rxBufferS;
+      #if defined(TWI_MERGE_BUFFERS)              // Same Buffers for tx/rx
+        rxHead   = &(vars._trHeadS);
+        rxTail   = &(vars._trTailS);
+        rxBuffer =   vars._trBufferS;
+      #else                                       // Separate tx/rx Buffers
+        rxHead   = &(vars._rxHeadS);
+        rxTail   = &(vars._rxTailS);
+        rxBuffer =   vars._rxBufferS;
       #endif
-    }
-    else
+    } else
   #endif
   {
-    #if defined (TWI_MERGE_BUFFERS)               //Same Buffers for tx/rx
-      rxHead  = &(vars._trHead);
-      rxTail  = &(vars._trTail);
-      rxBuffer = vars._trBuffer;
-    #else                                         //Separate tx/rx Buffers
-      rxHead  = &(vars._rxHead);
-      rxTail  = &(vars._rxTail);
-      rxBuffer = vars._rxBuffer;
+    #if defined(TWI_MERGE_BUFFERS)                // Same Buffers for tx/rx
+      rxHead   = &(vars._trHead);
+      rxTail   = &(vars._trTail);
+      rxBuffer =   vars._trBuffer;
+    #else                                         // Separate tx/rx Buffers
+      rxHead   = &(vars._rxHead);
+      rxTail   = &(vars._rxTail);
+      rxBuffer =   vars._rxBuffer;
     #endif
   }
-
-  if ((*rxHead) == (*rxTail)) {return -1;}
-  else                        {return rxBuffer[(*rxTail)];}
+  if ((*rxHead) == (*rxTail)) {
+    return -1;
+  } else {
+    return rxBuffer[(*rxTail)];
+  }
 }
 
 
@@ -534,15 +551,15 @@ int TwoWire::peek(void) {
  *@return     void
  */
 void TwoWire::flush(void) {
-  #if defined (TWI_MERGE_BUFFERS)               //merged tx/rx Buffers
+  #if defined(TWI_MERGE_BUFFERS)               // merged tx/rx Buffers
     vars._trTail = vars._trHead;
-    #if defined (TWI_MANDS)
+    #if defined(TWI_MANDS)
       vars._trTailS = vars._trHeadS;
     #endif
   #else
     vars._rxTail = vars._rxHead;
     vars._txTail = vars._txHead;
-    #if defined (TWI_MANDS)
+    #if defined(TWI_MANDS)
       vars._rxTailS = vars._rxHeadS;
       vars._txTailS = vars._txHeadS;
     #endif
@@ -564,7 +581,7 @@ void TwoWire::flush(void) {
  *@retval     left-shifted I2C address with the write/read bit
  */
 uint8_t TwoWire::getIncomingAddress(void) {
-  #if defined (TWI_MANDS)                         //Alias handler
+  #if defined(TWI_MANDS)                         // Alias handler
     return vars._incomingAddress;
   #else
     return vars._slaveAddress;
@@ -583,10 +600,14 @@ uint8_t TwoWire::getIncomingAddress(void) {
  *
  *@return     void
  */
-#if defined (TWI_DUALCTRL)
-void TwoWire::enableDualMode(bool fmp_enable) {
-  vars._module->DUALCTRL = ((fmp_enable << TWI_FMPEN_bp) | TWI_ENABLE_bm);
-}
+#if defined(TWI_DUALCTRL)
+  void TwoWire::enableDualMode(bool fmp_enable) {
+    vars._module->DUALCTRL = ((fmp_enable << TWI_FMPEN_bp) | TWI_ENABLE_bm);
+  }
+#else
+  void TwoWire::enableDualMode( __attribute__((unused)) bool fmp_enable) {
+    badCall("DualMode is not supported on this device.")
+  }
 #endif
 
 
@@ -608,22 +629,22 @@ void TwoWire::enableDualMode(bool fmp_enable) {
  *
  *@return     void
  */
-void TwoWire::onSlaveIRQ(TWI_t *module){                 //This function is static and is, thus, the only one for both
-                                                         //Wire interfaces. Here is decoded which interrupt was fired.
+void TwoWire::onSlaveIRQ(TWI_t *module){                  // This function is static and is, thus, the only one for both
+                                                          // Wire interfaces. Here is decoded which interrupt was fired.
 
-#if defined (TWI1)                                       //Two TWIs available
-   #if defined (USING_WIRE1)                             //User wants to use Wire and Wire1. Need to check the interface
-      if      (module == &TWI0) {
+#if defined(TWI1)                                         // Two TWIs available
+   #if defined(USING_WIRE1)                               // User wants to use Wire and Wire1. Need to check the interface
+      if (module == &TWI0) {
          TWI_HandleSlaveIRQ(&(Wire.vars));
       }
       else if (module == &TWI1) {
          TWI_HandleSlaveIRQ(&(Wire1.vars));
       }
-   #else                                                 //User uses only Wire but can use TWI0 and TWI1
-       TWI_HandleSlaveIRQ(&(Wire.vars));                 //Only one possible SlaveIRQ source/Target Class
+   #else                                                  // User uses only Wire but can use TWI0 and TWI1
+       TWI_HandleSlaveIRQ(&(Wire.vars));                  // Only one possible SlaveIRQ source/Target Class
    #endif
-#else                                                    //Only TWI0 available, IRQ can only have been issued by that interface
-   TWI_HandleSlaveIRQ(&(Wire.vars));                     //No need to check for it
+#else                                                     // Only TWI0 available, IRQ can only have been issued by that interface
+   TWI_HandleSlaveIRQ(&(Wire.vars));                      // No need to check for it
 #endif
    (void)module;
 }
@@ -670,8 +691,8 @@ void TwoWire::onRequest(void (*function)(void)) {
   TwoWire Wire(&TWI0);
 #endif
 
-#if defined (TWI1)
-#if defined (USING_WIRE1)
-   TwoWire Wire1(&TWI1);
-#endif
+#if defined(TWI1)
+  #if defined(USING_WIRE1)
+     TwoWire Wire1(&TWI1);
+  #endif
 #endif

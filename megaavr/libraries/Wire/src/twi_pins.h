@@ -60,10 +60,10 @@ void   TWI0_usePullups();
 
 
 #if defined (TWI1)
-void    TWI1_ClearPins();
-bool         TWI1_Pins(uint8_t sda_pin, uint8_t scl_pin);
-bool         TWI1_swap(uint8_t state);
-void   TWI1_usePullups();
+  void    TWI1_ClearPins();
+  bool         TWI1_Pins(uint8_t sda_pin, uint8_t scl_pin);
+  bool         TWI1_swap(uint8_t state);
+  void   TWI1_usePullups();
 #endif
 
 #endif /* TWI_DRIVER_H */
