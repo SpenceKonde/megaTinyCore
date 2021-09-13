@@ -2,7 +2,7 @@
 
 We have received many questions from users about how to take over TCA0 to generate 16-bit PWM or change the output frequency. There are a few non-obvious complications here, and this document aims to clear up these confusions. First, before you begin, make sure you have a recemt version of megaTinyCore installed. This document references functions added in the 2.3.x versions; pre-2.x versions further contain significant differences that render much of this document inapplicable. What is written here largely applies to TCA1 on the AVR Dx-series parts, and is expected to apply to the AVR EA-series as well, though no definitive information on those parts beyond their mention in the AVR EA-series technical brief has been released. It it unlikely that any relevant changes will be madem but not impossible.
 
-## For FAR more information
+## For far more information on type A timers
 Microchip has made available a Technical Brief describing the capabilities of the Type A timer, which is arguably the most powerful timer available on modern AVR devices (one could argue that the type D tiemr on the tinyAVR 1-series, AVR DA, DB, and DD-series parts is more powerful. I disagree with that claim; while it is unquestionably more complex and is capable of some tasks which the TCA is not, it is applicable to significantly fewer use cases, and far more challenging to configure). That technical brief describes all applications of the type A timer, not just PWM (and also assumes it is starting from power on reset (POR) state; if you are using code from there, you can call takeOverTCA0() to both reset it to this state, and ensure that the core does not subsequently mess with it).
 
 [Technical Brief 3217: Getting started with TCA](https://www.microchip.com/en-us/application-notes/tb3217)
@@ -16,7 +16,11 @@ The most common point of confusion is the fact that megaTinyCore, out of the box
 ```
 Note that as these bits have the same function in SINGLE and SPLIT mode, it does not matter whether you reference them as TCA0.SINGLE.* or TCA0.SPLIT.*
 
+However, **all that isn't necessary on recent versions of megaTinyCore**, because a function to do that - as well as cease all manipulation of the TCA0 by all API calls - is provided. Simply calling `takeOverTCA0()` will perform a hard reset of the timer, and mark it as being controlled exclusively by the user. The second function of this function prevents analogWrite() and digitalWrite() on the relevant pins from manipulating registers related to TCA0. This is critical if you've taken over the timer and altered the relevant PORTMUX registers - otherwise digitalWrite() to a pin that nominallty has PWM, but doesn't after your reconfigurations would result in thwe corresponding PWM channel (which you have pointing to a different pin) being turned off, for example.
+
 Once this has been done, further configuration is straightforward. Failing to turn off split mode when you intend to, however, will result in strange behavior. Among other things, that determines whether the 16-bit registers are treated as 16-bit registers or pairs of 8-bit registers.
+
+With the introduction of `takeOverTCA0()`, it should be called in all cases where settings of TCA0 which could change behavior of the standard Arduino API functions are manipulated by writing to the TCA0 registers. If this function is not called, unexpected and unwanted behavior may be experienced when the Arduino API functions are used after such reconfigurations of TCA0. That is not indicative of a defect in the core, but of a defect in the sketch.
 
 ## Avoid using TCA0 as the millis timer
 Reconfiguring TCA0 when it is used as the millis timer source will result in loss of timekeeping functionality. When doing this, you should avoid using TCA0 as the millis source. To ensure that you don't forget to set the millis timer correctly, it is suggested to put code like the following in your sketch to halt compile if you later open the sketch and did not choose the correct millis timer source.
@@ -36,7 +40,8 @@ Better yet, you can verify that you chose the intended millis timer, rather than
 In these examples, it is also used to make sure one doesn't try to run them on a part where the mappings of the channels to pins are different (ie, the 8-pin parts).
 
 ### Added complication for 8-pin parts
-On the 8-pin parts, the default location for WO0 is the same as for WO3: PA3, ie, you can't get an extra channel from split mode. However, WO0 can be moved from it's default location to PA7 via the PORTMUX; megaTinyCore does this to get the extra PWM channel out of the box. This is controlled by `PORTMUX.CTRLC`. Nothing else is controlled by this register, so you can just set it to the compiler-provided constants. None of the other parts supported by megaTinyCore have PWM pins blocking each other like this.
+On the 8-pin parts, the default location for WO0 is the same as for WO3: PA3, ie, you can't get an extra channel from split mode with the default pin assignments. However, WO0 can be moved from it's default location to PA7 via the PORTMUX; megaTinyCore does this to get the extra PWM channel. This is controlled by `PORTMUX.CTRLC`. None of the other parts supported by megaTinyCore have PWM pins on TCA0 blocking each other like this.
+
 ```c++
 PORTMUX.CTRLC = PORTMUX_TCA00_DEFAULT_gc;   // Move it back to PA3
 PORTMUX.CTRLC = PORTMUX_TCA00_ALTERNATE_gc; // Move it to PA7
