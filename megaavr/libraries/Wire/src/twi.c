@@ -675,7 +675,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
       default:
         // Abort operation
         _data->_module->SCTRLB = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc;
-         while (true) {}  // while loop for debugging. Use this to see what SSTATUS is
+        // while (true) {}  // while loop for debugging. Use this to see what SSTATUS is
         break;
     }
   }
