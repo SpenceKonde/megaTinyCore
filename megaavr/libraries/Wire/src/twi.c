@@ -53,7 +53,6 @@ void TWI_SlaveInterruptHandler(TWI_t *module);
  *@return     void
  */
 void TWI_MasterInit(struct twiData *_data) {
-
   #if defined(TWI_MANDS)                            // Check if the user wants to use Master AND Slave
     if (_data->_bools._masterEnabled == 1) {        // Slave is allowed to be enabled, don't re-enable the master though
       return;
@@ -100,7 +99,6 @@ void TWI_MasterInit(struct twiData *_data) {
  *@return     void
  */
 void TWI_SlaveInit(struct twiData *_data, uint8_t address, uint8_t receive_broadcast, uint8_t second_address) {
-
   #if defined(TWI_MANDS)                      // Check if the user wants to use Master AND Slave
     if (_data->_bools._slaveEnabled  == 1) {  // Master is allowed to be enabled, don't re-enable the slave though
       return;
@@ -237,8 +235,8 @@ void TWI_MasterSetBaud(struct twiData *_data, uint32_t frequency) {
       }
       _data->_module->MCTRLA    = restore;                  // restore the old register, thus enabling it again
       _data->_module->MSTATUS   = TWI_BUSSTATE_IDLE_gc;     // Force the state machine into Idle according to the data sheet
-      }
-   }
+    }
+  }
 }
 
 
@@ -335,16 +333,16 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
     return 0;                                                 // If the bus was not initialized, return
   }
 
-  beginning:                                                  // Position to restart in case of an Arbitration error
-  while ((_data->_module->MSTATUS & TWI_BUSSTATE_gm) == TWI_BUSSTATE_BUSY_gc);    // Wait for Bus to be free again
+  beginning:                                                    // Position to restart in case of an Arbitration error
+  while ((_data->_module->MSTATUS & TWI_BUSSTATE_gm) == TWI_BUSSTATE_BUSY_gc) {}  // Wait for Bus to be free again
 
   uint8_t dataWritten = 0;
-  uint8_t writeAddress = ADD_WRITE_BIT(_data->_slaveAddress); // Get slave address and clear the read bit
-  _data->_module->MADDR = writeAddress;                       // write to the ADDR Register -> (repeated) Start condition is issued and slave address is sent
+  uint8_t writeAddress = ADD_WRITE_BIT(_data->_slaveAddress);   // Get slave address and clear the read bit
+  _data->_module->MADDR = writeAddress;                         // write to the ADDR Register -> (repeated) Start condition is issued and slave address is sent
 
-  while (!(_data->_module->MSTATUS & TWI_WIF_bm));            // Wait for the address/data transfer completion   // ...thinking about adding a timeout...
-  if (_data->_module->MSTATUS & TWI_ARBLOST_bm) {             // If another Master has started writing an Address at the same time, go back and wait
-    goto beginning;                                           // Until the TWI bus has changed from BUSY to IDLE
+  while (!(_data->_module->MSTATUS & TWI_WIF_bm)) {}            // Wait for the address/data transfer completion
+  if (_data->_module->MSTATUS & TWI_ARBLOST_bm) {               // If another Master has started writing an Address at the same time, go back and wait
+    goto beginning;                                             // Until the TWI bus has changed from BUSY to IDLE
   }
 
   // if the slave has acknowledged the address, data can be sent
@@ -371,7 +369,7 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
       break;                                                    // so break the while loop
     }
 
-    while (!(_data->_module->MSTATUS & TWI_WIF_bm));            // Wait for the address/data transfer completion
+    while (!(_data->_module->MSTATUS & TWI_WIF_bm)) {}         // Wait for the address/data transfer completion
   }
 
   if (send_stop) {
@@ -423,15 +421,15 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
     (*rxTail) = (*rxHead);                                      // reset buffer positions so the slave can start writing at zero.
   #endif
 
-  if ((currentStatus & TWI_BUSSTATE_gm) == TWI_BUSSTATE_UNKNOWN_gc) { // Bus de-initialized for some reason
+  if ((currentStatus & TWI_BUSSTATE_gm) == TWI_BUSSTATE_UNKNOWN_gc) {  // Bus de-initialized for some reason
     return retVal;                                              // return 0
   }
-  while ((currentStatus & TWI_BUSSTATE_gm) == TWI_BUSSTATE_BUSY_gc);  // Wait if another master is using the bus
+  while ((currentStatus & TWI_BUSSTATE_gm) == TWI_BUSSTATE_BUSY_gc) {}  // Wait if another master is using the bus
 
   uint8_t readAddress = ADD_READ_BIT(_data->_slaveAddress);     // Get slave address and set the read bit
   _data->_module->MADDR = readAddress;                          // write to the ADDR Register -> (repeated) Start condition is issued and slave address is sent
 
-  while (!(_data->_module->MSTATUS & TWI_RIF_bm));             // Wait for the address/data receive completion
+  while (!(_data->_module->MSTATUS & (TWI_WIF_bm | TWI_RIF_bm))) {}   // WIF if NACKed, RIF if ACKed
 
   if (_data->_module->MSTATUS & TWI_RXACK_bm) {                 // Address was not Acknowledged (state M3 in data sheet)
     send_stop = true;                                           // Terminate the transaction, retVal is still '0'
@@ -463,7 +461,7 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
       break;                                                    // Break the loop, continue with the NACK and, if requested, STOP
     }
 
-    while (!(_data->_module->MSTATUS & TWI_RIF_bm));            // Wait for the address/data receive interrupt flag
+    while (!(_data->_module->MSTATUS & TWI_RIF_bm)) {}          // Wait for the address/data receive interrupt flag
   }
 
   theEnd:
@@ -490,14 +488,14 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
  *@return     void
  */
 void TWI_RegisterSlaveISRcallback(void (*function)(TWI_t *module)) {
-   if (__builtin_constant_p(function)) {
+  if (__builtin_constant_p(function)) {
     if (function == NULL) {
       badArg("Null pointer passed as ISR callback");
     } else {
       TWI_onSlaveISR = function;
     }
-   } else {
-     if (function != NULL) {
+  } else {
+    if (function != NULL) {
       TWI_onSlaveISR = function;
     }
   }
@@ -590,8 +588,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
   uint8_t payload;                                  // Declaration in switch case does not work
   uint8_t nextHead;
 
-  if (slaveStatus & (TWI_BUSERR_bm | TWI_COLL_bm))  // if Bus error/Collision was detected
-  {
+  if (slaveStatus & (TWI_BUSERR_bm | TWI_COLL_bm)) {  // if Bus error/Collision was detected
     payload = _data->_module->SDATA;                // Read data to remove Status flags
     (*rxTail) = (*rxHead);                          // Abort
     (*txTail) = (*txHead);                          // Abort
@@ -599,8 +596,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
     if (0 == _data->_bools._ackMatters) {
       slaveStatus = slaveStatus & ~TWI_RXACK_bm;    // remove RXACK except on master Read
     }
-    switch (slaveStatus)
-    {
+    switch (slaveStatus) {
       // STOP Interrupt
       // But no CLKHOLD
       case 0x40:    // APIF
@@ -612,14 +608,16 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
         NotifyUser_onReceive(_data);                // Notify user program "onReceive" if necessary
         (*rxTail) = (*rxHead);                      // User should have handled all data, if not, set available rxBytes to 0
         break;
+
       // Address Interrupt
       case 0x61:    // APIF|CLKHOLD|AP              // ADR with master write / slave read
         (*address) = _data->_module->SDATA;
         #if defined(TWI_MERGE_BUFFERS)              // if single Buffer operation
           (*rxTail) = (*rxHead);                    // reset buffer positions so the master can start writing at zero.
         #endif
-        _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc; // "Execute Acknowledge Action succeeded by reception of next byte"
-        break;                                      // expecting data interrupt next (case 0xA0). Fills rxBuffer
+        _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by reception of next byte"
+        break;
+        // expecting data interrupt next (case 0xA0). Fills rxBuffer
       case 0x63:    // APIF|CLKHOLD|DIR|AP          // ADR with master read  / slave write
         (*address) = _data->_module->SDATA;         // saving address to pass to the user function
         //                                             There is no way to identify a REPSTART, so when a Master Read occurs after a master write
@@ -628,7 +626,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
           (*txTail) = (*txHead);                    // reset buffer positions so the slave can start writing at zero.
         #endif
         NotifyUser_onRequest(_data);                // Notify user program "onRequest" if necessary
-        _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc; // "Execute Acknowledge Action succeeded by slave data interrupt"
+        _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by slave data interrupt"
         break;                                      // expecting the TWI module to issue a data interrupt with DIR bit set. (case 0xA2).
 
       // Data Write Interrupt
@@ -637,10 +635,10 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
       case 0xA1:    // DIF|CLKHOLD|AP
         payload = _data->_module->SDATA;
         nextHead = TWI_advancePosition(*rxHead);
-        if (nextHead == (*rxTail)) {                // if buffer is full
-          _data->_module->SCTRLB = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc; // "Execute Acknowledge Action succeeded by waiting for any Start (S/Sr) condition"
-          (*rxTail) = (*rxHead);                                          // Dismiss all received Data since data integrity can't be guaranteed
-        } else {                                    // if buffer is not full
+        if (nextHead == (*rxTail)) {                  // if buffer is full
+          _data->_module->SCTRLB = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc;  // "Execute ACK Action succeeded by waiting for any Start (S/Sr) condition"
+          (*rxTail) = (*rxHead);                                           // Dismiss all received Data since data integrity can't be guaranteed
+        } else {                                      // if buffer is not full
           rxBuffer[(*rxHead)] = payload;                  // Load data into the buffer
           (*rxHead) = nextHead;                           // Advance Head
           _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by reception of next byte"
@@ -666,6 +664,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
       // Data Read Interrupt
       // case 0x90:  // DIF|RXACK
       case 0xB2:    // DIF|CLKHOLD|RXACK|DIR       // data NACK on master read  / slave write
+      /* fall-through */
       case 0xB3:    // DIF|CLKHOLD|RXACK|DIR|AP
         _data->_bools._ackMatters = false;                // stop checking for NACK
         _data->_module->SCTRLB = TWI_SCMD_COMPTRANS_gc;   // "Wait for any Start (S/Sr) condition"
