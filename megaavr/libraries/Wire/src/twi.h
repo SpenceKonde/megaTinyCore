@@ -38,13 +38,26 @@ SOFTWARE.
 #endif
 
 /* These options are or will be controlled by boards.txt menu options
-#define USING_WIRE1       // On devices with two TWIs, this identifies if the user wants to use Wire1
-#define TWI_MANDS         // This enables the simultaneous use of the Master and Slave functionality - where supported
-#define TWI_MERGE_BUFFERS // Merges the tx and rx buffers - this option will break the TWI when any rx occurs between beginTransmission and endTransmission!
-                          // It is not advised to use this define. Only use this when you need the RAM **really** badly
-                          // Spence: Isn't that situation only relevant on parts with dual mode? I didn't think you
-                          // could receive between beginTransmission and endTransmission... except on a part with dual mode
-                          */
+ * These are defined via the tools submenu. Those two lines should never be uncommented. */
+
+// #define USING_WIRE1       // On devices with two TWIs, this identifies if the user wants to use Wire1
+// #define TWI_MANDS         // This enables the simultaneous use of the Master and Slave functionality - where supported
+
+/* This dangerous one is is not. It must be manually uncommented if you're sure you understand the ramifications */
+
+// #define TWI_MERGE_BUFFERS // Merges the tx and rx buffers - this option will break the TWI when any rx occurs between beginTransmission and endTransmission!
+
+/*
+ * It is not advised to use this define! Only use this when you need the RAM **really** badly and have a way to know that your system will
+ * not receive messageas as a slave between beginTransmission and endTransmission while acting as a master. beginTransaction does nothing to the state
+ * of the bus - and they all just throw data into a buffer until endTransaction is called.
+ * Sharing the master and slave buffers is thus not safe in the general case; additional assumptions must be made and ensured to be valid.
+ */
+
+#if (defined(USING_WIRE1) && !defined(TWI1))
+  // Means they asked to use TWI1 on a part that dont have one
+  #error "No second TWI (I2C) module present, but TWI options set to use one. The second port is only available on 32, 48, or 64 pin DA and DB-series parts"
+#endif
 
 
 #if ((defined(TWI0_DUALCTRL) && !defined(USING_WIRE1)) || (defined(TWI1_DUALCTRL) && defined(USING_WIRE1)))
@@ -59,22 +72,22 @@ SOFTWARE.
     //#undef TWI_MANDS
     #error "Master + Slave mode is not supported on the 202 or 402."
     // If a user enables master + slave mode on a part where we know it won't we should error
-    // so that they know what's wrong instead of silently disobeying
+    // so that they know what's wrong instead of silently disobeying their request.
   #endif
 #endif
 
 
 #ifndef BUFFER_LENGTH
-  #if (RAMSIZE < 256)          /* Parts with 128b of RAM wince at pair of 16k buffers         */
+  #if (RAMSIZE < 256)         /* Parts with 128b of RAM wince at pair of 16k buffers         */
     #define BUFFER_LENGTH 16  /* 2k tinyAVRs: 128b -  25% of available RAM                   */
-  #elif (RAMSIZE < 512)        /* Parts with 256b of RAM shall allocate 24b buffers           */
+  #elif (RAMSIZE < 512)       /* Parts with 256b of RAM shall allocate 24b buffers           */
     #define BUFFER_LENGTH 32  /* 4k tinyAVRs 0/1: 256b - 25% of available RAM - of           */
   #elif (RAMSIZE < 2048)      /* parts with 512b or 1024b of RAM get 32b buffers             */
     #define BUFFER_LENGTH 32  /* 8k tinyAVRs, 16k 0-series - 6-13% of available RAM          */
   #elif (RAMSIZE < 4096)      /* 16k AVR DD-series, 16k tinyAVR 1/2-series 48b buffers       */
     #define BUFFER_LENGTH 32  /* and 32k tinyAVR   - 3-5% of available RAM                   */
-  #else                        /* >=4k: Dx32/m320x (4k) m480x (6k),  Dx64 (8k) Dx128 (16k)    */
-    #define BUFFER_LENGTH 130  /* 130 - 128b on all Dx with >= 4k RAM, to match official      */
+  #else                       /* >=4k: Dx32/m320x (4k) m480x (6k),  Dx64 (8k) Dx128 (16k)    */
+    #define BUFFER_LENGTH 130 /* 130 - 128b on all Dx with >= 4k RAM, to match official      */
   #define BUFFER_NOT_POWER_2
   #endif                      /* 4809 core plus that couple bytes mentioned above.           */
 #endif

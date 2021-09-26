@@ -319,28 +319,28 @@ uint8_t TWI_Available(struct twiData *_data) {
  *            to an error or because of an empty txBuffer
  */
 uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
-  #if defined(TWI_MERGE_BUFFERS)                              // Same Buffers for tx/rx
+  #if defined(TWI_MERGE_BUFFERS)                                // Same Buffers for tx/rx
     uint8_t* txHead   = &(_data->_trHead);
     uint8_t* txTail   = &(_data->_trTail);
     uint8_t* txBuffer =   _data->_trBuffer;
-  #else                                                       // Separate tx/rx Buffers
+  #else                                                         // Separate tx/rx Buffers
     uint8_t* txHead   = &(_data->_txHead);
     uint8_t* txTail   = &(_data->_txTail);
     uint8_t* txBuffer =   _data->_txBuffer;
   #endif
 
   if ((_data->_module->MSTATUS & TWI_BUSSTATE_gm) == TWI_BUSSTATE_UNKNOWN_gc) {
-    return 0;                                                 // If the bus was not initialized, return
+    return 0;                                                   // If the bus was not initialized, return
   }
 
   beginning:                                                    // Position to restart in case of an Arbitration error
-  while ((_data->_module->MSTATUS & TWI_BUSSTATE_gm) == TWI_BUSSTATE_BUSY_gc) {}  // Wait for Bus to be free again
+  while ((_data->_module->MSTATUS & TWI_BUSSTATE_gm) == TWI_BUSSTATE_BUSY_gc);  // Wait for Bus to be free again
 
   uint8_t dataWritten = 0;
   uint8_t writeAddress = ADD_WRITE_BIT(_data->_slaveAddress);   // Get slave address and clear the read bit
   _data->_module->MADDR = writeAddress;                         // write to the ADDR Register -> (repeated) Start condition is issued and slave address is sent
 
-  while (!(_data->_module->MSTATUS & TWI_WIF_bm)) {}            // Wait for the address/data transfer completion
+  while (!(_data->_module->MSTATUS & TWI_WIF_bm));            // Wait for the address/data transfer completion
   if (_data->_module->MSTATUS & TWI_ARBLOST_bm) {               // If another Master has started writing an Address at the same time, go back and wait
     goto beginning;                                             // Until the TWI bus has changed from BUSY to IDLE
   }
@@ -369,7 +369,7 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
       break;                                                    // so break the while loop
     }
 
-    while (!(_data->_module->MSTATUS & TWI_WIF_bm)) {}         // Wait for the address/data transfer completion
+    while (!(_data->_module->MSTATUS & TWI_WIF_bm));         // Wait for the address/data transfer completion
   }
 
   if (send_stop) {
@@ -424,12 +424,12 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
   if ((currentStatus & TWI_BUSSTATE_gm) == TWI_BUSSTATE_UNKNOWN_gc) {  // Bus de-initialized for some reason
     return retVal;                                              // return 0
   }
-  while ((currentStatus & TWI_BUSSTATE_gm) == TWI_BUSSTATE_BUSY_gc) {}  // Wait if another master is using the bus
+  while ((currentStatus & TWI_BUSSTATE_gm) == TWI_BUSSTATE_BUSY_gc);  // Wait if another master is using the bus
 
   uint8_t readAddress = ADD_READ_BIT(_data->_slaveAddress);     // Get slave address and set the read bit
   _data->_module->MADDR = readAddress;                          // write to the ADDR Register -> (repeated) Start condition is issued and slave address is sent
 
-  while (!(_data->_module->MSTATUS & (TWI_WIF_bm | TWI_RIF_bm))) {}   // WIF if NACKed, RIF if ACKed
+  while (!(_data->_module->MSTATUS & (TWI_WIF_bm | TWI_RIF_bm)));   // WIF if NACKed, RIF if ACKed
 
   if (_data->_module->MSTATUS & TWI_RXACK_bm) {                 // Address was not Acknowledged (state M3 in data sheet)
     send_stop = true;                                           // Terminate the transaction, retVal is still '0'
@@ -461,7 +461,7 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
       break;                                                    // Break the loop, continue with the NACK and, if requested, STOP
     }
 
-    while (!(_data->_module->MSTATUS & TWI_RIF_bm)) {}          // Wait for the address/data receive interrupt flag
+    while (!(_data->_module->MSTATUS & TWI_RIF_bm));          // Wait for the address/data receive interrupt flag
   }
 
   theEnd:

@@ -20,12 +20,15 @@ endTransmission	KEYWORD2
 requestFrom	KEYWORD2
 onReceive	KEYWORD2
 onRequest	KEYWORD2
+getIncomingAddress	KEYWORD2
+enableDualMode	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
 #######################################
 
 Wire	KEYWORD2
+Wire1	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

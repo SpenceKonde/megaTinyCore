@@ -113,7 +113,15 @@ class TwoWire: public Stream {
     virtual void flush(void);
 
     uint8_t getIncomingAddress(void);
-    void   enableDualMode(bool fmp_enable);      //Moves the Slave to dedicated pins
+    /* Gets the address to which we are responding as slave. If you didn't
+     * supply more than one argument to begin(), this doesn't tell you anything
+     * you didn't (shouldn't) already know. If, however, you did, this is an
+     * essential piece of information as you consider how to respond */
+
+    void enableDualMode(bool fmp_enable);
+    /* This will move the slave pins to the dual mode pins.
+     * You must specify whether or not the slave should be
+     * operating in fastmode+ */
 
     void onReceive(void (*)(int));
     void onRequest(void (*)(void));

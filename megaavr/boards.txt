@@ -51,7 +51,7 @@ menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
 menu.resetpinopti=UPDI/Reset Pin and Optiboot Entry (burn bootloader req'd)
 menu.resetpinopti_2=UPDI/alt-RST pins and Optiboot Entry (burn bootloader req'd)
 menu.uartvoltage=Voltage Baud Correction
-menu.wire=TWI Options
+menu.wire=TWI (I2C/Wire.h) Options
 
 
 ##########################################################################

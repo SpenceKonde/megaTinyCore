@@ -28,8 +28,6 @@
 #define TWI_PINS_H
 
 #include <Arduino.h>
-
-#include "avr/io.h"
 #include "twi_pins.h"
 
 bool TWI_checkPins(const uint8_t sda_pin, const uint8_t scl_pin);
@@ -341,23 +339,36 @@ void TWI0_usePullups() {
         port->PIN1CTRL |= PORT_PULLUPEN_bm;
       } else {
     #endif
-      port->OUTCLR = 0x0C; //bits 2 and 3
-      port->PIN2CTRL |= PORT_PULLUPEN_bm;
-      port->PIN3CTRL |= PORT_PULLUPEN_bm;
+      port->OUTCLR     = 0x0C; //bits 2 and 3
+      port->PIN2CTRL  |= PORT_PULLUPEN_bm;
+      port->PIN3CTRL  |= PORT_PULLUPEN_bm;
     #ifdef __AVR_DD__
       }
     #endif
     #if defined(TWI_DUALCTRL)
       if (TWI0.DUALCTRL & TWI_ENABLE_bm) {
-        if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm)==0) {
-          PORTC.OUTCLR = 0x0C; //bits 2 and 3
+        #ifndef __AVR_DD__
+          if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == 0) {
+        #else
+          if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == 0 || (PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm)== 3) {
+        #endif
+          PORTC.OUTCLR    = 0x0C; //bits 2 and 3
           PORTC.PIN2CTRL |= PORT_PULLUPEN_bm;
           PORTC.PIN3CTRL |= PORT_PULLUPEN_bm;
+        #ifndef __AVR_DD__
         } else {
-          PORTC.OUTCLR = 0xC0; //bits 6 and 7
+          PORTC.OUTCLR    = 0xC0; //bits 6 and 7
           PORTC.PIN6CTRL |= PORT_PULLUPEN_bm;
           PORTC.PIN7CTRL |= PORT_PULLUPEN_bm;
         }
+        #else
+        {
+          /* Uhhhhh user has requested dual mode, this would imply using pins that don't exist on the DD-series.
+           * Unsure how to handle this if we don't recognize it at runtime. We await actual release of these parts
+           * to see how the manufacturer presents this and if they explicitly state anything about it.            */
+        }
+
+
       }
     #endif
   #else // megaTinyCore
