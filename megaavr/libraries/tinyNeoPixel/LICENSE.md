@@ -1,3 +1,9 @@
+# tinyNeoPixel License
+The tinyNeoPixel library is derived from adafruitNeoPixel, which is released under the terms of the LGPL 3, unlike the rest of the core which is released under LGPL 2.1.
+The license was previously in a file named "COPYING". It has been renamed for consistency and prefaced for clarity.
+
+## GNU Lesser General Public License, Version 3
+```legalese
                    GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
@@ -82,8 +88,7 @@ layouts and accessors, or small macros, inline functions and templates
 taken together, effectively do not restrict modification of the
 portions of the Library contained in the Combined Work and reverse
 engineering for debugging such modifications, if you also do each of
-the following:
-
+the following
    a) Give prominent notice with each copy of the Combined Work that
    the Library is used in it and that the Library and its use are
    covered by this License.
@@ -124,7 +129,6 @@ the following:
    Code. If you use option 4d1, you must provide the Installation
    Information in the manner specified by section 6 of the GNU GPL
    for conveying Corresponding Source.)
-
   5. Combined Libraries.
 
   You may place library facilities that are a work based on the
@@ -132,7 +136,6 @@ Library side by side in a single library together with other library
 facilities that are not Applications and are not covered by this
 License, and convey such a combined library under terms of your
 choice, if you do both of the following:
-
    a) Accompany the combined library with a copy of the same work based
    on the Library, uncombined with any other library facilities,
    conveyed under the terms of this License.
@@ -140,7 +143,6 @@ choice, if you do both of the following:
    b) Give prominent notice with the combined library that part of it
    is a work based on the Library, and explaining where to find the
    accompanying uncombined form of the same work.
-
   6. Revised Versions of the GNU Lesser General Public License.
 
   The Free Software Foundation may publish revised and/or new versions
@@ -163,3 +165,4 @@ whether future versions of the GNU Lesser General Public License shall
 apply, that proxy's public statement of acceptance of any version is
 permanent authorization for you to choose that version for the
 Library.
+```
