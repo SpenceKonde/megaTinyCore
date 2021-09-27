@@ -22,20 +22,22 @@
     do not hesitate to offer users new features to take advantage of hardware
     capabilities not present on older devices, this does not extend to new
     compiler features which require modifications to code to take advantage
-    of. -Spence, 9/25/2021
+    of. We have candidates for overaligned new and delete though, for when/if
+    they are required.
+    -Spence, 9/25/2021
  */
 
 #ifndef NEW_H
   #define NEW_H
 
   #include <stdlib.h>
-                                                /* C++11 and later              */
-  void* operator new   (size_t size             /* return malloc(size);         */);
-  void* operator new[] (size_t size             /* return malloc(size);         */);
-  void* operator new   (size_t size, void * ptr /* (void size); return ptr;     */) noexcept;
-  void* operator new[] (size_t size, void * ptr /* (void size); return ptr;     */) noexcept;
-  void operator delete   (void* ptr             /* free(ptr);                   */) noexcept;
-  void operator delete[] (void* ptr             /* free(ptr);                   */) noexcept;
+                                                /* C++11 and later                */
+  void* operator new   (size_t size             /* return malloc(size);           */);
+  void* operator new[] (size_t size             /* return malloc(size);           */);
+  void* operator new   (size_t size, void * ptr /* (void size); return ptr;       */) noexcept;
+  void* operator new[] (size_t size, void * ptr /* (void size); return ptr;       */) noexcept;
+  void operator delete   (void* ptr             /* free(ptr);                     */) noexcept;
+  void operator delete[] (void* ptr             /* free(ptr);                     */) noexcept;
 
   #if (__cpp_sized_deallocation >= 201309L)       /* C++14 and later only         */
     void operator delete   (void* ptr, size_t size /* (void)size; return ptr;     */) noexcept;
@@ -43,10 +45,12 @@
   #endif
 
   #if (__cpp_aligned_new >= 201606L) /* C++17 and later only                      */
-    /* Not actually supported, these stubs just generate a more helpful error     */
-    void* operator new     (size_t size, std::align_val_t al                         );
-    void* operator new[]   (size_t size, std::align_val_t al                         );
+    /* These are unsupported and just stubs that generate a more helpful error    */
+    /* If it turns out that we do need them, we have a candidate for these        */
+    void* operator new     (size_t size, std::align_val_t al                        );
     void  operator delete  (void* ptr,/* (void)al; return ptr; */std::align_val_t al) noexcept;
+    /* Not actually supported, these stubs just generate a more helpful error   */
+    void* operator new[]   (size_t size, std::align_val_t al                        );
     void  operator delete[](void* ptr,/* (void)al; return ptr; */std::align_val_t al) noexcept;
     void  operator delete  (void* ptr, size_t size,/* above +  */std::align_val_t al) noexcept;
     void  operator delete[](void* ptr, size_t size,/* (void)al;*/std::align_val_t al) noexcept;
