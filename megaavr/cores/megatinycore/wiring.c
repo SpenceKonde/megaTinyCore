@@ -172,41 +172,45 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
 }
 
 /*  Both millis and micros must take great care to prevent any kind of backward time travel.
-  *
-
-  * These values are unsigned, and should not decrease, except when they overflow. Hence when
-  * we compare a value with what we recorded previously and find the new value to be lower, it
-  * looks the same as it would 2^32 (4.2 billion) intervals in the future. Timeouts end prematurely
-  * and similar undesired behaviors occur.
-  *
-  * There are three hazardous things we read here:
-  * timer_millis, timer_overflow_count. and the timer count itself (TCxn.CNT).
-  * The normal variables need only be read with interrupts disabled, in case of an
-  * interrupt writing to it while we were reading it. AVRs are little-endian, so this would result
-  * in the low byte being read before the overflow and the high byte after, and hence a value
-  * higher than it should be. Subsequent calls would return the right value.
-  *
-  * In the case of the timer value, it is more complicated.
-  * Here, the hardware at first glance seems to protect us (see "reading 16-bit registers" in the
-  * datasheet). But the register gets read in the interrupt, so we still need those disabled.
-  * There is an additional risk though that we get a value from after the timer has overflowed
-  * and since we disabled interrupts, the interrupt hasn't updated the overflow. We check the
-  * interrupt flag, and if it's set, we check whether the timer value we read was near overflow
-  * (the specifics vary by the timer - they're very different timers). If it isn't close to overflow
-  * but the flag is set, we must have read it after the overflow, so we compensate for the missed
-  * interrupt. If interrupts are disabled for long enough, this heuristic will be wrong, but in
-  * that case it is the user's fault, as this limitation is widely known and documentedm, as well
-  * as unavoidable.
-  * Failure to compensate looks like the inverse of the above case.
-  * (note that because only micros reads the timer, and hence, only micros can experience
-  * backwards time travel due to interrupts being left disabled for too long, millis will just
-  * stop increasing.
-  *
-  * Both of these cause severe breakage everywhere. The first type is simple to avoid, but if
-  * missed can be more subtle:
-
-
-  */
+ *
+ * These values are unsigned, and should not decrease, except when they overflow. Hence when
+ * we compare a value with what we recorded previously and find the new value to be lower, it
+ * looks the same as it would 2^32 (4.2 billion) intervals in the future. Timeouts end prematurely
+ * and similar undesired behaviors occur.
+ *
+ * There are three hazardous things we read here:
+ * timer_millis, timer_overflow_count, and the timer count itself (TCxn.CNT).
+ * The normal variables need only be read with interrupts disabled, in case of an
+ * interrupt writing to it while we were reading it. AVRs are little-endian, so this would result
+ * in the low byte being read before the overflow and the high byte after, and hence a value
+ * higher than it should be for that call. Subsequent calls would return the right value.
+ *
+ * In the case of the timer value, it is more complicated.
+ * Here, the hardware at first glance seems to protect us (see "reading 16-bit registers" in the
+ * datasheet). But the register gets read in the interrupt, so we still need those disabled.
+ * There is an additional risk though that we get a value from after the timer has overflowed
+ * and since we disabled interrupts, the interrupt hasn't updated the overflow. We check the
+ * interrupt flag, and if it's set, we check whether the timer value we read was near overflow
+ * (the specifics vary by the timer - they're very different timers). If it isn't close to overflow
+ * but the flag is set, we must have read it after the overflow, so we compensate for the missed
+ * interrupt. If interrupts are disabled for long enough, this heuristic will be wrong, but in
+ * that case it is the user's fault, as this limitation is widely known and documentedm, as well
+ * as unavoidable. Failure to compensate looks like the inverse of the above case.
+ *
+ * (note that only micros reads the timer, and hence, only micros can experience backwards time
+ * travel due to interrupts being left disabled for too long, millis will just stop increasing.
+ *
+ * Both of these cause severe breakage everywhere. The first type is simple to avoid, but if
+ * missed can be more subtle, since it makes a big difference only if the byte where the read
+ * was interrupted rolled over. The second type is more obvious, potentially happening on every timer
+ * overflow, instead of just every 256th timer overflow, and when it does happen, anyting waiting
+ * for a specific number of microseconds to pass that gets that value will do so.
+ * Though (see delay below) each incidence only short-circuits one ms of delay(), not the whole
+ * thing.
+ *
+ * All time time travel except for glitchs from disabling millis for too long should no longer
+ * be possible. If they are, that is a critical bug.
+ */
 
 
 unsigned long millis() {
@@ -221,7 +225,7 @@ unsigned long millis() {
       /* There has just been an overflow that hasn't been accounted for by the interrupt. Check if the high bit of counter is set.
        * We just basically need to make sure that it didn't JUST roll over at the last couple of clocks. But this merthod is
        * implemented very efficiently (just an sbrs) so it is more efficient than other approaches. If user code is leaving
-       * interrupts off nearly long enough for this to be wrong, they shouldn't expect millis to work right. */
+       * interrupts off nearly long enough for over 30 seconds, they shouldn't be surprised. */
       if (!(rtccount & 0x8000)) m++;
     }
     SREG = oldSREG;
@@ -230,19 +234,16 @@ unsigned long millis() {
     m = m - (m >> 5) + (m >> 7);
     /* the compiler is incorrigible - it cannot be convinced not to copy m twice, shifting one 7 times and the other 5 times
      * and wasting 35 clock cycles and several precious instruction words.
-     * This ends up with the exact same implementation
-    uint32_t n = (m >> 5);
-    m -= n;
-    n = n >> 2;
-    m += n;
-     * What one would want to do is, first load the overflowcount into the high bytes in the first place, (4 words 6 clocks)
-     * followed by the count (4 & 6) Do the check for recent overflow as it's done now essentially (7 & 9). Then, we'd move
-     * to the 1024->1000-ifier. So: movw the 4 bytes into 4 new registers... and clear the register after it, (3 clocks 3 words).
-     * This would form a 5 byte register, in effect. Then leftshift those one each, and shift the carry bit into a fifth register
-     * like it was all one (5 clocks 5 words). It now contain m >> 7, add to m (4 & 4).
-     * Repeat the leftshift twice more (17 clocks 9 words) giving m >> 5, subtract (4 & 4)  and you're done.
-     * This not only is more efficient in and of itself, but it  ALSO saves you 4 words and 6 clocks in the prologue and epilogue
-     * because you don't need to save and restore r16 and r17 because you don't piss away 4 registers. */
+     * This ends up with the exact same implementation:
+
+          uint32_t n = (m >> 5);
+          m -= n;
+          n = n >> 2;
+          m += n;
+
+     * Not only that - but a dedicated optimizing assembly programmer could probably ensure that instead of the >> 7 (a little mini loop)
+     * that was implemented leftshifting it once, retaining the carried bit, and
+     */
   #else
     m = timer_millis;
     SREG = oldSREG;
@@ -316,20 +317,17 @@ unsigned long millis() {
         #warning "TCD is not supported as a millis timing source when the oscillator is tuned to a frequency other than 16 or 20 MHz. Timing results will be wrong - use TCA0 or a TCB."
       #endif
     #elif (defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1))
-      // ticks is 0 ~ F_CPU/2000 - 1
+      // ticks is 0 ~ F_CPU/2000 except at 1 MHz where it's 0 ~ 1000.
       // we shift 1, 2, 3, or 4 times it to the right ball park
-      // I wonder how much could be gained from doing it stepwise (copy ticks to a union with byte[2], rightshift by 2, subtract
-      // rightshift 2, add (we know high byte is 0, but it doesn't help because carry), rightshift low byte 2 more (low-only
-      // saves 2 clocks), subtract low byte... wonder if it would be enough to do the final term faster than we currently do the
-      // 4 term approximation? I think that would be exact! We'd also have equal + and -, reaping the reduced rounding noise
-      // currently we end up with, it looks like, 0-995 (+/- 1) instead of 0-999? which I think we'd have with the last term.
-      // Looked at generated assembly, no clue how they get there from here!
+      // I may have missed some optimziations here.
+      // Note thst you want to alternate addition and subtraction to suppress noise.
+      /* multiples of 5 */
       #if   (F_CPU  == 30000000UL)
         ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 3) - (ticks >> 4) + (ticks >> 8)); // Damned near perfect.
+        microseconds = overflows * 1000 + (ticks + (ticks >> 3) - (ticks >> 4) + (ticks >> 8)); // very, very close.
       #elif (F_CPU  == 25000000UL)
         ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 2) - (ticks >> 5)); // Damned near perfect.
+        microseconds = overflows * 1000 + (ticks + (ticks >> 2) - (ticks >> 5)); // very, very close.
       #elif (F_CPU  == 20000000UL)
         ticks = ticks >> 3;
         microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
@@ -339,15 +337,16 @@ unsigned long millis() {
       #elif (F_CPU  ==  5000000UL)
         ticks = ticks >> 1;
         microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
-      #elif (F_CPU  == 24000000UL)
-        ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
+
+      /* multiples of 12 */
       #elif (F_CPU  == 24000000UL)
         ticks = ticks >> 4;
         microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
       #elif (F_CPU  == 12000000UL)
         ticks = ticks >> 3;
         microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
+
+      /* powers of 2 - trivial*/
       #elif (F_CPU  == 32000000UL || F_CPU > 24000000UL)
         microseconds = overflows * 1000 + (ticks >> 4);
       #elif (F_CPU  == 16000000UL || F_CPU > 12000000UL)
@@ -357,6 +356,7 @@ unsigned long millis() {
       #elif (F_CPU  ==  4000000UL || F_CPU >  3000000UL)
         microseconds = overflows * 1000 + (ticks >> 1);
       #else // (F_CPU  ==  1000000UL || F_CPU  == 2000000UL);
+        //these are the same because except at 1 MHz, we use CLK_PER/2 as source for TCB
         microseconds = overflows * 1000 + ticks;
       #endif
 
@@ -366,7 +366,7 @@ unsigned long millis() {
             F_CPU ==  1000000UL)
         #warning "Millis timer (TCBn) at this frequency is unsupported, micros() will return totally bogus values."
       #endif
-    #else //TCA0
+    #else //Done with TCB, only thing left is TCA0
       #if (F_CPU == 20000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
         microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
                      + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
