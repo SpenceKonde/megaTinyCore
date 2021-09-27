@@ -320,55 +320,57 @@ bool TWI0_swap(uint8_t state) {
 
 void TWI0_usePullups() {
   // make sure we don't get errata'ed - make sure their bits in the output registers are off!
-  #ifdef DXCORE
+  #if defined(DXCORE) /* MegaCoreX will need a test here */
     // if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == 0x02) {
     // below achieves same more efficiently, since only the master/slave pins are supported by Wire.h
     // and those are only ever on PA2/PA3, or PC2/PC3 for PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm == 0x02.
     // but portToPortStruct takes a port number... and PC is 2 while PA is 0. So PORTMUX.TWIROUTEA& 0x02
     // is the number that portToPortStruct would want, directly, to get that all important port struct.
     // Slightly more complicated on DD-series since they added a fourth option to the portmux to help
-    // with the constrained pinout.
+    // with the constrained pinout - the middle two options involve pins that don't exist. These are
+    // still referenced by the io headers because they haven't finished cleaning them.
+
     #ifndef __AVR_DD__
       PORT_t *port = portToPortStruct(PORTMUX.TWIROUTEA & 0x02);
     #else
-      uint8_t temp = PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm;
-      PORT_t *port = portToPortStruct(temp==2?PC:PA);
-      if (temp==3) {
-        port->OUTCLR = 0x03; //bits 0 and 1
-        port->PIN0CTRL |= PORT_PULLUPEN_bm;
-        port->PIN1CTRL |= PORT_PULLUPEN_bm;
+      uint8_t muxbits = PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm; // this gets used 4 times, and being volatile, would need to be re-read and &-ed every time
+      PORT_t *port = portToPortStruct(muxbits == 2 ? PC : PA);
+      if (muxbits == 3) {
+        port->OUTCLR     = 0x03; //bits 0 and 1
+        port->PIN0CTRL  |= PORT_PULLUPEN_bm;
+        port->PIN1CTRL  |= PORT_PULLUPEN_bm;
       } else {
-    #endif
-      port->OUTCLR     = 0x0C; //bits 2 and 3
-      port->PIN2CTRL  |= PORT_PULLUPEN_bm;
-      port->PIN3CTRL  |= PORT_PULLUPEN_bm;
-    #ifdef __AVR_DD__
+        port->OUTCLR     = 0x0C; //bits 2 and 3
+        port->PIN2CTRL  |= PORT_PULLUPEN_bm;
+        port->PIN3CTRL  |= PORT_PULLUPEN_bm;
       }
     #endif
     #if defined(TWI_DUALCTRL)
       if (TWI0.DUALCTRL & TWI_ENABLE_bm) {
         #ifndef __AVR_DD__
+          // DA, DB can have it on bits 2/3 or 6/7 of a port
           if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == 0) {
+            PORTC.OUTCLR    = 0x0C; //bits 2 and 3
+            PORTC.PIN2CTRL |= PORT_PULLUPEN_bm;
+            PORTC.PIN3CTRL |= PORT_PULLUPEN_bm;
+          } else {
+            PORTC.OUTCLR    = 0xC0; //bits 6 and 7
+            PORTC.PIN6CTRL |= PORT_PULLUPEN_bm;
+            PORTC.PIN7CTRL |= PORT_PULLUPEN_bm;
+          }
         #else
-          if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == 0 || (PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm)== 3) {
+          // we already grabbed the bits from portmux register above.
+          if (muxbits == 0 || muxbits == 3) {
+            PORTC.OUTCLR    = 0x0C; //bits 2 and 3
+            PORTC.PIN2CTRL |= PORT_PULLUPEN_bm;
+            PORTC.PIN3CTRL |= PORT_PULLUPEN_bm;
+          } else {
+            /* TODO when datasheet finally makes it out of Microchip....
+             * Uhhhhh user has requested dual mode, this would imply using pins that don't exist on the DD-series.
+             * Unsure how to handle this if we don't recognize it at runtime. We await actual release of these parts
+             * to see how the manufacturer presents this and if they explicitly state anything about it.            */
+          }
         #endif
-          PORTC.OUTCLR    = 0x0C; //bits 2 and 3
-          PORTC.PIN2CTRL |= PORT_PULLUPEN_bm;
-          PORTC.PIN3CTRL |= PORT_PULLUPEN_bm;
-        #ifndef __AVR_DD__
-        } else {
-          PORTC.OUTCLR    = 0xC0; //bits 6 and 7
-          PORTC.PIN6CTRL |= PORT_PULLUPEN_bm;
-          PORTC.PIN7CTRL |= PORT_PULLUPEN_bm;
-        }
-        #else
-        {
-          /* Uhhhhh user has requested dual mode, this would imply using pins that don't exist on the DD-series.
-           * Unsure how to handle this if we don't recognize it at runtime. We await actual release of these parts
-           * to see how the manufacturer presents this and if they explicitly state anything about it.            */
-        }
-
-
       }
     #endif
   #else // megaTinyCore
@@ -393,7 +395,6 @@ void TWI0_usePullups() {
     #endif
   #endif
 }
-
 #if defined(TWI1)
 void TWI1_ClearPins() {
   #ifdef PORTMUX_TWIROUTEA
