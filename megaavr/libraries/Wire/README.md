@@ -1,7 +1,8 @@
 # Wire (TWI/I2C)
 All of these parts have a single I2C/TWI module, and Wire.h provides the usual API.
 
-## NEW in 2.4.3 - totally rewritten Wire library thanks to @MX682X . Should be 100% API compatible, use less flash, and have a new menu option to enable both master AND slave instead of the usual master OR slave. This uses the same pair of pins (this is termed "multimaster mode" in the 'biz). Enabling increases binary size, and allocates another buffer for data (out of RAM), snd being the less common use case, we choose to default to the more efficient implementation in light the stringent constraints on these parts.
+## NEW in 2.4.3 - totally rewritten Wire library thanks to @MX682X
+Should be 100% API compatible, use less flash, and have a new menu option to enable both master AND slave instead of the usual master OR slave. This uses the same pair of pins (this is termed "multimaster mode" in the 'biz). Enabling increases binary size, and allocates another buffer for data (out of RAM), snd being the less common use case, we choose to default to the more efficient implementation in light the stringent constraints on these parts.
 
 
 
