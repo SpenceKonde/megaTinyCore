@@ -696,10 +696,31 @@ void resetViaSWR() {
 
 ### Using watchdog to reset when hung
 If you only worked with the watchdog timer as an Arduino user - you might not even know why it's called that, or what the original concept was, and just know it as that trick to do a software reset on classic AVRs, and as a way to generate periodic interrupts. The "purpose" of a watchdog timer is to detect when the part has become hung - either because it's wound up in an infinite loop due to a bug, or because it wound up in a bad state due to a glitch on the power supply or other adverse hardware event, has been left without a clock by an external clock source failing, went to sleep waiting for some event which doesn't end up happening (or without correctly enabling whatever is supposed to wake it up) - and issue a reset. It is often anthropomorphized as a dog, who needs to be "fed" or "pet" periodically, or else he will "bite" (commonly seen in comments - the latter generally only when intentionally triggering it, as in `while (1); //wait for the watchdog to bite`).
+ 
+You would first initialize the WDT like:
+```c++
+_PROTECTED_WRITE(WDT.CTRLA,settings); //enable the WDT
+```
 
-A typical use of this is to have the main loop (generally loop() in an Arduino sketch) reset the watchdog at the start or end of each loop, so when a function it calls ends up hung, we can
+To configure the WDT to reset the device after a period of time, replace `settings` above with the desired WDT timeout period from this table. If is getting stuck somewhere that causes it to repeatedly reset the WDT you can configure the window mode to reset if an attempt is made to reset the watchdog timer within the specified period. To do this, bitwise OR the two, eg: ` _PROTECTED_WRITE(WDT.CTRLA, WDT_PERIOD_8KCLK_gc | WDT_WINDOW_16CLK_gc );` would set the WDT to reset the device if two attempts to reset the watchdog were ever made within 16 milliseconds (before the "window" opens), or if no reset was performed in the 8 seconds after that (when the window closes).
 
 
+| Timeout | WDT period name      | WDT Window name      |
+|---------|----------------------|----------------------|
+|  0.008s | WDT_PERIOD_8CLK_gc   | WDT_WINDOW_8CLK_gc   |
+|  0.016s | WDT_PERIOD_16CLK_gc  | WDT_WINDOW_16CLK_gc  |
+|  0.032s | WDT_PERIOD_32CLK_gc  | WDT_WINDOW_32CLK_gc  |
+|  0.064s | WDT_PERIOD_64CLK_gc  | WDT_WINDOW_64CLK_gc  |
+|  0.128s | WDT_PERIOD_128CLK_gc | WDT_WINDOW_128CLK_gc |
+|  0.256s | WDT_PERIOD_256CLK_gc | WDT_WINDOW_256CLK_gc |
+|  0.512s | WDT_PERIOD_512CLK_gc | WDT_WINDOW_512CLK_gc |
+|  1.024s | WDT_PERIOD_1KCLK_gc  | WDT_WINDOW_1KCLK_gc  |
+|  2.048s | WDT_PERIOD_2KCLK_gc  | WDT_WINDOW_2KCLK_gc  |
+|  4.096s | WDT_PERIOD_4KCLK_gc  | WDT_WINDOW_4KCLK_gc  |
+|  8.192s | WDT_PERIOD_8KCLK_gc  | WDT_WINDOW_8KCLK_gc  |
+
+#### Resetting the WDT
+A typical use of this is to have the main loop (generally loop() in an Arduino sketch) reset the watchdog at the start or end of each loop, so when a function it calls ends up hung, we can use:
 
 ```c
 // As a function
@@ -707,11 +728,27 @@ void wdt_reset() {
   __asm__ __volatile__ ("wdr"::);
 }
 ```
+
 Or
+
 ```c
 // as a macro (which is all that wdt.h does)
 #define wdt_reset() __asm__ __volatile__ ("wdr"::)
 ```
+
+#### Disabling WDT
+In some cases you may only want the WDT enabled when certain routines prone to hanging due to external conditions, and then turn it off again.
+```
+_PROTECTED_WRITE(WDT.CTRLA,0); //Yeah, that's it.
+```
+
+At the other extreme you may want it to be impossible for code, even very clever bugs will never be able to turn it off. You can lock the WDT in it's current configuration by writing the WDT_LOCK bit in WDT.STATUS to 1 - only a system reset will unset the bit. 
+
+```
+__PROTECTED_WRITE(WDT.STATUS,WDT_LOCK_bm); // call after setting WDT to desired configuration.
+```
+For even more protection (and more nuisance in keeping the WDT from bitingat all times, even during startup). you can set the WDTCFG fuse via UPDI programming. At startup, that value is copied to WDT.CTRLA, and the lock bit in WDT.STATUS is set. Only UPDI programming can undo the WDT if congfiguref through the fuses. This feature is not exposed by the core - you must manually run avrdude or SerialUPDI and use it to write that fuse. "burn bootloader" will, however, set that fuse to 0 (the point of burn bootloader is initializing the chip to a fully known state; it only involves a bootloader if you've chosen an optiboot board configuration.
+ 
 
 ### The wrong way to reset from software
 I have seen people throw around `asm volatile("jmp 0");` as a solution to a need to reset from software. **Don't do that** - all compiled C code makes assumptions about the state from which it is run. Jumping to 0 from a running application violates several of them unless you take care to avoid those pitfalls (if I were to add a comment after that line, it would read something like `// Reset chip uncleanly to produce unpredictable results`. Both Optiboot and the init() method of megaTinyCore make assumptions about the state of peripheral registers as well (namely, that they're in their reset configuration when it starts). Doing that was always risky business and should never be done on any part (certainly not without taking precautions). Now that we finally have a right way to do software reset, there is absolutely no excuse for using such a tactic!
