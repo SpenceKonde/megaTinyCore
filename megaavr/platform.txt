@@ -18,15 +18,16 @@ build.versiondefines=-DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DA
 # AVR compile variables
 # ---------------------
 
-compiler.warning_flags=-w
-compiler.warning_flags.none=-w
-compiler.warning_flags.default=
+compiler.warning_flags=-Wall
+compiler.warning_flags.none=-Wall
+compiler.warning_flags.default=-Wall
 compiler.warning_flags.more=-Wall
 compiler.warning_flags.all=-Wall -Wextra
+
 # Default "compiler.path" is correct, change only if you want to override the initial value
 compiler.path={runtime.tools.avr-gcc.path}/bin/
 compiler.c.cmd=avr-gcc
-compiler.c.flags=-c -g -Os {compiler.warning_flags} -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mrelax
+compiler.c.flags=-c -g -Os {compiler.warning_flags} -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mrelax -Werror=implicit-function-declaration -Wundef
 compiler.c.elf.flags={compiler.warning_flags} -Os -g -flto -fuse-linker-plugin -Wl,--gc-sections -Wl,--section-start={build.text_section_start} -mrelax
 compiler.c.elf.cmd=avr-gcc
 compiler.S.flags=-c -g -x assembler-with-cpp -flto -MMD
@@ -96,12 +97,12 @@ recipe.hooks.objcopy.postobjcopy.2.pattern.macosx=bash -c "{compiler.path}{compi
 
 
 ## This is the name that memory maps, assembly listings and hex files will be output as
-build.extraassetname={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}.m{build.millistimer}
+build.extraassetname={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource.m{build.millistimer}.{versionnum.major}{versionnum.minor}{versionnum.patch}
 
 ## Save hex
 # Needs to be specified separately completely, because otherwise some parts of it don't resolve for reasons I dont understand.
 recipe.output.tmp_file={build.project_name}.hex
-recipe.output.save_file={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.u{build.uartvoltage}.m{build.millistimer}.hex
+recipe.output.save_file={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.m{build.millistimer}.{versionnum.major}{versionnum.minor}{versionnum.patch}.hex
 
 ## Save lst
 recipe.hooks.savehex.presavehex.1.pattern.windows=cmd /C copy "{build.path}\{build.project_name}.lst" "{sketch_path}\{build.extraassetname}.lst"
