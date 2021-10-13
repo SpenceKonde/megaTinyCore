@@ -50,7 +50,7 @@ menu.bootloaderuart=UART for Bootloader (burn bootloader req'd)
 menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
 menu.resetpinopti=UPDI/Reset Pin and Optiboot Entry (burn bootloader req'd)
 menu.resetpinopti_2=UPDI/alt-RST pins and Optiboot Entry (burn bootloader req'd)
-menu.uartvoltage=Voltage Baud Correction
+##menu.uartvoltage=Voltage Baud Correction
 menu.wire=TWI (I2C/Wire.h) Options
 
 
@@ -99,7 +99,7 @@ atxy7.build.variant=txy7
 atxy7.build.tuned=
 atxy7.build.mcu=attiny{build.attiny}
 atxy7.build.f_cpu={build.speed}000000L
-atxy7.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} {build.tuned}
+atxy7.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} {build.tuned}
 atxy7.build.export_merged_output=false
 
 ### BOOTLOADING PARAMETERS (FUSES)
@@ -361,12 +361,12 @@ atxy7.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy7.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 ### VOLTAGE FOR UART BAUD CORRECTION
-atxy7.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
-atxy7.menu.uartvoltage.skip.build.uartvoltage=NA
-atxy7.menu.uartvoltage.5v=Closer to 5v
-atxy7.menu.uartvoltage.3v=Closer to 3v
-atxy7.menu.uartvoltage.5v.build.uartvoltage=5V
-atxy7.menu.uartvoltage.3v.build.uartvoltage=3V
+#atxy7.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+#atxy7.menu.uartvoltage.skip.build.uartvoltage=NA
+#atxy7.menu.uartvoltage.5v=Closer to 5v
+#atxy7.menu.uartvoltage.3v=Closer to 3v
+#atxy7.menu.uartvoltage.5v.build.uartvoltage=5V
+#atxy7.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ### TWI OPTIONS
 atxy7.menu.wire.mors=Master or Slave (saves Flash & RAM)
@@ -395,7 +395,7 @@ atxy6.build.variant=txy6
 atxy6.build.tuned=
 atxy6.build.mcu=attiny{build.attiny}
 atxy6.build.f_cpu={build.speed}000000L
-atxy6.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} {build.tuned}
+atxy6.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} {build.tuned}
 atxy6.build.export_merged_output=false
 
 ### BOOTLOADING PARAMETERS (FUSES)
@@ -663,12 +663,12 @@ atxy6.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy6.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 ### VOLTAGE FOR UART BAUD CORRECTION
-atxy6.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
-atxy6.menu.uartvoltage.skip.build.uartvoltage=NA
-atxy6.menu.uartvoltage.5v=Closer to 5v
-atxy6.menu.uartvoltage.3v=Closer to 3v
-atxy6.menu.uartvoltage.5v.build.uartvoltage=5V
-atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
+#atxy6.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+#atxy6.menu.uartvoltage.skip.build.uartvoltage=NA
+#atxy6.menu.uartvoltage.5v=Closer to 5v
+#atxy6.menu.uartvoltage.3v=Closer to 3v
+#atxy6.menu.uartvoltage.5v.build.uartvoltage=5V
+#atxy6.menu.uartvoltage.3v.build.uartvoltage=3V
 ### TWI OPTIONS
 atxy6.menu.wire.mors=Master or Slave (saves Flash & RAM)
 atxy6.menu.wire.mors.build.wire=MORS
@@ -698,7 +698,7 @@ atxy4.build.tuned=
 atxy4.build.tuned=
 atxy4.build.mcu=attiny{build.attiny}
 atxy4.build.f_cpu={build.speed}000000L
-atxy4.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} {build.tuned}
+atxy4.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} {build.tuned}
 atxy4.build.export_merged_output=false
 atxy4.build.tuned=
 
@@ -968,12 +968,12 @@ atxy4.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy4.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 ### VOLTAGE FOR UART BAUD CORRECTION
-atxy4.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
-atxy4.menu.uartvoltage.skip.build.uartvoltage=NA
-atxy4.menu.uartvoltage.5v=Closer to 5v
-atxy4.menu.uartvoltage.3v=Closer to 3v
-atxy4.menu.uartvoltage.5v.build.uartvoltage=5V
-atxy4.menu.uartvoltage.3v.build.uartvoltage=3V
+#atxy4.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+#atxy4.menu.uartvoltage.skip.build.uartvoltage=NA
+#atxy4.menu.uartvoltage.5v=Closer to 5v
+#atxy4.menu.uartvoltage.3v=Closer to 3v
+#atxy4.menu.uartvoltage.5v.build.uartvoltage=5V
+#atxy4.menu.uartvoltage.3v.build.uartvoltage=3V
 ### TWI OPTIONS
 atxy4.menu.wire.mors=Master or Slave (saves Flash & RAM)
 atxy4.menu.wire.mors.build.wire=MORS
@@ -1001,7 +1001,7 @@ atxy2.build.variant=txy2
 atxy2.build.tuned=
 atxy2.build.mcu=attiny{build.attiny}
 atxy2.build.f_cpu={build.speed}000000L
-atxy2.build.extra_flags=-DARDUINO_attinyxy2 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} {build.tuned}
+atxy2.build.extra_flags=-DARDUINO_attinyxy2 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} {build.tuned}
 atxy2.build.export_merged_output=false
 
 ### BOOTLOADING PARAMETERS (FUSES)
@@ -1223,12 +1223,12 @@ atxy2.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy2.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 ### VOLTAGE FOR UART BAUD CORRECTION
-atxy2.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
-atxy2.menu.uartvoltage.skip.build.uartvoltage=NA
-atxy2.menu.uartvoltage.5v=Closer to 5v
-atxy2.menu.uartvoltage.3v=Closer to 3v
-atxy2.menu.uartvoltage.5v.build.uartvoltage=5V
-atxy2.menu.uartvoltage.3v.build.uartvoltage=3V
+#atxy2.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+#atxy2.menu.uartvoltage.skip.build.uartvoltage=NA
+#atxy2.menu.uartvoltage.5v=Closer to 5v
+#atxy2.menu.uartvoltage.3v=Closer to 3v
+#atxy2.menu.uartvoltage.5v.build.uartvoltage=5V
+#atxy2.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ### TWI OPTIONS
 atxy2.menu.wire.mors=Master or Slave (x12 only)
@@ -1278,7 +1278,7 @@ microchip.upload.serialparams=
 ### CHIP
 microchip.menu.board_name.cn3217=Curiosity Nano ATtiny3217
 microchip.menu.board_name.cn3217.build.board=AVR_CuriosityNano3217
-microchip.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
+microchip.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchip.menu.board_name.cn3217.build.attiny=3217
 microchip.menu.board_name.cn3217.upload.protocol=curiosity_updi
 microchip.menu.board_name.cn3217.upload.maximum_size=32768
@@ -1286,7 +1286,7 @@ microchip.menu.board_name.cn3217.upload.maximum_data_size=2048
 
 microchip.menu.board_name.cn1627=Curiosity Nano ATtiny1627
 microchip.menu.board_name.cn1627.build.board=AVR_CuriosityNano1627
-microchip.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7
+microchip.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7
 microchip.menu.board_name.cn1627.build.millistimer=B1
 microchip.menu.board_name.cn1627.build.attiny=1627
 microchip.menu.board_name.cn1627.upload.protocol=curiosity_updi
@@ -1295,7 +1295,7 @@ microchip.menu.board_name.cn1627.upload.maximum_data_size=2048
 
 microchip.menu.board_name.cn1607=Curiosity Nano ATtiny1607
 microchip.menu.board_name.cn1607.build.board=AVR_CuriosityNano1607
-microchip.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7
+microchip.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7
 microchip.menu.board_name.cn1607.build.attiny=1607
 microchip.menu.board_name.cn1607.build.millistimer=A0
 microchip.menu.board_name.cn1607.upload.protocol=curiosity_updi
@@ -1305,7 +1305,7 @@ microchip.menu.board_name.cn1607.upload.maximum_data_size=1024
 
 microchip.menu.board_name.xp3217=Xplained Pro ATtiny3217
 microchip.menu.board_name.xp3217.build.board=AVR_Xplained_Pro_3217
-microchip.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
+microchip.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
 microchip.menu.board_name.xp3217.build.attiny=3217
 microchip.menu.board_name.xp3217.build.millistimer=D0
 microchip.menu.board_name.xp3217.upload.protocol=xplainedpro_updi
@@ -1315,7 +1315,7 @@ microchip.menu.board_name.xp3217.upload.maximum_data_size=2048
 
 microchip.menu.board_name.xp817=Xplained Pro ATtiny817
 microchip.menu.board_name.xp817.build.board=AVR_Xplained_Pro_817
-microchip.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
+microchip.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
 microchip.menu.board_name.xp817.build.attiny=817
 microchip.menu.board_name.xp817.build.millistimer=D0
 microchip.menu.board_name.xp817.upload.protocol=xplainedpro_updi
@@ -1324,7 +1324,7 @@ microchip.menu.board_name.xp817.upload.maximum_data_size=512
 
 microchip.menu.board_name.xm817=Xplained Mini ATtiny817
 microchip.menu.board_name.xm817.build.board=AVR_XplainedMini817
-microchip.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5
+microchip.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5
 microchip.menu.board_name.xm817.build.attiny=817
 microchip.menu.board_name.xm817.build.millistimer=D0
 microchip.menu.board_name.xm817.upload.protocol=xplainedmini_updi
@@ -1333,7 +1333,7 @@ microchip.menu.board_name.xm817.upload.maximum_data_size=512
 
 microchip.menu.board_name.xn416=Xplained Nano ATtiny416
 microchip.menu.board_name.xn416.build.board=AVR_XplainedNano416
-microchip.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP
+microchip.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP
 microchip.menu.board_name.xn416.build.attiny=416
 microchip.menu.board_name.xn416.build.variant=txy6
 microchip.menu.board_name.xn416.build.millistimer=A0
@@ -1490,12 +1490,12 @@ microchip.menu.startuptime.32.bootloader.SYSCFG1=0x06
 microchip.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 ### VOLTAGE FOR UART BAUD CORRECTION
-microchip.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
-microchip.menu.uartvoltage.skip.build.uartvoltage=NA
-microchip.menu.uartvoltage.5v=Closer to 5v
-microchip.menu.uartvoltage.3v=Closer to 3v
-microchip.menu.uartvoltage.5v.build.uartvoltage=5V
-microchip.menu.uartvoltage.3v.build.uartvoltage=3V
+#microchip.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+#microchip.menu.uartvoltage.skip.build.uartvoltage=NA
+#microchip.menu.uartvoltage.5v=Closer to 5v
+#microchip.menu.uartvoltage.3v=Closer to 3v
+#microchip.menu.uartvoltage.5v.build.uartvoltage=5V
+#microchip.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ### TWI OPTIONS
 microchip.menu.wire.mors=Master or Slave (saves Flash & RAM)
@@ -1538,7 +1538,7 @@ atxy7o.build.tuned=
 atxy7o.build.tuned=
 atxy7o.build.mcu=attiny{build.attiny}
 atxy7o.build.f_cpu={build.speed}000000L
-atxy7o.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
+atxy7o.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
 atxy7o.build.export_merged_output=true
 
 ### BOOTLOADING PARAMETERS
@@ -1766,12 +1766,12 @@ atxy7o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atxy7o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
 ### VOLTAGE FOR UART BAUD CORRECTION
-atxy7o.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
-atxy7o.menu.uartvoltage.skip.build.uartvoltage=NA
-atxy7o.menu.uartvoltage.5v=Closer to 5v
-atxy7o.menu.uartvoltage.3v=Closer to 3v
-atxy7o.menu.uartvoltage.5v.build.uartvoltage=5V
-atxy7o.menu.uartvoltage.3v.build.uartvoltage=3V
+#atxy7o.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+#atxy7o.menu.uartvoltage.skip.build.uartvoltage=NA
+#atxy7o.menu.uartvoltage.5v=Closer to 5v
+#atxy7o.menu.uartvoltage.3v=Closer to 3v
+#atxy7o.menu.uartvoltage.5v.build.uartvoltage=5V
+#atxy7o.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ### BOOTLOADER UART PINS
 atxy7o.menu.bootloaderuart.default=TX:9 (PB2), RX:8 (PB3)
@@ -1807,7 +1807,7 @@ atx27o.build.mcu=attiny{build.attiny}
 atx27o.build.f_cpu={build.speed}000000L
 atx27o.build.extra_flags=-DARDUINO_attinyx27 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
 atx27o.build.export_merged_output=true
-atx27o.build.uartvoltage=
+#atx27o.build.uartvoltage=
 
 ### BOOTLOADING PARAMETERS
 atx27o.bootloader.WDTCFG=0x00
@@ -2060,7 +2060,7 @@ atxy6o.build.variant=txy6
 atxy6o.build.tuned=
 atxy6o.build.mcu=attiny{build.attiny}
 atxy6o.build.f_cpu={build.speed}000000L
-atxy6o.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
+atxy6o.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
 atxy6o.build.export_merged_output=true
 
 ### BOOTLOADING PARAMETERS
@@ -2261,12 +2261,12 @@ atxy6o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy6o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
 ### VOLTAGE FOR UART BAUD CORRECTION
-atxy6o.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
-atxy6o.menu.uartvoltage.skip.build.uartvoltage=NA
-atxy6o.menu.uartvoltage.5v=Closer to 5v
-atxy6o.menu.uartvoltage.3v=Closer to 3v
-atxy6o.menu.uartvoltage.5v.build.uartvoltage=5V
-atxy6o.menu.uartvoltage.3v.build.uartvoltage=3V
+#atxy6o.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+#atxy6o.menu.uartvoltage.skip.build.uartvoltage=NA
+#atxy6o.menu.uartvoltage.5v=Closer to 5v
+#atxy6o.menu.uartvoltage.3v=Closer to 3v
+#atxy6o.menu.uartvoltage.5v.build.uartvoltage=5V
+#atxy6o.menu.uartvoltage.3v.build.uartvoltage=3V
 
 
 ### UPDI/RESET PIN CONFIGURATION & OPTIBOOT ENTRY
@@ -2334,7 +2334,7 @@ atx26o.build.mcu=attiny{build.attiny}
 atx26o.build.f_cpu={build.speed}000000L
 atx26o.build.extra_flags=-DARDUINO_attinyx26 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
 atx26o.build.export_merged_output=true
-atx26o.build.uartvoltage=
+#atx26o.build.uartvoltage=
 
 ### BOOTLOADING PARAMETERS
 atx26o.bootloader.WDTCFG=0x00
@@ -2586,7 +2586,7 @@ atxy4o.build.variant=txy4
 atxy4o.build.tuned=
 atxy4o.build.mcu=attiny{build.attiny}
 atxy4o.build.f_cpu={build.speed}000000L
-atxy4o.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
+atxy4o.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
 atxy4o.build.export_merged_output=true
 
 ### BOOTLOADING PARAMETERS
@@ -2800,12 +2800,12 @@ atxy4o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy4o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
 ### VOLTAGE FOR UART BAUD CORRECTION
-atxy4o.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
-atxy4o.menu.uartvoltage.skip.build.uartvoltage=NA
-atxy4o.menu.uartvoltage.5v=Closer to 5v
-atxy4o.menu.uartvoltage.5v.build.uartvoltage=5V
-atxy4o.menu.uartvoltage.3v=Closer to 3v
-atxy4o.menu.uartvoltage.3v.build.uartvoltage=3V
+#atxy4o.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+#atxy4o.menu.uartvoltage.skip.build.uartvoltage=NA
+#atxy4o.menu.uartvoltage.5v=Closer to 5v
+#atxy4o.menu.uartvoltage.5v.build.uartvoltage=5V
+#atxy4o.menu.uartvoltage.3v=Closer to 3v
+#atxy4o.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ### BOOTLOADER UART PINS
 atxy4o.menu.bootloaderuart.default=TX:5 (PB2), RX:4 (PB3)
@@ -3127,7 +3127,7 @@ atxy2o.build.variant=txy2
 atxy2o.build.tuned=
 atxy2o.build.mcu=attiny{build.attiny}
 atxy2o.build.f_cpu={build.speed}000000L
-atxy2o.build.extra_flags=-DARDUINO_attinyxy2 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DUSING_OPTIBOOT {build.tuned}
+atxy2o.build.extra_flags=-DARDUINO_attinyxy2 -DMILLIS_USE_TIMER{build.millistimer} -DUSING_OPTIBOOT {build.tuned}
 atxy2o.build.export_merged_output=true
 
 ### BOOTLOADING PARAMETERS
@@ -3325,12 +3325,12 @@ atxy2o.menu.bootloaderuart.default.bootloader.uartswap=2
 atxy2o.menu.bootloaderuart.alternate.bootloader.uartswap=z_alt
 
 ### VOLTAGE FOR UART BAUD CORRECTION
-atxy2o.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
-atxy2o.menu.uartvoltage.skip.build.uartvoltage=NA
-atxy2o.menu.uartvoltage.5v=Closer to 5v
-atxy2o.menu.uartvoltage.5v.build.uartvoltage=5V
-atxy2o.menu.uartvoltage.3v=Closer to 3v
-atxy2o.menu.uartvoltage.3v.build.uartvoltage=3V
+#atxy2o.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+#atxy2o.menu.uartvoltage.skip.build.uartvoltage=NA
+#atxy2o.menu.uartvoltage.5v=Closer to 5v
+#atxy2o.menu.uartvoltage.5v.build.uartvoltage=5V
+#atxy2o.menu.uartvoltage.3v=Closer to 3v
+#atxy2o.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ### UPDI/RESET PIN CONFIGURATION & OPTIBOOT ENTRY
 atxy2o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
@@ -3409,7 +3409,7 @@ microchipo.upload.extra_params=-D
 ### CHIP
 microchipo.menu.board_name.cn3217=Curiosity Nano ATtiny3217
 microchipo.menu.board_name.cn3217.build.board=AVR_CuriosityNano3217
-microchipo.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
+microchipo.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchipo.menu.board_name.cn3217.bootloader.file=optiboot_Curiosity3217.hex
 microchipo.menu.board_name.cn3217.build.attiny=3217
 microchipo.menu.board_name.cn3217.build.variant=txy7
@@ -3418,7 +3418,7 @@ microchipo.menu.board_name.cn3217.upload.maximum_data_size=2048
 
 microchipo.menu.board_name.cn1627=Curiosity Nano ATtiny1627
 microchipo.menu.board_name.cn1627.build.board=AVR_CuriosityNano1627
-microchipo.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
+microchipo.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchipo.menu.board_name.cn1627.bootloader.file=optiboot_Curiosity1627.hex
 microchipo.menu.board_name.cn1627.build.millistimer=B1
 microchipo.menu.board_name.cn1627.build.attiny=1627
@@ -3428,7 +3428,7 @@ microchipo.menu.board_name.cn1627.upload.maximum_data_size=2048
 
 microchipo.menu.board_name.cn1607=Curiosity Nano ATtiny1607
 microchipo.menu.board_name.cn1607.build.board=AVR_CuriosityNano1607
-microchipo.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
+microchipo.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchipo.menu.board_name.cn1607.bootloader.file=optiboot_Curiosity1607.hex
 microchipo.menu.board_name.cn1607.build.attiny=1607
 microchipo.menu.board_name.cn1607.build.variant=txy7
@@ -3438,7 +3438,7 @@ microchipo.menu.board_name.cn1607.upload.maximum_data_size=1024
 
 microchipo.menu.board_name.xp3217=Xplained Pro ATtiny3217
 microchipo.menu.board_name.xp3217.build.board=AVR_XplainedPro3217
-microchipo.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
+microchipo.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
 microchipo.menu.board_name.xp3217.bootloader.file=optiboot_XplainedPro3217.hex
 microchipo.menu.board_name.xp3217.build.attiny=3217
 microchipo.menu.board_name.xp3217.build.variant=txy7
@@ -3448,7 +3448,7 @@ microchipo.menu.board_name.xp3217.upload.maximum_data_size=2048
 
 microchipo.menu.board_name.xp817=Xplained Pro ATtiny817
 microchipo.menu.board_name.xp817.build.board=AVR_XplainedPro817
-microchipo.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
+microchipo.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
 microchipo.menu.board_name.xp817.bootloader.file=optiboot_XplainedPro817.hex
 microchipo.menu.board_name.xp817.build.attiny=817
 microchipo.menu.board_name.xp817.build.variant=txy7
@@ -3458,7 +3458,7 @@ microchipo.menu.board_name.xp817.upload.maximum_data_size=512
 
 microchipo.menu.board_name.xm817=Xplained Mini ATtiny817
 microchipo.menu.board_name.xm817.build.board=AVR_XplainedMini817
-microchipo.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5 {build.tuned}
+microchipo.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5 {build.tuned}
 microchipo.menu.board_name.xm817.bootloader.file=optiboot_XplainedMini817.hex
 microchipo.menu.board_name.xm817.build.attiny=817
 microchipo.menu.board_name.xm817.build.variant=txy7
@@ -3468,7 +3468,7 @@ microchipo.menu.board_name.xm817.upload.maximum_data_size=512
 
 microchipo.menu.board_name.xn416=Xplained Nano ATtiny416
 microchipo.menu.board_name.xn416.build.board=AVR_XplainedNano416
-microchipo.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DUARTBAUD{build.uartvoltage} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP {build.tuned}
+microchipo.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP {build.tuned}
 microchipo.menu.board_name.xn416.bootloader.file=optiboot_XplainedNano416.hex
 microchipo.menu.board_name.xn416.build.attiny=416
 microchipo.menu.board_name.xn416.build.variant=txy6
@@ -3611,12 +3611,12 @@ microchipo.menu.startuptime.32.bootloader.SYSCFG1=0x06
 microchipo.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 ### VOLTAGE FOR UART BAUD CORRECTION
-microchipo.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
-microchipo.menu.uartvoltage.skip.build.uartvoltage=NA
-microchipo.menu.uartvoltage.5v=Closer to 5v
-microchipo.menu.uartvoltage.3v=Closer to 3v
-microchipo.menu.uartvoltage.5v.build.uartvoltage=5V
-microchipo.menu.uartvoltage.3v.build.uartvoltage=3V
+##microchipo.menu.uartvoltage.skip=Ignore (saves flash, almost always fine)
+##microchipo.menu.uartvoltage.skip.build.uartvoltage=NA
+##microchipo.menu.uartvoltage.5v=Closer to 5v
+##microchipo.menu.uartvoltage.3v=Closer to 3v
+##microchipo.menu.uartvoltage.5v.build.uartvoltage=5V
+##microchipo.menu.uartvoltage.3v.build.uartvoltage=3V
 
 ### TWI OPTIONS
 microchipo.menu.wire.mors=Master or Slave (saves Flash & RAM)

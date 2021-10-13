@@ -287,46 +287,53 @@ In versions prior to 2.0.0, this was instead configured using the Tools -> UART 
 #### Baud Rates
 When operating at 1MHz, the UART can reach 115200 baud (2.3.0+ required for stable operation).
 
-Maximum baud rate scales directly with the system clock speed; 2 mbaud is just barely possible at 16 MHz (this is the same maximum that was possible on classic AVRs); unlike classic AVRs, these have a "fractional baud rate generator": rather than specifying the bit period in units of 8 (U2X=1) or 16 (U2X=0) clock cycles as on classic AVRs, here it is specified in 64ths of 8 or 16 clock cycles (no, I'm not sure how they pulled that off. Seems to be established technology, but it sure looks like magic to me).  This is a boon at high baud rates - it guarantees that as long as the system is clocked high enough to generate the requested baud rate, worst case, the bit timing will be off by no more than 1/129th - less than 0.77%. At lower speeds, the error is far smaller, often negligible - for the speeds supported by megaTinyCore, the commonly used baud rates (9600, 19200, 57600 and 115200) are all within 0.1% except for 115200 @ 1 MHz (0.64%).  Of course, that is error in addition to any inaccuracy due to the internal oscillator being off-target; even if the best OSC20MCALA value is chosen by the factory cal (often but not always the case), on the 0/1-series, the increment size is 1.5%, so there's an a +/- 0.75% error - or more, because occasionally the factory calibration is 1 setting off from the ideal. On 2-series it's half that. Either way, you safe almost guaranteed to be within 1%, with is more than enough for most serial communication. If you need it even closer (really?) you can select the voltage baud correction option from the tools menu; this will use the factory calibrated oscillator error values to nudge the baud rate even closer to the target.
+Maximum baud rate scales directly with the system clock speed; 2 mbaud is just barely possible at 16 MHz (this is the same maximum that was possible on classic AVRs); unlike classic AVRs, these have a "fractional baud rate generator": rather than specifying the bit period in units of 8 (U2X=1) or 16 (U2X=0) clock cycles as on classic AVRs, here it is specified in 64ths of 8 or 16 clock cycles (no, I'm not sure how they pulled that off. Seems to be established technology, but it sure looks like magic to me).  This is a boon at high baud rates - it guarantees that as long as the system is clocked high enough to generate the requested baud rate, worst case, the bit timing will be off by no more than 1/129th - less than 0.77%. At lower speeds, the error is far smaller, often negligible - for the speeds supported by megaTinyCore, the commonly used baud rates (9600, 19200, 57600 and 115200) are all within 0.1% except for 115200 @ 1 MHz (0.64%).  Of course, that is error in addition to any inaccuracy due to the internal oscillator being off-target; the granularity of the tuning is is 1.5%, so that adds a +/- 0.75% error. On 2-series it's about 0.9%, so the maximum error is less than 0.5% at room temp between 3 and 5V. The recommended maximum error (sum of clock error on both sides) is 4% with U2X on, and 4.5% without, and the recommended clock difference is 1.5% and 2%, so only when talking to devices with unusually fussy serial ports would this be a concern.
 
-##### Voltage correction
-To maximize the accuracy of the baud rate when using the internal oscillator, from the Tools -> Voltage for UART Baud menu, select whether the voltage is closer to 5v or 3v - the factory calibration supplies an oscillator error adjustment for the purpose of UART baud calculation for 5v and 3v, and using the right one will produce a baud rate closer to the target value. That said, testing has indicated that either setting is good enough unless you are talking to particularly finicky devices. On parts with 4k or less of flash, this setting is ignored because it adds approx 90 bytes to the size of the compiled binary, and on 2k and 4k parts, it's just not worth the space. This correction factor is never used by the bootloader - it is only necessary when you'rte interacting with something particularly picky about then baud rate which will not accept a nearly correct baud.
+~##### Voltage correction
+To maximize the accuracy of the baud rate when using the internal oscillator, from the Tools -> Voltage for UART Baud menu, select whether the voltage is closer to 5v or 3v - the factory calibration supplies an oscillator error adjustment for the purpose of UART baud calculation for 5v and 3v, and using the right one will produce a baud rate closer to the target value. That said, testing has indicated that either setting is good enough unless you are talking to particularly finicky devices. On parts with 4k or less of flash, this setting is ignored because it adds approx 90 bytes to the size of the compiled binary, and on 2k and 4k parts, it's just not worth the space. This correction factor is never used by the bootloader - it is only necessary when you'rte interacting with something particularly picky about then baud rate which will not accept a nearly correct baud.~
+
+##### Voltage correction is dropped entirely from 2.4.3.
+It was an ineffective method to make use of a feature that is of little benefit when it is an otherwise sound, wasted flash when it was used unnecessarily (likely every time it was used) and which on average adjusts the serial baud rate by a few tenths of a percent, which is several times more accurate than USART needs to be. A future update may provide a macro to calculate a "compensated baud", which would be calculated at runtime by simple multiplication, instead of having to do division (which the old method needed to use).
+
+
+##### A note on Baud issues
+Usually problems communicating with things due to baud rate, on the modern AVRs, are because whatever it's talking to is way off target. For example, if you're talking over the serial port to an ATmega328p - being a classic AVR, it doesn't have that fractional baud rate generator. Instead, it needs the baud register set so a number that it can divide the clock by it's baud register. If it only had to generate the clock speed by dividing the clock, that wouldn't be so bad. But the USART needs to divide the system clock to get one **8 times the baud rate** (in U2X, which Arduino cores use - 16x otherwise). A 16 MHz Arduino Uno talking at 115200 baud, for example, isn't actually talking at 115200 baud... Arduino picks UBRR = 16, leading to division by 17 (like most AVR timing related things, the result is N+1 when the numeric value is N) - It's running at 117500 baud, around 2% fast. If that one were trying to talk to an 8 MHz one - the best value is 8, so it's dividing the clock by 9, and the effective baud rate ends up as 111111 baud, more than 3.5% low - they're off by a combined 6%: They cannot talk to eachother, even though they both have a crystal. One of the tinyAVR parts supported by this core might be able to talk to both, but it wouldn't need to very far off in the high direction to have trouble talking to the 8 MHz one. If you find yourself in a situation like this, where you have parts that can communicate amongst eachother or with the computer, but which have trouble talking to a new ATtiny (since the modern ATtiny won't be using U2X, while the '328p will, it wouldn't even be surprising if the tiny could receive serial from a 328p @ 8 MHz - but the 328p couldn't receive frome the tiny). What you need in this situation is not to try to make the clock more accurate, but to figure out which direction the other devices are off in - and just nudge the baud rate you specify up or down accordingly. You could go 1.5-2% in either direction and still be able to talk to a serial adapter - and one of those two will be close enough to what the off-target devices are using to be able to communicate with anythign that's able to talk to a serial adapter. If the other devices are classic AVRs, you can check a table of AVR baud rates ([such as this one I made](https://docs.google.com/spreadsheets/d/1uzU_HqWEpK-wQUo4Q7FBZGtHOo_eY4P_BAzmVbKCj6Y/edit?usp=sharing)) to see what baud rate one would expect it to be at. And no matter what kind of device it is, you can always determine it experimentally - it's either too fast or too slow, so there are only two options to try.
+
+**Wait, what about autobaud?** What about it? Although the name suggests it would be just the thing, you can't just turn on autobaud and have it automagically pick the right baud rate for an existing protocol. It relies on the other device sending a break followed by a "sync" charachter, 0x55. Unless you are programming the other device too, that option is probably not available to you. Even when you are, it's cumbersome to have to rig up two devices like that, and probably not a practical approach. It's meant for (and typically used in) automotive settings as part of a LIN (a serial-based multidrop network), and there, everything is using a shared protocol. That protocol starts every packet with a break followed by a sync,
+
 
 #### printHex
 As an aid to development and debugging, we provide the printHex method. This is a method that will print a wide variety of things as hex. Passing pointers to it will usually dereference them and return the incremented pointer (so you could call it in a loop) See [the printHex documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/printHex.md) for more information. printHex is a development and debugging aid. Behavior may change without warning in a future release - the newline behavior in particular is worse than I would like it to be, but so is every way I've tried to make it better so far.
 
 ### SPI support
-All of these parts have a single hardware SPI peripheral. It works exactly like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. Note that the 8-pin parts (412, 212, 402, 204) do not have a specific SS pin.
+All of these parts have a single hardware SPI peripheral. It works like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. On 8-pin parts, the only option for the SS pin is PA0 (the UPDI/reset pin); this does not matter for the purposes of this core though, because, like the official library, this only operates as a master, and the SS pin is used only when potentially acting as a slave.
 
 On all parts except the 14-pin parts, the SPI pins can be moved to an alternate location (note: On 8-pin parts, the SCK pin cannot be moved). This is configured using the SPI.swap() or SPI.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This must be called **before** calling SPI.begin().
 
 `SPI.swap(1) or SPI.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one.
 
-`SPI.pins(MOSI pin, MISO pin, SCK pin, SS pin);` - this will set the mapping to whichever mapping has the specified pins. If this is not a valid mapping option, it will return false and set the mapping to the default. This uses more flash than SPI.swap(); that method is preferred.
+`SPI.pins(MOSI pin, MISO pin, SCK pin, SS pin);` - this will set the mapping to whichever mapping has the specified pins. If this is not a valid mapping option, it will return false and set the mapping to the default. This uses more flash than SPI.swap(); that method is preferred. The SS pin argument is optional, as the pin is not used when acting as an SPI master, and neither this library nor the official SPI.h library support acting as a slave.
 
-When it can be determined that arguments passed to SPI.swap() will always be invalid at compile time, that will generate a compile error to that effect - but we have no way other than returning false (which is ignored unless the returned value is checked) to let the user know that that is the reason that SPI isn't doing what they want.
+When it can be determined that arguments passed to SPI.swap() or SPI.pins() are invalid at compile time (most commonly when the argument(s) are constants, which they almost always are), the core will generate a compile error to that effect. This is meant to help prevent such detectable problems from requiring debugging time on hardware - there's never a right time to usse
 
-In versions prior to 2.0.0, this was instead configured using the Tools -> SPI Pins submenu; this is set at compile time (reburning bootloader is not required). In these versions, you could see whether the alternate pins are in use by checking if SPIREMAP is #defined - you can for example use it to check that the correct options are selected and terminate compilation so you can select the right option if that is the case.
-
-This core disables the SS pin when running in SPI master mode. This means that the "SS" pin can be used for whatever purpose you want - unlike classic AVRs, where this could not be disabled. Earlier versions of this document incorrectly stated that this behavior was enabled in megaTinyCore; it never was, and SS was always disabled. It should be re-enabled and the SS pin configured appropriately (probably as INPUT_PULLUP) if master/slave functionality is required.
+This core disables the SS pin - this means that the "SS" pin can be used for whatever purpose you want, and the pin is relevant only when making an SPI slave (which requires you to implement the interaction with the SPI peripheral yourself - though it's not rocket science or anything). On the classic AVRs, if SS was an input and SPI was enabled, it was acting as the SS pin, and if it went low, it would switch the device to slave mode (and SPI.h would not function until put back into master mode, which was not done automatically).
 
 ### I2C (TWI) support
 All of these parts have a single hardware I2C (TWI) peripheral. It works *almost* exactly like the one on official Arduino boards using the Wire.h library, except for the additional features noted below. See the pinout charts for the location of these pins. **You must be sure to use external pullup resistors on the SDA and SCL lines if the devices you are connecting do not have those on board** (many Arduino/hobby targeted breakout boards do - typically 10k - though these may need to be enabled with a solder-bridge or jumper). The 30k-50k internal pullup resistors are not suitable for I2C pullup resistors; while they were enabled by megaTinyCore prior to version 2.1.0, this was the worst of both worlds: they often did work with the simple test case, leading the developer on their merry way thinking they were all set, only to discover that when they added another I2C device or two, or moved the device to the end of a longer cable, I2C suddenly no longer worked - it's probably better for it to fail immediately, prompting investigation and subsequent addition of appropriate pullup resistors. Note that there is nothing *preventing* one from enabling the internal pullups manually - you just should do so knowing that even if it happens to work, it's not a robust solution.
 
 #### TWI pins
-On all 1-series parts with at least 14 pins, the TWI can be swapped to an alternate pair of pins. Neither 0-series nor 2-series parts have alternate pin locations for the TWI. On 2.0.0 and later, this is configured using the Wire.swap() or Wire.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** Wire.begin(). This implementation of pin swapping is the same as what is used by[DxCore](https://github.com/SpenceKonde/DxCore) and [MegaCoreX](https://github.com/MCUdude/MegaCoreX).
+On all 1-series parts with at least 14 pins, the TWI can be swapped to an alternate pair of pins. Neither 0-series nor 2-series parts have alternate pin locations for the TWI. This should be called **before** Wire.begin(). This implementation of pin swapping is the same as what is used by[DxCore](https://github.com/SpenceKonde/DxCore) and [MegaCoreX](https://github.com/MCUdude/MegaCoreX).
 
 `Wire.swap(1) or Wire.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one.
 
 `Wire.pins(SDA pin, SCL pin)` - this will set the mapping to whichever mapping has the specified pins as SDA and SCL. If this is not a valid mapping option, it will return false and set the mapping to the default. This uses more flash than Wire.swap(); that method is preferred.
 
-In versions prior to 2.0.0, this was instead configured using the Tools -> I2C Pins submenu; this is set at compile time (reburning bootloader is not required). In these versions, you could see whether the alternate pins are in use by checking if TWIREMAP is #defined - you can, for example, use it to check whether correct options are selected and terminate compilation, so you can select the right option.
 
 #### General Call and Second Slave Addresses
 When the version of Wire.h supplied with megaTinyCore 1.1.9 and later is used in slave mode, it is now possible to respond to the general call (0x00) address as well. This is controlled by the optional second argument to Wire.begin() (thanks [@LordJakson](https://github.com/LordJakson)!) If the argument is supplied and true, general call broadcasts will also trigger the interrupt. There is furthermore a third optional argument, which is passed unaltered to the `TWI0.SADDRMASK` register. If the low bit is 0, and bits set 1 will cause the I2C hardware to ignore that bit of the address (masked off bits will be treated as matching). If the low bit is 1, it will instead act as a second address that the device can respond to. See the datasheet for more information about this register.
 
 #### Multi-master support - acting as both slave and master
-This functionality is supported by the hardware (on the same pins, not same-or-different pins like the dual mode on full size parts) is coming, hopefully in the 2.4.x timeframe! Code has been offered, but I need a stable version out the door first, amd 2.4.0 is holding up too much to delay further.
+This functionality is supported by the hardware (on the same pins, not same-or-different pins like the dual mode on full size parts) is available for test with the developmebt version of 2.4.3 -
 
 #### TWI buffer size
 The Wire library requires a TX and RX buffer; these are both the same size, determined by how much SRAM the part has. Trying to use Wire to send something too large for the buffer will result in the extra bytes just not being sent. The buffer sizes were revised in 2.3.0 to reduce the number of "oddball" parts - all tinyAVR parts supported by megaTinyCore now get 32 byte buffers except the 2k parts, which literally cannot fit buffers that large in their limited SRAM. The 2k parts also don't have enough flash to do much with the Wire library, anyweay. There is little room to improve the flash footpring of the full Wire library further, so I2C use on such 2k parts will likely require alternative iplementations to fit within the flash. (we do not recommend using the 2k parts at all, due to how lousy the developer experience is under such tight constraints.
@@ -349,8 +356,8 @@ Wire is basically unusable w/2k flash anyway, so the smaller buffer is largely a
 | Parts           | Wire instances   | Bus Topology         |    Arduino support? |
 |-----------------|------------------|----------------------|------------------
 | Classic ATmega  | 1 (rarely 2) TWI | Multimaster          | Maybe via libraries, has been done.
-| Classoic Timy   | USI or slave only| Multimaster          | No, coming soon!
-| Modern Tiny     | 1 full TWI       | Multimaster          | No, coming soon!
+| Clssoic Timy    | USI or slave only| Multimaster          |
+| Modern Tiny     | 1 full TWI       | Multimaster          |
 | mega 0-series   | 1                | Dual mode supported  | No, probable after we get it here.
 | AVR Dx-series   | 2 but see note   | Dual mode supported  | No, coming soon! Currently support for only one TWI peripheral.
 
@@ -364,11 +371,11 @@ The core provides hardware PWM via the standard `analogWrite()` function. On the
 #### [Taking over TCA0](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/TakingOverTCA0.md)
 
 #### PWM on TCD0 pins (PIN_PC0 and PIN_PC1 - 10,11 on x16, 12,13 on x17)
-The 3216, 1616, 816, 416, and the 3217, 1617 and 817 have two additional PWM pins driven by Timer D (PC0 and PC1 - pins 10 and 11 on x16, 12 and 13 on x17). Timer D is an async timer, and the outputs can't be enabled or disabled without briefly stopping the timer. This results in a brief glitch on the other PWM pin (if it is currently outputting PWM), and doing so requires slightly longer - though the duration of this glitch is under 1 us. If TCD is used as the millis timer - which is the default on any part that has a type D timer (in order to keep the timers that are more readily repurposed available - TCD0 is not an easy peripheral to work with), this will result in millis losing a very small amount of time (under 1 us) every time PWM is turned on or off on a TCD pin. Since
+The 3216, 1616, 816, 416, and the 3217, 1617 and 817 have two additional PWM pins driven by Timer D (PC0 and PC1 - pins 10 and 11 on x16, 12 and 13 on x17). Timer D is an async timer, and the outputs can't be enabled or disabled without briefly stopping the timer. This results in a brief glitch on the other PWM pin (if it is currently outputting PWM), and doing so requires slightly longer - though the duration of this glitch is under 1 us. If TCD is used as the millis timer - which is the default on any part that has a type D timer (in order to keep the timers that are more readily repurposed available - TCD0 is not an easy peripheral to work with), this will result in millis losing a very small amount of time (under 1 us) every time PWM is turned on or off on a TCD pin.
 
 As of 2.2.0, analogWrite of 0 or 255 on a TCD-driven PWM pin does not disconnect the pin from the timer - instead it results in a constant HIGH or LOW output without disconnecting the timer(use digitalWrite() for that). This means that analogWrite(PIN_PC0 or PC1, 0) can be used to connect the timer to the pin without outputting PWM (yet) - doing this on both pins prior to setting any other duty cycles would allow one to ensure that no glitch of any sort occurs on the other TCD0 pin when the second pin is connected to it. Only digitalWrite() will disconnect the timer from the pin. When outputting a HIGH in this way, the pin is "inverted"; this means that digitalRead() on it will return 0, not 1 (if you're digitalRead'ing a pin, which you have set to output a constant HIGH, using analogWrite, and it's one of those two pins, it will read LOW - however, if you are using digitalRead() on a pin that you've set to output a constant value, you may be doing something wrong in general.
 
-There is a benefit of having an async timer, however: megaTinyCore configures it to use the unprescaled internal oscillator as it's clock source. This means that while there is a difference in PWM frequency between 16-MHz derived and 20-MHz derived clocks, there is no change in frequency for different system clock speeds! The exception to this is when TCD0 is used as the millis/micros timing source at 1 MHz - running at full speed there resulted in spending an unreasonable fraction of runtime in the millis ISR.
+There is a benefit of having an async timer, however: megaTinyCore configures it to use the unprescaled internal oscillator as it's clock source. This means that while there is a difference in PWM frequency between 16-MHz derived and 20-MHz derived clocks, there is no change in frequency for different system clock speeds for the TCD-controlled pins (the TCA-controlled pins will ) The exception to this is when TCD0 is used as the millis/micros timing source at 1 MHz - running at full speed there resulted in spending an unreasonable fraction of runtime in the millis ISR (tens of percent of the time.
 
 On some versions of megaTinyCore prior to 2.2.0, PWM on the TCD0 pins was entirely broken.
 
@@ -378,7 +385,7 @@ This also covers the PWM frequencies that these timers will give you at various 
 
 
 ### Tone Support
-Support for tone() is provided on all parts using TCB0, unless TCB1 is present and TCB0 is set as millis source. This is like the standard tone() function. Unlike on some classic AVRs, it does not support use of the hardware output compare to generate tones - due to the very limited PWM capabilities and restricted prescaler selection for the TCBs, this is not practical. See caveats below if using TCB0 or TCB1 for millis/micros settings. On parts with 8k or less flash, tones which specify a duration longer than 65536ms and a high frequency (specifically where duration times frequency is >4.2 billion) are not supported - if specified at compile time it will generate a compile error, and at runtime, it will produce a shorter duration tone than expected - this is a trade-off to reduce flash usage. It was decided that requesting a tone over a minute long (several minutes continuous at the upper limit of human hearing would be required to trigger the issue, and it would need to be even longer as the frequency got lower) qualifies as highly abnormal usage of tone(). At that point, rather than counting the number of times the tone pin is toggled (like tone() with a duration specified does), it probably makes more sense to use durationless tone(), and turn it off with noTone(). Or, for the sake of everyone within earshot, maybe don't make your device emit a high pitched tone for minutes on end at all? On parts with 16k flash or more a slightly less flash efficient implementation is used and the limit is significantly higher and very unlikely to be encountered.
+Support for tone() is provided on all parts using TCB0, unless TCB1 is present and TCB0 is set as millis source. This is like the standard tone() function. Unlike on some classic AVRs, it does not support use of the hardware output compare to generate tones - due to the very limited PWM capabilities and restricted prescaler selection for the TCBs, this is not practical. See caveats below if using TCB0 or TCB1 for millis/micros settings. On parts with 8k or less flash, tones which specify a duration longer than 65536ms and a high frequency (specifically where duration times frequency is >4.2 billion) are not supported - if specified at compile time it will generate a compile error, and at runtime, it will produce a shorter duration tone than expected - this is a trade-off to reduce flash usage. It was decided that requesting a tone over a minute long (several minutes continuous at the upper limit of human hearing would be required to trigger the issue, and it would need to be even longer as the frequency got lower) qualifies as highly abnormal usage of tone(). At that point, rather than counting the number of times the tone pin is toggled (like tone() with a duration specified does), it probably makes more sense to use durationless tone(), and turn it off with noTone(). Or, for the sake of everyone within earshot, m ybe don't make your device emit a high pitched tone for minutes on end at all? On parts with 16k flash or more a slightly less flash efficient implementation is used and the limit is significantly higher and very unlikely to be encountered.
 
 Tone can only play a tone on one pin at a time. In theopry you can play one tone per typeB timer, simultaneously, withhout anything more exotic than tone does - beyond adding a cacility to manage the multiople pins It is my opinion that those belong in a library, not the core, See comments in core.cpp for some things, and feel free to ask if you want more information about what I tjink could be doner I don't think it's **that** hard, . The builtin tone
 
@@ -696,7 +703,7 @@ void resetViaSWR() {
 
 ### Using watchdog to reset when hung
 If you only worked with the watchdog timer as an Arduino user - you might not even know why it's called that, or what the original concept was, and just know it as that trick to do a software reset on classic AVRs, and as a way to generate periodic interrupts. The "purpose" of a watchdog timer is to detect when the part has become hung - either because it's wound up in an infinite loop due to a bug, or because it wound up in a bad state due to a glitch on the power supply or other adverse hardware event, has been left without a clock by an external clock source failing, went to sleep waiting for some event which doesn't end up happening (or without correctly enabling whatever is supposed to wake it up) - and issue a reset. It is often anthropomorphized as a dog, who needs to be "fed" or "pet" periodically, or else he will "bite" (commonly seen in comments - the latter generally only when intentionally triggering it, as in `while (1); //wait for the watchdog to bite`).
- 
+
 You would first initialize the WDT like:
 ```c++
 _PROTECTED_WRITE(WDT.CTRLA,settings); //enable the WDT
@@ -731,25 +738,81 @@ void wdt_reset() {
 
 Or
 
-```c
+```c++
 // as a macro (which is all that wdt.h does)
 #define wdt_reset() __asm__ __volatile__ ("wdr"::)
 ```
 
 #### Disabling WDT
 In some cases you may only want the WDT enabled when certain routines prone to hanging due to external conditions, and then turn it off again.
-```
+```c++
 _PROTECTED_WRITE(WDT.CTRLA,0); //Yeah, that's it.
 ```
 
-At the other extreme you may want it to be impossible for code, even very clever bugs will never be able to turn it off. You can lock the WDT in it's current configuration by writing the WDT_LOCK bit in WDT.STATUS to 1 - only a system reset will unset the bit. 
+At the other extreme you may want it to be impossible for code, even very clever bugs will never be able to turn it off. You can lock the WDT in it's current configuration by writing the WDT_LOCK bit in WDT.STATUS to 1 - only a system reset will unset the bit.
 
-```
+```c++
 __PROTECTED_WRITE(WDT.STATUS,WDT_LOCK_bm); // call after setting WDT to desired configuration.
 ```
 For even more protection (and more nuisance in keeping the WDT from bitingat all times, even during startup). you can set the WDTCFG fuse via UPDI programming. At startup, that value is copied to WDT.CTRLA, and the lock bit in WDT.STATUS is set. Only UPDI programming can undo the WDT if congfiguref through the fuses. This feature is not exposed by the core - you must manually run avrdude or SerialUPDI and use it to write that fuse. "burn bootloader" will, however, set that fuse to 0 (the point of burn bootloader is initializing the chip to a fully known state; it only involves a bootloader if you've chosen an optiboot board configuration.
- 
 
+#### Summary and mini-example
+So overall, if you wanted your sketch to reset if you ever spent longer than 8 seconds between loop() iterations and also detect when a WDT reset just occurred and take special actions in setup you might do this
+```c++
+void wdt_enable() {
+  _PROTECTED_WRITE(WDT.CTRLA,WDT_PERIOD_8KCLK_gc); // no window, 8 seconds
+}
+
+void wdt_reset() {
+  __asm__ __volatile__ ("wdr"::);
+}
+
+void wdt_disable() {
+  _PROTECTED_WRITE(WDT.CTRLA,0);
+}
+
+/* If you at some point plan to put the chip to sleep you need to turn off the WDT or it will reset you out of sleep... */
+void goToSleep() {
+  wdt_disable();
+  sleep_cpu();
+  wdt_enable();  // turn the WDT back on promptly when we awaken.
+}
+
+void loop() {
+  wdt_reset(); // reset watchdog.
+  <snip - rest of loop goes here>
+}
+
+/* for NON-OPTIBOOT */
+void setup() {
+  wdt_enable(); //we're super paranoid, so we turn on WDT immediately!
+  uint8_t resetflags = RSTCTRL.RSTFR; // Read the flags
+  RSTCTRL.RSTFR = resetflags; // clear them for next time (only power on reset will clear then otherwise)
+  if (resetflags & RSTCTRL_WDRF) { //means it was a WDT reset
+    NotifyUserOfHangAndWDTReset();
+    if (resetflags != RSTCTRL_WDRF) {
+      Serial.println("Weird, we clear the flags upon reset, how did we end up with more than just one reset cause flag?")
+    }
+  }
+  <snip - rest of setup goes here>
+}
+/* For OPTIBOOT */
+void setup() {
+  wdt_enable(); //we're super paranoid, so we turn on WDT immediately.
+  uint8_t resetflags = GPIOR0 & 0x3F; // Optiboot stashes the reset flags here before clearing them to honor entry conditions.
+  // It never uses the top two bits, but init() does use those to report clock start problems.
+  GPIOR0 &= 0xC0; // clear non-clock-related ones
+  if (resetflags == RSTCTRL_WDRF) { //means it was a WDT reset. In optiboot configurations, this should always be accompanied by another flag unless it was a wdt reset from the application.
+    NotifyUserOfHangAndWDTReset();
+  }
+  if (GPIOR0 != 0) { //this means one of top two bits is set, or maybe both.
+	Serial.println("Clock startup errors reported");
+	Serial.printHex(GPIOR0); //this might be useful in understanding why the hang occurred? maybe?
+  }
+  <snip - rest of setup goes here>
+}
+
+```
 ### The wrong way to reset from software
 I have seen people throw around `asm volatile("jmp 0");` as a solution to a need to reset from software. **Don't do that** - all compiled C code makes assumptions about the state from which it is run. Jumping to 0 from a running application violates several of them unless you take care to avoid those pitfalls (if I were to add a comment after that line, it would read something like `// Reset chip uncleanly to produce unpredictable results`. Both Optiboot and the init() method of megaTinyCore make assumptions about the state of peripheral registers as well (namely, that they're in their reset configuration when it starts). Doing that was always risky business and should never be done on any part (certainly not without taking precautions). Now that we finally have a right way to do software reset, there is absolutely no excuse for using such a tactic!
 

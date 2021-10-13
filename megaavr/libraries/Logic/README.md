@@ -6,8 +6,6 @@ All of the examples assume the use of megaTinyCore, MegaCoreX or DxCore as appro
 
 More information about CCL can be found in the [Microchip Application Note TB3218](http://ww1.microchip.com/downloads/en/AppNotes/TB3218-Getting-Started-with-CCL-90003218A.pdf) and in the [megaAVR-0 family data sheet](http://ww1.microchip.com/downloads/en/DeviceDoc/megaAVR0-series-Family-Data-Sheet-DS40002015B.pdf) and the datasheet for the part in question.
 
-
-
 ## Logic
 Class for interfacing with the built-in logic block (sometimes referred to as `LUT`s, from the "LookUp Table" - though it is a curious use of language, that is what Microchip refers to them as). Use the predefined objects `Logic0`, `Logic1`, `Logic2` and `Logic3`. The logic blocks are paired, each pair sharing a single sequencer and `feedback` channel. `Logic2` and `Logic3` are only available on tinyAVR 2-series parts.
 
@@ -16,12 +14,14 @@ These objects expose **all** configuration options as properties, described belo
 ### Pin availability and Quick Reference
 This was simpler with 0/1-series (22 i/o pins, 10 CCL functions, none stacked onto the same pins), but with 2-series, 20 different CCL functions, crammed into just 22 GPIO pins, two of which have one blocks' input and one of the outputs for another. The ones with no inputs on lower pincount parts are more useful than one might expect; advanced use cases will often use mostly internal inputs - and the event system can always be used to get pin input in anyway - albeit at a cost of an event channel.
 
-Logic Block |  IN0-2  | OUT | ALT OUT | Availability |
-------------|---------|-----|---------|--------------|
-Logic0      | PA0-PA2 | PA4 |     PB4 |    All parts |
-Logic1      | PC3-PC5 | PA7 |     PC1 |    All parts |
-Logic2      | PB0-PB2 | PB3 |     PB6 |     2-series |
-Logic3      | PC0-PC2 | PC4 |     PA5 |     2-series |
+Logic Block |  IN0-2  | OUT | 8pin | ALT OUT | Availability |
+------------|---------|-----|------|---------|--------------|
+Logic0      | PA0-PA2 | PA4 |  PA6 |     PB4 |    All parts |
+Logic1      | PC3-PC5 | PA7 |  PA7 |     PC1 |    All parts |
+Logic2      | PB0-PB2 | PB3 |  --- |     PB6 |     2-series |
+Logic3      | PC0-PC2 | PC4 |  --- |     PA5 |     2-series |
+
+
 
 * Inputs are always in consecutive order counting by bit position (not physical order).
 * All logic blocks present always have at least one output pin
@@ -37,6 +37,13 @@ Logic2 IN   |         N/A |      YES, ALL |      YES, ALL |      YES, ALL |
 Logic2 OUT  |         N/A |   NO ALT OUT2 |   NO ALT OUT2 |     YES, BOTH |
 Logic3 IN   |         N/A |     NO INPUTS |      YES, ALL |      YES, ALL |
 Logic3 OUT  |         N/A | ALT OUT3 ONLY | ALT OUT3 ONLY |     YES, BOTH |
+
+### Overhead
+On the 0/1-series, the overhead is approximately 546 bytes of flash and 26 bytes of flash.
+On the 2-series, with twice as many LUTs, it is much larger:  984 bytes and 60b RAM.
+This is farily small for msot parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series. Though the main reason people use 4k parts is that they want something in the 8 pin package, where that's their best option.
+
+Writing a constant value to 4 registers (the minimum plausible needed to configure a LUT) for 2 or 4 LUTs requires 56 or 112 bytes, respectively.
 
 ## Properties
 

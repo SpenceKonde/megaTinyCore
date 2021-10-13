@@ -291,6 +291,17 @@
   #define MEGATINYCORE "Unknown 2.4.0+"
 #endif
 
+/* Add a feature - yay!
+ * Rename registers so people can't carry code back and forth = booo
+ */
+#ifndef TCA_SINGLE_CNTEI_bm
+  #define TCA_SINGLE_CNTEI_bm TCA_SINGLE_CNTAEI_bm
+  #define TCA_SINGLE_EVACT_POSEDGE_gc TCA_SINGLE_EVACTA_CNT_POSEDGE_gc
+  #define TCA_SINGLE_EVACT_CNT_ANYEDGE_gc TCA_SINGLE_EVACTA_CNT_ANYEDGE_gc
+  #define TCA_SINGLE_EVACT_CNT_HIGHLVL_gc TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc
+  #define TCA_SINGLE_EVACT_UPDOWN_gc TCA_SINGLE_EVACTA_UPDOWN_gc
+#endif
+
 // Version related defines now handled in platform.txt
 #define MEGATINYCORE_NUM ((MEGATINYCORE_MAJOR<<24)+(MEGATINYCORE_MINOR<<16)+(MEGATINYCORE_PATCH<<8)+MEGATINYCORE_RELEASED)
 
