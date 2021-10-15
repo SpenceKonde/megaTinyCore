@@ -18,6 +18,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Improved docs for tinyNeoPixel. The two libraries each have a README.md linking to a greatly expanded library document.
 * Document use of WDT for it's original purpose, to protect against hangs!
 * Actually prevent disabling warnings - -Wall for all! You should not be compiling code with warnings disabled, the vast majority of the time, they're pointing to problems, and in the casee that aren't bugs, they're still a weak point that future bugs could come from (and that people will comment on when you post the code on forums to ask for help). I thought I'd done this a long time ago. Also pull in some warning-related flags from DxCore, including making implicit function declarations error, since the implied declarations when this happens are basically never result in working code, but it occasionally compiles and malfunctions.
+* Fix timekeeping on clock speeds only supported with external clocks or tuning when a TCA or TCB is used for millis (it's still busted with the TCD)
 
 ## Released Versions
 

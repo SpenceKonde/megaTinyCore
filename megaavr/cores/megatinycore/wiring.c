@@ -322,31 +322,37 @@ unsigned long millis() {
       // I may have missed some optimziations here.
       // Note thst you want to alternate addition and subtraction to suppress noise.
       /* multiples of 5 */
-      #if   (F_CPU  == 30000000UL)
+      #if (F_CPU == 28000000UL)
         ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 3) - (ticks >> 4) + (ticks >> 8)); // very, very close.
-      #elif (F_CPU  == 25000000UL)
+        microseconds = overflows * 1000 + (ticks + (ticks >> 3) + (ticks >> 6) + (ticks >> 8)); // Extremely close, and rounding will tend to help.
+      #elif (F_CPU == 14000000UL) /* not supported by the core! */
+        ticks = ticks >> 3;
+        microseconds = overflows * 1000 + (ticks + (ticks >> 3) + (ticks >> 6) + (ticks >> 8)); // Extremely close, and rounding will tend to help.
+      #elif (F_CPU == 30000000UL)
         ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 2) - (ticks >> 5)); // very, very close.
-      #elif (F_CPU  == 20000000UL)
+        microseconds = overflows * 1000 + (ticks + (ticks >> 3) - (ticks >> 4) + (ticks >> 8)); // Damned near perfect.
+      #elif (F_CPU == 25000000UL)
+        ticks = ticks >> 4;
+        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 5)); // - (ticks >> 7)
+        // Multiples of 12
+        // + (ticks >> 3) - (ticks >> 5) is better than + (ticks >> 4) + (ticks >> 5) - same average, but alternating + and - gives less rounding error.
+      #elif (F_CPU == 24000000UL)
+        ticks = ticks >> 4;
+        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
+      #elif (F_CPU == 12000000UL)
+        ticks = ticks >> 3;
+        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
+        // multiples of 10
+      #elif (F_CPU == 20000000UL)
         ticks = ticks >> 3;
         microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
-      #elif (F_CPU  == 10000000UL)
+      #elif (F_CPU == 10000000UL)
         ticks = ticks >> 2;
         microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
-      #elif (F_CPU  ==  5000000UL)
+      #elif (F_CPU ==  5000000UL)
         ticks = ticks >> 1;
         microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
-
-      /* multiples of 12 */
-      #elif (F_CPU  == 24000000UL)
-        ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
-      #elif (F_CPU  == 12000000UL)
-        ticks = ticks >> 3;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
-
-      /* powers of 2 - trivial*/
+        // powers of 2
       #elif (F_CPU  == 32000000UL || F_CPU > 24000000UL)
         microseconds = overflows * 1000 + (ticks >> 4);
       #elif (F_CPU  == 16000000UL || F_CPU > 12000000UL)
@@ -367,15 +373,31 @@ unsigned long millis() {
         #warning "Millis timer (TCBn) at this frequency is unsupported, micros() will return totally bogus values."
       #endif
     #else //Done with TCB, only thing left is TCA0
-      #if (F_CPU == 20000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
-        microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                     + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
-                     // bafflingly, casting to a uint16_t makes the compiler generate more efficient code...  but
-                     // casting to uint8_t doesn't! I don't understand it. but I'll take a free 8 bytes and 4 clocks any day.
-                     // I also cannot fathom how the compiler generates what it does from this input....
+
+      #elif (F_CPU == 30000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
+        microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+            + ((ticks * 2) + ((uint16_t)(ticks >> 3)));
+      #elif (F_CPU == 28000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
+        microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+            + ((ticks * 2) + ((uint16_t)(ticks >> 2) + (ticks >> 5)));
+      #elif (F_CPU == 25000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
+        microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+            + (ticks * 2 + ((uint16_t)(ticks >> 1) + (ticks >> 4)));
+      #elif (F_CPU == 24000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
+        microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+            + (ticks * 3 - ((uint16_t)(ticks >> 2) - (ticks >> 4) - (ticks >> 5)));
+      #elif (F_CPU == 20000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
+        microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+            + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
+      #elif (F_CPU == 28000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
+        microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+            + (ticks * 4 + ((uint16_t)(ticks >> 1) + (ticks >> 4) + (ticks >> 5)));
+      #elif (F_CPU == 12000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
+        microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+            + (ticks * 5 + ((uint16_t)(ticks >> 2) + (ticks >> 4) + (ticks >> 5)));
       #elif (F_CPU == 10000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
-        microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
-                     + (ticks * 3 + ((uint16_t)(ticks >> 1) - (ticks >> 3)));
+        microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
+            + ((ticks << 3) - ((uint16_t)(ticks << 1) + (ticks >> 1) - (ticks >> 3)));
       #elif (F_CPU == 5000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 16)
         microseconds = (overflows * millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
                      + (ticks * 3 + ((uint16_t)(ticks >> 2) - (ticks >> 4)));
