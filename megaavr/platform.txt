@@ -156,7 +156,7 @@ tools.avrdude.erase.pattern=
 
 tools.avrdude.bootloader.params.verbose=-v
 tools.avrdude.bootloader.params.quiet=-q -q
-tools.avrdude.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verbose} -p{build.mcu}{upload.workaround} -c{protocol} {program.extra_params} -e "-Ufuse0:w:{bootloader.WDTCFG}:m" "-Ufuse1:w:{bootloader.BODCFG}:m" "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse4:w:{bootloader.TCD0CFG}:m" "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse7:w:{bootloader.APPEND}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "{bootloader.avrdudestring}"
+tools.avrdude.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verbose} -p{build.mcu}{upload.workaround} -c{protocol} {program.extra_params} -e "-Ufuse0:w:{bootloader.WDTCFG}:m" "-Ufuse1:w:{bootloader.BODCFG}:m" "-Ufuse2:w:{bootloader.OSCCFG}:m" {bootloader.TCD0CFG_avrdude} "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse7:w:{bootloader.APPEND}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "{bootloader.avrdudestring}"
 
 tools.avrdude_remote.upload.pattern=/usr/bin/run-avrdude /tmp/sketch.hex {upload.verbose} -p{build.mcu}
 
@@ -192,7 +192,7 @@ tools.serialupdi.erase.pattern=
 
 tools.serialupdi.bootloader.params.verbose=
 tools.serialupdi.bootloader.params.quiet=
-tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:{bootloader.OSCCFG} 4:{bootloader.TCD0CFG} 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} {bootloader.serialupdistring}
+tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:{bootloader.OSCCFG} {bootloader.TCD0CFG_serialupdi} 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} {bootloader.serialupdistring}
 
 tools.serialupdi.program.params.verbose=
 tools.serialupdi.program.params.quiet=
