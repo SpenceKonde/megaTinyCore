@@ -19,6 +19,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Document use of WDT for it's original purpose, to protect against hangs!
 * Actually prevent disabling warnings - -Wall for all! You should not be compiling code with warnings disabled, the vast majority of the time, they're pointing to problems, and in the casee that aren't bugs, they're still a weak point that future bugs could come from (and that people will comment on when you post the code on forums to ask for help). I thought I'd done this a long time ago. Also pull in some warning-related flags from DxCore, including making implicit function declarations error, since the implied declarations when this happens are basically never result in working code, but it occasionally compiles and malfunctions.
 * Fix timekeeping on clock speeds only supported with external clocks or tuning when a TCA or TCB is used for millis (it's still busted with the TCD)
+* Correct SYSCFG0 fuse settings when burning bootloader for 2-series parts - they default the reserved bits to 1 not 0, and worse still, setting themto 0 enables a mode we probaby don't want.
+* Stop clearing fuse 4 by writing the default values for TCD0 on a 1-series. Now, with great difficulty, we only set that on parts that actually have the type D timer in order to keep our promise of burn bootloader restoring the chip to a fully known state. (well, except for the user row, and EEPROM if you've got it set to retain).
 
 ## Released Versions
 
