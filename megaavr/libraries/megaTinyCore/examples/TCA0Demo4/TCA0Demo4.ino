@@ -7,7 +7,7 @@
  */
 
 #if defined(MILLIS_USE_TIMERA0)||!defined(__AVR_ATtinyxy2__)
-#error "This sketch is for an 8-pin part and takes over TCA0"
+  #error "This sketch is for an 8-pin part and takes over TCA0"
 #endif
 
 void setup() {
@@ -15,7 +15,7 @@ void setup() {
   // No need to enable split mode - core has already done that for us.
   pinMode(PIN_PB0, OUTPUT); // PB0 - TCA0 WO0, pin7 on 14-pin parts
   pinMode(PIN_PA5, OUTPUT); // PA5 - TCA0 WO5, pin1 on 14-pin parts
-  TCA0.SPLIT.CTRLB  = TCA_SPLIT_LCMP0EN_bm|TCA_SPLIT_HCMP2EN_bm; // PWM on WO5, WO0
+  TCA0.SPLIT.CTRLB  = TCA_SPLIT_LCMP0EN_bm | TCA_SPLIT_HCMP2EN_bm; // PWM on WO5, WO0
   TCA0.SPLIT.LPER   = 0xFF; // Count all the way down from 255 on WO0/WO1/WO2
   TCA0.SPLIT.HPER   = 200;  // Count down from only 200 on WO3/WO4/WO5
   TCA0.SPLIT.LCMP0  = 0x7F; // 50% duty cycle

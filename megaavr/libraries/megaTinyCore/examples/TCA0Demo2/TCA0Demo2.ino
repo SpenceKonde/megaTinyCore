@@ -53,7 +53,7 @@ void setFrequency(unsigned long freqInHz) {
     presc++;
     tempperiod      = tempperiod >> (presc > 4 ? 2 : 1);
   }
-  Period=tempperiod;
+  Period            = tempperiod;
   TCA0.SINGLE.CTRLA = (presc << 1) | TCA_SINGLE_ENABLE_bm;
   TCA0.SINGLE.PER   = Period;
 }

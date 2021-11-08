@@ -12,7 +12,7 @@
  */
 
 #if defined(MILLIS_USE_TIMERA0) || !defined(__AVR_ATtinyxy2__)
-#error "This sketch is for an 8-pin part and takes over TCA0"
+  #error "This sketch is for an 8-pin part and takes over TCA0"
 #endif
 
 
