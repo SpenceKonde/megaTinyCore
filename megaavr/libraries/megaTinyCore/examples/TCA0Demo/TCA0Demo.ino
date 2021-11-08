@@ -1,5 +1,12 @@
-#if defined(MILLIS_USE_TIMERA0)||defined(__AVR_ATtinyxy2__)
-#error "This sketch takes over TCA0, don't use for millis here.  Pin mappings on 8-pin parts are different"
+/* Example 1: 16-bit PWM in single mode, dual slope with interrupt.
+ * https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/TakingOverTCA0.md
+ *
+ * The whole "ISR adjusting duty cycle" like that probably isn't something you'd actually
+ * want to do - but it demonstrates how to configure an ISR on TCA0, which is the point.
+ */
+
+#if defined(MILLIS_USE_TIMERA0) || defined(__AVR_ATtinyxy2__)
+  #error "This sketch takes over TCA0, don't use for millis here.  Pin mappings on 8-pin parts are different"
 #endif
 
 unsigned int DutyCycle = 0;
@@ -7,9 +14,7 @@ unsigned int DutyCycle = 0;
 void setup() {
   // We will be outputting PWM on PB0
   pinMode(PIN_PB0, OUTPUT); //PB0 - TCA0 WO0, pin7 on 14-pin parts
-  TCA0.SPLIT.CTRLA = 0; //disable TCA0 and set divider to 1
-  TCA0.SPLIT.CTRLESET = TCA_SPLIT_CMD_RESET_gc | 0x03; //set CMD to RESET, and enable on both pins.
-  TCA0.SPLIT.CTRLD = 0; //Split mode now off, CMPn = 0, CNT = 0, PER = 255
+  takeOverTCA0();                           // This replaces disabling and resettng the timer, required previously.
   TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_DSBOTTOM_gc); //Dual slope PWM mode OVF interrupt at BOTTOM, PWM on WO0
   TCA0.SINGLE.PER = 0xFFFF; // Count all the way up to 0xFFFF
   // At 20MHz, this gives ~152Hz PWM
