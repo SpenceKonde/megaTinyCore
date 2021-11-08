@@ -1,7 +1,7 @@
 # Installing megaTinyCore
 
 ## Supported IDE versions
-megaTinyCore requires a version of the IDE later than 1.6.3; - it may require a much more recent version of the IDE; this has not been tested. It has been tested with 1.8.9 and 1.8.13. Due to a regression in 1.8.15 megaTinyCore is not compatible with that IDE version. It errors out because it says there's no version, when the version as specified in platform.txt has been confirmed to be entirely valid.
+megaTinyCore requires a version of the IDE later than 1.6.3; - it may require a much more recent version of the IDE; this has not been tested. It has been tested with 1.8.9 and 1.8.13. 1.8.15 and 1.8.16 seem to have issues when certain cores are installed, or when cores are installed manually. I have verified that megaTinyCore works when installed via board manager, and that some other core on my system causes all compilation attempts to fail on a non-portable installation, even the builtin Arduino AVR Boards
 
 ### Alternative development environments
 There are a number of other alternatives to the Arduino IDE as such, with their users making unflattering (and occasionally profane) comments about the Arduino IDE and it's myriad shortcomings. It is known that the core can be used on the following alternative platforms. Where these are links, this link describes use of this core on that IDE. If no link is probvided, that's because I don't use that IDE, and nobody who does have volunteered a guide to installation, use, and any additional complications.
