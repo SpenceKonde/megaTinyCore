@@ -161,6 +161,9 @@ Used with `begin()` to provide custom iteration.
 ## Very advanced considerations
 Because we have people using megaTinyCore and DxCore to write code that will be deployed to a production environment, these considerations had to be addressed.
 
+### EEPROM on tinyAVR may read incorrectly on first read after reset
+We have several reports of this. Behavior intermittent, and reading from a recently updated cell will occasionally produce wrong results. For all three individuals who encountered this, it vanished without a trace after reproducing repeatedly. I saw it with my own eyes, and then without changing the code, I could no longer trigger it. This is very mysterious.
+
 ### EEPROM endurance
 The EEPROM write endurance is not infinite. The headline spec for all parts supported by this library is 100,000 writes (compared to 10,000 for the flash). For the DB-series a second figure is given, the number of "erase/write cycles before refresh" whatever the heck that means. It's spec'ed at 1 million minimum, typical 4 million. I'm not sure how to reconcile those two numbers and there is no description of how N<sub>D_REF</sub> differs from E<sub>D</sub>.
 
