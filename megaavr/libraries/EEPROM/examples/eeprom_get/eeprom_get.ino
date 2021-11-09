@@ -1,19 +1,18 @@
-/***
-    eeprom_get example.
-
-    This shows how to use the EEPROM.get() method.
-
-    To pre-set the EEPROM data, run the example sketch eeprom_put.
-    This sketch will run without it, however, the values shown
-    will be shown from what ever is already on the EEPROM.
-
-    This may cause the serial object to print out a large string
-    of garbage if there is no null character inside one of the strings
-    loaded.
-
-    Written by Christopher Andrews 2015
-    Released under MIT licence.
-***/
+/* eeprom_get example.
+ *
+ * This shows how to use the EEPROM.get() method.
+ *
+ * To pre-set the EEPROM data, run the example sketch eeprom_put.
+ * This sketch will run without it, however, the values shown
+ * will be shown from what ever is already on the EEPROM.
+ *
+ * This may cause the serial object to print out a large string
+ * of garbage if there is no null character inside one of the strings
+ * loaded.
+ *
+ * Written by Christopher Andrews 2015
+ * Released under MIT licence.
+ */
 
 #include <EEPROM.h>
 
@@ -30,15 +29,15 @@ void setup() {
   EEPROM.get(eeAddress, f);
   Serial.println(f, 3);    //This may print 'ovf, nan' if the data inside the EEPROM is not a valid float.
 
-  /***
-    As get also returns a reference to 'f', you can use it inline.
-    E.g: Serial.print( EEPROM.get( eeAddress, f ) );
-  ***/
+  /*
+   * As get also returns a reference to 'f', you can use it inline.
+   * E.g: Serial.print( EEPROM.get( eeAddress, f ) );
+   */
 
-  /***
-    Get can be used with custom structures too.
-    I have separated this into an extra function.
-  ***/
+  /*
+   * Get can be used with custom structures too.
+   * I have separated this into an extra function.
+   */
 
   secondTest(); //Run the next test.
 }
@@ -62,5 +61,5 @@ void secondTest() {
 }
 
 void loop() {
-  /* Empty loop */
+  /* Empty loop  */
 }
