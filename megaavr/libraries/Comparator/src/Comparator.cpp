@@ -1,3 +1,4 @@
+//*INDENT-OFF* formatting checker doesn't like all the indentation...
 #include "Comparator.h"
 #include "Arduino.h"
 
@@ -27,30 +28,31 @@
 #elif defined(AC0_AC_vect)
   static volatile voidFuncPtr intFuncAC[1];
 #else
-  #error target does not have an analog comparator!
+  #error "Unsupported part? This device does not have an analog comparator!"
 #endif
 
-/* A few notes on adaptations for megaTinyCore
+/* A few notes on adaptations for megaTinyCore/DxCore
   1. There are two definitions for the comparator objects, one with negative and
   positive inputs 0, used for 8-pin and 0-series parts, and the other with all
   of them. 0-series parts have small flash, and 8-pin parts have small flash, so
   the small amount of flash this saves is worthwhile (you don't just get back
   the flash the constructor above eats; there's also the if/elseif chain below)
-  2. Atmel and Microchip are at it again with dartboards, monkeys and feature
-  lists. Though broadly similar, the devils are in the details, and there seem
-  to be a considerable population of them here. Every series is rather different from the others.
+  2. Atmel/Microchip are at it again with dartboards and register names.
+  Though broadly similar, the devils are in the details, and there seem to be a
+  considerable population of them here considering the small surface area. Every
+  series is rather different from the others.
   3. Inversion may be desired even when just using a as an event source, with no
-  pin output.... Currently no way to do this!
-  4. All this, and no wrapper around getting the current status?
-  I added a value() method that returns a boolean indicating the state, just
-  because it seemed weird to have wrappers around everything else but not that.
+  pin output -> disable_invert
+  4. Added read() method to get current state.
   5. Added optional (defaults to false) argument to stop(), if true, it re-enables
-  the digital input buffers on the pins that were used. Doesn't take up any
-  space if not used thanks to LTO.
+  the digital input buffers on the pins that were used.
+  6. 11/21: cleaned up a few places where we did R/M/W instead of write.
+  7. Windowed mode and LPMODE are not supported. Windowed mode is not worth it
+  LPMODE might be?
+  8. Needs a way to disable defining the ISRs, ISR that calls a function = bloat.
 */
 
 
-//*INDENT-OFF* formatting checker doesn't like all the indentation...
 #if (MEGATINYCORE_SERIES > 0) && defined(PORTB)
 AnalogComparator::AnalogComparator(
                                    const uint8_t comp_number,
@@ -87,28 +89,28 @@ AnalogComparator::AnalogComparator(
 
 
 void AnalogComparator::init() {
-  // Set voltage reference]
+  // Set voltage reference
   if (reference != ref::disable) {
     if (comparator_number == 0) {
-
       #if defined(VREF_AC0REFEN_bm)
       /* 0/1-series and 2-series name it differently
-         See, on the 0-series, where there's nothing like a DAC, still called
-         DAC0REF. But on 2-series, where there's a DACREF for AC0, this is
-         called AC0REF. Totally reasonable bitfield naming right? */
-        VREF.CTRLA  = reference; /* otherwise empty register */
+         See, on the 0-series, the bitfield is named DAC0REFEN, like 1-series
+         Even if there is no DAC and no DACREF.
+         But on 2-series, where there's a DACREF for AC0, but no proper DAC
+         this is called AC0REF. Totally reasonable bitfield naming right? */
+        VREF.CTRLA  = reference; /* otherwise empty register on 2-series*/
         VREF.CTRLB |= VREF_AC0REFEN_bm;
         AC.DACREF = dacref;
       #else
         VREF.CTRLA  = (VREF.CTRLA & 0xF8) | reference; /* shared with ADC0 reference */
         #ifdef DAC0
           VREF.CTRLB |= VREF_DAC0REFEN_bm;
-          DAC0.CTRLA |= DAC_ENABLE_bm;
+          DAC0.CTRLA |= DAC_ENABLE_bm; /* Shared with the actual DAC */
           DAC0.DATA   = dacref;
         #endif
       #endif
     #if defined (AC1)
-      } else if (comparator_number == 1) { // Everything with AC1 and AC2 has the DAC.
+      } else if (comparator_number == 1) { // all tinyAVR with AC1 and AC2 has the DACREF as DACn, not ACn.DACREF.
         VREF.CTRLC  = (VREF.CTRLC & 0xF8) | reference; /* shared with ADC1 reference */
         VREF.CTRLB |= VREF_DAC1REFEN_bm;
         DAC1.CTRLA |= DAC_ENABLE_bm;
@@ -181,24 +183,6 @@ void AnalogComparator::init() {
     #endif
   #endif
   AC.MUXCTRLA = (input_p << 3) | input_n | (output & 0x80);
-  /* Huh! Okay then.... apparently when you enable output, it takes over the direction control too, so no need to do this!
-  // Set output
-  if (output != out::disable) { //either enable or invert
-    // Prepare for output pin config (now only executed if output is requested on pin, though it only buys speed not code size -SK)
-    #ifdef AC1
-      PORT_t &output_port = (comparator_number == 0) ? PORTA : PORTB;
-      uint8_t pin_number = (comparator_number == 0) ? PIN5_bm : ((comparator_number == 1) ? PIN3_bm : PIN2_bm);
-    #else //Don't test which AC it is if we only have one
-      PORT_t &output_port = PORTA;
-      #ifndef PORTB
-        uint8_t pin_number = PIN3_bm;
-      #else
-        uint8_t pin_number = PIN5_bm;
-      #endif
-    #endif
-    output_port.DIRSET =  pin_number;
-  }
-  */
 
   // Set hysteresis, and output,
   AC.CTRLA = (AC.CTRLA & ~(AC_HYSMODE_gm | AC_OUTEN_bm)) | hysteresis | (output & 0x40);
@@ -216,30 +200,29 @@ void AnalogComparator::stop(bool restore) {
   start(false);
   if (restore) {
     // reset inputs
-
     if (input_p == in_p::in0) {
-      IN0_P &= ~PORT_ISC_gm;
+      IN0_P = 0;
     }
     #if (MEGATINYCORE_SERIES > 0) && defined(PORTB)
       else if (input_p == in_p::in1) {
-        IN1_P &= ~PORT_ISC_gm;
+        IN1_P = 0;
       } else if (input_p == in_p::in2) {
-        IN2_P &= ~PORT_ISC_gm;
+        IN2_P = 0;
       } else if (input_p == in_p::in3) {
-        IN3_P &= ~PORT_ISC_gm;
+        IN3_P = 0;
       }
     #endif
 
     if (input_n == in_n::in0) {
-      IN0_N &= ~PORT_ISC_gm;
+      IN0_N = 0;
     }
     #if (MEGATINYCORE_SERIES > 0) && defined(PORTB)
       else if (input_n == in_n::in1) {
-        IN1_N &= ~PORT_ISC_gm;
+        IN1_N = 0;
       }
       #if (MEGATINYCORE_SERIES == 2)
         else if (input_n == in_n::in2) {
-          IN2_N &= ~PORT_ISC_gm;
+          IN2_N = 0;
         }
       #endif
     #endif
@@ -247,6 +230,7 @@ void AnalogComparator::stop(bool restore) {
 }
 
 void AnalogComparator::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
+  #if !defined(DXCORE)
   AC_INTMODE_t intmode;
   switch (mode) {
     // Set RISING, FALLING or CHANGE interrupt trigger for the comparator output
@@ -263,13 +247,35 @@ void AnalogComparator::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
       // Only RISING, FALLING and CHANGE is supported
       return;
   }
-
+  #else
+  AC_INTMODE_NORMAL_t intmode;
+  switch (mode) {
+    // Set RISING, FALLING or CHANGE interrupt trigger for the comparator output
+    case RISING:
+      intmode = (AC_INTMODE_NORMAL_t)AC_INTMODE_NORMAL_POSEDGE_gc;
+      break;
+    case FALLING:
+      intmode = (AC_INTMODE_NORMAL_t)AC_INTMODE_NORMAL_NEGEDGE_gc;
+      break;
+    case CHANGE:
+      intmode = (AC_INTMODE_NORMAL_t)AC_INTMODE_NORMAL_BOTHEDGE_gc;
+      break;
+    default:
+      // Only RISING, FALLING and CHANGE is supported
+      return;
+  }
+  #endif
   // Store function pointer
   intFuncAC[comparator_number] = userFunc;
 
+
   // Set interrupt trigger and enable interrupt
-  AC.CTRLA = (AC.CTRLA & ~AC_INTMODE_gm) | intmode ;
+  #ifdef !defined(DXCORE)
+  AC.CTRLA = (AC.CTRLA & ~AC_INTMODE_gm) | intmode;
   AC.INTCTRL = AC_CMP_bm;
+  #else
+  AC.INTCTRL = intmode | AC_CMP_bm;
+  #endif
 }
 
 void AnalogComparator::detachInterrupt() {
