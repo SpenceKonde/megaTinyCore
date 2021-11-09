@@ -45,7 +45,7 @@ void loop() {
 
   addr = addr + 1;
   if (addr == EEPROM.length()) { // Okay, we've written gibberish over the entire EEPROM
-    while(1); // Wait forever - no need to sit there wasting rewrite longevity.
+    while (1); // Wait forever - no need to sit there wasting rewrite longevity.
   }
 
   /* As the EEPROM sizes are powers of two, wrapping (preventing overflow) of an
