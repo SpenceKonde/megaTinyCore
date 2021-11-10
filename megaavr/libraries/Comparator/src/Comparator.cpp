@@ -58,16 +58,16 @@ AltOUT |  PIN_PC6* |  PIN_PC6* |  PIN_PC6* |   n/a    | PIN_PC6* | PIN_PC6* |   
     AnalogComparator    Comparator0(0, AC0, PORTD.PIN2CTRL, PORTD.PIN4CTRL, PORTD.PIN6CTRL, PORTD.PIN1CTRL,                 PORTD.PIN3CTRL, PORTD.PIN5CTRL, PORTD.PIN7CTRL);
   #endif
 /* Now for the tinyAVR parts
-|  PIN  |  8-pin  |0/1-ser AC0| 2-ser AC0 | 1+ser AC0 | 1+ser AC1 | 1+ser AC2 |
-|-------|---------|-----------|-----------|-----------|-----------|-----------|
-|IN P0  | PIN_PA7 |  PIN_PA7  |  PIN_PA7  |  PIN_PA7  |  PIN_PA7  |  PIN_PA6  |
-|IN P1  |   n/a   |  PIN_PB5* |  PIN_PB5* |  PIN_PB5* |  PIN_PB6* |  PIN_PB0  |
-|IN P2  |   n/a   |    n/a    |  PIN_PB1  |  PIN_PB1  |  PIN_PB0  |  PIN_PB5* |
-|IN P3  |   n/a   |    n/a    |  PIN_PB6* |  PIN_PB6* |  PIN_PB4* |  PIN_PB7* |
-|IN N0  | PIN_PA6 |  PIN_PA6  |  PIN_PA6  |  PIN_PA6  |  PIN_PA5  |  PIN_PA7  |
-|IN N1  |   n/a   |  PIN_PB4* |  PIN_PB4* |  PIN_PB4* |  PIN_PB7* |  PIN_PB6* |
-|IN N2  |   n/a   |    n/a    |  PIN_PB0  |    n/a    |    n/a    |    n/a    |
-|OUT    | PIN_PA3 |  PIN_PA5  |  PIN_PA5  |  PIN_PA5  |  PIN_PB3  |  PIN_PB2  |
+|  PIN  |  8-pin  |0/1-series AC0|2-series AC0|1+series AC0|1+series AC1|1+series AC2|
+|-------|---------|--------------|------------|------------|------------|------------|
+|IN P0  | PIN_PA7 |     PIN_PA7  |   PIN_PA7  |   PIN_PA7  |   PIN_PA7  |   PIN_PA6  |
+|IN P1  |   n/a   |     PIN_PB5* |   PIN_PB5* |   PIN_PB5* |   PIN_PB6* |   PIN_PB0  |
+|IN P2  |   n/a   |       n/a    |   PIN_PB1  |   PIN_PB1  |   PIN_PB0  |   PIN_PB5* |
+|IN P3  |   n/a   |       n/a    |   PIN_PB6* |   PIN_PB6* |   PIN_PB4* |   PIN_PB7* |
+|IN N0  | PIN_PA6 |     PIN_PA6  |   PIN_PA6  |   PIN_PA6  |   PIN_PA5  |   PIN_PA7  |
+|IN N1  |   n/a   |     PIN_PB4* |   PIN_PB4* |   PIN_PB4* |   PIN_PB7* |   PIN_PB6* |
+|IN N2  |   n/a   |       n/a    |   PIN_PB0  |     n/a    |     n/a    |     n/a    |
+|OUT    | PIN_PA3 |     PIN_PA5  |   PIN_PA5  |   PIN_PA5  |   PIN_PB3  |   PIN_PB2  |
 */
 #elif defined(ANALOG_COMP_PINS_TINY_FEW)
   /* P0, N0 */

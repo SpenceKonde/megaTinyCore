@@ -7,21 +7,21 @@ The tinyAVR 0-series, 2-series, and 1-series parts with less than 16k of flash h
 ## Basics
 An analog comparator, as the name implies, compares two analog voltages. If the "positive" input is higher than the "negative" one, the output is 1/HIGH, otherwise it is low. These can be configured to invert their value, and the output pins themselves can be inverted if desired (this library does not do that for you though - you want the builtin pinConfigure() for that)
 
-Use the predefined object(s) `Comparator` or `Comparator0` and for parts that have them, `Comparator1` or `Comparator2`. (`Comparator` is #defined as `Comparator0` for code compatibility between single and multiple comparator parts. **Only the ATtiny3216, 3217, 1614, 1616, and 1617 have three comparators - They use the 1+ser columns below**. All other parts including smaller 1-series use the 0/1-ser column
+Use the predefined object(s) `Comparator` or `Comparator0` and for parts that have them, `Comparator1` or `Comparator2`. (`Comparator` is #defined as `Comparator0` for code compatibility between single and multiple comparator parts. **Only the ATtiny3216, 3217, 1614, 1616, and 1617 have three comparators - They use the 1+series columns below**. All other parts including smaller 1-series use the 0/1-series column
 
 ## Pin Assignments
 These options are radically different between the "lesser" 1-series parts - those with 2k, 4k, or 8k of flash, and the "golden" 1-series or 1+series parts, those with 16k or more. The parts where there is one positive pin that can be used by multiple parts are probably meant for use with the optional windowed mode which this library does not support. Note also that for AC0, the same pins (where supported) are used across the whole product line - though "golden" 1-series and 2-series parts have some extra options, which will likey carry over to the 3-series. Assuming they continue with tinyAVR as opposed to flushing it and replacing with low-pin-count parts in the flagship lines, like the DD-series which (if it ever comes out) will be available in a 14 or 20 pin package.
 
-|  PIN  |  8-pin  |0/1-ser AC0| 2-ser AC0 | 1+ser AC0 | 1+ser AC1 | 1+ser AC2 |
-|-------|---------|-----------|-----------|-----------|-----------|-----------|
-|IN P0  | PIN_PA7 |  PIN_PA7  |  PIN_PA7  |  PIN_PA7  |  PIN_PA7  |  PIN_PA6  |
-|IN P1  |   n/a   |  PIN_PB5* |  PIN_PB5* |  PIN_PB5* |  PIN_PB6* |  PIN_PB0  |
-|IN P2  |   n/a   |    n/a    |  PIN_PB1  |  PIN_PB1  |  PIN_PB0  |  PIN_PB5* |
-|IN P3  |   n/a   |    n/a    |  PIN_PB6* |  PIN_PB6* |  PIN_PB4* |  PIN_PB7* |
-|IN N0  | PIN_PA6 |  PIN_PA6  |  PIN_PA6  |  PIN_PA6  |  PIN_PA5  |  PIN_PA7  |
-|IN N1  |   n/a   |  PIN_PB4* |  PIN_PB4* |  PIN_PB4* |  PIN_PB7* |  PIN_PB6* |
-|IN N2  |   n/a   |    n/a    |  PIN_PB0  |    n/a    |    n/a    |    n/a    |
-|OUT    | PIN_PA3 |  PIN_PA5  |  PIN_PA5  |  PIN_PA5  |  PIN_PB3  |  PIN_PB2  |
+|  PIN  |  8-pin  |0/1-series AC0|2-series AC0|1+series AC0|1+series AC1|1+series AC2|
+|-------|---------|--------------|------------|------------|------------|------------|
+|IN P0  | PIN_PA7 |     PIN_PA7  |   PIN_PA7  |   PIN_PA7  |   PIN_PA7  |   PIN_PA6  |
+|IN P1  |   n/a   |     PIN_PB5* |   PIN_PB5* |   PIN_PB5* |   PIN_PB6* |   PIN_PB0  |
+|IN P2  |   n/a   |       n/a    |   PIN_PB1  |   PIN_PB1  |   PIN_PB0  |   PIN_PB5* |
+|IN P3  |   n/a   |       n/a    |   PIN_PB6* |   PIN_PB6* |   PIN_PB4* |   PIN_PB7* |
+|IN N0  | PIN_PA6 |     PIN_PA6  |   PIN_PA6  |   PIN_PA6  |   PIN_PA5  |   PIN_PA7  |
+|IN N1  |   n/a   |     PIN_PB4* |   PIN_PB4* |   PIN_PB4* |   PIN_PB7* |   PIN_PB6* |
+|IN N2  |   n/a   |       n/a    |   PIN_PB0  |     n/a    |     n/a    |     n/a    |
+|OUT    | PIN_PA3 |     PIN_PA5  |   PIN_PA5  |   PIN_PA5  |   PIN_PB3  |   PIN_PB2  |
 
 `*` indicates that this pin is not present on all pincounts. PB4 and PB5 are only found in 20 and 24 pin parts, and PB6 and PB7 are exclusive to the 24-pin parts. These are only valid inputs for parts on which they exist
 
@@ -29,7 +29,7 @@ These options are radically different between the "lesser" 1-series parts - thos
 There are several things that may be surprising about this peripheral and the wrapper this class provides.
 
 ### Regarding input pins
-In accordance with the recomendations of Microchip from the datasheet, we disable the digital input for all pins used by the analog comparator through the PINnCTRL register; this is done when `init()` is called. digitalRead() will always return `LOW` on these pins. When the `stop()` method is called, these pins will remain off until manually reconfigured, unless told to restore them via `stop(true)`. You can call `stop(true)` even if the comparator is not currently enabled, but has been initialized. This may be useful if you have been using it with one set of pins.
+In accordance with the recommendations of Microchip from the datasheet, we disable the digital input for all pins used by the analog comparator through the PINnCTRL register; this is done when `init()` is called. digitalRead() will always return `LOW` on these pins. When the `stop()` method is called, these pins will remain off until manually reconfigured, unless told to restore them via `stop(true)`. You can call `stop(true)` even if the comparator is not currently enabled, but has been initialized. This may be useful if you have been using it with one set of pins.
 
 When the PINnCTRL register is modified by the class at any point, any other configuration (input level on DB/DD, inversion, and internal pullup) will be returned to the default values. You likely don't want any of those options while using the analog comparator anyway. The pullup will throw off the reading (and is not of a tightly controlled strength, so you can't use it as part of a resistor divider), and as these pins will have analog voltages likely between the input high and low thresholds applied to them, leaving the digital input enabled will increase power consumption.
 
@@ -97,7 +97,7 @@ ref::vref_0v55;   // 0.55V internal reference
 ref::vref_1v1;    // 1.1V internal reference
 ref::vref_1v5;    // 1.5V internal reference
 ref::vref_2v5;    // 2.5V internal reference
-ref::vref_4v34;   // 4.34V internal referenc
+ref::vref_4v34;   // 4.34V internal reference
 ref::vref_2v500;  // 2.5V internal reference (compatibility)
 ```
 
@@ -179,11 +179,10 @@ PORTA.PIN5CTRL = PORT_INVEN_bm;         // Invert PA5
 // Now, PIN_PA5 will provide non-inverted output, while Comparator.read() and the event outputs provides inverted output.
 ```
 
-```
-| AC# | AC0 | AC1 | AC2 | AC0 on 8-pin parts |
+|     | AC0 | AC1 | AC2 | AC0 on 8-pin parts |
 |-----|-----|-----|-----|--------------------|
 | PIN | PA5 | PB3 | PB2 |         PA3        |
-```
+
 
 #### Usage
 ``` c++
@@ -194,11 +193,11 @@ Comparator.output = out::enable; // Enable output comparator's output pin. Compa
 `Comparator.output` defaults to `out::disable` if not specified in the user program.
 
 ### output_swap
-Variable for pin swapping the physical output pin to its alternative position, if available. There is only an alternate pin available to Dx/Ex-series on parts with at least 48 pins and is not available on megaAVR 0-series, or any tinyAVR parts.
+Variable for pin swapping the physical output pin to its alternative position, if available. There is only an alternate pin available on Dx/Ex-series on parts with at least 48 pins and is **not available on megaAVR 0-series, or any tinyAVR parts**.
 Accepted values:
 ```c++
 out::no_swap;  // Use default pin position
-out::pin_swap; // Use alternative position (48 and 64-pin parts only)
+out::pin_swap; // Use alternative position - this option is only available for Dx and Ex parts with at least 48 pins.
 ```
 
 #### Usage
@@ -267,11 +266,11 @@ This method stops the analog comparator. You may optionally pass a boolean value
 
 #### Usage
 ```c++
-Comparator.stop(); // Stop comparator. Will not reenable digital input, and digitalRead() of the input pins will return 0 regardless of the voltage on the pin
+Comparator.stop(); // Stop comparator. Will not re-enable digital input, and digitalRead() of the input pins will return 0 regardless of the voltage on the pin
 ```
 
 ```c++
-Comparator.stop(true); // Stop comparator. Digital input on the pins that this comparator was using will be reenabled.
+Comparator.stop(true); // Stop comparator. Digital input on the pins that this comparator was using will be re-enabled.
 ```
 
 ### read()

@@ -12,9 +12,9 @@
     of objects with alignment greater than __STDCPP_DEFAULT_NEW_ALIGNMENT__.
     This has two major differences from the C++14 sized deallocaton.
     1. It cannot be simply ignored - they presumably wanted alignment for
-    a reason; this implentation is not impossible, but nor is it trivial.
+    a reason; this implementation is not impossible, but nor is it trivial.
     2. If code used on C++14 or earlier is asking for the alignment aware
-    versions of these operators, either it doesn't actally need it and
+    versions of these operators, either it doesn't actually need it and
     shouldn't be, or it was sheer happenstance that whatver address it
     was getting worked within it's assumoptions.
   Unless and until official cores or other cores in widespread use add support

@@ -168,7 +168,7 @@ We have several reports of this. Behavior intermittent, and reading from a recen
 The EEPROM write endurance is not infinite. The headline spec for all parts supported by this library is 100,000 writes (compared to 10,000 for the flash). For the DB-series a second figure is given, the number of "erase/write cycles before refresh" whatever the heck that means. It's spec'ed at 1 million minimum, typical 4 million. I'm not sure how to reconcile those two numbers and there is no description of how N<sub>D_REF</sub> differs from E<sub>D</sub>.
 
 ### Writing to EEPROM from within an interrupt (ISR) can make millis lose time
-Writing to the EEPROM is very slow compared to basicaly anything else a microcontroller does, per the table above (the specifications are disturbingly vague for the Dx-series)
+Writing to the EEPROM is very slow compared to basically anything else a microcontroller does, per the table above (the specifications are disturbingly vague for the Dx-series)
 During an Interrupt Service Routine (ISR), like a function that is executed as a result of attachInterrupt(), or one defined with `ISR()`, all interrupts are disabled (unless one has been marked as priority level 1; the core does not ever do this by default). That includes the millis timekeeping interrupt... and leaving interrupts disabled for longer than (typically) 1ms will result in `millis()` and `micros()` losing time. This will never happen for a single isolated byte write, since the CPU is only halted if an attempt is made to write the EEPROM while another write is already in progress.
 
 #### On DxCore and with the current version

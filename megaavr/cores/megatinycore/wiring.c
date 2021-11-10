@@ -203,7 +203,7 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
  * Both of these cause severe breakage everywhere. The first type is simple to avoid, but if
  * missed can be more subtle, since it makes a big difference only if the byte where the read
  * was interrupted rolled over. The second type is more obvious, potentially happening on every timer
- * overflow, instead of just every 256th timer overflow, and when it does happen, anyting waiting
+ * overflow, instead of just every 256th timer overflow, and when it does happen, anything waiting
  * for a specific number of microseconds to pass that gets that value will do so.
  * Though (see delay below) each incidence only short-circuits one ms of delay(), not the whole
  * thing.
@@ -320,7 +320,7 @@ unsigned long millis() {
       // ticks is 0 ~ F_CPU/2000 except at 1 MHz where it's 0 ~ 1000.
       // we shift 1, 2, 3, or 4 times it to the right ball park
       // I may have missed some optimziations here.
-      // Note thst you want to alternate addition and subtraction to suppress noise.
+      // Note that you want to alternate addition and subtraction to suppress noise.
       /* multiples of 5 */
       #if (F_CPU == 28000000UL)
         ticks = ticks >> 4;
@@ -426,7 +426,7 @@ unsigned long millis() {
 #else
   /* Uses should not call millis() or micros() if the core timekeeping has been disabled. Usually, encountering this error either means
    * that they disabled millis earlier for some other sketch, and the preferences were saved with that - or that they are using a library
-   * with a dependance on the timekeeping facilities. Sometimes these are meaningful, other times it is only for a feature that isn't
+   * with a dependence on the timekeeping facilities. Sometimes these are meaningful, other times it is only for a feature that isn't
    * being used, or to catch a particular corner case (see: tinyNeoPixel, very end of show() for an example).
    * As of 2.4.3 we provide the stubs below, which we hope is more useful than being told that millis or micros isn't defined.
    */
