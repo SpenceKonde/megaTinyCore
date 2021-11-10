@@ -22,7 +22,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Correct SYSCFG0 fuse settings when burning bootloader for 2-series parts - they default the reserved bits to 1 not 0, and worse still, setting themto 0 enables a mode we probaby don't want.
 * Stop clearing fuse 4 by writing the default values for TCD0 on a 1-series. Now, with great difficulty, we only set that on parts that actually have the type D timer in order to keep our promise of burn bootloader restoring the chip to a fully known state. (well, except for the user row, and EEPROM if you've got it set to retain).
 * Fix theoretical EEPROM.h bug inherited from avr-libc, and keep millis() from losing time when writing more than one byte at a time; update and harmonize with DxCore.
-* Tiny optimization in Comparator.h
+* Harmonize Comparator.h with DxCore.
 * Fix 402 with bad signature support.
 * Fix names of .lst and .map
 
