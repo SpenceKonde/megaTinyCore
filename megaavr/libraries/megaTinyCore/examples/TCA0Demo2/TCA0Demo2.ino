@@ -10,7 +10,7 @@
   #error "This sketch takes over TCA0, don't use for millis here.  Pin mappings on 8-pin parts are different"
 #endif
 
-unsigned int Period=0xFFFF;
+unsigned int Period = 0xFFFF;
 
 void setup() {                // We will be outputting PWM on PB0
   pinMode(PIN_PB0, OUTPUT);   // PB0 - TCA0 WO0, pin7 on 14-pin parts
@@ -32,7 +32,7 @@ void loop() {
   PWMDemo(13);      // 13Hz
 }
 
-void PWMDemo(unsigned long frequency){
+void PWMDemo(unsigned long frequency) {
   setFrequency(frequency);
   setDutyCycle(64); // ~25%
   delay(4000);
