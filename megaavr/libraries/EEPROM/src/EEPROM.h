@@ -68,15 +68,15 @@ struct EERef {
       "andi r18, 3"       "\n\t" // if NVMCTRL is busy....
       "brne .-6"          "\n\t" // repeat until it's not.
       "cli"               "\n\t" // disable interrupts. 3 clock window during which an interrupt couldstart write since we checked
-                                 // but this just means millis will lose time - nvmctrl halts CPU to finish last write
+      //                            but this just means millis will lose time - nvmctrl halts CPU to finish last write
       "st X, %0"          "\n\t" // write the value we were passed
       "ldi %0, 0x9D"      "\n\t" // CCP signature loaded in it's place
       "out 0x34, %0"      "\n\t" // protection enabled
       "ldi %0, 0x03"      "\n\t" // command loaded: page erase-write.
       "st Z, %0"          "\n\t" // write the page erase-write command to nvmctrl.ctrla
       "out 0x3f, r0"      "\n"   // restore SREG
-      :"+d" (in)          // take the value we are writing in any upper register as read/write,
-      : "x" (adr)         // and the address (not the index) in X
+      :"+d"(in)           // take the value we are writing in any upper register as read/write,
+      : "x"(adr)          // and the address (not the index) in X
       : "r30", "r31", "r18");      // clobber Z and r18. We needed an upper register for the temporary value to andi it. I wonder if this will fix the eeprom bugs too?
     return *this;
     #else
