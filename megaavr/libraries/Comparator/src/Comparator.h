@@ -300,6 +300,9 @@ class AnalogComparator {
         return !!(AC.STATUS & AC_STATE_bm);
       #endif
     }
+    AC_t& getPeripheral() {
+      return AC;
+    }
 
     out::output_t      output         = out::disable;
     #if defined(DXCORE)

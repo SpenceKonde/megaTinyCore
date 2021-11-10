@@ -307,3 +307,19 @@ Method for disabling analog comparator interrupt.
 ```c++
 Comparator.detachInterrupt(); // Disable interrupt
 ```
+
+### getPeripheral()
+This method simply returns a reference to the analog comparator struct which it is using. Since there is a fixed correspondence between the pre-defined objects and the peripheral struct, this is rarely necessary - in this example you could have just written to AC0.CTRLA - but what if you're writing a library where you ask the user to pass you a reference to the configured Comparator (ie, you're making a "friendly" library that's meant for people using this library, or because you're trying to support a variety of parts, and don't want to have to write 4 implementations just to configure the reference and turn on a comparator - like this library does. For such a simple peripheral, there sure have been a lot of changes since the first modern AVRs.), and within the library, you need to do something to it that requires the actual registers.
+
+#### Usage
+```c++
+/* This only makes sense if you assume that this is executing in a context where
+ * MyComparator was passed as a reference, so this code has no idea whether
+ * it's Comparator0 or Comparator2 or Comparator6 on some future part with
+ * way too many comparators */
+MyComparator.init(); //initialize the comparator - let's assume it was configured a few lines before this example begins.
+AC_t& AC_struct = MyComparator.getPeripheral(); // Grab the ACn struct - AC0, AC1, AC2, etc.
+AC_struct.CTRLA |= AC_LPMODE_bm | AC_RUNSTBY_bm // Reduce power consumption at expense of response time and leave on in standby
+MyComparator.start();   // Enable the comparator
+enterStandbySleep();  // enter standby sleep mode until the comparator interrupt fires, waking it up.
+```
