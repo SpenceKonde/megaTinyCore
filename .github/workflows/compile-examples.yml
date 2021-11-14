@@ -37,7 +37,9 @@ jobs:
         - megaavr/libraries/Wire/examples/SFRRanger_reader
         - megaavr/libraries/tinyNeoPixel/examples/RGBWstrandtest
         - megaavr/extras/CompileTestSketches/test_analog_read
-        - megaavr/libraries/Wire/examples/DualAddress
+        - megaavr/libraries/Wire/examples/slave_secondary_address
+        - megaavr/libraries/Wire/examples/slave_address_mask
+        - megaavr/libraries/Wire/examples/master_multi_address_write
       available-flash-4kB-plus-true-sketch-paths: |
         - megaavr/libraries/SoftwareSerial/examples/SoftwareSerialExample
         - megaavr/libraries/Wire/examples/master_reader
@@ -49,8 +51,11 @@ jobs:
         - megaavr/libraries/USERSIG/examples/usersig_put
         - megaavr/libraries/USERSIG/examples/usersig_read
         - megaavr/libraries/Wire/examples/digital_potentiometer
-        - megaavr/libraries/Wire/examples/master_writer
-        - megaavr/libraries/Wire/examples/slave_receiver
+        - megaavr/libraries/Wire/examples/master_write
+        - megaavr/libraries/Wire/examples/slave_read
+        - megaavr/libraries/Wire/examples/slave_write
+        - megaavr/libraries/Wire/examples/master_read
+        - megaavr/libraries/Wire/examples/slave_dual_address
         - megaavr/libraries/megaTinyCore/examples/ModernRevSer
         - megaavr/libraries/megaTinyCore/examples/readTempVcc
         - megaavr/libraries/tinyNeoPixel/examples/buttoncycler

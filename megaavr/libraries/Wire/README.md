@@ -4,8 +4,6 @@ All of these parts have a single I2C/TWI module, and Wire.h provides the usual A
 ## NEW in 2.4.3 - totally rewritten Wire library thanks to @MX682X
 Should be 100% API compatible, use less flash, and have a new menu option to enable both master AND slave instead of the usual master OR slave. This uses the same pair of pins (this is termed "multimaster mode" in the 'biz). Enabling increases binary size, and allocates another buffer for data (out of RAM), snd being the less common use case, we choose to default to the more efficient implementation in light the stringent constraints on these parts.
 
-
-
 ## Pin Mappings
 On the 1-series parts with more than 8 pins, an alternat pin mapping is available; this is configured using the Wire.swap() or Wire.pins() methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This should be called **before** Wire.begin().
 
@@ -23,10 +21,14 @@ On the 1-series parts with more than 8 pins, an alternat pin mapping is availabl
 There are no alternate TWI pin mapping options for the 0-series or 2-series devices.
 
 ## Pullups
-The I2C standard absolutely does require external pullups. The fact that I2C ever works with just the internal pullups is somewhat surprising - but the protocol is designed to be resiliant to mildly adverse hardware conditions. However, as wires get longer and/or slave devices more numerous, the bus capacitance increases and the internal pullups will no longer be sufficient for proper functioning. By popular demand we have added a method to enable the pullups; we suggest using this only as a debugging aid: *if this fixes any problems, you should install external pullup resistors* (in the absence of other devices on the bus having their own pullups breakout boards often do), 4.7k is a good default value for standard speed I2C). After selecting the desired pin mapping (if not the default) call:
+The I2C standard absolutely does require external pullups. The fact that I2C ever works with just the internal pullups is somewhat surprising - but the protocol is designed to be resiliant to mildly adverse hardware conditions. However, as wires get longer and/or slave devices more numerous, the bus capacitance increases and the internal pullups will no longer be sufficient for proper functioning. By popular demand we have added a method to enable the pullups; we suggest using this only as a debugging aid: *if this fixes any problems, you should install external pullup resistors* (in the absence of other devices on the bus having their own pullups breakout boards often do), **4.7k is a good default value** for standard speed I2C). After selecting the desired pin mapping (if not the default) call:
 ```c
 Wire.usePullups();
 ```
+
+## Valid Addresses
+Addresses are 7 bits - 8 bits are sent, and the least significant one indicates if it's a read or write operation. This leaves 128 addresses, however, some of them are "reserved", and have a special semantic meaning in I2C and I2C-compatible protocols.
+
 
 ## Wire.setClock()
 `Wire.setClock()` is not exact (nor is it on the official core). The clock speed always depends on network conditions - the baud generator adapts to electrical conditions, particularly the rise time of the SCL and SDA line. `Wire.setClock()` must be called after `Wire.begin()`, and will briefly disable the TWI interface to make the necessary changes. It will handle the `FMPEN` bit to enable "Fast Mode Plus" for speeds in excess of 400 kHz.
@@ -39,13 +41,16 @@ In slave mode, it is  possible to respond to the general call (0x00) address as 
 Wire.begin(uint8_t address, bool receive_broadcast, uint8_t second_address)
 ```
 
-If the slave is configured to accept more than one address, it will often be critical to know which one it is responding to. This has been the case since the above features were added, but will be addressed in 2.3.4:
+If the slave is configured to accept more than one address, it will often be critical to know which one it is responding to. This has been the case since the above features were added, but is addressed in 2.4.3
 ```c
 uint8_t addr = Wire.getIncomingAddress(); // Returns incoming address in slave mode, currently as 8-bit address (leftshifted one plqace). This may bne changed to 7-bit before the release.
 ```
 
 ## Master/Slave mode
 As of 2.4.3, we support operating as master and slave on the same pins (sometimes called a multi-master configuration). To make use of this, you must choose the appropriate option from the `Tools -> TWI (I2C/Wire.h) Options` menu. If "Msater and slave" is selected, flash and RAM use is higher, but you will be able to use both master and slave mode simultaneously. On the tinyAVR parts, there is no "dual mode", a feature of "full size" modern AVRs whereby the slave operation can be moved to a second pair of pins; thus the I2C bus will be conncted to this part plus it's master and it's slave (and potentially several of either or both). Take particular care with voltage levels to ensure that the pullups are connected to a voltage compatible with all three, and that no 5v devices on the bus have the pullups connected (they will work if the pullups are only connected to +3.3v). There is no special code needed - it simply permits you to start both master and slave modes and get working results.
+
+## Why are there so many names for this interface?
+Wire, TWI (Two Wire Interface), Two Wire, IIC, I2C, I<sup>2</sup>C... The reason for this is that I2C (and the explicitly formatted version of it, I<sup>2</sup>C) are trademarked by Phillips (now NXP) which has historically been very litigious, and would go after manufacturers of parts that didn't pay license fees. So devices that could communicate with and which were I2C in all but name proliferated. The last patent expired a while ago, but they still hold the trademarks, so other manufacturers persist in using their names. The actual terms described in the specification refer to all devices that "can" communicate with I2C devices, truly a ludacrisly expansive claim if taken literally, since any microcontroller with functional GPIO pins "could" communicate with an I2C device by bitbanging. In any event, Atmel always used TWI, and that tradition was not lost when Microchip purchased them. . So where did this name come from? IIC was apparently the inspiration: "Inter-Integrated Circuit".
 
 ## Errata warning
 All modern AVRs, since the release of the first tinyAVR 0/1-series, through the AVR DB-series, have always had a silicon bug relating to the TWI pins. When the TWI peripheral takes control of the SCL and SDA, it correctly controls their being an INPUT or OUTPUT - but it fails to also take over the output value... That means that if the PORTx.OUT bit is 1 for either of the pins, it would be trying to drive the line high instead of low, and the I2C bus would be non-functional. As of 2.2.6, we always clear those bits in begin(); this was not done on older versions. In any event, do not `digitalWrite()` either of the pins  `HIGH` or set their `pinMode()` to `INPUT_PULLUP` after calling `Wire.begin()`. Calling them before that is pointless too, since they will be superseded by begin(). If you want to enabler the internal pullups, use Wire.usePullups.
