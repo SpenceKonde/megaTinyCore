@@ -24,11 +24,6 @@
   Modified 2021 by MX682X for the Wire library rewriting project
 */
 
-
-
-
-
-
 #ifndef TWI_PINS_H
 #define TWI_PINS_H
 
@@ -37,32 +32,16 @@
 #include "avr/io.h"
 
 
-
-
-/**
- *@brief              TWI_MasterCalcBaud calculates the baud for the desired frequency
- *
- *                    Moved temporarily to twi_pins.h due to licensing reasons
- *                    Can be moved back into twi.c on merge to the DxCore and license adjustment
- *
- *@param              uint32_t frequency is the desired frequency
- *
- *@return             uint8_t
- *@retval             the desired baud value
- */
-uint8_t TWI_MasterCalcBaud(uint32_t frequency);
-
-
-void    TWI0_ClearPins();
-bool         TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin);
-bool         TWI0_swap(uint8_t state);
+void   TWI0_ClearPins();
+bool   TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin);
+bool   TWI0_swap(uint8_t state);
 void   TWI0_usePullups();
 
 
 #if defined (TWI1)
-  void    TWI1_ClearPins();
-  bool         TWI1_Pins(uint8_t sda_pin, uint8_t scl_pin);
-  bool         TWI1_swap(uint8_t state);
+  void   TWI1_ClearPins();
+  bool   TWI1_Pins(uint8_t sda_pin, uint8_t scl_pin);
+  bool   TWI1_swap(uint8_t state);
   void   TWI1_usePullups();
 #endif
 
