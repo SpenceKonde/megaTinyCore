@@ -70,7 +70,10 @@
                        off - will make it easier to move this to DxCore without breakage.
                        I think the cleanup more or less exactly got enough flash back that
                        the coverage of corner cases cost.
-2.4.0      S Konde     Spotted amd fixed a few improperly handled corner cases, and a lot of reorganization of questionable value.
+2.4.0      S Konde     Spotted amd fixed a few improperly handled corner cases, and a lot of
+                       reorganization of questionable value.
+2.4.3      S Konde      11/14/21 - Removed debug code which had not been disabled and would
+                       print garbage to the serial port.
 
   **********************************************************************************************************/
 /************************************************************************************************************
@@ -103,7 +106,7 @@ My tentative ruling is that:
     ground without looking at it). In that hypothetical library, one design decision would have to be how to deal with
     the most important part, that being turning the noisy thing off - basically, whether to implement multiTone() and
     noMultiTone(pin), or to have things like `toneTimerTCB0.tone()/toneTimerTCB0.noTone()`. I am inclined
-    to think the second approach is a more sound one. If anytone wants to write such a librarty, I'm haoppy to adcise
+    to think the second approach is a more sound one. If anytone wants to write such a librarty, I'm happy to advise
   B. For the default noTone() that does not involve a library, pin should he required. Arguanbly there should be two
     versions of it, with and without a pin argument, where the latter would shut down tone wherever it is.
     ************************************************************************************************************/
@@ -182,7 +185,7 @@ My tentative ruling is that:
      * being invalid to work with is NOT safe to assume on embedded
      * systems. */
 
-    Serial.println(frequency);
+    //Serial.println(frequency);
     long toggle_count;
     // Calculate the toggle count
     if (duration > 0) {    // Duration defined
@@ -229,8 +232,8 @@ My tentative ruling is that:
       // "tone", and they should be generating it through other means.
       compare_val = 0xFFFF; // do the best we can
     }
-    Serial.println(compare_val);
-    Serial.println(divisionfactor);
+    //Serial.println(compare_val);
+    //Serial.println(divisionfactor);
     // Anyway - so we know that the new pin is valid....
     if (_pin != pin) {  // ...let's see if we're using it already.
       if (_pin != NOT_A_PIN) { // If not - were we using one before?
