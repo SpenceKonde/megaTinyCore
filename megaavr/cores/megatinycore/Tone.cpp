@@ -18,7 +18,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-  -------- ----------- --------------------------------------------------------------------------------------
+  -------- ----------- -------- --------
    0001    B Hagman    09/08/02 Initial coding
    0002    B Hagman    09/08/18 Multiple pins
    0003    B Hagman    09/08/18 Moved initialization from constructor to begin()
