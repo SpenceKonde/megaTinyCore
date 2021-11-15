@@ -62,7 +62,6 @@ jobs:
         - megaavr/libraries/tinyNeoPixel_Static/examples/buttoncycler
         - megaavr/libraries/tinyNeoPixel_Static/examples/strandtest
       available-flash-2kB-plus-true-sketch-paths: |
-        - megaavr/libraries/Wire/examples/slave_sender
         - megaavr/extras/CompileTestSketches/test_digital_io
         - megaavr/extras/CompileTestSketches/test_macros
       available-flash-1_5kB-plus-true-sketch-paths: |
