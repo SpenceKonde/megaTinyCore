@@ -50,7 +50,7 @@ SOFTWARE.
 
 #if (!defined(TWI1) && defined(USING_WIRE1))
   // If pins for Wire1 are not defined, but USING_WIRE1 was defined in the boards.txt menu, throw an error. Used for 28-pin DA/DB parts
-  #error "This part does not support two Wire interfaces."
+  #error "This part only provides a single Wire interface."
 #endif
 
 #if ((defined(TWI0_DUALCTRL) && !defined(USING_WIRE1)) || (defined(TWI1_DUALCTRL) && defined(USING_WIRE1)))
@@ -91,7 +91,7 @@ SOFTWARE.
 // #define TWI_ERROR_ENABLED
 
 // The error result may not be accurate, it just helps narrowing the problem down
-#define  TWI_NO_ERR            0      // Default
+#define  TWI_NO_ERR            0  // Default
 #define  TWI_ERR_PULLUP        1  // Likely problem with pull-ups
 #define  TWI_ERR_TIMEOUT       2  // TWI Timed out on data rx/tx
 #define  TWI_ERR_BUS_ARB       3  // Bus error and/or Arbitration lost
