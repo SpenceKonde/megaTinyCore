@@ -17,6 +17,8 @@
  * See the Wire library README.md for more information.
  */
 
+#define MySerial Serial
+
 #include <Wire.h>
 
 int8_t rxLen = 0;
