@@ -42,7 +42,6 @@ jobs:
         - megaavr/libraries/Wire/examples/master_multi_address_write
       available-flash-4kB-plus-true-sketch-paths: |
         - megaavr/libraries/SoftwareSerial/examples/SoftwareSerialExample
-        - megaavr/libraries/Wire/examples/master_reader
       available-flash-3_5kB-plus-true-sketch-paths: |
         - megaavr/libraries/EEPROM/examples/eeprom_crc
         - megaavr/libraries/EEPROM/examples/eeprom_put
