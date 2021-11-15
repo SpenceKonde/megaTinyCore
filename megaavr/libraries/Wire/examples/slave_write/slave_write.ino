@@ -25,7 +25,7 @@ void loop() {
 }
 
 void transmitDataWire() {
-  #if defined(MILLIS_USE_TIMERNONE)
+  #if !defined(MILLIS_USE_TIMERNONE)
   uint32_t ms = millis();
   #else
   uint32_t ms = 123456789UL; //placeholder - there's no millis to send because it's disabled.
