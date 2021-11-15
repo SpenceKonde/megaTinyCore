@@ -18,16 +18,22 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Clarified licence (for one thing, renamed to a .md so people can read it more easily, and know that it's readable if they're on windows) for tinyNeoPixel.
 * Improved docs for tinyNeoPixel. The two libraries each have a README.md linking to a greatly expanded library document.
 * Document use of WDT for it's original purpose, to protect against hangs!
-* Actually prevent disabling warnings - -Wall for all! You should not be compiling code with warnings disabled, the vast majority of the time, they're pointing to problems, and in the casee that aren't bugs, they're still a weak point that future bugs could come from (and that people will comment on when you post the code on forums to ask for help). I thought I'd done this a long time ago. Also pull in some warning-related flags from DxCore, including making implicit function declarations error, since the implied declarations when this happens are basically never result in working code, but it occasionally compiles and malfunctions.
+* Actually prevent disabling warnings - -Wall for all! You should not be compiling code with warnings disabled, the vast majority of the time, they're pointing to problems, and in the cases that aren't bugs, they're still a weak point that future bugs could come from (and that people will comment on when you post the code on forums to ask for help). I thought I'd done this a long time ago. Also pull in some warning-related flags from DxCore, including making implicit function declarations error, since the implied declarations when this happens are basically never result in working code, but it occasionally compiles and malfunctions.
 * Fix timekeeping on clock speeds only supported with external clocks or tuning when a TCA or TCB is used for millis (it's still busted with the TCD)
-* Correct SYSCFG0 fuse settings when burning bootloader for 2-series parts - they default the reserved bits to 1 not 0, and worse still, setting themto 0 enables a mode we probably don't want.
+* Correct SYSCFG0 fuse settings when burning bootloader for 2-series parts - they default the reserved bits to 1 not 0, and worse still, setting them to 0 enables a mode we probably don't want.
 * Stop clearing fuse 4 by writing the default values for TCD0 on a 1-series. Now, with great difficulty, we only set that on parts that actually have the type D timer in order to keep our promise of burn bootloader restoring the chip to a fully known state. (well, except for the user row, and EEPROM if you've got it set to retain).
 * Fix theoretical EEPROM.h bug inherited from avr-libc, and keep millis() from losing time when writing more than one byte at a time; update and harmonize with DxCore.
 * Harmonize Comparator.h with DxCore.
 * Fix 402 with bad signature support.
 * Fix names of .lst and .map
 * Add avrdude.conf for the 32k 2-series parts which are now becoming available.
+* Fix bug with disabled millis on tinyNeoPixel libraries not working. Again.
 * Correctly comment out leftover debugging prints that would be called when using `tone()` (megaTinyCore #550).
+* Adjust serial buffer size 512b and 1k parts by adding an intermediate 32b serial buffer size.
+  * Parts with 512b are changed - from 16->32 for RX, TX unchanged at 16 (32->48 for each port used).
+  * Parts with 1k are changed - from 64 to 32 for TX, RX unchanged at 64 (128->96 for each port used).
+  * Smaller and larger parts are unchanged. This mostly helps to smooth out the RAM usage curve as you change flash size - going from 256 to 512 didn't previously change the allocation, while the jump from 512b to 1k was alarmingly large. The fact that the 8k 2-series have  poirts each makes this more noticable. This combined with another breakpoint led me to think that something else was broken.
+*
 
 ## Released Versions
 

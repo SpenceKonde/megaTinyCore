@@ -1,70 +1,95 @@
-/*
-  UART.h - Hardware serial library for Wiring
-  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-  Modified 28 September 2010 by Mark Sproul
-  Modified 14 August 2012 by Alarus
-  Modified 3 December 2013 by Matthijs Kooijman
-*/
+/* UART.h - Hardware serial library for Wiring
+ * Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * Modified 28 September 2010 by Mark Sproul
+ * Modified 14 August 2012 by Alarus
+ * Modified 3 December 2013 by Matthijs Kooijman
+ * Modified by someone, sometime in 2016 to work on megaAVR 0-series
+ * Modified 2017-2021 by Spence Konde for DxCore and megaTinyCore
+ */
 
 #pragma once
 
 #include <inttypes.h>
 #include "api/HardwareSerial.h"
 #include "pins_arduino.h"
+/* Define constants and variables for buffering incoming serial data.  We're
+ * using a ring buffer (I think), in which head is the index of the location
+ * to which to write the next incoming character and tail is the index of the
+ * location from which to read.
+ * NOTE: a "power of 2" buffer size is recommended to dramatically
+ *       optimize all the modulo operations for ring buffers.
+ * ... Well, it was missing some optimization, because explicitly doing the
+ * optimization saved a bit more flash... I see no compelling reason to permit
+ * non-power-of-2 ring buffer length. -Spence
+ *
+ * WARNING: When buffer sizes are increased to > 256, the buffer index
+ * variables are automatically increased in size, but the extra
+ * atomicity guards needed for that are not implemented. This will
+ * often work, but occasionally a race condition can occur that makes
+ * Serial behave erratically. See https://github.com/arduino/Arduino/issues/2405
+ * Flash versus RAM table
+ * |       |  modern tinyAVR series parts   | Other modern parts   |
+ * | Flash | 0-series | 1-series | 2-series | mega | All Dx |  EA  |
+ * |-------|----------|----------|----------|------|--------|------|
+ * |  2048 |      128 |      128 |       -  |   -  |     -  |   -  |
+ * |  4096 |      256 |      256 |      512 |   -  |     -  |   -  |
+ * |  8192 |      512 |      512 |     1024 | 1024 |     -  | 1024 |
+ * | 16384 |     1024 |     2048 |     2048 | 2048 |   2048 | 2048 |
+ * | 32768 |       -  |     2048 |     3072 | 4096 |   4096 | 4096 |
+ * | 49152 |       -  |       -  |       -  | 6120 |     -  |   -  |
+ * | 65536 |       -  |       -  |       -  |   -  |   8192 | 6120 |
+ * |  128k |       -  |       -  |       -  |   -  |  16384 |   -  |
+ * This ratio is remarkably consistent. No AVR part was ever made with
+ * less than 8:1 flash:ram, nor more than 16:1, since first ATmegas!
+ * The sole exception? The ATmega2560/2561 has only 4k flash.
+ * (to be fair, you are allowed to use external RAM - also I think
+ * a unique feature)
+ */
 
-// Define constants and variables for buffering incoming serial data.  We're
-// using a ring buffer (I think), in which head is the index of the location
-// to which to write the next incoming character and tail is the index of the
-// location from which to read.
-// NOTE: a "power of 2" buffer size is recommended to dramatically
-//       optimize all the modulo operations for ring buffers.
-// ... Well, it was missing some optimization, because explicitly doing the
-// optimization saved a bit more flash... I see no compelling reason to permit
-// non-power-of-2 ring buffer length. -Spence
-//
-// WARNING: When buffer sizes are increased to > 256, the buffer index
-// variables are automatically increased in size, but the extra
-// atomicity guards needed for that are not implemented. This will
-// often work, but occasionally a race condition can occur that makes
-// Serial behave erratically. See https://github.com/arduino/Arduino/issues/2405
-#if !defined(SERIAL_TX_BUFFER_SIZE)
-  #if ((RAMEND - RAMSTART) < 1023)
+#if !defined(SERIAL_TX_BUFFER_SIZE)   // could be overridden by boards.txt
+  #if   (INTERNAL_SRAM_SIZE  < 1024)  // 256b/512b RAM
     #define SERIAL_TX_BUFFER_SIZE 16
+  #elif (INTERNAL_SRAM_SIZE < 2048)   // 1k RAM
+    #define SERIAL_TX_BUFFER_SIZE 32
   #else
-    #define SERIAL_TX_BUFFER_SIZE 64
+    #define SERIAL_TX_BUFFER_SIZE 64  // 2k/3k RAM
   #endif
 #endif
-#if !defined(SERIAL_RX_BUFFER_SIZE)
-  #if ((RAMEND - RAMSTART) < 1023)
+#if !defined(SERIAL_RX_BUFFER_SIZE)   // could be overridden by boards.txt
+  #if   (INTERNAL_SRAM_SIZE <  512)  // 256b RAM
     #define SERIAL_RX_BUFFER_SIZE 16
+  #elif (INTERNAL_SRAM_SIZE < 1024)  // 512b RAM
+    #define SERIAL_RX_BUFFER_SIZE 32
   #else
-    #define SERIAL_RX_BUFFER_SIZE 64
+    #define SERIAL_RX_BUFFER_SIZE 64  // 1k+ RAM
   #endif
 #endif
-#if (SERIAL_TX_BUFFER_SIZE>256)
+/* Use INTERNAL_SRAM_SIZE instead of RAMEND - RAMSTART, which is vulnerable to
+ * a fencepost error. */
+#if (SERIAL_TX_BUFFER_SIZE > 256)
   typedef uint16_t tx_buffer_index_t;
 #else
-  typedef uint8_t tx_buffer_index_t;
+  typedef uint8_t  tx_buffer_index_t;
 #endif
-#if  (SERIAL_RX_BUFFER_SIZE>256)
+#if (SERIAL_RX_BUFFER_SIZE > 256)
   typedef uint16_t rx_buffer_index_t;
 #else
-  typedef uint8_t rx_buffer_index_t;
+  typedef uint8_t  rx_buffer_index_t;
 #endif
 // As noted above, forcing the sizes to be a power of two saves a small
 // amount of flash, and there's no compelling reason to NOT have them be
@@ -73,10 +98,10 @@
 // and replace them with % SERIAL_xX_BUFFER_SIZE; where xX is TX or RX.
 // There are two of each, and the old ending of the line is even commented
 // out at the end of the line.
-#if (SERIAL_TX_BUFFER_SIZE&(SERIAL_TX_BUFFER_SIZE-1))
+#if (SERIAL_TX_BUFFER_SIZE & (SERIAL_TX_BUFFER_SIZE - 1))
   #error "ERROR: TX buffer size must be a power of two."
 #endif
-#if (SERIAL_RX_BUFFER_SIZE&(SERIAL_RX_BUFFER_SIZE-1))
+#if (SERIAL_RX_BUFFER_SIZE & (SERIAL_RX_BUFFER_SIZE - 1))
   #error "ERROR: RX buffer size must be a power of two."
 #endif
 
