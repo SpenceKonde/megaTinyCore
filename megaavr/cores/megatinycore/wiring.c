@@ -317,32 +317,244 @@ unsigned long millis() {
         #warning "TCD is not supported as a millis timing source when the oscillator is tuned to a frequency other than 16 or 20 MHz. Timing results will be wrong - use TCA0 or a TCB."
       #endif
     #elif (defined(MILLIS_USE_TIMERB0)||defined(MILLIS_USE_TIMERB1))
-      // ticks is 0 ~ F_CPU/2000 except at 1 MHz where it's 0 ~ 1000.
-      // we shift 1, 2, 3, or 4 times it to the right ball park
-      // I may have missed some optimziations here.
-      // Note that you want to alternate addition and subtraction to suppress noise.
-      /* multiples of 5 */
-      #if (F_CPU == 28000000UL)
+      /* Ersatz Division for TCBs - now with inline assembly!
+       *
+       * It's well known that division is an operator you want to avoid like the plague on AVR.
+       * Not only is it slow, the execution time isn't even easy to analyze - it depends on the
+       * two opperands, particularly the divisor... so you can't just look at the generated
+       * assembly and count clock cycles, you've got to either time it expoerimentally with
+       * a representative set of sample data, or know how many times it will pass through the
+       * loops and then count clock cycles. If the operands aren't constant (if they are, you
+       * can probably manage to get it optimized away at compile time) your best hope is likely
+       * simulation, assuming you know enough about the values it will end up having to divide.
+       *
+       * Anyway. You don't want to be doing division. But that's what you need in order to
+       * appropriately scale the ick count from the prescaler-deprived TCBs. Since many users
+       * reconfigure the TCA for advanced PWM, using the TCA-prescaled clock was a non-starter
+       * particularly since many parts have only one TCA. But division can be approximated
+       * very closely if the divisor is constant using a series of bitshifts and addition/subtraction.
+       *
+       * The series of shifts was determined numerically with a spreadsheet that calculated the results for
+       * each value that could come from the initial round of rightshifts for any combination of
+       * bitshifts and provided a number of statistics to select based on. Bacwards time travel must
+       * never happenb, or if it does, it must be a shorter backward step than micros runtime - 1 us
+       * otherwise delay() will break and timeouts can instantly expire when it is hit. Similarly,
+       * one wants to avoid large jumps forward, and cases where more consecutive "actual" times
+       * than absolutely necessary return the same value (time should flow at a constant rate).
+       * Finally, the artifacts of the calculation that are unavoidable should be distributed uniformly.
+       * Undershooting or overshooting 999 endpoint at the counter's maximum value is the usual
+       * source of large jumps (at the overflow point) in either direction. Terms should, as much as
+       * possible alternate between positive and negative to minimize artifacs.
+       *
+       * The most popular/important speeds are hand-implemented in assembly because the compiler
+       * was doing a miserable job of it - wasting 20-30% of the execution time and it's one of the few
+       * Arduino API functions that users will be surprised and dismayed to find running slowiy.
+       * Not only does it run faster on "normal" boards (the 16 MHz clock eliminates the need to divide
+       * DxCore offers many speeds where the math doesn't all optimize away to nothing like it does at
+       * 1/2/4/8/16/32.
+       *
+       * Do notice that we are replacing a smaller number of terms, and it's still much faster
+       * The 19's went from 5 term ersatz-division to 6, while 12's went from 5 terms to 9, yet still
+       * got a lot faster. The terrible twelves are the frequency most difficult to do this with.
+       * Ironically, one of the the two that are is easiest is 36, which is good enough with 3 and
+       * effectively exact (That "middle 12" is closer than the other 12's get with 9!)
+       * 25 also matches it. Maybe it's something 25 and 36 being perfect squares?
+       *
+       * The three problems were that:
+       * 1. Compiler generated code stubbornly insisted doing repeated shift operation in a loop
+       * with 3 cycle per iteration (the shift itself took only 2)
+       * 2. Compiler could not be convinced to do things that we know will always be < 255 as
+       * bytes. Sure, it wouldn't know that - it's not legal for it to do that on it's own.
+       * But even when I cast everything to uint8_t, it would shift a 16-bit value around
+       * unnecessarily.
+       * 3. It would distribute the ticks >> 4. That is, it wouldn't shift the value of
+       * ticks in place, even though it wasn't referenced after this because I was assigning
+       * the result to ticks, and hence the old value was "dead"
+       * Instead, it would copy it, shift the copy 3 or 4 places. Then when it needed the
+       * ticks >> 2, it would make a copy of the ORIGINAL and shift that 6 places,
+       * instead of copying the copy and shifting just 2 places.
+       *
+       * A general trend seems to be that the compiler is not smart enough to "reuse" an
+       * existing value that has already been shifted such that it's closer to the target.
+       * at least for multi-byte variables. This is not the worst example of it I've run into
+       * but the micros() function is a little bit sensitive to the execution time.
+       * Apparently people sometimes want to *do something* in response to the value it
+       * returns - and they seem to want to do that in a timely manner, otherwise they'd
+       * have not bothered to record a time so accurately...
+       */
+        // Oddball clock speeds
+      #if   (F_CPU == 44000000UL) // Extreme overclocking
         ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 3) + (ticks >> 6) + (ticks >> 8)); // Extremely close, and rounding will tend to help.
-      #elif (F_CPU == 14000000UL) /* not supported by the core! */
+        microseconds = overflows * 1000 + (ticks - /* (ticks >> 1) + (ticks >> 2) - */ + (ticks >> 5) + /* (ticks >> 6) - */ (ticks >> 7)); // + (ticks >> 10)
+      #elif (F_CPU == 36000000UL) // 50% overclock!
+        ticks = ticks >> 4;
+        microseconds = overflows * 1000 + (ticks - (ticks >> 3) + (ticks >> 6)); // - (ticks >> 9) + (ticks >> 10) // with 5 terms it is DEAD ON
+      #elif (F_CPU == 28000000UL) // Not supported by DxCore - nobody wants it.
+        ticks = ticks >> 4;
+        microseconds = overflows * 1000 + (ticks + (ticks >> 2) - (ticks >> 3) + (ticks >> 5) - (ticks >> 6)); // + (ticks >> 8) - (ticks >> 9)
+      #elif (F_CPU == 14000000UL) // Not supported by DxCore - nobody wants it.
         ticks = ticks >> 3;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 3) + (ticks >> 6) + (ticks >> 8)); // Extremely close, and rounding will tend to help.
-      #elif (F_CPU == 30000000UL)
+        microseconds = overflows * 1000 + (ticks + (ticks >> 2) - (ticks >> 3) + (ticks >> 5) - (ticks >> 6)); // + (ticks >> 8) - (ticks >> 9)
+      #elif (F_CPU == 30000000UL) // Easy overclock
         ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 3) - (ticks >> 4) + (ticks >> 8)); // Damned near perfect.
-      #elif (F_CPU == 25000000UL)
+        microseconds = overflows * 1000 + (ticks + (ticks >> 3) - (ticks >> 4) + (ticks >> 7) - (ticks >> 8)); // 5 terms is the optimal. Good but not as close as we get for most.
+      #elif (F_CPU == 25000000UL) // Barely overclocked.
         ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 5)); // - (ticks >> 7)
-        // Multiples of 12
-        // + (ticks >> 3) - (ticks >> 5) is better than + (ticks >> 4) + (ticks >> 5) - same average, but alternating + and - gives less rounding error.
-      #elif (F_CPU == 24000000UL)
+        microseconds = overflows * 1000 + (ticks + /* (ticks >> 1) -*/ (ticks >> 2) + /* (ticks >> 4) -*/ (ticks >> 5)); // DEAD ON with 5 terms
+
+      /* The Terrible Twelves (or threes) - Twelve may be a great number in a lot of ways... but here, it's actually 3 in disguise.
+       * NINE TERMS in the damned bitshift division expansion. And the result isn't even amazing. - it's worse than what can be done
+       * with just 5 terms for dividing by 36 or 25... where you're dividing by 9 and 12.5 respectively, or after the initial shifts, by
+       * 0.78125 and 1.25, and comparable to the best series for division by 1.375 (44 MHz) or 0.9375 (30 MHz) which each have 7 terms,
+       * though it's better than the best possible for the division by 0.875 associated with 28 MHs clocks which is also a 7 term one.
+       * This ends on This is division by 0.75, which sounds like it should be the easiest out of the lot.
+
+       * This does the following:
+       * ticks = ticks >> (1, 2, 3, 4, or 6 for 3 MHz, 6 MHz, 12 MHz, 24 MHz, or 48 MHz)
+       * ticks = ticks + (ticks >> 1) - (ticks >> 2) + (ticks >> 3) - (ticks >> 4) + (ticks >> 5) - (ticks >> 6) + (ticks >> 7) - (ticks >> 9)
+       *
+       * Equivalent to :
+       * ticks = ticks / (1.5, 3, 6, 12, or 24)
+       *
+       * Division is way too too slow, but we need to convert current timer ticks, which
+       * are are 0-2999, 0-5999, 0-11999, or 0-23999 into the 3 least significant digits
+       * of the number of microseconds so that it can be added to overflows * 1000.
+       *
+       * Runtime is 28, 30, 32, or 34 clocks
+       * 3 and 6 MHz not a supported speed.
+       * 57 replaced with 30 save 27 clocks @ 12 = 2 us saved
+       * 67 replaced with 32 save 35 clocks @ 24 = 1.5us saved
+       * 77 replaced with 34 save 43 clocks @ 48 = 1 us saved
+       */
+      #elif (F_CPU == 48000000UL || F_CPU == 24000000UL || F_CPU == 12000000UL || F_CPU == 6000000UL || F_CPU == 3000000UL)
+        __asm__ __volatile__(
+          "movw r0,%A0"   "\n\t"
+          "lsr r1"        "\n\t"
+          "ror r0"        "\n\t"
+          #if (F_CPU != 3000000UL)
+            "lsr r1"        "\n\t"
+            "ror r0"        "\n\t"
+          #endif
+          #if (F_CPU == 12000000UL || F_CPU == 24000000UL || F_CPU == 48000000UL)
+            "lsr r1"      "\n\t"  //sacrifice 1 word for 9 clocks on the 12 MHz configuration
+            "ror r0"      "\n\t"
+          #endif
+          #if (F_CPU == 24000000UL || F_CPU == 48000000UL)
+            "lsr r1"      "\n\t"  // sacrifice 3 words for 12 clocks on the 24 MHz configuration
+            "ror r0"      "\n\t"
+          #endif
+          #if (F_CPU == 48000000UL )
+            "lsr r1"      "\n\t"  // sacrifice 5 words for 15 clocks on the 48 MHz configuration.
+            "ror r0"      "\n\t"
+          #endif
+          "movw %A0,r0"   "\n\t"  // This is the value we call ticks, because that's what it was in old code.
+          "lsr r1"        "\n\t"
+          "ror r0"        "\n\t"  //
+          "add %A0, r0"   "\n\t"  // + ticks >> 1
+          "adc %B0, r1"   "\n\t"  //
+          "lsr r1"        "\n\t"  //
+          "ror r0"        "\n\t"  // ticks >> 2. Now it's under 250, and r31 is 0
+          "mov r1,r0"     "\n\t"  // copy over
+          "lsr r1 "       "\n\t"
+          "sub r0,r1"     "\n\t"  // - ticks >>3
+          "lsr r1"        "\n\t"
+          "add r0,r1"     "\n\t"  // + ticks >> 4
+          "lsr r1"        "\n\t"
+          "sub r0,r1"     "\n\t"  // - ticks >> 5
+          "lsr r1"        "\n\t"
+          "add r0,r1"     "\n\t"  // + ticks >> 6
+          "lsr r1"        "\n\t"
+          "sub r0,r1"     "\n\t"  // - ticks >> 7
+          "lsr r1"        "\n\t"
+          "lsr r1"        "\n\t"
+          "add r0,r1"     "\n\t"  // + ticks >> 9
+          "eor r1,r1"     "\n\t"  // clear out r1
+          "sub %A0,r0"    "\n\t"  // Add the sum of terms that fit in a byte to what was ticks in old code.
+          "sbc %B0,r1"    "\n"    // carry
+          : "+r" (ticks));        // Do the rest in C
+        microseconds = overflows * 1000 + ticks; // nice and clean.
+
+      /* The Troublesome Tens - I initially fumbled this after the **now** r1 is 0 line
+       * I did several dumb things - at first I thought it was my pointless moving and
+       * adding. But the real problem was that on that line, I'd just deleted the
+       * now unnecessary lsr r1, leaving the next as ror instead of lsr. So instead of pushing
+       * that bit into the void, it came back as the new high bit, causing the device to travel
+       * back in time. Unfortunately, a few hundred milliseconds isn't far back enough to
+       * snag a winning ticket for todays lotto, but more than than the execution time
+       * of micros is far enough back to thoroughly break delay() Even if I could just go back
+       * just far enough to tell myself where the bug was, I'd take it...
+       *
+       * This does the following:
+       * ticks = ticks >> (1, 2, 3, or 4 for 5 MHz, 10 MHz, 20 MHz, or 40 MHz)
+       * ticks = ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6) + (ticks >> 8)
+       *
+       * Equivalent to:
+       * ticks = tick / (2.5, 5, 10, or 20)
+       * Division is way too slow, but we need to convert current timer ticks, which
+       * are 0-2499, 0-4999, 0-9999, or 0-19999, into the 3 least significant digits
+       * of the number of microseconds so that it can be added to overflows * 1000.
+       *
+       * Runtime is 23,25,27, or 29 clocks, savings vs the best I could do in C
+       *
+       * 33 replaced with 23 save 10 clocks @ 5  = 2 us saved
+       * 46 replaced with 25 save 21 clocks @ 10 = 2.5 us saved
+       * 56 replaced with 27 save 29 clocks @ 20 = 1.5 us saved
+       * 66 replaced with 29 save 37 clocks @ 40 = 1 us saved
+       */
+      #elif (F_CPU == 40000000UL || F_CPU == 20000000UL || F_CPU == 10000000UL || F_CPU == 5000000UL)
+        __asm__ __volatile__(
+          "movw r0,%A0"   "\n\t"  // no savings until after the initial rightshifts at 5 MHz
+          "lsr r1"        "\n\t"
+          "ror r0"        "\n\t"
+          #if (F_CPU == 10000000UL || F_CPU == 20000000UL || F_CPU == 40000000UL)
+            "lsr r1"      "\n\t"  // sacrifice 1 word for 9 clocks at 10 MHz
+            "ror r0"      "\n\t"
+          #endif
+          #if (F_CPU == 20000000UL || F_CPU == 40000000UL)
+            "lsr r1"      "\n\t"  // sacrifice 3 words for 12 clocks at 20 MHz
+            "ror r0"      "\n\t"
+          #endif
+          #if (F_CPU == 40000000UL )
+            "lsr r1"      "\n\t"  // sacrifice 5 words for 15 clocks at 40 MHz
+            "ror r0"      "\n\t"
+          #endif
+          "movw %A0,r0"   "\n\t"  // ticks
+          "lsr r1"        "\n\t"
+          "ror r0"        "\n\t"
+          "lsr r1"        "\n\t"
+          "ror r0"        "\n\t"  //   ticks >> 2.
+          "sub %A0, r0"   "\n\t"  // - ticks >> 2
+          "sbc %B0, r1"   "\n\t"  // It could be 312 so we can't do what we did for the 12's
+          "lsr r1"        "\n\t"
+          "ror r0"        "\n\t"  // **now** r1 is 0.
+          "lsr r0"        "\n\t"
+          "mov r1,r0"     "\n\t"  // + ticks >> 4
+          "lsr r1"        "\n\t"
+          "lsr r1"        "\n\t"
+          "sub r0,r1"     "\n\t"  // - ticks >> 6
+          "lsr r1"        "\n\t"
+          "lsr r1"        "\n\t"
+          "add r0,r1"     "\n\t"  // + ticks >> 8
+          "eor r1,r1"     "\n\t"  // restore zero_reg
+          "add %A0,r0"    "\n\t"  // add to the shifted ticks
+          "adc %B0,r1"    "\n"    // carry
+          : "+r" (ticks));        // Do the rest in C
+        microseconds = overflows * 1000 + ticks;
+/* replaces:
+      #elif (F_CPU == 48000000UL) // Extreme overclocking
+        ticks = ticks >> 5;
+        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
+      #elif (F_CPU == 24000000UL) // max rated speed
         ticks = ticks >> 4;
         microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
       #elif (F_CPU == 12000000UL)
         ticks = ticks >> 3;
         microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
-        // multiples of 10
+      // Never was an implementation for 6, but it's obvious what the old style implementation would be,
+
+      #elif (F_CPU == 40000000UL) // overclocked aggressively
+        ticks = ticks >> 4;
+        microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
       #elif (F_CPU == 20000000UL)
         ticks = ticks >> 3;
         microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
@@ -352,20 +564,22 @@ unsigned long millis() {
       #elif (F_CPU ==  5000000UL)
         ticks = ticks >> 1;
         microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
-        // powers of 2
+*/
+
+      // powers of 2  - and a catchall for parts without dedicated implementations. It gives wrong results, but
+      // it also doesn't take forever like doing division would.
       #elif (F_CPU  == 32000000UL || F_CPU > 24000000UL)
         microseconds = overflows * 1000 + (ticks >> 4);
       #elif (F_CPU  == 16000000UL || F_CPU > 12000000UL)
         microseconds = overflows * 1000 + (ticks >> 3);
       #elif (F_CPU  ==  8000000UL || F_CPU >  6000000UL)
         microseconds = overflows * 1000 + (ticks >> 2);
-      #elif (F_CPU  ==  4000000UL || F_CPU >  3000000UL)
+      #elif (F_CPU  ==  4000000UL || F_CPU >= 3000000UL)
         microseconds = overflows * 1000 + (ticks >> 1);
-      #else // (F_CPU  ==  1000000UL || F_CPU  == 2000000UL);
-        //these are the same because except at 1 MHz, we use CLK_PER/2 as source for TCB
-        microseconds = overflows * 1000 + ticks;
+      #else //(F_CPU == 1000000UL || F_CPU == 2000000UL) - here clock is running at system clock instead of half system clock.
+            // also works at 2MHz, since we use CLKPER for 1MHz vs CLKPER/2 for all others.
+        microseconds   = overflows * 1000 + ticks;
       #endif
-
       #if !(F_CPU == 32000000UL || F_CPU == 30000000UL || F_CPU == 25000000UL || F_CPU == 24000000UL || \
             F_CPU == 20000000UL || F_CPU == 16000000UL || F_CPU == 12000000UL || F_CPU == 10000000UL || \
             F_CPU ==  8000000UL || F_CPU ==  5000000UL || F_CPU ==  4000000UL || F_CPU ==  2000000UL || \
@@ -512,18 +726,21 @@ unsigned long millis() {
     }
   Why didn't I just use delay_ms() that time?
   */
-
 inline __attribute__((always_inline)) void delayMicroseconds(unsigned int us) {
   // This function gets optimized away, but to what depends on whether us is constant.
   if (__builtin_constant_p(us)) {
-    _delay_us(us); // Constant microseconds use the avr-libc _delay_us() which is highly accurate for all values and efficient.
+    _delay_us(us); // Constant microseconds use the avr-libc _delay_us() which is highly accurate for all values and efficient!
   } else { // If it is not, we have to use the Arduino style implementation.
     _delayMicroseconds(us);
   }
 }
-/* Delay for the given number of microseconds. This is UGLY AS SIN and explicitly depends on function call overhead for
- * very short delays.
- * First, we get 1 us in and return if that's what was asked for.
+
+/* delayMicroseconds() when delay is not a compile-time known constant.
+ * Delay for the given number of microseconds. This is UGLY AS SIN and explicitly depends on function call
+ * overhead for very short delays.
+ * High clock speeds shouldn't return immediately for a 1us delay - we can instead only drop a fraction of a us
+ * 48, 44, 40, and 32 drop 1/2 us, and 36 drops 2/3rds.
+ * Note that us ceases to be in units of microseconds as soon as the function is entered; it gets turned into the loop counter.
  * Then we use a minimal number of bitshifts to calculate the number of passes through the delay loop
  * and subtract the number of loop-cycles of time we burned doing so. But need to be careful that sane values
  * don't get so much bigger that they overflow the unsigned int we're storing it in. To that end, we use
@@ -534,272 +751,309 @@ inline __attribute__((always_inline)) void delayMicroseconds(unsigned int us) {
  *  "rcall .-4" "\n\t"    // 2 cycles - ... but then called here...
  * This exploits the fact that return is a 4-clock instruction (even on AVRxt) by first hopping over a return
  * then immediately calling that return instruction - 8 clocks in 3 words. Once the ret is there, additional
- * rcall instructions can get 6 clocks in a single word, though we only get to take advantage of that once for the 30 MHz case.
+ * rcall instructions can get 6 clocks in a single word, though we only get to take advantage of that once for
+ * the 30 MHz case and any longer delays do better with a loop.
  */
-
-#if F_CPU >= 32000000L
-  // 16 MHz math, 8-cycle loop
+#if   F_CPU >= 48000000L
+  // 16 MHz math, 12-cycle loop, 1us passes through loop twice.
+  #define DELAYMICROS_TWELVE
+#elif F_CPU >= 44000000L
+  // 16 MHz math, 11-cycle loop, 1us passes through loop twice.
+  #define DELAYMICROS_ELEVEN
+#elif F_CPU >= 40000000L
+  // 16 MHz math, 10-cycle loop, 1us passes through loop twice.
+  #define DELAYMICROS_TEN
+#elif F_CPU >= 36000000L
+  // 12 MHz math, 12-cycle loop, 1us passes through loop once.
+  #define DELAYMICROS_TWELVE
+#elif F_CPU >= 32000000L
+  // 16 MHz math, 8-cycle loop, 1us passes through loop twice.
   #define DELAYMICROS_EIGHT
 #elif F_CPU >= 30000000L
-  // 12 MHz math, 10-cycle loop
+  // 12 MHz math, 10-cycle loop, 1us returns immediately.
   #define DELAYMICROS_TEN
 #elif F_CPU >= 28000000L
-  // 16 MHz math, 7-cycle loop
+  // 16 MHz math, 7-cycle loop, 1us returns immediately.
   #define DELAYMICROS_SEVEN
 #elif F_CPU >= 24000000L
-  // 12 MHz math, 8-cycle loop
+  // 12 MHz math, 8-cycle loop, 1us returns immediately.
   #define DELAYMICROS_EIGHT
+#elif F_CPU >= 20000000L
+  // 20 MHz math, 10-cycle loop, 1us returns immediately.
+  #define DELAYMICROS_TEN
+#elif F_CPU >= 10000000L
+  // 20 MHz math, 10-cycle loop, 1us returns immediately.
+  #define DELAYMICROS_FIVE
+#elif F_CPU >=  5000000L
+  // 20 MHz math, 10-cycle loop, 1us returns immediately.
+  #define DELAYMICROS_FIVE
 #endif
 
 __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
-  // call = 4 cycles + 4 cycles to init us
-  #if F_CPU >= 32000000L
-  // here, we only take half a us at the start!
-  __asm__ __volatile__ ("rjmp .+0"); //just waiting 2 cycles - so we're half a us in
+ /* Must be noinline because we rely on function-call overhead */
 
-  // the loop takes 1/4 of a microsecond (8 cycles)
-  // per iteration, so execute it four times for each microsecond of
-  // delay requested.
+#if F_CPU >= 48000000L
+  // make the initial delay 24 cycles
+  __asm__ __volatile__ (
+    "rjmp .+2" "\n\t"     // 2 cycles - jump over next instruction.
+    "ret" "\n\t"          // 4 cycles - rjmped over initially....
+    "rcall .-4");         // 2 cycles - ... but then called here);
+                          // wait 8 cycles with 3 words
+  // the loop takes 1/4 of a microsecond (12 cycles) per iteration
+  // so execute it four times for each microsecond of delay requested.
   us <<= 2; // x4 us, = 4 cycles
+  // we only burned ~22 cycles above, subtraction takes another 2 - so we've lost
+  // half a us and only need to drop 2 rounds through the loop!
+  us -= 2; // = 2 cycles,
 
-  // account for the time taken in the preceding commands.
+#elif F_CPU >= 44000000L
+  // Again, we can do all this in half of 1 us, so we
+  // just pass through the loop 2 times for 1 us delay.
+  __asm__ __volatile__(
+    "rjmp .+0" "\n\t"     // 2 cycles
+    "rjmp .+0" "\n\t"     // 2 cycles
+    "nop");               // 1 cycles
+                          // Wait 5 cycles in 3 words.
+  // the loop takes 1/4 of a microsecond (11 cycles) per iteration
+  // so execute it four times for each microsecond of delay requested.
+  us <<= 2; // x4 us, = 4 cycles
+  // we just burned 19 (21) cycles above, remove 2
+  // us is at least 8 so we can subtract 2
+  us -= 2;
+
+#elif F_CPU >= 40000000L
+  // Again, we can do all this in half of 1 us, so we
+  // just pass through the loop 2 times for 1 us delay.
+  __asm__ __volatile__(
+    "rjmp .+0" "\n\t"     // 2 cycles
+    "nop");               // 1 cycles
+                          // Wait 3 cycles in 2 words.
+  // the loop takes 1/4 of a microsecond (10 cycles) per iteration
+  // so execute it four times for each microsecond of delay requested.
+  us <<= 2; // x4 us, = 4 cycles
+  // we just burned 17 (19) cycles above, remove 2.
+  // us is at least 8 so we can subtract 2
+  us -= 2;
+
+#elif F_CPU >= 36000000L
+  // Here we get the initial delay is about 24 cycles, so we pass through
+  // the loop once for 1us delay.
+  __asm__ __volatile__ (
+    "rjmp .+0" "\n\t"     // 2 cycles
+    "rjmp .+2" "\n\t"     // 2 cycles - jump over next instruction.
+    "ret" "\n\t"          // 4 cycles - rjmped over initially....
+    "rcall .-4");         // 2 cycles - ... but then called here);
+                          // wait 10 cycles in 4 words
+  // the loop takes 1/3 of a microsecond (12 cycles) per iteration
+  // so execute it three times for each microsecond of delay requested.
+  us = (us << 1) + us; // x3 us, = 5 cycles
+  // we just burned 23 (25) cycles above, remove 2
+  us -= 2; //2 cycles
+
+#elif F_CPU >= 32000000L
+  // here, we only take half a us at the start
+  __asm__ __volatile__ ("rjmp .+0");
+                          // wait 2 cycles
+  // in by the end of this section.
+  // the loop takes 1/4 of a microsecond (8 cycles) per iteration
+  // so execute it four times for each microsecond of delay requested.
+  us <<= 2; // x4 us, = 4 cycles
   // we only burned ~14 cycles above, subtraction takes another 2 - so we've lost half a us,
   // and only need to drop 2 rounds through the loop!
   us -= 2; // = 2 cycles
 
-
 #elif F_CPU >= 30000000L
-  // for the 30 MHz clock
-
   // for a one-microsecond delay, burn 14 cycles and return
   __asm__ __volatile__ (
     "rjmp .+2" "\n\t"     // 2 cycles - jump over the return.
     "ret" "\n\t"          // 4 cycles - rjmped over initially...
     "rcall .-4" "\n\t"    // 2 cycles - ... but then called here...
     "rcall .-6");         // 2+4 cycles - ... and here again!
-                          // Waiting 14 cycles - in only 4 words!
+                          // Waiting 14 cycles in only 4 words
   if (us <= 1) return; // = 3 cycles, (4 when true)
-
-  // the loop takes 1/3 of a microsecond (10 cycles)
-  // per iteration, so execute it three times for each microsecond of
-  // delay requested.
+  // the loop takes 1/3 of a microsecond (10 cycles) per iteration
+  // so execute it three times for each microsecond of delay requested.
   us = (us << 1) + us; // x3 us, = 5 cycles
-
-  // account for the time taken in the preceding commands.
   // we just burned 28 (30) cycles above, remove 3
   us -= 3; //2 cycles
 
-#elif F_CPU >= 28000000L
 
+
+#elif F_CPU >= 28000000L
   // for a one-microsecond delay, burn 12 cycles and return
   __asm__ __volatile__ (
+    "rjmp .+0" "\n\t"     // 2 cycles
+    "rjmp .+0" "\n\t"     // 2 cycles
     "rjmp .+2" "\n\t"     // 2 cycles - jump over next instruction.
     "ret" "\n\t"          // 4 cycles - rjmped over initially....
-    "rcall .-4" "\n\t"    // 2 cycles - ... but then called here);
-    "rjmp .+0" "\n\t"     // 2 cycles
-    "rjmp .+0");          // 2 cycles
-                          // Wait 12 cycles with 5 words
+    "rcall .-4");         // 2 cycles - ... but then called here);
+                          // wait 12 cycles in 5 words
   if (us <= 1) return; //  = 3 cycles, (4 when true)
 
-  // the loop takes 1/4 of a microsecond (7 cycles)
-  // per iteration, so execute it four times for each microsecond of
-  // delay requested.
-  us <<= 2; // x4 us, = 4 cycles
-
-  // account for the time taken in the preceding commands.
+  // the loop takes 1/4 of a microsecond (7 cycles) per iteration
+  // so execute it four times for each microsecond of delay requested.
+  us <<= 2; // x4 us, = 4 cycles=
   // we just burned 27 (29) cycles above, remove 4, (7*4=28)
   // us is at least 8 so we can subtract 5
   us -= 4; // = 2 cycles,
 
 
 #elif F_CPU >= 24000000L
-  // for the 24 MHz clock
-
   // for a one-microsecond delay, burn 8 cycles and return
   __asm__ __volatile__ (
     "rjmp .+2" "\n\t"     // 2 cycles - jump over next instruction.
     "ret" "\n\t"          // 4 cycles - rjmped over initially....
     "rcall .-4");         // 2 cycles - ... but then called here);
                           // wait 8 cycles with 3 words
-  if (us <= 1) return;    //  = 3 cycles, (4 when true)
+  if (us <= 1) return; //  = 3 cycles, (4 when true)
 
-  // the loop takes 1/3 of a microsecond (8 cycles)
-  // per iteration, so execute it three times for each microsecond of
-  // delay requested.
+  // the loop takes 1/3 of a microsecond (8 cycles) per iteration
+  // so execute it three times for each microsecond of delay requested.
   us = (us << 1) + us; // x3 us, = 5 cycles
-
-  // account for the time taken in the preceding commands.
   // we just burned 24 (22) cycles above, remove 3
   us -= 3; //2 cycles
 
-
 #elif F_CPU >= 20000000L
-  // for a one-microsecond delay, simply return.  the overhead
-  // of the function call takes 18 (20) cycles, which is 1us
-  __asm__ __volatile__(
-    "rjmp .+0" "\n\t"
-    "rjmp .+0" "\n\t"); //just waiting 4 cycles
-  if (us <= 1) {
-    return;  //  = 3 cycles, (4 when true)
-  }
+  // for a one-microsecond delay, burn 4 clocks and then return
+  __asm__ __volatile__ (
+    "rjmp .+0" "\n\t"     // 2 cycles
+    "nop" );              // 1 cycle
+                          // wait 3 cycles with 2 words
+  if (us <= 1) return; //  = 3 cycles, (4 when true)
+  // the loop takes a 1/2 of a microsecond (10 cycles) per iteration
+  // so execute it twice for each microsecond of delay requested.
+  us = us << 1; // x2 us, = 2 cycles
+  // we just burned 21 (23) cycles above, remove 2
+  // us is at least 4 so we can subtract 2.
+  us -= 2; // 2 cycles
 
-  // the loop takes a 1/5 of a microsecond (4 cycles)
-  // per iteration, so execute it five times for each microsecond of
-  // delay requested.
-  us = (us << 2) + us; // x5 us, = 7 cycles
-
-  // account for the time taken in the preceding commands.
-  // we just burned 26 (28) cycles above, remove 7, (7*4=28)
-  // us is at least 10 so we can subtract 7
-  us -= 7; // 2 cycles
-
-  #elif F_CPU >= 16000000L
-  // for the 16 MHz clock on most Arduino boards
-
+#elif F_CPU >= 16000000L
   // for a one-microsecond delay, simply return.  the overhead
   // of the function call takes 14 (16) cycles, which is 1us
-  if (us <= 1) {
-    return;  //  = 3 cycles, (4 when true)
-  }
-
-  // the loop takes 1/4 of a microsecond (4 cycles)
-  // per iteration, so execute it four times for each microsecond of
-  // delay requested.
+  if (us <= 1) return; //  = 3 cycles, (4 when true)
+  // the loop takes 1/4 of a microsecond (4 cycles) per iteration
+  // so execute it four times for each microsecond of delay requested.
   us <<= 2; // x4 us, = 4 cycles
-
-  // account for the time taken in the preceding commands.
   // we just burned 19 (21) cycles above, remove 5, (5*4=20)
   // us is at least 8 so we can subtract 5
-  us -= 5; // = 2 cycles,
+  us -= 5; // = 2 cycles
 
-  #elif F_CPU >= 10000000L
-  // for 10MHz (20MHz/2)
-
+#elif F_CPU >= 12000000L
   // for a 1 microsecond delay, simply return.  the overhead
   // of the function call takes 14 (16) cycles, which is 1.5us
-  if (us <= 1) {
-    return;  //  = 3 cycles, (4 when true)
-  }
-
-  // the loop takes 2/5 of a microsecond (4 cycles)
-  // per iteration, so execute it 2.5 times for each microsecond of
-  // delay requested.
-  us = (us << 1) + (us >> 1); // x2.5 us, = 5 cycles
-
-  // account for the time taken in the preceding commands.
+  if (us <= 1) return; //  = 3 cycles, (4 when true)
+  // the loop takes 1/3 of a microsecond (4 cycles) per iteration
+  // so execute it three times for each microsecond of delay requested.
+  us = (us << 1) + us; // x3 us, = 5 cycles
   // we just burned 20 (22) cycles above, remove 5, (5*4=20)
   // us is at least 6 so we can subtract 5
   us -= 5; //2 cycles
 
-  #elif F_CPU >= 8000000L
-  // for the 8 MHz internal clock
+#elif F_CPU >= 10000000L
+  // for a 1 microsecond delay, simply return.  the overhead
+  // of the function call takes 14 (16) cycles, which is 1.5us
+  if (us <= 2) return; //  = 3 cycles, (4 when true)
+  // the loop takes 2/5 of a microsecond (5 cycles) per iteration
+  // so execute it 2.5 times for each microsecond of delay requested.
+  us = us << 1; // x2 us, = 2 cycles
+  // we just burned 20 (22) cycles above, remove 4, (5*4=20)
+  // us is at least 6 so we can subtract 4
+  us -= 4; //2 cycles
 
+#elif F_CPU >= 8000000L
   // for a 1 and 2 microsecond delay, simply return.  the overhead
   // of the function call takes 14 (16) cycles, which is 2us
-  if (us <= 2) {
-    return;  //  = 3 cycles, (4 when true)
-  }
-
-  // the loop takes 1/2 of a microsecond (4 cycles)
-  // per iteration, so execute it twice for each microsecond of
-  // delay requested.
+  if (us <= 2) return; //  = 3 cycles, (4 when true)
+  // the loop takes 1/2 of a microsecond (4 cycles) per iteration
+  // so execute it twice for each microsecond of delay requested.
   us <<= 1; //x2 us, = 2 cycles
-
-  // account for the time taken in the preceding commands.
-  // we just burned 17 (19) cycles above, remove 4, (4*4=16)
+  // we just burned 17 (19) cycles above, remove 5, (4*5=20)
   // us is at least 6 so we can subtract 4
-  us -= 4; // = 2 cycles
-  #elif F_CPU >= 5000000L
-  // for 5MHz (20MHz / 4)
+  us -= 5; // = 2 cycles
 
+#elif F_CPU >= 5000000L
   // for a 1 ~ 3 microsecond delay, simply return.  the overhead
   // of the function call takes 14 (16) cycles, which is 3us
-  if (us <= 3) {
-    return;  //  = 3 cycles, (4 when true)
-  }
+  if (us <= 3) return; // 3 cycles, (4 when true)
+  // the loop takes 1 microsecond (5 cycles) per iteration
+  // so just remove 3 loops for overhead
+  us -= 3; // = 2 cycles
 
-  // the loop takes 4/5th microsecond (4 cycles)
-  // per iteration, so we want to add it to 1/4th of itself
-  us += us >> 2;
-  us -= 2; // = 2 cycles
-
-  #elif F_CPU >= 4000000L
-  // for that unusual 4mhz clock...
-
+#elif F_CPU >= 4000000L
   // for a 1 ~ 4 microsecond delay, simply return.  the overhead
   // of the function call takes 14 (16) cycles, which is 4us
-  if (us <= 4) {
-    return;  //  = 3 cycles, (4 when true)
-  }
+  if (us <= 4) return; // 3 cycles, (4 when true)
+  // the loop takes 1 microsecond (4 cycles) per iteration,
+  // just remove 4 loops for overhead
+  us -= 4; // = 2 cycles for the time taken up with call overhead and test above
 
-  // the loop takes 1 microsecond (4 cycles)
-  // per iteration, so nothing to do here! \o/
-
-  us -= 2; // = 2 cycles
-
-
-  #else
+#else // F_CPU == 1000000
   // for the 1 MHz internal clock (default settings for common AVR microcontrollers)
   // the overhead of the function calls is 14 (16) cycles
-  if (us <= 16) {
-    return;  //= 3 cycles, (4 when true)
-  }
-  if (us <= 25) {
-    return;  //= 3 cycles, (4 when true), (must be at least 25 if we want to subtract 22)
-  }
-
-  // compensate for the time taken by the preceding and next commands (about 22 cycles)
+  if (us <= 16) return; // 3 cycles, (4 when true)
+  if (us <= 25) return; // 3 cycles, (4 when true), (must be at least 26 if we want to subtract 22 and rightshift twice.)
+  // compensate for the time taken by the preceding and following commands (about 22 cycles)
   us -= 22; // = 2 cycles
   // the loop takes 4 microseconds (4 cycles)
   // per iteration, so execute it us/4 times
   // us is at least 4, divided by 4 gives us 1 (no zero delay bug)
   us >>= 2; // us div 4, = 4 cycles
-
-
-  #endif
+#endif
 
 
 #if defined(DELAYMICROS_TWELVE)
   __asm__ __volatile__ (
-    "1: sbiw %0,1" "\n\t" // 2 cycles
-    "rjmp .+2" "\n\t"     // 2 cycles - jump over next instruction.
-    "ret" "\n\t"          // 4 cycles - rjmped over initially....
-    "rcall .-4" "\n\t"    // 2 cycles - ... but then called here
-    "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+    "1: sbiw %0, 1" "\n\t"            // 2 cycles
+    "rjmp .+2"      "\n\t"            // 2 cycles - jump over next instruction.
+    "ret"           "\n\t"            // 4 cycles - rjmped over initially....
+    "rcall .-4"     "\n\t"            // 2 cycles - ... but then called here
+    "brne 1b" : "=w" (us) : "0" (us)  // 2 cycles
+  );
+#elif defined(DELAYMICROS_ELEVEN)
+  __asm__ __volatile__ (
+    "1: sbiw %0, 1" "\n\t"            // 2 cycles
+    "nop"           "\n\t"            // 1 cycle
+    "rjmp .+0"      "\n\t"            // 2 cycles
+    "rjmp .+0"      "\n\t"            // 2 cycles
+    "rjmp .+0"      "\n\t"            // 2 cycles
+    "brne 1b" : "=w" (us) : "0" (us)  // 2 cycles
   );
 #elif defined(DELAYMICROS_TEN)
   __asm__ __volatile__ (
-    "1: sbiw %0,1" "\n\t" // 2 cycles
-    "rjmp .+0" "\n\t"     // 2 cycles each;
-    "rjmp .+0" "\n\t"     // 2 cycles each;
-    "rjmp .+0" "\n\t"     // 2 cycles each;
-    "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+    "1: sbiw %0, 1" "\n\t"            // 2 cycles
+    "rjmp .+0"      "\n\t"            // 2 cycles
+    "rjmp .+0"      "\n\t"            // 2 cycles
+    "rjmp .+0"      "\n\t"            // 2 cycles
+    "brne 1b" : "=w" (us) : "0" (us)  // 2 cycles
   );
 #elif defined(DELAYMICROS_EIGHT)
   __asm__ __volatile__ (
-    "1: sbiw %0,1" "\n\t" // 2 cycles
-    "rjmp .+0" "\n\t"     // 2 cycles each;
-    "rjmp .+0" "\n\t"     // 2 cycles each;
-    "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+    "1: sbiw %0, 1" "\n\t"            // 2 cycles
+    "rjmp .+0"      "\n\t"            // 2 cycles
+    "rjmp .+0"      "\n\t"            // 2 cycles
+    "brne 1b" : "=w" (us) : "0" (us)  // 2 cycles
   );
 #elif defined(DELAYMICROS_SEVEN)
   __asm__ __volatile__ (
-    "1: sbiw %0,1" "\n\t" // 2 cycles
-    "rjmp .+0" "\n\t"     // 2 cycles
-    "nop"      "\n\t"     // 1 cyc;e
-    "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+    "1: sbiw %0, 1" "\n\t"            // 2 cycles
+    "rjmp .+0"      "\n\t"            // 2 cycles
+    "nop"           "\n\t"            // 1 cycle
+    "brne 1b" : "=w" (us) : "0" (us)  // 2 cycles
   );
-#else
-  // the classic 4 cycle delay loop...
-  // busy wait
+#elif defined(DELAYMICROS_FIVE)
   __asm__ __volatile__ (
-    "1: sbiw %0,1" "\n\t" // 2 cycles
-    "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+    "1: sbiw %0, 1" "\n\t"            // 2 cycles
+    "nop"           "\n\t"            // 1 cycle
+    "brne 1b" : "=w" (us) : "0" (us)  // 2 cycles
+  );
+#else // the classic 4 cycle delay loop...
+  __asm__ __volatile__ (
+    "1: sbiw %0, 1" "\n\t"            // 2 cycles
+    "brne 1b" : "=w" (us) : "0" (us)  // 2 cycles
   );
 #endif
   // return = 4 cycles
 }
-
 
 void stop_millis()
 { // Disable the interrupt:
