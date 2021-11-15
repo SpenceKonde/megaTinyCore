@@ -40,7 +40,7 @@ void loop() {
 void sendDataWire() {
   uint32_t ms;
   if (4 == Wire.requestFrom(0x54, 4, 0x01)) {    // request from slave
-    while ( Wire.available() ) {
+    while (Wire.available()) {
       ms  = (uint32_t)Wire.read();               // read out 32-bit wide data
       ms |= (uint32_t)Wire.read() <<  8;
       ms |= (uint32_t)Wire.read() << 16;

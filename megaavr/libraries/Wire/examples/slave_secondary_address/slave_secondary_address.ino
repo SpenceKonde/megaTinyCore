@@ -60,7 +60,7 @@ void loop() {
 // this function is registered as an event, see setup()
 void receiveDataWire(int16_t numBytes) {
   uint8_t addr = Wire.getIncomingAddress();   // get the address that triggered this function
-                                              // the incoming address is leftshifted though
+  //                                          // the incoming address is leftshifted though
   if (addr == (0x54 << 1)) {                  // if the address was 0x54, do this
     MySerial.print("Addr 0x54: ");
     for (uint8_t i = 0; i < numBytes; i++) {

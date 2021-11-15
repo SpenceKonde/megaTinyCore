@@ -49,7 +49,7 @@
 
 volatile uint8_t input[32];       // We store the data received here in the interrupt handler see receiveDataWire()
 volatile uint8_t gotMessage = 0;  // and we put the address here. It's leftshifted one place, so we can use that
-                                  // bit to indicate a message, even if it's a general call, see receiveDataWire()
+//                                   bit to indicate a message, even if it's a general call, see receiveDataWire()
 volatile uint8_t lenMessage = 0;  // And the length gets stored here.
 #define MySerial Serial           // The serial port connected to the to the computer.
 
@@ -79,7 +79,7 @@ void loop() {
 void printMessage() {
   uint8_t addr = gotMessage >> 1;
   cli(); // disable interrupts, we don't want another receive to write over these
-         // while we are reading them. This is the same as NoInterrupts();
+  //        while we are reading them. This is the same as NoInterrupts();
   uint8_t len = lenMessage; // lenMessage is volatile, but it won't change
   // during one call to printMessage() since interrupts are disabled.
   // Saving to a temp variable like this saves 2-4 bytes of flash for every place
@@ -119,12 +119,12 @@ void printMessage() {
      * of every variable stored after them in the RAM until it hit one
      * containing zero.
      */
-    for (uint8_t i = 0; i < len; i++ ) {
+    for (uint8_t i = 0; i < len; i++) {
       MySerial.write(input[i]);
     }
     MySerial.println();
     MySerial.print("Hex: ");
-    for (uint8_t i = 0; i < len; i++ ){
+    for (uint8_t i = 0; i < len; i++) {
       MySerial.printHex(input[i]);
     }
     MySerial.println();

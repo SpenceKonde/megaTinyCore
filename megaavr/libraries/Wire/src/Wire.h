@@ -60,9 +60,9 @@ extern "C" {
 
 
 class TwoWire: public Stream {
- private:
-  twiData vars;   // We're using a struct to reduce the amount of parameters that have to be passed.
- public:
+  private:
+    twiData vars;   // We're using a struct to reduce the amount of parameters that have to be passed.
+  public:
     explicit TwoWire(TWI_t *twi_module);
     bool pins(uint8_t sda_pin, uint8_t scl_pin);
     bool swap(uint8_t state = 1);
@@ -139,7 +139,7 @@ class TwoWire: public Stream {
     using Print::write;
 
     #if defined(TWI_ERROR_ENABLED)
-      uint8_t returnError();
+    uint8_t returnError();
     #endif
 
     void    TWI_onReceiveService(int numBytes);
