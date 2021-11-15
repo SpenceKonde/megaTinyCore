@@ -1,17 +1,35 @@
-# USERSIG Library V2.0 for megaTinyCore
+# USERSIG Library V2.0.1 for megaTinyCore
 
-Written by: _Christopher Andrews_
-
-Adapted for the USERROW/USER SIGNATURE for tinyAVR 0/1/2-series and megaAVR 0-series by: _Spence Konde_
+**Written by:** _Spence Konde_
+**Based on EEPROM.h by:** Christopher Andrews
 
 ## What is the USERSIG library
 
-The USERSIG library provides an easy to use interface to interact with the so-called "user row" or "user signature" - on tinyAVR 0/1/2-series and megaAVR 0-series parts, this works just like EEPROM - except that it is not cleared by a chip erase, regardless of whether the EESAVE bit is set in the fuses. This library is named USERSIG because USERROW is the name of a builtin way to access it included in the io headers (low level files containing register names and the like), but which provides no facility for writing or doing other things that you probably want to do with them
-
-## A word about datatypes used
-These are known by many names; `uint8_t`, `byte`, and `unsigned char` - they are all interchangible.
+The USERSIG library provides an easy to use interface to interact with the so-called "user row" or "user signature" - on tinyAVR 0/1/2-series and megaAVR 0-series parts, this works just like EEPROM - except that it is not cleared by a chip erase, regardless of whether the EESAVE bit is set in the fuses. This memory section is most often called the "USERROW" since that is what Microchip calls it. This library is named USERSIG (from "User Signature Space", the non-abbreviated official name and the "USER_SIGNATURE_SIZE" macros) because USERROW is the name of a builtin way to access it included in the io headers (low level files containing register names and the like), but which provides no facility for writing or doing other things that you probably want to do with them. (How did it become "User Row" from "User Signature"? Probably the same way that the read-only signature that all AVR parts have came to be called the "SIGROW" - I don't know what that way is, but it's consistant).
 
 Addresses in the USERSIG area are given by by a `byte`, not an `int`, as all released parts have under 256 bytes of memory of this type. The library offsets it as appropriate for your part to get the memory mapped address.
+
+## USEROW Sizes
+
+| AVR Device                          | USERROW size | Supported |
+|-------------------------------------|--------------|-----------|
+| tinyAVR 0/1/2-series                |          32b |       Yes |
+| megaAVR 0-series (8k or 16k flash)  |          32b |       Yes |
+| megaAVR 0-series (32k or 48k flash) |          64b |       Yes |
+| DA, DB, DD-series (all flash sizes) |          32b | On DxCore |
+| EA-series (all flash sizes)         |          64b |   Not yet |
+
+The Dx-series uses a different version of the library, which is included with DxCore. It's almost the same, but not quite - this one is functionally identical to EEPROM, those parts have hardware which cannot be made to look like EEPROM in the same way. See the library documentation for DxCore for more informnation.
+
+Specifying an address beyond the size of the USEROW will wrap around to the beginning.
+
+## Write Endurance
+The USERROW write endurance is similar to the flash endurance according a well-placed source. There is no specification given in the datasheet.
+
+## The last 12 bytes of the USERSIG
+If (and only if) you have used the included tuning sketch to calibrate the internal oscillator for other frequencies, we store that calibration data in the USERROW, at the last 12 addreses. The last 6 get the values used with the internal oscillator at nominally 20 MHz, and the next-to-last 6 get the values for when the interal oscillator is set for a 16 MHz nominal frequency: Hence you have only 20 bytes available. If you are using the "tuned" oscillator options, you should avoid overwriting the last 12 bytes - or at least the one for the frequency you are tuning for (this includes the case where the tuning sketch has never been run, and you're using the tuned internal oscillator option and relying on us to guess the correct calibration value - we'll mistake your value for the calibration value); if you do, your new value will be used as the calibration value, and at the next reset, you'll wonder why your "24 MHz" tuning has turned into 17.3 MHz or some other wacky frequency.
+
+Those locations are only used when Tools -> Clock is set to "Internal xx MHz (tuned)" - other clock options do not require such measures.
 
 ## How to use it
 The USERSIG library is included with megaTinyCore. To add its functionality to your sketch you'll need to reference the library header file. You do this by adding an include directive to the top of your sketch.
@@ -70,6 +88,8 @@ Two parameters are needed to call this function. The first is a `byte` containin
 This function uses the _update_ method to write its data, and therefore only rewrites changed cells.
 
 This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
+
+This should be obvious, but don't use `USERSIG.put()` to store something that won't fit in the USERROW. Addresses wrap around, and what you saved will come out looking very different.
 
 ### **Subscript operator:** `USERSIG[address]` [[_example_]](examples/usersig_crc/usersig_crc.ino)
 
@@ -144,3 +164,6 @@ This function returns an `USPtr` pointing at the location after the last USERSIG
 Used with `begin()` to provide custom iteration.
 
 **Note:** The `USPtr` returned is invalid as it is out of range. In fact the hardware causes wrapping of the address (overflow) and `USERSIG.end()` actually references the first USERSIG cell.
+
+## A general warning
+This library and the USERROW functionality have not been as thoroughly vetted for gremlins as EEPROM. Unlike EEPROM, we don't know how many skeletons are in this ~closet~ memory section. Accordingly, before you go shipping a product that relies on this, be sure to test it under adverse scenarios if it is expected to perform reliably in them (for example, low voltage, power interruption during write, etc). Be particularly careful of things that are known to cause issues with EEPROM.
