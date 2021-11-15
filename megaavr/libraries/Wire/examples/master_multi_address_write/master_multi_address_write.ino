@@ -26,7 +26,7 @@
  *
  * To use this, you need to connect the SCL and SDA pins of this device to the
  * SCL and SDA pins of a second device running the Slave Secondary Address example or
- * Slave Address Mask exaple.
+ * Slave Address Mask example.
  *
  * Pullup resistors must be connected between both data lines and Vcc.
  * See the Wire library README.md for more information.

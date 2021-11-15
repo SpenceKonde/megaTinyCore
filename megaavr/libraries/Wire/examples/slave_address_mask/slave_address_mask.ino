@@ -28,7 +28,7 @@
  * under us. That isn't catastrophic here, but if we were doing something
  * else with the data it could be.
  *
- * This (moreso than the secondary address one) is meant to be a more
+ * This (more so than the secondary address one) is meant to be a more
  * comprehensive (if not comprehensible) starting point. It's also an
  * example of why I probably shouldn't be writing examples...
  *

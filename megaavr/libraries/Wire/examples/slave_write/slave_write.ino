@@ -4,7 +4,7 @@
  * with up to 4 bytes of data - namely, the current value of millis.
  *
  * If millis is disabled, it will instead always return the sequence
- * 1234567890 (1,234,567,890, or 0x499602D2 represented in hexademical)
+ * 1234567890 (1,234,567,890, or 0x499602D2 represented in hexadecimal)
  *
  * To use this, you need to connect the SCL and SDA pins of this device to the
  * SCL and SDA pins of a second device running the Master Read example.

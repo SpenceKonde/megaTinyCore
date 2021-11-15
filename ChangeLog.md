@@ -32,7 +32,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Adjust serial buffer size 512b and 1k parts by adding an intermediate 32b serial buffer size.
   * Parts with 512b are changed - from 16->32 for RX, TX unchanged at 16 (32->48 for each port used).
   * Parts with 1k are changed - from 64 to 32 for TX, RX unchanged at 64 (128->96 for each port used).
-  * Smaller and larger parts are unchanged. This mostly helps to smooth out the RAM usage curve as you change flash size - going from 256 to 512 didn't previously change the allocation, while the jump from 512b to 1k was alarmingly large. The fact that the 8k 2-series have  poirts each makes this more noticable. This combined with another breakpoint led me to think that something else was broken.
+  * Smaller and larger parts are unchanged. This mostly helps to smooth out the RAM usage curve as you change flash size - going from 256 to 512 didn't previously change the allocation, while the jump from 512b to 1k was alarmingly large. The fact that the 8k 2-series have  poirts each makes this more noticeable. This combined with another breakpoint led me to think that something else was broken.
 *
 
 ## Released Versions
