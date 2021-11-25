@@ -12,7 +12,11 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
   * Support for Dual Mode (one instance of TWI acting as master on one pair of pins and slave on another) on parts that support it (there are no current or announced tinyAVR parts with dual mode support.
   * Significantly reduced flash usage under all circumstances (even master+slave mode should use less flash than old master or slave mode - the cost of supporting master-and-slave mode is RAM for a second buffer. There is an implementation included that can use the same memory for both buffers, however, it is not currently exposed via an option due to the risk of breakage if you receive while preparing to send something.
   * Failed attempts will timeout instead of hanging indefinitely.
+  * (TODO) - Port wire changes back here.
   * Correct defect in the changelog (this file) due to a suspected a CEBCAK (cat exists between chair and keyboard).
+* (TODO) - Port Serial changes here from DxCore
+* (TODO) - Finish Event changes and port to here.
+* (TODO) - Port enhanced documentation from DxCore.
 * Recent change to C++17 required additions to new.cpp and new.h, including sized deallocation (`delete`) and alignment-aware `new` and `delete` operators. The sized deallocation operator is called when existing code that worked before is compiled to the C++ 17 standard; since free() doesn't care about the size, implementation was straightforward. Discussion is ongoing about the aligned `new` and `delete` operators, which are also new in this version of the standards. It is likely that we will not support them, since other Arduino cores aren't even building to C++ 17 standard, so if your code needs aligned new/delete, it also won't work anywhere else in Arduino-land. While we are not shy about adding features, we do so only to support hardware features. If conditions change we will revisit this matter.
 * Using millis or micros (or rather attempting to) when they are unavailable due to millis being disabled, or in the case of micros, RTC used as millis time source, give better errors.
 * Clarified licence (for one thing, renamed to a .md so people can read it more easily, and know that it's readable if they're on windows) for tinyNeoPixel.
@@ -33,7 +37,10 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
   * Parts with 512b are changed - from 16->32 for RX, TX unchanged at 16 (32->48 for each port used).
   * Parts with 1k are changed - from 64 to 32 for TX, RX unchanged at 64 (128->96 for each port used).
   * Smaller and larger parts are unchanged. This mostly helps to smooth out the RAM usage curve as you change flash size - going from 256 to 512 didn't previously change the allocation, while the jump from 512b to 1k was alarmingly large. The fact that the 8k 2-series have  poirts each makes this more noticeable. This combined with another breakpoint led me to think that something else was broken.
-*
+* Officially deprecate jtag2updi.
+* Port micros and delay-microseconds improvements from DxCore.
+* Add a set of compatibility defines to make life easier for people porting non-Event library event-using code to 0/1-series.
+* SerialUPDI reference now links to it's actual location.
 
 ## Released Versions
 

@@ -82,7 +82,9 @@ Two parameters are needed to call this function. The first is an `int` containin
 
 This function uses the _update_ method to write its data, and therefore only rewrites changed cells.
 
-This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
+This function returns a reference to the `object` passed in. It does not need to be used and is only returned for convenience.
+
+This should be obvious, but don't use this to store something that won't fit in the EEPROM. It will blindly write it, the address will wrap around when you go off the end, and you will be left with only the last x bytes (where x is the size of the EEPROM on your part) stored, and hence will `get()` something very different than what you `put()` in.
 
 ### Subscript operator: `EEPROM[address]` [[_example_]](examples/eeprom_crc/eeprom_crc.ino)
 

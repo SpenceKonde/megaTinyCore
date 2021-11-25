@@ -383,22 +383,22 @@ unsigned long millis() {
        * have not bothered to record a time so accurately...
        */
         // Oddball clock speeds
-      #if   (F_CPU == 44000000UL) // Extreme overclocking
+      #if   (F_CPU == 44000000UL) // Nope, not gonna happen even on a tinyAVR 2-series w/ext clock.
         ticks = ticks >> 4;
         microseconds = overflows * 1000 + (ticks - /* (ticks >> 1) + (ticks >> 2) - */ + (ticks >> 5) + /* (ticks >> 6) - */ (ticks >> 7)); // + (ticks >> 10)
-      #elif (F_CPU == 36000000UL) // 50% overclock!
+      #elif (F_CPU == 36000000UL) // MAYBE possible on 2-series tinyAVR w/external CLOCK.
         ticks = ticks >> 4;
         microseconds = overflows * 1000 + (ticks - (ticks >> 3) + (ticks >> 6)); // - (ticks >> 9) + (ticks >> 10) // with 5 terms it is DEAD ON
-      #elif (F_CPU == 28000000UL) // Not supported by DxCore - nobody wants it.
+      #elif (F_CPU == 28000000UL) // Who wants this stupid speed? But we support it.
         ticks = ticks >> 4;
         microseconds = overflows * 1000 + (ticks + (ticks >> 2) - (ticks >> 3) + (ticks >> 5) - (ticks >> 6)); // + (ticks >> 8) - (ticks >> 9)
-      #elif (F_CPU == 14000000UL) // Not supported by DxCore - nobody wants it.
+      #elif (F_CPU == 14000000UL) // Not supported by megaTinyCore - nobody wants it, it'sa bad speed.
         ticks = ticks >> 3;
         microseconds = overflows * 1000 + (ticks + (ticks >> 2) - (ticks >> 3) + (ticks >> 5) - (ticks >> 6)); // + (ticks >> 8) - (ticks >> 9)
-      #elif (F_CPU == 30000000UL) // Easy overclock
+      #elif (F_CPU == 30000000UL) // Maximum overclock from internal on 1-series. Not all parts can do it.
         ticks = ticks >> 4;
         microseconds = overflows * 1000 + (ticks + (ticks >> 3) - (ticks >> 4) + (ticks >> 7) - (ticks >> 8)); // 5 terms is the optimal. Good but not as close as we get for most.
-      #elif (F_CPU == 25000000UL) // Barely overclocked.
+      #elif (F_CPU == 25000000UL) // Basically any part can do 25
         ticks = ticks >> 4;
         microseconds = overflows * 1000 + (ticks + /* (ticks >> 1) -*/ (ticks >> 2) + /* (ticks >> 4) -*/ (ticks >> 5)); // DEAD ON with 5 terms
 
@@ -541,32 +541,35 @@ unsigned long millis() {
           : "+r" (ticks));        // Do the rest in C
         microseconds = overflows * 1000 + ticks;
 /* replaces:
-      #elif (F_CPU == 48000000UL) // Extreme overclocking
-        ticks = ticks >> 5;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
-      #elif (F_CPU == 24000000UL) // max rated speed
-        ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
-      #elif (F_CPU == 12000000UL)
-        ticks = ticks >> 3;
-        microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
-      // Never was an implementation for 6, but it's obvious what the old style implementation would be,
+ *    #elif (F_CPU == 48000000UL) // Works on Dx extended temp range w/ext CLOCK, but unachievable on tiny.
+ *      ticks = ticks >> 5;
+ *      microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
+ *    #elif (F_CPU == 24000000UL) // Easy overclock for tinies.
+ *      ticks = ticks >> 4;
+ *      microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
+ *    #elif (F_CPU == 12000000UL)
+ *      ticks = ticks >> 3;
+ *      microseconds = overflows * 1000 + (ticks + (ticks >> 2) + (ticks >> 3) - (ticks >> 5)); // - (ticks >> 7)
+ *    // Never was an implementation for 6, but it's obvious what the old style implementation would be,
+ *
+ *    #elif (F_CPU == 40000000UL) // unachievable on tiny, works on Dx with ext crystal on most I spec and almost all E-spec.
+ *      ticks = ticks >> 4;
+ *      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
+ *    #elif (F_CPU == 20000000UL)
+ *      ticks = ticks >> 3;
+ *      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
+ *    #elif (F_CPU == 10000000UL)
+ *      ticks = ticks >> 2;
+ *      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
+ *    #elif (F_CPU ==  5000000UL)
+ *      ticks = ticks >> 1;
+ *      microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
+ */
 
-      #elif (F_CPU == 40000000UL) // overclocked aggressively
-        ticks = ticks >> 4;
-        microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
-      #elif (F_CPU == 20000000UL)
-        ticks = ticks >> 3;
-        microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
-      #elif (F_CPU == 10000000UL)
-        ticks = ticks >> 2;
-        microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
-      #elif (F_CPU ==  5000000UL)
-        ticks = ticks >> 1;
-        microseconds = overflows * 1000 + (ticks - (ticks >> 2) + (ticks >> 4) - (ticks >> 6)); // + (ticks >> 8)
-*/
-
-      // powers of 2  - and a catchall for parts without dedicated implementations. It gives wrong results, but
+      // powers of 2, which dont need to divide by non-powers of 2 and hence don't need
+      // ugly bitshift ersatz division, and this code is simple with no room for avr-gcc to screw up and
+      // throw away 30-50 clock cycles for no reason.
+      // also a catchall for parts without dedicated implementations. It gives wrong results, but
       // it also doesn't take forever like doing division would.
       #elif (F_CPU  == 32000000UL || F_CPU > 24000000UL)
         microseconds = overflows * 1000 + (ticks >> 4);
@@ -586,7 +589,7 @@ unsigned long millis() {
             F_CPU ==  1000000UL)
         #warning "Millis timer (TCBn) at this frequency is unsupported, micros() will return totally bogus values."
       #endif
-    #else //Done with TCB, only thing left is TCA0
+    #else //Done with TCB
 
       #if (F_CPU == 30000000UL && TIME_TRACKING_TICKS_PER_OVF == 255 && TIME_TRACKING_TIMER_DIVIDER == 64)
         microseconds = (overflows * clockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF))
@@ -1340,7 +1343,7 @@ void __attribute__((weak)) init_ADC0() {
     #if   (F_CPU == 6000000 || F_CPU == 12000000 || F_CPU == 24000000 || F_CPU ==25000000)
       ADC0.SAMPCTRL = (7); // 9 ADC clocks, 12 us
     #elif (F_CPU == 5000000 || F_CPU == 10000000 || F_CPU == 20000000 )
-      ADC0.SAMPCTRL = 13;   // 15 ADC clock,s 12 us
+      ADC0.SAMPCTRL = (13);   // 15 ADC clock,s 12 us
     #else
       ADC0.SAMPCTRL = (10); // 12 ADC clocks, 12 us
     #endif
