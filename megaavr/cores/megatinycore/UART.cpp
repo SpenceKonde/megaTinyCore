@@ -105,7 +105,7 @@ void UartClass::_tx_data_empty_irq(void) {
   // There must be more data in the output
   // buffer. Send the next byte
   unsigned char c = _tx_buffer[_tx_buffer_tail];
-  _tx_buffer_tail = (_tx_buffer_tail + 1) & (SERIAL_TX_BUFFER_SIZE-1); //% SERIAL_TX_BUFFER_SIZE;
+  _tx_buffer_tail = (_tx_buffer_tail + 1) & (SERIAL_TX_BUFFER_SIZE - 1); //% SERIAL_TX_BUFFER_SIZE;
 
   // clear the TXCIF flag -- "can be cleared by writing a one to its bit
   // location". This makes sure flush() won't return until the bytes
@@ -196,9 +196,9 @@ void UartClass::begin(unsigned long baud, uint16_t config) {
 
   // Use CLK2X if appropriate.
   #if (F_CPU > 2000000)
-  if(baud>=(38400*(F_CPU/1000000))) {
+  if(baud >= (38400 * (F_CPU / 1000000))) {
     rxmode = USART_RXMODE_CLK2X_gc;
-    baud=baud>>1;
+    baud=baud >> 1;
   } /*
   since this is the default, we don't need to set this, saving a bit of flash.
   else {
@@ -240,8 +240,8 @@ void UartClass::begin(unsigned long baud, uint16_t config) {
     #endif
     baud_setting *= (1024 + sigrow_val);
     baud_setting /= 2048;
-    if (baud_setting>65535){
-      baud_setting=65535;
+    if (baud_setting > 65535) {
+      baud_setting = 65535;
     }
     #else
     #if (F_CPU > 2000000)
@@ -302,7 +302,7 @@ void UartClass::end() {
 }
 
 int UartClass::available(void) {
-  return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) & (SERIAL_RX_BUFFER_SIZE-1); //% SERIAL_RX_BUFFER_SIZE;
+  return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) & (SERIAL_RX_BUFFER_SIZE - 1); //% SERIAL_RX_BUFFER_SIZE;
 }
 
 int UartClass::peek(void) {
@@ -319,7 +319,7 @@ int UartClass::read(void) {
     return -1;
   } else {
     unsigned char c = _rx_buffer[_rx_buffer_tail];
-    _rx_buffer_tail = (rx_buffer_index_t)(_rx_buffer_tail + 1) & (SERIAL_RX_BUFFER_SIZE-1); // % SERIAL_RX_BUFFER_SIZE;
+    _rx_buffer_tail = (rx_buffer_index_t)(_rx_buffer_tail + 1) & (SERIAL_RX_BUFFER_SIZE - 1); // % SERIAL_RX_BUFFER_SIZE;
     return c;
   }
 }
@@ -400,7 +400,7 @@ size_t UartClass::write(uint8_t c) {
 
     return 1;
   }
-  tx_buffer_index_t i = (_tx_buffer_head + 1) & (SERIAL_TX_BUFFER_SIZE-1); // % SERIAL_TX_BUFFER_SIZE;
+  tx_buffer_index_t i = (_tx_buffer_head + 1) & (SERIAL_TX_BUFFER_SIZE - 1); // % SERIAL_TX_BUFFER_SIZE;
 
   //If the output buffer is full, there's nothing for it other than to
   //wait for the interrupt handler to empty it a bit (or emulate interrupts)
@@ -418,36 +418,34 @@ size_t UartClass::write(uint8_t c) {
 }
 
 void UartClass::printHex (const uint8_t b) {
-  char x=(b>>4)|'0';
+  char x = (b >> 4) | '0';
   if (x > '9')
     x += 7;
   write(x);
-  x=(b&0x0F)|'0';
+  x = (b & 0x0F) | '0';
   if (x > '9')
     x += 7;
   write(x);
 }
-void UartClass::printHex(const uint16_t w, bool swaporder){
-  uint8_t * ptr=(uint8_t*)&w;
-  if (swaporder){
+void UartClass::printHex(const uint16_t w, bool swaporder) {
+  uint8_t* ptr = (uint8_t *) &w;
+  if (swaporder) {
     printHex(*(ptr++));
     printHex(*(ptr));
-  }
-  else {
-    printHex(*(ptr+1));
+  } else {
+    printHex(*(ptr + 1));
     printHex(*(ptr));
   }
 }
 
-void UartClass::printHex(const uint32_t l, bool swaporder){
-  uint8_t * ptr=(uint8_t*)&l;
-  if (swaporder){
+void UartClass::printHex(const uint32_t l, bool swaporder) {
+  uint8_t* ptr = (uint8_t *) &l;
+  if (swaporder) {
     printHex(*(ptr++));
     printHex(*(ptr++));
     printHex(*(ptr++));
     printHex(*(ptr));
-  }
-  else {
+  } else {
     ptr+=3;
     printHex(*(ptr--));
     printHex(*(ptr--));
@@ -456,8 +454,8 @@ void UartClass::printHex(const uint32_t l, bool swaporder){
   }
 }
 
-uint8_t * UartClass::printHex(uint8_t* p,uint8_t len, char sep) {
-  for (byte i=0;i<len;i++) {
+uint8_t * UartClass::printHex(uint8_t* p, uint8_t len, char sep) {
+  for (byte i = 0; i < len; i++) {
     if (sep && i) write(sep);
     printHex(*p++);
   }
@@ -466,9 +464,9 @@ uint8_t * UartClass::printHex(uint8_t* p,uint8_t len, char sep) {
 
 
 uint16_t * UartClass::printHex(uint16_t* p, uint8_t len, char sep, bool swaporder) {
-  for (byte i=0;i<len;i++) {
+  for (byte i = 0; i < len; i++) {
     if (sep && i) write(sep);
-    printHex(*p++,swaporder);
+    printHex(*p++, swaporder);
   }
   return p;
 }
