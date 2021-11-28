@@ -27,21 +27,21 @@ These parts do not support an external HF crystal, only an external clock. No wa
    5 | Internal        |
    4 | Internal        |
    1 | Internal        |
-  20 | Internal, tuned |
-  16 | Internal, tuned |
-  12 | Internal, tuned |
-  20 | External Clock  | External clock goes to CLKI (PA3). Minimize any load on this pin, including even short wires. HF stuff is very picky.
+  20 | Internal, tuned | Works with 16 MHz oscillator
+  16 | Internal, tuned | Works with 20 MHz oscillator
+  12 | Internal, tuned | 
+  20 | External Clock  | External clock to (PA3), short wires.
   16 | External Clock  | As above.
   10 | External Clock  | As above.
    8 | External Clock  | As above.
-  24 | Internal, tuned | OVERCLOCKED, usually fine @ 5v and room temperature.
-  25 | Internal, tuned | OVERCLOCKED, usually fine @ 5v and room temperature.
+  24 | Internal, tuned | OVERCLOCKED, usually works
+  25 | Internal, tuned | OVERCLOCKED, usually works
   30 | Internal, tuned | OVERCLOCKED, may be unstable.
-  24 | External Clock  | OVERCLOCKED, usually fine @ 5v and room temperature. Uses CLKI/PA3 as above.
-  25 | External Clock  | OVERCLOCKED, usually fine @ 5v and room temperature. Uses CLKI/PA3 as above.
-  30 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
-  32 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
-When external clock is used as system clock source, it cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
+  24 | External Clock  | OVERCLOCKED, usually works
+  25 | External Clock  | OVERCLOCKED, usually works
+  30 | External Clock  | OVERCLOCKED, may be unstable
+  32 | External Clock  | OVERCLOCKED, may be unstable
+When external clock is used as system clock source PA3 cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
 
 The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Tuning.md) for more information before using these options.
 
