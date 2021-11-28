@@ -41,6 +41,7 @@ These parts do not support an external HF crystal, only an external clock. No wa
   25 | External Clock  | OVERCLOCKED, usually works
   30 | External Clock  | OVERCLOCKED, may be unstable
   32 | External Clock  | OVERCLOCKED, may be unstable
+
 When external clock is used as system clock source PA3 cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
 
 The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Tuning.md) for more information before using these options.
