@@ -29,7 +29,7 @@ These parts do not support an external HF crystal, only an external clock. No wa
    1 | Internal        |
   20 | Internal, tuned | Works with 16 MHz oscillator
   16 | Internal, tuned | Works with 20 MHz oscillator
-  12 | Internal, tuned | 
+  12 | Internal, tuned |
   20 | External Clock  | External clock to (PA3), short wires.
   16 | External Clock  | As above.
   10 | External Clock  | As above.

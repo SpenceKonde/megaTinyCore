@@ -199,7 +199,7 @@ jobs:
       - name: Compile examples (all default)
         uses: arduino/compile-sketches@main
         with:
-          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }}
+          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},wiremode=mors,attach=allenable
           sketch-paths: |
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
@@ -230,7 +230,7 @@ jobs:
       - name: Compile examples (disable millis)
         uses: arduino/compile-sketches@main
         with:
-          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},millis=disabled
+          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},millis=disabled,wiremode=mands,attach=manual
           sketch-paths: |
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
@@ -288,7 +288,7 @@ jobs:
       - name: Compile examples (RTC millis)
         uses: arduino/compile-sketches@main
         with:
-          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},millis=rtc,wire=mands,attach=allenabled
+          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},millis=rtc,wiremode=mands,attach=allenabled
           sketch-paths: |
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
@@ -318,7 +318,7 @@ jobs:
       - name: Compile examples (default millis, 8 MHz)
         uses: arduino/compile-sketches@main
         with:
-          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},clock${{ matrix.bootloader-code }}=8internal,wire=mors,attach=oldversion
+          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},clock${{ matrix.bootloader-code }}=8internal,wiremode=mors,attach=oldversion
           sketch-paths: |
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
@@ -347,7 +347,7 @@ jobs:
       - name: Compile examples (default millis, clock 25 MHz internal, tuned)
         uses: arduino/compile-sketches@main
         with:
-          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},clock${{ matrix.bootloader-code }}=25internaltuned
+          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},clock${{ matrix.bootloader-code }}=25internaltuned,wiremode=mors,attach=oldversion
           sketch-paths: |
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
@@ -377,7 +377,7 @@ jobs:
       - name: Compile examples (default millis, clock 24 MHz external)
         uses: arduino/compile-sketches@main
         with:
-          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},clock${{ matrix.bootloader-code }}=24extclock
+          fqbn: ${{ env.platform-name }}:atx${{ matrix.bootloader-series}}${{ matrix.IO-class }}${{ matrix.bootloader-code }}:chip=${{ matrix.flash-class }}${{ matrix.peripheral-class }}${{ matrix.IO-class }},clock${{ matrix.bootloader-code }}=24extclock,wiremode=mors,attach=oldversion
           sketch-paths: |
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
