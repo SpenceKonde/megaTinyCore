@@ -4062,23 +4062,23 @@ atxy2o.menu.wiremode.mands.build.wire=MANDS
 #----------------------------------------#
 # printf() version options               #
 #________________________________________#
-atx24o.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
-atx24o.menu.printf.full=Full, 2.6k, prints floats
-atx24o.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
-atx24o.menu.printf.full.build.printfabr=.pfF
-atx24o.menu.printf.minimal=Minimal, 1.1k flash used
-atx24o.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
-atx24o.menu.printf.minimal.build.printfabr=.pfM
+atxy2o.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atxy2o.menu.printf.full=Full, 2.6k, prints floats
+atxy2o.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atxy2o.menu.printf.full.build.printfabr=.pfF
+atxy2o.menu.printf.minimal=Minimal, 1.1k flash used
+atxy2o.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atxy2o.menu.printf.minimal.build.printfabr=.pfM
 
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atx24o.menu.attach.allenabled=On all pins, like usual
-atx24o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atx24o.menu.attach.manual=Only enabled ports. Please see documentation.
-atx24o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atx24o.menu.attach.oldversion=Old version, (may fix bugs)
-atx24o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atxy2o.menu.attach.allenabled=On all pins, like usual
+atxy2o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy2o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy2o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atxy2o.menu.attach.oldversion=Old version, (may fix bugs)
+atxy2o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ##########################################################################
 #                                                                        #
