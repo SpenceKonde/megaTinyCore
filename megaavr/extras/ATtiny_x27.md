@@ -57,6 +57,7 @@ These parts do not support an external HF crystal, only an external clock, and/o
   25 | External Clock  | OVERCLOCKED, usually fine @ 5v and room temperature. Uses CLKI/PA3 as above.
   30 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
   32 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
+  
 When external clock is used as system clock source, it cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
 
 * The overclocked options at 24/25 MHz have been found to generally work around room temperature when running at 5v. For faster speeds, initial results seem to imply that the 2-series parts are significantly more capable of handling higher operating frequencies compared to the 0/1-series, and that with solid 5v supply, 32 MHz at room temperature may be good enough for practical use! Whereas the previous parts collapsed at around 30-32 MHz running from internal oscillator, that isn't seen until the mid 30's on the 2-series parts. As always, external oscillators work more reliably than the internal one when overclocking, but they generally cost about as much as the microcontroller itself and are gross overkill (in terms of accuracy) for what most arduino folks want from them.
