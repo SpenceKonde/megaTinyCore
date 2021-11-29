@@ -412,10 +412,10 @@ atxy7.menu.startuptime.64.bootloader.SYSCFG1=0x07
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atxy7.menu.wire.mors=Master or Slave (saves flash and RAM)
-atxy7.menu.wire.mors.build.wire=MORS
-atxy7.menu.wire.mands=Master and Slave
-atxy7.menu.wire.mands.build.wire=MANDS
+atxy7.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atxy7.menu.wiremode.mors.build.wire=MORS
+atxy7.menu.wiremode.mands=Master and Slave
+atxy7.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -775,10 +775,10 @@ atxy6.menu.startuptime.64.bootloader.SYSCFG1=0x07
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atxy6.menu.wire.mors=Master or Slave (saves flash and RAM)
-atxy6.menu.wire.mors.build.wire=MORS
-atxy6.menu.wire.mands=Master and Slave
-atxy6.menu.wire.mands.build.wire=MANDS
+atxy6.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atxy6.menu.wiremode.mors.build.wire=MORS
+atxy6.menu.wiremode.mands=Master and Slave
+atxy6.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -1138,10 +1138,10 @@ atxy4.menu.startuptime.64.bootloader.SYSCFG1=0x07
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atxy4.menu.wire.mors=Master or Slave (saves flash and RAM)
-atxy4.menu.wire.mors.build.wire=MORS
-atxy4.menu.wire.mands=Master and Slave
-atxy4.menu.wire.mands.build.wire=MANDS
+atxy4.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atxy4.menu.wiremode.mors.build.wire=MORS
+atxy4.menu.wiremode.mands=Master and Slave
+atxy4.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -1453,10 +1453,10 @@ atxy2.menu.startuptime.64.bootloader.SYSCFG1=0x07
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atxy2.menu.wire.mors=Master or Slave (saves flash and RAM)
-atxy2.menu.wire.mors.build.wire=MORS
-atxy2.menu.wire.mands=Master and Slave  (412 and 212 only)
-atxy2.menu.wire.mands.build.wire=MANDS
+atxy2.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atxy2.menu.wiremode.mors.build.wire=MORS
+atxy2.menu.wiremode.mands=Master and Slave  (412 and 212 only)
+atxy2.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -1774,10 +1774,10 @@ microchip.menu.startuptime.64.bootloader.SYSCFG1=0x07
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-microchip.menu.wire.mors=Master or Slave (saves flash and RAM)
-microchip.menu.wire.mors.build.wire=MORS
-microchip.menu.wire.mands=Master and Slave
-microchip.menu.wire.mands.build.wire=MANDS
+microchip.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+microchip.menu.wiremode.mors.build.wire=MORS
+microchip.menu.wiremode.mands=Master and Slave
+microchip.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -2105,10 +2105,10 @@ atxy7o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atxy7o.menu.wire.mors=Master or Slave (saves flash and RAM)
-atxy7o.menu.wire.mors.build.wire=MORS
-atxy7o.menu.wire.mands=Master and Slave
-atxy7o.menu.wire.mands.build.wire=MANDS
+atxy7o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atxy7o.menu.wiremode.mors.build.wire=MORS
+atxy7o.menu.wiremode.mands=Master and Slave
+atxy7o.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -2418,10 +2418,10 @@ atx27o.menu.bootloaderuart.alternate1.bootloader.uartswap=_u1alt
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atx27o.menu.wire.mors=Master or Slave (saves flash and RAM)
-atx27o.menu.wire.mors.build.wire=MORS
-atx27o.menu.wire.mands=Master and Slave
-atx27o.menu.wire.mands.build.wire=MANDS
+atx27o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atx27o.menu.wiremode.mors.build.wire=MORS
+atx27o.menu.wiremode.mands=Master and Slave
+atx27o.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -2747,10 +2747,10 @@ atxy6o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atxy6o.menu.wire.mors=Master or Slave (saves flash and RAM)
-atxy6o.menu.wire.mors.build.wire=MORS
-atxy6o.menu.wire.mands=Master and Slave
-atxy6o.menu.wire.mands.build.wire=MANDS
+atxy6o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atxy6o.menu.wiremode.mors.build.wire=MORS
+atxy6o.menu.wiremode.mands=Master and Slave
+atxy6o.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -3060,10 +3060,10 @@ atx26o.menu.bootloaderuart.alternate1.bootloader.uartswap=_u1alt
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atx26o.menu.wire.mors=Master or Slave (saves flash and RAM)
-atx26o.menu.wire.mors.build.wire=MORS
-atx26o.menu.wire.mands=Master and Slave
-atx26o.menu.wire.mands.build.wire=MANDS
+atx26o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atx26o.menu.wiremode.mors.build.wire=MORS
+atx26o.menu.wiremode.mands=Master and Slave
+atx26o.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -3402,10 +3402,10 @@ atxy4o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atxy4o.menu.wire.mors=Master or Slave (saves flash and RAM)
-atxy4o.menu.wire.mors.build.wire=MORS
-atxy4o.menu.wire.mands=Master and Slave
-atxy4o.menu.wire.mands.build.wire=MANDS
+atxy4o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atxy4o.menu.wiremode.mors.build.wire=MORS
+atxy4o.menu.wiremode.mands=Master and Slave
+atxy4o.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -3710,10 +3710,10 @@ atx24o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atx24o.menu.wire.mors=Master or Slave (saves flash and RAM)
-atx24o.menu.wire.mors.build.wire=MORS
-atx24o.menu.wire.mands=Master and Slave
-atx24o.menu.wire.mands.build.wire=MANDS
+atx24o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atx24o.menu.wiremode.mors.build.wire=MORS
+atx24o.menu.wiremode.mands=Master and Slave
+atx24o.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -4030,10 +4030,10 @@ atxy2o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atx24o.menu.wire.mors=Master or Slave (saves flash and RAM)
-atx24o.menu.wire.mors.build.wire=MORS
-atx24o.menu.wire.mands=Master and Slave (412 and 212 only)
-atx24o.menu.wire.mands.build.wire=MANDS
+atx24o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atx24o.menu.wiremode.mors.build.wire=MORS
+atx24o.menu.wiremode.mands=Master and Slave (412 and 212 only)
+atx24o.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
@@ -4345,10 +4345,10 @@ microchipo.menu.startuptime.64.bootloader.SYSCFG1=0x07
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-microchipo.menu.wire.mors=Master or Slave (saves flash and RAM)
-microchipo.menu.wire.mors.build.wire=MORS
-microchipo.menu.wire.mands=Master and Slave
-microchipo.menu.wire.mands.build.wire=MANDS
+microchipo.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+microchipo.menu.wiremode.mors.build.wire=MORS
+microchipo.menu.wiremode.mands=Master and Slave
+microchipo.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
