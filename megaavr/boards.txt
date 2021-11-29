@@ -9,11 +9,11 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other             ##       #  #      ###   #
-#  contributors 2018-2021                      #  #      #  #         #  #
-#  megaTinyCore is free software.        # #     #       ####       ##   #
-#  (LGPL v2.1) see LICENSE.md and        # #    #    ##     #  ##     #  #
-#  License section of README.md           #    ####  ##     #  ##  ###   #
+#  Copyright Spence Konde and other             ##       ####       ###  #
+#  contributors 2018-2021                      #  #      #         #  ## #
+#  megaTinyCore is free software.        # #     #       ###       # # # #
+#  (LGPL v2.1) see LICENSE.md and        # #    #    ##     #  ##  ##  # #
+#  License section of README.md           #    ####  ##  ###   ##   ###  #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
@@ -40,8 +40,8 @@
 menu.chip=Chip
 # used in place of the chip menu for official Microchip boards
 menu.board_name=Board Name
-menu.clock=Clock (burn bootloader NOT req'd)
-menu.clocko=Clock (burn bootloader req'd, or see docs)
+menu.clock=Clock
+menu.clocko=Clock (burn bootloader usually req'd see docs)
 menu.millis=millis()/micros() Timer
 menu.startuptime=Startup Time
 menu.startuptimeopti=Startup Time (burn bootloader req'd)
@@ -52,8 +52,9 @@ menu.bootloaderuart=UART for Bootloader (burn bootloader req'd)
 menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
 menu.resetpinopti=UPDI/Reset Pin and Optiboot Entry (burn bootloader req'd)
 menu.resetpinopti_2=UPDI/alt-RST pins and Optiboot Entry (burn bootloader req'd)
-menu.wire=TWI (I2C/Wire.h) Options
-
+menu.attach=attachInterrupt() Version
+menu.printf=printf()
+menu.wiremode=Wire (Wire.h/I2C) Library mode
 
 ##########################################################################
 #                                                                        #
@@ -88,8 +89,9 @@ microchipo.name=Official Microchip Board w/Optiboot
 #  ATtiny827/817/807             #       #     #       #   #  ##     #####
 #  ATtiny427/417/407            ####     #     #      ###  #   #       ###
 #________________________________________________________________________#
-
-### BUILD PARAMETERS
+#                                        #
+# BUILD PARAMETERS                       #
+#________________________________________#
 atxy7.build.text_section_start=.text=0x0
 atxy7.build.millistimer=D0
 atxy7.build.bootload=
@@ -98,12 +100,15 @@ atxy7.build.clocksource=0
 atxy7.build.core=megatinycore
 atxy7.build.variant=txy7
 atxy7.build.tuned=
+atxy7.build.printf=
 atxy7.build.mcu=attiny{build.attiny}
 atxy7.build.f_cpu={build.speed}000000L
-atxy7.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} {build.tuned}
+atxy7.build.extra_flags=-DARDUINO_attinyxy7 {build.tuned}
 atxy7.build.export_merged_output=false
 
-### BOOTLOADING PARAMETERS (FUSES)
+#----------------------------------------#
+# BOOTLOADING PARAMETERS (FUSES)         #
+#________________________________________#
 atxy7.bootloader.WDTCFG=0x00
 atxy7.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy7.bootloader.OSCCFG=0x01
@@ -112,16 +117,32 @@ atxy7.bootloader.TCD0CFG_serialupdi=
 atxy7.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy7.bootloader.APPEND=0x00
 atxy7.bootloader.BOOTEND=0x00
-atxy7.bootloader.tool=avrdude
 atxy7.bootloader.avrdudestring=
 atxy7.bootloader.serialupdistring=-aerase
+atxy7.bootloader.altreset=Alt reset pin not supported on 0/1-series.
+atxy7.bootloader.tool=avrdude
 
-### ALL UPLOADING VIA UPDI
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atxy7.build.bootload=
+atxy7.build.printfabr=
+atxy7.build.wireabr=
+
+#----------------------------------------#
+# ALL UPLOADING VIA UPDI                 #
+#________________________________________#
 atxy7.upload.tool=avrdude
 atxy7.upload.workaround=
 atxy7.upload.with_programmer_not_available_for_bootloader_boards=
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# 24-pin 0/1-series tinyAVR submenus          #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atxy7.menu.chip.3217=ATtiny3217
 atxy7.menu.chip.3217.build.board=AVR_ATtiny3217
 atxy7.menu.chip.3217.build.attiny=3217
@@ -195,7 +216,9 @@ atxy7.menu.chip.807.build.millistimer=A0
 atxy7.menu.chip.807.upload.maximum_size=8192
 atxy7.menu.chip.807.upload.maximum_data_size=512
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atxy7.menu.clock.20internal=20 MHz internal
 atxy7.menu.clock.16internal=16 MHz internal
 atxy7.menu.clock.10internal=10 MHz internal
@@ -281,25 +304,29 @@ atxy7.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy7.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy7.menu.clock.5internal.bootloader.OSCCFG=0x02
 
-### BOD VOLTAGE
+#----------------------------------------#
+# BOD VOLTAGE                            #
+#________________________________________#
 atxy7.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy7.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atxy7.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atxy7.menu.bodvoltage.2v1=2.1V
-atxy7.menu.bodvoltage.2v9=2.9V
-atxy7.menu.bodvoltage.3v3=3.3V
-atxy7.menu.bodvoltage.3v7=3.7V
-atxy7.menu.bodvoltage.4v0=4.0V
+atxy7.menu.bodvoltage.2v1=2.1V (Unofficial)
+atxy7.menu.bodvoltage.2v9=2.9V (Unofficial)
+atxy7.menu.bodvoltage.3v3=3.3V (Unofficial)
+atxy7.menu.bodvoltage.3v7=3.7V (Unofficial)
+atxy7.menu.bodvoltage.4v0=4.0V (Unofficial)
 atxy7.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atxy7.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atxy7.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atxy7.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atxy7.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atxy7.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atxy7.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atxy7.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atxy7.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy7.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atxy7.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy7.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy7.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy7.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BOD MODE
+#----------------------------------------#
+# BOD MODE                               #
+#________________________________________#
 atxy7.menu.bodmode.disabled=Disabled/Disabled
 atxy7.menu.bodmode.enabled=Enabled/Enabled
 atxy7.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -319,13 +346,17 @@ atxy7.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy7.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy7.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### EEPROM RETAIN
+#----------------------------------------#
+# EEPROM RETAIN                          #
+#________________________________________#
 atxy7.menu.eesave.enable=EEPROM retained
 atxy7.menu.eesave.enable.bootloader.eesavebit=1
 atxy7.menu.eesave.disable=EEPROM not retained
 atxy7.menu.eesave.disable.bootloader.eesavebit=0
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atxy7.menu.millis.enabled=Enabled (default timer)
 atxy7.menu.millis.disabled=Disabled (saves flash)
 atxy7.menu.millis.timera=TCA0 (default on 0-series)
@@ -344,7 +375,9 @@ atxy7.menu.millis.rtc.build.millistimer=RTC
 atxy7.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy7.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### UPDI/RESET PIN CONFIGURATION
+#----------------------------------------#
+# UPDI/RESET PIN CONFIGURATION           #
+#________________________________________#
 atxy7.menu.resetpin.UPDI=UPDI (no reset pin)
 atxy7.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy7.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
@@ -356,7 +389,9 @@ atxy7.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
 #atxy7.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
 #atxy7.menu.resetpin.gpio.bootloader.resetpinbits=00
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atxy7.menu.startuptime.8=8ms
 atxy7.menu.startuptime.0=0ms
 atxy7.menu.startuptime.1=1ms
@@ -374,11 +409,34 @@ atxy7.menu.startuptime.16.bootloader.SYSCFG1=0x05
 atxy7.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy7.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
-### TWI OPTIONS
-atxy7.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atxy7.menu.wire.mors=Master or Slave (saves flash and RAM)
 atxy7.menu.wire.mors.build.wire=MORS
 atxy7.menu.wire.mands=Master and Slave
 atxy7.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atxy7.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atxy7.menu.printf.full=Full, 2.6k, prints floats
+atxy7.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atxy7.menu.printf.full.build.printfabr=.pfF
+atxy7.menu.printf.minimal=Minimal, 1.1k flash used
+atxy7.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atxy7.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atxy7.menu.attach.allenabled=On all pins, like usual
+atxy7.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy7.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy7.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atxy7.menu.attach.oldversion=Old version, (may fix bugs)
+atxy7.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ##########################################################################
 #  Non-bootloader                                                        #
@@ -388,23 +446,26 @@ atxy7.menu.wire.mands.build.wire=MANDS
 #  ATtiny826/816/806             #    #   #     #       #   #  ##    #####
 #  ATtiny427/416/406            ####   ###      #      ###  #   #      ###
 #________________________________________________________________________#
-
-### BUILD PARAMETERS
+#                                        #
+# BUILD PARAMETERS                       #
+#________________________________________#
 atxy6.build.text_section_start=.text=0x0
 atxy6.build.millistimer=D0
 atxy6.build.bootload=
-atxy6.bootloader.resetpinbits=01
 atxy6.build.board=AVR_ATtinyxy6
 atxy6.build.clocksource=0
 atxy6.build.core=megatinycore
 atxy6.build.variant=txy6
 atxy6.build.tuned=
+atxy6.build.printf=
 atxy6.build.mcu=attiny{build.attiny}
 atxy6.build.f_cpu={build.speed}000000L
-atxy6.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} {build.tuned}
+atxy6.build.extra_flags=-DARDUINO_attinyxy6 {build.tuned}
 atxy6.build.export_merged_output=false
 
-### BOOTLOADING PARAMETERS (FUSES)
+#----------------------------------------#
+# BOOTLOADING PARAMETERS (FUSES)         #
+#________________________________________#
 atxy6.bootloader.WDTCFG=0x00
 atxy6.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy6.bootloader.OSCCFG=0x01
@@ -413,16 +474,32 @@ atxy6.bootloader.TCD0CFG_serialupdi=
 atxy6.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy6.bootloader.APPEND=0x00
 atxy6.bootloader.BOOTEND=0x00
-atxy6.bootloader.tool=avrdude
 atxy6.bootloader.avrdudestring=
 atxy6.bootloader.serialupdistring=-aerase
+atxy6.bootloader.altreset=Alt reset pin not supported on 0/1-series.
+atxy6.bootloader.tool=avrdude
 
-### ALL UPLOADING VIA UPDI
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atxy6.build.bootload=
+atxy6.build.printfabr=
+atxy6.build.wireabr=
+
+#----------------------------------------#
+# ALL UPLOADING VIA UPDI                 #
+#________________________________________#
 atxy6.upload.tool=avrdude
 atxy6.upload.workaround=
 atxy6.upload.with_programmer_not_available_for_bootloader_boards=
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# 20-pin 0/1-series tinyAVR submenus          #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atxy6.menu.chip.3216=ATtiny3216
 atxy6.menu.chip.3216.build.board=AVR_ATtiny3216
 atxy6.menu.chip.3216.build.attiny=3216
@@ -502,7 +579,9 @@ atxy6.menu.chip.406.build.millistimer=A0
 atxy6.menu.chip.406.upload.maximum_size=4096
 atxy6.menu.chip.406.upload.maximum_data_size=256
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atxy6.menu.clock.20internal=20 MHz internal
 atxy6.menu.clock.16internal=16 MHz internal
 atxy6.menu.clock.10internal=10 MHz internal
@@ -588,25 +667,29 @@ atxy6.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy6.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy6.menu.clock.5internal.bootloader.OSCCFG=0x02
 
-### BOD VOLTAGE
+#----------------------------------------#
+# BOD VOLTAGE                            #
+#________________________________________#
 atxy6.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy6.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atxy6.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atxy6.menu.bodvoltage.2v1=2.1V
-atxy6.menu.bodvoltage.2v9=2.9V
-atxy6.menu.bodvoltage.3v3=3.3V
-atxy6.menu.bodvoltage.3v7=3.7V
-atxy6.menu.bodvoltage.4v0=4.0V
+atxy6.menu.bodvoltage.2v1=2.1V (Unofficial)
+atxy6.menu.bodvoltage.2v9=2.9V (Unofficial)
+atxy6.menu.bodvoltage.3v3=3.3V (Unofficial)
+atxy6.menu.bodvoltage.3v7=3.7V (Unofficial)
+atxy6.menu.bodvoltage.4v0=4.0V (Unofficial)
 atxy6.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atxy6.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atxy6.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atxy6.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atxy6.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atxy6.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atxy6.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atxy6.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atxy6.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy6.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atxy6.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy6.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy6.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy6.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BOD MODE
+#----------------------------------------#
+# BOD MODE                               #
+#________________________________________#
 atxy6.menu.bodmode.disabled=Disabled/Disabled
 atxy6.menu.bodmode.enabled=Enabled/Enabled
 atxy6.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -626,13 +709,17 @@ atxy6.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy6.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy6.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### EEPROM RETAIN
+#----------------------------------------#
+# EEPROM RETAIN                          #
+#________________________________________#
 atxy6.menu.eesave.enable=EEPROM retained
 atxy6.menu.eesave.enable.bootloader.eesavebit=1
 atxy6.menu.eesave.disable=EEPROM not retained
 atxy6.menu.eesave.disable.bootloader.eesavebit=0
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atxy6.menu.millis.enabled=Enabled (default timer)
 atxy6.menu.millis.disabled=Disabled (saves flash)
 atxy6.menu.millis.timera=TCA0 (default on 0-series)
@@ -651,7 +738,9 @@ atxy6.menu.millis.rtc.build.millistimer=RTC
 atxy6.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy6.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### UPDI/RESET PIN CONFIGURATION
+#----------------------------------------#
+# UPDI/RESET PIN CONFIGURATION           #
+#________________________________________#
 atxy6.menu.resetpin.UPDI=UPDI (no reset pin)
 atxy6.menu.resetpin.UPDI.bootloader.resetpinbits=01
 atxy6.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
@@ -663,7 +752,9 @@ atxy6.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
 #atxy6.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
 #atxy6.menu.resetpin.gpio.bootloader.resetpinbits=00
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atxy6.menu.startuptime.8=8ms
 atxy6.menu.startuptime.0=0ms
 atxy6.menu.startuptime.1=1ms
@@ -681,11 +772,34 @@ atxy6.menu.startuptime.16.bootloader.SYSCFG1=0x05
 atxy6.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy6.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
-### TWI OPTIONS
-atxy6.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atxy6.menu.wire.mors=Master or Slave (saves flash and RAM)
 atxy6.menu.wire.mors.build.wire=MORS
 atxy6.menu.wire.mands=Master and Slave
 atxy6.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atxy6.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atxy6.menu.printf.full=Full, 2.6k, prints floats
+atxy6.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atxy6.menu.printf.full.build.printfabr=.pfF
+atxy6.menu.printf.minimal=Minimal, 1.1k flash used
+atxy6.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atxy6.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atxy6.menu.attach.allenabled=On all pins, like usual
+atxy6.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy6.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy6.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atxy6.menu.attach.oldversion=Old version, (may fix bugs)
+atxy6.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ##########################################################################
 #  Non-bootloader                                                        #
@@ -695,24 +809,27 @@ atxy6.menu.wire.mands.build.wire=MANDS
 #  ATtiny824/414/404             #       #     #       #   #  ##     #####
 #  ATtiny424/214/204            ###      #     #      ###  #   #       ###
 #________________________________________________________________________#
-
-### BUILD PARAMETERS
+#                                        #
+# BUILD PARAMETERS                       #
+#________________________________________#
 atxy4.build.text_section_start=.text=0x0
 atxy4.build.millistimer=D0
 atxy4.build.bootload=
-atxy4.bootloader.resetpinbits=01
 atxy4.build.board=AVR_ATtinyxy4
 atxy4.build.clocksource=0
 atxy4.build.clocksource=0
 atxy4.build.core=megatinycore
 atxy4.build.variant=txy4
 atxy4.build.tuned=
+atxy4.build.printf=
 atxy4.build.mcu=attiny{build.attiny}
 atxy4.build.f_cpu={build.speed}000000L
-atxy4.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} {build.tuned}
+atxy4.build.extra_flags=-DARDUINO_attinyxy4 {build.tuned}
 atxy4.build.export_merged_output=false
 
-### BOOTLOADING PARAMETERS (FUSES)
+#----------------------------------------#
+# BOOTLOADING PARAMETERS (FUSES)         #
+#________________________________________#
 atxy4.bootloader.WDTCFG=0x00
 atxy4.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy4.bootloader.OSCCFG=0x01
@@ -721,16 +838,31 @@ atxy4.bootloader.TCD0CFG_serialupdi=
 atxy4.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy4.bootloader.APPEND=0x00
 atxy4.bootloader.BOOTEND=0x00
-atxy4.bootloader.tool=avrdude
 atxy4.bootloader.avrdudestring=
 atxy4.bootloader.serialupdistring=-aerase
+atxy4.bootloader.tool=avrdude
 
-### ALL UPLOADING VIA UPDI
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atxy4.build.bootload=
+atxy4.build.printfabr=
+atxy4.build.wireabr=
+
+#----------------------------------------#
+# ALL UPLOADING VIA UPDI                 #
+#________________________________________#
 atxy4.upload.tool=avrdude
 atxy4.upload.workaround=
 atxy4.upload.with_programmer_not_available_for_bootloader_boards=
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# 14-pin 0/1-series tinyAVR submenus          #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atxy4.menu.chip.1614=ATtiny1614
 atxy4.menu.chip.1614.build.board=AVR_ATtiny1614
 atxy4.menu.chip.1614.build.attiny=1614
@@ -812,7 +944,9 @@ atxy4.menu.chip.204.build.millistimer=A0
 atxy4.menu.chip.204.upload.maximum_size=2048
 atxy4.menu.chip.204.upload.maximum_data_size=128
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atxy4.menu.clock.20internal=20 MHz internal
 atxy4.menu.clock.16internal=16 MHz internal
 atxy4.menu.clock.10internal=10 MHz internal
@@ -898,25 +1032,29 @@ atxy4.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy4.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy4.menu.clock.5internal.bootloader.OSCCFG=0x02
 
-### BOD VOLTAGE
+#----------------------------------------#
+# BOD VOLTAGE                            #
+#________________________________________#
 atxy4.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy4.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atxy4.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atxy4.menu.bodvoltage.2v1=2.1V
-atxy4.menu.bodvoltage.2v9=2.9V
-atxy4.menu.bodvoltage.3v3=3.3V
-atxy4.menu.bodvoltage.3v7=3.7V
-atxy4.menu.bodvoltage.4v0=4.0V
+atxy4.menu.bodvoltage.2v1=2.1V (Unofficial)
+atxy4.menu.bodvoltage.2v9=2.9V (Unofficial)
+atxy4.menu.bodvoltage.3v3=3.3V (Unofficial)
+atxy4.menu.bodvoltage.3v7=3.7V (Unofficial)
+atxy4.menu.bodvoltage.4v0=4.0V (Unofficial)
 atxy4.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atxy4.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atxy4.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atxy4.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atxy4.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atxy4.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atxy4.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atxy4.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atxy4.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy4.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atxy4.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy4.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy4.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy4.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BOD MODE
+#----------------------------------------#
+# BOD MODE                               #
+#________________________________________#
 atxy4.menu.bodmode.disabled=Disabled/Disabled
 atxy4.menu.bodmode.enabled=Enabled/Enabled
 atxy4.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -936,13 +1074,17 @@ atxy4.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy4.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy4.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### EEPROM RETAIN
+#----------------------------------------#
+# EEPROM RETAIN                          #
+#________________________________________#
 atxy4.menu.eesave.enable=EEPROM retained
 atxy4.menu.eesave.enable.bootloader.eesavebit=1
 atxy4.menu.eesave.disable=EEPROM not retained
 atxy4.menu.eesave.disable.bootloader.eesavebit=0
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atxy4.menu.millis.enabled=Enabled (default timer)
 atxy4.menu.millis.disabled=Disabled (saves flash)
 atxy4.menu.millis.timera=TCA0 (default on 0-series)
@@ -961,7 +1103,9 @@ atxy4.menu.millis.rtc.build.millistimer=RTC
 atxy4.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy4.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### UPDI/RESET PIN CONFIGURATION
+#----------------------------------------#
+# UPDI/RESET PIN CONFIGURATION           #
+#________________________________________#
 #Expert mode - if you understand what these mean, uncomment them to enable.
 #there are a few lines like this in platform.txt too that can be uncommented to enable for uploads, not just when burning bootloader
 #atxy4.menu.resetpin.UPDI=UPDI (no reset pin)
@@ -971,8 +1115,9 @@ atxy4.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 #atxy4.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
 #atxy4.menu.resetpin.gpio.bootloader.resetpinbits=00
 
-
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atxy4.menu.startuptime.8=8ms
 atxy4.menu.startuptime.0=0ms
 atxy4.menu.startuptime.1=1ms
@@ -990,12 +1135,34 @@ atxy4.menu.startuptime.16.bootloader.SYSCFG1=0x05
 atxy4.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy4.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
-
-### TWI OPTIONS
-atxy4.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atxy4.menu.wire.mors=Master or Slave (saves flash and RAM)
 atxy4.menu.wire.mors.build.wire=MORS
 atxy4.menu.wire.mands=Master and Slave
 atxy4.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atxy4.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atxy4.menu.printf.full=Full, 2.6k, prints floats
+atxy4.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atxy4.menu.printf.full.build.printfabr=.pfF
+atxy4.menu.printf.minimal=Minimal, 1.1k flash used
+atxy4.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atxy4.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atxy4.menu.attach.allenabled=On all pins, like usual
+atxy4.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy4.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy4.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atxy4.menu.attach.oldversion=Old version, (may fix bugs)
+atxy4.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ############################################################################
 #  Non-bootloader                                                          #
@@ -1005,23 +1172,26 @@ atxy4.menu.wire.mands.build.wire=MANDS
 #  ATtiny212                         #   #     #       #   #  ##       #####
 #  ATtiny202                          ###      #      ###  #   #         ###
 #__________________________________________________________________________#
-
-### BUILD PARAMETERS
+#                                        #
+# BUILD PARAMETERS                       #
+#________________________________________#
 atxy2.build.text_section_start=.text=0x0
 atxy2.build.millistimer=D0
 atxy2.build.bootload=
-atxy2.bootloader.resetpinbits=01
 atxy2.build.board=AVR_ATtinyxy2
 atxy2.build.clocksource=0
 atxy2.build.core=megatinycore
 atxy2.build.variant=txy2
-atxy2.build.tuned=
 atxy2.build.mcu=attiny{build.attiny}
 atxy2.build.f_cpu={build.speed}000000L
-atxy2.build.extra_flags=-DARDUINO_attinyxy2 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} {build.tuned}
+atxy2.build.extra_flags=-DARDUINO_attinyxy2 {build.tuned}
 atxy2.build.export_merged_output=false
+atxy2.build.tuned=
+atxy2.build.printf=
 
-### BOOTLOADING PARAMETERS (FUSES)
+#----------------------------------------#
+# BOOTLOADING PARAMETERS (FUSES)         #
+#________________________________________#
 atxy2.bootloader.WDTCFG=0x00
 atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy2.bootloader.OSCCFG=0x01
@@ -1030,17 +1200,31 @@ atxy2.bootloader.TCD0CFG_serialupdi=
 atxy2.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy2.bootloader.APPEND=0x00
 atxy2.bootloader.BOOTEND=0x00
-atxy2.bootloader.tool=avrdude
 atxy2.bootloader.avrdudestring=
 atxy2.bootloader.serialupdistring=-aerase
+atxy2.bootloader.tool=avrdude
 
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atxy2.build.bootload=
+atxy2.build.printfabr=
+atxy2.build.wireabr=
 
-### ALL UPLOADING VIA UPDI
+#----------------------------------------#
+# ALL UPLOADING VIA UPDI                 #
+#________________________________________#
 atxy2.upload.tool=avrdude
 atxy2.upload.workaround=
 atxy2.upload.with_programmer_not_available_for_bootloader_boards=
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+#  8-pin 0/1-series tinyAVR submenus          #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atxy2.menu.chip.412=ATtiny412
 atxy2.menu.chip.412.build.board=AVR_ATtiny412
 atxy2.menu.chip.412.build.attiny=412
@@ -1081,7 +1265,9 @@ atxy2.menu.chip.202.upload.maximum_data_size=128
 atxy2.menu.chip.202.bootloader.TCD0CFG_avrdude=
 atxy2.menu.chip.202.bootloader.TCD0CFG_serialupdi=
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atxy2.menu.clock.20internal=20 MHz internal
 atxy2.menu.clock.16internal=16 MHz internal
 atxy2.menu.clock.10internal=10 MHz internal
@@ -1167,25 +1353,29 @@ atxy2.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy2.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy2.menu.clock.5internal.bootloader.OSCCFG=0x02
 
-### BOD VOLTAGE
+#----------------------------------------#
+# BOD VOLTAGE                            #
+#________________________________________#
 atxy2.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy2.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atxy2.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atxy2.menu.bodvoltage.2v1=2.1V
-atxy2.menu.bodvoltage.2v9=2.9V
-atxy2.menu.bodvoltage.3v3=3.3V
-atxy2.menu.bodvoltage.3v7=3.7V
-atxy2.menu.bodvoltage.4v0=4.0V
+atxy2.menu.bodvoltage.2v1=2.1V (Unofficial)
+atxy2.menu.bodvoltage.2v9=2.9V (Unofficial)
+atxy2.menu.bodvoltage.3v3=3.3V (Unofficial)
+atxy2.menu.bodvoltage.3v7=3.7V (Unofficial)
+atxy2.menu.bodvoltage.4v0=4.0V (Unofficial)
 atxy2.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atxy2.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atxy2.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atxy2.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atxy2.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atxy2.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atxy2.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atxy2.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atxy2.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy2.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atxy2.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy2.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy2.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy2.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BOD MODE
+#----------------------------------------#
+# BOD MODE                               #
+#________________________________________#
 atxy2.menu.bodmode.disabled=Disabled/Disabled
 atxy2.menu.bodmode.enabled=Enabled/Enabled
 atxy2.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -1205,13 +1395,17 @@ atxy2.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy2.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy2.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### EEPROM RETAIN
+#----------------------------------------#
+# EEPROM RETAIN                          #
+#________________________________________#
 atxy2.menu.eesave.enable=EEPROM retained
 atxy2.menu.eesave.enable.bootloader.eesavebit=1
 atxy2.menu.eesave.disable=EEPROM not retained
 atxy2.menu.eesave.disable.bootloader.eesavebit=0
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atxy2.menu.millis.enabled=Enabled (default timer)
 atxy2.menu.millis.disabled=Disabled (saves flash)
 atxy2.menu.millis.timera=TCA0 (default on 402/202)
@@ -1224,7 +1418,9 @@ atxy2.menu.millis.timerd.build.millistimer=D0
 atxy2.menu.millis.timerb0.build.millistimer=B0
 atxy2.menu.millis.rtc.build.millistimer=RTC
 
-### UPDI/RESET PIN CONFIGURATION
+#----------------------------------------#
+# UPDI/RESET PIN CONFIGURATION           #
+#________________________________________#
 #Expert mode - if you understand what these mean, uncomment them to enable.
 #there are a few lines like this in platform.txt too that can be uncommented to enable for uploads, not just when burning bootloader
 #atxy2.menu.resetpin.UPDI=UPDI (no reset pin)
@@ -1234,7 +1430,9 @@ atxy2.menu.millis.rtc.build.millistimer=RTC
 #atxy2.menu.resetpin.gpio=GPIO (DANGER - Bricks chip w/out HV UPDI programmer - Use PCHV)
 #atxy2.menu.resetpin.gpio.bootloader.resetpinbits=00
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atxy2.menu.startuptime.8=8ms
 atxy2.menu.startuptime.0=0ms
 atxy2.menu.startuptime.1=1ms
@@ -1252,12 +1450,34 @@ atxy2.menu.startuptime.16.bootloader.SYSCFG1=0x05
 atxy2.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy2.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
-
-### TWI OPTIONS
-atxy2.menu.wire.mors=Master or Slave (x12 only)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atxy2.menu.wire.mors=Master or Slave (saves flash and RAM)
 atxy2.menu.wire.mors.build.wire=MORS
-atxy2.menu.wire.mands=Master and Slave (x12 only)
+atxy2.menu.wire.mands=Master and Slave  (412 and 212 only)
 atxy2.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atxy2.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atxy2.menu.printf.full=Full, 2.6k, prints floats
+atxy2.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atxy2.menu.printf.full.build.printfabr=.pfF
+atxy2.menu.printf.minimal=Minimal, 1.1k flash used
+atxy2.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atxy2.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atxy2.menu.attach.allenabled=On all pins, like usual
+atxy2.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy2.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy2.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atxy2.menu.attach.oldversion=Old version, (may fix bugs)
+atxy2.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ############################################################################
 #  Non-bootloader                                                          #
@@ -1267,8 +1487,9 @@ atxy2.menu.wire.mands.build.wire=MANDS
 #                   #   #  #  #    # #   #   # #    #  #  #  #         #####
 #                   #   # ###  ### #  ##  ###   ### #  # ### #           ###
 #__________________________________________________________________________#
-
-### BUILD PARAMETERS
+#                                        #
+# BUILD PARAMETERS                       #
+#________________________________________#
 microchip.build.text_section_start=.text=0x0
 microchip.build.millistimer=D0
 microchip.build.bootload=
@@ -1276,12 +1497,15 @@ microchip.build.clocksource=0
 microchip.build.core=megatinycore
 microchip.build.variant=txy7
 microchip.build.tuned=
+microchip.build.printf=
 microchip.build.mcu=attiny{build.attiny}
 microchip.build.f_cpu={build.speed}000000L
 microchip.build.export_merged_output=false
 microchip.build.board=Microchip Placeholder
 
-### BOOTLOADING PARAMETERS (FUSES)
+#----------------------------------------#
+# BOOTLOADING PARAMETERS (FUSES)         #
+#________________________________________#
 microchip.bootloader.WDTCFG=0x00
 microchip.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 microchip.bootloader.OSCCFG=0x01
@@ -1290,19 +1514,35 @@ microchip.bootloader.TCD0CFG_serialupdi=4:0x00
 microchip.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 microchip.bootloader.APPEND=0x00
 microchip.bootloader.BOOTEND=0x00
+microchip.bootloader.altreset=Alt reset not supported on 0/1-series.
 microchip.bootloader.tool=avrdude
 
-### ALL UPLOADING VIA UPDI
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+microchip.build.bootload=
+microchip.build.printfabr=
+microchip.build.wireabr=
+
+#----------------------------------------#
+# ALL UPLOADING VIA UPDI                 #
+#________________________________________#
 microchip.upload.tool=avrdude
 microchip.upload.workaround=
 microchip.upload.with_programmer_not_available_for_bootloader_boards=
 microchip.upload.extra_params=-Pusb
 microchip.upload.serialparams=
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# Microchip Official Board submenus           #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 microchip.menu.board_name.cn3217=Curiosity Nano ATtiny3217
 microchip.menu.board_name.cn3217.build.board=AVR_CuriosityNano3217
-microchip.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
+microchip.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchip.menu.board_name.cn3217.build.attiny=3217
 microchip.menu.board_name.cn3217.upload.protocol=curiosity_updi
 microchip.menu.board_name.cn3217.upload.maximum_size=32768
@@ -1310,7 +1550,7 @@ microchip.menu.board_name.cn3217.upload.maximum_data_size=2048
 
 microchip.menu.board_name.cn1627=Curiosity Nano ATtiny1627
 microchip.menu.board_name.cn1627.build.board=AVR_CuriosityNano1627
-microchip.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7
+microchip.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7
 microchip.menu.board_name.cn1627.build.millistimer=B1
 microchip.menu.board_name.cn1627.build.attiny=1627
 microchip.menu.board_name.cn1627.upload.protocol=curiosity_updi
@@ -1322,7 +1562,7 @@ microchip.menu.board_name.cn1627.bootloader.TCD0CFG_serialupdi=
 
 microchip.menu.board_name.cn1607=Curiosity Nano ATtiny1607
 microchip.menu.board_name.cn1607.build.board=AVR_CuriosityNano1607
-microchip.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7
+microchip.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7
 microchip.menu.board_name.cn1607.build.attiny=1607
 microchip.menu.board_name.cn1607.build.millistimer=A0
 microchip.menu.board_name.cn1607.upload.protocol=curiosity_updi
@@ -1334,7 +1574,7 @@ microchip.menu.board_name.cn1607.bootloader.TCD0CFG_serialupdi=
 
 microchip.menu.board_name.xp3217=Xplained Pro ATtiny3217
 microchip.menu.board_name.xp3217.build.board=AVR_Xplained_Pro_3217
-microchip.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
+microchip.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
 microchip.menu.board_name.xp3217.build.attiny=3217
 microchip.menu.board_name.xp3217.build.millistimer=D0
 microchip.menu.board_name.xp3217.upload.protocol=xplainedpro_updi
@@ -1344,7 +1584,7 @@ microchip.menu.board_name.xp3217.upload.maximum_data_size=2048
 
 microchip.menu.board_name.xp817=Xplained Pro ATtiny817
 microchip.menu.board_name.xp817.build.board=AVR_Xplained_Pro_817
-microchip.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
+microchip.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
 microchip.menu.board_name.xp817.build.attiny=817
 microchip.menu.board_name.xp817.build.millistimer=D0
 microchip.menu.board_name.xp817.upload.protocol=xplainedpro_updi
@@ -1353,7 +1593,7 @@ microchip.menu.board_name.xp817.upload.maximum_data_size=512
 
 microchip.menu.board_name.xm817=Xplained Mini ATtiny817
 microchip.menu.board_name.xm817.build.board=AVR_XplainedMini817
-microchip.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5
+microchip.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5
 microchip.menu.board_name.xm817.build.attiny=817
 microchip.menu.board_name.xm817.build.millistimer=D0
 microchip.menu.board_name.xm817.upload.protocol=xplainedmini_updi
@@ -1362,7 +1602,7 @@ microchip.menu.board_name.xm817.upload.maximum_data_size=512
 
 microchip.menu.board_name.xn416=Xplained Nano ATtiny416
 microchip.menu.board_name.xn416.build.board=AVR_XplainedNano416
-microchip.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP
+microchip.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP
 microchip.menu.board_name.xn416.build.attiny=416
 microchip.menu.board_name.xn416.build.variant=txy6
 microchip.menu.board_name.xn416.build.millistimer=A0
@@ -1370,7 +1610,9 @@ microchip.menu.board_name.xn416.upload.protocol=xplainedmini_updi
 microchip.menu.board_name.xn416.upload.maximum_size=4096
 microchip.menu.board_name.xn416.upload.maximum_data_size=256
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 microchip.menu.clock.20internal=20 MHz internal
 microchip.menu.clock.16internal=16 MHz internal
 microchip.menu.clock.10internal=10 MHz internal
@@ -1429,25 +1671,29 @@ microchip.menu.clock.20internal.bootloader.OSCCFG=0x02
 microchip.menu.clock.10internal.bootloader.OSCCFG=0x02
 microchip.menu.clock.5internal.bootloader.OSCCFG=0x02
 
-### BOD VOLTAGE
+#----------------------------------------#
+# BOD VOLTAGE                            #
+#________________________________________#
 microchip.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 microchip.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 microchip.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-microchip.menu.bodvoltage.2v1=2.1V
-microchip.menu.bodvoltage.2v9=2.9V
-microchip.menu.bodvoltage.3v3=3.3V
-microchip.menu.bodvoltage.3v7=3.7V
-microchip.menu.bodvoltage.4v0=4.0V
+microchip.menu.bodvoltage.2v1=2.1V (Unofficial)
+microchip.menu.bodvoltage.2v9=2.9V (Unofficial)
+microchip.menu.bodvoltage.3v3=3.3V (Unofficial)
+microchip.menu.bodvoltage.3v7=3.7V (Unofficial)
+microchip.menu.bodvoltage.4v0=4.0V (Unofficial)
 microchip.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-microchip.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-microchip.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-microchip.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-microchip.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-microchip.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-microchip.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 microchip.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+microchip.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+microchip.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+microchip.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+microchip.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+microchip.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+microchip.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BOD MODE
+#----------------------------------------#
+# BOD MODE                               #
+#________________________________________#
 microchip.menu.bodmode.disabled=Disabled/Disabled
 microchip.menu.bodmode.enabled=Enabled/Enabled
 microchip.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -1467,13 +1713,17 @@ microchip.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 microchip.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 microchip.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### EEPROM RETAIN
+#----------------------------------------#
+# EEPROM RETAIN                          #
+#________________________________________#
 microchip.menu.eesave.enable=EEPROM retained
 microchip.menu.eesave.enable.bootloader.eesavebit=1
 microchip.menu.eesave.disable=EEPROM not retained
 microchip.menu.eesave.disable.bootloader.eesavebit=0
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 microchip.menu.millis.enabled=Enabled (default timer)
 microchip.menu.millis.disabled=Disabled (saves flash)
 microchip.menu.millis.timera=TCA0 (default on 0-series)
@@ -1492,15 +1742,18 @@ microchip.menu.millis.rtc.build.millistimer=RTC
 microchip.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 microchip.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### UPDI/RESET PIN CONFIGURATION
+#----------------------------------------#
+# UPDI/RESET PIN CONFIGURATION           #
+#________________________________________#
 microchip.menu.resetpin.UPDI=UPDI (no reset pin)
 microchip.menu.resetpin.UPDI.bootloader.resetpinbits=01
 microchip.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
 microchip.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
 # the microchip debuggers are not 12v tolerant so nothing that would need hv programming to reset is supported. And if you cut the straps to debugger, you shouldn't be using this board definition.
 
-
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 microchip.menu.startuptime.8=8ms
 microchip.menu.startuptime.0=0ms
 microchip.menu.startuptime.1=1ms
@@ -1518,14 +1771,34 @@ microchip.menu.startuptime.16.bootloader.SYSCFG1=0x05
 microchip.menu.startuptime.32.bootloader.SYSCFG1=0x06
 microchip.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
-### TWI OPTIONS
-microchip.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+microchip.menu.wire.mors=Master or Slave (saves flash and RAM)
 microchip.menu.wire.mors.build.wire=MORS
 microchip.menu.wire.mands=Master and Slave
 microchip.menu.wire.mands.build.wire=MANDS
 
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+microchip.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+microchip.menu.printf.full=Full, 2.6k, prints floats
+microchip.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+microchip.menu.printf.full.build.printfabr=.pfF
+microchip.menu.printf.minimal=Minimal, 1.1k flash used
+microchip.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+microchip.menu.printf.minimal.build.printfabr=.pfM
 
-
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+microchip.menu.attach.allenabled=On all pins, like usual
+microchip.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+microchip.menu.attach.manual=Only enabled ports. Please see documentation.
+microchip.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+microchip.menu.attach.oldversion=Old version, (may fix bugs)
+microchip.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ##########################################################################
 ##########################################################################
@@ -1546,8 +1819,9 @@ microchip.menu.wire.mands.build.wire=MANDS
 #  ATtiny1607/817                #       #     #       #   #  ##         #
 #  ATtiny807/417                ####     #     #      ###  #   #         #
 #________________________________________________________________________#
-
-### BUILD PARAMETERS
+#                                        #
+# BUILD PARAMETERS                       #
+#________________________________________#
 atxy7o.build.text_section_start=.text=0x200
 atxy7o.build.millistimer=D0
 atxy7o.build.bootload=opti
@@ -1556,12 +1830,15 @@ atxy7o.build.clocksource=0
 atxy7o.build.core=megatinycore
 atxy7o.build.variant=txy7
 atxy7o.build.tuned=
+atxy7o.build.printf=
 atxy7o.build.mcu=attiny{build.attiny}
 atxy7o.build.f_cpu={build.speed}000000L
-atxy7o.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
+atxy7o.build.extra_flags=-DARDUINO_attinyxy7 -DUSING_OPTIBOOT {build.tuned}
 atxy7o.build.export_merged_output=true
 
-### BOOTLOADING PARAMETERS
+#----------------------------------------#
+# BOOTLOADING PARAMETERS                 #
+#________________________________________#
 atxy7o.bootloader.WDTCFG=0x00
 atxy7o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy7o.bootloader.OSCCFG=0x01
@@ -1570,18 +1847,33 @@ atxy7o.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy7o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy7o.bootloader.APPEND=0x00
 atxy7o.bootloader.BOOTEND=0x02
-atxy7o.bootloader.tool=avrdude
 atxy7o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atxy7o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy7o.bootloader.tool=avrdude
 
-### UPLOAD VIA OPTIBOOT
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atxy7o.build.bootload=
+atxy7o.build.printfabr=
+atxy7o.build.wireabr=
+
+#----------------------------------------#
+# UPLOAD VIA OPTIBOOT                    #
+#________________________________________#
 atxy7o.upload.workaround=
 atxy7o.upload.tool=avrdude
 atxy7o.upload.serialparams=-P{serial.port} -b115200
 atxy7o.upload.protocol=arduino
 atxy7o.upload.extra_params=-D
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# 24-pin Optiboot 0/1-series tinyAVR submenus #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atxy7o.menu.chip.3217=ATtiny3217
 atxy7o.menu.chip.3217.build.board=AVR_ATtiny3217
 atxy7o.menu.chip.3217.build.attiny=3217
@@ -1619,8 +1911,9 @@ atxy7o.menu.chip.807.upload.maximum_data_size=512
 atxy7o.menu.chip.807.bootloader.TCD0CFG_avrdude=
 atxy7o.menu.chip.807.bootloader.TCD0CFG_serialupdi=
 
-### CLOCK SOURCE
-
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atxy7o.menu.clocko.20internal=20 MHz internal
 atxy7o.menu.clocko.16internal=16 MHz internal
 atxy7o.menu.clocko.10internal=10 MHz internal
@@ -1701,25 +1994,29 @@ atxy7o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atxy7o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atxy7o.menu.clocko.5internal.bootloader.OSCCFG=0x02
 
-### BOD VOLTAGE
+#----------------------------------------#
+# BOD VOLTAGE                            #
+#________________________________________#
 atxy7o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy7o.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atxy7o.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atxy7o.menu.bodvoltage.2v1=2.1V
-atxy7o.menu.bodvoltage.2v9=2.9V
-atxy7o.menu.bodvoltage.3v3=3.3V
-atxy7o.menu.bodvoltage.3v7=3.7V
-atxy7o.menu.bodvoltage.4v0=4.0V
+atxy7o.menu.bodvoltage.2v1=2.1V (Unofficial)
+atxy7o.menu.bodvoltage.2v9=2.9V (Unofficial)
+atxy7o.menu.bodvoltage.3v3=3.3V (Unofficial)
+atxy7o.menu.bodvoltage.3v7=3.7V (Unofficial)
+atxy7o.menu.bodvoltage.4v0=4.0V (Unofficial)
 atxy7o.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atxy7o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atxy7o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atxy7o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atxy7o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atxy7o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atxy7o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atxy7o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atxy7o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy7o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atxy7o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy7o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy7o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy7o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BOD MODE
+#----------------------------------------#
+# BOD MODE                               #
+#________________________________________#
 atxy7o.menu.bodmode.disabled=Disabled/Disabled
 atxy7o.menu.bodmode.enabled=Enabled/Enabled
 atxy7o.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -1739,7 +2036,9 @@ atxy7o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy7o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy7o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atxy7o.menu.millis.enabled=Enabled (default timer)
 atxy7o.menu.millis.disabled=Disabled (saves flash)
 atxy7o.menu.millis.timera=TCA0 (default on 0-series)
@@ -1758,7 +2057,10 @@ atxy7o.menu.millis.rtc.build.millistimer=RTC
 atxy7o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy7o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### UPDI/RESET PIN CONFIGURATION & OPTIBOOT ENTRY
+#----------------------------------------#
+#  UPDI and RESET PIN configuration and  #
+#       OPTIBOOT ENTRY conditions        #
+#----------------------------------------#
 atxy7o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
 atxy7o.menu.resetpinopti.UPDI.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
 atxy7o.menu.resetpinopti.UPDI.bootloader.resetpinbits=01
@@ -1772,7 +2074,9 @@ atxy7o.menu.resetpinopti.gpio=GPIO, Optiboot for 8 sec. after power-on & SW rese
 atxy7o.menu.resetpinopti.gpio.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
 atxy7o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atxy7o.menu.startuptimeopti.8=8ms
 atxy7o.menu.startuptimeopti.0=0ms
 atxy7o.menu.startuptimeopti.1=1ms
@@ -1790,18 +2094,42 @@ atxy7o.menu.startuptimeopti.16.bootloader.SYSCFG1=0x05
 atxy7o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atxy7o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
-
-### BOOTLOADER UART PINS
+#----------------------------------------#
+# BOOTLOADER UART PINS                   #
+#________________________________________#
 atxy7o.menu.bootloaderuart.default=TX:9 (PB2), RX:8 (PB3)
 atxy7o.menu.bootloaderuart.alternate=TX:18 (PA1), RX:19 (PA2)
 atxy7o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy7o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
-### TWI OPTIONS
-atxy7o.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atxy7o.menu.wire.mors=Master or Slave (saves flash and RAM)
 atxy7o.menu.wire.mors.build.wire=MORS
 atxy7o.menu.wire.mands=Master and Slave
 atxy7o.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atxy7o.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atxy7o.menu.printf.full=Full, 2.6k, prints floats
+atxy7o.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atxy7o.menu.printf.full.build.printfabr=.pfF
+atxy7o.menu.printf.minimal=Minimal, 1.1k flash used
+atxy7o.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atxy7o.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atxy7o.menu.attach.allenabled=On all pins, like usual
+atxy7o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy7o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy7o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atxy7o.menu.attach.oldversion=Old version, (may fix bugs)
+atxy7o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ############################################################################
 #  WITH OPTIBOOT                                                    ##   ###
@@ -1812,7 +2140,9 @@ atxy7o.menu.wire.mands.build.wire=MANDS
 #                               ####     #     #      ###  #   #    ##   ###
 #___________________________________________________________________##___###
 
-### BUILD PARAMETERS
+#----------------------------------------#
+# BUILD PARAMETERS                       #
+#________________________________________#
 atx27o.build.text_section_start=.text=0x200
 atx27o.build.millistimer=B1
 atx27o.build.bootload=opti
@@ -1821,12 +2151,15 @@ atx27o.build.clocksource=0
 atx27o.build.core=megatinycore
 atx27o.build.variant=txy7
 atx27o.build.tuned=
+atx27o.build.printf=
 atx27o.build.mcu=attiny{build.attiny}
 atx27o.build.f_cpu={build.speed}000000L
-atx27o.build.extra_flags=-DARDUINO_attinyx27 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
+atx27o.build.extra_flags=-DARDUINO_attinyx27 -DUSING_OPTIBOOT {build.tuned}
 atx27o.build.export_merged_output=true
 
-### BOOTLOADING PARAMETERS
+#----------------------------------------#
+# BOOTLOADING PARAMETERS                 #
+#________________________________________#
 atx27o.bootloader.WDTCFG=0x00
 atx27o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atx27o.bootloader.OSCCFG=0x01
@@ -1835,18 +2168,33 @@ atx27o.bootloader.TCD0CFG_serialupdi=
 atx27o.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}10
 atx27o.bootloader.APPEND=0x00
 atx27o.bootloader.BOOTEND=0x02
-atx27o.bootloader.tool=avrdude
 atx27o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atx27o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atx27o.bootloader.tool=avrdude
 
-### UPLOAD VIA OPTIBOOT
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atx27o.build.bootload=
+atx27o.build.printfabr=
+atx27o.build.wireabr=
+
+#----------------------------------------#
+# UPLOAD VIA OPTIBOOT                    #
+#________________________________________#
 atx27o.upload.workaround=
 atx27o.upload.tool=avrdude
 atx27o.upload.serialparams=-P{serial.port} -b115200
 atx27o.upload.protocol=arduino
 atx27o.upload.extra_params=-D
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# 24-pin Optiboot 0/1-series tinyAVR submenus #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atx27o.menu.chip.3227=ATtiny3227
 atx27o.menu.chip.3227.build.board=AVR_ATtiny3227
 atx27o.menu.chip.3227.build.attiny=3227
@@ -1868,7 +2216,9 @@ atx27o.menu.chip.427.build.attiny=427
 atx27o.menu.chip.427.upload.maximum_size=3584
 atx27o.menu.chip.427.upload.maximum_data_size=512
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atx27o.menu.clocko.20internal=20 MHz internal
 atx27o.menu.clocko.16internal=16 MHz internal
 atx27o.menu.clocko.10internal=10 MHz internal
@@ -1954,7 +2304,9 @@ atx27o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atx27o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atx27o.menu.clocko.5internal.bootloader.OSCCFG=0x02
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atx27o.menu.millis.enabled=Enabled (default timer, TCB1)
 atx27o.menu.millis.disabled=Disabled (saves flash)
 atx27o.menu.millis.timera=TCA0
@@ -1971,25 +2323,29 @@ atx27o.menu.millis.rtc.build.millistimer=RTC
 atx27o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atx27o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### BODVOLTAGE
+#----------------------------------------#
+# BODVOLTAGE                             #
+#________________________________________#
 atx27o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atx27o.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atx27o.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atx27o.menu.bodvoltage.2v1=2.1V
-atx27o.menu.bodvoltage.2v9=2.9V
-atx27o.menu.bodvoltage.3v3=3.3V
-atx27o.menu.bodvoltage.3v7=3.7V
-atx27o.menu.bodvoltage.4v0=4.0V
+atx27o.menu.bodvoltage.2v1=2.1V (Unofficial)
+atx27o.menu.bodvoltage.2v9=2.9V (Unofficial)
+atx27o.menu.bodvoltage.3v3=3.3V (Unofficial)
+atx27o.menu.bodvoltage.3v7=3.7V (Unofficial)
+atx27o.menu.bodvoltage.4v0=4.0V (Unofficial)
 atx27o.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atx27o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atx27o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atx27o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atx27o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atx27o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atx27o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atx27o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atx27o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atx27o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atx27o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atx27o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atx27o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atx27o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BODMODE
+#----------------------------------------#
+# BODMODE                                #
+#________________________________________#
 atx27o.menu.bodmode.disabled=Disabled/Disabled
 atx27o.menu.bodmode.enabled=Enabled/Enabled
 atx27o.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -2009,7 +2365,10 @@ atx27o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atx27o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atx27o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### UPDI + RESET PIN CONFIGURATION
+#----------------------------------------#
+#  UPDI and RESET PIN configuration and  #
+#       OPTIBOOT ENTRY conditions        #
+#----------------------------------------#
 atx27o.menu.resetpinopti_2.UPDIaltrst=UPDI on PA0, RST on PB4 (Optiboot for 1 sec after reset)
 atx27o.menu.resetpinopti_2.UPDIaltrst.bootloader.file=optiboot_tx2z{bootloader.uartswap}_rst.hex
 atx27o.menu.resetpinopti_2.UPDIaltrst.bootloader.resetpinbits=11
@@ -2026,7 +2385,9 @@ atx27o.menu.resetpinopti_2.gpio=PA0 is GPIO, Optiboot for 8 sec. after power-on 
 atx27o.menu.resetpinopti_2.gpio.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
 atx27o.menu.resetpinopti_2.gpio.bootloader.resetpinbits=00
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atx27o.menu.startuptimeopti.8=8ms
 atx27o.menu.startuptimeopti.0=0ms
 atx27o.menu.startuptimeopti.1=1ms
@@ -2044,7 +2405,9 @@ atx27o.menu.startuptimeopti.16.bootloader.SYSCFG1=0x05
 atx27o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atx27o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
-### BOOTLOADER UART PINS
+#----------------------------------------#
+# BOOTLOADER UART PINS                   #
+#________________________________________#
 atx27o.menu.bootloaderuart.default=TX:9 (PB2), RX:8 (PB3) (UART0 default pins)
 atx27o.menu.bootloaderuart.alternate=TX:18 (PA1), RX:19 (PA2) (UART0 alt pins)
 atx27o.menu.bootloaderuart.alternate1=TX:14 (PC2), RX:13 (PC1) (UART1 alt pins)
@@ -2052,11 +2415,34 @@ atx27o.menu.bootloaderuart.default.bootloader.uartswap=
 atx27o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 atx27o.menu.bootloaderuart.alternate1.bootloader.uartswap=_u1alt
 
-### TWI OPTIONS
-atx27o.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atx27o.menu.wire.mors=Master or Slave (saves flash and RAM)
 atx27o.menu.wire.mors.build.wire=MORS
 atx27o.menu.wire.mands=Master and Slave
 atx27o.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atx27o.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atx27o.menu.printf.full=Full, 2.6k, prints floats
+atx27o.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atx27o.menu.printf.full.build.printfabr=.pfF
+atx27o.menu.printf.minimal=Minimal, 1.1k flash used
+atx27o.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atx27o.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atx27o.menu.attach.allenabled=On all pins, like usual
+atx27o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atx27o.menu.attach.manual=Only enabled ports. Please see documentation.
+atx27o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atx27o.menu.attach.oldversion=Old version, (may fix bugs)
+atx27o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ############################################################################
 #  WITH OPTIBOOT                                                         ###
@@ -2067,7 +2453,9 @@ atx27o.menu.wire.mands.build.wire=MANDS
 #  ATtiny416/406                ####   ###      #      ###  #   #        ###
 #________________________________________________________________________###
 
-### BUILD PARAMETERS
+#----------------------------------------#
+# BUILD PARAMETERS                       #
+#________________________________________#
 atxy6o.build.text_section_start=.text=0x200
 atxy6o.build.millistimer=D0
 atxy6o.build.bootload=opti
@@ -2076,12 +2464,15 @@ atxy6o.build.clocksource=0
 atxy6o.build.core=megatinycore
 atxy6o.build.variant=txy6
 atxy6o.build.tuned=
+atxy6o.build.printf=
 atxy6o.build.mcu=attiny{build.attiny}
 atxy6o.build.f_cpu={build.speed}000000L
-atxy6o.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
+atxy6o.build.extra_flags=-DARDUINO_attinyxy6 -DUSING_OPTIBOOT {build.tuned}
 atxy6o.build.export_merged_output=true
 
-### BOOTLOADING PARAMETERS
+#----------------------------------------#
+# BOOTLOADING PARAMETERS                 #
+#________________________________________#
 atxy6o.bootloader.WDTCFG=0x00
 atxy6o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy6o.bootloader.OSCCFG=0x01
@@ -2090,18 +2481,33 @@ atxy6o.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy6o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy6o.bootloader.APPEND=0x00
 atxy6o.bootloader.BOOTEND=0x02
-atxy6o.bootloader.tool=avrdude
 atxy6o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atxy6o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy6o.bootloader.tool=avrdude
 
-### UPLOAD VIA OPTIBOOT
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atxy6o.build.bootload=
+atxy6o.build.printfabr=
+atxy6o.build.wireabr=
+
+#----------------------------------------#
+# UPLOAD VIA OPTIBOOT                    #
+#________________________________________#
 atxy6o.upload.workaround=
 atxy6o.upload.tool=avrdude
 atxy6o.upload.serialparams=-P{serial.port} -b115200
 atxy6o.upload.protocol=arduino
 atxy6o.upload.extra_params=-D
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# 20-pin Optiboot 0/1-series tinyAVR submenus #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atxy6o.menu.chip.3216=ATtiny3216
 atxy6o.menu.chip.3216.build.board=AVR_ATtiny3216
 atxy6o.menu.chip.3216.build.attiny=3216
@@ -2147,7 +2553,9 @@ atxy6o.menu.chip.406.upload.maximum_data_size=256
 atxy6o.menu.chip.406.bootloader.TCD0CFG_avrdude=
 atxy6o.menu.chip.406.bootloader.TCD0CFG_serialupdi=
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atxy6o.menu.clocko.20internal=20 MHz internal
 atxy6o.menu.clocko.16internal=16 MHz internal
 atxy6o.menu.clocko.10internal=10 MHz internal
@@ -2228,7 +2636,9 @@ atxy6o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atxy6o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atxy6o.menu.clocko.5internal.bootloader.OSCCFG=0x02
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atxy6o.menu.millis.enabled=Enabled (default timer)
 atxy6o.menu.millis.disabled=Disabled (saves flash)
 atxy6o.menu.millis.timera=TCA0 (default on 0-series)
@@ -2247,25 +2657,29 @@ atxy6o.menu.millis.rtc.build.millistimer=RTC
 atxy6o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy6o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### BOD VOLTAGE
+#----------------------------------------#
+# BOD VOLTAGE                            #
+#________________________________________#
 atxy6o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy6o.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atxy6o.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atxy6o.menu.bodvoltage.2v1=2.1V
-atxy6o.menu.bodvoltage.2v9=2.9V
-atxy6o.menu.bodvoltage.3v3=3.3V
-atxy6o.menu.bodvoltage.3v7=3.7V
-atxy6o.menu.bodvoltage.4v0=4.0V
+atxy6o.menu.bodvoltage.2v1=2.1V (Unofficial)
+atxy6o.menu.bodvoltage.2v9=2.9V (Unofficial)
+atxy6o.menu.bodvoltage.3v3=3.3V (Unofficial)
+atxy6o.menu.bodvoltage.3v7=3.7V (Unofficial)
+atxy6o.menu.bodvoltage.4v0=4.0V (Unofficial)
 atxy6o.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atxy6o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atxy6o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atxy6o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atxy6o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atxy6o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atxy6o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atxy6o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atxy6o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy6o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atxy6o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy6o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy6o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy6o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BOD MODE
+#----------------------------------------#
+# BOD MODE                               #
+#________________________________________#
 atxy6o.menu.bodmode.disabled=Disabled/Disabled
 atxy6o.menu.bodmode.enabled=Enabled/Enabled
 atxy6o.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -2285,9 +2699,10 @@ atxy6o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy6o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy6o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-
-
-### UPDI/RESET PIN CONFIGURATION & OPTIBOOT ENTRY
+#----------------------------------------#
+#  UPDI and RESET PIN configuration and  #
+#       OPTIBOOT ENTRY conditions        #
+#----------------------------------------#
 atxy6o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
 atxy6o.menu.resetpinopti.UPDI.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
 atxy6o.menu.resetpinopti.UPDI.bootloader.resetpinbits=01
@@ -2301,7 +2716,9 @@ atxy6o.menu.resetpinopti.gpio=GPIO, Optiboot for 8 sec. after power-on & SW rese
 atxy6o.menu.resetpinopti.gpio.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
 atxy6o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atxy6o.menu.startuptimeopti.8=8ms
 atxy6o.menu.startuptimeopti.0=0ms
 atxy6o.menu.startuptimeopti.1=1ms
@@ -2319,17 +2736,43 @@ atxy6o.menu.startuptimeopti.16.bootloader.SYSCFG1=0x05
 atxy6o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atxy6o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
-### BOOTLOADER UART PINS
+#----------------------------------------#
+# BOOTLOADER UART PINS                   #
+#________________________________________#
 atxy6o.menu.bootloaderuart.default=TX:7 (PB2), RX:6 (PB3)
 atxy6o.menu.bootloaderuart.alternate=TX:14 (PA1), RX:15 (PA2)
 atxy6o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy6o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
-### TWI OPTIONS
-atxy6o.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atxy6o.menu.wire.mors=Master or Slave (saves flash and RAM)
 atxy6o.menu.wire.mors.build.wire=MORS
 atxy6o.menu.wire.mands=Master and Slave
 atxy6o.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atxy6o.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atxy6o.menu.printf.full=Full, 2.6k, prints floats
+atxy6o.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atxy6o.menu.printf.full.build.printfabr=.pfF
+atxy6o.menu.printf.minimal=Minimal, 1.1k flash used
+atxy6o.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atxy6o.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atxy6o.menu.attach.allenabled=On all pins, like usual
+atxy6o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy6o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy6o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atxy6o.menu.attach.oldversion=Old version, (may fix bugs)
+atxy6o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+
 ############################################################################
 #  WITH OPTIBOOT                                                    ##   ###
 #  2-series                      ##    ###      ####   ###  #   #   ##   ###
@@ -2339,7 +2782,9 @@ atxy6o.menu.wire.mands.build.wire=MANDS
 #                               ####   ###      #      ###  #   #   ##   ###
 #___________________________________________________________________##___###
 
-### BUILD PARAMETERS
+#----------------------------------------#
+# BUILD PARAMETERS                       #
+#________________________________________#
 atx26o.build.text_section_start=.text=0x200
 atx26o.build.millistimer=B1
 atx26o.build.bootload=opti
@@ -2348,12 +2793,15 @@ atx26o.build.clocksource=0
 atx26o.build.core=megatinycore
 atx26o.build.variant=txy6
 atx26o.build.tuned=
+atx26o.build.printf=
 atx26o.build.mcu=attiny{build.attiny}
 atx26o.build.f_cpu={build.speed}000000L
-atx26o.build.extra_flags=-DARDUINO_attinyx26 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
+atx26o.build.extra_flags=-DARDUINO_attinyx26 -DUSING_OPTIBOOT {build.tuned}
 atx26o.build.export_merged_output=true
 
-### BOOTLOADING PARAMETERS
+#----------------------------------------#
+# BOOTLOADING PARAMETERS                 #
+#________________________________________#
 atx26o.bootloader.WDTCFG=0x00
 atx26o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atx26o.bootloader.OSCCFG=0x01
@@ -2362,18 +2810,33 @@ atx26o.bootloader.TCD0CFG_serialupdi=
 atx26o.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}10
 atx26o.bootloader.APPEND=0x00
 atx26o.bootloader.BOOTEND=0x02
-atx26o.bootloader.tool=avrdude
 atx26o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atx26o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atx26o.bootloader.tool=avrdude
 
-### UPLOAD VIA OPTIBOOT
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atx26o.build.bootload=
+atx26o.build.printfabr=
+atx26o.build.wireabr=
+
+#----------------------------------------#
+# UPLOAD VIA OPTIBOOT                    #
+#________________________________________#
 atx26o.upload.workaround=
 atx26o.upload.tool=avrdude
 atx26o.upload.upload.serialparams=-P{serial.port} -b115200
 atx26o.upload.protocol=arduino
 atx26o.upload.extra_params=-D
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# 20-pin Optiboot 2-series tinyAVR submenus   #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atx26o.menu.chip.3226=ATtiny3226
 atx26o.menu.chip.3226.build.board=AVR_ATtiny3226
 atx26o.menu.chip.3226.build.attiny=3226
@@ -2395,7 +2858,9 @@ atx26o.menu.chip.426.build.attiny=426
 atx26o.menu.chip.426.upload.maximum_size=3584
 atx26o.menu.chip.426.upload.maximum_data_size=512
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atx26o.menu.clocko.20internal=20 MHz internal
 atx26o.menu.clocko.16internal=16 MHz internal
 atx26o.menu.clocko.10internal=10 MHz internal
@@ -2481,7 +2946,9 @@ atx26o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atx26o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atx26o.menu.clocko.5internal.bootloader.OSCCFG=0x02
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atx26o.menu.millis.enabled=Enabled (default timer, TCB1)
 atx26o.menu.millis.disabled=Disabled (saves flash)
 atx26o.menu.millis.timera=TCA0
@@ -2498,25 +2965,29 @@ atx26o.menu.millis.rtc.build.millistimer=RTC
 atx26o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atx26o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### BODVOLTAGE
+#----------------------------------------#
+# BODVOLTAGE                             #
+#________________________________________#
 atx26o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atx26o.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atx26o.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atx26o.menu.bodvoltage.2v1=2.1V
-atx26o.menu.bodvoltage.2v9=2.9V
-atx26o.menu.bodvoltage.3v3=3.3V
-atx26o.menu.bodvoltage.3v7=3.7V
-atx26o.menu.bodvoltage.4v0=4.0V
+atx26o.menu.bodvoltage.2v1=2.1V (Unofficial)
+atx26o.menu.bodvoltage.2v9=2.9V (Unofficial)
+atx26o.menu.bodvoltage.3v3=3.3V (Unofficial)
+atx26o.menu.bodvoltage.3v7=3.7V (Unofficial)
+atx26o.menu.bodvoltage.4v0=4.0V (Unofficial)
 atx26o.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atx26o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atx26o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atx26o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atx26o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atx26o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atx26o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atx26o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atx26o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atx26o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atx26o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atx26o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atx26o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atx26o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BODMODE
+#----------------------------------------#
+# BODMODE                                #
+#________________________________________#
 atx26o.menu.bodmode.disabled=Disabled/Disabled
 atx26o.menu.bodmode.enabled=Enabled/Enabled
 atx26o.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -2536,7 +3007,10 @@ atx26o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atx26o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atx26o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### UPDI/RESET PIN CONFIGURATION & OPTIBOOT ENTRY
+#----------------------------------------#
+#  UPDI and RESET PIN configuration and  #
+#       OPTIBOOT ENTRY conditions        #
+#----------------------------------------#
 atx26o.menu.resetpinopti_2.UPDI=No RST, UPDI enabled, 8 sec Optiboot after power on or SW reset
 atx26o.menu.resetpinopti_2.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
 atx26o.menu.resetpinopti_2.UPDI.bootloader.resetpinbits=01
@@ -2553,7 +3027,9 @@ atx26o.menu.resetpinopti_2.gpio=PA0 is GPIO, Optiboot for 8 sec, no RST, no UPDI
 atx26o.menu.resetpinopti_2.gpio.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
 atx26o.menu.resetpinopti_2.gpio.bootloader.resetpinbits=00
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atx26o.menu.startuptimeopti.8=8ms
 atx26o.menu.startuptimeopti.0=0ms
 atx26o.menu.startuptimeopti.1=1ms
@@ -2571,7 +3047,9 @@ atx26o.menu.startuptimeopti.16.bootloader.SYSCFG1=0x05
 atx26o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atx26o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
-### BOOTLOADER UART PINS
+#----------------------------------------#
+# BOOTLOADER UART PINS                   #
+#________________________________________#
 atx26o.menu.bootloaderuart.default=TX:7 (PB2), RX:6 (PB3) (UART0 default pins)
 atx26o.menu.bootloaderuart.alternate=TX:14 (PA1), RX:15 (PA2) (UART0 alt pins)
 atx26o.menu.bootloaderuart.alternate1=TX:12 (PC2), RX:11 (PC1) (UART1 alt pins)
@@ -2579,11 +3057,35 @@ atx26o.menu.bootloaderuart.default.bootloader.uartswap=
 atx26o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 atx26o.menu.bootloaderuart.alternate1.bootloader.uartswap=_u1alt
 
-### TWI OPTIONS
-atx26o.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atx26o.menu.wire.mors=Master or Slave (saves flash and RAM)
 atx26o.menu.wire.mors.build.wire=MORS
 atx26o.menu.wire.mands=Master and Slave
 atx26o.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atx26o.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atx26o.menu.printf.full=Full, 2.6k, prints floats
+atx26o.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atx26o.menu.printf.full.build.printfabr=.pfF
+atx26o.menu.printf.minimal=Minimal, 1.1k flash used
+atx26o.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atx26o.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atx26o.menu.attach.allenabled=On all pins, like usual
+atx26o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atx26o.menu.attach.manual=Only enabled ports. Please see documentation.
+atx26o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atx26o.menu.attach.oldversion=Old version, (may fix bugs)
+atx26o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+
 ############################################################################
 #  WITH OPTIBOOT                                                         ###
 #  0/1-series                    #    #  #     ####   ###  #   #         ###
@@ -2593,7 +3095,9 @@ atx26o.menu.wire.mands.build.wire=MANDS
 #  ATtiny404/214/204            ###      #     #      ###  #   #         ###
 #________________________________________________________________________###
 
-### BUILD PARAMETERS
+#----------------------------------------#
+# BUILD PARAMETERS                       #
+#________________________________________#
 atxy4o.build.text_section_start=.text=0x200
 atxy4o.build.millistimer=D0
 atxy4o.build.bootload=opti
@@ -2602,12 +3106,15 @@ atxy4o.build.clocksource=0
 atxy4o.build.core=megatinycore
 atxy4o.build.variant=txy4
 atxy4o.build.tuned=
+atxy4o.build.printf=
 atxy4o.build.mcu=attiny{build.attiny}
 atxy4o.build.f_cpu={build.speed}000000L
-atxy4o.build.extra_flags=-DARDUINO_attinyxy4 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
+atxy4o.build.extra_flags=-DARDUINO_attinyxy4 -DUSING_OPTIBOOT {build.tuned}
 atxy4o.build.export_merged_output=true
 
-### BOOTLOADING PARAMETERS
+#----------------------------------------#
+# BOOTLOADING PARAMETERS                 #
+#________________________________________#
 atxy4o.bootloader.WDTCFG=0x00
 atxy4o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy4o.bootloader.OSCCFG=0x01
@@ -2616,18 +3123,33 @@ atxy4o.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy4o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy4o.bootloader.APPEND=0x00
 atxy4o.bootloader.BOOTEND=0x02
-atxy4o.bootloader.tool=avrdude
 atxy4o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atxy4o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy4o.bootloader.tool=avrdude
 
-### UPLOAD VIA OPTIBOOT
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atxy4o.build.bootload=
+atxy4o.build.printfabr=
+atxy4o.build.wireabr=
+
+#----------------------------------------#
+# UPLOAD VIA OPTIBOOT                    #
+#________________________________________#
 atxy4o.upload.workaround=
 atxy4o.upload.tool=avrdude
 atxy4o.upload.serialparams=-P{serial.port} -b115200
 atxy4o.upload.protocol=arduino
 atxy4o.upload.extra_params=-D
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# 14-pin Optiboot 0/1-series tinyAVR submenus #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atxy4o.menu.chip.1614=ATtiny1614
 atxy4o.menu.chip.1614.build.board=AVR_ATtiny1614
 atxy4o.menu.chip.1614.build.attiny=1614
@@ -2681,7 +3203,9 @@ atxy4o.menu.chip.204.upload.maximum_data_size=128
 atxy4o.menu.chip.204.bootloader.TCD0CFG_avrdude=
 atxy4o.menu.chip.204.bootloader.TCD0CFG_serialupdi=
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atxy4o.menu.clocko.20internal=20 MHz internal
 atxy4o.menu.clocko.16internal=16 MHz internal
 atxy4o.menu.clocko.10internal=10 MHz internal
@@ -2767,9 +3291,9 @@ atxy4o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atxy4o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atxy4o.menu.clocko.5internal.bootloader.OSCCFG=0x02
 
-
-
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atxy4o.menu.millis.enabled=Enabled (default timer)
 atxy4o.menu.millis.disabled=Disabled (saves flash)
 atxy4o.menu.millis.timera=TCA0 (default on 0-series)
@@ -2788,25 +3312,29 @@ atxy4o.menu.millis.rtc.build.millistimer=RTC
 atxy4o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy4o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### BOD VOLTAGE
+#----------------------------------------#
+# BOD VOLTAGE                            #
+#________________________________________#
 atxy4o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy4o.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atxy4o.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atxy4o.menu.bodvoltage.2v1=2.1V
-atxy4o.menu.bodvoltage.2v9=2.9V
-atxy4o.menu.bodvoltage.3v3=3.3V
-atxy4o.menu.bodvoltage.3v7=3.7V
-atxy4o.menu.bodvoltage.4v0=4.0V
+atxy4o.menu.bodvoltage.2v1=2.1V (Unofficial)
+atxy4o.menu.bodvoltage.2v9=2.9V (Unofficial)
+atxy4o.menu.bodvoltage.3v3=3.3V (Unofficial)
+atxy4o.menu.bodvoltage.3v7=3.7V (Unofficial)
+atxy4o.menu.bodvoltage.4v0=4.0V (Unofficial)
 atxy4o.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atxy4o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atxy4o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atxy4o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atxy4o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atxy4o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atxy4o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atxy4o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atxy4o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy4o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atxy4o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy4o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy4o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy4o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BOD MODE
+#----------------------------------------#
+# BOD MODE                               #
+#________________________________________#
 atxy4o.menu.bodmode.disabled=Disabled/Disabled
 atxy4o.menu.bodmode.enabled=Enabled/Enabled
 atxy4o.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -2826,14 +3354,18 @@ atxy4o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy4o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy4o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-
-### BOOTLOADER UART PINS
+#----------------------------------------#
+# BOOTLOADER UART PINS                   #
+#________________________________________#
 atxy4o.menu.bootloaderuart.default=TX:5 (PB2), RX:4 (PB3)
 atxy4o.menu.bootloaderuart.alternate=TX:8 (PA1), RX:9 (PA2)
 atxy4o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy4o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
-### UPDI/RESET PIN CONFIGURATION & OPTIBOOT ENTRY
+#----------------------------------------#
+#  UPDI and RESET PIN configuration and  #
+#       OPTIBOOT ENTRY conditions        #
+#----------------------------------------#
 atxy4o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
 atxy4o.menu.resetpinopti.UPDI.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
 atxy4o.menu.resetpinopti.UPDI.bootloader.resetpinbits=01
@@ -2847,7 +3379,9 @@ atxy4o.menu.resetpinopti.gpio=GPIO, Optiboot for 8 sec. after power-on & SW rese
 atxy4o.menu.resetpinopti.gpio.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
 atxy4o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atxy4o.menu.startuptimeopti.8=8ms
 atxy4o.menu.startuptimeopti.0=0ms
 atxy4o.menu.startuptimeopti.1=1ms
@@ -2865,11 +3399,34 @@ atxy4o.menu.startuptimeopti.16.bootloader.SYSCFG1=0x05
 atxy4o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atxy4o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
-### TWI OPTIONS
-atxy4o.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atxy4o.menu.wire.mors=Master or Slave (saves flash and RAM)
 atxy4o.menu.wire.mors.build.wire=MORS
 atxy4o.menu.wire.mands=Master and Slave
 atxy4o.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atxy4o.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atxy4o.menu.printf.full=Full, 2.6k, prints floats
+atxy4o.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atxy4o.menu.printf.full.build.printfabr=.pfF
+atxy4o.menu.printf.minimal=Minimal, 1.1k flash used
+atxy4o.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atxy4o.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atxy4o.menu.attach.allenabled=On all pins, like usual
+atxy4o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy4o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy4o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atxy4o.menu.attach.oldversion=Old version, (may fix bugs)
+atxy4o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ############################################################################
 #  WITH OPTIBOOT                                                    ##   ###
@@ -2880,7 +3437,9 @@ atxy4o.menu.wire.mands.build.wire=MANDS
 #                               ###      #     #      ###  #   #    ##   ###
 #___________________________________________________________________##___###
 
-### BUILD PARAMETERS
+#----------------------------------------#
+# BUILD PARAMETERS                       #
+#________________________________________#
 atx24o.build.text_section_start=.text=0x200
 atx24o.build.millistimer=B1
 atx24o.build.bootload=opti
@@ -2889,16 +3448,15 @@ atx24o.build.clocksource=0
 atx24o.build.core=megatinycore
 atx24o.build.variant=txy4
 atx24o.build.tuned=
+atx24o.build.printf=
 atx24o.build.mcu=attiny{build.attiny}
 atx24o.build.f_cpu={build.speed}000000L
-atx24o.build.extra_flags=-DARDUINO_attinyx24 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DUSING_OPTIBOOT {build.tuned}
+atx24o.build.extra_flags=-DARDUINO_attinyx24 -DUSING_OPTIBOOT {build.tuned}
 atx24o.build.export_merged_output=true
 
-##############################
-###     FUSE VALUES AND    ###
-### BOOTLOADING PARAMETERS ###
-##############################
-
+#----------------------------------------#
+# BOOTLOADING PARAMETERS                 #
+#________________________________________#
 atx24o.bootloader.WDTCFG=0x00
 atx24o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atx24o.bootloader.OSCCFG=0x01
@@ -2907,21 +3465,33 @@ atx24o.bootloader.TCD0CFG_serialupdi=
 atx24o.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}10
 atx24o.bootloader.APPEND=0x00
 atx24o.bootloader.BOOTEND=0x02
-atx24o.bootloader.tool=avrdude
 atx24o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atx24o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atx24o.bootloader.tool=avrdude
 
-###########################
-### UPLOAD VIA OPTIBOOT ###
-###########################
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atx24o.build.bootload=
+atx24o.build.printfabr=
+atx24o.build.wireabr=
 
+#----------------------------------------#
+# UPLOAD VIA OPTIBOOT                    #
+#________________________________________#
 atx24o.upload.workaround=
 atx24o.upload.tool=avrdude
 atx24o.upload.serialparams=-P{serial.port} -b115200
 atx24o.upload.protocol=arduino
 atx24o.upload.extra_params=-D
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# 14-pin Optiboot 2-series tinyAVR submenus   #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atx24o.menu.chip.3224=ATtiny3224
 atx24o.menu.chip.3224.build.board=AVR_ATtiny3224
 atx24o.menu.chip.3224.build.attiny=3224
@@ -2943,7 +3513,9 @@ atx24o.menu.chip.424.build.attiny=424
 atx24o.menu.chip.424.upload.maximum_size=3584
 atx24o.menu.chip.424.upload.maximum_data_size=512
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atx24o.menu.clocko.20internal=20 MHz internal
 atx24o.menu.clocko.16internal=16 MHz internal
 atx24o.menu.clocko.10internal=10 MHz internal
@@ -3029,7 +3601,9 @@ atx24o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atx24o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atx24o.menu.clocko.5internal.bootloader.OSCCFG=0x02
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atx24o.menu.millis.enabled=Enabled (default timer, TCB1)
 atx24o.menu.millis.disabled=Disabled (saves flash)
 atx24o.menu.millis.timera=TCA0
@@ -3046,25 +3620,29 @@ atx24o.menu.millis.rtc.build.millistimer=RTC
 atx24o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atx24o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### BODVOLTAGE
+#----------------------------------------#
+# BODVOLTAGE                             #
+#________________________________________#
 atx24o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atx24o.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atx24o.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atx24o.menu.bodvoltage.2v1=2.1V
-atx24o.menu.bodvoltage.2v9=2.9V
-atx24o.menu.bodvoltage.3v3=3.3V
-atx24o.menu.bodvoltage.3v7=3.7V
-atx24o.menu.bodvoltage.4v0=4.0V
+atx24o.menu.bodvoltage.2v1=2.1V (Unofficial)
+atx24o.menu.bodvoltage.2v9=2.9V (Unofficial)
+atx24o.menu.bodvoltage.3v3=3.3V (Unofficial)
+atx24o.menu.bodvoltage.3v7=3.7V (Unofficial)
+atx24o.menu.bodvoltage.4v0=4.0V (Unofficial)
 atx24o.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atx24o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atx24o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atx24o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atx24o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atx24o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atx24o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atx24o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atx24o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atx24o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atx24o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atx24o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atx24o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atx24o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BODMODE
+#----------------------------------------#
+# BODMODE                                #
+#________________________________________#
 atx24o.menu.bodmode.disabled=Disabled/Disabled
 atx24o.menu.bodmode.enabled=Enabled/Enabled
 atx24o.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -3084,7 +3662,10 @@ atx24o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atx24o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atx24o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### RESET PIN CONFIGURATION
+#----------------------------------------#
+#  UPDI and RESET PIN configuration and  #
+#       OPTIBOOT ENTRY conditions        #
+#----------------------------------------#
 atx24o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
 atx24o.menu.resetpinopti.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
 atx24o.menu.resetpinopti.UPDI.bootloader.resetpinbits=01
@@ -3098,7 +3679,9 @@ atx24o.menu.resetpinopti.gpio=GPIO, Optiboot for 8 sec. after power-on & SW rese
 atx24o.menu.resetpinopti.gpio.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
 atx24o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atx24o.menu.startuptimeopti.8=8ms
 atx24o.menu.startuptimeopti.0=0ms
 atx24o.menu.startuptimeopti.1=1ms
@@ -3116,17 +3699,42 @@ atx24o.menu.startuptimeopti.16.bootloader.SYSCFG1=0x05
 atx24o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atx24o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
-### BOOTLOADER UART PINS
+#----------------------------------------#
+# BOOTLOADER UART PINS                   #
+#________________________________________#
 atx24o.menu.bootloaderuart.default=TX:5 (PB2), RX:4 (PB3) (UART0 default pins)
 atx24o.menu.bootloaderuart.alternate=TX:8 (PA1), RX:9 (PA2) (UART0 alt/UART1 default pins)
 atx24o.menu.bootloaderuart.default.bootloader.uartswap=
 atx24o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
-### TWI OPTIONS
-atx24o.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atx24o.menu.wire.mors=Master or Slave (saves flash and RAM)
 atx24o.menu.wire.mors.build.wire=MORS
 atx24o.menu.wire.mands=Master and Slave
 atx24o.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atx24o.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atx24o.menu.printf.full=Full, 2.6k, prints floats
+atx24o.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atx24o.menu.printf.full.build.printfabr=.pfF
+atx24o.menu.printf.minimal=Minimal, 1.1k flash used
+atx24o.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atx24o.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atx24o.menu.attach.allenabled=On all pins, like usual
+atx24o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atx24o.menu.attach.manual=Only enabled ports. Please see documentation.
+atx24o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atx24o.menu.attach.oldversion=Old version, (may fix bugs)
+atx24o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ############################################################################
 #                                                                          #
@@ -3136,8 +3744,9 @@ atx24o.menu.wire.mands.build.wire=MANDS
 #  ATtiny212                         #   #     #       #   #  ##           #
 #  ATtiny202                          ###      #      ###  #   #           #
 #__________________________________________________________________________#
-
-### BUILD PARAMETERS
+#                                        #
+# BUILD PARAMETERS                       #
+#________________________________________#
 atxy2o.build.text_section_start=.text=0x200
 atxy2o.build.millistimer=D0
 atxy2o.build.bootload=opti
@@ -3146,12 +3755,15 @@ atxy2o.build.clocksource=0
 atxy2o.build.core=megatinycore
 atxy2o.build.variant=txy2
 atxy2o.build.tuned=
+atxy2o.build.printf=
 atxy2o.build.mcu=attiny{build.attiny}
 atxy2o.build.f_cpu={build.speed}000000L
-atxy2o.build.extra_flags=-DARDUINO_attinyxy2 -DMILLIS_USE_TIMER{build.millistimer} -DUSING_OPTIBOOT {build.tuned}
+atxy2o.build.extra_flags=-DARDUINO_attinyxy2 -DUSING_OPTIBOOT {build.tuned}
 atxy2o.build.export_merged_output=true
 
-### BOOTLOADING PARAMETERS
+#----------------------------------------#
+# BOOTLOADING PARAMETERS                 #
+#________________________________________#
 atxy2o.bootloader.WDTCFG=0x00
 atxy2o.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy2o.bootloader.OSCCFG=0x01
@@ -3160,18 +3772,33 @@ atxy2o.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy2o.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 atxy2o.bootloader.APPEND=0x00
 atxy2o.bootloader.BOOTEND=0x02
-atxy2o.bootloader.tool=avrdude
 atxy2o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atxy2o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy2o.bootloader.tool=avrdude
 
-### UPLOAD VIA OPTIBOOT
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+atxy2o.build.bootload=
+atxy2o.build.printfabr=
+atxy2o.build.wireabr=
+
+#----------------------------------------#
+# UPLOAD VIA OPTIBOOT                    #
+#________________________________________#
 atxy2o.upload.workaround=
 atxy2o.upload.upload.serialparams=-P{serial.port} -b115200
 atxy2o.upload.tool=avrdude
 atxy2o.upload.protocol=arduino
 atxy2o.upload.extra_params=-D
 
-### CHIP
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+#  8-pin Optiboot 0/1-series tinyAVR submenus #
+#_____________________________________________#
+# CHIP                                   #
+#________________________________________#
 atxy2o.menu.chip.412=ATtiny412
 atxy2o.menu.chip.412.build.board=AVR_ATtiny412
 atxy2o.menu.chip.412.build.attiny=412
@@ -3208,7 +3835,9 @@ atxy2o.menu.chip.202.upload.maximum_data_size=128
 atxy2o.menu.chip.202.TCD0CFG_avrdude=
 atxy2o.menu.chip.202.TCD0CFG_serialupdi=
 
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 atxy2o.menu.clocko.20internal=20 MHz internal
 atxy2o.menu.clocko.16internal=16 MHz internal
 atxy2o.menu.clocko.10internal=10 MHz internal
@@ -3294,7 +3923,9 @@ atxy2o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atxy2o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atxy2o.menu.clocko.5internal.bootloader.OSCCFG=0x02
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 atxy2o.menu.millis.enabled=Enabled (default timer)
 atxy2o.menu.millis.disabled=Disabled (saves flash)
 atxy2o.menu.millis.timera=TCA0 (default on 402/202)
@@ -3307,25 +3938,29 @@ atxy2o.menu.millis.timerd.build.millistimer=D0
 atxy2o.menu.millis.timerb0.build.millistimer=B0
 atxy2o.menu.millis.rtc.build.millistimer=RTC
 
-### BOD VOLTAGE
+#----------------------------------------#
+# BOD VOLTAGE                            #
+#________________________________________#
 atxy2o.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 atxy2o.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 atxy2o.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-atxy2o.menu.bodvoltage.2v1=2.1V
-atxy2o.menu.bodvoltage.2v9=2.9V
-atxy2o.menu.bodvoltage.3v3=3.3V
-atxy2o.menu.bodvoltage.3v7=3.7V
-atxy2o.menu.bodvoltage.4v0=4.0V
+atxy2o.menu.bodvoltage.2v1=2.1V (Unofficial)
+atxy2o.menu.bodvoltage.2v9=2.9V (Unofficial)
+atxy2o.menu.bodvoltage.3v3=3.3V (Unofficial)
+atxy2o.menu.bodvoltage.3v7=3.7V (Unofficial)
+atxy2o.menu.bodvoltage.4v0=4.0V (Unofficial)
 atxy2o.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-atxy2o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-atxy2o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-atxy2o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-atxy2o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-atxy2o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-atxy2o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 atxy2o.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+atxy2o.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+atxy2o.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+atxy2o.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+atxy2o.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+atxy2o.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+atxy2o.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BOD MODE
+#----------------------------------------#
+# BOD MODE                               #
+#________________________________________#
 atxy2o.menu.bodmode.disabled=Disabled/Disabled
 atxy2o.menu.bodmode.enabled=Enabled/Enabled
 atxy2o.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -3345,7 +3980,9 @@ atxy2o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy2o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy2o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### BOOTLOADER UART PINS
+#----------------------------------------#
+# BOOTLOADER UART PINS                   #
+#________________________________________#
 # Weird thing - non-alt-0pin bootloaders for 2-series are separate binaries because of LED pin
 # But when altgernate pins are used, it can use the same binary as all other 0/1-series!
 atxy2o.menu.bootloaderuart.default=TX:0 (PA6), RX:1 (PA7)
@@ -3353,8 +3990,10 @@ atxy2o.menu.bootloaderuart.alternate=TX:2 (PA1), RX:3 (PA2)
 atxy2o.menu.bootloaderuart.default.bootloader.uartswap=2
 atxy2o.menu.bootloaderuart.alternate.bootloader.uartswap=z_alt
 
-
-### UPDI/RESET PIN CONFIGURATION & OPTIBOOT ENTRY
+#----------------------------------------#
+#  UPDI and RESET PIN configuration and  #
+#       OPTIBOOT ENTRY conditions        #
+#----------------------------------------#
 atxy2o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
 atxy2o.menu.resetpinopti.UPDI.bootloader.file=optiboot_txy{bootloader.uartswap}.hex
 atxy2o.menu.resetpinopti.UPDI.bootloader.resetpinbits=01
@@ -3368,7 +4007,9 @@ atxy2o.menu.resetpinopti.gpio=GPIO, Optiboot for 8 sec. after power-on & SW rese
 atxy2o.menu.resetpinopti.gpio.bootloader.file=optiboot_txy{bootloader.uartswap}.hex
 atxy2o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 atxy2o.menu.startuptimeopti.8=8ms
 atxy2o.menu.startuptimeopti.0=0ms
 atxy2o.menu.startuptimeopti.1=1ms
@@ -3386,7 +4027,34 @@ atxy2o.menu.startuptimeopti.16.bootloader.SYSCFG1=0x05
 atxy2o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atxy2o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+atx24o.menu.wire.mors=Master or Slave (saves flash and RAM)
+atx24o.menu.wire.mors.build.wire=MORS
+atx24o.menu.wire.mands=Master and Slave (412 and 212 only)
+atx24o.menu.wire.mands.build.wire=MANDS
 
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+atx24o.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+atx24o.menu.printf.full=Full, 2.6k, prints floats
+atx24o.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+atx24o.menu.printf.full.build.printfabr=.pfF
+atx24o.menu.printf.minimal=Minimal, 1.1k flash used
+atx24o.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+atx24o.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+atx24o.menu.attach.allenabled=On all pins, like usual
+atx24o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atx24o.menu.attach.manual=Only enabled ports. Please see documentation.
+atx24o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+atx24o.menu.attach.oldversion=Old version, (may fix bugs)
+atx24o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 
 ##########################################################################
 #                                                                        #
@@ -3396,8 +4064,9 @@ atxy2o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 # WITH OPTIBOOT     #   #  #  #    # #   #   # #    #  #  #  #       #####
 #                   #   # ###  ### #  ##  ###   ### #  # ### #         ###
 #________________________________________________________________________#
-
-### BUILD PARAMETERS
+#                                        #
+# BUILD PARAMETERS                       #
+#________________________________________#
 microchipo.build.text_section_start=.text=0x200
 microchipo.build.board=AVR_MicrochipOfficial
 microchipo.build.millistimer=D0
@@ -3407,11 +4076,14 @@ microchipo.build.core=megatinycore
 microchipo.build.mcu=attiny{build.attiny}
 microchipo.build.f_cpu={build.speed}000000L
 microchipo.build.tuned=
+microchipo.build.printf=
 microchipo.build.export_merged_output=false
 microchipo.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 microchipo.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 
-### BOOTLOADING PARAMETERS (FUSES)
+#----------------------------------------#
+# BOOTLOADING PARAMETERS (FUSES)         #
+#________________________________________#
 microchipo.bootloader.WDTCFG=0x00
 microchipo.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 microchipo.bootloader.OSCCFG=0x01
@@ -3422,17 +4094,30 @@ microchipo.bootloader.APPEND=0x00
 microchipo.bootloader.BOOTEND=0x00
 microchipo.bootloader.tool=avrdude
 
-### UPLOAD VIA OPTIBOOT
+#----------------------------------------#
+# Exported hex/lst/map names will        #
+# indicate selected options. These       #
+# are only to do that, nothing else      #
+#________________________________________#
+microchipo.build.bootload=
+microchipo.build.printfabr=
+microchipo.build.wireabr=
+
+#----------------------------------------#
+# UPLOAD VIA OPTIBOOT                    #
+#________________________________________#
 microchipo.upload.workaround=
 microchipo.upload.upload.serialparams=-P{serial.port} -b115200
 microchipo.upload.tool=avrdude
 microchipo.upload.protocol=arduino
 microchipo.upload.extra_params=-D
 
-### CHIP
+#----------------------------------------#
+# CHIP                                   #
+#________________________________________#
 microchipo.menu.board_name.cn3217=Curiosity Nano ATtiny3217
 microchipo.menu.board_name.cn3217.build.board=AVR_CuriosityNano3217
-microchipo.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
+microchipo.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchipo.menu.board_name.cn3217.bootloader.file=optiboot_Curiosity3217.hex
 microchipo.menu.board_name.cn3217.build.attiny=3217
 microchipo.menu.board_name.cn3217.build.variant=txy7
@@ -3441,7 +4126,7 @@ microchipo.menu.board_name.cn3217.upload.maximum_data_size=2048
 
 microchipo.menu.board_name.cn1627=Curiosity Nano ATtiny1627
 microchipo.menu.board_name.cn1627.build.board=AVR_CuriosityNano1627
-microchipo.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
+microchipo.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchipo.menu.board_name.cn1627.bootloader.file=optiboot_Curiosity1627.hex
 microchipo.menu.board_name.cn1627.build.millistimer=B1
 microchipo.menu.board_name.cn1627.build.attiny=1627
@@ -3454,7 +4139,7 @@ microchipo.menu.board_name.cn1627.bootloader.TCD0CFG_serialupdi=
 
 microchipo.menu.board_name.cn1607=Curiosity Nano ATtiny1607
 microchipo.menu.board_name.cn1607.build.board=AVR_CuriosityNano1607
-microchipo.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
+microchipo.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchipo.menu.board_name.cn1607.bootloader.file=optiboot_Curiosity1607.hex
 microchipo.menu.board_name.cn1607.build.attiny=1607
 microchipo.menu.board_name.cn1607.build.variant=txy7
@@ -3466,7 +4151,7 @@ microchipo.menu.board_name.cn1607.bootloader.TCD0CFG_serialupdi=
 
 microchipo.menu.board_name.xp3217=Xplained Pro ATtiny3217
 microchipo.menu.board_name.xp3217.build.board=AVR_XplainedPro3217
-microchipo.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
+microchipo.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
 microchipo.menu.board_name.xp3217.bootloader.file=optiboot_XplainedPro3217.hex
 microchipo.menu.board_name.xp3217.build.attiny=3217
 microchipo.menu.board_name.xp3217.build.variant=txy7
@@ -3476,7 +4161,7 @@ microchipo.menu.board_name.xp3217.upload.maximum_data_size=2048
 
 microchipo.menu.board_name.xp817=Xplained Pro ATtiny817
 microchipo.menu.board_name.xp817.build.board=AVR_XplainedPro817
-microchipo.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
+microchipo.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
 microchipo.menu.board_name.xp817.bootloader.file=optiboot_XplainedPro817.hex
 microchipo.menu.board_name.xp817.build.attiny=817
 microchipo.menu.board_name.xp817.build.variant=txy7
@@ -3486,7 +4171,7 @@ microchipo.menu.board_name.xp817.upload.maximum_data_size=512
 
 microchipo.menu.board_name.xm817=Xplained Mini ATtiny817
 microchipo.menu.board_name.xm817.build.board=AVR_XplainedMini817
-microchipo.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5 {build.tuned}
+microchipo.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5 {build.tuned}
 microchipo.menu.board_name.xm817.bootloader.file=optiboot_XplainedMini817.hex
 microchipo.menu.board_name.xm817.build.attiny=817
 microchipo.menu.board_name.xm817.build.variant=txy7
@@ -3496,7 +4181,7 @@ microchipo.menu.board_name.xm817.upload.maximum_data_size=512
 
 microchipo.menu.board_name.xn416=Xplained Nano ATtiny416
 microchipo.menu.board_name.xn416.build.board=AVR_XplainedNano416
-microchipo.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DMILLIS_USE_TIMER{build.millistimer} -DTWI_{build.wire} -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP {build.tuned}
+microchipo.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP {build.tuned}
 microchipo.menu.board_name.xn416.bootloader.file=optiboot_XplainedNano416.hex
 microchipo.menu.board_name.xn416.build.attiny=416
 microchipo.menu.board_name.xn416.build.variant=txy6
@@ -3504,8 +4189,9 @@ microchipo.menu.board_name.xn416.build.millistimer=D0
 microchipo.menu.board_name.xn416.upload.maximum_size=4096
 microchipo.menu.board_name.xn416.upload.maximum_data_size=256
 
-
-### CLOCK SOURCE
+#----------------------------------------#
+# CLOCK SOURCE                           #
+#________________________________________#
 microchipo.menu.clocko.20internal=20 MHz internal
 microchipo.menu.clocko.16internal=16 MHz internal
 microchipo.menu.clocko.10internal=10 MHz internal
@@ -3564,25 +4250,29 @@ microchipo.menu.clocko.20internal.bootloader.OSCCFG=0x02
 microchipo.menu.clocko.10internal.bootloader.OSCCFG=0x02
 microchipo.menu.clocko.5internal.bootloader.OSCCFG=0x02
 
-### BOD VOLTAGE
+#----------------------------------------#
+# BOD VOLTAGE                            #
+#________________________________________#
 microchipo.menu.bodvoltage.1v8=1.8V (5 MHz or less)
 microchipo.menu.bodvoltage.2v6=2.6V (10 MHz or less)
 microchipo.menu.bodvoltage.4v2=4.2V (20 MHZ or less)
-microchipo.menu.bodvoltage.2v1=2.1V
-microchipo.menu.bodvoltage.2v9=2.9V
-microchipo.menu.bodvoltage.3v3=3.3V
-microchipo.menu.bodvoltage.3v7=3.7V
-microchipo.menu.bodvoltage.4v0=4.0V
+microchipo.menu.bodvoltage.2v1=2.1V (Unofficial)
+microchipo.menu.bodvoltage.2v9=2.9V (Unofficial)
+microchipo.menu.bodvoltage.3v3=3.3V (Unofficial)
+microchipo.menu.bodvoltage.3v7=3.7V (Unofficial)
+microchipo.menu.bodvoltage.4v0=4.0V (Unofficial)
 microchipo.menu.bodvoltage.1v8.bootloader.bodlevbits=000
-microchipo.menu.bodvoltage.2v6.bootloader.bodlevbits=010
-microchipo.menu.bodvoltage.4v2.bootloader.bodlevbits=111
-microchipo.menu.bodvoltage.4v0.bootloader.bodlevbits=110
-microchipo.menu.bodvoltage.3v7.bootloader.bodlevbits=101
-microchipo.menu.bodvoltage.3v3.bootloader.bodlevbits=100
-microchipo.menu.bodvoltage.2v9.bootloader.bodlevbits=011
 microchipo.menu.bodvoltage.2v1.bootloader.bodlevbits=001
+microchipo.menu.bodvoltage.2v6.bootloader.bodlevbits=010
+microchipo.menu.bodvoltage.2v9.bootloader.bodlevbits=011
+microchipo.menu.bodvoltage.3v3.bootloader.bodlevbits=100
+microchipo.menu.bodvoltage.3v7.bootloader.bodlevbits=101
+microchipo.menu.bodvoltage.4v0.bootloader.bodlevbits=110
+microchipo.menu.bodvoltage.4v2.bootloader.bodlevbits=111
 
-### BOD MODE
+#----------------------------------------#
+# BOD MODE                               #
+#________________________________________#
 microchipo.menu.bodmode.disabled=Disabled/Disabled
 microchipo.menu.bodmode.enabled=Enabled/Enabled
 microchipo.menu.bodmode.ensampfast=Enabled/Sampled (1 kHz)
@@ -3602,7 +4292,9 @@ microchipo.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 microchipo.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 microchipo.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
-### MILLIS TIMER
+#----------------------------------------#
+# MILLIS TIMER                           #
+#________________________________________#
 microchipo.menu.millis.enabled=Enabled (default timer)
 microchipo.menu.millis.disabled=Disabled (saves flash)
 microchipo.menu.millis.timera=TCA0 (default on 0-series)
@@ -3620,7 +4312,19 @@ microchipo.menu.millis.rtc.build.millistimer=RTC
 microchipo.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 microchipo.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
-### STARTUP TIME (SUT)
+#----------------------------------------#
+#  UPDI and RESET PIN configuration and  #
+#       OPTIBOOT ENTRY conditions        #
+#----------------------------------------#
+microchip.menu.resetpin.UPDI=UPDI (no reset pin)
+microchip.menu.resetpin.UPDI.bootloader.resetpinbits=01
+microchip.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
+microchip.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
+# the microchip debuggers are not 12v tolerant so nothing that would need hv programming to reset is supported. And if you cut the straps to debugger, you shouldn't be using this board definition.
+
+#----------------------------------------#
+# STARTUP TIME (SUT)                     #
+#________________________________________#
 microchipo.menu.startuptime.8=8ms
 microchipo.menu.startuptime.0=0ms
 microchipo.menu.startuptime.1=1ms
@@ -3638,8 +4342,31 @@ microchipo.menu.startuptime.16.bootloader.SYSCFG1=0x05
 microchipo.menu.startuptime.32.bootloader.SYSCFG1=0x06
 microchipo.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
-### TWI OPTIONS
-microchipo.menu.wire.mors=Master or Slave (saves Flash & RAM)
+#----------------------------------------#
+# TWI OPTIONS                            #
+#________________________________________#
+microchipo.menu.wire.mors=Master or Slave (saves flash and RAM)
 microchipo.menu.wire.mors.build.wire=MORS
 microchipo.menu.wire.mands=Master and Slave
 microchipo.menu.wire.mands.build.wire=MANDS
+
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
+microchipo.menu.printf.default=Default (doesn't print floats, 1.4k flash use)
+microchipo.menu.printf.full=Full, 2.6k, prints floats
+microchipo.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
+microchipo.menu.printf.full.build.printfabr=.pfF
+microchipo.menu.printf.minimal=Minimal, 1.1k flash used
+microchipo.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
+microchipo.menu.printf.minimal.build.printfabr=.pfM
+
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
+microchipo.menu.attach.allenabled=On all pins, like usual
+microchipo.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+microchipo.menu.attach.manual=Only enabled ports. Please see documentation.
+microchipo.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
+microchipo.menu.attach.oldversion=Old version, (may fix bugs)
+microchipo.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD

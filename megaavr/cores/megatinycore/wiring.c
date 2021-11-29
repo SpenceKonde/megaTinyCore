@@ -22,6 +22,13 @@
 
 #include "wiring_private.h"
 #include "util/delay.h"
+#ifndef F_CPU
+  #error "F_CPU not defined. F_CPU must always be defined as the clock frequency in Hz"
+#endif
+#ifndef CLOCK_SOURCE
+  #error "CLOCK_SOURCE not defined. Must be 0 for internal, 1 for crystal, or 2 for external clock"
+#endif
+
 /* Declared in wiring_private.h
  * PeripheralControl is used to mark peripherals as being "taken over" by the user
  * 0x40 = TIMERD0
@@ -718,17 +725,7 @@ unsigned long millis() {
     }
   }
 #endif
-/* Historical method without millis
-  void delay(uint32_t ms) {
-    if (__builtin_constant_p(ms)) {
-      _delay_ms(ms);
-    } else {
-      while (ms--) {
-        delayMicroseconds(1000);
-      }
-    }
-  Why didn't I just use delay_ms() that time?
-  */
+
 inline __attribute__((always_inline)) void delayMicroseconds(unsigned int us) {
   // This function gets optimized away, but to what depends on whether us is constant.
   if (__builtin_constant_p(us)) {
@@ -758,44 +755,51 @@ inline __attribute__((always_inline)) void delayMicroseconds(unsigned int us) {
  * the 30 MHz case and any longer delays do better with a loop.
  */
 #if   F_CPU >= 48000000L
-  // 16 MHz math, 12-cycle loop, 1us passes through loop twice.
+  // 16 MHz math, 12-cycle loop, 1us burns and passes through loop twice.
   #define DELAYMICROS_TWELVE
 #elif F_CPU >= 44000000L
-  // 16 MHz math, 11-cycle loop, 1us passes through loop twice.
+  // 16 MHz math, 11-cycle loop, 1us burns and passes through loop twice.
   #define DELAYMICROS_ELEVEN
 #elif F_CPU >= 40000000L
-  // 16 MHz math, 10-cycle loop, 1us passes through loop twice.
+  // 20 MHz math, 10-cycle loop, 1us burns and passes through loop twice.
   #define DELAYMICROS_TEN
 #elif F_CPU >= 36000000L
-  // 12 MHz math, 12-cycle loop, 1us passes through loop once.
+  // 12 MHz math, 12-cycle loop, 1us burns and passes through loop once.
   #define DELAYMICROS_TWELVE
 #elif F_CPU >= 32000000L
   // 16 MHz math, 8-cycle loop, 1us passes through loop twice.
   #define DELAYMICROS_EIGHT
 #elif F_CPU >= 30000000L
-  // 12 MHz math, 10-cycle loop, 1us returns immediately.
+  // 12 MHz math, 10-cycle loop, 1us burns and returns.
   #define DELAYMICROS_TEN
 #elif F_CPU >= 28000000L
-  // 16 MHz math, 7-cycle loop, 1us returns immediately.
+  // 16 MHz math, 7-cycle loop, 1us burns and returns.
   #define DELAYMICROS_SEVEN
 #elif F_CPU >= 24000000L
-  // 12 MHz math, 8-cycle loop, 1us returns immediately.
+  // 12 MHz math, 8-cycle loop, 1us burns and returns.
   #define DELAYMICROS_EIGHT
 #elif F_CPU >= 20000000L
-  // 20 MHz math, 10-cycle loop, 1us returns immediately.
+  // 20 MHz math, 10-cycle loop, 1us burns and returns.
   #define DELAYMICROS_TEN
-#elif F_CPU >= 10000000L
-  // 20 MHz math, 10-cycle loop, 1us returns immediately.
+#elif F_CPU >= 16000000L
+  // 16 MHz math, 4-cycle loop, 1us returns immediately.
+#elif F_CPU >= 12000000L
+  // 16 MHz math, 4-cycle loop, 1us returns immediately.
+#elif F_CPU >= 10000000L || (F_CPU >= 5000000L && F_CPU < 8000000L)
+  // 10 MHz: 5-cycle loop, 1us returns immediately
+  // 5 MHz: 5-cycle loop, 1-3 us returns immediately.
   #define DELAYMICROS_FIVE
-#elif F_CPU >=  5000000L
-  // 20 MHz math, 10-cycle loop, 1us returns immediately.
-  #define DELAYMICROS_FIVE
+#else
+  // 8 MHz: 16 MHz math, 4-cycle loop, 1-2 us returns immediately.
+  // 4 MHz: 16 MHz math, 4-cycle loop, 1-4 us returns immediately.
+  // 2 MHz: 16 MHz math, 4-cycle loop, 1-8 us returns immediately.
+  // 1 MHz: 16 MHz math, 4-cycle loop, < 16 us returns immediately, < 25 burns and returns.
+  // Anything not listed uses the fastest one that is and which is slower than F_CPU
 #endif
-
 __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
  /* Must be noinline because we rely on function-call overhead */
 
-#if F_CPU >= 48000000L
+#if F_CPU == 48000000L
   // make the initial delay 24 cycles
   __asm__ __volatile__ (
     "rjmp .+2" "\n\t"     // 2 cycles - jump over next instruction.
@@ -880,8 +884,6 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
   // we just burned 28 (30) cycles above, remove 3
   us -= 3; //2 cycles
 
-
-
 #elif F_CPU >= 28000000L
   // for a one-microsecond delay, burn 12 cycles and return
   __asm__ __volatile__ (
@@ -899,7 +901,6 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
   // we just burned 27 (29) cycles above, remove 4, (7*4=28)
   // us is at least 8 so we can subtract 5
   us -= 4; // = 2 cycles,
-
 
 #elif F_CPU >= 24000000L
   // for a one-microsecond delay, burn 8 cycles and return
@@ -990,7 +991,16 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
   // just remove 4 loops for overhead
   us -= 4; // = 2 cycles for the time taken up with call overhead and test above
 
-#else // F_CPU == 1000000
+#elif F_CPU >= 2000000L
+  // for a 1 ~ 4 microsecond delay, simply return.  the overhead
+  // of the function call takes 14 (16) cycles, which is 8us
+  if (us <= 8) return; // 3 cycles, (4 when true)
+  // the loop takes 2 microsecond (4 cycles) per iteration,
+  // just remove 4 loops for overhead
+  us >>= 1; //divide by 2.
+  us -= 4; // = 2 cycles for the time taken up with call overhead and test above
+
+#else // F_CPU >= 1000000
   // for the 1 MHz internal clock (default settings for common AVR microcontrollers)
   // the overhead of the function calls is 14 (16) cycles
   if (us <= 16) return; // 3 cycles, (4 when true)
@@ -1002,8 +1012,7 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
   // us is at least 4, divided by 4 gives us 1 (no zero delay bug)
   us >>= 2; // us div 4, = 4 cycles
 #endif
-
-
+/* Implementation of the delay loop of 4, 5, 7, 8, 10, 11, or 12 clocks. */
 #if defined(DELAYMICROS_TWELVE)
   __asm__ __volatile__ (
     "1: sbiw %0, 1" "\n\t"            // 2 cycles
@@ -1101,20 +1110,7 @@ void restart_millis()
       #else                   // or even 8 otherwise for really slow system clocks.
         TCA0.SPLIT.CTRLA   =   (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SPLIT_ENABLE_bm);
       #endif
-    #elif defined(MILLIS_USE_TIMERA1)
-        /* Use prescale appropriate for system clock speed */
-
-      #if (F_CPU > 25000000) //   use 256 divider when clocked over 25 MHz
-        TCA1.SPLIT.CTRLA   = (TCA_SPLIT_CLKSEL_DIV256_gc) | (TCA_SPLIT_ENABLE_bm);
-      #elif (F_CPU > 5000000) //  use 64 divider for everything in the middle
-        TCA1.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV64_gc) | (TCA_SPLIT_ENABLE_bm);
-      #elif (F_CPU > 1000000) // and use 16...
-        TCA1.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV16_gc) | (TCA_SPLIT_ENABLE_bm);
-      #else                   // or even 8 otherwise for really slow system clocks.
-        TCA1.SPLIT.CTRLA   =   (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SPLIT_ENABLE_bm);
-      #endif
-      TCA1.SPLIT.CTRLD    = TCA_SPLIT_SPLITM_bm;
-      TCA1.SPLIT.HPER     = PWM_TIMER_PERIOD;
+      /* No TCA1 on tinyAVRs */
     #elif defined(MILLIS_USE_TIMERD0)
       TCD0.CTRLA          = 0x00;
       while (TCD0.STATUS & 0x01);
@@ -1204,9 +1200,7 @@ void init() {
   // Initializes hardware: First we configure the main clock, then fire up the other peripherals
   init_clock();
   init_ADC0();
-
   init_timers();
-
   #ifndef MILLIS_USE_TIMERNONE
     init_millis();
   #endif
@@ -1277,7 +1271,9 @@ void __attribute__((weak)) init_clock() {
 #if defined(CLOCK_TUNE_INTERNAL)
   #include "tune_guesses.h"
   void tune_internal() {
-    uint8_t osccfg=FUSE.OSCCFG-1; /****** THIS IS A MAGIC NAME - DO NOT CHANGE IT ******/
+    uint8_t osccfg=FUSE.OSCCFG - 1; /****** "osccfg" IS A MAGIC NAME - DO NOT CHANGE IT ******/
+    // The GUESSCAL, MAX_TUNING, TUNED_CALIBRATION_OFFSET and TUNE_PRESCALE symbols, which look like constants, aren't.
+    // They're macros from tune_guesses.h and get replaced with (ternary operators and math involving osccfg), so what looks very simple here... actually isn't.
     if (TUNED_CALIBRATION_OFFSET == -1) {
       GPIOR0 |= 0x80;
       GPIOR0 |= 0x40;
@@ -1328,8 +1324,8 @@ void __attribute__((weak)) init_ADC0() {
    * Note that on 0/1-series, the prescale settings are placed powers-of-two
    * apart. On the 2-series and Dx-series, they are MUCH closer together.
    **************************************************************************/
-    // 25 MHz / 32 = 780 kHz, 30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz.
-    #if   F_CPU   > 24000000    // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
+    //                              30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz.
+    #if   F_CPU   > 24000000     // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
       ADC0.CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >= 12000000    // 16 MHz / 16 = 1.0 MHz,  20 MHz / 16 = 1.25 MHz
       ADC0.CTRLC  = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
@@ -1388,31 +1384,35 @@ void __attribute__((weak)) init_ADC0() {
 
 #ifdef ADC1
   __attribute__((weak)) void init_ADC1() {
-  #if   F_CPU > 24000000    // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
-    ADC0.CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
-  #elif F_CPU >= 12000000 // 16 MHz / 16 = 1 MHz,  20 MHz / 16 = 1.25 MHz
-  ADC1.CTRLC = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 6000000 // 8 MHz / 8 = 1 MHz, 10 MHz / 64 = 1.25 MHz
-  ADC1.CTRLC = ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #elif F_CPU >= 3000000 // 4 MHz / 32 = 1 MHz, 5 MHz / 32 = 1.25 MHz
-  ADC1.CTRLC = ADC_PRESC_DIV4_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #else  // 1 MHz / 2 = 500 kHz - the lowest setting
-  ADC1.CTRLC = ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;;
-  #endif
-  ADC1.SAMPCTRL = 14; //16 ADC clock sampling time - should be about the same amount of *time* as originally?
-  ADC1.CTRLD = ADC_INITDLY_DLY16_gc;
-  /* Enable ADC */
-  ADC1.CTRLA |= ADC_ENABLE_bm;
-}
+    //                              30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz.
+    #if   F_CPU   > 24000000     // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
+      ADC0.CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #elif F_CPU  >= 12000000    // 16 MHz / 16 = 1.0 MHz,  20 MHz / 16 = 1.25 MHz
+      ADC0.CTRLC  = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #elif F_CPU  >=  6000000    //  8 MHz /  8 = 1.0 MHz,  10 MHz /  8 = 1.25 MHz
+      ADC0.CTRLC  =  ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #elif F_CPU  >=  3000000    //  4 MHz /  4 = 1.0 MHz,   5 MHz /  4 = 1.25 MHz
+      ADC0.CTRLC  =  ADC_PRESC_DIV4_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #else                       //  1 MHz /  2 = 500 kHz - the lowest setting
+      ADC0.CTRLC  =  ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+    #endif
+    #if   (F_CPU == 6000000 || F_CPU == 12000000 || F_CPU == 24000000 || F_CPU ==25000000)
+      ADC0.SAMPCTRL = (7); // 9 ADC clocks, 12 us
+    #elif (F_CPU == 5000000 || F_CPU == 10000000 || F_CPU == 20000000 )
+      ADC0.SAMPCTRL = (13);   // 15 ADC clock,s 12 us
+    #else
+      ADC0.SAMPCTRL = (10); // 12 ADC clocks, 12 us
+    #endif
+    ADC0.CTRLD    = ADC_INITDLY_DLY16_gc;
+    ADC0.CTRLA    = ADC_ENABLE_bm;
+  }
 #endif
 
 void __attribute__((weak)) init_timers()  {
-
   init_TCA0();
   #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && !defined(MILLIS_USE_TIMERD0))
     init_TCD0();
   #endif
-
 }
 
 
@@ -1427,10 +1427,13 @@ void __attribute__((weak)) init_TCD0() {
 #endif
 
 void __attribute__((weak)) init_TCA0() {
-    /*  TYPE A TIMER   */
+  /*  TYPE A TIMER   */
 
-  /* PORTMUX setting for TCA - don't need to set because using default */
-  //PORTMUX.CTRLA = PORTMUX_TCA00_DEFAULT_gc;
+  /* PORTMUX setting for TCA - don't need to set because using default
+     UNLESS it's an 8-pin part, in which case we do.*/
+  #ifdef __AVR_ATtinyxy2__
+    PORTMUX.CTRLC = 1; //move WO0 output to PA7 so PA3 can be used with WO3
+  #endif
 
   /* Enable Split Mode */
   TCA0.SPLIT.CTRLD = TCA_SPLIT_SPLITM_bm;
@@ -1462,8 +1465,5 @@ void __attribute__((weak)) init_TCA0() {
     TCA0.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV16_gc) | (TCA_SPLIT_ENABLE_bm);
   #else                   // or even 8 otherwise for really slow system clocks.
     TCA0.SPLIT.CTRLA   =   (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SPLIT_ENABLE_bm);
-  #endif
-  #ifdef __AVR_ATtinyxy2__
-    PORTMUX.CTRLC = 1; //move WO0 output to PA7 so PA3 can be used with WO3
   #endif
 }

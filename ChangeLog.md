@@ -4,19 +4,17 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
+### Ongoing
+* Port enhanced documentation from DxCore.
 
-### Planned 2.4.3
+### Planned 2.5.0
 * **New I2C/TWI implementation** (I2C and TWI refer to the same interface, the one provided by Wire.h; don't get me started about how these and the library are named).
   * Support for acting as both master and slave (on the same pins); this configuration, sometimes known as "multi-master", includes not only the simple case of multiple masters and slaves on an I2C bus, each of which is always exclusively either a master or a slave, but also the more complicated case, which has been a frequent request: For the AVR device to act as both master AND slave. It can both initiate transactions with slaves, or respond to transactions initiated by other masters.
   * New tools menu option to select whether to support only being a master *or* a slave, as we do now (default) or to support acting as both master *and* slave (new functionality).
   * Support for Dual Mode (one instance of TWI acting as master on one pair of pins and slave on another) on parts that support it (there are no current or announced tinyAVR parts with dual mode support.
   * Significantly reduced flash usage under all circumstances (even master+slave mode should use less flash than old master or slave mode - the cost of supporting master-and-slave mode is RAM for a second buffer. There is an implementation included that can use the same memory for both buffers, however, it is not currently exposed via an option due to the risk of breakage if you receive while preparing to send something.
   * Failed attempts will timeout instead of hanging indefinitely.
-  * (TODO) - Port wire changes back here.
-  * Correct defect in the changelog (this file) due to a suspected a CEBCAK (cat exists between chair and keyboard).
-* (TODO) - Port Serial changes here from DxCore
-* (TODO) - Finish Event changes and port to here.
-* (TODO) - Port enhanced documentation from DxCore.
+  * Support for slave counting the bytes read by the master, and for slave to check whether it's in the middle of a transaction (for example, before sleeping)
 * Recent change to C++17 required additions to new.cpp and new.h, including sized deallocation (`delete`) and alignment-aware `new` and `delete` operators. The sized deallocation operator is called when existing code that worked before is compiled to the C++ 17 standard; since free() doesn't care about the size, implementation was straightforward. Discussion is ongoing about the aligned `new` and `delete` operators, which are also new in this version of the standards. It is likely that we will not support them, since other Arduino cores aren't even building to C++ 17 standard, so if your code needs aligned new/delete, it also won't work anywhere else in Arduino-land. While we are not shy about adding features, we do so only to support hardware features. If conditions change we will revisit this matter.
 * Using millis or micros (or rather attempting to) when they are unavailable due to millis being disabled, or in the case of micros, RTC used as millis time source, give better errors.
 * Clarified licence (for one thing, renamed to a .md so people can read it more easily, and know that it's readable if they're on windows) for tinyNeoPixel.
@@ -39,8 +37,13 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
   * Smaller and larger parts are unchanged. This mostly helps to smooth out the RAM usage curve as you change flash size - going from 256 to 512 didn't previously change the allocation, while the jump from 512b to 1k was alarmingly large. The fact that the 8k 2-series have  poirts each makes this more noticeable. This combined with another breakpoint led me to think that something else was broken.
 * Officially deprecate jtag2updi.
 * Port micros and delay-microseconds improvements from DxCore.
-* Add a set of compatibility defines to make life easier for people porting non-Event library event-using code to 0/1-series.
+* Add a set of compatibility defines to make life easier for people porting non-Event-library event-using code to 0/1-series.
 * SerialUPDI reference now links to it's actual location.
+* (TODO) - Port Serial changes here from DxCore
+* (TODO) - Finish Event changes and port to here.
+* Port new attach interrupt from DxCore.
+* Port new printf option from DxCore.
+* Platform.txt organization and commenting. Fix issues where defines were missing from lib-discovery phase.
 
 ## Released Versions
 
