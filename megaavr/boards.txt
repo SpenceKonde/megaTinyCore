@@ -4054,10 +4054,10 @@ atxy2o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 #----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
-atx24o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
-atx24o.menu.wiremode.mors.build.wire=MORS
-atx24o.menu.wiremode.mands=Master and Slave (412 and 212 only)
-atx24o.menu.wiremode.mands.build.wire=MANDS
+atxy2o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
+atxy2o.menu.wiremode.mors.build.wire=MORS
+atxy2o.menu.wiremode.mands=Master and Slave (412 and 212 only)
+atxy2o.menu.wiremode.mands.build.wire=MANDS
 
 #----------------------------------------#
 # printf() version options               #
