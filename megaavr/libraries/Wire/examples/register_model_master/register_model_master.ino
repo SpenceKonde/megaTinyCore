@@ -77,7 +77,7 @@ void loop() {
     MySerial.printHex((uint8_t)Wire.read());   // Print it out for user.
     MySerial.print(' ');                       // spaces between each byte
   }
-  MySerial.println("Chane speed at which the LED blinks");
+  MySerial.println("Change speed at which the LED blinks");
   Wire.beginTransmission(0x69);   // prepare transmission to slave with address 0x69
   Wire.write(0x4);                // Write just the address
   Wire.write(0x80);               // Write a value

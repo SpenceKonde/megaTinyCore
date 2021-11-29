@@ -37,7 +37,7 @@ As of 2.3.2, with the dramatic improvements in performance, and the proven relia
 Read the [SerialUPDI documentation](https://github.com/SpenceKonde/AVR-Guidance/blob/master/UPDI/jtag2updi.md)
 
 ### With a classic Arduino (jtag2updi)
-One can be made from a classic AVR Uno/Nano/Pro Mini; inexpensive Nano clones are the usual choice, being cheap enough that one can be wired up and then left like that. We no longer provide detailed documentation for this processess; jtag2updi is deprecated.If you are still using it, you should select jtag2updi from the tools->programmer menu. This was previously our recommended option; due to persistent jtag2updi bugs, and it's reliance on the largely unmaintained 'avrdude' tool (which among other things inserts a spurious error message into all UPDI uploads made with it), this is no longer recommended.
+One can be made from a classic AVR Uno/Nano/Pro Mini; inexpensive Nano clones are the usual choice, being cheap enough that one can be wired up and then left like that. We no longer provide detailed documentation for this processes; jtag2updi is deprecated.If you are still using it, you should select jtag2updi from the tools->programmer menu. This was previously our recommended option; due to persistent jtag2updi bugs, and it's reliance on the largely unmaintained 'avrdude' tool (which among other things inserts a spurious error message into all UPDI uploads made with it), this is no longer recommended.
 
 ## Supported Parts (click link for pinout diagram and details)
 * tinyAVR 2-series
