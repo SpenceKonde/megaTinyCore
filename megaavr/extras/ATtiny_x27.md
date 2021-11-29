@@ -3,7 +3,7 @@
 
  Specifications       |    ATtiny427   |   ATtiny827   |   ATtiny1627  |  ATtiny3227   |
 ----------------------|----------------|---------------|---------------|---------------|
-Availability          |  Since Q2 2021 | Since Q2 2021 | Since Q1 2021 |    late 2021? |
+Availability          |  Since Q2 2021 | Since Q2 2021 | Since Q1 2021 | Since Q4 2021 |
 Flash (program memory)|     4096 bytes |    8192 bytes |   16384 bytes |   32768 bytes |
 Flash w/Optiboot      |     3584 bytes |    7680 bytes |   15872 bytes |   32256 bytes |
 RAM                   |      512 bytes |    1024 bytes |    2048 bytes |    3072 bytes |
