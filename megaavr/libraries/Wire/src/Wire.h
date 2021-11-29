@@ -119,6 +119,8 @@ class TwoWire: public Stream {
     virtual void flush(void);
 
     uint8_t getIncomingAddress(void);
+    uint8_t getBytesRead(void);
+    uint8_t slaveTransactionOpen(void);
     void   enableDualMode(bool fmp_enable);      // Moves the Slave to dedicated pins
 
     void onReceive(void (*)(int));
@@ -153,7 +155,7 @@ class TwoWire: public Stream {
 #endif
 
 #if defined (TWI1)
-  #if defined (USING_WIRE1)
+  #if defined (TWI_USING_WIRE1)
     extern TwoWire Wire1;
   #endif
 #endif

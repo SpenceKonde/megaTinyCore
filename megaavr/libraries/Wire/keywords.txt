@@ -21,7 +21,13 @@ requestFrom	KEYWORD2
 onReceive	KEYWORD2
 onRequest	KEYWORD2
 getIncomingAddress	KEYWORD2
-enableDualMode	KEYWORD2
+getBytesRead	KEYWORD2
+slaveTransactionOpen	KEYWORD2
+endMaster	KEYWORD2
+endSlave	KEYWORD2
+swapModule	KEYWORD2
+WIRE_ALT_ADDRESS	KEYWORD2
+WIRE_ADDRESS_MASK	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)

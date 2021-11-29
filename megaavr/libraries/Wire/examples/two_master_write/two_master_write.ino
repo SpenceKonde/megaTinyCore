@@ -43,6 +43,9 @@ char input[32];
 int8_t len = 0;
 
 #define MySerial Serial             // The serial port connected to the to the computer.
+#if !defined(TWI1) || !defined(TWI_USING_WIRE1)
+  #error "This sketch requires that the board have a second TWI interface, and be set to enable Wire1 from the tools submenu"
+#endif
 
 void setup() {
   Wire.begin();                       // initialize master

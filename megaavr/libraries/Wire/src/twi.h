@@ -42,18 +42,18 @@ SOFTWARE.
 #endif
 
 /* These options are or will be controlled by boards.txt menu options
-#define USING_WIRE1       // On devices with two TWIs, this identifies if the user wants to use Wire1
+#define TWI_USING_WIRE1   // On devices with two TWIs, this identifies if the user wants to use Wire1
 #define TWI_MANDS         // This enables the simultaneous use of the Master and Slave functionality - where supported
 #define TWI_MERGE_BUFFERS // Merges the tx and rx buffers - this option will break the TWI when any rx occurs between beginTransmission and endTransmission!
                           // It is not advised to use this define. Only use this when you need the RAM **really** badly
 */
 
-#if (!defined(TWI1) && defined(USING_WIRE1))
-  // If pins for Wire1 are not defined, but USING_WIRE1 was defined in the boards.txt menu, throw an error. Used for 28-pin DA/DB parts
+#if (!defined(TWI1) && defined(TWI_USING_WIRE1))
+  // If pins for Wire1 are not defined, but TWI_USING_WIRE1 was defined in the boards.txt menu, throw an error. Used for 28-pin DA/DB parts
   #error "This part only provides a single Wire interface."
 #endif
 
-#if ((defined(TWI0_DUALCTRL) && !defined(USING_WIRE1)) || (defined(TWI1_DUALCTRL) && defined(USING_WIRE1)))
+#if ((defined(TWI0_DUALCTRL) && !defined(TWI_USING_WIRE1)) || (defined(TWI1_DUALCTRL) && defined(TWI_USING_WIRE1)))
   /* Instead of requiring changes to the library to switch between DxCore and megaTinyCore, we can check
    * if the part supports dual mode. Goal is that the identical library can be used on both, so updates
    * in one can be propagated to the other by just copying files. */
@@ -151,7 +151,6 @@ struct twiData {
     uint8_t _rxHead;
     uint8_t _rxTail;
   #endif
-
   #if defined(TWI_MANDS)
     uint8_t _incomingAddress;
     #if defined(TWI_MERGE_BUFFERS)
@@ -183,6 +182,7 @@ struct twiData {
       uint8_t _rxBufferS[BUFFER_LENGTH];
     #endif
   #endif
+  uint8_t _slaveBytesRead;
 };
 
 

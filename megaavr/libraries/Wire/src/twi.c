@@ -761,6 +761,7 @@ void SlaveIRQ_DataReadAck(struct twiData *_data) {
 
   _data->_bools._ackMatters = true;         // start checking for NACK
   if ((*txHead) != (*txTail)) {             // Data is available
+    _data->_slaveBytesRead++;
     _data->_module->SDATA = txBuffer[(*txTail)];      // Writing to the register to send data
     (*txTail) = TWI_advancePosition(*txTail);         // Advance tail
     _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;    // "Execute a byte read operation followed by Acknowledge Action"
