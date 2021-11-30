@@ -43,6 +43,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * (TODO) - Finish Event changes and port to here.
 * Port new attach interrupt from DxCore.
 * Port new printf option from DxCore.
+* Update callbacks to match DxCore 1.4.0, most notably the init_reset_flags(). It will automatically clear reset flags if not overridden, stashing them in GPIOR0 (chosen because has lower overhead than a variable)
 * Platform.txt organization and commenting. Fix issues where defines were missing from lib-discovery phase.
 
 ## Released Versions

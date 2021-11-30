@@ -56,29 +56,29 @@ One can be made from a classic AVR Uno/Nano/Pro Mini; inexpensive Nano clones ar
   * [ATtiny402,202](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x02.md)
 
 ## Overall Part Comparison
-| tinyAVR series      |     0-series   |     1-series    | 1-series 16+k  |      2-series       |
-|---------------------|----------------|-----------------|----------------|---------------------|
-| Pincounts           | 8*  14, 20, 24 |  8*  14, 20, 24 |     14, 20, 24 |          14, 20, 24 |
-| Flash               |  2, 4, 8, 16k  |        2, 4, 8k |     16k or 32k |    (planned) 32768b |
-| RAM                 | 128,256,512,1k |    128,256,512b |          2048b |              3072b  |
-| Separate reset pin? |            NO  |              NO |             NO |  20/24-pin optional |
-| PWM pins (Arduino)  | 8pin: 4 else 6 | 8p:4,14p6,else8 |     >=20p:8, 6 |                   6 |
-| Type A timers       |              1 |               1 |              1 |                   1 |
-| Type B timers       |              1 |               1 |    16k, else 2 |                   2 |
-| Type D timer        |             NO |             Yes |            Yes |                  No |
-| Real Time Clock     |  Yes, no xtal  |             Yes |            Yes |                 Yes |
-| USARTs    (pin options) |      1 (2) |           1 (2) |          1 (2) |               2 (3) |
-| SPI ports (pin options) |         1  |  2 except 14pin | 2 except 14pin |   1 (2 on 20/24pin) |
-| TWI ports (pin options) |         1  |           1 (2) |          1 (2) |                  1  |
-| Maximum rated speed |         20 MHz |            20Mz |         20 MHz |              20 MHz |
-| Overclocking (internal @ 5v) |   ??? |       25-30 MHz |      25-30 MHz |              32 MHz |
-| Overclocking (ext. clk @ 5v) |   ??? |          32 MHz |         32 MHz |           >= 32 MHz |
-| External crystal    |            NO  |              NO |             NO |                  NO |
-| Event Channels      | 1 sync 2 async |  2 sync 4 async | 2 sync 4 async |    6, no sync/async |
-| CCL Logic Blocks    |     2 (1 pair) |     2 (1 pair)  |     2 (1 pair) |         4 (2 pairs) |
-| Analog Comparators  |  1, no DAC REF |   1, w/DAC REF  |   3, w/DAC REF |        1, w/DAC REF |
-| ADC                 |     10-bit ADC |     10-bit ADC  | 2x 10-bit ADCs |   12-bit diff w/PGA |
-| Analog References   | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | 1.024V, 2.048V, 2.5V, 4.096V |
+| tinyAVR series          |     0-series   |     1-series    | 1-series 16+k  |      2-series       |
+|-------------------------|----------------|-----------------|----------------|---------------------|
+| Pincounts               | 8*  14, 20, 24 |  8*  14, 20, 24 |     14, 20, 24 |          14, 20, 24 |
+| Flash                   |  2, 4, 8, 16k  |        2, 4, 8k |     16k or 32k |    (planned) 32768b |
+| RAM                     | 128,256,512,1k |    128,256,512b |          2048b |              3072b  |
+| Separate reset pin?     |            NO  |              NO |             NO |  20/24-pin optional |
+| PWM pins (Arduino)      | 8pin: 4 else 6 | 8p:4,14p6,else8 |     >=20p:8, 6 |                   6 |
+| Type A timers           |              1 |               1 |              1 |                   1 |
+| Type B timers           |              1 |               1 |    16k, else 2 |                   2 |
+| Type D timer            |             NO |             Yes |            Yes |                  No |
+| Real Time Clock         |  Yes, no xtal  |             Yes |            Yes |                 Yes |
+| USARTs    (pin options) |      1 (2)     |           1 (2) |          1 (2) |               2 (3) |
+| SPI ports (pin options) |         1      |  2 except 14pin | 2 except 14pin |   1 (2 on 20/24pin) |
+| TWI ports (pin options) |         1      |           1 (2) |          1 (2) |                  1  |
+| Maximum rated speed     |         20 MHz |            20Mz |         20 MHz |              20 MHz |
+| Overclocking (internal @ 5v) |   ???     |       25-30 MHz |      25-30 MHz |              32 MHz |
+| Overclocking (ext. clk @ 5v) |   ???     |          32 MHz |         32 MHz |           >= 32 MHz |
+| External crystal        |            NO  |              NO |             NO |                  NO |
+| Event Channels          | 1 sync 2 async |  2 sync 4 async | 2 sync 4 async |    6, no sync/async |
+| CCL Logic Blocks        |     2 (1 pair) |     2 (1 pair)  |     2 (1 pair) |         4 (2 pairs) |
+| Analog Comparators      |  1, no DAC REF |   1, w/DAC REF  |   3, w/DAC REF |        1, w/DAC REF |
+| ADC                     |     10-bit ADC |     10-bit ADC  | 2x 10-bit ADCs |   12-bit diff w/PGA |
+| Analog References       | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | 1.024V, 2.048V, 2.5V, 4.096V |
 
 ### Notes and highlights
 #### 8-pin parts are 2k or 4k 0/1-series only
@@ -167,7 +167,6 @@ The core also provides An and PIN_An constants (where n is a number from 0 to 11
 These parts (well, the 1/2-series at least - the 0-series is more of a budget option) provide an excellent toolbox of versatile and powerful peripherals; the top-end ones are on a par with or better than classic megaAVR parts - for a tinyAVR price. One of the guiding principles of the design of megaTinyCore, as with my other cores, is to allow the supported parts to reach their full potential - or as close to that as possible within the limitations of Arduino. This (very large) section covers the features of these parts and how they are exposed by megaTinyCore, as well as features of the core itself. This (very large) section attempts to cover each of the feature areas. Do try to find the feature you are working with if you're trying to use some chip feature and having trouble!
 
 ### Supported Clock Speeds
-**Important - Read about [Tuning](megaavr/extras/Tuning.md) before selecting any tuned option!**
 * 20 MHz Internal (4.5v-5.5v - typical for 5v systems)
 * 16 MHz Internal (4.5v-5.5v - typical for 5v systems)
 * 10 MHz Internal (2.7v-5.5v - typical for 3.3v systems)
@@ -192,17 +191,18 @@ These parts (well, the 1/2-series at least - the 0-series is more of a budget op
 * 30 MHz External clock (Overclocked aggressively)
 * 32 MHz External clock (Overclocked aggressively)
 
+
+**Important - Read about [Tuning](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md) before selecting any tuned option!**
+
+More information on these clock speeds can be found in the [Clock Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Clocks.md)
+
 Voltages shown are those guaranteed by to work by manufacturer specifications. Unless pushing the bounds of the operating temperature range, these parts do far better (2-series generally work at 32 MHz and 5v @ room temperature even from internal oscillator; the 0/1-series will likewise usually work at 32 MHz with external clock provided the power supply is a stable 5.0-5.5V).
 
 No action is required to set the `OSCCFG` fuse when the sketch is uploaded via UPDI. When uploaded through Optiboot, the fuse cannot be changed, so whatever was chosen when the bootloader was burned is what is used, and only "burn bootloader" or uploading a sketch via UPDI will change that.
 
-All internal oscillator clock speed options use the factory default calibration unless a "tuned" option is selected, in which case the calibration is adjusted as documented in the [tuning documentation.](megaavr/extras/Tuning.md)
+All internal oscillator clock speed options use the factory default calibration unless a "tuned" option is selected, in which case the calibration is adjusted as documented in the [tuning documentation.](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md)
 
-See [Speed Grades](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/SpeedGrades.md) for more information on the manufacturer's speed grades. Note that those are the voltages and clock speeds at which it is guaranteed to work, where an unexpected glitch of some description could pose a hazard to persons or property. Under favorable temperatures (ie, room temperature), and with higher tolerance for potential stability issues than a commercial customer, the speed grades can easily be beaten. *Our testing has found that the official speed grades are extremely conservative* - I was able to run the 1-series parts I tested at 32MHz at room temperature at 5V with external oscillator (though it was very sensitive to supply voltage changes), and it's been widely observed that they seem to work fine at their full 20 MHz 4.5V ~ 5.5V speed running from 3.3V. I make no claims as to their stability under conditions outside the manufacturer specifications, nor did I exhaustively test all peripherals - I can say only that there was nothing obviously broken, and adding 2 and 2 did still get a result of 4 (well, the test specifically was subtraction, and the variables were unsigned longs, which is harder - but the result was correct). From tuned internal oscillator, 30 MHz on 0/1 and 32 MHz on 2-series may even be stable (though much above that results in unstable or incorrect operation, most frequently resulting in logical and/or mathematical operations yielding 0 when they should not (ie, 2 + 2 = 0 - that I know this stems from Serial continuing to work and printing out `0`s even while the CPU was making frequent math errors due to the excessive clock speed; in other words, the speed limit seems to be in the AVR CPU itself, not the memory or peripheral bus; note that ASCII `0` is `0x30`, not 0.
-
-If you must run it outside the manufacturer specifications, I would suggest using the watchdog timer to reset it in the event that it hangs. A part being run outside of the manufacturer specified operating conditions should never be used for any sort of critical task or even those tasks where a failure would be inconvenient to recover from (such as a device which was difficult to access for maintenance or replacement).
-
-These parts do not support using an external crystal like the classic ATtiny parts do, though they do support an external **clock** (that can come from an external oscillator or - available from the usual suspects for a price nearly as high as the ATtiny itself, or from aliexpress only slightly less exorbitant (search for "active crystal" - it turns up fewer crystals in the results, because all the crystals use the word "oscillator" in the listing title), the CLKOUT from another processor, and so on). For the vast majority of use cases, there is no need for an external clock - the internal oscillator is tightly calibrated enough that the internal clock will work for UART communication without issue, and even if overclocking is required, megaTinyCore 2.4.0 supports that by tuning the internal oscillactor. Like the megaAVR 0-series, the tinyAVR parts include oscillator speed corrections at 3V and 5V in the signature row. If you need particularly accurate UART baud rates more than you need the flash this option uses, you can enable it from the Tools submenu (note that this option is never used by the bootloader, only the application, and it is not used when a "tuned" speed selected - changing to that speed causes the correction to no longer be applicable. There are no plans to provide a replacement mechanism for precise baud rate generation when the oscillator is tuned; supporting a need for such bizarrely high UART baud rate accuracy while running at a weird speed is well outside the use cases that the core supports; if that applies to you, an external clock is the appropriate solution - provided, of course, that a review of the requirements reaffirms the need for both of those conditions).
+See [Speed Grade reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_SpeedGrades.md) for more information on the manufacturer's speed grades. Note that those are the voltages and clock speeds at which it is guaranteed to work, where an unexpected glitch of some description could pose a hazard to persons or property. Under favorable temperatures (ie, room temperature), and with higher tolerance for potential stability issues than a commercial customer, the speed grades can easily be beaten. *Our testing has found that the official speed grades are extremely conservative*.
 
 
 ### Memory-mapped flash: No need to declare PROGMEM
@@ -210,61 +210,26 @@ Unlike classic AVRs, on the these parts, *the flash is within the same address s
 
 However, do note that if you explicitly declare a variable PROGMEM, you must still use the pgm_read functions to read it, just like on classic AVRs - when a variable is declared PROGMEM on parts with memory mapped flash, the pointer is offset (address is relative to start of flash, not start of address space); this same offset is applied when using the `pgm_read_*_near()` macros. Do note that declaring things PROGMEM and accessing with `pgm_read_*_near` functions, although it works fine, is slower and wastes a small amount of flash (compared to simply declaring the variables const); the same goes for the F() macro with constant strings in 2.1.0 and later (for a period of time before 2.1.0, `F()` did nothing - but that caused problems for third party libraries, and the authors maintained that the problem was with the core, not the library, and my choice was to accept less efficiency, or deny my users access to popular libraries). Using the `F()` macro may be necessary for compatibility with some third party libraries (the specific cases that forced the return of `F()` upon us were not of that sort - we were actually able to make the ones I knew of work with the F()-as-noop code, and they took up a few bytes less flash as a result).
 
+## Exposed Hardware Features
+
+### ADC Support
+These parts all have a large number of analog inputs. The 0/1-series have a 10-bit ADC - sometimes 2 for the 16k and 32k 1-series parts, while the 2-series has one of the most advanced ADCs ever featured on an AVR, with 12 bit resolution and true differential measurement capability. They can be read with `analogRead()` like on a normal AVR, and we default to 10-bit resolution; you can change to the full 12-bit with `analogReadResolution()`, and use the enhanced analogRead functions to take automatically oversampled, decimated readings for higher resolution and to take differential measurements. There major differences between the 0/1-series and the 2-series, and that is all detailed in the ADC reference.
+
+### DAC Support
+The 1-series parts have an 8-bit DAC which can generate a real analog voltage (note that this provides low current and can only be used as a voltage reference or control voltage, it cannot be used to power other devices). This generates voltages between 0 and the selected `VREF` - which cannot be Vdd, unfortunately. Set the DAC reference voltage via the `DACReference()` function - pass it any of the ADC reference options listed under the ADC section above (except VDD). Call `analogWrite()` on the DAC pin (PA6) to set the voltage to be output by the DAC. To turn off the DAC output, call `digitalWrite()` or `turnOffPWM()` on that pin.
+
+See the [**ADC and DAC Reference**](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Analog.md) for the full details.
+
+Using the `An` constants is deprecated - the recommended practice is to just use the digital pin number, or better yet, use `PIN_Pxn` notation when calling `analogRead()`. Particularly since the release of 1.3.0 and megaTinyCore 2.3.0, a number of enhanced ADC features have been added to expose more of the power of the sophisticated ADC in these parts to users.
+
+### Watchdog timer, software reset
+There are more options than on classic AVR for resetting, including if the code gets hung up somehow. The watchdog timer can only reset (use the RTC and PIT for timed interrupts)
+See the [**Reset and Watchdog (WDT) Reference**](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Reset.md)
+
 ### Improved digital I/O
+This core adds a number of new features include fast digital I/O (1-14 clocks depending on what's known at compile time, and 2-28 bytes of flash, and for configuring all per-pin settings the hardware has with `pinConfigure()`
 
-#### openDrain()
-It has always been possible to get the benefit of an "open drain" configuration on an AVR - you set a pin's output value to 0 and toggle it between input and output. For reasons which were never clear to me, Arduino never exposed this to users. This core provides a slightly smoother (also faster) wrapper around this than using pinMode (since pinMode must also concern itself with configuring the pullup, whether it needs to be changed or not, every time, it is slow even compared to the already slow digital I/O functions). The openDrain() function takes a pin and a value - `LOW`, `FLOATING` (`HIGH` has the same effect, but is discouraged) or `CHANGE`. openDrain() always makes sure the output buffer is not set to drive the pin high; often the other end of a pin you're using in open drain mode may be connected to something running from a lower supply voltage, where setting it OUTPUT with the pin set high could damage the other device. openDrainFast() is also provided. Like the most recent versions of DxCore, it also writes the pin LOW prior to setting it output or toggling it with change. `CHANGE` is slightly slower and takes an extra 2 words of flash because the VPORT register only has set bit index and clear bit index, so we have to use a full STS instruction to write to the `PORT.DIRTGL` register. Use pinMode() to set the pin `INPUT_PULLUP` before you start using `openDrain()`, or use `pinConfigure()` if you need the pullup enabled too'; this donesn't touch it. We do not prevent you from setting a pin with a pullup on it as output and driving it low with this (or in general). That is non-destructive (it's not like, say bridging two pins and driving one high and the other low) but it doesn't exactly help with power consumption.
-
-```c++
-openDrain(PIN_PA1, LOW); // sets pin output, LOW.
-openDrain(PIN_PA1, FLOATING); // sets pin input and lets it float.
-```
-
-#### Fast Digital I/O
-This core includes the Fast Digital I/O functions, digitalReadFast(), digitalWriteFast() and openDrainFast(). These are always inlined, but still take up less flash than the normal version of the function, and execute the in a single clock cycle. The catch is that the pin MUST be a known constant at compile time. For the fastest, least flash-hungry results, you should use a compile-time known constant for the pin value as well. Remember than there are three options here, not just two. If you only want it to choose between two of the options, you will get smaller binaries that run faster by using the ternary operator to explicitly tell the compiler that the value is only ever going to be those two values, and then it can optimize away the third case. See the second example below.
-
-```c++
-digitalWriteFast(PIN_PD0,val); // This one is slower than the one below:
-digitalWriteFast(PIN_PD0,val?HIGH:LOW); // Ternary operator used to explicitly tell the compiler to only treat the incoming value as HIGH or LOW.
-
-```
-
-| function            | Any value | HIGH/LOW |   fixed |
-|---------------------|-----------|----------|---------|
-| openDrainFast()     | 14 words  | 7 words  | 2 words if LOW<br/>1 if FLOATING<br/>3 if CHANGE |
-| digitalWriteFast()  | 10 words  | 6 words  | 1 words |
-
-Execution time is 1 or 2 clocks per word that is actually executed (not all of them are in the multiple possibility options. in the case of the "any option" digitalWrite, if it's LOW, if change, 6, and if HIGH, 7
-Note that the HIGH/LOW numbers include the overhead of a val?HIGH:LOW statement. That is how the numbers were generated - you can use a variable of volatile uint8_t and that will prevent the compiler from making; 3 and 5 for the two word case. Which highlights one problem: the execution times now depend on the values, qand rather strongly. Another reason to, as much as possible, to get your assumptions about it's value - even if you never set it-  so you can see how large the the binary is while keeping the test case as simple as possible.
-
-1 word is 2 bytes; when openDrainFast is not setting the pin FLOATING, it needs an extra word to set the output to low level as well (just in case); if CHANGE is an option, it also uses an extra 2 words because instead of a single instruction against VPORT.IN, it needs to load the pin bit mask into a register (1 word) and use STS to write it (2 words) - and it also does the clearing of the output value - hence how we end up with the penalty of 4 for the unrestricted case vs digitalWriteFast.
-
-
-#### pinConfigure()
-pinConfigure is a somewhat ugly function to expose all options that can be configured on a per-pin basis. It is called as shown here; you can bitwise-or any number of the constants shown in the table below. All of those pin options will be configured as specified. Pin functions that don't have a corresponding option OR'ed into the second argument will not be changed.  There are very few guard rails here: This function will happily enable pin interrupts that you don't have a handler for (but when they fire it'll crash the sketch), or waste power with pins driven low while connected to the pullup and so on.
-
-```c++
-pinConfigure(PIN_PA4,(PIN_DIR_INPUT | PIN_PULLUP_ON | PIN_OUT_LOW | PIN_INLVL_TTL));
-// Set PIN_PA4 to input, with pullup enabled and output value of LOW (ready for openDrainFast() and using TTL logic levels. Do not change settings on invert or input sense.
-// This might be used for some sort of bi-directional open-drain communication protocol with a device operating at lower voltage.
-
-pinConfigure(PIN_PD4,(PIN_DIR_INPUT | PIN_OUT_LOW | PIN_PULLUP_OFF | PIN_INVERT_OFF | PIN_INLVL_SCHMITT | PIN_INPUT_ENABLE));
-// Set PD4 inpit, with output register set low, pullup, invert, and alternate levels off, and digital input enabled. Ie, the reset condition!
-
-```
-
-
-| Functionality               | Enable              | Disable             | Toggle             |
-|-----------------------------|---------------------|---------------------|--------------------|
-| Direction, pinMode()        | `PIN_DIR_OUTPUT`<br/>`PIN_DIR_OUT`<br/>`PIN_DIRSET` | `PIN_DIR_INPUT`<br/>`PIN_DIR_IN`<br/>`PIN_DIRCLR`       | `PIN_DIR_TOGGLE`<br/>`PIN_DIRTGL` |
-| Pin output, HIGH or LOW     | `PIN_OUT_HIGH`<br/>`PIN_OUTSET`           | `PIN_OUT_LOW`<br/>`PIN_OUTCLR`          | `PIN_OUT_TOGGLE`<br/>`PIN_OUTTGL`       |
-| Internal Pullup             | `PIN_PULLUP_ON`<br/>`PIN_PULLUP`          | `PIN_PULLUP_OFF`<br/>`PIN_NOPULLUP`       | `PIN_PULLUP_TGL`       |
-| Invert HIGH and LOW         |`PIN_INVERT_ON`      | `PIN_INVERT_OFF`    | `PIN_INVERT_TGL`       |
-| Digital input buffer        | `PIN_INPUT_ENABLE`  | `PIN_INPUT_DISABLE` | Not supported<br/>No plausible use case |
-| Interrupt on change         | `PIN_INT_CHANGE`    | `PIN_INPUT_ENABLE` or<br/>`PIN_INPUT_DISABLE` | Not applicable |
-| Interrupt on Rise           | `PIN_INT_RISE`      | `PIN_INPUT_ENABLE` or<br/>`PIN_INPUT_DISABLE` | Not applicable |
-| Interrupt on Fall           | `PIN_INT_FALL`      | `PIN_INPUT_ENABLE` or<br/>`PIN_INPUT_DISABLE` | Not applicable |
-| Interrupt on LOW            | `PIN_INT_LEVEL`     | `PIN_INPUT_ENABLE` or<br/>`PIN_INPUT_DISABLE` | Not applicable |
+See the [**Improved Digital I/O Reference**](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Digital.md)
 
 ### Serial (UART) Support
 All of the 0/1-series parts have a single hardware serial port (UART or USART); the 2-series parts have two. It works exactly like the one on official Arduino boards (except that there is no auto-reset, unless you've wired it up by fusing the UPDI pin as reset (requiring either HV-UPDI or the Optiboot bootloader to upload code), or set up an "ersatz reset pin" as described elsewhere in this document). See the pinout charts for the locations of the serial pins.
@@ -319,50 +284,9 @@ When it can be determined that arguments passed to SPI.swap() or SPI.pins() are 
 This core disables the SS pin - this means that the "SS" pin can be used for whatever purpose you want, and the pin is relevant only when making an SPI slave (which requires you to implement the interaction with the SPI peripheral yourself - though it's not rocket science or anything). On the classic AVRs, if SS was an input and SPI was enabled, it was acting as the SS pin, and if it went low, it would switch the device to slave mode (and SPI.h would not function until put back into master mode, which was not done automatically).
 
 ### I2C (TWI) support
-All of these parts have a single hardware I2C (TWI) peripheral. It works *almost* exactly like the one on official Arduino boards using the Wire.h library, except for the additional features noted below. See the pinout charts for the location of these pins. **You must be sure to use external pullup resistors on the SDA and SCL lines if the devices you are connecting do not have those on board** (many Arduino/hobby targeted breakout boards do - typically 10k - though these may need to be enabled with a solder-bridge or jumper). The 30k-50k internal pullup resistors are not suitable for I2C pullup resistors; while they were enabled by megaTinyCore prior to version 2.1.0, this was the worst of both worlds: they often did work with the simple test case, leading the developer on their merry way thinking they were all set, only to discover that when they added another I2C device or two, or moved the device to the end of a longer cable, I2C suddenly no longer worked - it's probably better for it to fail immediately, prompting investigation and subsequent addition of appropriate pullup resistors. Note that there is nothing *preventing* one from enabling the internal pullups manually - you just should do so knowing that even if it happens to work, it's not a robust solution.
+All of these parts have a single hardware I2C (TWI) peripheral. It presents an API compatible with the standard Arduino implementation, but with added support for multiple slave addresses, answering general call addresses - and most excitingly, simultaneous master and slave operation!
 
-#### TWI pins
-On all 1-series parts with at least 14 pins, the TWI can be swapped to an alternate pair of pins. Neither 0-series nor 2-series parts have alternate pin locations for the TWI. This should be called **before** Wire.begin(). This implementation of pin swapping is the same as what is used by[DxCore](https://github.com/SpenceKonde/DxCore) and [MegaCoreX](https://github.com/MCUdude/MegaCoreX).
-
-`Wire.swap(1) or Wire.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one.
-
-`Wire.pins(SDA pin, SCL pin)` - this will set the mapping to whichever mapping has the specified pins as SDA and SCL. If this is not a valid mapping option, it will return false and set the mapping to the default. This uses more flash than Wire.swap(); that method is preferred.
-
-
-#### General Call and Second Slave Addresses
-When the version of Wire.h supplied with megaTinyCore 1.1.9 and later is used in slave mode, it is now possible to respond to the general call (0x00) address as well. This is controlled by the optional second argument to Wire.begin() (thanks [@LordJakson](https://github.com/LordJakson)!) If the argument is supplied and true, general call broadcasts will also trigger the interrupt. There is furthermore a third optional argument, which is passed unaltered to the `TWI0.SADDRMASK` register. If the low bit is 0, and bits set 1 will cause the I2C hardware to ignore that bit of the address (masked off bits will be treated as matching). If the low bit is 1, it will instead act as a second address that the device can respond to. See the datasheet for more information about this register.
-
-#### Multi-master support - acting as both slave and master
-This functionality is supported by the hardware (on the same pins, not same-or-different pins like the dual mode on full size parts) is available for test with the developmebt version of 2.4.3 -
-
-#### TWI buffer size
-The Wire library requires a TX and RX buffer; these are both the same size, determined by how much SRAM the part has. Trying to use Wire to send something too large for the buffer will result in the extra bytes just not being sent. The buffer sizes were revised in 2.3.0 to reduce the number of "oddball" parts - all tinyAVR parts supported by megaTinyCore now get 32 byte buffers except the 2k parts, which literally cannot fit buffers that large in their limited SRAM. The 2k parts also don't have enough flash to do much with the Wire library, anyweay. There is little room to improve the flash footpring of the full Wire library further, so I2C use on such 2k parts will likely require alternative iplementations to fit within the flash. (we do not recommend using the 2k parts at all, due to how lousy the developer experience is under such tight constraints.
-
-#### *almost?*
-There is one other rather significant change, though it is transparent to almost everyone. The official Arduino megaavr core has TwoWire extending HardwareI2C, which extends Stream. We just extend Stream. HardwareI2C defines a considerable number of virtual member functions. This results in all of those methods being included in the final binary *regardless of whether they are called*. A master needs all the slave functions even if it never operates as a slave. A slave needs all the master functions, even if it never operates as a master. And the 4k parts can just forget about using Wire.h. Nobody has been able to express how this benefits the user, or why it was done other than that the 4809 is all that core was written to support and it has enough flash to get away with doing that, nor has anyone reported any problems caused by it.
-
-| Parts                  |   SRAM   | Buffers (2.3.0+) | Buffers (pre-2.3.0) |
-|------------------------|----------|------------------|---------------------|
-| 2k 0/1-series          |     128b |              16b |                 16b |
-| 4-8k 0/1, 4k 2-series  | under 1k |              32b |                 16b |
-| other tinyAVR, AVR16DD | under 4k |              32b |                 32b |
-| AVR32DA/DB/DD parts    | under 8k |             130b |                 64b |
-| AVR128Dx and AVR64Dx   | 8 or 16k |             130b |                128b |
-
-Wire is basically unusable w/2k flash anyway, so the smaller buffer is largely academic. The 32b buffer is really rough with 256b - ways. Now all tinyAVR with >128b ram have 32b I2C TX and RX buffers. The Wire codebase is used for DxCore as well; on these larger parts, we need to be compatible with the official m4809 core which does 128b; we add 2 more to allow for a 128 byte page write to 512kbit+ (64KByte) AT24 I2C memory/eeprom chips, since those require two address bytes followed by the data.
-
-#### Use with multiple masters
-
-| Parts           | Wire instances   | Bus Topology         |    Arduino support? |
-|-----------------|------------------|----------------------|------------------
-| Classic ATmega  | 1 (rarely 2) TWI | Multimaster          | Maybe via libraries, has been done.
-| Clssoic Timy    | USI or slave only| Multimaster          |
-| Modern Tiny     | 1 full TWI       | Multimaster          |
-| mega 0-series   | 1                | Dual mode supported  | No, probable after we get it here.
-| AVR Dx-series   | 2 but see note   | Dual mode supported  | No, coming soon! Currently support for only one TWI peripheral.
-
-
-Multimaster puts both functionalities on one pair of pins. Many complications and caveats are introduced, though the standard does provide for bus arbitration. Dual mode lets a single TWI module act as master of one bus via one set of pins while being a slave on another, using a different pair of pins. without the rolls fightign. This appears to be a functionality of "full size" parts only - which is unfortunate, because it's *really* the one you want. We are hopeful that the hardware of the modern AVR parts should make this work better; there is a major rewrite of Wire coming which will add multimaster (and dual mode where applicable) as well as reduce flash usage. I consider it high enough risk that it is being deferred until early 2.4.x
+This is fully documented in the [Wire library reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Wire/README.md)
 
 ### PWM support
 The core provides hardware PWM via the standard `analogWrite()` function. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available. On all other parts except 1-series parts with 20 or 24 pins, 6 PWM pins are available, all driven by Timer A. The 20 and 24 pin 1-series parts have two additional pins, driven by TCD0. The 2-series apparently traded TCD0 for a second serial port and a super-fancy ADC - those parts also all have 6 PWM pins. The Type B timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A and they are often too useful to justify using a whole TCB for  - however you can take them over if you need to generate PWM at different frequencies, though the fact that the prescaler cannot differ from the type A timer limits this use as well. See the pinout charts for a list of which pins support PWM.
@@ -416,165 +340,13 @@ This board package also supports using an external 32.768khz crystal as the cloc
 Yes, you can use an external oscillator for the RTC, at least on 1 and 2 series parts.
 When it's an oscillator not a crystal,It can be fed to either TOSC0 or CLKI
 
-
-### ADC Support
-These parts all have a large number of analog inputs (11 pins on 20 and 24-pin 0/1-series, 15 on 2-series, 9 on 14-pin parts and 5 on 8-pin parts.) - plus the one on the UPDI pin which is not totally usable because the UPDI functionality). They can be read with analogRead() like on a normal AVR. While the `An` constants (ex, `A3`) are supported, and will read from the ADC channel of that number, they are in fact defined as then digital pin shared with that channel. Using the `An` constants is deprecated - the recommended practice is to just use the digital pin number, or better yet, use `PIN_Pxn` notation when calling analogRead(). Particularly with the release of 2.3.0 and tinyAVR 2-series support, a number of enhanced ADC features have been added to expose more of the power of the sophisticated ADC in these parts.
-
-**Be sure to disable to the ADC prior to putting the part to sleep if low power consumption is required!**
-
-#### Reference Voltages
-Analog reference voltage can be selected as usual using analogReference(). Supported reference voltages are listed below:
-
-| tinyAVR 0/1-series                     | tinyAVR 2-series                        |
-|----------------------------------------|-----------------------------------------|
-| `VDD` (Vcc/supply voltage - default)   | `VDD` (Vcc/supply voltage - default)    |
-| `INTERNAL0V55`                         | `INTERNAL1V024`                         |
-| `INTERNAL1V1`                          | `INTERNAL2V048`                         |
-| `INTERNAL1V5`                          | `INTERNAL4V096`                         |
-| `INTERNAL2V5`                          | `INTERNAL2V500`                         |
-| `INTERNAL4V3` (alias of INTERNAL4V34)  | `INTERNAL4V1` (alias of INTERNAL4V096)  |
-| `INTERNAL4V34`                         | `EXTERNAL`                              |
-| `EXTERNAL` (16k and 32k 1-series only) |                                         |
-Note: We do not provide a reference named "INTERNAL" like some classic AVR cores do; because the available voltages vary, this would be a detriment to cross-compatibility - by generating code that would compile, but behave differently, that would introduce the potential for new bugs that would be difficult to debug. Especially since the internal reference voltage isn't the same one that classic AVRs where that usage was commonplace is.... and so these would behave wrongly no matter what was done; minor modifications to sketches are required wheever the internal references are used when porting from classic to modern AVRs.
-
-
-#### Internal Sources
-In addition to reading from pins, you can read from a number of internal sources - this is done just like reading a pin, except the constant listed in the table below is used instead of the pin name or pin number:
-| tinyAVR 0/1-series                     | tinyAVR 2-series                    |
-|----------------------------------------|-------------------------------------|
-| `ADC_INTREF`                           | `ADC_VDDDIV10`                      |
-| `ADC_TEMPERATURE`                      | `ADC_TEMPERATURE`                   |
-| `ADC_DAC0` (1-series only)             | `ADC_GROUND` (offset calibration?)  |
-| `ADC_GROUND` (offset calibration?)     | `ADC_DACREF0*`                      |
-| `ADC_DACREF0` (alias of ADC_DAC0)      | `ADC_DAC0` (alias of `ADC_DACREF0`) |
-| `ADC_PTC` (not particularly useful)    | |
-
-DACREF0 is the the reference voltage for the analog comparator, AC0. On the 1-series, this is the same as the `DAC0` voltage (yup, the analog voltage is shared). Analog comparators AC1 and AC2 on 1-series parts with at least 16k of flash also have a DAC1 and DAC2 to generate a reference voltage for them (though it does not have an output buffer), . On the 2-series, this is only used as the AC0 reference voltage; it cannot be output to a pin. . Unlike the AVR DA-series parts, which have neither `VDDDIV10` nor `INTREF` as an option so reading the reference voltage through `DACREF0` was the only way to determine the operating voltage, there is not a clear use case for the ability to measure this voltage.
-
-#### Analog Resolution
-The hardware supports increasing the resolution of analogRead() to the limit of the hardware's native resolution (10 or 12 bits); Additionally, we provide automatic oversampling and decimation up to the limit of what can be gathered in one batch using the accumulation feature; this is exposed through the analogReadEnh() function detailed below.
-
-
-#### A second ADC? *1-series only*
-On some parts, yes! The "good" 1-series parts (1614, 1616, 1617, 3216, and 3217) have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins (it can also read from DAC2). Currently, there are no plans to implement this in the core due to the large number of currently available pins. Instead, it is recommended that users who wish to "take over" an ADC to use it's more advanced functionality choose ADC1 for this purpose. See [ADC free-run and more](megaavr/extras/ADCFreerunAndMore.md) for some examples of what one might do to take advantage of it.  As of 2.0.5, megaTinyCore provides a function `init_ADC1()` which initializes ADC1 in the same way that ADC0 is (with correct prescaler for clock speed and VDD reference). On these parts, ADC1 can be used to read DAC1 (DACREF1) and DAC2 (DACREF2), these are channels `0x1B` and `0x1E` respectively. The core does not provide an equivalent to analogRead() for ADC1 at this time.
-
-#### ADC Sampling Speed
-megaTinyCore takes advantage of the improvements in the ADC on the newer AVR parts to improve the speed of analogRead() by more than a factor of three over classic AVRs! The ADC clock which was - on the classic AVRs - constrained to the range 50-200kHz - can be cranked up as high as 1.5MHz at full resolution! On the 0/1-series, we use 1MHz at 16/8/4 MHz system clock, and 1.25 MHz at 20/10/5 MHz system clock. To compensate for the faster ADC clock, we set the sample duration to 14 to extend the sampling period from the default of 2 ADC clock cycles to 16 - providing approximately the same sampling period as on classic AVRs (which is probably a conservative decision). On the 2-series, the corresponding setting has only 0.5 or 1 ADC clock added to it, so we set it to 15 - however, it can be set all the way up to 255. The ADC clock is run at approx. 2.5 MHz on the 2-series parts.  If you are measuring a lower impedance signal and need even faster `analogRead()` performance - or if you are measuring a high-impedance signal and need a longer sampling time, you can adjust that setting with `analogSampleDuration()` detailed below.
-
-#### Analog Functions
-This core includes the following analogRead-related functions
-
-##### analogRead(pin)
-The standard analogRead(). Single-ended, and resolution set by analogReadResolution(), default 10 bit (0-1023. Negative return values indicate an error condition (though when the compiler can tell that a given call will *always* return an error, we issue a compile error instead)
-
-##### analogReadResolution(resolution)
-Sets resolution for the analogRead() function. Unlike the stock version, this returns true/false. If it returns false, the value passed was invalid, and resolution was set to the default, 10 bits. The only valid values are those that are supported natively by the hardware, plus 10 bit even if not natively supported, for compatibility.
-Hence, the only valid values are 8, 10 and - on the 2-series - 12.
-This is different from the Zero/Due/etc implementations, which allow you to pass anything from 1-32, and rightshift the minimum resolution or leftshift the maximum resolution as needed to get the requested range of values. Within the limited resources of an 8-bit AVR with potentially only 4k of flash, this is a unjustifiable waste of resources; furthermore, padding a reading with zeros so it matches the format of a more precise measuring method strikes me as generally poor practice, as if we're saying we have more resolution that we do. Note also that we offer oversampling & decimation with `analogReadEnh()` and `analogReadDiff()`, which can extend the resolution keep the extra bits meaningful. `analogReadResolution()` only controls the resolution of analogRead() itself. The aforementioned enhanced analog measurement functions take desired resolution as an argument.
-
-##### analogSampleDuration(duration)
-Sets sampling duration (SAMPLEN on 0/1 or SAMPDUR on 2-series) For high impedance voltage sources, use a longer sample length. For faster reads, use a shorter sample length. Passing 0 will approximately double analogRead()
-speed. This returns a `bool` - it is `true` if value is valid; on 0/1-series maximum is 31 and the duration of a sample is SAMPLEN + 2 (max. 33 ADC clock sampling duration); on 2-series any 8-bit value is valid, and duration is this many plus 0.5 (without PGA) or 1 (with PGA) ADC clocks. This value is used for all analog measurement functions.
-
-The megaTinyCore default is 14 for 0/1-series and 15 for the 2-series - for 16 or 15.5 ADC clocks (which is half as long on the 2-series, since it supports higher ADC clock speeds. ADC clock is configured 1-1.25 MHz on 0/1, and approx. 2.5 MHz on 2-series.
-
-Reducing it to the minimum will approximately cut the time analogRead() takes in half, but will have poor accuracy unless measuring very low impedance signals;
-
-##### ADCPowerOptions(options) *2-series only*
-The PGA requires powere when turned on. It is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that specifies valid gain > 0; if it is not already on, this will slow down the reading. By default we turn it off afterwards. There is also a "low latency" mode that, when enabled, keeps the ADC reference and related hardware running to prevent the delay (on order of tens of microseconds) before the next analog reading is taken. We use that by default, but it can be turned off with this function.
-Generate the argument for this by using one of the following constants, or bitwise-or'ing together a low latency option and a PGA option. If only one option is supplied, the other configuration will not be changed.
-* `LOW_LAT_OFF`   Turn off low latency mode.
-* `LOW_LAT_ON`    Turn on low latency mode.
-* `PGA_OFF_ONCE`  Turn off the PGA now. Don't change settings; if not set to turn off automatically, that doesn't change.
-* `PGA_KEEP_ON`   Enable PGA. Disable the automatic shutoff of the PGA.
-* `PGA_AUTO_OFF`  Disable PGA now, and in future turn if off after use.
-Example:
-```c
-ADCPowerOptions(LOW_LAT_ON  | PGA_KEEP_ON ); //low latency on. Turn the PGA on, and do not automatically shut it off. Maximum power consumption, minimum ADC delays.
-ADCPowerOptions(LOW_LAT_OFF | PGA_AUTO_OFF); //low latency off. Turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays.
-```
-
-**More advanced method** This is not recommended, as it is harder to read; however under the hood the two are identical, and if setting this to something determined at runtime, this may be easier to implement. The argument is a number between 0x00 and 0x0F. The structure is 0b 0000 PPLL - P bits control the PGA power state, L bits the LOWLAT setting.
-* `LL = 00` Take no action on low latency mode.
-* `LL = 01` Take no action on low latency mode.
-* `LL = 10` Turn off low latency mode.
-* `LL = 11` Turn on low latency mode.
-* `PP = 00` Don't change anything relating to the PGA.
-* `PP = 01` Turn off the PGA now. Don't change settings; if not set to turn off automatically, that doesn't change.
-* `PP = 10` Enable PGA. Disable the automatic shutoff of the PGA.
-* `PP = 11` Disable PGA now, and in future turn if off after use
-
-Example:
-```c
-ADCPowerOptions(0x0B); //0x0F = 0b 0000 1011 LL = 11, so low latency on. PP = 10, so PGA on, automatic shut off disabled. Maximum power consumption, minimum ADC delays.
-ADCPowerOptions(0x0E); //0x02 = 0b 0000 1110 LL = 10, so low latency off. PP = 11, turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays.
-```
-
-##### analogReadEnh(pin, res=ADC_NATIVE_RESOLUTION, gain=0)
-Enhanced `analogRead()` - returns a `long` (`int32_t`), not an `int` (`int16_t`). Perform a single-ended read on the specified pin. `res` is resolution in bits, which may range from 8 to `ADC_MAX_OVERSAMPLED_RESOLUTION`. This maximum is 13 bits for 0/1-series parts, and 17 bits for 2-series parts. If this is less than the native ADC resolution, that resolution is used, and then it is right-shifted 1, 2, or 3 times; if it is more than the native resolution, the accumulation option which will take 4<sup>n</sup> samples (where `n` is `res`-native resolution). Note that even with the faster ADC in the 2-series, and even without extending the sampling duration, a 1024 sample burst read is not instantaneous - with defaults it's around 12 ms for 1024-sample burst read, and at maximum sample duration it will take over 100ms. The accumulated result is then decimated (rightshifted n places) to yield a result with the requested resolution, which is returned. See [Atmel app note AVR121](https://ww1.microchip.com/downloads/en/appnotes/doc8003.pdf) - the specific case of the 2-series is discussed in a more recent app note from Microchip, but it is not a particularly informative document.  Alternately, to get the raw accumulated ADC readings, pass one of the `ADC_ACC_n` constants for the second argument where `n` is a power of 2 up to 64 (0/1-series), 128 (Dx-series), or 1024 (2-series). Be aware, however, that the lowest bits of a raw accumulated reading should not be trusted (which is why the decimation step is needed, and why 4x the samples are required for every extra bit of resolution instead of 2x). On 2-series parts *the PGA can be used for single ended measurements*. Valid options for gain are 0 (PGA disabled, default), 1 (unity gain - may help in some circumstances - but that is the extent of my knowledge on that matter, and powers of 2 up to 16) - on 0/1-series parts, the gain argument should be omitted or 0.
-```c++
-  int32_t second_pin_voltage = analogReadEnh(PIN_PA2,13);
-  // measure voltage on PA2, to 13 bits of resolution, which will require either 3 or 1 bits of oversampling + decimation
-  // (depending on whether it is a 0/1 or 2-series part.)
-```
-
-
-##### analogReadDiff(positive, negative, res=ADC_NATIVE_RESOLUTION, gain=0) *2-series only*
-Differential `analogRead()` - returns a `long` (`int32_t`), not an `int` (`int16_t`). Performs a differential read using the specified pins as the positive and negative inputs. Any analog input pin can be used for the positive side, but only pins on PORTA (tinyAVR 2-series) or PORTD/PORTE (AVR Dx-series) can be used as the negative input. The result returned is the voltage on the positive side, minus the voltage on the negative side, measured against the selected analog reference. The `res` parameter works the same way as for `analogReadEnh()`, as does the `gain` function. Gain becomes FAR more useful here than in single-ended mode as you can now take a very small difference and "magnify" it to make it easier to measure.
-
-```c++
-  int32_t diff_first_second = analogReadDiff(PIN_PA1, PIN_PA2, 12, 0);
-  // Simple differential read to with PA1 as positive and PA2 as negative. Presumable these are close in voltage.
-  // (I used two pots and manually adjusted them to be very close; also could have done like 10k-100ohm-10k resistor network)
-```
-
-#### Offset error *2-series only*
-Particularly with small reference voltages, measuring very small voltage differences, the offset error was higher than I expected (though not as bad as I feared when I wrote this initially - there was a bug analogReadEnh() that set the ADC prescaler to the minimum after every measurement, leaving the ADC running far out of spec). To see the magnitude of this offset error in your differential readings, take one differential measurement, then switch positive and negative and take the measurement again, and sum the two results. If there were no offset error, and assuming the voltages did not change, that would be zero. It will be important to see if methods can be used to correct for the offset. Also, remember that **oversampling does not do anything to help with offset error** - adding a bunch of measurements, all of which are high or low by the same amount will yield a sum that is proportionately just as high or low, and can increase the apparent size of the offset error  Increasing the gain, however, does help.
-```c++
-  analogReference(INTERNAL1V024); //minimum reference
-  // Make PA1 and PA2 really close in voltage - we want to see this new ADC shine right?
-  int32_t diff_first_second = analogReadDiff(PIN_PA1, PIN_PA2, 12, 0);
-  int32_t diff_second_first = analogReadDiff(PIN_PA2, PIN_PA1, 12, 0);
-  Serial.println(diff_first_second + diff_second_first);
-  Serial.println(diff_first_second);
-  Serial.println(diff_second_first);
-```
-
-
-#### Error Codes
-The analogRead function and the enhanced version of it can return a number of different "error" codes to indicate that it was called under inappropriate conditions. These are always values very close to the minimum value of the signed integer that it returns. Although on megaTinyCore, a successful analogRead will always return a positive value (so that -1, -2, etc would work), it is done is done in this way so that the same error codes are returned on all parts, even classic AVRs (ex, ATtiny861 on ATTinyCore 2.0.0 and later) that do differential ADC reads through analogRead(). All of these error codes (for both analogRead and the enhanced versions) are #defined with the names shown below as well so you can test for them programmatically. Note that if the compiler knows at compile time that one of these errors will be generated by a given call, that will be treated as a compile error. Only error conditions that come about at runtime will trigger the error codes
-
-##### `ADC_ERROR_BAD_PIN_OR_CHANNEL` (-32765)
-##### `ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL` (-2100000000)
-The selected pin has no analog input capability, does not exist, or, if it's a channel number (from ADC_CH(channel number), it does not exist or is otherwise invalid.
-
-##### `ADC_ERROR_BUSY` (-32766)
-##### `ADC_ENH_ERROR_BUSY` (-2100000001)
-The requested reading could not be made because the ADC is currently busy taking another measurement, for example in free running mode.
-
-##### `ADC_ERROR_DISABLED` (-32767)
-##### `ADC_ENH_ERROR_DISABLED` (-2100000007)
-The requested reading could not be made because the ADC is currently disabled. Did you disable it when you put the device to sleep and never turn it back on?
-
-##### `ADC_ENH_ERROR_RES_TOO_LOW` (-2100000003)
-Resolution must not be lower than the lowest native resolution that the part supports (Core presents this as ADC_NATIVE_RESOLUTION_LOW). If you require lower resolution, that is what the `>>` operator is for.
-
-##### `ADC_ENH_ERROR_RES_TOO_HIGH` (-2100000004)
-The 0/1-series can get 3 extra bits by oversampling 64x and right- shifting 3 times. The 2-series can get 5 by oversampling by a whopping 1024x (taking 13-160 ms depending on options)
-and then right-shifting 5 times. Thus, maximums are 13 and 17. If you want the raw result before decimation (being aware that the lowest bits are mostly noise), one of the `ADC_ACC_n` constants may be used, where `n` is 2, 4, 8, 16, 32, 64, or on 2-series only, 128, 256, 512, or 1024 - in this case, that many samples will be taken through burst/accumulation mode and returned without decimation.
-
-##### `ADC_ENH_ERROR_BAD_NEG_PIN` (-2100000005)
-Returned by analogReadDiff when the requested pin for the negative input is not valid as a negative input. Negative pins can only be on PORTA (for tinyAVR) or PORTD/PORTE (for Dx-series), so there are significantly fewer channels to choose from.
-
-### DAC Support
-The 1-series parts have an 8-bit DAC which can generate a real analog voltage. This generates voltages between 0 and the selected VREF (which cannot be VDD, unfortunately). Set the DAC reference voltage via the `DACReference()` function - pass it one of the `INTERNAL` reference options listed under the ADC section above. In versions prior to 2.0.0, select the DAC VREF voltage from the Tools -> DAC Voltage Reference submenu. This voltage must be half a volt lower than Vcc for the voltage reference to be accurate. The DAC is exposed via the analogWrite() function: Call `analogWrite(PIN_PA6,value)` to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin; note that unlike most* PWM pins `analogWrite(PIN_PA6,0)` and `analogWrite(PIN_PA6,255)` do not act as if you called digitalWrite() on the pin; 0 or 255 written to the `DAC0.DATA` register; thus you do not have to worry about it applying the full supply voltage to the pin (which you may have connected to sensitive devices that would be harmed by such a voltage) if let the calculation return 255; that will just output 255/256ths of the reference voltage.
-
 ### printf() support for "printable" class
 Unlike the official board packages, but like many third party board packages, megaTinyCore includes the .printf() method for the printable class (used for Serial and many other libraries that have print() methods); this works like printf(), except that it outputs to the device in question; for example:
 ```cpp
 Serial.printf("Milliseconds since start: %ld\n", millis());
 ```
 Note that using this method will pull in just as much bloat as sprintf(), so it may be unsuitable on devices with small flash memory.
+
 
 ### Pin Interrupts
 All pins can be used with attachInterrupt() and detachInterrupt(), on RISING, FALLING, CHANGE, or LOW. All pins can wake the chip from sleep on CHANGE or LOW. Pins marked as ASync Interrupt pins on the megaTinyCore pinout charts (pins 2 and 6 within each port) can be used to wake from sleep on RISING and FALLING edge as well. Those pins are termed "fully asynchronous pins" in the datasheet
