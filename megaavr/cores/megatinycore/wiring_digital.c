@@ -125,34 +125,38 @@ void pinConfigure(uint8_t pin, uint16_t pinconfig) {
   SREG=oldSREG; //re-enable interrupts
 }
 
-
+static inline uint8_t portToPortBaseOffset(uint8_t port);
+static inline uint8_t portToPortBaseOffset(uint8_t port) {
+  _SWAP(port);
+  return port << 1;
+}
 void pinMode(uint8_t pin, uint8_t mode) {
   check_valid_digital_pin(pin);         /* generate compile error if a constant that is not a valid pin is used as the pin */
   check_valid_pin_mode(mode);           /* generate compile error if a constant that is not a valid pin mode is used as the mode */
   uint8_t bit_mask = digitalPinToBitMask(pin);
-  if ((bit_mask == NOT_A_PIN) || (mode > INPUT_PULLUP)) {
+  if ((bit_mask == NOT_A_PIN) || (mode > 3)) {
     return;                             /* ignore invalid pins passed at runtime */
   }
-  PORT_t *port = digitalPinToPortStruct(pin);
-  //if (port == NULL) return;           /* skip this test; if bit_mask isn't NOT_A_PIN, port won't be null - if it is, pins_arduino.h contains errors and we can't expect any digital I/O to work correctly.
-  if (mode == OUTPUT) {
-    port->DIRSET = bit_mask;            /* Configure direction as output and done*/
-  } else {                              /* mode == INPUT or INPUT_PULLUP - more complicated */
-                                        /* Calculate where pin control register is */
-    uint8_t bit_pos = digitalPinToBitPosition(pin);
-    volatile uint8_t *pin_ctrl = getPINnCTRLregister(port, bit_pos);
-    uint8_t status = SREG;              /* Save state */
-    cli();                              /* Interrupts off for PINnCTRL stuff */
-    port->DIRCLR = bit_mask;            /* Configure direction as input */
-    if (mode == INPUT_PULLUP) {         /* Configure pull-up resistor */
-      *pin_ctrl |= PORT_PULLUPEN_bm;    /* Enable pull-up */
-      port->OUTSET = bit_mask;          /* emulate setting of the port output register on classic AVR */
-    } else {                            /* mode == INPUT (no pullup) */
-      *pin_ctrl &= ~(PORT_PULLUPEN_bm); /* Disable pull-up */
-      port->OUTCLR = bit_mask;          /* emulate clearing of the port output register on classic AVR */
+  volatile uint8_t * port_base = ((volatile uint8_t *) (uint16_t)(0x0400 | portToPortBaseOffset(digitalPinToPort(pin))));
+  if (mode & 0x01) {
+    // OUTPUT mode, so write DIRSET with the mask.
+    *(port_base + 1) = bit_mask;
+  } else {
+    *(port_base + 2) = bit_mask;
+    if (mode == 2) {
+      *(port_base + 5) = bit_mask;
+    } else if (mode == 0) {
+      *(port_base + 6) = bit_mask;
     }
-    SREG = status;                      /* Restore state */
   }
+  port_base +=(uint8_t) digitalPinToBitPosition(pin) | (uint8_t) 0x10;
+  bit_mask = *port_base;
+  if (mode & 2) {
+    bit_mask |= 0x08;
+  } else {
+    bit_mask &= 0xF7;
+  }
+  *port_base = bit_mask;
 }
 
 

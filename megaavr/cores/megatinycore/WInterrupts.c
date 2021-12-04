@@ -42,10 +42,10 @@
   #else
     voidFuncPtr intFunc_A[8];
     #ifdef PORTB_PINS
-      voidFuncPtr * intFunc_B[PORTB_PINS];
+      voidFuncPtr intFunc_B[PORTB_PINS];
     #endif
     #ifdef PORTC_PINS
-      voidFuncPtr * intFunc_C[PORTC_PINS];
+      voidFuncPtr intFunc_C[PORTC_PINS];
     #endif
     volatile voidFuncPtr * intFunc[] = {
     intFunc_A,

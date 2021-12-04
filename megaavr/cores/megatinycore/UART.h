@@ -1,25 +1,13 @@
-/* UART.h - Hardware serial library for Wiring
- * Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+/* UART.h - Hardware serial library, main header.
+ * This library is free software released under LGPL 2.1.
+ * See License.md for more information.
+ * This file is part of megaTinyCore.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- * Modified 28 September 2010 by Mark Sproul
- * Modified 14 August 2012 by Alarus
- * Modified 3 December 2013 by Matthijs Kooijman
- * Modified by someone, sometime in 2016 to work on megaAVR 0-series
- * Modified 2017-2021 by Spence Konde for DxCore and megaTinyCore
+ * Copyright (c) 2006 Nicholas Zambetti, Modified by
+ * 11/23/2006 David A. Mellis, 9/20/2010 Mark Sproul,
+ * 8/24/2012 Alarus, 12/3/2013 Matthijs Kooijman
+ * Others (unknown) 2013-2017, 2017-2021 Spence Konde
+ * and 2021 MX682X
  */
 
 #pragma once
@@ -27,21 +15,27 @@
 #include <inttypes.h>
 #include "api/HardwareSerial.h"
 #include "pins_arduino.h"
+#include "UART_constants.h"
+#include "UART_check_pins.h"
+
+// No UART_swap.h on megaTinyCore - there isn't enough to put in separate file.
+
 /* Define constants and variables for buffering incoming serial data.  We're
- * using a ring buffer (I think), in which head is the index of the location
- * to which to write the next incoming character and tail is the index of the
+ * using a ring buffer, in which head is the index of the location to which
+ * to write the next incoming character and tail is the index of the
  * location from which to read.
- * NOTE: a "power of 2" buffer size is recommended to dramatically
- *       optimize all the modulo operations for ring buffers.
- * ... Well, it was missing some optimization, because explicitly doing the
- * optimization saved a bit more flash... I see no compelling reason to permit
- * non-power-of-2 ring buffer length. -Spence
+ * NOTE: a "power of 2" buffer size is required. The compiler misses chances
+ * to optimize power-of-2 buffers sizes, so disallowing them saves flash.
+ * I see no compelling reason to permit non-power-of-2 ring buffer length.
+ *      -Spence
  *
  * WARNING: When buffer sizes are increased to > 256, the buffer index
  * variables are automatically increased in size, but the extra
  * atomicity guards needed for that are not implemented. This will
  * often work, but occasionally a race condition can occur that makes
  * Serial behave erratically. See https://github.com/arduino/Arduino/issues/2405
+ * This is definitely fixed for TX. I am not confident that it is for RX.
+ *
  * Flash versus RAM table
  * |       |  modern tinyAVR series parts   | Other modern parts   |
  * | Flash | 0-series | 1-series | 2-series | mega | All Dx |  EA  |
@@ -56,10 +50,13 @@
  * |  128k |       -  |       -  |       -  |   -  |  16384 |   -  |
  * This ratio is remarkably consistent. No AVR part was ever made with
  * less than 8:1 flash:ram, nor more than 16:1, since first ATmegas!
- * The sole exception? The ATmega2560/2561 has only 4k flash.
+ * The sole exception? The ATmega2560/2561 has only 4k RAM.
  * (to be fair, you are allowed to use external RAM - also I think
  * a unique feature)
  */
+#define USE_ASM_TXC 1    // This *appears* to work? It's the easy one.
+#define USE_ASM_RXC 1    // This now works, so use it when it is beneficial (2-series only)
+#define USE_ASM_DRE 1    // This is the hard one...Depends on BOTH buffers, and the
 
 #if !defined(SERIAL_TX_BUFFER_SIZE)   // could be overridden by boards.txt
   #if   (INTERNAL_SRAM_SIZE  < 1024)  // 256b/512b RAM
@@ -73,10 +70,14 @@
 #if !defined(SERIAL_RX_BUFFER_SIZE)   // could be overridden by boards.txt
   #if   (INTERNAL_SRAM_SIZE <  512)  // 256b RAM
     #define SERIAL_RX_BUFFER_SIZE 16
+    // current tx buffer position = SerialClass + txtail + 37
   #elif (INTERNAL_SRAM_SIZE < 1024)  // 512b RAM
     #define SERIAL_RX_BUFFER_SIZE 32
+    // current tx buffer position = SerialClass + txtail + 53
   #else
     #define SERIAL_RX_BUFFER_SIZE 64  // 1k+ RAM
+    // current tx buffer position = SerialClass + txtail + 85
+    // rx buffer position always = SerialClass + rxhead + 21
   #endif
 #endif
 /* Use INTERNAL_SRAM_SIZE instead of RAMEND - RAMSTART, which is vulnerable to
@@ -105,169 +106,158 @@
   #error "ERROR: RX buffer size must be a power of two."
 #endif
 
-// Define config for Serial.begin(baud, config);
-#undef SERIAL_5N1
-#undef SERIAL_6N1
-#undef SERIAL_7N1
-#undef SERIAL_8N1
-#undef SERIAL_5N2
-#undef SERIAL_6N2
-#undef SERIAL_7N2
-#undef SERIAL_8N2
-#undef SERIAL_5E1
-#undef SERIAL_6E1
-#undef SERIAL_7E1
-#undef SERIAL_8E1
-#undef SERIAL_5E2
-#undef SERIAL_6E2
-#undef SERIAL_7E2
-#undef SERIAL_8E2
-#undef SERIAL_5O1
-#undef SERIAL_6O1
-#undef SERIAL_7O1
-#undef SERIAL_8O1
-#undef SERIAL_5O2
-#undef SERIAL_6O2
-#undef SERIAL_7O2
-#undef SERIAL_8O2
+// tinyAVR 0/1-series has 2 bits devoted to RS485, supporting normal (00), RS485 with XDIR driven to control
+// an external line driver (01), and some other mysterious mode (10) the function of which is unclear. There is
+// evidence that this poorly documented feature is also present in other hardware, and was only removed on paper.
+#if defined(USART_RS4850_bm) && !defined(USART_RS485_bm)
+  #define USART_RS485_bm USART_RS4850_bm
+#endif
+#if defined(__AVR_ATtinyxy2__)
+const uint8_t _usart_pins[][4] = {{PIN_PA6, PIN_PA7, PIN_PA0, PIN_PA3},{PIN_PA1, PIN_PA2, NOT_A_PIN, NOT_A_PIN}};
+#elif !defined(__AVR_ATtinyx26__) && !defined(__AVR_ATtinyx27__) && defined(MEGATINYCORE_SERIES)
+const uint8_t _usart_pins[][4] = {{PIN_PB2, PIN_PB3, PIN_PB1, PIN_PB0},{PIN_PA1, PIN_PA2, PIN_PA3, PIN_PA4}};
+#elif defined(__AVR_ATtinyx26__) || defined(__AVR_ATtinyx27__)
+const uint8_t _usart_pins[][4] = {
+  {PIN_PB2, PIN_PB3, PIN_PB1, PIN_PB0},
+  {PIN_PA1, PIN_PA2, PIN_PA3, PIN_PA4},
+  {PIN_PC0, PIN_PC1, PIN_PC2, PIN_PC3}
+};
 
-// Define config for Serial.begin(baud, config); Default: SERIAL_8N1
-#define SERIAL_5N1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_5BIT_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_1BIT_gc)
-#define SERIAL_6N1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_6BIT_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_1BIT_gc)
-#define SERIAL_7N1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_7BIT_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_1BIT_gc)
-#define SERIAL_8N1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_1BIT_gc)
-
-#define SERIAL_5N2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_5BIT_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_2BIT_gc)
-#define SERIAL_6N2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_6BIT_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_2BIT_gc)
-#define SERIAL_7N2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_7BIT_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_2BIT_gc)
-#define SERIAL_8N2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_2BIT_gc)
-
-#define SERIAL_5E1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_5BIT_gc | USART_PMODE_EVEN_gc | USART_SBMODE_1BIT_gc)
-#define SERIAL_6E1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_6BIT_gc | USART_PMODE_EVEN_gc | USART_SBMODE_1BIT_gc)
-#define SERIAL_7E1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_7BIT_gc | USART_PMODE_EVEN_gc | USART_SBMODE_1BIT_gc)
-#define SERIAL_8E1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | USART_PMODE_EVEN_gc | USART_SBMODE_1BIT_gc)
-
-#define SERIAL_5E2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_5BIT_gc | USART_PMODE_EVEN_gc | USART_SBMODE_2BIT_gc)
-#define SERIAL_6E2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_6BIT_gc | USART_PMODE_EVEN_gc | USART_SBMODE_2BIT_gc)
-#define SERIAL_7E2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_7BIT_gc | USART_PMODE_EVEN_gc | USART_SBMODE_2BIT_gc)
-#define SERIAL_8E2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | USART_PMODE_EVEN_gc | USART_SBMODE_2BIT_gc)
-
-#define SERIAL_5O1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_5BIT_gc | USART_PMODE_ODD_gc | USART_SBMODE_1BIT_gc)
-#define SERIAL_6O1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_6BIT_gc | USART_PMODE_ODD_gc | USART_SBMODE_1BIT_gc)
-#define SERIAL_7O1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_7BIT_gc | USART_PMODE_ODD_gc | USART_SBMODE_1BIT_gc)
-#define SERIAL_8O1 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | USART_PMODE_ODD_gc | USART_SBMODE_1BIT_gc)
-
-#define SERIAL_5O2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_5BIT_gc | USART_PMODE_ODD_gc | USART_SBMODE_2BIT_gc)
-#define SERIAL_6O2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_6BIT_gc | USART_PMODE_ODD_gc | USART_SBMODE_2BIT_gc)
-#define SERIAL_7O2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_7BIT_gc | USART_PMODE_ODD_gc | USART_SBMODE_2BIT_gc)
-#define SERIAL_8O2 (USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | USART_PMODE_ODD_gc | USART_SBMODE_2BIT_gc)
-
+#else
+  #error "This can't happen - it doesn't have 8, 14, 20 or 24 pins, or it has 14 pins but no series - defines aren't being picked up correctly."
+#endif
+/*
+#if defined(__AVR_ATtinyxy2__)
+const uint8_t _usart_pins[][7] = {{PIN_PA6, PIN_PA7, PIN_PA0, PIN_PA3},{PIN_PA1, PIN_PA2, NOT_A_PIN, NOT_A_PIN}};
+#elif !defined(__AVR_ATtinyx26__) && !defined(__AVR_ATtinyx27__) && defined(MEGATINYCORE_SERIES)
+const uint8_t _usart_pins[][7] = {{4, 8, 2, 1, 0x22, 0x23, 0x20},{2, 4, 8, 16, 0x01, 0x02, 0x04}};
+#elif defined(__AVR_ATtinyx26__) || defined(__AVR_ATtinyx27__)
+const uint8_t _usart_pins[][7] = {
+  {4, 8, 2, 1, 0x22, 0x23, 0x20},
+  {2, 4, 8, 16, 0x01, 0x02, 0x04},
+  {1, 2, 4, 8, 0x40, 0x41, 0x43}
+};
+*/
 #define SERIAL_PIN_SETS 2
+// WHAT THE HELL IS WRONG WITH THIS?!
+// When this definition is used, row 0 is {PIN_PB3,PIN_PB2,PIN_PB1,PIN_PB0 in this file and row 2 is 0, 0, 0, 0! WTF}
+// TX, RX, XCK, XDIR
+/*
+const uint8_t _usart_pins[][4] = {
+  #if defined(HWSERIAL0_MUX)
+    #if (defined(PIN_HWSERIAL0_TX) && defined(PIN_HWSERIAL0_RX) && defined(PIN_HWSERIAL0_XCK) && defined(PIN_HWSERIAL0_XIR) && PIN_HWSERIAL0_TX != NOT_A_PIN && PIN_HWSERIAL0_RX != NOT_A_PIN)
+      {PIN_HWSERIAL0_TX, PIN_HWSERIAL0_RX, PIN_HWSERIAL0_XCK, PIN_HWSERIAL0_XDIR},
+    #else
+      {NOT_A_PIN, NOT_A_PIN, NOT_A_PIN, NOT_A_PIN},
+    #endif
+  #endif
+  #if defined(HWSERIAL0_MUX_PINSWAP_1)
+    #if (defined(PIN_HWSERIAL0_TX_PINSWAP_1) && defined(PIN_HWSERIAL0_RX_PINSWAP_1) && defined(PIN_HWSERIAL0_XCK_PINSWAP_1) && defined(PIN_HWSERIAL0_XIR_PINSWAP_1) && PIN_HWSERIAL0_TX_PINSWAP_1 != NOT_A_PIN && PIN_HWSERIAL0_RX_PINSWAP_1 != NOT_A_PIN)
+      {PIN_HWSERIAL0_TX_PINSWAP_1, PIN_HWSERIAL0_RX_PINSWAP_1, PIN_HWSERIAL0_XCK_PINSWAP_1, PIN_HWSERIAL0_XDIR_PINSWAP_1},
+    #else
+      {NOT_A_PIN, NOT_A_PIN, NOT_A_PIN, NOT_A_PIN},
+    #endif
+  #endif
+  #if defined(USART1) //On 0/1-series, with only one USART, we don't even need the third row.
+    #if defined(HWSERIAL1_MUX_PINSWAP_1)
+      #if (defined(PIN_HWSERIAL1_TX_PINSWAP_1) && defined(PIN_HWSERIAL1_RX_PINSWAP_1) && defined(PIN_HWSERIAL1_XCK_PINSWAP_1) && defined(PIN_HWSERIAL1_XIR_PINSWAP_1) && PIN_HWSERIAL1_TX_PINSWAP_1 != NOT_A_PIN && PIN_HWSERIAL1_RX_PINSWAP_1 != NOT_A_PIN)
+        {PIN_HWSERIAL1_TX_PINSWAP_1, PIN_HWSERIAL1_RX_PINSWAP_1, PIN_HWSERIAL1_XCK_PINSWAP_1, PIN_HWSERIAL1_XDIR_PINSWAP_1},
+      #else
+        {NOT_A_PIN, NOT_A_PIN, NOT_A_PIN, NOT_A_PIN},
+      #endif
+    #endif
+  #endif
+};
+*/
 
+
+/* DANGER DANGER DANGER */
+/* CHANGING THE MEMBER VARIABLES BETWEEN HERE AND THE OTHER SCARY COMMENT WILL COMPLETELY BREAK SERIAL
+ * WHEN USE_ASM_DRE and USE_ASM_RXC is used! */
+/* DANGER DANGER DANGER */
 class UartClass : public HardwareSerial {
   protected:
     volatile USART_t *const _hwserial_module;
-
-    struct UartPinSet {
-      uint8_t const rx_pin;
-      uint8_t const tx_pin;
-      uint8_t const mux;
-    } _hw_set[SERIAL_PIN_SETS];
-
+    const uint8_t _module_number;
     uint8_t _pin_set;
 
-    // Has any byte been written to the UART since begin()
-    bool _written;
+    uint8_t _state; /* 0b000000hw */
+    // h = half duplex with open drain - disable RX while TX.
+    // w = written (like old _written)
 
     volatile rx_buffer_index_t _rx_buffer_head;
     volatile rx_buffer_index_t _rx_buffer_tail;
     volatile tx_buffer_index_t _tx_buffer_head;
     volatile tx_buffer_index_t _tx_buffer_tail;
 
-    volatile uint8_t _hwserial_dre_interrupt_vect_num;
-
     // Don't put any members after these buffers, since only the first
     // 32 bytes of this struct can be accessed quickly using the ldd
     // instruction.
     volatile unsigned char _rx_buffer[SERIAL_RX_BUFFER_SIZE];
     volatile unsigned char _tx_buffer[SERIAL_TX_BUFFER_SIZE];
+/* DANGER DANGER DANGER */
+/* ANY CHANGES BETWEEN OTHER SCARY COMMENT AND THIS ONE WILL BREAK SERIAL when USE_ASM_DRE or USE_ASM_RXC is used! */
+/* DANGER DANGER DANGER */
 
   public:
-    inline UartClass(volatile USART_t *hwserial_module, uint8_t hwserial_rx_pin, uint8_t hwserial_tx_pin, uint8_t hwserial_rx_pin_swap, uint8_t hwserial_tx_pin_swap, uint8_t dre_vect_num, uint8_t uart_mux, uint8_t uart_mux_swap);
-    bool pins(uint8_t tx, uint8_t rx);
-    bool swap(uint8_t state = 1);
-    void begin(unsigned long baud) {
-      begin(baud, SERIAL_8N1);
-    }
-    void begin(unsigned long, uint16_t);
-    void end();
+    inline UartClass(volatile USART_t *hwserial_module, uint8_t module_number, uint8_t default_pinset);
+    bool                    pins(uint8_t tx, uint8_t rx);
+    bool                    swap(uint8_t mux_level = 1);
+    void                   begin(uint32_t baud) {begin(baud, SERIAL_8N1);}
+    void                   begin(uint32_t baud, uint16_t options);
+    void                     end();
+    void                printHex(const     uint8_t              b);
+    void                printHex(const    uint16_t  w, bool s = 0);
+    void                printHex(const    uint32_t  l, bool s = 0);
+    void                printHex(const      int8_t  b)              {printHex((uint8_t)    b);            }
+    void                printHex(const        char  b)              {printHex((uint8_t)    b);            }
+    void              printHexln(const      int8_t  b)              {printHex((uint8_t)    b); println(); }
+    void              printHexln(const        char  b)              {printHex((uint8_t)    b); println(); }
+    void              printHexln(const     uint8_t  b)              {printHex(             b); println(); }
+    void              printHexln(const    uint16_t  w, bool s = 0)  {printHex(          w, s); println(); }
+    void              printHexln(const    uint32_t  l, bool s = 0)  {printHex(          l, s); println(); }
+    void              printHexln(const     int16_t  w, bool s = 0)  {printHex((uint16_t)w, s); println(); }
+    void              printHexln(const     int32_t  l, bool s = 0)  {printHex((uint16_t)l, s); println(); }
+    uint8_t *           printHex(          uint8_t* p, uint8_t len, char sep = 0            );
+    uint16_t *          printHex(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
+    volatile uint8_t *  printHex(volatile  uint8_t* p, uint8_t len, char sep = 0            );
+    volatile uint16_t * printHex(volatile uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
 
-    void printHex(const uint8_t b);
-    void printHex(const uint16_t w, bool swaporder = 0);
-    void printHex(const uint32_t l, bool swaporder = 0);
-
-    void printHex(const int8_t b) { printHex((uint8_t)b); }
-    void printHex(const int16_t w, bool swaporder = 0) { printHex((uint16_t)w, swaporder); }
-    void printHex(const int32_t l, bool swaporder = 0) { printHex((uint32_t)l, swaporder); }
-
-    uint8_t * printHex(uint8_t* p,uint8_t len, char sep= 0 );
-    uint16_t * printHex(uint16_t* p, uint8_t len, char sep = 0, bool swaporder = 0);
-
-    void printHexln(const uint8_t b) { printHex(b); println(); }
-    void printHexln(const uint16_t w, bool swaporder = 0) { printHex(w,swaporder); println(); }
-    void printHexln(const uint32_t l, bool swaporder = 0) { printHex(l,swaporder); println(); }
-
-    void printHexln(const int8_t b) { printHex(b); println(); }
-    void printHexln(const int16_t w, bool swaporder = 0) { printHex(w,swaporder); println(); }
-    void printHexln(const int32_t l, bool swaporder = 0) { printHex(l,swaporder); println(); }
-
-    uint8_t * printHexln(uint8_t* p,uint8_t len, char sep= 0 ) {p = printHex(p,len,sep); println(); return p;}
-    uint16_t * printHexln(uint16_t* p, uint8_t len, char sep = 0, bool swaporder = 0) {p = printHex(p,len,sep,swaporder); println(); return p;}
-
-    virtual int available(void);
-    virtual int peek(void);
-    virtual int read(void);
     virtual int availableForWrite(void);
-    virtual void flush(void);
-    virtual size_t write(uint8_t);
-    inline size_t write(unsigned long n) {
-      return write((uint8_t)n);
-    }
-    inline size_t write(long n) {
-      return write((uint8_t)n);
-    }
-    inline size_t write(unsigned int n) {
-      return write((uint8_t)n);
-    }
-    inline size_t write(int n) {
-      return write((uint8_t)n);
-    }
+    virtual int available(void);
+    virtual      int peek(void);
+    virtual      int read(void);
+    virtual    void flush(void);
+    virtual  size_t write(uint8_t ch);
+    inline   size_t write(unsigned long n)  {return write((uint8_t)n);}
+    inline   size_t write(long n)           {return write((uint8_t)n);}
+    inline   size_t write(unsigned int n)   {return write((uint8_t)n);}
+    inline   size_t write(int n)            {return write((uint8_t)n);}
     using Print::write; // pull in write(str) and write(buf, size) from Print
     explicit operator bool() {
       return true;
     }
 
     // Interrupt handlers - Not intended to be called externally
-    inline void _rx_complete_irq(void);
-    void _tx_data_empty_irq(void);
+    #if !(defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && \
+                (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16))
+      static void _rx_complete_irq(UartClass& uartClass);
+    #endif
+    #if !(defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && \
+                 (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+                 (SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
+      static void _tx_data_empty_irq(UartClass& uartClass);
+    #endif
 
   private:
     void _poll_tx_data_empty(void);
+    static void        _set_pins(uint8_t port_num, uint8_t mux_setting, uint8_t enmask);
+    static uint8_t _pins_to_swap(uint8_t port_num, uint8_t tx_pin, uint8_t rx_pin);
 };
 
-#if defined(HWSERIAL0)
+#if defined(USART0)
   extern UartClass Serial;
-  #define HAVE_HWSERIAL0
 #endif
-#if defined(HWSERIAL1)
+#if defined(USART1)
   extern UartClass Serial1;
-  #define HAVE_HWSERIAL1
-#endif
-#if defined(HWSERIAL2)
-  extern UartClass Serial2;
-  #define HAVE_HWSERIAL2
-#endif
-#if defined(HWSERIAL3)
-  extern UartClass Serial3;
-  #define HAVE_HWSERIAL3
 #endif

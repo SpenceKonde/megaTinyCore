@@ -76,24 +76,18 @@
 #define PIN_WIRE_SDA                      (PIN_PA1)
 #define PIN_WIRE_SCL                      (PIN_PA2)
 
-
-#define HWSERIAL0                         (&USART0)
-#define HWSERIAL0_DRE_VECTOR              (USART0_DRE_vect)
-#define HWSERIAL0_DRE_VECTOR_NUM          (USART0_DRE_vect_num)
-#define HWSERIAL0_RXC_VECTOR              (USART0_RXC_vect)
-#define HWSERIAL0_RXC_VECTOR_NUM          (USART0_RXC_vect_num)
-#define HWSERIAL0_TXC_VECTOR              (USART0_TXC_vect)
-#define HWSERIAL0_TXC_VECTOR_NUM          (USART0_TXC_vect_num)
-#define HWSERIAL0_MUX_PINSWAP_1           (0x01)
-#define PIN_HWSERIAL0_RX_PINSWAP_1        (PIN_PA2)
-#define PIN_HWSERIAL0_TX_PINSWAP_1        (PIN_PA1)
-#define PIN_HWSERIAL0_XCK_PINSWAP_1       (PIN_PA3)
-#define PIN_HWSERIAL0_XDIR_PINSWAP_1      (PIN_PA0)
-#define HWSERIAL0_MUX                     (0x00)
+/* Serial pin values here are not used by the core. They don't get picked up correctly in UART.h where they're needed and I can't figure out why. */
+// Serial (USART0)
+#define HWSERIAL0_MUX_DEFAULT             (0)
 #define PIN_HWSERIAL0_RX                  (PIN_PA7)
 #define PIN_HWSERIAL0_TX                  (PIN_PA6)
 #define PIN_HWSERIAL0_XCK                 (PIN_PA3)
 #define PIN_HWSERIAL0_XDIR                (PIN_PA0)
+#define PIN_HWSERIAL0_RX_PINSWAP_1        (PIN_PA2)
+#define PIN_HWSERIAL0_TX_PINSWAP_1        (PIN_PA1)
+// Alt pins don't include the rarely used functions on 8-pin parts.
+#define PIN_HWSERIAL0_XCK_PINSWAP_1       (NOT_A_PIN)
+#define PIN_HWSERIAL0_XDIR_PINSWAP_1      (NOT_A_PIN)
 
 /*
        ##  #   #  ##  #     ###   ###      ####  ### #   #  ###

@@ -39,12 +39,13 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Port micros and delay-microseconds improvements from DxCore.
 * Add a set of compatibility defines to make life easier for people porting non-Event-library event-using code to 0/1-series.
 * SerialUPDI reference now links to it's actual location.
-* (TODO) - Port Serial changes here from DxCore
+* Port Serial changes here from DxCore. The reduced flash use I had hoped for did not materialize, unfortunately, I'm still working on it. There's a whole bunch more functionality though!
 * (TODO) - Finish Event changes and port to here.
 * Port new attach interrupt from DxCore.
 * Port new printf option from DxCore.
 * Update callbacks to match DxCore 1.4.0, most notably the init_reset_flags(). It will automatically clear reset flags if not overridden, stashing them in GPIOR0 (chosen because has lower overhead than a variable)
 * Platform.txt organization and commenting. Fix issues where defines were missing from lib-discovery phase.
+* Reduce flash footprint of pinMode.
 
 ## Released Versions
 
