@@ -45,7 +45,7 @@ We only officially support (and test on) the Arduino IDE. Other IDEs are often u
 * [Taking over TCA0](TakingOverTCA0.md) and using it to generate 16-bit PWM, or 16 bit arbitrary pulses
 * [Hardware timers and how this core uses them for PWM and millis](PWMandTimers.md) is documented in this document. PWM frequencies are designed to be similar to popular classic AVR devices by default.
 * [Manufacturer specified "speed grade" that the 0/1-series are rated for](SpeedGrades.md) are documented here, and are extremely conservative.
-* ["Tuning" the internal oscillator to different speeds](Tuning.md) is supported since 2.4.0. You can use the inclucded sketch as described here with a trusted timebase to generate calibrated values to write to USERROW, and have the core use those - but if there are no such constants stored, we'll take our best guess.
+* ["Tuning" the internal oscillator to different speeds](Ref_Tuning.md) is supported since 2.4.0. You can use the inclucded sketch as described here with a trusted timebase to generate calibrated values to write to USERROW, and have the core use those - but if there are no such constants stored, we'll take our best guess.
 * [Manual power saving and sleep configuration](PowerSave.md) until I write the long delayed power saving library (avr/power.h doesn't do anything on these parts)
 
 ## Special Libraries

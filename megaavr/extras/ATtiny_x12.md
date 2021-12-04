@@ -44,7 +44,7 @@ These parts do not support an external HF crystal, only an external clock. No wa
 
 When external clock is used as system clock source PA3 cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
 
-The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Tuning.md) for more information before using these options.
+The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Ref_Tuning.md) for more information before using these options.
 
 ## WARNING: On pre 2.0.0 versions of megaTinyCore, the UART defaulted to the alternate positions
 This matches the megaTinyCore 412/402 Rev. - and Rev. A breakout boards below.. On bootloader . **In 2.0.0 and later, this is no longer the case!** You must call Serial.swap(1) prior to Serial.begin() to move it to the alt pins (or connect your adapter to pins 0 and 1 instead of 2 and 3). It should never have been done that way in the first place. Rev. B of the breakout boards that has the FTDI header tied to the standard serial pins is now available.

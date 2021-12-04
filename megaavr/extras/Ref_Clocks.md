@@ -47,7 +47,7 @@ The tinyAVR product line does not support use of an external high frequency crys
 ## Tuning
 The compliance of the tinyAVR 0/1/2-series oscillator blows the datasheet specifications out of the water and into low earth orbit. The difference between the speed with the oscillator frequency cal at it's minimum and at it's maximum values is about the magnitude of it's nominal frequency! 0/1-series parts usually go from a little under 5/8ths of their nominal frequency with tuning at 0 up to 1-5/8ths with tuning at the maximum! 2-series parts have a slightly wider range, centered a couple of MHz higher; a typical 2-series, at a nominal frequency of 20 MHz could be tuned from as low as 12 MHz up to around 36 or so, if you were to extrapolate the speed speed trend (they generally don't make it all the way to 0x7F tuning).
 
-A tuning sketch must be used to experimentally determine the values to use. See the [Tuning Reference](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Tuning.md). Tuning is a LOT more fun here than on the DX-series!
+A tuning sketch must be used to experimentally determine the values to use. See the [Tuning Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md). Tuning is a LOT more fun here than on the DX-series!
 
 ## External clocks
 External clocks are always an option. The layout considerations are pretty simple: Keep the high frequency trace as short as possible. Don't connect anything else to the high frequency trace, make sure you follow the guidelines in their datasheet on decoupling capacitors. And if using one of the rectangular SMT ones, be careful to orient it correctly when placing the part. It fits just fine rotated 180 degrees, which will connect vcc and gnd backwards, instantly destroying the oscillator and presenting a near short to the power supply.
@@ -77,7 +77,7 @@ If, instead, the speed is close to what you asked for, but off a few percent, I 
 The other failure mode is that it does seem to run at the requested speed, but you notice that sketches hang over time, or occasionally output nonsensical numbers (typically 1's turn into 0's). This means that that chip is being run faster than it's capable of under the voltage and temperature conditions. Do you have a stable 5V supply that is well-decoupled? That is essential.
 You may just have to use a different chip, as in the case above.
 
-Considerations for Tuned oscillators are covered in greater depth in the [Tuning Reference](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Tuning.md).
+Considerations for Tuned oscillators are covered in greater depth in the [Tuning Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md).
 
 ### External clocks
 The normal failure mode observed is that the chip just *stops* very rarly in the initialization process - it switches to the external clock, ceases to have a clock, and doesn't do anything more. There aren't many possible causes.
