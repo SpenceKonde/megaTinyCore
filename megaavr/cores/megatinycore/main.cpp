@@ -1,7 +1,7 @@
 /* main.cpp - Main loop for Arduino sketches
    Part of megaTinyCore - github.com/SpenceKonde/megaTinyCore
    Copyright (c) 2018~2021 Spence Konde, (c) 2005-2013 Arduino
-   Free Software - LGPL 2.1, please see LICENCE.md for details */=
+   Free Software - LGPL 2.1, please see LICENCE.md for details */
 
 #include <Arduino.h>
 
@@ -90,10 +90,10 @@ int main() {
  * (many are available reasonably cheaply on aliexpress et al.) end up being very useful        *
  * for this sort of thing.                                                                      */
 
-  void __attribute__((weak)) init_reset_flags() ;
+  void __attribute__((weak)) init_reset_flags();
   void __attribute__((weak)) init_reset_flags() {
     uint8_t flags = RSTCTRL.RSTFR;
-    RSTCTRL.RSTFR=flags
+    RSTCTRL.RSTFR = flags;
     if (flags == 0) {
       _PROTECTED_WRITE(RSTCTRL.SWRR, 1);
     }

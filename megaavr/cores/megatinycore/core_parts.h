@@ -226,6 +226,8 @@
 #define NOT_A_PIN 255
 #define NOT_A_PORT 255
 #define NOT_AN_INTERRUPT 255
+#define NOT_A_MUX 255
+#define MUX_NONE 128
 
 #define PA 0
 #define PB 1

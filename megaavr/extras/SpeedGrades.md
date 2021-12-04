@@ -2,13 +2,29 @@
 
 The datasheets for these parts specify the maximum officially supported operating frequency (F_CPU) for these parts over various voltage ranges. These speeds all have a BOD threshold voltage above which the parts are "guaranteed" to work. Like all AVR microcontrollers, the operating frequency can usually be pushed significantly above the official specs at room temperature (this shouldn't be relied upon in production, of course). Both the automotive and non-automotive versions are available in a -40-105C rated version, and a -40-125C version. These are identified by a letter at the end of the part number - an N or F (respectively) for non-automotive parts, and B and Z for the automotive versions; colloquially, they are sometimes referred to as "N-spec" or "F-spec" parts.
 
+*Observing these limits is strongly recommended if you depend on reliable functioning of the device* and **mandatory for safety critical applications (which shouldn't be written in Arduino at all)**
+
+Where failure or occasional hang or error is acceptable - it is possible to greatly exceed these limits. 50-60% above them usually works at room temperature.
+Though these are the specs for 0/1/2-series parts, the 2-series has considerably more headroom than the older ones.
+
 ## Official Specs
 
-Voltage | BOD voltage | Max F_CPU (-40~105C) | Max F_CPU (>105C, or any automotive)
---------|-------------|----------------------|----------------------
-1.8~5.5 | 1.8 | 5 MHz | n/a
-2.7~5.5 | 2.6 | 10 MHz | 8 MHz
-4.5~5.5 | 4.2 | 20 MHz | 16 MHz
+Voltage | BOD voltage | Max F_CPU (-40~105C)  | Max F_CPU (>105C, or any automotive)
+--------|-------------|-----------------------|----------------------
+1.8~5.5 | 1.8V        | 5 MHz                 | See note              |
+  n/a   | 2.1V        | Unofficial            | Unofficial            |
+2.7~5.5 | 2.6V        | 10 MHz                | 8 MHz                 |
+  n/a   | 2.9V        | Unofficial            | Unofficial            |
+  n/a   | 3.3V        | Unofficial            | Unofficial            |
+  n/a   | 3.7V        | Unofficial            | Unofficial            |
+  n/a   | 4.0V        | Unofficial            | Unofficial            |
+4.5~5.5 | 4.2V        | 20 MHz                | 16 MHz                |
+
+Note: Automotive parts, and extended temperature range parts in their extended temperature range, are not rated for operation below 2.7V (or rather, below the 2.6V BOD voltage).
+
+Notice how the unofficial BOD settings (described as "unqualified" in a changelog about their removal from the io headers) are each quite close to a one of the three special speed. One imagines that the chip was designed in the hopes that each one could use it's lowest range, and then they tested to determine which one was truly reliable at ach speed; in this explanation, only the speeds > 10 MHz fell short of their best hopes.
+
+Max F_CPU is the maximum speed that is guaranteed to work above the specified BOD voltage.
 
 ## Calculating for other voltages
 The datasheet specifies that the maximum frequency is linear over the operating voltage range.

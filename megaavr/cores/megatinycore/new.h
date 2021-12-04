@@ -1,6 +1,8 @@
-/*
-  New version 2021 for megaTinyCore and DxCore.
-  Free software (LGPL 2.1) see the License.md file included with this core. */
+/* New version (c) Spence Konde 2021
+ * This file is part of megaTinyCore, DxCore, and ATTinyCore.
+ * This is free software (released under the LGPL 2.1). For more
+ * information, see the License.md file included with this core.
+ */
 
 /*
   C++11 needed some new new and delete operators.
