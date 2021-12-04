@@ -59,7 +59,7 @@
   It's just ugly. It gets worse for the other interrupts because we have to work with the class, not just the
   hardware. Crucially the only thing different betweren the USARTs here isthe addressthey're working with.
   Much of the benefit comes from being able to get the benefits of functionsin terms of flash use without the
-  penalties that come with useing a true function in an ISR (50-80 byte prologue + epiloge), and also
+  penalties that come with using a true function in an ISR (50-80 byte prologue + epiloge), and also
   being aware that the X register can't do displacement when planning what goes in which regiseser... which
   is not avr-gcc's strong suite, and often ends up displacing from the X with adiw/sbiw spam. savings for one
   copy of it is small. Savings for several is HUGE! Performance is better, but not much.
@@ -510,7 +510,7 @@ void UartClass::begin(unsigned long baud, uint16_t options) {
   (*MyUSART).CTRLA          = ctrla & 0xDF; // position, which we never set in begin.
   (*MyUSART).CTRLB          = ctrlb;        // Set the all important CTRLB...
   _set_pins(_module_number, _pin_set, setpinmask); // set up the pin(s)
-  SREG=oldSREG;                             // reenable interrupts, and we're done.
+  SREG=oldSREG;                             // re-enable interrupts, and we're done.
 }
 
 void UartClass::_set_pins(uint8_t mod_nbr, uint8_t mux_set, uint8_t enmask) {

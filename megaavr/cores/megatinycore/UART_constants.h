@@ -103,8 +103,10 @@
   #define SERIAL_LOOPBACK      (((uint16_t) USART_LBME_bm)   << 8)// 0x0800
   #define SERIAL_TX_ONLY       (((uint16_t) USART_RXEN_bm)   << 8)// 0x8000 The TXEN/RXEN bits are swapped - we invert the meaning of this bit.
   #define SERIAL_RX_ONLY       (((uint16_t) USART_TXEN_bm)   << 8)// 0x4000 so if not specified, you get a serial port with both pins. Do not specify both. That will not enable anything.
-  //#define SERIAL_CONFIG_VALID ((uint16_t) 0x1000)               // 0x1000 This bit is set by all of the SERIAL_nPs defines. If it is NOT present
-  #define SERIAL_HALF_DUPLEX     (SERIAL_LOOPBACK | SERIAL_OPENDRAIN)    // We will assume SERIAL_8N1, not SERIAL 5N1, which is what CTRLC = 0 would normally do.
+//#define SERIAL_MODE_SYNC      Defined Above                     // 0x0040 - works much like a modifier to enable synchronous mode.
+// See the Serial reference for more information as additional steps are required
+  #define SERIAL_HALF_DUPLEX     (SERIAL_LOOPBACK | SERIAL_OPENDRAIN)
+  //
 
 
 /* CTRLA is interrupt flags, plus 3 some options relevant to RS485
@@ -209,8 +211,6 @@
  * we're going to write to CTRLB. The other CTRLB one and the internal need to be done individually, so it doesn't matter
  * that needs to set other options too.
  */
-
-
 
 
   /* These are not usable on these parts. badCall() gets pulled in if you use them. */

@@ -216,7 +216,7 @@ Example 2: Override and indicate that it's a recovery from dirty reset by turnin
       //digitalWriteFast(LED_BUITIN2, HIGH);  //
       } else {
         //pinModeFast(LED_BUILTIN2, INPUT);   // What why? Because you have no idea what the state of the hardware is if there's a dirty reset!
-        //It could have been high for some other reason, and since no reset ocurred, it still would be. This way, you know that if both LEDs are on... that was a dirty reset.
+        //It could have been high for some other reason, and since no reset occurred, it still would be. This way, you know that if both LEDs are on... that was a dirty reset.
       }
       while(1);                               // wait for timeout
     }

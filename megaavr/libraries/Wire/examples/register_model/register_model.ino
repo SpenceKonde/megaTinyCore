@@ -55,7 +55,7 @@ void setup() {
 }
 
 void loop() {
-  static uint32_t lastBlinkAt=0;
+  static uint32_t lastBlinkAt = 0;
   uint16_t delaytime = DeviceRegisters[4] + ((uint16_t)DeviceRegisters[5] << 8);
   if (millis() - lastBlinkAt > delaytime) {
     lastBlinkAt = millis();

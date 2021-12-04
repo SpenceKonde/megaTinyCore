@@ -26,11 +26,12 @@
 #include <avr/pgmspace.h>
 #include "timers.h"
 
- /*##  ### #   #  ###
- #   #  #  ##  # #
- ####   #  # # #  ###
- #      #  #  ##     #
- #     ### #   #  #*/
+/*##  ### #   #  ###
+#   #  #  ##  # #
+####   #  # # #  ###
+#      #  #  ##     #
+#     ### #   #  #*/
+
 #define PIN_PA4          (0)
 #define PIN_PA5          (1)
 #define PIN_PA6          (2)

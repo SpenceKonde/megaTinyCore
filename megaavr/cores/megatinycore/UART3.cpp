@@ -16,7 +16,7 @@
 #if defined(USART3)
   ISR(USART3_TXC_vect) {
     // only enabled in half duplex mode - we disable RX interrupt while sending.
-    // When we are done sending, we reenable the RX interrupt and disable this one.
+    // When we are done sending, we re-enable the RX interrupt and disable this one.
     // Note that we do NOT clear TXC flag, which the flush() method relies on.
     uint8_t ctrla;
     while (USART3.STATUS & USART_RXCIF_bm) {
