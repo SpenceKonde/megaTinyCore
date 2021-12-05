@@ -79,7 +79,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
 
 */
 
-#if defined(USE_ASM_TXC) && USE_ASM_TXC == 1 /*&& defined(USART1)*/
+#if defined(USE_ASM_TXC) && USE_ASM_TXC == 1
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_txc(void){
     __asm__ __volatile__(
       "_do_txc:"                  "\n\t"  //
@@ -121,7 +121,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
   }
 
 */
-#if (defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16)/* && defined(USART1) */)
+#if (defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/ )
   // We only ever use this on the 2-series. 1-series doesn't gain anything with this. The inlining makes the compiler FAR more efficient. RXC isn't compiled stupidly,
   // the problem is that the ABI requires it to be inefficient as hell. But it's a big deal for the smaller size 2-series parts.
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_rxc(void){
@@ -534,7 +534,7 @@ void UartClass::_set_pins(uint8_t mod_nbr, uint8_t mux_set, uint8_t enmask) {
   #endif
   const uint8_t* muxrow = &(_usart_pins[mod_nbr + mux_set][0]);
   if ((enmask & 0x40 && !(enmask & 0x08))) {
-    pinMode(muxrow[0], OUTPUT); //If any only if TX is enabled and open drain isn't should the TX pin be output.
+    pinMode(muxrow[0], OUTPUT); //If and only if TX is enabled and open drain isn't should the TX pin be output.
   } else if (enmask & 0x50) { // if it is enabled but is in open drain mode, or is disabled, but loopback is enabled
     // TX should be INPUT_PULLUP.
     pinMode(muxrow[0], INPUT_PULLUP);

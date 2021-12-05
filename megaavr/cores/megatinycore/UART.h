@@ -54,12 +54,14 @@
  * (to be fair, you are allowed to use external RAM - also I think
  * a unique feature)
  */
-#define USE_ASM_TXC 1    // This *appears* to work? It's the easy one.
-#define USE_ASM_RXC 1    // This now works, so use it when it is beneficial (2-series only)
-#define USE_ASM_DRE 1    // This is the hard one...Depends on BOTH buffers, and the
-
+#define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART, 50 for 2.
+#define USE_ASM_RXC 1    // This now works. Saves only 4b for 1 usart but 102 for 2.
+#define USE_ASM_DRE 1      // This is the hard one...Depends on BOTH buffers, and has that other method of calling it. saves 34b for 1 USART 102 for 2
+// savings:
+// 44 total for 0/1,
+// 301 for 2-series, which may be nearly 9% of the total flash!
 #if !defined(SERIAL_TX_BUFFER_SIZE)   // could be overridden by boards.txt
-  #if   (INTERNAL_SRAM_SIZE  < 1024)  // 256b/512b RAM
+  #if   (INTERNAL_SRAM_SIZE  < 1024)  // 128/256b/512b RAM
     #define SERIAL_TX_BUFFER_SIZE 16
   #elif (INTERNAL_SRAM_SIZE < 2048)   // 1k RAM
     #define SERIAL_TX_BUFFER_SIZE 32
@@ -68,7 +70,7 @@
   #endif
 #endif
 #if !defined(SERIAL_RX_BUFFER_SIZE)   // could be overridden by boards.txt
-  #if   (INTERNAL_SRAM_SIZE <  512)  // 256b RAM
+  #if   (INTERNAL_SRAM_SIZE <  512)  // 128/256b RAM
     #define SERIAL_RX_BUFFER_SIZE 16
     // current tx buffer position = SerialClass + txtail + 37
   #elif (INTERNAL_SRAM_SIZE < 1024)  // 512b RAM
@@ -239,7 +241,7 @@ class UartClass : public HardwareSerial {
     }
 
     // Interrupt handlers - Not intended to be called externally
-    #if !(defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && \
+    #if !(defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && defined(USART1) && \
                 (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16))
       static void _rx_complete_irq(UartClass& uartClass);
     #endif

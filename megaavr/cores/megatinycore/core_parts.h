@@ -208,16 +208,21 @@
 /* Used for AttachInterrupt to reduce RAM use. */
 #ifdef __AVR_ATtinyxy4__
   #define PORTB_PINS 4
+  #define _AVR_PINCOUNT 14
 #endif
 #ifdef __AVR_ATtinyxy6__
   #define PORTB_PINS 6
   #define PORTC_PINS 4
+  #define _AVR_PINCOUNT 20
 #endif
 #ifdef __AVR_ATtinyxy7__
   #define PORTB_PINS 8
   #define PORTC_PINS 6
+  #define _AVR_PINCOUNT 24
 #endif
-
+#ifdef __AVR_ATtinyxy2__
+  #define _AVR_PINCOUNT 8
+#endif
 
 // #define OUTPUT_PULLUP 3  // not implemented
 

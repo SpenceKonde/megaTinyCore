@@ -467,10 +467,10 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 
 
 
-#define CORE_HAS_FASTIO 1
+#define CORE_HAS_FASTIO 2
 #define CORE_HAS_OPENDRAIN 1
 #define CORE_HAS_PINCONFIG 1
-#define CORE_HAS_FASTPINMODE 0
+#define CORE_HAS_FASTPINMODE 1
 
 #if (MEGATINYCORE_SERIES == 2)
   // if analogReadEnh() supplied, this is defined as 1
