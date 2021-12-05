@@ -1,7 +1,4 @@
 # ADC/DAC Reference for megaTinyCore
-
-
-### ADC Support
 These parts all have a large number of analog inputs (11 pins on 20 and 24-pin 0/1-series, 15 on 2-series, 9 on 14-pin parts and 5 on 8-pin parts.) - plus the one on the UPDI pin which is not totally usable because the UPDI functionality). They can be read with analogRead() like on a normal AVR. While the `An` constants (ex, `A3`) are supported, and will read from the ADC channel of that number, they are in fact defined as then digital pin shared with that channel. Using the `An` constants is deprecated - the recommended practice is to just use the digital pin number, or better yet, use `PIN_Pxn` notation when calling analogRead(). Particularly with the release of 2.3.0 and tinyAVR 2-series support, a number of enhanced ADC features have been added to expose more of the power of the sophisticated ADC in these parts.
 
 **Be sure to disable to the ADC prior to putting the part to sleep if low power consumption is required!**
