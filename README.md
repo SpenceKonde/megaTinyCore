@@ -41,7 +41,7 @@ One can be made from a classic AVR Uno/Nano/Pro Mini; inexpensive Nano clones ar
 
 ## Compatibility note for 32-bit linux
 Apparently Arduino isn't packaging 32-bit versions of the latest avrdude. 
-I defined a new tool definition which is a copy of arduino18 (the latest) except that it pulls in version 17 instead on 32-bit linux, since that's the best that's available for that platform. 
+I defined a new tool definition which is a copy of arduino18 (the latest) except that it pulls in version 17 instead on 32-bit linux, since that's the best that's available for that platform. The arduino17 version does not correctly support uploading with some of the Microchio programming tools.
 
 This is currently used only for the latest release, and should fix the avrdude not available for this platform error. 
 
