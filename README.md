@@ -39,6 +39,12 @@ Read the [SerialUPDI documentation](https://github.com/SpenceKonde/AVR-Guidance/
 ### With a classic Arduino (jtag2updi)
 One can be made from a classic AVR Uno/Nano/Pro Mini; inexpensive Nano clones are the usual choice, being cheap enough that one can be wired up and then left like that. We no longer provide detailed documentation for this processes; jtag2updi is deprecated.If you are still using it, you should select jtag2updi from the tools->programmer menu. This was previously our recommended option; due to persistent jtag2updi bugs, and it's reliance on the largely unmaintained 'avrdude' tool (which among other things inserts a spurious error message into all UPDI uploads made with it), this is no longer recommended.
 
+## Compatibility note for 32-bit linux
+Apparently Arduino isn't packaging 32-bit versions of the latest avrdude. 
+I defined a new tool definition which is a copy of arduino18 (the latest) except that it pulls in version 17 instead on 32-bit linux, since that's the best that's available for that platform. 
+
+This is currently used only for the latest release, and should fix the avrdude not available for this platform error. 
+
 ## Supported Parts (click link for pinout diagram and details)
 * tinyAVR 2-series
   * [ATtiny3227,1627,827,427](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x27.md)
