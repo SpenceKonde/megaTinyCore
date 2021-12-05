@@ -65,9 +65,9 @@ init_TCD0	KEYWORD2
 analogReadEnh	KEYWORD2
 analogReadDiff	KEYWORD2
 #new attachInterrupt()
-attachPortAEnable KEYWORD2
-attachPortBEnable KEYWORD2
-attachPortCEnable KEYWORD2
+attachPortAEnable	KEYWORD2
+attachPortBEnable	KEYWORD2
+attachPortCEnable	KEYWORD2
 
 #pinConfigure
 pinConfigure	KEYWORD2
