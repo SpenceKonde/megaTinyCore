@@ -924,6 +924,167 @@ void Event::soft_event() {
  *
  * @param state Optional parameter. Defaults to true
  */
+
+gen::generator_t Event::gen_from_peripheral(TCB_t * timer, uint8_t event_type) {
+  uint8_t addr = (uint8_t)(uint16_t) timer;
+  #if !defined(MEGATINYCORE) || MEGATINYCORE_SERIES == 2
+    #if !defined(DXCORE) && !defined(MEGATINYCORE)
+      if (eventType > 1)
+    #else
+      if (event_type)
+    #endif
+      addr = 0;
+    else {
+      addr >>= 3; //now it's 0, 2, 4, 6, or 8.
+      addr += event_type & 0x01; // 0x00 = capt, 0x01 = ovf
+      addr += 0xA0;
+    }
+  #else
+    // tinyAVR 0/1 UGLY because here they're channel dependent in the case of TCB1...
+    addr &= 0x3F;
+    addr >>= 4;
+    // should now have 0, unless it's a 1-series's TCB1.
+    if (addr == 1) {// TCB1
+      if (event_type == 1) {
+        addr = 0x10; // event_type 1 for gen channel 1? Ugh...
+      } else {
+        addr = 0x15;
+      }
+    } else {
+      addr = 0x01;
+    }
+  #endif
+  return (gen::generator_t) addr;
+}
+
+user::user_t Event::user_from_peripheral(TCB_t * timer, uint8_t user_type) {
+  uint8_t addr = (uint8_t)(uint16_t) &timer;
+  #if defined(DXCORE) || (defined(MEGATINYCORE) && MEGATINYCORE_SERIES == 2)
+    //low byte of address is 0x00, 0x10, 0x20, 0x30, 0x40 on Dx, 0x80 0x90, 0xA0, 0xB0 on mega0, 0x40, 50 on tiny 0/1, and 80, 90 on tiny 2.
+    addr &= 0x7F; //strip high bit off.
+    // and rightshift
+    addr >>= 3; //now it's 0, 2, 4, 6, or 8.
+    if (user_type > 1)
+      addr = -1; // invalid user requested.
+    else {
+      addr += user_type & 0x01; // 0x00 = capt, 0x01 = ovf
+      #if defined(__AVR_DA__)
+        addr += 0x1F;
+      #elif defined(MEGATINYCORE)
+        addr += 0x11; //2-series
+      #else //DD, DB
+        addr += 0x1E;
+      #endif
+    }
+  #else  //these parts have only 1 user per TCB
+    if (user_type) //so this had better be 0.
+      addr = -1;
+    else {
+      addr &= 0x3F; //remove high bits, thus cleaning both tinyAVR and megaAVR  - megaAVR doesn't have an instance that gets up above 0xC0.
+      addr >>= 4; //now it's 0, 1, 2, or 3, and they each have their own offset:
+      #if defined(MEGATINYCORE)
+        addr += 0x06;
+      #else
+        addr += 0x15;
+      #endif
+    }
+  #endif
+  return (user::user_t) addr;
+}
+
+
+gen::generator_t Event::gen_from_peripheral(CCL_t * logic, uint8_t event_type){
+  uint8_t retval = 0;
+  if ((uint16_t) logic == 0x1C0) {
+    #if (!defined(MEGATINYCORE) || MEGATINYCORE_SERIES != 2)
+      if (event_type < 6) {
+        retval = event_type + 0x10;
+      }
+    #else
+      if (event_type < 5) {
+        retval = event_type + 1;
+      }
+    #endif
+  }
+  return (gen::generator_t) retval;
+}
+
+user::user_t Event::user_from_peripheral(CCL_t * logic, uint8_t event_type){
+  uint8_t retval = -1;
+  if ((uint16_t) logic == 0x1C0){
+    #if (!defined(MEGATINYCORE) || MEGATINYCORE_SERIES != 2)
+      if (event_type < 13) {
+        retval = event_type;
+      }
+    #else
+      if (event_type < 5) {
+        retval = event_type + 2;
+      }
+    #endif
+  }
+  return (user::user_t) retval;
+}
+
+gen::generator_t Event::gen_from_peripheral(AC_t * comp, uint8_t event_type) {
+  #if defined(MEGATINYCORE) && MEGATINYCORE_SERIES == 1 && FLASH_SIZE > 8192
+    badCall("gen_from_peripheral for ACn on the tinyAVR 1-series w/3 is not supported because it depends on the channel number");
+  #endif
+  uint8_t addr = (uint8_t)(uint16_t) &comp;
+  addr &= 0x7F;
+  addr >>= 3; // now it's 0, 1, or 2.
+  addr += 20;
+  return (gen::generator_t) addr;
+}
+
+gen::generator_t Event::gen_from_peripheral(TCA_t * timer, uint8_t event_type) {
+  uint8_t addr = (uint8_t)(uint16_t) timer;
+  uint8_t retval = 0;
+  if (event_type < 6) {
+    #if !defined(MEGATINYCORE) || MEGATINYCORE_SERIES == 2
+      if (event_type > 1) {
+        event_type += 2; //mysterious gap?
+      }
+      retval = (event_type + 0x80);
+      #if (defined(__AVR_DA__) || defined(__AVR_DB__))
+        if (addr == 0x40)
+          retval += 0x08;
+      #else
+        (void) addr; //prevent warning.
+      #endif
+    #else
+      retval = event_type + 1;
+    #endif
+
+  }
+  return (gen::generator_t) retval;
+}
+
+user::user_t Event::user_from_peripheral(TCA_t * timer, uint8_t user_type) {
+  uint8_t addr = (uint8_t)(uint16_t) &timer;
+  #if defined(DXCORE)
+    addr = addr ? 2 : 0;
+  #else
+    addr = 0;
+  #endif
+  #if defined(DXCORE) || (defined(MEGATINYCORE) && MEGATINYCORE_SERIES == 2)
+    addr += user_type;
+  #else
+    if (user_type)  //asking for the second user, which doesn't exist.
+      return (user::user_t) -1;
+  #endif
+  #if defined(__AVR_DB__) || defined(__AVR_DD__)
+    addr += 0x1A;
+  #elif !defined(MEGATINYCORE)
+    addr += 0x1B // DA or mega0
+  #elif MEGATINYCORE_SERIES == 2
+    addr += 0x0E;
+  #else
+    addr = 0x10;
+  #endif
+  return (user::user_t) addr;
+}
+
+
 void Event::start(bool state) {
   if (state) {
     // Write event generator setting to EVSYS_CHANNELn register

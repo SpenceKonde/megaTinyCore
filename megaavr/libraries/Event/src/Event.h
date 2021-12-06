@@ -1208,6 +1208,15 @@ class Event {
     void soft_event();
     void start(bool state = true);
     void stop();
+    /* event_types: They start from 0x00 for inputs. Outputs start at 0x40 */
+    static gen::generator_t gen_from_peripheral(TCB_t * timer, uint8_t event_type);
+    static user::user_t    user_from_peripheral(TCB_t * timer, uint8_t event_type);
+    static gen::generator_t gen_from_peripheral(TCA_t * timer, uint8_t event_type);
+    static user::user_t    user_from_peripheral(TCA_t * timer, uint8_t event_type);
+    static gen::generator_t gen_from_peripheral(CCL_t * logic, uint8_t event_type);
+    static user::user_t    user_from_peripheral(CCL_t * logic, uint8_t event_type);
+    static gen::generator_t gen_from_peripheral(AC_t * comp, uint8_t event_type);
+
 
   private:
     const uint8_t channel_number;      // Holds the event generator channel number
