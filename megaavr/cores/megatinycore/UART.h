@@ -115,7 +115,7 @@
   #define USART_RS485_bm USART_RS4850_bm
 #endif
 #if defined(__AVR_ATtinyxy2__)
-const uint8_t _usart_pins[][4] = {{PIN_PA6, PIN_PA7, PIN_PA0, PIN_PA3},{PIN_PA1, PIN_PA2, NOT_A_PIN, NOT_A_PIN}};
+const uint8_t _usart_pins[][4] = {{PIN_PA6, PIN_PA7, PIN_PA3, PIN_PA0},{PIN_PA1, PIN_PA2, NOT_A_PIN, NOT_A_PIN}};
 #elif !defined(__AVR_ATtinyx26__) && !defined(__AVR_ATtinyx27__) && defined(MEGATINYCORE_SERIES)
 const uint8_t _usart_pins[][4] = {{PIN_PB2, PIN_PB3, PIN_PB1, PIN_PB0},{PIN_PA1, PIN_PA2, PIN_PA3, PIN_PA4}};
 #elif defined(__AVR_ATtinyx26__) || defined(__AVR_ATtinyx27__)
@@ -171,6 +171,19 @@ const uint8_t _usart_pins[][4] = {
   #endif
 };
 */
+
+
+#define syncBegin(port, baud, config, syncopts) ({\
+  if ((config & 0xC0) == 0x40)                    \
+    {pinConfigure(port.getPin(2), syncopts);      \
+    port.begin(baud >> 3, config);                \
+  }})
+
+#define mspiBegin(port, baud, config, invert) ({  \
+  if ((config & 0xC0) == 0xC0) {                  \
+    pinConfigure(port.getPin(2), invert);         \
+    port.begin(baud >> 3, config);                \
+  }})
 
 
 /* DANGER DANGER DANGER */
@@ -239,6 +252,7 @@ class UartClass : public HardwareSerial {
     explicit operator bool() {
       return true;
     }
+    uint8_t getPin(uint8_t pin);
 
     // Interrupt handlers - Not intended to be called externally
     #if !(defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && defined(USART1) && \

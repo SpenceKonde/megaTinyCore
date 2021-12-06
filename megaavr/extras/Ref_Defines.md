@@ -95,3 +95,26 @@ Occasionally Microchip has not kept the names of registers or bitfields consiste
 * The `TCA_SINGLE_EVACT` bitfield - This was changed to `TCA_SINGLE_EVACTA` on the Dx, as were it's group codes. Both names will work, permitting code portability from tinyAVR to Dx.
 * The `RTC_CLKSEL` group codes were renamed on non-tiny parts. Both names will work on both cores, permitting code portability from tinyAVR to Dx.
 * The `EVSYS` user registers were numbered but not named on 0/1-series. The new names work on those parts. The names with numbers only work on 0/1-series.
+
+
+## Identifying Timers
+Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statements to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro. Defines are available on all parts that the core supports, whether or not the timer in question is present on the part (ie, it is safe to use them in tests/code without making sure that the part has that timer). There are two very closely related macros for determining pin timers:
+* `digitalPinToTimer()` tells you what timer (if any) the pin is associated with by default. This is a constant, when the argument is constant, the optimizer will optimize it away.
+* `digitalPinToTimerNow()` tells you what timer (if any) the pin is associated with currently. On megaTinyCore, this is either the result of `digitalPinToTimer()` unless that timer has been "taken over" by user code with `takeOverTCA0()` or `takeOverTCD0()`. On modern AVR cores like Dx-core which support use of `analogWrite()` even when the `PORTMUX.TCxROUTEA` register (where `x` is `A` or `D`) has been changed, this will return the timer currently associated with that pin. megaTinyCore does NOT support non-default timer pin mappings with `analogWrite()`- so if `PORTMUX.TCAROUTEA` (2-series) or `PORTMUX.CTRLC` (0/1-series) has been altered, this will not not reflect that.
+
+```c
+#define NOT_ON_TIMER 0x00   // if MILLIS_TIMER set to this, millis is disabled. If digitalPinToTimer() gives this, it is not a PWM pin
+#define TIMERA0 0x10        // Present on all modern AVRs
+#define TIMERA1 0x08        // Not present on any tinyAVR; only on AVR DA and DB-series parts with at least 48 pins and AVR EA-series parts
+#define TIMERB0 0x20        // Present on all modern AVRs
+#define TIMERB1 0x21        // Not present on any tinyAVR 0-series or tinyAVR 1-series parts with 2, 4, or 8k of flash
+#define TIMERB2 0x22        // Not present on any tinyAVR
+#define TIMERB3 0x23        // Not present on any tinyAVR
+#define TIMERB4 0x24        // Not present on any tinyAVR
+#define TIMERB5 0x25        // Not present on any tinyAVR
+#define TIMERD0 0x40        // Present only on tinyAVR 1-series and AVR Dx-series parts.
+#define DACOUT 0x80         // Not a timer, obviously - but used like one by analogWrite()
+#define TIMERRTC 0x90       // Usable for millis only
+#define TIMERRTC_XTAL 0x91  // Usable for millis only
+#define TIMERRTC_XOSC 0x92  // Usable for millis only
+```

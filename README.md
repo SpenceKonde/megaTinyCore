@@ -40,10 +40,10 @@ Read the [SerialUPDI documentation](https://github.com/SpenceKonde/AVR-Guidance/
 One can be made from a classic AVR Uno/Nano/Pro Mini; inexpensive Nano clones are the usual choice, being cheap enough that one can be wired up and then left like that. We no longer provide detailed documentation for this processes; jtag2updi is deprecated.If you are still using it, you should select jtag2updi from the tools->programmer menu. This was previously our recommended option; due to persistent jtag2updi bugs, and it's reliance on the largely unmaintained 'avrdude' tool (which among other things inserts a spurious error message into all UPDI uploads made with it), this is no longer recommended.
 
 ## Compatibility note for 32-bit linux
-Apparently Arduino isn't packaging 32-bit versions of the latest avrdude. 
+Apparently Arduino isn't packaging 32-bit versions of the latest avrdude.
 I defined a new tool definition which is a copy of arduino18 (the latest) except that it pulls in version 17 instead on 32-bit linux, since that's the best that's available for that platform. The arduino17 version does not correctly support uploading with some of the Microchio programming tools.
 
-This is currently used only for the latest release, and should fix the avrdude not available for this platform error. 
+This is currently used only for the latest release, and should fix the avrdude not available for this platform error.
 
 ## Supported Parts (click link for pinout diagram and details)
 * tinyAVR 2-series
@@ -244,39 +244,7 @@ All of the 0/1-series parts have a single hardware serial port (UART or USART); 
 
 Prior to putting the part into a sleep mode, or otherwise disabling it's ability to transmit, be sure that it has finished sending the data in the buffer by calling `Serial.flush()`, otherwise the serial port will emit corrupted characters.
 
-#### Pin Swapping
-On all parts, the UART pins can be swapped to an alternate location. This is configured using the `Serial.swap()` or `Serial.pins()` methods. Both of them achieve the same thing, but differ in how you specify the set of pins to use. This must be called **before** calling `Serial.begin()`.
-
-`Serial.swap(1) or Serial.swap(0)` will set the the mapping to the alternate (1) or default (0) pins. It will return true if this is a valid option, and false if it is not (you don't need to check this, but it may be useful during development). If an invalid option is specified, it will be set to the default one.
-
-`Serial.pins(TX pin, RX pin)` - this will set the mapping to whichever mapping has the specified pins as TX and RX. If this is not a valid mapping option, it will return false and set the mapping to the default. This uses more flash than `Serial.swap()`; that method is preferred.
-
-Bootloaders are available for both UART mappings; the UART bootloader option selected when you do "burn bootloader" for an Optiboot board definition is the serial port that the uploaded bootloaded will use.
-
-**tiny 2-series warning** On the tinyAVR 2-series, there are two serial ports, `Serial` and `Serial1`. Each of can use one of two pin options (except on 14-pin parts, where the alternate pins for `Serial1` are not present). The *default* pins for `Serial1` are the same as the *alternate* pins for `Serial`.
-
-In versions prior to 2.0.0, this was instead configured using the Tools -> UART Pins menu. If you're still using such ancient versions, please update.
-
-#### Baud Rates
-When operating at 1MHz, the UART can reach 115200 baud (2.3.0+ required for stable operation).
-
-Maximum baud rate scales directly with the system clock speed; 2 mbaud is just barely possible at 16 MHz (this is the same maximum that was possible on classic AVRs); unlike classic AVRs, these have a "fractional baud rate generator": rather than specifying the bit period in units of 8 (U2X=1) or 16 (U2X=0) clock cycles as on classic AVRs, here it is specified in 64ths of 8 or 16 clock cycles (no, I'm not sure how they pulled that off. Seems to be established technology, but it sure looks like magic to me).  This is a boon at high baud rates - it guarantees that as long as the system is clocked high enough to generate the requested baud rate, worst case, the bit timing will be off by no more than 1/129th - less than 0.77%. At lower speeds, the error is far smaller, often negligible - for the speeds supported by megaTinyCore, the commonly used baud rates (9600, 19200, 57600 and 115200) are all within 0.1% except for 115200 @ 1 MHz (0.64%).  Of course, that is error in addition to any inaccuracy due to the internal oscillator being off-target; the granularity of the tuning is is 1.5%, so that adds a +/- 0.75% error. On 2-series it's about 0.9%, so the maximum error is less than 0.5% at room temp between 3 and 5V. The recommended maximum error (sum of clock error on both sides) is 4% with U2X on, and 4.5% without, and the recommended clock difference is 1.5% and 2%, so only when talking to devices with unusually fussy serial ports would this be a concern.
-
-~##### Voltage correction~
-~To maximize the accuracy of the baud rate when using the internal oscillator, from the Tools -> Voltage for UART Baud menu, select whether the voltage is closer to 5v or 3v - the factory calibration supplies an oscillator error adjustment for the purpose of UART baud calculation for 5v and 3v, and using the right one will produce a baud rate closer to the target value. That said, testing has indicated that either setting is good enough unless you are talking to particularly finicky devices. On parts with 4k or less of flash, this setting is ignored because it adds approx 90 bytes to the size of the compiled binary, and on 2k and 4k parts, it's just not worth the space. This correction factor is never used by the bootloader - it is only necessary when you'rte interacting with something particularly picky about then baud rate which will not accept a nearly correct baud.~
-
-##### Voltage correction is dropped entirely from 2.4.3
-It was an ineffective method to make use of a feature that is of little benefit when it is an otherwise sound, wasted flash when it was used unnecessarily (likely every time it was used) and which on average adjusts the serial baud rate by a few tenths of a percent, which is several times more accurate than USART needs to be. A future update may provide a macro to calculate a "compensated baud", which would be calculated at runtime by simple multiplication, instead of having to do division (which the old method needed to use).
-
-
-##### A note on Baud issues
-Usually problems communicating with things due to baud rate, on the modern AVRs, are because whatever it's talking to is way off target. For example, if you're talking over the serial port to an ATmega328p - being a classic AVR, it doesn't have that fractional baud rate generator. Instead, it needs the baud register set so a number that it can divide the clock by it's baud register. If it only had to generate the clock speed by dividing the clock, that wouldn't be so bad. But the USART needs to divide the system clock to get one **8 times the baud rate** (in U2X, which Arduino cores use - 16x otherwise). A 16 MHz Arduino Uno talking at 115200 baud, for example, isn't actually talking at 115200 baud... Arduino picks UBRR = 16, leading to division by 17 (like most AVR timing related things, the result is N+1 when the numeric value is N) - It's running at 117500 baud, around 2% fast. If that one were trying to talk to an 8 MHz one - the best value is 8, so it's dividing the clock by 9, and the effective baud rate ends up as 111111 baud, more than 3.5% low - they're off by a combined 6%: They cannot talk to each other, even though they both have a crystal. One of the tinyAVR parts supported by this core might be able to talk to both, but it wouldn't need to very far off in the high direction to have trouble talking to the 8 MHz one. If you find yourself in a situation like this, where you have parts that can communicate amongst each other or with the computer, but which have trouble talking to a new ATtiny (since the modern ATtiny won't be using U2X, while the '328p will, it wouldn't even be surprising if the tiny could receive serial from a 328p @ 8 MHz - but the 328p couldn't receive from the tiny). What you need in this situation is not to try to make the clock more accurate, but to figure out which direction the other devices are off in - and just nudge the baud rate you specify up or down accordingly. You could go 1.5-2% in either direction and still be able to talk to a serial adapter - and one of those two will be close enough to what the off-target devices are using to be able to communicate with anything that's able to talk to a serial adapter. If the other devices are classic AVRs, you can check a table of AVR baud rates ([such as this one I made](https://docs.google.com/spreadsheets/d/1uzU_HqWEpK-wQUo4Q7FBZGtHOo_eY4P_BAzmVbKCj6Y/edit?usp=sharing)) to see what baud rate one would expect it to be at. And no matter what kind of device it is, you can always determine it experimentally - it's either too fast or too slow, so there are only two options to try.
-
-**Wait, what about autobaud?** What about it? Although the name suggests it would be just the thing, you can't just turn on autobaud and have it automagically pick the right baud rate for an existing protocol. It relies on the other device sending a break followed by a "sync" character, 0x55. Unless you are programming the other device too, that option is probably not available to you. Even when you are, it's cumbersome to have to rig up two devices like that, and probably not a practical approach. It's meant for (and typically used in) automotive settings as part of a LIN (a serial-based multidrop network), and there, everything is using a shared protocol. That protocol starts every packet with a break followed by a sync,
-
-
-#### printHex
-As an aid to development and debugging, we provide the printHex method. This is a method that will print a wide variety of things as hex. Passing pointers to it will usually dereference them and return the incremented pointer (so you could call it in a loop) See [the printHex documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/printHex.md) for more information. printHex is a development and debugging aid. Behavior may change without warning in a future release - the newline behavior in particular is worse than I would like it to be, but so is every way I've tried to make it better so far.
+See the [**Serial Reference**](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Serial.md) for a full list of options - as of 2.5.0 almost every type of functionality that the serial hardware can do is supported, including RS485 mode, half-duplex (via LBME and ODME), and even synchronous and Master SPI mode!
 
 ### SPI support
 All of these parts have a single hardware SPI peripheral. It works like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. On 8-pin parts, the only option for the SS pin is PA0 (the UPDI/reset pin); this does not matter for the purposes of this core though, because, like the official library, this only operates as a master, and the SS pin is used only when potentially acting as a slave.
@@ -292,7 +260,7 @@ When it can be determined that arguments passed to SPI.swap() or SPI.pins() are 
 This core disables the SS pin - this means that the "SS" pin can be used for whatever purpose you want, and the pin is relevant only when making an SPI slave (which requires you to implement the interaction with the SPI peripheral yourself - though it's not rocket science or anything). On the classic AVRs, if SS was an input and SPI was enabled, it was acting as the SS pin, and if it went low, it would switch the device to slave mode (and SPI.h would not function until put back into master mode, which was not done automatically).
 
 ### I2C (TWI) support
-All of these parts have a single hardware I2C (TWI) peripheral. It presents an API compatible with the standard Arduino implementation, but with added support for multiple slave addresses, answering general call addresses - and most excitingly, simultaneous master and slave operation!
+All of these parts have a single hardware I2C (TWI) peripheral. It presents an API compatible with the standard Arduino implementation, but with added support for multiple slave addresses, answering general call addresses - and most excitingly, simultaneous master and slave operation! (new in 2.5.0)
 
 This is fully documented in the [Wire library reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Wire/README.md)
 
@@ -319,7 +287,7 @@ This also covers the PWM frequencies that these timers will give you at various 
 ### Tone Support
 Support for tone() is provided on all parts using TCB0, unless TCB1 is present and TCB0 is set as millis source. This is like the standard tone() function. Unlike on some classic AVRs, it does not support use of the hardware output compare to generate tones - due to the very limited PWM capabilities and restricted prescaler selection for the TCBs, this is not practical. See caveats below if using TCB0 or TCB1 for millis/micros settings. On parts with 8k or less flash, tones which specify a duration longer than 65536ms and a high frequency (specifically where duration times frequency is >4.2 billion) are not supported - if specified at compile time it will generate a compile error, and at runtime, it will produce a shorter duration tone than expected - this is a trade-off to reduce flash usage. It was decided that requesting a tone over a minute long (several minutes continuous at the upper limit of human hearing would be required to trigger the issue, and it would need to be even longer as the frequency got lower) qualifies as highly abnormal usage of tone(). At that point, rather than counting the number of times the tone pin is toggled (like tone() with a duration specified does), it probably makes more sense to use durationless tone(), and turn it off with noTone(). Or, for the sake of everyone within earshot, m ybe don't make your device emit a high pitched tone for minutes on end at all? On parts with 16k flash or more a slightly less flash efficient implementation is used and the limit is significantly higher and very unlikely to be encountered.
 
-Tone can only play a tone on one pin at a time. In theopry you can play one tone per typeB timer, simultaneously, withhout anything more exotic than tone does - beyond adding a cacility to manage the multiople pins It is my opinion that those belong in a library, not the core, See comments in core.cpp for some things, and feel free to ask if you want more information about what I tjink could be doner I don't think it's **that** hard, . The builtin tone
+Tone can only play a tone on one pin at a time. In theory you can play one tone per typeB timer, simultaneously, without anything more exotic than what tone() does now other than adding a capability to manage the multiople pins. It is my opinion that those belong in a library, not the core, See comments in core.cpp for some thoughts if you want to implement something like that - I'd be happy to give more thoughts if you have questions.
 
 ### millis/micros Timekeeping Options
 megaTinyCore provides the option to use any available timer on a part for the millis()/micros timekeeping, controlled by a Tools submenu - or it can be disabled entirely if needed to save flash, allow use of all timer interrupts, or eliminate the periodic background interrupt. By default, TCD0 will be used by on parts that have one - otherwise TCA0 will be used (in versions prior to 1.1.9, TCA0 was used by default on parts that could output PWM with TCD0 on pins not available for TCA0 PWM). All timers available on the parts can be used: TCA0, TCD0 (on parts that have it), TCB0, TCB1 (where present) and the RTC. Many of these - particularly the non-default options, involve tradeoffs. In brief, TCA0 is a very versatile timer that users often want to reconfigure, TCD0 loses a small amount of time when PWM is turned on or off on the two TCD0 PWM pins (10,11 on 20-pin parts, 12,13 on 24-pin parts), TCB0 conflicts with Servo and tone on parts that don't have TCB1, and when the RTC is used micros() is not available at all because the clock isn't fast enough. With these limitations in mind, the timer selection menu provides a way to move millis()/micro to the timer most appropriate for your needs.
@@ -342,48 +310,67 @@ void GoToSleep() {
 
 This functionality will be made easier to use via ModernSleep whern that library is available.
 
-This board package also supports using an external 32.768khz crystal as the clock source for the RTC (not supported on 0-series or 8-pin parts). If this is used, make sure that the crystal is connected between the TOSC1 and TOSC2 pins (these are the same as the TX and RX pins with the default pin mapping, unfortunately), that nothing else is, that no excessively long wires or traces are connected to these pins, and that appropriate loading capacitors per crystal manufacturer datasheet are connected.
+This board package also supports using an external 32.768khz crystal as the clock source for the RTC (not supported on 0-series or 8-pin parts). If this is used, make sure that the crystal is connected between the TOSC1 and TOSC2 pins (these are the same as the TX and RX pins with the default pin mapping, unfortunately), that nothing else is, that no excessively long wires or traces are connected to these pins, and that appropriate loading capacitors per crystal manufacturer datasheet are connected. I found the 32k crystal to be extremely uncooperative. To reduce power usage, they try to drive the crystal as weakly as they can get away with, which in turn makes it more susceptible to interferance.
 
 #### What about external oscillator "32768 Hz""
 Yes, you can use an external oscillator for the RTC, at least on 1 and 2 series parts.
-When it's an oscillator not a crystal,It can be fed to either TOSC0 or CLKI
+When it's an oscillator not a crystal,It can be fed to either TOSC0 or CLKI; better support for this will come in the future.
 
-### printf() support for "printable" class
-Unlike the official board packages, but like many third party board packages, megaTinyCore includes the .printf() method for the printable class (used for Serial and many other libraries that have print() methods); this works like printf(), except that it outputs to the device in question; for example:
+### `printf()` support for "printable" class
+Unlike the official board packages, but like many third party board packages, megaTinyCore includes the `printf()` method for the printable class (used for Serial and many other libraries that have `print()` methods); this works like `printf()`, except that it outputs to the device in question; for example:
 ```cpp
 Serial.printf("Milliseconds since start: %ld\n", millis());
 ```
-Note that using this method will pull in just as much bloat as sprintf(), so it may be unsuitable on devices with small flash memory.
+Note that using this method will pull in just as much bloat as `sprintf()` and is subject to the same limitations as printf - by default, floating point values aren't printed.
+You can choose to have a full `printf()` implementation from a tools submenu if you want to print floating point numbers
+
+#### printf has many pitfalls
+There are a considerable number of ways to screw up with printf. Some of the recent issues that have come up:
+* Formatting specifiers have modifiers that they must be paired with depending on the datatype being printed, for all except one type. See the table of ones that I expect will work below (it was cribbed from [cplusplus.com/reference/cstdio/printf/](https://www.cplusplus.com/reference/cstdio/printf/), and then I chopped off all the rows that aren't applicable, which is most of them). Apparently many people are not fully aware (or at all aware) of how important this is - even when they think they know how to use printf(), and may have done so on previously (on a desktop OS, with 32-bit ints and no reason to use smaller datatypes for simple stuff).
+* There are (as of 1.4.0) warnings enabled for format specifiers that don't match the the arguments, but you should not rely on them. Doublecheck what you pass to printf - printf bugs are a common cause of software bugs in the real world. Be aware that *while you can use F() on the format string, there are no warnings for invalid format strings in that case*; a conservative programmer would first make the app work without F() around the format string, and only switch to F() once the format string was known working.
+
+From cplusplus.com:
+>The length sub-specifier modifies the length of the data type. This is a chart showing the types used to interpret the corresponding arguments with and without length specifier ~(if a different type is used, the proper type promotion or conversion is performed, if allowed)~:
+Strikethrough mine 'cause that don't work here (and it's not my fault nor under my control - it's supplied with avrlibc, and I suspect that it's because the overhead of implementing it on an 8-bit AVR is too large) - When incorrect length specifiers are given (including none when one should be used) surprising things happen. It looks to me like all the arguments get smushed together into a group of bytes. Then it reads the format string, and when it gets to a format specifier for an N byte datatype, it grabs N bytes from the argument array, formats them and prints them to whatever you're printing to, proceeding until the end of the format string. Thus, failing to match the format specifiers' length modifiers with the arguments will result in printing wrong data, for that substitution **and all subsequent ones** in that call to printf.
+
+The table below is the relevant lines from that table - many standard types are not a thing in Arduino.
+
+| length | d i | u o x X | f F e E g G a A |  c  |    s   |  p   |    n     |
+|--------|-----|---------|-----------------|-----|--------|------|----------|
+| (none) |int16|  uint16 | float           | int |  char* |void* | int*     |
+| hh     |int8 |  uint8  |                 |     |        |      | char*    |
+| l      |int32|  uint32 |                 |     |        |      | int32_t* |
+
+Notice that there is no line for 64 bit types in the table above; these are not supported (support for 64-bit types is pretty spotty, which is not surprising. Variables of that size are hard to work with on an 8-bit microcontroller). This applies to all versions of printf - the capability is not supplied by avrlibc.
 
 
-### Pin Interrupts
+#### Selectable printf() implementation
+A tools submenu lets you choose from full `printf()` with all features, the default one that drops float support to save 1k of flash, and the minimal one drops almost everything and for another 450 bytes (will be a big deal on the 16k and 8k parts. Less so on 128k ones.) - note that selecting any non-default option here *will cause it to be included in the binary even if it's never called* - and if it's never called, it normally wouldn't be included. So an empty sketch will take more space with minimal printf selected than with the default, while a sketch that uses printf will take less space with minimal printf vs default.
+
+### Interrupts (from pins, and in general)
 All pins can be used with attachInterrupt() and detachInterrupt(), on RISING, FALLING, CHANGE, or LOW. All pins can wake the chip from sleep on CHANGE or LOW. Pins marked as ASync Interrupt pins on the megaTinyCore pinout charts (pins 2 and 6 within each port) can be used to wake from sleep on RISING and FALLING edge as well. Those pins are termed "fully asynchronous pins" in the datasheet
 
-Advanced users can instead set up interrupts manually, ignoring attachInterrupt and manipulating the relevant port registers appropriately and defining the ISR with the ISR() macro - this will produce smaller code (using less flash and RAM) and the ISRs will run faster as they don't have to check whether an interrupt is enabled for every pin on the port. For full information and example, see: [Pin Interrupts](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PinInterrupts.md)
+Advanced users can instead set up interrupts manually, ignoring attachInterrupt and manipulating the relevant port registers appropriately and defining the ISR with the ISR() macro - this will produce smaller code (using less flash and RAM) and the ISRs will run faster as they don't have to check whether an interrupt is enabled for every pin on the port.
+
+For full information and example, see [the Interrupt Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Interrupts.md)
 
 ### Improved Export Compiled Binary
-The Sketch -> Export Compiled Binary option has been significantly enhanced in megaTinyCore and it now provides a record of settings when the export was performed, and assembly listings and memory map to assist in optimization and size reduction effort.
+The Sketch -> Export Compiled Binary option has been significantly enhanced in megaTinyCore and it now provides a record of settings when the export was performed, and assembly listings and s memory map to assist in optimization and reducing flash usage.
 
-#### Naming includes all Tools submenu options that effect compiled output
-The name of the exported binary includes every tools submenu selection that could impact the compiled binary, for example `Test.ino.t1614opti.20.u5V.mD0.hex` - the full part number (not just family), whether it's using optiboot (this effects start address of .hex, unlike classic AVRs where a bootloaded board takes the same binary as non-bootloaded one), the clock speed (in MHz), the approximate voltage for UART baud rate calculation if used, and the millis timer source (`A0`, `B0`, `B1`, `D0`, `RTC`, `RTC_XTAL` or `NONE`). Entries will be added to this as new submenus are added to the core.
+See the [Export Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Export.md)
 
-#### Assembly Listing generation
-Like ATTinyCore and DxCore, Sketch -> Export compiled binary also generates an assembly listing in the sketch folder (same naming scheme as above); this file, ending in .lst, can be opened in any text editor. It contains an assembly listing, with the C source and generated assembly intermixed, which (attempts to) show which C generated which instructions. One does not need to know assembly to understand that a whole load of cryptic instructions means more flash usage than a small number of cryptic instructions; this very simple rule helps with the most common use case for the listing: figuring out what exactly it is in the code that is responsible for it eating up all the flash. See: [Assembly Listing Basics](https://github.com/SpenceKonde/AVR-Guidance/blob/master/LowLevel/AssemblyListingBasics.md) for a very brief orientation.
-
-#### Memory Map generation (New in 2.3.0)
-The memory map is a less powerful resource than an assembly listing - but it is far easier to understand, and it is very much focused on the sizes of sections in memory (both RAM and Flash), which is a very common reason to be looking at this low-level info. It's a text file with a .map extension, containing a table of values, with columns delimited by the | character, and all numbers in hexadecimal (which is the only right way for memory addresses). Each symbol name is listed, along with it's address, and - if it occupies space in flash or ram, that size, as well as where they are defined. It may be best viewed in a spreadsheet, but I haven't been able to make it import into excel cleanly; a future update may add some pre-processing to help with this.
 
 ### BOD configuration options
 These parts officially support BOD trigger levels of 1.8V, 2.6V, and 4.2V, with Disabled, Active, and Sampled operation options for when the chip is in Active and Sleep modes - Disabled uses no extra power, Active uses the most, and Sampled is in the middle. As of 2.1.0, the active/sleep modes have been combined into a single menu, the nonsensical options (such as using more aggressive BOD is while sleeping than while awake) removed, and the previously unexposed options added: sampled mode is now available with two sample rates (the faster one uses ever so slightly more power, as you would expect), and "Enabled hold wake" - in that mode, BOD is disabled in sleep, enabled when not sleeping, and when waking up, code execution does not begin until the BOD is ready. See the datasheet for details on power consumption and the meaning of these options. You must do Burn Bootloader to apply this setting, even in 2.2.0 and later; it's not a "safe" setting, since if you set it to a voltage higher that the operating voltage and enable it, the chip is "bricked" until a high enough voltage is applied.
 
 #### Additional BOD levels
-Between the initial header file and preliminary datasheet release, and the more recent versions of each, several BOD settings were removed from the tinyAVR 0/1-series datasheets, and the atpack release notes described them as "unqualified" - (described as "unqualified" in the release notes accpompanying this change - I understand that this has something to do with the vetting process for critical applications which these parts go through and do not correspond to a voltage above which the chip is guaranteed to function under certain conditions (The three official BOD levels are the voltages that the chip is guaranteed (Yup, they use that word in the datasheet!) to work within the manufacturer specified temperature range running at a system clock frequency no higher than marked, and it has been implied that ongoing tests of production devices are performed it would appear that their policy is to test against  that this is tested in production. In contrast, the other 5 BOD levels are expected to work as one would expect, but Microchip does not provide any *guarantee* that they'll work, even if all other design requirements are met. were removed from the datasheet and header files. These are supported by the megaTinyCore BOD  dropdown menu, but (as of 2.0.4 - the first version that has the new headers) are marked as such in the submenu. Note that the new headers no longer provide the `*_gc` enum entries for these BOD levels..
+Between the initial header file and preliminary datasheet release, and the more recent versions of each, several BOD settings were removed from the tinyAVR 0/1-series datasheets, and the atpack release notes described them as "unqualified" - (described as "unqualified" in the release notes accpompanying this change - I understand that this has something to do with the vetting process for critical applications which these parts go through and do not correspond to a voltage above which the chip is guaranteed to function under certain conditions (The three official BOD levels are the voltages that the chip is guaranteed (Yup, they use that word in the datasheet!) to work within the manufacturer specified temperature range running at a system clock frequency no higher than marked, and it has been implied that ongoing tests of production devices are performed it would appear that their policy is to test against  that this is tested in production. In contrast, the other 5 BOD levels are expected to work as one would expect, but Microchip does not provide any *guarantee* that they'll work, even if all other design requirements are met. were removed from the datasheet and header files. These are supported by the megaTinyCore BOD  dropdown menu, but (as of 2.0.4 - the first version that has the new headers) are marked as such in the submenu. Note that the new headers no longer provide the `*_gc` enum entries for these BOD levels.
 
 ### Auto-set safe fuses on UPDI upload
 Whenever a UPDI programmer is used to upload code, all fuses that can be set "safely" (as in, without risk of bricking the board, or bricking the board if one does not have access to an HV programmer), and which have any built-in configuration options, will be set. Thus, except where noted, behavior will always match the selected tools menu. In summary, these are handled as follows:
 ```text
 WDTCFG will not be changed - it is not configured by megaTinyCore except to reset it to the factory default when doing "burn bootloader".
-BODCFG will not be changed - not safe
+BODCFG will not be changed - not safe, you could set the bod level to 4.3 on a 3.3v system, and then it would need to get >4.3v applied to reprogram it. If it is onthe same circuit board as parts that would be damaged, this is a difficult situation to recover from.
 OSCCFG will be set
 TCD0CFG will not be changed - it is not configured by megaTinyCore except to reset it to the factory default when doing "burn bootloader".
 SYSCFG0 will not be changed - not safe
@@ -419,7 +406,7 @@ I know lots of people use libraries that aren't on that list, and I fully expect
 Most existing Arduino libraries work (see the [Supported Libraries List](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/LibraryCompatibility.md) for a more complete list and discussion of what kinds of libraries might have issues). Of the few libraries that don't work, a handful happened to also be extremely popular and heavily used, such that it was felt necessary to include a compatible version with the core. In addition to these, libraries which expose hardware only present on the modern AVRs are also included. These libraries are listed below.
 
 ### tinyNeoPixel (WS2812)
-The usual NeoPixel (WS2812) libraries, including the popular FastLED as well as AdafruitNeoPixel, have problems on these parts - they depend on hand-tuned assembly, but the execution time of several key instructions has been improved; the improvements enable significant simplification of the code for driving these LEDs. This core includes a compatible version of the tinyNeoPixel library for interfacing with these ubiquitous addressable LEDs. There are two versions,  both tightly based on the Adafruit_NeoPixel library - one implements a truly identical API, and differs only in name.  The other realizes significant flash savings in exchange for minor restrictions (length must be constant and known at compile time) and a slightly different syntax for the constructor. See the [tinyNeoPixel documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/tinyNeoPixel.md) and included examples for more information.
+The usual NeoPixel (WS2812) libraries, including the popular FastLED as well as AdafruitNeoPixel, have problems on these parts - they depend on hand-tuned assembly, but the execution time of several key instructions has been improved; the improvements enable significant simplification of the code for driving these LEDs. This core includes a compatible version of the tinyNeoPixel library for interfacing with these ubiquitous addressable LEDs. There are two versions,  both tightly based on the Adafruit_NeoPixel library - one implements a truly identical API, differing only in name. (Well, and obviously the fact that it works on tinyAVR and Dx-series and megaAVR 0-series parts at clock speeds from 8 MHz to 48 MHz, instead of on most classic AVRs at 8, 12, and 16 MHz). The other version makes a slight change to the constructor and drops support for changing length at runtime, in order to realize significant flash savings (around 1k). See the [tinyNeoPixel documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/tinyNeoPixel.md) and included examples for more information.
 
 ### EEPROM and USERROW
 The standard EEPROM.h is available here - it works like it does on any AVR. `USERSIG.h` (from "User Signature" which the datasheet has sometimes called the `USERROW`) it has the same API as EEPROM, though there may be future additions to harmonize with Dx-friendly functions for updating multiple bytes - the Dx-series parts can only erase the whole USERROW, so potentially each byte written could involve erasing and rewriting it all - the question of how to deal with that is why DxCore doesn't have a USERSIG library yet). The name "USERSIG" refers to the alternate name of the USERROW, the "User Signature" space - the name USERROW could not be used because it is defined by the io headers (it's the `struct` of type `USERROW_t`, made up of `USERROW.USERROW0` through `USERROW.USERROW31`. Not the most useful thing, but we never override the io header file definitions unless working around a bug.
@@ -454,236 +441,15 @@ These parts have either 1 or 3 (1614, 1616, 1617, 3216, and 3217) on-chip analog
 
 This library is also included in DxCore and MegaCoreX, covering all modern AVRs with comparator hardware. Written by @MCUDude.
 
-[Logic library documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Comparator/README.md)
+[Comparator library documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Comparator/README.md)
 
-## Triggering a reset from software
-
-As noted above in the discussion of the shared UPDI/reset pin, these parts support a native software reset operation; on classic AVRs, the only way was to enable the watchdog timer, and then wait for it to time out. With the "modern" AVR devices, there are two ways to trigger a reset from software: A watchdog timer reset (as before), and the native software reset. Unlike classic AVRs, after a WDT reset, the watchdog timer is not forced on with the minimum timeout (on classic devices, this is why doing a WDT restart with very old bootloaders instead hung the board - the bootloader wasn't smart enough to turn it off before it was reset by it.). These two methods of resetting the chip allow you to signal to the application or bootloader what sort of condition triggered the reset.
-
-Additionally, while the bootloader, if used (see below) will run after a software reset, it will NOT run after a watchdog reset (well - it will run, but only long enough to read the reset flag register and see that it was restarted by the WDT: That means that either the bootloader just ran, finished, and reset the device (If we didn't jump to the app in this case, we'd just sit in the bootloader doing WDT resets forever), that the application suffered from a WDT timeout due to a bug or adverse conditions (that's not the bootloader's business to get involved in) or that the application intentionally triggered a WDT reset. None of those are "entry conditions" for Optiboot - so Optiboot jumps to the app immediately).This allows the application a convenient mechanism to restart itself without having to potentially wait through the bootloader attempting to communicate with whatever is connected to the serial port.
-
-
-Note: While the windowed mode would at first seem to suggest that you could reset much faster by setting it and then executing `WDR` until it resets from missing the window, you don't gain nearly as much as you'd think. First, the initial WDR needs to be synchronized - 2-3 WDT clocks, ie, 2-3 ms. Additional WDRs executed while this is happening are ignored. Only when the second WDR makes it to the watchdog timer domain will it reset the system. So the overall time to restart is 6-9ms. Instead 10-11 ms (sync delay + minimum timeout).
-```c++
-void resetViaWDT() {
-  _PROTECTED_WRITE(WDT.CTRLA,WDT_PERIOD_8CLK_gc); //enable the WDT, minimum timeout
-  while (1); // spin until reset
-}
-
-```c++
-void resetViaWDTFaster() {
-  _PROTECTED_WRITE(WDT.CTRLA,WDT_WINDOW_8CLK_gc | WDT_PERIOD_8CLK_gc); //enable the WDT, minimum timeout, minimum window.
-  while (1) __asm__ __volatile__ ("wdr"::); // execute WDR's until reset. The loop should in total take 3 clocks (the compiler will implement it as wdr, rjmp .-4), but because of the sync to the relatively slow
-}
-
-void resetViaSWR() {
-  _PROTECTED_WRITE(RSTCTRL.SWRR,1);
-}
-```
-
-### Using watchdog to reset when hung
-If you only worked with the watchdog timer as an Arduino user - you might not even know why it's called that, or what the original concept was, and just know it as that trick to do a software reset on classic AVRs, and as a way to generate periodic interrupts. The "purpose" of a watchdog timer is to detect when the part has become hung - either because it's wound up in an infinite loop due to a bug, or because it wound up in a bad state due to a glitch on the power supply or other adverse hardware event, has been left without a clock by an external clock source failing, went to sleep waiting for some event which doesn't end up happening (or without correctly enabling whatever is supposed to wake it up) - and issue a reset. It is often anthropomorphized as a dog, who needs to be "fed" or "pet" periodically, or else he will "bite" (commonly seen in comments - the latter generally only when intentionally triggering it, as in `while (1); //wait for the watchdog to bite`).
-
-You would first initialize the WDT like:
-```c++
-_PROTECTED_WRITE(WDT.CTRLA,settings); //enable the WDT
-```
-
-To configure the WDT to reset the device after a period of time, replace `settings` above with the desired WDT timeout period from this table. If is getting stuck somewhere that causes it to repeatedly reset the WDT you can configure the window mode to reset if an attempt is made to reset the watchdog timer within the specified period. To do this, bitwise OR the two, eg: `_PROTECTED_WRITE(WDT.CTRLA, WDT_PERIOD_8KCLK_gc | WDT_WINDOW_16CLK_gc );` would set the WDT to reset the device if two attempts to reset the watchdog were ever made within 16 milliseconds (before the "window" opens), or if no reset was performed in the 8 seconds after that (when the window closes).
-
-
-| Timeout | WDT period name      | WDT Window name      |
-|---------|----------------------|----------------------|
-|  0.008s | WDT_PERIOD_8CLK_gc   | WDT_WINDOW_8CLK_gc   |
-|  0.016s | WDT_PERIOD_16CLK_gc  | WDT_WINDOW_16CLK_gc  |
-|  0.032s | WDT_PERIOD_32CLK_gc  | WDT_WINDOW_32CLK_gc  |
-|  0.064s | WDT_PERIOD_64CLK_gc  | WDT_WINDOW_64CLK_gc  |
-|  0.128s | WDT_PERIOD_128CLK_gc | WDT_WINDOW_128CLK_gc |
-|  0.256s | WDT_PERIOD_256CLK_gc | WDT_WINDOW_256CLK_gc |
-|  0.512s | WDT_PERIOD_512CLK_gc | WDT_WINDOW_512CLK_gc |
-|  1.024s | WDT_PERIOD_1KCLK_gc  | WDT_WINDOW_1KCLK_gc  |
-|  2.048s | WDT_PERIOD_2KCLK_gc  | WDT_WINDOW_2KCLK_gc  |
-|  4.096s | WDT_PERIOD_4KCLK_gc  | WDT_WINDOW_4KCLK_gc  |
-|  8.192s | WDT_PERIOD_8KCLK_gc  | WDT_WINDOW_8KCLK_gc  |
-
-#### Resetting the WDT
-A typical use of this is to have the main loop (generally loop() in an Arduino sketch) reset the watchdog at the start or end of each loop, so when a function it calls ends up hung, we can use:
-
-```c
-// As a function
-void wdt_reset() {
-  __asm__ __volatile__ ("wdr"::);
-}
-```
-
-Or
-
-```c++
-// as a macro (which is all that wdt.h does)
-#define wdt_reset() __asm__ __volatile__ ("wdr"::)
-```
-
-#### Disabling WDT
-In some cases you may only want the WDT enabled when certain routines prone to hanging due to external conditions, and then turn it off again.
-```c++
-_PROTECTED_WRITE(WDT.CTRLA,0); //Yeah, that's it.
-```
-
-At the other extreme you may want it to be impossible for code, even very clever bugs will never be able to turn it off. You can lock the WDT in it's current configuration by writing the WDT_LOCK bit in WDT.STATUS to 1 - only a system reset will unset the bit.
-
-```c++
-__PROTECTED_WRITE(WDT.STATUS,WDT_LOCK_bm); // call after setting WDT to desired configuration.
-```
-For even more protection (and more nuisance in keeping the WDT from bitingat all times, even during startup). you can set the WDTCFG fuse via UPDI programming. At startup, that value is copied to WDT.CTRLA, and the lock bit in WDT.STATUS is set. Only UPDI programming can undo the WDT if congfiguref through the fuses. This feature is not exposed by the core - you must manually run avrdude or SerialUPDI and use it to write that fuse. "burn bootloader" will, however, set that fuse to 0 (the point of burn bootloader is initializing the chip to a fully known state; it only involves a bootloader if you've chosen an optiboot board configuration.
-
-#### Summary and mini-example
-So overall, if you wanted your sketch to reset if you ever spent longer than 8 seconds between loop() iterations and also detect when a WDT reset just occurred and take special actions in setup you might do this
-```c++
-void wdt_enable() {
-  _PROTECTED_WRITE(WDT.CTRLA,WDT_PERIOD_8KCLK_gc); // no window, 8 seconds
-}
-
-void wdt_reset() {
-  __asm__ __volatile__ ("wdr"::);
-}
-
-void wdt_disable() {
-  _PROTECTED_WRITE(WDT.CTRLA,0);
-}
-
-/* If you at some point plan to put the chip to sleep you need to turn off the WDT or it will reset you out of sleep... */
-void goToSleep() {
-  wdt_disable();
-  sleep_cpu();
-  wdt_enable();  // turn the WDT back on promptly when we awaken.
-}
-
-void loop() {
-  wdt_reset(); // reset watchdog.
-  <snip - rest of loop goes here>
-}
-
-/* for NON-OPTIBOOT */
-void setup() {
-  wdt_enable(); //we're super paranoid, so we turn on WDT immediately!
-  uint8_t resetflags = RSTCTRL.RSTFR; // Read the flags
-  RSTCTRL.RSTFR = resetflags; // clear them for next time (only power on reset will clear then otherwise)
-  if (resetflags & RSTCTRL_WDRF) { //means it was a WDT reset
-    NotifyUserOfHangAndWDTReset();
-    if (resetflags != RSTCTRL_WDRF) {
-      Serial.println("Weird, we clear the flags upon reset, how did we end up with more than just one reset cause flag?")
-    }
-  }
-  <snip - rest of setup goes here>
-}
-/* For OPTIBOOT */
-void setup() {
-  wdt_enable(); //we're super paranoid, so we turn on WDT immediately.
-  uint8_t resetflags = GPIOR0 & 0x3F; // Optiboot stashes the reset flags here before clearing them to honor entry conditions.
-  // It never uses the top two bits, but init() does use those to report clock start problems.
-  GPIOR0 &= 0xC0; // clear non-clock-related ones
-  if (resetflags == RSTCTRL_WDRF) { //means it was a WDT reset. In optiboot configurations, this should always be accompanied by another flag unless it was a wdt reset from the application.
-    NotifyUserOfHangAndWDTReset();
-  }
-  if (GPIOR0 != 0) { //this means one of top two bits is set, or maybe both.Serial.println("Clock startup errors reported");
-  Serial.printHex(GPIOR0); //this might be useful in understanding why the hang occurred? maybe?
-  }
-  <snip - rest of setup goes here>
-}
-
-```
-### The wrong way to reset from software
-I have seen people throw around `asm volatile("jmp 0");` as a solution to a need to reset from software. **Don't do that** - all compiled C code makes assumptions about the state from which it is run. Jumping to 0 from a running application violates several of them unless you take care to avoid those pitfalls (if I were to add a comment after that line, it would read something like `// Reset chip uncleanly to produce unpredictable results`. Both Optiboot and the init() method of megaTinyCore make assumptions about the state of peripheral registers as well (namely, that they're in their reset configuration when it starts). Doing that was always risky business and should never be done on any part (certainly not without taking precautions). Now that we finally have a right way to do software reset, there is absolutely no excuse for using such a tactic!
-
+## WDT and resets
+For more information on resetting from software, using the Watchdog Timer, the causes of unexpected resets and how ot prevent them, and generally all things reset-related, see the [Reset Guide](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md)
 
 ## Identifying Part and Options in sketch
 It is often useful to identify what options are selected on the menus from within the sketch; this is particularly useful for verifying that you have selected the options you wrote the sketch for when opened later by yourself or someone who you shared it with. Or, you can use these, combined with `#if` macros to select the appropriate code depending on the part or options at hand.
 
-### Part or Part Family
-When writing code that may be compiled for a variety of target chips (which is particularly easy on the megaAVR parts, as the peripherals are so similar), it is often useful to be able to identify which family of parts is being used, in order to, for example, select which pin numbers to use for each purpose. Each part is identified by a #define:
-`__AVR_ATtiny***__` where *** is the part number (ex: `__AVR_ATtiny3216__`).
-
-This core provides three additional #defines for part "families" - note that in versions prior to 2.0.2, these are incorrect for many parts:
-* `__AVR_ATtinyx**__` where ** is the last 2 digits of the part number (ex: `__AVR_ATtinyx16__`)
-* `__AVR_ATtinyxy*__` where * is the last digit of the part number, (ex: `__AVR_ATtinyxy6__`)
-* `MEGATINYCORE_SERIES` is defined as 0, 1, or 2
-
-These are all just shorthand, for convenience - `#ifdef __AVR_ATtinyxy2__` is equivalent to `#if defined(__AVR_ATtiny212__) || defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__)`, and `#if MEGATINYCORE_SERIES == 0` is shorthand for `#if defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny402__) || defined(__AVR_ATtiny204__) || defined(__AVR_ATtiny404__) || defined(__AVR_ATtiny804__) || defined(__AVR_ATtiny1604__) || defined(__AVR_ATtiny406__) || defined(__AVR_ATtiny806__) || defined(__AVR_ATtiny1606__) || defined(__AVR_ATtiny407__) || defined(__AVR_ATtiny807__) || defined(__AVR_ATtiny1607__)` which is an awkwardly verbose test to put it mildly.
-
-### Clock Source
-The clock source can be checked via the `CLOCK_SOURCE` This is defined as either 0 (indicating the internal oscillator is selected) or 2 (indicating an external clock). This checks only what was selected at compile time and which are configured before setup() is called; this is also what defines the behavior of all functions provided by the core; if you were to manually change the clock source at runtime, it is on you to keep track of it, and functions provided by the core that depend on the clock source should not be expected to be behave (we do not advise manually changing the clock source under any circumstances for precisely this reason).
-
-### Core Version
-Version information for MEGATINYCORE is also provided by a few additional defines to make it easier to work with these in a sketch or compare to specific values; an example is presented below:
-* MEGATINYCORE "2.0.2"
-* MEGATINYCORE_MAJOR 2
-* MEGATINYCORE_MINOR 0
-* MEGATINYCORE_PATCH 2
-* MEGATINYCORE_RELEASED 1
-* MEGATINYCORE_NUM 0x02000201
-While historically, these have often not been consistently updated with every release, as of 2.1.4, they are now generated directly from the platform.txt - it is hoped that this will help improve that.
-
-### Millis Timer Selection
-The option used for the millis/micros timekeeping is given by a define of the form USE_MILLIS_TIMERxx. Possible options are:
-* USE_MILLIS_TIMERA0
-* USE_MILLIS_TIMERB0
-* USE_MILLIS_TIMERB1
-* USE_MILLIS_TIMERD0
-* USE_MILLIS_TIMERRTC (defined if RTC is used for millis - whether or not external crystal or oscillator is used)
-* USE_MILLIS_TIMERRTC_XTAL (only defined if RTC is used with external crystal)
-* USE_MILLIS_TIMERRTC_XOSC (only defined if RTC is used with external oscillator)
-* USE_MILLIS_TIMERNONE (defined if millis timekeeping is disabled)
-* DISABLE_MILLIS (synonym for above, for backwards compatibility)
-Additionally, `MILLIS_TIMER` is defined to that timer - see `Identifying Timers` below
-
-#### Checking that correct menu option is selected
-If your sketch requires that the TCB0 is used as the millis timer
-
-```c
-#ifndef MILLIS_USE_TIMERB0
-#error "This sketch is written for use with TCB0 as the millis timing source"
-#endif
-```
-
-#### Core feature detection
-There are a number of macros for determining what (if any) features the core supports (these are shared with DxCore) Values of these are shown in parenthesis, where two values are given, the first uis for 0/1-series, the second for 2-series, as they have different capabilities.
-* `CORE_HAS_FASTIO` (1) - If defined as 1 or higher, indicates that digitalWriteFast() and digitalReadFast() is available. If undefined or defined as 0, these are not available. If other "fast" versions are implemented, they would be signified by this being defined as a higher number. If defined as -1, there are no digital____Fast() functions, but with constant pins, these functions are optimized aggressively for speed and flash usage (though not all the way down to 1 instruction).
-* `CORE_HAS_OPENDRAIN` (1) - If defined as 1, indicates that openDrain() and (assuming `CORE_HAS_FASTIO` is >= 1) openDrainFast() are available. If undefined or 0, these are not available.
-* `CORE_HAS_PINCONFIG` (1) - If defined as 1, indicates that pinConfigure() is available. If not defined or defined as 0, it is not available.
-* `CORE_HAS_FASTPINMODE` (0) - If defined as 1, indicates that pinModeFast() is available. If not defined or defined as 0, it is not available. Available in 2.4.1 and later.
-* `CORE_HAS_TIMER_TAKEOVER` (1) - if defined as 1, takeOverTCxn() functions are available to let user code take full control of TCA0, TCA1 and/or TCD0.
-* `CORE_HAS_TIMER_RESUME` (1)- if defined as 1, the corresponding resumeTCxn() functions, which reinitialize them and return them to their normal core-integrated functions, are available.
-* `ADC_NATIVE_RESOLUTION` (10 or 12)- This is the maximum resolution, in bits, of the ADC without using oversampling.
-* `ADC_NATIVE_RESOLUTION_LOW` (8 or 10) - The ADC has a resolution setting that chooses between ADC_NATIVE_RESOLUTION, and a lower resolution.
-* `ADC_DIFFERENTIAL` (0 or 2) - This is defined as 1 if the part has a basic differential ADC (no gain, and V<sub>analog_in</sub> constrained to between Gnd and V<sub>Ref</sub>), and 2 if it has a full-featured one. *It does not indicate whether said differential capability is exposed by the core* - see `CORE_HAS_ANALOG_DIFF`
-* `SUPPORT_LONG_TONES` (0 or 1, depending on flash size)  - On some modern AVR cores, an intermediate value in the tone duration calculation can overflow; this occurs because the tone duration is timed by counting the number of times the pin is flipped; the conversion between seconds and milliseconds results in a value being multiplied by 1000. This effect is worst at high frequencies, and can manifest at durations as short as 65 seconds worst case. Working around this is straightforward, but comes at the cost of some flash. Cores may or may not choose to address it - either because their author is unaware of the issue, or feels that the flash cost is not justified (megaTinyCore only supports long tones on parts with more than 8k of flash).  If `SUPPORT_LONG_TONES` is defined as 1, as long as (duration * frequency)/500 < 4.294 billion, the duration will not be truncated. If it is defined as 0, the issue is not worked around, though the author or maintainer of the core was aware of the issue and chose not to fully correct it (ex, to save flash) but took an obvious step to reduce the impact; the duration will be truncated if (duration * frequency) exceeds 4.294 billion. If `SUPPORT_LONG_TONES` is not defined at all that suggests that the issue was not mitigated at all, and the issue may be present in its original form, in which case the duration will likely be truncated if (duration * frequency) exceeds 2.14 billion. In any event, if this issue is relevant to your application (that is, you are generating a high-pitched tone for over a minute at a time) your sketch may be annoying to others.
-* `CORE_HAS_ANALOG_ENH` (1)  - If defined as 1, analogReadEnh() (enhanced analogRead) is available. Otherwise, it is not.
-* `CORE_HAS_ANALOG_DIFF` (0 or 1)  - If defined as 1, analogReadDiff() (differential enhanced analogRead) is available. Otherwise, it is not. This is available on the 2-series parts only, as those are the only modern tinyAVR devices which feature a differential ADC.
-* `ADC_MAX_OVERSAMPLED_RESOLUTION` (13 or 17) - If either `CORE_HAS_ANALOG_ENH` or `CORE_HAS_ANALOG_DIFF` is 1, this is defined as the maximum resolution obtainable automatically via oversampling and decimation using those functions.
-* `ADC_MAXIMUM_GAIN` (0 or 16) - Some parts have an amplifier, often used for differential readings. The Dx-series are not among them (right now it's only the 2-series). If this is defined as a positive number, it is the maximum gain available. If this is defined as -1, there are one or more `OPAMP` peripherals available which could be directed towards the same purpose, though more deliberation would be needed. If it is defined as -128 (which may come out as 128 if converted to an unsigned integer), there is a gain stage on the differential ADC, but it is a classic AVR, so the available gain options depend on which pins are being measured, and there is a different procedure as detailed in the core documentation (ex, ATTinyCore 2.0.0 and later). If it is 0 or undefined, there is no built-in analog gain stage for the ADC, or it is not exposed through the core.
-* `PORT_HAS_INLVL` (0) - Some parts have an option to configure pins to use "TTL" input levels, so that the threshold for `HIGH` or `LOW` does not depend on the operating voltage. The tinyAVR 0/1/2 series do not have this feature. Testing this macro is not recommended. Instead, use `#if defined(PORT_INLVL_bm)`.
-
-#### Identifying Timers
-Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statements to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro. Defines are available on all parts that the core supports, whether or not the timer in question is present on the part (ie, it is safe to use them in tests/code without making sure that the part has that timer). There are two very closely related macros for determining pin timers:
-* `digitalPinToTimer()` tells you what timer (if any) the pin is associated with by default. This is a constant, when the argument is constant, the optimizer will optimize it away.
-* `digitalPinToTimerNow()` tells you what timer (if any) the pin is associated with currently. On megaTinyCore, this is either the result of `digitalPinToTimer()` unless that timer has been "taken over" by user code with `takeOverTCA0()` or `takeOverTCD0()`. On modern AVR cores like Dx-core which support use of `analogWrite()` even when the `PORTMUX.TCxROUTEA` register (where `x` is `A` or `D`) has been changed, this will return the timer currently associated with that pin. megaTinyCore does NOT support non-default timer pin mappings with `analogWrite()`- so if `PORTMUX.TCAROUTEA` (2-series) or `PORTMUX.CTRLC` (0/1-series) has been altered, this will not not reflect that.
-
-```c
-#define NOT_ON_TIMER 0x00   // if MILLIS_TIMER set to this, millis is disabled. If digitalPinToTimer() gives this, it is not a PWM pin
-#define TIMERA0 0x10        // Present on all modern AVRs
-#define TIMERA1 0x08        // Not present on any tinyAVR; only on AVR DA and DB-series parts with at least 48 pins and AVR EA-series parts
-#define TIMERB0 0x20        // Present on all modern AVRs
-#define TIMERB1 0x21        // Not present on any tinyAVR 0-series or tinyAVR 1-series parts with 2, 4, or 8k of flash
-#define TIMERB2 0x22        // Not present on any tinyAVR
-#define TIMERB3 0x23        // Not present on any tinyAVR
-#define TIMERB4 0x24        // Not present on any tinyAVR
-#define TIMERB5 0x25        // Not present on any tinyAVR
-#define TIMERD0 0x40        // Present only on tinyAVR 1-series and AVR Dx-series parts.
-#define DACOUT 0x80         // Not a timer, obviously - but used like one by analogWrite()
-#define TIMERRTC 0x90       // Usable for millis only
-#define TIMERRTC_XTAL 0x91  // Usable for millis only
-#define TIMERRTC_XOSC 0x92  // Usable for millis only
-```
+There are a great number of #defines provided to get information on the hardware in use in order to write portable and flexible code in your sketch or particularly liberary code.
 
 ## Bootloader (Optiboot) Support
 A new version of Optiboot (Optiboot_x) now runs on the tinyAVR 0-series, 1-series and 2-series chips.  It's under 512 bytes, and works on all parts supported by this core allowing for a convenient workflow with the same serial connections used for both uploading code and debugging (like a normal Arduino Pro Mini) - except for the detail about not having autoreset unless you disable UPDI (except for the 20 and 24-pin 2-series parts which can put reset on PB4 instead), which is a bit of a bummer.
@@ -733,30 +499,6 @@ This upload method is NOT SUPPORTED by megaTinyCore. If you want to upload via p
 #### Removing Optiboot - 2.2.0 and later
 On 2.2.0 and later, whenever code is uploaded via UPDI ("upload" from non-optiboot board definition), whether or not the device has been bootloaded (like on classic AVRs, "upload using programmer" will trash any bootloader present), `BOOTEND` will be set to match what the code was compiled for; with an optiboot board definition selected, this will result in the first 512b of flash being blank (since we erased any bootloader present), `BOOTEND=2` (512b bootloader section, as application expects), and a working sketch. With a non-optiboot board definition selected, this will result in `BOOTEND=0`, no gap at the start of the sketch, and a working sketch.
 
-#### Removing Optiboot - 2.1.5 and earlier
-Like classic AVRs with hardware bootloader support (like the ATmega328p, and all other ATmega parts older than the 4809/4808), and unlike ATtiny parts without such support (those use "virtual boot" to get bootloader functionality) you must do "burn bootloader" with a non-optiboot part selected in order to reprogram the part normally via UPDI.
-
-#### Background, 2.1.5 and earlier
-Unlike classic AVRs with hardware bootloader support, where not doing "burn bootloader" before switching to uploading via a programmer would work until sketch size reached the very end of the flash (where the chip thinks the bootloader is), on these parts the sketch would fail in strange and bizarre ways if code is compiled with incorrect assumption about the size or presence of a bootloader (`BOOTEND` fuse) - it could be challenging to identify what the cause of the problem was when this happened - you would typically see pieces of behavior that you recognize, but not in an order that made sense. The reason for this is that the `BOOTEND` fuse sets the location of the interrupt vectors. If the application is started at 0x200, as it would for code compiled for use with Optiboot, but `BOOTEND` is set to 0, the hardware would, when an interrupt fired, jump to the blank section of flash before the application, execution would run along the blank flash until it hit the actual sketch... but it would still think it was in an interrupt, whereas in the inverse scenario, the hardware would jump to the middle of the application code instead of the vector table. Both scenarios are (speaking from experience) incredibly confusing when encountered.
-
-In an effort to prevent these scenarios, starting in 2.2.0, whenever the part is programmed via UPDI (ie, any time except when using the bootloader to upload code), all fuses that are "safe" to set (see above) will be set, including `BOOTEND`.
-
-### Autoreset circuit
-If using the bootloader with with the UPDI pin set to reset, this is needed for uploading. It will reset the chip when serial connection is opened like on typical Arduino boards. Do not connect an autoreset circuit to the UPDI pin if it is not set to act as reset, as this will not reset the chip, and will just block UPDI programming. If you are using a 2-series part with at least 20 pins, you can use the "alternate reset" option to make PB4 act as a hardware reset (for Optiboot configurations, this is the default); in this case, follow the below instructions, except use PB4 instead of the reset pin throughout the instructions.
-* 1 Small signal diode (specifics aren't important, as long as it's approximately a standard diode)
-* 1 0.1uF Ceramic Capacitor
-* 1 10k Resistor
-* A tinyAVR 0/1-series part with the bootloader installed on it (you can't do UPDI programming once the autoreset circuit is connected the the UPDI/Reset pin, even if that pin hasn't yet been set to act as reset, as the autoreset circuit will interfere with UPDI programming).
-
-Connect the DTR pin of the serial adapter to one side of a 0.1uF ceramic capacitor.
-Connect the other side of the capacitor to the Reset (formerly UPDI) pin.
-Connect the 10k resistor between Reset and Vcc.
-Connect the diode between Reset and Vcc with the band towards Vcc.
-
-The breakout boards I sell on Tindie have a pair of pads on the back that can be bridged with solder to reversibly connect the on-board autoreset circuit to the UPDI/Reset pin. If you buy a breakout board from me which has the autoreset circuit, but which is not bootloaded, these pads will not have been connected - use a UPDI programmer to put the bootloader on it with your desired settings, then bridge the pads on the back to connect the auto-reset circuit. If you buy a breakout board from me with Optiboot preloaded, it will come set for 20/10/5MHz, BOD set to "sampled" mode with a threshold of 3.7v (for 5v boards) or 2.6v (for 3.3v boards) or disabled entirely (for no-regulator boards), and if you ordered a board with the autoreset circuit, the UPDI pin will be set to work as reset (if you need different settings, please mention this when ordering - boards with optiboot preloaded are bootloaded only when the order is packed, so I can use whatever settings you specify).
-
-Note that, if you have UPDI programming enabled, and desire the convenience of autoresetting to enter serial bootloader to upload sketches, or resetting the chip when entering the serial monitor, you can use the technique described near the top of the readme (under the section about there not being a dedicated reset pin) to make an ersatz reset pin that does a software reset when held low - this will enter the bootloader, so if your sketches set up an ersatz reset pin, you can use that to get into the bootloader (this isn't foolproof, because if your sketch chokes before it properly sets up the interrupt, or you choked and forgot to include the ersatz reset code in the last sketch you uploaded - but in this case you can enter bootloader by power cycling as described above). The autoreset circuit works the same way - just connect the parts as described above, only using your ersatz reset pin instead of the UPDI/Reset pin.
-
 #### A few caveats
 * The bootloader is at the beginning of memory, rather than at the end (where it was on older chips). Thus, the start of the application code must be 512b after the start of the memory - this is handled by the core, but you cannot upload a .hex file compiled with a non-optiboot board definition to an optiboot board definition and vice versa.
 * **If you have set the UPDI/Reset pin to act as a reset pin, you can no longer program the part via UPDI** without using an HV programmer to reset the pin to act as UPDI.
@@ -766,11 +508,35 @@ Note that, if you have UPDI programming enabled, and desire the convenience of a
 * The "size" of the sketch as reported by avrdude during the upload process is 512b larger (the size of the bootloader) than the actual sketch size when a bootloader is in use (though the size reported at the end of the compile process is the correct size). The fact that the bootloader goes at the start of the flash instead of the end confuses avrdude. The size displayed by the IDE when you "verify" a sketch is correct, the value that avrdude displays is not.
 
 ## Guides
+These are being ported from DxCore as time permits. Many of them are identical on the two cores.
+### Reference Material
+#### [Analog Input (ADC) and output (DAC)](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md)
+The API reference for the analog-related functionality that is included in this core beyond the standard Arduino API.
+#### [Digital I/O and enhanced options](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Digital.md)
+The API reference for the digital I/O-related functionality that is included in this core beyond the standard Arduino API, as well as a few digital I/O related features that exist in the hardware which we provide no wrapper around.
+#### [Interrupts](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Interrupts.md)
+Includes a list of all interrupt vectors that can be used, how the flags are cleared (not a substitute for the datasheet - just a very quick reminder), which parts each vector exists on, and and what parts of the core, if any, make use of a vector. It also has general guidance and warnings relating to interrupts their handling, including estimates of real-world interrupt response times.
+#### [Serial](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Serial.md)
+The USARTs (Serial) have some additional features not seen on the official cores.
+#### [SerialUPDI](https://github.com/SpenceKonde/AVR-Guidance/blob/master/UPDI/jtag2updi.md)
+Serial UPDI is our recommended tool for UPDI programming.
+#### [Clock Information](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Clocks.md)
+Supported clock sources and considerations for the use thereof.
+#### [Constants for part/feature/pin/version identification](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Defines.md)
+The core feature defines are used by megaTinyCore and other cores I maintain as well. This also documents what constant values are defined by the core for version identification, testing for features, and dealing with compatibility problems.
+#### [Assembly Listing and Memory Maps](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Export.md)
+Export compiled binary generates both assembly listings and memory maps, in addition to the hex file. The options selected are encoded in the name of the file to help prevent confusion, and make it easy to compare two configurations when you are surprised by the differences between them.
+#### [Reset control and the WDT](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md)
+The sources of reset, and how to handle reset cause flags to ensure clean resets and proper functioning in adcverse events. **Must read for production systems**
+### Other documents
+These guides are older, some are still relevant
+### [Timers and megaTinyCore](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PWMandTimers.md)
+This contains some of the information that would go into Ref_Timers like DxCore has.
 ### [Power Saving techniques and Sleep](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PowerSave.md)
-### [Direct Port Manipulation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/DirectPortManipulation.md)
-### [Pin Interrupts](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PinInterrupts.md)
 ### [Taking over the PWM timer](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/TakingOverTCA0.md)
-### [Advanced ADC features - freerun, window mode, etc](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ADCFreerunAndMore.md)
+This has been recently updated and will likely be turned into a Ref_TCA0.
+### [Advanced ADC features - For 0/1-series only](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ADCFreerunAndMore.md)
+This document describes how (on the 0 and 1 series only) the timer can be taken over and reconfigured, with particular attention to free running mode. The 2-series ADC is different, and it would require changes to reflect those differences.
 
 ## List of Tools sub-menus
 * Tools -> Chip - sets the specific part within a selected family to compile for and upload to.
@@ -784,14 +550,19 @@ Note that, if you have UPDI programming enabled, and desire the convenience of a
   * If it is set to I/O, the pin will act as a normal I/O pin with incredibly weak pin drivers - don't expect it to be able to source or sink more than 0.5mA when set output. If using Optiboot, the bootloader will behave in the same way as when the pin is left as UPDI. To reprogram using an HV programmer, you must use the Power Cycle High Voltage (PCHV) procedure. Consult the documentation for your HV programmer for more information.
   * On the 2-series 20 and 24-pin part, an additional options is available, and the default when using Optiboot with those parts: Alternate Reset; with this option selected the UPDI pin retains it's UPDI functionality, but the PIN_PB4 ceases to be an I/O pin, and instead acts like an external RESET pin! In light of the continued scarcity of HV UPDI programmers within the hobbyist community
 * Tools -> Startup Time - This is the time between reset (from any cause) and the start of code execution. We default to 8ms and recommend using that unless you have a reason not to - that default option is generally fine... In rare cases (such as particularly slow rising power supplies when BOD is not enabled, such that it needs to wait longer than the usual 8ms to have a voltage high enough to function reliably at, or conversely,  when the power supply is known to be fast rising (or BOD is in use) and you have need to respond almost instantly after a reset)
-* Tools -> Voltage Baud Correction - If you are using the internal oscillator and reaaaaally want the UART baud rates to be as close to the target as possible you can set this to the voltage closer to your operating voltage, and it will use the factory programmed internal oscillator error values. Under normal operation, this just wastes flash and is not needed. That is why it now (as of 2.3.0) defaults to Ignore.
+* ~Tools -> Voltage Baud Correction - If you are using the internal oscillator and reaaaaally want the UART baud rates to be as close to the target as possible you can set this to the voltage closer to your operating voltage, and it will use the factory programmed internal oscillator error values. Under normal operation, this just wastes flash and is not needed. That is why it now (as of 2.3.0) defaults to Ignore~. Removed from 2.5.0
+* Tools -> `printf()` implementation - The default option can be swapped for a lighter weight version that omits most functionality to save a tiny amount of flash, or for a full implementation (which allows printing floats with it) at the cost of about 1k extra. Note that if non-default options are selected, the implementation is always included in the binary, and will take space even if not called. This applies to everywhere that format strings are used, including Serial.printf().
+* Tools -> attachInterrupt Mode - Choose from 3 options - the new, enabled on all pins always (like the old one), Manual, or the old implementation in case of regressions in the new implementation. When in Manual mode, You must call `attachPortAEnable()` (replace A with the letter of the port) before attaching the interrupt. This allows attachInterrupt to be used without precluding any use of a manually defined interrupt (which is always much faster to respond. Basically any time you "attach" an interrupt, the performance is much worse. )
+* Tools -> Wire Mode  - In the past, you have only had the option of using Wire as a master, or a slave. Now the same interface can be used for both at the same time, either on the same pins, or in dual mode. To use simultaneous master or slave, or to enable a second Wire interface, the approipriate option must be selected from tools -> Wire Mode.
 * Tools -> millis()/micros() - If set to enable (default), millis(), micros() and pulseInLong() will be available. If set to disable, these will not be available, Serial methods which take a timeout as an argument will not have an accurate timeout (though the actual time will be proportional to the timeout supplied); delay will still work. Disabling millis() and micros() saves flash, and eliminates the millis interrupt every 1-2ms; this is especially useful on the 8-pin parts which are extremely limited in flash. Depending on the part, options to force millis/micros onto specific timers are available. A #error will be shown upon compile if a specific timer is chosen but that timer does not exist on the part in question (as the 0-series parts have fewer timers, but run from the same variant). If RTC is selected, micros() and pulseInLong() will not be available - only millis() will be.
 * Tools -> UART for Bootloader - If using Optiboot bootloader, select which set of pins you want to use for serial uploads. After making a selection, you must connect a UPDI programmer and do tools -> Burn Bootloader to upload the correct bootloader for the selected option.
 
-## Warning: Direct Register Manipulation
+## Warnings and Caveats
+
+### Direct Register Manipulation
 If you are manually manipulating registers controlling a peripheral, you should not count on the behavior of API functions that relate to the same peripheral, nor should you assume that calling said API functions will not adversely impact the rest of your application. For example, if you "take over" TCA0, you should not expect that using analogWrite() - except on the two pins on the 20/24-pin parts controlled by TCD0 - will work for generating PWM; indeed you should expect that it will break whatever you are doing with TCA0.
 
-## Warning: I2C **requires** external pullup resistors
+### I2C **requires** external pullup resistors
 Earlier versions of megaTinyCore enabled the internal pullup resistors on the I2C pins. This is no longer done; they are miles away from being strong enough to meet the I2C specifications - it was decided that it is preferably for it to fail consistently without external ones than to work under simple conditions with the internal ones, yet fail under more demanding ones (more devices, longer wires, etc).
 
 ## Differences in Behavior between megaTinyCore and Official Cores
@@ -831,8 +602,8 @@ The earlier versions of the avr-gcc toolchain contained several issues relevant 
 * Sometimes a sketch which is too big to fit will, instead of generating a message saying that, result in the error: 'relocation truncated to fit: R_AVR_13_PCREL against symbol tablejump2'.
 * There is a bug in the `<avr/eeprom.h>` library's eeprom_is_ready() macro - it uses names for registers from the XMEGA family of parts (under the hood, these chips actually have an XMEGA core!). Attempting to use that macro will generate a error stating that `'NVM_STATUS' was not declared in this scope`. This has been corrected in current compiler packages; if you get this error, update the official AVR board package, upgrade to Arduino 1.8.13, or install megaTinyCore using board manager.
 
-## Very low-level differences
-There are two classes of significant low level architectural differences - the improved instruction set, and the unified memory address space.
+## Very low-level differences between Classic and Modern AVRs
+There are two classes of significant low level architectural differences (aside from the vastly improved peripherals) - the improved instruction set, and the unified memory address space.
 
 ### Instruction Set (AVRe/AVRe+ vs AVRxt)
 The classic AVR devices all use the venerable `AVRe` (ATtiny) or `AVRe+` (ATmega) instruction set (`AVRe+` differs from `AVRe` in that it has hardware multiplication and supports devices with more than 64k of flash). Modern AVR devices (with the exception of ones with minuscule flash and memory, such as the ATtiny10, which use the reduced core `AVRrc`) all use  the latest iteration of the AVR instruction set, `AVRxt`. `AVRxt` has much in common with `AVRxm` (used in XMega parts) in terms of instruction timing - and in the few places where they differ, `AVRxt` is faster (SBIC, as well as LDD, and LD with predecrement, are all 1 clock slower on `AVRxm` vs `AVRxt` or `AVRe`), however `AVRxt` doesn't have the single-instruction-two-clock read-and-write instructions for memory access `LAT`, `LAC`, `LAS`, and `XCH`. The difference between subspecies of the AVR instruction set is unimportant for 99.9% of users - but if you happen to be working with hand-tuned assembly (or are using a library that does so, and are wondering why the timing is messed up), the changes are:
@@ -844,7 +615,7 @@ The classic AVR devices all use the venerable `AVRe` (ATtiny) or `AVRe+` (ATmega
 * CALL is 3 cycles instead of 4 on classic AVR
 * ST and STD is 1 cycle vs 2 on classic AVR (STS is still 2 - as any two word instruction must be)
 
-As you can see, everything that involves writing to the SRAM is faster now; it would appear that any time it is writing to a location based on one of the pointer registers or the stack pointer, it's a single cycle. This has the knockon effect of making all the variants of call faster too, since they have to put the return address into the stack. It would appear that, other than the improvement to SBI/CBI, all the differences between AVRxm, AVRxt, and AVRe+ are related to how it interacts with the memory. I can't say I've ever felt like LAT, LAC, or LAS would be terribly useful as they are described in the instruction set manual - those take a register and the address pointed to by the Z register, and load the contents of the specified address, and toggle, set or clear in that memory address the bits that were set to begin with in the register. If that worked on special function registers, it would be a very useful instruction. But it says they only work on SRAM... so not as much of a loss. `XCH` is more obviously useful than the others, but all 4 of them comr with the need to set up the Z register... which in many cases would take out the most exciting use cases.
+As you can see, everything that involves writing to the SRAM is faster now; it would appear that any time it is writing to a location based on one of the pointer registers or the stack pointer, it's a single cycle. All the other improvements except CBI and SBI can be viewed as a consequence of that. Of course the variants of call are faster, they have to put the return address into the stack. I can't say I've ever felt like LAT, LAC, or LAS would be terribly useful as they are described in the instruction set manual - those take a register and the address pointed to by the Z register, and load the contents of the specified address, and toggle, set or clear in that memory address the bits that were set to begin with in the register. If that worked on special function registers, it would be a very useful instruction (taking PERIPHERAL.REGISTER |= SOME_BIT_bm; from a 5 clock, non-atomic operation to a 2 clock atomic one! But it says they only work on SRAM... so not as much of a loss. `XCH` is more obviously useful than the others, but all 4 of them come with the need to set up the Z register... which in many cases would take long enough that it wouldn't be a notable improvement.
 
 Note that the improvement to PUSH can make interrupts respond significantly faster (since they have to push the contents of registers onto the stack at the beginning of the ISR), though the corresponding POP's at the end aren't any faster. The change with ST impacted tinyNeoPixel. Prior to my realizing this, the library worked on SK6812 LEDs (which happened to be what I tested with) at 16/20 MHz, but not real WS2812's. However, once I discovered this, I was able to leverage it to use a single tinyNeoPixel library instead of a different one for each port like was needed with ATTinyCore (for 8 MHz, they need to use the single cycle OUT on classic AVRs to meet timing requirements, the two cycle ST was just too slow; hence the port had to be known at compile time, or there must be one copy of the routine for each port, an extravagance that the ATtiny parts cannot afford. But with single cycle ST, that issue vanished).
 

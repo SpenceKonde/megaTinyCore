@@ -427,6 +427,11 @@ uint8_t UartClass::_pins_to_swap(uint8_t port_num, uint8_t tx_pin, uint8_t rx_pi
   }
 }
 
+uint8_t UartClass::getPin(uint8_t pin) {
+  if (pin >3) return NOT_A_PIN;
+  return (_usart_pins[_module_number + _pin_set][pin]);
+}
+
 bool UartClass::swap(uint8_t newmux) {
   #if !(MEGATINYCORE_SERIES == 2 && defined(__ATtinyxy4__))
     // it's either a 0/1-series: They have options of 0 and 1.

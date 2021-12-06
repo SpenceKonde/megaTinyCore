@@ -5,7 +5,7 @@ Use of advanced functionality of these parts frequenctly requires use of interru
 As the name implies, an interrupt is something that can cause the currently running code to stop in it's tracks. The location of the instruction it was about to execute is pushed onto the stack, and it then jumps to a specific "interrupt vector" near the start of the flash. This in turn is a jump (or rjump) to the Interruipt Service Routine (ISR). This runs, and then returns to the code that was interrupted through a `RETI` instruction. Almost every peripheral can generate at least one interrupt, and most can generate several. See the datasheet for more information on what conditions they can be generated in.
 
 ## Creating an ISR
-There are two ways that you may end up writing an ISR, but most of the same considerations apply. The first most Arduino users will see is an `attachInterrupt()` function or method - these take a function name as an argument. Somewhere in the core or library is the ISR itself, which checks if you've attached one, and calls it if so. This is simpler - where it's an option - though the performance suffers profoundly as there's another layer of calls and returns, and a larger minimum number of registers that the ISR will have to save and restore (see the notes below). We recommend avoiding `attachInterrupt()` type calls when possible. For pin interrupts, even after the 1.3.7 rewrite, `attachInterrupt(pin, isr)` interrupts will take 50-100 clock cycles before the ISR even starts executing, and has a total overhead of around 150 clock cycles. This method is easy, but the slow response time limits its usefulness. This is inherrent to the any system wherein an arbitrary function pointer is called from an ISR (about half the overhead) and the fact that the API permits a separate function on each pin within a port and has to check for null pointers make it that much worse.
+There are two ways that you may end up writing an ISR, but most of the same considerations apply. The first most Arduino users will see is an `attachInterrupt()` function or method - these take a function name as an argument. Somewhere in the core or library is the ISR itself, which checks if you've attached one, and calls it if so. This is simpler - where it's an option - though the performance suffers profoundly. While the function call itself takes only 7-8 clock cycles including the return - but the overhead it imposes if much worse. An interrupt can be called at any time. Thus, it cannot make any assumptions about working registers that are or are not available. It has to assume everything is used, and save and restore each one (by `push`ing it onto the stack at the start, and `pop`ing it back at the end; even r0 (tempreg) and r1 (the known zero). The status register ALSO needs to be saved and restored. These happen in the "prologue" and "epilogue" Any ISR (except for one declared naked) will always push r1 and r0 onto the stack, load the sreg into r0 and push that onto the stack, and clear r1 in the prologue, and undo those in the "epilogue". If you your interrupt accesses additional variables, which it probably will, working registers needed to fit them are also saved and restored (in the prologue and epilogue, not at the time they're used.  If you call a function from within the ISR, and it is either defined at runtime (ex, via attachInterrupt), or is called from multiple places, such that the compiler doesn't inline it, it is required to assume that **all** registers that a function is allowed to use without saving and restoring registers are used. That gives an overhead of something like 68 clock cycles, just because a function is called. something like attachInterrupt also has overhead where it looks at the flags and then sees which of the many interrupts which may have been attached it should call. Don't forget that this takes flash as well, and the overhead of 40-50 bytes per interrupt adds up.
 
 The other way is directly - it's as if you are declaring a function, but instead of the name, you use the ISR() macro with the vector name as it's argument; these can have overhead as low as 21 clock cycles, split approximately evenly between before and after:
 
@@ -15,88 +15,53 @@ ISR(CCL_CCL_vect) {
 }
 ```
 
-That 21 clock overhead figure is a best-case value - it can be worse (worst case possible is 68 clocks - 26 before and 42 after for an ISR that uses every call-used working register, like the attachInterrupt case forces it to assume). This is in to any register shuffling overhead that would be imposed for very register-intensive code in a normal function call; well written interrupts are short and sweet and will be closer to 21 than 68.
+That 21 clock overhead figure is a best-case value - it can be worse worst case possible is 68 clocks more than the same code in another context - 26 before and 42 after (It is actually quite easy to end up in that worst case - just call a function, and you're there). Well written interrupts are short and sweet and will have overhead closer to 21 than 68, while interrupts called with attachInterrupt-type methods will have an overhead of hundreds of clock cycles. The improved version of attachInterrupt in this core is somewhat less bad than the standard one, with overhead as low as around 100 clocks if the interrupt is set on bit 0 of the port (the further up in the port you go, the higher the overhead, because it checks them sequentially).
 
 ## Only one definition per vector
-You cannot define the same vector as two different things. This is most often a problem with the default settings for `attachInterrupt()` - to mimic the standard API, by default, we permit attach interrupt on any pin. Even if no pin in a port is attached to, it will still always take over every port interrupt vector. There is a menu option added to 1.3.7 to select between 3 versions of `attachInterrupt()` - the new version (default), the old one (in case there is a new bug introduced by this), and manual. In manual mode you can restrict it to specific ports, such that it leaves other port vectors unused. You must call `attachPortAEnable()` (replace A with the letter of the port) before attaching the interrupt. The main point of this is that (in addition to saving an amount of flash that doesn't much matter on the Dx-series) `attachInterrupt()` on one pin (called by a library, say) will not glom onto every single port's pin interrupt vectors so you can't manually define any. The interrupts are still just as slow (it's inherrent to calling a function by pointer from an ISR - and low-numbered pins are faster to start executing than high numbered ones. The method to enable may change - I had hoped that I could detect which pins were used, but I couldn't get the function chose which ports to enable to not count as "referencing" those ports, and hence pull in the ISR. I am not happy with it, but "can't use any pin interrupts except through `attachInterrupt()` if using a library that uses `attachInterrupt()`  is significantly worse.
+You cannot define the same vector as two different things. This is most often a problem with the default settings for `attachInterrupt()` - to mimic the standard API, by default, we permit attach interrupt on any pin. Even if no pin in a port is attached to, it will still always take over every port interrupt vector. There is a menu option added to 1.3.7 to select between 3 versions of `attachInterrupt()` - the new version (default), the old one (in case there is a new bug introduced by this), and manual. In manual mode you can restrict it to specific ports, such that it leaves other port vectors unused. You must call `attachPortAEnable()` (replace A with the letter of the port) before attaching the interrupt. The main point of this is that (in addition to saving flash) `attachInterrupt()` on one pin (called by a library, say) will not glom onto every single port's pin interrupt vectors so you can't manually define any. The interrupts are still just as slow (it's inherrent to calling a function by pointer from an ISR - and low-numbered pins are faster to start executing than high numbered ones. The method to enable may change - I had hoped that I could detect which pins were used, but I couldn't get the function chose which ports to enable to not count as "referencing" those ports, and hence pull in the ISR. I am not happy with it, but "can't use any pin interrupts except through `attachInterrupt()` if using a library that uses `attachInterrupt()`  is significantly worse.
 
 ## List of interrupt vector names
 If there is a list of the names defined for the interrupt vectors is present somewhere in the datasheet, I was never able to find it. These are the possible names for interrupt vectors on the parts supported by megaTinyCore. Not all parts will have all interrupts listed below (interrupts associated with hardware not present on a chip won't exist there). An ISR is created with the `ISR()` macro.
 
-**WARNING** If you misspell the name of a vector, you will get a compiler warning BUT NOT AN ERROR! Hence, you can upload the bad code... in this case the chip will freeze the instant the ISR you thought you assigned is called, as it jumps to BAD_ISR, which in turn jumps to the reset vector... but since the reti instruction is never executed, it still thinks its in an interrupt. If the recommended procedures in the [reset reference](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Reset.md) were followed, this will be detected through the absence of a new reset flag, triggering a software reset; Otherwise, the code will start running, with interrupts "enabled" but not actually occurring, which usually but not always results in a hang or bootloop, but could potentially do something more subtly wrong. Encountering this (and the annoying lack of a nice list anywhere outside of the io.h) was the impetus for creating this list.
+**WARNING** If you misspell the name of a vector, you will get a compiler warning BUT NOT AN ERROR! Hence, you can upload the bad code... in this case the chip will freeze the instant the ISR you thought you assigned is called, as it jumps to BAD_ISR, which in turn jumps to the reset vector... but since the reti instruction is never executed, it still thinks its in an interrupt. If the recommended procedures in the [reset reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md) were followed, this will be detected through the absence of a new reset flag, triggering a software reset; Otherwise, the code will start running, with interrupts "enabled" but not actually occurring, which usually but not always results in a hang or bootloop, but could potentially do something more subtly wrong. Encountering this (and the annoying lack of a nice list anywhere outside of the io.h) was the impetus for creating this list.
 
-| Vector Name         | DA | DB | DD | Cleared By       | Notes                                               | Used by              |
-|---------------------|----|----|----|------------------|-----------------------------------------------------|----------------------|
-| `AC0_AC_vect`       | XX | XX | XX | Manually         |                                                     | Comparator.h library |
-| `AC1_AC_vect`       | XX | XX |    | Manually         |                                                     | Comparator.h library |
-| `AC2_AC_vect`       | XX | XX |    | Manually         |                                                     | Comparator.h library |
-| `ADC0_RESRDY_vect`  | XX | XX | XX | Read result reg  |                                                     |                      |
-| `ADC0_WCMP_vect`    | XX | XX | XX | Manually         | ADC Window Comparator interrupt.                    |                      |
-| `BOD_VLM_vect`      | XX | XX | XX | Manually(?)      |                                                     |                      |
-| `CCL_CCL_vect`      | XX | XX | XX | Manually         | Check flags to see which triggered, like with PORT  | Logic.h library      |
-| `CLKCTRL_CFD_vect`  |    | XX | XX | Manually         | Called when ext. clock fails, used by core for blink| For ext. clock/xtal  |
-| `MVIO_MVIO_vect`    |    | XX | XX | Manually         | Called when MVIO enables or disables (due to vDDIO2)|                      |
-| `NMI_vect`          | XX | XX | XX | Reset            | Can only be triggered by CRC failure.               |                      |
-| `NVMCTRL_EE_vect`   | XX | XX | XX | Write(?)         | Unclear if can clear, or is like DRE on USARTs      |                      |
-| `PORTA_PORT_vect`   | XX | XX | XX | Manually         |                                                     | attachInterrupt()    |
-| `PORTB_PORT_vect`   |  X |  X |    | Manually         |                                                     | attachInterrupt()    |
-| `PORTC_PORT_vect`   | XX | XX | XX | Manually         |                                                     | attachInterrupt()    |
-| `PORTD_PORT_vect`   | XX | XX | XX | Manually         |                                                     | attachInterrupt()    |
-| `PORTE_PORT_vect`   |  X |  X |    | Manually         |                                                     | attachInterrupt()    |
-| `PORTF_PORT_vect`   | XX | XX | XX | Manually         |                                                     | attachInterrupt()    |
-| `PORTG_PORT_vect`   |  X |  X |    | Manually         |                                                     | attachInterrupt()    |
-| `PTC_PTC_vect`      | XX |    |    | Handled by QTouch| All aspects of PTC only handled by QTouch library   |                      |
-| `RTC_CNT_vect`      | XX | XX | XX | Manually         | Two possible flags, CNT and OVF                     |                      |
-| `RTC_PIT_vect`      | XX | XX | XX | Manually         | Time to first PIT int is random from 0 to period    |                      |
-| `SPI0_INT_vect`     | XX | XX | XX | Depends on mode  | 2 or 4 flags, some autoclear, some don't            |                      |
-| `SPI1_INT_vect`     | XX | XX | XX | Depends on mode  | 2 or 4 flags, some autoclear, some don't            |                      |
-| `TCA0_CMP0_vect`    | XX | XX | XX | Manually         | Split Mode: `TCA0_LCMP0_vect`                       |                      |
-| `TCA0_CMP1_vect`    | XX | XX | XX | Manually         | Split Mode: `TCA0_LCMP1_vect`                       |                      |
-| `TCA0_CMP2_vect`    | XX | XX | XX | Manually         | Split Mode: `TCA0_LCMP2_vect`                       |                      |
-| `TCA0_HUNF_vect`    | XX | XX | XX | Manually         | Split Mode only                                     | If used for millis   |
-| `TCA0_OVF_vect`     | XX | XX | XX | Manually         | Split Mode: `TCA0_LUNF_vect`                        |                      |
-| `TCA1_CMP0_vect`    |  X |  X |    | Manually         | Split Mode: `TCA1_LCMP0_vect`                       |                      |
-| `TCA1_CMP1_vect`    |  X |  X |    | Manually         | Split Mode: `TCA1_LCMP1_vect`                       |                      |
-| `TCA1_CMP2_vect`    |  X |  X |    | Manually         | Split Mode: `TCA1_LCMP2_vect`                       |                      |
-| `TCA1_HUNF_vect`    |  X |  X |    | Manually         | Split Mode only                                     | If used for millis   |
-| `TCA1_OVF_vect`     |  X |  X |    | Manually         | Split Mode: `TCA1_LUNF_vect`                        |                      |
-| `TCB0_INT_vect`     | XX | XX | XX | Depends on mode  | Two flags: CMP on read ccmp in capt mode, OVF Manual| If used for millis   |
-| `TCB1_INT_vect`     | XX | XX | XX | Depends on mode  | Two flags: CMP on read ccmp in capt mode, OVF Manual| If used for millis   |
-| `TCB2_INT_vect`     | XX | XX |  X | Depends on mode  | Two flags: CMP on read ccmp in capt mode, OVF Manual| If used for millis   |
-| `TCB3_INT_vect`     |  X |  X |    | Depends on mode  | Two flags: CMP on read ccmp in capt mode, OVF Manual| If used for millis   |
-| `TCB4_INT_vect`     |  X |  X |    | Depends on mode  | Two flags: CMP on read ccmp in capt mode, OVF Manual| If used for millis   |
-| `TCD0_OVF_vect`     | XX | XX | XX | Manually         |                                                     |                      |
-| `TCD0_TRIG_vect`    | XX | XX | XX | Manually         |                                                     |                      |
-| `TWI0_TWIM_vect`    | XX | XX | XX | Usually Auto     | See datasheet for list of what clears it            | Wire.h library       |
-| `TWI0_TWIS_vect`    | XX | XX | XX | Usually Auto     | See datasheet for list of what clears it            | Wire.h library       |
-| `TWI1_TWIM_vect`    | XX | XX |    | Usually Auto     | See datasheet for list of what clears it            | Wire.h library       |
-| `TWI1_TWIS_vect`    | XX | XX |    | Usually Auto     | See datasheet for list of what clears it            | Wire.h library       |
-| `USART0_DRE_vect`   | XX | XX | XX | Write, not manual| ISR must write data or disable interrupt            | Serial class         |
-| `USART0_RXC_vect`   | XX | XX | XX | RXCIF, on read   | Error flags, if enabled, only clear manually        | Serial class         |
-| `USART0_TXC_vect`   | XX | XX | XX | Manually         | Often polled and not cleared until next write       |                      |
-| `USART1_DRE_vect`   | XX | XX | XX | Write, not manual| ISR must write data or disable interrupt            | Serial class         |
-| `USART1_RXC_vect`   | XX | XX | XX | RXCIF, on read   | Error flags, if enabled, only clear manually        | Serial class         |
-| `USART1_TXC_vect`   | XX | XX | XX | Manually         | Often polled and not cleared until next write       |                      |
-| `USART2_DRE_vect`   | XX | XX |    | Write, not manual| ISR must write data or disable interrupt            | Serial class         |
-| `USART2_RXC_vect`   | XX | XX |    | RXCIF, on read   | Error flags, if enabled, only clear manually        | Serial class         |
-| `USART2_TXC_vect`   | XX | XX |    | Manually         | Often polled and not cleared until next write       |                      |
-| `USART3_DRE_vect`   |  X |  X |    | Write, not manual| ISR must write data or disable interrupt            | Serial class         |
-| `USART3_RXC_vect`   |  X |  X |    | RXCIF, on read   | Error flags, if enabled, only clear manually        | Serial class         |
-| `USART3_TXC_vect`   |  X |  X |    | Manually         | Often polled and not cleared until next write       |                      |
-| `USART4_DRE_vect`   |  X |  X |    | Write, not manual| ISR must write data or disable interrupt            | Serial class         |
-| `USART4_RXC_vect`   |  X |  X |    | RXCIF, on read   | Error flags, if enabled, only clear manually        | Serial class         |
-| `USART4_TXC_vect`   |  X |  X |    | Manually         | Often polled and not cleared until next write       |                      |
-| `USART5_DRE_vect`   |  X |  X |    | Write, not manual| ISR must write data or disable interrupt            | Serial class         |
-| `USART5_RXC_vect`   |  X |  X |    | RXCIF, on read   | Error flags, if enabled, only clear manually        | Serial class         |
-| `USART5_TXC_vect`   |  X |  X |    | Manually         | Often polled and not cleared until next write       |                      |
-| `ZCD0_ZCD_vect`     | XX | XX |    | Manually         |                                                     | ZCD.h library        |
-| `ZCD1_ZCD_vect`     |  X |  X |    | Manually         |                                                     | ZCD.h library        |
-| `ZCD2_ZCD_vect`     |  X |  X |    | Manually         |                                                     | ZCD.h library        |
-| `ZCD3_ZCD_vect`     |    |    | XX | Manually         | DD-series has no ZCD0-2, and instead has ZCD3       | ZCD.h library        |
+| Vector Name       | 0 | 1 | 2 | Flag Cleared on | Notes                                       |
+|-------------------|---|---|---|-----------------|---------------------------------------------|
+| AC0_AC_vect       | X | X | X | Manually        |                                             |
+| AC1_AC_vect       |   | * |   | Manually        | 1-series with 16k or 32k flash only         |
+| AC2_AC_vect       |   | * |   | Manually        | 1-series with 16k or 32k flash only         |
+| ADC0_ERROR_vect   |   |   | X | Manually        | Multiple flags for different errors         |
+| ADC0_SAMPRDY_vect |   |   | X | Read sample reg | WCOMP uses SAMPRDY or RESRDY on 2-series    |
+| ADC0_RESRDY_vect  | X | X | X | Read result reg |                                             |
+| ADC0_WCOMP_vect   | X | X |   | Manually        | Window Comparator on 0/1-series             |
+| ADC1_RESRDY_vect  |   | * |   | Read result reg | 1-series with 16k or 32k flash only         |
+| ADC1_WCOMP_vect   |   | * |   | Manually        | 1-series with 16k or 32k flash only         |
+| BOD_VLM_vect      | X | X | X | Manually(?)     |                                             |
+| CCL_CCL_vect      |   |   | X | Manually        | Shared by whole CCL. Not present on 0/1     |
+| CRCSCAN_NMI_vect  | X | X | X | Reset           | NMI guarantees device stopped if CRC fails  |
+| NVMCTRL_EE_vect   | X | X | X | Write/Manually  | ISR must write data or disable interrupt    |
+| PORTA_PORT_vect   | X | X | X | Manually        |                                             |
+| PORTB_PORT_vect   | X | X | X | Manually        | Not present on 8-pin parts                  |
+| PORTC_PORT_vect   | X | X | X | Manually        | Not present on 8 or 14-pin parts            |
+| RTC_CNT_vect      | X | X | X | Manually        | Two possible flags, CNT and OVF             |
+| RTC_PIT_vect      | X | X | X | Manually        |                                             |
+| SPI0_INT_vect     | X | X | X | Depends on mode | 2 or 5 flags, some autoclear, some dont     |
+| TCA0_CMP0_vect    | X | X | X | Manually        | Alias: TCA0_LCMP0_vect                      |
+| TCA0_CMP1_vect    | X | X | X | Manually        | Alias: TCA0_LCMP1_vect                      |
+| TCA0_CMP2_vect    | X | X | X | Manually        | Alias: TCA0_LCMP2_vect                      |
+| TCA0_HUNF_vect    | X | X | X | Manually        |                                             |
+| TCA0_OVF_vect     | X | X | X | Manually        | Alias: TCA0_LUNF_vect                       |
+| TCB0_INT_vect     | X | X | X | Depends on mode | Two flags on 2 series only. Behavior depends on mode, see datasheet |
+| TCB1_INT_vect     |   | * | X | Depends on mode | 1-series with 16k or 32k flash or 2-series  |
+| TCD0_OVF_vect     |   | X |   | Manually        |                                             |
+| TCD0_TRIG_vect    |   | X |   | Manually        |                                             |
+| TWI0_TWIM_vect    | X | X | X | Usually Auto    | See datasheet, flag clearing is complicated |
+| TWI0_TWIS_vect    | X | X | X | Usually Auto    | See datasheet, flag clearing is complicated |
+| USART0_DRE_vect   | X | X | X | Write/Disable   | ISR must write data or disable interrupt    |
+| USART0_RXC_vect   | X | X | X | RXCIF, on read  | Error flags, if enabled, only cleared manually |
+| USART0_TXC_vect   | X | X | X | Manually        | Often used without the interrupt enabled    |
 
-`XX` indicates available on at least three of the four pincounts that series is available in.
-
-`X` indicates available on only one or two of the four sizes that series is available in (ex: TCA1 is only on 48 and 64 pin DA or DB)
+`*` - There are two classes of 1-series - the ones with 16k or more of flash, and the ones with less. These are only available on the larger ones, because they operate on a peripheral that only exists there.
 
 ## Why clearing flags is so complicated
 Almost all flags *can* be manually cleared - the ones that can be cleared automatically generally do that to be helpful:
@@ -154,7 +119,7 @@ ISR(PORTA_PORT_vect) {
 **Also correct**
 ```c++
 // This could be made into an else-if in order to let other interrupts fire if your ISR is slow, and is
-// likely to be called often with multiple flags set - that case goes particularly  well with round-robin
+// likely to be called often with multiple flags set - that case goes particularly well with round-robin
 // interrupt scheduling - but if you're in a situation where you need this, you should be concerned about
 // larger scale probems with your code - you're either generating way too many interrupts, or they are
 // far too slow...
@@ -209,7 +174,7 @@ So as described above, execution reaches the ISR within 6 system clock cycles (s
 One of the worst things is calling a function that won't end up being inlined or can't be optimized - like the "attachInterrupt" functions - in this case, the prologue + jump is minimum 24 clocks, and the epilogue 39, as it must assume the function uses all of the "call used" registers and save and restore them all.
 
 ### ISRs benefit the most from using the GPRs
-If you're desperate for speed - or space - and if all you are doing is setting a flag, you can use one of the general purpose registers: GPR.GPR0/1/2/3 - the only place the core uses any of those is when using a bootloader, where the reset cause is stashed in `GPR.GPR0` before the reset flags are cleared and the sketch is run (you can clear it in setup: `GPR.GPR0 = 0`. To get the full benefit, use single-bit operations - they're in the low I/O space. So something like `GPR.GPR1 |= (1 << n)` where n is known at compile time, is a single clock operation which consumes no registers - it gets turned into a `sbi` - set bit index, with the register and bit being encoded by the opcode itself. The same goes for `GPR.GPR1 &= ~(1 << n)`  - these are also atomic (an interrupt couldn't interrupt them like it could a read-modify-write). There are analogous instructions that make things like `if(GPR.GPR1 & (1 << n))` and `if (!(GPR.GPR1 & (1 << n))` lightning fast tests. These bits are only magic when manipulating a single bit, and the bit and GPR is known at compile time: `GPR.GPR1 |= 3` is a 3 clock non-atomic read-modify-write operation which needs a working register to store the intermediate value in while modifying it, which is just slightly faster than `MyGlobalByte |= 3`, which is a 6-clock non-atomic read-modify-write using 1 working register for the intermediate. `GPR |= 1; GPR |= 2;` is 2 clocks, each of which is an atomic operation which does not require a register to store any intermediate values. Note that atomicity is only a concern for code running outside the ISR, or code within a level 0 priority ISR when a level 1 priority ISR uses the same variable or hardware register.
+If you're desperate for speed - or space - and if all you are doing is setting a flag, you can use one of the general purpose registers: GPR.GPR0/1/2/3 - the only place the core uses any of those is at the very beginning of execution, when the reset cause is stashed in `GPIOR0` before the reset flags are cleared and the sketch is run (that way you can see what the reset cause was - the core does not use it after that) To get the full benefit, use single-bit operations - they're in the low I/O space. So something like `GPIOR1 |= (1 << n)` where n is known at compile time, is a single clock operation which consumes no registers - it gets turned into a `sbi` - set bit index, with the register and bit being encoded by the opcode itself. The same goes for `GPIOR &= ~(1 << n)`  - these are also atomic (an interrupt couldn't interrupt them like it could a read-modify-write). There are analogous instructions that make things like `if(GPIOR1 & (1 << n))` and `if (!(GPIOR1 & (1 << n))` lightning fast. GPIOR's are only magic when manipulating a single bit, and the bit and must be known at compile time: `GPIOR1 |= 3` is a 3 clock non-atomic read-modify-write operation which needs a working register to store the intermediate value in while modifying it, which is just slightly faster than `MyGlobalByte |= 3`, which is a 6-clock non-atomic read-modify-write using 1 working register for the intermediate. `GPIOR1 |= 1; GPIOR1 |= 2;` is 2 clocks, each of which is an atomic operation which does not require a register to store any intermediate values. Note that atomicity is only a concern for code running outside the ISR, or code within a level 0 priority ISR when some other ISR is configured with level 1 priority.
 
 ## Naked ISRs
 An advanced technique. This requires that either your ISR be written entirely in assembly, with your own prologue and epilogue hand optimized for this use case, or that you know for a fact that the tiny piece of C code you use doesn't change `SREG` or use any working registers.
@@ -219,41 +184,54 @@ In a naked ISR, all the compiler does for you is tell the linker to that this co
 /* OK - results in an sbi that neither changes SREG nor uses a register*/
 ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 {
-  GPR.GPR1 |= (1 << 0);
+  GPIOR1 |= (1 << 0);
   reti();
 }
 /* OK - digitalWriteFast() where both arguments are constant maps directly to sbi*/
 ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 {
-  digitalWriteFast(PIN_PB4,HIGH);
+  digitalWriteFast(PIN_PB4, HIGH);
+  reti();
+}
+/* NO! it will need a register for MyGlobalByte*/
+ISR(PERIPHERAL_INT_vect, ISR_NAKED)
+{
+  digitalWriteFast(PIN_PB4, MyGlobalByte);
   reti();
 }
 /* NO! setting multiple bit requires a register */
 ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 {
-  GPR.GPR1 |= 3;
+  GPIOR1 |= 3;
+  reti();
+}
+/* OK - the separate writes is okay, neither require a register. */
+ISR(PERIPHERAL_INT_vect, ISR_NAKED)
+{
+  GPIOR1 |= 1;
+  GPIOR1 |= 2;
   reti();
 }
 /* NO! This is a read-modify-write, AND the addition changes SREG. */
 ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 {
-  GPR.GPR1++;
+  GPIOR1++;
   reti();
 }
 /* NO! You must reti(), or it will continue on and execute whatever happens to be after it in the flash (potentially anything) */
 ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 {
-  GPR.GPR1 |= (1 << 0);
+  GPIOR1 |= (1 << 0);
 }
 /* OK - turns into sbic (Skip-next-instruction-if-Bit-in-I/O-is-Clear), sbi  */
 ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 {
-  if (GPR.GPR0 & (1 << 0))
-    GPR.GPR1 |= (1 << 0);
+  if (GPIOR1 & (1 << 0))
+    GPIOR1 |= (1 << 0);
   reti();
 }
-/* Anything more compllicated written in C - even when it can be safe - should be verified by reading the assembly listing.
+/* Anything more compllicated written in C - even when it could be safe - should be verified by reading the assembly listing.
  * The compiler does not "know" that it has to avoid using any working registers or changing the SREG.
- * ISR_NAKED is really meant to run hand-optimized assembly, rather than relying on the compiler not doing anything dumb
+ * ISR_NAKED is really meant to run hand-optimized assembly, rather than relying on the compiler not doing anything dumb.
  */
 ```

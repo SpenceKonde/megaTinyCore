@@ -92,6 +92,20 @@
   #define SERIAL_MSPI_MSB_FIRST_PHASE  (SERIAL_MODE_MSPI | SERIAL_MSPI_PHASE | SERIAL_MSPI_MSB)
   #define SERIAL_MSPI_LSB_FIRST_PHASE  (SERIAL_MODE_MSPI | SERIAL_MSPI_PHASE | SERIAL_MSPI_LSB)
 
+/* helper options for syncBegin() and mspiBegin() */
+  #define MSPIBEGIN_INVERT          (PIN_DIR_SET|PIN_INVERT_SET)
+  #define MSPIBEGIN_NORMAL          (PIN_DIR_SET|PIN_INVERT_CLR)
+  #define SYNCBEGIN_INVERT_MASTER   (PIN_DIR_SET|PIN_INVERT_SET)
+  #define SYNCBEGIN_NORMAL_MASTER   (PIN_DIR_SET|PIN_INVERT_CLR)
+  #define SYNCBEGIN_INVERT_SLAVE    (PIN_DIR_CLR|PIN_INVERT_SET)
+  #define SYNCBEGIN_NORMAL_SLAVE    (PIN_DIR_CLR|PIN_INVERT_CLR)
+/* helper defines to get pins currently selected by number */
+  #define PIN_SERIAL_TX             (0)
+  #define PIN_SERIAL_RX             (1)
+  #define PIN_SERIAL_XCK            (2)
+  #define PIN_SERIAL_XDIR           (3)
+
+
 /* Modifier Definitions  - these can be OR'ed with the other definition to turn on features like one-wire half duplex and more */
 #if defined(USART_RS4850_bm)
   #define SERIAL_RS485         (((uint16_t) USART_RS4850_bm) << 8)// 0x0100
