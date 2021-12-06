@@ -5,6 +5,7 @@
  * Spence Konde 2021 - megaTinyCore is free software (LGPL 2.1)
  * See LICENSE.txt for full legal boilerplate if you must */
 
+#include <avr/io.h>
 //#defines to identify part families
 #if defined(__AVR_ATtiny3227__)
   #define MEGATINYCORE_MCU 3227
@@ -302,64 +303,50 @@
   #endif
   // Also, the 0/1-series have useless names for the event channels. But we can define the 2-series names for them!
   // This makes it easier to write portable code without using the event library and incurring that overhead.
-  #if defined(SYNCUSER0)
-    #define USERTCA0CNTA SYNCUSER0
+
+  #if defined(EVSYS_SYNCUSER0)
     #define EVSYS_USERTCA0CNTA EVSYS_SYNCUSER0
   #endif
-  #if defined(SYNCUSER1)
-    #define USERUSART0IRDA SYNCUSER1
+  #if defined(EVSYS_SYNCUSER1)
     #define EVSYS_USERUSART0IRDA EVSYS_SYNCUSER1
   #endif
-  #if defined(ASYNCUSER0)
-    #define USERTCB0CAPT ASYNCUSER0
+  #if defined(EVSYS_ASYNCUSER0)
     #define EVSYS_USERTCB0CAPT EVSYS_ASYNCUSER0
   #endif
-  #if defined(ASYNCUSER1)
-    #define USERADC0START ASYNCUSER1
+  #if defined(EVSYS_ASYNCUSER1)
     #define EVSYS_USERADC0START EVSYS_ASYNCUSER1
   #endif
-  #if defined(ASYNCUSER2)
-    #define USERCCLLUT0A ASYNCUSER2
+  #if defined(EVSYS_ASYNCUSER2)
     #define EVSYS_USERCCLLUT0A EVSYS_ASYNCUSER2
   #endif
-  #if defined(ASYNCUSER3)
-    #define USERCCLLUT1A ASYNCUSER3
+  #if defined(EVSYS_ASYNCUSER3)
     #define EVSYS_USERCCLLUT1A EVSYS_ASYNCUSER3
   #endif
-  #if defined(ASYNCUSER4)
-    #define USERCCLLUT0B ASYNCUSER4
+  #if defined(EVSYS_ASYNCUSER4)
     #define EVSYS_USERCCLLUT0B EVSYS_ASYNCUSER4
   #endif
-  #if defined(ASYNCUSER5)
-    #define USERCCLLUT1B ASYNCUSER5
+  #if defined(EVSYS_ASYNCUSER5)
     #define EVSYS_USERCCLLUT1B EVSYS_ASYNCUSER5
   #endif
-  #if defined(ASYNCUSER6)
-    #define USERTCD0INPUTA ASYNCUSER6
+  #if defined(EVSYS_ASYNCUSER6)
     #define EVSYS_USERTCD0INPUTA EVSYS_ASYNCUSER6
   #endif
-  #if defined(ASYNCUSER7)
-    #define USERTCD0INPUTB ASYNCUSER7
+  #if defined(EVSYS_ASYNCUSER7)
     #define EVSYS_USERTCD0INPUTB EVSYS_ASYNCUSER7
   #endif
-  #if defined(ASYNCUSER8)
-    #define USEREVSYSEVOUTA ASYNCUSER8
+  #if defined(EVSYS_ASYNCUSER8)
     #define EVSYS_USEREVSYSEVOUTA EVSYS_ASYNCUSER8
   #endif
-  #if defined(ASYNCUSER9)
-    #define USEREVSYSEVOUTB ASYNCUSER9
+  #if defined(EVSYS_ASYNCUSER9)
     #define EVSYS_USEREVSYSEVOUTB EVSYS_ASYNCUSER9
   #endif
-  #if defined(ASYNCUSER10)
-    #define USEREVSYSEVOUTB ASYNCUSER10
-    #define EVSYS_USEREVSYSEVOUTB EVSYS_ASYNCUSER10
+  #if defined(EVSYS_ASYNCUSER10)
+    #define EVSYS_USEREVSYSEVOUTC EVSYS_ASYNCUSER10
   #endif
-  #if defined(ASYNCUSER11)
-    #define USERTCB1CAPT ASYNCUSER11
+  #if defined(EVSYS_ASYNCUSER11)
     #define EVSYS_USERTCB1CAPT EVSYS_ASYNCUSER11
   #endif
-  #if defined(ASYNCUSER12)
-    #define USERADC1START ASYNCUSER12
+  #if defined(EVSYS_ASYNCUSER12)
     #define EVSYS_USERADC1START EVSYS_ASYNCUSER12
   #endif
 
