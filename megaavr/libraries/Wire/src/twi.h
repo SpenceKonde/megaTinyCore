@@ -44,7 +44,7 @@ SOFTWARE.
 /* These options are or will be controlled by boards.txt menu options
 #define TWI_USING_WIRE1   // On devices with two TWIs, this identifies if the user wants to use Wire1
 #define TWI_MANDS         // This enables the simultaneous use of the Master and Slave functionality - where supported
-#define TWI_MERGE_BUFFERS // Merges the tx and rx buffers - this option will break the TWI when any rx occurs between beginTransmission and endTransmission!
+#define TWI_MERGE_BUFFERS // Merges the master tx and rx buffers - this option will break the TWI when any rx occurs between beginTransmission and endTransmission!
                           // It is not advised to use this define. Only use this when you need the RAM **really** badly
 */
 
@@ -153,15 +153,9 @@ struct twiData {
   #endif
   #if defined(TWI_MANDS)
     uint8_t _incomingAddress;
-    #if defined(TWI_MERGE_BUFFERS)
-      uint8_t _trHeadS;
-      uint8_t _trTailS;
-    #else
-      uint8_t _txHeadS;
-      uint8_t _txTailS;
-      uint8_t _rxHeadS;
-      uint8_t _rxTailS;
-    #endif
+    
+    uint8_t _trHeadS;
+    uint8_t _trTailS;
   #endif
 
   void (*user_onRequest)(void);
@@ -175,12 +169,7 @@ struct twiData {
   #endif
 
   #if defined(TWI_MANDS)
-    #if defined(TWI_MERGE_BUFFERS)
-      uint8_t _trBufferS[BUFFER_LENGTH];
-    #else
-      uint8_t _txBufferS[BUFFER_LENGTH];
-      uint8_t _rxBufferS[BUFFER_LENGTH];
-    #endif
+    uint8_t _trBufferS[BUFFER_LENGTH];
   #endif
   uint8_t _slaveBytesRead;
 };

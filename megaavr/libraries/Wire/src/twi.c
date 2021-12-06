@@ -263,13 +263,8 @@ uint8_t TWI_Available(struct twiData *_data) {
 
   #if defined(TWI_MANDS)                          // Add following if host and client are split
     if (_data->_bools._toggleStreamFn == 0x01) {
-      #if defined(TWI_MERGE_BUFFERS)              // Same Buffers for tx/rx
-        rxHead  = &(_data->_trHeadS);
-        rxTail  = &(_data->_trTailS);
-      #else                                       // Separate tx/rx Buffers
-        rxHead  = &(_data->_rxHeadS);
-        rxTail  = &(_data->_rxTailS);
-      #endif
+      rxHead  = &(_data->_trHeadS);
+      rxTail  = &(_data->_trTailS);
     } else
   #endif
   {
@@ -545,17 +540,10 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
  */
 void TWI_HandleSlaveIRQ(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* txHead   = &(_data->_trHeadS);
-      uint8_t* txTail   = &(_data->_trTailS);
-      uint8_t* rxHead   = &(_data->_trHeadS);
-      uint8_t* rxTail   = &(_data->_trTailS);
-    #else                                           // Separate tx/rx Buffers
-      uint8_t* txHead   = &(_data->_txHeadS);
-      uint8_t* txTail   = &(_data->_txTailS);
-      uint8_t* rxHead   = &(_data->_rxHeadS);
-      uint8_t* rxTail   = &(_data->_rxTailS);
-    #endif
+    uint8_t* txHead   = &(_data->_trHeadS);
+    uint8_t* txTail   = &(_data->_trTailS);
+    uint8_t* rxHead   = &(_data->_trHeadS);
+    uint8_t* rxTail   = &(_data->_trTailS);
 
   #else                                             // Slave using the host buffer
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
@@ -628,13 +616,9 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
 void SlaveIRQ_AddrRead(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
     uint8_t*    address = &(_data->_incomingAddress);
-    #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* txHead   = &(_data->_trHeadS);
-      uint8_t* txTail   = &(_data->_trTailS);
-    #else                                           // Separate tx/rx Buffers
-      uint8_t* txHead   = &(_data->_txHeadS);
-      uint8_t* txTail   = &(_data->_txTailS);
-    #endif
+
+    uint8_t* txHead   = &(_data->_trHeadS);
+    uint8_t* txTail   = &(_data->_trTailS);
 
   #else                                             // Slave using the host buffer
     uint8_t*    address = &(_data->_clientAddress);
@@ -661,11 +645,9 @@ void SlaveIRQ_AddrRead(struct twiData *_data) {
 void SlaveIRQ_AddrWrite(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
     uint8_t*    address = &(_data->_incomingAddress);
-    #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* rxHead   = &(_data->_trHeadS);
-      uint8_t* rxTail   = &(_data->_trTailS);
-    #endif
 
+    uint8_t* rxHead   = &(_data->_trHeadS);
+    uint8_t* rxTail   = &(_data->_trTailS);
   #else                                             // Slave using the host buffer
     uint8_t*    address = &(_data->_clientAddress);
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
@@ -676,7 +658,7 @@ void SlaveIRQ_AddrWrite(struct twiData *_data) {
 
 
   (*address) = _data->_module->SDATA;
-  #if defined(TWI_MERGE_BUFFERS)              // if single Buffer operation
+  #if defined(TWI_MERGE_BUFFERS) || defined(TWI_MANDS)  // if single Buffer operation
     (*rxTail) = (*rxHead);                    // reset buffer positions so the host can start writing at zero.
   #endif
   _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by reception of next byte"
@@ -684,14 +666,8 @@ void SlaveIRQ_AddrWrite(struct twiData *_data) {
 
 void SlaveIRQ_Stop(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* rxHead   = &(_data->_trHeadS);
-      uint8_t* rxTail   = &(_data->_trTailS);
-    #else                                           // Separate tx/rx Buffers
-      uint8_t* rxHead   = &(_data->_txHeadS);
-      uint8_t* rxTail   = &(_data->_txTailS);
-    #endif
-
+    uint8_t* rxHead   = &(_data->_trHeadS);
+    uint8_t* rxTail   = &(_data->_trTailS);
   #else                                             // Slave using the host buffer
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
       uint8_t* rxHead   = &(_data->_trHead);
@@ -710,14 +686,8 @@ void SlaveIRQ_Stop(struct twiData *_data) {
 
 void SlaveIRQ_DataReadNack(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* txHead   = &(_data->_trHeadS);
-      uint8_t* txTail   = &(_data->_trTailS);
-    #else                                           // Separate tx/rx Buffers
-      uint8_t* txHead   = &(_data->_txHeadS);
-      uint8_t* txTail   = &(_data->_txTailS);
-    #endif
-
+    uint8_t* txHead   = &(_data->_trHeadS);
+    uint8_t* txTail   = &(_data->_trTailS);
   #else                                             // Slave using the host buffer
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
       uint8_t* txHead   = &(_data->_trHead);
@@ -736,16 +706,9 @@ void SlaveIRQ_DataReadNack(struct twiData *_data) {
 
 void SlaveIRQ_DataReadAck(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* txHead   = &(_data->_trHeadS);
-      uint8_t* txTail   = &(_data->_trTailS);
-      uint8_t* txBuffer =   _data->_trBufferS;
-    #else                                           // Separate tx/rx Buffers
-      uint8_t* txHead   = &(_data->_txHeadS);
-      uint8_t* txTail   = &(_data->_txTailS);
-      uint8_t* txBuffer =   _data->_txBufferS;
-    #endif
-
+    uint8_t* txHead   = &(_data->_trHeadS);
+    uint8_t* txTail   = &(_data->_trTailS);
+    uint8_t* txBuffer =   _data->_trBufferS;
   #else                                             // Slave using the host buffer
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
       uint8_t* txHead   = &(_data->_trHead);
@@ -773,16 +736,9 @@ void SlaveIRQ_DataReadAck(struct twiData *_data) {
 
 void SlaveIRQ_DataWrite(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
       uint8_t* rxHead   = &(_data->_trHeadS);
       uint8_t* rxTail   = &(_data->_trTailS);
       uint8_t* rxBuffer =   _data->_trBufferS;
-    #else                                           // Separate tx/rx Buffers
-      uint8_t* rxHead   = &(_data->_rxHeadS);
-      uint8_t* rxTail   = &(_data->_rxTailS);
-      uint8_t* rxBuffer =   _data->_rxBufferS;
-    #endif
-
   #else                                             // Slave using the host buffer
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
       uint8_t* rxHead   = &(_data->_trHead);
