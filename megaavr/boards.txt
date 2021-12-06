@@ -131,6 +131,7 @@ atxy7.bootloader.tool=avrdude
 #________________________________________#
 atxy7.build.bootload=
 atxy7.build.printfabr=
+atxy7.build.attachabr=
 atxy7.build.wireabr=
 
 #----------------------------------------#
@@ -439,6 +440,8 @@ atxy7.menu.attach.manual=Only enabled ports. Please see documentation.
 atxy7.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy7.menu.attach.oldversion=Old version, (may fix bugs)
 atxy7.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atxy7.menu.attach.manual.build.attachabr=.aMan
+atxy7.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
 #  Non-bootloader                                                        #
@@ -490,6 +493,7 @@ atxy6.bootloader.tool=avrdude
 #________________________________________#
 atxy6.build.bootload=
 atxy6.build.printfabr=
+atxy6.build.attachabr=
 atxy6.build.wireabr=
 
 #----------------------------------------#
@@ -804,6 +808,8 @@ atxy6.menu.attach.manual=Only enabled ports. Please see documentation.
 atxy6.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy6.menu.attach.oldversion=Old version, (may fix bugs)
 atxy6.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atxy6.menu.attach.manual.build.attachabr=.aMan
+atxy6.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
 #  Non-bootloader                                                        #
@@ -855,6 +861,7 @@ atxy4.bootloader.tool=avrdude
 #________________________________________#
 atxy4.build.bootload=
 atxy4.build.printfabr=
+atxy4.build.attachabr=
 atxy4.build.wireabr=
 
 #----------------------------------------#
@@ -1169,6 +1176,8 @@ atxy4.menu.attach.manual=Only enabled ports. Please see documentation.
 atxy4.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy4.menu.attach.oldversion=Old version, (may fix bugs)
 atxy4.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atxy4.menu.attach.manual.build.attachabr=.aMan
+atxy4.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
 #  Non-bootloader                                                          #
@@ -1219,6 +1228,7 @@ atxy2.bootloader.tool=avrdude
 #________________________________________#
 atxy2.build.bootload=
 atxy2.build.printfabr=
+atxy2.build.attachabr=
 atxy2.build.wireabr=
 
 #----------------------------------------#
@@ -1486,6 +1496,8 @@ atxy2.menu.attach.manual=Only enabled ports. Please see documentation.
 atxy2.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy2.menu.attach.oldversion=Old version, (may fix bugs)
 atxy2.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atxy2.menu.attach.manual.build.attachabr=.aMan
+atxy2.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
 #  Non-bootloader                                                          #
@@ -1870,6 +1882,7 @@ atxy7o.bootloader.tool=avrdude
 #________________________________________#
 atxy7o.build.bootload=
 atxy7o.build.printfabr=
+atxy7o.build.attachabr=
 atxy7o.build.wireabr=
 
 #----------------------------------------#
@@ -2142,6 +2155,8 @@ atxy7o.menu.attach.manual=Only enabled ports. Please see documentation.
 atxy7o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy7o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy7o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atxy7o.menu.attach.manual.build.attachabr=.aMan
+atxy7o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
 #  WITH OPTIBOOT                                                    ##   ###
@@ -2193,6 +2208,7 @@ atx27o.bootloader.tool=avrdude
 #________________________________________#
 atx27o.build.bootload=
 atx27o.build.printfabr=
+atx27o.build.attachabr=
 atx27o.build.wireabr=
 
 #----------------------------------------#
@@ -2457,6 +2473,8 @@ atx27o.menu.attach.manual=Only enabled ports. Please see documentation.
 atx27o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atx27o.menu.attach.oldversion=Old version, (may fix bugs)
 atx27o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atx27o.menu.attach.manual.build.attachabr=.aMan
+atx27o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
 #  WITH OPTIBOOT                                                         ###
@@ -2508,6 +2526,7 @@ atxy6o.bootloader.tool=avrdude
 #________________________________________#
 atxy6o.build.bootload=
 atxy6o.build.printfabr=
+atxy6o.build.attachabr=
 atxy6o.build.wireabr=
 
 #----------------------------------------#
@@ -2788,6 +2807,8 @@ atxy6o.menu.attach.manual=Only enabled ports. Please see documentation.
 atxy6o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy6o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy6o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atxy6o.menu.attach.manual.build.attachabr=.aMan
+atxy6o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
 #  WITH OPTIBOOT                                                    ##   ###
@@ -2839,6 +2860,7 @@ atx26o.bootloader.tool=avrdude
 #________________________________________#
 atx26o.build.bootload=
 atx26o.build.printfabr=
+atx26o.build.attachabr=
 atx26o.build.wireabr=
 
 #----------------------------------------#
@@ -3103,6 +3125,8 @@ atx26o.menu.attach.manual=Only enabled ports. Please see documentation.
 atx26o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atx26o.menu.attach.oldversion=Old version, (may fix bugs)
 atx26o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atx26o.menu.attach.manual.build.attachabr=.aMan
+atx26o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
 #  WITH OPTIBOOT                                                         ###
@@ -3154,6 +3178,7 @@ atxy4o.bootloader.tool=avrdude
 #________________________________________#
 atxy4o.build.bootload=
 atxy4o.build.printfabr=
+atxy4o.build.attachabr=
 atxy4o.build.wireabr=
 
 #----------------------------------------#
@@ -3447,6 +3472,8 @@ atxy4o.menu.attach.manual=Only enabled ports. Please see documentation.
 atxy4o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy4o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy4o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atxy4o.menu.attach.manual.build.attachabr=.aMan
+atxy4o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
 #  WITH OPTIBOOT                                                    ##   ###
@@ -3498,6 +3525,7 @@ atx24o.bootloader.tool=avrdude
 #________________________________________#
 atx24o.build.bootload=
 atx24o.build.printfabr=
+atx24o.build.attachabr=
 atx24o.build.wireabr=
 
 #----------------------------------------#
@@ -3757,6 +3785,8 @@ atx24o.menu.attach.manual=Only enabled ports. Please see documentation.
 atx24o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atx24o.menu.attach.oldversion=Old version, (may fix bugs)
 atx24o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atx24o.menu.attach.manual.build.attachabr=.aMan
+atx24o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
 #                                                                          #
@@ -3807,6 +3837,7 @@ atxy2o.bootloader.tool=avrdude
 #________________________________________#
 atxy2o.build.bootload=
 atxy2o.build.printfabr=
+atxy2o.build.attachabr=
 atxy2o.build.wireabr=
 
 #----------------------------------------#
@@ -4079,6 +4110,8 @@ atxy2o.menu.attach.manual=Only enabled ports. Please see documentation.
 atxy2o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy2o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy2o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
+atxy2o.menu.attach.manual.build.attachabr=.aMan
+atxy2o.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
 #                                                                        #

@@ -115,10 +115,10 @@ recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf
 ## Save hex
 # Needs to be specified separately, because otherwise some parts of it don't resolve for reasons I dont understand.
 recipe.output.tmp_file={build.project_name}.hex
-recipe.output.save_file={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.m{build.millistimer}{build.wireabr}{build.printfabr}.{versionnum.major}{versionnum.minor}{versionnum.patch}.hex
+recipe.output.save_file={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.m{build.millistimer}{build.wireabr}{build.printfabr}{build.attachabr}.v{versionnum.major}{versionnum.minor}{versionnum.patch}.hex
 
 ## Extra asset name (for .lst and .map output - doesn't fully resolve for .hex)
-build.extraassetname={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.m{build.millistimer}{build.wireabr}{build.printfabr}.v{versionnum.major}{versionnum.minor}{versionnum.patch}
+build.extraassetname={build.project_name}.t{build.attiny}{build.bootload}.{build.speed}c{build.clocksource}.m{build.millistimer}{build.wireabr}{build.printfabr}{build.attachabr}.v{versionnum.major}{versionnum.minor}{versionnum.patch}
 
 ## Create disassembler listing
 recipe.hooks.objcopy.postobjcopy.1.pattern.windows=cmd /C "{compiler.path}{compiler.objdump.cmd}" {compiler.objdump.flags} "{build.path}/{build.project_name}.elf" > "{build.path}/{build.project_name}.lst"
