@@ -60,6 +60,8 @@ This is currently used only for the latest release, and should fix the avrdude n
   * [ATtiny1606,806,406](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x06.md)
   * [ATtiny1604,804,404,204](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x04.md)
   * [ATtiny402,202](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x02.md)
+## Unsupported parts
+  * ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the AVR core they use is gimped -  and their price isn't all that much lower. Avoid them.
 
 ## Overall Part Comparison
 | tinyAVR series          |     0-series   |     1-series    | 1-series 16+k  |      2-series       |
@@ -106,7 +108,7 @@ Unlike almost every other AVR ever, the 16k and 32k versions (only) have a few e
 #### What the overclocking numbers mean
 Overclocked speeds are typical maximum speeds that can be reached with basic functionality intact. Not all parts will reach or function at these speeds, and the operating temperature range is likely far narrower than it is at the rated speeds. I'm aware of nobody who has played with overclocking the 0-series, but as it was released at the same time as the 1-series and appears to be a 1-series with fewer features, I would expect them to be the same - though if they turned out not to be, I could rationalize a difference in either direction equally easily (and even phrase it in a way that makes someone who assumed otherwise look silly: "they're budget parts, likely made with a less advanced process, of course they don't overclock as well!" or "without all those wacky features hanging off the clock, of course they overclock better!").
 
-The internal oscillator speeds can be reached (on most but not all specimens) with [tuning](megaavr/extras/Tuning.md). Best results however are obtained with an external oscillator. Never use an overclocked part in any critical application. neither stability nor correctness of artithmatic can be guaranteed!!
+The internal oscillator speeds can be reached (on most but not all specimens) with [tuning](megaavr/extras/Ref_Tuning.md). Best results overcocking are (as on classic AVRs) obtained with an external oscillator. Never use an overclocked part in any critical application. neither stability nor correctness of artithmatic can be guaranteed!!
 
 ### Automotive (VAO) versions
 The automotive versions should also work. You must always select the 16 MHz-derived clock speeds on these parts. They do not support 20 MHz operation.
@@ -169,7 +171,7 @@ In order to prevent all confusion about pin identities and eliminate ambiguity, 
 When a single number is used to refer to a pin - in the documentation, or in your code - it is always the "Arduino pin number". These are the pin numbers shown in orange (for pins capable of analogRead()) and blue (for pins that are not) on the pinout charts. All of the other ways of referring to pins are #defined to the corresponding Arduino pin number.
 
 ### An and PIN_An constants
-The core also provides An and PIN_An constants (where n is a number from 0 to 11). As with the official core, PIN_An is defined as the digital pin number of the pin shared with analog channel n These refer to the ADC0 *channel* numbers. This naming system is similar to what was used on many classic AVR cores **but here, they are just #defined as the corresponding Arduino pin number**. If you need to get the analog channel number on a digital pin, use the `digitalPinToAnalogInput(pin)` macro. The An numbers are not shown on the pinout charts - just use the digital pin numbers. The mapping of analog channels to pins is shown in the the datasheet under the I/O Multiplexing Considerations chapter, and reproduced in the [advanced ADC features page](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ADCFreerunAndMore.md). Note that channel A0 is on the UPDI/Reset pin - however, even when configured as UPDI, it can be used as a digital input, and as an analog input on the 0 and 1-series. as long as the signals it can be exposed to do not look like the UPDI enable sequence.
+The core also provides An and PIN_An constants (where n is a number from 0 to 11). As with the official core, PIN_An is defined as the digital pin number of the pin shared with analog channel n These refer to the ADC0 *channel* numbers. This naming system is similar to what was used on many classic AVR cores **but here, they are just #defined as the corresponding Arduino pin number**. If you need to get the analog channel number on a digital pin, use the `digitalPinToAnalogInput(pin)` macro - but you only need that if you're writing an advanced ADC library.
 
 ## megaTinyCore and tinyAVR 0/1/2-series Features
 These parts (well, the 1/2-series at least - the 0-series is more of a budget option) provide an excellent toolbox of versatile and powerful peripherals; the top-end ones are on a par with or better than classic megaAVR parts - for a tinyAVR price. One of the guiding principles of the design of megaTinyCore, as with my other cores, is to allow the supported parts to reach their full potential - or as close to that as possible within the limitations of Arduino. This (very large) section covers the features of these parts and how they are exposed by megaTinyCore, as well as features of the core itself. This (very large) section attempts to cover each of the feature areas. Do try to find the feature you are working with if you're trying to use some chip feature and having trouble!
@@ -522,6 +524,8 @@ The USARTs (Serial) have some additional features not seen on the official cores
 Serial UPDI is our recommended tool for UPDI programming.
 #### [Clock Information](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Clocks.md)
 Supported clock sources and considerations for the use thereof.
+#### [Speed Grades](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_SpeedGrades.md)
+Manufacturer specs for speed at various voltages, and some discussion of BOD thresholds.
 #### [Constants for part/feature/pin/version identification](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Defines.md)
 The core feature defines are used by megaTinyCore and other cores I maintain as well. This also documents what constant values are defined by the core for version identification, testing for features, and dealing with compatibility problems.
 #### [Assembly Listing and Memory Maps](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Export.md)
