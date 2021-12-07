@@ -76,7 +76,7 @@ This is currently used only for the latest release, and should fix the avrdude n
 | Type D timer            |             NO |             Yes |            Yes |                  No |
 | Real Time Clock         |  Yes, no xtal  |             Yes |            Yes |                 Yes |
 | USARTs    (pin options) |      1 (2)     |           1 (2) |          1 (2) |               2 (3) |
-| SPI ports (pin options) |         1      |  2 except 14pin | 2 except 14pin |   1 (2 on 20/24pin) |
+| SPI ports (pin options) |         1      |1(2)except 14pin | 2 except 14pin |   1 (2 on 20/24pin) |
 | TWI ports (pin options) |         1      |           1 (2) |          1 (2) |                  1  |
 | Maximum rated speed     |         20 MHz |            20Mz |         20 MHz |              20 MHz |
 | Overclocking (internal @ 5v) |   ???     |       25-30 MHz |      25-30 MHz |              32 MHz |
