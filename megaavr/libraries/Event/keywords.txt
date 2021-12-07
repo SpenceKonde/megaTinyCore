@@ -23,7 +23,7 @@ clear_user	KEYWORD2
 soft_event	KEYWORD2
 long_soft_event	KEYWORD2
 gen_from_peripheral	KEYWORD2
-user_from_peripheral	KEYWORD
+user_from_peripheral	KEYWORD2
 start	KEYWORD2
 stop	KEYWORD2
 
