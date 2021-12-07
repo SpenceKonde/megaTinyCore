@@ -23,7 +23,6 @@
 #include "api/ArduinoAPI.h"
 
 #include <avr/pgmspace.h>
-#include <avr/io.h>
 #include <avr/interrupt.h>
 
 #ifdef __cplusplus

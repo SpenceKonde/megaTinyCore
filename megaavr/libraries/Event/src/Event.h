@@ -1206,22 +1206,24 @@ class Event {
     int8_t set_user_pin(uint8_t pin_number);
     static void clear_user(user::user_t event_user);
     void soft_event();
+    void long_soft_event(uint8_t length);
     void start(bool state = true);
     void stop();
     /* event_types: They start from 0x00 for inputs. Outputs start at 0x40 */
-    static gen::generator_t gen_from_peripheral(TCB_t * timer, uint8_t event_type);
-    static user::user_t    user_from_peripheral(TCB_t * timer, uint8_t event_type);
-    static gen::generator_t gen_from_peripheral(TCA_t * timer, uint8_t event_type);
-    static user::user_t    user_from_peripheral(TCA_t * timer, uint8_t event_type);
-    static gen::generator_t gen_from_peripheral(CCL_t * logic, uint8_t event_type);
-    static user::user_t    user_from_peripheral(CCL_t * logic, uint8_t event_type);
-    static gen::generator_t gen_from_peripheral(AC_t * comp, uint8_t event_type);
-
+    static gen::generator_t gen_from_peripheral(TCB_t   * timer, uint8_t event_type = 0);
+    static user::user_t    user_from_peripheral(TCB_t   * timer, uint8_t user_type  = 0);
+    static user::user_t    user_from_peripheral(USART_t * usart, uint8_t user_type  = 0);
+    static gen::generator_t gen_from_peripheral(TCA_t   * timer, uint8_t event_type = 0);
+    static user::user_t    user_from_peripheral(TCA_t   * timer, uint8_t user_type  = 0);
+    static gen::generator_t gen_from_peripheral(CCL_t   * logic, uint8_t event_type = 0);
+    static user::user_t    user_from_peripheral(CCL_t   * logic, uint8_t user_type  = 0);
+    static gen::generator_t gen_from_peripheral(AC_t    *  comp, uint8_t event_type = 0);
 
   private:
     const uint8_t channel_number;      // Holds the event generator channel number
     volatile uint8_t &channel_address; // Reference to the event channel address
     uint8_t generator_type;            // Generator type the event channel is using
+    static void _long_soft_event(uint8_t channel, uint8_t length);    // holds the bulky assembly routine for the long softevent.
 };
 #if defined(MEGATINYCORE) && MEGATINYCORE_SERIES !=2
   #if defined(EVSYS_SYNCCH0)

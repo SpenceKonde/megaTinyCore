@@ -376,6 +376,9 @@ Event& Event::assign_generator_pin(uint8_t port, uint8_t port_pin) {
 }
 
 Event& Event::assign_generator(gen::generator_t gen, uint8_t ch) {
+  if (gen == 255) { //bogus generators should be rejected.
+    return Event_empty;
+  }
   if (ch != 255) { // this means it can only be the divided rtc, pins, or disable,
     if (gen == 0) {
       // What the hell are they doing asking for disabled with a specific channel's constant?!
@@ -918,6 +921,65 @@ void Event::soft_event() {
   #endif
 }
 
+void Event::long_soft_event(uint8_t length) {
+  _long_soft_event(channel_number, length);
+}
+
+void Event::_long_soft_event(uint8_t channel, uint8_t length) {
+  uint16_t strobeaddr;
+  #if defined(EVSYS_STROBE)
+    strobeaddr = (uint16_t) &EVSYS_STROBE;
+  #elif defined(EVSYS_SYNCSTROBE)
+    if (channel >1)
+      strobeaddr = (uint16_t) &EVSYS_ASYNCSTROBE;
+    else
+      strobeaddr = (uint16_t) &EVSYS_SYNCSTROBE;
+  #elif defined(EVSYS_SWEVENTB)
+    if (channel > 7) {
+      channel -= 8;
+      strobeaddr = (uint16_t) &EVSYS_SWEVENTB;
+    }
+    else
+      strobeaddr = (uint16_t) &EVSYS_SWEVENTA;
+  #elif defined(EVSYS_SWEVENTA)
+    strobeaddr = (uint16_t) &EVSYS_SWEVENTA;
+  #else
+    #error "Don't know the strobe register!"
+  #endif
+  channel = (((uint8_t)1) << channel);
+  __asm__ __volatile__ (
+    "in r0, 0x3F"     "\n\t" // save SREG
+    "cli"             "\n\t" // interrupts off
+    "cpi %1, 4"       "\n\t"
+    "brcs long_soft2" "\n\t" // less than 4 -> 2
+    "breq long_soft4" "\n\t" // equal to 4 -> 4
+    "cpi %1, 10"      "\n\t" // compare with 8
+    "brcs long_soft6" "\n\t" // less than 10 (but more than 4) -> 6
+    "breq long_soft10""\n\t" // equal to 10 -> 10
+    "st Z, %0"        "\n\t" // otherwise they get 16.
+    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t"
+  "long_soft10:"      "\n\t"
+    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t"
+  "long_soft6:"       "\n\t"
+    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t"
+  "long_soft4:"       "\n\t"
+    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t"
+  "long_soft2:"       "\n\t"
+    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t"
+    "out 0x3f, r0"    "\n"   // restore SREG, reenabling interrupts.
+    ::"r"((uint8_t) channel),"d"((uint8_t) length),"z" ((uint16_t) strobeaddr));
+}
+
 
 /**
  * @brief Starts the event generator for a particular event channel
@@ -933,7 +995,7 @@ gen::generator_t Event::gen_from_peripheral(TCB_t * timer, uint8_t event_type) {
     #else
       if (event_type)
     #endif
-      addr = 0;
+      addr = -1;
     else {
       addr >>= 3; //now it's 0, 2, 4, 6, or 8.
       addr += event_type & 0x01; // 0x00 = capt, 0x01 = ovf
@@ -994,7 +1056,7 @@ user::user_t Event::user_from_peripheral(TCB_t * timer, uint8_t user_type) {
 
 
 gen::generator_t Event::gen_from_peripheral(CCL_t * logic, uint8_t event_type){
-  uint8_t retval = 0;
+  uint8_t retval = -1;
   if ((uint16_t) logic == 0x1C0) {
     #if (!defined(MEGATINYCORE) || MEGATINYCORE_SERIES != 2)
       if (event_type < 6) {
@@ -1038,7 +1100,7 @@ gen::generator_t Event::gen_from_peripheral(AC_t * comp, uint8_t event_type) {
 
 gen::generator_t Event::gen_from_peripheral(TCA_t * timer, uint8_t event_type) {
   uint8_t addr = (uint8_t)(uint16_t) timer;
-  uint8_t retval = 0;
+  uint8_t retval = -1;
   if (event_type < 6) {
     #if !defined(MEGATINYCORE) || MEGATINYCORE_SERIES == 2
       if (event_type > 1) {
@@ -1081,6 +1143,27 @@ user::user_t Event::user_from_peripheral(TCA_t * timer, uint8_t user_type) {
   #else
     addr = 0x10;
   #endif
+  return (user::user_t) addr;
+}
+
+user::user_t Event::user_from_peripheral(USART_t * usart, uint8_t user_type) {
+  uint8_t addr = (uint8_t)(uint16_t) &usart;
+  if (user_type)
+    addr = -1;
+  else {
+    addr >>= 5; //get 0, 1, 2, 3, 4, or 5.
+    #if defined(__AVR_DA__)
+      addr += 0x14;
+    #elif defined(__AVR_DB__) || defined(__AVR_DD__)
+      addr += 0x15;
+    #elif (defined(MEGATINYCORE) && MEGATINYCORE_SERIES == 2)
+      addr += 0x0C;
+    #elif defined(MEGATINYCORE)
+      addr += 0x11;
+    #else
+      addr += 0x0F;
+    #endif
+  }
   return (user::user_t) addr;
 }
 
