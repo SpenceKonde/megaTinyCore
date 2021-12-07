@@ -174,7 +174,7 @@ In Open Drain mode, the TX pin will no longer drive high. The pin must not be se
 In RS485 mode, at initialization, the HWSerial class configures the XDIR pin as an OUTPUT. 1 bit-time prior to sending any data, the XDIR pin will be driven HIGH. If using RS485, this should be connected to the external line driver IC to enable transmit. XDIR will be lowered 1 bit-time after the last bit has been sent. If you require the opposite polarity, simply set PORTx.PINnCTRL |= PORT_INVEN_bm;
 or use `pinConfigure()` [See Digital I/O Reference](Ref_Digital.md)
 
-RS485 mode in combination with RX_ONLY will simply set the pin to an output, but never use it, because the TX module isnt enabled.
+RS485 mode in combination with RX_ONLY will simply set the pin to an output, but never use it, because the TX module isn't enabled.
 
 #### These options were meant to be combined
 * Loopback + Open Drain - These two not-particularly-useful options, when combined, become very useful - this gives you a half-duplex single serial interface. This is fairly common (UPDI is actually implemented this way), but it's almost ubiquitous in RS485.

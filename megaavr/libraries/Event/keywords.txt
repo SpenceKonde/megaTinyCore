@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map For Wire
+# Syntax Coloring Map For Event
 #######################################
 
 #######################################
@@ -12,11 +12,18 @@
 #######################################
 get_channel_number	KEYWORD2
 get_user_channel	KEYWORD2
+get_user_channel_number	KEYWORD2
 set_generator	KEYWORD2
 get_generator	KEYWORD2
 set_user	KEYWORD2
+set_user_pin	KEYWORD2
+assign_generator_pin	KEYWORD2
+assign_generator	KEYWORD2
 clear_user	KEYWORD2
 soft_event	KEYWORD2
+long_soft_event	KEYWORD2
+gen_from_peripheral	KEYWORD2
+user_from_peripheral	KEYWORD
 start	KEYWORD2
 stop	KEYWORD2
 
@@ -35,6 +42,12 @@ Event6	KEYWORD2
 Event7	KEYWORD2
 Event8	KEYWORD2
 Event9	KEYWORD2
+EventSync0	KEYWORD2
+EventSync1	KEYWORD2
+EventAsync0	KEYWORD2
+EventAsync1	KEYWORD2
+EventAsync2	KEYWORD2
+EventAsync3	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
@@ -52,3 +65,4 @@ gen7	LITERAL1
 gen8	LITERAL1
 gen9	LITERAL1
 user	LITERAL1
+gens	LITERAL1

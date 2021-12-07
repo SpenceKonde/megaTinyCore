@@ -312,7 +312,7 @@ void GoToSleep() {
 
 This functionality will be made easier to use via ModernSleep whern that library is available.
 
-This board package also supports using an external 32.768khz crystal as the clock source for the RTC (not supported on 0-series or 8-pin parts). If this is used, make sure that the crystal is connected between the TOSC1 and TOSC2 pins (these are the same as the TX and RX pins with the default pin mapping, unfortunately), that nothing else is, that no excessively long wires or traces are connected to these pins, and that appropriate loading capacitors per crystal manufacturer datasheet are connected. I found the 32k crystal to be extremely uncooperative. To reduce power usage, they try to drive the crystal as weakly as they can get away with, which in turn makes it more susceptible to interferance.
+This board package also supports using an external 32.768khz crystal as the clock source for the RTC (not supported on 0-series or 8-pin parts). If this is used, make sure that the crystal is connected between the TOSC1 and TOSC2 pins (these are the same as the TX and RX pins with the default pin mapping, unfortunately), that nothing else is, that no excessively long wires or traces are connected to these pins, and that appropriate loading capacitors per crystal manufacturer datasheet are connected. I found the 32k crystal to be extremely uncooperative. To reduce power usage, they try to drive the crystal as weakly as they can get away with, which in turn makes it more susceptible to interference.
 
 #### What about external oscillator "32768 Hz""
 Yes, you can use an external oscillator for the RTC, at least on 1 and 2 series parts.
@@ -372,7 +372,7 @@ Between the initial header file and preliminary datasheet release, and the more 
 Whenever a UPDI programmer is used to upload code, all fuses that can be set "safely" (as in, without risk of bricking the board, or bricking the board if one does not have access to an HV programmer), and which have any built-in configuration options, will be set. Thus, except where noted, behavior will always match the selected tools menu. In summary, these are handled as follows:
 ```text
 WDTCFG will not be changed - it is not configured by megaTinyCore except to reset it to the factory default when doing "burn bootloader".
-BODCFG will not be changed - not safe, you could set the bod level to 4.3 on a 3.3v system, and then it would need to get >4.3v applied to reprogram it. If it is onthe same circuit board as parts that would be damaged, this is a difficult situation to recover from.
+BODCFG will not be changed - not safe, you could set the bod level to 4.3 on a 3.3v system, and then it would need to get >4.3v applied to reprogram it. If it is on the same circuit board as parts that would be damaged, this is a difficult situation to recover from.
 OSCCFG will be set
 TCD0CFG will not be changed - it is not configured by megaTinyCore except to reset it to the factory default when doing "burn bootloader".
 SYSCFG0 will not be changed - not safe
@@ -446,7 +446,7 @@ This library is also included in DxCore and MegaCoreX, covering all modern AVRs 
 [Comparator library documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Comparator/README.md)
 
 ## WDT and resets
-For more information on resetting from software, using the Watchdog Timer, the causes of unexpected resets and how ot prevent them, and generally all things reset-related, see the [Reset Guide](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md)
+For more information on resetting from software, using the Watchdog Timer, the causes of unexpected resets and how to prevent them, and generally all things reset-related, see the [Reset Guide](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md)
 
 ## Identifying Part and Options in sketch
 It is often useful to identify what options are selected on the menus from within the sketch; this is particularly useful for verifying that you have selected the options you wrote the sketch for when opened later by yourself or someone who you shared it with. Or, you can use these, combined with `#if` macros to select the appropriate code depending on the part or options at hand.
