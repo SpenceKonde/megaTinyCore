@@ -369,7 +369,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     // 01 = Turn off PGA, settings unchanged. It will be enabled next time it is used until 01 or 11 is is passed to this.
     // 10 = Turn on PGA, and don't turn it off automatically.
     // 11 = turn off PGA now and automatically.
-    uint8_t lowlat &= options & 0x03;
+    uint8_t lowlat = options & 0x03;
     if (lowlat > 1) {
       if (lowlat == 3)
         ADC0.CTRLA &= ~ADC_LOWLAT_bm;
@@ -395,7 +395,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
     uint8_t sampnum;
     if (res > 0x80) { // raw accumulation
-      sampnum &= res & 0x7F;
+      sampnum = res & 0x7F;
       if (sampnum > 10) return ADC_ENH_ERROR_RES_TOO_HIGH;
     } else {
       if (res < ADC_NATIVE_RESOLUTION_LOW) return ADC_ENH_ERROR_RES_TOO_LOW;
@@ -453,7 +453,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     }
     ADC0.CTRLF = sampnum;
     uint8_t command = ((neg != SINGLE_ENDED)?0x80:0) | ((res == 8) ? ADC_MODE_SINGLE_8BIT_gc : (res > ADC_NATIVE_RESOLUTION ? ADC_MODE_BURST_gc : ADC_MODE_SINGLE_12BIT_gc)) | 1;
-    ADC0.COMMAND &= command;
+    ADC0.COMMAND = command;
     while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
     int32_t result = ADC0.RESULT;
 
@@ -637,7 +637,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     }
     uint8_t sampnum;
     if (res & 0x80) { // raw accumulation
-      sampnum &= res & 0x7F;
+      sampnum = res & 0x7F;
       if (sampnum > 6) return ADC_ENH_ERROR_RES_TOO_HIGH;
     } else {
       if (res < ADC_NATIVE_RESOLUTION_LOW) return ADC_ENH_ERROR_RES_TOO_LOW;
@@ -680,7 +680,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
         result >>= 1;
         shift--;
       }
-      uint8_t roundup &= result&0x01;
+      uint8_t roundup = result & 0x01;
       result >>= 1;
       result += roundup;
     } else if (res == ADC_NATIVE_RESOLUTION - 1) { // 9 bit res?!
@@ -783,7 +783,7 @@ void analogWrite(uint8_t pin, int val) {
           bit_mask = 1;  // on the xy2, WO0 is on PA7
         }
         #endif
-        uint8_t offset &= 0;
+        uint8_t offset = 0;
         if (bit_mask > 0x04) { // HCMP
           bit_mask <<= 1;      // mind the gap
           offset = 1;          // used to offset the
@@ -830,7 +830,7 @@ void analogWrite(uint8_t pin, int val) {
           }
         #endif
 
-        uint8_t oldSREG &= SREG;
+        uint8_t oldSREG = SREG;
         cli(); // interrupts off... wouldn't due to have this mess interrupted and messed with...
         while ((TCD0.STATUS & (TCD_ENRDY_bm | TCD_CMDRDY_bm)) != (TCD_ENRDY_bm | TCD_CMDRDY_bm)); // if previous sync/enable in progress, wait for it to finish.
         // with interrupts off since an interrupt could trip these...

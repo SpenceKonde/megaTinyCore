@@ -515,7 +515,7 @@ void UartClass::begin(unsigned long baud, uint16_t options) {
   (*MyUSART).CTRLA          = ctrla & 0xDF; // position, which we never set in begin.
   (*MyUSART).CTRLB          = ctrlb;        // Set the all important CTRLB...
   _set_pins(_module_number, _pin_set, setpinmask); // set up the pin(s)
-  SREG &= oldSREG;                             // re-enable interrupts, and we're done.
+  SREG = oldSREG;                             // re-enable interrupts, and we're done.
 }
 
 void UartClass::_set_pins(uint8_t mod_nbr, uint8_t mux_set, uint8_t enmask) {

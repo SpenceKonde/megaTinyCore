@@ -122,7 +122,7 @@ void pinConfigure(uint8_t pin, uint16_t pinconfig) {
     }
   }
   *(portbase + 0x10 + bit_pos)=pinncfg;
-  SREG &= oldSREG; // re-enable interrupts
+  SREG = oldSREG; // re-enable interrupts
 }
 
 static inline uint8_t portToPortBaseOffset(uint8_t port);
@@ -222,7 +222,7 @@ void turnOffPWM(uint8_t pin) {
         // rigmarole that produces a glitch in the PWM
         uint8_t fc_mask = (bit_mask == 0x02?0x80:0x40);
         if (TCD0.FAULTCTRL & fc_mask) {
-          uint8_t oldSREG &= SREG;
+          uint8_t oldSREG = SREG;
           cli();
           // uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
           //
@@ -242,7 +242,7 @@ void turnOffPWM(uint8_t pin) {
             }
           #endif
 
-          SREG &= oldSREG;
+          SREG = oldSREG;
         }
         break;
       }
@@ -283,7 +283,7 @@ void digitalWrite(uint8_t pin, uint8_t val) {
     // we need to know if it's been set high or low
     // otherwise the pullup state could get out of
     // sync with the output bit. Annoying!
-    val &= port->OUT & bit_mask;
+    val = port->OUT & bit_mask;
     // val will now be 0 (LOW) if the toggling made it LOW
     // or bit_mask if not. And further down, we only need to
     // know if it's
@@ -413,13 +413,13 @@ void openDrain(uint8_t pin, uint8_t state) {
   if (bit_mask == NOT_A_PIN)  return;
   /* Get port */
   PORT_t *port = digitalPinToPortStruct(pin);
-  port->OUTCLR &= bit_mask;
+  port->OUTCLR = bit_mask;
   if (state == LOW)
-    port->DIRSET &= bit_mask;
+    port->DIRSET = bit_mask;
   else if (state == CHANGE)
-    port->DIRTGL &= bit_mask;
+    port->DIRTGL = bit_mask;
   else // assume FLOAT
-    port->DIRCLR &= bit_mask;
+    port->DIRCLR = bit_mask;
   turnOffPWM(pin);
 }
 
@@ -434,7 +434,7 @@ inline __attribute__((always_inline)) void openDrainFast(uint8_t pin, uint8_t va
   VPORT_t *vport;
   vport = (VPORT_t *)(port * 4);
   PORT_t *portstr;
-  portstr &= (PORT_t *)(0x400+(0x20*port));
+  portstr = (PORT_t *)(0x400 + (0x20 * port));
 
   if (val == LOW)
     vport->DIR |= mask;

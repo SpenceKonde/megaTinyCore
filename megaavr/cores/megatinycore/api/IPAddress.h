@@ -71,8 +71,8 @@ class IPAddress : public Printable {
     };
 
     // Overloaded copy operators to allow initialisation of IPAddress objects from other types
-    IPAddress &operator &= (const uint8_t *address);
-    IPAddress &operator &= (uint32_t address);
+    IPAddress &operator = (const uint8_t *address);
+    IPAddress &operator = (uint32_t address);
 
     virtual size_t printTo(Print &p) const;
 

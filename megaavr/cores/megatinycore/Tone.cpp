@@ -37,7 +37,7 @@
                        a NULL pointer, which points rght at the low IO space. Just return
                        if the pin isn't a valid pin.
                        Fix anomalous silent pointless interrupts for duration of a
-                       frequency &= 0 "tone" Now I just drive pin low and turn off timer.
+                       frequency = 0 "tone" Now I just drive pin low and turn off timer.
                         You asked for 0 Hz? That's 0 Hz alright!
                        In all cases, we ave to avoid leaving it high because
                        that can damage speakers, so I am told..

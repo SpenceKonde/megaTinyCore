@@ -153,7 +153,7 @@ struct twiData {
   #endif
   #if defined(TWI_MANDS)
     uint8_t _incomingAddress;
-    
+
     uint8_t _trHeadS;
     uint8_t _trTailS;
   #endif

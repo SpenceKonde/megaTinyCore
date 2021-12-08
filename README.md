@@ -60,6 +60,7 @@ This is currently used only for the latest release, and should fix the avrdude n
   * [ATtiny1606,806,406](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x06.md)
   * [ATtiny1604,804,404,204](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x04.md)
   * [ATtiny402,202](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x02.md)
+
 ## Unsupported parts
   * ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the AVR core they use is gimped -  and their price isn't all that much lower. Avoid them.
 

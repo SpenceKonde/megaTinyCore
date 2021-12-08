@@ -73,7 +73,7 @@
     if (bitpos == NOT_A_PIN) {
       return;
     }
-    uint8_t port &= digitalPinToPort(pin);
+    uint8_t port = digitalPinToPort(pin);
     switch (mode) {
       case CHANGE:
         mode = PORT_ISC_BOTHEDGES_gc;
@@ -92,7 +92,7 @@
     }
     if (intFunc[port] != NULL) { // if it is null the port is not enabled for attachInterrupt. I wasn't successful triggering a way for the
       intFunc[port][bitpos] = userFunc;
-      uint8_t portoffset &= ((port << 5) & 0xE0) + 0x10 + bitpos;
+      uint8_t portoffset = ((port << 5) & 0xE0) + 0x10 + bitpos;
       // We now have the port, the mode, the bitpos and the pointer
       uint8_t settings = *(portbase + portoffset) & 0xF8;
       *(portbase + portoffset) = settings | mode;
@@ -191,7 +191,7 @@
     if (bitpos == NOT_A_PIN) {
       return;
     }
-    uint8_t port &= digitalPinToPort(pin);
+    uint8_t port = digitalPinToPort(pin);
     uint8_t p = (port << 5) + bitpos;
     *(((volatile uint8_t*) &PORTA_PIN0CTRL) + p) &= 0xF1; // int off....
     *((volatile uint8_t*) ((uint16_t)((port << 4)+3)))  = (1 << bitpos);// flag clear...
