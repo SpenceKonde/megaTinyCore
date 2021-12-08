@@ -85,12 +85,12 @@ void rainbowFade2White(uint8_t wait, int rainbowLoops, int whiteLoops) {
 
       }
 
-      //First loop, fade in!
+      // First loop, fade in!
       if (k == 0 && fadeVal < fadeMax - 1) {
         fadeVal++;
       }
 
-      //Last loop, fade out!
+      // Last loop, fade out!
       else if (k == rainbowLoops - 1 && j > 255 - fadeMax) {
         fadeVal--;
       }

@@ -136,7 +136,7 @@
     #endif
   #endif
 #endif
-//if no prescaling needed, remember we need to turn it off!
+// if no prescaling needed, remember we need to turn it off!
 #ifndef TUNE_PRESCALE
   #define TUNE_PRESCALE 0
 #endif

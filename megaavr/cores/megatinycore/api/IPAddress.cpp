@@ -74,12 +74,12 @@ bool IPAddress::fromString(const char *address) {
   return true;
 }
 
-IPAddress &IPAddress::operator=(const uint8_t *address) {
+IPAddress &IPAddress::operator &= (const uint8_t *address) {
   memcpy(_address.bytes, address, sizeof(_address.bytes));
   return *this;
 }
 
-IPAddress &IPAddress::operator=(uint32_t address) {
+IPAddress &IPAddress::operator &= (uint32_t address) {
   _address.dword = address;
   return *this;
 }

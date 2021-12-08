@@ -29,7 +29,7 @@
 
 
 inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
-  if(__builtin_constant_p(pin)) {
+  if (__builtin_constant_p(pin)) {
     if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
     // Exception made for NOT_A_PIN - code exists which relies on being able to pass this and have nothing happen.
     // While IMO very poor coding practice, these checks aren't here to prevent lazy programmers from intentionally
@@ -40,10 +40,10 @@ inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pi
 }
 
 inline __attribute__((always_inline)) void check_valid_analog_pin(pin_size_t pin) {
-  if(__builtin_constant_p(pin)) {
+  if (__builtin_constant_p(pin)) {
     #if MEGATINYCORE_SERIES == 2
       if (pin != ADC_TEMPERATURE && pin != ADC_GROUND && pin != ADC_DACREF0 && pin != ADC_VDDDIV10)
-    #elif defined(ADC_DAC0) //1-series
+    #elif defined(ADC_DAC0) // 1-series
       if (pin != ADC_DAC0 && pin != ADC_INTREF && pin != ADC_TEMPERATURE && pin != ADC_GROUND)
     #else // 0-series.
       if (pin != ADC_INTREF && pin != ADC_TEMPERATURE && pin != ADC_GROUND)
@@ -71,7 +71,7 @@ inline __attribute__((always_inline)) void check_valid_analog_pin(pin_size_t pin
 inline __attribute__((always_inline)) void check_valid_analog_ref(uint8_t mode) {
   if (__builtin_constant_p(mode)) {
     #if MEGATINYCORE_SERIES == 2
-      if (!(mode == EXTERNAL || mode == VDD || mode== INTERNAL1V024 || mode== INTERNAL2V048 || mode== INTERNAL4V1 || mode== INTERNAL2V5 ))
+      if (!(mode == EXTERNAL || mode == VDD || mode== INTERNAL1V024 || mode== INTERNAL2V048 || mode== INTERNAL4V1 || mode== INTERNAL2V5))
     #elif defined(EXTERNAL)
       if (!(mode == EXTERNAL || mode == VDD || mode== INTERNAL0V55  || mode== INTERNAL1V1   || mode== INTERNAL1V5 || mode== INTERNAL2V5 || mode== INTERNAL4V34))
     #else
@@ -83,7 +83,7 @@ inline __attribute__((always_inline)) void check_valid_analog_ref(uint8_t mode) 
 
 inline __attribute__((always_inline)) void check_valid_enh_res(uint8_t res) {
   if (__builtin_constant_p(res)) {
-    if (res < 0x80){
+    if (res < 0x80) {
       if (res < ADC_NATIVE_RESOLUTION_LOW) {
             badArg("When a resolution is passed to analogReadEnh, it must be at least the minimum native resolution (8 bits)");
       } else if (res > ADC_MAX_OVERSAMPLED_RESOLUTION) {
@@ -137,7 +137,7 @@ inline bool analogReadResolution(uint8_t res) {
   check_valid_resolution(res);
   #if MEGATINYCORE_SERIES == 2
     bool temp = (res == 8 || res == 10 || res == 12);
-    _analog_options = (_analog_options & 0xF0) | (temp ? res : 10); //just set that variable, setting the bit is awkward.
+    _analog_options = (_analog_options & 0xF0) | (temp ? res : 10); // just set that variable, setting the bit is awkward.
     return temp;
   #else
     if (res == 8) {
@@ -263,7 +263,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
  *     length to the maximum supported value.
  *   ADC_ENH_ERROR_RES_TOO_LOW (-2100000003)
  *     Resolution must not be lower than the lowest native resolution that
- *     the part supports (Core presents this as ADC_NATIVE_RESOLUTION_LOW )
+ *     the part supports (Core presents this as ADC_NATIVE_RESOLUTION_LOW)
  *     Get 8-bits and divide it if this is required; this is a rare
  *     use-case, and it is not appropriate to force the overhead on
  *     everyone else.
@@ -303,7 +303,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     if (mode != 1 && mode != 3) {
       ADC0.CTRLC = TIMEBASE_1US | mode;
     }
-    //Uh? Is that it? That was, ah, a tiny bit simpler.
+    // Uh? Is that it? That was, ah, a tiny bit simpler.
   }
 
   int16_t analogRead(uint8_t pin) {
@@ -315,7 +315,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       pin &= 0x3F;
     }
     #if PROGMEM_SIZE < 8096
-      if (pin > 0x33) { //covers most ways a bad channel could come about
+      if (pin > 0x33) { // covers most ways a bad channel could come about
     #else
       if (pin > NUM_ANALOG_INPUTS && ((pin < 0x30) || (pin > 0x33))) {
     #endif
@@ -345,7 +345,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
 
 
   inline __attribute__((always_inline)) void check_valid_negative_pin(uint8_t pin) {
-    if(__builtin_constant_p(pin)) {
+    if (__builtin_constant_p(pin)) {
       if (pin < 0x80) {
         // If high bit set, it's a channel, otherwise it's a digital pin so we look it up..
         pin = digitalPinToAnalogInput(pin);
@@ -369,7 +369,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     // 01 = Turn off PGA, settings unchanged. It will be enabled next time it is used until 01 or 11 is is passed to this.
     // 10 = Turn on PGA, and don't turn it off automatically.
     // 11 = turn off PGA now and automatically.
-    uint8_t lowlat=options & 0x03;
+    uint8_t lowlat &= options & 0x03;
     if (lowlat > 1) {
       if (lowlat == 3)
         ADC0.CTRLA &= ~ADC_LOWLAT_bm;
@@ -377,7 +377,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
         ADC0.CTRLA |= ADC_LOWLAT_bm;
     }
     uint8_t pgaen = options & 0x0C;
-    if (pgaen & 0x04) //turn off PGA.
+    if (pgaen & 0x04) // turn off PGA.
       ADC0.PGACTRL &= ~ADC_PGAEN_bm;
     if (pgaen & 0x08) {
       _analog_options = (_analog_options & 0x7F) | ((pgaen & 0x04)? 0 : 0x80);
@@ -394,8 +394,8 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   int32_t _analogReadEnh(uint8_t pin, uint8_t neg, uint8_t res, uint8_t gain) {
     if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
     uint8_t sampnum;
-    if (res > 0x80) { //raw accumulation
-      sampnum=res & 0x7F;
+    if (res > 0x80) { // raw accumulation
+      sampnum &= res & 0x7F;
       if (sampnum > 10) return ADC_ENH_ERROR_RES_TOO_HIGH;
     } else {
       if (res < ADC_NATIVE_RESOLUTION_LOW) return ADC_ENH_ERROR_RES_TOO_LOW;
@@ -410,7 +410,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       pin &= 0x3F;
     }
     #if PROGMEM_SIZE < 8096
-      if (pin > 0x33) { //covers most ways a bad channel could come about
+      if (pin > 0x33) { // covers most ways a bad channel could come about
     #else
       if (pin > NUM_ANALOG_INPUTS && ((pin < 0x30) || (pin > 0x33))) {
     #endif
@@ -425,7 +425,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       }
 
       #if PROGMEM_SIZE < 8096
-        if (neg > 0x33)  //covers most ways a bad channel could come about
+        if (neg > 0x33)  // covers most ways a bad channel could come about
       #else
         if (neg > NUM_ANALOG_INPUTS && ((neg != 0x30) && (neg != 0x33) && (neg != 0x31)))
       #endif
@@ -453,7 +453,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     }
     ADC0.CTRLF = sampnum;
     uint8_t command = ((neg != SINGLE_ENDED)?0x80:0) | ((res == 8) ? ADC_MODE_SINGLE_8BIT_gc : (res > ADC_NATIVE_RESOLUTION ? ADC_MODE_BURST_gc : ADC_MODE_SINGLE_12BIT_gc)) | 1;
-    ADC0.COMMAND=command;
+    ADC0.COMMAND &= command;
     while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
     int32_t result = ADC0.RESULT;
 
@@ -464,9 +464,9 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
         shift--;
       }
       // Sanity checks
-      //uint8_t roundup=result&0x01;
-      //result >>= 1;
-      //result += roundup;
+      // uint8_t roundup=result&0x01;
+      // result >>= 1;
+      // result += roundup;
     } else if (res == 8) {
       ; // do nothing
     } else if (res < ADC_NATIVE_RESOLUTION) {
@@ -495,7 +495,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     check_valid_enh_res(res);
     check_valid_analog_pin(pos);
     check_valid_negative_pin(neg);
-    if (__builtin_constant_p(gain)){
+    if (__builtin_constant_p(gain)) {
       if (gain != 0 && gain != 1 && gain != 2 && gain != 4 && gain != 8 && gain != 16)
         badArg("The requested gain is not available on this part, accepted values are 0, 1, 2, 4, 8 and 16.");
     }
@@ -519,7 +519,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     if (frequency == -1) {
       frequency = 2750;
     }
-    if (frequency > 0 ) {
+    if (frequency > 0) {
       if ((options & 0x01) == 0) {
         frequency = constrain(frequency, 300, ((ADC0.CTRLC & 0x04) ? 3000 : 6000));
       }
@@ -554,21 +554,21 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
         case EXTERNAL:
       #endif
       case VDD:
-        VREF.CTRLB &= ~VREF_ADC0REFEN_bm; //Turn off force-adc-reference-enable
-        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
+        VREF.CTRLB &= ~VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
+        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
         // VREF.CTRLA does not need to be reconfigured, as the voltage references only supply their specified voltage when requested to do so by the ADC.
         break;
       case INTERNAL0V55:
-        VREF.CTRLA =  VREF.CTRLA & ~(VREF_ADC0REFSEL_gm); //These bits are all 0 for 0.55v reference, so no need to do the mode << VREF_ADC0REFSEL_gp here;
-        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; //per datasheet, recommended SAMPCAP=0 at ref < 1v
-        VREF.CTRLB |= VREF_ADC0REFEN_bm; //Turn off force-adc-reference-enable
+        VREF.CTRLA =  VREF.CTRLA & ~(VREF_ADC0REFSEL_gm); // These bits are all 0 for 0.55v reference, so no need to do the mode << VREF_ADC0REFSEL_gp here;
+        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; // per datasheet, recommended SAMPCAP=0 at ref < 1v
+        VREF.CTRLB |= VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
         break;
       case INTERNAL1V1:
       case INTERNAL2V5:
       case INTERNAL4V34:
       case INTERNAL1V5:
         VREF.CTRLA = (VREF.CTRLA & ~(VREF_ADC0REFSEL_gm)) | (mode << VREF_ADC0REFSEL_gp);
-        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; //per datasheet, recommended SAMPCAP=1 at ref > 1v
+        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v
         break;
     }
   }
@@ -636,8 +636,8 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
         badArg("This part does not have an amplifier, gain argument must be omitted or given as 0");
     }
     uint8_t sampnum;
-    if (res & 0x80) { //raw accumulation
-      sampnum=res & 0x7F;
+    if (res & 0x80) { // raw accumulation
+      sampnum &= res & 0x7F;
       if (sampnum > 6) return ADC_ENH_ERROR_RES_TOO_HIGH;
     } else {
       if (res < ADC_NATIVE_RESOLUTION_LOW) return ADC_ENH_ERROR_RES_TOO_LOW;
@@ -662,7 +662,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
 
     uint8_t _ctrla = ADC0.CTRLA;
     ADC0.CTRLA = ADC_ENABLE_bm | (res == ADC_NATIVE_RESOLUTION_LOW ? ADC_RESSEL_bm : 0);
-    //if (res > 0x80) {
+    // if (res > 0x80) {
       ADC0.CTRLB = sampnum;
     /*} else
     if (res > ADC_NATIVE_RESOLUTION) {
@@ -680,10 +680,10 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
         result >>= 1;
         shift--;
       }
-      uint8_t roundup=result&0x01;
+      uint8_t roundup &= result&0x01;
       result >>= 1;
       result += roundup;
-    } else if (res == ADC_NATIVE_RESOLUTION - 1) { //9 bit res?!
+    } else if (res == ADC_NATIVE_RESOLUTION - 1) { // 9 bit res?!
       result >>= 1;
     } // res > 0x80 (raw accumulate) or res == 8, res == 10 need no adjustment;
     ADC0.CTRLA = _ctrla;
@@ -713,7 +713,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     if (frequency == -1) {
       frequency = 1450;
     }
-    if (frequency > 0 ) {
+    if (frequency > 0) {
       bool using_0v55 = !(VREF.CTRLA & VREF_ADC0REFSEL_gm || ADC0.CTRLC & ADC_REFSEL_gm);
       if ((options & 0x01) == 0) {
         frequency = constrain(frequency, (using_0v55 ? 100: 200), (using_0v55 ? 260 : 1500));
@@ -722,7 +722,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       for (uint8_t i =0; i < 8; i++) {
         int16_t clkadc = adc_prescale_to_clkadc[i];
         prescale = i;
-        if ((frequency >= clkadc) || (adc_prescale_to_clkadc[i+1] < ((options & 0x01) ? 2 : (using_0v55 ? 100 : 200)))) {
+        if ((frequency >= clkadc) || (adc_prescale_to_clkadc[i + 1] < ((options & 0x01) ? 2 : (using_0v55 ? 100 : 200)))) {
           ADC0.CTRLC = (ADC0.CTRLC & ~ADC_PRESC_gm) | prescale;
           break;
         }
@@ -780,10 +780,10 @@ void analogWrite(uint8_t pin, int val) {
         /* Calculate correct compare buffer register */
         #ifdef __AVR_ATtinyxy2__
         if (bit_mask == 0x80) {
-          bit_mask = 1;  //on the xy2, WO0 is on PA7
+          bit_mask = 1;  // on the xy2, WO0 is on PA7
         }
         #endif
-        uint8_t offset=0;
+        uint8_t offset &= 0;
         if (bit_mask > 0x04) { // HCMP
           bit_mask <<= 1;      // mind the gap
           offset = 1;          // used to offset the
@@ -801,7 +801,7 @@ void analogWrite(uint8_t pin, int val) {
     case DACOUT:
     {
       DAC0.DATA = val;
-      DAC0.CTRLA = 0x41; //OUTEN=1, ENABLE=1
+      DAC0.CTRLA = 0x41; // OUTEN=1, ENABLE=1
       break;
     }
   #endif
@@ -823,51 +823,51 @@ void analogWrite(uint8_t pin, int val) {
         #if defined(NO_GLITCH_TIMERD0)
           uint8_t set_inven = 0;
           if (val < 1) {
-            val = 0;        //this will "just work", we'll set it to the maximum, it will never match, and will stay LOW
+            val = 0;        // this will "just work", we'll set it to the maximum, it will never match, and will stay LOW
           } else if (val > 254) {
-            val = 0;        //here we *also* set it to 0 so it would stay LOW
-            set_inven = 1;  //but we invert the pin output with INVEN!
+            val = 0;        // here we *also* set it to 0 so it would stay LOW
+            set_inven = 1;  // but we invert the pin output with INVEN!
           }
         #endif
 
-        uint8_t oldSREG=SREG;
-        cli(); //interrupts off... wouldn't due to have this mess interrupted and messed with...
-        while ((TCD0.STATUS & (TCD_ENRDY_bm | TCD_CMDRDY_bm )) != (TCD_ENRDY_bm | TCD_CMDRDY_bm )); //if previous sync/enable in progress, wait for it to finish.
+        uint8_t oldSREG &= SREG;
+        cli(); // interrupts off... wouldn't due to have this mess interrupted and messed with...
+        while ((TCD0.STATUS & (TCD_ENRDY_bm | TCD_CMDRDY_bm)) != (TCD_ENRDY_bm | TCD_CMDRDY_bm)); // if previous sync/enable in progress, wait for it to finish.
         // with interrupts off since an interrupt could trip these...
-        //set new values
+        // set new values
         uint8_t fc_mask;
-        if (bit_mask == 2) {  //PIN_PC1
+        if (bit_mask == 2) {  // PIN_PC1
           TCD0.CMPBSET = ((255 - val) << 1) - 1;
           fc_mask = 0x80;
-        } else {        //PIN_PC0
+        } else {        // PIN_PC0
           TCD0.CMPASET = ((255 - val) << 1) - 1;
           fc_mask = 0x40;
         }
 
         if (!(TCD0.FAULTCTRL & fc_mask)) {
-          //if it's not active, we need to activate it... which produces a glitch in the PWM
-          TCD0.CTRLA &= ~TCD_ENABLE_bm; //stop the timer
+          // if it's not active, we need to activate it... which produces a glitch in the PWM
+          TCD0.CTRLA &= ~TCD_ENABLE_bm; // stop the timer
           _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL | fc_mask);
           while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until we can re-enable it
-          TCD0.CTRLA |= TCD_ENABLE_bm; //re-enable it
+          TCD0.CTRLA |= TCD_ENABLE_bm; // re-enable it
         } else {
-          TCD0.CTRLE = TCD_SYNCEOC_bm; //Synchronize
+          TCD0.CTRLE = TCD_SYNCEOC_bm; // Synchronize
         }
 
         #if defined(NO_GLITCH_TIMERD0)
-          // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts )
+          // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts)
           // so if we're here, we're acting on either PC0 or PC1.
-          if (set_inven == 0){
+          if (set_inven == 0) {
             // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR)
             // or somewhere in between.
-            if (bit_mask == 1){
+            if (bit_mask == 1) {
               PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
             } else {
               PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
             }
           } else {
             // we *are* turning off PWM while forcing pin high - analogwrite(pin,255) was called on TCD0 PWM pin...
-            if (bit_mask == 1){
+            if (bit_mask == 1) {
               PORTC.PIN0CTRL |= PORT_INVEN_bm;
             } else {
               PORTC.PIN1CTRL |= PORT_INVEN_bm;
@@ -878,7 +878,7 @@ void analogWrite(uint8_t pin, int val) {
       }
       break;
     #endif
-    //end of TCD0 code
+    // end of TCD0 code
 
     /* If non timer pin, or unknown timer definition.  */
     /* do a digital write  */
@@ -890,7 +890,7 @@ void analogWrite(uint8_t pin, int val) {
         digitalWrite(pin, HIGH);
       }
       break;
-  } //end of switch/case
+  } // end of switch/case
   // Now that everything is said and done, we've set the pin high or low as if it's not a PWM pin, or told the timer to give it PWM if it is - this is a better timwe to finally turn on the output drivers.
   // True, it is at most 1-2 PWM timer ticks under typical settings, it's probably at least 1 tick, maybe several at 1 MHz (haven't timed analogWrite lately)
   pinMode(pin, OUTPUT);

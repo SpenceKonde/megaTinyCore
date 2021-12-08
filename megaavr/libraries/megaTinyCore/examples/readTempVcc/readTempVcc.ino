@@ -22,7 +22,7 @@ void setup() {
   Serial.begin(57600);
 }
 
-uint16_t readSupplyVoltage() { //returns value in millivolts to avoid floating point
+uint16_t readSupplyVoltage() { // returns value in millivolts to avoid floating point
   #if MEGATINYCORE_SERIES!=2
   analogReference(VDD);
   VREF.CTRLA = VREF_ADC0REFSEL_1V5_gc;
@@ -41,13 +41,13 @@ uint16_t readSupplyVoltage() { //returns value in millivolts to avoid floating p
   return reading;
   #else
   analogReference(INTERNAL1V024);
-  Serial.print(analogReadEnh(ADC_VDDDIV10, 12)); //throwaway reading just for goood measure.
+  Serial.print(analogReadEnh(ADC_VDDDIV10, 12)); // throwaway reading just for goood measure.
   Serial.println(" (discarded)");
   int32_t vddmeasure = analogReadEnh(ADC_VDDDIV10, 12); // Take it at 12 bits
   Serial.println(vddmeasure);
-  int16_t returnval = vddmeasure >> 2; //divide by 4 to get into millivolts.
+  int16_t returnval = vddmeasure >> 2; // divide by 4 to get into millivolts.
   if (vddmeasure & 0x02) {
-    //if last two digits were 0b11 or 0b10 we should round up
+    // if last two digits were 0b11 or 0b10 we should round up
     returnval++;
   }
   return returnval;
@@ -67,17 +67,17 @@ void printRegisters() {
 
 uint16_t readTemp() {
   #if MEGATINYCORE_SERIES!=2
-  //based on the datasheet, in section 30.3.2.5 Temperature Measurement
+  // based on the datasheet, in section 30.3.2.5 Temperature Measurement
   int8_t sigrow_offset = SIGROW.TEMPSENSE1; // Read signed value from signature row
   uint8_t sigrow_gain = SIGROW.TEMPSENSE0; // Read unsigned value from signature row
   analogReference(INTERNAL1V1);
-  ADC0.SAMPCTRL = 0x1F; //maximum length sampling
+  ADC0.SAMPCTRL = 0x1F; // maximum length sampling
   ADC0.CTRLD &= ~(ADC_INITDLY_gm);
-  ADC0.CTRLD |= ADC_INITDLY_DLY32_gc; //wait 32 ADC clocks before reading new reference
+  ADC0.CTRLD |= ADC_INITDLY_DLY32_gc; // wait 32 ADC clocks before reading new reference
   uint16_t adc_reading = analogRead(ADC_TEMPERATURE); // ADC conversion result with 1.1 V internal reference
   Serial.println(adc_reading);
   analogReference(VDD);
-  ADC0.SAMPCTRL = 0x0E; //14, what we now set it to automatically on startup so we can run the ADC while keeping the same sampling time
+  ADC0.SAMPCTRL = 0x0E; // 14, what we now set it to automatically on startup so we can run the ADC while keeping the same sampling time
   ADC0.CTRLD &= ~(ADC_INITDLY_gm);
   ADC0.CTRLD |= ADC_INITDLY_DLY16_gc;
   uint32_t temp = adc_reading + sigrow_offset; // Datasheet is WRONG - the offset from the sigrow is signed; it should be added, not subtracted!

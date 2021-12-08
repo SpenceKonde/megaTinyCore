@@ -37,11 +37,11 @@ The USERSIG library is included with megaTinyCore. To add its functionality to y
 ```Arduino
 #include <USERSIG.h>
 
-void setup(){
+void setup() {
 
 }
 
-void loop(){
+void loop() {
 
 }
 
@@ -53,34 +53,34 @@ You can view all the examples [here](examples/).
 
 ## Library functions
 
-### `USERSIG.read( address )` [[_example_]](examples/usersig_read/usersig_read.ino)
+### `USERSIG.read(address)` [[_example_]](examples/usersig_read/usersig_read.ino)
 
 This function allows you to read a single byte of data from the USERSIG.
 Its only parameter is an `byte` which should be set to the address you wish to read.
 
 The function returns an `unsigned char` containing the value read.
 
-### `USERSIG.write( address, value )` [[_example_]](examples/usersig_write/usersig_write.ino)
+### `USERSIG.write(address, value)` [[_example_]](examples/usersig_write/usersig_write.ino)
 
 The `write()` method allows you to write a single byte of data to the USERSIG.
 Two parameters are needed. The first is a `byte` containing the address that is to be written, and the second is the data to be written, a `byte`.
 
 This function does not return any value.
 
-### `USERSIG.update( address, value )` [[_example_]](examples/usersig_update/usersig_update.ino)
+### `USERSIG.update(address, value)` [[_example_]](examples/usersig_update/usersig_update.ino)
 
 This function is similar to `USERSIG.write()` however this method will only write data if the cell contents pointed to by `address` is different to `value`. This method can help prevent unnecessary wear on the USERSIG cells.
 
 This function does not return any value.
 
-### `USERSIG.get( address, object )` [[_example_]](examples/usersig_get/usersig_get.ino)
+### `USERSIG.get(address, object)` [[_example_]](examples/usersig_get/usersig_get.ino)
 
 This function will retrieve any object from the USERSIG.
 Two parameters are needed to call this function. The first is a `byte` containing the address that is to be written, and the second is the object you would like to read.
 
 This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
 
-### `USERSIG.put( address, object )` [[_example_]](examples/usersig_put/usersig_put.ino)
+### `USERSIG.put(address, object)` [[_example_]](examples/usersig_put/usersig_put.ino)
 
 This function will write any object to the USERSIG.
 Two parameters are needed to call this function. The first is a `byte` containing the address that is to be written, and the second is the object you would like to write.
@@ -101,15 +101,15 @@ This operator returns a reference to the USERSIG cell.
 ```c++
 byte val;
 
-//Read first USERSIG cell.
-val = USERSIG[ 0 ];
+// Read first USERSIG cell.
+val = USERSIG[0];
 
-//Write first USERSIG cell.
-USERSIG[ 0 ] = val;
+// Write first USERSIG cell.
+USERSIG[0] = val;
 
-//Compare contents
-if( val == USERSIG[ 0 ] ){
-  //Do something...
+// Compare contents
+if (val == USERSIG[0]) {
+  // Do something...
 }
 ```
 
@@ -130,11 +130,11 @@ Its purpose is to mimic a typical byte of RAM, however its storage is the USERSI
 This class has an overhead of two bytes, similar to storing a pointer to an USERSIG cell.
 
 ```C++
-USRef ref = USERSIG[ 10 ]; //Create a reference to 11th cell.
+USRef ref = USERSIG[10]; // Create a reference to 11th cell.
 
-ref = 4; //write to USERSIG cell.
+ref = 4; // write to USERSIG cell.
 
-unsigned char val = ref; //Read referenced cell.
+unsigned char val = ref; // Read referenced cell.
 ```
 
 ### `USPtr` class
@@ -144,13 +144,13 @@ Just like a normal pointer type, this type can be dereferenced and repositioned 
 increment/decrement operators.
 
 ```C++
-USPtr ptr = 10; //Create a pointer to 11th cell.
+USPtr ptr = 10; // Create a pointer to 11th cell.
 
-*ptr = 4; //dereference and write to USERSIG cell.
+*ptr = 4; // dereference and write to USERSIG cell.
 
-unsigned char val = *ptr; //dereference and read.
+unsigned char val = *ptr; // dereference and read.
 
-ptr++; //Move to next USERSIG cell.
+ptr++; // Move to next USERSIG cell.
 ```
 
 #### `USERSIG.begin()`

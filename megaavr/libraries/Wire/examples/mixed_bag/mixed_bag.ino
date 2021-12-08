@@ -55,7 +55,7 @@ void setup() {
   Wire.begin(0x54, false, WIRE_ALT_ADDRESS(0x64));// initialize slave - equiv. ((64 << 1) | 1)
   Wire.onReceive(receiveDataWire);                // Set the slave receive ISR
   Wire.onRequest(transmitDataWire);               // Set the slave request ISR
-  //MySerial.swap(1);           // Remember to swap serial pins if you need to do that with your connections.
+  // MySerial.swap(1);           // Remember to swap serial pins if you need to do that with your connections.
   MySerial.begin(115200);       // Use 115200 baud - this is the 2020's, and these are modern AVRs.
 }
 

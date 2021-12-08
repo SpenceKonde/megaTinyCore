@@ -60,10 +60,10 @@ struct USRef {
   }
 
   // Assignment/write members.
-  USRef &operator=(const USRef &ref) {
+  USRef &operator = (const USRef &ref) {
     return *this = *ref;
   }
-  USRef &operator=(uint8_t in)       {
+  USRef &operator = (uint8_t in)       {
     *(uint8_t *)((index & (USER_SIGNATURES_SIZE - 1)) | USER_SIGNATURES_START) = in;
     _PROTECTED_WRITE_SPM(NVMCTRL.CTRLA, NVMCTRL_CMD_PAGEERASEWRITE_gc);
     while (NVMCTRL.STATUS & NVMCTRL_EEBUSY_bm);
@@ -124,7 +124,7 @@ struct USRef {
     return --(*this), ret;
   }
 
-  uint8_t index; //Index of current USERSIG cell.
+  uint8_t index; // Index of current USERSIG cell.
 };
 
 /* USPtr class.
@@ -142,7 +142,7 @@ struct USPtr {
   operator int() const              {
     return index;
   }
-  USPtr &operator=(int in)          {
+  USPtr &operator = (int in)          {
     return index = (in), *this;
   }
 
@@ -179,7 +179,7 @@ struct USPtr {
 
 struct USERSIGClass {
 
-  //Basic user access methods.
+  // Basic user access methods.
   USRef operator[](const int idx)    {
     return idx;
   }

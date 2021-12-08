@@ -41,7 +41,7 @@ uint8_t stockCal;
     const uint8_t names[]        = {   16,    20,    24,    25,    30,    32,  0xFF};
     #define CAL_START (USER_SIGNATURES_SIZE-6)
   #endif
-#else  //0/1 series
+#else  // 0/1 series
   const uint8_t homeindex        = 2;
   #if F_CPU == 16000000
     const uint16_t speeds[]      = {10000, 12000, 16000, 20000, 24000, 25000, 65535};
@@ -65,10 +65,10 @@ void ensureCleanReset() {
   if (rstfr == 0) {
     rstfr = GPIOR0 & (~RSTCTRL_WDRF_bm);
   }
-  if (!(rstfr & 0x30)) { //if neither a software or or UPDI reset, it may be unclean from excessive overclocking
+  if (!(rstfr & 0x30)) { // if neither a software or or UPDI reset, it may be unclean from excessive overclocking
     _PROTECTED_WRITE(RSTCTRL_SWRR, RSTCTRL_SWRE_bm);
   } else {
-    if (rstfr & 0x20) { //UPDI reset - that implies we just uploaded this and that we should retune the oscillator.
+    if (rstfr & 0x20) { // UPDI reset - that implies we just uploaded this and that we should retune the oscillator.
        // You don't upload a tuning sketch if you don't intend to tune it.
        TuningDone = 255;
     } else if (rstfr != 0x10) { // if it's not just a reset flag, let's clean it for good measure
@@ -105,7 +105,7 @@ void setup() {
   #endif
 
   _delay_ms(10);
-  //See if we already wrote some tuning constants - the one at our home speed is enough to cancel tuning
+  // See if we already wrote some tuning constants - the one at our home speed is enough to cancel tuning
   // except when tuning_done=255 meaning it was just uploaded
   #ifdef FORCE_PIN
     uint16_t countdown = 3000;
@@ -124,7 +124,7 @@ void setup() {
         Serial.println("already tuned");
         for (byte i = 0; i < 6; i++) {
           if (i) Serial.print(':');
-          Serial.printHex(USERSIG.read(CAL_START+i));
+          Serial.printHex(USERSIG.read(CAL_START + i));
         }
       Serial.println();
       Serial.flush();
@@ -137,7 +137,7 @@ void setup() {
         Serial.println("tuning with new sketch");
         for (byte i = 0; i < 6; i++) {
           if (i) Serial.print(':');
-          Serial.printHex(USERSIG.read(CAL_START+i));
+          Serial.printHex(USERSIG.read(CAL_START + i));
         }
       Serial.println();
       Serial.flush();
@@ -147,13 +147,13 @@ void setup() {
 
 void TotallyJustBlink() {
   #ifdef VPORTA
-    VPORTA.DIR=0;
+    VPORTA.DIR = 0;
   #endif
   #ifdef VPORTB
-    VPORTB.DIR=0;
+    VPORTB.DIR = 0;
   #endif
   #ifdef VPORTC
-    VPORTC.DIR=0;
+    VPORTC.DIR = 0;
   #endif
   pinMode(LED_BUILTIN,OUTPUT);
   while (1) {
@@ -172,7 +172,7 @@ void tidyTuningValues() {
         // must be too low Mark as such
         USERSIG.write(CAL_START + j, 0x80);
       } else {
-        USERSIG.write(CAL_START + j, 0xC0); //indicating we didn't even make it there.
+        USERSIG.write(CAL_START + j, 0xC0); // indicating we didn't even make it there.
       }
     }
   }
@@ -186,7 +186,7 @@ void loop() {
   _PROTECTED_WRITE(WDT_CTRLA, 0x0B);
   uint16_t lastpulselen = 1;
   uint8_t currentTarget = 0;
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 3); //prescale enabled, div by 4
+  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 3); // prescale enabled, div by 4
   #if MEGATINYCORE_SERIES==2
     for (byte x = 0; x < 128; x++)  // 128 possible settings for 2-series
   #else
@@ -196,7 +196,7 @@ void loop() {
     watchdogReset();
     _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, x); /* Switch to new clock - prescale of 4 already on */
     _NOP();
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 2);   //prescale disabled, div by 4
+    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 2);   // prescale disabled, div by 4
     _delay_ms(1);
     digitalWriteFast(PROG_PIN,HIGH);
     byte done = 0;
@@ -211,19 +211,19 @@ void loop() {
           while (i < 8)
         #endif
         {
-          uint16_t temp=pulseIn(PIN_PA5, LOW, (uint32_t) 100000UL);
+          uint16_t temp = pulseIn(PIN_PA5, LOW, (uint32_t) 100000UL);
           #if defined(ONEKHZMODE)
             if (temp < 200 || temp > 1000)
           #else
             if (temp < 400 || temp > 2000)
           #endif
           {
-            i = 100; //set to impossible value to reach normally.
+            i = 100; // set to impossible value to reach normally.
           }
           pulselen += temp;
            i++;
         }
-        if (i == 8 || i == 16){
+        if (i == 8 || i == 16) {
           done = 1;
         }
 
@@ -256,7 +256,7 @@ void loop() {
     // First pass, we need to figure out what the first constant we write is.
     if (x == 0) {
       while (pulselen > PulseLens[currentTarget] && (pulselen - PulseLens[currentTarget]) > 150) {
-        currentTarget++; //oscillator is too fast, can't hit that speed.
+        currentTarget++; // oscillator is too fast, can't hit that speed.
 
       }
     }
@@ -275,7 +275,7 @@ void loop() {
         }
 
       } else {
-        //We got this one already!
+        // We got this one already!
         currentTarget++;
       }
 #if MEGATINYCORE_SERIES == 2
@@ -285,27 +285,27 @@ void loop() {
 #endif
       // this is the last chance and we don't have values for all targets!
       // Are we so close tat we can get away with using it?
-      uint16_t underoneandhalfpercent=PulseLens[currentTarget];
-      underoneandhalfpercent >>= 6; //divide by 64, for around 1.6% of targe
+      uint16_t underoneandhalfpercent = PulseLens[currentTarget];
+      underoneandhalfpercent >>= 6; // divide by 64, for around 1.6% of targe
       if (PulseLens[currentTarget] - pulselen < underoneandhalfpercent) {
-        writeme=x;
+        writeme = x;
       }
     }
 
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 3); //prescale enabled, div by 4: Slow back down so we can safely increment the speed next pass through loop.
+    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 3); // prescale enabled, div by 4: Slow back down so we can safely increment the speed next pass through loop.
     if (writeme != 0x80 && TuningDone != 1) {
 
       USERSIG.write(CAL_START + currentTarget, writeme);
     }
-    lastpulselen = pulselen; //Today is just tomorrow's yesterday.
+    lastpulselen = pulselen; // Today is just tomorrow's yesterday.
     _delay_ms(5);
   }
-  //End of the loop, we've done them all!
+  // End of the loop, we've done them all!
   watchdogReset();
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 3); //prescale enabled, div by 4
+  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 3); // prescale enabled, div by 4
   _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, stockCal);
   _NOP(); _NOP();
-  //now for ones we still haven't hit, mark as 0x80 ("tuning found unreachable")
+  // now for ones we still haven't hit, mark as 0x80 ("tuning found unreachable")
   if (currentTarget <= 5 && USERSIG.read(CAL_START + currentTarget) == 0xFF) {
     while (currentTarget <= 5) {
       if (USERSIG.read(CAL_START + currentTarget) == 0xFF) {
@@ -314,13 +314,13 @@ void loop() {
       currentTarget++;
     }
   }
-  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 2); //prescale disabled, div by 4
+  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 2); // prescale disabled, div by 4
   _PROTECTED_WRITE(WDT_CTRLA, 0x00);
   _delay_ms(20);
   #ifdef SERIAL_DEBUG
     for (byte i = 0; i < 6; i++) {
       if (i) Serial.print(':');
-      Serial.printHex(USERSIG.read(CAL_START+i));
+      Serial.printHex(USERSIG.read(CAL_START + i));
     }
     Serial.flush();
   #endif

@@ -44,7 +44,7 @@ int8_t len = 0;
 
 void setup() {
   Wire.begin();                     // initialize master
-  //MySerial.swap(1);               // Remember to swap serial pins if you need to do that with your connections.
+  // MySerial.swap(1);               // Remember to swap serial pins if you need to do that with your connections.
   MySerial.begin(115200);           // Use 115200 baud - this is the 2020's, and these are modern AVRs.
 }
 
@@ -87,7 +87,7 @@ void sendDataWire() {
   #else
   if (firstElement >= '0' && firstElement <= '7') {   // check if the first element 0~7
     address = firstElement - '0';  // a char is an int8_t, a signed 8-bit value, so you can subtract them just fine.
-    address <<= 4; //so we got a 0-7 from previous line, leftshift it 4 places to put it in the high bits.
+    address <<= 4; // so we got a 0-7 from previous line, leftshift it 4 places to put it in the high bits.
     address |= 4;  // and we promised to use 0x_4 for the addresses, so add bitwise or that 4 into the low nybble.
   } else {
     address = 0;

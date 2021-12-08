@@ -70,7 +70,7 @@ bool TWI_checkPins(const uint8_t sda_pin, const uint8_t scl_pin) {
 
 void TWI0_ClearPins() {
   #ifdef PORTMUX_TWIROUTEA
-    uint8_t muxval = PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm; //registers are volatile, so this is bulky to recheck multiple times.
+    uint8_t muxval = PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm; // registers are volatile, so this is bulky to recheck multiple times.
     if (muxval == PORTMUX_TWI0_ALT2_gc) {
       // make sure we don't get errata'ed - make sure their bits in the
       // PORTx.OUT registers are 0.
@@ -91,7 +91,7 @@ void TWI0_ClearPins() {
             PORTC.OUTCLR = 0xC0;  // bits 6 and 7
           }
         #else
-          PORTC.OUTCLR = 0x0C; //AVR DD only has one set of slave only pins.
+          PORTC.OUTCLR = 0x0C; // AVR DD only has one set of slave only pins.
         #endif
       }
     #endif

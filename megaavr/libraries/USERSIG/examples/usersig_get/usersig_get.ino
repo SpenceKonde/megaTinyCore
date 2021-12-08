@@ -20,20 +20,20 @@
 
 void setup() {
 
-  float f = 0.00f;   //Variable to store data read from USERSIG.
-  int eeAddress = 0; //USERSIG address to start reading from
+  float f = 0.00f;   // Variable to store data read from USERSIG.
+  int eeAddress = 0; // USERSIG address to start reading from
 
   Serial.begin(115200);
 
   Serial.print("Read float from USERSIG: ");
 
-  //Get the float data from the USERSIG at position 'eeAddress'
+  // Get the float data from the USERSIG at position 'eeAddress'
   USERSIG.get(eeAddress, f);
-  Serial.println(f, 3);    //This may print 'ovf, nan' if the data inside the USERSIG is not a valid float.
+  Serial.println(f, 3);    // This may print 'ovf, nan' if the data inside the USERSIG is not a valid float.
 
   /***
     As get also returns a reference to 'f', you can use it inline.
-    E.g: Serial.print( USERSIG.get( eeAddress, f ) );
+    E.g: Serial.print(USERSIG.get(eeAddress, f));
   ***/
 
   /***
@@ -41,7 +41,7 @@ void setup() {
     I have separated this into an extra function.
   ***/
 
-  secondTest(); //Run the next test.
+  secondTest(); // Run the next test.
 }
 
 struct MyObject {
@@ -51,9 +51,9 @@ struct MyObject {
 };
 
 void secondTest() {
-  int eeAddress = sizeof(float); //Move address to the next byte after float 'f'.
+  int eeAddress = sizeof(float); // Move address to the next byte after float 'f'.
 
-  MyObject customVar; //Variable to store custom object read from USERSIG.
+  MyObject customVar; // Variable to store custom object read from USERSIG.
   USERSIG.get(eeAddress, customVar);
 
   Serial.println("Read custom object from USERSIG: ");

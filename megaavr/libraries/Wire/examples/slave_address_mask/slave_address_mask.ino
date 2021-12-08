@@ -130,7 +130,7 @@ void printMessage() {
     MySerial.println();
   }
   gotMessage = 0;
-  sei(); //enable interrupts again. This is the same as Interrupts();
+  sei(); // enable interrupts again. This is the same as Interrupts();
 }
 
 // function that executes whenever data is received from master

@@ -71,7 +71,7 @@ namespace SDLib {
       boolean begin(uint8_t csPin = SD_CHIP_SELECT_PIN);
       boolean begin(uint32_t clock, uint8_t csPin);
 
-      //call this when a card is removed. It will allow you to insert and initialise a new card.
+      // call this when a card is removed. It will allow you to insert and initialise a new card.
       void end();
 
       // Open the specified file/directory with the supplied mode (e.g. read or

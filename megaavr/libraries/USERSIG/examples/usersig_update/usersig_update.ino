@@ -38,7 +38,7 @@ void loop() {
   /***
     The function USERSIG.update(address, val) is equivalent to the following:
 
-    if( USERSIG.read(address) != val ){
+    if (USERSIG.read(address) != val) {
       USERSIG.write(address, val);
     }
   ***/

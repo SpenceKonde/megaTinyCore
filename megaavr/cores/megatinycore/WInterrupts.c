@@ -73,7 +73,7 @@
     if (bitpos == NOT_A_PIN) {
       return;
     }
-    uint8_t port=digitalPinToPort(pin);
+    uint8_t port &= digitalPinToPort(pin);
     switch (mode) {
       case CHANGE:
         mode = PORT_ISC_BOTHEDGES_gc;
@@ -92,7 +92,7 @@
     }
     if (intFunc[port] != NULL) { // if it is null the port is not enabled for attachInterrupt. I wasn't successful triggering a way for the
       intFunc[port][bitpos] = userFunc;
-      uint8_t portoffset=((port << 5) & 0xE0) + 0x10 + bitpos;
+      uint8_t portoffset &= ((port << 5) & 0xE0) + 0x10 + bitpos;
       // We now have the port, the mode, the bitpos and the pointer
       uint8_t settings = *(portbase + portoffset) & 0xF8;
       *(portbase + portoffset) = settings | mode;
@@ -126,7 +126,7 @@
       "push  r30"        "\n\t"
       "push  r31"        "\n\t"
       ::);
-    asm volatile (  //This gets us the address of intFunc in Y pointer reg.
+    asm volatile (  // This gets us the address of intFunc in Y pointer reg.
       "add   r26,   r16"  "\n\t" // get the address of the functions for this port (r 16 is 2x the port number)
       "adc   r27,    r1"  "\n\t" // by adding that offset to the address we had the compiler generate the ldi's for
       "ld    r28,     X+" "\n\t" // load the pointer to this port's function array...
@@ -191,7 +191,7 @@
     if (bitpos == NOT_A_PIN) {
       return;
     }
-    uint8_t port=digitalPinToPort(pin);
+    uint8_t port &= digitalPinToPort(pin);
     uint8_t p = (port << 5) + bitpos;
     *(((volatile uint8_t*) &PORTA_PIN0CTRL) + p) &= 0xF1; // int off....
     *((volatile uint8_t*) ((uint16_t)((port << 4)+3)))  = (1 << bitpos);// flag clear...
@@ -227,7 +227,7 @@
 
   #if defined(CORE_ATTACH_ALL)
     #ifdef PORTA_PINS
-      ISR(PORTA_PORT_vect, ISR_NAKED){
+      ISR(PORTA_PORT_vect, ISR_NAKED) {
       asm volatile(
         "push r1"       "\n\t"
         "push r16"      "\n\t"
@@ -238,7 +238,7 @@
     }
     #endif
     #ifdef PORTB_PINS
-      ISR(PORTB_PORT_vect, ISR_NAKED){
+      ISR(PORTB_PORT_vect, ISR_NAKED) {
       asm volatile(
         "push r1"       "\n\t"
         "push r16"      "\n\t"
@@ -249,7 +249,7 @@
     }
     #endif
     #ifdef PORTC_PINS
-      ISR(PORTC_PORT_vect, ISR_NAKED){
+      ISR(PORTC_PORT_vect, ISR_NAKED) {
       asm volatile(
         "push r1"       "\n\t"
         "push r16"      "\n\t"
@@ -306,13 +306,13 @@
 
     /* Get bit position and check pin validity */
     uint8_t bit_pos = digitalPinToBitPosition(pin);
-    if(bit_pos == NOT_A_PIN) return;
+    if (bit_pos == NOT_A_PIN) return;
 
     /* Get interrupt number from pin */
     uint8_t interruptNum = (digitalPinToPort(pin) * 8) + bit_pos;
 
     /* Check interrupt number and apply function pointer to correct array index */
-    if(interruptNum < EXTERNAL_NUM_INTERRUPTS) {
+    if (interruptNum < EXTERNAL_NUM_INTERRUPTS) {
       intFunc[interruptNum] = userFunc;
 
       // Configure the interrupt mode (trigger on low input, any change, rising
@@ -352,12 +352,12 @@
   void detachInterrupt(uint8_t pin) {
     /* Get bit position and check pin validity */
     uint8_t bit_pos = digitalPinToBitPosition(pin);
-    if(bit_pos == NOT_A_PIN) return;
+    if (bit_pos == NOT_A_PIN) return;
 
     /* Get interrupt number from pin */
     uint8_t interruptNum = (digitalPinToPort(pin) * 8) + bit_pos;
 
-    if(interruptNum < EXTERNAL_NUM_INTERRUPTS) {
+    if (interruptNum < EXTERNAL_NUM_INTERRUPTS) {
       // Disable the interrupt.
 
       /* Get pointer to correct pin control register */
@@ -380,16 +380,16 @@
     uint8_t bit_pos = PIN0_bp, bit_mask = PIN0_bm;
 
     /* Iterate through flags */
-    while(bit_pos <= PIN7_bp){
+    while(bit_pos <= PIN7_bp) {
 
       /* Check if flag raised */
-      if(int_flags & bit_mask){
+      if (int_flags & bit_mask) {
 
       /* Get interrupt */
       uint8_t interrupt_num = port*8 + bit_pos;
 
         /* Check if function defined */
-        if(intFunc[interrupt_num] != 0){
+        if (intFunc[interrupt_num] != 0) {
 
           /* Call function */
           intFunc[interrupt_num]();

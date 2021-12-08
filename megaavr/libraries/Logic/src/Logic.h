@@ -125,7 +125,7 @@ namespace in {
     input           = 0x25,
     input_no_pullup = 0x25,
 
-    #else //tinyAVR 0/1-series
+    #else // tinyAVR 0/1-series
     masked          = 0x00,
     unused          = 0x00,
     disable         = 0x00,

@@ -33,7 +33,7 @@ extern "C" {
   void badCall(const char*) __attribute__((error("")));
   inline __attribute__((always_inline)) void check_constant_pin(pin_size_t pin)
   {
-    if(!__builtin_constant_p(pin))
+    if (!__builtin_constant_p(pin))
       badArg("Fast digital pin must be a constant");
   }
 /* ADC-related stuff */
@@ -57,7 +57,7 @@ extern "C" {
   #define INTERNAL        ADC_REFSEL_INTREF_gc
   #define VDD             ADC_REFSEL_VDDREF_gc
 
-  #if (defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3217__) )
+  #if (defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny3217__))
     #define EXTERNAL      ADC_REFSEL_VREFA_gc
   #endif
 
@@ -231,7 +231,7 @@ void set_millis(uint32_t newmillis);  // set current millis time.
 int32_t     analogReadEnh(        uint8_t pin, /* no neg */ uint8_t res, uint8_t gain);
 int32_t     analogReadDiff(       uint8_t pos, uint8_t neg, uint8_t res, uint8_t gain);
 int16_t     analogClockSpeed(     int16_t frequency,        uint8_t options);
-bool        analogSampleDuration( uint8_t dur);
+bool        analogSampleDuration(uint8_t dur);
 void        DACReference(         uint8_t mode);
 void        ADCPowerOptions(      uint8_t options); /* 2-series only */
 
@@ -306,20 +306,20 @@ extern const uint8_t digital_pin_to_bit_position[];
 extern const uint8_t digital_pin_to_timer[];
 
 
-#define digitalPinToPort(pin)               ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_port[pin]                            : NOT_A_PIN )
-#define digitalPinToBitPosition(pin)        ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_bit_position[pin]                    : NOT_A_PIN )
-#define digitalPinToBitMask(pin)            ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_bit_mask[pin]                        : NOT_A_PIN )
-#define digitalPinToTimer(pin)              ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_timer[pin]                           : NOT_ON_TIMER )
+#define digitalPinToPort(pin)               ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_port[pin]                            : NOT_A_PIN)
+#define digitalPinToBitPosition(pin)        ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_bit_position[pin]                    : NOT_A_PIN)
+#define digitalPinToBitMask(pin)            ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_bit_mask[pin]                        : NOT_A_PIN)
+#define digitalPinToTimer(pin)              ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_timer[pin]                           : NOT_ON_TIMER)
 #define portToPortStruct(port)              ((port < NUM_TOTAL_PORTS) ? ((PORT_t *) &PORTA + port)                          : NULL)
 #define digitalPinToPortStruct(pin)         ((pin  < NUM_TOTAL_PINS)  ? ((PORT_t *) &PORTA + digitalPinToPort(pin))         : NULL)
-#define analogPinToBitPosition(pin)         ((digitalPinToAnalogInput(pin) != NOT_A_PIN) ? digital_pin_to_bit_position[pin] : NOT_A_PIN )
-#define analogPinToBitMask(pin)             ((digitalPinToAnalogInput(pin) != NOT_A_PIN) ? digital_pin_to_bit_mask[pin]     : NOT_A_PIN )
-#define getPINnCTRLregister(port, bit_pos)  (((port != NULL) && (bit_pos < NOT_A_PIN)) ? ((volatile uint8_t *)&(port->PIN0CTRL) + bit_pos) : NULL )
+#define analogPinToBitPosition(pin)         ((digitalPinToAnalogInput(pin) != NOT_A_PIN) ? digital_pin_to_bit_position[pin] : NOT_A_PIN)
+#define analogPinToBitMask(pin)             ((digitalPinToAnalogInput(pin) != NOT_A_PIN) ? digital_pin_to_bit_mask[pin]     : NOT_A_PIN)
+#define getPINnCTRLregister(port, bit_pos)  (((port != NULL) && (bit_pos < NOT_A_PIN)) ? ((volatile uint8_t *)&(port->PIN0CTRL) + bit_pos) : NULL)
 
 #define digitalPinToInterrupt(P) (P)
 
 #define portOutputRegister(P) ((volatile uint8_t *)(&portToPortStruct(P)->OUT))
-#define portInputRegister(P)  ((volatile uint8_t *)(&portToPortStruct(P)->IN ))
+#define portInputRegister(P)  ((volatile uint8_t *)(&portToPortStruct(P)->IN))
 #define portModeRegister(P)   ((volatile uint8_t *)(&portToPortStruct(P)->DIR))
 
 
@@ -422,7 +422,7 @@ extern const uint8_t digital_pin_to_timer[];
 
 #ifdef __cplusplus
   #include "UART.h"
-  int32_t analogReadEnh( uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
+  int32_t analogReadEnh(uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int32_t analogReadDiff(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int16_t analogClockSpeed(int16_t frequency = 0, uint8_t options = 0);
 #endif

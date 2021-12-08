@@ -110,7 +110,7 @@ void loop() {
     Serial.print(NUMBER_OF_PAGES);
     Serial.print(" to show all pages: ");
 
-    //Get page number from the serial monitor
+    // Get page number from the serial monitor
     do {
       while (!Serial.available());
       pageNumber = Serial.read() - 0x30;
@@ -156,7 +156,7 @@ void loop() {
     // Clear pageNumber
     pageNumber = 0xff;
 
-    //Get page number from the serial monitor
+    // Get page number from the serial monitor
     Serial.print("\nWhich page do you want to write to? Page: ");
     do {
       while (!Serial.available());
@@ -204,7 +204,7 @@ void loop() {
 
 
 
-  //Return to the main menu if 'm' is sent
+  // Return to the main menu if 'm' is sent
   Serial.println("\ntype the character 'm' to return to to the main menu");
   do {
     while (!Serial.available());

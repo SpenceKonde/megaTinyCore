@@ -17,11 +17,11 @@ The EEPROM library is included with all hardware packages for hardware with that
 ```Arduino
 #include <EEPROM.h>
 
-void setup(){
+void setup() {
 
 }
 
-void loop(){
+void loop() {
 
 }
 
@@ -48,34 +48,34 @@ You can view all the examples [here](examples/).
 
 ## Library functions
 
-### `EEPROM.read( address )` [[_example_]](examples/eeprom_read/eeprom_read.ino)
+### `EEPROM.read(address)` [[_example_]](examples/eeprom_read/eeprom_read.ino)
 
 This function allows you to read a single byte of data from the eeprom.
 Its only parameter is an `int` which should be set to the address you wish to read.
 
 The function returns an `unsigned char` containing the value read.
 
-### `EEPROM.write( address, value )` [[_example_]](examples/eeprom_write/eeprom_write.ino)
+### `EEPROM.write(address, value)` [[_example_]](examples/eeprom_write/eeprom_write.ino)
 
 The `write()` method allows you to write a single byte of data to the EEPROM.
 Two parameters are needed. The first is an `int` containing the address that is to be written, and the second is a the data to be written (`unsigned char`).
 
 This function does not return any value.
 
-### `EEPROM.update( address, value )` [[_example_]](examples/eeprom_update/eeprom_update.ino)
+### `EEPROM.update(address, value)` [[_example_]](examples/eeprom_update/eeprom_update.ino)
 
 This function is similar to `EEPROM.write()` however this method will only write data if the cell contents pointed to by `address` is different to `value`. This method can help prevent unnecessary wear on the EEPROM cells.
 
 This function does not return any value.
 
-### `EEPROM.get( address, object )` [[_example_]](examples/eeprom_get/eeprom_get.ino)
+### `EEPROM.get(address, object)` [[_example_]](examples/eeprom_get/eeprom_get.ino)
 
 This function will retrieve any object from the EEPROM.
 Two parameters are needed to call this function. The first is an `int` containing the address that is to be written, and the second is the object you would like to read.
 
 This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
 
-### `EEPROM.put( address, object )` [[_example_]](examples/eeprom_put/eeprom_put.ino)
+### `EEPROM.put(address, object)` [[_example_]](examples/eeprom_put/eeprom_put.ino)
 
 This function will write any object to the EEPROM.
 Two parameters are needed to call this function. The first is an `int` containing the address that is to be written, and the second is the object you would like to write.
@@ -96,15 +96,15 @@ This operator returns a reference to the EEPROM cell.
 ```c++
 unsigned char val;
 
-//Read first EEPROM cell.
-val = EEPROM[ 0 ];
+// Read first EEPROM cell.
+val = EEPROM[0];
 
-//Write first EEPROM cell.
-EEPROM[ 0 ] = val;
+// Write first EEPROM cell.
+EEPROM[0] = val;
 
-//Compare contents
-if( val == EEPROM[ 0 ] ){
-  //Do something...
+// Compare contents
+if (val == EEPROM[0]) {
+  // Do something...
 }
 ```
 
@@ -125,11 +125,11 @@ Its purpose is to mimic a typical byte of RAM, however its storage is the EEPROM
 This class has an overhead of two bytes, similar to storing a pointer to an EEPROM cell.
 
 ```C++
-EERef ref = EEPROM[ 10 ]; //Create a reference to 11th cell.
+EERef ref = EEPROM[10]; // Create a reference to 11th cell.
 
-ref = 4; //write to EEPROM cell.
+ref = 4; // write to EEPROM cell.
 
-unsigned char val = ref; //Read referenced cell.
+unsigned char val = ref; // Read referenced cell.
 ```
 
 ### `EEPtr` class
@@ -139,13 +139,13 @@ Just like a normal pointer type, this type can be dereferenced and repositioned 
 increment/decrement operators.
 
 ```C++
-EEPtr ptr = 10; //Create a pointer to 11th cell.
+EEPtr ptr = 10; // Create a pointer to 11th cell.
 
-*ptr = 4; //dereference and write to EEPROM cell.
+*ptr = 4; // dereference and write to EEPROM cell.
 
-unsigned char val = *ptr; //dereference and read.
+unsigned char val = *ptr; // dereference and read.
 
-ptr++; //Move to next EEPROM cell.
+ptr++; // Move to next EEPROM cell.
 ```
 
 ### `EEPROM.begin()`

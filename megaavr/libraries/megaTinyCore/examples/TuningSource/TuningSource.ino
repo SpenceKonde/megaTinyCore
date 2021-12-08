@@ -39,18 +39,18 @@
       #define TUNE_OUTPUT_PIN PIN_PD7
     #endif
   #endif
-#else //TUNE_OUTPUT_PIN defined
+#else // TUNE_OUTPUT_PIN defined
   #ifndef TUNE_WITH_RTC
     #if !((((defined(PIN_PA0) && TUNE_OUTPUT_PIN == PIN_PA0) || (defined(PIN_PA1) && TUNE_OUTPUT_PIN == PIN_PA1) ||  (defined(PIN_PA2) && TUNE_OUTPUT_PIN == PIN_PA2)  || \
             (defined(PIN_PC0) && TUNE_OUTPUT_PIN == PIN_PC0) || (defined(PIN_PC1) && TUNE_OUTPUT_PIN == PIN_PC1) ||  (defined(PIN_PC2) && TUNE_OUTPUT_PIN == PIN_PC2)  || \
-            (defined(PIN_PD1) && TUNE_OUTPUT_PIN == PIN_PD1) || (defined(PIN_PD2) && TUNE_OUTPUT_PIN == PIN_PD2) || ((defined(PIN_PD0) && TUNE_OUTPUT_PIN == PIN_PD0)  && PIN_D0 != NOT_A_PIN ) || \
+            (defined(PIN_PD1) && TUNE_OUTPUT_PIN == PIN_PD1) || (defined(PIN_PD2) && TUNE_OUTPUT_PIN == PIN_PD2) || ((defined(PIN_PD0) && TUNE_OUTPUT_PIN == PIN_PD0)  && PIN_D0 != NOT_A_PIN) || \
             (defined(PIN_PE0) && TUNE_OUTPUT_PIN == PIN_PE0) || (defined(PIN_PE1) && TUNE_OUTPUT_PIN == PIN_PE1) ||  (defined(PIN_PE2) && TUNE_OUTPUT_PIN == PIN_PE2)  || \
             (defined(PIN_PF0) && TUNE_OUTPUT_PIN == PIN_PF0) || (defined(PIN_PF1) && TUNE_OUTPUT_PIN == PIN_PF1) ||  (defined(PIN_PF2) && TUNE_OUTPUT_PIN == PIN_PF2)  || \
             (defined(PIN_PG0) && TUNE_OUTPUT_PIN == PIN_PG0) || (defined(PIN_PG1) && TUNE_OUTPUT_PIN == PIN_PG1) ||  (defined(PIN_PG2) && TUNE_OUTPUT_PIN == PIN_PG2)) && !defined(MEGATINYCORE)) || \
            ((defined(PIN_PB0) && TUNE_OUTPUT_PIN == PIN_PB0) || (defined(PIN_PB1) && TUNE_OUTPUT_PIN == PIN_PB1) ||  (defined(PIN_PB2) && TUNE_OUTPUT_PIN == PIN_PB2)))
       #error "Invalid or unusable custom output pin defined"
     #endif
-  #else //TUNE_WITH_RTC
+  #else // TUNE_WITH_RTC
     #if (defined(MEGATINYCORE) && MEGATINYCORESERIES < 2)
       #if  (!((defined(PIN_PA2) && TUNE_OUTPUT_PIN == PIN_PA2) || (defined(PIN_PB2) && TUNE_OUTPUT_PIN == PIN_PB2) || (defined(PIN_PC2) && TUNE_OUTPUT_PIN == PIN_PC2)))
         #error "Cannot use RTC derved tuning signal on this pin"
@@ -88,36 +88,36 @@
   #warning "If RTC is used to generate the tuning signal, it must not be used for millis, otherwise TCA0 must not be - millis has now been uncleanly disabled and built-in timekeeping cannot be used."
   // ; millis will never advance, delay() may never return, and micros will return wrong values. Use util/delay.h's _delay_ms() and _delay_us() instead.
 #endif
-void setup(){
+void setup() {
   /* Modern AVR */
   #ifndef TUNE_WITH_RTC
     #ifndef MEGATINYCORE
       // All modern AVRs that are not tinyAVR
 
       byte port = digitalPinToPort(TUNE_OUTPUT_PIN);
-      PORTMUX.TCAROUTEA=port;
+      PORTMUX.TCAROUTEA = port;
 
     #endif
 
     pinMode(TUNE_OUTPUT_PIN,OUTPUT);
-    TCA0.SPLIT.CTRLA = 0; //disable TCA0 and set divider to 1
-    TCA0.SPLIT.CTRLESET=TCA_SPLIT_CMD_RESET_gc|0x03; //set CMD to RESET, and enable on both pins.
-    TCA0.SPLIT.CTRLD=0; //Split mode now off, CMPn = 0, CNT = 0, PER = 255
-    TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
-    #if (F_CPU > 32000000) //Some lunatic has is using a chip that's way overlcocked as timing reference!
+    TCA0.SPLIT.CTRLA = 0; // disable TCA0 and set divider to 1
+    TCA0.SPLIT.CTRLESET = TCA_SPLIT_CMD_RESET_gc|0x03; // set CMD to RESET, and enable on both pins.
+    TCA0.SPLIT.CTRLD = 0; // Split mode now off, CMPn = 0, CNT = 0, PER = 255
+    TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); // Single slope PWM mode, PWM on WO0
+    #if (F_CPU > 32000000) // Some lunatic has is using a chip that's way overlcocked as timing reference!
       TCA0.SINGLE.PER   = (F_CPU/1000) - 1; //
       switch (digitalPinToBitPosition(TUNE_OUTPUT_PIN)) {
         case 0:
           TCA0.SINGLE.CMP0  = (F_CPU/2000) - 1; // 50% duty cycle,
-          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); // Single slope PWM mode, PWM on WO0
           break;
         case 1:
           TCA0.SINGLE.CMP1  = (F_CPU/2000) - 1; // 50% duty cycle,
-          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); // Single slope PWM mode, PWM on WO0
           break;
         case 2:
           TCA0.SINGLE.CMP2  = (F_CPU/2000) - 1; // 50% duty cycle,
-          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP2EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP2EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); // Single slope PWM mode, PWM on WO0
           break;
         default:
           invalidPin();
@@ -128,24 +128,24 @@ void setup(){
       switch (digitalPinToBitPosition(TUNE_OUTPUT_PIN)) {
         case 0:
           TCA0.SINGLE.CMP0  = (F_CPU/1000) - 1; // 50% duty cycle,
-          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); // Single slope PWM mode, PWM on WO0
           break;
         case 1:
           TCA0.SINGLE.CMP1  = (F_CPU/1000) - 1; // 50% duty cycle,
-          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); // Single slope PWM mode, PWM on WO0
           break;
         case 2:
           TCA0.SINGLE.CMP2  = (F_CPU/1000) - 1; // 50% duty cycle,
-          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP2EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); //Single slope PWM mode, PWM on WO0
+          TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP2EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); // Single slope PWM mode, PWM on WO0
           break;
         default:
           invalidPin();
       }
-      TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; //enable the timer with no prescaling
+      TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; // enable the timer with no prescaling
     #endif
     pinMode(LED_BUILTIN,OUTPUT);
   }
-#else //this is for tuning another chip from a watch crystal on this chip.
+#else // this is for tuning another chip from a watch crystal on this chip.
   // Self-tuning with watch crystal may also be supported in the future,
   // but that woukd be it's own sketch, and is not a priority because of how
   // unpleasant they made using a crystal on these parts by virtue of their
@@ -190,12 +190,12 @@ void invalidPin() {
       uint16_t Timer1TOP = (OC1PERIOD >> 3) - 1;
       uint16_t TimerOC1A = (OC1LENGTH >> 3) - 1;
       uint16_t TimerOC1B = (OC1LENGTH >> 3) - 1;
-      uint8_t cs1=0x02;
+      uint8_t cs1 = 0x02;
     #else
       uint16_t Timer1TOP = (OC1PERIOD) - 1;
       uint16_t TimerOC1A = (OC1LENGTH) - 1;
       uint16_t TimerOC1B = (OC1LENGTH) - 1;
-      uint8_t cs1=0x01;
+      uint8_t cs1 = 0x01;
     #endif
     #if ENABLEOC1A
       pinMode(PIN_TIMER_OC1A, OUTPUT);
@@ -207,7 +207,7 @@ void invalidPin() {
     Serial.println(TimerOC1A);
     Serial.println(OCR1A);
     TCCR1A = (ENABLEOC1A << COM1A1)|(ENABLEOC1B << COM1B1) | (WGM1 & 0x03);
-    TCCR1B = ((WGM1 & 0x0C) << 1) | cs1;  //restart tme
+    TCCR1B = ((WGM1 & 0x0C) << 1) | cs1;  // restart tme
     ICR1 = Timer1TOP;
     OCR1A = TimerOC1A;
     OCR1B = TimerOC1B;

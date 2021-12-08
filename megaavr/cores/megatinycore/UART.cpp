@@ -80,7 +80,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
 */
 
 #if defined(USE_ASM_TXC) && USE_ASM_TXC == 1
-  void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_txc(void){
+  void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_txc(void) {
     __asm__ __volatile__(
       "_do_txc:"                  "\n\t"  //
         "push     r31"            "\n\t"  // push other half of Z register.
@@ -124,7 +124,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
 #if (defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/ )
   // We only ever use this on the 2-series. 1-series doesn't gain anything with this. The inlining makes the compiler FAR more efficient. RXC isn't compiled stupidly,
   // the problem is that the ABI requires it to be inefficient as hell. But it's a big deal for the smaller size 2-series parts.
-  void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_rxc(void){
+  void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_rxc(void) {
     __asm__ __volatile__(
       "_do_rxc:"                      "\n\t" //
         "push       r18"              "\n\t" // r30 and r31 pushed before this.
@@ -193,7 +193,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
       #if SERIAL_RX_BUFFER_SIZE > 256
         rx_buffer_index_t i = (uint16_t)(rxHead + 1) % SERIAL_RX_BUFFER_SIZE;
       #else
-        rx_buffer_index_t i = ( uint8_t)(rxHead + 1) % SERIAL_RX_BUFFER_SIZE;
+        rx_buffer_index_t i = (uint8_t)(rxHead + 1) % SERIAL_RX_BUFFER_SIZE;
       #endif
 
       // if we should be storing the received character into the location
@@ -224,7 +224,7 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
 #if defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && \
            (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
            (SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16)
-  void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_dre(void){
+  void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_dre(void) {
     __asm__ __volatile__(
     "_do_dre:"                        "\n\t"
       "push        r18"               "\n\t"
@@ -244,7 +244,7 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       "ldd         r25,   Z + 20"     "\n\t"  // tx tail in r25
       "movw        r26,      r30"     "\n\t"  // copy of serial in X
       "add         r26,      r25"     "\n\t"  // Serial + txtail  - txtail 0~63
-      "adc         r27,      r18"     "\n\t"  // Carry (X = &Serial + 0~63 )
+      "adc         r27,      r18"     "\n\t"  // Carry (X = &Serial + 0~63)
 #if   SERIAL_RX_BUFFER_SIZE == 128
       "subi        r26,     0x6B"     "\n\t"  //
       "sbci        r27,     0xFF"     "\n\t"  // +149
@@ -312,9 +312,9 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
     // Check if tx buffer already empty. when called by _poll_tx_data_empty()
     //  if (uartClass._tx_buffer_head == txTail) {
       // Buffer empty, so disable "data register empty" interrupt
-      //usartModule->CTRLA &= (~USART_DREIE_bm);
-      //return;
-    //} //moved to poll function to make ISR smaller and faster
+      // usartModule->CTRLA &= (~USART_DREIE_bm);
+      // return;
+    //} // moved to poll function to make ISR smaller and faster
 
     // There must be more data in the output
     // buffer. Send the next byte
@@ -331,7 +331,7 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
     if (uartClass._tx_buffer_head == txTail) {
       // Buffer empty, so disable "data register empty" interrupt
       ctrla &= ~(USART_DREIE_bm);
-      //if (uartClass._state & 2) { // Shouldn't need this - we turned this on in write();
+      // if (uartClass._state & 2) { // Shouldn't need this - we turned this on in write();
       //  ctrla |= USART_TXCIE_bm;  // in half duplex, turn on TXC interrupt, which will re-enable RX int.
       //}
       usartModule->CTRLA = ctrla;
@@ -378,7 +378,7 @@ void UartClass::_poll_tx_data_empty(void) {
         void * thisSerial = this;
         #endif
         __asm__ __volatile__(
-                "clt"              "\n\t" //CLear the T flag to signal to the ISR that we got there from here.
+                "clt"              "\n\t" // CLear the T flag to signal to the ISR that we got there from here.
                 "rjmp _poll_dre"   "\n\t"
                 "_poll_dre_done:"    "\n"
 #ifdef USART1
@@ -441,14 +441,14 @@ bool UartClass::swap(uint8_t newmux) {
       return true;
     }
   #else
-    //means it is a 14-pin 2-series, whose second USART doesn't have an alternate location.
+    // means it is a 14-pin 2-series, whose second USART doesn't have an alternate location.
     if (_module_number + newmux < 2) {
       _pin_set = newmux;
       return true;
     }
   #endif
   #if MEGATINYCORE_SERIES == 2
-    else if (newmux == MUX_NONE) {  //128 codes for MUX_NONE
+    else if (newmux == MUX_NONE) {  // 128 codes for MUX_NONE
       _pin_set = 3;
       return true;
     }
@@ -492,7 +492,7 @@ void UartClass::begin(unsigned long baud, uint16_t options) {
     ctrla  |= USART_RXCIE_bm;               // we will want to enable the ISR.
   }
   uint8_t setpinmask = ctrlb & 0xC8;        // ODME in bit 3, TX and RX enabled in bit 6, 7
-  if ((ctrla & USART_LBME_bm) && (setpinmask == 0xC8)) { //if it's open-drain and loopback, need to set state bit 2.
+  if ((ctrla & USART_LBME_bm) && (setpinmask == 0xC8)) { // if it's open-drain and loopback, need to set state bit 2.
     _state                 |= 2;            // since that changes some behavior (RXC disabled while sending) // Now we should be able to ST _state.
     setpinmask             |= 0x10;         // this tells _set_pins not to disturb the configuration on the RX pin.
   }
@@ -515,7 +515,7 @@ void UartClass::begin(unsigned long baud, uint16_t options) {
   (*MyUSART).CTRLA          = ctrla & 0xDF; // position, which we never set in begin.
   (*MyUSART).CTRLB          = ctrlb;        // Set the all important CTRLB...
   _set_pins(_module_number, _pin_set, setpinmask); // set up the pin(s)
-  SREG=oldSREG;                             // re-enable interrupts, and we're done.
+  SREG &= oldSREG;                             // re-enable interrupts, and we're done.
 }
 
 void UartClass::_set_pins(uint8_t mod_nbr, uint8_t mux_set, uint8_t enmask) {
@@ -523,7 +523,7 @@ void UartClass::_set_pins(uint8_t mod_nbr, uint8_t mux_set, uint8_t enmask) {
   #if defined(PORTMUX_USARTROUTEA)
     uint8_t muxregval    = PORTMUX.USARTROUTEA;
     muxregval           &= ~(mod_nbr ? 0x0C : 0x03);
-    PORTMUX.USARTROUTEA  = (muxregval) | (mux_set << (mod_nbr ? 2 : 0)); //shift muxset left if needed.
+    PORTMUX.USARTROUTEA  = (muxregval) | (mux_set << (mod_nbr ? 2 : 0)); // shift muxset left if needed.
 
   #else
     if (mux_set) {
@@ -539,7 +539,7 @@ void UartClass::_set_pins(uint8_t mod_nbr, uint8_t mux_set, uint8_t enmask) {
   #endif
   const uint8_t* muxrow = &(_usart_pins[mod_nbr + mux_set][0]);
   if ((enmask & 0x40 && !(enmask & 0x08))) {
-    pinMode(muxrow[0], OUTPUT); //If and only if TX is enabled and open drain isn't should the TX pin be output.
+    pinMode(muxrow[0], OUTPUT); // If and only if TX is enabled and open drain isn't should the TX pin be output.
   } else if (enmask & 0x50) { // if it is enabled but is in open drain mode, or is disabled, but loopback is enabled
     // TX should be INPUT_PULLUP.
     pinMode(muxrow[0], INPUT_PULLUP);
@@ -549,12 +549,12 @@ void UartClass::_set_pins(uint8_t mod_nbr, uint8_t mux_set, uint8_t enmask) {
     pinMode(muxrow[1], INPUT_PULLUP);
   }
   if (enmask & 0x01) { // finally if RS485 mode is enabled, we make XDIR output, otherwise it can't drive the pin.
-    pinMode(muxrow[3], OUTPUT); //make XDIR output.
+    pinMode(muxrow[3], OUTPUT); // make XDIR output.
   }
   /*
   uint8_t muxrow = mod_nbr + mux_set;
   if ((enmask & 0x40 && !(enmask & 0x08))) {
-    pinMode(_usart_pins[muxrow][0], OUTPUT); //If any only if TX is enabled and open drain isn't should the TX pin be output.
+    pinMode(_usart_pins[muxrow][0], OUTPUT); // If any only if TX is enabled and open drain isn't should the TX pin be output.
   } else if (enmask & 0x50) { // if it is enabled but is in open drain mode, or is disabled, but loopback is enabled
     // TX should be INPUT_PULLUP.
     pinMode(_usart_pins[muxrow][0], INPUT_PULLUP);
@@ -564,7 +564,7 @@ void UartClass::_set_pins(uint8_t mod_nbr, uint8_t mux_set, uint8_t enmask) {
     pinMode(_usart_pins[muxrow][1], INPUT_PULLUP);
   }
   if (enmask & 0x01) { // finally if RS485 mode is enabled, we make XDIR output, otherwise it can't drive the pin.
-    pinMode(_usart_pins[muxrow][3], OUTPUT); //make XDIR output.
+    pinMode(_usart_pins[muxrow][3], OUTPUT); // make XDIR output.
   }
   // And it is up to the user to configure the XCK pin as required for their application if they are using that.
   */
@@ -582,7 +582,7 @@ void UartClass::_set_pins(uint8_t mod_nbr, uint8_t mux_set, uint8_t enmask) {
     }
   }
   if (enmask & 0x01) { // RS485 enabled
-    pinMode(_usart_pins[muxrow][3], OUTPUT); //make XDIR output.
+    pinMode(_usart_pins[muxrow][3], OUTPUT); // make XDIR output.
   }
   */
 }
@@ -678,7 +678,7 @@ void UartClass::end() {
     // significantly improve the effective data rate at high (>
     // 500kbit/s) bit rates, where interrupt overhead becomes a slowdown.
     if ((_tx_buffer_head == _tx_buffer_tail) && ((*_hwserial_module).STATUS & USART_DREIF_bm)) {
-      if (_state & 2) { //in half duplex mode, we turn off RXC interrupt
+      if (_state & 2) { // in half duplex mode, we turn off RXC interrupt
         uint8_t ctrla = (*_hwserial_module).CTRLA;
         ctrla &= ~USART_RXCIE_bm;
         ctrla |=  USART_TXCIE_bm;
@@ -712,7 +712,7 @@ void UartClass::end() {
     }
     _tx_buffer[_tx_buffer_head] = c;
     _tx_buffer_head = i;
-    if (_state & 2) { //in half duplex mode, we turn off RXC interrupt
+    if (_state & 2) { // in half duplex mode, we turn off RXC interrupt
       uint8_t ctrla = (*_hwserial_module).CTRLA;
       ctrla &= ~USART_RXCIE_bm;
       ctrla |= USART_TXCIE_bm | USART_DREIE_bm;

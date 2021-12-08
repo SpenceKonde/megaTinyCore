@@ -1438,7 +1438,7 @@ size_t SdFile::write(const void *buf, uint16_t nbyte) {
 
 writeErrorReturn:
   // return for write error
-  //writeError = true;
+  // writeError = true;
   setWriteError();
   return 0;
 }

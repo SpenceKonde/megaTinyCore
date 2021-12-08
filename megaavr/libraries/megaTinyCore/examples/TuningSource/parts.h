@@ -3,26 +3,18 @@
   #define  PARTS_H_
 
   #include <avr/io.h>
-
-  #if (defined(__AVR_ATmega16__)    || defined(__AVR_ATmega32__)    || defined(__AVR_ATmega64__)    || defined(__AVR_ATmega128__)   || \
+  #if   (defined(__AVR_ATmega16__)    || defined(__AVR_ATmega32__)    || defined(__AVR_ATmega64__)    ||  defined(__AVR_ATmega128__)   || \
          defined(__AVR_ATmega164A__)  || defined(__AVR_ATmega164PA__) || \
          defined(__AVR_ATmega324A__)  || defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega324PB__) || defined(__AVR_ATmega644A__)  || \
          defined(__AVR_ATmega644PA__) || defined(__AVR_ATmega1284__)  || defined(__AVR_ATmega1284P__))
-
     #define __AVR_ATmega_Mighty__
-
-
   #elif  (defined(__AVR_ATmega641__) || defined(__AVR_ATmega1281__) || defined(__AVR_ATmega2561__) || \
           defined(__AVR_ATmega640__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__))
-
     #define __AVR_ATmega_Mega__
-
-
   #elif (defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328PB__) || \
          defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega168PB__) || defined(__AVR_ATmega168A__)  || defined(__AVR_ATmega168PA__) || \
          defined(__AVR_ATmega88__)  || defined(__AVR_ATmega88P__)  || defined(__AVR_ATmega88PB__)  || \
          defined(__AVR_ATmega8__) || (defined(__ABR_ATtiny88__) && F_CPU==16000000) /* MHET Tiny88 */)
-
     #define __AVR_ATmega_Mini__
     #ifndef TIMER0_TYPICAL
       #define TIMER0_TYPICAL              (1)
@@ -49,7 +41,7 @@
 
   /*
   #elif (defined(__AVR_ATmega808__) ||defined(__AVR_ATmega1608__) ||defined(__AVR_ATmega3208__) ||defined(__AVR_ATmega4808__) || \
-         defined(__AVR_ATmega809__) ||defined(__AVR_ATmega1609__) ||defined(__AVR_ATmega3209__) ||defined(__AVR_ATmega4809__) )
+         defined(__AVR_ATmega809__) ||defined(__AVR_ATmega1609__) ||defined(__AVR_ATmega3209__) ||defined(__AVR_ATmega4809__))
 
     #define __AVR_ATmega_Zero__
 
@@ -87,7 +79,7 @@
       #else
         error "Unknown or unsupported part"
       #endif
-    #else //DXCore, megaTinyCore, ATTinyCore
+    #else // DXCore, megaTinyCore, ATTinyCore
       #if (CLOCK_SOURCE & 0x0F) != 1 && ((CLOCK_SOURCE & 0x0F) != 2)
         #error "This is a TIMING REFERENCE. Using the internal oscillator would defeat the whole point!"
       #endif

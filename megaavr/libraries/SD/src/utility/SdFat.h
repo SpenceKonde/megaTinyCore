@@ -40,7 +40,7 @@ class SdVolume;
 //==============================================================================
 // SdFile class
 
-#ifdef O_RDONLY //ARDUINO_ARCH_MBED
+#ifdef O_RDONLY // ARDUINO_ARCH_MBED
   #undef O_READ
   #undef O_RDONLY
   #undef O_WRITE
@@ -157,7 +157,7 @@ class SdFile : public Print {
        Set writeError to false before calling print() and/or write() and check
        for true after calls to print() and/or write().
     */
-    //bool writeError;
+    // bool writeError;
     /**
        Cancel unbuffered reads for this file.
        See setUnbufferedRead()

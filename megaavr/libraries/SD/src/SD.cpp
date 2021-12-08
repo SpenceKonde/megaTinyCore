@@ -364,7 +364,7 @@ namespace SDLib {
            root.openRoot(volume);
   }
 
-  //call this when a card is removed. It will allow you to insert and initialise a new card.
+  // call this when a card is removed. It will allow you to insert and initialise a new card.
   void SDClass::end() {
     root.close();
   }
@@ -523,7 +523,7 @@ namespace SDLib {
   */
 
 
-  //boolean SDClass::close() {
+  // boolean SDClass::close() {
   //  /*
   //
   //    Closes the file opened by the `open` method.
@@ -543,7 +543,7 @@ namespace SDLib {
   }
 
 
-  //boolean SDClass::exists(char *filepath, SdFile& parentDir) {
+  // boolean SDClass::exists(char *filepath, SdFile& parentDir) {
   //  /*
   //
   //     Returns true if the supplied file path rooted at `parentDir`
@@ -585,24 +585,24 @@ namespace SDLib {
   File File::openNextFile(uint8_t mode) {
     dir_t p;
 
-    //Serial.print("\t\treading dir...");
+    // Serial.print("\t\treading dir...");
     while (_file->readDir(&p) > 0) {
 
       // done if past last used entry
       if (p.name[0] == DIR_NAME_FREE) {
-        //Serial.println("end");
+        // Serial.println("end");
         return File();
       }
 
       // skip deleted entry and entries for . and  ..
       if (p.name[0] == DIR_NAME_DELETED || p.name[0] == '.') {
-        //Serial.println("dots");
+        // Serial.println("dots");
         continue;
       }
 
       // only list subdirectories and files
       if (!DIR_IS_FILE_OR_SUBDIR(&p)) {
-        //Serial.println("notafile");
+        // Serial.println("notafile");
         continue;
       }
 
@@ -610,19 +610,19 @@ namespace SDLib {
       SdFile f;
       char name[13];
       _file->dirName(p, name);
-      //Serial.print("try to open file ");
-      //Serial.println(name);
+      // Serial.print("try to open file ");
+      // Serial.println(name);
 
       if (f.open(_file, name, mode)) {
-        //Serial.println("OK!");
+        // Serial.println("OK!");
         return File(f, name);
       } else {
-        //Serial.println("ugh");
+        // Serial.println("ugh");
         return File();
       }
     }
 
-    //Serial.println("nothing");
+    // Serial.println("nothing");
     return File();
   }
 

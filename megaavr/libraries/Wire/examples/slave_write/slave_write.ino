@@ -28,7 +28,7 @@ void transmitDataWire() {
   #if !defined(MILLIS_USE_TIMERNONE)
   uint32_t ms = millis();
   #else
-  uint32_t ms = 123456789UL; //placeholder - there's no millis to send because it's disabled.
+  uint32_t ms = 123456789UL; // placeholder - there's no millis to send because it's disabled.
   #endif
   Wire.write((uint8_t) ms);
   Wire.write((uint8_t)(ms >> 8));

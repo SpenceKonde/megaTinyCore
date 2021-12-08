@@ -46,11 +46,11 @@ void setup() {
   // Start the AVR logic hardware
   Logic::start();
 
-  analogWrite(PIN_TCA_WO1, 128); //start TCA0 WO0 running
-  TCB0.CTRLA = 0x01; //enabled with CLKPER as clock source
-  TCB0.CTRLB = 0x07; //PWM8 mode, but output pin not enabled
-  TCB0.CCMPL = 255; //255 counts
-  TCB0.CCMPH = 128; //50% duty cycle
+  analogWrite(PIN_TCA_WO1, 128); // start TCA0 WO0 running
+  TCB0.CTRLA = 0x01; // enabled with CLKPER as clock source
+  TCB0.CTRLB = 0x07; // PWM8 mode, but output pin not enabled
+  TCB0.CCMPL = 255; // 255 counts
+  TCB0.CCMPH = 128; // 50% duty cycle
 }
 
 void loop() {

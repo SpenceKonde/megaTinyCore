@@ -104,7 +104,7 @@ namespace gen {
     mvio_ok       = 0x05,
 #endif
 #if defined(ZCD3)
-    zcd3_out      = 0x30, //The ZCD is numbered differently, I think just because it's on different pins. Still has the same event channel
+    zcd3_out      = 0x30, // The ZCD is numbered differently, I think just because it's on different pins. Still has the same event channel
 #endif
 #if defined(__AVR_DB__)
     opamp0_ready  = 0x34,
@@ -211,7 +211,7 @@ namespace gen2 {
     pin_pc6     = 0x46,
     pin_pc7     = 0x47,
 #endif
-#if !defined(DXCORE) || defined(PIN_PD1) //See above for note on PIN_PD0 and why we can't test that, this even impacts DBs.
+#if !defined(DXCORE) || defined(PIN_PD1) // See above for note on PIN_PD0 and why we can't test that, this even impacts DBs.
 #if !defined(MVIO) || defined(Dx_48_PINS) || defined(Dx_64_PINS)
     pin_pd0     = 0x48,
 #endif
@@ -249,7 +249,7 @@ namespace gen3 {
     pin_pc6     = 0x46,
     pin_pc7     = 0x47,
 #endif
-#if !defined(DXCORE) || defined(PIN_PD1) //See above for note on PIN_PD0 and why we can't test that, this even impacts DBs.
+#if !defined(DXCORE) || defined(PIN_PD1) // See above for note on PIN_PD0 and why we can't test that, this even impacts DBs.
 #if !defined(MVIO) || defined(Dx_48_PINS) || defined(Dx_64_PINS)
     pin_pd0     = 0x48,
 #endif
@@ -448,11 +448,16 @@ namespace user {
     usart3_irda    = 0x12,
 #endif
     tca0           = 0x13,
+    tca0_cnt_a     = 0x13,
     tcb0           = 0x14,
+    tcb0_capt      = 0x14,
     tcb1           = 0x15,
+    tcb1_capt      = 0x15,
     tcb2           = 0x16,
+    tcb2_capt      = 0x16,
 #if defined(TCB3)
     tcb3           = 0x17,
+    tcb3_capt      = 0x17,
 #endif
     // "Unofficial" user generators. Uses EVOUT, but swaps the output pin using PORTMUX
     evouta_pin_pa7 = 0x89,
@@ -506,9 +511,10 @@ namespace user {
 #if defined(USART5)
       usart5_irda    = 0x1A,
 #endif
+      tca0           = 0x1B,
       tca0_cnt_a     = 0x1B,
-      tca0_cnt       = 0x1B,
       tca0_cnt_b     = 0x1C,
+      tca1           = 0x1D,
       tca1_cnt_a     = 0x1D,
       tca1_cnt_b     = 0x1E,
       tcb0_capt      = 0x1F,
@@ -522,7 +528,7 @@ namespace user {
       tcb2_cnt       = 0x24,
 #if defined(TCB3)
       tcb3_capt      = 0x25,
-      tcb4           = 0x25,
+      tcb3           = 0x25,
       tcb3_cnt       = 0x26,
 #endif
 #if defined(TCB4)
@@ -592,9 +598,11 @@ namespace user {
 #if defined(USART5)
     usart5_irda    = 0x19,
 #endif
-    tca0_cnt_a     = 0x1A,
+    tca0          = 0x1A,
+    tca0_cnt_a    = 0x1A,
     tca0_cnt_b     = 0x1B,
-    tca1_cnt_a     = 0x1C,
+    tca1          = 0x1C,
+    tca1_cnt_a    = 0x1C,
     tca1_cnt_b     = 0x1D,
     tcb0_capt      = 0x1E,
     tcb0_cnt       = 0x1F,
@@ -665,12 +673,16 @@ namespace user {
 #endif
     usart0_irda    = 0x14,
     usart1_irda    = 0x15,
-    tca0_cnt_a     = 0x1A,
+    tca0          = 0x1A,
+    tca0_cnt_a    = 0x1A,
     tca0_cnt_b     = 0x1B,
+    tcb0           = 0x1E,
     tcb0_capt      = 0x1E,
     tcb0_cnt       = 0x1F,
+    tcb1           = 0x20,
     tcb1_capt      = 0x20,
     tcb1_cnt       = 0x21,
+    tcb2           = 0x22,
     tcb2_capt      = 0x22,
     tcb2_cnt       = 0x23,
     tcd0_in_a      = 0x28,
@@ -710,8 +722,10 @@ namespace user {
       tca0_cmp0       = 0x84,
       tca0_cmp1       = 0x85,
       tca0_cmp2       = 0x86,
+      tcb0            = 0xA0,
       tcb0_capt       = 0xA0,
       tcb0_ovf        = 0xA1,
+      tcb1            = 0xA2,
       tcb1_capt       = 0xA2,
       tcb1_ovf        = 0xA3,
     };
@@ -920,10 +934,13 @@ namespace user {
 #endif
       usart0_irda             = 0x0C,
       usart1_irda             = 0x0D,
-      tca0_cnt_a              = 0x0E,
+      tca0                   = 0x0E,
+      tca0_cnt_a             = 0x0E,
       tca0_cnt_b              = 0x0F,
+      tcb0                    = 0x11,
       tcb0_capt               = 0x11,
       tcb0_cnt                = 0x12,
+      tcb1                    = 0x13,
       tcb1_capt               = 0x13,
       tcb1_cnt                = 0x14,
     };
@@ -952,6 +969,7 @@ namespace user {
       pin_pa6      = 0x13,
       pin_pa7      = 0x14,
 #if (PROGMEM_SIZE > 8192 && MEGATINYCORE_SERIES == 1)
+      tcb1         = 0x15,
       tcb1_capt    = 0x15,
 #endif
     };
@@ -1056,6 +1074,7 @@ namespace user {
         pin_pb7      = 0x0F,
 #endif
 #if (PROGMEM_SIZE > 8192) /* Only 16/32k 1-series, but only 1-series is here */
+        tcb1         = 0x10,
         tcb1_capt    = 0x10,
 #endif
       };
@@ -1067,6 +1086,7 @@ namespace user {
     enum generator_t : uint8_t {
       disable           = 0x00,
       off               = 0x00,
+      tcb0              = 0x01,
       tcb0_capt         = 0x01,
       tca0_ovf_lunf     = 0x02,
       tca0_hunf         = 0x03,
@@ -1098,6 +1118,7 @@ namespace user {
 
   namespace user {
     enum user_t : uint8_t {
+      tcb0                    = 0x00,
       tcb0_capt               = 0x00,
       adc0_start              = 0x01,
       ccl0_event_a            = 0x02,
@@ -1109,8 +1130,10 @@ namespace user {
       evouta_pin_pa2          = 0x08,
       evoutb_pin_pb2          = 0x09,
       evoutc_pin_pc2          = 0x0A,
+      tcb1                    = 0x0B,
       tcb1_capt               = 0x0B,
       adc1_start              = 0x0c,
+      tca0                    = 0x10,
       tca0_cnt_a              = 0x10,
       usart0_irda             = 0x11,
     };

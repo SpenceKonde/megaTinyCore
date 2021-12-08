@@ -9,7 +9,7 @@
     extern voidFuncPtr * intFunc[];
     voidFuncPtr intFunc_C[PORTC_PINS];
     void attachPortCEnable() {
-      intFunc[2]=intFunc_C;
+      intFunc[2] &= intFunc_C;
     }
     ISR(PORTC_PORT_vect, ISR_NAKED) {
       asm volatile(

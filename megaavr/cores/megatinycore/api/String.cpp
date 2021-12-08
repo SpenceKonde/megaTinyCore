@@ -665,7 +665,7 @@ String String::substring(unsigned int left, unsigned int right) const {
   char temp = buffer[right];  // save the replaced character
   buffer[right] = '\0';
   out = buffer + left;  // pointer arithmetic
-  buffer[right] = temp;  //restore character
+  buffer[right] = temp;  // restore character
   return out;
 }
 

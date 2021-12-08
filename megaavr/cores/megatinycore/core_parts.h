@@ -376,10 +376,10 @@
 #endif
 
 // Version related defines now handled in platform.txt
-#define MEGATINYCORE_NUM ((MEGATINYCORE_MAJOR<<24)+(MEGATINYCORE_MINOR<<16)+(MEGATINYCORE_PATCH<<8)+MEGATINYCORE_RELEASED)
+#define MEGATINYCORE_NUM ((MEGATINYCORE_MAJOR << 24) + (MEGATINYCORE_MINOR << 16) + (MEGATINYCORE_PATCH << 8) + MEGATINYCORE_RELEASED)
 
 #if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_XOSC))
-  #if (MEGATINYCORE_SERIES==0 || defined(__AVR_ATtinyxy2__))
+  #if (MEGATINYCORE_SERIES == 0 || defined(__AVR_ATtinyxy2__))
     #error "Only the tinyAVR 1-series and 2-series parts with at least 8 pins support external RTC timebase"
   #endif
   #define MILLIS_USE_TIMERRTC
@@ -390,7 +390,7 @@
   * useful to users, as well. These are described in more detail in the
   * README. */
 
-#if (MEGATINYCORE_SERIES==2)
+#if (MEGATINYCORE_SERIES == 2)
   #define ADC_NATIVE_RESOLUTION 12
   #define ADC_NATIVE_RESOLUTION_LOW 8
   // 1 if hardware has a differential ADC - separate from core support

@@ -30,8 +30,8 @@
   #define   getInt(ignore)      parseInt(ignore)
   #define   getFloat()          parseFloat()
   #define   getFloat(ignore)    parseFloat(ignore)
-  #define   getString( pre_string, post_string, buffer, length)
-  readBytesBetween( pre_string, terminator, buffer, length)
+  #define   getString(pre_string, post_string, buffer, length)
+  readBytesBetween(pre_string, terminator, buffer, length)
 */
 
 // This enumeration provides the lookahead options for parseInt(), parseFloat()
@@ -70,15 +70,15 @@ class Stream : public Print {
       return _timeout;
     }
 
-    bool find(char *target);   // reads data from the stream until the target string is found
-    bool find(uint8_t *target) {
-      return find((char *)target);
+    bool find(char * target);   // reads data from the stream until the target string is found
+    bool find(uint8_t * target) {
+      return find((char *) target);
     }
     // returns true if target string is found, false if timed out (see setTimeout)
 
-    bool find(char *target, size_t length);   // reads data from the stream until the target string of given length is found
-    bool find(uint8_t *target, size_t length) {
-      return find((char *)target, length);
+    bool find(char * target, size_t length);   // reads data from the stream until the target string of given length is found
+    bool find(uint8_t * target, size_t length) {
+      return find((char *) target, length);
     }
     // returns true if target string is found, false if timed out
 
@@ -86,14 +86,14 @@ class Stream : public Print {
       return find(&target, 1);
     }
 
-    bool findUntil(char *target, char *terminator);   // as find but search ends if the terminator string is found
-    bool findUntil(uint8_t *target, char *terminator) {
-      return findUntil((char *)target, terminator);
+    bool findUntil(char * target, char *terminator);   // as find but search ends if the terminator string is found
+    bool findUntil(uint8_t * target, char *terminator) {
+      return findUntil((char *) target, terminator);
     }
 
-    bool findUntil(char *target, size_t targetLen, char *terminate, size_t termLen);   // as above but search ends if the terminate string is found
-    bool findUntil(uint8_t *target, size_t targetLen, char *terminate, size_t termLen) {
-      return findUntil((char *)target, targetLen, terminate, termLen);
+    bool findUntil(char * target, size_t targetLen, char *terminate, size_t termLen);   // as above but search ends if the terminate string is found
+    bool findUntil(uint8_t * target, size_t targetLen, char *terminate, size_t termLen) {
+      return findUntil((char *) target, targetLen, terminate, termLen);
     }
 
     long parseInt(LookaheadMode lookahead = SKIP_ALL, char ignore = NO_IGNORE_CHAR);
@@ -106,9 +106,9 @@ class Stream : public Print {
     float parseFloat(LookaheadMode lookahead = SKIP_ALL, char ignore = NO_IGNORE_CHAR);
     // float version of parseInt
 
-    size_t readBytes(char *buffer, size_t length);  // read chars from stream into buffer
-    size_t readBytes(uint8_t *buffer, size_t length) {
-      return readBytes((char *)buffer, length);
+    size_t readBytes(char * buffer, size_t length);  // read chars from stream into buffer
+    size_t readBytes(uint8_t * buffer, size_t length) {
+      return readBytes((char *) buffer, length);
     }
     // terminates if length characters have been read or timeout (see setTimeout)
     // returns the number of characters placed in the buffer (0 means no valid data found)
@@ -136,14 +136,14 @@ class Stream : public Print {
     // the public API simple, these overload remains protected.
 
     struct MultiTarget {
-      const char *str;  // string you're searching for
+      const char * str;  // string you're searching for
       size_t len;       // length of string you're searching for
       size_t index;     // index used by the search routine.
     };
 
     // This allows you to search for an arbitrary number of strings.
     // Returns index of the target that is found first or -1 if timeout occurs.
-    int findMulti(struct MultiTarget *targets, int tCount);
+    int findMulti(struct MultiTarget * targets, int tCount);
 };
 
 #undef NO_IGNORE_CHAR

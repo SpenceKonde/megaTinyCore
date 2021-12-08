@@ -26,10 +26,10 @@ int delayval = 500; // delay for half a second
 
 void setup() {
   pinMode(PIN, OUTPUT);
-  //with tinyNeoPixel_Static, you need to set pinMode yourself. This means you can eliminate pinMode()
-  //and replace with direct port writes to save a couple hundred bytes in sketch size (note that this
-  //savings is only present when you eliminate *all* references to pinMode).
-  //leds.begin() not needed on tinyNeoPixel
+  // with tinyNeoPixel_Static, you need to set pinMode yourself. This means you can eliminate pinMode()
+  // and replace with direct port writes to save a couple hundred bytes in sketch size (note that this
+  // savings is only present when you eliminate *all* references to pinMode).
+  // leds.begin() not needed on tinyNeoPixel
 }
 
 void loop() {
@@ -45,12 +45,12 @@ void loop() {
 
     delay(delayval); // Delay for a period of time (in milliseconds).
   }
-  //with tinyNeoPixel_Static, since we have the pixel array, we can also directly manipulate it - this sacrifices the correction for the pixel order, and the clarity of setColor to save a tiny amount of flash and time.
+  // with tinyNeoPixel_Static, since we have the pixel array, we can also directly manipulate it - this sacrifices the correction for the pixel order, and the clarity of setColor to save a tiny amount of flash and time.
   for (int i = 0; i < (NUMPIXELS * 3); i++) {
-    pixels[i] = 150; //set byte i of array (this is channel (i%3) of led (i/3) (respectively, i%4 and i/4 for RGBW leds)
-    leds.show(); //show
-    delay(delayval); //delay for a period of time
-    pixels[i] = 0; //turn off the above pixel
-    //result is that each pixel will cycle through each of the primary colors (green, red, blue for most LEDs) in turn, and only one LED will be on at a time.
+    pixels[i] = 150; // set byte i of array (this is channel (i%3) of led (i/3) (respectively, i%4 and i/4 for RGBW leds)
+    leds.show(); // show
+    delay(delayval); // delay for a period of time
+    pixels[i] = 0; // turn off the above pixel
+    // result is that each pixel will cycle through each of the primary colors (green, red, blue for most LEDs) in turn, and only one LED will be on at a time.
   }
 }

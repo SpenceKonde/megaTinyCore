@@ -25,7 +25,7 @@ int8_t len = 0;
 
 void setup() {
   Wire.begin();                       // initialize master
-  //MySerial.swap(1);                 // Remember to swap serial pins if you need to do that with your connections.
+  // MySerial.swap(1);                 // Remember to swap serial pins if you need to do that with your connections.
   MySerial.begin(115200);             // Use 115200 baud - this is the 2020's, and these are modern AVRs.
 }
 

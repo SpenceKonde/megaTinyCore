@@ -54,6 +54,6 @@ void loop() {
    * ++addr &= EEPROM.length() - 1;
    */
 
-  digitalWrite(LED_BUILTIN, HIGH); //briefly flash LED as activity indication.
+  digitalWrite(LED_BUILTIN, HIGH); // briefly flash LED as activity indication.
   delay(2000);
 }

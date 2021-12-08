@@ -51,7 +51,7 @@
 // Constructor when length, pin and type are known at compile-time:
 tinyNeoPixel::tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t, uint8_t *pxl) :
   brightness(0), pixels(pxl), endTime(0) {
-  //boolean oldThreeBytesPerPixel = (wOffset == rOffset); // false if RGBW
+  // boolean oldThreeBytesPerPixel = (wOffset == rOffset); // false if RGBW
   wOffset = (t >> 6) & 0b11; // See notes in header file
   rOffset = (t >> 4) & 0b11; // regarding R/G/B/W offsets
   gOffset = (t >> 2) & 0b11;
@@ -66,8 +66,8 @@ tinyNeoPixel::tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t, uint8_t *pxl) 
 
 
 tinyNeoPixel::~tinyNeoPixel() {
-  //if (pixels)   free(pixels);
-  //if (pin >= 0) pinMode(pin, INPUT);
+  // if (pixels)   free(pixels);
+  // if (pin >= 0) pinMode(pin, INPUT);
 }
 
 // *INDENT-OFF*   astyle don't like assembly
@@ -1124,7 +1124,7 @@ void tinyNeoPixel::setBrightness(uint8_t b) {
   }
 }
 
-//Return the brightness value
+// Return the brightness value
 uint8_t tinyNeoPixel::getBrightness(void) const {
   return brightness - 1;
 }
@@ -1145,7 +1145,7 @@ uint32_t tinyNeoPixel::gamma32(uint32_t x) {
   // someone's storing information in the unused most significant byte
   // of an RGB value, but this seems exceedingly rare and if it's
   // encountered in reality they can mask values going in or coming out.
-  for (uint8_t i=0; i<4; i++) y[i] = gamma8(y[i]);
+  for (uint8_t i = 0; i<4; i++) y[i] = gamma8(y[i]);
   return x; // Packed 32-bit return
 }
 // *INDENT-ON*

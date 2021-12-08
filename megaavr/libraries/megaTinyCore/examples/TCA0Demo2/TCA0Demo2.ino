@@ -19,7 +19,7 @@ void setup() {                // We will be outputting PWM on PB0
   TCA0.SINGLE.PER   = Period; // Count all the way up to 0xFFFF
   //                             At 20MHz, this gives ~305Hz PWM
   TCA0.SINGLE.CMP0  = 0;
-  TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; //enable the timer with no prescaler
+  TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; // enable the timer with no prescaler
 }
 
 void loop() {

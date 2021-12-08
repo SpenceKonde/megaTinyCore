@@ -6,16 +6,17 @@ extern "C" {
 
 void yield(void);
 
-#define LOW           0x00
-#define HIGH          0x01
-#define CHANGE        0x04
-#define FALLING       0x02
-#define RISING        0x03
-#define INPUT         0x00
-#define OUTPUT        0x01
-#define INPUT_PULLUP  0x02
-#define LSBFIRST      0x00
-#define MSBFIRST      0x01
+#define LOW              0    /* used for digitalWrite(), digitalRead(), openDrain() and attachInterrupt() */
+#define HIGH             1    /* used for digitalWrite(), digitalRead(). There is no option for HIGH level interrupt provided by the hardware */
+#define FLOATING         HIGH /* Not in official API - used for openDrain, while making clear what you're doing */
+#define CHANGE           4    /* used for attachInterrupt() */
+#define FALLING          2    /* used for attachInterrupt() */
+#define RISING           3    /* used for attachInterrupt() */
+#define INPUT            0    /* used for pinMode() */
+#define OUTPUT           1    /* used for pinMode() */
+#define INPUT_PULLUP     2    /* used for pinMode() */
+#define LSBFIRST         0    /* used for shiftIn/shiftOut */
+#define MSBFIRST         1    /* used for shiftIn/shiftOut */
 
 
 #define PI            3.1415926535897932384626433832795

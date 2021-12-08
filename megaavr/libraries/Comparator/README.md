@@ -316,7 +316,7 @@ This method simply returns a reference to the analog comparator struct which it 
  * MyComparator was passed as a reference, so this code has no idea whether
  * it's Comparator0 or Comparator2 or Comparator6 on some future part with
  * way too many comparators */
-MyComparator.init(); //initialize the comparator - let's assume it was configured a few lines before this example begins.
+MyComparator.init(); // initialize the comparator - let's assume it was configured a few lines before this example begins.
 AC_t& AC_struct = MyComparator.getPeripheral(); // Grab the ACn struct - AC0, AC1, AC2, etc.
 AC_struct.CTRLA |= AC_LPMODE_bm | AC_RUNSTBY_bm // Reduce power consumption at expense of response time and leave on in standby
 MyComparator.start();   // Enable the comparator

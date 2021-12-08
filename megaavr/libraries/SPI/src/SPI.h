@@ -36,14 +36,14 @@
 // SPI_HAS_NOTUSINGINTERRUPT means that SPI has notUsingInterrupt() method
 #define SPI_HAS_NOTUSINGINTERRUPT 1
 
-#define SPI_MODE0           ( SPI_MODE_0_gc )
-#define SPI_MODE1           ( SPI_MODE_1_gc )
-#define SPI_MODE2           ( SPI_MODE_2_gc )
-#define SPI_MODE3           ( SPI_MODE_3_gc )
+#define SPI_MODE0           (SPI_MODE_0_gc)
+#define SPI_MODE1           (SPI_MODE_1_gc)
+#define SPI_MODE2           (SPI_MODE_2_gc)
+#define SPI_MODE3           (SPI_MODE_3_gc)
 
-#define SPI_MODE_MASK       ( SPI_MODE_gm   )
-#define SPI_CLOCK_MASK      ( SPI_PRESC_gm  )
-#define SPI_2XCLOCK_MASK    ( SPI_CLK2X_bm  )
+#define SPI_MODE_MASK       (SPI_MODE_gm   )
+#define SPI_CLOCK_MASK      (SPI_PRESC_gm  )
+#define SPI_2XCLOCK_MASK    (SPI_CLK2X_bm  )
 
 #define SPI_INTERRUPT_DISABLE     0
 #define SPI_INTERRUPT_ENABLE      1
@@ -209,12 +209,12 @@ class SPIClass {
   extern SPIClass SPI;
 #endif
 
-#define SPI_CLOCK_DIV2      ( SPI_PRESC_DIV4_gc     | SPI_CLK2X_bm  )
-#define SPI_CLOCK_DIV4      ( SPI_PRESC_DIV4_gc                     )
-#define SPI_CLOCK_DIV8      ( SPI_PRESC_DIV16_gc    | SPI_CLK2X_bm  )
-#define SPI_CLOCK_DIV16     ( SPI_PRESC_DIV16_gc                    )
-#define SPI_CLOCK_DIV32     ( SPI_PRESC_DIV64_gc    | SPI_CLK2X_bm  )
-#define SPI_CLOCK_DIV64     ( SPI_PRESC_DIV64_gc                    )
-#define SPI_CLOCK_DIV128    ( SPI_PRESC_DIV128_gc                   )
+#define SPI_CLOCK_DIV2      (SPI_PRESC_DIV4_gc     | SPI_CLK2X_bm)
+#define SPI_CLOCK_DIV4      (SPI_PRESC_DIV4_gc                   )
+#define SPI_CLOCK_DIV8      (SPI_PRESC_DIV16_gc    | SPI_CLK2X_bm)
+#define SPI_CLOCK_DIV16     (SPI_PRESC_DIV16_gc                  )
+#define SPI_CLOCK_DIV32     (SPI_PRESC_DIV64_gc    | SPI_CLK2X_bm)
+#define SPI_CLOCK_DIV64     (SPI_PRESC_DIV64_gc                  )
+#define SPI_CLOCK_DIV128    (SPI_PRESC_DIV128_gc                 )
 
 #endif

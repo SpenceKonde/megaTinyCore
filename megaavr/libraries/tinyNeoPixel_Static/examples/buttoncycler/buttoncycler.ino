@@ -35,7 +35,7 @@ int showType = 0;
 void setup() {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(PIXEL_PIN, OUTPUT);
-  //strip.begin();
+  // strip.begin();
   strip.show(); // Initialize all pixels to 'off'
 }
 
@@ -121,37 +121,37 @@ void rainbowCycle(uint8_t wait) {
   }
 }
 
-//Theatre-style crawling lights.
+// Theatre-style crawling lights.
 void theaterChase(uint32_t c, uint8_t wait) {
-  for (int j = 0; j < 10; j++) { //do 10 cycles of chasing
+  for (int j = 0; j < 10; j++) { // do 10 cycles of chasing
     for (int q = 0; q < 3; q++) {
       for (uint16_t i = 0; i < strip.numPixels(); i = i + 3) {
-        strip.setPixelColor(i + q, c);  //turn every third pixel on
+        strip.setPixelColor(i + q, c);  // turn every third pixel on
       }
       strip.show();
 
       delay(wait);
 
       for (uint16_t i = 0; i < strip.numPixels(); i = i + 3) {
-        strip.setPixelColor(i + q, 0);      //turn every third pixel off
+        strip.setPixelColor(i + q, 0);      // turn every third pixel off
       }
     }
   }
 }
 
-//Theatre-style crawling lights with rainbow effect
+// Theatre-style crawling lights with rainbow effect
 void theaterChaseRainbow(uint8_t wait) {
   for (int j = 0; j < 256; j++) {   // cycle all 256 colors in the wheel
     for (int q = 0; q < 3; q++) {
       for (uint16_t i = 0; i < strip.numPixels(); i = i + 3) {
-        strip.setPixelColor(i + q, Wheel((i + j) % 255)); //turn every third pixel on
+        strip.setPixelColor(i + q, Wheel((i + j) % 255)); // turn every third pixel on
       }
       strip.show();
 
       delay(wait);
 
       for (uint16_t i = 0; i < strip.numPixels(); i = i + 3) {
-        strip.setPixelColor(i + q, 0);      //turn every third pixel off
+        strip.setPixelColor(i + q, 0);      // turn every third pixel off
       }
     }
   }

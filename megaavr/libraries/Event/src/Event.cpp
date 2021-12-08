@@ -356,7 +356,7 @@ Event& Event::assign_generator_pin(uint8_t port, uint8_t port_pin) {
       }
       #if defined (PIN_PC0) // can't test if PORTx is defined - all are defined everywhere)
         if (port == PC) {
-          #if MEGATINYCORE_SERIES == 1 //no event 4 on 0-series
+          #if MEGATINYCORE_SERIES == 1 // no event 4 on 0-series
             if (Event4.generator_type == gen::disable || Event4.generator_type == gen) {
               Event4.generator_type = gen;
               return Event4;
@@ -368,7 +368,7 @@ Event& Event::assign_generator_pin(uint8_t port, uint8_t port_pin) {
             return Event0;
           }
         }
-      #endif //PC-bearing parts end here
+      #endif // PC-bearing parts end here
 
     #endif // end of tiny 0/1 assign_generator_pin()
   }
@@ -376,7 +376,7 @@ Event& Event::assign_generator_pin(uint8_t port, uint8_t port_pin) {
 }
 
 Event& Event::assign_generator(gen::generator_t gen, uint8_t ch) {
-  if (gen == 255) { //bogus generators should be rejected.
+  if (gen == 255) { // bogus generators should be rejected.
     return Event_empty;
   }
   if (ch != 255) { // this means it can only be the divided rtc, pins, or disable,
@@ -393,7 +393,7 @@ Event& Event::assign_generator(gen::generator_t gen, uint8_t ch) {
           return Event1;
         }
         #if (MEGATINYCORE_SERIES == 1)
-          else if (Event0.generator_type == gen::disable || Event0.generator_type == gen){
+          else if (Event0.generator_type == gen::disable || Event0.generator_type == gen) {
             Event0.generator_type = gen;
             return Event0;
           }
@@ -406,7 +406,7 @@ Event& Event::assign_generator(gen::generator_t gen, uint8_t ch) {
             if ((Event1.generator_type == gen::disable && Event0.generator_type != 0x15) || Event1.generator_type == 0x10) {
               Event1.generator_type = gen1::tcb1_capt;
               return Event1;
-            } else if (Event0.generator_type == gen::disable || Event0.generator_type == 0x15){
+            } else if (Event0.generator_type == gen::disable || Event0.generator_type == 0x15) {
               Event0.generator_type = gen0::tcb1_capt;
               return Event0;
             }
@@ -415,7 +415,7 @@ Event& Event::assign_generator(gen::generator_t gen, uint8_t ch) {
         }
       #endif
       #if MEGATINYCORE_SERIES == 1
-        if (ch == 5) { //can only be RTC - easy.
+        if (ch == 5) { // can only be RTC - easy.
           if (Event5.generator_type == gen::disable || Event5.generator_type == gen) {
             Event5.generator_type = gen;
             return Event5;
@@ -532,7 +532,7 @@ Event& Event::assign_generator(gen::generator_t gen, uint8_t ch) {
       }
     #endif // non-tiny0/1-section of channel-specific generators.
   } else { // otherwise it could be on any channel, so check if it's already live on a channel first
-    Event& chan=Event::get_generator_channel(gen);
+    Event& chan = Event::get_generator_channel(gen);
     if (chan.get_channel_number() != 255) { // is this right?
       return chan;
     } else {
@@ -760,9 +760,9 @@ int8_t Event::set_user_pin(uint8_t pin_number) {
         #if defined(PIN_PC2) // no tinyAVR  has PC2 that doesn't have PB2
           else if (port == PB)
             event_user = user::evoutb_pin_pb2;
-          else //we know this must be PC2 because if it was port pin 2, (not NOT_A_PIN), and it's not PA2 or PB2
+          else // we know this must be PC2 because if it was port pin 2, (not NOT_A_PIN), and it's not PA2 or PB2
             event_user = user::evoutc_pin_pc2;
-        #elif defined(PIN_PB2) //14-pin parts - same logic here, if it's port pin 2, and we have PIN_PB2, it's not PA2, and we don't have PC2, it's gotta be PB2.
+        #elif defined(PIN_PB2) // 14-pin parts - same logic here, if it's port pin 2, and we have PIN_PB2, it's not PA2, and we don't have PC2, it's gotta be PB2.
           else
             event_user = user::evoutb_pin_pb2;
         #endif
@@ -773,7 +773,7 @@ int8_t Event::set_user_pin(uint8_t pin_number) {
           #if defined(PIN_PB7)
             if (port == PA)
               event_user = user::evouta_pin_pa7;
-            else //we know this must be PB2 because if it was port pin 7, but not PA7, this is the only other Px7 on tinyAVR.
+            else // we know this must be PB2 because if it was port pin 7, but not PA7, this is the only other Px7 on tinyAVR.
               event_user = user::evoutb_pin_pb7;
           #else // if there's no PB7 (20 or 14-pin part), yet this is a port pin 7, it can only be PA7, that's the only pin 7 on the part!
             event_user = user::evouta_pin_pa7;
@@ -783,7 +783,7 @@ int8_t Event::set_user_pin(uint8_t pin_number) {
     return event_user;
     #else
     // DONE WITH the tinyAVRs!
-    #if !defined(DXCORE) || defined(PIN_PA2) //14-pin DD doesn't have PA2 or PA7 - Everything else does though.
+    #if !defined(DXCORE) || defined(PIN_PA2) // 14-pin DD doesn't have PA2 or PA7 - Everything else does though.
       if (port == PA) {
         if (port_pin == 2)
           event_user = user::evouta_pin_pa2;
@@ -793,11 +793,11 @@ int8_t Event::set_user_pin(uint8_t pin_number) {
     #endif
     #if defined(__AVR_ATmegax09__) || defined(PIN_PB2)
       else if (port == PB) {
-        if (port_pin == 2){
+        if (port_pin == 2) {
           event_user = user::evoutb_pin_pb2;
         }
         #if defined(PIN_PB7)
-          if (port_pin == 7){
+          if (port_pin == 7) {
             event_user = user::evoutb_pin_pb7;
           }
         #endif
@@ -805,11 +805,11 @@ int8_t Event::set_user_pin(uint8_t pin_number) {
     #endif
     #if !defined(DXCORE) || defined PIN_PC2 // DU-series sacrificed PORTC at the altar of native USB (along with their TCD+PLL and assorted other treasures)
       else if (port == PC) {
-        if (port_pin == 2){
+        if (port_pin == 2) {
           event_user = user::evoutc_pin_pc2;
         }
         #if defined(__AVR_ATmegax09__) || defined(PIN_PC7)
-          else if (port_pin == 7){
+          else if (port_pin == 7) {
             event_user = user::evoutc_pin_pc7;
           }
         #endif
@@ -829,7 +829,7 @@ int8_t Event::set_user_pin(uint8_t pin_number) {
         if (port_pin == 2)
           event_user = user::evoute_pin_pe2;
         #if defined(PIN_PE7)
-          else if (port_pin == 7){
+          else if (port_pin == 7) {
             event_user = user::evoutc_pin_pc7;
           }
         #endif
@@ -946,7 +946,7 @@ void Event::_long_soft_event(uint8_t channel, uint8_t length) {
   #else
     #error "Don't know the strobe register!"
   #endif
-  channel = (((uint8_t)1) << channel);
+  channel = (1<<channel);
   __asm__ __volatile__ (
     "in r0, 0x3F"     "\n\t" // save SREG
     "cli"             "\n\t" // interrupts off
@@ -997,7 +997,7 @@ gen::generator_t Event::gen_from_peripheral(TCB_t * timer, uint8_t event_type) {
     #endif
       addr = -1;
     else {
-      addr >>= 3; //now it's 0, 2, 4, 6, or 8.
+      addr >>= 3; // now it's 0, 2, 4, 6, or 8.
       addr += event_type & 0x01; // 0x00 = capt, 0x01 = ovf
       addr += 0xA0;
     }
@@ -1022,10 +1022,10 @@ gen::generator_t Event::gen_from_peripheral(TCB_t * timer, uint8_t event_type) {
 user::user_t Event::user_from_peripheral(TCB_t * timer, uint8_t user_type) {
   uint8_t addr = (uint8_t)(uint16_t) &timer;
   #if defined(DXCORE) || (defined(MEGATINYCORE) && MEGATINYCORE_SERIES == 2)
-    //low byte of address is 0x00, 0x10, 0x20, 0x30, 0x40 on Dx, 0x80 0x90, 0xA0, 0xB0 on mega0, 0x40, 50 on tiny 0/1, and 80, 90 on tiny 2.
-    addr &= 0x7F; //strip high bit off.
+    // low byte of address is 0x00, 0x10, 0x20, 0x30, 0x40 on Dx, 0x80 0x90, 0xA0, 0xB0 on mega0, 0x40, 50 on tiny 0/1, and 80, 90 on tiny 2.
+    addr &= 0x7F; // strip high bit off.
     // and rightshift
-    addr >>= 3; //now it's 0, 2, 4, 6, or 8.
+    addr >>= 3; // now it's 0, 2, 4, 6, or 8.
     if (user_type > 1)
       addr = -1; // invalid user requested.
     else {
@@ -1033,17 +1033,17 @@ user::user_t Event::user_from_peripheral(TCB_t * timer, uint8_t user_type) {
       #if defined(__AVR_DA__)
         addr += 0x1F;
       #elif defined(MEGATINYCORE)
-        addr += 0x11; //2-series
-      #else //DD, DB
+        addr += 0x11; // 2-series
+      #else // DD, DB
         addr += 0x1E;
       #endif
     }
-  #else  //these parts have only 1 user per TCB
-    if (user_type) //so this had better be 0.
+  #else  // these parts have only 1 user per TCB
+    if (user_type) // so this had better be 0.
       addr = -1;
     else {
-      addr &= 0x3F; //remove high bits, thus cleaning both tinyAVR and megaAVR  - megaAVR doesn't have an instance that gets up above 0xC0.
-      addr >>= 4; //now it's 0, 1, 2, or 3, and they each have their own offset:
+      addr &= 0x3F; // remove high bits, thus cleaning both tinyAVR and megaAVR  - megaAVR doesn't have an instance that gets up above 0xC0.
+      addr >>= 4; // now it's 0, 1, 2, or 3, and they each have their own offset:
       #if defined(MEGATINYCORE)
         addr += 0x06;
       #else
@@ -1055,7 +1055,7 @@ user::user_t Event::user_from_peripheral(TCB_t * timer, uint8_t user_type) {
 }
 
 
-gen::generator_t Event::gen_from_peripheral(CCL_t * logic, uint8_t event_type){
+gen::generator_t Event::gen_from_peripheral(CCL_t * logic, uint8_t event_type) {
   uint8_t retval = -1;
   if ((uint16_t) logic == 0x1C0) {
     #if (!defined(MEGATINYCORE) || MEGATINYCORE_SERIES != 2)
@@ -1071,9 +1071,9 @@ gen::generator_t Event::gen_from_peripheral(CCL_t * logic, uint8_t event_type){
   return (gen::generator_t) retval;
 }
 
-user::user_t Event::user_from_peripheral(CCL_t * logic, uint8_t event_type){
+user::user_t Event::user_from_peripheral(CCL_t * logic, uint8_t event_type) {
   uint8_t retval = -1;
-  if ((uint16_t) logic == 0x1C0){
+  if ((uint16_t) logic == 0x1C0) {
     #if (!defined(MEGATINYCORE) || MEGATINYCORE_SERIES != 2)
       if (event_type < 13) {
         retval = event_type;
@@ -1104,14 +1104,14 @@ gen::generator_t Event::gen_from_peripheral(TCA_t * timer, uint8_t event_type) {
   if (event_type < 6) {
     #if !defined(MEGATINYCORE) || MEGATINYCORE_SERIES == 2
       if (event_type > 1) {
-        event_type += 2; //mysterious gap?
+        event_type += 2; // mysterious gap?
       }
       retval = (event_type + 0x80);
       #if (defined(__AVR_DA__) || defined(__AVR_DB__))
         if (addr == 0x40)
           retval += 0x08;
       #else
-        (void) addr; //prevent warning.
+        (void) addr; // prevent warning.
       #endif
     #else
       retval = event_type + 1;
@@ -1131,13 +1131,13 @@ user::user_t Event::user_from_peripheral(TCA_t * timer, uint8_t user_type) {
   #if defined(DXCORE) || (defined(MEGATINYCORE) && MEGATINYCORE_SERIES == 2)
     addr += user_type;
   #else
-    if (user_type)  //asking for the second user, which doesn't exist.
+    if (user_type)  // asking for the second user, which doesn't exist.
       return (user::user_t) -1;
   #endif
   #if defined(__AVR_DB__) || defined(__AVR_DD__)
     addr += 0x1A;
   #elif !defined(MEGATINYCORE)
-    addr += 0x1B // DA or mega0
+    addr += 0x1B; // DA or mega0
   #elif MEGATINYCORE_SERIES == 2
     addr += 0x0E;
   #else
@@ -1151,7 +1151,7 @@ user::user_t Event::user_from_peripheral(USART_t * usart, uint8_t user_type) {
   if (user_type)
     addr = -1;
   else {
-    addr >>= 5; //get 0, 1, 2, 3, 4, or 5.
+    addr >>= 5; // get 0, 1, 2, 3, 4, or 5.
     #if defined(__AVR_DA__)
       addr += 0x14;
     #elif defined(__AVR_DB__) || defined(__AVR_DD__)

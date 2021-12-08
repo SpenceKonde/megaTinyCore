@@ -160,7 +160,7 @@ const uint8_t _usart_pins[][4] = {
       {NOT_A_PIN, NOT_A_PIN, NOT_A_PIN, NOT_A_PIN},
     #endif
   #endif
-  #if defined(USART1) //On 0/1-series, with only one USART, we don't even need the third row.
+  #if defined(USART1) // On 0/1-series, with only one USART, we don't even need the third row.
     #if defined(HWSERIAL1_MUX_PINSWAP_1)
       #if (defined(PIN_HWSERIAL1_TX_PINSWAP_1) && defined(PIN_HWSERIAL1_RX_PINSWAP_1) && defined(PIN_HWSERIAL1_XCK_PINSWAP_1) && defined(PIN_HWSERIAL1_XIR_PINSWAP_1) && PIN_HWSERIAL1_TX_PINSWAP_1 != NOT_A_PIN && PIN_HWSERIAL1_RX_PINSWAP_1 != NOT_A_PIN)
         {PIN_HWSERIAL1_TX_PINSWAP_1, PIN_HWSERIAL1_RX_PINSWAP_1, PIN_HWSERIAL1_XCK_PINSWAP_1, PIN_HWSERIAL1_XDIR_PINSWAP_1},

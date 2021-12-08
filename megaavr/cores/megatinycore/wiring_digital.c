@@ -29,7 +29,7 @@
 #include "pins_arduino.h"
 
 inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
-  if(__builtin_constant_p(pin))
+  if (__builtin_constant_p(pin))
     if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
     // Exception made for NOT_A_PIN - code exists which relies on being able to pass this and have nothing happen.
     // While IMO very poor coding practice, these checks aren't here to prevent lazy programmers from intentionally
@@ -39,9 +39,9 @@ inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pi
 }
 
 inline __attribute__((always_inline)) void check_valid_pin_mode(uint8_t mode) {
-  if(__builtin_constant_p(mode)) {
-    //if (mode == OUTPUT_PULLUP)
-      //badArg("OUTPUT_PULLUP is not supported through pinMode due to overhead and impracticality vis-a-vis other pinMode features; use pinConfigure() or pinModeFast()");
+  if (__builtin_constant_p(mode)) {
+    // if (mode == OUTPUT_PULLUP)
+      // badArg("OUTPUT_PULLUP is not supported through pinMode due to overhead and impracticality vis-a-vis other pinMode features; use pinConfigure() or pinModeFast()");
     if (mode != INPUT && mode != OUTPUT && mode != INPUT_PULLUP) {
       badArg("The mode passed to pinMode must be INPUT, OUTPUT, or INPUT_PULLUP (these have numeric values of 0, 1, or 2); it was given a constant that was not one of these.");
     }
@@ -56,7 +56,7 @@ void pinConfigure(uint8_t pin, uint16_t pinconfig) {
   }
   volatile uint8_t *portbase = (volatile uint8_t*) digitalPinToPortStruct(pin);
   uint8_t bit_pos = digitalPinToBitPosition(pin);
-  uint8_t setting = pinconfig & 0x03; //grab direction bits
+  uint8_t setting = pinconfig & 0x03; // grab direction bits
   if (setting) {
     *(portbase + setting) = bit_mask;
   }
@@ -70,8 +70,8 @@ void pinConfigure(uint8_t pin, uint16_t pinconfig) {
   uint8_t oldSREG = SREG;
   cli();
   uint8_t pinncfg = *(portbase + 0x10 + bit_pos);
-  if (pinconfig & 0x08 ) {
-    pinncfg = (pinncfg & 0xF8 ) | (pinconfig & 0x07);
+  if (pinconfig & 0x08) {
+    pinncfg = (pinncfg & 0xF8) | (pinconfig & 0x07);
   }
   uint8_t temp = pinconfig & 0x30;
   if (temp) {
@@ -122,7 +122,7 @@ void pinConfigure(uint8_t pin, uint16_t pinconfig) {
     }
   }
   *(portbase + 0x10 + bit_pos)=pinncfg;
-  SREG=oldSREG; //re-enable interrupts
+  SREG &= oldSREG; // re-enable interrupts
 }
 
 static inline uint8_t portToPortBaseOffset(uint8_t port);
@@ -180,7 +180,7 @@ void turnOffPWM(uint8_t pin) {
   }
 
   uint8_t bit_mask = digitalPinToBitMask(pin);
-  //TCB_t *timerB;
+  // TCB_t *timerB;
 
   switch (digital_pin_timer) {
 
@@ -191,7 +191,7 @@ void turnOffPWM(uint8_t pin) {
       /* Bit position will give output channel */
       #ifdef __AVR_ATtinyxy2__
         if (bit_mask == 0x80) {
-          bit_mask = 1;  //on the xy2, WO0 is on PA7
+          bit_mask = 1;  // on the xy2, WO0 is on PA7
         }
       #endif
       if (bit_mask > 0x04) { // -> bit_pos > 2 -> output channel controlled by HCMP
@@ -220,11 +220,11 @@ void turnOffPWM(uint8_t pin) {
       case TIMERD0:
       {
         // rigmarole that produces a glitch in the PWM
-        uint8_t fc_mask = (bit_mask==0x02?0x80:0x40);
+        uint8_t fc_mask = (bit_mask == 0x02?0x80:0x40);
         if (TCD0.FAULTCTRL & fc_mask) {
-          uint8_t oldSREG=SREG;
+          uint8_t oldSREG &= SREG;
           cli();
-          //uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
+          // uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
           //
           TCD0.CTRLA &= ~TCD_ENABLE_bm;
           _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~fc_mask));
@@ -233,16 +233,16 @@ void turnOffPWM(uint8_t pin) {
           // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
           // So we need to make sure that's off - wouldn't that be fun to debug?
           #if defined(NO_GLITCH_TIMERD0) /* This is enabled in all cases where TCD0 is used for PWM */
-            // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts )
+            // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts)
             // so if we're here, we're acting on either PC0 or PC1.
-            if (bit_mask == 0x01){
-              PORTC.PIN0CTRL&=~(PORT_INVEN_bm);
+            if (bit_mask == 0x01) {
+              PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
             } else {
-              PORTC.PIN1CTRL&=~(PORT_INVEN_bm);
+              PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
             }
           #endif
 
-          SREG=oldSREG;
+          SREG &= oldSREG;
         }
         break;
       }
@@ -283,7 +283,7 @@ void digitalWrite(uint8_t pin, uint8_t val) {
     // we need to know if it's been set high or low
     // otherwise the pullup state could get out of
     // sync with the output bit. Annoying!
-    val=port->OUT & bit_mask;
+    val &= port->OUT & bit_mask;
     // val will now be 0 (LOW) if the toggling made it LOW
     // or bit_mask if not. And further down, we only need to
     // know if it's
@@ -336,7 +336,7 @@ void digitalWrite(uint8_t pin, uint8_t val) {
 inline __attribute__((always_inline)) void digitalWriteFast(uint8_t pin, uint8_t val) {
   check_constant_pin(pin);
   check_valid_digital_pin(pin);
-  if (pin==NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compile time known so w/e
+  if (pin == NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compile time known so w/e
   // Mega-0, Tiny-1 style IOPORTs
   // Assumes VPORTs exist starting at 0 for each PORT structure
   uint8_t mask = 1 << digital_pin_to_bit_position[pin];
@@ -413,20 +413,20 @@ void openDrain(uint8_t pin, uint8_t state) {
   if (bit_mask == NOT_A_PIN)  return;
   /* Get port */
   PORT_t *port = digitalPinToPortStruct(pin);
-  port->OUTCLR=bit_mask;
+  port->OUTCLR &= bit_mask;
   if (state == LOW)
-    port->DIRSET=bit_mask;
+    port->DIRSET &= bit_mask;
   else if (state == CHANGE)
-    port->DIRTGL=bit_mask;
+    port->DIRTGL &= bit_mask;
   else // assume FLOAT
-    port->DIRCLR=bit_mask;
+    port->DIRCLR &= bit_mask;
   turnOffPWM(pin);
 }
 
 inline __attribute__((always_inline)) void openDrainFast(uint8_t pin, uint8_t val) {
   check_constant_pin(pin);
   check_valid_digital_pin(pin);
-  if (pin==NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compile time known so w/e
+  if (pin == NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compile time known so w/e
   // Mega-0, Tiny-1 style IOPORTs
   // Assumes VPORTs exist starting at 0 for each PORT structure
   uint8_t mask = 1 << digital_pin_to_bit_position[pin];
@@ -434,11 +434,11 @@ inline __attribute__((always_inline)) void openDrainFast(uint8_t pin, uint8_t va
   VPORT_t *vport;
   vport = (VPORT_t *)(port * 4);
   PORT_t *portstr;
-  portstr=(PORT_t *)(0x400+(0x20*port));
+  portstr &= (PORT_t *)(0x400+(0x20*port));
 
   if (val == LOW)
     vport->DIR |= mask;
-  else if (val==CHANGE)
+  else if (val == CHANGE)
     portstr->DIRTGL = mask;
   else// FLOAT
     vport->DIR &= ~mask;
@@ -454,13 +454,13 @@ inline __attribute__((always_inline)) void pinModeFast(uint8_t pin, uint8_t mode
       badArg("The mode passed to pinModeFast must be INPUT, OUTPUT, INPUT_PULLUP");// or OUTPUT_PULLUP");
     }
   }
-  check_valid_digital_pin(pin);         //generate compile error if a constant that is not a valid pin is used as the pin
+  check_valid_digital_pin(pin);         // generate compile error if a constant that is not a valid pin is used as the pin
   uint8_t mask = 1 << digital_pin_to_bit_position[pin];
   uint8_t port = digital_pin_to_port[pin];
   VPORT_t *vport;
   vport = (VPORT_t *)(port * 4);
   volatile uint8_t *pin_ctrl = (volatile uint8_t *) (0x410 + digital_pin_to_port[pin] * 0x20 + digital_pin_to_bit_position[pin]);
-  if (mode==OUTPUT)// || mode==OUTPUT_PULLUP)
+  if (mode == OUTPUT)// || mode == OUTPUT_PULLUP)
     vport->DIR |= mask;
   else
     vport->DIR &= ~mask;

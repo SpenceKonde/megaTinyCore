@@ -52,11 +52,11 @@ struct EERef {
   }
 
   // Assignment/write members.
-  EERef &operator=(const EERef &ref) {
+  EERef &operator = (const EERef &ref) {
     return *this = *ref;
   }
 
-  EERef &operator=(uint8_t in)       {
+  EERef &operator = (uint8_t in)       {
     #ifdef MEGATINYCORE
     // I see no reason why eeprom_write_byte() won't corrupt EEPROM if an ISR tries to write at the wrong instant. The window is 1 clock, but not 0
     uint16_t adr = (uint16_t)MAPPED_EEPROM_START + (index & EEPROM_INDEX_MASK);
@@ -95,7 +95,7 @@ struct EERef {
     _PROTECTED_WRITE_SPM(NVMCTRL.CTRLA, NVMCTRL_CMD_EEERWR_gc);
     *(uint8_t *)(MAPPED_EEPROM_START + (index & EEPROM_INDEX_MASK)) = in;
 
-    SREG = oldSREG; //restore SREG and interrupts
+    SREG = oldSREG; // restore SREG and interrupts
     return *this;
     #endif
   }
@@ -172,7 +172,7 @@ struct EEPtr {
   operator int() const                {
     return index;
   }
-  EEPtr &operator=(int in)          {
+  EEPtr &operator = (int in)          {
     return index = in, *this;
   }
 

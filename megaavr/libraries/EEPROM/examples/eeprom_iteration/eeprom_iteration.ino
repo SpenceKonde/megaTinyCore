@@ -20,8 +20,8 @@ void setup() {
 
   for (int index = 0 ; index < EEPROM.length() ; index++) {
 
-    //Add one to each cell in the EEPROM
-    EEPROM[ index ] += 1;
+    // Add one to each cell in the EEPROM
+    EEPROM[index] += 1;
   }
 
   /*
@@ -32,8 +32,8 @@ void setup() {
 
   while (index < EEPROM.length()) {
 
-    //Add one to each cell in the EEPROM
-    EEPROM[ index ] += 1;
+    // Add one to each cell in the EEPROM
+    EEPROM[index] += 1;
     index++;
   }
 
@@ -41,16 +41,16 @@ void setup() {
    * Iterate the EEPROM using a do-while loop.
    */
 
-  int idx = 0;  //Used 'idx' to avoid name conflict with 'index' above.
+  int idx = 0;  // Used 'idx' to avoid name conflict with 'index' above.
 
   do {
 
-    //Add one to each cell in the EEPROM
-    EEPROM[ idx ] += 1;
+    // Add one to each cell in the EEPROM
+    EEPROM[idx] += 1;
     idx++;
   } while (idx < EEPROM.length());
 
 
-} //End of setup function.
+} // End of setup function.
 
 void loop() {}

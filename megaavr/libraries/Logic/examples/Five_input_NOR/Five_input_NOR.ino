@@ -1,19 +1,19 @@
 /***********************************************************************|
-  | tinyAVR Configurable Custom Logic library                             |
-  |                                                                       |
-  | Five_input_NOR.ino                                                    |
-  |                                                                       |
-  | A library for interfacing with the megaAVR Configurable Custom Logic. |
-  | Developed in 2019 by MCUdude.                                         |
-  | https://github.com/MCUdude/                                           |
-  |                                                                       |
-  | In this example we use two logic blocks to get five inputs.           |
-  | The output of block 1 is connected to one of the inputs of block 0.   |
-  | With the correct truth tables values we can make the output of        |
-  | block 0 go high when all inputs are low.                              |
-  |                                                                       |
-  | See Microchip's application note TB3218 for more information.         |
-  |***********************************************************************/
+| tinyAVR Configurable Custom Logic library                             |
+|                                                                       |
+| Five_input_NOR.ino                                                    |
+|                                                                       |
+| A library for interfacing with the megaAVR Configurable Custom Logic. |
+| Developed in 2019 by MCUdude.                                         |
+| https://github.com/MCUdude/                                           |
+|                                                                       |
+| In this example we use two logic blocks to get five inputs.           |
+| The output of block 1 is connected to one of the inputs of block 0.   |
+| With the correct truth tables values we can make the output of        |
+| block 0 go high when all inputs are low.                              |
+|                                                                       |
+| See Microchip's application note TB3218 for more information.         |
+|***********************************************************************/
 
 #include <Logic.h>
 
@@ -34,12 +34,12 @@ void setup() {
   // Here, PA3 is used as input 1 and PB0 is used as input 2
 
   #if defined(__AVR_ATtinyxy6__)
-  #ifdef EVSYS_CHANNEL0 //means it's a 2-series, where the event system works like it does on everything other than the tinyAVR 0/1-series
+  #ifdef EVSYS_CHANNEL0 // means it's a 2-series, where the event system works like it does on everything other than the tinyAVR 0/1-series
   EVSYS.CHANNEL0 = EVSYS_CHANNEL0_PORTA_PIN3_gc;
   EVSYS.USERCCLLUT1A = EVSYS_USER_CHANNEL0_gc;
   EVSYS.CHANNEL1 = EVSYS_CHANNEL1_PORTB_PIN0_gc;
   EVSYS.USERCCLLUT1B = EVSYS_USER_CHANNEL1_gc;
-  #else //it's a tinyAVR 0/1
+  #else // it's a tinyAVR 0/1
   EVSYS.ASYNCCH0 = EVSYS_ASYNCCH0_PORTA_PIN3_gc;    // PA3 as ASYNC0 generator
   EVSYS.ASYNCUSER3 = EVSYS_ASYNCUSER3_ASYNCCH0_gc;  // Use Async0 as LUT1 event 0 per Table 14-4 in datasheet
   EVSYS.ASYNCCH1 = EVSYS_ASYNCCH1_PORTB_PIN0_gc;    // PB0 as ASYNC1 generator
@@ -62,7 +62,7 @@ void setup() {
   Logic1.input2 = in::input_pullup;   // Set PC5 as input with pullup
 
   #endif
-  //End of workaround code
+  // End of workaround code
 
   Logic1.input0 = in::input_pullup;   // Set PC3 as input with pullup
   Logic1.output = out::disable;       // Enable output pin

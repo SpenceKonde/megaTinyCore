@@ -199,7 +199,7 @@ class tinyNeoPixel {
     setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b),
     setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t w),
     setPixelColor(uint16_t n, uint32_t c),
-    fill(uint32_t c=0, uint16_t first=0, uint16_t count=0),
+    fill(uint32_t c = 0, uint16_t first = 0, uint16_t count = 0),
     setBrightness(uint8_t b),
     clear();
   uint8_t
@@ -279,7 +279,7 @@ class tinyNeoPixel {
   static uint32_t   Color(uint8_t r, uint8_t g, uint8_t b, uint8_t w) {
     return ((uint32_t)w << 24) | ((uint32_t)r << 16) | ((uint32_t)g <<  8) | b;
   }
-  static uint32_t   ColorHSV(uint16_t hue, uint8_t sat=255, uint8_t val=255);
+  static uint32_t   ColorHSV(uint16_t hue, uint8_t sat = 255, uint8_t val = 255);
   /*!
     @brief   A gamma-correction function for 32-bit packed RGB or WRGB
              colors. Makes color transitions appear more perceptially
@@ -297,7 +297,7 @@ class tinyNeoPixel {
   #if (!defined(MILLIS_USE_TIMERNONE) && !defined(MILLIS_USE_TIMERRTC) && !defined(MILLIS_USE_TIMERRTC_XTAL) && !defined(MILLIS_USE_TIMERRTC_XOSC))
     inline bool canShow(void) { return (micros() - endTime) >= 50L; }
   #else
-    inline bool canShow(void) {return 1;} //we don't have micros here;
+    inline bool canShow(void) {return 1;} // we don't have micros here;
   #endif
 
 

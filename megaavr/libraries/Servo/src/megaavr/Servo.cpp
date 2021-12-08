@@ -8,8 +8,8 @@
   #define ticksToUs(_ticks) (((unsigned) (_ticks) * 2) / clockCyclesPerMicrosecond()) // converts from ticks back to microseconds
   #define TRIM_DURATION  51                                                           // compensation ticks to trim adjust delays in the ISR
 #else
-  #define usToTicks(_us)    ((( _us ) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
-  #define ticksToUs(_ticks) (((unsigned) _ticks ) / clockCyclesPerMicrosecond())      // converts from ticks back to microseconds
+  #define usToTicks(_us)    ((( _us) * clockCyclesPerMicrosecond()))                  // converts microseconds to tick
+  #define ticksToUs(_ticks) (((unsigned) _ticks) / clockCyclesPerMicrosecond())       // converts from ticks back to microseconds
   #define TRIM_DURATION  102                                                          // compensation ticks to trim adjust delays in the ISR
 #endif
 
@@ -65,7 +65,7 @@ void ServoHandler(int timer) {
     }
   } else {
     if (SERVO_INDEX(timer, currentServoIndex[timer]) < ServoCount && SERVO(timer, currentServoIndex[timer]).Pin.isActive == true) {
-      //digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, LOW);   // pulse this channel low if activated
+      // digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, LOW);   // pulse this channel low if activated
       ((PORT_t *)&PORTA + SERVO(timer, currentServoIndex[timer]).Pin.port)->OUTCLR = SERVO(timer, currentServoIndex[timer]).Pin.bitmask;
       // SIXTY TICKS
     }
@@ -76,7 +76,7 @@ void ServoHandler(int timer) {
 
   if (SERVO_INDEX(timer, currentServoIndex[timer]) < ServoCount && currentServoIndex[timer] < SERVOS_PER_TIMER) {
     if (SERVO(timer, currentServoIndex[timer]).Pin.isActive == true) {   // check if activated
-      //digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, HIGH);   // it's an active channel so pulse it high
+      // digitalWrite(SERVO(timer, currentServoIndex[timer]).Pin.nbr, HIGH);   // it's an active channel so pulse it high
       ((PORT_t *)&PORTA + SERVO(timer, currentServoIndex[timer]).Pin.port)->OUTSET = SERVO(timer, currentServoIndex[timer]).Pin.bitmask;
       // EIGHTY TICKS
     }
@@ -185,7 +185,7 @@ uint8_t Servo::attach(byte pin, int min, int max) {
     PORT_t *port = ((PORT_t *)&PORTA + prt);
     port->DIRSET = bitmask;
     // todo min/max check: abs(min - MIN_PULSE_WIDTH) /4 < 128
-    this->min  = (MIN_PULSE_WIDTH - min) / 4; //resolution of min/max is 4 uS
+    this->min  = (MIN_PULSE_WIDTH - min) / 4; // resolution of min/max is 4 uS
     this->max  = (MAX_PULSE_WIDTH - max) / 4;
     // initialize the timer if it has not already been initialized
     timer = SERVO_INDEX_TO_TIMER(servoIndex);

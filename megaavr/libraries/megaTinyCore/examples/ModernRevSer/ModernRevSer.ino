@@ -19,7 +19,7 @@ void setup() {
   Serial.println();
   delay(1000);
   Serial.print("REVID: ");
-  #ifdef SIGROW_SERNUM15 //AVR Dx-series
+  #ifdef SIGROW_SERNUM15 // AVR Dx-series
 #define SERLEN
   char major = 0x40 + (SYSCFG.REVID >> 4);
   Serial.print(major);

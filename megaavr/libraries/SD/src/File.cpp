@@ -15,7 +15,7 @@
 #include <SD.h>
 
 /* for debugging file open/close leaks
-   uint8_t nfilecount=0;
+   uint8_t nfilecount = 0;
 */
 
 File::File(SdFile f, const char *n) {
@@ -40,7 +40,7 @@ File::File(SdFile f, const char *n) {
 File::File(void) {
   _file = 0;
   _name[0] = 0;
-  //Serial.print("Created empty file object");
+  // Serial.print("Created empty file object");
 }
 
 // returns a pointer to the file name

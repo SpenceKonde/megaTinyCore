@@ -11,7 +11,7 @@ The event system allows routing of signals from event "generators" (outputs on v
 More information about the Event system and how it works can be found in the [Microchip Application Note AN2451](http://ww1.microchip.com/downloads/en/AppNotes/DS00002451B.pdf) and in the [megaAVR-0 family data sheet](http://ww1.microchip.com/downloads/en/DeviceDoc/megaAVR0-series-Family-Data-Sheet-DS40002015B.pdf).
 
 ## Level vs. Pulse events
-There are two types of events - a "pulse" interrupt, which lasts for the duration of a single clock cycle (either `CLK_PER` or a relevant (slower) clock - for example, the USART XCK generator provides a pulse event which lasts one XCK period, which is far slower than CLK_PER (the "peripheral; . while the TCD0-derived ones are ) or a "level" interrupt which lasts for the duration of some condition. Often for a given even generator or user only one or the other makes sense. Less often, for some reason or another, you may need a level event, but all you have is a pulse event - or the other way around. A [CCL module (Logic.h)](../Logic/README.md) event between the two at the cost of the logic module and one event channel. In the case of timer WO (PWM) channels, the CCL already has level inputs to match the pulse inputs that the event system can get on compare match. Many of the pulse interrupts are generated at the same moment that interrupt flags get set - except that where an interrupt bit sticks around until serviced, the pulse bit is present generally for only a single clock cycle (meaning they are only *usable* for triggering other event system things or peripherals. s can be (they often let you do similar things faster with less CPU involvement, too), but unlike interrupts, they won't stick around until you explicitly clear them
+There are two types of events - a "pulse" interrupt, which lasts for the duration of a single clock cycle (either `CLK_PER` or a relevant (slower) clock - for example, the USART XCK generator provides a pulse event which lasts one XCK period, which is far slower than CLK_PER (the "peripheral; . while the TCD0-derived ones are) or a "level" interrupt which lasts for the duration of some condition. Often for a given even generator or user only one or the other makes sense. Less often, for some reason or another, you may need a level event, but all you have is a pulse event - or the other way around. A [CCL module (Logic.h)](../Logic/README.md) event between the two at the cost of the logic module and one event channel. In the case of timer WO (PWM) channels, the CCL already has level inputs to match the pulse inputs that the event system can get on compare match. Many of the pulse interrupts are generated at the same moment that interrupt flags get set - except that where an interrupt bit sticks around until serviced, the pulse bit is present generally for only a single clock cycle (meaning they are only *usable* for triggering other event system things or peripherals. s can be (they often let you do similar things faster with less CPU involvement, too), but unlike interrupts, they won't stick around until you explicitly clear them
 
 
 ## Synchronization
@@ -67,7 +67,7 @@ There are no SPI or USART generators, though those are not as useful (note: you 
 The TCD events are async and **based on the TCD clock** *which may be faster than the peripheral clock*. If for example, you are feeding it to a CCL with the synchronizer enabled, events can be missed (this is considerably more concerning on the Dx-series parts, where the TCD has a PLL that can guarantee it is running faster than the system clock!)
 RTC events are async pulse events, but they are based on the RTC clock domain, which is typically hundreds of times slower than the main clock.
 While the analog comparator generators are available on every async channel, they are not interchangible; they have different numerical values on each one!
-There is a general appearance of the designers having made a few poor decisions, but not having had the time to correct them prior to release resulting in all this weirdness. This is supported by the fact that the megaAVR 0-series and all other chips released since have had an almost identical even system, to eachother, and different from the tiny 0/1-series.
+There is a general appearance of the designers having made a few poor decisions, but not having had the time to correct them prior to release resulting in all this weirdness. This is supported by the fact that the megaAVR 0-series and all other chips released since have had an almost identical even system, to each other, and different from the tiny 0/1-series.
 
 #### 2-series
 On the 2-series parts, they put a synchronizer onto each channel, making it into two subchannels, a sync and async one, which is completely transparent to the user. The channels are far more flexible; like all other parts with an event system except the 0/1-series, only the port pins, and which set of taps off the PIT it gets are different between event channels. And they are delivered in pairs as they should be. Unlike, for example, the Dx-series, the event channels wrap around (the Dx-series has a number of channels that have no pin generators!)
@@ -223,7 +223,7 @@ Method to get the generator used for a particular channel.
 #### Usage
 ```c++
 uint8_t generator_used = Event0.get_generator();
-if(generator_used == gen::ccl0_out) {
+if (generator_used == gen::ccl0_out) {
   Serial.println("We're using gen::ccl0_out as generator");
 }
 ```
@@ -261,7 +261,7 @@ Event0.set_user(user::ccl0_event_a); // Also set CCL0 Event 0/Event A in event u
 ```
 
 ### set_user_pin()
-This is the analog of set_user above - the difference being that it takes a pin number as an argument. This must be a pin that supports event output - the number of the pin within the port must be 2 or 7, and you cannot use both pin2 and pin 7 of the same port at the same time (if you're totally out of event out pins, but not CCL blocks, you can set up a CCL to use a )
+This is the analog of set_user above - the difference being that it takes a pin number as an argument. This must be a pin that supports event output - the number of the pin within the port must be 2 or 7, and you cannot use both pin2 and pin 7 of the same port at the same time (if you're totally out of event out pins, but not CCL blocks, you can set up a CCL to use a)
 
 
 ### clear_user()
@@ -283,8 +283,8 @@ The lengths that are available are 2, 4, 6, 10 and 16 (any number less than 4 wi
 
 #### Usage
 ```c++
-Event0.long_soft_event(4); //will invert the state of the event channel for 4 system clock cycles (200ns at 20 MHz)
-Event0.long_soft_event(10); //will invert the state of the event channel for 10 system clock cycles (500ns at 20 MHz)
+Event0.long_soft_event(4); // will invert the state of the event channel for 4 system clock cycles (200ns at 20 MHz)
+Event0.long_soft_event(10); // will invert the state of the event channel for 10 system clock cycles (500ns at 20 MHz)
 
 ```
 Don't forget that this is an invert, not a "high" or "low". It should be entirely possible for the event that normally drives it to occur resulting in the state changing during that pulse, depending on it's configuration. Note also that the overhead of long_soft_event is typically several times the length of the pulse due to calculating the bitmask to write; it's longer with higher numbered channels. if that is a problem, whatever your use case is, it is not one of the ones this was intended for...
@@ -318,7 +318,7 @@ This is most useful if you are writing portable (library) code that uses the Eve
 #### Usage
 ```c
 // Here we see a typical use case - you get the generator, and immediately ask Event to assign a channel to it and give that to you. After getting it, you test to make sure it's not Event_empty, which indicates that either gen_from_peripheral failed, or assign_generator was out of event channels. Either way that's probably the user's fault, so you decide to return an error code.
-uint8_t init(TCB_t* some_timer, /*and more arguments, most likely */) { //User could pass any TCB, and will expect your code to work!
+uint8_t init(TCB_t* some_timer, /*and more arguments, most likely */) { // User could pass any TCB, and will expect your code to work!
   &Event_TCBnCapt = Event::assign_generator(Event::gen_from_peripheral(some_timer,0));
   if (_TCBnCapt.get_channel_number() == 255)
     return MY_ERROR_INVALID_TIMER_OR_NO_FREE_EVENT;

@@ -9,7 +9,7 @@
 
 void setup() {
   // pinMode (MyButtonPin,INPUT_PULLUP)
-  _delay_ms(1000); //gives you a chance to get the serial monitor open.
+  _delay_ms(1000); // gives you a chance to get the serial monitor open.
   // while (digitalRead(MyButtonPin) == HIGH)
   // uncomment the lines above and below it and connect a button between that pin and ground to make this wait until you press the button.
   byte errortype = 0;
@@ -29,14 +29,14 @@ void setup() {
       if (CLKCTRLK.MCLKSTATUS & CLKCTRL_SOSC_bm) { // and trying?
         errortype |= 4;
       }
-      errortype |= 128; //using fallback clock.
+      errortype |= 128; // using fallback clock.
     } else {
       _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
     }
   }
-  #elif (CLOCKSOURCE == 0) //internal oscillator
+  #elif (CLOCKSOURCE == 0) // internal oscillator
   if ((CLKCTRL_MCLKCTRLA & 0x03) !=  CLKCTRL_CLKSEL_OSC20M_gc) {
-    //core thinks it is using iinternal, but hardware set for external, likely due to user modification of initialization routines.
+    // core thinks it is using iinternal, but hardware set for external, likely due to user modification of initialization routines.
     // set it back to to the configured frequency
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, CLKCTRL_CLKSEL_OSC20M_gc);
@@ -49,11 +49,11 @@ void setup() {
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_2X_gc));
     #elif (F_CPU == 5000000 || (F_CPU == 4000000) // prescaled by 4
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
-    #elif (F_CPU == 1000000) //16MHz prescaled by 16
+    #elif (F_CPU == 1000000) // 16MHz prescaled by 16
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
     #else
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_6X_gc));
-    errortype |= 128; //we are now at fallback frequency.
+    errortype |= 128; // we are now at fallback frequency.
     #endif
     errortype |= 8;
   }
@@ -79,8 +79,8 @@ void setup() {
   } else if (errormsgs == 0x40) {
     errortype |= 64;
   }
-  #endif //if tuning enabled.
-  #endif //end of clock-source dependent diagostics
+  #endif // if tuning enabled.
+  #endif // end of clock-source dependent diagostics
 
   // Now that we know what, if anything, is wrong, let's set up serial so it works and tell the user.
   if (!(errortype & (128 | 64))) {
@@ -96,7 +96,7 @@ void setup() {
       Serial.println("Your part is running at an 20 MHz-derived speed, from internal w/out tuning, but selected F_CPU 16 MHz derived\r\nThis can only happen if programming via bootloader - UPDI upload sets the OSCCFG fuse\r\nEither reburn bootloader with the desired speed selected, or run the tuning sketch (see docs) and use 16 MHz (tuned).\r\nwhich will give 16 MHz even if the osccfg fuse is set to 20.\r\nOr select a 20 MHz-derived speed (20/10/5) instead of a 16 MHz derived one (16/8/4/1)");
     }
   }
-  if (errortype & (128 | 64)) { //would be an else except we need to end up here if 128 not set and 16 is......
+  if (errortype & (128 | 64)) { // would be an else except we need to end up here if 128 not set and 16 is......
     if (errortype & 64) {
       Serial.begin(19200);
       Serial.println("Tuned internal selected, but tuning sketch has not run successfully. If you can read this, our guess was close enough for UART to work though!");
