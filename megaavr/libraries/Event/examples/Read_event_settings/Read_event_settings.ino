@@ -31,7 +31,7 @@ void print_user_info(user::user_t my_user) {
 }
 
 void setup() {
-  Serial.begin(9600); // Initialize hardware serial port
+  Serial.begin(115200); // Initialize hardware serial port
 
   Event2.set_generator(gen2::pin_pa1); // Set pin PE0 as event generator
   #if MEGATINYCORE_SERIES == 2

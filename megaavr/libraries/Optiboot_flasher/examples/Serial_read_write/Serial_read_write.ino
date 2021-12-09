@@ -50,7 +50,7 @@ const uint8_t flashSpace[SPM_PAGESIZE * NUMBER_OF_PAGES] __attribute__((aligned(
 void setup() {
   delay(1000);
   // Initialize serial
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   if (!optiboot_check_writable()) {
     Serial.println("Incompatible or no bootloader present! Please burn the correct bootloader");

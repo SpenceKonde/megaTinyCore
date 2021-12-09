@@ -62,7 +62,7 @@ void flash_end_write(uint16_t offset_addr) {
 
 void setup() {
   delay(2000);
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   static uint16_t addr = 0;
 

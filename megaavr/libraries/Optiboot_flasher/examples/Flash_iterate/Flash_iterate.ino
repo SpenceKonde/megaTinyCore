@@ -64,7 +64,7 @@ void read_data() {
 
 void setup() {
   delay(2000);
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   if (!flash.check_writable()) {
     Serial.println("Incompatible or no bootloader present! Please burn correct bootloader");

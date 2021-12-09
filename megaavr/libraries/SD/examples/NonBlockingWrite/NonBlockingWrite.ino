@@ -31,8 +31,7 @@ String buffer;
 unsigned long lastMillis = 0;
 
 void setup() {
-  Serial.begin(9600);
-  while (!Serial);
+  Serial.begin(115200);
 
   // reserve 1kB for String used as a buffer
   buffer.reserve(1024);
