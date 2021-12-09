@@ -46,14 +46,13 @@
 
 #define TIME_TRACKING_TICKS_PER_OVF   (TIME_TRACKING_TIMER_PERIOD + 1UL)
 #define TIME_TRACKING_CYCLES_PER_OVF  (TIME_TRACKING_TICKS_PER_OVF * TIME_TRACKING_TIMER_DIVIDER)
-
 // For a type B timer as millis, these #defines aren't needed, but they're defined accurately anyway,
 
 // However PWM_TIMER_PERIOD _does_ apply to a type B timer as PWM, or a type A timer not doing millis.
-// It happens to be the as a type A timer that is doing millis.
+// It happens to be the same as the period of a type A timer that *is* doing millis.
 
-#define PWM_TIMER_PERIOD  0xFE  /* For frequency */
-#define PWM_TIMER_COMPARE 0x00  /* For duty cycle - this is never used. \
+#define PWM_TIMER_PERIOD  0xFE  // For frequency
+#define PWM_TIMER_COMPARE 0x00  // For duty cycle - this is never used.
 /* The original implementation set the compare registers (all 6 of them, with an STS instruction),
  * and also set a number of other TCA registers to their POR values. That was dumb, and is no longer done. */
 
@@ -90,6 +89,6 @@
 #if !defined(MILLIS_USE_TIMERNONE)
   #define millis millis
   #if !defined(MILLIS_USE_TIMERRTC)
-    #define micros micross
+    #define micros micros
   #endif
 #endif
