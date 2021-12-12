@@ -820,7 +820,7 @@ void Event::soft_event() {
       EVSYS.ASYNCSTROBE = (1 << (channel_number - 2));
     }
   #else
-    // Everything newer calles the registers EVSYS.SWEVENTA or SWEVENTB for the few devices lucky enough to have more than 8 channels.
+    // Everything newer calls the registers EVSYS.SWEVENTA or SWEVENTB for the few devices lucky enough to have more than 8 channels.
     #if defined(EVSYS_SWEVENTB)
       if (channel_number < 8) {
         EVSYS.SWEVENTA = (1 << channel_number);

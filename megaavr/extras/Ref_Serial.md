@@ -192,7 +192,7 @@ In this case, Any *write* will temporarily disable the RXC interrupt, and enable
 That configuration will result from calling the two argument version of begin() with SERIAL_OPEN_DRAIN and SERIAL_LOOPBACK, or equivalently, SERIAL_HALF_DUPLEX, and neither SERIAL_TX_ONLY nor SERIAL_RX_ONLY.
 
 ### Inverted Serial
-Rarely, one needs to have *inverted* serial, ie, idle line is low, the start bit is high, high bits are 0, low bits are 1 and the stop bit is low.) This can be achieved by by inverting the port (either manually, `PORTx.PINxCTRL |= PORT_INVEN_bm;` or via pinConfigure() - [see Digital I/O Reference](Ref_Digital.md) . Generally, when one of the pins is inverted, the other one is to, so you probably want to invert both TX and RX, and you probably don't want the pullup on either of them, sicne they lines are idle LOW when inverted.
+Rarely, one needs to have *inverted* serial, ie, idle line is low, the start bit is high, high bits are 0, low bits are 1 and the stop bit is low.) This can be achieved by by inverting the port (either manually, `PORTx.PINxCTRL |= PORT_INVEN_bm;` or via pinConfigure() - [see Digital I/O Reference](Ref_Digital.md) . Generally, when one of the pins is inverted, the other one is to, so you probably want to invert both TX and RX, and you probably don't want the pullup on either of them, since they lines are idle LOW when inverted.
 
 ```c
 //after Serial.begin(), which would mess all this up.
