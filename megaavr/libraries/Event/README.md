@@ -62,6 +62,7 @@ Many parts with lower pincount do not have any options specific to a channel ava
 |                            | `gen0::tcb1_capt`        |                         |                         |                         |                         |                         |                          |
 
 Notes:
+Yeah, all async channels have the AC1 and AC2 (assuming the part has it) but the numeric value isn't the same. Same goes for TCB1 and the sync channels.
 There are no ADC event eenerators on 0/1-series. Nope, I dunno why either. It's unfortunate that on the only AVRs with 2 ADCs, we can't fire events with them!
 There are no SPI or USART generators, though those are not as useful (note: you can still get them from the CCL)
 The TCD events are async and **based on the TCD clock** *which may be faster than the peripheral clock*. If for example, you are feeding it to a CCL with the synchronizer enabled, events can be missed (this is considerably more concerning on the Dx-series parts, where the TCD has a PLL that can guarantee it is running faster than the system clock!)
@@ -319,7 +320,7 @@ This is most useful if you are writing portable (library) code that uses the Eve
 ```c
 // Here we see a typical use case - you get the generator, and immediately ask Event to assign a channel to it and give that to you. After getting it, you test to make sure it's not Event_empty, which indicates that either gen_from_peripheral failed, or assign_generator was out of event channels. Either way that's probably the user's fault, so you decide to return an error code.
 uint8_t init(TCB_t* some_timer, /*and more arguments, most likely */) { // User could pass any TCB, and will expect your code to work!
-  &Event_TCBnCapt = Event::assign_generator(Event::gen_from_peripheral(some_timer,0));
+  &Event_TCBnCapt = Event::assign_generator(Event::gen_from_peripheral(TCA,1));
   if (_TCBnCapt.get_channel_number() == 255)
     return MY_ERROR_INVALID_TIMER_OR_NO_FREE_EVENT;
   doMoreCoolStuff();
@@ -332,14 +333,15 @@ Shown below, generators/user per instance  (second argument should be less than 
 | Peripheral |   tiny0  |   tiny1  |   tiny2  |   mega0  |  DA/DB/DB   |
 |------------|----------|----------|----------|----------|-------------|
 | TCAn       | 5 / 1 x1 | 5/1 x1   | 5 / 2 x1 | 5 / 1 x1 |  5 / 2 x1-2 |
-| TCBn       | 1 / 1 x1 | 1/1 x1-2 | 2 / 2 x2 | 1/1 x3-4 |  2 / 2 x2-5 |
+| TCBn       |    ***   |    ***   | 2 / 2 x2 | 1/1 x3-4 |  2 / 2 x2-5 |
 | CCL **     | 2 / 4    | 2 / 4    | 4 / 8    | 4 / 8    |4-6 / 8-12   |
 | ACn        | 1 / 0 x1 | */0 x1-3 | 1 / 0 x1 | 1 / 0 x1 |  1 / 0 x1-3 |
 | USARTn     | 0 / 1 x1 | 0/1 x1   | ! / 1 x2 | !/1 x3-4 |  ! / 1 x2-6 |
 
 `*` - the tiny1 parts with 1 AC work normally. This is unfortuately not supported for tiny1 parts with the triple-AC configuration:
 `**` - There is only one CCL peripheral, with multiple logic blocks. Each logic block has 1 event generator and 2 event users. If using the logic library, get the Logic instance number. The output generator is that number. The input is twice that number, and twice that number + 1.
-`!` - These parts do have an option, but we didn't bother to implement it because it isn't particularly useful. But the Event RX mode combined with the TX input to the CCL permit arbitrary remapping of RX and very flexible remapping of TX!
+`***` - This peripheral is not supported becausse the generator numbers are channel dependent.
+`!` - These parts do have an option, but we didn't bother to implement it because it isn't particularly useful. But the Event RX mode combined with the TX input to the CCL permit arbitrary remapping of RX and very flexible remapping of TX.
 
 And what they are:
 
