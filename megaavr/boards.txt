@@ -139,7 +139,7 @@ atxy7.build.wireabr=
 #________________________________________#
 atxy7.upload.tool=avrdude
 atxy7.upload.workaround=
-atxy7.upload.with_programmer_not_available_for_bootloader_boards=
+atxy7.upload.prog_interlock=
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 24-pin 0/1-series tinyAVR submenus          #
@@ -501,7 +501,7 @@ atxy6.build.wireabr=
 #________________________________________#
 atxy6.upload.tool=avrdude
 atxy6.upload.workaround=
-atxy6.upload.with_programmer_not_available_for_bootloader_boards=
+atxy6.upload.prog_interlock=
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 20-pin 0/1-series tinyAVR submenus          #
@@ -869,7 +869,7 @@ atxy4.build.wireabr=
 #________________________________________#
 atxy4.upload.tool=avrdude
 atxy4.upload.workaround=
-atxy4.upload.with_programmer_not_available_for_bootloader_boards=
+atxy4.upload.prog_interlock=
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 14-pin 0/1-series tinyAVR submenus          #
@@ -1236,7 +1236,7 @@ atxy2.build.wireabr=
 #________________________________________#
 atxy2.upload.tool=avrdude
 atxy2.upload.workaround=
-atxy2.upload.with_programmer_not_available_for_bootloader_boards=
+atxy2.upload.prog_interlock=
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 #  8-pin 0/1-series tinyAVR submenus          #
@@ -1553,7 +1553,7 @@ microchip.build.wireabr=
 #________________________________________#
 microchip.upload.tool=avrdude
 microchip.upload.workaround=
-microchip.upload.with_programmer_not_available_for_bootloader_boards=
+microchip.upload.prog_interlock=
 microchip.upload.extra_params=-Pusb
 microchip.upload.serialparams=
 
@@ -1892,6 +1892,7 @@ atxy7o.upload.workaround=
 atxy7o.upload.tool=avrdude
 atxy7o.upload.serialparams=-P{serial.port} -b115200
 atxy7o.upload.protocol=arduino
+atxy7o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
 atxy7o.upload.extra_params=-D
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
@@ -2218,6 +2219,7 @@ atx27o.upload.workaround=
 atx27o.upload.tool=avrdude
 atx27o.upload.serialparams=-P{serial.port} -b115200
 atx27o.upload.protocol=arduino
+atx27o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
 atx27o.upload.extra_params=-D
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
@@ -2536,6 +2538,7 @@ atxy6o.upload.workaround=
 atxy6o.upload.tool=avrdude
 atxy6o.upload.serialparams=-P{serial.port} -b115200
 atxy6o.upload.protocol=arduino
+atxy6o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
 atxy6o.upload.extra_params=-D
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
@@ -2870,6 +2873,7 @@ atx26o.upload.workaround=
 atx26o.upload.tool=avrdude
 atx26o.upload.upload.serialparams=-P{serial.port} -b115200
 atx26o.upload.protocol=arduino
+atx26o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
 atx26o.upload.extra_params=-D
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
@@ -3188,6 +3192,7 @@ atxy4o.upload.workaround=
 atxy4o.upload.tool=avrdude
 atxy4o.upload.serialparams=-P{serial.port} -b115200
 atxy4o.upload.protocol=arduino
+atxy4o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
 atxy4o.upload.extra_params=-D
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
@@ -3535,6 +3540,7 @@ atx24o.upload.workaround=
 atx24o.upload.tool=avrdude
 atx24o.upload.serialparams=-P{serial.port} -b115200
 atx24o.upload.protocol=arduino
+atx24o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
 atx24o.upload.extra_params=-D
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
@@ -3847,6 +3853,7 @@ atxy2o.upload.workaround=
 atxy2o.upload.upload.serialparams=-P{serial.port} -b115200
 atxy2o.upload.tool=avrdude
 atxy2o.upload.protocol=arduino
+atxy2o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
 atxy2o.upload.extra_params=-D
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
@@ -4169,6 +4176,7 @@ microchipo.upload.workaround=
 microchipo.upload.upload.serialparams=-P{serial.port} -b115200
 microchipo.upload.tool=avrdude
 microchipo.upload.protocol=arduino
+microchipo.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
 microchipo.upload.extra_params=-D
 
 #----------------------------------------#

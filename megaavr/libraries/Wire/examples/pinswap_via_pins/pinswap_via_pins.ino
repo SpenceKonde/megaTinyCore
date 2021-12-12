@@ -9,7 +9,7 @@
 void setup() {
   Wire.pins(GPIOR0, GPIOR1); // Choose the PC2/PC3 pinset for the TWI interface
   Wire.begin();        // join i2c bus (address optional for master)
-  Serial.begin(9600);  // start serial for output
+  Serial.begin(115200);  // start serial for output
 }
 
 void loop() {

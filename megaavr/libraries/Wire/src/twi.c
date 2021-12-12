@@ -138,10 +138,11 @@ void TWI_SlaveInit(struct twiData *_data, uint8_t address, uint8_t receive_broad
  *
  *@return             void
  */
+/*
 void TWI_Flush(struct twiData *_data) {
   _data->_module->MCTRLB |= TWI_FLUSH_bm;
 }
-
+*/
 
 /**
  *@brief      TWI_Disable disables the TWI host and client

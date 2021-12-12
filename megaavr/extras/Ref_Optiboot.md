@@ -33,6 +33,23 @@ When you "burn bootloader", the base oscillator frequency is set according to th
 
 There is a "workaround" for this sketch dependence on the fuse value, though. The tinyAVR parts have an extremely flexible oscillator. For the 1-series, the "16 MHz" one can be tuned to speeds between (typically) 10 MHz and over 25, while the "20 MHz" one can often hit 32, though none of the ones I've tried it on were stable at 32. The 2-series parts can go from approx. 12 up to around 30 on the "16 MHz" oscillator, and something like 15 through the mid 30's on the 2-series (they're often stable as high as 32, unlike 1-series, too). Since 16 and 20 are in both of those ranges, if you "tune" the internal oscillator, and then select a "tuned" speed when uploading, you can upload through optiboot and get 16 or 20 MHz as desired, regardless of what speed you selected when bootloading it. See the [tuning guide](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md).
 
+## Upload using Programmer is not supported
+Optiboot boards will not work if a sketch is uploaded via UPDI. Only two schemes are supported by this core for getting a compiled binary onto the chip:
+* Use UPDI to upload the sketch (this is the non-optiboot configuration). You must have a board definition without (Optiboot) in the name selected.
+* Use UPDI for bootloading only. Upload sketches with serial only. You must have a board definition with (Optiboot) in the name selected.
+
+I am hoping to find a way to output an error more gracefully, but in 2.5.0, the solution results in the top of the error being:
+
+In white text:
+```text
+ERROR: Upload using programmer is not supported on optiboot boards""C:\arduino-1.8.13\hardware\tools\avr/bin/avrdude -CC:\Users\Spence\Documents\Arduino\hardware\megaTinyCore\megaavr/avrdude.conf -v -pattiny3216 -cjtag2updi -PCOM11 -Ufuse2:w:0x02:m -Ufuse6:w:0x04:m -Ufuse8:w:0x02:m -Uflash:w:C:\Users\Spence\AppData\Local\Temp\arduino_build_10043/sketch_dec10a.ino.hex:i
+```
+In orange "error text":
+
+```text
+java.io.IOException: Cannot run program "ERROR: Upload using programmer is not supported on optiboot boards\"\"C:\arduino-1.8.13\hardware\tools\avr/bin/avrdude": CreateProcess error=2, The system cannot find the file specified
+```
+I hope this is clear enough.
 
 ## Sketch size avrdude reports is wrong
 The "size" of the sketch as reported by avrdude during the upload process is 512b larger (the size of the bootloader) than the actual sketch size when a bootloader is in use (though the size reported at the end of the compile process is the correct size). The fact that the bootloader goes at the start of the flash instead of the end confuses avrdude. The size displayed by the IDE when you "verify" a sketch is correct, the value that avrdude displays is not.

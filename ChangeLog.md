@@ -46,6 +46,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Update callbacks to match DxCore 1.4.0, most notably the init_reset_flags(). It will automatically clear reset flags if not overridden, stashing them in GPIOR0 (chosen because has lower overhead than a variable)
 * Platform.txt organization and commenting. Fix issues where defines were missing from lib-discovery phase.
 * Reduce flash footprint of pinMode.
+* Improve methods used to block attempts to use "upload using programmer" when an optiboot board is selected. That confiuration is guaranteed not to work, and we should not do things that we know 100% will not work. We would need a merged output file for this, but the IDE doesn;t make those for us here. (only over on attinycore, where they're not usable and we must go out of our way to delete the damned things)
+
 
 ## Released Versions
 

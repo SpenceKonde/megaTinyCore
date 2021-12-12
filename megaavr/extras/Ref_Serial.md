@@ -191,6 +191,17 @@ In this case, Any *write* will temporarily disable the RXC interrupt, and enable
 
 That configuration will result from calling the two argument version of begin() with SERIAL_OPEN_DRAIN and SERIAL_LOOPBACK, or equivalently, SERIAL_HALF_DUPLEX, and neither SERIAL_TX_ONLY nor SERIAL_RX_ONLY.
 
+### Inverted Serial
+Rarely, one needs to have *inverted* serial, ie, idle line is low, the start bit is high, high bits are 0, low bits are 1 and the stop bit is low.) This can be achieved by by inverting the port (either manually, `PORTx.PINxCTRL |= PORT_INVEN_bm;` or via pinConfigure() - [see Digital I/O Reference](Ref_Digital.md) . Generally, when one of the pins is inverted, the other one is to, so you probably want to invert both TX and RX, and you probably don't want the pullup on either of them, sicne they lines are idle LOW when inverted.
+
+```c
+//after Serial.begin(), which would mess all this up.
+// assumg TX_PIN and RX_PIN are the TX and RX pins respectively/
+pinConfigure(TX_PIN,(PIN_PULLUP_OFF | PIN_INVERT_ON));
+pinConfigure(TX_PIN,(PIN_PULLUP_OFF | PIN_INVERT_ON));
+MSPIBEGIN_INVERT or MSPIBEGIN_NORMAL
+*/
+```
 ### Event RX - documentation pending testing and verification
 
 ### Using Synchronous modes
@@ -207,6 +218,7 @@ To use the synchronous mode, you must do four things:
 * Add the `SERIAL_MODE_SYNC` constant to the second argument to Serial.begin() by ORing it with the rest of the value, ex: `Serial.begin(100000 >> 3, (SERIAL_MODE_SYNC | SERIAL_8N1));` should start USART0 in sync mode with a baud rate of 100kbaud.
 
 There is a macro which *should* work for this (done as a macro so it doesn't add anything to the class if not used). This should be treated as experimental (the API may change)
+
 ```c
 syncBegin(port, baud, config, syncoptions);
 /*example*/

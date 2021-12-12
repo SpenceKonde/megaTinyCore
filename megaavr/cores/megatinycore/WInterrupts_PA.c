@@ -10,7 +10,7 @@
     extern voidFuncPtr * intFunc[];
     voidFuncPtr intFunc_A[8];
     void attachPortAEnable() {
-      intFunc[0] &= intFunc_A;
+      intFunc[0] = intFunc_A;
     }
     /* It is the act of referencing attachPortAEnable() in this file that the compiler to also include the ISR.
      * (ISRs can't be asssigned at runtime - the only way things like attachInterruprt look like they can is

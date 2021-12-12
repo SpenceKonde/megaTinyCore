@@ -9,7 +9,7 @@
 void setup() {
   Wire.swap(2);        // Choose pin swapping level 2 (PC2/PC3 master/slave)
   Wire.begin();        // join i2c bus (address optional for master)
-  Serial.begin(9600);  // start serial for output
+  Serial.begin(115200);  // start serial for output
 }
 
 void loop() {
