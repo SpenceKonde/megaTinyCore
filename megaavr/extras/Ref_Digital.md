@@ -1,6 +1,32 @@
 # Improved Digital I/O Functionality
 This core includes a number of features to provide more control or performance when doing digital I/O. This page describes how to use them. All of the options that can be configured for a pin are exposed. The only things that aren't exposed are the slew rate limiting feature, and the multi-pin configuration facilities. The slew rate limiting is can only be configured on a per port basis; trning it on and off is so simple (see below) that it needs no wrapper. The multi-pin configuration system does not have an obvious "right way" to expose it and should be handled directly by the sketch - it is very flexible and no wrapper around it would be able to preserve it's virtues while being much of a wrapper.
 
+## Ballpark overhead figures
+The digital I/O functions are astonishingly inefficient. This isn't my fault - it's the Arduino API's fault
+Single call to the function, volatile variables used as arguments to the functions to prevent compiler from making assumptions about their values.
+
+The comparison to the fast I/O functions is grossly unfair, because the fast I/O functions have constant arguments - but this gives an idea of the scale.
+Remember also that executing 1 word of code (2 bytes) takes 1 clock cycle, though not all of the code paths are traversed every time.
+
+| Function           | t3224 | t3216 | Notes
+|--------------------|-------|-------|-------------------------
+| pinMode()          |  +128 |  +146 |
+| digitalWrite()     |  +198 |  +340 | Calls turnOffPWM()
+| both of above      |  +296 |  +438 | Calls turnOffPWM()
+| openDrain()        |  +128 |  +262 | Calls turnOffPWM()
+| turnOffPWM()       |   +72 |  +228 | 3216 has the complicated type D timer
+| digitalRead()      |   +76 |   +78 | Official core calls turnOffPWM (we don't)
+| pinConfigure() 1   |  +104 |  +116 | Only direction/output level
+| pinConfigure() 2   |  +202 |  +220 | Only pullup, input sense, and direction/outlevel
+| pinConfigure() 3   |  +232 |  +250 | Unconstrained
+| digitalWriteFast() |    +2 |    +2 | With constant arguments.
+| pinModeFast()      |   +12 |   +12 | With constant arguments.
+| Serial.begin()     | +1444 | +1442 | For comparison. Anything "printable" pulls in a lot of bloat.
+
+
+This is why the fast digital I/O functions exist, and why there are people who habitually do `VPORTA.OUT |= 0x80;` instead of `digitalWrite(PIN_PA7,HIGH);`
+
+It's also why I am not comfortable automatically switching digital I/O to "fast" type when constant arguments are given. The normal functions are just SO SLOW that you're sure to break code that hadn't realized they were depending on the time it took for digital write, even if just for setup or hold time for the thing it's talking to.
 ## openDrain()
 It has always been possible to get the benefit of an open drain configuration - you set a pin's output value to 0 and toggle it between input and output. This core provides a slightly smoother (also faster) wrapper around this than using pinmode (since pinMode must also concern itself with configuring the pullup, whether it needs to be changed or not, every time - it's actually significantly slower setting things input vs output. The openDrain() function takes a pin and a value - `LOW`, `FLOATING` (or `HIGH`) or `CHANGE`. `openDrain()` always makes sure the output buffer is not set to drive the pin high; often the other end of a pin you're using in open drain mode may be connected to something running from a lower supply voltage, where setting it OUTPUT with the pin set high could damage the other device.
 
