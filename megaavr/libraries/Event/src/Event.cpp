@@ -907,50 +907,54 @@ void Event::_long_soft_event(uint8_t channel, uint8_t length) {
 
 gen::generator_t Event::gen_from_peripheral(TCB_t& timer, uint8_t event_type) {
   uint8_t gentype = -1;
-  #if !(defined(DXCORE) || defined(TINY_2_SERIES))
-    if (event_type != 1) {
-      return (gen::generator_t) -1;
-    } else {
-      gentype = 0;
-    }
+  #if defined(TINY_0_OR_1_SERIES)
+    badCall("gen_from_peripheral() does not support channel-specific generators. The TCBs on 0/1-series are.");
   #else
-    if (event_type < 2) {
-      gentype = event_type;
+    #if !(defined(DXCORE) || defined(TINY_2_SERIES))  // Dx-series and 2-series have ovf event. Others dont.
+      if (event_type != 1) {
+        return (gen::generator_t) -1;
+      } else {
+        gentype = 0;
+      }
+    #else
+      if (event_type < 2) {
+        gentype = event_type;
+      }
+    #endif
+    if (&timer == &TCB0) {
+      gentype += (uint8_t) gen::tcb0_capt;
+    } else
+    #if (defined TCB1)
+    if (&timer == &TCB1) {
+      gentype += (uint8_t) gen::tcb1_capt;
+    } else
+    #endif
+    #if (defined TCB2)
+    if (&timer == &TCB2) {
+      gentype += (uint8_t) gen::tcb2_capt;
+    } else
+    #endif
+    #if (defined TCB3)
+    if (&timer == &TCB3) {
+      gentype += (uint8_t) gen::tcb3_capt;
+    } else
+    #endif
+    #if (defined TCB4)
+    if (&timer == &TCB4) {
+      gentype += (uint8_t) gen::tcb4_capt;
+    } else
+    #endif
+    {
+      gentype = -1;
     }
   #endif
-  if (&timer == &TCB0) {
-    gentype += (uint8_t) gen::tcb0_capt;
-  } else
-  #if (defined TCB1)
-  if (&timer == &TCB1) {
-    gentype += (uint8_t) gen::tcb1_capt;
-  } else
-  #endif
-  #if (defined TCB2)
-  if (&timer == &TCB2) {
-    gentype += (uint8_t) gen::tcb2_capt;
-  } else
-  #endif
-  #if (defined TCB3)
-  if (&timer == &TCB3) {
-    gentype += (uint8_t) gen::tcb3_capt;
-  } else
-  #endif
-  #if (defined TCB4)
-  if (&timer == &TCB4) {
-    gentype += (uint8_t) gen::tcb4_capt;
-  } else
-  #endif
-  {
-    gentype = -1;
-  }
   return (gen::generator_t) gentype;
 }
 
 user::user_t Event::user_from_peripheral(TCB_t& timer, uint8_t user_type) {
   uint8_t user = -1;
-  #if !(defined(DXCORE) || defined(TINY_2_SERIES)) // Dx-series and 2-serieshave separate event counter..
-    if (event_type != 1) {
+  #if !(defined(DXCORE) || defined(TINY_2_SERIES)) // Dx-series and 2-series have event count input, others don't.
+    if (user_type != 1) {
       return (user::user_t) -1;
     } else {
       user = 0;
@@ -993,20 +997,21 @@ user::user_t Event::user_from_peripheral(TCB_t& timer, uint8_t user_type) {
 gen::generator_t Event::gen_from_peripheral(AC_t& comp)
 {
   #if defined(TINY_1_16K_PLUS)
-    badCall("gen_from_peripheral for ACn on the tinyAVR 1-series w/3 is not supported because it depends on the channel number");
-  #endif
-  #if defined(AC0)
-    if (&comp == &AC0)
-      return gen::ac0_out;
-    else
-    #if defined(AC1)
-      if(&comp == &AC1)
-        return gen::ac1_out;
+    badCall("gen_from_peripheral() does not support channel-specific generators. The AC's larger 1-series are.");
+  #else
+    #if defined(AC0)
+      if (&comp == &AC0)
+        return gen::ac0_out;
       else
+      #if defined(AC1)
+        if(&comp == &AC1)
+          return gen::ac1_out;
+        else
+        #endif
+      #if defined(AC2)
+      if(&comp == &AC2)
+        return gen::ac2_out;
       #endif
-    #if defined(AC2)
-    if(&comp == &AC2)
-      return gen::ac2_out;
     #endif
   #endif
   return (gen::generator_t) -1;
@@ -1016,16 +1021,15 @@ gen::generator_t Event::gen_from_peripheral(CCL_t& logic, uint8_t logicblock) {
   uint8_t retval = -1;
   if (&logic == &CCL) {
     #if defined(TINY_0_OR_1_SERIES)
-
+      if (logicblock < 2)
     #elif defined(CCL_LUT4CTRLA)
-      if (logicblock < 6) {
-        retval = logicblock + (uint8_t) (gen::ccl0_out);
-      }
+      if (logicblock < 6)
     #else
-      if (logicblock < 4) {
-        retval = event_type + (uint8_t) (gen::ccl0_out);
-      }
+      if (logicblock < 4)
     #endif
+    {
+      retval = logicblock + (uint8_t) (gen::ccl0_out);
+    }
   }
   return (gen::generator_t) retval;
 }
@@ -1035,14 +1039,13 @@ user::user_t Event::user_from_peripheral(CCL_t& logic, uint8_t user_type) {
   if (&logic == &CCL) {
     #if !defined(TINY_0_OR_1_SERIES)
       #if defined(CCL_TRUTH4)
-        if (user_type < 13) {
-          retval = user_type;
-        }
+        if (user_type < 13)
       #else
-        if (user_type < 9) {
-          retval = user_type;
-        }
+        if (user_type < 9)
       #endif
+      {
+        retval = user_type;
+      }
     #else
       if (user_type < 5) {
         retval = user_type + 2;
@@ -1075,23 +1078,23 @@ gen::generator_t Event::gen_from_peripheral(TCA_t& timer, uint8_t event_type) {
 user::user_t Event::user_from_peripheral(TCA_t& timer, uint8_t user_type) {
   uint8_t user = -1;
   #if !(defined(DXCORE) || defined(TINY_2_SERIES))
-    if (user_type != 1) {
+    if (user_type != 0) {
       return (user::user_t) -1;
     }
   #else
     if (user_type > 1) {
       return (user::user_t) -1;
     }
-    user = user_type;
   #endif
-    #if defined(TCA1)
-    if (&timer == &TCA1) {
-      user += 2;
-    } else
-    #endif
-    if (&timer != &TCA0) {
-      return (user::user_t) -1;
-    }
+  user = user_type; // 0 or 1 for event user a or b (on parts with both, or 0 for parts hat only have one.
+  #if defined(TCA1)
+  if (&timer == &TCA1) {
+    user += 2;
+  } else
+  #endif
+  if (&timer != &TCA0) {
+    return (user::user_t) -1;
+  }
   #if defined(__AVR_DA__)
     user += 0x1B;
   #elif defined(__AVR_DB__) || defined(__AVR_DD__)

@@ -2,22 +2,22 @@
 #define EVENT_H
 
 #include <Arduino.h>
-
-#if (defined(MEGATINYCORE) && MEGATINYCORE_SERIES != 2)
+#if defined(MEGATINYCORE)
+  #if (MEGATINYCORE_SERIES != 2)
     #define TINY_0_OR_1_SERIES
-#endif
+  #endif
 
-#if MEGATINYCORE_SERIES == 1 && FLASH_SIZE > 8192
-  // The elite tinyAVR 1-series parts with 16k or more of flash were blessed with peripherals
-  // well beyond what lesser 1-series parts got (3 AC's, a second ADC, and some other stuff
-  // Microchip didn't do a good job of advertising this differece)
-  #define TINY_1_16K_PLUS
-#endif
+  #if MEGATINYCORE_SERIES == 1 && PROGMEM_SIZE > 8192
+    // The elite tinyAVR 1-series parts with 16k or more of flash were blessed with peripherals
+    // well beyond what lesser 1-series parts got (3 AC's, a second ADC, and some other stuff
+    // Microchip didn't do a good job of advertising this differece)
+    #define TINY_1_16K_PLUS
+  #endif
 
-#if (defined(MEGATINYCORE) && MEGATINYCORE_SERIES == 2)
-  #define TINY_2_SERIES
+  #if (defined(MEGATINYCORE) && MEGATINYCORE_SERIES == 2)
+    #define TINY_2_SERIES
+  #endif
 #endif
-
 // *INDENT-OFF* astyle hates how we formatted this.
 // I mean, I do too, but I hated all the alternatives we tried even more.
 // Readable code always takes priority over formatting dogma. -Spence
@@ -1115,7 +1115,9 @@ namespace user {
       disable           = 0x00,
       off               = 0x00,
       ccl_lut0          = 0x01,
+      ccl0_out          = 0x01,
       ccl_lut1          = 0x02,
+      ccl1_out          = 0x02,
       ac0_out           = 0x03,
 #if MEGATINYCORE_SERIES == 1
       tcd0_cmpbclr      = 0x04,
@@ -1284,7 +1286,7 @@ class Event {
     #define EVSYS_USERADC0START         EVSYS_ASYNCUSER1
   #endif
   #if defined(EVSYS_ASYNCUSER2)
-    #define EVSYS_USERCCLLUT0A          VSYS_ASYNCUSER2
+    #define EVSYS_USERCCLLUT0A          EVSYS_ASYNCUSER2
   #endif
   #if defined(EVSYS_ASYNCUSER3)
     #define EVSYS_USERCCLLUT1A          EVSYS_ASYNCUSER3
