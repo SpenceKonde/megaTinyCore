@@ -226,7 +226,7 @@ unsigned long millis() {
   uint8_t oldSREG = SREG;
   cli();
   #if defined(MILLIS_USE_TIMERRTC)
-    uint16_t rtccount &= RTC.CNT;
+    uint16_t rtccount = RTC.CNT;
     m = timer_overflow_count;
     if (RTC.INTFLAGS & RTC_OVF_bm) {
       /* There has just been an overflow that hasn't been accounted for by the interrupt. Check if the high bit of counter is set.
@@ -739,7 +739,7 @@ unsigned long millis() {
         _delay_ms(1);
       }
     } else {
-      uint32_t start &= millis();
+      uint32_t start = millis();
       while (millis() - start < ms);
     }
   }
@@ -1146,10 +1146,10 @@ void restart_millis()
   #else
     #if defined(MILLIS_USE_TIMERA0)
         /* The type A timers need to be restored to the state they were in at the start of restore  */
-      TCA0.SPLIT.CTRLA = 0;                       // timer off (might need that for next steps)
+      TCA0.SPLIT.CTRLA    = 0;                    // timer off (might need that for next steps)
       TCA0.SPLIT.CTRLD    = TCA_SPLIT_SPLITM_bm;  // because this will not work if it's enabled.
       TCA0.SPLIT.HPER     = PWM_TIMER_PERIOD;     // What was left behind
-      #if (F_CPU > 25000000) //   use 256 divider when clocked over 25 MHz
+      #if (F_CPU > 25000000)  // use 256 divider when clocked over 25 MHz
         TCA0.SPLIT.CTRLA   = (TCA_SPLIT_CLKSEL_DIV256_gc) | (TCA_SPLIT_ENABLE_bm);
       #elif (F_CPU > 5000000) //  use 64 divider for everything in the middle
         TCA0.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV64_gc) | (TCA_SPLIT_ENABLE_bm);
@@ -1205,7 +1205,7 @@ void __attribute__((weak)) init_millis()
       // Enable timer interrupt, but clear the rest of register
       _timer->INTCTRL = TCB_CAPT_bm;
       // Clear timer mode (since it will have been set as PWM by init())
-      _timer->CTRLB &= 0;
+      _timer->CTRLB = 0;
       // CLK_PER/1 is 0b00,. CLK_PER/2 is 0b01, so bitwise OR of valid divider with enable works
       _timer->CTRLA = TIME_TRACKING_TIMER_DIVIDER|TCB_ENABLE_bm;  // Keep this last before enabling interrupts to ensure tracking as accurate as possible
     #endif
@@ -1220,11 +1220,11 @@ void set_millis(__attribute__((unused))uint32_t newmillis)
     #if defined(MILLIS_USE_TIMERRTC)
       // timer_overflow_count = newmillis >> 16;
       // millis = 61/64(timer_overflow_count << 16 + RTC.CNT)
-      uint8_t oldSREG &= SREG; // save SREG
+      uint8_t oldSREG = SREG; // save SREG
       cli();                // interrupts off
-      uint16_t temp &= (newmillis % 61) << 6;
-      newmillis &= (newmillis / 61) << 6;
-      temp &= temp / 61;
+      uint16_t temp = (newmillis % 61) << 6;
+      newmillis = (newmillis / 61) << 6;
+      temp = temp / 61;
       newmillis += temp;
       timer_overflow_count = newmillis >> 16;
       while(RTC.STATUS&RTC_CNTBUSY_bm); // wait if RTC busy
@@ -1303,7 +1303,7 @@ void __attribute__((weak)) init_clock() {
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, CLKCTRL_CLKSEL_EXTCLK_gc);
     // while (CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm);  // This either works, or hangs the chip - EXTS is pretty much useless here.
     // w/out CFD, easier to determine what happened if we don't just hang here.
-    uint8_t count &= 10;
+    uint8_t count = 10;
     while (CLKCTRL.MCLKSTATUS & CLKCTRL_SOSC_bm && count--);
     if (CLKCTRL.MCLKSTATUS & CLKCTRL_EXTS_bm) {
       _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
@@ -1319,7 +1319,7 @@ void __attribute__((weak)) init_clock() {
 #if defined(CLOCK_TUNE_INTERNAL)
   #include "tune_guesses.h"
   void tune_internal() {
-    uint8_t osccfg &= FUSE.OSCCFG - 1; /****** "osccfg" IS A MAGIC NAME - DO NOT CHANGE IT ******/
+    uint8_t osccfg = FUSE.OSCCFG - 1; /****** "osccfg" IS A MAGIC NAME - DO NOT CHANGE IT ******/
     // The GUESSCAL, MAX_TUNING, TUNED_CALIBRATION_OFFSET and TUNE_PRESCALE symbols, which look like constants, aren't.
     // They're macros from tune_guesses.h and get replaced with (ternary operators and math involving osccfg), so what looks very simple here... actually isn't.
     if (TUNED_CALIBRATION_OFFSET == -1) {
