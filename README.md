@@ -62,7 +62,16 @@ This is currently used only for the latest release, and should fix the avrdude n
   * [ATtiny402,202](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x02.md)
 
 ## Unsupported parts
-  * ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the AVR core they use is gimped -  and their price isn't all that much lower. Avoid them.
+ * ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the AVR core they use is gimped. But [attiny10core](https://github.com/technoblogy/attiny10core) supports them!
+ * Any classic (pre-2016) tinyAVR parts - these are supported by [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore)
+  * ATtiny 25/45/85, 24/44/84, 261/461/861, 48/88, and 43, as well as the late-classical ATtiny 441/841, 1634 and 828.
+  * The small-and-strange ATtinys: ATtiny26 (support coming to ATTinyCore 2.0.0), and ATtiny43 (already supported).
+ * The even smaller or stranger ones not supported by ATTinyCore
+  * ATtiny20/40
+  * ATtiny13 (just smaller - Use [MicroCore](https://github.com/MCUdude/MicroCore) by @MCUdude)
+  * ATtiny15 (obsolete) and ATtiny28 (obsolete, and like, really terrible)
+ * Anything with "Mega" in the name (Use [one of @MCUdude's cores](https://github.com/MCUdude/))
+ * Anything named like "AVR##XX##" where X is a letter and # is a number - you want [DxCore](https://github.com/SpenceKonde/ATTinyCore) for those )
 
 ## Overall Part Comparison
 | tinyAVR series          |     0-series   |     1-series    | 1-series 16+k  |      2-series       |
