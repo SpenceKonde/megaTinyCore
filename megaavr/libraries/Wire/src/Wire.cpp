@@ -626,6 +626,50 @@ void TwoWire::enableDualMode(bool fmp_enable) {
 }
 
 
+/**
+ *@brief      selectSlaveBuffer allows the user to access the slave buffer
+ *
+ *            When debugging the slave mode, this can be useful to access the slave
+ *            buffer with write/read/etc. outside the slave onRequest/onReceive functions.
+ *
+ *            It is best to call this function on disabled global or slave interrupts.
+ *            deselectSlaveBuffer() has to be called later to ensure proper operation of the TWI.
+ *
+ *@param      void
+ *
+ *@return     void
+ */
+void TwoWire::selectSlaveBuffer(void) {
+  #if defined(TWI_MANDS)
+    vars._bools._toggleStreamFn = 0x01;
+  #else
+    badCall("selectSlaveBuffer() was called, but simultaneous mode is not selected");
+  #endif
+}
+
+
+/**
+ *@brief      deselectSlaveBuffer allows the user to access the master buffer(s) again
+ *
+ *            When debugging the slave mode, this can be useful to access the slave
+ *            buffer with write/read/etc. outside the slave onRequest/onReceive functions.
+ *
+ *            It is best to call this function on disabled global or slave interrupts.
+ *            This function has to be called after a previous call to selectSlaveBuffer().
+ *
+ *@param      void
+ *
+ *@return     void
+ */
+void TwoWire::deselectSlaveBuffer(void) {
+  #if defined(TWI_MANDS)
+    vars._bools._toggleStreamFn = 0x00;
+  #else
+    badCall("deselectSlaveBuffer() was called, but simultaneous mode is not selected");
+  #endif
+}
+
+
 
 
 /**

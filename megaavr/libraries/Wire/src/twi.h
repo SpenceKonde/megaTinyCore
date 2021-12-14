@@ -1,6 +1,5 @@
 /*
   Copyright (c) 2021 MX682X
-  With comparatively trivial modifications by Spence Konde.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -53,12 +52,14 @@ SOFTWARE.
   // If pins for Wire1 are not defined, but TWI_USING_WIRE1 was defined in the boards.txt menu, throw an error. Used for 28-pin DA/DB parts
   #error "This part only provides a single Wire interface."
 #endif
+
 #if ((defined(TWI0_DUALCTRL) && !defined(TWI_USING_WIRE1)) || (defined(TWI1_DUALCTRL) && defined(TWI_USING_WIRE1)))
   /* Instead of requiring changes to the library to switch between DxCore and megaTinyCore, we can check
    * if the part supports dual mode. Goal is that the identical library can be used on both, so updates
    * in one can be propagated to the other by just copying files. */
   #define TWI_DUALCTRL   // This identifies if the device supports dual mode, where slave pins are different from the master pins
 #endif
+
 
 #if defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny202__)
   #if defined(TWI_MANDS)  // 202 and 402 do not support independent master and slave.
