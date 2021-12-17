@@ -33,11 +33,12 @@ void print_user_info(user::user_t my_user) {
 void setup() {
   Serial.begin(115200); // Initialize hardware serial port
 
-  Event2.set_generator(gen2::pin_pa1); // Set pin PE0 as event generator
+  Event2.set_generator(gen2::pin_pa1); // Set pin PA1 as event generator
+  #if defined(MEGATINYCORE)
   #if MEGATINYCORE_SERIES == 2
-  Event3.set_generator(gen3::pin_pa6); // Set pin PE1 as event generator
+  Event3.set_generator(gen3::pin_pa6); // Set pin PA6 as event generator
   #else
-  Event3.set_generator(gen3::pin_pb1); // Set pin PE1 as event generator
+  Event3.set_generator(gen4::pin_pb1); // PB1 as the generator for this channel
   #endif
   // For more information about EVOUT, see the PORTMUX section in the datasheet
   Event2.set_user(user::evouta_pin_pa2); // Set EVOUTE as event user

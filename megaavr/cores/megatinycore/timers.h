@@ -266,7 +266,7 @@
       #define TCD0_PWM_NO_MUX
     #elif (defined(__AVR_DD__))
       #define TCD0_PWM_WITH_MUX
-      #warning "TCD PWM is currently only available on PA4-7. Support for all working mux options is plannmed in a near future release."
+      #warning "TCD PWM is currently only available on PA4-7. Support for all working mux options is planned in a near future release."
     #endif
     // NO_MUX expects the TCD pins to be listed in the timer table as TIMERD0
     // WITH_MUX expects TIMERD0_nWOx where N is 0-7 and x is A-D

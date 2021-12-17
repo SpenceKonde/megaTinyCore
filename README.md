@@ -62,43 +62,45 @@ This is currently used only for the latest release, and should fix the avrdude n
   * [ATtiny402,202](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x02.md)
 
 ## Unsupported parts
- * Anything named like "AVR##XX##" where X is a letter and # is a number - you want my [DxCore](https://github.com/SpenceKonde/ATTinyCore) for those
- * Any classic (pre-2016) tinyAVR parts - these are supported by [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore)
+* Anything named like "AVR##XX##" where X is a letter and # is a number - you want my [DxCore](https://github.com/SpenceKonde/ATTinyCore) for those
+* Any classic (pre-2016) tinyAVR parts - these are supported by [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore)
   * ATtiny 25/45/85, 24/44/84, 261/461/861, 48/88, and 43, as well as the late-classical ATtiny 441/841, 1634 and 828.
   * The small-and-strange ATtinys: ATtiny26 (support coming to ATTinyCore 2.0.0), and ATtiny43 (already supported).
- * The even smaller or stranger ones not supported by ATTinyCore
+* The even smaller or stranger ones not supported by ATTinyCore
   * ATtiny20/40
   * ATtiny13 (just smaller - Use [MicroCore](https://github.com/MCUdude/MicroCore) by @MCUdude)
   * ATtiny15 (obsolete) and ATtiny28 (obsolete, and like, really terrible)
- * ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the AVR core they use is gimped. But [attiny10core](https://github.com/technoblogy/attiny10core) supports them!
- * Anything with "Mega" in the name (Use [one of @MCUdude's cores](https://github.com/MCUdude/))
+* ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the AVR core they use is gimped. But [attiny10core](https://github.com/technoblogy/attiny10core) supports them!
+* Anything with "Mega" in the name (Use [one of @MCUdude's cores](https://github.com/MCUdude/))
 
 ## Overall Part Comparison
-| tinyAVR series          |     0-series   |     1-series    | 1-series 16+k  |      2-series       |
+| tinyAVR series          |     0-series   |     1-series    | 1-series plus  |      2-series       |
 |-------------------------|----------------|-----------------|----------------|---------------------|
 | Pincounts               | 8*  14, 20, 24 |  8*  14, 20, 24 |     14, 20, 24 |          14, 20, 24 |
-| Flash                   |  2, 4, 8, 16k  |        2, 4, 8k |     16k or 32k |    (planned) 32768b |
-| RAM                     | 128,256,512,1k |    128,256,512b |          2048b |              3072b  |
-| Separate reset pin?     |            NO  |              NO |             NO |  20/24-pin optional |
-| PWM pins (Arduino)      | 8pin: 4 else 6 | 8p:4,14p6,else8 |     >=20p:8, 6 |                   6 |
+| Flash                   |  2, 4, 8, 16k  |        2, 4, 8k |     16k or 32k | 4k, 8k, 16k, or 32k |
+| RAM                     | 128,256,512,1k |    128,256,512b |          2048b | 512, 1k, 2k, or 3k  |
+| Separate reset pin?     |            NO  |              NO |             NO | optional on 20/24pin|
+| PWM pins (Arduino)      | 8pin: 4 else 6 |      4, 6, or 8 |         6 or 8 |                   6 |
 | Type A timers           |              1 |               1 |              1 |                   1 |
-| Type B timers           |              1 |               1 |    16k, else 2 |                   2 |
+| Type B timers           |              1 |               1 |              2 |                   2 |
 | Type D timer            |             NO |             Yes |            Yes |                  No |
-| Real Time Clock         |  Yes, no xtal  |             Yes |            Yes |                 Yes |
-| USARTs    (pin options) |      1 (2)     |           1 (2) |          1 (2) |               2 (3) |
-| SPI ports (pin options) |         1      |1(2)except 14pin | 2 except 14pin |   1 (2 on 20/24pin) |
-| TWI ports (pin options) |         1      |           1 (2) |          1 (2) |                  1  |
+| Real Time Clock         |   Yes, no xtal |             Yes |            Yes |                 Yes |
+| USARTs    (pin options) |          1 (2) |           1 (2) |          1 (2) |               2 (3) |
+| SPI port pin options    |              1 | 2 except 14-pin | 2 except 14pin |   1 (2 on 20/24pin) |
+| TWI port pin options    |              1 |  2 except 8-pin |             2  |                   1 |
 | Maximum rated speed     |         20 MHz |            20Mz |         20 MHz |              20 MHz |
 | Overclocking (internal @ 5v) |   ???     |       25-30 MHz |      25-30 MHz |              32 MHz |
 | Overclocking (ext. clk @ 5v) |   ???     |          32 MHz |         32 MHz |           >= 32 MHz |
 | External crystal        |            NO  |              NO |             NO |                  NO |
-| Event Channels          | 1 sync 2 async |  2 sync 4 async | 2 sync 4 async |    6, no sync/async |
+| Event Channels          | 1 sync 2 async |  2 sync 4 async | 2 sync 4 async |       6 normal ones |
 | CCL Logic Blocks        |     2 (1 pair) |     2 (1 pair)  |     2 (1 pair) |         4 (2 pairs) |
 | Analog Comparators      |  1, no DAC REF |   1, w/DAC REF  |   3, w/DAC REF |        1, w/DAC REF |
 | ADC                     |     10-bit ADC |     10-bit ADC  | 2x 10-bit ADCs |   12-bit diff w/PGA |
 | Analog References       | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | 1.024V, 2.048V, 2.5V, 4.096V |
 
 ### Notes and highlights
+The tinyAVR 2-series has normal event channels, not the weird async/sync ones that the 0/1-series has. They will act as sync or async channels as required (according to the datasheet, each has both a sync and async channel internally)
+
 #### 8-pin parts are 2k or 4k 0/1-series only
  Very disappointing news - I can see why this is though - adapting the pinout to match the small number of pins means that the pins that things are on for the 8-pin parts isn't the same. It breaks the consistency that the rest of the parts have, where each pin has the same functionality on all parts that have that pin. Let us all just hope that there is a series of 8-pin tinyAVR parts on Microchip's roadmap, and they just decided to leave them out of the 2-series to focus on the core feature (the differential ADC)
 
