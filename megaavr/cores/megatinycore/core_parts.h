@@ -6,6 +6,7 @@
  * See LICENSE.txt for full legal boilerplate if you must */
 
 #include <avr/io.h>
+#include <core_parameters.h>
 //#defines to identify part families
 #if defined(__AVR_ATtiny3227__)
   #define MEGATINYCORE_MCU 3227
@@ -354,18 +355,8 @@
 
 #define CLOCK_TUNE_START (USER_SIGNATURES_SIZE - 12)
 
-
-// This define can get black-hole'ed somehow (reported on platformio) likely the ugly syntax to pass a string define from platform.txt via a -D
-// directive passed to the compiler is getting mangled somehow, though I'm amazed it doesn't cause a  compile error. But checking for defined(MEGATINYCORE)
-// is the documented method to detect that megaTinyCore is in use, and without it things that tried to do conditional compilation based on that were not
-// recognizing it as megaTinyCore and hence would fail to compile when that conditional compilation was required to make it build.
-// From: https://github.com/adafruit/Adafruit_BusIO/issues/43
-#ifndef MEGATINYCORE
-  #define MEGATINYCORE "Unknown 2.4.0+"
-#endif
-
 /* Add a feature - yay!
- * Rename registers so people can't carry code back and forth = booo
+ * Rename registers so people can't carry code back and forth - booo!
  */
 #ifndef TCA_SINGLE_CNTEI_bm
   #define TCA_SINGLE_CNTEI_bm TCA_SINGLE_CNTAEI_bm
@@ -375,14 +366,12 @@
   #define TCA_SINGLE_EVACT_UPDOWN_gc TCA_SINGLE_EVACTA_UPDOWN_gc
 #endif
 
-// Version related defines now handled in platform.txt
-#define MEGATINYCORE_NUM ((MEGATINYCORE_MAJOR << 24) + (MEGATINYCORE_MINOR << 16) + (MEGATINYCORE_PATCH << 8) + MEGATINYCORE_RELEASED)
 
+/* Make sure we error out quickly if told to use an RTC timing option that isn't available. */
 #if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_XOSC))
   #if (MEGATINYCORE_SERIES == 0 || defined(__AVR_ATtinyxy2__))
     #error "Only the tinyAVR 1-series and 2-series parts with at least 8 pins support external RTC timebase"
   #endif
-  #define MILLIS_USE_TIMERRTC
 #endif
 
  /* HARDWARE FEATURES - Used by #ifdefs and as constants in calculations in
