@@ -1,4 +1,4 @@
-/* Wire Register Model
+  /* Wire Register Model
  * by Spence Konde
  *
  * Demonstrates use of the Wire library
