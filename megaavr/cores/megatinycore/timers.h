@@ -159,6 +159,8 @@
    * available CPU time. */
   #if (defined(MILLIS_USE_TIMERD0) && F_CPU == 1000000)
     #define TIMERD0_PRESCALER (TCD_CLKSEL_20MHZ_gc | TCD_CNTPRES_DIV32_gc | TCD_SYNCPRES_DIV2_gc)
+    // TODO: change to TIMERD0_CLOCK_SETTING here and elsewhere
+    // along with TIMERD0_TOP_SETTING and TIMERD0_WGMODE_SETTING
   #else
     #define TIMERD0_PRESCALER (TCD_CLKSEL_20MHZ_gc | TCD_CNTPRES_DIV32_gc)
   #endif
@@ -215,16 +217,25 @@
               |     1 MHz |          8 |           4 |   254 |
    */
   #if USE_TIMERD0_PWM == 1
+    #if !defined(TIMERD0_WGMODE_SETTING)
+      #define TIMERD0_WGMODE_SETTING (TCD_WGMODE_ONERAMP_gc)
+    #endif
     #if !defined(TIMERD0_CLOCK_SETTING)
       #if (CLOCK_SOURCE != 0)
+        /*
+        This is ALSO almost indistinguishable! Same F_PWM, but lower internal frequency.
+        Sync is slower. but the bugs with TCD async events won't happen, and it's easier to do wacky stuff with the PROGEV.
+        #define TIMERD0_CLOCK_SETTING (TCD_CNTPRES_DIV4_gc | TCD_SYNCPRES_DIV1_gc | TCD_CLKSEL_OSCHF_gc)
+        #define TIMERD0_SET_CLOCK     (CLKCTRL_FREQSEL_1M_gc)
+        */
         #define TIMERD0_CLOCK_SETTING (TCD_CNTPRES_DIV32_gc | TCD_SYNCPRES_DIV1_gc | TCD_CLKSEL_OSCHF_gc)
-        #define TIMERD0_SET_CLOCK     (8) // Instruct the TCD initialization routine to set the internal HF oscillator to 8 MHz just for TCD0.
+        #define TIMERD0_SET_CLOCK     (CLKCTRL_FREQSEL_8M_gc)
         // And we can set TOP to the default 254.
         #if !defined(TIMERD0_TOP_SETTING)
           #define TIMERD0_TOP_SETTING   (0xFE)
-        #endif
         // that gives the target 980 kHz PWM freqwuency....
-      // if it's internal HF osc as systen clock, it's more complicated.....
+        #endif
+      // if it's internal HF osc as system clock, it's more complicated.....
       #elif (F_CPU == 5000000UL || F_CPU == 10000000UL || F_CPU == 6000000UL || F_CPU == 7000000UL || F_CPU == 14000000UL)
         // These speeds are prescaled so we can run from unprescaled clock, and keep the same settings we use at higher clock.
         #define TIMERD0_CLOCK_SETTING (TCD_CNTPRES_DIV32_gc | TCD_SYNCPRES_DIV1_gc | TCD_CLKSEL_OSCHF_gc)
@@ -244,7 +255,7 @@
             #define TIMERD0_TOP_SETTING   (509)
           #endif
         #endif
-      #else
+      #else //catchall F_CPU speeds
         #define TIMERD0_CLOCK_SETTING  (TCD_CNTPRES_DIV32_gc | TCD_SYNCPRES_DIV1_gc | TCD_CLKSEL_CLKPER_gc)
         #if !defined(TIMERD0_TOP_SETTING)
           #if (F_CPU <= 8000000)
@@ -255,9 +266,11 @@
             #define TIMERD0_TOP_SETTING   (1019)
           #endif
         #endif
+      #endif // end of F_CPU tests
+    #else //CLOCK setting IS defined!!
+      #if !defined(TIMERD0_TOP_SETTING)
+        #define TIMERD0_TOP_SETTING (254)
       #endif
-    #else
-      #define TIMERD0_CLOCK_SETTING (254)
     #endif
     // Okay, now that we've got the speed of the timer all sorted out, what's next?
     //
