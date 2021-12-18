@@ -2,10 +2,8 @@
 ### [Check it out, we have "discussions" now!](https://github.com/SpenceKonde/megaTinyCore/discussions)
 Let's use that - it's better than gitter ever was, and it's all on one site.
 
-### **WARNING** Github version (2.4.3 development) has sigificant differences from the released library (2.4.2) relating to the Wire library
-For all wire issues, please try the other version - the most important type of wire issue for us is something that worked before and doesn't now, and the reverse.
-
-**(2.4.1 and 2.4.0 are bad releases. Use 2.4.2).**
+### 2.5.0 is here! New Wire library is in! Serial improvements are in! (Including some snazzy things like loopback support)
+Try it out! Report issues! Build awesome stuff!
 
 #### [Wiring](Wiring.md)
 #### [Installation](Installation.md)
