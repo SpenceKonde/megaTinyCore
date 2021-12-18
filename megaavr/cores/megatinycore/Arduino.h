@@ -19,7 +19,7 @@
 
 #ifndef Arduino_h
 #define Arduino_h
-#include "core_parts.h"
+#include "core_devices.h"
 #include "api/ArduinoAPI.h"
 
 #include <avr/pgmspace.h>
