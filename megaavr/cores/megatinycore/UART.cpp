@@ -294,7 +294,11 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       "pop         r29"               "\n\t"  // pop Y
       "pop         r28"               "\n\t"  // finish popping Y
       "brts        .+2"               "\n\t"  // hop over the next insn if T bit set, means entered through do_dre, rather than poll_dre
-      "rjmp _poll_dre_done"           "\n\t"  // we skip this jump.
+#if PROGMEM_SIZE > 0x8192
+      "jmp _poll_dre_done"            "\n\t"  // >8k parts must us jmp, otherwise it will give PCREL error.
+#else
+      "rjmp _poll_dre_done"           "\n\t"  // 8k parts can use RJMP
+#endif
       "pop         r27"               "\n\t"  // and continue with popping registers.
       "pop         r26"               "\n\t"
       "pop         r25"               "\n\t"
@@ -385,7 +389,11 @@ void UartClass::_poll_tx_data_empty(void) {
         #endif
         __asm__ __volatile__(
                 "clt"              "\n\t" // CLear the T flag to signal to the ISR that we got there from here.
-                "rjmp _poll_dre"   "\n\t"
+#if PROGMEM_SIZE > 0x8192
+                "jmp _poll_dre"    "\n\t"
+#else
+                "rjmp _poll_dre"    "\n\t"
+#endif
                 "_poll_dre_done:"    "\n"
 #ifdef USART1
                 ::"z"((uint16_t)thisSerial)

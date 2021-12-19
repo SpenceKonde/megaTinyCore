@@ -4,15 +4,17 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-## Planned 2.5.1
-* Added support for serial buffer sizes of 256.
-* Added test for defined(USE_ASM_TXC), USE_ASM_RXC, and USE_ASM_DRE in UART.h so that variants and board definitions can now turn this off.
-* Attempting to use illegal options, like buffer sizes that aren't powers of 2, now errors out.
 
 ### Ongoing
 * Port enhanced documentation from DxCore.
 
 ## Released Versions
+
+## 2.5.1
+* Added support for serial buffer sizes of 256.
+* Added test for defined(USE_ASM_TXC), USE_ASM_RXC, and USE_ASM_DRE in UART.h so that variants and board definitions can now turn this off.
+* Attempting to use illegal options, like buffer sizes that aren't powers of 2, now errors out.
+* **CRITICAL BUGFIX** which could COMPLETELY BREAK SERIAL if the sketch used >8192b of flash, with obtuse and uninformative error messages
 
 ### 2.5.0
 * **New I2C/TWI implementation** (I2C and TWI refer to the same interface, the one provided by Wire.h; don't get me started about how these and the library are named).
