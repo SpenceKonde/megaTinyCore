@@ -54,9 +54,17 @@
  * (to be fair, you are allowed to use external RAM - also I think
  * a unique feature)
  */
-#define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART, 50 for 2.
-#define USE_ASM_RXC 1    // This now works. Saves only 4b for 1 usart but 102 for 2.
-#define USE_ASM_DRE 1      // This is the hard one...Depends on BOTH buffers, and has that other method of calling it. saves 34b for 1 USART 102 for 2
+#if !defined(USE_ASM_TXC)
+  #define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART, 50 for 2.
+#endif
+
+#if !defined(USE_ASM_RXC)
+  #define USE_ASM_RXC 1    // This now works. Saves only 4b for 1 usart but 102 for 2.
+#endif
+
+#if !defined(USE_ASM_DRE)
+  #define USE_ASM_DRE 1      // This is the hard one...Depends on BOTH buffers, and has that other method of calling it. saves 34b for 1 USART 102 for 2
+#endif
 // savings:
 // 44 total for 0/1,
 // 301 for 2-series, which may be nearly 9% of the total flash!
@@ -107,6 +115,30 @@
 #if (SERIAL_RX_BUFFER_SIZE & (SERIAL_RX_BUFFER_SIZE - 1))
   #error "ERROR: RX buffer size must be a power of two."
 #endif
+
+#if defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && !(SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16)
+  #error "Assembly RX Complete (RXC) ISR is only supported when RX buffer size are 256, 128, 64, 32 or 16 bytes"
+#endif
+
+#if defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && !((SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+                                                  (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
+  #error "Assembly Data Register Empty (DRE) ISR is only supported when both TX and RX buffer sizes are 256, 128, 64, 32 or 16 bytes"
+#endif
+
+
+#define syncBegin(port, baud, config, syncopts) ({\
+  if ((config & 0xC0) == 0x40)                    \
+    {pinConfigure(port.getPin(2), syncopts);      \
+    port.begin(baud >> 3, config);                \
+  }})
+
+#define mspiBegin(port, baud, config, invert) ({  \
+  if ((config & 0xC0) == 0xC0) {                  \
+    pinConfigure(port.getPin(2), invert);         \
+    port.begin(baud >> 3, config);                \
+  }})
+
+
 
 // tinyAVR 0/1-series has 2 bits devoted to RS485, supporting normal (00), RS485 with XDIR driven to control
 // an external line driver (01), and some other mysterious mode (10) the function of which is unclear. There is
@@ -172,18 +204,6 @@ const uint8_t _usart_pins[][4] = {
 };
 */
 
-
-#define syncBegin(port, baud, config, syncopts) ({\
-  if ((config & 0xC0) == 0x40)                    \
-    {pinConfigure(port.getPin(2), syncopts);      \
-    port.begin(baud >> 3, config);                \
-  }})
-
-#define mspiBegin(port, baud, config, invert) ({  \
-  if ((config & 0xC0) == 0xC0) {                  \
-    pinConfigure(port.getPin(2), invert);         \
-    port.begin(baud >> 3, config);                \
-  }})
 
 
 /* DANGER DANGER DANGER */

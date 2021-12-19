@@ -4,10 +4,17 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
+## Planned 2.5.1
+* Added support for serial buffer sizes of 256.
+* Added test for defined(USE_ASM_TXC), USE_ASM_RXC, and USE_ASM_DRE in UART.h so that variants and board definitions can now turn this off.
+* Attempting to use illegal options, like buffer sizes that aren't powers of 2, now errors out.
+
 ### Ongoing
 * Port enhanced documentation from DxCore.
 
-### Planned 2.5.0
+## Released Versions
+
+### 2.5.0
 * **New I2C/TWI implementation** (I2C and TWI refer to the same interface, the one provided by Wire.h; don't get me started about how these and the library are named).
   * Support for acting as both master and slave (on the same pins); this configuration, sometimes known as "multi-master", includes not only the simple case of multiple masters and slaves on an I2C bus, each of which is always exclusively either a master or a slave, but also the more complicated case, which has been a frequent request: For the AVR device to act as both master AND slave. It can both initiate transactions with slaves, or respond to transactions initiated by other masters.
   * New tools menu option to select whether to support only being a master *or* a slave, as we do now (default) or to support acting as both master *and* slave (new functionality).
@@ -48,9 +55,6 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Reduce flash footprint of pinMode.
 * Improve methods used to block attempts to use "upload using programmer" when an optiboot board is selected. That confiuration is guaranteed not to work, and we should not do things that we know 100% will not work. We would need a merged output file for this, but the IDE doesn;t make those for us here. (only over on attinycore, where they're not usable and we must go out of our way to delete the damned things)
 * Timers.h shared with DxCore.
-
-
-## Released Versions
 
 ### 2.4.2
 * Correct bug with openDrainFast(pin,CHANGE); This was a really nasty one, albeit for a rare corner case. Using CHANGE on a pin that was not on PORTA would alter other settings for other pins seemingly at random instead due to a missing '0x' in a memory offset.

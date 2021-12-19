@@ -121,7 +121,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
   }
 
 */
-#if (defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/ )
+#if (defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/ )
   // We only ever use this on the 2-series. 1-series doesn't gain anything with this. The inlining makes the compiler FAR more efficient. RXC isn't compiled stupidly,
   // the problem is that the ABI requires it to be inefficient as hell. But it's a big deal for the smaller size 2-series parts.
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_rxc(void) {
@@ -151,9 +151,10 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
         "andi       r24,      0x1F"   "\n\t" // Wrap the head around
 #elif SERIAL_RX_BUFFER_SIZE == 16
         "andi       r24,      0x0F"   "\n\t" // Wrap the head around
-#else
+#elif SERIAL_RX_BUFFER_SIZE != 256
   #error "Can't happen - we already checked for unsupported buffer sizes!"
 #endif
+// otherwise it's 256, and wraps around naturally.
         "ldd        r18,    Z + 18"   "\n\t" // load tail index
         "cp         r18,       r24"   "\n\t" // See if head is at tail. If so, buffer full,
         "breq  _end_rxc"              "\n\t" // can't do anything, just restore state and leave.
@@ -222,8 +223,8 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
 */
 
 #if defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && \
-           (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
-           (SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16)
+           (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+           (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16)
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_dre(void) {
     __asm__ __volatile__(
     "_do_dre:"                        "\n\t"
@@ -245,7 +246,11 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       "movw        r26,      r30"     "\n\t"  // copy of serial in X
       "add         r26,      r25"     "\n\t"  // Serial + txtail  - txtail 0~63
       "adc         r27,      r18"     "\n\t"  // Carry (X = &Serial + 0~63)
-#if   SERIAL_RX_BUFFER_SIZE == 128
+#if   SERIAL_RX_BUFFER_SIZE == 256
+      "subi        r26,     0xEB"     "\n\t"  //
+      "sbci        r27,     0xFE"     "\n\t"  // +277
+      "ld          r24,        X"     "\n\t"  // grab the character
+#elif SERIAL_RX_BUFFER_SIZE == 128
       "subi        r26,     0x6B"     "\n\t"  //
       "sbci        r27,     0xFF"     "\n\t"  // +149
       "ld          r24,        X"     "\n\t"  // grab the character
@@ -274,9 +279,10 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       "andi        r25,     0x1F"     "\n\t" // Wrap the head around
 #elif SERIAL_TX_BUFFER_SIZE == 16
       "andi        r25,     0x0F"     "\n\t" // Wrap the head around
-#else
+#elif SERIAL_TX_BUFFER_SIZE != 256
   #error "Can't happen - we already checked for unsupported buffer sizes!"
 #endif
+// otherwise it's 256, and wraps around naturally.
       "ldd         r24,   Y +  5"     "\n\t"  // get CTRLA into r24
       "ldd         r18,   Z + 19"     "\n\t"  // txhead into r18
       "cpse        r18,      r25"     "\n\t"  // if they're the same
@@ -370,8 +376,8 @@ void UartClass::_poll_tx_data_empty(void) {
         return;
       }
       #if !(defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && \
-                   (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
-                   (SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
+                   (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128  || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+                   (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128  || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
         _tx_data_empty_irq(*this);
       #else
         #ifdef USART1
