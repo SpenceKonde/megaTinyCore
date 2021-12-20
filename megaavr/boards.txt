@@ -9,11 +9,11 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other             ##       ####       ###  #
-#  contributors 2018-2021                      #  #      #         #  ## #
-#  megaTinyCore is free software.        # #     #       ###       # # # #
-#  (LGPL v2.1) see LICENSE.md and        # #    #    ##     #  ##  ##  # #
-#  License section of README.md           #    ####  ##  ###   ##   ###  #
+#  Copyright Spence Konde and other             ##       ####       ##   #
+#  contributors 2018-2021                      #  #      #         #  #  #
+#  megaTinyCore is free software.        # #     #       ###         #   #
+#  (LGPL v2.1) see LICENSE.md and        # #    #    ##     #  ##   #    #
+#  License section of README.md           #    ####  ##  ###   ##  ####  #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
@@ -119,6 +119,7 @@ atxy7.bootloader.TCD0CFG_serialupdi=
 atxy7.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy7.bootloader.APPEND=0x00
 atxy7.bootloader.BOOTEND=0x00
+atxy7.bootloader.resetpinbits=01
 atxy7.bootloader.avrdudestring=
 atxy7.bootloader.serialupdistring=-aerase
 atxy7.bootloader.altreset=Alt reset pin not supported on 0/1-series.
@@ -481,6 +482,7 @@ atxy6.bootloader.TCD0CFG_serialupdi=
 atxy6.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy6.bootloader.APPEND=0x00
 atxy6.bootloader.BOOTEND=0x00
+atxy6.bootloader.resetpinbits=01
 atxy6.bootloader.avrdudestring=
 atxy6.bootloader.serialupdistring=-aerase
 atxy6.bootloader.altreset=Alt reset pin not supported on 0/1-series.
@@ -850,6 +852,7 @@ atxy4.bootloader.TCD0CFG_serialupdi=
 atxy4.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy4.bootloader.APPEND=0x00
 atxy4.bootloader.BOOTEND=0x00
+atxy4.bootloader.resetpinbits=01
 atxy4.bootloader.avrdudestring=
 atxy4.bootloader.serialupdistring=-aerase
 atxy4.bootloader.tool=avrdude
@@ -1217,6 +1220,7 @@ atxy2.bootloader.TCD0CFG_serialupdi=
 atxy2.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 atxy2.bootloader.APPEND=0x00
 atxy2.bootloader.BOOTEND=0x00
+atxy2.bootloader.resetpinbits=01
 atxy2.bootloader.avrdudestring=
 atxy2.bootloader.serialupdistring=-aerase
 atxy2.bootloader.tool=avrdude
@@ -1536,6 +1540,7 @@ microchip.bootloader.TCD0CFG_serialupdi=4:0x00
 microchip.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
 microchip.bootloader.APPEND=0x00
 microchip.bootloader.BOOTEND=0x00
+microchip.bootloader.resetpinbits=01
 microchip.bootloader.altreset=Alt reset not supported on 0/1-series.
 microchip.bootloader.tool=avrdude
 
