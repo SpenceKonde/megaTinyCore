@@ -238,7 +238,7 @@ These parts all have a large number of analog inputs. The 0/1-series have a 10-b
 ### DAC Support
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage (note that this provides low current and can only be used as a voltage reference or control voltage, it cannot be used to power other devices). This generates voltages between 0 and the selected `VREF` - which cannot be Vdd, unfortunately. Set the DAC reference voltage via the `DACReference()` function - pass it any of the ADC reference options listed under the ADC section above (except VDD). Call `analogWrite()` on the DAC pin (PA6) to set the voltage to be output by the DAC. To turn off the DAC output, call `digitalWrite()` or `turnOffPWM()` on that pin.
 
-See the [**ADC and DAC Reference**](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Analog.md) for the full details.
+See the [**ADC and DAC Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md) for the full details.
 
 Using the `An` constants is deprecated - the recommended practice is to just use the digital pin number, or better yet, use `PIN_Pxn` notation when calling `analogRead()`. Particularly since the release of 1.3.0 and megaTinyCore 2.3.0, a number of enhanced ADC features have been added to expose more of the power of the sophisticated ADC in these parts to users.
 
