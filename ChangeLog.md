@@ -10,11 +10,14 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Released Versions
 
+## 2.5.2
+* **CRITICAL BUGFIX** - burn bootloader was broken on most parts.
+
 ## 2.5.1
 * Added support for serial buffer sizes of 256.
 * Added test for defined(USE_ASM_TXC), USE_ASM_RXC, and USE_ASM_DRE in UART.h so that variants and board definitions can now turn this off.
 * Attempting to use illegal options, like buffer sizes that aren't powers of 2, now errors out.
-* **CRITICAL BUGFIX** which could COMPLETELY BREAK SERIAL if the sketch used >8192b of flash, with obtuse and uninformative error messages
+* **CRITICAL BUGFIX** for issue introduced in 2.5.0 which could COMPLETELY BREAK SERIAL if the sketch used >8192b of flash, with obtuse and uninformative error messages
 
 ### 2.5.0
 * **New I2C/TWI implementation** (I2C and TWI refer to the same interface, the one provided by Wire.h; don't get me started about how these and the library are named).
