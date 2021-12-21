@@ -369,7 +369,7 @@ int SoftwareSerial::available() {
     return 0;
   }
 
-  return (int16_t)(_receive_buffer_tail + _SS_MAX_RX_BUFF - _receive_buffer_head) % _SS_MAX_RX_BUFF;
+  return (uint8_t)(_receive_buffer_tail + _SS_MAX_RX_BUFF - _receive_buffer_head) % _SS_MAX_RX_BUFF;
   // this cast saves 86 - and a even a uint16_t saves 78, and cuts > 10 us from the execution time
   // The shortcut of & (2^n - 1) only works for unsigned operands.
 }
