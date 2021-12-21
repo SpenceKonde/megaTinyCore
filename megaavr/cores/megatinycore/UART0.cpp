@@ -27,7 +27,7 @@
       __asm__ __volatile__(
             "push  r30"         "\n\t" // push the low byte of Z
             "ldi r30, 0x00"     "\n\t" // and put the low bit of this USART there - 0x20 * n
-            "rjmp _do_txc"      "\n\t" // _do_txc pushes the other necessary registers and loads 0x08 into the high byte.
+            "jmp _do_txc"      "\n\t" // _do_txc pushes the other necessary registers and loads 0x08 into the high byte.
             :::);
     }
   #else
@@ -54,7 +54,7 @@
             "push      r31"     "\n\t"
             :::);
       __asm__ __volatile__(
-            "rjmp   _do_rxc"     "\n\t"
+            "jmp   _do_rxc"     "\n\t"
             ::"z"(&Serial));
       __builtin_unreachable();
   }
@@ -72,7 +72,7 @@
                 "push  r31"    "\n\t"
                 :::);
       __asm__ __volatile__(
-                "rjmp _do_dre"  "\n"
+                "jmp _do_dre"  "\n"
                 ::"z"(&Serial));
       __builtin_unreachable();
     }
