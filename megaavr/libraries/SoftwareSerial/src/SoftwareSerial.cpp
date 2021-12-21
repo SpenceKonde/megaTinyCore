@@ -287,6 +287,7 @@ void SoftwareSerial::begin(long speed) {
     #if GCC_VERSION > 40800
     // Timings counted from gcc 4.8.2 output. This works up to 115200 on
     // 16Mhz and 57600 on 8Mhz.
+    // These should really be recalculated on avr-gcc 7.3....
     //
     // When the start bit occurs, there are 3 or 4 cycles before the
     // interrupt flag is set, 4 cycles before the PC is set to the right
@@ -359,7 +360,7 @@ int SoftwareSerial::read() {
 
   // Read from "head"
   uint8_t d = _receive_buffer[_receive_buffer_head]; // grab next byte
-  _receive_buffer_head = (_receive_buffer_head + 1) % _SS_MAX_RX_BUFF;
+  _receive_buffer_head = (uint8_t)(_receive_buffer_head + 1) % _SS_MAX_RX_BUFF; // this cast saves 6 bytes
   return d;
 }
 
@@ -368,7 +369,9 @@ int SoftwareSerial::available() {
     return 0;
   }
 
-  return (_receive_buffer_tail + _SS_MAX_RX_BUFF - _receive_buffer_head) % _SS_MAX_RX_BUFF;
+  return (int16_t)(_receive_buffer_tail + _SS_MAX_RX_BUFF - _receive_buffer_head) % _SS_MAX_RX_BUFF;
+  // this cast saves 86 - and a even a uint16_t saves 78, and cuts > 10 us from the execution time
+  // The shortcut of & (2^n - 1) only works for unsigned operands.
 }
 
 size_t SoftwareSerial::write(uint8_t b) {
