@@ -293,10 +293,11 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       "std      Z + 20,      r25"     "\n\t"  // store new tail
       "pop         r29"               "\n\t"  // pop Y
       "pop         r28"               "\n\t"  // finish popping Y
-      "brts        .+2"               "\n\t"  // hop over the next insn if T bit set, means entered through do_dre, rather than poll_dre
 #if PROGMEM_SIZE > 0x8192
+      "brts        .+4"               "\n\t"  // hop over the next insn if T bit set, means entered through do_dre, rather than poll_dre
       "jmp _poll_dre_done"            "\n\t"  // >8k parts must us jmp, otherwise it will give PCREL error.
 #else
+      "brts        .+2"               "\n\t"  // hop over the next insn if T bit set, means entered through do_dre, rather than poll_dre
       "rjmp _poll_dre_done"           "\n\t"  // 8k parts can use RJMP
 #endif
       "pop         r27"               "\n\t"  // and continue with popping registers.
