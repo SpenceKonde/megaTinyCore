@@ -60,7 +60,7 @@ This is currently used only for the latest release, and should fix the avrdude n
   * [ATtiny402,202](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ATtiny_x02.md)
 
 ## Unsupported parts
-* Anything named like "AVR##XX##" where X is a letter and # is a number - you want my [DxCore](https://github.com/SpenceKonde/ATTinyCore) for those
+* Anything named like "AVR##XX##" where X is a letter and # is a number - you want my [DxCore](https://github.com/SpenceKonde/DxCore) for those
 * Any classic (pre-2016) tinyAVR parts - these are supported by [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore)
   * ATtiny 25/45/85, 24/44/84, 261/461/861, 48/88, and 43, as well as the late-classical ATtiny 441/841, 1634 and 828.
   * The small-and-strange ATtinys: ATtiny26 (support coming to ATTinyCore 2.0.0), and ATtiny43 (already supported).
@@ -244,19 +244,19 @@ Using the `An` constants is deprecated - the recommended practice is to just use
 
 ### Watchdog timer, software reset
 There are more options than on classic AVR for resetting, including if the code gets hung up somehow. The watchdog timer can only reset (use the RTC and PIT for timed interrupts)
-See the [**Reset and Watchdog (WDT) Reference**](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Reset.md)
+See the [**Reset and Watchdog (WDT) Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md)
 
 ### Improved digital I/O
 This core adds a number of new features include fast digital I/O (1-14 clocks depending on what's known at compile time, and 2-28 bytes of flash, and for configuring all per-pin settings the hardware has with `pinConfigure()`
 
-See the [**Improved Digital I/O Reference**](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Digital.md)
+See the [**Improved Digital I/O Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Digital.md)
 
 ### Serial (UART) Support
 All of the 0/1-series parts have a single hardware serial port (UART or USART); the 2-series parts have two. It works exactly like the one on official Arduino boards (except that there is no auto-reset, unless you've wired it up by fusing the UPDI pin as reset (requiring either HV-UPDI or the Optiboot bootloader to upload code), or set up an "ersatz reset pin" as described elsewhere in this document). See the pinout charts for the locations of the serial pins.
 
 Prior to putting the part into a sleep mode, or otherwise disabling it's ability to transmit, be sure that it has finished sending the data in the buffer by calling `Serial.flush()`, otherwise the serial port will emit corrupted characters.
 
-See the [**Serial Reference**](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Serial.md) for a full list of options - as of 2.5.0 almost every type of functionality that the serial hardware can do is supported, including RS485 mode, half-duplex (via LBME and ODME), and even synchronous and Master SPI mode!
+See the [**Serial Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Serial.md) for a full list of options - as of 2.5.0 almost every type of functionality that the serial hardware can do is supported, including RS485 mode, half-duplex (via LBME and ODME), and even synchronous and Master SPI mode!
 
 ### SPI support
 All of these parts have a single hardware SPI peripheral. It works like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. On 8-pin parts, the only option for the SS pin is PA0 (the UPDI/reset pin); this does not matter for the purposes of this core though, because, like the official library, this only operates as a master, and the SS pin is used only when potentially acting as a slave.
