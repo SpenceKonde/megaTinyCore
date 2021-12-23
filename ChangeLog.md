@@ -10,6 +10,9 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Port enhanced documentation from DxCore.
 
 ## Released Versions
+## 2.5.4
+* **CRITICAL BUGFIX**. Prior critical bugfix was unsuccessful because the flashsize test was comparing it to the wrong value. Additionally, the branch before a jmp, with it's offset specified numerically, needs to match the size of the rjmp or jmp instruction;  This corrects that.
+
 
 ## 2.5.3
 * **CRITICAL BUGFIX** Serial-using sketches wouldfail to compile if they were large enough.
