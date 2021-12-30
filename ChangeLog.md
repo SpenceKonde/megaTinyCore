@@ -9,6 +9,11 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### Ongoing
 * Port enhanced documentation from DxCore.
 
+## 2.5.5
+* **Critical Bugfix** to correct issue with uploading via optiboot.
+* Document my butchering of the board manager json and how to correct issues caused by it. (sorry!)
+* Housekeeping in UART.h and UART.cpp
+
 ## Released Versions
 ## 2.5.4
 * **CRITICAL BUGFIX**. Prior critical bugfix was unsuccessful because the flashsize test was comparing it to the wrong value. Additionally, the branch before a jmp, with it's offset specified numerically, needs to match the size of the rjmp or jmp instruction;  This corrects that.

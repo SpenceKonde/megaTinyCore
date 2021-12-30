@@ -68,7 +68,10 @@
 // savings:
 // 44 total for 0/1,
 // 301 for 2-series, which may be nearly 9% of the total flash!
-#if !defined(SERIAL_TX_BUFFER_SIZE)   // could be overridden by boards.txt
+// The USE_ASM_* options can be disabled by defining them as 0 either in variant pins_arduino.h
+
+// The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file or boards.txt as well (By passing them as extra flags).
+#if !defined(SERIAL_TX_BUFFER_SIZE)
   #if   (INTERNAL_SRAM_SIZE  < 1024)  // 128/256b/512b RAM
     #define SERIAL_TX_BUFFER_SIZE 16
   #elif (INTERNAL_SRAM_SIZE < 2048)   // 1k RAM
@@ -77,7 +80,7 @@
     #define SERIAL_TX_BUFFER_SIZE 64  // 2k/3k RAM
   #endif
 #endif
-#if !defined(SERIAL_RX_BUFFER_SIZE)   // could be overridden by boards.txt
+#if !defined(SERIAL_RX_BUFFER_SIZE)
   #if   (INTERNAL_SRAM_SIZE <  512)  // 128/256b RAM
     #define SERIAL_RX_BUFFER_SIZE 16
     // current tx buffer position = SerialClass + txtail + 37
@@ -146,19 +149,18 @@
 #if defined(USART_RS4850_bm) && !defined(USART_RS485_bm)
   #define USART_RS485_bm USART_RS4850_bm
 #endif
-#if defined(__AVR_ATtinyxy2__)
+#if defined(__AVR_ATtinyxy2__) // 8-pin parts use a different set of pin mappings.
 const uint8_t _usart_pins[][4] = {{PIN_PA6, PIN_PA7, PIN_PA3, PIN_PA0},{PIN_PA1, PIN_PA2, NOT_A_PIN, NOT_A_PIN}};
-#elif !defined(__AVR_ATtinyx26__) && !defined(__AVR_ATtinyx27__) && defined(MEGATINYCORE_SERIES)
+#elif !defined(__AVR_ATtinyx26__) && !defined(__AVR_ATtinyx27__) // Everything that's not a 2-series with >= 20 pins has the standard mappings.
 const uint8_t _usart_pins[][4] = {{PIN_PB2, PIN_PB3, PIN_PB1, PIN_PB0},{PIN_PA1, PIN_PA2, PIN_PA3, PIN_PA4}};
-#elif defined(__AVR_ATtinyx26__) || defined(__AVR_ATtinyx27__)
+#elif defined(__AVR_ATtinyx26__) || defined(__AVR_ATtinyx27__) // 2-series with 20 or 24 pins have the alt pins for USART1.
 const uint8_t _usart_pins[][4] = {
   {PIN_PB2, PIN_PB3, PIN_PB1, PIN_PB0},
   {PIN_PA1, PIN_PA2, PIN_PA3, PIN_PA4},
   {PIN_PC0, PIN_PC1, PIN_PC2, PIN_PC3}
 };
-
 #else
-  #error "This can't happen - it doesn't have 8, 14, 20 or 24 pins, or it has 14 pins but no series - defines aren't being picked up correctly."
+  #error "This can't happen - it doesn't have 8, 14, 20 or 24 pins, or it has 14 pins but no serial port - defines aren't being picked up correctly."
 #endif
 /*
 #if defined(__AVR_ATtinyxy2__)
@@ -208,7 +210,7 @@ const uint8_t _usart_pins[][4] = {
 
 /* DANGER DANGER DANGER */
 /* CHANGING THE MEMBER VARIABLES BETWEEN HERE AND THE OTHER SCARY COMMENT WILL COMPLETELY BREAK SERIAL
- * WHEN USE_ASM_DRE and USE_ASM_RXC is used! */
+ * WHEN USE_ASM_DRE and/or USE_ASM_RXC is used! */
 /* DANGER DANGER DANGER */
 class UartClass : public HardwareSerial {
   protected:
@@ -235,24 +237,27 @@ class UartClass : public HardwareSerial {
 /* DANGER DANGER DANGER */
 
   public:
-    inline UartClass(volatile USART_t *hwserial_module, uint8_t module_number, uint8_t default_pinset);
+    inline             UartClass(volatile USART_t *hwserial_module, uint8_t module_number, uint8_t default_pinset);
     bool                    pins(uint8_t tx, uint8_t rx);
     bool                    swap(uint8_t mux_level = 1);
     void                   begin(uint32_t baud) {begin(baud, SERIAL_8N1);}
     void                   begin(uint32_t baud, uint16_t options);
     void                     end();
+    // Basic printHex() forms for 8, 16, and 32-bit values
     void                printHex(const     uint8_t              b);
     void                printHex(const    uint16_t  w, bool s = 0);
     void                printHex(const    uint32_t  l, bool s = 0);
-    void                printHex(const      int8_t  b)              {printHex((uint8_t)    b);            }
-    void                printHex(const        char  b)              {printHex((uint8_t)    b);            }
-    void              printHexln(const      int8_t  b)              {printHex((uint8_t)    b); println(); }
-    void              printHexln(const        char  b)              {printHex((uint8_t)    b); println(); }
-    void              printHexln(const     uint8_t  b)              {printHex(             b); println(); }
-    void              printHexln(const    uint16_t  w, bool s = 0)  {printHex(          w, s); println(); }
-    void              printHexln(const    uint32_t  l, bool s = 0)  {printHex(          l, s); println(); }
-    void              printHexln(const     int16_t  w, bool s = 0)  {printHex((uint16_t)w, s); println(); }
-    void              printHexln(const     int32_t  l, bool s = 0)  {printHex((uint16_t)l, s); println(); }
+    // printHex(signed) and printHexln() - trivial implementation;
+    void                printHex(const      int8_t  b)              {printHex((uint8_t )   b);           }
+    void                printHex(const        char  b)              {printHex((uint8_t )   b);           }
+    void              printHexln(const      int8_t  b)              {printHex((uint8_t )   b); println();}
+    void              printHexln(const        char  b)              {printHex((uint8_t )   b); println();}
+    void              printHexln(const     uint8_t  b)              {printHex(             b); println();}
+    void              printHexln(const    uint16_t  w, bool s = 0)  {printHex(          w, s); println();}
+    void              printHexln(const    uint32_t  l, bool s = 0)  {printHex(          l, s); println();}
+    void              printHexln(const     int16_t  w, bool s = 0)  {printHex((uint16_t)w, s); println();}
+    void              printHexln(const     int32_t  l, bool s = 0)  {printHex((uint16_t)l, s); println();}
+    // The pointer-versions for mass printing uint8_t and uint16_t arrays.
     uint8_t *           printHex(          uint8_t* p, uint8_t len, char sep = 0            );
     uint16_t *          printHex(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
     volatile uint8_t *  printHex(volatile  uint8_t* p, uint8_t len, char sep = 0            );
@@ -275,13 +280,11 @@ class UartClass : public HardwareSerial {
     uint8_t getPin(uint8_t pin);
 
     // Interrupt handlers - Not intended to be called externally
-    #if !(defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && defined(USART1) && \
-                (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16))
+    #if !(USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16))
       static void _rx_complete_irq(UartClass& uartClass);
     #endif
-    #if !(defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && \
-                 (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
-                 (SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
+    #if !(USE_ASM_DRE == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+                              (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
       static void _tx_data_empty_irq(UartClass& uartClass);
     #endif
 

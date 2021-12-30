@@ -139,6 +139,7 @@ atxy7.build.wireabr=
 # ALL UPLOADING VIA UPDI                 #
 #________________________________________#
 atxy7.upload.tool=avrdude
+atxy7.upload.serialparams=
 atxy7.upload.workaround=
 atxy7.upload.prog_interlock=
 
@@ -502,6 +503,7 @@ atxy6.build.wireabr=
 # ALL UPLOADING VIA UPDI                 #
 #________________________________________#
 atxy6.upload.tool=avrdude
+atxy6.upload.serialparams=
 atxy6.upload.workaround=
 atxy6.upload.prog_interlock=
 
@@ -871,6 +873,7 @@ atxy4.build.wireabr=
 # ALL UPLOADING VIA UPDI                 #
 #________________________________________#
 atxy4.upload.tool=avrdude
+atxy4.upload.serialparams=
 atxy4.upload.workaround=
 atxy4.upload.prog_interlock=
 
@@ -1239,6 +1242,7 @@ atxy2.build.wireabr=
 # ALL UPLOADING VIA UPDI                 #
 #________________________________________#
 atxy2.upload.tool=avrdude
+atxy2.upload.serialparams=
 atxy2.upload.workaround=
 atxy2.upload.prog_interlock=
 

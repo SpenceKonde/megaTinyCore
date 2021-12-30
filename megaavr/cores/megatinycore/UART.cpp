@@ -59,14 +59,11 @@
   It's just ugly. It gets worse for the other interrupts because we have to work with the class, not just the
   hardware. Crucially the only thing different betweren the USARTs here isthe addressthey're working with.
   Much of the benefit comes from being able to get the benefits of functionsin terms of flash use without the
-  penalties that come with using a true function in an ISR (50-80 byte prologue + epiloge), and also
+  penalties that come with using a true CALL instruction in an ISR (50-80 byte prologue + epiloge), and also
   being aware that the X register can't do displacement when planning what goes in which regiseser... which
   is not avr-gcc's strong suite, and often ends up displacing from the X with adiw/sbiw spam. savings for one
-  copy of it is small. Savings for several is HUGE! Performance is better, but not much.
-  Biggest advantage is for 2-series with the dual UARTs but only 4k flash, where with all 3 interrupts like this
-  will 158 bytes freed up from the ISRs alone!
-
-
+  copy of it is small. Savings for several is gets large fast! Performance is better, but not much.
+  Biggest advantage is for 2-series with the dual UARTs, but potentially as little as 4k of flash.
 
 ISR(USART1_TXC_vect, ISR_NAKED) {
   __asm__ __volatile__(
@@ -79,7 +76,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
 
 */
 
-#if defined(USE_ASM_TXC) && USE_ASM_TXC == 1
+#if USE_ASM_TXC == 1
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_txc(void) {
     __asm__ __volatile__(
       "_do_txc:"                  "\n\t"  //
@@ -89,11 +86,11 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
         "push     r24"            "\n\t"  // and push that. r30 pushed and loaded by ISR already.
         "ldi      r31,     0x08"  "\n\t"  // all USARTs are 0x08n0 where n is an even hex digit.
       "_txc_flush_rx:"            "\n\t"  // start of rx flush loop.
-        "ld       r24,        Z"  "\n\t"  // rx data
-        "ldd      r24,   Z +  4"  "\n\t"  // status
-        "sbrs     r24,        7"  "\n\t"  // if RXC bit is set,...
+        "ld       r24,        Z"  "\n\t"  // Z + 0 = USARTn.RXDATAL rx data
+        "ldd      r24,   Z +  4"  "\n\t"  // Z + 4 = USARTn.STATUS
+        "sbrs     r24,        7"  "\n\t"  // if RXC bit is set...
         "rjmp     _txc_flush_rx"  "\n\t"  // .... skip this jump to remove more from the buffer.
-        "ldd      r24,   Z +  5"  "\n\t"  // read CTRLA
+        "ldd      r24,   Z +  5"  "\n\t"  // Z + 5 = USARTn.CTRLA read CTRLA
         "andi     r24,     0xBF"  "\n\t"  // clear TXCIE
         "ori      r24,     0x80"  "\n\t"  // set RXCIE
         "std   Z +  5,      r24"  "\n\t"  // store CTRLA
@@ -121,9 +118,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
   }
 
 */
-#if (defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/ )
-  // We only ever use this on the 2-series. 1-series doesn't gain anything with this. The inlining makes the compiler FAR more efficient. RXC isn't compiled stupidly,
-  // the problem is that the ABI requires it to be inefficient as hell. But it's a big deal for the smaller size 2-series parts.
+#if (USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/ )
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_rxc(void) {
     __asm__ __volatile__(
       "_do_rxc:"                      "\n\t" //
@@ -135,11 +130,12 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
         "push       r28"              "\n\t" //
         "push       r29"              "\n\t" //
         "ldd        r28,    Z + 12"   "\n\t" // Load USART into Y pointer
-        "ldd        r29,    Z + 13"   "\n\t" // We interact with the USART only this once
+//      "ldd        r29,    Z + 13"   "\n\t" // We interact with the USART only this once
+        "ldi        r29,      0x08"   "\n\t" // High byte always 0x08 for USART peripheral: Save-a-clock.
         "ldd        r24,    Y +  1"   "\n\t" // load high byte first
         "ld         r25,         Y"   "\n\t" // then low byte of RXdata
-        "sbrc       r24,         1"   "\n\t" // if there's a parity error, then
-        "rjmp  _end_rxc"              "\n\t" // do nothing more (framing errors are ok?)
+        "sbrc       r24,         1"   "\n\t" // if there's a parity error, then do nothing more. Copies the behavior of
+        "rjmp  _end_rxc"              "\n\t" // stock implementation - framing errors are ok, apparently...
         "ldd        r28,    Z + 17"   "\n\t" // load current head index
         "ldi        r24,         1"   "\n\t" // Clear r24 and initialize it with 1
         "add        r24,       r28"   "\n\t" // add current head index to it
@@ -179,7 +175,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
     __builtin_unreachable();
 
   }
-#elif defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && defined(USART1)
+#elif USE_ASM_RXC == 1
   #warning "USE_ASM_RXC is defined and this has more than one serial port, but the buffer size is not supported, falling back to the classical RXC."
 #else
   void UartClass::_rx_complete_irq(UartClass& uartClass) {
@@ -241,13 +237,14 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       "push        r29"               "\n\t"
       "ldi         r18,        0"     "\n\t"
       "ldd         r28,   Z + 12"     "\n\t"  // usart in Y
-      "ldd         r29,   Z + 13"     "\n\t"  // usart in Y
+//    "ldd         r29,   Z + 13"     "\n\t"  // usart in Y
+      "ldi         r29,     0x08"     "\n\t"  // High byte always 0x08 for USART peripheral: Save-a-clock.
       "ldd         r25,   Z + 20"     "\n\t"  // tx tail in r25
       "movw        r26,      r30"     "\n\t"  // copy of serial in X
       "add         r26,      r25"     "\n\t"  // Serial + txtail  - txtail 0~63
       "adc         r27,      r18"     "\n\t"  // Carry (X = &Serial + 0~63)
-#if   SERIAL_RX_BUFFER_SIZE == 256
-      "subi        r26,     0xEB"     "\n\t"  //
+#if   SERIAL_RX_BUFFER_SIZE == 256            // RX buffer determines offset start of class.
+      "subi        r26,     0xEB"     "\n\t"  // There's no addi/adci, so we instead subtract 65536-
       "sbci        r27,     0xFE"     "\n\t"  // +277
       "ld          r24,        X"     "\n\t"  // grab the character
 #elif SERIAL_RX_BUFFER_SIZE == 128
@@ -268,28 +265,30 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
   #error "Can't happen - we already checked for unsupported buffer sizes!"
 #endif
       "ldi         r18,     0x40"     "\n\t"
-      "std       Y + 4,      r18"     "\n\t"  // clear TXC
-      "std       Y + 2,      r24"     "\n\t"  // write char
-      "subi        r25,     0xFF"     "\n\t"  // txtail +1
-#if   SERIAL_TX_BUFFER_SIZE == 128
-      "andi        r25,     0x7F"     "\n\t" // Wrap the head around
+      "std       Y + 4,      r18"     "\n\t" // Y + 4 = USART.STATUS - clear TXC
+      "std       Y + 2,      r24"     "\n\t" // Y + 2 = USART.TXDATAL - write char
+      "subi        r25,     0xFF"     "\n\t" // txtail +1
+#if   SERIAL_TX_BUFFER_SIZE == 256
+//    "andi        r25,     0x7F"     "\n\t" // take no action to wrap
+#elif SERIAL_TX_BUFFER_SIZE == 128
+      "andi        r25,     0x7F"     "\n\t" // Wrap the tail around
 #elif SERIAL_TX_BUFFER_SIZE == 64
-      "andi        r25,     0x3F"     "\n\t" // Wrap the head around
+      "andi        r25,     0x3F"     "\n\t" // Wrap the tail around
 #elif SERIAL_TX_BUFFER_SIZE == 32
-      "andi        r25,     0x1F"     "\n\t" // Wrap the head around
+      "andi        r25,     0x1F"     "\n\t" // Wrap the tail around
 #elif SERIAL_TX_BUFFER_SIZE == 16
-      "andi        r25,     0x0F"     "\n\t" // Wrap the head around
-#elif SERIAL_TX_BUFFER_SIZE != 256
+      "andi        r25,     0x0F"     "\n\t" // Wrap the tail around
+#else
   #error "Can't happen - we already checked for unsupported buffer sizes!"
 #endif
 // otherwise it's 256, and wraps around naturally.
-      "ldd         r24,   Y +  5"     "\n\t"  // get CTRLA into r24
+      "ldd         r24,   Y +  5"     "\n\t"  // Y + 5 = USART.CTRLA - get CTRLA into r24
       "ldd         r18,   Z + 19"     "\n\t"  // txhead into r18
       "cpse        r18,      r25"     "\n\t"  // if they're the same
       "rjmp  _done_dre_irq"           "\n\t"
       "andi        r24,     0xDF"     "\n\t"  // DREIE off
       "std      Y +  5,      r24"     "\n\t"  // write new ctrla
-    "_done_dre_irq:"                  "\n\t"  // Beginning of the end of the DRE
+    "_done_dre_irq:"                  "\n\t"  // Beginning of the end of DRE
       "std      Z + 20,      r25"     "\n\t"  // store new tail
       "pop         r29"               "\n\t"  // pop Y
       "pop         r28"               "\n\t"  // finish popping Y
@@ -313,7 +312,7 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       ::);
     __builtin_unreachable();
   }
-#elif defined(USE_ASM_DRE) && USE_ASM_DRE == 1
+#elif USE_ASM_DRE == 1
   #warning "USE_ASM_DRE is defined, but the buffer sizes are not supported, falling back to the classical DRE."
 #else
   void UartClass::_tx_data_empty_irq(UartClass& uartClass) {
