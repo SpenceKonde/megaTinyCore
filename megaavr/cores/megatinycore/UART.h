@@ -69,8 +69,8 @@
 // 44 total for 0/1,
 // 301 for 2-series, which may be nearly 9% of the total flash!
 // The USE_ASM_* options can be disabled by defining them as 0 either in variant pins_arduino.h
-
-// The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file or boards.txt as well (By passing them as extra flags).
+// The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file (as defines in pins_arduino.h) or boards.txt as (By passing them as extra flags).
+// note that buffer sizes must be powers of 2 omly.
 #if !defined(SERIAL_TX_BUFFER_SIZE)
   #if   (INTERNAL_SRAM_SIZE  < 1024)  // 128/256b/512b RAM
     #define SERIAL_TX_BUFFER_SIZE 16

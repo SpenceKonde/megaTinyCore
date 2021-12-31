@@ -8,6 +8,9 @@
  * 8/24/2012 Alarus, 12/3/2013 Matthijs Kooijman
  * Others (unknown) 2013-2017, 2017-2021 Spence Konde
  * and 2021 MX682X
+ *
+ * 12/27/21: Clean up tests for conditional compilation
+ *           tests for defined(USE_ASM_*) removed as UART.h tests that.
  */
 
 #include <stdlib.h>
@@ -132,14 +135,16 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
         "ldd        r28,    Z + 12"   "\n\t" // Load USART into Y pointer
 //      "ldd        r29,    Z + 13"   "\n\t" // We interact with the USART only this once
         "ldi        r29,      0x08"   "\n\t" // High byte always 0x08 for USART peripheral: Save-a-clock.
-        "ldd        r24,    Y +  1"   "\n\t" // load high byte first
-        "ld         r25,         Y"   "\n\t" // then low byte of RXdata
+        "ldd        r24,    Y +  1"   "\n\t" // Y + 1 = USARTn.RXDATAH - load high byte first
+        "ld         r25,         Y"   "\n\t" // Y + 0 = USARTn.RXDATAH - then low byte of RXdata
         "sbrc       r24,         1"   "\n\t" // if there's a parity error, then do nothing more. Copies the behavior of
         "rjmp  _end_rxc"              "\n\t" // stock implementation - framing errors are ok, apparently...
         "ldd        r28,    Z + 17"   "\n\t" // load current head index
         "ldi        r24,         1"   "\n\t" // Clear r24 and initialize it with 1
         "add        r24,       r28"   "\n\t" // add current head index to it
-#if   SERIAL_RX_BUFFER_SIZE == 128
+#if   SERIAL_RX_BUFFER_SIZE == 256
+        // No additional action needed, head wraps naturally.
+#elif SERIAL_RX_BUFFER_SIZE == 128
         "andi       r24,      0x7F"   "\n\t" // Wrap the head around
 #elif SERIAL_RX_BUFFER_SIZE == 64
         "andi       r24,      0x3F"   "\n\t" // Wrap the head around
@@ -147,13 +152,11 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
         "andi       r24,      0x1F"   "\n\t" // Wrap the head around
 #elif SERIAL_RX_BUFFER_SIZE == 16
         "andi       r24,      0x0F"   "\n\t" // Wrap the head around
-#elif SERIAL_RX_BUFFER_SIZE != 256
-  #error "Can't happen - we already checked for unsupported buffer sizes!"
 #endif
 // otherwise it's 256, and wraps around naturally.
         "ldd        r18,    Z + 18"   "\n\t" // load tail index
-        "cp         r18,       r24"   "\n\t" // See if head is at tail. If so, buffer full,
-        "breq  _end_rxc"              "\n\t" // can't do anything, just restore state and leave.
+        "cp         r18,       r24"   "\n\t" // See if head is at tail. If so, buffer full. The incoming data is discarded,
+        "breq  _end_rxc"              "\n\t" // because there is noplace to put it, and we just restore state and leave.
         "add        r28,       r30"   "\n\t" // r28 has what would be the next index in it.
         "mov        r29,       r31"   "\n\t" // and this is the high byte of serial instance
         "ldi        r18,         0"   "\n\t" // need a known zero to carry.
@@ -176,7 +179,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
 
   }
 #elif USE_ASM_RXC == 1
-  #warning "USE_ASM_RXC is defined and this has more than one serial port, but the buffer size is not supported, falling back to the classical RXC."
+  #warning "USE_ASM_RXC is set, but the buffer size is not supported, falling back to the classical RXC."
 #else
   void UartClass::_rx_complete_irq(UartClass& uartClass) {
     // if (bit_is_clear(*_rxdatah, USART_PERR_bp)) {
@@ -218,9 +221,8 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
 
 */
 
-#if defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && \
-           (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
-           (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16)
+#if USE_ASM_DRE == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+                        (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16)
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_dre(void) {
     __asm__ __volatile__(
     "_do_dre:"                        "\n\t"
@@ -241,8 +243,8 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       "ldi         r29,     0x08"     "\n\t"  // High byte always 0x08 for USART peripheral: Save-a-clock.
       "ldd         r25,   Z + 20"     "\n\t"  // tx tail in r25
       "movw        r26,      r30"     "\n\t"  // copy of serial in X
-      "add         r26,      r25"     "\n\t"  // Serial + txtail  - txtail 0~63
-      "adc         r27,      r18"     "\n\t"  // Carry (X = &Serial + 0~63)
+      "add         r26,      r25"     "\n\t"  // SerialN + txtail
+      "adc         r27,      r18"     "\n\t"  // X = &Serial + txtail
 #if   SERIAL_RX_BUFFER_SIZE == 256            // RX buffer determines offset start of class.
       "subi        r26,     0xEB"     "\n\t"  // There's no addi/adci, so we instead subtract 65536-
       "sbci        r27,     0xFE"     "\n\t"  // +277
@@ -261,15 +263,13 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
 #elif SERIAL_RX_BUFFER_SIZE == 16
       "adiw        r26,     0x25"     "\n\t"  // +37
       "ld          r24,        X"     "\n\t"  // grab the character
-#else
-  #error "Can't happen - we already checked for unsupported buffer sizes!"
 #endif
       "ldi         r18,     0x40"     "\n\t"
       "std       Y + 4,      r18"     "\n\t" // Y + 4 = USART.STATUS - clear TXC
       "std       Y + 2,      r24"     "\n\t" // Y + 2 = USART.TXDATAL - write char
       "subi        r25,     0xFF"     "\n\t" // txtail +1
 #if   SERIAL_TX_BUFFER_SIZE == 256
-//    "andi        r25,     0x7F"     "\n\t" // take no action to wrap
+//    // No action needed to wrap the tail around -
 #elif SERIAL_TX_BUFFER_SIZE == 128
       "andi        r25,     0x7F"     "\n\t" // Wrap the tail around
 #elif SERIAL_TX_BUFFER_SIZE == 64
@@ -278,10 +278,7 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       "andi        r25,     0x1F"     "\n\t" // Wrap the tail around
 #elif SERIAL_TX_BUFFER_SIZE == 16
       "andi        r25,     0x0F"     "\n\t" // Wrap the tail around
-#else
-  #error "Can't happen - we already checked for unsupported buffer sizes!"
 #endif
-// otherwise it's 256, and wraps around naturally.
       "ldd         r24,   Y +  5"     "\n\t"  // Y + 5 = USART.CTRLA - get CTRLA into r24
       "ldd         r18,   Z + 19"     "\n\t"  // txhead into r18
       "cpse        r18,      r25"     "\n\t"  // if they're the same
@@ -313,7 +310,7 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
     __builtin_unreachable();
   }
 #elif USE_ASM_DRE == 1
-  #warning "USE_ASM_DRE is defined, but the buffer sizes are not supported, falling back to the classical DRE."
+  #warning "USE_ASM_DRE == 1, but the buffer sizes are not supported, falling back to the classical DRE."
 #else
   void UartClass::_tx_data_empty_irq(UartClass& uartClass) {
     USART_t* usartModule = (USART_t*)uartClass._hwserial_module;  // reduces size a little bit
