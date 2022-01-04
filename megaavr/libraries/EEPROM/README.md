@@ -1,7 +1,7 @@
-# **EEPROM Library V2.1.2** for Modern AVRs
+# **EEPROM Library V2.1.3** for Modern AVRs
 
-**Written by:** _Christopher Andrews_
-**Ported by:** _Spence Konde_
+**Written by:** _Christopher Andrews_.
+**Ported by:** _Spence Konde_.
 
 ## What is the EEPROM library?
 
@@ -10,6 +10,12 @@ Th EEPROM library provides an easy to use interface to interact with the interna
 It can be used exactly like the one included with the standard Arduino AVR core.
 
 It is included with DxCore and megaTinyCore.
+
+## When is EEPROM erased?
+1. When a sketch manually erases some or all of it.
+2. IF using a non-optiboot configuration, it can optionally be erased every time new code is uploaded. This is controlled by the EESAVE fuse bit. On AVR DA and DB parts, this is a "safe" fuse and is set on all uploads. On AVR DD and ATTiny parts, it is not considered a safe fuse, since it can disable non-HV UPDI programming; on those parts you must do "burn bootloader" to apply these changes. When optiboot is used, the EEPROM is never erased by an upload through optiboot, but EESAVE is not set, so that re-bootloading it will clear the EEPROM and restore the chip to a known state.
+
+See also the [USERSIG](../USERSIG/README.md) library which writes to the rather similar memory section known as the USERROW (aka "user signature space"), which is only erased if manually erased or if the chip is locked, and then erased in order to unlock it. Note that there are signficant differences in the USERSIG library on tinyAVR and AVR Dx-series parts due to underlying differences in the NVM controller.
 
 ## How to use it
 The EEPROM library is included with all hardware packages for hardware with that functionality (which is almost universal).
@@ -39,10 +45,11 @@ The library provides a global variable named `EEPROM`, you use this variable to 
 | tinyAVR 0/1/2-series 16-32k flash   |        256b |             4 ms |
 | megaAVR 0-series (all flash sizes)  |        256b |             4 ms |
 | DA, DB, EA-series (all flash sizes) |        512b |        11 ms (?) |
-| DA, DB, EA-series (all flash sizes) |        512b |             TBD  |
-| DD-series (all flash sizes)         |        256b |             TBD  |
+| DD-series (all flash sizes)         |        256b | TBD-likely 11 ms |
+| EA-series (all flash sizes)         |        512b |              TBD |
 
-Specifying an address beyond the size of the EEPROM will wrap around to the beginning.
+Specifying an address beyond the size of the EEPROM will wrap around to the beginning. The addressses passed to EEPROM functions are a `uint8_t` (aka byte) on parts with up to 256b of flash and a `uint16_t` (word or unsigned int) on parts with more.
+
 
 You can view all the examples [here](examples/).
 

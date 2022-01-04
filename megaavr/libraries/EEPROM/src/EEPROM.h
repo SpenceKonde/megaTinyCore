@@ -30,6 +30,20 @@
 
 #define EEPROM_INDEX_MASK (EEPROM_SIZE - 1)
 
+/* Parts with 256b of EEPROM or less are probably short on flash too.
+ * So we should try to do what we can to minimize our usage of it.
+ * To achieve this, we use a uint8_t instead of a uint16_t to store
+ * the index, which results in savings of at least 2 bytes for almost
+ * every occasion that one uses an index value in any way.
+ */
+
+#if EEPROM_SIZE <= 256
+  #define INDEXDATATYPE uint8_t
+#else
+  #define INDEXDATATYPE uint16_t
+#endif
+
+
 /* EERef class.
  *
  * This object references an EEPROM cell.
@@ -37,13 +51,14 @@
  * This class has an overhead of two bytes, similar to storing a pointer to an EEPROM cell.
  */
 
+
 struct EERef {
 
-  EERef(const uint8_t index)
+  EERef(const INDEXDATATYPE index)
     : index(index)                 {}
 
   // Access/read members.
-  uint8_t operator*() const            {
+  uint8_t operator * () const            {
     return (*(uint8_t *)((uint16_t)(MAPPED_EEPROM_START + (index & EEPROM_INDEX_MASK))));
   }
 
@@ -99,34 +114,34 @@ struct EERef {
     return *this;
     #endif
   }
-  EERef &operator +=(uint8_t in)     {
+  EERef &operator += (uint8_t in)     {
     return *this = **this + in;
   }
-  EERef &operator -=(uint8_t in)     {
+  EERef &operator -= (uint8_t in)     {
     return *this = **this - in;
   }
-  EERef &operator *=(uint8_t in)     {
+  EERef &operator *= (uint8_t in)     {
     return *this = **this * in;
   }
-  EERef &operator /=(uint8_t in)     {
+  EERef &operator /= (uint8_t in)     {
     return *this = **this / in;
   }
-  EERef &operator ^=(uint8_t in)     {
+  EERef &operator ^= (uint8_t in)     {
     return *this = **this ^ in;
   }
-  EERef &operator %=(uint8_t in)     {
+  EERef &operator %= (uint8_t in)     {
     return *this = **this % in;
   }
-  EERef &operator &=(uint8_t in)     {
+  EERef &operator &= (uint8_t in)     {
     return *this = **this & in;
   }
-  EERef &operator |=(uint8_t in)     {
+  EERef &operator |= (uint8_t in)     {
     return *this = **this | in;
   }
-  EERef &operator <<=(uint8_t in)    {
+  EERef &operator <<= (uint8_t in)    {
     return *this = **this << in;
   }
-  EERef &operator >>=(uint8_t in)    {
+  EERef &operator >>= (uint8_t in)    {
     return *this = **this >> in;
   }
 
@@ -135,26 +150,26 @@ struct EERef {
   }
 
   /* Prefix increment/decrement */
-  EERef &operator++()                  {
+  EERef &operator ++ ()                  {
     return *this += 1;
   }
-  EERef &operator--()                  {
+  EERef &operator -- ()                  {
     return *this -= 1;
   }
 
   /* Postfix increment/decrement */
-  uint8_t operator++ (int) {
+  uint8_t operator ++ (int) {
     uint8_t ret = **this;
     return ++(*this), ret;
   }
 
-  uint8_t operator-- (int) {
+  uint8_t operator -- (int) {
     uint8_t ret = **this;
     return --(*this), ret;
   }
 
 
-  uint8_t index; // Index of current EEPROM cell.
+  INDEXDATATYPE index; // Index of current EEPROM cell.
 };
 
 /* EEPtr class.
@@ -165,40 +180,38 @@ struct EERef {
  */
 
 struct EEPtr {
-
-  EEPtr(const uint8_t index)
-    : index(index)                {}
+  EEPtr(const INDEXDATATYPE index)
+    : index(index)                    {}
 
   operator int() const                {
     return index;
   }
-  EEPtr &operator = (int in)          {
+  EEPtr &operator = (int in)            {
     return index = in, *this;
   }
 
   // Iterator functionality.
-  bool operator!=(const EEPtr &ptr) {
+  bool operator != (const EEPtr &ptr)   {
     return index != ptr.index;
   }
-  EERef operator*()                   {
+  EERef operator * ()                   {
     return index;
   }
 
   /* Prefix & Postfix increment/decrement */
-  EEPtr &operator++()                 {
+  EEPtr &operator ++ ()                 {
     return ++index, *this;
   }
-  EEPtr &operator--()                 {
+  EEPtr &operator -- ()                 {
     return --index, *this;
   }
-  EEPtr operator++ (int)              {
+  EEPtr operator ++ (int)              {
     return index++;
   }
-  EEPtr operator-- (int)              {
+  EEPtr operator -- (int)              {
     return index--;
   }
-
-  uint8_t index; // Index of current EEPROM cell.
+  INDEXDATATYPE index; // Index of current EEPROM cell.
 };
 
 /* EEPROMClass class.
@@ -211,16 +224,16 @@ struct EEPtr {
 struct EEPROMClass {
 
   // Basic user access methods.
-  EERef operator[](const int idx)        {
+  EERef operator [] (const INDEXDATATYPE idx)        {
     return idx & EEPROM_END;
   }
-  uint8_t read(uint8_t idx)              {
+  uint8_t read(const INDEXDATATYPE idx)              {
     return EERef(idx);
   }
-  void write(uint8_t idx, uint8_t val)   {
+  void write(INDEXDATATYPE idx, uint8_t val)   {
     (EERef(idx)) = val;
   }
-  void update(uint8_t idx, uint8_t val)  {
+  void update(INDEXDATATYPE idx, uint8_t val)  {
     EERef(idx).update(val);
   }
 
@@ -236,19 +249,19 @@ struct EEPROMClass {
   }
 
   // Functionality to 'get' and 'put' objects to and from EEPROM.
-  template< typename T > T &get(int idx, T &t) {
+  template< typename T > T &get(INDEXDATATYPE idx, T &t) {
     EEPtr e = idx;
     uint8_t *ptr = (uint8_t *) &t;
-    for (int count = sizeof(T) ; count ; --count, ++e) {
+    for (uint8_t count = sizeof(T); count; --count, ++e) {
       *ptr++ = *e;
     }
     return t;
   }
 
-  template< typename T > const T &put(int idx, const T &t) {
+  template< typename T > const T &put(INDEXDATATYPE idx, const T &t) {
     EEPtr e = idx;
     const uint8_t *ptr = (const uint8_t *) &t;
-    for (int count = sizeof(T) ; count ; --count, ++e) {
+    for (uint8_t count = sizeof(T); count; --count, ++e) {
       (*e).update(*ptr++);
     }
     return t;
