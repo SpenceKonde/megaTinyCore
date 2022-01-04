@@ -237,7 +237,7 @@ upload_flags =
   -v
 ```
 ### Using SerialUPDI from platformIO
-It has been reported that, added to platformio.ini, the following works for making platformIO use SerialUPDI. 
+It has been reported that, added to platformio.ini, the following works for making platformIO use SerialUPDI. This can probably be generalized better, but I (Spence Konde) don't use platformIO and so don't know how to do that. 
 ```
 [env:ATtiny1614]
 platform = atmelmegaavr
@@ -256,7 +256,8 @@ PlatformIO detects serial ports automatically. However, if you want to override 
 Sets the serial monitor baud rate. Defaults to 9600 if not defined.
 
 
-## pyupdi
+## pyupdi (historical)
+SerialUPDI can be used with platformIO, so use of pyupdi is no longer necessary.
 [pyupdi](https://github.com/mraardvark/pyupdi) is a Python-based tool for programming tinyAVR and megaAVR devices with UPDI interface via a standard serial port. It can be installed directly in the PlatformIO virtual environment using the following command:
 
 ```bash
