@@ -39,7 +39,7 @@ Logic3 IN   |         N/A |     NO INPUTS |      YES, ALL |      YES, ALL |
 Logic3 OUT  |         N/A | ALT OUT3 ONLY | ALT OUT3 ONLY |     YES, BOTH |
 
 ### Overhead
-On the 0/1-series, the overhead is approximately 546 bytes of flash and 26 bytes of flash.
+On the 0/1-series, the overhead is approximately 546 bytes of flash and 26 bytes of RAM.
 On the 2-series, with twice as many LUTs, it is much larger:  984 bytes and 60b RAM.
 This is farily small for msot parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series. Though the main reason people use 4k parts is that they want something in the 8 pin package, where that's their best option.
 
