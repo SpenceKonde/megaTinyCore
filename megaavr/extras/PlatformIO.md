@@ -32,7 +32,6 @@ The most common functionality is available in this template. As you can see, the
 
 More information on what each line means can be found further down on this page.
 
-
 ## platformio.ini template
 
 ```ini
@@ -236,6 +235,16 @@ Typical parameters are `-PUSB` and `-v`.
 upload_flags =
   -PUSB
   -v
+```
+### Using SerialUPDI from platformIO
+It has been reported that, added to platformio.ini, the following works for making platformIO use SerialUPDI. 
+```
+[env:ATtiny1614]
+platform = atmelmegaavr
+board = ATtiny1614
+framework = arduino
+upload_protocol = custom
+upload_command = C:\Users\tony_\AppData\Local\Arduino15\packages\megaTinyCore\tools\python3\3.7.2-post1/python3 -u C:\Users\tony_\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.4.2/tools/prog.py -t uart -u COM18 -b 460800 -d attiny1614 --fuses 2:0x01 6:0x04 8:0x00 -f$SOURCE -a write
 ```
 
 
