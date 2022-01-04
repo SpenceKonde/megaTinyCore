@@ -8,7 +8,21 @@
  * 8/24/2012 Alarus, 12/3/2013 Matthijs Kooijman
  * Others (unknown) 2013-2017, 2017-2021 Spence Konde
  * and 2021 MX682X
- */
+ *
+ * Modified 28 September 2010 by Mark Sproul
+ * Modified 14 August 2012 by Alarus
+ * Modified 3 December 2013 by Matthijs Kooijman
+ * Modified by SOMEONE around 2016-2017; hardware seriel didn't port itself to the megaAVR 0-series.
+ * Modified 2017-2021 by Spence Konde for megaTinyCore and DxCore.
+ * Modified late 2021 by Spence Konde and MX682X for DxCore
+ * 12/26/21: Correct bug introduced in my ASM macros. -Spence
+ * 12/30/21: Clean up tests for conditional compilation
+             tests for defined(USE_ASM_*) removed UART.h tests that test both defined and the value of
+             USE_ASM_* macros. We check if they're defined and define them if they're not defined already
+             so whenever UART.h has been loaded, those three macros are defined as either 1, or wharever
+             value the user overode them with, likely 0. Also high byte of UART address always 0x08, so replace
+             2-clock ldd with 1 clock ldi. - Spence
+*/
 
 #pragma once
 
@@ -119,12 +133,12 @@
   #error "ERROR: RX buffer size must be a power of two."
 #endif
 
-#if defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && !(SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16)
+#if USE_ASM_RXC == 1 && !(SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16)
   #error "Assembly RX Complete (RXC) ISR is only supported when RX buffer size are 256, 128, 64, 32 or 16 bytes"
 #endif
 
-#if defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && !((SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
-                                                  (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
+#if USE_ASM_DRE == 1 && !((SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+                          (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
   #error "Assembly Data Register Empty (DRE) ISR is only supported when both TX and RX buffer sizes are 256, 128, 64, 32 or 16 bytes"
 #endif
 

@@ -224,7 +224,7 @@ struct EEPtr {
 struct EEPROMClass {
 
   // Basic user access methods.
-  EERef operator [] (const INDEXDATATYPE idx)        {
+  EERef operator [](const INDEXDATATYPE idx)        {
     return idx & EEPROM_END;
   }
   uint8_t read(const INDEXDATATYPE idx)              {

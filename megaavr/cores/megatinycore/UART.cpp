@@ -9,8 +9,7 @@
  * Others (unknown) 2013-2017, 2017-2021 Spence Konde
  * and 2021 MX682X
  *
- * 12/27/21: Clean up tests for conditional compilation
- *           tests for defined(USE_ASM_*) removed as UART.h tests that.
+ * See UART.h for more of a record of changes.
  */
 
 #include <stdlib.h>
@@ -121,7 +120,7 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
   }
 
 */
-#if (USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/ )
+#if (USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) )
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_rxc(void) {
     __asm__ __volatile__(
       "_do_rxc:"                      "\n\t" //
@@ -153,7 +152,6 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
 #elif SERIAL_RX_BUFFER_SIZE == 16
         "andi       r24,      0x0F"   "\n\t" // Wrap the head around
 #endif
-// otherwise it's 256, and wraps around naturally.
         "ldd        r18,    Z + 18"   "\n\t" // load tail index
         "cp         r18,       r24"   "\n\t" // See if head is at tail. If so, buffer full. The incoming data is discarded,
         "breq  _end_rxc"              "\n\t" // because there is noplace to put it, and we just restore state and leave.
@@ -246,7 +244,7 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       "add         r26,      r25"     "\n\t"  // SerialN + txtail
       "adc         r27,      r18"     "\n\t"  // X = &Serial + txtail
 #if   SERIAL_RX_BUFFER_SIZE == 256            // RX buffer determines offset start of class.
-      "subi        r26,     0xEB"     "\n\t"  // There's no addi/adci, so we instead subtract 65536-
+      "subi        r26,     0xEB"     "\n\t"  // There's no addi/adci, so we instead subtract (65536-(offset we want to add))
       "sbci        r27,     0xFE"     "\n\t"  // +277
       "ld          r24,        X"     "\n\t"  // grab the character
 #elif SERIAL_RX_BUFFER_SIZE == 128
@@ -313,8 +311,8 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
   #warning "USE_ASM_DRE == 1, but the buffer sizes are not supported, falling back to the classical DRE."
 #else
   void UartClass::_tx_data_empty_irq(UartClass& uartClass) {
-    USART_t* usartModule = (USART_t*)uartClass._hwserial_module;  // reduces size a little bit
-    tx_buffer_index_t txTail = uartClass._tx_buffer_tail;
+    USART_t* usartModule      = (USART_t*)uartClass._hwserial_module;  // reduces size a little bit
+    tx_buffer_index_t txTail  = uartClass._tx_buffer_tail;
 
     // Check if tx buffer already empty. when called by _poll_tx_data_empty()
     //  if (uartClass._tx_buffer_head == txTail) {
@@ -376,16 +374,15 @@ void UartClass::_poll_tx_data_empty(void) {
 
         return;
       }
-      #if !(defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && \
-                   (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128  || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
-                   (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128  || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
+      #if !(USE_ASM_DRE == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128  || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+                                (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128  || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
         _tx_data_empty_irq(*this);
       #else
         #ifdef USART1
-        void * thisSerial = this;
+          void * thisSerial = this;
         #endif
         __asm__ __volatile__(
-                "clt"              "\n\t" // CLear the T flag to signal to the ISR that we got there from here.
+                "clt"              "\n\t" // Clear the T flag to signal to the ISR that we got there from here.
 #if PROGMEM_SIZE > 8192
                 "jmp _poll_dre"    "\n\t"
 #else
