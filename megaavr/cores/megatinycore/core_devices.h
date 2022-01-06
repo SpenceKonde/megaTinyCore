@@ -268,6 +268,11 @@
 #define TIMERRTC_XTAL 0x91  // 1/2-series only, millis timing source only
 #define TIMERRTC_XOSC 0x92  // 1/2-series only, millis timing source only
 
+#if MEGATINYCORE_SERIES <= 2
+  #define RTC_CLKSEL_OSC32K_gc  RTC_CLKSEL_INT32K_gc
+  #define RTC_CLKSEL_OSC1K_gc   RTC_CLKSEL_INT1K_gc
+  #define RTC_CLKSEL_XTAL32K_gc RTC_CLKSEL_TOSC32K_gc
+#endif
 
 #if MEGATINYCORE_SERIES == 2
 /* Initial version of the IO headers omits these definitions!
