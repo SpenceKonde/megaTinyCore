@@ -269,7 +269,16 @@ void TWI_MasterSetBaud(struct twiData *_data, uint32_t frequency) {
  *@retval     amount of bytes available to read from the host or client buffer
  */
 uint8_t TWI_Available(struct twiData *_data) {
-  uint16_t num;
+  #if (BUFFER_LENGTH <= 128) || !defined(BUFFER_NOT_POWER_2)
+    /* This saves some flash. If the buffer IS a power of 3, either it's less than or equal to 128,
+     * or it's 256. In that case, the 256 buffer length drops out of the math because (uint8_t) 256 == 0,
+     * and this also works. It's just numbers from 128 through 255 that are problematic (that is, DxCore's
+     * 130 which is now 131)
+     */
+    uint8_t num;
+  #else
+    uint16_t num;
+  #endif
   uint8_t* rxHead;
   uint8_t* rxTail;
 
@@ -292,7 +301,7 @@ uint8_t TWI_Available(struct twiData *_data) {
   num = (BUFFER_LENGTH + (*rxHead) - (*rxTail));
 
   #if defined(BUFFER_NOT_POWER_2)
-    if (num <  BUFFER_LENGTH) {
+    if (num <  (uint8_t)BUFFER_LENGTH) {
       return  num;
     } else {
       return (num - BUFFER_LENGTH);

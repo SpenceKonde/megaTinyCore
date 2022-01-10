@@ -95,10 +95,15 @@ SOFTWARE.
   #if (RAMSIZE < 256)
     #define BUFFER_LENGTH 16
   #elif (RAMSIZE < 4096)
+  /* this was 32, which saved some space because we could greatly simplify
+   * the check, but this version of wire loses a byte to the address, so
+   * 32 BUFFERLENGTH is actually 31. That broke some libraries, including
+   * Adafruit's OLED library.
+   */
     #define BUFFER_LENGTH 33
     #define BUFFER_NOT_POWER_2
   #else
-    #define BUFFER_LENGTH 130
+    #define BUFFER_LENGTH 131
     #define BUFFER_NOT_POWER_2
   #endif
 #endif
