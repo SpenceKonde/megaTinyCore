@@ -23,7 +23,7 @@
       asm volatile(
         "push r16"        "\n\t"
         "ldi r16, 0"      "\n\t"
-#if FLASH_SIZE > 8192
+#if PROGMEM_SIZE > 8192
         "jmp AttachedISR" "\n\t"
 #else
         "rjmp AttachedISR" "\n\t"

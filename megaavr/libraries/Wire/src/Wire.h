@@ -143,7 +143,7 @@ class TwoWire: public Stream {
     }
     using Print::write;
 
-    #if defined(TWI_ERROR_ENABLED)
+    #if defined(TWI_READ_ERROR_ENABLED) && defined(TWI_ERROR_ENABLED)
     uint8_t returnError();
     #endif
 

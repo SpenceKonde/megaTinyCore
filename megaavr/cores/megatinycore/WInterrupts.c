@@ -137,21 +137,21 @@
       "ldi   r27,     0"  "\n\t" // clear x high byte
       "ld    r15,     X"  "\n\t" // Load flags to r15"
       "sbiw  r26,     0"  "\n\t" // this will set flag if it's zero.
-      "breq  AIntend"     "\n\t" // port not enabled, null pointer, just clear flags end hit the exit ramp.
-      "mov   r17,   r15"  "\n\t" // copy that flags to r17;
-    "AIntloopst:"         "\n\t"
+      "breq  AIntEnd"     "\n\t" // port not enabled, null pointer, just clear flags end hit the exit ramp.
+      "mov   r17,   r15"  "\n\t" // copy that flags to r17
+    "AIntLoop:"           "\n\t"
       "lsr   r17"         "\n\t" // shift it right one place, now the LSB is in carry.
       "brcs  .+6"         "\n\t" // means we have something to do this time.
-      "breq  AIntend"     "\n\t" // This means carry wasn't set and r17 is 0. - we're done.
+      "breq  AIntEnd"     "\n\t" // This means carry wasn't set and r17 is 0. - we're done.
       "adiw  r28,    2"   "\n\t" // otherwise it's not a the int we care about, increment Y by 2, so it will point to the next element.
-      "rjmp AIntloopst"   "\n\t" // restart the loop in that case.
+      "rjmp AIntLoop"     "\n\t" // restart the loop in that case.
       "ld    r30,    Y+"  "\n\t" // load the function pointer;
       "ld    r31,    Y+"  "\n\t" // load the function pointer;
       "sbiw  r30,    0"   "\n\t" // zero-check it.
-      "breq AIntloopst"   "\n\t" // restart loop if it is, don't call the null pointer
+      "breq AIntLoop"     "\n\t" // restart loop if it is, don't call the null pointer
       "icall"             "\n\t" // call their function, which is allowed to shit on any upper registers other than 28, 29, 16, and 17.
-      "rjmp AIntloopst"   "\n\t" // Restart loop after.
-    "AIntend:"            "\n\t" // sooner or later r17 will be 0 and we'll branch here.
+      "rjmp AIntLoop"     "\n\t" // Restart loop after.
+    "AIntEnd:"            "\n\t" // sooner or later r17 will be 0 and we'll branch here.
       "mov   r16,  r26"   "\n\t" // So when we do this, we end up with VPORTA.FLAGS address in r16
       "ldi   r27,    0"   "\n\t" // high byte is 0, cause we're targeting the VPORT
       "st      X,  r15"   "\n\t" // store to clear the flags....
@@ -169,7 +169,7 @@
       "pop   r20"         "\n\t"
       "pop   r19"         "\n\t"
       "pop   r18"         "\n\t"
-      "pop   r17"         "\n\t" // skip 16 again - it's way down at the end, because it was pushed elsewhere.
+      "pop   r17"         "\n\t" // skip 16 again - it's way down at the end, because it was pushed earlier
       "pop   r15"         "\n\t"
       "pop   r1"          "\n\t"
       "pop   r0"          "\n\t"
@@ -183,7 +183,7 @@
       );
       __builtin_unreachable();
   }
-
+}
 
   void detachInterrupt(uint8_t pin) {
     /* Get bit position and check pin validity */
@@ -197,15 +197,15 @@
     *((volatile uint8_t*) ((uint16_t)((port << 4)+3)))  = (1 << bitpos);// flag clear...
     intFunc[port][bitpos] = NULL; // clear pointer.
   }
-/* If not enabling attach on all ports always, instead the identical ISR definitions are in the WInterruptsA/B/C/D/E/F/G.c files.
+/* If not enabling attach on all ports always, instead the near-identical ISR definitions are in the WInterruptsA/B/C/D/E/F/G.c files.
  * Okay, so what the f-- is going on here?
  * To avoid each interrupt vector having it's own lengthy prologue and epilog separaely, which is needed in order for a function call to be made in an ISR
  * All we do is push an upper register onto the stack so can load a value twice the PORT number there, and jump to actual function that does the work here.
  *
- * The isrBody() has two consecutive blocks of inline assembly, First, do what is basically a standard prologue, for something that calls a function. We finish the prologue but we need to
- * push the Y pointer and r15 (call saved) for this routine. Then we pop out of that assembly block just to grab the pointer to IntFunc array, which we need in a pointer reg.
+ * The isrBody() has two consecutive blocks of inline assembly, First, do what is basically a standard prologue, for something that calls a function (thus there is only one prologue, instead of one per port).
+ * We finish the prologue but we need to push the Y pointer and r15 (call saved) for this routine. Then we slip out out of that assembly block just to grab the pointer to IntFunc array, which we need in a pointer reg;
+ * The second block of inline ASM specifies that the pointer to the array of pointers to arrays of pointers to interrupt functions be passed in the X pointer register
  *
- * Assembly is split up only so we can grab that address through that in a constraint.
  * We couldn't have done that any sooner, we had nowhere to put it. To that we add the pre-doubled port number - pointers are 2 bytes so we need that
  * doubling.
  *
@@ -231,7 +231,7 @@
       asm volatile(
         "push r16"      "\n\t"
         "ldi r16, 0"    "\n\t"
-    #if FLASH_SIZE > 8192
+    #if PROGMEM_SIZE > 8192
         "jmp AttachedISR" "\n\t"
     #else
         "rjmp AttachedISR" "\n\t"
@@ -245,7 +245,7 @@
       asm volatile(
         "push r16"      "\n\t"
         "ldi r16, 2"    "\n\t"
-    #if FLASH_SIZE > 8192
+    #if PROGMEM_SIZE > 8192
         "jmp AttachedISR" "\n\t"
     #else
         "rjmp AttachedISR" "\n\t"
@@ -259,7 +259,7 @@
       asm volatile(
         "push r16"      "\n\t"
         "ldi r16, 4"    "\n\t"
-    #if FLASH_SIZE > 8192
+    #if PROGMEM_SIZE > 8192
         "jmp AttachedISR" "\n\t"
     #else
         "rjmp AttachedISR" "\n\t"

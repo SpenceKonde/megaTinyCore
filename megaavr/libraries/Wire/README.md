@@ -66,7 +66,7 @@ Wire.begin(uint8_t address, bool receive_broadcast, uint8_t second_address)
 
 If the slave is configured to accept more than one address, it will often be critical to know which one it is responding to. Use `getIncomingAddress()` to see which address triggered it; This value is the internal representation (ie, it is leftshifted 1 place, and the low bit (indicating read/write) should be ignored)
 ```c
-uint8_t addr = Wire.getIncomingAddress() << 1 ; // Returns incoming address in slave mode, currently as 8-bit address (leftshifted one plqace). This may bne changed to 7-bit before the release.
+uint8_t addr = Wire.getIncomingAddress() << 1; // Returns incoming address in slave mode, currently as 8-bit address (leftshifted one place).
 ```
 
 ## Master/Slave mode
@@ -212,17 +212,33 @@ High Speed Mode is different animal altogether: FM+ more or less exhausted what 
 ```c++
 flush();
 ```
-A `flush()` method exists on all versions of Wire.h; indeed, `Stream` which it subclasses demands that - however very rarely is it actually implemented by anything other than Serial - (where there is a specific and very common reason use case) where one must clear the buffer in a specific way (by waiting for it to empty) before doing things like going to sleep or performing a software reset. Wire has rarely implemented this. In this case, it performs the functionality that the datasheets refer to as a "TWI_FLUSH" - this resets the internal state *of the master* - and at the Wire library level, the buffers are cleared; that command is apparently intended for error handling. The hardware keeps track of activity on the bus (as required by the protocol), but misbehaving devices can confuse the master - they might do something that the specification says a device will will not do, or generate electrical conditions that the master is unable to interpret in a useful way - pins not reaching the logic level thresholds, malformed data and which may in turn leave it confused as to whether the bus is available. It might be necessary to call in an attempt to recover from adverse events, which has historically been a challenge for the Wire library.
 
-For a slave to wait until transactions are over, use slaveTransactionOpen().
 
+~A `flush()` method exists on all versions of Wire.h; indeed, `Stream` which it subclasses demands that - however very rarely is it actually implemented by anything other than Serial - (where there is a specific and very common reason use case) where one must clear the buffer in a specific way (by waiting for it to empty) before doing things like going to sleep or performing a software reset. Wire has rarely implemented this. In this case, it performs the functionality that the datasheets refer to as a "TWI_FLUSH" - this resets the internal state *of the master* - and at the Wire library level, the buffers are cleared; that command is apparently intended for error handling. The hardware keeps track of activity on the bus (as required by the protocol), but misbehaving devices can confuse the master - they might do something that the specification says a device will will not do, or generate electrical conditions that the master is unable to interpret in a useful way - pins not reaching the logic level thresholds, malformed data and which may in turn leave it confused as to whether the bus is available. It might be necessary to call in an attempt to recover from adverse events, which has historically been a challenge for the Wire library.~
+
+```c++
+uint8_t endTransmission(bool sendStop);
+```
+In 2.5.4/1.4.4 it was reported that the return value of this method did not match the API - it was returning a count of bytes written, which broke lots of existing code. This is now corrected. Values returned are a superset of the the stock version, covering three additional causes of errors. These are not expected to break existing code, since a 0 still indicates success, and it only reports some things with new codes that previouslt were considered "unknown errors", which should still be treated as errors by code.
+
+| Value | Meaning                                                        | Standard |
+|-------|----------------------------------------------------------------|----------|
+|  0x00 | Success                                                        | Yes      |
+|  0x01 | TX buffer overflow. Not used.                                  | Yes      |
+|  0x02 | Timeout waiting for ack of address                             | Yes      |
+|  0x03 | Timeout waiting for ack of data                                | Yes      |
+|  0x04 | Unknown error                                                  | Yes      |
+|  0x10 | Arbitration lost                                               | No       |
+|  0x11 | Line held low or not pulled up                                 | No       |
+|  0xFF | Bus in unknown state (begin() not called?)                     | No       |
+
+In the case of a TX buffer overflow, when it gets to endTransmission, this looks the same as a full buffer, because write() didn't put the excess data into the buffer, and returned a number smaller than the number of bytes passed to it. I'm not sure how error code 1 could ever happen.
 
 ### Methods that have their standard behavior
 The implementation isn't identical, but the behavior is unchanged - or differ only in an irrelevant and implicitly convertible return or argument type (some versions of the official core have sizes returned as  `size_t` for example; Nothing that any AVR will ever likely to involve single I2C-related function calls that act on 256 or more bytes; using a `uint8_t` helps to reduce flash size).
 ```c++
     void beginTransmission(uint8_t address);
     uint8_t requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop); // changed from size_t return type. Argument types differ, but are implicitly convertible without issues.
-    uint8_t endTransmission(bool sendStop); // changed from size_t
     size_t write(uint8_t data);
     int available();
     int read();

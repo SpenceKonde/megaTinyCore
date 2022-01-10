@@ -329,8 +329,13 @@ void TwoWire::beginTransmission(uint8_t address) {
  *
  *
  *@return     uint8_t
- *@retval     amount of bytes that were actually written. If it differs from the amount that was expected
- *              an error might have occurred.
+ *@retval     0 for success,
+ *            2 for timeout at address byte
+ *            3 for timeout at a data byte
+ *            4 for unknown error
+ *           16 for bus arbitration lost
+ *           17 for lines held low or pullups absent.
+ *          255 (-1) for TWI not initialized (begin not called) or bus somehow in "unknown" state.
  */
 uint8_t TwoWire::endTransmission(bool sendStop) {
   // transmit (blocking)
@@ -755,7 +760,7 @@ void TwoWire::onRequest(void (*function)(void)) {
 }
 
 
-#if defined(TWI_ERROR_ENABLED)
+#if defined(TWI_READ_ERROR_ENABLED) && defined(TWI_ERROR_ENABLED)
 uint8_t TwoWire::returnError() {
   return vars._errors;
 }

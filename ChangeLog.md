@@ -13,9 +13,9 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * **Critical Bugfix** to correct issue with uploading via optiboot.
 * Document my butchering of the board manager json and how to correct issues caused by it. (sorry!)
 * Housekeeping in UART.h and UART.cpp
-* **Critical Bugfix** to correct attachInterrupt, which would corrupt the stack when used in the default mode.
+* **Critical Bugfix** to correct attachInterrupt, which would corrupt the stack when used in the default mode. (DxCore #225)
 * Allow the DxCore names for RTC clock sources to be used.
-*
+* **Critical Bugfix** to correct return values from Wire.endTransaction() to match the API. (DxCore #226)
 
 ## Released Versions
 ## 2.5.4
