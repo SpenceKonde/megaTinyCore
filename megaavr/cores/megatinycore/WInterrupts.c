@@ -183,7 +183,6 @@
       );
       __builtin_unreachable();
   }
-}
 
   void detachInterrupt(uint8_t pin) {
     /* Get bit position and check pin validity */
