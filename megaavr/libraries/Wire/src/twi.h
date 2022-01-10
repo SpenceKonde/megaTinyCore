@@ -95,7 +95,8 @@ SOFTWARE.
   #if (RAMSIZE < 256)
     #define BUFFER_LENGTH 16
   #elif (RAMSIZE < 4096)
-    #define BUFFER_LENGTH 32
+    #define BUFFER_LENGTH 33
+    #define BUFFER_NOT_POWER_2
   #else
     #define BUFFER_LENGTH 130
     #define BUFFER_NOT_POWER_2
