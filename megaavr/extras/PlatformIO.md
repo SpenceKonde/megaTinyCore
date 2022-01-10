@@ -237,15 +237,16 @@ upload_flags =
   -v
 ```
 ### Using SerialUPDI from platformIO
-It has been reported that, added to platformio.ini, the following works for making platformIO use SerialUPDI. This can probably be generalized better, but I (Spence Konde) don't use platformIO and so don't know how to do that. 
-```
+It has been reported that, added to platformio.ini, the following works for making platformIO use SerialUPDI, assuming this core is present and installed via board manager on the Arduino IDE. Replace the megaTinyCore version with the installed version. This can probably be generalized better, but I (Spence Konde) don't use platformIO and so don't know how to do that. This is also a very aggressive configuration, and you may have better luck if you back off the speed to 115200 baud. UPDI does autobaud - you just want to make sure you pick a speed that the hardware will handle. 115200 works almost always, higher speeds are more demanding of how the UPDI circuit is wired up to meet required rise and fall times.
+```ini
 [env:ATtiny1614]
 platform = atmelmegaavr
 board = ATtiny1614
 framework = arduino
 upload_protocol = custom
-upload_command = C:\Users\tony_\AppData\Local\Arduino15\packages\megaTinyCore\tools\python3\3.7.2-post1/python3 -u C:\Users\tony_\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.4.2/tools/prog.py -t uart -u COM18 -b 460800 -d attiny1614 --fuses 2:0x01 6:0x04 8:0x00 -f$SOURCE -a write
+upload_command = C:\Users\(your username)\AppData\Local\Arduino15\packages\megaTinyCore\tools\python3\3.7.2-post1/python3 -u C:\Users\(your username)AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.4.2/tools/prog.py -t uart -u COM18 -b 460800 -d attiny1614 --fuses 2:0x01 6:0x04 8:0x00 -f$SOURCE -a write
 ```
+
 
 
 ### `monitor_port`
