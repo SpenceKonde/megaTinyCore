@@ -9,16 +9,18 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### Ongoing
 * Port enhanced documentation from DxCore.
 
+## Released Versions
+
 ## 2.5.5
 * **Critical Bugfix** to correct issue with uploading via optiboot.
-* Document my butchering of the board manager json and how to correct issues caused by it. (sorry!)
+* Document my butchering of the board manager json and how to correct issues caused by it. (sorry! )
 * Housekeeping in UART.h and UART.cpp
 * **Critical Bugfix** to correct attachInterrupt, which would corrupt the stack when used in the default mode. (DxCore #225)
 * Allow the DxCore names for RTC clock sources to be used.
 * **Critical Bugfix** to correct return values from Wire.endTransaction() to match the API. (DxCore #226)
-* Correct serious defect in new Wire library. The point of using 32b buffers is to match basically everything else, since having less than the assumed amount will cause failures to many libraries. However, we also stuff the slave address into the buffer, so 32 byte buffers only give us 31 bytes of data. This was detected when it broke the adafruit OLED library. Fixing it by enlarging the buffer and sacrificing power-of-2-ness cost 54-78 bytes of flash. I was able to get back around 40% of that for parts with buffer sizes under 128b (ie, all of the megaTinyCore; DxCore doesn't care since they got 130b buffers, though they need 131b or I should have just done 128b, cause we need 130b of "data" to write a 128b page to external eeproms)
+* Correct serious defect in new Wire library. The point of using 32b buffers is to match basically everything else, since having less than the assumed amount will cause failures to many libraries. However, we also stuff the slave address into the buffer, so 32 byte buffers only give us 31 bytes of data. This was detected when it broke the adafruit OLED library. Fixing it by enlarging the buffer and sacrificing power-of-2-ness cost 54-78 bytes of flash. I was able to get back around 40% of that for parts with buffer sizes under 128b (ie, all of the megaTinyCore; DxCore doesn't care since they got 130b buffers, though they need 131b or I should have just done 128b, cause we need 130b of "data" to write a 128b page to external eeproms) (#593)
+* Correct typo in boards.txt impacting old wrong-sig ATtiny402's. (#592)
 
-## Released Versions
 ## 2.5.4
 * **CRITICAL BUGFIX**. Prior critical bugfix was unsuccessful because the flashsize test was comparing it to the wrong value. Additionally, the branch before a jmp, with it's offset specified numerically, needs to match the size of the rjmp or jmp instruction;  This corrects that.
 
