@@ -6,6 +6,7 @@ from pymcuprog.pymcuprog_errors import PymcuprogError
 from . import constants
 from .timeout import Timeout
 from time import sleep
+import pause_mod
 
 class NvmUpdi(object):
     """
@@ -125,11 +126,12 @@ class NvmUpdiTinyMega(NvmUpdi):
         return self.write_nvm(address, data, use_word_access=False,
                               nvmcommand=constants.UPDI_V0_NVMCTRL_CTRLA_ERASE_WRITE_PAGE)
 
-    def write_fuse(self, address, data):
+    def write_fuse(self, address, data, write_delay=1):
         """
         Writes one fuse value (v0)
         :param address: address to write to
         :param data: data to write
+        :param write_delay: only default (1) is used ever. pause after every write, as fusewrite failures have been encountered without it.
         """
 
         # Check that NVM controller is ready
@@ -149,6 +151,8 @@ class NvmUpdiTinyMega(NvmUpdi):
         self.logger.debug("Execute fuse write")
         self.execute_nvm_command(constants.UPDI_V0_NVMCTRL_CTRLA_WRITE_FUSE)
 
+        if write_delay > 0:
+            pause_mod.milliseconds(write_delay)
         if not self.wait_flash_ready():
             raise PymcuprogError("Timeout waiting for flash ready before page buffer clear ")
 
@@ -199,11 +203,8 @@ class NvmUpdiTinyMega(NvmUpdi):
         self.execute_nvm_command(nvmcommand)
 
         if pagewrite_delay > 0:
-            sleep(pagewrite_delay/1000.0)
+            pause_mod.milliseconds(pagewrite_delay)
         # SACRIFICES SPEED FOR COMPATIBILITY - above line should execute only when --pagepause command line parameter is 1 or more (default 0), so we can adjust it externally
-        #  it should sleep for that many milliseconds (the granularity of this is low enough enough that 0.001 vs 0.005 makes no difference in my testing)
-        # I couldn't propagate it through this mess, and I really tried, because it is a 2:1 performance hit on CH340 on some parts, which is brutal, but it breaks too many adapters to not have it
-        # this should only ever happen for tinyAVR/megaAVR, NEVER Dx-series parts.
         if not bulkwrite == 1:
             # do a final NVM status check only if not doing a bulk write, or after the last chunk (when bulkwrite = 2)
             # not doing this every page made uploads about 15% faster
@@ -293,7 +294,8 @@ class NvmUpdiAvrDx(NvmUpdi):
         This version of the NVM block has no page buffer, so words are written directly.
         :param address: address to write to
         :param data: data to write
-        :param use_word_access: write in whole words?
+        :param use_word_access: write in whole words, almost always true.
+        :param pagewrite_delay: not used on AVR Dx (V1 NVMCTRL) - these do not have page writes as a concept.
         """
         nvm_command = constants.UPDI_V1_NVMCTRL_CTRLA_FLASH_WRITE
 

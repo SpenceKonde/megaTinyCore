@@ -1,38 +1,59 @@
-serialupdi.name=SerialUPDI with 4.7k resistor or diode (230400 baud)
+serialupdi.name=SerialUPDI - 230400 baud, 2.7V+ (Mac/Linux: usually CH340 only, Win: most adapters)
 serialupdi.protocol=uart
 serialupdi.program.extra_params=-u {serial.port} -b 230400
 serialupdi.program.protocol=uart
 serialupdi.program.tool=serialupdi
 serialupdi.bootloader.tool=serialupdi
 
+serialupdi230k_wd1.name=SerialUPDI - 230400 baud w/write delay, 2.7V+ (Linux/MacOS: other adapters, Win: maybe some adapters)
+serialupdi230k_wd1.protocol=uart
+serialupdi230k_wd1.program.extra_params=-u {serial.port} -b 230400 -wd 1
+serialupdi230k_wd1.program.protocol=uart
+serialupdi230k_wd1.program.tool=serialupdi
+serialupdi230k_wd1.bootloader.tool=serialupdi
+
+serialupdi57k.name=SerialUPDI - SLOW: 57600 baud, any platform, any voltage, any adapter.
+serialupdi57k.protocol=uart
+serialupdi57k.program.extra_params=-u {serial.port} -b 57600
+serialupdi57k.program.protocol=uart
+serialupdi57k.program.tool=serialupdi
+serialupdi57k.bootloader.tool=serialupdi
+
 jtag2updi.name=jtag2updi
 jtag2updi.communication=serial
 jtag2updi.protocol=jtag2updi
 jtag2updi.program.protocol=jtag2updi
 jtag2updi.program.tool=avrdude
-jtag2updi.program.extra_params=-P{serial.port}
+jtag2updi.program.extra_params=-P{serial.port} -b{program.speed}
 jtag2updi.program.speed=115200
 
-serialupdi460k.name=SerialUPDI with 4.7k resistor or diode (TURBO 4.5v+ 460800 baud)
+serialupdi460k.name=SerialUPDI - FAST: 4.5v+ 460800 baud (CH340 - and maybe some others)
 serialupdi460k.protocol=uart
 serialupdi460k.program.extra_params=-u {serial.port} -b 460800
 serialupdi460k.program.protocol=uart
 serialupdi460k.program.tool=serialupdi
 serialupdi460k.bootloader.tool=serialupdi
 
-medbg.name=Xplained Mini (mEDBG, debug chip: ATmega32u4)
-medbg.communication=usb
-medbg.protocol=xplainedmini_updi
-medbg.program.protocol=xplainedmini_updi
-medbg.program.tool=avrdude
-medbg.program.extra_params=-Pusb
+serialupdi460k_wd1.name=SerialUPDI - FAST: 4.5v+ 460800 baud w/write delay (other non-CH340 adapters, often slower than 230k, esp. on Windows)
+serialupdi460k_wd1.protocol=uart
+serialupdi460k_wd1.program.extra_params=-u {serial.port} -b 460800 -wd 1
+serialupdi460k_wd1.program.protocol=uart
+serialupdi460k_wd1.program.tool=serialupdi
+serialupdi460k_wd1.bootloader.tool=serialupdi
 
-edbg.name=Xplained Pro (EDBG, debug chip: AT32UC3A4256)
-edbg.communication=usb
-edbg.protocol=xplainedpro_updi
-edbg.program.protocol=xplainedpro_updi
-edbg.program.tool=avrdude
-edbg.program.extra_params=-Pusb
+serialupdi921k.name=SerialUPDI - TURBO: 4.5v+ 921600 baud (CH340 (and maybe some others) only)
+serialupdi921k.protocol=uart
+serialupdi921k.program.extra_params=-u {serial.port} -b 921600
+serialupdi921k.program.protocol=uart
+serialupdi921k.program.tool=serialupdi
+serialupdi921k.bootloader.tool=serialupdi
+
+serialupdi921k_wd1.name=SerialUPDI - TURBO: 4.5v+ 921600 baud w/write delay, (adapters that support it and are not CH340, many fall back to 115200)
+serialupdi921k_wd1.protocol=uart
+serialupdi921k_wd1.program.extra_params=-u {serial.port} -b 921600 -wd 1
+serialupdi921k_wd1.program.protocol=uart
+serialupdi921k_wd1.program.tool=serialupdi
+serialupdi921k_wd1.bootloader.tool=serialupdi
 
 nedbg.name=Curiosity Nano (nEDBG, debug chip: ATSAMD21E18)
 nedbg.communication=usb
@@ -41,30 +62,37 @@ nedbg.program.protocol=curiosity_updi
 nedbg.program.tool=avrdude
 nedbg.program.extra_params=-Pusb
 
-atmelice_updi.name=Atmel-ICE (UPDI)
+edbg.name=Xplained Pro (EDBG, debug chip: AT32UC3A4256)
+edbg.communication=usb
+edbg.protocol=xplainedpro_updi
+edbg.program.protocol=xplainedpro_updi
+edbg.program.tool=avrdude
+edbg.program.extra_params=-Pusb
+
+medbg.name=Xplained Mini (mEDBG, debug chip: ATmega32u4)
+medbg.communication=usb
+medbg.protocol=xplainedmini_updi
+medbg.program.protocol=xplainedmini_updi
+medbg.program.tool=avrdude
+medbg.program.extra_params=-Pusb
+
+atmelice_updi.name=Atmel-ICE
 atmelice_updi.communication=usb
 atmelice_updi.protocol=atmelice_updi
 atmelice_updi.program.protocol=jtagice3_updi
 atmelice_updi.program.tool=avrdude
 atmelice_updi.program.extra_params=-Pusb
 
-pickit4_updi.name=PICkit4 (UPDI)
+pickit4_updi.name=PICkit4
 pickit4_updi.communication=usb
 pickit4_updi.protocol=pickit4_updi
 pickit4_updi.program.protocol=jtagice3_updi
 pickit4_updi.program.tool=avrdude
 pickit4_updi.program.extra_params=-Pusb
 
-snap_updi.name=MPLAB SNAP (UPDI)
+snap_updi.name=MPLAB SNAP
 snap_updi.communication=usb
 snap_updi.protocol=snap_updi
 snap_updi.program.protocol=jtagice3_updi
 snap_updi.program.tool=avrdude
 snap_updi.program.extra_params=-Pusb
-
-serialupdi57k.name=SerialUPDI with 4.7k resistor or diode SLOW (57600 baud)
-serialupdi57k.protocol=uart
-serialupdi57k.program.extra_params=-u {serial.port} -b 57600
-serialupdi57k.program.protocol=uart
-serialupdi57k.program.tool=serialupdi
-serialupdi57k.bootloader.tool=serialupdi

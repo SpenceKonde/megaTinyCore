@@ -48,7 +48,7 @@ class UpdiDatalink:
             self.stcs(constants.UPDI_CS_CTRLA, 0x06)
             if baud <= 115200:
                 self.stcs(constants.UPDI_ASI_CTRLA, 0x03)
-            elif baud > 230400:
+            elif baud > 460800:
                 self.stcs(constants.UPDI_ASI_CTRLA, 0x01)
             else:
                 self.stcs(constants.UPDI_ASI_CTRLA, 0x02)
