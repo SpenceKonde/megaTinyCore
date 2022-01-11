@@ -11,6 +11,11 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Released Versions
 
+## 2.5.6
+* **Critical "bugfix"** to work around bug in IDE that prevents parsing of certain parameters and prevented the fix implemented for optiboot uploads from working correctly. {upload.serialparams} doesn't parse. Neither does {serial_params}. It makes no sense. If it was a reserved name, both would refuse to parse, but instead only one does.
+* Proliferation of SerialUPDI options has occurred to provide options for mac/linux users (in particular) because their OS's often reduce latency such that the normal 230.4k baud rate doesn't work. Unfortunately I can't hide options based on OS.
+* Fix serialUPDI write delay not rely on sleep() which lacks the granularity we need.
+
 ## 2.5.5
 * **Critical Bugfix** to correct issue with uploading via optiboot.
 * Document my butchering of the board manager json and how to correct issues caused by it. (sorry! )

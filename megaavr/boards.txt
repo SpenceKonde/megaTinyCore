@@ -139,7 +139,6 @@ atxy7.build.wireabr=
 # ALL UPLOADING VIA UPDI                 #
 #________________________________________#
 atxy7.upload.tool=avrdude
-atxy7.upload.serialparams=
 atxy7.upload.workaround=
 atxy7.upload.prog_interlock=
 
@@ -503,7 +502,6 @@ atxy6.build.wireabr=
 # ALL UPLOADING VIA UPDI                 #
 #________________________________________#
 atxy6.upload.tool=avrdude
-atxy6.upload.serialparams=
 atxy6.upload.workaround=
 atxy6.upload.prog_interlock=
 
@@ -873,7 +871,6 @@ atxy4.build.wireabr=
 # ALL UPLOADING VIA UPDI                 #
 #________________________________________#
 atxy4.upload.tool=avrdude
-atxy4.upload.serialparams=
 atxy4.upload.workaround=
 atxy4.upload.prog_interlock=
 
@@ -1242,7 +1239,6 @@ atxy2.build.wireabr=
 # ALL UPLOADING VIA UPDI                 #
 #________________________________________#
 atxy2.upload.tool=avrdude
-atxy2.upload.serialparams=
 atxy2.upload.workaround=
 atxy2.upload.prog_interlock=
 
@@ -1564,7 +1560,7 @@ microchip.upload.tool=avrdude
 microchip.upload.workaround=
 microchip.upload.prog_interlock=
 microchip.upload.extra_params=-Pusb
-microchip.upload.serialparams=
+microchip.upload.serial_params=
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # Microchip Official Board submenus           #
@@ -1899,10 +1895,9 @@ atxy7o.build.wireabr=
 #________________________________________#
 atxy7o.upload.workaround=
 atxy7o.upload.tool=avrdude
-atxy7o.upload.serialparams=-P{serial.port} -b115200
 atxy7o.upload.protocol=arduino
 atxy7o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atxy7o.upload.extra_params=-D
+atxy7o.upload.extra_params=-D -P{serial.port} -b115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 24-pin Optiboot 0/1-series tinyAVR submenus #
@@ -2226,10 +2221,9 @@ atx27o.build.wireabr=
 #________________________________________#
 atx27o.upload.workaround=
 atx27o.upload.tool=avrdude
-atx27o.upload.serialparams=-P{serial.port} -b115200
 atx27o.upload.protocol=arduino
 atx27o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atx27o.upload.extra_params=-D
+atx27o.upload.extra_params=-D -P{serial.port} -b115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 24-pin Optiboot 0/1-series tinyAVR submenus #
@@ -2545,10 +2539,9 @@ atxy6o.build.wireabr=
 #________________________________________#
 atxy6o.upload.workaround=
 atxy6o.upload.tool=avrdude
-atxy6o.upload.serialparams=-P{serial.port} -b115200
 atxy6o.upload.protocol=arduino
 atxy6o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atxy6o.upload.extra_params=-D
+atxy6o.upload.extra_params=-D -P{serial.port} -b115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 20-pin Optiboot 0/1-series tinyAVR submenus #
@@ -2880,10 +2873,9 @@ atx26o.build.wireabr=
 #________________________________________#
 atx26o.upload.workaround=
 atx26o.upload.tool=avrdude
-atx26o.upload.upload.serialparams=-P{serial.port} -b115200
 atx26o.upload.protocol=arduino
 atx26o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atx26o.upload.extra_params=-D
+atx26o.upload.extra_params=-D -P{serial.port} -b115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 20-pin Optiboot 2-series tinyAVR submenus   #
@@ -3199,10 +3191,9 @@ atxy4o.build.wireabr=
 #________________________________________#
 atxy4o.upload.workaround=
 atxy4o.upload.tool=avrdude
-atxy4o.upload.serialparams=-P{serial.port} -b115200
 atxy4o.upload.protocol=arduino
 atxy4o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atxy4o.upload.extra_params=-D
+atxy4o.upload.extra_params=-D -P{serial.port} -b115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 14-pin Optiboot 0/1-series tinyAVR submenus #
@@ -3547,10 +3538,9 @@ atx24o.build.wireabr=
 #________________________________________#
 atx24o.upload.workaround=
 atx24o.upload.tool=avrdude
-atx24o.upload.serialparams=-P{serial.port} -b115200
 atx24o.upload.protocol=arduino
 atx24o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atx24o.upload.extra_params=-D
+atx24o.upload.extra_params=-D -P{serial.port} -b115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 14-pin Optiboot 2-series tinyAVR submenus   #
@@ -3859,11 +3849,10 @@ atxy2o.build.wireabr=
 # UPLOAD VIA OPTIBOOT                    #
 #________________________________________#
 atxy2o.upload.workaround=
-atxy2o.upload.upload.serialparams=-P{serial.port} -b115200
 atxy2o.upload.tool=avrdude
 atxy2o.upload.protocol=arduino
 atxy2o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atxy2o.upload.extra_params=-D
+atxy2o.upload.extra_params=-D -P{serial.port} -b115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 #  8-pin Optiboot 0/1-series tinyAVR submenus #
@@ -4182,11 +4171,10 @@ microchipo.build.wireabr=
 # UPLOAD VIA OPTIBOOT                    #
 #________________________________________#
 microchipo.upload.workaround=
-microchipo.upload.upload.serialparams=-P{serial.port} -b115200
 microchipo.upload.tool=avrdude
 microchipo.upload.protocol=arduino
 microchipo.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-microchipo.upload.extra_params=-D
+microchipo.upload.extra_params=-D -P{serial.port} -b115200
 
 #----------------------------------------#
 # CHIP                                   #

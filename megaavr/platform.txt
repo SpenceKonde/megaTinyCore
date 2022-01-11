@@ -159,8 +159,11 @@ recipe.hooks.savehex.presavehex.2.pattern.macosx=cp "{build.path}/{build.project
 #########################################
 
 ## Unused but required parameters
+# Uploading without verification is prohibited. Since there is no checksum or verification of success at any point in the upload process otherwise,
+# if verificiation was disabled, an upload problem could look like a code problem, and you could debug it unsuccessfully for days with no progress.
 tools.avrdude.program.verify=
 tools.avrdude.upload.verify=
+# the erase pattern, if defined, is used I think immediately prior to bootloading only, but bootloading can be done in a single operation; there is no need for this.
 tools.avrdude.erase.params.verbose=
 tools.avrdude.erase.params.quiet=
 tools.avrdude.erase.pattern=
@@ -175,13 +178,13 @@ tools.avrdude.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
 tools.avrdude.program.params.verbose=-v
 tools.avrdude.program.params.quiet=-q -q
 tools.avrdude.program.params.noverify=-V
-tools.avrdude.program.pattern.windows={upload.prog_interlock}"{cmd.path}" "-C{config.path}" {program.verbose} -p{build.mcu}{upload.workaround} -c{protocol} {program.extra_params} "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+tools.avrdude.program.pattern.windows={upload.prog_interlock}"{cmd.path}" "-C{config.path}" {program.verbose} {program.verify} -p{build.mcu}{upload.workaround} -c{protocol} {program.extra_params} "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 
 ## Used for "upload" through bootloader
 tools.avrdude.upload.params.verbose=-v
 tools.avrdude.upload.params.quiet=-q -q
 tools.avrdude.upload.params.noverify=-V
-tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} {program.verify} -p{build.mcu}{upload.workaround} -c{upload.protocol} {upload.extra_params} {upload.serialparams} "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} {upload.verify} -p{build.mcu}{upload.workaround} -c{upload.protocol} {upload.extra_params} "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 
 ## Used for Tools -> Burn Bootloader
 tools.avrdude.bootloader.params.verbose=-v
@@ -209,7 +212,7 @@ tools.serialupdi.cmd={runtime.platform.path}/tools/python3/python3
 ## Unused Parameters.
 # SerialUPDI has only one level of verbosity.
 # There's an *actual* internal verbose mode, but it is WAY too verbose and results >500kb log files which are mostly useless.
-# SerialUPDI must verify, because errors are not checked for along the way
+# Verification is not optional as there are no guardrails against unsuccessful uploads other than protocol failures
 # Upload is only for uploading through a bootloader, and erase is not used anywhere.
 tools.serialupdi.bootloader.params.noverify=
 tools.serialupdi.bootloader.params.quiet=
