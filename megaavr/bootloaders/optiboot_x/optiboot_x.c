@@ -622,6 +622,35 @@ void flash_led(uint8_t count) {
   }
   watchdogReset(); // for breakpointing
 }
+/* An argument can be made that we should always flash at the same speed:
+ * though I don't think this particularly matters. I would expect this to add
+ * lds, cpse, and two rjmps to the code for a total of 10 bytes.
+ * I will likely do this next time I have to recompile it all. Provided, that is,
+ * we still have that much space. Should probably #ifdef it so it can be
+ * turned on or off by passing a define to compiler.
+ */
+/*
+
+void flash_led(uint8_t count) {
+  uint16_t delay;  // at 20MHz/6, a 16bit delay counter is enough
+  while (count--) {
+    LED_PORT.IN |= LED; // Ensure same LED flash speed regardless of OSCCFG.
+    if ((FUSE_OSCCFG & FUSE_FREQSEL_gm) == FREQSEL_16MHZ_gc) {
+      delay = ((16E6 / 6) / 150)
+    } else {
+      delay = ((20E6 / 6) / 150)
+    }
+    for (; delay; delay--) {
+      watchdogReset();
+      if (MYUART.STATUS & USART_RXCIF_bm) {
+        return;
+      }
+    }
+  }
+  watchdogReset(); // for breakpointing
+}
+
+ */
 #endif
 
 
@@ -740,6 +769,6 @@ void app() {
   RSTCTRL.RSTFR = ch; // reset causes
   *(volatile uint16_t *)(&optiboot_version);   // reference the version
   do_nvmctrl(0, NVMCTRL_CMD_PAGEBUFCLR_gc, 0); // reference this function!
-  __asm__ __volatile__("jmp 0");     // similar to running off end of memory
+  __asm__ __volatile__("jmp 0");               // similar to running off end of memory - It's worth noting that this code is not included in the generated binaries!
   //    _PROTECTED_WRITE(RSTCTRL.SWRR, 1); // cause new reset
 }
