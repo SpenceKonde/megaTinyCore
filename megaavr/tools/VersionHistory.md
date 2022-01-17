@@ -14,7 +14,7 @@ This was introduced in megaTinyCore 2.5.6; notably, it also added a crapload of 
 
 ## 1.2.1 - Part support update
 Mid-late 2021, text printed at startup not updated.
-Part of the promise of using pymcuprog was a steady stream of updates to support new parts. Unfortunatly that has not happened: While Microchip is keeping it updated internally, there is an in-house quality control process before it is released to github, and by all appearances this must be very thorough, because even in late 2021, long after the 64 and 32 DA and DB-series parts had been released, the device files for pymcuprog were still missing. And we're stuck with it's disadvantages, namely that the codebase is a sprawling mess written by multiple individuals none of whom speak python fluently (and you can be sure Spence hasn't helped matters in this fork).
+Part of the promise of using pymcuprog was a steady stream of updates to support new parts. Unfortunately that has not happened: While Microchip is keeping it updated internally, there is an in-house quality control process before it is released to github, and by all appearances this must be very thorough, because even in late 2021, long after the 64 and 32 DA and DB-series parts had been released, the device files for pymcuprog were still missing. And we're stuck with it's disadvantages, namely that the codebase is a sprawling mess written by multiple individuals none of whom speak python fluently (and you can be sure Spence hasn't helped matters w/rt code quality, his idea of a python development tool is google search.
 The missing files were synthecized from existing files and publlically available information on the parts.
 
 ## 1.2.0 - Addition of read chunking
