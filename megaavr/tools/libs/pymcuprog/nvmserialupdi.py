@@ -184,7 +184,7 @@ class NvmAccessProviderSerial(NvmAccessProvider):
         :param memory_info: dictionary for the memory as provided by the DeviceMemoryInfo class
         :param offset: relative offset in the memory type
         :param numbytes: number of bytes to read
-        :param max_read_chunk: <=256
+        :param max_read_chunk: memory is read im chunks of up to 512b at a time. The -rc parameter can shrink this if needed for compatibility with certain hardware. 
         :return: array of bytes read
         """
         offset += memory_info[DeviceMemoryInfoKeys.ADDRESS]
@@ -204,7 +204,9 @@ class NvmAccessProviderSerial(NvmAccessProvider):
             if numbytes > 0x100 and max_read_chunk is None:
                 use_word_access = True
                 read_chunk_size = 0x200
-
+            elif max_read_chunk is not None:
+                if max_read_chunk > 256:
+                    use_word_access = True
         # SACRIFICES SPEED FOR COMPATIBILITY - above line should happen whenever --limitreadsize=1  command line parameter is not passed, so we can only turn it on for specific tools -> programmer options that have this weird limitation. I couldn't propagate it through this mess!
         n_chunk = math.ceil(numbytes/read_chunk_size)
         bar = progress_bar.ProgressBar(n_chunk, hide=n_chunk == 1)

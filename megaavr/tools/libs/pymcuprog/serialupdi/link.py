@@ -43,14 +43,20 @@ class UpdiDatalink:
             if not self._check_datalink():
                 raise PymcuprogError("UPDI initialisation failed")
 
-    def change_baud(self, baud):
+    def change_baud(self, baud, thirtytwoisoption=False):
         if self.updi_phy is not None:
             self.stcs(constants.UPDI_CS_CTRLA, 0x06)
             if baud <= 115200:
+                self.logger.info("Setting UPDI clock to 4 MHz")
                 self.stcs(constants.UPDI_ASI_CTRLA, 0x03)
-            elif baud > 460800:
+            elif thirtytwoisoption and baud > 921600:
+                self.logger.info("Setting UPDI clock to 32 MHz - Good luck!")
+                self.stcs(constants.UPDI_ASI_CTRLA, 0x01)
+            elif baud >= 460800:
+                self.logger.info("Setting UPDI clock to 16 MHz")
                 self.stcs(constants.UPDI_ASI_CTRLA, 0x01)
             else:
+                self.logger.info("Setting UPDI clock to 8 MHz")
                 self.stcs(constants.UPDI_ASI_CTRLA, 0x02)
             self.updi_phy.change_baud(baud)
 
@@ -63,7 +69,7 @@ class UpdiDatalink:
                 self.logger.info("UPDI init OK")
                 return True
         except PymcuprogError:
-            self.logger.warning("Check failed")
+            self.logger.warning("UPDI init failed: Can't read CS register.")
             return False
         self.logger.info("UPDI not OK - reinitialisation required")
         return False
@@ -73,7 +79,7 @@ class UpdiDatalink:
         Load data from Control/Status space
         :param address: address to load
         """
-        self.logger.debug("LDCS from 0x%02X", address)
+        self.logger.info("LDCS from 0x%02X", address)
         self.updi_phy.send([constants.UPDI_PHY_SYNC, constants.UPDI_LDCS | (address & 0x0F)])
         response = self.updi_phy.receive(self.LDCS_RESPONSE_BYTES)
         numbytes_received = len(response)
@@ -89,7 +95,7 @@ class UpdiDatalink:
         :param address: address to store to
         :param value: value to write
         """
-        self.logger.debug("STCS to 0x%02X", address)
+        self.logger.info("STCS %02X to 0x%02X", value, address)
         self.updi_phy.send([constants.UPDI_PHY_SYNC, constants.UPDI_STCS | (address & 0x0F), value])
 
     def ld_ptr_inc(self, size):
@@ -128,14 +134,21 @@ class UpdiDatalink:
         response = self.updi_phy.receive(1)
 
         if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
+            if len(response > 0):
+                self.logger.error("Expecting ACK after ST8 *ptr++. Got %d.", num, request[0])
+            else:
+                self.logger.error("Expecting ACK after ST8 *ptr++. Got nothing.", num)
             raise PymcuprogError("ACK error with st_ptr_inc")
-
         num = 1
         while num < len(data):
             self.updi_phy.send([data[num]])
             response = self.updi_phy.receive(1)
 
             if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
+                if len(response > 0):
+                    self.logger.error("Expecting ACK after ST8 *ptr++, after byte %d. Got 0x%00X}", num, request[0])
+                else:
+                    self.logger.error("Expecting ACK after ST8 *ptr++, after byte %d. Got nothing", num)
                 raise PymcuprogError("Error with st_ptr_inc")
             num += 1
 
@@ -150,7 +163,11 @@ class UpdiDatalink:
         response = self.updi_phy.receive(1)
 
         if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
-            raise PymcuprogError("ACK error with st_ptr_inc16")
+            if len(response > 0):
+                self.logger.error("Expecting ACK after ST16 *ptr++. Got {}}", response[0])
+            else:
+                self.logger.error("Expecting ACK after ST16 *ptr++. Got nothing")
+            raise PymcuprogError("Error with st_ptr_inc16")
 
         num = 2
         while num < len(data):
@@ -158,6 +175,10 @@ class UpdiDatalink:
             response = self.updi_phy.receive(1)
 
             if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
+                if len(response > 0):
+                    self.logger.error("Expecting ACK after ST16 *ptr++, after word %d.  0x%00X}", num, request[0])
+                else:
+                    self.logger.error("Expecting ACK after ST16 *ptr++, after word %d. Got nothing", num)
                 raise PymcuprogError("Error with st_ptr_inc16")
             num += 2
 
@@ -275,11 +296,19 @@ class UpdiDatalink:
         """
         response = self.updi_phy.receive(1)
         if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
+            if len(response >= 0):
+                self.logger.error("expecting ACK after ST, but got: %02x", response[0])
+            else:
+                self.logger.error("expecting ACK after ST, got nothing.")
             raise PymcuprogError("Error with st")
 
         self.updi_phy.send(values)
         response = self.updi_phy.receive(1)
         if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
+            if len(response >= 0):
+                self.logger.error("expecting ACK after ST value, but got: %02x", response[0])
+            else:
+                self.logger.error("expecting ACK after ST value, got nothing.")
             raise PymcuprogError("Error with st")
 
 
@@ -300,7 +329,7 @@ class UpdiDatalink16bit(UpdiDatalink):
         :param address: address to load from
         :return: value read
         """
-        self.logger.info("LD from 0x{0:06X}".format(address))
+        self.logger.debug("LD from 0x{0:06X}".format(address))
         self.updi_phy.send(
             [constants.UPDI_PHY_SYNC, constants.UPDI_LDS | constants.UPDI_ADDRESS_16 | constants.UPDI_DATA_8,
              address & 0xFF, (address >> 8) & 0xFF])
@@ -312,7 +341,7 @@ class UpdiDatalink16bit(UpdiDatalink):
         :param address: address to load from
         :return: values read
         """
-        self.logger.info("LD from 0x{0:06X}".format(address))
+        self.logger.debug("LD from 0x{0:06X}".format(address))
         self.updi_phy.send(
             [constants.UPDI_PHY_SYNC, constants.UPDI_LDS | constants.UPDI_ADDRESS_16 | constants.UPDI_DATA_16,
              address & 0xFF, (address >> 8) & 0xFF])
@@ -325,7 +354,7 @@ class UpdiDatalink16bit(UpdiDatalink):
         :param address: address to write to
         :param value: value to write
         """
-        self.logger.info("ST to 0x{0:06X}".format(address))
+        self.logger.debug("ST to 0x{0:06X}".format(address))
         self.updi_phy.send(
             [constants.UPDI_PHY_SYNC, constants.UPDI_STS | constants.UPDI_ADDRESS_16 | constants.UPDI_DATA_8,
              address & 0xFF, (address >> 8) & 0xFF])
@@ -337,7 +366,7 @@ class UpdiDatalink16bit(UpdiDatalink):
         :param address: address to write to
         :param value: value to write
         """
-        self.logger.info("ST to 0x{0:06X}".format(address))
+        self.logger.debug("ST to 0x{0:06X}".format(address))
         self.updi_phy.send(
             [constants.UPDI_PHY_SYNC, constants.UPDI_STS | constants.UPDI_ADDRESS_16 | constants.UPDI_DATA_16,
              address & 0xFF, (address >> 8) & 0xFF])
@@ -348,7 +377,7 @@ class UpdiDatalink16bit(UpdiDatalink):
         Set the pointer location
         :param address: address to write
         """
-        self.logger.info("ST to ptr")
+        self.logger.debug("ST to ptr")
         self.updi_phy.send(
             [constants.UPDI_PHY_SYNC, constants.UPDI_ST | constants.UPDI_PTR_ADDRESS | constants.UPDI_DATA_16,
              address & 0xFF, (address >> 8) & 0xFF])
@@ -374,7 +403,7 @@ class UpdiDatalink24bit(UpdiDatalink):
         :param address: address to load from
         :return: value read
         """
-        self.logger.info("LD from 0x{0:06X}".format(address))
+        self.logger.debug("LD from 0x{0:06X}".format(address))
         self.updi_phy.send(
             [constants.UPDI_PHY_SYNC, constants.UPDI_LDS | constants.UPDI_ADDRESS_24 | constants.UPDI_DATA_8,
              address & 0xFF, (address >> 8) & 0xFF, (address >> 16) & 0xFF])
@@ -386,7 +415,7 @@ class UpdiDatalink24bit(UpdiDatalink):
         :param address: address to load from
         :return: values read
         """
-        self.logger.info("LD from 0x{0:06X}".format(address))
+        self.logger.debug("LD from 0x{0:06X}".format(address))
         self.updi_phy.send(
             [constants.UPDI_PHY_SYNC, constants.UPDI_LDS | constants.UPDI_ADDRESS_24 | constants.UPDI_DATA_16,
              address & 0xFF, (address >> 8) & 0xFF, (address >> 16) & 0xFF])
@@ -399,7 +428,7 @@ class UpdiDatalink24bit(UpdiDatalink):
         :param address: address to write to
         :param value: value to write
         """
-        self.logger.info("ST to 0x{0:06X}".format(address))
+        self.logger.debug("ST to 0x{0:06X}".format(address))
         self.updi_phy.send(
             [constants.UPDI_PHY_SYNC, constants.UPDI_STS | constants.UPDI_ADDRESS_24 | constants.UPDI_DATA_8,
              address & 0xFF, (address >> 8) & 0xFF, (address >> 16) & 0xFF])
@@ -411,7 +440,7 @@ class UpdiDatalink24bit(UpdiDatalink):
         :param address: address to write to
         :param value: value to write
         """
-        self.logger.info("ST to 0x{0:06X}".format(address))
+        self.logger.debug("ST to 0x{0:06X}".format(address))
         self.updi_phy.send(
             [constants.UPDI_PHY_SYNC, constants.UPDI_STS | constants.UPDI_ADDRESS_24 | constants.UPDI_DATA_16,
              address & 0xFF, (address >> 8) & 0xFF, (address >> 16) & 0xFF])
@@ -422,7 +451,7 @@ class UpdiDatalink24bit(UpdiDatalink):
         Set the pointer location
         :param address: address to write
         """
-        self.logger.info("ST to ptr")
+        self.logger.debug("ST to ptr")
         self.updi_phy.send(
             [constants.UPDI_PHY_SYNC, constants.UPDI_ST | constants.UPDI_PTR_ADDRESS | constants.UPDI_DATA_24,
              address & 0xFF, (address >> 8) & 0xFF, (address >> 16) & 0xFF])

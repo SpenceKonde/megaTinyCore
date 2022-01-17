@@ -198,7 +198,7 @@ def _action_read(backend, args):
         return STATUS_FAILURE
 
     print("Reading...")
-    result = backend.read_memory(args.memory, args.offset, args.bytes, args.max_chunk_size)
+    result = backend.read_memory(args.memory, args.offset, args.bytes, args.max_read_chunk)
 
     # If a filename is specified, write to it
     hexfile = False
@@ -381,6 +381,7 @@ def _write_memory_segments(backend, memory_segments, verify, blocksize = 0, page
         be used as supplied. Even numbers up to the page size are recommended.
         Any other negative number is invalid, and is zero'ed out.
     """
+
     for segment in memory_segments:
         memory_name = segment.memory_info[DeviceMemoryInfoKeys.NAME]
         print("Writing {}...".format(memory_name))

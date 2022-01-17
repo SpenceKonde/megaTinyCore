@@ -32,6 +32,7 @@ class UpdiPhysical:
         self.send([constants.UPDI_BREAK])
 
     def change_baud(self, newbaud):
+        self.logger.info("Switching to '%d' baud", newbaud)
         self.ser.baudrate = newbaud
 
     def initialise_serial(self, port, baud):
@@ -97,6 +98,7 @@ class UpdiPhysical:
 
         # Re-init at the real baud
         temporary_serial.close()
+        self.logger.info("Double-break sent. Retrying.")
         self.initialise_serial(self.port, self.baud)
 
     def send(self, command):
@@ -104,7 +106,7 @@ class UpdiPhysical:
             Sends a char array to UPDI with NO inter-byte delay
             Note that the byte will echo back
         """
-        self.logger.info("send %d bytes", len(command))
+        self.logger.debug("send %d bytes", len(command))
         self._loginfo("data: ", command)
 
         self.ser.write(command)

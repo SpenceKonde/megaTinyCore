@@ -4,10 +4,14 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-### Planned 2.5.x
-
 ### Ongoing
 * Port enhanced documentation from DxCore.
+
+## Planned 2.5.7
+* Different (better) fix for the wire librar issue fixed in 2.5.6. from the author (currently available for testing on DxCore.)
+* A bug in SerialUPDI which had been present since it's introduction but went unnoticed has been fixed. One of the last changes that went into Serial UPDI after almost all testing was done, was a "read chunking" option to work around an issue found in a serial adapter that was very flaky (it was a D11C programmed for serial adapter operation, with bugs). That particular buggy serial adapter however is used in the curiculum of a professor who had been driving the push to improve SerialUPDI, and getting uploads to work using that as a UPDI adapter was the entire reason for his and Quentin's involvement in this, so when we discovered that the issue was still there, -rc was added and we then confirmed that it could now upload and verify code successfully (note that the bug in the D11C serial firmware was corrected a few days later - there was a specific amount of data that when sent or received would crash it due to a bug in the USB library, which eventually was corrected) However, the standalone read functionality was not retested. Turns out it was TOTALLY BUSTED whether or not read chunks were requested. There were two issues here: First, the variable was called max_read_chunk in some places, and max_chunk_size in others. Second, when it finally filtered down to the read function, if read-chunk was specified, it only worked up to 256 bytes, because it would only ever use words if read-chunking was not requested, which imposed an unnecessary and incoherent limit, since not specifying it would use the maximum of 512b.
+* Serial UPDI: Change warning level of spammiest messages. Verbose output can now be enabled from the IDE, and the volume of output it generates is sane.
+* Add somed comments in optiboot_x.c including prospective new version of flash_led which ensures that the led blinks at the correct speed regardless of OSCCFG fuse.
 
 ## Released Versions
 

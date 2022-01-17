@@ -7,7 +7,7 @@
 name=megaTinyCore
 versionnum.major=2
 versionnum.minor=5
-versionnum.patch=6
+versionnum.patch=7
 versionnum.postfix=
 versionnum.released=1
 
@@ -216,18 +216,18 @@ tools.serialupdi.cmd={runtime.platform.path}/tools/python3/python3
 # Upload is only for uploading through a bootloader, and erase is not used anywhere.
 tools.serialupdi.bootloader.params.noverify=
 tools.serialupdi.bootloader.params.quiet=
-tools.serialupdi.bootloader.params.verbose=
+tools.serialupdi.bootloader.params.verbose= -v
 tools.serialupdi.bootloader.verify=
 tools.serialupdi.erase.params.quiet=
-tools.serialupdi.erase.params.verbose=
+tools.serialupdi.erase.params.verbose= -v
 tools.serialupdi.erase.pattern=
 tools.serialupdi.program.params.noverify=
 tools.serialupdi.program.params.quiet=
-tools.serialupdi.program.params.verbose=
+tools.serialupdi.program.params.verbose= -v
 tools.serialupdi.program.verify=
 tools.serialupdi.upload.params.noverify=
 tools.serialupdi.upload.params.quiet=
-tools.serialupdi.upload.params.verbose=
+tools.serialupdi.upload.params.verbose= -v
 tools.serialupdi.upload.verify=
 tools.serialupdi.upload.pattern=echo "This can't happen, but has to be here or automated tests fail"
 
@@ -235,7 +235,7 @@ tools.serialupdi.upload.pattern=echo "This can't happen, but has to be here or a
 # write fuses 0, 1, 2, 4 (1-series only), 5, 6, 7, 8.
 # If fuse 4 (TCD0CFG) is written, it is always written to 0
 
-tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:{bootloader.OSCCFG} {bootloader.TCD0CFG_serialupdi} 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} {bootloader.serialupdistring}
+tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py"  -t {protocol} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:{bootloader.OSCCFG} {bootloader.TCD0CFG_serialupdi} 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} {bootloader.serialupdistring} {bootloader.verbose}
 
 ## Program pattern (all uploads through SerialUPDI)
 # Program will set fuses 2, 6 and 8 only. Fuses 0 and 4 are not written because the core never configures that.
@@ -246,7 +246,7 @@ tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/pr
 # ensuring that a part previously set to use a bootloader will be unbootloaded cleanly, instead of the
 # bootloader being erased but no sketches working)
 
-tools.serialupdi.program.pattern={upload.prog_interlock}"{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 2:{bootloader.OSCCFG} 6:{bootloader.SYSCFG1} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write
+tools.serialupdi.program.pattern={upload.prog_interlock}"{cmd}" -u "{runtime.platform.path}/tools/prog.py"  -t {protocol} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 2:{bootloader.OSCCFG} 6:{bootloader.SYSCFG1} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write {program.verbose}
 
 ###############
 # Expert Mode #
@@ -256,7 +256,7 @@ tools.serialupdi.program.pattern={upload.prog_interlock}"{cmd}" -u "{runtime.pla
 # SYSCFG0 including RSTPINCFG. In that case you may uncomment this and comment out the corresponding lines above.
 
 ## For avrdude - tools exist
-#tools.avrdude.program.pattern="{cmd.path}" "-C{config.path}" -p{build.mcu}{upload.workaround} -c{protocol} {program.extra_params} "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+#tools.avrdude.program.pattern="{cmd.path}" "-C{config.path}" {program.verbose} -p{build.mcu}{upload.workaround} -c{protocol} {program.extra_params} "-Ufuse2:w:{bootloader.OSCCFG}:m" "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 
 ## For SerialUPDI - HV programming tools under development
-#tools.serialupdi.program.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} --fuses 2:{bootloader.OSCCFG} 5:{bootloader.SYSCFG0}  6:{bootloader.SYSCFG1} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write
+#tools.serialupdi.program.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} --fuses 2:{bootloader.OSCCFG} 5:{bootloader.SYSCFG0}  6:{bootloader.SYSCFG1} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write {program.verbose}

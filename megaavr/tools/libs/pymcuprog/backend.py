@@ -478,7 +478,7 @@ class Backend(object):
         self.logger.error('%s flag not found for %s memory', chiperase_effect_key, memory_name)
         return ChiperaseEffect.NOT_ERASED
 
-    def read_memory(self, memory_name=MemoryNameAliases.ALL, offset_byte=0, numbytes=0, max_chunk_size=None):
+    def read_memory(self, memory_name=MemoryNameAliases.ALL, offset_byte=0, numbytes=0, max_read_chunk=None):
         """
         Read target device memory
 
@@ -501,7 +501,7 @@ class Backend(object):
         self._is_tool_not_connected_raise()
         self._is_session_not_active_raise()
 
-        return self.programmer.read_memory(memory_name=memory_name, offset=offset_byte, numbytes=numbytes, max_chunk_size=max_chunk_size)
+        return self.programmer.read_memory(memory_name=memory_name, offset=offset_byte, numbytes=numbytes, max_read_chunk=max_read_chunk)
 
     def write_memory(self, data, memory_name=MemoryNames.FLASH, offset_byte=0, blocksize=0, pagewrite_delay=0):
         """
