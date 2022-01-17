@@ -102,10 +102,10 @@ void TWI_SlaveInit(struct twiData *_data, uint8_t address, uint8_t receive_broad
     if (_data->_bools._clientEnabled  == 1) {  // Master is allowed to be enabled, don't re-enable the client though
       return;
     }
-  #else                                       // Master or Slave
-    if (_data->_bools._hostEnabled    == 1 || // If Master was enabled
-        _data->_bools._clientEnabled  == 1) { // or Slave was enabled
-    return;                                   // return and do nothing
+  #else                                         // Master or Slave
+    if (_data->_bools._hostEnabled    == 1 ||   // If Master was enabled
+        _data->_bools._clientEnabled  == 1) {   // or Slave was enabled
+    return;                                     // return and do nothing
     }
   #endif
 
@@ -250,66 +250,6 @@ void TWI_MasterSetBaud(struct twiData *_data, uint32_t frequency) {
   }
 }
 
-/**
- *@brief      TWI_Available returns the amount of bytes that are available to read in the host or client buffer
- *
- *            This function is placed in this file because the client interrupt handler needs it too.
- *            This file has no concept of the Wire object.
- *            In MANDS mode, when called from
- *            user_onRequest() or user_onReceive() it will return the number from the client buffer
- *            due to the _toggleStreamFn flag
- *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _bools._toggleStreamFn
- *                _rxHead(S)
- *                _rxTail(S)
- *
- *@return     uint8_t
- *@retval     amount of bytes available to read from the host or client buffer
- */
-uint8_t TWI_Available(struct twiData *_data) {
-  #if (BUFFER_LENGTH <= 128) || !defined(BUFFER_NOT_POWER_2)
-    /* This saves some flash. If the buffer IS a power of 3, either it's less than or equal to 128,
-     * or it's 256. In that case, the 256 buffer length drops out of the math because (uint8_t) 256 == 0,
-     * and this also works. It's just numbers from 128 through 255 that are problematic (that is, DxCore's
-     * 130 which is now 131)
-     */
-    uint8_t num;
-  #else
-    uint16_t num;
-  #endif
-  uint8_t* rxHead;
-  uint8_t* rxTail;
-
-  #if defined(TWI_MANDS)                          // Add following if host and client are split
-    if (_data->_bools._toggleStreamFn == 0x01) {
-      rxHead  = &(_data->_trHeadS);
-      rxTail  = &(_data->_trTailS);
-    } else
-  #endif
-  {
-    #if defined(TWI_MERGE_BUFFERS)                // Same Buffers for tx/rx
-      rxHead  = &(_data->_trHead);
-      rxTail  = &(_data->_trTail);
-    #else                                         // Separate tx/rx Buffers
-      rxHead  = &(_data->_rxHead);
-      rxTail  = &(_data->_rxTail);
-    #endif
-  }
-
-  num = (BUFFER_LENGTH + (*rxHead) - (*rxTail));
-
-  #if defined(BUFFER_NOT_POWER_2)
-    if (num <  (uint8_t)BUFFER_LENGTH) {
-      return  num;
-    } else {
-      return (num - BUFFER_LENGTH);
-    }
-  #else
-    return (num & (BUFFER_LENGTH - 1));             // a bitwise AND is more space-efficient but needs power of 2 buffer lengths
-  #endif
-}
 
 
 /**
@@ -334,12 +274,10 @@ uint8_t TWI_Available(struct twiData *_data) {
  */
 uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
   #if defined(TWI_MERGE_BUFFERS)                              // Same Buffers for tx/rx
-    uint8_t* txHead   = &(_data->_trHead);
-    uint8_t* txTail   = &(_data->_trTail);
+    uint8_t* txHead   = &(_data->_bytesToReadWrite);
     uint8_t* txBuffer =   _data->_trBuffer;
   #else                                                       // Separate tx/rx Buffers
-    uint8_t* txHead   = &(_data->_txHead);
-    uint8_t* txTail   = &(_data->_txTail);
+    uint8_t* txHead   = &(_data->_bytesToWrite);
     uint8_t* txBuffer =   _data->_txBuffer;
   #endif
 
@@ -390,9 +328,8 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
           else                  TWI_SET_ERROR(TWI_ERR_ACK_DAT);   // else payload was NACKed
           break;                                                  // leave loop
         } else {                                                  // otherwise WRITE was ACKed
-          if ((*txHead) != (*txTail)) {                           // check if there is data to be written
-            module->MDATA = txBuffer[(*txTail)];                  // Writing to the register to send data
-            (*txTail) = TWI_advancePosition(*txTail);             // advance tail
+          if (dataWritten < (*txHead)) {                          // check if there is data to be written
+            module->MDATA = txBuffer[dataWritten];                // Writing to the register to send data
             dataWritten++;                                        // data was Written
             timeout = 0;                                          // reset timeout
           } else {                                                // else there is no data to be written
@@ -436,14 +373,16 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
  */
 uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_stop) {
   #if defined(TWI_MERGE_BUFFERS)                                // Same Buffers for tx/rx
-    uint8_t* rxHead   = &(_data->_trHead);
-    uint8_t* rxTail   = &(_data->_trTail);
+    uint8_t* rxHead   = &(_data->_bytesToReadWrite);
+    uint8_t* rxTail   = &(_data->_bytesReadWritten);
     uint8_t* rxBuffer =   _data->_trBuffer;
   #else                                                         // Separate tx/rx Buffers
-    uint8_t* rxHead   = &(_data->_rxHead);
-    // uint8_t* rxTail   = &(_data->_rxTail);
+    uint8_t* rxHead   = &(_data->_bytesToRead);
+    uint8_t* rxTail   = &(_data->_bytesRead);
     uint8_t* rxBuffer =   _data->_rxBuffer;
   #endif
+
+  (*rxTail) = 0;                      // Reset counter
 
   TWI_t *module = _data->_module;     // Compiler treats the pointer to the TWI module as volatile and
                                       // creates bloat-y code, using a local variable fixes that
@@ -455,6 +394,8 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
     uint8_t currentStatus;
     uint8_t command  = 0;
     uint16_t timeout = 0;
+
+    module->MADDR = ADD_READ_BIT(_data->_clientAddress);  // Send Address with read bit
 
     while (true) {
       currentStatus = module->MSTATUS;
@@ -474,9 +415,9 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
       #endif
 
       if (currentStatus & (TWI_ARBLOST_bm | TWI_BUSERR_bm)) {   // Check for Bus error
-        module->MSTATUS = (TWI_ARBLOST_bm | TWI_BUSERR_bm);      // reset error flags
-        TWIR_SET_ERROR(TWI_ERR_BUS_ARB);                         // set error flag
-        break;                                                   // leave TX loop
+        module->MSTATUS = (TWI_ARBLOST_bm | TWI_BUSERR_bm);     // reset error flags
+        TWIR_SET_ERROR(TWI_ERR_BUS_ARB);                        // set error flag
+        break;                                                  // leave TX loop
       }
 
       if (command != 0) {
@@ -487,42 +428,39 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
         }
       }
 
-      if (currentSM == TWI_BUSSTATE_IDLE_gc) {    // Bus has not sent START yet
-          module->MADDR = ADD_READ_BIT(_data->_clientAddress);
-          timeout = 0;
-      } else if (currentSM == TWI_BUSSTATE_OWNER_gc) {  // Address sent, check for WIF/RIF
-        if (currentStatus & TWI_RIF_bm) {                    // data received
-          if (dataRead > (BUFFER_LENGTH-1)) {                   // Buffer overflow with this incoming Byte
-            TWIR_SET_ERROR(TWI_ERR_BUF_OVERFLOW);
-            command = TWI_ACKACT_bm | TWI_MCMD_STOP_gc;         // send STOP + NACK
-          } else {
-                                                      // Data is fine and we have space, so read out the data register
-            rxBuffer[(*rxHead)] = module->MDATA;        // and save it in the Buffer.
-            (*rxHead) = TWI_advancePosition(*rxHead);               // advance head
-            dataRead++;                                             // Byte was read
-            timeout = 0;                                            // reset timeout
+      if (currentSM == TWI_BUSSTATE_OWNER_gc) {  // Address sent, check for WIF/RIF
+        if (currentStatus & TWI_RIF_bm) {         // data received
+          if (dataRead < BUFFER_LENGTH) {          // Buffer still free
+            rxBuffer[dataRead] = module->MDATA;      // save byte in the Buffer.
+            dataRead++;                              // increment read counter
+            timeout = 0;                             // reset timeout
 
-            if (dataRead < bytesToRead) {                           // expecting more bytes, so
-              module->MCTRLB = TWI_MCMD_RECVTRANS_gc;               // send an ACK so the Slave so it can send the next byte
-            } else {                                                // Otherwise,
+            if (dataRead < bytesToRead) {            // expecting more bytes, so
+              module->MCTRLB = TWI_MCMD_RECVTRANS_gc;  // send an ACK so the Slave so it can send the next byte
+            } else {                                 // Otherwise,
               if (send_stop != 0) {
-                command = TWI_ACKACT_bm | TWI_MCMD_STOP_gc;       // send STOP + NACK
+                command = TWI_ACKACT_bm | TWI_MCMD_STOP_gc;   // send STOP + NACK
               } else {
                 break;
               }
             }
+
+          } else {                                        // Buffer overflow with the incoming byte
+            TWIR_SET_ERROR(TWI_ERR_BUF_OVERFLOW);         // Set Error and
+            command = TWI_ACKACT_bm | TWI_MCMD_STOP_gc;   // send STOP + NACK
           }
         } else if (currentStatus & TWI_WIF_bm) {  // Address NACKed
           TWIR_SET_ERROR(TWI_ERR_RXACK);          // set error flag
-          command = TWI_MCMD_STOP_gc;
+          command = TWI_MCMD_STOP_gc;             // free the bus
         }
       }
     }
+    (*rxHead) = dataRead;
   } else {
     TWIR_SET_ERROR(TWI_ERR_UNINIT);
   }
   #if defined(TWI_READ_ERROR_ENABLED) && defined(TWI_ERROR_ENABLED)
-    _data->_errors = TWIR_GET_ERROR;                           // save error flags
+    _data->_errors = TWIR_GET_ERROR;                // save error flags
   #endif
   return dataRead;
 }
@@ -557,34 +495,28 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
  */
 void TWI_HandleSlaveIRQ(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    uint8_t* txHead   = &(_data->_trHeadS);
-    uint8_t* txTail   = &(_data->_trTailS);
-    uint8_t* rxHead   = &(_data->_trHeadS);
-    uint8_t* rxTail   = &(_data->_trTailS);
+    uint8_t* txHead   = &(_data->_bytesToReadWriteS);
+    uint8_t* rxHead   = &(_data->_bytesToReadWriteS);
 
   #else                                             // Slave using the host buffer
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* txHead   = &(_data->_trHead);
-      uint8_t* txTail   = &(_data->_trTail);
-      uint8_t* rxHead   = &(_data->_trHead);
-      uint8_t* rxTail   = &(_data->_trTail);
+      uint8_t* txHead   = &(_data->_bytesToReadWrite);
+      uint8_t* rxHead   = &(_data->_bytesToReadWrite);
     #else                                           // Separate tx/rx Buffers
-      uint8_t* txHead   = &(_data->_txHead);
-      uint8_t* txTail   = &(_data->_txTail);
-      uint8_t* rxHead   = &(_data->_rxHead);
-      uint8_t* rxTail   = &(_data->_rxTail);
+      uint8_t* txHead   = &(_data->_bytesToWrite);
+      uint8_t* rxHead   = &(_data->_bytesToRead);
     #endif
   #endif
 
   uint8_t clientStatus = _data->_module->SSTATUS;
 
-  if (clientStatus & (TWI_BUSERR_bm | TWI_COLL_bm)) {  // if Bus error/Collision was detected
-    _data->_module->SDATA;                            // Read data to remove Status flags
-    (*rxTail) = (*rxHead);                          // Abort
-    (*txTail) = (*txHead);                          // Abort
-  } else {                                          // No Bus error/Collision was detected
+  if (clientStatus & (TWI_BUSERR_bm | TWI_COLL_bm)) {   // if Bus error/Collision was detected
+    _data->_module->SDATA;                              // Read data to remove Status flags
+    (*rxHead) = 0;                                      // Abort
+    (*txHead) = 0;                                      // Abort
+  } else {                                              // No Bus error/Collision was detected
     #if defined(TWI_MANDS)
-      _data->_bools._toggleStreamFn = 0x01;
+      _data->_bools._toggleStreamFn = 0x01;             // reroute stream functions to slave elements
     #endif
 
     if (clientStatus & TWI_APIF_bm) {  // Address/Stop Bit set
@@ -632,119 +564,116 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
  */
 void SlaveIRQ_AddrRead(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    uint8_t*    address = &(_data->_incomingAddress);
-
-    uint8_t* txHead   = &(_data->_trHeadS);
-    uint8_t* txTail   = &(_data->_trTailS);
-
-  #else                                             // Slave using the host buffer
-    uint8_t*    address = &(_data->_clientAddress);
+    uint8_t* address = &(_data->_incomingAddress);
+    uint8_t* txHead  = &(_data->_bytesToReadWriteS);
+    uint8_t* txTail  = &(_data->_bytesReadWrittenS);
+  #else                                             // Slave using the Master buffer
+    uint8_t* address = &(_data->_clientAddress);
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* txHead   = &(_data->_trHead);
-      uint8_t* txTail   = &(_data->_trTail);
+      uint8_t* txHead   = &(_data->_bytesToReadWrite);
+      uint8_t* txTail   = &(_data->_bytesReadWritten);
     #else                                           // Separate tx/rx Buffers
-      uint8_t* txHead   = &(_data->_txHead);
-      uint8_t* txTail   = &(_data->_txTail);
+      uint8_t* txHead   = &(_data->_bytesToWrite);
+      uint8_t* txTail   = &(_data->_bytesWritten);
     #endif
   #endif
 
+  (*address) = _data->_module->SDATA;       // saving address to expose to the user sketch
 
-  (*address) = _data->_module->SDATA;         // saving address to pass to the user function
-                                              // There is no way to identify a REPSTART, so when a Master Read occurs after a host write
-  NotifyUser_onReceive(_data);                // Notify user program "onReceive" if necessary
-  #if !defined(TWI_MERGE_BUFFERS)             // if not single Buffer operation
-    (*txTail) = (*txHead);                    // reset buffer positions so the client can start writing at zero.
-  #endif
-  NotifyUser_onRequest(_data);                // Notify user program "onRequest" if necessary
+                                            // There is no way to identify a REPSTART, so when a Master Read occurs after a Master write
+  NotifyUser_onReceive(_data);              // Notify user program "onReceive" if necessary
+
+  (*txHead) = 0;                            // reset buffer positions so the Slave can start writing at zero.
+  (*txTail) = 0;
+
+  NotifyUser_onRequest(_data);              // Notify user program "onRequest" if necessary
   _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by client data interrupt"
 }
 
 void SlaveIRQ_AddrWrite(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    uint8_t*    address = &(_data->_incomingAddress);
+    uint8_t* address = &(_data->_incomingAddress);
+    uint8_t* rxHead  = &(_data->_bytesToReadWriteS);
+    uint8_t* rxTail  = &(_data->_bytesReadWrittenS);
 
-    uint8_t* rxHead   = &(_data->_trHeadS);
-    uint8_t* rxTail   = &(_data->_trTailS);
-  #else                                             // Slave using the host buffer
+  #else                                             // Slave using the Master buffer
     uint8_t*    address = &(_data->_clientAddress);
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* rxHead   = &(_data->_trHead);
-      uint8_t* rxTail   = &(_data->_trTail);
+      uint8_t* rxHead   = &(_data->_bytesToReadWrite);
+      uint8_t* rxTail   = &(_data->_bytesReadWritten);
+    #else
+      uint8_t* rxHead   = &(_data->_bytesToRead);
+      uint8_t* rxTail   = &(_data->_bytesRead);
     #endif
   #endif
 
 
   (*address) = _data->_module->SDATA;
-  #if defined(TWI_MERGE_BUFFERS) || defined(TWI_MANDS)  // if single Buffer operation
-    (*rxTail) = (*rxHead);                    // reset buffer positions so the host can start writing at zero.
-  #endif
-  _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by reception of next byte"
+  (*rxHead) = 0;                                    // reset buffer positions so the Master can start writing at zero.
+  (*rxTail) = 0;
+  _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;    // "Execute Acknowledge Action succeeded by reception of next byte"
 }
 
 void SlaveIRQ_Stop(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    uint8_t* rxHead   = &(_data->_trHeadS);
-    uint8_t* rxTail   = &(_data->_trTailS);
-  #else                                             // Slave using the host buffer
+    uint8_t* rxHead   = &(_data->_bytesToReadWriteS);
+    uint8_t* rxTail   = &(_data->_bytesReadWrittenS);
+  #else                                             // Slave using the Master buffer
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* rxHead   = &(_data->_trHead);
-      uint8_t* rxTail   = &(_data->_trTail);
+      uint8_t* rxHead   = &(_data->_bytesToReadWrite);
+      uint8_t* rxTail   = &(_data->_bytesReadWritten);
     #else                                           // Separate tx/rx Buffers
-      uint8_t* rxHead   = &(_data->_txHead);
-      uint8_t* rxTail   = &(_data->_txTail);
+      uint8_t* rxHead   = &(_data->_bytesToRead);
+      uint8_t* rxTail   = &(_data->_bytesRead);
     #endif
   #endif
 
 
   _data->_module->SSTATUS = TWI_APIF_bm;      // Clear Flag, no further action needed
   NotifyUser_onReceive(_data);                // Notify user program "onReceive" if necessary
-  (*rxTail) = (*rxHead);                      // User should have handled all data, if not, set available rxBytes to 0
+  (*rxHead) = 0;                              // User should have handled all data, if not, set available rxBytes to 0
+  (*rxTail) = 0;
 }
 
 void SlaveIRQ_DataReadNack(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    uint8_t* txHead   = &(_data->_trHeadS);
-    uint8_t* txTail   = &(_data->_trTailS);
+    uint8_t* txHead   = &(_data->_bytesToReadWriteS);
   #else                                             // Slave using the host buffer
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* txHead   = &(_data->_trHead);
-      uint8_t* txTail   = &(_data->_trTail);
+      uint8_t* txHead   = &(_data->_bytesToReadWrite);
     #else                                           // Separate tx/rx Buffers
-      uint8_t* txHead   = &(_data->_txHead);
-      uint8_t* txTail   = &(_data->_txTail);
+      uint8_t* txHead   = &(_data->_bytesToWrite);
     #endif
   #endif
 
 
-  _data->_bools._ackMatters = false;                        // stop checking for NACK
+  _data->_bools._ackMatters = false;                // stop checking for NACK
   _data->_module->SCTRLB = TWI_SCMD_COMPTRANS_gc;   // "Wait for any Start (S/Sr) condition"
-  (*txTail) = (*txHead);                            // Abort further data writes
+  (*txHead) = 0;                                    // Abort further data writes
 }
 
 void SlaveIRQ_DataReadAck(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-    uint8_t* txHead   = &(_data->_trHeadS);
-    uint8_t* txTail   = &(_data->_trTailS);
+    uint8_t* txHead   = &(_data->_bytesToReadWriteS);
+    uint8_t* txTail   = &(_data->_bytesReadWrittenS);
     uint8_t* txBuffer =   _data->_trBufferS;
   #else                                             // Slave using the host buffer
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* txHead   = &(_data->_trHead);
-      uint8_t* txTail   = &(_data->_trTail);
+      uint8_t* txHead   = &(_data->_bytesToReadWrite);
+      uint8_t* txTail   = &(_data->_bytesReadWritten);
       uint8_t* txBuffer =   _data->_trBuffer;
     #else                                           // Separate tx/rx Buffers
-      uint8_t* txHead   = &(_data->_txHead);
-      uint8_t* txTail   = &(_data->_txTail);
+      uint8_t* txHead   = &(_data->_bytesToWrite);
+      uint8_t* txTail   = &(_data->_bytesWritten);
       uint8_t* txBuffer =   _data->_txBuffer;
     #endif
   #endif
 
-
-  _data->_bools._ackMatters = true;         // start checking for NACK
-  if ((*txHead) != (*txTail)) {             // Data is available
-    _data->_slaveBytesRead++;
-    _data->_module->SDATA = txBuffer[(*txTail)];      // Writing to the register to send data
-    (*txTail) = TWI_advancePosition(*txTail);         // Advance tail
-    _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;    // "Execute a byte read operation followed by Acknowledge Action"
+  _data->_bools._ackMatters = true;             // start checking for NACK
+  if ((*txTail) < (*txHead)) {                  // Data is available
+    _data->_module->SDATA = txBuffer[(*txTail)];    // Writing to the register to send data
+    _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;  // "Execute a byte read operation followed by Acknowledge Action"
+    (*txTail)++;                                    // Increment counter for sent bytes
 
   } else {                                            // No more data available
     _data->_module->SCTRLB = TWI_SCMD_COMPTRANS_gc;   // "Wait for any Start (S/Sr) condition"
@@ -753,33 +682,32 @@ void SlaveIRQ_DataReadAck(struct twiData *_data) {
 
 void SlaveIRQ_DataWrite(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
-      uint8_t* rxHead   = &(_data->_trHeadS);
-      uint8_t* rxTail   = &(_data->_trTailS);
+      uint8_t* rxHead   = &(_data->_bytesToReadWriteS);
+      uint8_t* rxTail   = &(_data->_bytesReadWrittenS);
       uint8_t* rxBuffer =   _data->_trBufferS;
   #else                                             // Slave using the host buffer
     #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-      uint8_t* rxHead   = &(_data->_trHead);
-      uint8_t* rxTail   = &(_data->_trTail);
+      uint8_t* rxHead   = &(_data->_bytesToReadWrite);
+      uint8_t* rxTail   = &(_data->_bytesReadWritten);
       uint8_t* rxBuffer =   _data->_trBuffer;
     #else                                           // Separate tx/rx Buffers
-      uint8_t* rxHead   = &(_data->_rxHead);
-      uint8_t* rxTail   = &(_data->_rxTail);
+      uint8_t* rxHead   = &(_data->_bytesToRead);
+      uint8_t* rxTail   = &(_data->_bytesRead);
       uint8_t* rxBuffer =   _data->_rxBuffer;
     #endif
   #endif
 
 
   uint8_t payload = _data->_module->SDATA;
-  uint8_t nextHead = TWI_advancePosition(*rxHead);
 
-  if (nextHead == (*rxTail)) {                  // if buffer is full
-    _data->_module->SCTRLB = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc;  // "Execute ACK Action succeeded by waiting for any Start (S/Sr) condition"
-    (*rxTail) = (*rxHead);                                           // Dismiss all received Data since data integrity can't be guaranteed
-
-  } else {                                      // if buffer is not full
+  if ((*rxHead) < BUFFER_LENGTH) {                // if buffer is not full
     rxBuffer[(*rxHead)] = payload;                  // Load data into the buffer
-    (*rxHead) = nextHead;                           // Advance Head
+    (*rxHead)++;                                    // Advance Head
     _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by reception of next byte"
+  } else {                                          // else buffer is full
+    _data->_module->SCTRLB = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc;  // "Execute ACK Action succeeded by waiting for any Start (S/Sr) condition"
+    (*rxHead) = 0;                                           // Dismiss all received Data since data integrity can't be guaranteed
+    (*rxTail) = 0;  // Make sure available will return 0
   }
 }
 
@@ -822,40 +750,20 @@ void NotifyUser_onRequest(struct twiData *_data) {
  *@return     void
  */
 void NotifyUser_onReceive(struct twiData *_data) {
+  #if defined(TWI_MANDS)                            // Master and Slave split
+    uint8_t* rxHead   = &(_data->_bytesToReadWriteS);
+  #else                                             // Slave using the Master buffer
+    #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
+      uint8_t* rxHead   = &(_data->_bytesToReadWrite);
+    #else                                           // Separate tx/rx Buffers
+      uint8_t* rxHead   = &(_data->_bytesToRead);
+    #endif
+  #endif
   if (_data->user_onReceive != NULL) {
-    uint8_t numBytes = TWI_Available(_data);
-    if (numBytes > 0) {
-      _data->user_onReceive(numBytes);
+    if ((*rxHead) > 0) {
+      _data->user_onReceive((*rxHead));
     }
   }
-}
-
-
-/**
- *@brief      TWI_advancePosition increments the given number if it smaller then the BUFFER_LENGTH value
- *
- *            When using round-robin buffers, it is important to reset at 0 when the position reaches
- *            the end of a buffer. This is done with this inline function.
- *            Because the AVR Dx chips were using a buffer of 130. I was not able to use the trick with
- *            the bitwise AND on Buffers that are a power of 2. To reduce the space usage on the smaller
- *            chips, I decided to add a #define based check to use the bitwise AND. To avoid duplicates of
- *            this part of the code, I wrote an extra function for that. It also increases readability.
- *
- *
- *@param      uint8_t pos is the number to be incremented/set to zero
- *
- *@return     uint8_t
- *@retval     the incremented number or zero.
- */
-uint8_t TWI_advancePosition(uint8_t pos) {
-  uint8_t nextPos = (pos + 1);
-  #if defined(BUFFER_NOT_POWER_2)
-    if (nextPos > (BUFFER_LENGTH - 1)) nextPos = 0;  // round-robin-ing
-  #else
-    nextPos &= (BUFFER_LENGTH - 1);
-  #endif
-
-  return nextPos;
 }
 
 

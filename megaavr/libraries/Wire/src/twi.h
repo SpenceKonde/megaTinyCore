@@ -79,7 +79,7 @@ SOFTWARE.
  * 32 byte buffers, many libraries implicitly depend >= 32 byte
  * buffers and will misbehave if the buffer used is smaller.
  * So even where it's painfully large portion of ram, we use
- * that.Similarly, most libraries will not make use of a larger one
+ * that. Similarly, most libraries will not make use of a larger one
  * Thus, we don't enlarge the buffer until we finally get to
  * the modern AVRs with >= 4k of RAM, where it doesn't really
  * matter anymore. At that point, enlarging the buffer to 130b
@@ -87,32 +87,27 @@ SOFTWARE.
  * Since the modern AVRs are lighter on EEPROM than classic ones
  * it is more likely that external storage would be needed.
  * SD cards are a poor choice for byte oriented data storage, in
- * addition to being astonishingly unrelible, and byte oriented
+ * addition to being astonishingly unreliable, and byte oriented
  * data storage is more useful for typical applications of AVRs
  * than file-oriented storage.
+ * If 130 bytes are not enough, the maximum supported buffer size
+ * is 256 bytes without modifications to the library.
  */
 #ifndef BUFFER_LENGTH
   #if (RAMSIZE < 256)
     #define BUFFER_LENGTH 16
   #elif (RAMSIZE < 4096)
-  /* this was 32, which saved some space because we could greatly simplify
-   * the check, but this version of wire loses a byte to the address, so
-   * 32 BUFFERLENGTH is actually 31. That broke some libraries, including
-   * Adafruit's OLED library.
-   */
-    #define BUFFER_LENGTH 33
-    #define BUFFER_NOT_POWER_2
+    #define BUFFER_LENGTH 32
   #else
-    #define BUFFER_LENGTH 131
-    #define BUFFER_NOT_POWER_2
+    #define BUFFER_LENGTH 130
   #endif
 #endif
 
 
-#define  TWI_TIMEOUT_ENABLE      // Enabled by default, might be disabled for debugging or other reasons
-#define  TWI_ERROR_ENABLED       // Enabled by default, TWI Master Write error functionality
-//#define TWI_READ_ERROR_ENABLED // Enabled on Master Read too
-//#define DISABLE_NEW_ERRORS     // Disables the new error codes and returns TWI_ERR_UNDEFINED instead.
+#define  TWI_TIMEOUT_ENABLE       // Enabled by default, might be disabled for debugging or other reasons
+#define  TWI_ERROR_ENABLED        // Enabled by default, TWI Master Write error functionality
+//#define TWI_READ_ERROR_ENABLED  // Enabled on Master Read too
+//#define DISABLE_NEW_ERRORS      // Disables the new error codes and returns TWI_ERR_UNDEFINED instead.
 
 // Errors from Arduino documentation:
 #define  TWI_ERR_SUCCESS         0x00  // Default
@@ -122,7 +117,7 @@ SOFTWARE.
 #define  TWI_ERR_UNDEFINED       0x04  // Software can't tell error source
 #define  TWI_ERR_TIMEOUT         0x05  // TWI Timed out on data rx/tx
 
-// Errors that are made to help finding errors on TWI lines. Only here to give a suggestion of where to look - these may not always be repoted accuratey.
+// Errors that are made to help finding errors on TWI lines. Only here to give a suggestion of where to look - these may not always be reported accurately.
 #if !defined(DISABLE_NEW_ERRORS)
   #define  TWI_ERR_UNINIT        0x10  // TWI was in bad state when function was called.
   #define  TWI_ERR_PULLUP        0x11  // Likely problem with pull-ups
@@ -159,7 +154,7 @@ SOFTWARE.
   #define TWIR_CHK_ERROR(x)     TWIR_ERROR_VAR == x
   #define TWIR_SET_ERROR(x)     TWIR_ERROR_VAR = x
 
-  //#define TWI_SET_EXT_ERROR(x)  TWI_ERROR_VAR = x
+  // #define TWI_SET_EXT_ERROR(x)  TWI_ERROR_VAR = x
 #else
   #define TWIR_ERROR_VAR        {}
   #define TWIR_INIT_ERROR       {}
@@ -167,7 +162,7 @@ SOFTWARE.
   #define TWIR_CHK_ERROR(x)     (true)
   #define TWIR_SET_ERROR(x)     {}
 
-  //#define TWI_SET_EXT_ERROR(x)  {}
+  // #define TWI_SET_EXT_ERROR(x)  {}
 #endif
 
 
@@ -194,18 +189,18 @@ struct twiData {
   #endif
   uint8_t _clientAddress;
   #if defined(TWI_MERGE_BUFFERS)
-    uint8_t _trHead;
-    uint8_t _trTail;
+    uint8_t _bytesToReadWrite;
+    uint8_t _bytesReadWritten;
   #else
-    uint8_t _txHead;
-    uint8_t _txTail;
-    uint8_t _rxHead;
-    uint8_t _rxTail;
+    uint8_t _bytesToWrite;
+    uint8_t _bytesToRead;
+    uint8_t _bytesRead;     // Used in slave mode exclusively
+    uint8_t _bytesWritten;  // Used in slave mode exclusively
   #endif
   #if defined(TWI_MANDS)
     uint8_t _incomingAddress;
-    uint8_t _trHeadS;
-    uint8_t _trTailS;
+    uint8_t _bytesToReadWriteS;
+    uint8_t _bytesReadWrittenS;
   #endif
   void (*user_onRequest)(void);
   void (*user_onReceive)(int);
@@ -218,7 +213,6 @@ struct twiData {
   #if defined(TWI_MANDS)
     uint8_t _trBufferS[BUFFER_LENGTH];
   #endif
-  uint8_t _slaveBytesRead;
 };
 
 
@@ -228,7 +222,6 @@ void     TWI_Flush(struct           twiData *_data);
 void     TWI_Disable(struct         twiData *_data);
 void     TWI_DisableMaster(struct   twiData *_data);
 void     TWI_DisableSlave(struct    twiData *_data);
-uint8_t  TWI_Available(struct       twiData *_data);
 void     TWI_HandleSlaveIRQ(struct  twiData *_data);
 uint8_t  TWI_MasterWrite(struct     twiData *_data, bool send_stop);
 void     TWI_MasterSetBaud(struct   twiData *_data, uint32_t frequency);

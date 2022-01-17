@@ -7,20 +7,21 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### Ongoing
 * Port enhanced documentation from DxCore.
 
-## Planned 2.5.7
-* Different (better) fix for the wire librar issue fixed in 2.5.6. from the author (currently available for testing on DxCore.)
+## Released Versions
+### 2.5.7
+* Different (better) fix for the wire library issue fixed in 2.5.6, from @MX682X (#593), we no longer use the ring buffer, simplifying the code and saving flash
 * A bug in SerialUPDI which had been present since it's introduction but went unnoticed has been fixed. One of the last changes that went into Serial UPDI after almost all testing was done, was a "read chunking" option to work around an issue found in a serial adapter that was very flaky (it was a D11C programmed for serial adapter operation, with bugs). That particular buggy serial adapter however is used in the curiculum of a professor who had been driving the push to improve SerialUPDI, and getting uploads to work using that as a UPDI adapter was the entire reason for his and Quentin's involvement in this, so when we discovered that the issue was still there, -rc was added and we then confirmed that it could now upload and verify code successfully (note that the bug in the D11C serial firmware was corrected a few days later - there was a specific amount of data that when sent or received would crash it due to a bug in the USB library, which eventually was corrected) However, the standalone read functionality was not retested. Turns out it was TOTALLY BUSTED whether or not read chunks were requested. There were two issues here: First, the variable was called max_read_chunk in some places, and max_chunk_size in others. Second, when it finally filtered down to the read function, if read-chunk was specified, it only worked up to 256 bytes, because it would only ever use words if read-chunking was not requested, which imposed an unnecessary and incoherent limit, since not specifying it would use the maximum of 512b.
 * Serial UPDI: Change warning level of spammiest messages. Verbose output can now be enabled from the IDE, and the volume of output it generates is sane.
 * Add somed comments in optiboot_x.c including prospective new version of flash_led which ensures that the led blinks at the correct speed regardless of OSCCFG fuse.
+* Not a change we made, just an observation: There is no more stylechecking on code because the tool we used has vanished from the internet and it's URL doesn't even resolve now.
 
-## Released Versions
 
-## 2.5.6
+### 2.5.6
 * **Critical "bugfix"** to work around bug in IDE that prevents parsing of certain parameters and prevented the fix implemented for optiboot uploads from working correctly. {upload.serialparams} doesn't parse. Neither does {serial_params}. It makes no sense. If it was a reserved name, both would refuse to parse, but instead only one does.
 * Proliferation of SerialUPDI options has occurred to provide options for mac/linux users (in particular) because their OS's often reduce latency such that the normal 230.4k baud rate doesn't work. Unfortunately I can't hide options based on OS.
 * Fix serialUPDI write delay not rely on sleep() which lacks the granularity we need.
 
-## 2.5.5
+### 2.5.5
 * **Critical Bugfix** to correct issue with uploading via optiboot.
 * Document my butchering of the board manager json and how to correct issues caused by it. (sorry! )
 * Housekeeping in UART.h and UART.cpp
@@ -30,18 +31,17 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Correct serious defect in new Wire library. The point of using 32b buffers is to match basically everything else, since having less than the assumed amount will cause failures to many libraries. However, we also stuff the slave address into the buffer, so 32 byte buffers only give us 31 bytes of data. This was detected when it broke the adafruit OLED library. Fixing it by enlarging the buffer and sacrificing power-of-2-ness cost 54-78 bytes of flash. I was able to get back around 40% of that for parts with buffer sizes under 128b (ie, all of the megaTinyCore; DxCore doesn't care since they got 130b buffers, though they need 131b or I should have just done 128b, cause we need 130b of "data" to write a 128b page to external eeproms) (#593)
 * Correct typo in boards.txt impacting old wrong-sig ATtiny402's. (#592)
 
-## 2.5.4
+### 2.5.4
 * **CRITICAL BUGFIX**. Prior critical bugfix was unsuccessful because the flashsize test was comparing it to the wrong value. Additionally, the branch before a jmp, with it's offset specified numerically, needs to match the size of the rjmp or jmp instruction;  This corrects that.
 
-
-## 2.5.3
+### 2.5.3
 * **CRITICAL BUGFIX** Serial-using sketches wouldfail to compile if they were large enough.
 * Make software serial suck somewhat less by performing a single bitwise-and to calculate the result of the modulo operator, instead of dividing a 2-byte signed value which we know will never be larger than twice the buffer size (of 64) and hence fits in a single unsigned byte.
 
-## 2.5.2
+### 2.5.2
 * **CRITICAL BUGFIX** - burn bootloader was broken on most parts.
 
-## 2.5.1
+### 2.5.1
 * Added support for serial buffer sizes of 256.
 * Added test for defined(USE_ASM_TXC), USE_ASM_RXC, and USE_ASM_DRE in UART.h so that variants and board definitions can now turn this off.
 * Attempting to use illegal options, like buffer sizes that aren't powers of 2, now errors out.

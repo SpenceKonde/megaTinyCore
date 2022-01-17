@@ -51,8 +51,6 @@ extern "C" {    // compiler was complaining when I put twi.h into the upper C in
  */
 TwoWire::TwoWire(TWI_t *twi_module) {
   vars._module = twi_module;
-  // vars.user_onRequest = NULL;  // Make sure to initialize this pointers
-  // vars.user_onReceive = NULL;  // This avoids weird jumps should something unexpected happen
 }
 
 /**
@@ -289,7 +287,7 @@ uint8_t TwoWire::requestFrom(uint8_t  address,  uint8_t  quantity,  uint8_t send
  *            This function only saves the client address in the structure, it does
  *            not perform any transmissions.
  *            a write() will fill the transmit buffer. write() has to be called after
- *            beginTransmission() was called
+ *            beginTransmission() was called. Any write() before beginTransmission() will be lost
  *
  *@param      uint8_t address - the address of the client
  *
@@ -297,11 +295,9 @@ uint8_t TwoWire::requestFrom(uint8_t  address,  uint8_t  quantity,  uint8_t send
  */
 void TwoWire::beginTransmission(uint8_t address) {
   #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-    uint8_t* txHead  = &(vars._trHead);
-    uint8_t* txTail  = &(vars._trTail);
+    uint8_t* txHead  = &(vars._bytesToReadWrite);
   #else                                           // Separate tx/rx Buffers
-    uint8_t* txHead  = &(vars._txHead);
-    uint8_t* txTail  = &(vars._txTail);
+    uint8_t* txHead  = &(vars._bytesToWrite);
   #endif
   if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
     badArg("Supplied address seems to be 8 bit. Only 7-bit-addresses are supported");
@@ -309,7 +305,7 @@ void TwoWire::beginTransmission(uint8_t address) {
   }
   // set address of targeted client
   vars._clientAddress = address << 1;
-  (*txTail) = (*txHead);  // reset transmitBuffer
+  (*txHead) = 0;  // fill buffer from 0
 }
 
 
@@ -357,41 +353,34 @@ uint8_t TwoWire::endTransmission(bool sendStop) {
  *@retval     1 if successful, 0 if the buffer is full
  */
 size_t TwoWire::write(uint8_t data) {
-
-  uint8_t nextHead;
   uint8_t* txHead;
-  uint8_t* txTail;
   uint8_t* txBuffer;
 
   #if defined(TWI_MANDS)                   // Add following if host and client are split
     if (vars._bools._toggleStreamFn == 0x01) {
-      txHead   = &(vars._trHeadS);
-      txTail   = &(vars._trTailS);
+      txHead   = &(vars._bytesToReadWriteS);
       txBuffer =   vars._trBufferS;
     } else
   #endif
   {
     #if defined(TWI_MERGE_BUFFERS)         // Same Buffers for tx/rx
-      txHead   = &(vars._trHead);
-      txTail   = &(vars._trTail);
+      txHead   = &(vars._bytesToReadWrite);
       txBuffer =   vars._trBuffer;
     #else                                  // Separate tx/rx Buffers
-      txHead   = &(vars._txHead);
-      txTail   = &(vars._txTail);
+      txHead   = &(vars._bytesToWrite);
       txBuffer =   vars._txBuffer;
     #endif
   }
 
   /* Put byte in txBuffer */
-  nextHead = TWI_advancePosition(*txHead);
 
-  if (nextHead == (*txTail)) {
-    return 0;                             // Buffer full, stop accepting data
+  if ((*txHead) < BUFFER_LENGTH) {      // while buffer not full, write to it
+    txBuffer[(*txHead)] = data;             // Load data into the buffer
+    (*txHead)++;                            // advancing the head
+    return 1;
+  } else {
+    return 0;
   }
-  txBuffer[(*txHead)] = data;             // Load data into the buffer
-  (*txHead) = nextHead;                   // advancing the head
-
-  return 1;
 }
 
 
@@ -408,12 +397,13 @@ size_t TwoWire::write(uint8_t data) {
  *@retval     amount of bytes copied
  */
 size_t TwoWire::write(const uint8_t *data, size_t quantity) {
+  uint8_t i = 0;  // uint8_t since we don't use bigger buffers
 
-  for (size_t i = 0; i < quantity; i++) {
-    write(*(data + i));
+  for (; i < (uint8_t)quantity; i++) {    // limit quantity to 255 to avoid lock up
+    if (write(*(data + i)) == 0) break;   // break if buffer full
   }
 
-  return quantity;
+  return i;
 }
 
 
@@ -431,7 +421,20 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity) {
  *@retval     amount of bytes available to read from the host buffer
  */
 int TwoWire::available(void) {
-  return TWI_Available(&vars);
+  int rxHead;
+  #if defined(TWI_MANDS)                          // Add following if host and client are split
+    if (vars._bools._toggleStreamFn == 0x01) {
+      rxHead  = vars._bytesToReadWriteS - vars._bytesReadWrittenS;
+    } else
+  #endif
+  {
+    #if defined(TWI_MERGE_BUFFERS)                // Same Buffers for tx/rx
+      rxHead  = vars._bytesToReadWrite - vars._bytesReadWritten;
+    #else                                         // Separate tx/rx Buffers
+      rxHead  = vars._bytesToRead - vars._bytesRead;
+    #endif
+  }
+  return rxHead;
 }
 
 
@@ -456,30 +459,30 @@ int TwoWire::read(void) {
 
   #if defined(TWI_MANDS)                         // Add following if host and client are split
     if (vars._bools._toggleStreamFn == 0x01) {
-      rxHead   = &(vars._trHeadS);
-      rxTail   = &(vars._trTailS);
+      rxHead   = &(vars._bytesToReadWriteS);
+      rxTail   = &(vars._bytesReadWrittenS);
       rxBuffer =   vars._trBufferS;
     } else
   #endif
   {
     #if defined(TWI_MERGE_BUFFERS)               // Same Buffers for tx/rx
-      rxHead   = &(vars._trHead);
-      rxTail   = &(vars._trTail);
+      rxHead   = &(vars._bytesToReadWrite);
+      rxTail   = &(vars._bytesReadWritten);
       rxBuffer =   vars._trBuffer;
     #else                                        // Separate tx/rx Buffers
-      rxHead   = &(vars._rxHead);
-      rxTail   = &(vars._rxTail);
+      rxHead   = &(vars._bytesToRead);
+      rxTail   = &(vars._bytesRead);
       rxBuffer =   vars._rxBuffer;
     #endif
   }
 
 
-  if ((*rxHead) == (*rxTail)) {   // if the head isn't ahead of the tail,
-    return -1;                    // we don't have any characters
-  } else {
+  if ((*rxTail) < (*rxHead)) {   // if there are bytes to read
     uint8_t c = rxBuffer[(*rxTail)];
-    (*rxTail) = TWI_advancePosition(*rxTail);
+    (*rxTail)++;
     return c;
+  } else {                      // No bytes to read. At this point, rxTail moved up to
+    return -1;                  // rxHead. To reset both to 0, a MasterRead or AddrWrite has to be called
   }
 }
 
@@ -502,28 +505,29 @@ int TwoWire::peek(void) {
   uint8_t* rxTail;
   uint8_t* rxBuffer;
 
-  #if defined(TWI_MANDS)                          // Add following if host and client are split
+  #if defined(TWI_MANDS)                         // Add following if host and client are split
     if (vars._bools._toggleStreamFn == 0x01) {
-        rxHead   = &(vars._trHeadS);
-        rxTail   = &(vars._trTailS);
-        rxBuffer =   vars._trBufferS;
+      rxHead   = &(vars._bytesToReadWriteS);
+      rxTail   = &(vars._bytesReadWrittenS);
+      rxBuffer =   vars._trBufferS;
     } else
   #endif
   {
-    #if defined(TWI_MERGE_BUFFERS)                // Same Buffers for tx/rx
-      rxHead   = &(vars._trHead);
-      rxTail   = &(vars._trTail);
+    #if defined(TWI_MERGE_BUFFERS)               // Same Buffers for tx/rx
+      rxHead   = &(vars._bytesToReadWrite);
+      rxTail   = &(vars._bytesReadWritten);
       rxBuffer =   vars._trBuffer;
-    #else                                         // Separate tx/rx Buffers
-      rxHead   = &(vars._rxHead);
-      rxTail   = &(vars._rxTail);
+    #else                                        // Separate tx/rx Buffers
+      rxHead   = &(vars._bytesToRead);
+      rxTail   = &(vars._bytesRead);
       rxBuffer =   vars._rxBuffer;
     #endif
   }
-  if ((*rxHead) == (*rxTail)) {
-    return -1;
-  } else {
+
+  if ((*rxTail) < (*rxHead)) {   // if there are bytes to read
     return rxBuffer[(*rxTail)];
+  } else {      // No bytes to read
+    return -1;
   }
 }
 
@@ -536,17 +540,6 @@ int TwoWire::peek(void) {
  *@return     void
  */
 void TwoWire::flush(void) {
-  #if defined(TWI_MERGE_BUFFERS)
-    vars._trTail = vars._trHead;
-  #else
-    vars._rxTail = vars._rxHead;
-    vars._txTail = vars._txHead;
-  #endif
-
-  #if defined (TWI_MANDS)
-    vars._trTailS = vars._trHeadS;
-  #endif
-
   /* Turn off and on TWI module */
   TWI_Flush(&vars);
 }
@@ -571,7 +564,8 @@ uint8_t TwoWire::getIncomingAddress(void) {
 }
 
 /**
- *@brief      getBytesRead provides a facility for the slave to check how many bytes were read.
+ *@brief      getBytesRead provides a facility for the slave to check how many bytes were
+ *              successfully read by the master.
  *
  *            Useful for implementing a "register model" like most I2C hardware does.
  *            Calling this will reset the counter, since it is an unusual use case for
@@ -583,9 +577,18 @@ uint8_t TwoWire::getIncomingAddress(void) {
  */
 
 uint8_t TwoWire::getBytesRead() {
-  uint8_t bytes = vars._slaveBytesRead;
-  vars._slaveBytesRead = 0;
-  return bytes;
+  uint8_t* txTail;
+  #if defined(TWI_MANDS)                         // Add following if host and client are split
+      txTail   = &(vars._bytesReadWrittenS);
+  #else
+    #if defined(TWI_MERGE_BUFFERS)               // Same Buffers for tx/rx
+      txTail   = &(vars._bytesReadWritten);
+    #else                                        // Separate tx/rx Buffers
+      txTail   = &(vars._bytesWritten);
+    #endif
+  #endif
+  // txTail variable (what ever applies on the mode) is reset on every slave AddrRead
+  return (*txTail);
 }
 
 /**
