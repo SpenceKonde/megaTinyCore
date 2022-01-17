@@ -398,8 +398,8 @@ size_t TwoWire::write(uint8_t data) {
  */
 size_t TwoWire::write(const uint8_t *data, size_t quantity) {
   uint8_t i = 0;  // uint8_t since we don't use bigger buffers
-
-  for (; i < (uint8_t)quantity; i++) {    // limit quantity to 255 to avoid lock up
+  uint8_t qty = quantity > BUFFER_LENGTH ? BUFFER_LENGTH : quantity; //Don't overfill the buffer.
+  for (; i < qty; i++) {
     if (write(*(data + i)) == 0) break;   // break if buffer full
   }
 
