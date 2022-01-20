@@ -10,11 +10,11 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ## Released Versions
 
 ### 2.5.9
-* CRITICAL BUGFIX - no changes to code, just botched the json file tools-dependancies in trying to fix the avrdude version.
+* **CRITICAL BUGFIX** - no changes to code, just botched the json file tools-dependancies in trying to fix the avrdude version.
 
 ### 2.5.8
 * Respond more gracefully when data that doesn't fit in Wire buffer is "written".
-* CRITICAL BUGFIX - correct uploads through avrdude on non-windows platforms.
+* **CRITICAL BUGFIX** - correct uploads through avrdude on non-windows platforms.
 * Correct avrdude tool version to use version 17 of avrdude on 32-bit x86 linux. and version 18 everywhere else, instead of not installing on that platform because avrdude 18 isn't available for it.
 
 ### 2.5.7
