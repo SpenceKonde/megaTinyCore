@@ -67,7 +67,9 @@ Options:
   millis=enabled
   resetpin=UPDI
   startuptime=0
-  uartvoltage=skip
+  wiremode=mors
+  printf=minimal
+  attach=allenabled
 ```
 Now we have to basically chain these key value pairs, comma separating each key value pair, staring with a ":" after the supplied FQBN.
 
@@ -76,7 +78,7 @@ Now we have to basically chain these key value pairs, comma separating each key 
 3.3. So expanding on the example further, the options that I listed above, if I had to chain the specific fuse detail), following will be the command to compile the sketch in the sketch directory:
 
 ```sh
-arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,uartvoltage=skip --output-dir ./build/
+arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,wiremode=mors,printf=minimal,attach=allenabled --output-dir ./build/
 ```
 Here I chose the build directory to be inside my sketch directory, where all the hex files etc will be exported.
 
@@ -95,7 +97,7 @@ From the sketch directory that has `build/` from previous step (if you have comp
 For our example:
 
 ```sh
-arduino-cli upload -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,uartvoltage=skip -p /dev/tty.usbserial-A10KHTR4 -P pyupdi57k -t
+arduino-cli upload -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,wiremode=mors,printf=minimal,attach=allenabled -p /dev/tty.usbserial-A10KHTR4 -P serialupdi -t
 ```
 
 ## If you want to compile and then upload right after compilation
@@ -105,5 +107,5 @@ arduino-cli compile -b FQBN:fuseKey=fuseValue,fuseKey=fuseValue,.. --output-dir 
 ```
 For our example that would be:
 ```sh
-arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,uartvoltage=skip --output-dir ./build/ -u -p /dev/tty.usbserial-A10KHTR4 -P pyupdi57k -t
+arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,wiremode=mors,printf=minimal,attach=allenabled --output-dir ./build/ -u -p /dev/tty.usbserial-A10KHTR4 -P serialupdi -t
 ```
