@@ -186,16 +186,16 @@ namespace ref {
 
       vref_1v024 = 0x00, // 1.024V
       vref_2v048 = 0x01, // 2.048V
-      vref_2v500 = 0x03, // 2.5V
-      vref_2v5   = 0x03,
-      vref_4v096 = 0x02, // 4.096V
-      vref_vdd   = 0x05, // VDD as reference
-  #else
-      vref_0v55 = 0x00, // 1.024V
-      vref_1v1   = 0x01, // 2.048V
-      vref_1v5   = 0x04, // 2.5V
+      vref_2v500 = 0x02, // 2.5V
       vref_2v5   = 0x02,
-      vref_4v3   = 0x03, // 4.096V
+      vref_4v096 = 0x03, // 4.096V
+      vref_vdd   = 0x07, // VDD as reference
+  #else
+      vref_0v55  = 0x00, // 0.55V
+      vref_1v1   = 0x01, // 1.1V
+      vref_1v5   = 0x04, // 1.5V
+      vref_2v5   = 0x02,
+      vref_4v3   = 0x03, // 4.3V  
   #endif
   #if defined(DXCORE)
     vref_vrefa = 0x06, // External reference from the VREFA pin
