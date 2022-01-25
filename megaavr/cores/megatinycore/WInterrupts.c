@@ -225,30 +225,28 @@
 */
 
   #if defined(CORE_ATTACH_ALL)
-    #ifdef PORTA_PINS
-      ISR(PORTA_PORT_vect, ISR_NAKED) {
-      asm volatile(
-        "push r16"      "\n\t"
-        "ldi r16, 0"    "\n\t"
-    #if PROGMEM_SIZE > 8192
-        "jmp AttachedISR" "\n\t"
-    #else
-        "rjmp AttachedISR" "\n\t"
-    #endif
-        ::);
-      __builtin_unreachable();
+    ISR(PORTA_PORT_vect, ISR_NAKED) {
+    asm volatile(
+      "push r16"      "\n\t"
+      "ldi r16, 0"    "\n\t"
+#if PROGMEM_SIZE > 8192
+      "jmp AttachedISR" "\n\t"
+#else
+      "rjmp AttachedISR" "\n\t"
+#endif
+      ::);
+    __builtin_unreachable();
     }
-    #endif
     #ifdef PORTB_PINS
       ISR(PORTB_PORT_vect, ISR_NAKED) {
       asm volatile(
         "push r16"      "\n\t"
         "ldi r16, 2"    "\n\t"
-    #if PROGMEM_SIZE > 8192
+#if PROGMEM_SIZE > 8192
         "jmp AttachedISR" "\n\t"
-    #else
+#else
         "rjmp AttachedISR" "\n\t"
-    #endif
+#endif
         ::);
       __builtin_unreachable();
     }
@@ -258,11 +256,11 @@
       asm volatile(
         "push r16"      "\n\t"
         "ldi r16, 4"    "\n\t"
-    #if PROGMEM_SIZE > 8192
+#if PROGMEM_SIZE > 8192
         "jmp AttachedISR" "\n\t"
-    #else
+#else
         "rjmp AttachedISR" "\n\t"
-    #endif
+#endif
         ::);
       __builtin_unreachable();
     }
