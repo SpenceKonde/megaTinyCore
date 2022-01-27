@@ -1,5 +1,4 @@
 /* Minimal demo of uaing the ADC to read temperature and operating voltage
- * This has not yet been updated to cover temperature on the new 2-series parts
  *
  * Reading Vdd on the 2-series is VERY easy though, because there's a channel
  * called VDDDIV10, and the core presents it as ADC_VDDDIV10. Care to guess
@@ -89,7 +88,16 @@ uint16_t readTemp() {
   temp >>= 8; // Divide result to get Kelvin
   return temp;
   #else
-  return -1;
+  int8_t sigrowOffset = SIGROW.TEMPSENSE1;
+  uint8_t sigrowGain = SIGROW.TEMPSENSE0;
+  analogSampleDuration(128); // must be >= 32µs * f_CLK_ADC per datasheet 30.3.3.7
+  analogReference(INTERNAL1V024);
+  uint32_t reading = analogRead(ADC_TEMPERATURE);
+  reading -= sigrowOffset;
+  reading *= sigrowGain;
+  reading += 0x80; // Add 1/2 to get correct rounding on division below
+  reading >>= 8; // Divide result to get Kelvin
+  return reading;
   #endif
 }
 void loop() {
