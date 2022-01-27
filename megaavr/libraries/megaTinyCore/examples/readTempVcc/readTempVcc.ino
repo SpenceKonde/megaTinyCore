@@ -45,6 +45,7 @@ uint16_t readSupplyVoltage() { // returns value in millivolts to avoid floating 
   Serial.println(" (discarded)");
   int32_t vddmeasure = analogReadEnh(ADC_VDDDIV10, 12); // Take it at 12 bits
   Serial.println(vddmeasure);
+  vddmeasure *= 10; // since we measured 1/10th VDD
   int16_t returnval = vddmeasure >> 2; // divide by 4 to get into millivolts.
   if (vddmeasure & 0x02) {
     // if last two digits were 0b11 or 0b10 we should round up
