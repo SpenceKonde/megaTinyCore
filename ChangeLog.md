@@ -11,7 +11,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### 2.5.10
 * **CRITICAL BUGFIX** - attachInterrupt was broken on default mode for PORTA (#625)
-* Fix references for comparator library. (#639 - thanks @mechatronics)
+* Fix references for comparator library. (#639 - thanks @mechatroniks-git )
 * Improve error reporting for SerialUPDI.
 * 2.5.8 is removed from board manager. Users with this installed will find that it is no longer available. Those unfortunate souls still on 1.8.9 but who upgraded will require manually deleting the packages folder inside the of the Arduino15 folder to install or otherwise modify the megatinycore package. This will eliminate the error message everyone has been seeing when the board.json. There was no way to eliminate the error which did not result breakage to users on 1.8.9 and earlier with 2.5.8 installed, and the error was producing far too many big reports. Users who are still on 1.8.9 should really upgrade. 1.8.13 is the recommended version currently due to serious bugs in the latest versions.
 
