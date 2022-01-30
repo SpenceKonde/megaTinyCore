@@ -30,21 +30,26 @@ Clock Sources         |   Internal osc @ 16 or 20 MHz or ext. clock |
 Frequency (rated)     |    Up to 5 MHz @ 1.8V, 10 @ 2.7V, 20 @ 4.5V |
 Frequwncy (max*)      |   Internal runs up to 36ish, functional at 32 MHz |
 Package               |             QFN-24, 4mm x 4mm (0.5mm pitch) |
+B.O.D. voltages       | 1.8, 2.6 (for 3-3.3v systems), and 4.2 (for 5V systems) |
+B.O.D. voltages       | "unqualified" 2.1, 2.9, 3.3, 3.7, 4.0       |
+
+The "unqualified" BOD voltages are not listed in the datasheet, but were referenced in early versions of headers, just like the 0/1-series. They appear to work, I take them being described as "unqualified" to mean that they are not guaranteed by Mirochop.
+
 
 ## Clock Options
 These parts do not support an external HF crystal, only an external clock, and/or a watch crystak for the RTC.
  MHz | Source          | Notes
  ----|-----------------|-------
-  20 | Internal        |
-  16 | Internal        |
-  10 | Internal        |
-   8 | Internal        |
-   5 | Internal        |
-   4 | Internal        |
+  20 | Internal        | Default, typical for 5V systems
+  16 | Internal        | Typical for 5V systems. Some libraries may work better at this speed.
+  10 | Internal        | Typical for 3.3V systems
+   8 | Internal        | Typical for 3.3V systems
+   5 | Internal        | Typical for 1.8V - 2.5V systems
+   4 | Internal        | Typical for 1.8V - 2.5V systems
    1 | Internal        |
-  20 | Internal, tuned |
-  16 | Internal, tuned |
-  12 | Internal, tuned |
+  20 | Internal, tuned | 16 MHz OSC selected by fuse can be tuned up to 20 no problem.
+  16 | Internal, tuned | 20 MHz selected by OSCCFG fuse can be tuned down to 16 no problem.
+  12 | Internal, tuned | 16 MHz can be just barely tuned down to 12. 20 MHz gets tuned up to 24 and prescaled.
   20 | External Clock  | External clock goes to CLKI (PA3). Minimize any load on this pin, including even short wires. HF stuff is very picky.
   16 | External Clock  | As above.
   10 | External Clock  | As above.
@@ -58,11 +63,13 @@ These parts do not support an external HF crystal, only an external clock, and/o
   30 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
   32 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
 
-When external clock is used as system clock source, it cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
+When external clock is used as system clock source, PA3 cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
 
-* The overclocked options at 24/25 MHz have been found to generally work around room temperature when running at 5v. For faster speeds, initial results seem to imply that the 2-series parts are significantly more capable of handling higher operating frequencies compared to the 0/1-series, and that with solid 5v supply, 32 MHz at room temperature may be good enough for practical use! Whereas the previous parts collapsed at around 30-32 MHz running from internal oscillator, that isn't seen until the mid 30's on the 2-series parts. As always, external oscillators work more reliably than the internal one when overclocking, but they generally cost about as much as the microcontroller itself and are gross overkill (in terms of accuracy) for what most arduino folks want from them.
+All else being equal, your chances of reaching an aggressive overclock are better with external clock vs internal, and with the extended temperature range parts instead of normal ones.
 
-The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Ref_Tuning.md) for more information before using these options.
+* The overclocked options at 24/25 MHz have been found to generally work around room temperature when running at 5v. For faster speeds, initial results seem to imply that the 2-series parts are significantly more capable of handling higher operating frequencies compared to the 0/1-series, and that with solid 5v supply, 32 MHz at room temperature may be good enough for practical use, even from the internal oscillator! Whereas the previous tinyAVR parts collapsed at around 30-32 MHz running from internal oscillator, that isn't seen until the mid 30's on the 2-series parts.
+
+The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Ref_Tuning.md) for more information before using these options. They require running a tuning sketch on your chip.
 
 ## Overview
 The 24-pin 2-series benefit from fact that the Reset function can be moved to pin PB4, allowing PA0 to remain UPDI, while also having a proper hardware reset! Like the 24-pin 0/1-series, the VQFN-24 package is the only option, no doubt a disappointment to those hoping to assemble them at home.
@@ -78,9 +85,8 @@ Optiboot is included and with the alternate reset option, you can have normal au
 For these parts, provided they have 8k+ flash, I make no recommendation between Optiboot with alternate reset pin vs use with UPDI programming and no bootloader - it comes down to your preferences and development workflow. For the 4k flash parts, I question the wisdom of dedicating 1/8th of the flash for a bootloader offering little practical benefit.
 
 ## Buy official megaTinyCore breakouts and support continued development
-To be designed in the future, if people suddenly start showing interest in the 24-pin tinyAVR parts - sales of the 24-pin boards for the 0 and 1-series parts have been very poor compared to the 20-pin ones, even for assembled boards, which I find mystifying. I don't know who's using them all - clearly *someone* is because they're backordered into next year, but whoever it is, they're not using my boards.. As I have in excess of 200 unused tinyAVR x07/x17 breakout boards I'm in no hurry to design a Rev. C to support the alt reset pin and sign up to have another 100 or so produced.
-
-[The existing boards for the 0-series and 1-series 24-pin parts work, but they don't support the alternate rewset pin for autoreset](https://www.tindie.com/products/17613/)
+[Assembled 3224 boards are now available, albeit with an jumper soldered onto the board to fix a bug](https://www.tindie.com/products/17523/). When this gets fixed will depend on customer interest.
+[Bare boards without alt-reset support](https://www.tindie.com/products/17613/)
 
 ## Notes on Tables
 `*`Maximum frequency that the the internal oscillator will reach when tuned upwards until it crashes, and the maximum frequency the part actually runs at (based on cursory, not rigorous testing - the parts that ran for a few milliseconds without crashing or failing to perform correct arithmetic with a few unsigned longs was enough to be considered "working") are reported. Both are at 5.0V and are typical values determined experimentally, and the parts may not function reliably at those speeds under more realistic conditions. Maximums vary between individual specimens. *Don't rely on parts exceeding manufacturer specifications*.

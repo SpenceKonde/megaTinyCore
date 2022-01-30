@@ -30,21 +30,26 @@ Clock Sources         |   Internal osc @ 16 or 20 MHz or ext. clock |
 Frequency (rated)     |    Up to 5 MHz @ 1.8V, 10 @ 2.7V, 20 @ 4.5V |
 Frequency (max * )    |  Internal runs up to 36, and works @ 32 MHz |
 Package               |                            SOIC-14, SSOP-14 |
+B.O.D. voltages       | 1.8, 2.6 (for 3-3.3v systems), and 4.2 (for 5V systems) |
+B.O.D. voltages       | "unqualified" 2.1, 2.9, 3.3, 3.7, 4.0       |
+
+The "unqualified" BOD voltages are not listed in the datasheet, but were referenced in early versions of headers, just like the 0/1-series. They appear to work, I take them being described as "unqualified" to mean that they are not guaranteed by Mirochop.
+
 
 ## Clock Options
 These parts do not support an external HF crystal, only an external clock, and/or a watch crystak for the RTC.
  MHz | Source          | Notes
  ----|-----------------|-------
-  20 | Internal        |
-  16 | Internal        |
-  10 | Internal        |
-   8 | Internal        |
-   5 | Internal        |
-   4 | Internal        |
+  20 | Internal        | Default, typical for 5V systems
+  16 | Internal        | Typical for 5V systems. Some libraries may work better at this speed.
+  10 | Internal        | Typical for 3.3V systems
+   8 | Internal        | Typical for 3.3V systems
+   5 | Internal        | Typical for 1.8V - 2.5V systems
+   4 | Internal        | Typical for 1.8V - 2.5V systems
    1 | Internal        |
-  20 | Internal, tuned |
-  16 | Internal, tuned |
-  12 | Internal, tuned |
+  20 | Internal, tuned | 16 MHz OSC selected by fuse can be tuned up to 20 no problem.
+  16 | Internal, tuned | 20 MHz selected by OSCCFG fuse can be tuned down to 16 no problem.
+  12 | Internal, tuned | 16 MHz can be just barely tuned down to 12. 20 MHz gets tuned up to 24 and prescaled.
   20 | External Clock  | External clock goes to CLKI (PA3). Minimize any load on this pin, including even short wires. HF stuff is very picky.
   16 | External Clock  | As above.
   10 | External Clock  | As above.
@@ -57,15 +62,21 @@ These parts do not support an external HF crystal, only an external clock, and/o
   25 | External Clock  | OVERCLOCKED, usually fine @ 5v and room temperature. Uses CLKI/PA3 as above.
   30 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
   32 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
-  
-When external clock is used as system clock source, it cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
 
-* The overclocked options at 24/25 MHz have been found to generally work around room temperature when running at 5v. For faster speeds, initial results seem to imply that the 2-series parts are significantly more capable of handling higher operating frequencies compared to the 0/1-series, and that with solid 5v supply, 32 MHz at room temperature may be good enough for practical use! Whereas the previous parts collapsed at around 30-32 MHz running from internal oscillator, that isn't seen until the mid 30's on the 2-series parts. As always, external oscillators work more reliably than the internal one when overclocking, but they generally cost about as much as the microcontroller itself and are gross overkill (in terms of accuracy) for what most arduino folks want from them.
+When external clock is used as system clock source, PA3 cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
 
-The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Ref_Tuning.md) for more information before using these options.
+All else being equal, your chances of reaching an aggressive overclock are better with external clock vs internal, and with the extended temperature range parts instead of normal ones.
+
+* The overclocked options at 24/25 MHz have been found to generally work around room temperature when running at 5v. For faster speeds, initial results seem to imply that the 2-series parts are significantly more capable of handling higher operating frequencies compared to the 0/1-series, and that with solid 5v supply, 32 MHz at room temperature may be good enough for practical use, even from the internal oscillator! Whereas the previous tinyAVR parts collapsed at around 30-32 MHz running from internal oscillator, that isn't seen until the mid 30's on the 2-series parts.
+
+The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Ref_Tuning.md) for more information before using these options. They require running a tuning sketch on your chip.
 
 ## Overview
-The smallest pincount of the tinyAVR 2-series parts - so far there is no word on what Microchip's plans are for the 8-pin package, but everyone I've spoken to is worried about the future of AVRs in 8-pin packages.. These have been announced in the full range of flash size options - Hopefully it won't be a repeat of the 3214 which was in the ATpacks, but never actually shipped, and had all references to it removed. Notice that some 1-series features - mostly the extravagances of the "golden" 1-series parts,  but also the type D timer - are gone, while the second type B timer (thankfully) is present in all sizes. The main features though are the fancy ADC, and the second USART - as well as a 32k version with 3k SRAM. The expanded RAM on the 4k and 8k parts goes a long way to making those parts more practical option.
+The smallest pincount of the tinyAVR 2-series parts - (so far there is no word on what Microchip's plans are for the 8-pin package, but everyone I've spoken to is worried about the future of AVRs in 8-pin packages).
+
+These are "available" in the full range of flash sizes (although "available" is a funny word during the Great Chip Shortage; in some cases it means that they will ship tomorrow, other cases, in 10-12 months).
+
+Notice that some 1-series features - mostly the extravagances of the "golden" 1-series parts,  but also the type D timer - are gone, while the second type B timer (thankfully) is present in all sizes. The main features though are the fancy ADC, and the second USART - as well as a 32k version with 3k SRAM. The Event System is also normal instead of wacky like te 0/1-series, and there are twice as many CCL logic blocks. The expanded RAM on the 4k and 8k parts goes a long way to making those parts more practical option.
 
 The super ADC can accumulate 1024 samples in a single burst read; decimation of the accumulated value so all of the digits are meaningful can give up to 17-bits of accuracy. For advanced ADC functionality, several new functions are provided, see ADC section of the main readme for more information.
 
@@ -75,7 +86,7 @@ Optiboot is supported, but unlike the higher pincount 2-series devices, you can'
 ## Buy official megaTinyCore breakouts and support continued development
 With no critical hardware differences, the same breakout boards we have been selling for the ATtiny1614 and 1614 can be used. We do have a new version in the works with improvements across the whole family, with better silkscreen (including both Pxn notation and key functions, ex. SDA, TX/RX, etc), slightly narrower 0.6" spacing between the rows of pins (for use with sockets and/or prototyping board that caters to that widely used spacing), and support for an external 3.2 x 2.5mm oscillator to supply F_CPU if you really feel you need that.
 
-[ATtiny1624 assembled](https://www.tindie.com/products/17598/)
+[ATtiny1624/3224 assembled](https://www.tindie.com/products/17598/)
 
 [ATtiny xy4 bare board](https://www.tindie.com/products/17748/)
 
