@@ -1,5 +1,7 @@
 = SD Library for Arduino =
 
+Modified for tinyAVR 0/1/2-series. I have a PR against the official SD repo which will bring a similar change and supports all modern AVRs. This library will be removed when that is available through the normal channels.
+
 image:https://travis-ci.org/arduino-libraries/SD.svg?branch=master[Build Status, link=https://travis-ci.org/arduino-libraries/SD]
 
 The SD library allows for reading from and writing to SD cards.
