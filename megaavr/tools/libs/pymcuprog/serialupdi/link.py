@@ -134,7 +134,7 @@ class UpdiDatalink:
         response = self.updi_phy.receive(1)
 
         if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
-            if len(response > 0):
+            if len(response)  > 0:
                 self.logger.error("Expecting ACK after ST8 *ptr++. Got %d.", num, request[0])
             else:
                 self.logger.error("Expecting ACK after ST8 *ptr++. Got nothing.", num)
@@ -145,7 +145,7 @@ class UpdiDatalink:
             response = self.updi_phy.receive(1)
 
             if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
-                if len(response > 0):
+                if len(response)  > 0:
                     self.logger.error("Expecting ACK after ST8 *ptr++, after byte %d. Got 0x%00X}", num, request[0])
                 else:
                     self.logger.error("Expecting ACK after ST8 *ptr++, after byte %d. Got nothing", num)
@@ -163,7 +163,7 @@ class UpdiDatalink:
         response = self.updi_phy.receive(1)
 
         if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
-            if len(response > 0):
+            if len(response)  > 0:
                 self.logger.error("Expecting ACK after ST16 *ptr++. Got {}}", response[0])
             else:
                 self.logger.error("Expecting ACK after ST16 *ptr++. Got nothing")
@@ -175,7 +175,7 @@ class UpdiDatalink:
             response = self.updi_phy.receive(1)
 
             if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
-                if len(response > 0):
+                if len(response)  > 0:
                     self.logger.error("Expecting ACK after ST16 *ptr++, after word %d.  0x%00X}", num, request[0])
                 else:
                     self.logger.error("Expecting ACK after ST16 *ptr++, after word %d. Got nothing", num)
@@ -296,7 +296,7 @@ class UpdiDatalink:
         """
         response = self.updi_phy.receive(1)
         if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
-            if len(response >= 0):
+            if len(response) >= 0:
                 self.logger.error("expecting ACK after ST, but got: %02x", response[0])
             else:
                 self.logger.error("expecting ACK after ST, got nothing.")
@@ -305,7 +305,7 @@ class UpdiDatalink:
         self.updi_phy.send(values)
         response = self.updi_phy.receive(1)
         if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
-            if len(response >= 0):
+            if len(response) >= 0:
                 self.logger.error("expecting ACK after ST value, but got: %02x", response[0])
             else:
                 self.logger.error("expecting ACK after ST value, got nothing.")
