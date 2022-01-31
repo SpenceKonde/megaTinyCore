@@ -1,5 +1,4 @@
 /* Minimal demo of uaing the ADC to read temperature and operating voltage
- * This has not yet been updated to cover temperature on the new 2-series parts
  *
  * Reading Vdd on the 2-series is VERY easy though, because there's a channel
  * called VDDDIV10, and the core presents it as ADC_VDDDIV10. Care to guess
@@ -45,6 +44,7 @@ uint16_t readSupplyVoltage() { // returns value in millivolts to avoid floating 
   Serial.println(" (discarded)");
   int32_t vddmeasure = analogReadEnh(ADC_VDDDIV10, 12); // Take it at 12 bits
   Serial.println(vddmeasure);
+  vddmeasure *= 10; // since we measured 1/10th VDD
   int16_t returnval = vddmeasure >> 2; // divide by 4 to get into millivolts.
   if (vddmeasure & 0x02) {
     // if last two digits were 0b11 or 0b10 we should round up
@@ -80,7 +80,7 @@ uint16_t readTemp() {
   ADC0.SAMPCTRL = 0x0E; // 14, what we now set it to automatically on startup so we can run the ADC while keeping the same sampling time
   ADC0.CTRLD &= ~(ADC_INITDLY_gm);
   ADC0.CTRLD |= ADC_INITDLY_DLY16_gc;
-  uint32_t temp = adc_reading + sigrow_offset; // Datasheet is WRONG - the offset from the sigrow is signed; it should be added, not subtracted!
+  uint32_t temp = adc_reading - sigrow_offset;
   Serial.println(temp);
   temp *= sigrow_gain; // Result might overflow 16 bit variable (10bit+8bit)
   Serial.println(temp);
@@ -88,7 +88,16 @@ uint16_t readTemp() {
   temp >>= 8; // Divide result to get Kelvin
   return temp;
   #else
-  return -1;
+  int8_t sigrowOffset = SIGROW.TEMPSENSE1;
+  uint8_t sigrowGain = SIGROW.TEMPSENSE0;
+  analogSampleDuration(128); // must be >= 32µs * f_CLK_ADC per datasheet 30.3.3.7
+  analogReference(INTERNAL1V024);
+  uint32_t reading = analogRead(ADC_TEMPERATURE);
+  reading -= sigrowOffset;
+  reading *= sigrowGain;
+  reading += 0x80; // Add 1/2 to get correct rounding on division below
+  reading >>= 8; // Divide result to get Kelvin
+  return reading;
   #endif
 }
 void loop() {
