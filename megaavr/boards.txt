@@ -435,11 +435,11 @@ atxy7.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atxy7.menu.attach.allenabled=On all pins, like usual
+atxy7.menu.attach.allenabled=On all pins, new implementation.
 atxy7.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atxy7.menu.attach.manual=Only enabled ports. Please see documentation.
 atxy7.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy7.menu.attach.oldversion=Old version, (may fix bugs)
+atxy7.menu.attach.oldversion=Old version, may fix bugs.
 atxy7.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy7.menu.attach.manual.build.attachabr=.aMan
 atxy7.menu.attach.oldversion.build.attachabr=.aOld

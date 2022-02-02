@@ -206,7 +206,6 @@ typedef enum ADC_ADCPGASAMPDUR_enum
     ADC_ADCPGASAMPDUR_6CLK_gc = (0x00<<1),  /* 6 ADC cycles */
     ADC_ADCPGASAMPDUR_15CLK_gc = (0x01<<1),  /* 15 ADC cycles */
     ADC_ADCPGASAMPDUR_20CLK_gc = (0x02<<1),  /* 20 ADC cycles */
-    ADC_ADCPGASAMPDUR_32CLK_gc = (0x03<<1),  /* 32 ADC cycles */
 } ADC_ADCPGASAMPDUR_t;
 
 /* Gain select */
@@ -2981,8 +2980,8 @@ IO Module Instances. Mapped to memory.
 #define BOD_VLMLVL1_bp  1  /* voltage level monitor level bit 1 position. */
 
 /* BOD.INTCTRL  bit masks and bit positions */
-#define BOD_VLMIE_bm  0x01  /* voltage level monitor interrupt enable bit mask. */
-#define BOD_VLMIE_bp  0  /* voltage level monitor interrupt enable bit position. */
+#define BOD_VLMIE_bm  0x01  /* voltage level monitor interrrupt enable bit mask. */
+#define BOD_VLMIE_bp  0  /* voltage level monitor interrrupt enable bit position. */
 #define BOD_VLMCFG_gm  0x06  /* Configuration group mask. */
 #define BOD_VLMCFG_gp  1  /* Configuration group position. */
 #define BOD_VLMCFG0_bm  (1<<1)  /* Configuration bit 0 mask. */
@@ -4618,8 +4617,8 @@ IO Module Instances. Mapped to memory.
 #define USART_SFDEN_bp  4  /* Start Frame Detection Enable bit position. */
 #define USART_TXEN_bm  0x40  /* Transmitter Enable bit mask. */
 #define USART_TXEN_bp  6  /* Transmitter Enable bit position. */
-#define USART_RXEN_bm  0x80  /* Receiver enable bit mask. */
-#define USART_RXEN_bp  7  /* Receiver enable bit position. */
+#define USART_RXEN_bm  0x80  /* Reciever enable bit mask. */
+#define USART_RXEN_bp  7  /* Reciever enable bit position. */
 
 /* USART.CTRLC  bit masks and bit positions */
 #define USART_UCPHA_bm  0x02  /* SPI Host Mode, Clock Phase bit mask. */
@@ -4662,8 +4661,6 @@ IO Module Instances. Mapped to memory.
 /* USART.DBGCTRL  bit masks and bit positions */
 #define USART_DBGRUN_bm  0x01  /* Debug Run bit mask. */
 #define USART_DBGRUN_bp  0  /* Debug Run bit position. */
-#define USART_ABMBP_bm  0x80  /* Autobaud majority voter bypass bit mask. */
-#define USART_ABMBP_bp  7  /* Autobaud majority voter bypass bit position. */
 
 /* USART.EVCTRL  bit masks and bit positions */
 #define USART_IREI_bm  0x01  /* IrDA Event Input Enable bit mask. */
@@ -4690,22 +4687,22 @@ IO Module Instances. Mapped to memory.
 #define USART_TXPL7_bp  7  /* Transmit pulse length bit 7 position. */
 
 /* USART.RXPLCTRL  bit masks and bit positions */
-#define USART_RXPL_gm  0x7F  /* Receiver Pulse Length group mask. */
-#define USART_RXPL_gp  0  /* Receiver Pulse Length group position. */
-#define USART_RXPL0_bm  (1<<0)  /* Receiver Pulse Length bit 0 mask. */
-#define USART_RXPL0_bp  0  /* Receiver Pulse Length bit 0 position. */
-#define USART_RXPL1_bm  (1<<1)  /* Receiver Pulse Length bit 1 mask. */
-#define USART_RXPL1_bp  1  /* Receiver Pulse Length bit 1 position. */
-#define USART_RXPL2_bm  (1<<2)  /* Receiver Pulse Length bit 2 mask. */
-#define USART_RXPL2_bp  2  /* Receiver Pulse Length bit 2 position. */
-#define USART_RXPL3_bm  (1<<3)  /* Receiver Pulse Length bit 3 mask. */
-#define USART_RXPL3_bp  3  /* Receiver Pulse Length bit 3 position. */
-#define USART_RXPL4_bm  (1<<4)  /* Receiver Pulse Length bit 4 mask. */
-#define USART_RXPL4_bp  4  /* Receiver Pulse Length bit 4 position. */
-#define USART_RXPL5_bm  (1<<5)  /* Receiver Pulse Length bit 5 mask. */
-#define USART_RXPL5_bp  5  /* Receiver Pulse Length bit 5 position. */
-#define USART_RXPL6_bm  (1<<6)  /* Receiver Pulse Length bit 6 mask. */
-#define USART_RXPL6_bp  6  /* Receiver Pulse Length bit 6 position. */
+#define USART_RXPL_gm  0x7F  /* Receiver Pulse Lenght group mask. */
+#define USART_RXPL_gp  0  /* Receiver Pulse Lenght group position. */
+#define USART_RXPL0_bm  (1<<0)  /* Receiver Pulse Lenght bit 0 mask. */
+#define USART_RXPL0_bp  0  /* Receiver Pulse Lenght bit 0 position. */
+#define USART_RXPL1_bm  (1<<1)  /* Receiver Pulse Lenght bit 1 mask. */
+#define USART_RXPL1_bp  1  /* Receiver Pulse Lenght bit 1 position. */
+#define USART_RXPL2_bm  (1<<2)  /* Receiver Pulse Lenght bit 2 mask. */
+#define USART_RXPL2_bp  2  /* Receiver Pulse Lenght bit 2 position. */
+#define USART_RXPL3_bm  (1<<3)  /* Receiver Pulse Lenght bit 3 mask. */
+#define USART_RXPL3_bp  3  /* Receiver Pulse Lenght bit 3 position. */
+#define USART_RXPL4_bm  (1<<4)  /* Receiver Pulse Lenght bit 4 mask. */
+#define USART_RXPL4_bp  4  /* Receiver Pulse Lenght bit 4 position. */
+#define USART_RXPL5_bm  (1<<5)  /* Receiver Pulse Lenght bit 5 mask. */
+#define USART_RXPL5_bp  5  /* Receiver Pulse Lenght bit 5 position. */
+#define USART_RXPL6_bm  (1<<6)  /* Receiver Pulse Lenght bit 6 mask. */
+#define USART_RXPL6_bp  6  /* Receiver Pulse Lenght bit 6 position. */
 
 
 
@@ -4806,8 +4803,8 @@ IO Module Instances. Mapped to memory.
 #define WDT_WINDOW3_bp  7  /* Window bit 3 position. */
 
 /* WDT.STATUS  bit masks and bit positions */
-#define WDT_SYNCBUSY_bm  0x01  /* Synchronization busy bit mask. */
-#define WDT_SYNCBUSY_bp  0  /* Synchronization busy bit position. */
+#define WDT_SYNCBUSY_bm  0x01  /* Syncronization busy bit mask. */
+#define WDT_SYNCBUSY_bp  0  /* Syncronization busy bit position. */
 #define WDT_LOCK_bm  0x80  /* Lock enable bit mask. */
 #define WDT_LOCK_bp  7  /* Lock enable bit position. */
 
@@ -5152,3 +5149,4 @@ IO Module Instances. Mapped to memory.
 
 
 #endif /* #ifdef _AVR_ATTINY1624_H_INCLUDED */
+
