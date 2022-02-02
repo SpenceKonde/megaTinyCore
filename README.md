@@ -2,8 +2,8 @@
 ### [Check it out, we have "discussions" now!](https://github.com/SpenceKonde/megaTinyCore/discussions)
 Let's use that - it's better than gitter ever was, and it's all on one site.
 
-### 2.5.7 is now available
-This includes some fixes and enhancements to SerialUPDI, and improves the 2.5.6 changes to Wire by eliminating the use of a ring rather entirely and using a simple linear buffer.
+### 2.5.10 is now available
+It is less buggy than all prior 2.5.x releases.
 
 ### Notice regarding update issues
 Well, I screwed up fairly badly in handling the board manager json. The short version of the story is that I discovered a bug in 2.4.3 that required no changes to the core, just a board manager change. So I changed the json file (big mistake). Anyone who installed after that change would get a java null pointer exception when trying to upgrade. But I didn't realize this until I had already done a release in 2.5.x, then realized I'd missed that fix, and modified the board manager json after release. Then I finally made the connection between having done that and the flood of support inquiries relating to being unable to upgrade.
