@@ -26,13 +26,13 @@ These parts do not support an external HF crystal, only an external clock, and/o
    5 | Internal        |
    4 | Internal        |
    1 | Internal        |
-  20 | Internal, tuned |
-  16 | Internal, tuned |
-  12 | Internal, tuned |
+  20 | Internal, tuned | Requires "tuning" sketch to have been run.
+  16 | Internal, tuned | Requires "tuning" sketch to have been run.
+  12 | Internal, tuned | Requires "tuning" sketch to have been run.
   20 | External Clock  | External clock goes to CLKI (PA3).
-  16 | External Clock  | As above.
-  10 | External Clock  | As above.
-   8 | External Clock  | As above.
+  16 | External Clock  | External clock goes to CLKI (PA3).
+  10 | External Clock  | External clock goes to CLKI (PA3).
+   8 | External Clock  | External clock goes to CLKI (PA3).
   24 | Internal, tuned | OVERCLOCKED, usually fine @ 5v and room temperature.
   25 | Internal, tuned | OVERCLOCKED, usually fine @ 5v and room temperature.
   30 | Internal, tuned | OVERCLOCKED, may be unstable.
