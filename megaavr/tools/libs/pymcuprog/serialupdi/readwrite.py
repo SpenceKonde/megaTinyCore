@@ -99,7 +99,7 @@ class UpdiReadWrite(object):
 
         # special case for single word - so we can optimize ld_ptr_inc16 for >1 word to improve performance.
         if words == 1:
-            return self.datalink.ld16(self,address)
+            return self.datalink.ld16(address)
 
         # Otherwise, store the address
         self.datalink.st_ptr(address)
