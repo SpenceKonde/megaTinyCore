@@ -19,7 +19,7 @@ ADC                   |                  12-bit, differential w/PGA |
 ADC Channels          |      15, 7 of which  can be neg. diff. pin. |
 DAC                   |                    Internal for AC ref only |
 Comparator            |                                           1 |
-PWM Channels (**)     |                        6 out of potential 8 |
+PWM Channels **       |                        6 out of potential 8 |
 Timer Type B          |                                           2 |
 Timer Type D          |                                          No |
 CCL logic             |                     4 LUTs, 10 of 12 inputs |
@@ -50,7 +50,7 @@ These parts do not support an external HF crystal, only an external clock, and/o
   20 | Internal, tuned | 16 MHz OSC selected by fuse can be tuned up to 20 no problem.
   16 | Internal, tuned | 20 MHz selected by OSCCFG fuse can be tuned down to 16 no problem.
   12 | Internal, tuned | 16 MHz can be just barely tuned down to 12. 20 MHz gets tuned up to 24 and prescaled.
-  20 | External Clock  | External clock goes to CLKI (PA3). Minimize any load on this pin, including even short wires. HF stuff is very picky.
+  20 | External Clock  | External clock goes to CLKI (PA3).
   16 | External Clock  | As above.
   10 | External Clock  | As above.
    8 | External Clock  | As above.
@@ -63,11 +63,13 @@ These parts do not support an external HF crystal, only an external clock, and/o
   30 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
   32 | External Clock  | OVERCLOCKED, may be unstable. Uses CLKI/PA3 as above.
 
-When external clock is used as system clock source, PA3 cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL.
+## Notes on Tables
+`*`Maximum frequency that the the internal oscillator will reach when tuned upwards until it crashes, and the maximum frequency the part actually runs at (based on cursory, not rigorous testing - the parts that ran for a few milliseconds without crashing or failing to perform correct arithmetic with a few unsigned longs were considered "working") are reported. Both are at 5.0V and are typical values determined experimentally, and the parts may not function reliably at those speeds under more realistic conditions. Maximums vary between individual specimens. *Don't rely on parts exceeding manufacturer specifications*.
 
-All else being equal, your chances of reaching an aggressive overclock are better with external clock vs internal, and with the extended temperature range parts instead of normal ones.
-
-*  The overclocked options at 24/25 MHz have been found to generally work around room temperature when running at 5v. For faster speeds, initial results seem to imply that the 2-series parts are significantly more capable of handling higher operating frequencies compared to the 0/1-series, and that with solid 5v supply, 32 MHz at room temperature may be good enough for practical use, even from the internal oscillator! Whereas the previous tinyAVR parts collapsed at around 30-32 MHz running from internal oscillator, that isn't seen until the mid 30's on the 2-series parts.
+* PWM channel reported is the number exposed via analogWrite with default megaTinyCore configuration. TCA0 is in split mode, and the type B timer(s) are not used for PWM; those could be configured by user code to get two additional channels.
+* When external clock is used as system clock source, PIN_PA3 cannot be used for any other purpose (obviously) - all control over that pin is taken by CLKCTRL. Minimize any load on this pin, including even short wires. HF stuff is very picky.
+* The overclocked options at 24/25 MHz have been found to generally work around room temperature when running at 5v. For faster speeds, initial results seem to imply that the 2-series parts are significantly more capable of handling higher operating frequencies compared to the 0/1-series, and that with solid 5v supply, 32 MHz at room temperature may be good enough for practical use, even from the internal oscillator! Whereas the previous tinyAVR parts collapsed at around 30-32 MHz running from internal oscillator, that isn't seen until the mid 30's on the 2-series parts.
+* All else being equal, your chances of reaching an aggressive overclock are better with external clock vs internal, and with the extended temperature range parts instead of normal ones.
 
 The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Ref_Tuning.md) for more information before using these options. They require running a tuning sketch on your chip.
 
@@ -89,11 +91,6 @@ For these parts, provided they have 8k+ flash, I make no recommendation between 
 [Assembled 3226 and 1626 boards are now available](https://www.tindie.com/products/17597/)
 
 [ATtiny3226/1626/826/426/3216/1616/816/416/1606/806/406 bare boards are now available](https://www.tindie.com/products/17614/) Rev. C has support for autoreset on the alternate reset pin.
-
-## Notes on Tables
-`*`Maximum frequency that the the internal oscillator will reach when tuned upwards until it crashes, and the maximum frequency the part actually runs at (based on cursory, not rigorous testing - the parts that ran for a few milliseconds without crashing or failing to perform correct arithmetic with a few unsigned longs was enough to be considered "working") are reported. Both are at 5.0V and are typical values determined experimentally, and the parts may not function reliably at those speeds under more realistic conditions. Maximums vary between individual specimens. *Don't rely on parts exceeding manufacturer specifications*.
-
-`**` PWM channels exposed with default configuration via analogWrite(). TCA0 is in split mode, and the type B timer(s) are not used for PWM; those could be configured by user code to get two additional channels.
 
 ## Datasheets and Errata
 See [Datasheet Listing](Datasheets.md)
