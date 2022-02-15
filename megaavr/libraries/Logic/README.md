@@ -41,9 +41,33 @@ Logic3 OUT  |         N/A | ALT OUT3 ONLY | ALT OUT3 ONLY |     YES, BOTH |
 ### Overhead
 On the 0/1-series, the overhead is approximately 546 bytes of flash and 26 bytes of RAM.
 On the 2-series, with twice as many LUTs, it is much larger:  984 bytes and 60b RAM.
-This is farily small for msot parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series. Though the main reason people use 4k parts is that they want something in the 8 pin package, where that's their best option.
+This is farily small for most parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series, but it it isn't an unreasonable amount of flash for the parts most people will be using. A future update will add a second slihtly modified version which removes attachInterrupt to permit manual implementation of the CCL interrupt, as any "attachInterrupt" scheme will always perform poorly, with an overhead of over 50 clock cycles in the ISR because of the call to a function that can't be inlined because it is set at runtime.
 
 Writing a constant value to 4 registers (the minimum plausible needed to configure a LUT) for 2 or 4 LUTs requires 56 or 112 bytes, respectively.
+
+## Logic class overview
+
+| Property    | namespace or type           | Function                                    |
+|-------------|-----------------------------|---------------------------------------------|
+| enable      | bool                        | Enable or disable logic block               |
+| input0      | in::                        | Selects input 0                             |
+| input1      | in::                        | Selects input 1                             |
+| input2      | in::                        | Selects input 2                             |
+| output      | out::                       | 'enable'/'disable' output pin               |
+| output_swap | out::                       | 'no_swap/'pin_swap' use alt output pin      |
+| filter      | filter::                    | 'filter'/'sync' or 'disable' filter         |
+| edgedetect  | edgedetect::                | 'enable'/'disable' edge detect mode         |
+| sequencer   | sequencer::                 | selects the sequecer, even #'ed blocks only |
+| clocksource | clocksource::               | select clock source, if not async.          |
+| truth       | uint8_t                     | truth table                                 |
+
+| Methods             | Function
+|---------------------|-----------------------------------------------------------------------------|
+| Logic::start();     | Enables CCL with current configuration.                                     |
+| Logic::stop();      | Disables CCL - must be disabled to change configuration                     |
+| init();             | Write settings for this logic block to registers. CCL must be stopped first |
+| attachInterrupt();  | Attach an interrupt on the CCL, supports RISING/FALLING/CHANGE              |
+| detachInterrupt();  | Detach the currently attached interrupt.                                    |
 
 ## Properties
 

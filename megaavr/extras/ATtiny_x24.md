@@ -76,7 +76,7 @@ The smallest pincount of the tinyAVR 2-series parts - (so far there is no word o
 
 These are "available" in the full range of flash sizes (although "available" is a funny word during the Great Chip Shortage; in some cases it means that they will ship tomorrow, other cases, in 10-12 months).
 
-Notice that some 1-series features - mostly the extravagances of the "golden" 1-series parts,  but also the type D timer - are gone, while the second type B timer (thankfully) is present in all sizes. The main features though are the fancy ADC, and the second USART - as well as a 32k version with 3k SRAM. The Event System is also normal instead of wacky like te 0/1-series, and there are twice as many CCL logic blocks. The expanded RAM on the 4k and 8k parts goes a long way to making those parts more practical option.
+Notice that some 1-series features - mostly the extravagances of the "golden" 1-series parts,  but also the type D timer - are gone, while the second type B timer (thankfully) is present in all sizes. The main features though are the fancy ADC, and the second USART - as well as a 32k version with 3k SRAM. The Event System is also normal instead of wacky like the 0/1-series, and there are twice as many CCL logic blocks. The expanded RAM on the 4k and 8k parts goes a long way to making those parts more practical option.
 
 The super ADC can accumulate 1024 samples in a single burst read; decimation of the accumulated value so all of the digits are meaningful can give up to 17-bits of accuracy. For advanced ADC functionality, several new functions are provided, see ADC section of the main readme for more information.
 

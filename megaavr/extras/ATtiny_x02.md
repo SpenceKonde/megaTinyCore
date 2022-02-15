@@ -1,20 +1,24 @@
 # ATtiny 202/402
 ![x02 Pin Mapping](ATtiny_x02.gif "Arduino Pin Mapping for ATtiny x02")
 
- Specifications |  ATtiny202|  ATtiny402
------------- | ------------- | -------------
-Flash (program memory)   | 2048 bytes | 4096 bytes
-Flash w/Optiboot  | 1536 bytes | 3584 bytes
-RAM  | 128 bytes | 256 bytes
-EEPROM | 64 bytes | 128 bytes
-Bootloader (optional) | Optiboot (No! Don't throw away a quarter of the flash!) | Optiboot (strongly not recommended)
-GPIO Pins | 6 (5 usable) | 6 (5 usable)
-ADC Channels | 6 (5 usable) | 6 (5 usable)
-DAC | No | No
-PWM Channels | 4 | 4
-Timer Type B | 1 | 1
-Timer Type D | No | No
-Interfaces | UART, SPI, I2C | UART, SPI, I2C
+ Specifications         |  ATtiny202   |  ATtiny402
+------------------------|--------------|--------------
+Flash (program memory)  | 2048 bytes   | 4096 bytes
+Flash w/Optiboot        | 1536 bytes   | 3584 bytes
+RAM                     | 128 bytes    |  256 bytes
+EEPROM                  | 64 bytes     |  128 bytes
+Bootloader (optional)   | Optiboot Optiboot (absolutely not recommended)  | Optiboot (strongly not recommended)
+GPIO Pins               | 6 (5 usable) | 6 (5 usable)
+ADC Channels            | 6 (5 usable) | 6 (5 usable)
+DAC                     |           No |        No
+PWM Channels            |            4 |         4
+Timer Type B            |            1 |         1
+Timer Type D            |           No |        No
+CCL Logic Blocks        | 2 (no int)   | 2 (no int)
+Event Channels          | 3, 1 sync<br/> 2 async | 3, 1 sync<br/> 2 async |
+Interfaces              | UART, SPI, I2C | UART, SPI, I2C
+
+Users needing to use the event system are strongly urged to use a 2-series part or at least a 1-series part. The 0-series event system is extremely limited.
 
 ## Clock Options
 These parts do not support an external HF crystal, only an external clock. No watch crystal support on 0-series.

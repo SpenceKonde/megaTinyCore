@@ -163,6 +163,45 @@ The best you can do is pipe the outputs to a pin and read the pin....
 Class for interfacing with the Event systemn (`EVSYS`). Each event channel has its own object.
 Use the predefined objects `Event0`, `Event1`, `Event2`, `Event3`, `Event4`, `Event5`. These, alternately, are known as `EventSync0`, `EventSync1`, `EventAsync0`, `EventAsync1`, `EventAsync2`, `EventAsync3` on the tinyAVR 0-series and 1-series. Additionally, there is an `Event_empty` that is returned whenever you call a method that returns an Event reference, but it can't fulfil your request.  Note that not all generators are available on all channels; see the tables above. On 2-series, it's fairly simple, and, all else being equal,  the first channels are the most useful, so the standard rule of thumb of "whenever you use a generator that can go anywhere, use the highest number port" holds. With so many options for each pin, relative to the number of pins, that's unlikely to be a problem. The 0 and 1-series oparts are more complicated. Obviously,on 8 pin parts, the two channels that can do PORTA are the most valuable, and the 1 or 3 channels without them a better choice, when you have a choice. The sixth channel, present only on 1-series, has the RTC division options in place of pins. It is either critical to your application, or the least useful, with no middle ground.
 
+
+### Class Overview
+
+| Method            | Argument/Return Type                                                     | Function                                |
+|-------------------|--------------------------------------------------------------------------|-----------------------------------------|
+| get_channel_number() | Returns channel number as a uint8_t                                   | For working with references             |
+| get_generator()   | returns uint8_t indicating generator number.                             |                                         |
+| set_generator()   | gen::, genN:: or pin number                                              | Sets the specified source as generator  |
+| set_user()        | user::user_t                                                             | Sets specified user to this channel     |
+| set_user_pin();   | valid EVOUT pin number, returns -1 if not valid pin, else user::user_t   | Set the event user to a pin             |
+| soft_event()      |                                                                          | Inverts the channel for one clock cycle |
+| long_soft_event() | duration of event, 4, 6, 10, or 16 - in clock cycles.                    | Inverts the channel for longer          |
+| start()           |                                                                          | Enables this channel                    |
+| stop()            |                                                                          | Disables this channel                   |
+
+
+These class methods return a reference to an event channel (an Event&), or Event_empty if none can be found.
+| Class Method                    | Argument Type     | Function                                      |
+|---------------------------------|-------------------|-----------------------------------------------|
+| Event::get_channel()            | uint8_t           | Get channel by number                         |
+| Event::get_generator_channel()  | gen::generator_t  | Get channel by generator (first match only)   |
+| Event::get_generator_channel()  | uint8_t           | Get channel by pin number                     |
+| Event::get_user_channel()       | user::user_t      | Get channel that user is set to               |
+| Event::assign_generator()       | gen::generator_   | return channel that has that generator,<br/> pick one and set if none currently set |
+| Event::assign_generator_pin()   | uint8_t           | return channel that has that pin as generator,<br/> pick one and set if none currently set |
+
+
+Class methods for working with users or looking up generator or user numbers
+| Class Method                     | Argument Types               |                                                  |
+|----------------------------------|------------------------------|--------------------------------------------------|
+| Event::get_user_channel_number() | user::user_t, returns int8_t | Returns the event channel number user set to.    |
+| Event::clear_user()              | user::user_t                 | Disconnect specified user from any event channel |
+| Event::gen_from_peripheral()     | TCA_t, TCB_t, `CCL`, or AC_t | Return the generator for this peripheral <br/> second argument specified which generator, if several |
+| Event::user_from_peripheral()    | TCA_t, TCB_t, `CCL`, or USART_t | Return the user for this peripheral <br/> second argument specifies which user, if several |
+
+For the CCL, when looking up a generator, the second argumennt is the logic block number, for looking up a user, it is twice the logic block number for input A
+
+
+
 ### get_channel_number()
 Method to get the current channel number. Useful if the channel object has been passed to a function as reference.
 
@@ -278,7 +317,7 @@ Creates a single software event - users connected to that channel will react to 
 
 
 ### long_soft_event()
-soft_event() is only one system clock long. Often you need something a little longer. 2 clocks? 4 clocks maybe? Maybe it needs to get past the 'filter' on a CCL... Or you've got 2 things that need to happen a fraction of a microsecond apart; you've tried triggering one on the rising edge of a soft_event and the other on the falling edge, but it's just a hair too fast, and the other obvious solutions aren't viable due to the specifics of your scheme. The only way that a soft-event can last multiple system clocks is if the register is written every clock cycle. There is no time got a loop; only brute force (ie, a contiguous block of 'ST'ore instructions) will do the trick. Now in many ways this defeats the point of the event system; however, there are times when it is not entirely unreasonable to do this (as noted above), particularly if doing weird things with the CCLs, event system, and other peripherals.
+soft_event() is only one system clock long. Often you need something a little longer. 2 clocks? 4 clocks maybe? Maybe it needs to get past the 'filter' on a CCL... Or you've got 2 things that need to happen a fraction of a microsecond apart; you've tried triggering one on the rising edge of a soft_event and the other on the falling edge, but it's just a hair too fast, and the other obvious solutions aren't viable due to the specifics of your scheme. The only way that a soft-event can last multiple system clocks is if the register is written every clock cycle. There is no time for a loop; only brute force (ie, a contiguous block of 'ST'ore instructions) will do the trick. Now in many ways this defeats the point of the event system; however, there are times when it is not entirely unreasonable to do this (as noted above), particularly if doing weird things with the CCLs, event system, and other peripherals.
 
 The lengths that are available are 2, 4, 6, 10 and 16 (any number less than 4 will give 2 clock-long pulse, only 4 will give a 4 clock long one. Anything between 4 and 10 will give 6, exactly 10 will give 10, and anything larger will give 16). Those numbers were chosen arbitrarily to keep the size small, and give a selection that covered the reasonable use cases I could think of. If you need longer, you shouold definitely use a different approach.
 

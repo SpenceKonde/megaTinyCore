@@ -7,15 +7,18 @@ Flash (program memory)   | 4096 bytes| 8192 bytes | 16384 bytes
 Flash w/Optiboot   | 3584 bytes| 7680 bytes | 15872 bytes
 RAM  | 256 bytes | 512 bytes | 1024 bytes
 EEPROM | 128 bytes | 128 bytes | 256 bytes
-Bootloader (optional) | Optiboot (strongly not recommended) |  Optiboot (awkard but viable, not recommended) | Optiboot (awkard but viable, not recommended)
+Bootloader (optional) | Optiboot (not recommended) |  Optiboot (awkard but viable, not recommended) | Optiboot (awkard but viable, not recommended)
 GPIO Pins | 18 (17 usable) | 18 (17 usable) | 18 (17 usable)
 ADC Channels | 12 (11 usable) | 12 (11 usable) | 12 (11 usable)
 DAC | No | No | No
 PWM Channels | 6 | 6 | 6
 Timer Type B | 1 | 1 | 1
 Timer Type D | No | No | No
-Interfaces | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C
+CCL Logic Blocks         |     2 (no int) |     2 (no int) |     2 (no int) |     2 (no int)
+Event Channels           | 3, 1 sync<br/> 2 async | 3, 1 sync<br/> 2 async  | 3, 1 sync<br/> 2 async | 3, 1 sync<br/> 2 async
+Interfaces               | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C | UART, SPI, I2C
 
+Users needing to use the event system are strongly urged to use a 2-series part or at least a 1-series part. The 0-series event system is extremely limited.
 ## Clock Options
 These parts do not support an external HF crystal, only an external clock. No watch crystal support on 0-series.
  MHz | Source          | Notes
@@ -54,8 +57,10 @@ The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](R
 
 On parts with less than 8k, in addition to the woes surrounding bootloader entry, you also end up sacrificing 1/4th or 1/8th of the flash to a bootloader, which strikes me as an outrageously large fraction.
 ## Buy official megaTinyCore breakouts and support continued development
-[ATtiny1606 assembled](https://www.tindie.com/products/17597/)
-[ATtiny3216/1616/816/416/1606/806/406 bare board](https://www.tindie.com/products/17614/)
+
+[ATtiny1606 assembled](https://www.tindie.com/products/17597/) - while supplies last only. We are discontinuing all 0-series assembled boards.
+
+[ATtiny3226/1626/826/426/3216/1616/816/416/1606/806/406 bare board](https://www.tindie.com/products/17614/)
 
 ## Datasheets and Errata
 See [Datasheet Listing](Datasheets.md)

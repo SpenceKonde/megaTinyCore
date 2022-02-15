@@ -85,8 +85,9 @@ Optiboot is included and with the alternate reset option, you can have normal au
 For these parts, provided they have 8k+ flash, I make no recommendation between Optiboot with alternate reset pin vs use with UPDI programming and no bootloader - it comes down to your preferences and development workflow. For the 4k flash parts, I question the wisdom of dedicating 1/8th of the flash for a bootloader offering little practical benefit.
 
 ## Buy official megaTinyCore breakouts and support continued development
-[Assembled 3224 boards are now available, albeit with an jumper soldered onto the board to fix a bug](https://www.tindie.com/products/17523/). When this gets fixed will depend on customer interest.
-[Bare boards without alt-reset support](https://www.tindie.com/products/17613/)
+[Assembled 3227 boards are now available, albeit with an jumper soldered onto the board to fix a bug](https://www.tindie.com/products/17523/).
+
+[Bare boards without alt-reset support](https://www.tindie.com/products/17613/) - As noted above, the Rev. C boards came back in bad shape. I wouldn't be selling them at all, except that I assembled 10 of them with a precious 3227 chip before discovering that the power on the top and bottom halves of the boards were not connected. Rev. D of the boards will correct this issue.
 
 ## Notes on Tables
 `*`Maximum frequency that the the internal oscillator will reach when tuned upwards until it crashes, and the maximum frequency the part actually runs at (based on cursory, not rigorous testing - the parts that ran for a few milliseconds without crashing or failing to perform correct arithmetic with a few unsigned longs was enough to be considered "working") are reported. Both are at 5.0V and are typical values determined experimentally, and the parts may not function reliably at those speeds under more realistic conditions. Maximums vary between individual specimens. *Don't rely on parts exceeding manufacturer specifications*.
