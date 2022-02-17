@@ -53,6 +53,10 @@ Specifying an address beyond the size of the EEPROM will wrap around to the begi
 
 You can view all the examples [here](examples/).
 
+## Warning: Using EEPROM right at startup
+We have received at multiple reports from users of erratic faiures to correctly read from the EEPROM when it is written immediately upon startup. There is considerable evidence that the cause of the problem was a slow-rising powe supply, coupled with the specific brownout detection configuration. This issue is still not entirely understood, but it is suspected that itends up doing the write very close to it's minimum voltage, when the chip may be running out of spec because the chip had by that point swithed to it's full clock speed (and BOD is forced on during NVMCTRL operations. Try to avoid writing to the EEPROM immediately upon startup - maybe pick a longer SUT (startup tme), maybe you simply wait until later into execution to  the write, etc. Many times the impacted individuals found that even a delay of a few milliseconds was sufficient to ensure that it worked (Issue #452). A more rigorous approach is to just measure the voltage before writing and make sure you're at the nominal voltage
+
+
 ## Library functions
 
 ### `EEPROM.read(address)` [[_example_]](examples/eeprom_read/eeprom_read.ino)
