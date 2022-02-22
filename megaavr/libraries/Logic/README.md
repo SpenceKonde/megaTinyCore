@@ -7,7 +7,7 @@ All of the examples assume the use of megaTinyCore, MegaCoreX or DxCore as appro
 More information about CCL can be found in the [Microchip Application Note TB3218](http://ww1.microchip.com/downloads/en/AppNotes/TB3218-Getting-Started-with-CCL-90003218A.pdf) and in the [megaAVR-0 family data sheet](http://ww1.microchip.com/downloads/en/DeviceDoc/megaAVR0-series-Family-Data-Sheet-DS40002015B.pdf) and the datasheet for the part in question.
 
 ## Logic
-Class for interfacing with the built-in logic block (sometimes referred to as `LUT`s, from the "LookUp Table" - though it is a curious use of language, that is what Microchip refers to them as). Use the predefined objects `Logic0`, `Logic1`, `Logic2` and `Logic3`. The logic blocks are paired, each pair sharing a single sequencer and `feedback` channel. `Logic2` and `Logic3` are only available on tinyAVR 2-series parts.
+`Logic` is the class the library provides for interfacing with a built-in logic block (sometimes referred to as `LUT`s, from the "LookUp Table" - though it is a curious use of language, that is what Microchip refers to them as; we try to avoid it, since it is ). Use the predefined objects `Logic0`, `Logic1`, `Logic2` and `Logic3`. The logic blocks are paired, each pair sharing a single sequencer and `feedback` channel. `Logic2` and `Logic3` are only available on tinyAVR 2-series parts.
 
 These objects expose **all** configuration options as properties, described below, and provide methods to apply those settings, attach interrupts (2-series only) and enable and disable the CCL in general.
 
