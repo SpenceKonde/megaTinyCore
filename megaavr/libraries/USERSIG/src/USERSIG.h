@@ -186,13 +186,26 @@ struct USERSIGClass {
   uint8_t read(int idx)              {
     return USRef(idx);
   }
-  void write(int idx, uint8_t val)   {
+  int8_t write(int idx, uint8_t val)   {
     (USRef(idx)) = val;
+    return 1;
   }
-  void update(int idx, uint8_t val)  {
+  int8_t update(int idx, uint8_t val)  {
     USRef(idx).update(val);
+    return 1;
   }
-
+  int8_t flush() {
+    return 0;
+  }
+  int8_t erase() {
+    for (uint8_t i = 1; i < USER_SIGNATURES_SIZE; i++) {
+      (USRef(i)) = 0xFF;
+    }
+    return 0;
+  }
+  int8_t pending() {
+    return 0;
+  }
   // STL and C++11 iteration capability.
   USPtr begin()                      {
     return 0x00;
