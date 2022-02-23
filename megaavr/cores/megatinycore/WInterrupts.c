@@ -68,6 +68,13 @@
   #endif
 
   volatile uint8_t* portbase = (volatile uint8_t*)((uint16_t)0x400);
+  /* On modern AVRs, the PORT registers start at 0x400
+   * At 32 bytes per port, with plenty of room to spare, up to 8 ports will fit before we are forced into  0x500.
+   * And the rest of this implementation falls over if there's an 8th port because it relies on VPORTs
+   * of which there are only 7 ports worth of registers available. So this implementation is guaranteed not to work on a
+   * future part with 8 ports anyway. We will cross that bridge once Microchip has announced intent to build it.
+   */
+
   void  attachInterrupt(uint8_t pin, void (*userFunc)(void), uint8_t mode) {
     uint8_t bitpos = digitalPinToBitPosition(pin);
     if (bitpos == NOT_A_PIN) {
@@ -90,15 +97,19 @@
       default:
         return;
     }
-    if (intFunc[port] != NULL) { // if it is null the port is not enabled for attachInterrupt. I wasn't successful triggering a way for the
+    if (intFunc[port] != NULL && userFunc != NULL) {
+      // if it is null the port is not enabled for attachInterrupt, and obviously a null user function is invalid too.
       intFunc[port][bitpos] = userFunc;
       uint8_t portoffset = ((port << 5) & 0xE0) + 0x10 + bitpos;
+      uint8_t oldSREG = SREG;
+      cli();
       // We now have the port, the mode, the bitpos and the pointer
       uint8_t settings = *(portbase + portoffset) & 0xF8;
       *(portbase + portoffset) = settings | mode;
+      SREG = oldSREG;
     }
   }
-
+#if !defined(ATTACH_LATECLEAR)
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) isrBody() {
     asm volatile (
      "AttachedISR:"      "\n\t" // as the scene opens, we have r16 on the stack already, portnumber x 2 in the r16
@@ -152,9 +163,9 @@
       "icall"             "\n\t" // call their function, which is allowed to shit on any upper registers other than 28, 29, 16, and 17.
       "rjmp AIntLoop"     "\n\t" // Restart loop after.
     "AIntEnd:"            "\n\t" // sooner or later r17 will be 0 and we'll branch here.
-      "mov   r16,  r26"   "\n\t" // So when we do this, we end up with VPORTA.FLAGS address in r16
-      "ldi   r27,    0"   "\n\t" // high byte is 0, cause we're targeting the VPORT
-      "st      X,  r15"   "\n\t" // store to clear the flags....
+      "mov   r26,  r16"   "\n\t" // We previously stashed the VPORT address in r16, so copy that to low byte of X pointer
+      "ldi   r27,    0"   "\n\t" // high byte is 0, cause we're targeting the VPORT, address < 0x20
+      "st      X,  r15"   "\n\t" // store to clear the flags.... that we recorded at the start of the interrupt. (LATECLEAR)
       "pop   r31"         "\n\t" // clean up a million registers
       "pop   r30"         "\n\t"
       "pop   r29"         "\n\t"
@@ -183,6 +194,90 @@
       );
       __builtin_unreachable();
   }
+#else // EARLYCLEAR
+  void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) isrBody() {
+    asm volatile (
+     "AttachedISR:"      "\n\t" // as the scene opens, we have r16 on the stack already, portnumber x 2 in the r16
+      "push  r0"         "\n\t" // so we start with a normal prologue
+      "in    r0, 0x3f"   "\n\t" // The SREG
+      "push  r0"         "\n\t" // on the stack
+      "in    r0, 0x3b"   "\n\t" // RAMPZ
+      "push  r0"         "\n\t" // on the stack.
+      "push  r1"         "\n\t" // We don't need r1 but the C code we call
+      "eor   r1, r1"     "\n\t" // is going to want this to be zero....
+      // "push  r15"     "\n\t" // We don't use r15 with EARLYCLEAR.
+      // "push  r17"     "\n\t" // Eyyyyy lookit dat, we don't need r17 for EARLYCLEAR either. So that's two fewer call-saved registers that we need to save and restore.
+      "push  r18"        "\n\t" // and now we push all call used registers
+      "push  r19"        "\n\t" // except r16 which was pushed over in WInterrupts_Px
+      "push  r20"        "\n\t"
+      "push  r21"        "\n\t"
+      "push  r22"        "\n\t"
+      "push  r23"        "\n\t"
+      "push  r24"        "\n\t"
+      "push  r25"        "\n\t"
+      "push  r26"        "\n\t"
+      "push  r27"        "\n\t"
+      "push  r28"        "\n\t" // Not call used, but we use it.
+      "push  r29"        "\n\t" // And we need it's call-saved-ness ourselves to maintain state through the
+      "push  r30"        "\n\t"
+      "push  r31"        "\n\t"
+      ::);
+    asm volatile (  // This gets us the address of intFunc in Y pointer reg.
+      "add   r26,   r16"  "\n\t" // get the address of the functions for this port (r 16 is 2x the port number)
+      "adc   r27,    r1"  "\n\t" // by adding that offset to the address we had the compiler generate the ldi's for;
+      "ld    r28,     X+" "\n\t" // That was the address of the start of array of pointers to arrays of pointers
+      "ld    r29,     X"  "\n\t" // Now we loaded Y with the start of our port's array of function pointers
+      "add   r16,   r16"  "\n\t" // double r16, so it is 4x port number - that's the address of the start of the VPORT
+      "subi  r16,   253"  "\n\t" // Add 3; now this is the address of the VPORTx.INTFLAGS
+      "mov   r26,   r16"  "\n\t" // r16 holds the INTFLAGs address, copy it to X reg low byte.
+      "ldi   r27,     0"  "\n\t" // clear x high byte
+      "ld    r16,     X"  "\n\t" // Load flags to r16"
+      "st      X,   r16"  "\n\t" // EARLYCLEAR
+      "sbiw  r26,     0"  "\n\t" // this will set flag if it's zero.
+      "breq  AIntEnd"     "\n\t" // port not enabled, null pointer, just clear flags end hit the exit ramp.
+    "AIntLoop:"           "\n\t"
+      "lsr   r16"         "\n\t" // shift it right one place, now the LSB is in carry.
+      "brcs  .+6"         "\n\t" // means we have something to do this time.
+      "breq  AIntEnd"     "\n\t" // This means carry wasn't set and r17 is 0. - we're done.
+      "adiw  r28,    2"   "\n\t" // otherwise it's not the int we care about, increment Y by 2, so it will point to the next element.
+      "rjmp AIntLoop"     "\n\t" // restart the loop in that case.
+      "ld    r30,    Y+"  "\n\t" // load the function pointer simultaneously advancing the Y pointer so next iteration it will
+      "ld    r31,    Y+"  "\n\t" // be pointing to the next function pointer.
+      "sbiw  r30,    0"   "\n\t" // zero-check the pointer before we call it.
+      "breq AIntLoop"     "\n\t" // restart loop if pointer is null. There is no interrupt handler yet interrupt is enabled and fired; Don't call the null pointer
+      "icall"             "\n\t" // call their function, which is allowed to shit on any upper registers other than 28, 29, 16, and 17.
+      "rjmp AIntLoop"     "\n\t" // Restart loop after.
+    "AIntEnd:"            "\n\t" // sooner or later r17 will be 0 and we'll branch here.
+      // with EARLYCLEAR variant, we don't need to do anythin other than cleaning up working registers - flags already cleared.
+      "pop   r31"         "\n\t" // clean up a million registers
+      "pop   r30"         "\n\t"
+      "pop   r29"         "\n\t"
+      "pop   r28"         "\n\t"
+      "pop   r27"         "\n\t"
+      "pop   r26"         "\n\t"
+      "pop   r25"         "\n\t"
+      "pop   r24"         "\n\t"
+      "pop   r23"         "\n\t"
+      "pop   r22"         "\n\t"
+      "pop   r21"         "\n\t"
+      "pop   r20"         "\n\t"
+      "pop   r19"         "\n\t" // skip 16 again - it's way down at the end, because it was pushed earlier
+      "pop   r18"         "\n\t"
+      //"pop   r17"       "\n\t" // Early clear doesn't need the extra registers.
+      //"pop   r15"       "\n\t" // Early clear doesn't need tha extra registers.
+      "pop   r1"          "\n\t"
+      "pop   r0"          "\n\t"
+      "out   0x3b,  r0"   "\n\t"
+      "pop   r0"          "\n\t"
+      "out   0x3f,  r0"   "\n\t" // between these is where there had been stuff added to the stack that we flushed.
+      "pop   r0"          "\n\t"
+      "pop   r16"         "\n\t" // this was the reg we pushed back in the port-specific file.
+      "reti"              "\n"  // now we should have the pointer to the return address fopr the ISR on top of the stack, so reti're
+      :: "x" ((uint16_t)(&intFunc))
+      );
+      __builtin_unreachable();
+  }
+#endif
 
   void detachInterrupt(uint8_t pin) {
     /* Get bit position and check pin validity */

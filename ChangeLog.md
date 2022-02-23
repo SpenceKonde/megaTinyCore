@@ -4,6 +4,14 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
+### Planned 2.5.11
+* **CRITICAL BUGFIX** - I finally saw the bug in my attachInterrupt implementation. I had a operands of a load backwards. (#651)
+* Make it possible to have applications that use our USERSIG library be code compatible with DxCore by providing do-nothing functions in place of the required do-something flush(), pending() functions, add erase() and make everything match the return types and report success.
+* Documentation improvements in a few areas.
+* tinyNeoPixel should work at lower clock speeds now possibly down to 4 MHz!
+* Fix output asset names for Microchip board definitions.
+
+
 ### Ongoing
 * Port enhanced documentation from DxCore.
 
