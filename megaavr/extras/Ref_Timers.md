@@ -178,26 +178,32 @@ Except when the resolution is way down near the minimum, the device spends more 
 When TCB2 (or other type B timer) is used for `millis()` timekeeping, it is set to run at the system clock prescaled by 2 (1 at 1 MHz system clock) and tick over every millisecond. This makes the millis ISR very fast, and provides 1ms resolution at all speeds for millis. The `micros()` function also has 1 us or almost-1 us resolution at all clock speeds (though there are small deterministic distortions due to the performance shortcuts used for the microsecond calculations. The only reason these excellent timers are not used by default is that too many other useful things need a TCB.
 
 
-|   CLK_PER | millis() | micros() | % in ISR | micros() time |
-|-----------|----------|----------|----------|---------------|
-|    32 MHz |     1 ms |     1 us |   0.20 % |          3 us |
-|    30 MHz |     1 ms |  1.07 us |   0.22 % |               |
-|    28 MHz |     1 ms |  1.14 us |   0.23 % |               |
-|    25 MHz |     1 ms |  1.28 us |   0.26 % |          6 us |
-|    24 MHz |     1 ms |  1.33 us |   0.27 % | *        5 us |
-|    20 MHz |     1 ms |     1 us |   0.33 % | *        6 us |
-|    16 MHz |     1 ms |     1 us |   0.40 % |          6 us |
-|    12 MHz |     1 ms |  1.33 us |   0.54 % | *       10 us |
-|    10 MHz |     1 ms |     1 us |   0.65 % | *       10 us |
-|     8 MHz |     1 ms |     1 us |   0.80 % |         11 us |
-|     5 MHz |     1 ms |     1 us |   1.30 % | *       23 us |
-|     4 MHz |     1 ms |     1 us |   1.60 % |         21 us |
-|     1 MHz |     1 ms |     1 us |   6.50 % |         78 us |
+|   CLK_PER | millis() | micros() | % in ISR | micros() time |  TOP  |
+|-----------|----------|----------|----------|---------------|-------|
+|    32 MHz |     1 ms |     1 us |   0.20 % |          3 us | 15999 |
+|    30 MHz |     1 ms |  1.07 us |   0.22 % |               | 14999 |
+|    28 MHz |     1 ms |  1.14 us |   0.23 % |               | 13999 |
+|    25 MHz |     1 ms |  1.28 us |   0.26 % |          6 us | 12499 |
+|    24 MHz |     1 ms |  1.33 us |   0.27 % | *        5 us | 11999 |
+|    20 MHz |     1 ms |     1 us |   0.33 % | *        6 us |  9999 |
+|    16 MHz |     1 ms |     1 us |   0.40 % |          6 us |  7999 |
+|    12 MHz |     1 ms |  1.33 us |   0.54 % | *       10 us |  5999 |
+|    10 MHz |     1 ms |     1 us |   0.65 % | *       10 us |  4999 |
+|     8 MHz |     1 ms |     1 us |   0.80 % |         11 us |  3999 |
+|     5 MHz |     1 ms |     1 us |   1.30 % | *       23 us |  2499 |
+|     4 MHz |     1 ms |     1 us |   1.60 % |         21 us |  1999 |
+|     2 MHz |     2 ms |     1 us |   1.60 % |  approx 39 us |  1999 |
+|     1 MHz |     2 ms |     1 us |   3.25 % |         78 us |   999 |
 
-Resolution is always exactly 1ms for millis, and whereas TCAn `micros()` is limited by the resolution of the timer, here it's instead limited only by the fact that the calculations drop the least significant bits first; this results in a value that may be as low as 750, yet is being mapped to 0-999, for 1.33 us resolution in the worst cases. The timer count and the running tally of overflows could get us microseconds limited only by F_CPU/2
+Resolution is always exactly 1ms for millis except at 1 and 2 MHz which we handle as a special case - we overflow only once per 2ms, and increment the time by 2 us. This means that:
+  1. millis() never returns an odd number at 1/2 MHz.
+  2. The interrupt runs half as often, spending a much more reasonable 3.25% of the time in the ISR than 6.5%.
+  3. At 2 MHz, we do prescale the clock, but count twice as high, and perform no math on the number of ticks, resulting in the same fast micros() execution. T
+  We feel that the loss of millis precision is acceptable (micros works fine) and it is worth the cost in precision to spend less time in the ISR, and would not be worth the clock cycles that it would take to check the timer count and see if it's at the half-way point yet. The interrupt fires every ms (2ms at 1/2 MHz), and doesn't need to handle partial millis or anything like TCA does. This allows us to use less clock time handling the ISR, give more accuate numbers and even provide faster micro return time up to around 12 MHz, at which point TCA'd micros starts to perform better (that's because the amount of work done in the interrupt for the TCA essentially constant, while for the TCB, the higher the )
+, and whereas TCAn `micros()` is limited by the resolution of the timer, here it's instead limited only by the fact that the calculations drop the least significant bits first; this results in a value that may be as low as 750, yet is being mapped to 0-999, for 1.33 us resolution in the worst cases. The timer count and the running tally of overflows could get us microseconds limited only by F_CPU/2
 The percentage of time spent in the ISR varies in inverse proportion to the clock speed - the ISR simply increments a counter and clears its flags. 65 clocks from interrupt bit set to interrupted code resuming.
 
-The time that `micros()` takes to return a value varies significatly with F_CPU. Specifically, powers of 2 are highly favorable, and almost all the calculations drop out of the 1 MHz case. micros takes between 78 and 160 clocks to run. Each factor of 2 increase in clock speed results in 5 extra clocks being added to micros in most cases (bitshifts, while faster than division, are still slow when you need multiples of them on larger types, especially in compiler-generated code)
+The time that `micros()` takes to return a value varies significatly with F_CPU. Specifically, powers of 2 are highly favorable, and almost all the calculations drop out of the 1/2 MHz case. micros takes between 78 and 160 clocks to run. Each factor of 2 increase in clock speed results in 5 extra clocks being added to micros in most cases (bitshifts, while faster than division, are still slow when you need multiples of them on larger types, especially in compiler-generated code)
 `*` indicates that the shift & sum ersatz-division is done in hand-optimized assembly because I just couldn't stand how stupid the and stubborn the compiler was, and by the time I was done analyzing it, implementing it was trivial. This improves accuracy, particularly in the case significantly as well. In these optimized cases, as well as the powers of 2, the results are as good as possible in light of the specified resolution - where resolution is coarser than 1us, (1/resolution) of possible values for the three lowest digits (in normal base 10 number systems) is skipped and never shows up. These skipped values are distributed evenly between 1 and 999. For example, for 12/24/48, that means 250 values never show up. Of the remaining 750, 500 will show for only 1 "actual" microsecond value, and 250 for 2 consecutive "actual" microsecond values. See the table at the end of this document for the list of skipped least-significant-digit combinations. None of the optimized options will ever go back in time, even by a single microsecond (as long as the chance of backward time travel is limited to less than the time it takes micros to execute, it can't break `delay()`, cause timeouts to instantly expire or cause other catastrophic consequences) nor are more than 2 values in a row ever skipped where resolution > 1us.
 
 ### TCD0 for millis timekeeping

@@ -144,7 +144,7 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
   // (volatile variables must be read from memory on every access)
 
   #if (defined(MILLIS_USE_TIMERB0)|defined(MILLIS_USE_TIMERB1))
-    #if (F_CPU>1000000)
+    #if (F_CPU > 2000000)
       timer_millis++; // that's all we need to do!
     #else
       timer_millis += 2;
@@ -302,12 +302,12 @@ unsigned long millis() {
     #else // timerb
       if ((flags & TCB_CAPT_bm) && !(ticks & 0xFF00)) {
     #endif
-      #if ((defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1)) && (F_CPU <= 1000000))
-        overflows += 2;
-      #else
-        overflows++;
-      #endif
-    } // end getting ticks
+        #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)) && !(F_CPU > 2000000UL)
+          overflows +=2;
+        #else
+          overflows++;
+        #endif
+      } // end getting ticks
 
     #if defined(MILLIS_USE_TIMERD0)
       #if (F_CPU == 20000000UL || F_CPU == 10000000UL || F_CPU == 5000000UL)
@@ -611,8 +611,8 @@ unsigned long millis() {
              F_CPU == 44000000UL || F_CPU == 28000000UL || F_CPU == 14000000UL || F_CPU ==  3000000UL || /* oddball frequencies       */ \
              F_CPU == 27000000UL)&& /* warn fools who messed with the timers.h file too and expected that the core would sort out how */ \
             ((TIME_TRACKING_TIMER_DIVIDER == 2 && TIME_TRACKING_TICKS_PER_OVF == F_CPU/2000) || /*how to make the timer work correctly*/ \
-             (TIME_TRACKING_TIMER_DIVIDER == 1 && TIME_TRACKING_TICKS_PER_OVF == F_CPU/1000 && F_CPU == 1000000)))
-                                                 /*  how to make the timer work correctly without them implementing it. No such luck  */
+             (TIME_TRACKING_TIMER_DIVIDER == 1 && (TIME_TRACKING_TICKS_PER_OVF == F_CPU/500 && F_CPU == 1000000) || (TIME_TRACKING_TICKS_PER_OVF == F_CPU/1000 && F_CPU == 2000000))))
+                                                 /*  without them implementing it. No such luck  */
         #warning "Millis timer (TCBn) at this frequency and/or configuration unsupported, micros() will return totally bogus values."
       #endif
     #else // Done with TCB
