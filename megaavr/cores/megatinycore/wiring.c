@@ -118,6 +118,21 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
       #error "Selected millis timer, TCB1 does not exist on this part."
     #endif
     &TCB1;
+  #elif defined(MILLIS_USE_TIMERB2)
+    #ifndef TCB2
+      #error "Selected millis timer, TCB2 does not exist on this part."
+    #endif
+    &TCB2;
+  #elif defined(MILLIS_USE_TIMERB3)
+    #ifndef TCB3
+      #error "Selected millis timer, TCB3 does not exist on this part."
+    #endif
+    &TCB3;
+  #elif defined(MILLIS_USE_TIMERB4)
+    #ifndef TCB4
+      #error "Selected millis timer, TCB4 does not exist on this part."
+    #endif
+    &TCB4;
   #else  // it's not TCB0, TCB1, TCD0, TCA0, or RTC
     #error "No millis timer selected, but not disabled - can't happen!".
   #endif
@@ -136,6 +151,12 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
   ISR(TCB0_INT_vect)
 #elif defined(MILLIS_USE_TIMERB1)
   ISR(TCB1_INT_vect)
+#elif defined(MILLIS_USE_TIMERB2)
+  ISR(TCB2_INT_vect)
+#elif defined(MILLIS_USE_TIMERB3)
+  ISR(TCB3_INT_vect)
+#elif defined(MILLIS_USE_TIMERB4)
+  ISR(TCB4_INT_vect)
 #else
   #error "No millis timer selected, but not disabled - cannot determine millis vector"
 #endif
@@ -143,7 +164,7 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
   // copy these to local variables so they can be stored in registers
   // (volatile variables must be read from memory on every access)
 
-  #if (defined(MILLIS_USE_TIMERB0)|defined(MILLIS_USE_TIMERB1))
+  #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
     #if (F_CPU > 2000000)
       timer_millis++; // that's all we need to do!
     #else
@@ -164,6 +185,7 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
       timer_millis = m;
     #endif
     // if RTC is used as timer, we only increment the overflow count
+    // Overflow count isn't used for TCB's
     timer_overflow_count++;
   #endif
   /* Clear flag */
@@ -241,16 +263,39 @@ unsigned long millis() {
     m = m - (m >> 5) + (m >> 7);
     /* the compiler is incorrigible - it cannot be convinced not to copy m twice, shifting one 7 times and the other 5 times
      * and wasting 35 clock cycles and several precious instruction words.
-     * This ends up with the exact same implementation:
-
-          uint32_t n = (m >> 5);
-          m -= n;
-          n = n >> 2;
-          m += n;
-
-     * Not only that - but a dedicated optimizing assembly programmer could probably ensure that instead of the >> 7 (a little mini loop)
-     * that was implemented leftshifting it once, retaining the carried bit, and
+     * What you want is for it to make one copy of m, shift it right 5 places, subtract, then rightshift it 2 more.
      */
+    /* Would this work?
+    uint32_t temp;
+    uint8_t cnt;
+    __asm__ __volatile__ (
+      "movw %A1, %A0     \n\t"
+      "movw %C1, %C0     \n\t" //make our copy
+      "ldi %2, 5"       "\n\t"
+      "lsr %D1"         "\n\t"
+      "ror %C1"         "\n\t"
+      "ror %B1"         "\n\t"
+      "ror %A1"         "\n\t"
+      "dec %2"          "\n\t"
+      "brne .-12"       "\n\t"
+      "sub %A0, %A1"    "\n\t"
+      "subc %B0, %B1"   "\n\t"
+      "subc %C0, %C1"   "\n\t"
+      "subc %D0, %D1"   "\n\t"
+      "ldi %2, 2"       "\n\t"
+      "lsr %D1"         "\n\t"
+      "ror %C1"         "\n\t"
+      "ror %B1"         "\n\t"
+      "ror %A1"         "\n\t"
+      "dec %2"          "\n\t"
+      "brne .-12"       "\n\t"
+      "add %A0, %A1"    "\n\t"
+      "adc %B0, %B1"    "\n\t"
+      "adc %C0, %C1"    "\n\t"
+      "adc %D0, %D1"    "\n\t"
+      : "+r" (m), "+r" (temp), "+d" (cnt)
+      );
+    */
   #else
     m = timer_millis;
     SREG = oldSREG;
@@ -261,7 +306,7 @@ unsigned long millis() {
 
   unsigned long micros() {
     unsigned long overflows, microseconds;
-    #if (defined(MILLIS_USE_TIMERD0) || defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
+    #if (defined(MILLIS_USE_TIMERD0) || defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
       uint16_t ticks;
     #else
       uint8_t ticks;
@@ -287,7 +332,7 @@ unsigned long millis() {
      * so we shouldn't increment overflows, or interrupts are disabled and micros isn't expected to work so it
      * doesn't matter.
      * Get current number of overflows and timer count */
-    #if !(defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1))
+    #if !(defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
       overflows = timer_overflow_count;
     #else
       overflows = timer_millis;
@@ -601,6 +646,7 @@ unsigned long millis() {
       #elif (F_CPU  ==  4000000UL || F_CPU >= 3000000UL)
         microseconds = overflows * 1000 + (ticks >> 1);
       #else //(F_CPU == 1000000UL || F_CPU == 2000000UL) - here clock is running at system clock instead of half system clock.
+            // and hence overflows only once per 2ms. On 2 MHz
             // also works at 2MHz, since we use CLKPER for 1MHz vs CLKPER/2 for all others.
         microseconds   = overflows * 1000 + ticks;
       #endif
