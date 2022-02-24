@@ -109,7 +109,7 @@
       SREG = oldSREG;
     }
   }
-#if !defined(ATTACH_LATECLEAR)
+#if !defined(CORE_ATTACH_LATECLEAR)
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) isrBody() {
     asm volatile (
      "AttachedISR:"      "\n\t" // as the scene opens, we have r16 on the stack already, portnumber x 2 in the r16
@@ -144,10 +144,10 @@
       "ld    r29,     X"  "\n\t" // ... to the Y pointer reg.
       "add   r16,   r16"  "\n\t" // double r16, so it is 4x port number - that's the address of the start of the VPORT
       "subi  r16,   253"  "\n\t" // Now this is the address of the VPORTx.INTFLAGS
-      "mov   r26,   r16"  "\n\t" // r16 to x reg low byte
+      "mov   r26,   r16"  "\n\t" // r16 to x reg low byte ASM always lists the destination operand first.
       "ldi   r27,     0"  "\n\t" // clear x high byte
       "ld    r15,     X"  "\n\t" // Load flags to r15"
-      "sbiw  r26,     0"  "\n\t" // this will set flag if it's zero.
+      "sbiw  r26,     0"  "\n\t" // subtract 0 from it - this serves as a single-word way to test if it's 0, because it will still set the Zero flag. It's no faster than cpi r26, 0, cpc r27, r1 but takes less flash.
       "breq  AIntEnd"     "\n\t" // port not enabled, null pointer, just clear flags end hit the exit ramp.
       "mov   r17,   r15"  "\n\t" // copy that flags to r17
     "AIntLoop:"           "\n\t"
@@ -163,7 +163,7 @@
       "icall"             "\n\t" // call their function, which is allowed to shit on any upper registers other than 28, 29, 16, and 17.
       "rjmp AIntLoop"     "\n\t" // Restart loop after.
     "AIntEnd:"            "\n\t" // sooner or later r17 will be 0 and we'll branch here.
-      "mov   r26,  r16"   "\n\t" // We previously stashed the VPORT address in r16, so copy that to low byte of X pointer
+      "mov   r26,  r16"   "\n\t" // We previously stashed the VPORT address in r16, so copy that to low byte of X pointer <<BUG WAS HERE, r26 was copied to r16 instead of the other way around>>
       "ldi   r27,    0"   "\n\t" // high byte is 0, cause we're targeting the VPORT, address < 0x20
       "st      X,  r15"   "\n\t" // store to clear the flags.... that we recorded at the start of the interrupt. (LATECLEAR)
       "pop   r31"         "\n\t" // clean up a million registers

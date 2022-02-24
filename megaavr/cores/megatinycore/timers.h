@@ -23,7 +23,7 @@
     #define TIME_TRACKING_TIMER_DIVIDER   (1)
     #define TIME_TRACKING_TIMER_PERIOD    ((F_CPU/500)-1)
   #elif (F_CPU == 2000000UL)
-    #define TIME_TRACKING_TIMER_DIVIDER   (1)
+    #define TIME_TRACKING_TIMER_DIVIDER   (2)
     #define TIME_TRACKING_TIMER_PERIOD    ((F_CPU/1000)-1)
   #else
     #define TIME_TRACKING_TIMER_DIVIDER   (2)
