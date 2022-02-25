@@ -123,12 +123,29 @@ class BaseConstructor:
         mapping = {}
         for key_node, value_node in node.value:
             key = self.construct_object(key_node, deep=deep)
-            if not isinstance(key, collections.Hashable):
-                raise ConstructorError("while constructing a mapping", node.start_mark,
-                        "found unhashable key", key_node.start_mark)
-            value = self.construct_object(value_node, deep=deep)
-            mapping[key] = value
+            
+            ## Version Check
+            python_version = sys.version
+            version = python_version.split()[0]
+            ver = version.split('.')
+            a = int(ver[0]) # For me this is 3
+            b = int(ver[1]) # For me this is 10
+            c = int(ver[2]) # for me this is 2
+            # If python Version is greater than 3.3 need to use collections.abc.hasable
+            if a > 2 and b > 2 :
+                if not isinstance(key, collections.abc.Hashable):
+                    raise ConstructorError("while constructing a mapping", node.start_mark,
+                            "found unhashable key", key_node.start_mark)
+                value = self.construct_object(value_node, deep=deep)
+                mapping[key] = value
+            else:
+               if not isinstance(key, collections.Hashable):
+                   raise ConstructorError("while constructing a mapping", node.start_mark,
+                           "found unhashable key", key_node.start_mark)
+                   value = self.construct_object(value_node, deep=deep)
+                   mapping[key] = value
         return mapping
+
 
     def construct_pairs(self, node, deep=False):
         if not isinstance(node, MappingNode):
