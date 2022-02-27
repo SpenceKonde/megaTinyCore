@@ -89,6 +89,7 @@ ISR(PORTA_PORT_vect) {
 ```
 
 **Less wrong**
+Note: This is how the "old version" of attachInterrupt is implemented. 
 ```c++
 ISR(PORTA_PORT_vect) {
   byte flags=PORTA.INTFLAGS; //Note: slower than VPORT; use VPORTx, not PORTx for INTFLAGS
@@ -98,7 +99,9 @@ ISR(PORTA_PORT_vect) {
   if (flags & (1 << 1)) {
     doSomethingElse();
   }
-  PORTA.INTFLAGS=flags; // Better... if you care whether one of those conditions happens again, though, you could still miss it.
+  PORTA.INTFLAGS=flags; 
+  // Better...  But in the case where an interrupt occurs a second time, you can miss it when you could have not-missed it.
+  // This is more of a risk if one interrupt takes much longer to process than most do. 
 }
 ```
 
@@ -118,16 +121,28 @@ ISR(PORTA_PORT_vect) {
 ```
 **Also correct**
 ```c++
-// This could be made into an else-if in order to let other interrupts fire if your ISR is slow, and is
-// likely to be called often with multiple flags set - that case goes particularly well with round-robin
-// interrupt scheduling - but if you're in a situation where you need this, you should be concerned about
-// larger scale probems with your code - you're either generating way too many interrupts, or they are
-// far too slow...
+// Clearing flags one at a time as they are handled might be done in order to let other interrupts fire if your ISR
+// is slow, and is likely to be called often with multiple flags set - that case goes particularly well with
+// round-robin interrupt scheduling, or when there is another higher priority interrupt enabled that you don't want
+// to be delayed while all of the interrupts for this vector are handled. If you're in a situation where you need
+// this, that is a "red flag" that your handlers are too slow. or you're generating too many interrupts too fast.
 
 ISR(PORTA_PORT_vect) {
   if (VPORTA.INTFLAGS & (1 << 0)) {
     VPORTA.INTFLAGS |= (1 << 0);
     doSomething();
+  }
+  else if (VPORTA.INTFLAGS & (1 << 1)) {
+    VPORTA.INTFLAGS |= (1 << 1);
+    doSomethingElse();
+  }
+}
+/* Equivalently - but more flexable because you can choose which cases do it more easily than you could normally */
+ISR(PORTA_PORT_vect) {
+  if (VPORTA.INTFLAGS & (1 << 0)) {
+    VPORTA.INTFLAGS |= (1 << 0);
+    doSomething();
+    return(); 
   }
   if (VPORTA.INTFLAGS & (1 << 1)) {
     VPORTA.INTFLAGS |= (1 << 1);
@@ -136,7 +151,7 @@ ISR(PORTA_PORT_vect) {
 }
 ```
 
-Note: `if (VPORTx.INTFLAGS & (1 << n))` is a maximally efficient way to test for a bit in a `VPORTx.anything` register or one of the 4 GPIORn/GPIOn/GPR.GPRn. Those registers (like many assorted important registers on classic AVRs - and unlike any other registers besides VPORTs and GPR/GPIOR/GPIO registers (over the past 6 years, the've been known by every one of those officially) are in the "Low I/O space", and instructions for atomic bit-level access exist. (set, clear, and skip-if-set/cleared).
+Note: `if (VPORTx.INTFLAGS & (1 << n))` is a maximally efficient way to test for a bit in a `VPORTx.anything` register or one of the 4 GPIORn/GPIOn/GPR.GPRn. Those registers (like many assorted important registers on classic AVRs - and unlike any other registers besides VPORTs and GPR/GPIOR/GPIO (`*`) registers (over the past 6 years, the've been known by every one of those officially) are in the "Low I/O space", and instructions for atomic bit-level access exist. (set, clear, and skip-if-set/cleared).
 
 
 ## If you don't need to do anything in the ISR
@@ -174,7 +189,7 @@ So as described above, execution reaches the ISR within 6 system clock cycles (s
 One of the worst things is calling a function that won't end up being inlined or can't be optimized - like the "attachInterrupt" functions - in this case, the prologue + jump is minimum 24 clocks, and the epilogue 39, as it must assume the function uses all of the "call used" registers and save and restore them all.
 
 ### ISRs benefit the most from using the GPRs
-If you're desperate for speed - or space - and if all you are doing is setting a flag, you can use one of the general purpose registers: GPR.GPR0/1/2/3 - the only place the core uses any of those is at the very beginning of execution, when the reset cause is stashed in `GPIOR0` before the reset flags are cleared and the sketch is run (that way you can see what the reset cause was - the core does not use it after that) To get the full benefit, use single-bit operations - they're in the low I/O space. So something like `GPIOR1 |= (1 << n)` where n is known at compile time, is a single clock operation which consumes no registers - it gets turned into a `sbi` - set bit index, with the register and bit being encoded by the opcode itself. The same goes for `GPIOR &= ~(1 << n)`  - these are also atomic (an interrupt couldn't interrupt them like it could a read-modify-write). There are analogous instructions that make things like `if(GPIOR1 & (1 << n))` and `if (!(GPIOR1 & (1 << n))` lightning fast. GPIOR's are only magic when manipulating a single bit, and the bit and must be known at compile time: `GPIOR1 |= 3` is a 3 clock non-atomic read-modify-write operation which needs a working register to store the intermediate value in while modifying it, which is just slightly faster than `MyGlobalByte |= 3`, which is a 6-clock non-atomic read-modify-write using 1 working register for the intermediate. `GPIOR1 |= 1; GPIOR1 |= 2;` is 2 clocks, each of which is an atomic operation which does not require a register to store any intermediate values. Note that atomicity is only a concern for code running outside the ISR, or code within a level 0 priority ISR when some other ISR is configured with level 1 priority.
+If you're desperate for speed - or space - and if all you are doing is setting a flag, you can use one of the general purpose registers: GPR.GPR0/1/2/3 - the only place the core uses any of those is at the very beginning of execution, when the reset cause is stashed in `GPIOR0` before the reset flags are cleared and the sketch is run (that way you can see what the reset cause was - the core does not use it after that - while the 99% of users who do not need to check that flag do not neef to rest it anyway or else face the prospect of the chip requiring a reset-pin-reset or power cycle to revive in the event of a "dirty reset" caused by hardware or software fault, see [the reset reference](Ref_Reset)). To get the full benefit of the GPR's, use single-bit operations only, and be sure that the bit is known at compile time. These are lighning fast, and use no working registers at all.  `GPIOR1 |= (1 << n)` where n is known at compile time, is a single clock operation which consumes no registers - it gets turned into a `sbi` - set bit index, with the register and bit being encoded by the opcode itself. The same goes for `GPIOR &= ~(1 << n)`  - these are also atomic (an interrupt couldn't interrupt them like it could a read-modify-write). There are analogous instructions that make things like `if(GPIOR1 & (1 << n))` and `if (!(GPIOR1 & (1 << n))` lightning fast. GPIOR's are only magic when manipulating a single bit, and the bit and must be known at compile time: `GPIOR1 |= 3` is a 3 clock non-atomic read-modify-write operation which needs a working register to store the intermediate value in while modifying it, which is just slightly faster than `MyGlobalByte |= 3`, which is a 6-clock non-atomic read-modify-write using 1 working register for the intermediate. `GPIOR1 |= 1; GPIOR1 |= 2;`, which achieves the same thing as GPIOR1 |= 3, is 2 clocks, each of which is an atomic operation which does not require a register to store any intermediate values. Note that atomicity is only a concern for code running outside the ISR, or code within a level 0 priority ISR when some other ISR is configured with level 1 priority. However, the fact that has no register dependance is a bigger deal in an ISR, because each working register used concurrently has to be saved at the start of the ISR, and restored at the end (total 3 clocks and 2 words). 
 
 ## Naked ISRs
 An advanced technique. This requires that either your ISR be written entirely in assembly, with your own prologue and epilogue hand optimized for this use case, or that you know for a fact that the tiny piece of C code you use doesn't change `SREG` or use any working registers.
@@ -235,3 +250,6 @@ ISR(PERIPHERAL_INT_vect, ISR_NAKED)
  * ISR_NAKED is really meant to run hand-optimized assembly, rather than relying on the compiler not doing anything dumb.
  */
 ```
+
+
+`*` Those registers have, between 2015 and 2021 been called GPIORn. GPIOn, and GPR.GPRn. At this rate, buy 2030, we'll have 
