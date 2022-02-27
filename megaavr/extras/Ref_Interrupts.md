@@ -23,45 +23,47 @@ You cannot define the same vector as two different things. This is most often a 
 ## List of interrupt vector names
 If there is a list of the names defined for the interrupt vectors is present somewhere in the datasheet, I was never able to find it. These are the possible names for interrupt vectors on the parts supported by megaTinyCore. Not all parts will have all interrupts listed below (interrupts associated with hardware not present on a chip won't exist there). An ISR is created with the `ISR()` macro.
 
-**WARNING** If you misspell the name of a vector, you will get a compiler warning BUT NOT AN ERROR! Hence, you can upload the bad code... in this case the chip will freeze the instant the ISR you thought you assigned is called, as it jumps to BAD_ISR, which in turn jumps to the reset vector... but since the reti instruction is never executed, it still thinks its in an interrupt. If the recommended procedures in the [reset reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md) were followed, this will be detected through the absence of a new reset flag, triggering a software reset; Otherwise, the code will start running, with interrupts "enabled" but not actually occurring, which usually but not always results in a hang or bootloop, but could potentially do something more subtly wrong. Encountering this (and the annoying lack of a nice list anywhere outside of the io.h) was the impetus for creating this list.
+**WARNING** If you misspell the name of a vector, you will get a compiler warning BUT NOT AN ERROR! Hence, you can upload the bad code... in this case the chip will reset the instant the ISR you thought you assigned is called, as it jumps to BAD_ISR, which in turn jumps to the reset vector... but since the reti instruction is never executed, it still thinks its in an interrupt. Unless you've defanged the megaTiynCore dirty reset protection, this will be caught and trigger an unexpected reset. Otherwise, it will either reset uncleanly, hang, or behave unpredictably. See the [reset reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md) for more information on this potential failure mode.
 
-| Vector Name       | 0 | 1 | 2 | Flag Cleared on | Notes                                       |
-|-------------------|---|---|---|-----------------|---------------------------------------------|
-| AC0_AC_vect       | X | X | X | Manually        |                                             |
-| AC1_AC_vect       |   | * |   | Manually        | 1-series with 16k or 32k flash only         |
-| AC2_AC_vect       |   | * |   | Manually        | 1-series with 16k or 32k flash only         |
-| ADC0_ERROR_vect   |   |   | X | Manually        | Multiple flags for different errors         |
-| ADC0_SAMPRDY_vect |   |   | X | Read sample reg | WCOMP uses SAMPRDY or RESRDY on 2-series    |
-| ADC0_RESRDY_vect  | X | X | X | Read result reg |                                             |
-| ADC0_WCOMP_vect   | X | X |   | Manually        | Window Comparator on 0/1-series             |
-| ADC1_RESRDY_vect  |   | * |   | Read result reg | 1-series with 16k or 32k flash only         |
-| ADC1_WCOMP_vect   |   | * |   | Manually        | 1-series with 16k or 32k flash only         |
-| BOD_VLM_vect      | X | X | X | Manually(?)     |                                             |
-| CCL_CCL_vect      |   |   | X | Manually        | Shared by whole CCL. Not present on 0/1     |
-| CRCSCAN_NMI_vect  | X | X | X | Reset           | NMI guarantees device stopped if CRC fails  |
-| NVMCTRL_EE_vect   | X | X | X | Write/Manually  | ISR must write data or disable interrupt    |
-| PORTA_PORT_vect   | X | X | X | Manually        |                                             |
-| PORTB_PORT_vect   | X | X | X | Manually        | Not present on 8-pin parts                  |
-| PORTC_PORT_vect   | X | X | X | Manually        | Not present on 8 or 14-pin parts            |
-| RTC_CNT_vect      | X | X | X | Manually        | Two possible flags, CNT and OVF             |
-| RTC_PIT_vect      | X | X | X | Manually        |                                             |
-| SPI0_INT_vect     | X | X | X | Depends on mode | 2 or 5 flags, some autoclear, some dont     |
-| TCA0_CMP0_vect    | X | X | X | Manually        | Alias: TCA0_LCMP0_vect                      |
-| TCA0_CMP1_vect    | X | X | X | Manually        | Alias: TCA0_LCMP1_vect                      |
-| TCA0_CMP2_vect    | X | X | X | Manually        | Alias: TCA0_LCMP2_vect                      |
-| TCA0_HUNF_vect    | X | X | X | Manually        |                                             |
-| TCA0_OVF_vect     | X | X | X | Manually        | Alias: TCA0_LUNF_vect                       |
-| TCB0_INT_vect     | X | X | X | Depends on mode | Two flags on 2 series only. Behavior depends on mode, see datasheet |
-| TCB1_INT_vect     |   | * | X | Depends on mode | 1-series with 16k or 32k flash or 2-series  |
-| TCD0_OVF_vect     |   | X |   | Manually        |                                             |
-| TCD0_TRIG_vect    |   | X |   | Manually        |                                             |
-| TWI0_TWIM_vect    | X | X | X | Usually Auto    | See datasheet, flag clearing is complicated |
-| TWI0_TWIS_vect    | X | X | X | Usually Auto    | See datasheet, flag clearing is complicated |
-| USART0_DRE_vect   | X | X | X | Write/Disable   | ISR must write data or disable interrupt    |
-| USART0_RXC_vect   | X | X | X | RXCIF, on read  | Error flags, if enabled, only cleared manually |
-| USART0_TXC_vect   | X | X | X | Manually        | Often used without the interrupt enabled    |
+| Vector Name       | 0 | 1 | 2 |Flags| Flag Cleared on | Notes                                       |
+|-------------------|---|---|---|-----|-----------------|---------------------------------------------|
+| AC0_AC_vect       | X | X | X |  1  | Manually        |                                             |
+| AC1_AC_vect       |   | * |   |  1  | Manually        | 1-series with 16k or 32k flash only         |
+| AC2_AC_vect       |   | * |   |  1  | Manually        | 1-series with 16k or 32k flash only         |
+| ADC0_ERROR_vect   |   |   | X | >1  | Manually        | Multiple flags for different errors         |
+| ADC0_SAMPRDY_vect |   |   | X | 1/2 | Read sample reg | WCOMP uses SAMPRDY or RESRDY on 2-series    |
+| ADC0_RESRDY_vect  | X | X | X | 1/2 | Read result reg |                                             |
+| ADC0_WCOMP_vect   | X | X |   |  1  | Manually        | Window Comparator on 0/1-series             |
+| ADC1_RESRDY_vect  |   | * |   |  1  | Read result reg | 1-series with 16k or 32k flash only         |
+| ADC1_WCOMP_vect   |   | * |   |  1  | Manually        | 1-series with 16k or 32k flash only         |
+| BOD_VLM_vect      | X | X | X |  1  | Manually(?)     | The behavior is not exactly clear for flag  |
+| CCL_CCL_vect      |   |   | X | 2/4 | Manually        | Shared by whole CCL. Not present on 0/1     |
+| CRCSCAN_NMI_vect  | X | X | X |  1  | Reset           | NMI can ensure device stopped if CRC fails  |
+| NVMCTRL_EE_vect   | X | X | X |  1  | Write/Manually  | ISR must write data or disable interrupt    |
+| PORTA_PORT_vect   | X | X | X |  8  | Manually        |                                             |
+| PORTB_PORT_vect   | X | X | X |  8  | Manually        | Not present on 8-pin parts                  |
+| PORTC_PORT_vect   | X | X | X |  8  | Manually        | Not present on 8 or 14-pin parts            |
+| RTC_CNT_vect      | X | X | X |  2  | Manually        | Two possible flags, CNT and OVF             |
+| RTC_PIT_vect      | X | X | X |  1  | Manually        |                                             |
+| SPI0_INT_vect     | X | X | X | 2-5 | Depends on mode | 2 in normal, 5 in buffered mode. See datasheet|
+| TCA0_CMP0_vect    | X | X | X |  1  | Manually        | Alias: TCA0_LCMP0_vect if in SPLIT mode **  |
+| TCA0_CMP1_vect    | X | X | X |  1  | Manually        | Alias: TCA0_LCMP1_vect if in SPLIT mode **  |
+| TCA0_CMP2_vect    | X | X | X |  1  | Manually        | Alias: TCA0_LCMP2_vect if in SPLIT mode **  |
+| TCA0_HUNF_vect    | X | X | X |  1  | Manually        | SPLIT mode only                             |
+| TCA0_OVF_vect     | X | X | X |  1  | Manually        | Alias: TCA0_LUNF_vect if in SPLIT mode **   |
+| TCB0_INT_vect     | X | X | X |  2  | Depends on mode | Two flags on 2 series only. Behavior depends on mode, see datasheet |
+| TCB1_INT_vect     |   | * | X |  2  | Depends on mode | 1-series with 16k or 32k flash or 2-series, 2 flags on 2-series only  |
+| TCD0_OVF_vect     |   | X |   |  1  | Manually        |                                             |
+| TCD0_TRIG_vect    |   | X |   |  1  | Manually        |                                             |
+| TWI0_TWIM_vect    | X | X | X | >1  | Usually Auto    | See datasheet, this is complicated and kind |
+| TWI0_TWIS_vect    | X | X | X | >1  | Usually Auto    | -of obtuse. Just use Wire.h                 |
+| USART0_DRE_vect   | X | X | X |  1  | Write/Disable   | ISR must write data or disable interrupt    |
+| USART0_RXC_vect   | X | X | X |  1  | RXCIF, on read  | Error flags, if enabled, only cleared manually |
+| USART0_TXC_vect   | X | X | X |  1  | Manually        | Often used without the interrupt enabled    |
 
 `*` - There are two classes of 1-series - the ones with 16k or more of flash, and the ones with less. These are only available on the larger ones, because they operate on a peripheral that only exists there.
+`**` - These vectors are traditionally referred to by different names when in split mode or normal mode, but the hardware cant tell the difference between the names.
+
 
 ## Why clearing flags is so complicated
 Almost all flags *can* be manually cleared - the ones that can be cleared automatically generally do that to be helpful:
@@ -71,63 +73,128 @@ Almost all flags *can* be manually cleared - the ones that can be cleared automa
 * USART, and buffered SPI have DRE interrupt that can only be cleared by writing more data - otherwise you need to disable the interurpt from within the ISR. The `USARTn.TXC` (transfer/transmit complete) flags are freqently polled rather than used to fire interrupts. It's not entirley clear from the datasheet if the EEPROM ready interrupt is like that, or can be cleared manually.
 * The NMI is a very special interrupt; it can be configured to be a normal interrupt *or* a Non-Maskable Interrupt. In NMI mode, the part will sit there running the interrupt instead of almost-working with damaged firmware - which could potentially create a dangerous situation if it was part of a life-saftety critical device, like the controller for an airbag, or antilock breaks in a car. In such cases, corrupted firmware might appear work fine, if the corruption only impacted code-paths related to handling the relevant emergency situations, so the vehicle and hence operator would not be aware of a problem until . No matter what the damaged firmware tries to do, it cannot disable or bypass the NMI. Only loading working firmware and resetting it will clear the NMI. This is of particular relevance in life-safety-critical applications which these parts (but NOT this software package nor Arduino in general) are certified for. Not something likely to be used in Arduino-land.
 
-### Vectors linked to many flags
+## For non-port interrupts, clear the INTFLAGS after configuring everything except actually turning on the interrupt.
+With only a few exceptions (see the datasheet) interrupt flags are set regardless of whether the interrupt is enabled, so it's not unusual for an intflag to have become set either during the configuration process, or prior. Once you configure the peripheral, you should clar the INTFLAGS as one of the last steps. I usually configure everything else, clear the flags, enable the interrupts I want, and finally enable the peripheral. Alternately, globally disable interrupts while configuring a peripheral that will generate an interrupt, and clear the flags when you reenable interrupts.
+
+PORT interrupts only set the flags when the PINnCTRL register is set to generate an interrupt.
+
+## Vectors linked to many flags
 There are a few vectors with a lot of flags that can trigger them. For example, each of the PORT interrupts has 8 flags that can trigger it. One hazard with these is that if you have a large number enabled - especially if your ISR is longer than it ought to be - that interrupts could fire whille the ISR is running. You need to make sure you aren't missing those:
-*note - these depict calling a function from the ISR. That's generally bad unless it will be automatically inlined because it is only referenced here, since it increases overhead due to required register saving and restoration.*
+*note - these depict calling a function from the ISR. Unless the function is only called in this one place and hence will be inlined, that is not good practice, and it involves a an extra 30 bytes and 45 clocks (approx) of overhead just because it's a function call*
 
 **Wrong**
 ```c++
-ISR(PORTA_PORT_vect) {
+ISR(PERIPHERAL_INT_vect) {
+  if (PERIPHERAL.INTFLAGS & (1 << 0)) {
+    doSomething();
+  }
+  if (PERIPHERAL.INTFLAGS & (1 << 1)) {
+    doSomethingElse();
+  }
+  PERIPHERAL.INTFLAGS=PERIPHERAL.INTFLAGS //WRONG - if an interrupt happened after it's conditional, it would be missed.
+}
+```
+
+**Usually wrong - except for some pin interrupts**
+This method is less wrong than the first. Compared to the third method, this "late clear" is worse when the interrupt is one that does not have a normall interrupt enable bit somewhere, and you are disabling it during the ISR (the most common case is when a pin interrupt is set or to trigger on LOW LEVEL)) and it is possible that an interrupt could occur again between an "early clear" and when you disable the the interrupt - amd stil trogger when the flag is set, even when disabled (again, only the on example I can think of).
+
+```c++
+ISR(PERIPHERAL_INT_vect) {
+  byte flags=PERIPHERAL.INTFLAGS;
+  if (flags & (1 << 0)) {
+    doSomething();
+  }
+  if (flags & (1 << 1)) {
+    doSomethingElse();
+  }
+  PERIPHERAL.INTFLAGS=flags;
+}
+```
+
+**Often wrong for pin inerrupts that can fire in rapid succession, otherwise usually right**
+One approach to address that is clearing the flags early. This is a good method for any interrupt except a pin interrupt that you disable in the ISR. Non-pin interrupts can be disabled by an interrupt enable bit (usually in PERIPHERAL.INTCTRL), and the INTFLAGS are set regardless of whether the pin is enabled. On the other hand, pin interrupts that may retrigger very quickly (particularly a LOW LEVEL interrupt, which will immediaely retrigger if the pin is still low, but also potentially switches that bounce). It is also suitable for pin interupts where the interrupt running once more after you disable it (such as a do-nothing int for waking the chip) is not problematic.
+```c++
+// Check and clear flags at start of ISR.
+ISR(PERIPHERAL_INT_vect) {
+  byte flags=PERIPHERAL.INTFLAGS;
+  PERIPHERAL.INTFLAGS=flags; // Very common approach
+  if (flags & (1 << 0)) {
+    doSomething();
+    // Only risk with this is that if you disable the interrupt here, it may have happened again and set the INTFLAG again. In which case the interrupt would immediately run again.
+  }
+  if (flags & (1 << 1)) {
+    doSomethingElse();
+  }
+}
+```
+
+**A middle of the road option**
+When you ARE disabling the interrupt, AND the interrupt flag will fire the ISR even when interupt isn't enabled (ie, like a PORT pin interrupt), your best option is likely something like this:
+```cpp
+ISR(PORA_PORT_vect) {
+  //check flags
+  byte flags = VPORTA.INTFLAGS //here we'll use a port example, like I said, I can't think of any other cases where the disable benavior is wacky like this.
+  // Let's assume flags 0 and 3 may be set.
+  if (flags & (1 << 1)) {           // Check if the flag is set, if it is; since we se flags to determine what code to run, we need o check flags, otherwise we
+    //                              // get to second half, and have cleared some flags that weren't recorded in flags because they happened during that timr!
+    PORTA.PIN1CTRL &= ~PORT_ISC_gm; // we want to turn off hat interrupt so we do so here.
+    VPORTA.INTFLAGS |= (1 << 1);    // Now clear flag knowing it won' get set again. .
+  }
+  if (flags & (1 << 3)) {  // Again // if nothing else, reading from that copy of flags is markedly faster.
+    PORTA.PIN3CTRL &= ~PORT_ISC_gm; // we want to turn off hat interrupt so we do so here.
+    VPORTA.INTFLAGS |= (1 << 3);    // Now clear flag knowing it won' get set again. .
+  }
+  // Now we've disabled the interrupt and clear the flags that were on, next step, use flags to decide what to do:
+  if (flags & (1 << 1)) {
+    // Handle flag 0 interrupt.
+  }
+  if (flags & (1 << 3)) {
+    // Handle flag 3 interrupt.
+  }
+}
+/* NOW f couse, if your ISRs are nice anmd short like the shold be,
+ * You can do things like this, making it more efficient - but only if the code we're running is mad short */
+ISR(PORA_PORT_vect) {
+  ; //here we'll use a port example, like I said, I can't think of any other cases where the disable benavior is wacky like this.
+  // Let's assume flags 0 and 3 may be set, and that PA0 does nothing but wake the chip from sleep, while PB3 sets a flag that we check in loop to see f something has happened:L
+  if (VPORTA.INTFLAGS & (1 << 1)) { // Check if the flag is set (which we can do, since we didn't ahve to make a copy of it, if it is,
+    VPORTA.INTFLAGS |= (1 << 3);    // Clear the flag, and we want to turn off hat interrupt
+    PORTA.PIN0CTRL &= ~PORT_ISC_gm; // so we do so here.
+    // Nothing more to do for PA1 - all we want is for an int to fire.
+  }
+  if (VPORTA.INTFLAGS & (1 << 3)) {  // Again if nothing else, reading from that copy of flags is markedly faster.
+    VPORTA.INTFLAGS |= (1 << 3);     // Again wih the clearing
+    PORTA.PIMN3CTRL &= ~PORT_ISC_gm;  // And we said we wanted to disable it.
+    GPIOR3 |= 1;                      // but if that's all we need to do in the ISR. this is much faster.
+  }
+}
+```
+
+**Always okay, but often one of above is the above is better**
+The generalized case of the above, where we don't make any distinction between which ones deserve to be run right after thy're cleared, and which are longer than that should be.Clear the flags as you go is also viable - but, especally with many interrupts on a port, it can be less efficient. **WARNING** if those are actual function calls, and they can't be automatically inlined, this is by far the worst of the implementations! Avoid actual function calls in ISRs if you can, unless you know they will be inlined.
+```cpp
+ISR(PERIPHERAL_INT_vect) {
   if (VPORTA.INTFLAGS & (1 << 0)) {
+    VPORTA.INTFLAGS |= (1 << 0);
     doSomething();
   }
   if (VPORTA.INTFLAGS & (1 << 1)) {
+    VPORTA.INTFLAGS |= (1 << 1);
     doSomethingElse();
   }
-  VPORTA.INTFLAGS=VPORTA.INTFLAGS //WRONG - if an interrupt happened after it's conditional, it would be missed.
 }
 ```
 
-**Less wrong**
-Note: This is how the "old version" of attachInterrupt is implemented. 
+**Increased overhead - but sometimes appropriate**
 ```c++
-ISR(PORTA_PORT_vect) {
-  byte flags=PORTA.INTFLAGS; //Note: slower than VPORT; use VPORTx, not PORTx for INTFLAGS
-  if (flags & (1 << 0)) {
-    doSomething();
-  }
-  if (flags & (1 << 1)) {
-    doSomethingElse();
-  }
-  PORTA.INTFLAGS=flags; 
-  // Better...  But in the case where an interrupt occurs a second time, you can miss it when you could have not-missed it.
-  // This is more of a risk if one interrupt takes much longer to process than most do. 
-}
-```
-
-**Correct**
-```c++
-// Check and clear flags at start of ISR.
-ISR(PORTA_PORT_vect) {
-  byte flags=VPORTA.INTFLAGS;
-  PORTA.INTFLAGS=flags; // Very common approach
-  if (flags & (1 << 0)) {
-    doSomething();
-  }
-  if (flags & (1 << 1)) {
-    doSomethingElse();
-  }
-}
-```
-**Also correct**
-```c++
-// Clearing flags one at a time as they are handled might be done in order to let other interrupts fire if your ISR
+// Clearing flags one at a time as they are handled, and then letting the interrupt handler return
+// might be done in order to let other interrupts fire if your ISR
 // is slow, and is likely to be called often with multiple flags set - that case goes particularly well with
 // round-robin interrupt scheduling, or when there is another higher priority interrupt enabled that you don't want
 // to be delayed while all of the interrupts for this vector are handled. If you're in a situation where you need
 // this, that is a "red flag" that your handlers are too slow. or you're generating too many interrupts too fast.
 
-ISR(PORTA_PORT_vect) {
+ISR(PERIPHERAL_INT_vect) {
   if (VPORTA.INTFLAGS & (1 << 0)) {
     VPORTA.INTFLAGS |= (1 << 0);
     doSomething();
@@ -138,11 +205,11 @@ ISR(PORTA_PORT_vect) {
   }
 }
 /* Equivalently - but more flexable because you can choose which cases do it more easily than you could normally */
-ISR(PORTA_PORT_vect) {
+ISR(PERIPHERAL_INT_vect) {
   if (VPORTA.INTFLAGS & (1 << 0)) {
     VPORTA.INTFLAGS |= (1 << 0);
     doSomething();
-    return(); 
+    return();
   }
   if (VPORTA.INTFLAGS & (1 << 1)) {
     VPORTA.INTFLAGS |= (1 << 1);
@@ -155,7 +222,7 @@ Note: `if (VPORTx.INTFLAGS & (1 << n))` is a maximally efficient way to test for
 
 
 ## If you don't need to do anything in the ISR
-For example, if it's only purpose is to wake from sleep, `ISR(PERIPHERAL_INT_vect) {;}` is slower and larger than `EMPTY_INTERRUPT(PERIPHERAL_INT_vect);` The latter will produce an ISR containing only a reti instruction. The former will generate the standard prologue and epilogue, for 21-26 clock overhead, instead of just the approx. 10 clock minimum overhead from getting to the vector and returning from it.
+For example, if it's only purpose is to wake from sleep, `ISR(PERIPHERAL_INT_vect) {;}` is slower and larger than `EMPTY_INTERRUPT(PERIPHERAL_INT_vect);` The latter will produce an ISR containing only a reti instruction. The former will generate the standard prologue and epilogue, for 21-26 clock overhead, instead of just the approx. 10 clock minimum overhead from getting to the vector and returning from it; however, this won't clear the interrupt flags, which on a modern AVR you almost always need to do. Very rarly are the INTFLAGS cleared when the handler executes, whereas on classic AVRs almost every interrupt did that
 
 ## If two interrupts have an identical implementation
 You can point two interrupt vectors at the same code, which imposes no flash penalty compared to having only one of them - however, you have ZERO information on which one triggered it in this case, and if you need to figure that out, that cost you some time, which you need to weigh against the flash cost.
@@ -189,11 +256,13 @@ So as described above, execution reaches the ISR within 6 system clock cycles (s
 One of the worst things is calling a function that won't end up being inlined or can't be optimized - like the "attachInterrupt" functions - in this case, the prologue + jump is minimum 24 clocks, and the epilogue 39, as it must assume the function uses all of the "call used" registers and save and restore them all.
 
 ### ISRs benefit the most from using the GPRs
-If you're desperate for speed - or space - and if all you are doing is setting a flag, you can use one of the general purpose registers: GPR.GPR0/1/2/3 - the only place the core uses any of those is at the very beginning of execution, when the reset cause is stashed in `GPIOR0` before the reset flags are cleared and the sketch is run (that way you can see what the reset cause was - the core does not use it after that - while the 99% of users who do not need to check that flag do not neef to rest it anyway or else face the prospect of the chip requiring a reset-pin-reset or power cycle to revive in the event of a "dirty reset" caused by hardware or software fault, see [the reset reference](Ref_Reset)). To get the full benefit of the GPR's, use single-bit operations only, and be sure that the bit is known at compile time. These are lighning fast, and use no working registers at all.  `GPIOR1 |= (1 << n)` where n is known at compile time, is a single clock operation which consumes no registers - it gets turned into a `sbi` - set bit index, with the register and bit being encoded by the opcode itself. The same goes for `GPIOR &= ~(1 << n)`  - these are also atomic (an interrupt couldn't interrupt them like it could a read-modify-write). There are analogous instructions that make things like `if(GPIOR1 & (1 << n))` and `if (!(GPIOR1 & (1 << n))` lightning fast. GPIOR's are only magic when manipulating a single bit, and the bit and must be known at compile time: `GPIOR1 |= 3` is a 3 clock non-atomic read-modify-write operation which needs a working register to store the intermediate value in while modifying it, which is just slightly faster than `MyGlobalByte |= 3`, which is a 6-clock non-atomic read-modify-write using 1 working register for the intermediate. `GPIOR1 |= 1; GPIOR1 |= 2;`, which achieves the same thing as GPIOR1 |= 3, is 2 clocks, each of which is an atomic operation which does not require a register to store any intermediate values. Note that atomicity is only a concern for code running outside the ISR, or code within a level 0 priority ISR when some other ISR is configured with level 1 priority. However, the fact that has no register dependance is a bigger deal in an ISR, because each working register used concurrently has to be saved at the start of the ISR, and restored at the end (total 3 clocks and 2 words). 
+If you're desperate for speed - or space - and if you need to set, clear or test a global flag, you can use one of the general purpose registers: GPR.GPR0/1/2/3. The only place the core uses any of those is at the very beginning of execution, when the reset cause is stashed in `GPIOR0` before the reset flags are cleared and the sketch is run (that way you can see what the reset cause was - while the 99% of users who do not need to check that flag benefit from having the reset flags cleared, because it enables the initialization code to turn a crash that might hang or result in incorrect behavior to instead simply reset cleanly  see [the reset reference](Ref_Reset)); the other 2 bits of GPIOR0 are used to record potential errors when a tuned internal clock is selected, again just so that user code has a way of accessing them. All of this is done before setup (ie, if you need it for this sort of thing, set it to 0 in setup).
+
+To get the full benefit of the GPR's, you must use single-bit operations only, and be sure that the bit is known at compile time. These are lighning fast, and use no working registers at all. `GPIOR1 |= (1 << n)` where n is known at compile time, is a single clock operation which consumes no registers - it gets turned into a `sbi` - set bit index, with the register and bit being encoded by the opcode itself. The same goes for `GPIOR &= ~(1 << n)`  - these are also atomic (an interrupt couldn't interrupt them like it could a read-modify-write). There are analogous instructions that make things like `if(GPIOR1 & (1 << n))` and `if (!(GPIOR1 & (1 << n))` lightning fast. GPIOR's are only magic when manipulating a single bit, and the bit and must be known at compile time: `GPIOR1 |= 3` is a 3 clock non-atomic read-modify-write operation which needs a working register to store the intermediate value in while modifying it, which is just slightly faster than `MyGlobalByte |= 3`, which is a 6-clock non-atomic read-modify-write using 1 working register for the intermediate. `GPIOR1 |= 1; GPIOR1 |= 2;`, which achieves the same thing as GPIOR1 |= 3, is 2 clocks, each of which is an atomic operation which does not require a register to store any intermediate values. Note that atomicity is only a concern for code running outside the ISR, or code within a level 0 priority ISR when some other ISR is configured with level 1 priority. However, the fact that has no register dependance is a bigger deal in an ISR, because each working register used concurrently has to be saved at the start of the ISR, and restored at the end (total 3 clocks and 2 words). The most surprising thing is that `GPIOR1 = 3` is a 2 clock operation *which needs a working register*, that is, it would often cost 5 clock cycles, and could not be used as part of a naked ISR (next section) without assemble, however, `GPIOR1 |= 1; GPIOR1 |= 2;` can!
 
 ## Naked ISRs
-An advanced technique. This requires that either your ISR be written entirely in assembly, with your own prologue and epilogue hand optimized for this use case, or that you know for a fact that the tiny piece of C code you use doesn't change `SREG` or use any working registers.
-In a naked ISR, all the compiler does for you is tell the linker to that this code is where it should point the vector. When writing a naked ISR, You are responsible for everything: prologue. epilogue, and the reti at the end. Don't forget the reti, without that you'll get crazy (and severely broken) behavior.
+One of the most advanced techniques relating to interrupts. This requires that either your ISR be written entirely in assembly, with your own prologue and epilogue hand optimized for your use case, or that you know for a fact that the tiny piece of C code you use doesn't change `SREG` or use any working registers.
+In a naked ISR, all the compiler does for you is tell the linker to that this code is where the jmp or rjmp in the vector table. When writing a naked ISR, You are responsible for everything: prologue. epilogue, and the reti at the end. Don't forget the reti, without that you'll get crazy (and severely broken) behavior. So wby would you ever choose to do such a difficult method with such a large downside risk? Because it is tiny, and it is fast. An ISR which does nothing at all, (but not an EMPTY_ISR, which is the point of that macro) will, before the user-supplied ISR starts executing, at minimum, push r0 and r1 onto the stack, load SREG into r0, push that onto the stack, and then take the exclusive or of r1 with itself to clear it (since the compiler uses r1 as the "known zero" register) (4 clocks), after the end of your code, it will then pop that old SREG value back into r0, and store it to the SREG, and then pop r1 and r0 to restore their original values (7 clocks), before reti()'ing to return to wherever it was called from.
 
 ```c
 /* OK - results in an sbi that neither changes SREG nor uses a register*/
@@ -202,6 +271,19 @@ ISR(PERIPHERAL_INT_vect, ISR_NAKED)
   GPIOR1 |= (1 << 0);
   reti();
 }
+/* The same interrupt without these (neither the ISR_NAKED nor the reti() ie, a normal interrupt),
+ * would take an extra 11 clock cycles to run, and take up an extra 16 bytes of flash. That
+ * usually isn't worth using a naked ISR. When you're on a 2k chip and the code overflows the flash
+ * by less than 16 bytes, it matters a great deal. Similarly in cases where performance is of utmost
+ * importance can demand this, recall that an interrupt takes around 5 to 6 clocks to get to, and 4
+ * to get back from, so if simply setting a flag is all you need to do, it wil halve the tiem it
+ * spends doing the interrupt-related things. Such cases are rare indeed, but they do exist.
+ * If you needed an interrupt that could run whie you were outputting data to a string of
+ * neopixel type LEDs, for example, that would be possible using only a slightly modified
+ * version of the tinyNeoPixel code (interrupts would need to be disabled between the first
+ * and second calls to ST, but a *very* fast interrupt would not be fatal as long as it was prevented
+ * from firing during a 0 bit while the data line was high)
+
 /* OK - digitalWriteFast() where both arguments are constant maps directly to sbi*/
 ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 {
@@ -252,4 +334,4 @@ ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 ```
 
 
-`*` Those registers have, between 2015 and 2021 been called GPIORn. GPIOn, and GPR.GPRn. At this rate, buy 2030, we'll have 
+`*` Those registers have, between 2015 and 2021 been called GPIORn. GPIOn, and GPR.GPRn. At this rate, buy 2030, we'll have
