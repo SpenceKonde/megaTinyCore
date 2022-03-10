@@ -166,7 +166,7 @@ Specifies what functionality the UPDI pin should have. Be careful when selecting
 
 
 ### `board_fuses`
-You can also manually set the fuse values if you prefer this instead letting PlatformIO figuring them for you. The ones you don't manually specify _will_ be calculated by PlatformIO.
+You can also manually set the fuse values if you prefer this instead letting PlatformIO figuring them for you. The ones you don't manually specify *will* be calculated by PlatformIO.
 
 ``` ini
 [env:set_fuses]

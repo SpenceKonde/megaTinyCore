@@ -1,9 +1,9 @@
 # Pin interrupts
 While the usual `attachInterrupt()` functionality is provided by megaTinyCore (and works on every pin, with every type of trigger), these will take longer to run, and use more flash, than an equivalent interrupt implemented manually (due to the need to check for all 8 pins - while a manually implemented scheme would know that only the pins configured to generate interrupts need to be checked; that takes both time and flash space). Additionally, there are common use cases (for example, reading rotary encoders, particularly more than one) where each pin being handled separately prevents convenient shortcuts from being taken. Worst of all, attaching any pin interrupt through the API causes the core to glom onto EVERY pin change interrupt. I need to fix this, or improve it, or something, but it's a very tricky problem!
 
-It is of course even more of a problem on the Dx-series parts any call to attachInterrupt will block off all 56 interrupts, instead of just 22 at most.
+It is of course even more of a problem on the Dx-series parts any call to attachInterrupt will block off up to 56 interrupts (well, actually at most 48; nobody noticed that PORTG didn't support attachInterrupt before; the "old implementation" was not updated to change that behavior), instead of just 22 at most.
 
-See also: [InterruptVectorNames.md](InterruptVectorNames.md)
+See also [the general interrupt reference](Ref_Interrupts.md)
 
 For these reasons, it is usually desirable and often necessary to manually implement a pin interrupt instead of using `attachInterrupt();`
 
@@ -15,10 +15,6 @@ The most problematic library that uses attachInterrupt is SoftwareSerial (mostly
 Note that this means that any library that needs to directly define a pin interrupt (for example, to minimize code size or meet response time requirements) is incompatible with any library that uses attachInterrupt, and vice versa. This is an unfortunate consequence of the design decisions made when the attachInterrupt API was written by Arduino. Unfortunately, time machines remain stubbornly out of reach, so we can't fix the attachInterrupt API.
 
 megaTinycore and DxCore have attempted to do the next best thing, and starting from 2.5.0 (though it is broken in 2.5.0 through 2.5.10) implemented two new modes for attachInterrupt(). The default ("All ports") mode uses a slightly more efficient implementation, but suffers from the same essential flaw, that it blocks off every available interrupt - though it is slightly faster, wastes about 50 fewer bytes per port, and the minimum time between the same interrupt trigger being set twice without missing either of them is shorter, because the flags are cleared before calling user code instead of after. The "manual mode" uses the new implementation - with the added caveat that you must call attachPortAEnable() (replace A with the letter of the port you need to attach to) before you call attachInterrupt(). Any number of ports present on the part can be enabled, and only those ports will have the interrupt used by it. If you needed to put a SoftwareSerial port on PORTA, you could select manual attach mode, call attachPortAEnable() before you called MySoftSerial.begin(), and still also use `ISR(PORTB_PORT_vect) {...}` to define a vector.
-
-There are two versions of the new implementation for "all ports" and "manual":
-  * "Late Clear" clears the flags *after* executing all attached interrupts. It takes a few clocks longer to enter and exit the interrupt, a few bytes more flash, and it is more likely to miss two interrupts that happen in rapid succession. This is should be compatible with all code that works with normal attachInterrupt.
-  * "Early Clear" clears the flags *before* executing *any* attached handlers. This saves around 10 clock cycles, and reduces the chance of missing the second of two interrupts which occur in rapid succession. However, if you need to disable the interrupt within the ISR (for example, when using a LOW LEVEL interrupt), you must clear the flag after you turn off the interrupt.
 
 To deal with the fact that this has been a very rough road to get working, there is also an option in the submenu to fall back to the stock attachInterrupt implementation, with all of it's disadvantages.
 
