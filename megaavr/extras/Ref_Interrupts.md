@@ -74,13 +74,14 @@ Almost all flags *can* be manually cleared - the ones that can be cleared automa
 * The NMI is a very special interrupt; it can be configured to be a normal interrupt *or* a Non-Maskable Interrupt. In NMI mode, the part will sit there running the interrupt instead of almost-working with damaged firmware - which could potentially create a dangerous situation if it was part of a life-saftety critical device, like the controller for an airbag, or antilock breaks in a car. In such cases, corrupted firmware might appear work fine, if the corruption only impacted code-paths related to handling the relevant emergency situations, so the vehicle and hence operator would not be aware of a problem until . No matter what the damaged firmware tries to do, it cannot disable or bypass the NMI. Only loading working firmware and resetting it will clear the NMI. This is of particular relevance in life-safety-critical applications which these parts (but NOT this software package nor Arduino in general) are certified for. Not something likely to be used in Arduino-land.
 
 ## For non-port interrupts, clear the INTFLAGS after configuring everything except actually turning on the interrupt.
-With only a few exceptions (see the datasheet) interrupt flags are set regardless of whether the interrupt is enabled, so it's not unusual for an intflag to have become set either during the configuration process, or prior. Once you configure the peripheral, you should clar the INTFLAGS as one of the last steps. I usually configure everything else, clear the flags, enable the interrupts I want, and finally enable the peripheral. Alternately, globally disable interrupts while configuring a peripheral that will generate an interrupt, and clear the flags when you reenable interrupts.
+With only a few exceptions (see the datasheet and in the case of he ACO, errata as well) interrupt flags are set regardless of whether the interrupt is enabled, so it's not unusual for an intflag to have become set either during the configuration process, or prior to it. Once you configure the peripheral, you should clar the INTFLAGS as one of the last steps, before the interrupts are enabled I usually configure everything else, clear the flags, enable the interrupts I want, and finally enable the peripheral.
+
+Note that the flags are still set if interrupts are globaly disabled. So even if youglobally disable interrupts while configuring a peripheral during the configuration process, you must clear the flags prior to you reenabling interrupts.
 
 PORT interrupts only set the flags when the PINnCTRL register is set to generate an interrupt.
 
 ## Vectors linked to many flags
-There are a few vectors with a lot of flags that can trigger them. For example, each of the PORT interrupts has 8 flags that can trigger it. One hazard with these is that if you have a large number enabled - especially if your ISR is longer than it ought to be - that interrupts could fire whille the ISR is running. You need to make sure you aren't missing those:
-*note - these depict calling a function from the ISR. Unless the function is only called in this one place and hence will be inlined, that is not good practice, and it involves a an extra 30 bytes and 45 clocks (approx) of overhead just because it's a function call*
+There are a few vectors with a lot of flags that can trigger them. For example, each of the PORT interrupts has 8 flags that can trigger it. One hazard with these is that if you have a large number enabled - especially if your ISR is longer than it ought to be - that interrupts could fire whille the ISR is running. You typically want to avoid missing any interrupts. *note - these depict calling a function from the ISR. Unless the function is only called in this one place and hence will be inlined, that is not good practice, and it involves a an extra 30 bytes and 45 clocks (approx) of overhead just because it's a function call*
 
 **Wrong**
 ```c++
@@ -96,7 +97,7 @@ ISR(PERIPHERAL_INT_vect) {
 ```
 
 **Usually wrong - except for some pin interrupts**
-This method is less wrong than the first. Compared to the third method, this "late clear" is worse when the interrupt is one that does not have a normall interrupt enable bit somewhere, and you are disabling it during the ISR (the most common case is when a pin interrupt is set or to trigger on LOW LEVEL)) and it is possible that an interrupt could occur again between an "early clear" and when you disable the the interrupt - amd stil trogger when the flag is set, even when disabled (again, only the on example I can think of).
+The "late clear" method is far less wrong than the first. You read he flags, and base your actions on them. Then, after the interrupt processing is done, you clear **the flags you recorded and used**. This will guarantee that if you have interrupts on (say) other pins on a port different from the one that triggered the ISR, and they meet the interrupt condition while handling the first interrupt, as soon as the ISR returns, it will execute a single instruction and then restart the interrupt to handle the other pin(s). **this is the only correct way to deal with a LOW_LEVEL pin interrupt** since you need to turn off the interrupt during the ISR. On the other hand, it's possible that one handler will be much longer than the other (you try to avoid long running interrupts, but sometimes you have no choice). If one of the flags is handled fast, and the condition occurs relatively frequently you could miss one because you were handling the slow one.
 
 ```c++
 ISR(PERIPHERAL_INT_vect) {
@@ -111,8 +112,8 @@ ISR(PERIPHERAL_INT_vect) {
 }
 ```
 
-**Often wrong for pin inerrupts that can fire in rapid succession, otherwise usually right**
-One approach to address that is clearing the flags early. This is a good method for any interrupt except a pin interrupt that you disable in the ISR. Non-pin interrupts can be disabled by an interrupt enable bit (usually in PERIPHERAL.INTCTRL), and the INTFLAGS are set regardless of whether the pin is enabled. On the other hand, pin interrupts that may retrigger very quickly (particularly a LOW LEVEL interrupt, which will immediaely retrigger if the pin is still low, but also potentially switches that bounce). It is also suitable for pin interupts where the interrupt running once more after you disable it (such as a do-nothing int for waking the chip) is not problematic.
+**Usually right - but wrong for most pin interrupts**
+One approach to address that is clearing the flags early. This is a good method for any interrupt except a pin interrupt that you disable in the ISR. Non-pin interrupts can be disabled by an interrupt enable bit (usually in PERIPHERAL.INTCTRL), and the INTFLAGS are set regardless of whether the pin is enabled. But pin interrupts that may retrigger very quickly (particularly a LOW LEVEL interrupt, which will immediaely retrigger if the pin is still low, but also potentially switches that bounce). It is also suitable for pin interupts where the interrupt running once more after you disable it (such as a do-nothing int for waking the chip) is not problematic.
 ```c++
 // Check and clear flags at start of ISR.
 ISR(PERIPHERAL_INT_vect) {
@@ -128,12 +129,12 @@ ISR(PERIPHERAL_INT_vect) {
 }
 ```
 
-**A middle of the road option**
-When you ARE disabling the interrupt, AND the interrupt flag will fire the ISR even when interupt isn't enabled (ie, like a PORT pin interrupt), your best option is likely something like this:
+**Dealing with the damned pin interrupts**
+When you ARE disabling the interrupt, AND the interrupt flag will fire the ISR even when interupt isn't enabled (ie, like a PORT pin interrupt), there are several approaches
 ```cpp
-ISR(PORA_PORT_vect) {
+ISR(PORTA_PORT_vect) {
   //check flags
-  byte flags = VPORTA.INTFLAGS //here we'll use a port example, like I said, I can't think of any other cases where the disable benavior is wacky like this.
+  byte flags = VPORTA.INTFLAGS; //here we'll use a port example, like I said, I can't think of any other cases where the disable benavior is wacky like this.
   // Let's assume flags 0 and 3 may be set.
   if (flags & (1 << 1)) {           // Check if the flag is set, if it is; since we se flags to determine what code to run, we need o check flags, otherwise we
     //                              // get to second half, and have cleared some flags that weren't recorded in flags because they happened during that timr!
@@ -152,21 +153,17 @@ ISR(PORA_PORT_vect) {
     // Handle flag 3 interrupt.
   }
 }
-/* NOW f couse, if your ISRs are nice anmd short like the shold be,
- * You can do things like this, making it more efficient - but only if the code we're running is mad short */
-ISR(PORA_PORT_vect) {
-  ; //here we'll use a port example, like I said, I can't think of any other cases where the disable benavior is wacky like this.
-  // Let's assume flags 0 and 3 may be set, and that PA0 does nothing but wake the chip from sleep, while PB3 sets a flag that we check in loop to see f something has happened:L
-  if (VPORTA.INTFLAGS & (1 << 1)) { // Check if the flag is set (which we can do, since we didn't ahve to make a copy of it, if it is,
-    VPORTA.INTFLAGS |= (1 << 3);    // Clear the flag, and we want to turn off hat interrupt
-    PORTA.PIN0CTRL &= ~PORT_ISC_gm; // so we do so here.
-    // Nothing more to do for PA1 - all we want is for an int to fire.
+
+
+ISR(PORTA_PORT_vect) {
+  // Imagine we have two interrupts on PORTA. Both the troublesome LOW_LEVEL type that we are using to wake from sleep, and we don't want the interrupts to fire while awake, that is, we want to disable the interrupts.
+  // Howeer, one of the pins (say PA3) should also set a global flag, while the other (PA1) should just wake the part.
+  PORTA.PIN3CTRL &= ~PORT_ISC_gm;   // disable both interrupts.
+  PORTA.PIN1CTRL &= ~PORT_ISC_gm;   //
+  if (flags & (1 << 3)) {           // Check for the flag
+    GPIOR3 |= 1;                    // Set a global flag very quickly.
   }
-  if (VPORTA.INTFLAGS & (1 << 3)) {  // Again if nothing else, reading from that copy of flags is markedly faster.
-    VPORTA.INTFLAGS |= (1 << 3);     // Again wih the clearing
-    PORTA.PIMN3CTRL &= ~PORT_ISC_gm;  // And we said we wanted to disable it.
-    GPIOR3 |= 1;                      // but if that's all we need to do in the ISR. this is much faster.
-  }
+  VPORTA.INTFLAGS = (1 << 3) | (1 << 1); // constant folding occurs here turning it into VPORTA.INTFLAGS = 0x09; Notice how VPORT intflags here is written with simple assignment.
 }
 ```
 
@@ -235,6 +232,18 @@ ISR(PERIPHERAL1_INT_vect){
 ```
 
 `ISR_ALIASOF()` can point a vector at an `EMPTY_INTERRUPT` which saves 2 bytes of flash compared to each one set EMPTY_INTERRUPT individually.
+
+## VPORTx.INTFLAGS is a WACKY register
+The behaviior of |= and = are trastically different - but unlike other intflag registers, where there's never a correct time to use |=, because it's in the low I/O space, |= is the fastest way to clear a single bit, and behaves very differently from |= when more that one bit is specified. However, using the VPORT registers is always faster **unless** the port is not known at compile time. In that case, the VPORT will no longer act like a VPORT and will be used like a normal register. So **don't do that!** If the compiler cannot treat the address of the register as compile time known, use the PORTx.INTFLAGS, not the VPORTx.INTFLAGS. However, because inside of an interrupt is usually where you most care about speed, the VPORT.INTFLAGS register is most often used, rather than PORTx.INTFLAGS if either could be used.
+
+* `VPORTA.INTFLAGS = 1 << 2;` this takes two clocks - 1 to load the constant '4' to a register, and one to write it to the flag register, and each of these take 1 word (2 bytes) of flash. It results in bit 2 being cleared.
+* `VPORTA.INTFLAGS |= 1 << 2;` This takes only one clock, since it's a single bit set or clear on a low I/O register, and only word of flash. It results in bit 1 being cleared. This is smaller and faster than the above.
+* `VPORTA.INTFLAGS = (1 << 2) | (1 << 1);` this takes two clocks - 1 to load the constant '6' to a register, and one to write it to the flag register, and each of these take 1 word (2 bytes) of flash. It results in bits 1 and 2 being cleared.
+* `VPORTA.INTFLAGS |= (1 << 2) | (1 << 1);` This instead takes 3 clocks - 1 to read the register, 1 to OR it with the and 1 to write it back. It clears **ALL BITS** because a bit is either cleared already, or set, so it will be written 1 and cleared. The compiler has no idea thatthere's anything special about this register. Don't do this!
+* `PORTA.INTFLAGS |= 1 << 2;` Unlike the VPORT intflags, writing the PORT intflags with |= even for one bit will still clear ever set bit. Don't do this!
+* `PORTA.INTFLAGS = 1 << 2;` or `VPORTA.INTFLAGS |= (1 << 2) | (1 << 1);` This is the right way to set it using the PORTx.INTFLAGS, works with an bit pattern. But it takes 3 clocks and 3 words of flash instead of 1.
+
+
 
 ## Reminders
 * ISRs should run FAST. Minimize the time that the code spends in the ISR. Never use polling loops unless you know that they will only need a couple of passes (an example would be TCD0 ENRDY or CMDRDY, which will never take longer than 16 clocks to clear), and avoid writing to serial. Most interrupts should just set a flag that is checked elsewhere, and do what must be done that instant (ex, read an incoming data byte from a register and store it in a buffer then set a flag or byte indicating at what point in the buffer it's at. Don't process the byte you received and figure out what it's instructing you to do - that should be done outside of the interrupt).

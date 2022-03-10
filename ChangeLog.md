@@ -6,11 +6,11 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### Planned 2.5.11
 * **CRITICAL BUGFIX** - I finally saw the bug in my attachInterrupt implementation. I had a operands of a load backwards. (#651)
-* Make it possible to have applications that use our USERSIG library be code compatible with DxCore by providing do-nothing functions in place of the required do-something flush(), pending() functions, add erase() and make everything match the return types and report success.
+* Make it possible to have applications that use our USERSIG library be code compatible with DxCore by providing do-nothing functions in place of dxcore's flush(), pending() functions, add erase() and make everything match the return types and report success.
 * Documentation improvements in a few areas.
 * tinyNeoPixel should work at lower clock speeds now possibly down to 4 MHz!
 * Fix output asset names for Microchip board definitions.
-
+* Preempt compatibility problems with libraries that assume a HardwareSerial.h file.
 
 ### Ongoing
 * Port enhanced documentation from DxCore.
