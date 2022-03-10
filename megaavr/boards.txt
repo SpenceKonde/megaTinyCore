@@ -437,17 +437,11 @@ atxy7.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy7.menu.attach.allenabled=On all pins, new implementation.
 atxy7.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy7.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy7.menu.attach.manual=Only enabled ports
 atxy7.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy7.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy7.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy7.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy7.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy7.menu.attach.oldversion=Old version, may fix bugs.
 atxy7.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy7.menu.attach.manual.build.attachabr=.aMan
-atxy7.menu.attach.all_late.build.attachabr=.aL
-atxy7.menu.attach.manual_late.build.attachabr=.aLMan
 atxy7.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
@@ -812,17 +806,11 @@ atxy6.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy6.menu.attach.allenabled=On all pins, like usual
 atxy6.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy6.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy6.menu.attach.manual=Only enabled ports
 atxy6.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy6.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy6.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy6.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy6.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy6.menu.attach.oldversion=Old version, (may fix bugs)
 atxy6.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy6.menu.attach.manual.build.attachabr=.aMan
-atxy6.menu.attach.all_late.build.attachabr=.aL
-atxy6.menu.attach.manual_late.build.attachabr=.aLMan
 atxy6.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
@@ -1187,17 +1175,11 @@ atxy4.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy4.menu.attach.allenabled=On all pins, like usual
 atxy4.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy4.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy4.menu.attach.manual=Only enabled ports
 atxy4.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy4.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy4.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy4.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy4.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy4.menu.attach.oldversion=Old version, (may fix bugs)
 atxy4.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy4.menu.attach.manual.build.attachabr=.aMan
-atxy4.menu.attach.all_late.build.attachabr=.aL
-atxy4.menu.attach.manual_late.build.attachabr=.aLMan
 atxy4.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -1514,17 +1496,11 @@ atxy2.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy2.menu.attach.allenabled=On all pins, like usual
 atxy2.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy2.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy2.menu.attach.manual=Only enabled ports
 atxy2.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy2.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy2.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy2.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy2.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy2.menu.attach.oldversion=Old version, (may fix bugs)
 atxy2.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy2.menu.attach.manual.build.attachabr=.aMan
-atxy2.menu.attach.all_late.build.attachabr=.aL
-atxy2.menu.attach.manual_late.build.attachabr=.aLMan
 atxy2.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -1847,17 +1823,11 @@ microchip.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 microchip.menu.attach.allenabled=On all pins, like usual
 microchip.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-microchip.menu.attach.manual=Only enabled ports. Please see documentation.
+microchip.menu.attach.manual=Only enabled ports
 microchip.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-microchip.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-microchip.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-microchip.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-microchip.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 microchip.menu.attach.oldversion=Old version, (may fix bugs)
 microchip.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 microchip.menu.attach.manual.build.attachabr=.aMan
-microchip.menu.attach.all_late.build.attachabr=.aL
-microchip.menu.attach.manual_late.build.attachabr=.aLMan
 microchip.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
@@ -2188,17 +2158,11 @@ atxy7o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy7o.menu.attach.allenabled=On all pins, like usual
 atxy7o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy7o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy7o.menu.attach.manual=Only enabled ports
 atxy7o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy7o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy7o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy7o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy7o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy7o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy7o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy7o.menu.attach.manual.build.attachabr=.aMan
-atxy7o.menu.attach.all_late.build.attachabr=.aL
-atxy7o.menu.attach.manual_late.build.attachabr=.aLMan
 atxy7o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -2511,17 +2475,11 @@ atx27o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atx27o.menu.attach.allenabled=On all pins, like usual
 atx27o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atx27o.menu.attach.manual=Only enabled ports. Please see documentation.
+atx27o.menu.attach.manual=Only enabled ports
 atx27o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atx27o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atx27o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atx27o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atx27o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atx27o.menu.attach.oldversion=Old version, (may fix bugs)
 atx27o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atx27o.menu.attach.manual.build.attachabr=.aMan
-atx27o.menu.attach.all_late.build.attachabr=.aL
-atx27o.menu.attach.manual_late.build.attachabr=.aLMan
 atx27o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -2850,17 +2808,11 @@ atxy6o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy6o.menu.attach.allenabled=On all pins, like usual
 atxy6o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy6o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy6o.menu.attach.manual=Only enabled ports
 atxy6o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy6o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy6o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy6o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy6o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy6o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy6o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy6o.menu.attach.manual.build.attachabr=.aMan
-atxy6o.menu.attach.all_late.build.attachabr=.aL
-atxy6o.menu.attach.manual_late.build.attachabr=.aLMan
 atxy6o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -3173,17 +3125,11 @@ atx26o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atx26o.menu.attach.allenabled=On all pins, like usual
 atx26o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atx26o.menu.attach.manual=Only enabled ports. Please see documentation.
+atx26o.menu.attach.manual=Only enabled ports
 atx26o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atx26o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atx26o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atx26o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atx26o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atx26o.menu.attach.oldversion=Old version, (may fix bugs)
 atx26o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atx26o.menu.attach.manual.build.attachabr=.aMan
-atx26o.menu.attach.all_late.build.attachabr=.aL
-atx26o.menu.attach.manual_late.build.attachabr=.aLMan
 atx26o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -3525,17 +3471,11 @@ atxy4o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy4o.menu.attach.allenabled=On all pins, like usual
 atxy4o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy4o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy4o.menu.attach.manual=Only enabled ports
 atxy4o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy4o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy4o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy4o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy4o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy4o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy4o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy4o.menu.attach.manual.build.attachabr=.aMan
-atxy4o.menu.attach.all_late.build.attachabr=.aL
-atxy4o.menu.attach.manual_late.build.attachabr=.aLMan
 atxy4o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -3843,17 +3783,11 @@ atx24o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atx24o.menu.attach.allenabled=On all pins, like usual
 atx24o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atx24o.menu.attach.manual=Only enabled ports. Please see documentation.
+atx24o.menu.attach.manual=Only enabled ports
 atx24o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atx24o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atx24o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atx24o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atx24o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atx24o.menu.attach.oldversion=Old version, (may fix bugs)
 atx24o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atx24o.menu.attach.manual.build.attachabr=.aMan
-atx24o.menu.attach.all_late.build.attachabr=.aL
-atx24o.menu.attach.manual_late.build.attachabr=.aLMan
 atx24o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -4173,17 +4107,11 @@ atxy2o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy2o.menu.attach.allenabled=On all pins, like usual
 atxy2o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy2o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy2o.menu.attach.manual=Only enabled ports
 atxy2o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy2o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy2o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy2o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy2o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy2o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy2o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy2o.menu.attach.manual.build.attachabr=.aMan
-atxy2o.menu.attach.all_late.build.attachabr=.aL
-atxy2o.menu.attach.manual_late.build.attachabr=.aLMan
 atxy2o.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
@@ -4498,15 +4426,9 @@ microchipo.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 microchipo.menu.attach.allenabled=On all pins, like usual
 microchipo.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-microchipo.menu.attach.manual=Only enabled ports. Please see documentation.
+microchipo.menu.attach.manual=Only enabled ports
 microchipo.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-microchipo.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-microchipo.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-microchipo.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-microchipo.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 microchipo.menu.attach.oldversion=Old version, (may fix bugs)
 microchipo.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 microchipo.menu.attach.manual.build.attachabr=.aMan
-microchipo.menu.attach.all_late.build.attachabr=.aL
-microchipo.menu.attach.manual_late.build.attachabr=.aLMan
 microchipo.menu.attach.oldversion.build.attachabr=.aOld
