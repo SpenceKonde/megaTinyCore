@@ -68,7 +68,7 @@ class TwoWire: public Stream {
     bool swap(uint8_t state = 1);
     bool swapModule(TWI_t *twi_module);
     void usePullups();
-    void setClock(uint32_t);
+    uint8_t setClock(uint32_t);
 
     void begin(); // all attempts to make these look prettier were rejected by astyle, and it's not worth disabling linting over.
     void begin(uint8_t  address, bool receive_broadcast, uint8_t second_address);

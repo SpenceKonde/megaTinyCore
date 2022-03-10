@@ -58,7 +58,7 @@ TwoWire::TwoWire(TWI_t *twi_module) {
  *
  *
  *@param      uint8_t sda_pin is the desired pin for SDA
- *            uint8_t scl_pin is the desired pin for SCL
+ *@param      uint8_t scl_pin is the desired pin for SCL
  *
  *@return     bool
  *@retval     true if change was successful
@@ -172,8 +172,8 @@ void TwoWire::begin(void) {
  *
  *
  *@param      uint8_t address - the desired address for the client module
- *            bool receive_broadcast - if true, enables a response on the 0x00 call
- *            uint8_t second_address holds the data for the SADDRMASK register. If the LSB is '1'
+ *@param      bool receive_broadcast - if true, enables a response on the 0x00 call
+ *@param      uint8_t second_address holds the data for the SADDRMASK register. If the LSB is '1'
  *              the TWI handles the 7 MSB as a second address for the client, otherwise the 7 MSB
  *              act as a bit mask, that disables the check on the corresponding SADDR bit.
  *
@@ -193,12 +193,14 @@ void TwoWire::begin(uint8_t address, bool receive_broadcast, uint8_t second_addr
  *
  *            Has only an effect when used after begin(void)
  *
- *@param      uint32_t clock - the desired clock in Hertz
+ *@param      uint32_t clock - the desired clock in hertz
  *
- *@return     void
+ *@return     uint8_t
+ *@retval       0 if no error occurred
+ *@retval       1 if a problem occurred
  */
-void TwoWire::setClock(uint32_t clock) {
-  TWI_MasterSetBaud(&vars, clock);
+uint8_t TwoWire::setClock(uint32_t clock) {
+  return TWI_MasterSetBaud(&vars, clock);
 }
 
 
@@ -215,7 +217,7 @@ void TwoWire::end(void) {
 
 
 /**
- *@brief      endhost disables the TWI host
+ *@brief      endMaster disables the TWI host
  *
  *@param      void
  *
@@ -251,8 +253,8 @@ void TwoWire::endSlave(void) {
  *            Received Bytes must be read with read().
  *
  *@param      int/uint8_t address - the address of the client
- *            int/uint8_t/size_t quantity - the amount of bytes that are expected to be received
- *            int/bool sendStop - if the transaction should be terminated with a STOP condition
+ *@param      int/uint8_t/size_t quantity - the amount of bytes that are expected to be received
+ *@param      int/bool sendStop - if the transaction should be terminated with a STOP condition
  *
  *@return     uint8_t
  *@retval     amount of bytes that were actually read. If 0, no read took place due to a bus error.
@@ -326,11 +328,14 @@ void TwoWire::beginTransmission(uint8_t address) {
  *
  *@return     uint8_t
  *@retval     0 for success,
- *            2 for timeout at address byte
- *            3 for timeout at a data byte
+ *            2 for when the address was NACK'd
+ *            3 for when the data was NACK'd
  *            4 for unknown error
- *           16 for bus arbitration lost
- *           17 for lines held low or pullups absent.
+ *            5 for timeout on the bus
+ *           16 for TWI is in a bad state
+ *           17 for the pull ups likely missing
+ *           18 for a bus arbitration/bus fault
+ *           20 for likely a slave holding the clock low
  *          255 (-1) for TWI not initialized (begin not called) or bus somehow in "unknown" state.
  */
 uint8_t TwoWire::endTransmission(bool sendStop) {
@@ -341,10 +346,11 @@ uint8_t TwoWire::endTransmission(bool sendStop) {
 
 
 /**
- *@brief      write fills the transmit buffers, host or client depending on when it is called
+ *@brief      write fills the transmit buffers, master or slave, depending on when it is called
  *
- *            Usually, the function fills the host transmit buffer.
- *            If called inside the specified onReceive or onRequest functions, the client buffer will be filled
+ *            Usually, the function fills the master transmit buffer.
+ *            If called inside the specified onReceive or onRequest functions, or after
+ *            selectSlaveBuffer, it fills the slave buffer.
  *
  *@param      uint8_t data - byte to put into the buffer
  *
@@ -390,7 +396,7 @@ size_t TwoWire::write(uint8_t data) {
  *            calls the write function in a for-loop
  *
  *@param      uint8_t *data - pointer to the array
- *            size_t quantity - amount of bytes to copy
+ *@param      size_t quantity - amount of bytes to copy
  *
  *
  *@return     uint8_t
@@ -412,8 +418,8 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity) {
  *@brief      available returns the amount of bytes that are available to read in the host or client buffer
  *
  *            Usually, the function returns the amount of bytes to read in the host buffer.
- *            If called inside the specified onReceive or onRequest functions,
- *            it returns the amount of bytes from the client buffer
+ *            If called inside the specified onReceive or onRequest functions, or after
+ *            selectSlaveBuffer, it returns the amount of bytes ready to read in the client buffer
  *
  *@param      void
  *
@@ -443,8 +449,9 @@ int TwoWire::available(void) {
  *@brief      read returns a byte from the host or client buffer and removes it from there
  *
  *            Usually, the function returns the byte from the host buffer.
- *            If called inside the specified onReceive or onRequest functions,
- *            it returns the byte from the client buffer
+ *            If called inside the specified onReceive or onRequest functions, or after
+ *            selectSlaveBuffer, it returns the first byte from the slave buffer and removes it
+ *            from there.
  *
  *@param      void
  *
@@ -491,8 +498,9 @@ int TwoWire::read(void) {
  *@brief      peek returns a byte from the host or client buffer but does not remove it
  *
  *            Usually, the function returns the byte from the host buffer.
- *            If called inside the specified onReceive or onRequest functions,
- *            it returns the byte from the client buffer
+ *            If called inside the specified onReceive or onRequest functions, or after
+ *            selectSlaveBuffer, it returns the first byte from the slave buffer but does not
+ *            remove it like read().
  *
  *@param      void
  *
@@ -608,9 +616,9 @@ uint8_t TwoWire::getBytesRead() {
 
 uint8_t TwoWire::slaveTransactionOpen() {
   uint8_t status = vars._module->SSTATUS;
-  if (!(status & 1)) return 0;  // If low bit cleared, last match was a stop condition -> not in transaction.
-  if (status & 2) return 2;     // Second bit will be 1 if last address match was for read
-  return 1;                     // Otherwise it was a write.
+  if (!(status & TWI_AP_bm)) return 0;  // If AP bit is cleared, last match was a stop condition -> not in transaction.
+  if (status & TWI_DIR_bm) return 2;    // DIR bit will be 1 if last address match was for read
+  return 1;                             // Otherwise it was a write.
 }
 
 /**
@@ -620,7 +628,7 @@ uint8_t TwoWire::slaveTransactionOpen() {
  *            Only available on the chips with a bigger pin count. See data sheet.
  *
  *@param      bool fmp_enable - set true if the TWI module has to expect a high
- *              frequency on the salve pins
+ *              frequency (>400kHz) on the salve pins
  *
  *@return     void
  */

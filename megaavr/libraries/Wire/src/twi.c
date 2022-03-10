@@ -41,11 +41,7 @@ void SlaveIRQ_DataWrite(struct twiData *_data);
 /**
  *@brief      TWI_MasterInit Initializes TWI host operation if not already initialized
  *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used:
- *              _bools._hostEnabled
- *              _bools._clientEnabled
- *              _module
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
  *
  *@return     void
  */
@@ -83,15 +79,11 @@ void TWI_MasterInit(struct twiData *_data) {
 /**
  *@brief      TWI_SlaveInit Initializes TWI client operation if not already initialized
  *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _bools._hostEnabled
- *                _bools._clientEnabled
- *                _module
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
  *@param      uint8_t address holds the primary address that this TWI client should listen to
- *            uint8_t receive_broadcast if true, instructs the TWI client to react to the
+ *@param      uint8_t receive_broadcast if true, instructs the TWI client to react to the
  *              general TWI call 0x00
- *            uint8_t second_address holds the data for the SADDRMASK register. If the LSB is '1'
+ *@param      uint8_t second_address holds the data for the SADDRMASK register. If the LSB is '1'
  *              the TWI handles the 7 MSB as a second address for the client, otherwise the 7 MSB
  *              act as a bit mask, that disables the check on the corresponding SADDR bit.
  *
@@ -132,9 +124,7 @@ void TWI_SlaveInit(struct twiData *_data, uint8_t address, uint8_t receive_broad
 /**
  *@brief      TWI_Flush clears the internal state of the host and changes the bus state to idle
  *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _module
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
  *
  *@return             void
  */
@@ -142,8 +132,8 @@ void TWI_Flush(struct twiData *_data) {
   #if defined(ERRATA_TWI_FLUSH)
     // badCall("The AVR DA-series parts are impacted by an errata that leaves the TWI peripheral in a non-functioning state when using flush.");
     // restarting TWI hardware by hand. Extra size shouldn't matter on DA series
-    uint8_t temp_MCTRLA      = _data->_module->MCTRLA;
-    uint8_t temp_SCTRLA      = _data->_module->SCTRLA;
+    uint8_t temp_MCTRLA     = _data->_module->MCTRLA;
+    uint8_t temp_SCTRLA     = _data->_module->SCTRLA;
     _data->_module->MCTRLA  = 0x00;
     _data->_module->SCTRLA  = 0x00;
     _data->_module->MCTRLA  = temp_MCTRLA;
@@ -158,9 +148,7 @@ void TWI_Flush(struct twiData *_data) {
 /**
  *@brief      TWI_Disable disables the TWI host and client
  *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _module
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
  *
  *@return     void
  */
@@ -173,10 +161,7 @@ void TWI_Disable(struct twiData *_data) {
 /**
  *@brief      TWI_DisableMaster disables the TWI host
  *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _bools._hostEnabled
- *                _module
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
  *
  *@return     void
  */
@@ -194,10 +179,8 @@ void TWI_DisableMaster(struct twiData *_data) {
 /**
  *@brief      TWI_DisableSlave disables the TWI client
  *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _bools._clientEnabled
- *                _module
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
+ *
  *@return     void
  */
 void TWI_DisableSlave(struct twiData *_data) {
@@ -220,18 +203,25 @@ void TWI_DisableSlave(struct twiData *_data) {
 /**
  *@brief      TWI_MasterSetBaud sets the baud register to get the desired frequency
  *
- *            After checking if the host is actually enabled, the new baud is calculated.
- *              Then it is compared to the old baud. Only if they differ, the host is disabled,
- *              the baud register updated, and the host re-enabled
+ *            After checking if the master mode is actually enabled, the new baud is calculated.
+ *              Then it is compared to the old baud. Only if they differ, the TWI is disabled,
+ *              the baud register updated, and the TWI re-enabled
  *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *              _bools._hostEnabled
- *              _module
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
  *
- *@return     void
+ *@return     uint8_t 1 - something went wrong; 0 - new frequency set.
  */
-void TWI_MasterSetBaud(struct twiData *_data, uint32_t frequency) {
+uint8_t TWI_MasterSetBaud(struct twiData *_data, uint32_t frequency) {
+  if (__builtin_constant_p(frequency)) {
+    if ((frequency < 1000) || (frequency > 15000000)) {
+      badArg("Invalid frequency was passed for SCL clock!");
+      return 1;
+    }
+  } else {
+    if (frequency < 1000) {
+      return 1;
+    }
+  }
   if (_data->_bools._hostEnabled == 1) {                  // Do something only if the host is enabled.
     uint8_t newBaud = TWI_MasterCalcBaud(frequency);      // get the new Baud value
     uint8_t oldBaud = _data->_module->MBAUD;              // load the old Baud value
@@ -239,18 +229,67 @@ void TWI_MasterSetBaud(struct twiData *_data, uint32_t frequency) {
       uint8_t restore = _data->_module->MCTRLA;           // Save the old Master state
       _data->_module->MCTRLA    = 0;                      // Disable Master
       _data->_module->MBAUD     = newBaud;                // update Baud register
-      if (frequency >= 600000) {
+      if (frequency > 400000) {
         _data->_module->CTRLA  |=  TWI_FMPEN_bm;          // Enable FastMode+
       } else {
         _data->_module->CTRLA  &= ~TWI_FMPEN_bm;          // Disable FastMode+
       }
       _data->_module->MCTRLA    = restore;                // restore the old register, thus enabling it again
-      _data->_module->MSTATUS   = TWI_BUSSTATE_IDLE_gc;   // Force the state machine into Idle according to the data sheet
+      if (restore & TWI_ENABLE_bm) {                      // If the TWI was enabled,
+        _data->_module->MSTATUS   = TWI_BUSSTATE_IDLE_gc;   // Force the state machine into IDLE according to the data sheet
+      }
     }
+    return 0;
   }
+  return 1;
 }
 
+/**
+ *@brief              TWI_MasterCalcBaud calculates the baud for the desired frequency
+ *
+ *@param              uint32_t frequency is the desired frequency
+ *
+ *@return             uint8_t value for the MBAUD register
+ *@retval             the desired baud value
+ */
+#define TWI_BAUD(freq, t_rise) ((F_CPU / freq) / 2) - (5 + (((F_CPU / 1000000) * t_rise) / 2000))
+uint8_t TWI_MasterCalcBaud(uint32_t frequency) {
+  int16_t baud;
 
+  #if (F_CPU == 20000000) || (F_CPU == 10000000)
+    if (frequency >= 600000) {          // assuming 1.5kOhm
+      baud = TWI_BAUD(frequency, 250);
+    } else if (frequency >= 400000) {   // assuming 2.2kOhm
+      baud = TWI_BAUD(frequency, 350);
+    } else {                            // assuming 4.7kOhm
+      baud = TWI_BAUD(frequency, 600);  // 300kHz will be off at 10MHz. Trade-off between size and accuracy
+    }
+  #else
+    if (frequency >= 600000) {          // assuming 1.5kOhm
+      baud = TWI_BAUD(frequency, 250);
+    } else if (frequency >= 400000) {   // assuming 2.2kOhm
+      baud = TWI_BAUD(frequency, 400);
+    } else {                            // assuming 4.7kOhm
+      baud = TWI_BAUD(frequency, 600);
+    }
+  #endif
+
+  #if (F_CPU >= 20000000)
+    const uint8_t baudlimit = 2;
+  #elif (F_CPU == 16000000) || (F_CPU == 8000000) || (F_CPU == 4000000)
+    const uint8_t baudlimit = 1;
+  #else
+    const uint8_t baudlimit = 0;
+  #endif
+
+  if (baud < baudlimit) {
+    return baudlimit;
+  } else if (baud > 255) {
+    return 255;
+  }
+
+  return (uint8_t)baud;
+}
 
 /**
  *@brief      TWI_MasterWrite performs a host write operation on the TWI bus
@@ -260,13 +299,8 @@ void TWI_MasterSetBaud(struct twiData *_data, uint32_t frequency) {
  *            The user has to make sure to have a host write or read at the end with a STOP
  *
  *
- *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _txBuffer[]
- *                _txHead
- *                _txTail
- *            bool send_stop enables the STOP condition at the end of a write
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
+ *@param      bool send_stop enables the STOP condition at the end of a write
  *
  *@return     uint8_t
  *@retval     amount of bytes that were written. If 0, no write took place, either due
@@ -290,10 +324,10 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
   uint16_t timeout = 0;
 
 
-  if ((module->MSTATUS & TWI_BUSSTATE_gm) == TWI_BUSSTATE_UNKNOWN_gc) {
-    return TWI_ERR_UNINIT;                     // If the bus was not initialized, return
-  }
-
+    if (((module->MSTATUS & TWI_BUSSTATE_gm) == TWI_BUSSTATE_UNKNOWN_gc) || // If the bus was not initialized
+      ((module->MCTRLA & TWI_ENABLE_bm) == false)) {  // Or is disabled,
+      return TWI_ERR_UNINIT;                          // return
+    }
 
   while (true) {
     currentStatus = module->MSTATUS;
@@ -334,7 +368,6 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
             timeout = 0;                                          // reset timeout
           } else {                                                // else there is no data to be written
             break;                                                // TX finished, leave loop, error is still TWI_NO_ERR
-
           }
         }
       }
@@ -357,18 +390,12 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
  *            The user has to make sure to have a host write or read at the end with a STOP
  *
  *
- *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _rxBuffer[]
- *                _rxHead
- *                _rxTail
- *
- *            uint8_t bytesToRead is the desired amount of bytes to read. When finished, a
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
+ *@param      uint8_t bytesToRead is the desired amount of bytes to read. When finished, a
  *              NACK is issued.
- *            bool send_stop enables the STOP condition at the end of a write
+ *@param      bool send_stop enables the STOP condition at the end of a write
  *
- *@return     uint8_t
+ *@return     uint8_t amount of actually read bytes
  *@retval     amount of bytes that were actually read. If 0, no read took place due to a bus error
  */
 uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_stop) {
@@ -389,6 +416,7 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
 
   TWIR_INIT_ERROR;             // local variable for errors
   uint8_t dataRead = 0;
+
   if ((module->MSTATUS & TWI_BUSSTATE_gm) != TWI_BUSSTATE_UNKNOWN_gc) {
     uint8_t currentSM;
     uint8_t currentStatus;
@@ -481,15 +509,7 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
  *            with displacement anyway due to the _data parameter being a pointer to a struct.
  *
  *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _incomingAddress/_clientAddress
- *                _txHead(S)
- *                _txTail(S)
- *                _rxHead(S)
- *                _rxTail(S)
- *                _txBuffer(S)[]
- *                _rxBuffer(S)[]
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
  *
  *@return     void
  */
@@ -551,14 +571,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
 /**
  *@brief      SlaveIRQ_AddrRead is a subroutine of TWI_HandleSlaveIRQ and handles the Address Read case
  *
- *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _incomingAddress/_clientAddress
- *                _bools
- *                _txHead
- *                _txTail
- *
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
  *
  *@return     void
  */
@@ -590,6 +603,14 @@ void SlaveIRQ_AddrRead(struct twiData *_data) {
   _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by client data interrupt"
 }
 
+
+/**
+ *@brief      SlaveIRQ_AddrWrite is a subroutine of TWI_HandleSlaveIRQ and handles the Address Write case
+ *
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
+ *
+ *@return     void
+ */
 void SlaveIRQ_AddrWrite(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
     uint8_t* address = &(_data->_incomingAddress);
@@ -607,13 +628,20 @@ void SlaveIRQ_AddrWrite(struct twiData *_data) {
     #endif
   #endif
 
-
   (*address) = _data->_module->SDATA;
   (*rxHead) = 0;                                    // reset buffer positions so the Master can start writing at zero.
   (*rxTail) = 0;
   _data->_module->SCTRLB = TWI_SCMD_RESPONSE_gc;    // "Execute Acknowledge Action succeeded by reception of next byte"
 }
 
+
+/**
+ *@brief      SlaveIRQ_Stop is a subroutine of TWI_HandleSlaveIRQ and handles the STOP case
+ *
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
+ *
+ *@return     void
+ */
 void SlaveIRQ_Stop(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
     uint8_t* rxHead   = &(_data->_bytesToReadWriteS);
@@ -628,13 +656,19 @@ void SlaveIRQ_Stop(struct twiData *_data) {
     #endif
   #endif
 
-
   _data->_module->SSTATUS = TWI_APIF_bm;      // Clear Flag, no further action needed
   NotifyUser_onReceive(_data);                // Notify user program "onReceive" if necessary
   (*rxHead) = 0;                              // User should have handled all data, if not, set available rxBytes to 0
   (*rxTail) = 0;
 }
 
+/**
+ *@brief      SlaveIRQ_DataReadNack is a subroutine of TWI_HandleSlaveIRQ and handles the NACK after a byte transmission
+ *
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
+ *
+ *@return     void
+ */
 void SlaveIRQ_DataReadNack(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
     uint8_t* txHead   = &(_data->_bytesToReadWriteS);
@@ -652,6 +686,13 @@ void SlaveIRQ_DataReadNack(struct twiData *_data) {
   (*txHead) = 0;                                    // Abort further data writes
 }
 
+/**
+ *@brief      SlaveIRQ_DataReadAck is a subroutine of TWI_HandleSlaveIRQ and handles the ACK after a byte transmission
+ *
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
+ *
+ *@return     void
+ */
 void SlaveIRQ_DataReadAck(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
     uint8_t* txHead   = &(_data->_bytesToReadWriteS);
@@ -680,6 +721,14 @@ void SlaveIRQ_DataReadAck(struct twiData *_data) {
   }
 }
 
+
+/**
+ *@brief      SlaveIRQ_DataWrite is a subroutine of TWI_HandleSlaveIRQ and handles the receiving of a byte
+ *
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
+ *
+ *@return     void
+ */
 void SlaveIRQ_DataWrite(struct twiData *_data) {
   #if defined(TWI_MANDS)                            // Master and Slave split
       uint8_t* rxHead   = &(_data->_bytesToReadWriteS);
@@ -717,12 +766,7 @@ void SlaveIRQ_DataWrite(struct twiData *_data) {
  *            This function calls the user defined function in the sketch if it was
  *            registered. It is issued on host READ
  *
- *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _bools
- *                user_onRequest()
- *
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
  *
  *@return     void
  */
@@ -740,12 +784,7 @@ void NotifyUser_onRequest(struct twiData *_data) {
  *            registered. It is issued on host WRITE. the user defined function is only called
  *            if there were bytes written. it passes the amount of written bytes to the user function
  *
- *
- *@param      struct twiData *_data is a pointer to the structure that holds the variables
- *              of a Wire object. Following struct elements are used in this function:
- *                _bools
- *                user_onReceive()
- *
+ *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
  *
  *@return     void
  */
@@ -766,55 +805,3 @@ void NotifyUser_onReceive(struct twiData *_data) {
   }
 }
 
-
-/**
- *@brief              TWI_MasterCalcBaud calculates the baud for the desired frequency
- *
- *@param              uint32_t frequency is the desired frequency
- *
- *@return             uint8_t
- *@retval             the desired baud value
- */
-#define TWI_BAUD(freq, t_rise) ((F_CPU / freq) / 2) - (5 + (((F_CPU / 1000000) * t_rise) / 2000))
-uint8_t TWI_MasterCalcBaud(uint32_t frequency) {
-  uint16_t t_rise;
-  int16_t baud;
-
-  // The nonlinearity of the frequency coupled with the processor frequency a general offset has been calculated and tested for different frequency bands
-  #if F_CPU > 16000000
-    if (frequency <= 100000) {
-      t_rise = 1000;
-      baud = TWI_BAUD(frequency, t_rise) + 6;  // Offset +6
-    } else if (frequency <= 400000) {
-      t_rise = 300;
-      baud = TWI_BAUD(frequency, t_rise) + 1;  // Offset +1
-    } else if (frequency <= 800000) {
-      t_rise = 120;
-      baud = TWI_BAUD(frequency, t_rise);
-    } else {
-      t_rise = 120;
-      baud = TWI_BAUD(frequency, t_rise) - 1;  // Offset -1
-    }
-  #else
-    if (frequency <= 100000) {
-      t_rise = 1000;
-      baud = TWI_BAUD(frequency, t_rise) + 8;  // Offset +8
-    } else if (frequency <= 400000) {
-      t_rise = 300;
-      baud = TWI_BAUD(frequency, t_rise) + 1;  // Offset +1
-    } else if (frequency <= 800000) {
-      t_rise = 120;
-      baud = TWI_BAUD(frequency, t_rise);
-    } else {
-      t_rise = 120;
-      baud = TWI_BAUD(frequency, t_rise) - 1;  // Offset -1
-    }
-  #endif
-
-  if (baud < 1) {
-    baud = 1;
-  } else if (baud > 255) {
-    baud = 255;
-  }
-  return (uint8_t)baud;
-}
