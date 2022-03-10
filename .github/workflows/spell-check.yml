@@ -27,6 +27,6 @@ jobs:
         with:
           check_filenames: true
           check_hidden: true
-          skip: "./.git,*.py,*.gif,*.jpg,*.png"
+          skip: "./.git,*.py,*.gif,*.jpg,*.png",./megaavr/extras/ioheaders/*.h
           # In the event of a false positive, add the word in all lower case to this file:
           ignore_words_file: megaavr/extras/ci/codespell-ignore-words-list.txt
