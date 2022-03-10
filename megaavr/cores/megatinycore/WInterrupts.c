@@ -109,7 +109,7 @@
       SREG = oldSREG;
     }
   }
-#if !defined(CORE_ATTACH_LATECLEAR)
+#if !defined(CORE_ATTACH_EARLYCLEAR)
   void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) isrBody() {
     asm volatile (
      "AttachedISR:"      "\n\t" // as the scene opens, we have r16 on the stack already, portnumber x 2 in the r16
