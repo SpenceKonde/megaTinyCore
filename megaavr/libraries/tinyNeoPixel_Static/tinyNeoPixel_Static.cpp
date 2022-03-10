@@ -130,7 +130,7 @@ void tinyNeoPixel::show(void) {
   //   * Comversely, [port] is never written. The thing that port writes
   //     *too* is changd, but [port] is not.
   //   * b (bit number for speeds that don't have to unroll the loop)
-  //     is given constraint "+r", which can assign it to any regiser.
+  //     is given constraint "+r", which can assign it to any register.
   //     But the code uses LDI on it. LDI doesn't work on every register,
   //     it must have the "+d" constraint to guarantee an upper register.
 

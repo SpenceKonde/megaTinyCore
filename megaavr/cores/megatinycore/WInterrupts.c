@@ -264,7 +264,7 @@
       "pop   r19"         "\n\t" // skip 16 again - it's way down at the end, because it was pushed earlier
       "pop   r18"         "\n\t"
       //"pop   r17"       "\n\t" // Early clear doesn't need the extra registers.
-      //"pop   r15"       "\n\t" // Early clear doesn't need tha extra registers.
+      //"pop   r15"       "\n\t" // Early clear doesn't need the extra registers.
       "pop   r1"          "\n\t"
       "pop   r0"          "\n\t"
       "out   0x3b,  r0"   "\n\t"

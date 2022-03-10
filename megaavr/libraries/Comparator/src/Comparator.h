@@ -195,7 +195,7 @@ namespace ref {
       vref_1v1   = 0x01, // 1.1V
       vref_1v5   = 0x04, // 1.5V
       vref_2v5   = 0x02,
-      vref_4v3   = 0x03, // 4.3V  
+      vref_4v3   = 0x03, // 4.3V
   #endif
   #if defined(DXCORE)
     vref_vrefa = 0x06, // External reference from the VREFA pin

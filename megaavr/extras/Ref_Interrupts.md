@@ -64,7 +64,7 @@ If there is a list of the names defined for the interrupt vectors is present som
 | USART0_TXC_vect   | X | X | X |  1  | Manually        | Often used without the interrupt enabled    |
 
 `*` - There are two classes of 1-series - the ones with 16k or more of flash, and the ones with less. These are only available on the larger ones, because they operate on a peripheral that only exists there.
-`**` - These vectors are traditionally referred to by different names when in split mode or normal mode, but the hardware cant tell the difference between the names.
+`**` - These vectors are traditionally referred to by different names when in split mode or normal mode, but the hardware can't tell the difference between the names.
 
 
 ## Why clearing flags is so complicated
@@ -115,7 +115,7 @@ ISR(PERIPHERAL_INT_vect) {
 ```
 
 **Usually right - but wrong for most pin interrupts**
-One approach to address that is clearing the flags early. This is a good method for any interrupt except a pin interrupt that you disable in the ISR. Non-pin interrupts can be disabled by an interrupt enable bit (usually in PERIPHERAL.INTCTRL), and the INTFLAGS are set regardless of whether the pin is enabled. But pin interrupts that may retrigger very quickly (particularly a LOW LEVEL interrupt, which will immediaely retrigger if the pin is still low, but also potentially switches that bounce). It is also suitable for pin interupts where the interrupt running once more after you disable it (such as a do-nothing int for waking the chip) is not problematic.
+One approach to address that is clearing the flags early. This is a good method for any interrupt except a pin interrupt that you disable in the ISR. Non-pin interrupts can be disabled by an interrupt enable bit (usually in PERIPHERAL.INTCTRL), and the INTFLAGS are set regardless of whether the pin is enabled. But pin interrupts that may retrigger very quickly (particularly a LOW LEVEL interrupt, which will immediaely retrigger if the pin is still low, but also potentially switches that bounce). It is also suitable for pin interrupts where the interrupt running once more after you disable it (such as a do-nothing int for waking the chip) is not problematic.
 ```c++
 // Check and clear flags at start of ISR.
 ISR(PERIPHERAL_INT_vect) {
@@ -132,7 +132,7 @@ ISR(PERIPHERAL_INT_vect) {
 ```
 
 **Dealing with the damned pin interrupts**
-When you ARE disabling the interrupt, AND the interrupt flag will fire the ISR even when interupt isn't enabled (ie, like a PORT pin interrupt), there are several approaches
+When you ARE disabling the interrupt, AND the interrupt flag will fire the ISR even when interrupt isn't enabled (ie, like a PORT pin interrupt), there are several approaches
 ```cpp
 ISR(PORTA_PORT_vect) {
   //check flags
@@ -170,7 +170,7 @@ ISR(PORTA_PORT_vect) {
 ```
 
 **Always okay, but often one of above is the above is better**
-The generalized case of the above, where we don't make any distinction between which ones deserve to be run right after thy're cleared, and which are longer than that should be.Clear the flags as you go is also viable - but, especally with many interrupts on a port, it can be less efficient. **WARNING** if those are actual function calls, and they can't be automatically inlined, this is by far the worst of the implementations! Avoid actual function calls in ISRs if you can, unless you know they will be inlined.
+The generalized case of the above, where we don't make any distinction between which ones deserve to be run right after thy're cleared, and which are longer than that should be.Clear the flags as you go is also viable - but, especially with many interrupts on a port, it can be less efficient. **WARNING** if those are actual function calls, and they can't be automatically inlined, this is by far the worst of the implementations! Avoid actual function calls in ISRs if you can, unless you know they will be inlined.
 ```cpp
 ISR(PERIPHERAL_INT_vect) {
   if (VPORTA.INTFLAGS & (1 << 0)) {
@@ -203,7 +203,7 @@ ISR(PERIPHERAL_INT_vect) {
     doSomethingElse();
   }
 }
-/* Equivalently - but more flexable because you can choose which cases do it more easily than you could normally */
+/* Equivalently - but more flexible because you can choose which cases do it more easily than you could normally */
 ISR(PERIPHERAL_INT_vect) {
   if (VPORTA.INTFLAGS & (1 << 0)) {
     VPORTA.INTFLAGS |= (1 << 0);
@@ -269,7 +269,7 @@ One of the worst things is calling a function that won't end up being inlined or
 ### ISRs benefit the most from using the GPRs
 If you're desperate for speed - or space - and if you need to set, clear or test a global flag, you can use one of the general purpose registers: GPR.GPR0/1/2/3. The only place the core uses any of those is at the very beginning of execution, when the reset cause is stashed in `GPIOR0` before the reset flags are cleared and the sketch is run (that way you can see what the reset cause was - while the 99% of users who do not need to check that flag benefit from having the reset flags cleared, because it enables the initialization code to turn a crash that might hang or result in incorrect behavior to instead simply reset cleanly  see [the reset reference](Ref_Reset.md)); the other 2 bits of GPIOR0 are used to record potential errors when a tuned internal clock is selected, again just so that user code has a way of accessing them. All of this is done before setup (ie, if you need it for this sort of thing, set it to 0 in setup).
 
-To get the full benefit of the GPR's, you must use single-bit operations only, and be sure that the bit is known at compile time. These are lighning fast, and use no working registers at all. `GPIOR1 |= (1 << n)` where n is known at compile time, is a single clock operation which consumes no registers - it gets turned into a `sbi` - set bit index, with the register and bit being encoded by the opcode itself. The same goes for `GPIOR &= ~(1 << n)`  - these are also atomic (an interrupt couldn't interrupt them like it could a read-modify-write). There are analogous instructions that make things like `if(GPIOR1 & (1 << n))` and `if (!(GPIOR1 & (1 << n))` lightning fast. GPIOR's are only magic when manipulating a single bit, and the bit and must be known at compile time: `GPIOR1 |= 3` is a 3 clock non-atomic read-modify-write operation which needs a working register to store the intermediate value in while modifying it, which is just slightly faster than `MyGlobalByte |= 3`, which is a 6-clock non-atomic read-modify-write using 1 working register for the intermediate. `GPIOR1 |= 1; GPIOR1 |= 2;`, which achieves the same thing as GPIOR1 |= 3, is 2 clocks, each of which is an atomic operation which does not require a register to store any intermediate values. Note that atomicity is only a concern for code running outside the ISR, or code within a level 0 priority ISR when some other ISR is configured with level 1 priority. However, the fact that has no register dependance is a bigger deal in an ISR, because each working register used concurrently has to be saved at the start of the ISR, and restored at the end (total 3 clocks and 2 words). The most surprising thing is that `GPIOR1 = 3` is a 2 clock operation *which needs a working register*, that is, it would often cost 5 clock cycles, and could not be used as part of a naked ISR (next section) without assemble, however, `GPIOR1 |= 1; GPIOR1 |= 2;` can!
+To get the full benefit of the GPR's, you must use single-bit operations only, and be sure that the bit is known at compile time. These are lighning fast, and use no working registers at all. `GPIOR1 |= (1 << n)` where n is known at compile time, is a single clock operation which consumes no registers - it gets turned into a `sbi` - set bit index, with the register and bit being encoded by the opcode itself. The same goes for `GPIOR &= ~(1 << n)`  - these are also atomic (an interrupt couldn't interrupt them like it could a read-modify-write). There are analogous instructions that make things like `if(GPIOR1 & (1 << n))` and `if (!(GPIOR1 & (1 << n))` lightning fast. GPIOR's are only magic when manipulating a single bit, and the bit and must be known at compile time: `GPIOR1 |= 3` is a 3 clock non-atomic read-modify-write operation which needs a working register to store the intermediate value in while modifying it, which is just slightly faster than `MyGlobalByte |= 3`, which is a 6-clock non-atomic read-modify-write using 1 working register for the intermediate. `GPIOR1 |= 1; GPIOR1 |= 2;`, which achieves the same thing as GPIOR1 |= 3, is 2 clocks, each of which is an atomic operation which does not require a register to store any intermediate values. Note that atomicity is only a concern for code running outside the ISR, or code within a level 0 priority ISR when some other ISR is configured with level 1 priority. However, the fact that has no register dependence is a bigger deal in an ISR, because each working register used concurrently has to be saved at the start of the ISR, and restored at the end (total 3 clocks and 2 words). The most surprising thing is that `GPIOR1 = 3` is a 2 clock operation *which needs a working register*, that is, it would often cost 5 clock cycles, and could not be used as part of a naked ISR (next section) without assemble, however, `GPIOR1 |= 1; GPIOR1 |= 2;` can!
 
 ## Naked ISRs
 One of the most advanced techniques relating to interrupts. This requires that either your ISR be written entirely in assembly, with your own prologue and epilogue hand optimized for your use case, or that you know for a fact that the tiny piece of C code you use doesn't change `SREG` or use any working registers.
@@ -287,7 +287,7 @@ ISR(PERIPHERAL_INT_vect, ISR_NAKED)
  * usually isn't worth using a naked ISR. When you're on a 2k chip and the code overflows the flash
  * by less than 16 bytes, it matters a great deal. Similarly in cases where performance is of utmost
  * importance can demand this, recall that an interrupt takes around 5 to 6 clocks to get to, and 4
- * to get back from, so if simply setting a flag is all you need to do, it wil halve the tiem it
+ * to get back from, so if simply setting a flag is all you need to do, it will halve the time it
  * spends doing the interrupt-related things. Such cases are rare indeed, but they do exist.
  * If you needed an interrupt that could run whie you were outputting data to a string of
  * neopixel type LEDs, for example, that would be possible using only a slightly modified
