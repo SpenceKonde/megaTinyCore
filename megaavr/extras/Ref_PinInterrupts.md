@@ -38,7 +38,7 @@ Bit 3 controls the pullup.
 
 Bit 3 is set when `pinMode()` is used to set the pin to INPUT_PULLUP. When manually writing the PINnCTRL registers, be sure to either use bitwise operators to preserve this bit, or set it to the correct value (the former is easier to remember, but the latter is faster)
 
-#### The rest of PINnCTRL - in the event that you need to know it now:
+#### The rest of PINnCTRL - in the event that you need to know it now
 
 Bits 4 and 5 are reserved (aka, unused).
 

@@ -1,7 +1,7 @@
 # **EEPROM Library V2.1.3** for Modern AVRs
 
-**Written by:** _Christopher Andrews_.
-**Ported and updated by:** _Spence Konde_.
+**Written by:** *Christopher Andrews*.
+**Ported and updated by:** *Spence Konde*.
 
 ## What is the EEPROM library?
 
