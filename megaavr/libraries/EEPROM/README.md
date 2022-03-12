@@ -13,9 +13,9 @@ This is the documentation for the version included with with DxCore and megaTiny
 
 ## When is EEPROM erased?
 1. When a sketch manually erases some or all of it.
-2. IF using a non-optiboot configuration, it can optionally be erased every time new code is uploaded. This is controlled by the EESAVE fuse bit. On AVR DA and DB parts, this is a "safe" fuse and is set on all uploads. On AVR DD and ATTiny parts, it is not considered a safe fuse, since it can disable non-HV UPDI programming; on those parts you must do "burn bootloader" to apply these changes.
+2. IF using a non-optiboot configuration, it can optionally be erased every time new code is uploaded. This is controlled by the EESAVE fuse bit. On AVR DA and DB parts, this is a "safe" fuse and is set on all uploads. On AVR DD and ATTiny parts, it is not considered a safe fuse, since it is on the same fusebyte that can disable non-HV UPDI programming; on those parts you must do "burn bootloader" to apply these changes.
 
-See also the [USERSIG](../USERSIG/README.md) library which writes to the rather similar memory section known as the USERROW (aka "user signature space"), which is only erased if manually erased or if a locked chip is erased to unlock it (that will always restore the flash, EEPROM, and USERROW to blank state to protect proprietary or confidential information from leaking). Note that there are significant differences in the USERSIG library on tinyAVR and AVR Dx-series parts due to underlying differences in the NVM controller; on tinyAVR the library presents an identical interface to EEPROM. On DxCore, it is necessaey to call an additional function to commit the new data if an erase is required.
+See also the [USERSIG](../USERSIG/README.md) library which writes to the rather similar memory section known as the USERROW (aka "user signature space"), which is only erased if manually erased or if a locked chip is erased to unlock it (that will always restore the flash, EEPROM, and USERROW to blank state to protect proprietary or confidential information from leaking). Note that there are significant differences in the USERSIG library on tinyAVR and AVR Dx-series parts due to underlying differences in the NVM controller; on tinyAVR the library presents an identical interface to EEPROM. On DxCore, it is necessaey to call an additional function to commit the new data if an erase is required. See the linked readme file for more information.
 
 ## How to use it
 The EEPROM library is included with all hardware packages for hardware with that functionality (which is almost universal).
@@ -44,8 +44,8 @@ The library provides a global variable named `EEPROM`, you use this variable to 
 | tinyAVR 0/1/2-series 4-8k flash     |        128b |             4 ms |
 | tinyAVR 0/1/2-series 16-32k flash   |        256b |             4 ms |
 | megaAVR 0-series (all flash sizes)  |        256b |             4 ms |
-| DA, DB, EA-series (all flash sizes) |        512b |        11 ms (?) |
-| DD-series (all flash sizes)         |        256b | TBD-likely 11 ms |
+| DA, DB-series (all flash sizes)     |        512b |            11 ms |
+| DD-series (all flash sizes)         |        256b |            11 ms |
 | EA-series (all flash sizes)         |        512b |              TBD |
 
 Specifying an address beyond the size of the EEPROM will wrap around to the beginning. The addresses passed to EEPROM functions are a `uint8_t` (aka byte) on parts with up to 256b of flash and a `uint16_t` (word or unsigned int) on parts with more.
@@ -59,46 +59,46 @@ On the modern tinAVR devices (but not with any Dx-series parts) we have received
 
 ## Library functions
 
-### `EEPROM.read(address)` [[_example_]](examples/eeprom_read/eeprom_read.ino)
+### `EEPROM.read(address)` [[*example*]](examples/eeprom_read/eeprom_read.ino)
 
 This function allows you to read a single byte of data from the eeprom.
 Its only parameter is an `int` which should be set to the address you wish to read.
 
 The function returns an `unsigned char` containing the value read.
 
-### `EEPROM.write(address, value)` [[_example_]](examples/eeprom_write/eeprom_write.ino)
+### `EEPROM.write(address, value)` [[*example*]](examples/eeprom_write/eeprom_write.ino)
 
 The `write()` method allows you to write a single byte of data to the EEPROM.
 Two parameters are needed. The first is an `int` containing the address that is to be written, and the second is a the data to be written (`unsigned char`).
 
 This function does not return any value.
 
-### `EEPROM.update(address, value)` [[_example_]](examples/eeprom_update/eeprom_update.ino)
+### `EEPROM.update(address, value)` [[*example*]](examples/eeprom_update/eeprom_update.ino)
 
 This function is similar to `EEPROM.write()` however this method will only write data if the cell contents pointed to by `address` is different to `value`. This method can help prevent unnecessary wear on the EEPROM cells.
 
 This function does not return any value.
 
-### `EEPROM.get(address, object)` [[_example_]](examples/eeprom_get/eeprom_get.ino)
+### `EEPROM.get(address, object)` [[*example*]](examples/eeprom_get/eeprom_get.ino)
 
 This function will retrieve any object from the EEPROM.
 Two parameters are needed to call this function. The first is an `int` containing the address that is to be written, and the second is the object you would like to read.
 
 This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
 
-### `EEPROM.put(address, object)` [[_example_]](examples/eeprom_put/eeprom_put.ino)
+### `EEPROM.put(address, object)` [[*example*]](examples/eeprom_put/eeprom_put.ino)
 
 This function will write any object to the EEPROM.
 Two parameters are needed to call this function. The first is an `int` containing the address that is to be written, and the second is the object you would like to write.
 
-This function uses the _update_ method to write its data, and therefore only rewrites changed cells.
+This function uses the *update* method to write its data, and therefore only rewrites changed cells.
 
 This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
 
-### Subscript operator: `EEPROM[address]` [[_example_]](examples/eeprom_crc/eeprom_crc.ino)
+### Subscript operator: `EEPROM[address]` [[*example*]](examples/eeprom_crc/eeprom_crc.ino)
 
 This operator allows using the identifier `EEPROM` like an array.
-EEPROM cells can be read _and_ **_written_** directly using this method.
+EEPROM cells can be read *and* **_written_** directly using this method.
 
 This operator returns a reference to the EEPROM cell.
 
@@ -191,7 +191,7 @@ The avr-libc runtime included with the toolchain provides an eeprom_write_byte()
 
 
 ### EEPROM corruption due to low supply voltage
-If the power supply voltage is insufficient (as in, below operating specifications) while writing to the EEPROM, corruption can result; this includes the case where power is cut entirely while writing to the EEPROM. This phenomenon is described in the "Preventing Flash/EEPROM corruption" section (9.3.3) of the datasheet. Enabling the Brown-Out Detect functionality ("burn bootloader" required after changing those settings to apply them) will prevent this by holding the part in reset when below a minimum supply voltage. Even better would be to use the VLM to detect when the operating voltage is perilously close to the BOD threshold.
+If the power supply voltage is insufficient (as in, below operating specifications) while writing to the EEPROM, corruption can result; In addition to the case discussed earlier, where a slow rising power supply and an early EEPROM write conspire to yield a corrupted value being written, (which users have encountered on tinyAVRs with the BOD off when writing the EEPROM immediately at power on) this includes the case where power is cut entirely while writing to the EEPROM in addition to transient brownouts, which are likely a less frequent cause of this sort of issue). This phenomenon is described in the "Preventing Flash/EEPROM corruption" section (9.3.3) of the datasheet. Enabling the Brown-Out Detect functionality ("burn bootloader" required after changing those settings to apply them) will prevent this by holding the part in reset when below a minimum supply voltage. Even better would be to use the VLM to detect when the operating voltage is perilously close to the BOD threshold.
 
 Alternate methods of ensuring that there is not expected to be a power failure within the next 11 ms (DxCore) or 4ms (megaTinyCore) might include monitoring the supply voltage with the ADC. It is also important to practice good hardware design: particularly, you should have sufficient board-level decoupling capacitors to make sure the power can't drop out so quickly that a write might not finish. And if user action is the likely cause of the power loss, one could flash an LED while writing or similar.
 
