@@ -8,9 +8,11 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * **CRITICAL BUGFIX** - I finally saw the bug in my attachInterrupt implementation. I had a operands of a load backwards. (#651)
 * Make it possible to have applications that use our USERSIG library be code compatible with DxCore by providing do-nothing functions in place of dxcore's flush(), pending() functions, add erase() and make everything match the return types and report success.
 * Documentation improvements in a few areas.
-* tinyNeoPixel should work at lower clock speeds now possibly down to 4 MHz!
+* Based on feedback, removed emulation of classicAVR pinMode() calls as regards the state of the PORTx.OUT register.
+* tinyNeoPixel 2.0.4, with support down to lower speeds, and inline assembly that is technically correct. (Before this it was only an accident of the deterministic avr-gcc register allocation and the fact that illegally written read-only operands represented variables that fell out of scope without being further used)
 * Fix output asset names for Microchip board definitions.
 * Preempt compatibility problems with libraries that assume a HardwareSerial.h file.
+* Improve user experience for people using updated compilers. Makes bit of a mess out of uart_constants.h though.
 
 ### Ongoing
 * Port enhanced documentation from DxCore.

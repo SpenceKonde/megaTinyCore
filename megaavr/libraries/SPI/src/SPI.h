@@ -22,6 +22,7 @@
 
 #include <Arduino.h>
 
+
 #ifndef USE_MALLOC_FOR_IRQ_MAP
   #define USE_MALLOC_FOR_IRQ_MAP  0
 #endif
@@ -31,24 +32,48 @@
 //   - endTransaction()
 //   - usingInterrupt()
 //   - SPISetting(clock, bitOrder, dataMode)
-#define SPI_HAS_TRANSACTION 1
+
+#ifndef SPI_HAS_TRANSACTION
+  #define SPI_HAS_TRANSACTION 1
+#endif
 
 // SPI_HAS_NOTUSINGINTERRUPT means that SPI has notUsingInterrupt() method
-#define SPI_HAS_NOTUSINGINTERRUPT 1
+#ifndef SPI_HAS_NOTUSINGINTERRUPT
+  #define SPI_HAS_NOTUSINGINTERRUPT 1
+#endif
 
-#define SPI_MODE0           (SPI_MODE_0_gc)
-#define SPI_MODE1           (SPI_MODE_1_gc)
-#define SPI_MODE2           (SPI_MODE_2_gc)
-#define SPI_MODE3           (SPI_MODE_3_gc)
+#ifndef SPI_MODE0
+  #define SPI_MODE0           (SPI_MODE_0_gc)
+#endif
+#ifndef SPI_MODE1
+  #define SPI_MODE1           (SPI_MODE_1_gc)
+#endif
+#ifndef SPI_MODE2
+  #define SPI_MODE2           (SPI_MODE_2_gc)
+#endif
+#ifndef SPI_MODE3
+  #define SPI_MODE3           (SPI_MODE_3_gc)
+#endif
 
-#define SPI_MODE_MASK       (SPI_MODE_gm   )
-#define SPI_CLOCK_MASK      (SPI_PRESC_gm  )
-#define SPI_2XCLOCK_MASK    (SPI_CLK2X_bm  )
+#ifndef SPI_MODE_MASK
+  #define SPI_MODE_MASK       (SPI_MODE_gm )
+#endif
+#ifndef SPI_CLOCK_MASK
+  #define SPI_CLOCK_MASK      (SPI_PRESC_gm)
+#endif
+#ifndef SPI_2XCLOCK_MASK
+  #define SPI_2XCLOCK_MASK    (SPI_CLK2X_bm)
+#endif
 
-#define SPI_INTERRUPT_DISABLE     0
-#define SPI_INTERRUPT_ENABLE      1
+#ifndef SPI_INTERRUPT_DISABLE
+  #define SPI_INTERRUPT_DISABLE     0
+#endif
+#ifndef SPI_INTERRUPT_ENABLE
+  #define SPI_INTERRUPT_ENABLE      1
+#endif
 
 //#define EXTERNAL_NUM_INTERRUPTS   NUM_TOTAL_PINS
+
 
 class SPISettings {
   public:
@@ -153,8 +178,8 @@ class SPIClass {
     void transfer(void *buf, size_t count);
 
     // Transaction Functions
-    void usingInterrupt(int interruptNumber);
-    void notUsingInterrupt(int interruptNumber);
+    void usingInterrupt(uint8_t interruptNumber);
+    void notUsingInterrupt(uint8_t interruptNumber);
     void beginTransaction(SPISettings settings);
     void endTransaction(void);
 
@@ -182,9 +207,10 @@ class SPIClass {
       SPI0.INTCTRL &= ~(SPI_IE_bm);
     }
 
+    #ifdef CORE_ATTACH_OLD
     void detachMaskedInterrupts();
     void reattachMaskedInterrupts();
-
+    #endif
     uint8_t _uc_pinMiso;
     uint8_t _uc_pinMosi;
     uint8_t _uc_pinSCK;
@@ -193,14 +219,18 @@ class SPIClass {
 
     bool initialized;
     uint8_t interruptMode;
+    #ifdef CORE_ATTACH_OLD
     char interruptSave;
     uint32_t interruptMask_lo;
     uint32_t interruptMask_hi;
-
     #if USE_MALLOC_FOR_IRQ_MAP
     uint8_t *irqMap = NULL;
     #else
     volatile uint8_t irqMap[EXTERNAL_NUM_INTERRUPTS];
+    #endif
+    #else
+    uint8_t old_sreg;
+    uint8_t in_transaction;
     #endif
 };
 

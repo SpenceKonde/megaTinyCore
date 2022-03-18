@@ -146,13 +146,17 @@ void SPIClass::begin() {
 }
 
 void SPIClass::init() {
-  if (initialized) {
+  if (initialized)
     return;
-  }
   interruptMode = SPI_IMODE_NONE;
+  #ifdef CORE_ATTACH_OLD
   interruptSave = 0;
   interruptMask_lo = 0;
   interruptMask_hi = 0;
+  #else
+  in_transaction = 0;
+  old_sreg = 0x80;
+  #endif
   initialized = true;
 }
 
@@ -166,6 +170,7 @@ void SPIClass::end() {
   initialized = false;
 }
 
+#ifdef CORE_ATTACH_OLD
 void SPIClass::usingInterrupt(int interruptNumber) {
   if ((interruptNumber == NOT_AN_INTERRUPT)) {
     return;
@@ -281,7 +286,39 @@ void SPIClass::endTransaction(void) {
     }
   }
 }
+#else // End of old interrupt related stuff, start of new-attachInterrupt-compatible implementation.
+void SPIClass::usingInterrupt(uint8_t interruptNumber) {
+  if ((interruptNumber == NOT_AN_INTERRUPT)) {
+    return;
+  }
+  interruptMode = SPI_IMODE_GLOBAL;
+}
 
+void SPIClass::notUsingInterrupt(uint8_t interruptNumber) {
+  if ((interruptNumber == NOT_AN_INTERRUPT)) {
+    return;
+  }
+  interruptMode = SPI_IMODE_NONE;
+}
+
+void SPIClass::beginTransaction(SPISettings settings) {
+  if (interruptMode != SPI_IMODE_NONE) {
+    old_sreg=SREG;
+    cli(); // NoInterrupts();
+  }
+  in_transaction = 1;
+  config(settings);
+}
+
+void SPIClass::endTransaction(void) {
+  if (in_transaction) {
+    in_transaction = 0;
+    if (interruptMode != SPI_IMODE_NONE) {
+      SREG = old_sreg;
+    }
+  }
+}
+#endif // End new attachInterrupt-compatible implementation.
 void SPIClass::setBitOrder(uint8_t order) {
   if (order == LSBFIRST) {
     SPI0.CTRLA |= (SPI_DORD_bm);
