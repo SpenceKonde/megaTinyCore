@@ -143,11 +143,13 @@ void pinMode(uint8_t pin, uint8_t mode) {
     *(port_base + 1) = bit_mask;
   } else {
     *(port_base + 2) = bit_mask;
-    if (mode == 2) {
+    /* By unanimous decision of users who spoke up, we shall not st the output register to emulate classic AVRs.
+    if (mode == INPUT_PULLUP) {
       *(port_base + 5) = bit_mask;
     } else if (mode == 0) {
       *(port_base + 6) = bit_mask;
     }
+    */
   }
   port_base +=(uint8_t) digitalPinToBitPosition(pin) | (uint8_t) 0x10;
   bit_mask = *port_base;
