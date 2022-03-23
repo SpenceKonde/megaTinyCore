@@ -6,6 +6,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### Planned 2.5.11
 * **CRITICAL BUGFIX** - I finally saw the bug in my attachInterrupt implementation. I had a operands of a load backwards. (#651)
+* **CRITICAL BUGFIX** - Apply changes from DxCore to SPI library where needed for new attachInterrupt behavior.
 * Make it possible to have applications that use our USERSIG library be code compatible with DxCore by providing do-nothing functions in place of dxcore's flush(), pending() functions, add erase() and make everything match the return types and report success.
 * Documentation improvements in a few areas.
 * Based on feedback, removed emulation of classicAVR pinMode() calls as regards the state of the PORTx.OUT register.
@@ -13,6 +14,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Fix output asset names for Microchip board definitions.
 * Preempt compatibility problems with libraries that assume a HardwareSerial.h file.
 * Improve user experience for people using updated compilers. Makes bit of a mess out of uart_constants.h though.
+* Fix bugs with compatibility in names of constants associated with no change in function. Sigh.
 
 ### Ongoing
 * Port enhanced documentation from DxCore.

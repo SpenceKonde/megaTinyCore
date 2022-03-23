@@ -303,7 +303,7 @@ void SPIClass::notUsingInterrupt(uint8_t interruptNumber) {
 
 void SPIClass::beginTransaction(SPISettings settings) {
   if (interruptMode != SPI_IMODE_NONE) {
-    old_sreg=SREG;
+    old_sreg = SREG;
     cli(); // NoInterrupts();
   }
   in_transaction = 1;

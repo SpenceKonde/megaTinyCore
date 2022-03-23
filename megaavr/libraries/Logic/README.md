@@ -12,7 +12,7 @@ More information about CCL can be found in the [Microchip Application Note TB321
 These objects expose **all** configuration options as properties, described below, and provide methods to apply those settings, attach interrupts (2-series only) and enable and disable the CCL in general.
 
 ### Pin availability and Quick Reference
-This was simpler with 0/1-series (22 i/o pins, 10 CCL functions, none stacked onto the same pins), but with 2-series, 20 different CCL functions, crammed into just 22 GPIO pins, two of which have one blocks' input and one of the outputs for another. The ones with no inputs on lower pincount parts are more useful than one might expect; advanced use cases will often use mostly internal inputs - and the event system can always be used to get pin input in anyway - albeit at a cost of an event channel.
+This was simpler with 0/1-series (22 i/o pins, 10 CCL functions, none stacked onto the same pins), but with 2-series, 20 different CCL functions, crammed into just 22 GPIO pins, two of which have one blocks' input and one of the outputs for another. The ones with no inputs on lower pincount parts are more useful than one might expect; advanced use cases will often use mostly internal inputs - and the event system can always be used to get pin input in anyway - albeit at a cost of an event channel. If you do not require pin inputs, these should be used in preference to the logic blocks that do have them all else veing equa;l
 
 Logic Block |  IN0-2  | OUT | 8pin | ALT OUT | Availability |
 ------------|---------|-----|------|---------|--------------|
@@ -24,42 +24,41 @@ Logic3      | PC0-PC2 | PC4 |  --- |     PA5 |     2-series |
 
 
 * Inputs are always in consecutive order counting by bit position (not physical order).
-* All logic blocks present always have at least one output pin
+* All logic blocks present *on tinyAVR* always have an output pin, but may not have input pins.
 * `Logic2` and `Logic3` are present only on the 2-series.
 
-Logic Block |  8-pin      |     14-pin    |     20-pin    |     24-pin    |
-------------|-------------|---------------|---------------|---------------|
-Logic0 IN   | IN0 IS UPDI |   IN0 IS UPDI |   IN0 IS UPDI |   IN0 IS UPDI |
-Logic0 OUT  | NO ALT OUT0 |   NO ALT OUT0 |     YES, BOTH |     YES, BOTH |
-Logic1 IN   |   NO INPUTS |     NO INPUTS |      IN0 ONLY |      YES, ALL |
-Logic1 OUT  | NO ALT OUT1 |   NO ALT OUT1 |     YES, BOTH |     YES, BOTH |
-Logic2 IN   |         N/A |      YES, ALL |      YES, ALL |      YES, ALL |
-Logic2 OUT  |         N/A |   NO ALT OUT2 |   NO ALT OUT2 |     YES, BOTH |
-Logic3 IN   |         N/A |     NO INPUTS |      YES, ALL |      YES, ALL |
-Logic3 OUT  |         N/A | ALT OUT3 ONLY | ALT OUT3 ONLY |     YES, BOTH |
+Logic Block |  8-pin        | 14-pin        | 20-pin        | 24-pin        |
+------------|---------------|---------------|---------------|---------------|
+Logic0 IN   | IN0 is UPDI   | IN0 is UPDI   | IN0 is UPDI   | IN0 is UPDI   |
+Logic0 OUT  | No alt output | No alt output | Yes, both     | Yes, both     |
+Logic1 IN   | None          | None          | IN0 only      | Yes, all      |
+Logic1 OUT  | No alt output | No alt output | Yes, both     | Yes, both     |
+Logic2 IN   | Not present   | Yes, all      | Yes, all      | Yes, all      |
+Logic2 OUT  | Not present   | No alt output | No alt output | Yes, both     |
+Logic3 IN   | Not present   | None          | Yes, all      | Yes, all      |
+Logic3 OUT  | Not present   | Only alt out  | Only alt out  | Yes, both     |
 
 ### Overhead
-On the 0/1-series, the overhead is approximately 546 bytes of flash and 26 bytes of RAM.
-On the 2-series, with twice as many LUTs, it is much larger:  984 bytes and 60b RAM.
-This is farily small for most parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series, but it it isn't an unreasonable amount of flash for the parts most people will be using. A future update will add a second slihtly modified version which removes attachInterrupt to permit manual implementation of the CCL interrupt, as any "attachInterrupt" scheme will always perform poorly, with an overhead of over 50 clock cycles in the ISR because of the call to a function that can't be inlined because it is set at runtime.
-
-Writing a constant value to 4 registers (the minimum plausible needed to configure a LUT) for 2 or 4 LUTs requires 56 or 112 bytes, respectively.
+* On the 0/1-series, the overhead is approximately 546 bytes of flash and 26 bytes of RAM.
+* On the 2-series, with twice as many LUTs, it is much larger:  984 bytes and 60b RAM.
+* This is farily small for 16/32k parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series, but it it isn't an unreasonable amount of flash for the parts most people will be using. A future update will add a second slihtly modified version which removes attachInterrupt to permit manual implementation of the CCL interrupt, as any "attachInterrupt" scheme will always perform miserably (it is inherrent to calling a non-inlinable function on an AVR from within an ISR, with an overhead of over 50 clock cycles in the ISR and because the interrupt pointer is set at runtime, it can never be inlined.
+* Writing a constant value to 4 registers (the minimum plausible needed to configure a LUT) for 2 or 4 LUTs requires 56 or 112 bytes, respectively.
 
 ## Logic class overview
 
-| Property    | namespace or type           | Function                                    |
-|-------------|-----------------------------|---------------------------------------------|
-| enable      | bool                        | Enable or disable logic block               |
-| input0      | in::                        | Selects input 0                             |
-| input1      | in::                        | Selects input 1                             |
-| input2      | in::                        | Selects input 2                             |
-| output      | out::                       | 'enable'/'disable' output pin               |
-| output_swap | out::                       | 'no_swap/'pin_swap' use alt output pin      |
-| filter      | filter::                    | 'filter'/'sync' or 'disable' filter         |
-| edgedetect  | edgedetect::                | 'enable'/'disable' edge detect mode         |
-| sequencer   | sequencer::                 | selects the sequecer, even #'ed blocks only |
-| clocksource | clocksource::               | select clock source, if not async.          |
-| truth       | uint8_t                     | truth table                                 |
+| Property    | namespace or type   |  Function                                    |
+|-------------|---------------------|----------------------------------------------|
+| enable      | bool                |  Enable or disable logic block               |
+| input0      | in::                |  Selects input 0                             |
+| input1      | in::                |  Selects input 1                             |
+| input2      | in::                |  Selects input 2                             |
+| output      | out::               |  'enable'/'disable' output pin               |
+| output_swap | out::               |  'no_swap/'pin_swap' use alt output pin      |
+| filter      | filter::            |  'filter'/'sync' or 'disable' filter         |
+| edgedetect  | edgedetect::        |  'enable'/'disable' edge detect mode         |
+| sequencer   | sequencer::         |  selects the sequecer, even #'ed blocks only |
+| clocksource | clocksource::       |  select clock source, if not async.          |
+| truth       | uint8_t             |  truth table                                 |
 
 | Methods             | Function
 |---------------------|-----------------------------------------------------------------------------|
@@ -338,6 +337,7 @@ Logic::stop(); // Stop CCL
 Method for enabling interrupts for a specific block.
 Valid arguments for the third parameters are `RISING`, `FALLING` and `CHANGE`.
 This method isn't available on tinyAVR 0/1-series as these parts cannot generate an interrupt from the CCL blocks.
+All forms of attachInterrupt, everywhere, are fundamentally evil, because they add a several microsecond overheead to the ISR simply because there is a call to a non-inlinable function;
 
 #### Usage
 ```c++
