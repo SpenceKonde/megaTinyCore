@@ -146,8 +146,9 @@ void SPIClass::begin() {
 }
 
 void SPIClass::init() {
-  if (initialized)
+  if (initialized) {
     return;
+  }
   interruptMode = SPI_IMODE_NONE;
   #ifdef CORE_ATTACH_OLD
   interruptSave = 0;

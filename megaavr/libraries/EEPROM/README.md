@@ -98,7 +98,7 @@ This function returns a reference to the `object` passed in. It does not need to
 ### Subscript operator: `EEPROM[address]` [[*example*]](examples/eeprom_crc/eeprom_crc.ino)
 
 This operator allows using the identifier `EEPROM` like an array.
-EEPROM cells can be read *and* **_written_** directly using this method.
+EEPROM cells can be read *and* **written** directly using this method.
 
 This operator returns a reference to the EEPROM cell.
 
