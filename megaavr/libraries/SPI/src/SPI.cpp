@@ -171,7 +171,7 @@ void SPIClass::end() {
 }
 
 #ifdef CORE_ATTACH_OLD
-void SPIClass::usingInterrupt(int interruptNumber) {
+void SPIClass::usingInterrupt(uint8_t interruptNumber) {
   if ((interruptNumber == NOT_AN_INTERRUPT)) {
     return;
   }
@@ -194,7 +194,7 @@ void SPIClass::usingInterrupt(int interruptNumber) {
   }
 }
 
-void SPIClass::notUsingInterrupt(int interruptNumber) {
+void SPIClass::notUsingInterrupt(uint8_t interruptNumber) {
   if ((interruptNumber == NOT_AN_INTERRUPT)) {
     return;
   }
