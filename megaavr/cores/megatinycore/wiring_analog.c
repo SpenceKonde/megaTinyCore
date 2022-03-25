@@ -622,7 +622,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       return false;
     } else {
       ADC0.SAMPCTRL = dur;
-      return "true";
+      return true;
     }
   }
 
