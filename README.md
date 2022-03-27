@@ -103,7 +103,7 @@ This is currently used only for the latest release, and should fix the avrdude n
   * ATtiny20/40
   * ATtiny13 (just smaller - Use [MicroCore](https://github.com/MCUdude/MicroCore) by @MCUdude)
   * ATtiny15 (obsolete) and ATtiny28 (obsolete, and like, really terrible)
-* ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the AVR core they use is gimped. But [attiny10core](https://github.com/technoblogy/attiny10core) supports them!
+* ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the AVR CPU core they use is gimped: pop is *three clocks*, as is call, and ret is *six*, memory access is slower, and as if that all weren't enough, there's no multiplication and half as many working registers. But [attiny10core](https://github.com/technoblogy/attiny10core) supports them!
 * Anything with "Mega" in the name (Use [one of @MCUdude's cores](https://github.com/MCUdude/))
 
 ## Overall Part Comparison
@@ -125,8 +125,8 @@ This is currently used only for the latest release, and should fix the avrdude n
 | Overclocking (internal @ 5v) |   ???     |       25-30 MHz |        25-30 MHz |              32 MHz |
 | Overclocking (ext. clk @ 5v) |   ???     |          32 MHz |           32 MHz |           >= 32 MHz |
 | External crystal        |            NO  |              NO |               NO |                  NO |
-| Event Channels          | 1 sync 2 async |  2 sync 4 async |   2 sync 4 async |       6 normal ones |
-| CCL Logic Blocks        |     2 (1 pair) |     2 (1 pair)  |       2 (1 pair) |         4 (2 pairs) |
+| Event Channels          | 1 sync, 2 async | 2 sync, 4 async |   2 sync 4 async |       6 normal ones |
+| CCL Logic Blocks        |       2 (1 pair) |     2 (1 pair)  |       2 (1 pair) |         4 (2 pairs) |
 | Analog Comparators      |  1, no DAC REF |   1, w/DAC REF  |     3, w/DAC REF |        1, w/DAC REF |
 | ADC                     |     10-bit ADC |     10-bit ADC  |   2x 10-bit ADCs |   12-bit diff w/PGA |
 | Analog References       | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | 1.024V, 2.048V, 2.5V, 4.096V |
