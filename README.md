@@ -2,7 +2,7 @@
 ### [Check it out, we have "discussions" now!](https://github.com/SpenceKonde/megaTinyCore/discussions)
 Let's use that - it's better than gitter ever was, and it's all on one site.
 
-### 2.5.10 is now available
+### 2.5.11 is now available
 It is less buggy than all prior 2.5.x releases.
 
 ### Notice regarding update issues
