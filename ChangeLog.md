@@ -20,7 +20,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Preempt compatibility problems with libraries that assume a HardwareSerial.h file.
 * Improve user experience for people using updated compilers. Makes bit of a mess out of uart_constants.h though.
 * Fix bugs with compatibility in names of constants associated with no change in function, this time in association with TCB clock source
-
+* Fix issue with SerialUPDI when validating code where the final page contains only a single word of data. 
 
 ### 2.5.10
 * **CRITICAL BUGFIX** - attachInterrupt was broken on default mode for PORTA (#625)
