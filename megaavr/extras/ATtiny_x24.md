@@ -1,7 +1,7 @@
 # ATtiny 424/824/1624/3224
 ![x24 Pin Mapping](ATtiny_x24.gif "Arduino Pin Mapping for ATtiny x24")
 
- Specifications       |    ATtiny424   |   ATtiny824   |   ATtiny1627  |  ATtiny3224   |
+ Specifications       |    ATtiny424   |   ATtiny824   |   ATtiny1624  |  ATtiny3224   |
 ----------------------|----------------|---------------|---------------|---------------|
 Availability          |  Since Q2 2021 | Since Q2 2021 | Since Q1 2021 | Since Q4 2021 |
 Flash (program memory)|     4096 bytes |    8192 bytes |   16384 bytes |   32768 bytes |
