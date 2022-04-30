@@ -9,11 +9,11 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other         ##       ####       #    #   #
-#  contributors 2018-2021                  #  #      #         ##   ##   #
-#  megaTinyCore is free software.    # #     #       ###        #    #   #
+#  Copyright Spence Konde and other         ##       ####       #    ##  #
+#  contributors 2018-2021                  #  #      #         ##   #  # #
+#  megaTinyCore is free software.    # #     #       ###        #     #  #
 #  (LGPL v2.1) see LICENSE.md and    # #    #    ##     #  ##   #    #   #
-#  License section of README.md       #    ####  ##  ###   ##  ###  ###  #
+#  License section of README.md       #    ####  ##  ###   ##  ###  #### #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
@@ -4376,10 +4376,10 @@ microchipo.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 #  UPDI and RESET PIN configuration and  #
 #       OPTIBOOT ENTRY conditions        #
 #----------------------------------------#
-microchip.menu.resetpin.UPDI=UPDI (no reset pin)
-microchip.menu.resetpin.UPDI.bootloader.resetpinbits=01
-microchip.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
-microchip.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
+microchipo.menu.resetpin.UPDI=UPDI (no reset pin)
+microchipo.menu.resetpin.UPDI.bootloader.resetpinbits=01
+microchipo.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
+microchipo.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
 # the microchip debuggers are not 12v tolerant so nothing that would need hv programming to reset is supported. And if you cut the straps to debugger, you shouldn't be using this board definition.
 
 #----------------------------------------#
