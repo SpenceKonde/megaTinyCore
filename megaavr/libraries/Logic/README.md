@@ -108,7 +108,7 @@ in::event_0;          // Connect input to event a
 in::event_a;          // Connect input to event a (preferred)
 in::event_1;          // Connect input to event b
 in::event_b;          // Connect input to event b (preferred)
-in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode
+in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode (imagine using an OUTPUT to switch modes)
 in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on
 in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off
 in::input;            // Synonym for input_no_pullup

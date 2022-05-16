@@ -398,30 +398,8 @@ void Logic::stop() {
 }
 
 static volatile register8_t &PINCTRL(PORT_t &port, const uint8_t pin_bm) {
-  if (pin_bm == PIN0_bm) {
-    return port.PIN0CTRL;
-  }
-  if (pin_bm == PIN1_bm) {
-    return port.PIN1CTRL;
-  }
-  if (pin_bm == PIN2_bm) {
-    return port.PIN2CTRL;
-  }
-  if (pin_bm == PIN3_bm) {
-    return port.PIN3CTRL;
-  }
-  #ifdef MEGATINYCORE
-  if (pin_bm == PIN4_bm) {
-    return port.PIN4CTRL;
-  }
-  if (pin_bm == PIN5_bm) {
-    return port.PIN5CTRL;
-  }
-  #endif
-  if (pin_bm == PIN6_bm) {
-    return port.PIN6CTRL;
-  }
-  return port.PIN7CTRL;
+  //register8_t = port.PIN0CTRL;
+  return ((register8_t)&port.PIN0CTRL) + pin_bm;
 }
 
 void Logic::initInput(in::input_t &input, PORT_t &port, const uint8_t pin_bm) {
@@ -460,8 +438,8 @@ void Logic::init() {
     }
   }
   // Set inputs modes
-  block.LUTCTRLB = (input1 << CCL_INSEL1_gp) | (input0 << CCL_INSEL0_gp);
-  block.LUTCTRLC = (input2 << CCL_INSEL2_gp);
+  block.LUTCTRLB = ((input1 & 0x0f) << CCL_INSEL1_gp) | ((input0 & 0x0f) << CCL_INSEL0_gp);
+  block.LUTCTRLC = input2; /* pray that some day we need to handle a 4th input! */
 
   // Set truth table
   block.TRUTH = truth;
@@ -483,102 +461,3 @@ void Logic::init() {
                    #endif
                    | (enable ? CCL_ENABLE_bm : 0);
 }
-
-
-#if defined(CCL_CCL_vect)
-void Logic::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
-  CCL_INTMODE0_t intmode;
-  switch (mode) { // Set RISING, FALLING or CHANGE interrupt trigger for a block output
-    case RISING:
-      intmode = CCL_INTMODE0_RISING_gc;
-      break;
-    case FALLING:
-      intmode = CCL_INTMODE0_FALLING_gc;
-      break;
-    case CHANGE:
-      intmode = CCL_INTMODE0_BOTH_gc;
-      break;
-    default: // Only RISING, FALLING and CHANGE is supported
-      return;
-  }
-  #if defined(CCL_TRUTH4)
-  if (block.number > 3) {
-    const int16_t intmode_bp = (block.number & 0x03) * 2;
-    CCL.INTCTRL1 = (CCL.INTCTRL1 & ~(CCL_INTMODE0_gm << intmode_bp)) | (intmode << intmode_bp);
-  } else {
-    const int16_t intmode_bp = (block.number & 0x03) * 2;
-    CCL.INTCTRL0 = (CCL.INTCTRL0 & ~(CCL_INTMODE0_gm << intmode_bp)) | (intmode << intmode_bp);
-  }
-  #else
-  const int16_t intmode_bp = block.number * 2;
-  CCL.INTCTRL0 = (CCL.INTCTRL0 & ~(CCL_INTMODE0_gm << intmode_bp)) | (intmode << intmode_bp);
-  #endif
-  // Store function pointer
-  intFuncCCL[block.number] = userFunc;
-}
-
-void Logic::detachInterrupt() {
-  // Disable interrupt for a given block output
-  #if defined(CCL_TRUTH4)
-  if (block.number > 4) {
-    CCL.INTCTRL1 &= ~(CCL_INTMODE1_gm << ((block.number & 3) * 2));
-  } else {
-    CCL.INTCTRL0 &= ~(CCL_INTMODE0_gm << (block.number * 2));
-  }
-  #else
-  CCL.INTCTRL0 &= ~(CCL_INTMODE0_gm << (block.number * 2));
-  #endif
-}
-
-// CCL interrupt service routine
-// Use attachIntterupt to activate this.
-ISR(CCL_CCL_vect) {
-  // Check for block 0 interrupt
-  if (CCL.INTFLAGS & CCL_INT0_bm) {
-    // Run user function
-    intFuncCCL[CCL_INT0_bp]();
-    // Clear flag
-    CCL.INTFLAGS |= CCL_INT0_bm;
-  }
-  // Check for block 1 interrupt
-  if (CCL.INTFLAGS & CCL_INT1_bm) {
-    // Run user function
-    intFuncCCL[CCL_INT1_bp]();
-    // Clear flag
-    CCL.INTFLAGS |= CCL_INT1_bm;
-  }
-  // Check for block 2 interrupt
-  if (CCL.INTFLAGS & CCL_INT2_bm) {
-    // Run user function
-    intFuncCCL[CCL_INT2_bp]();
-    // Clear flag
-    CCL.INTFLAGS |= CCL_INT2_bm;
-  }
-  // Check for block 3 interrupt
-  if (CCL.INTFLAGS & CCL_INT3_bm) {
-    // Run user function
-    intFuncCCL[CCL_INT3_bp]();
-    // Clear flag
-    CCL.INTFLAGS |= CCL_INT3_bm;
-  }
-  #if defined(TRUTH4)
-  // Check for block 4 interrupt
-  if (CCL.INTFLAGS & CCL_INT4_bm) {
-    // Run user function
-    intFuncCCL[CCL_INT4_bp]();
-    // Clear flag
-    CCL.INTFLAGS |= CCL_INT4_bm;
-  }
-  #endif
-  #if defined(TRUTH5)
-  // Check for block 5 interrupt
-  if (CCL.INTFLAGS & CCL_INT5_bm) {
-    // Run user function
-    intFuncCCL[CCL_INT5_bp]();
-    // Clear flag
-    CCL.INTFLAGS |= CCL_INT5_bm;
-  }
-  #endif // CCL_CCL_vect
-}
-
-#endif
