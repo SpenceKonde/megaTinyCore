@@ -177,7 +177,7 @@ As of version 2.4.0, we now provide an "Official Microchip Board" option. This d
 
 As noted above, these may not work correctly on 32-bit linux platforms This is beyond my control, I don't build avrdude binaries amd I am *not* taking on that task too. I have too many already.
 
-### Why does blink take more flash on the XPlained Mini vs the XPlained Pro? 
+### Why does blink take more flash on the XPlained Mini vs the XPlained Pro?
 Both have the same ATtiny817!  For the same reason that blink will take more flash if you change it to use `PIN_PC0` as opposed to `PIN_PB4`: PC0, used on the XPlained Mini is a PWM pin, while PB4, used by the XPlained Pro is not. Since that is the only pin that digitalWrite() is being used on, the compiler is free to optimize away anything that isn't needed for digitalWrite() on that pin, including the functionality to turn off PWM output on a pin that supports PWM. The diference vanishes if digitalWrite() is also used on a pin that supports PWM on both devices (or if digitalWrite() is replaced with digitalWriteFast(), which assumes that you won't call it on a pin outputting PWM).
 
 ## Buying tinyAVR 1-series and 2-series Breakout Boards
