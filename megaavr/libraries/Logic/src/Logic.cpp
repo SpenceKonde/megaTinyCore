@@ -397,9 +397,31 @@ void Logic::stop() {
   start(false);
 }
 
-static volatile register8_t &PINCTRL(PORT_t &port, const uint8_t pin_bm) {
-  //register8_t = port.PIN0CTRL;
-  return ((register8_t)&port.PIN0CTRL) + pin_bm;
+static volatile register8_t *PINCTRL(PORT_t &port, const uint8_t pin_bm) {
+ if (pin_bm == PIN0_bm) {
+    return port.PIN0CTRL;
+  }
+  if (pin_bm == PIN1_bm) {
+    return port.PIN1CTRL;
+  }
+  if (pin_bm == PIN2_bm) {
+    return port.PIN2CTRL;
+  }
+  if (pin_bm == PIN3_bm) {
+    return port.PIN3CTRL;
+  }
+  #ifdef MEGATINYCORE
+  if (pin_bm == PIN4_bm) {
+    return port.PIN4CTRL;
+  }
+  if (pin_bm == PIN5_bm) {
+    return port.PIN5CTRL;
+  }
+  #endif
+  if (pin_bm == PIN6_bm) {
+    return port.PIN6CTRL;
+  }
+  return port.PIN7CTRL;
 }
 
 void Logic::initInput(in::input_t &input, PORT_t &port, const uint8_t pin_bm) {
@@ -407,9 +429,9 @@ void Logic::initInput(in::input_t &input, PORT_t &port, const uint8_t pin_bm) {
     port.DIRCLR = pin_bm;
 
     if (input == in::input) {
-      PINCTRL(port, pin_bm) &= ~PORT_PULLUPEN_bm;
+      *PINCTRL(port, pin_bm) &= ~PORT_PULLUPEN_bm;
     } else {
-      PINCTRL(port, pin_bm) |= PORT_PULLUPEN_bm;
+      *PINCTRL(port, pin_bm) |= PORT_PULLUPEN_bm;
     }
     input = in::input;
   }
