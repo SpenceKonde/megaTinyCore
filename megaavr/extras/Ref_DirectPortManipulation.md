@@ -164,11 +164,11 @@ For the case of INTFLAGS, as stated in the datasheet, they are CLEARED by writin
 The above-described manipulations where a single bit is toggled are identical to digitalWriteFast() and pinModeFast() with a constant output or mode.
 
 The equivalent of `if (digitalReadFast())` is:
-```
+```c
 if (VPORTx.IN & (1 << bit))
 ```
 or
-```
+```c
 if (!(VPORTx.IN & (1 << bit)))
 
 ```
