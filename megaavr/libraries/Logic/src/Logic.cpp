@@ -397,7 +397,7 @@ void Logic::stop() {
   start(false);
 }
 
-static volatile register8_t *PINCTRL(PORT_t &port, const uint8_t pin_bm) {
+static volatile register8_t &PINCTRL(PORT_t &port, const uint8_t pin_bm) {
  if (pin_bm == PIN0_bm) {
     return port.PIN0CTRL;
   }
@@ -429,9 +429,9 @@ void Logic::initInput(in::input_t &input, PORT_t &port, const uint8_t pin_bm) {
     port.DIRCLR = pin_bm;
 
     if (input == in::input) {
-      *PINCTRL(port, pin_bm) &= ~PORT_PULLUPEN_bm;
+      PINCTRL(port, pin_bm) &= ~PORT_PULLUPEN_bm;
     } else {
-      *PINCTRL(port, pin_bm) |= PORT_PULLUPEN_bm;
+      PINCTRL(port, pin_bm) |= PORT_PULLUPEN_bm;
     }
     input = in::input;
   }
