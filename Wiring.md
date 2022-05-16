@@ -1,6 +1,6 @@
 # Minimal Wiring Requirements
 
-## These are the bare minimum requirements to bring the ATtiny chip to life and program it using the Arduino IDE:
+**These are the bare minimum requirements to bring the ATtiny chip to life and program it using the Arduino IDE:**
 
 * Vcc pin connected to supply voltage (1.8 - 5v depending on which ATtiny part, planned clock speed, and fuse settings)
 * Gnd pin connected to Ground
