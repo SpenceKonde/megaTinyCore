@@ -79,7 +79,7 @@ So, while many examples of direct port writes for classic AVRs will use |= and &
 
 ## VPORTx.OUT vs PORTx.OUTSET/PORTx.OUTCLR
 So, knowing all this, when is it more efficient to use `VPORTx.OUT |= PIN3_bm` and when is it more efficient to use `PORTx.OUTSET=PIN3_bm`?
-* When PIN3_bm is known at compile time, using `VPORTx.OUT |= PIN3_bm`is faster, and consumes less flash (likely 2 bytes less flash, 1 clock cycle faster).
+* When PIN3_bm is known at compile time, using `VPORTx.OUT |= PIN3_bm` is faster, and consumes less flash (likely 2 bytes less flash, 1 clock cycle faster).
 * If instead of referring to PB3 with `PIN3_bm` or `(1 << 3)`, or even `0x08` (`8` is also valid, but terrible practice, and 0x08 is not much better), a variable is used, it's value may not be compile time known. The compiler is sometimes very clever when performing "constant folding". But other times, it is quite the opposite, and will miss obvious chances. Unless you're sure it will be treated as a constant and `PORTx.OUTSET` should be used - `VPORTx.OUT |= 1 << not-a-constant` takes 4 bytes more flash, 2 more clock cycles **and is not atomic** - if an interrupt fires and modifies the register at just the wrong moment, between the read and the write, the value calculated from the pre-intterrupt read will be used the change that the interrupt made will be reversed.
 * If the extreme performance of the VPORT access is not needed, considering the small penalty, is is likely better practice to use `PORTx.OUTSET` in any event, if your code is for public consumption, as it's purpose is much more immediately obvious to the uninitiated. Arduino users with little experience frequently reuse and modify sketches they find on the internet, and using the option that can safely deal with non-compiletime-known values reduces the likelihood of such careless modifications producing strange bugs. That in turn benefits the experienced Arduino users who end up helping them on the forums.
 
@@ -94,10 +94,10 @@ DDRx  | PORTx.DIR | VPORTx.DIR
 **NOTE** Unlike classic AVRs, setting the bit in PORTx.OUT while pin is set as an INPUT will *NOT* enable the pullups. Only the PORTx.PINnCTRL registers can do that. There is no VPORT register that allows changing pullup status. Writing to PORTx.IN does *NOT* toggle the output of the bit, but writing to VPORTx.IN *DOES*.
 
 
-## Closing renarks
-Issues submitted have made it clear trht the avove doesn't seem to make it clear enmough.
+## Closing remarks
+Issues submitted have made it clear that the above doesn't seem to make it clear enough.
 
-Below are exceprpts from my reponses to such inquiries
+Below are excerpts from my responses to such inquiries
 For setting or clearing a single, fixed bit, in the PORT direction or PORT output, clearing a bit in PORT interrupt flag registers, or for toggling the PORT output, in the case where both the PORT and the bit are constant and known at compile time (values passed to class constructors or methods of class members are never compile time known as far as the optimizer is concerned), the most efficient way is with the VPORT registers:
 
 ```c
