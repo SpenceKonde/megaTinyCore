@@ -56,6 +56,9 @@
 
 #if MEGATINYCORE_SERIES != 2
   #define digitalPinToAnalogInput(p)  (((p) < 4) ? ((p) + 4) : ((p) == 21 ? 0 : ((((p) > 17) && ((p) < 21)) ? ((p) - 17) : (((p) < 8) ? ((p) + 2) : (((p) < 12) ? (p):NOT_A_PIN)))))
+  #if defined(ADC1)
+    #define digitalPinToAnalogInput_ADC1(p) ((p) < 6 ? (p) : ((p) < PINS_COUNT && ((p) >= PIN_PC0) ? (6 + (p) - PIN_PC0) : NOT_A_PIN))
+  #endif
 #else
   /* 2-series MUX table says ADC channel 0 is tied to ground, not PA0, PC0 through PC3 are a A12-15 */
   #define digitalPinToAnalogInput(p)  (((p) < 4) ? ((p) + 4) : ((((p) > 17) && ((p) < 21)) ? ((p) - 17) : (((p) < 8) ? ((p) + 2) : (((p) < 16) ? (p):NOT_A_PIN))))
@@ -192,6 +195,8 @@ static const uint8_t    A11 = PIN_PB0;
   static const uint8_t  A15 = PIN_PC3;
 #endif
 
+
+
 /*
             ####  ### #   #      ##  ####  ####   ##  #   #  ###
             #   #  #  ##  #     #  # #   # #   # #  #  # #  #
@@ -231,7 +236,8 @@ static const uint8_t    A11 = PIN_PB0;
 //                              (AIN6) (AIN7)           (AIN8) (AIN9)
 //                               (DAC)
 
-/*
+/*  0/1-series. ADC1, TCB1 and AC1, AC2 present only on 16/32k 1-series. TCD0, DAC0, alternate SPI/I2C pins and AC0 inputs past 0 only available on 1-series.
+
   PIN#   DESC         Pin Name  Other/Sp  ADC0      ADC1      PTC       AC0       AC1       AC2       DAC0      USART0    SPI0      TWI0      TCA(PWM)  TCBn      TCD0      CCL
   0      A0 or SS     PA4                 AIN4      AIN0      X0/Y0                                             XDIR      SS                  WO4                 WOA       LUT0-OUT
   1      A1           PA5       VREFA     AIN5      AIN1      X1/Y1     OUT       AINN0                                                       WO5       TCB0 WO   WOB
@@ -250,12 +256,41 @@ static const uint8_t    A11 = PIN_PB0;
   13                  PC1                           AIN7                                                                  *MISO                                   WOD       *LUT1-OUT
   14                  PC2       EVOUT2              AIN8                                                                  *MOSI
   15                  PC3                           AIN9                                                                  *SS                 *WO3                          LUT1-IN0
-  16                  PC4
-  17                  PC5
+  16                  PC4                           AIN10                                                                                     *WO4      *TCB1 WO            LUT1-IN1
+  17                  PC5                           AIN11                                                                                     *WO5                          LUT1-IN2
   18     MOSI         PA1                 AIN1                                                                  *TxD      MOSI      *SDA                                    LUT0-IN1
   19     MISO         PA2       EVOUT0    AIN2                                                                  *RxD      MISO      *SCL                                    LUT0-IN2
   20     SCK          PA3       EXTCLK    AIN3                                                                  *XCK      SCK                 WO3       TCB1 WO
   21?    UPDI         PA0       RESET/    AIN0                                                                                                                              LUT1-IN0
+                              UPDI
+      alternative pin locations
+
+
+  2-series
+  PIN#   DESC         Pin Name  Other/Sp  ADC0      AC0       USART0    SPI0      TWI0      TCA(PWM)  TCBn      CCL
+  0      A0 or SS     PA4                 AIN4                XDIR      SS                  WO4                 LUT0-OUT
+  1      A1           PA5       VREFA     AIN5      OUT                                     WO5       TCB0 WO
+  2      A2 or DAC    PA6                 AIN6      AINN0
+  3      A3           PA7                 AIN7      AINP0                                                       LUT1-OUT
+  4                   PB7
+  5                   PB6
+  6      LED          PB5       CLKOUT    AIN8      AINP1                                   *WO2
+  7                   PB4                 AIN9      AINN1                                   *WO1                *LUT0-OUT
+  8      RX           PB3       TOSC1                         RxD                           *WO0
+  9      TX           PB2       TOSC2 /                       TxD                           WO2
+                              EVOUT1
+  10     SDA          PB1                 AIN10     AINP2     XCK                 SDA       WO1
+  11     SCL          PB0                 AIN11               XDIR                SCL       WO0
+  12                  PC0                                               *SCK                          TCB0 WO
+  13                  PC1                                               *MISO                                   *LUT1-OUT
+  14                  PC2       EVOUT2                                  *MOSI
+  15                  PC3                                               *SS                 *WO3                LUT1-IN0
+  16                  PC4                                                                   *WO4      *TCB1 WO  LUT1-IN1
+  17                  PC5                                                                   *WO5                LUT1-IN2
+  18     MOSI         PA1                 AIN1                *TxD      MOSI      *SDA                          LUT0-IN1
+  19     MISO         PA2       EVOUT0    AIN2                *RxD      MISO      *SCL                          LUT0-IN2
+  20     SCK          PA3       EXTCLK    AIN3                *XCK      SCK                 WO3       TCB1 WO
+  21?    UPDI         PA0       RESET/                                                                          LUT1-IN0
                               UPDI
       alternative pin locations
 */

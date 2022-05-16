@@ -149,7 +149,7 @@
       "ld    r15,     X"  "\n\t" // Load flags to r15"
       "sbiw  r26,     0"  "\n\t" // subtract 0 from it - this serves as a single-word way to test if it's 0, because it will still set the Zero flag. It's no faster than cpi r26, 0, cpc r27, r1 but takes less flash.
       "breq  AIntEnd"     "\n\t" // port not enabled, null pointer, just clear flags end hit the exit ramp.
-      "mov   r17,   r15"  "\n\t" // copy that flags to r17
+      "mov   r17,   r15"  "\n\t" // copy the flags to r17
     "AIntLoop:"           "\n\t"
       "lsr   r17"         "\n\t" // shift it right one place, now the LSB is in carry.
       "brcs  .+6"         "\n\t" // means we have something to do this time.

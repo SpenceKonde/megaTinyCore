@@ -64,6 +64,10 @@
 
 #if MEGATINYCORE_SERIES != 2
   #define digitalPinToAnalogInput(p)  (((p) < 6) ? ((p) + 4) : ((p) == 17 ? 0 : (((p) > 13 && (p) < 17) ? ((p) - 13) : (((p) == 8) ? 10 : ((p) == 9 ? 11 : NOT_A_PIN)))))
+  #if defined(ADC1)
+    #define digitalPinToAnalogInput_ADC1(p) ((p) < 6 ? (p) : ((p) < PINS_COUNT && ((p) >= PIN_PC0) ? (6 + (p) - PIN_PC0) : NOT_A_PIN))
+  #endif
+
 #else
   /* 2-series MUX table says ADC channel 0 is tied to ground, not PA0, PC0 through PC3 are a A12-15 */
   #define digitalPinToAnalogInput(p)  (((p) < 6) ? ((p) + 4) : (((p) > 13 && (p) < 17) ? ((p) - 13) : ((((p) >= 8) && ((p) < 14)) ? ((p) + 2) :  NOT_A_PIN)))

@@ -1,4 +1,4 @@
-/*
+          /*
   wiring.c - Partial implementation of the Wiring API for the ATmega8.
   Part of Arduino - http://www.arduino.cc/
 
@@ -540,8 +540,8 @@ unsigned long millis() {
           "add r0,r1"     "\n\t"  // + ticks >> 9
           "eor r1,r1"     "\n\t"  // clear out r1
           "sub %A0,r0"    "\n\t"  // Add the sum of terms that fit in a byte to what was ticks in old code.
-          "sbc %B0,r1"    "\n"    // carry - that's why you need a known 0 register!
-          : "+r" (ticks));        // Do the rest in C
+          "sbc %B0,r1"    "\n"    // carry - see,this is why AVR needs a known zero.
+          : "+r" (ticks));        // Do the rest in C. ticks is a read/write opperand.
         microseconds = overflows * 1000 + ticks; // nice and clean.
 
       /* The Troublesome Tens - I initially fumbled this after the **now** r1 is 0 line
@@ -608,7 +608,7 @@ unsigned long millis() {
           "eor r1,r1"     "\n\t"  // restore zero_reg
           "add %A0,r0"    "\n\t"  // add to the shifted ticks
           "adc %B0,r1"    "\n"    // carry
-          : "+r" (ticks));        // Do the rest in C
+          : "+r" (ticks));        // Do the rest in C. ticks is a read/write opperand.
         microseconds = overflows * 1000 + ticks;
 /* replaces:
       #elif (F_CPU == 48000000UL) // Extreme overclocking
@@ -1300,7 +1300,9 @@ void init() {
   #endif
   /*************************** ENABLE GLOBAL INTERRUPTS *************************/
   // Finally, after everything is initialized, we go ahead and enable interrupts.
-  sei();
+  if (onAfterInit()) {
+    sei();
+  }
 }
 
   /******************************** CLOCK STUFF *********************************/
@@ -1475,7 +1477,7 @@ void __attribute__((weak)) init_ADC0() {
   #endif
 }
 
-
+// Must be called manually.
 #ifdef ADC1
   __attribute__((weak)) void init_ADC1() {
     //                              30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz.
@@ -1561,3 +1563,8 @@ void __attribute__((weak)) init_TCA0() {
     TCA0.SPLIT.CTRLA   =   (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SPLIT_ENABLE_bm);
   #endif
 }
+
+
+__attribute__((weak)) void onPreMain() {;}
+__attribute__((weak)) void onBeforeInit() {;}
+__attribute__((weak)) uint8_t onAfterInit() {return 1;}
