@@ -19,7 +19,7 @@ Analog reference voltage can be selected as usual using analogReference(). Suppo
 
 Note: We do not provide a reference named "INTERNAL" like some classic AVR cores do; because the available voltages vary, this would be a detriment to cross-compatibility - by generating code that would compile, but behave differently, that would introduce the potential for new bugs that would be difficult to debug. Especially since the internal reference voltage isn't the same one that classic AVRs where that usage was commonplace is.... and so these would behave wrongly no matter what was done; minor modifications to sketches are required wheever the internal references are used when porting from classic to modern AVRs.
 
-Note the change from the heinous near random referencevoltages 0/1-series to maximally convenient ones on everything later. Why do I say maximally convenient? Consider a 12-bit ADC conversion, using the INTERNAL4V096 referemce and no other funny stuff going on:
+Note the change from the heinous near random reference voltages 0/1-series to maximally convenient ones on everything later. Why do I say maximally convenient? Consider a 12-bit ADC conversion, using the INTERNAL4V096 reference and no other funny stuff going on:
 
 Note also that on 0/1-eries, you must be sure toe select analogClockSpeed after choosingthe 0.55V reference, as it has a much more restricted range of clock speeds
 
@@ -41,8 +41,8 @@ The Ground internal sources are presumably meant to help correct for offset erro
 
 DACREF0 is the the reference voltage for the analog comparator, AC0. On the 1-series, this is the same as the `DAC0` voltage (yup, the analog voltage is shared). Analog comparators AC1 and AC2 on 1-series parts with at least 16k of flash also have a DAC1 and DAC2 to generate a reference voltage for them (though it does not have an output buffer), . On the 2-series, this is only used as the AC0 reference voltage; it cannot be output to a pin. . Unlike the AVR DA-series parts, which have neither `VDDDIV10` nor `INTREF` as an option so reading the reference voltage through `DACREF0` was the only way to determine the operating voltage, there is not a clear use case for the ability to measure this voltage.
 
-`*` Note that the I/O headers omit several options listed in the datasheet; For Dx-series, DACREF options aren't listed in the I/O headers for MUXPOS or Ground, but we still provide te constants listed above, consistent with the datasheet.
-`?` The DD-series lists a "BGTEMPSENSE" option in the preliminary datasheet. It's suposed t obe a better temperature sensor. It is not mentioned anywhere other than the muxpos table, and may end up being dropped from the final datasheet. This will be classified as an AVR Research Mystery if full information isn't available when silicon starts shipping, with the reward for someone who figures out and finds that it works being an DD-series breakout board, with chip mounted, of your choice (or a quantity of bare boards TBD). If you find, sadly, that it doesn't work, you'll still be eligible for a bounty of a smaller number of bare DD-breakout boards.
+`*` Note that the I/O headers omit several options listed in the datasheet; For Dx-series, DACREF options aren't listed in the I/O headers for MUXPOS or Ground, but we still provide the constants listed above, consistent with the datasheet.
+`?` The DD-series lists a "BGTEMPSENSE" option in the preliminary datasheet. It's supposed to be a better temperature sensor. It is not mentioned anywhere other than the muxpos table, and may end up being dropped from the final datasheet. This will be classified as an AVR Research Mystery if full information isn't available when silicon starts shipping, with the reward for someone who figures out and finds that it works being an DD-series breakout board, with chip mounted, of your choice (or a quantity of bare boards TBD). If you find, sadly, that it doesn't work, you'll still be eligible for a bounty of a smaller number of bare DD-breakout boards.
 `†` This options is available only on ACD1 of the tinyAVR 1-series parts.
 
 ### Analog Resolution
@@ -197,20 +197,20 @@ The busy and disabled errors are the only ones that we never know at compile tim
 |ADC_ERROR_INVALID_CLOCK         |      -32764 | Returned by analogSetClock() if, somehow, it fails to find an appropriate value. May be a cant-happen.
 |ADC_ERROR_BAD_PIN_OR_CHANNEL    |      -32765 | The specified pin or ADC channel does not exist or does support analog reads.
 |ADC_ERROR_BUSY                  |      -32766 | The ADC is busy with another conversion.
-|ADC_ERROR_DISABLED              |      -32767 | The ADC is disabled at this time. Did you disable it before going to sleep and not reenable it?
+|ADC_ERROR_DISABLED              |      -32767 | The ADC is disabled at this time. Did you disable it before going to sleep and not re-enable it?
 |ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL| -2100000000 | The specified pin or ADC channel does not exist or does support analog reads.
 |ADC_ENH_ERROR_BUSY              | -2100000001 | The ADC is busy with another conversion.
 |ADC_ENH_ERROR_RES_TOO_LOW       | -2100000003 | Minimum ADC resolution is 8 bits. If you really want less, you can always rightshit it.
 |ADC_ENH_ERROR_RES_TOO_HIGH      | -2100000004 | Maximum resolution, using automatic oversampling and decimation is less than the requested resolution.
 |ADC_DIFF_ERROR_BAD_NEG_PIN      | -2100000005 | analogReadDiff() was called with a negative input that is not valid.
-|ADC_ENH_ERROR_DISABLED          | -2100000007 | The ADC is currently disabled. You must enable it to take measurements. Did you disable it before going to sleep and not reenable it?
+|ADC_ENH_ERROR_DISABLED          | -2100000007 | The ADC is currently disabled. You must enable it to take measurements. Did you disable it before going to sleep and not re-enable it?
 
-IF you get the ADC_ERROR_DISABLED, most likely you disabled the ADC with ADCPowerOptions to save power in sleep, and forgot to reenable it.
+IF you get the ADC_ERROR_DISABLED, most likely you disabled the ADC with ADCPowerOptions to save power in sleep, and forgot to re-enable it.
 
 ### PrintADCRuntimeError(uint32_t error, &UartClass DebugSerial)
 Pass one of the above runtime errors and the name of a serial port to get a human-readable error message. This is wasteful of space, do don't include it in your code unless you need to.
 
-### ADCPowerOptions(options) *2-series only prior to 2.5.12* For compatibilit, a much more limited verson is provided for 0/1-series. See below
+### ADCPowerOptions(options) *2-series only prior to 2.5.12* For compatibility, a much more limited version is provided for 0/1-series. See below
 The PGA requires powere when turned on. It is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that specifies valid gain > 0; if it is not already on, this will slow down the reading. By default we turn it off afterwards. There is also a "low latency" mode that, when enabled, keeps the ADC reference and related hardware running to prevent the delay (on order of tens of microseconds) before the next analog reading is taken. We use that by default, but it can be turned off with this function.
 Generate the argument for this by using one of the following constants, or bitwise-or'ing together a low latency option and a PGA option. If only one option is supplied, the other configuration will not be changed. Note that due to current errata, you **must** have LOW_LAT enabeld
 * `LOW_LAT_OFF`     Turn off low latency mode. *2-series only*
@@ -230,7 +230,7 @@ ADCPowerOptions(LOW_LAT_OFF | PGA_AUTO_OFF);            //  low latency off. Tur
 ADCPowerOptions(ADC_DISABLE);                           //  turn off the ADC.
 ADCPowerOptions(ADC_ENABLE | ADC_RUNSTBTY);             //  Turn the ADC back on, and it will run in standby mode. If lowlatency mode was enabled, it will remain so,
 ```
-As of 2.5.12 we will always disable and reenable the ADC if touching LOWLAT, in the hopes that this will work around the lowlat errata consistently.
+As of 2.5.12 we will always disable and re-enable the ADC if touching LOWLAT, in the hopes that this will work around the lowlat errata consistently.
 **it is still recommended to call ADCPowerOptions(), if needed, before any other ADC-related functions** unless you fully understand the errata and the rammifications of your actions.
 **On most 2-series parts LOWLAT mode is REQUIRED in order to use the PGA when not using an internal reference, or measuring the DACREF!**
 
@@ -250,7 +250,7 @@ The 2-series and 0-series dont have DACs, though the 2-series analog comparator 
 
 
 ## Analog *channel* identifiers
-The ADC is configured in terms of channel numbers, not pin numbers. analogRead() hence converts the number of a pin with an analog channel associated with it to the number of that analog channel, so there is no need to deal with the analog channel numbers. The one exception to that is in the case of the non-pin inputs, the constants like ADC_DAC and ADC_VDDDIV10. I have a simple system to internally signal when a number isn';'t an digital pin number, but is instead an analog channel number: Simply set the high bit. I refer to these as analog channel identifiers. When the high bit is masked off, these are the value that you must set the MUX to in order to use this input source. No AVR has ever had more than 127 pins, much less that many analog channels, so this shouldn't be an issue. With 254 valid values, the current design provides room for 127 digital pins and 127 analog inputs, where the largest modern AVRs have only 56 I/O pins (it will be a technical challenge to surpass that, becasue they don't have any more registers for the VPORTs, and analog multiplexers that only go up to 73 (they use the second highest bit to denote non-pin inputs. )
+The ADC is configured in terms of channel numbers, not pin numbers. analogRead() hence converts the number of a pin with an analog channel associated with it to the number of that analog channel, so there is no need to deal with the analog channel numbers. The one exception to that is in the case of the non-pin inputs, the constants like ADC_DAC and ADC_VDDDIV10. I have a simple system to internally signal when a number isn';'t an digital pin number, but is instead an analog channel number: Simply set the high bit. I refer to these as analog channel identifiers. When the high bit is masked off, these are the value that you must set the MUX to in order to use this input source. No AVR has ever had more than 127 pins, much less that many analog channels, so this shouldn't be an issue. With 254 valid values, the current design provides room for 127 digital pins and 127 analog inputs, where the largest modern AVRs have only 56 I/O pins (it will be a technical challenge to surpass that, because they don't have any more registers for the VPORTs, and analog multiplexers that only go up to 73 (they use the second highest bit to denote non-pin inputs. )
 
 These numbers (they do have defines in the variants, and `ADC_CH()` will take an analog channel number (ex, "0") and turn it into the analog channel identifier. But you never need to do that unless you're getting very deep into a custom ADC library) The most common example when channels are used is when reading from things that are not pins - like the internal tap on the DAC output, or the VDDDIV10 value to find the supply voltage. These may overlap with pin numbers. Also internally, channel numbers are sometimes passed between functions. They are defined for pins that exist as analog channels, with names of rthe form `AINn` but **you should never use the AIN values** except in truly extraordinary conditions, and even then it's probably inappropriate. However I felt like mention of them here wax needed. Some macros abd helper funbctions involved are:
 

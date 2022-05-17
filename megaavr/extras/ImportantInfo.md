@@ -47,7 +47,7 @@ We only officially support (and test on) the Arduino IDE. Other IDEs are often u
 * [Names of the interrupt vectors on all parts](InterruptVectorNames.md) because for reasons I do not understand, it's a warning, not an error, to make a typo in the name of a vector; the compiled result hangs if this improperly defined interrupt is triggered. **This also contains some general information on interrupts on these parts.**
 * [Taking over TCA0](TakingOverTCA0.md) and using it to generate 16-bit PWM, or 16 bit arbitrary pulses
 * [Hardware timers and how this core uses them for PWM and millis](PWMandTimers.md) is documented in this document. PWM frequencies are designed to be similar to popular classic AVR devices by default.
-* [Manufacturer specified "speed grade" that the 0/1-series are rated for](SpeedGrades.md) are documented here, and are extremely conservative.
+* [Manufacturer specified "speed grade" that the 0/1-series are rated for](Ref_SpeedGrades.md) are documented here, and are extremely conservative.
 * ["Tuning" the internal oscillator to different speeds](Ref_Tuning.md) is supported since 2.4.0. You can use the inclucded sketch as described here with a trusted timebase to generate calibrated values to write to USERROW, and have the core use those - but if there are no such constants stored, we'll take our best guess.
 * [Manual power saving and sleep configuration](PowerSave.md) until I write the long delayed power saving library (avr/power.h doesn't do anything on these parts)
 
@@ -66,8 +66,8 @@ We only officially support (and test on) the Arduino IDE. Other IDEs are often u
 * [Optiboot reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md) The installation and operation of the Optiboot bootloader (for uploading over straight serial (not SerialUPDI)) is described here. Not recommended except on the 20/24-pin 2-series (since they have the alt reset pin) or for special use cases that demand it.
 * Other documents
 These guides are older, some are still relevant
-* [Timers and megaTinyCore](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PWMandTimers.md) This contains some of the information that would go into Ref_Timers like DxCore has.
-* [Advanced ADC features - For 0/1-series only](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ADCFreerunAndMore.md) This document describes how (on the 0 and 1 series only) the timer can be taken over and reconfigured, with particular attention to free running mode. The 2-series ADC is different, and it would require changes to reflect those differences.
+* [Timers and megaTinyCore](PWMandTimers.md) This contains some of the information that would go into Ref_Timers like DxCore has.
+* [Advanced ADC features - For 0/1-series only](ADCFreerunAndMore.md) This document describes how (on the 0 and 1 series only) the timer can be taken over and reconfigured, with particular attention to free running mode. The 2-series ADC is different, and it would require changes to reflect those differences.
 
 ## Special Libraries
 The libraries included with the core have README files associated with them
