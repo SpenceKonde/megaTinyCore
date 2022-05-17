@@ -2,19 +2,22 @@
 Various reset sources are available. Thus far the options have been the same on all modern AVRs. All six reset causes are frequently encountered important to know about. It's also important to be aware of the possibility that your code could reset - or appear to - without the chip actually resetting. I refer to this as a "dirty reset", and it is a Bad Thing. Frequently that is what is happening when you see an AVR get into a bad state after some adverse event, and not work until powrcycled or reset. That is discussed in it'as own section further down.
 
 
-| Reset Source         | Flag name         | Flag bit | Notes     |
-|----------------------|-------------------|----------|------------
-| UPDI Reset           | RSTCTRL_UPDIRF_bm |  1 << 5  | Done during programming several times. |
-| Software Reset (SWR) | RSTCTRL_SWRF_bm   |  1 << 4  | When requested by the application |
-| Watchdog Reset (WDR) | RSTCTRL_WDRF_bm   |  1 << 3  | When WDT expires w/out wdr instruction<br/>wdr executed before window in windowed mode|
-| External Reset       | RSTCTRL_EXTRF_bm  |  1 << 2  | When reset pin is brought LOW |
-| Brownout Reset (BOR) | RSTCTRL_BORF_bm   |  1 << 1  | When Vdd lower than BOD threshold and BOD enabled. |
-| Power on reset (POR) | RSTCTRL_PORF_bn   |       1  | On power on (Vdd goes above V<sub>POR</sub> from below V<sub>PORR</sub>)
+| Reset Source         | Flag name         | Flag bit |      | Notes     |
+|----------------------|-------------------|----------|------|------------
+| UPDI Reset           | RSTCTRL_UPDIRF_bm |  1 << 5  | 0x20 | Done during programming several times. |
+| Software Reset (SWR) | RSTCTRL_SWRF_bm   |  1 << 4  | 0x10 | When requested by the application |
+| Watchdog Reset (WDR) | RSTCTRL_WDRF_bm   |  1 << 3  | 0x08 | When WDT expires w/out wdr instruction<br/>wdr executed before window in windowed mode|
+| External Reset       | RSTCTRL_EXTRF_bm  |  1 << 2  | 0x04 | When reset pin is brought LOW |
+| Brownout Reset (BOR) | RSTCTRL_BORF_bm   |  1 << 1  | 0x02 | When Vdd lower than BOD threshold and BOD enabled. |
+| Power on reset (POR) | RSTCTRL_PORF_bn   |       1  | 0x01 | On power on (Vdd goes above V<sub>POR</sub> from below V<sub>PORR</sub>)
 
-* All of these resets restore the peripheral registers to their power on state - with the exception of the reset flag register.
+* All of these resets restore the peripheral registers [SFRs](https://github.com/SpenceKonde/AVR-Guidance/blob/master/Glossary.md#avr-jargon-referenced-from-other-documents) to their power on state - with the exception of the reset flag register, amd a small number of things that ONLY POR resets:
+  * Some parts fail to reset the BOD/VLM registers except on POR (see errata if you're using VLM.
+  * If an HV pulse was applied to the reset/updi pin to force it into UPDI mode only POR will reset that
+  * All reset flags are cleared by a POR (except for PORF itself which is set).
+  * This does NOT apply to working registers (r0-r31)! they contain random values, as does the rest of the data space
 * The WDT does not turn itself back on when it causes a reset on modern AVRs.
 * A BOR will clear all other reset flags except PORF.
-* A POR will clear all other reset flags.
 
 
 ## Determining reset cause

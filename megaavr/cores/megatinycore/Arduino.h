@@ -68,7 +68,18 @@ extern "C" {
     #define ADC_DAC0      ADC_CH(ADC_MUXPOS_DAC0_gc)
     #define ADC_DACREF0   ADC_DAC0
   #endif
-  // DACREF1 and DACREF2 can only be measured with ADC1. ADC1 is not exposed by megaTinyCore at this time.
+
+  #if defined(ADC1)
+    #define ADC1_CH(ch)     (0xC0 | (ch))
+    // All parts with the second adc have both extra dacrefs.
+    #define ADC1_DAC0     ADC1_CH(ADC_MUXPOS_DAC0_gc)
+    #define ADC1_DACREF0  ADC1_DAC0
+    #define ADC1_DAC1     ADC1_CH(ADC_MUXPOS_TEMPSENSE_gc) // see section 30.5.7 MUXPOS register.
+    #define ADC1_DACREF1  ADC1_DAC1
+    #define ADC1_DAC2     ADC1_CH(0x1B) // see section 30.5.7 MUXPOS register.
+    #define ADC1_DACREF2  ADC1_DAC2
+    #define getAnalogSampleDuration1()   (ADC1.SAMPCTRL)
+  #endif
   #define ADC_DEFAULT_SAMPLE_LENGTH 14
   #define ADC_ACC2        0x81
   #define ADC_ACC4        0x82
@@ -123,13 +134,17 @@ extern "C" {
   #define ADC_ACC512      0x89
   #define ADC_ACC1024     0x8A
 
-  #define getAnalogSampleDuration()   (ADC0.CTRLE)
+  #define getAnalogSampleDuration()   ((uint8_t)ADC0.CTRLE)
 
   #define LOW_LAT_ON      0x03
   #define LOW_LAT_OFF     0x02
   #define PGA_KEEP_ON     0x08
   #define PGA_AUTO_OFF    0x0C
   #define PGA_OFF_ONCE    0x04
+  #define ADC_ENABLE      0x20
+  #define ADC_DISABLE     0x30
+  #define ADC_STANDBY_ON  0xC0
+  #define ADC_STANDBY_OFF 0x80
 
 #endif
 
@@ -143,8 +158,8 @@ extern "C" {
  * analogRead should never return a negative. Neither should analogReadEnh
  * but I decided to have only 2 sets of ADC errors, not three.  */
 
-#define ADC_ERROR_BAD_PIN_OR_CHANNEL                -32765
 #define ADC_ERROR_DISABLED                          -32767
+#define ADC_ERROR_BAD_PIN_OR_CHANNEL                -32765
 #define ADC_ERROR_BUSY                              -32766
 #define ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL       -2100000000
 // positive channel is not (0x80 | valid_channel) nor a digital pin number
@@ -195,12 +210,21 @@ extern "C" {
 
 
 void init_ADC0(void); /* Called by init() after clock is set */
-void init_ADC1(void); /* Called by init() on parts with ADC1 */
+#if defined(ADC1)
+  void init_ADC1(void); /* Never called automatically, but must be called manuaklkly in order to use the ADC1 functions. */
+#endif
 void init_clock(void);/* called by init() first  */
 void init_millis();   /* called by init() last   */
 void init_timers();   /* called by init()        */
 void init_TCA0();     /* called by init_timers() */
 void init_TCD0();     /* called by init_timers() */
+
+// callbacks normally empty and optimized away.
+void onPreMain();
+void onBeforeInit();
+uint8_t onAfterInit();
+void initVariant();
+
 
 // Peripheral takeover
 // These will remove things controlled by
@@ -223,7 +247,7 @@ void set_millis(uint32_t newmillis);  // set current millis time.
  * Also, this might at times be appropriate
  * set_millis(millis() + known_offset);
  * after doing something that we know will block too long for millis to keep time
- * see also
+ * see also:
  */
 
 // DIGITAL I/O EXTENDED FUNCTIONS
@@ -231,56 +255,103 @@ void set_millis(uint32_t newmillis);  // set current millis time.
 int32_t     analogReadEnh(        uint8_t pin, /* no neg */ uint8_t res, uint8_t gain);
 int32_t     analogReadDiff(       uint8_t pos, uint8_t neg, uint8_t res, uint8_t gain);
 int16_t     analogClockSpeed(     int16_t frequency,        uint8_t options);
-bool        analogSampleDuration(uint8_t dur);
+bool        analogSampleDuration( uint8_t dur);
+void        ADCPowerOptions(      uint8_t options); // fewer options on 0/1=seroes
+#if defined(ADC1)
+  int32_t     analogReadEnh1(       uint8_t pin, /* no neg */ uint8_t res, uint8_t gain);
+  int32_t     analogReadDiff1(      uint8_t pos, uint8_t neg, uint8_t res, uint8_t gain); /* This just errors because these parts don't have a differential ADC */
+  int16_t     analogClockSpeed1(    int16_t frequency,        uint8_t options);
+  bool        analogSampleDuration1(uint8_t dur);
+  int16_t     analogRead1(          uint8_t pin);
+  void        analogReference1(     uint8_t mode);
+  void        ADCPowerOptions1(      uint8_t options);  // Fewer optiopms
+#endif
 void        DACReference(         uint8_t mode);
-void        ADCPowerOptions(      uint8_t options); /* 2-series only */
 
 // DIGITAL I/O EXTENDED FUNCTIONS
 // Covered in documentation.
-void           openDrain(uint8_t pinNumber,   uint8_t val);
-int8_t   digitalReadFast(uint8_t pinNumber               );
-void    digitalWriteFast(uint8_t pinNumber,   uint8_t val);
-void       openDrainFast(uint8_t pinNumber,   uint8_t val);
-void         pinModeFast(uint8_t pinNumber,  uint8_t mode); /* Does NOT implement the old-style setting/clearing of output value for input/input_pullup - and does support OUTPUT_PULLUP (for "open drain" applications) */
-void        pinConfigure(uint8_t pinNumber, uint16_t mode);
-void          turnOffPWM(uint8_t pinNumber               ); /* Turns off pins that analogWrite() can turn on PWM for. Does nothing if the pin is outputting PWM, but user has "taken over" that timer,
+void           openDrain(uint8_t pinNumber,   uint8_t val);  /* Slow like digitalWrite */
+int8_t   digitalReadFast(uint8_t pinNumber               );  /* Lightning fast - sometimes mindbogglingly so */
+void    digitalWriteFast(uint8_t pinNumber,   uint8_t val);  /* Lightning fast. Doesn't work unless pin is constant. */
+void       openDrainFast(uint8_t pinNumber,   uint8_t mode); /* Lightning fast. Doesn't work unless pin is constant.*/
+void         pinModeFast(uint8_t pinNumber,  uint8_t mode);  /* Lightning fast. Both pin AND mode must be constant! */
+void        pinConfigure(uint8_t pinNumber, uint16_t mode);  /* Surprisingly, hold's it's own against the stock digital I/O functions, despite doing way the hell more */
+void          turnOffPWM(uint8_t pinNumber               );  /* Turns off pins that analogWrite() and digitalWrite() can turn on or off PWM for. Does nothing if the pin is outputting PWM, but user has "taken over" that timer,
 nor does it do anything to PWM generated by a type B timer, which are not used by analogWrite()*/
 
 // avr-libc defines _NOP() since 1.6.2
-// It does? Better tell avr-gcc, because it insists otherwise...
+// Hum. Above comment was there when I moved in, doesn't seem to be true though.
+// "It does? Better tell avr-gcc, because it insists otherwise..."
+// Here are the most efficient ways to to all the cyclecounting delays before it becomes more efficient to use a 3 clock loop.
 #ifndef _NOP
-  #define _NOP()    __asm__ __volatile__ ("nop");
+  #define _NOP()    __asm__ __volatile__ ("nop")
 #endif
 #ifndef _NOP2
-  #define _NOP2()   __asm__ __volatile__ ("rjmp .+0");
+  #define _NOP2()   __asm__ __volatile__ ("rjmp .+0")
 #endif
 #ifndef _NOPNOP
-  #define _NOPNOP() __asm__ __volatile__ ("rjmp .+0");
+  #define _NOPNOP() __asm__ __volatile__ ("rjmp .+0")
 #endif
 #ifndef _NOP8
-  #define _NOP8()   __asm__ __volatile__ ("rjmp .+2"  "\n\t" \
-                                          "ret"       "\n\t" \
-                                          "rcall .-4" "\n\t");
-#endif
-#ifndef _NOP14
-  #define _NOP14()  __asm__ __volatile__ ("rjmp .+2"  "\n\t" \
-                                          "ret"       "\n\t" \
-                                          "rcall .-4" "\n\t" \
-                                          "rcall .-6" "\n\t" );
+  #define _NOP8()   __asm__ __volatile__ ("rjmp .+2"  "\n\t"   /* 2 clk jump over next instruction */ \
+                                          "ret"       "\n\t"   /* 2 clk return (wha? why here?) */    \
+                                          "rcall .-4" "\n\t" ) /* 4 clk "Oh, I see. We jump over a retun (2 clock) call it, and then immediately return." */
 #endif
 
+/*
+Not enabled. Ugly ways to get delays at very small flash cost.
+#ifndef _NOP6
+  #define _NOP6()   __asm__ __volatile__ ("rcall lonereturn") // 2 bytes of flash.  2+4=6 clk only works if you've got _LONE_RETURN() somewhere. Only guaranteed to work on 8k and smaller parts.
+  #define _NOP7()   __asm__ __volatile__ ("call lonereturn")  // 4 bytes of flash.  3+4=7 clk and see above, except that this will only work w/>8k flash.
+  #define _LONE_RETURN() __asm__ __volatile__ ("rjmp .+2"    "\n\t"  \  // 4 bytes of flash overhead, but must exist onece and only one for NOP6/7 (but not any others) . Don't trip over thr ret. Note that if you're writing inline assembly with ret esewhere, just preceed
+                                               "lonereturn:" "\n\t"  \  // it with a a label and jump to it to save 2 bytes vs this methodMust exist somwehere for
+                                                 "ret"         "\n\t" )
+  // It could be put into it's own function and marked with the "used" attribute. This allows elimination of the initial rjmp, at the cost of making an ugly hack even uglier.
+  // Or even worse, you have other inline assembly, and you just stick the label right before the return!
+  // Really, these are things you shoudnt do unless you have your back against the flash/RAM limits and a gun to your head.
+  #endif
+*/
+#ifndef _NOP14
+  #define _NOP14()  __asm__ __volatile__ ("rjmp .+2"  "\n\t"   /* same idea as above. */ \
+                                          "ret"       "\n\t"   /* Except now it's no longer able to beat the loop if it has a free register. */ \
+                                          "rcall .-4" "\n\t"   /* so this is unlikely to be better, ever. */ \
+                                          "rcall .-6" "\n\t" )
+#endif
+/* Beyond this, just use a loop
+ * (eg, ldi (any upper register), n; dec r0; brne .-4)
+ * and pad with rjmp or nop if needed to get target delay.
+ * 3n cycles in 3 words, 3n+2, 3n+1 4n, or 5n in 4 words. Though
+ *                  uint8_t x = 20;
+ *                  __asm__ __volatile__ ("dec %0"      "\n\t"  // Line is preceeded by an implied ldi.
+ *                                        "brne .-4     "\n\t"
+ *                                        : "+d"((uint8_t)(x));
+ *
+ * The above will take 60 clock cycles under almost all conditions.
+ * The exceptions are that if an interrupt fires, time doesn't pass during that interrupt
+ * to the knowledge of that code (always a problem with cycle counting, and part of why hardware timers exist.
+ * Or, under extreme register pressure there may not be an available upper register to use as the counter (and we can't use lower registers, such as
+ * the always available tmp_reg, r0, with the load immediate instruction).
+ * this case the compiler has no option but to push an upper register onto the stack at the start and then pop it off at the end adding 3 cycles.
+ * (and no facility is provided to know when it's doing this - the determination happens at compile time, but you can't do a conditional compilation on it.
+ * It is exceedingly unusual to care
+ *
+ * You can extend the length of the iterations by adding nop betweeen the dec and brne, and branching 2 bytes further. that makes it 4 clocks per iteration.
+ * You can go for much longer by using 16-bits:
+ *                  uint16_t x = 2000;   // overall takes 8 bytrsd
+ *                  __asm__ __volatile__ ("sbiw %0,1"    "\n\t"  // Line is preceeded by 2 implied LDI's to fill that upper register pair, Much higher chance of having to push and pop.
+ *                                        "brne .-4      "\n\t"  // SBIW takes 2 clocks. branch takes 2 clocks unless it doesn't branch, when it only takes one
+ *                                        : "+w"((uint16_t)(x))  // hence this takes 4N+1 clocks (4 per iteration, except for last one which is only 3, plus 2 for the pair of LDI's)
+ *
+ */
+
+
+// The fastest way to swap nybbles
 #ifndef _SWAP
   #define _SWAP(n) __asm__ __volatile__ ("swap %0"  "\n\t" :"+r"((uint8_t)(n)));
 #endif
 
 
 
-
-/* Beyond this, just use a loop
- * (eg, ldi r0, n dec r0 brne .-4)
- * and pad with rjmp or nop if needed to get target delay.
- * 3n cycles in 3 words, 3n+2, 3n+1 4n, or 5n in 4 words.
- */
 
 uint16_t clockCyclesPerMicrosecond();
 unsigned long clockCyclesToMicroseconds(unsigned long cycles);
@@ -425,6 +496,12 @@ extern const uint8_t digital_pin_to_timer[];
   int32_t analogReadEnh(uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int32_t analogReadDiff(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int16_t analogClockSpeed(int16_t frequency = 0, uint8_t options = 0);
+  bool printADCRuntimeError(int32_t error, UartClass &__dbgser = Serial);
+  #if defined(ADC1)
+    int32_t analogReadEnh1(uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
+    int32_t analogReadDiff1(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
+    int16_t analogClockSpeed1(int16_t frequency = 0, uint8_t options = 0);
+  #endif
 #endif
 
 // Include the variants

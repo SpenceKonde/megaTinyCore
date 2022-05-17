@@ -70,21 +70,39 @@ PIN_SERIAL_XDIR
 This function is meant for use by libraries to allow them to figure out which pin is in use without duplicating the logic we have already implemented.
 
 ### Serial.printHex() and Serial.printHexln()
-Serial.printHex() is a cut-down method to print hexadecimal numbers with less bloat than Serial.print(number,HEX). It's designed to print numbers in the way that programmers would want them printed - the number of leading zeros will match the data type, ie if you print an unsigned long, with 1 in the low byte and 0's in the other three, it will print 00000001, not 1. As you would expect, printHexln() does the same thing and adds a newline.
+One extremely common task in embedded programming, particualarly debugging embedded code, is printing data out as hexadecimal numbers. There is of course,  `Serial.print(number,HEX)`, but not only does that burn more flash, it doesn't add an appropriate number of leading zeros (making it hard to read). It's designed to print numbers in the way that programmers would want them printed - the number of leading zeros will match the data type, ie if you print an unsigned long, with 1 in the low byte and 0's in the other three, it will print 00000001, not 1. As you would expect, printHexln() does the same thing and adds a newline.
+Below is an unabridged list of the versions:
+```c++
+    void                printHex(const     uint8_t              b);
+    void                printHex(const    uint16_t  w, bool s = 0);
+    void                printHex(const    uint32_t  l, bool s = 0);
+    void                printHex(const      int8_t  b)              {printHex((uint8_t )   b);           }
+    void                printHex(const        char  b)              {printHex((uint8_t )   b);           }
+    void                printHex(const     int16_t  w, bool s = 0)  {printHex((uint16_t)w, s);           }
+    void                printHex(const     int32_t  l, bool s = 0)  {printHex((uint32_t)l, s);           }
+    void              printHexln(const      int8_t  b)              {printHex((uint8_t )b   ); println();}
+    void              printHexln(const        char  b)              {printHex((uint8_t )b   ); println();}
+    void              printHexln(const     uint8_t  b)              {printHex(          b   ); println();}
+    void              printHexln(const    uint16_t  w, bool s = 0)  {printHex(          w, s); println();}
+    void              printHexln(const    uint32_t  l, bool s = 0)  {printHex(          l, s); println();}
+    void              printHexln(const     int16_t  w, bool s = 0)  {printHex((uint16_t)w, s); println();}
+    void              printHexln(const     int32_t  l, bool s = 0)  {printHex((uint32_t)l, s); println();}
+    uint8_t *           printHex(          uint8_t* p, uint8_t len, char sep = 0            );
+    uint16_t *          printHex(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
+    volatile uint8_t *  printHex(volatile  uint8_t* p, uint8_t len, char sep = 0            );
+    volatile uint16_t * printHex(volatile uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
+```
 
-There are two additional features aimed at the same goal sort of use case:
+There are two particular features worth noting in addition to the correct number of leading zeros, and the fact that it is not horrendously bloated like full serial print.
 1. For 16 and 32-bit datatypes, you can pass a boolean as the second argument. If it is true, the endianness will be reversed.
 
-2. You can also pass a pointer to either a uint8_t or a uint16_t. In this case the arguments are:
+2. You can also pass a pointer to either a uint8_t or a uint16_t variable. In this case the arguments are:
 ```c
 uint8_t *  printHex(uint8_t * p, uint8_t len, char sep = 0);
 uint16_t * printHex(uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
 ```
 
-It will print n elements starting from the address the pointer is pointed at, if `sep` is non-zero, that character will be placed between each byte or word. If s is true, the endianness will be swapped as well. There is a slightly different implementation for volatile pointers, and know that the compiler won't try to "help" you by skipping the reads.
-
-All cases where a pointer is used return a pointer to the next element. These automatically put a newline at the end.
-The point of it was doing things like this when debugging issues with a peripheral:
+It will print `len` elements starting from the address the pointer is pointed at, if `sep` is non-zero, that character will be placed between each byte or word - these are **characters** not strings. A single charachter, enclosed between a pair of single quotes. ":" is a 2 character string - a colon followed by a null terminator, and is invalid. Anything between double quotes is invalid. Use single quotes as shown below. If s is true for a pointer to 16-bit values, the endianness will be swapped as well. There is a slightly different implementation for pointers to volatile variables to help prevent problems when using this to dump the contents of peripheral registers. Which is what printHex was made for.
 ```c
   // dump every register associated with the CCL
   volatile uint8_t * cclconfig= (volatile uint8_t*)&CCL;
@@ -119,7 +137,6 @@ Many peripherals have a couple of 16-bit registers, amongst a sea of 16-bit ones
   00:00:00:00:00:00
 */
 ```
-
 
 ### Serial.begin(uint32_t baud, uint16_t options)
 This starts the serial port. Options should be made by combining the constant referring to the desired baud rate, parity and stop bit length, zero or more of the modifiers below
@@ -196,11 +213,10 @@ Rarely, one needs to have *inverted* serial, ie, idle line is low, the start bit
 
 ```c
 //after Serial.begin(), which would mess all this up.
-// assumg TX_PIN and RX_PIN are the TX and RX pins respectively/
+// assumg TX_PIN and RX_PIN are the TX and RX pins respectively
 pinConfigure(TX_PIN,(PIN_PULLUP_OFF | PIN_INVERT_ON));
 pinConfigure(TX_PIN,(PIN_PULLUP_OFF | PIN_INVERT_ON));
-MSPIBEGIN_INVERT or MSPIBEGIN_NORMAL
-*/
+// for Sync mode, you cvan use the constants described below
 ```
 ### Event RX - documentation pending testing and verification
 
