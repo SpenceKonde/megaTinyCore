@@ -235,14 +235,16 @@ In 2.5.4/1.4.4 it was reported that the return value of this method did not matc
 
 | Value | Meaning                                                        | Standard |
 |-------|----------------------------------------------------------------|----------|
-|  0x00 | Success                                                        | Yes      |
-|  0x01 | TX buffer overflow. Not used.                                  | Yes      |
-|  0x02 | Timeout waiting for ack of address                             | Yes      |
-|  0x03 | Timeout waiting for ack of data                                | Yes      |
-|  0x04 | Unknown error                                                  | Yes      |
-|  0x10 | Arbitration lost                                               | No       |
-|  0x11 | Line held low or not pulled up                                 | No       |
-|  0xFF | Bus in unknown state (begin() not called?)                     | No       |
+|  0x00 | Success                                                        | Yes      | TWI_ERR_SUCCESS
+|  0x01 | TX buffer overflow. Not used.                                  | Yes      | TWI_ERR_DATA_TOO_LONG
+|  0x02 | Address was NAK'd                                              | Yes      | TWI_ERR_ACK_ADR
+|  0x03 | Data was NAK'd                                                 | Yes      | TWI_ERR_ACK_DAT
+|  0x04 | Unknown error                                                  | Yes      | TWI_ERR_UNDEFINED
+|  0x11 | Line held low or not pulled up                                 | No       | TWI_ERR_PULLUPS
+|  0x12 | Arbitration lost                                               | No       | TWI_ERR_BUS_ARB
+|  0x13 | Buffer overflow on master read                                 | No       | TWI_ERR_BUF_OVERFLOW
+|  0x14 | Something is holding the clock                                 | No       | TWI_ERR_CLKHLD
+
 
 In the case of a TX buffer overflow, when it gets to endTransmission, this looks the same as a full buffer, because write() didn't put the excess data into the buffer, and returned a number smaller than the number of bytes passed to it. I'm not sure how error code 1 could ever happen.
 

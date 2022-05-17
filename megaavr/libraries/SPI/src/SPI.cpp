@@ -1,28 +1,37 @@
 /*
-   SPI Master library for Arduino Zero.
-   Copyright (c) 2015 Arduino LLC
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with this library; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ * SPI Master library for DxCore.
+ * Copyright (c) 2021 Spence Konde, based om earlier version
+ * of SPI.h (c) 2015 Arduino LLC
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+// *INDENT-OFF* astyle hates how we formatted this
 
 #include "SPI.h"
 #include <Arduino.h>
 
-#define SPI_IMODE_NONE   0
-#define SPI_IMODE_EXTINT 1
-#define SPI_IMODE_GLOBAL 2
+#ifndef SPI_IMODE_NONE
+  #define SPI_IMODE_NONE   0
+#endif
+#ifndef SPI_IMODE_EXTINT
+  #define SPI_IMODE_EXTINT 1
+#endif
+#ifndef SPI_IMODE_GLOBAL
+  #define SPI_IMODE_GLOBAL 2
+#endif
+
 
 const SPISettings DEFAULT_SPI_SETTINGS = SPISettings();
 
@@ -173,17 +182,16 @@ void SPIClass::end() {
 
 #ifdef CORE_ATTACH_OLD
 void SPIClass::usingInterrupt(uint8_t interruptNumber) {
-  if ((interruptNumber == NOT_AN_INTERRUPT)) {
+  if ((interruptNumber == NOT_AN_INTERRUPT))
     return;
-  }
 
-  if (interruptNumber >= EXTERNAL_NUM_INTERRUPTS) {
+  if (interruptNumber >= EXTERNAL_NUM_INTERRUPTS)
     interruptMode = SPI_IMODE_GLOBAL;
-  } else {
+  else {
     #if USE_MALLOC_FOR_IRQ_MAP
-    if (irqMap == NULL) {
-      irqMap = (uint8_t *)malloc(EXTERNAL_NUM_INTERRUPTS);
-    }
+      if (irqMap == NULL) {
+        irqMap = (uint8_t*)malloc(EXTERNAL_NUM_INTERRUPTS);
+      }
     #endif
 
     interruptMode |= SPI_IMODE_EXTINT;
