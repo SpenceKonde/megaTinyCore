@@ -149,9 +149,9 @@ class SPISettings {
       /* library to coeexist with code that uses the SPI as a slave,     */
       /* if and only if the SPI_MODEn named constants are used           */
       ctrlb = (dataMode);
-              // (SPI_SSD_bm)          |
-              // (0 << SPI_BUFWR_bp)   |
-              // (0 << SPI_BUFEN_bp);
+      // (SPI_SSD_bm)          |
+      // (0 << SPI_BUFWR_bp)   |
+      // (0 << SPI_BUFEN_bp);
 
       /* Get Clock related values.*/
       uint8_t clockDiv_mult = (clockDiv & 0x1);

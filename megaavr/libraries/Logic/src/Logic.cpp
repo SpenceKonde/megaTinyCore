@@ -398,7 +398,7 @@ void Logic::stop() {
 }
 
 static volatile register8_t &PINCTRL(PORT_t &port, const uint8_t pin_bm) {
- if (pin_bm == PIN0_bm) {
+  if (pin_bm == PIN0_bm) {
     return port.PIN0CTRL;
   }
   if (pin_bm == PIN1_bm) {
