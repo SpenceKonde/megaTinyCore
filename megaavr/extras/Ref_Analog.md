@@ -6,22 +6,43 @@ These parts all have a large number of analog inputs (11 pins on 20 and 24-pin 0
 ## Reference Voltages
 Analog reference voltage can be selected as usual using analogReference(). Supported reference voltages are listed below:
 
-| tinyAVR 0/1-series                     | tinyAVR 2-series, Dx, and EA            |
-|----------------------------------------|-----------------------------------------|
-| `VDD` (Vcc/supply voltage - default)   | `VDD` (Vcc/supply voltage - default)    |
-| `INTERNAL0V55`                         | `INTERNAL1V024`                         |
-| `INTERNAL1V1`                          | `INTERNAL2V048`                         |
-| `INTERNAL1V5`                          | `INTERNAL4V096`                         |
-| `INTERNAL2V5`                          | `INTERNAL2V500`                         |
-| `INTERNAL4V3` (alias of INTERNAL4V34)  | `INTERNAL4V1` (alias of INTERNAL4V096)  |
-| `INTERNAL4V34`                         | `EXTERNAL`                              |
-| `EXTERNAL` (16k and 32k 1-series only) |                                         |
+| tinyAVR 0/1-series                     | VDD<sub>min</sub> | tinyAVR 2-series, Dx, and EA            | VDD<sub>min</sub> |
+|----------------------------------------|--------|-----------------------------------------|--------|
+| `VDD` (Vcc/supply voltage - default)   | n/a    | `VDD` (Vcc/supply voltage - default)    | n/a    |
+| `INTERNAL0V55`                         | 1.8V   | `INTERNAL1V024`                         | 1.8    |
+| `INTERNAL1V1`                          | 1.8V   | `INTERNAL2V048`                         | 2.6    |
+| `INTERNAL1V5`                          | 1.9V   | `INTERNAL4V096`                         | 4.6    |
+| `INTERNAL2V5`                          | 2.9V   | `INTERNAL2V500`                         | 3.0    |
+| `INTERNAL4V3` (alias of INTERNAL4V34)  | 4.75V  | `INTERNAL4V1` (alias of INTERNAL4V096)  | -      |
+| `INTERNAL4V34`                         | -      | `EXTERNAL`                              | V<sub>ref</sub>+0.5V |
+| `EXTERNAL` (16k and 32k 1-series only) | V<sub>ref</sub>+0.4V |                           |        |
 
-Note: We do not provide a reference named "INTERNAL" like some classic AVR cores do; because the available voltages vary, this would be a detriment to cross-compatibility - by generating code that would compile, but behave differently, that would introduce the potential for new bugs that would be difficult to debug. Especially since the internal reference voltage isn't the same one that classic AVRs where that usage was commonplace is.... and so these would behave wrongly no matter what was done; minor modifications to sketches are required wheever the internal references are used when porting from classic to modern AVRs.
+### Important notes regarding reference voltages
 
-Note the change from the heinous near random referencevoltages 0/1-series to maximally convenient ones on everything later. Why do I say maximally convenient? Consider a 12-bit ADC conversion, using the INTERNAL4V096 referemce and no other funny stuff going on:
+1. We do not provide a reference named "INTERNAL" like some classic AVR cores do; because the available voltages vary, this would be a detriment to cross-compatibility - by generating code that would compile, but behave differently, that would introduce the potential for new bugs that would be difficult to debug. Especially since the internal reference voltage isn't the same one that classic AVRs where that usage was commonplace is.... and so these would behave wrongly no matter what was done; minor modifications to sketches are required wheever the internal references are used when porting from classic to modern AVRs.
 
-Note also that on 0/1-eries, you must be sure toe select analogClockSpeed after choosingthe 0.55V reference, as it has a much more restricted range of clock speeds
+2. As you can see in the table above, more conservative values were spec'ed for the 2-series. this could be because of increased sensitivity of the ADC to adverse operating conditions, or may reflect a generally more careful and deliberate approach taken with the 2-series (compare the length of the errata for the 2-series with the 1-series, for example).
+
+3. The External Reference option on the 16k and 32k 1-series parts - like most of the other features specific to just those parts - was added is a somewhat slapdash manner. They say, and I quote:
+```text
+When using the external reference voltage VREFA, configure ADCnREFSEL[0:2] in the corresponding VREF.CTRLn
+register to the value that is closest, but above the applied reference voltage. For external references higher than
+4.3V, use ADCnREFSEL[0:2] = 0x3 [4.3V].
+```
+However, one must NOT have ADCnREFEN bit set when using an external reference, so it's far from clear why the above is required, this warning was never present until 2.5.12, and nobody complained. This suggests that it one of the following is true:
+  a. Configuring refsel per the datasheet isn't that important afterall, or makes small enough difference in accuracy that it has gone unnoticed so far.
+  b. Failure to configure refsel per the datasheet causes only poor ADC accuracy, and the few individuals using an external reference read the relevant paragraph in the datasheet and configured refsel.
+  b. Configuring refsel per the datasheet is a *safeguard* against some undesirable outcome that could occur if ADCnREFEN was also set with an external reference.
+  c. Configuring refsel per the datasheet is a safeguard against some undesirable outcome that could occur whether or not ADCnREFEN is set, but the undesirable outcome impacts the internal references only, and the few people who have encountered this have not encountered the consequences because the don't use the internal reference source
+  d. Nobody is using the external voltage reference on these things in the first place.
+
+My guess (and it is ONLY A **GUESS**) is that b or c is the case, and the undesired outcome takes the form of damage to the selected analog reference. Which will usually be 0.55V. if all that was done was immediately set it to the external reference. That reference voltage is rarely used, so this could plausibly have gone unnoticed by megaTinyCore users.
+
+analogReference() as you know takes only a single argument, and the overhead of measuring an external reference voltaqge to determine what the internal reference should be set to in order to comply with that restriction would be prohibitive. If you are using the external reference on the 1-series parts, first call analogReference with a internal reference per their quoted instructions, then set it to the external reference.
+
+3. Note the change from the heinous near random reference voltages used on the 0/1-series - which you often end up either checking against thresholds calculated at compile time or using floating point math in order to do anything useful with - to maximally convenient ones on everything released later than the 0/1-series. I say they are maximally convenient because with 12-bit resolution selected, 4.096V, 2.048V, and 1.024V references corresopond to 1 mV/LSB, 0.5mv/LSB, and 0.25mv/LSB.
+
+4. On 0/1-series, you must be sure to slow down the ADC clock with analogClockSpeed after choosing the 0.55V reference, as it has a much more restricted operating clock speed range: 100 - 260 kHZ. The other references can be used at 200 - 2000 kHz.
 
 ## Internal Sources
 In addition to reading from pins, you can read from a number of internal sources - this is done just like reading a pin, except the constant listed in the table below is used instead of the pin name or pin number:
@@ -184,7 +205,7 @@ If anyone undertakes a study to determine the impact of different ADC clock freq
 I've been told that application notes with some guidance on how to best configure the ADC for different jobs is coming. Microchip is aware that the new ADC has a bewildering number of knobs compared to classic AVRs, where there was typically only 1 degree of freedom, the reference, which is simple to pick and undeerstand, since only one prescaler setting was in spec.
 
 ### getAnalogReadResolution()
-Returns either 10 or 12, the current resolution set for analogRead.
+Returns either 8, 10 or 12 (2-series only), the current resolution set for analogRead.
 
 ### getAnalogSampleDuration()
 Returns the number of ADC clocks by which the minimum sample length has been extended.
@@ -205,10 +226,15 @@ The busy and disabled errors are the only ones that we never know at compile tim
 |ADC_DIFF_ERROR_BAD_NEG_PIN      | -2100000005 | analogReadDiff() was called with a negative input that is not valid.
 |ADC_ENH_ERROR_DISABLED          | -2100000007 | The ADC is currently disabled. You must enable it to take measurements. Did you disable it before going to sleep and not reenable it?
 
-IF you get the ADC_ERROR_DISABLED, most likely you disabled the ADC with ADCPowerOptions to save power in sleep, and forgot to reenable it.
-
-### PrintADCRuntimeError(uint32_t error, &UartClass DebugSerial)
+### printADCRuntimeError(uint32_t error, &UartClass DebugSerial)
 Pass one of the above runtime errors and the name of a serial port to get a human-readable error message. This is wasteful of space, do don't include it in your code unless you need to.
+```
+int32_t adc_reading=AnalogReadDiff(PIN_PA1, PIN_PA2);
+if (adc_reading < -32768 ) {
+  Serial.println("An error was returned while taking a differential reading!")
+  printADCRuntimeError(adc_reading, Serial);
+}
+```
 
 ### ADCPowerOptions(options) *2-series only prior to 2.5.12* For compatibilit, a much more limited verson is provided for 0/1-series. See below
 The PGA requires powere when turned on. It is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that specifies valid gain > 0; if it is not already on, this will slow down the reading. By default we turn it off afterwards. There is also a "low latency" mode that, when enabled, keeps the ADC reference and related hardware running to prevent the delay (on order of tens of microseconds) before the next analog reading is taken. We use that by default, but it can be turned off with this function.
@@ -228,11 +254,9 @@ Example:
 ADCPowerOptions(LOW_LAT_ON  | PGA_KEEP_ON );            //  low latency on. Turn the PGA on, and do not automatically shut it off. Maximum power consumption, minimum ADC delays.
 ADCPowerOptions(LOW_LAT_OFF | PGA_AUTO_OFF);            //  low latency off. Turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays. **ERRATA WARNING** turning off LOWLAT can cause problems on 2=series parts! See the errata for the sopecific part you are using.)
 ADCPowerOptions(ADC_DISABLE);                           //  turn off the ADC.
-ADCPowerOptions(ADC_ENABLE | ADC_RUNSTBTY);             //  Turn the ADC back on, and it will run in standby mode. If lowlatency mode was enabled, it will remain so,
+ADCPowerOptions(ADC_ENABLE                              //  Turn the ADC back on. If LOWLAT mode was on, when you turned off the ADC it will still be on,. Same with the other options.
 ```
-As of 2.5.12 we will always disable and reenable the ADC if touching LOWLAT, in the hopes that this will work around the lowlat errata consistently.
-**it is still recommended to call ADCPowerOptions(), if needed, before any other ADC-related functions** unless you fully understand the errata and the rammifications of your actions.
-**On most 2-series parts LOWLAT mode is REQUIRED in order to use the PGA when not using an internal reference, or measuring the DACREF!**
+As of 2.5.12 this function will always disable and reenable the ADC if touching LOWLAT, in the hopes that this will work around the LOWLAT errata consistently. **On most 2-series parts LOWLAT mode is REQUIRED in order to use the PGA when not using an internal reference, or measuring the DACREF!** This is a silicon bug, see the appropriate errata sheet for your parts.
 
 Lowlat mode is enabled by default for this reason, as well as to generally improve performance. Disabling the ADC will end the power consumption associated with it.
 
@@ -242,6 +266,8 @@ Only the following are supported
 * `ADC_DISABLE`     Disable the ADC to save power in sleep modes.   *new 2.5.12*
 * `ADC_STANDBY_ON`  Turn on ADC run standbv mode                    *new 2.5.12*
 * `ADC_STANDBY_OFF` Turn off ADC run standby mode                   *new 2.5.12*
+
+In all cases, if no command to turn on or off an option is passed the current setting will remain unchanged
 
 ### DAC Support
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage. This generates voltages between 0 and the selected VREF (which cannot be VDD, unfortunately). Set the DAC reference voltage via the `DACReference()` function - pass it one of the `INTERNAL` reference options listed under the ADC section above. This voltage must be half a volt lower than Vcc for the voltage reference to be accurate. The DAC is exposed via the analogWrite() function: Call `analogWrite(PIN_PA6,value)` to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin; note that unlike most* PWM pins `analogWrite(PIN_PA6,0)` and `analogWrite(PIN_PA6,255)` do not act as if you called digitalWrite() on the pin; 0 or 255 written to the `DAC0.DATA` register; thus you do not have to worry about it applying the full supply voltage to the pin (which you may have connected to sensitive devices that would be harmed by such a voltage) if let the calculation return 255; that will just output 255/256ths of the reference voltage.
