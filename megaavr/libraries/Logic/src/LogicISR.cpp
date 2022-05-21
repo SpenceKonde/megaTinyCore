@@ -1,5 +1,3 @@
-
-
 #if defined(CCL_CCL_vect)
 void Logic::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
   CCL_INTMODE0_t intmode;
