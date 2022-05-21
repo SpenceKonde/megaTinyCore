@@ -26,14 +26,17 @@ This document is best viewed online if you isntalled via board manager - [https:
 ### **Arduino 1.8.13 is recommended**
 Older versions do not properly handle the programmers in the tools -> programmers menu, which degrades the UX rapidly as the number of installed cores increases. They are not suitable.
 
-The newest versions (1.8.17, 1.8.18, and 1.8.19) generate a "panic: no major version found" error and fail to compile any sketch for me. This is despite the fact major, minor, and patch versions are specified in platform.txt. I don't know why everyone does not have the same problem, I just know I don't have time for this kind of crap, don't know either of the relevant programming languages, and am continuing to use 1.8.13 until a newer version with basic functionality intact is available. We appear to be back to the bad old days where only a small fraction of IDE releases are any good. :-(
+The newest versions (1.8.17, 1.8.18, and 1.8.19) may generate a "panic: no major version found" error and fail to compile any sketch. It is not clear what triggers this bug, as it is not a missing major version define. The major, minor, and patch versions are specified in platform.txt. We appear to be back to the bad old days where only a small fraction of IDE releases are any good. :-(
 
-When megaTinyCore is installed through board manager, the required version of the toolchain is installed automatically. Manual installation - assuming you want support for the 2-series - is more complicated; see the [Installation guide for more information](Installation.md).
+When megaTinyCore is installed through board manager, the required version of the toolchain is installed automatically. All 0/1/2-series parts are supported with no extra steps.
+
+
+Manual installation is more complicated - particularly if you want support for the 2-series; see the [Installation guide for more information](Installation.md).
 
 ## **megaTinyCore** - Background and basics
 An Arduino core for the tinyAVR 0-series, 1-series, and now the 2-series. These parts have an improved architecture compared to the "classic" tinyAVR parts (which are supported by [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore)), with improved peripherals and improved execution time for certain instructions (these are similar in both regards to the advanced AVR Dx-series, as well as megaAVR 0-series chips like the ATmega4809 as used on the official Nano Every and Uno Wifi Rev. 2 - although the Arduino team has done their best to kneecap them) in the low-cost, small packages typical of the ATtiny line. All of these parts feature at least one hardware UART, and an SPI and TWI interface (none of that USI garbage like, for example, the ATtiny85 has), a powerful event system, configurable custom logic, at least one on-chip analog comparator, a surprisingly accurate internal oscillator, and in the case of the 1-series, an actual DAC output channel, and in the case of the 2-series, a fancy differential ADC.
 
-Moreover, the tinyAVR 0/1/2-series parts are *cheap* - the highest end parts, the 3216 and 3217, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini) run just over $1 USD, and under $.90 in quantity - less than many 8k classic AVR ATtiny parts ("AVR instruction set, at a PIC price"). All of these parts are rated to run at 16 MHz or 20 MHz (at 4.5-5.5v) without an external crystal, and the internal oscillator is accurate enough for UART communication.
+Moreover, the tinyAVR 0/1/2-series parts are *cheap* - the highest end parts, the 3226 and 3227, with 32k of flash and 2k of SRAM (same as the atmega328p used in Uno/Nano/ProMini) run just over $1 USD in quantity - less than many 8k classic AVR ATtiny parts ("AVR instruction set, at a PIC price"). All of these parts are rated to run at 16 MHz or 20 MHz (at 4.5-5.5v) without an external crystal, and the internal oscillator is accurate enough for UART communication.
 
 These use UPDI programming, not traditional ISP like the classic ATtiny parts did. See below for more information. Getting a UPDI programmer is simple - you can use a classic 328p-based Arduino as programmer using jtag2updi - or for better results with cheaper hardware, you can use *any USB-serial adapter* and a resistor (and preferably a diode) using the included SerialUPDI tool, or you can use AVRdude with one of the Microchip programmers (the mEDBG/nEDBG/EDBG-based programmers on their development board, Atmel-ICE or SNAP) or any UPDI programming tool that emulates one of those (which, to my knowledge, all of them do - if there is one that avrdude supports and that my core doesn't provide an issue to support please open an issue to let me know!)
 
@@ -107,9 +110,9 @@ This is currently used only for the last few releases, and should fix the avrdud
   * ATtiny 25/45/85, 24/44/84, 261/461/861, 48/88, and 43, as well as the late-classical ATtiny 441/841, 1634 and 828.
   * The small-and-strange ATtinys: ATtiny26 (support coming to ATTinyCore 2.0.0), and ATtiny43 (already supported).
 * The even smaller or stranger ones not supported by ATTinyCore
-  * ATtiny20/40
+  * ATtiny20/40 (these sound normal until you get to the ram access part of the datasheet....)
   * ATtiny13 (just smaller - Use [MicroCore](https://github.com/MCUdude/MicroCore) by @MCUdude)
-  * ATtiny15 (obsolete) and ATtiny28 (obsolete, and like, really terrible)
+  * ATtiny15 (obsolete) and ATtiny28 (obsolete). And like, really terrible. I'd have marked these "obsolete" and buried them in the back yard as quickly as possible too.
 * ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the AVR CPU core they use is gimped: pop is *three clocks*, as is call, and ret is *six*, memory access is slower, and as if that all weren't enough, there's no multiplication and half as many working registers. But [attiny10core](https://github.com/technoblogy/attiny10core) supports them!
 * Anything with "Mega" in the name (Use [one of @MCUdude's cores](https://github.com/MCUdude/))
 
@@ -136,7 +139,7 @@ This is currently used only for the last few releases, and should fix the avrdud
 | CCL Logic Blocks        |       2 (1 pair) |     2 (1 pair)  |       2 (1 pair) |         4 (2 pairs) |
 | Analog Comparators      |  1, no DAC REF |   1, w/DAC REF  |     3, w/DAC REF |        1, w/DAC REF |
 | ADC                     |     10-bit ADC |     10-bit ADC  |   2x 10-bit ADCs |   12-bit diff w/PGA |
-| Analog References       | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | 1.024V, 2.048V, 2.5V, 4.096V |
+| Analog References       | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V | .55V, 1.1V, 1.5V, 2.5V, 4.3V, external, | 1.024V, 2.048V, 2.5V, 4.096V, external |
 
 ### Notes and highlights
 The tinyAVR 2-series has normal event channels, not the weird async/sync ones that the 0/1-series has. They will act as sync or async channels as required (according to the datasheet, each has both a sync and async channel internally)
