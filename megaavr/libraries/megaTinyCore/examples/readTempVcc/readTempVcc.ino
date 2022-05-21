@@ -93,7 +93,7 @@ uint16_t readTemp() {
   analogSampleDuration(128); // must be >= 32µs * f_CLK_ADC per datasheet 30.3.3.7
   analogReference(INTERNAL1V024);
   uint32_t reading = analogRead(ADC_TEMPERATURE);
-  reading -= sigrowOffset;
+  reading += sigrowOffset; // Adding these gives reasonable numbers, subtracting them does not.
   reading *= sigrowGain;
   reading += 0x80; // Add 1/2 to get correct rounding on division below
   reading >>= 8; // Divide result to get Kelvin

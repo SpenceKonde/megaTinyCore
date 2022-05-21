@@ -121,7 +121,7 @@ typedef void (*voidFuncPtr)(void);
 #define bit(b) (1UL << (b))
 #endif
 
-#if DISCOURAGE_NONSTANDARD_TYPES
+#if defined(DISCOURAGE_NONSTANDARD_TYPES) && DISCOURAGE_NONSTANDARD_TYPES
 typedef bool      boolean __attribute__ ((deprecated("a 'boolean' is called a 'bool' in standard C - suggest using standard type name")));
 typedef uint8_t   byte __attribute__ ((deprecated("a 'byte' is an 'unsigned char' (may be more than 8 bits on non-AVR) or 'uint8_t' (always 8 bits) in standard C - suggest using one of these standard types.")));
 typedef uint16_t  word __attribute__ ((deprecated("a 'word' is an 'unsigned int' (may be more than 16 bits on non-AVR) or 'uint15_t' (always 16 bits) in standard C - suggest using one of these standard types.")));
