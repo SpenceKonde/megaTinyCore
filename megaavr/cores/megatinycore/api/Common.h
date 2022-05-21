@@ -59,9 +59,52 @@ void yield(void);
 #define sq(x)        ({ __typeof__ (x) _x = (x); _x * _x; })
 #endif
 
+
+/* This is sorta silly. But normal round() builtin is bulkier and returns a float while arduino code written for other plaforms will expect
+integer types... This also has the same concerns about sideffects as before - except they're less likely to show up when
+starting from a float. Who does meFloat++? Certainly not as many as do constrain(myInt++,minval,maxval);
+*/
+
 #ifndef round
-#define round(x)     ({ __typeof__ (x) _x = (x);  _x >= 0 ? (long)x + 0.5 : (long)x - 0.5 ;})
+#define round(x)     ({ __typeof__ (x) _x = (x);  _x >= 0 ? (long)(_x + 0.5) : (long)(_x - 0.5 );})
 #endif
+
+/* In the end, it is probably better to do this manually rather than using round(). Why?
+
+* If you know the value you're starting with is postiive, you can skip the first test and just add 0.5 and cast to integer type - saves space.
+* You can use the minimum size datatypes (wthis casts things to 4-byte values. Maybe the thing your rounding is, say -50.0 to 50.0 you can cast to a single byte for more compact code
+* You can choose which of the rounding strategies you wish to use. Because there are not less than TEN DIFFERENT STRATEGIES TO ROUND NUMBERS
+* Any of these approaches will result in smaller code:
+* For example, rounding a number you know ought to fit a 16 bit unsigned datatype easily, you might do:
+* uint16_t roundedval = (uint16_t) (floatval + 0.5)
+*
+* Even better, avoid using floats in the first place. Why are you using them? sometimes you really don't have much of a choice, other times
+* you very definitely do. This is particularly true with ADC readings, for example say you're using to 4.096 Volt reference, and you
+* want to measure and print out a voltage.
+uint32_t reading = analogReadEnh(adc_pin, 12);  //where adc_pin is just the pin number being read
+float temp = reading;
+Serial.print(temp/1000); // 4.096v reference, and 12 bit accuracy (ie, 0-4095). So each LSB is 1 mv so dividing by 1000 gets volts.
+Serial.println('V'); //print out the units too
+3.2k on a 1626/
+Or you could do:
+uint32_t reading = analogReadEnh(adc_pin, 12); // same analog reading
+Serial.print(reading/1000) //volts
+Serial.print('.'); //decimal point
+Serial.print(reading%1000) //millivolts
+Serial.println('V'); //print out the units too
+// This would print the same thing, only without any floating point derived error... weighing in at 2k of flash.
+
+// And just doing this saves another 100 bytes:
+uint32_t reading = analogReadEnh(1, 12);  //where adc_pin is just the pin number being read
+Serial.print((uint16_t)reading);
+Serial.println("mV");
+
+
+* Yeah the last one is kind of a copoout,  but not only is it flash-efficient, it also runs *much* faster, because division
+* be it floating point or otherwise, is sloowwwwwwww on AVR. But that was no excuse for round being broken like it was.
+*/
+
+
 
 typedef void (*voidFuncPtr)(void);
 
@@ -78,11 +121,15 @@ typedef void (*voidFuncPtr)(void);
 #define bit(b) (1UL << (b))
 #endif
 
-/* TODO: request for removal */
+#if DISCOURAGE_NONSTANDARD_TYPES
+typedef bool      boolean __attribute__ ((deprecated("a 'boolean' is called a 'bool' in standard C - suggest using standard type name")));
+typedef uint8_t   byte __attribute__ ((deprecated("a 'byte' is an 'unsigned char' (may be more than 8 bits on non-AVR) or 'uint8_t' (always 8 bits) in standard C - suggest using one of these standard types.")));
+typedef uint16_t  word __attribute__ ((deprecated("a 'word' is an 'unsigned int' (may be more than 16 bits on non-AVR) or 'uint15_t' (always 16 bits) in standard C - suggest using one of these standard types.")));
+#else
 typedef bool      boolean;
 typedef uint8_t   byte;
 typedef uint16_t  word;
-
+#endif
 void init(void);
 void initVariant(void);
 

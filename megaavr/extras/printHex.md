@@ -6,7 +6,7 @@ void Serial.printHex(int8_t b);
 ```
 These methods simply print the value passed to it as hexadecimal. No leading `0x` or trailing separators or newlines (a future version may add a printHexln() method). These are particularly useful for printing the values of 8-bit registers, and it was for this purpose that they were added to the core. Because the leading zero is printed where appropriate, multiple bytes can be printed consecutively and the value will remain intelligible.
 ```c++
-boid Serial.printHex(uint16_t w, bool swaporder=0);
+void Serial.printHex(uint16_t w, bool swaporder=0);
 void Serial.printHex(int16_t w, bool swaporder=0);
 void Serial.printHex(uint32_t l, bool swaporder=0);
 void Serial.printHex(int32_t l, bool swaporder=0);
