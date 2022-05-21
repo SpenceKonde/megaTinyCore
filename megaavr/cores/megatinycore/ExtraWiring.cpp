@@ -12,13 +12,13 @@ bool printADCRuntimeError(int32_t error, UartClass &__dbgser) {
       case 3:
         __dbgser.println("Requested res < 8, minimum us 8-bit"); break;
       case 4:
-        __dbgser.println("Requested res is higher than a singel burst can achieve."); break;
+        __dbgser.println("Requested res is higher than a single burst can achieve."); break;
       #if defined(PGACTRL)
       case 5:
         __dbgser.println("negative pin or channel does not exist or is not a valid"); break;
       #endif
       case 6:
-        __dbgser.println("The ADC has been disabled, reenable it with ADCPowerOptions."); break;
+        __dbgser.println("The ADC has been disabled, re-enable it with ADCPowerOptions."); break;
       default: {
         __dbgser.println("Error code not recognized");
       }
@@ -35,7 +35,7 @@ bool printADCRuntimeError(int32_t error, UartClass &__dbgser) {
       case 5:
         __dbgser.println("pin or channel does not exist on this part"); break;
       case 7:
-        __dbgser.println("The ADC has been disabled, reenable it with ADCPowerOptions."); break;
+        __dbgser.println("The ADC has been disabled, re-enable it with ADCPowerOptions."); break;
       default: {
         __dbgser.println("Error code not recognized");
       }

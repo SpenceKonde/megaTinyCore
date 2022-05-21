@@ -289,7 +289,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
  *    printADCRuntimeError(-2100000003, &Serial);
  *    will peinr "ADC_ENH_ERROR_RES_TOO_LOW"
  *    Will print nothing and return false if the result wasn't an error
- *    Inefficent of flash space..
+ *    Inefficient of flash space..
  ****************************************************************************/
 
 
@@ -598,9 +598,9 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     void ADCPowerOptions(uint8_t options) {
     if (__builtin_constant_p(options)) {
       if (options & 0x0F) {
-        badArg("Only runstandby and enable/disable are suppoted - the hardware doesn't have LOWLAT nor the PGA");
+        badArg("Only runstandby and enable/disable are supported - the hardware doesn't have LOWLAT nor the PGA");
       }
-    }    // 0b SSEE xxxx
+    }    // 0b SEE xxxx
     // SS = run standby
     // 00 = no change to run standby
     // 01 = no change to run standby
@@ -825,10 +825,10 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   void ADCPowerOptions1(uint8_t options) {
     if (__builtin_constant_p(options)) {
       if (options & 0x0F) {
-        badArg("Only runstandby and enable/disable are suppoted - the hardware doesn't have LOWLAT nor the PGA");
+        badArg("Only runstandby and enable/disable are supported - the hardware doesn't have LOWLAT nor the PGA");
       }
     }
-    // 0b SSEE xxxx
+    // 0b SSE xxxx
     // SS = run standby
     // 00 = no change to run standby
     // 01 = no change to run standby

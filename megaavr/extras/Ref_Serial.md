@@ -102,7 +102,7 @@ uint8_t *  printHex(uint8_t * p, uint8_t len, char sep = 0);
 uint16_t * printHex(uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
 ```
 
-It will print `len` elements starting from the address the pointer is pointed at, if `sep` is non-zero, that character will be placed between each byte or word - these are **characters** not strings. A single charachter, enclosed between a pair of single quotes. ":" is a 2 character string - a colon followed by a null terminator, and is invalid. Anything between double quotes is invalid. Use single quotes as shown below. If s is true for a pointer to 16-bit values, the endianness will be swapped as well. There is a slightly different implementation for pointers to volatile variables to help prevent problems when using this to dump the contents of peripheral registers. Which is what printHex was made for.
+It will print `len` elements starting from the address the pointer is pointed at, if `sep` is non-zero, that character will be placed between each byte or word - these are **characters** not strings. A single character, enclosed between a pair of single quotes. ":" is a 2 character string - a colon followed by a null terminator, and is invalid. Anything between double quotes is invalid. Use single quotes as shown below. If s is true for a pointer to 16-bit values, the endianness will be swapped as well. There is a slightly different implementation for pointers to volatile variables to help prevent problems when using this to dump the contents of peripheral registers. Which is what printHex was made for.
 ```c
   // dump every register associated with the CCL
   volatile uint8_t * cclconfig= (volatile uint8_t*)&CCL;
