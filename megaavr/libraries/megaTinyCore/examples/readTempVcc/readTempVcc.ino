@@ -10,6 +10,18 @@
  * reference is in units of 0.25 mV. To get millivolts, just divide by 4.
  */
 
+/* The 2-series temperature sensor on the other hand... well, frankly it seems to be
+ * rather poorly calibrated. Batches are consistent amongst eachother - but not with
+ * the actual temperature. One user reported getting the very reasonable 300 or 299K value
+ * for every chip he tested, as expected.
+ * I tested 5 1624 and 3224 chips at ambient temperature of around 85 F (302 K), and consistently
+ * got results between 313 and 318K. Running at 3.3V instead of 5V would lower the calculated
+ * temperature by around 2K. It is most certainly not 105 F in my workshop, even though it is a warm day.
+ *
+ * So as regards temp sensing on the 2-series, YMMVG
+ */
+
+
 #define RESULTCOUNT 4
 int16_t results[RESULTCOUNT];
 int32_t sum;
@@ -19,6 +31,9 @@ void setup() {
   // put your setup code here, to run once:
   delay(1000);
   Serial.begin(57600);
+  #if MEGATINYCORE_SERIES == 2
+  Serial.println("On some parts, these results may be off by more than twice the spec'ed +/- 5 degrees.");
+  #endif
 }
 
 uint16_t readSupplyVoltage() { // returns value in millivolts to avoid floating point
@@ -93,13 +108,16 @@ uint16_t readTemp() {
   analogSampleDuration(128); // must be >= 32µs * f_CLK_ADC per datasheet 30.3.3.7
   analogReference(INTERNAL1V024);
   uint32_t reading = analogRead(ADC_TEMPERATURE);
-  reading += sigrowOffset; // Adding these gives reasonable numbers, subtracting them does not.
+  reading -= sigrowOffset;
   reading *= sigrowGain;
   reading += 0x80; // Add 1/2 to get correct rounding on division below
   reading >>= 8; // Divide result to get Kelvin
   return reading;
   #endif
 }
+
+
+
 void loop() {
   int16_t reading = readSupplyVoltage();
   Serial.print("System voltage is: ");
@@ -109,6 +127,6 @@ void loop() {
   Serial.print("System temperature is: ");
   Serial.print(reading);
   Serial.println(" K");
-
-  delay(10000);
+  Serial.pritnln("See notes in sketch on the accuracy (or rather the lack thereof) of the builtin temperature sensor");
+  delay(1000);
 }
