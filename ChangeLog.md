@@ -11,9 +11,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Okay fine now you can use ADC1 just like it was an ADC0, see the notes in [Analog Input (ADC) and output (DAC)](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md) for steps required to enable it.
 * You can now enable and disable the ADC with analogPowerOption() and enable/disable standby mode.
 * Fix issue with SSD bit being cleared when using beginTransaction().
-* Fix bug in Logic with pin inputs being handledi mproperly
+* Fix bug in Logic with pin inputs being handled improperly
 * Fix many documentation issues, improve docs generally.
-
 
 ## Released Versions
 
