@@ -519,6 +519,8 @@ See the [Optiboot reference](https://github.com/SpenceKonde/megaTinyCore/blob/ma
 ## Guides
 These are being ported from DxCore as time permits. Many of them are identical on the two cores.
 ### Reference Material
+#### [Function Reference](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Functions.md)
+Covering top-level functions and macros that are non-standard, or are standard but poorly documented.
 #### [Analog Input (ADC) and output (DAC)](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md)
 The API reference for the analog-related functionality that is included in this core beyond the standard Arduino API.
 #### [Digital I/O and enhanced options](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Digital.md)
@@ -533,6 +535,8 @@ Serial UPDI is our recommended tool for UPDI programming.
 Supported clock sources and considerations for the use thereof.
 #### [Speed Grades](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_SpeedGrades.md)
 Manufacturer specs for speed at various voltages, and some discussion of BOD thresholds.
+#### [Callbacks/weakly defined functions](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Callbacks.md)
+These are provided by the core and can be overridden with code to run in the event of certain conditions, or at certain times in the startup process.
 #### [Constants for part/feature/pin/version identification](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Defines.md)
 The core feature defines are used by megaTinyCore and other cores I maintain as well. This also documents what constant values are defined by the core for version identification, testing for features, and dealing with compatibility problems.
 #### [Assembly Listing and Memory Maps](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Export.md)
@@ -541,10 +545,10 @@ Export compiled binary generates both assembly listings and memory maps, in addi
 The sources of reset, and how to handle reset cause flags to ensure clean resets and proper functioning in adcverse events. **Must read for production systems**
 #### [Optiboot reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md)
 The installation and operation of the Optiboot bootloader (for uploading over straight serial (not SerialUPDI)) is described here. Not recommended except on the 20/24-pin 2-series (since they have the alt reset pin) or for special use cases that demand it.
+### [Timers and megaTinyCore Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Timers.md)
+This contains some of the information that would go into Ref_Timers like DxCore has.
 ### Other documents
 These guides are older, some are still relevant
-### [Timers and megaTinyCore](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PWMandTimers.md)
-This contains some of the information that would go into Ref_Timers like DxCore has.
 ### [Power Saving techniques and Sleep](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PowerSave.md)
 ### [Taking over the PWM timer](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/TakingOverTCA0.md)
 This has been recently updated and will likely be turned into a Ref_TCA0.

@@ -1,0 +1,170 @@
+# Startup order and callback-like-functions
+These are not callbacks. Callbacks are not efficient in this context. However, weakly defined functions like these achieve the same effect, and do so efficiently. To do so you override them - typically you would override one that isn't an empty function with an empty function to disable that initialization step, or you would override ones that default to an empty function with code that needs to run at the appointed time.
+
+A callback would be where you supply a function pointer which we then call (which would end up as an icall instruction). Doing such a thing is much more costly, because the compiler can't assume it is constant. Hence call-used registers (even if the function doesn't use them) get saved and restored, function call overhead cannot be avoided, and the compiler can't optimize them. We try to avoid these. They're only used when the function to be called can actually change at runtime, mainly when "attaching" interrupts.
+
+**This document reflects the 2.5.12 release of megaTinyCore**
+Some of these were added in 2.4.x (actually, quite a few of them were, which was the impetus for writing this)
+
+## Startup Sequence
+When execution reaches the application after reset or bootloader, it hits the reset vector first, and then jumps where ver that is pointing and begins execution with the .init sections
+```text
+Things most reasonable to override are marked with a + and the start of the line.
+Things that might make sense to override only with empty functions are marked with - at the start of the line.
+Things that might make sense call if main or init is oerwritten are marked with # atthe start of line
+Sections defined by AVR-GCC are marked with S at start of the line.
+Things that you will likely break stuff without benefit by overriding are marked with X at start of line
+
+S .init2: This initializes the stack and clears r1 (the known zero) that avr-gcc needs. No C code before here works correctly!
+S .init3: This calls the megaTinyCore function _initThreeStuff()
+  _initThreeStuff() is a creatively named internal early initialization routine; it cannot be overridden. but the functions it calls can be.
++ init_reset_flags() - checks reset flags, and if none are set, fires software reset. You may wish to override this in order to assiist debugging
++  onPreMain() - can be used to provide code that needs to run before class constructors.
+S .init4: For devices with > 64 KB of ROM, .init4 defines the code which takes care of copying the contents of .data from the flash to SRAM.
+S .init6: Used for constructors in C++ programs.
+S .init9: Jumps to main()
+  main()
++   onBeforeInit() - This is called first, before any initialization.
+-   init() - to initialize the peripherals so the core-provided functions work.
+#   init_clock() - This is called first, to initialize the system clock. You oughtn't override this, but if you override main you almost certainly want to call this
+#   init_ADC0() - This is called to initialize the ADC
+#   //init_ADC1() - on the 1-series w/16 or 32k flash, aka "Golden 1-series" series parts with a seocnd ADC, this function exists but it NOT called. See Ref_Analog.md.
+    init_timers() - This function calls the timer initialization functions
+-    init_TCA0() - Initialized TCA0 in split mode for PWM output. If you don't want PWM or need to use PWM in 16-bit mode or need buffering, AND are truly desperate for more flash, you can override with an empty function.
+                    Don't do that if you are using TCA0 for millis, though.
+-     init_TCD0() - If present and not used for millis (1-series)
+X   init_millis() - This is called to kick off millis() timekeeping. This will configure TCD0 or any TCB if it is used for millis as well.
+                    TCD0 require a nontrivial amount of additional code here and elsewhere when used for millis().
+X initVariant() - A rare few libraries define this for stuff they need to run before setup.
++ onAfterInit() - returns a uint8_t, normally 0. If it returns anything else, we will not enable interrupts, with all the hazards that entails (see below for some specifics)
+  setup() - Finally the normal setup() is called
+  loop() - and the normal loop(), called continually.
+```
+
+If you for some reason end up directly putting functions into init 5, 7, or 8 (best steer clear of the ones that are taken) be warned:
+The function must be declared with both `((naked))` and `((used))` attributes! The latter is required or the optimizer will just eliminate it. The former is needed to prevent it from generating a return instruction at the end. This causes a crash when it tries to return and there's nothing on the call stack to return to.
+
+## Recommended override candidates
+These are the functions which are there with the intent that users will have good reason to override them. Except as described for `init_reset_flags`, these should only be used when you can't just do whatever you need to do in setup() for some reason.
+
+### init_reset_flags
+```c
+  void init_reset_flags() __attribute__((weak)) {
+    if (RSTCTRL.RSTFR == 0) { // How are we in the super early init code without have reset? Likely we overwrote the return address on the stack with garbage. The state of the chip is now undefined.
+      _PROTECTED_WRITE(RSTCTRL.SWRR, 1); // reset the device - the assumptions made by the core within init(), run before setup() are not valid, and we wound up here through a serious malfunction.
+    }
+  }
+```
+[The reset reference](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Reset.md) has recommended overrides and explanation of why this is so important.
+
+
+### onPreMain
+```c
+void onPreMain() __attribute__((weak)) {
+}
+```
+This is the recommended way to run code before the class constructors. Runs after init_reset_flags, so it won't run on a dirty reset if reset flags are being cleared as they should be.
+Override init_reset_flags instead if you are trying to snoop around and figure out why you keep getting dirty resets.
+
+
+### onAfterInit
+```c++
+
+uint8_t onAfterInit() __attribute__((weak)) {
+  return 0;
+}
+
+```
+onAfterInit runs just before setup is called, but after all other initialization. returning a non-zero value will prevent interrupts from being enabled. Good for debugging if you suspect that an interrupt is firing and wrecking everything as soon as they're enabled (for example, an interrupt which you cannot identify is being enabled by a class constructor in a poorly written library, such that the flag is set before setup() is called - and there's something horribly wrong about that interrupt (say, maybe it doesn't exist causing a dirty reset, or loops forever because it does `while(SOME_REGISTER = 1);` (instead of `== 1`)). In cases like this, it can be hard to get information out ("Who here knows what a hardware debugger is?" *most hands go up* "Who here has seen a hardware debugger for an AVR in person?" *most hands go down* "Who here has used one...." *all the hands remain up* "... for hardware debugging, not just programming" *all the hands go down except for that one smart guy in every class* )
+
+
+### onBeforeInit
+```c++
+void onBeforeInit() __attribute__((weak));{;}
+```
+onBeforeInit is called as the first code in main, useful if you need to squeeze in some code between class constructors and the rest of the internal initialization. Rarely useful - where it is, it's probably a shim for a poorly written library whose class constructor shits on something while you wait for a fix from the author, or if the author ignored your bug report, or is one of those people with a chip on their shoulder regarding modern AVRs and told you that it would be a cold day in hell when he made any changes to support this architecture, referring to it with profanity and/or pejoratives (has happened a couple of times, but I talk to a lot of people about this, and most of them thank me for telling them what's wrong and how to fix it) - in this situation, if you don't want to modfiy the library, but you have to do something to extinguish small dumpster fire started by the class constructor bafore the init() routine dumps a bucket of gasoline on it, this is how you would do it. Please report any library that requires this to me so that I can A) apply additional pressure to the library maintainer, and B) warn people in the library compatiblity list.
+
+## Clock Failure Handling
+The AVR DB and later have clock failure handling callbacks (though they are practically useless on the DB).
+
+The tinyAVRs do not. If using an external clock source, and it stops, so does the chip. There are two possible results if the external clock disappears:
+1. If the WDT is enabled, it will reset the chip. init() will then likely try to use the non functional source again.
+
+## Things you probably shouldn't override
+The functions listed below can be overridden. In most cases they should not be. They are listed for completeness; many of them were added for use during development of the core to make core development easier. They may be useful for debugging and on rare occasions in
+
+### main
+```c
+int main() {
+  onBeforeInit(); //Emnpty callback called before init but after the .init stuff. First normal code executed - no peripherals have been set up yet, but class constructors have been run. Useful if you need to fiddle with a class instance at this point in time,
+  init(); //Interrupts are turned on just prior to init() returning.
+  initVariant();
+  if (!onAfterInit()) sei();  //enable interrupts.
+  setup();
+  for (;;) {
+    loop();
+    #ifdef ENABLE_SERIAL_EVENT /* this is never true unless core is modified */
+      if (serialEventRun) serialEventRun();
+    #endif
+  }
+}
+```
+This is the main program. The only things that run first are the things in the .initN sections - this means init_reset_flags(), onPreMain(), and class constructors. It can be overridden but in this case nothing will be initialized, and the clock will be 4 MHz internal when it is called. If you have a different speed selected, everything that depends on F_CPU (including the avrlibc delay.h) will have all timing wrong. Even if you override main, you probably want to call init_clock() at the start or be sure to compile for 4 MHz. If you just don't want to use the Arduino setup/loop structure, but you do want everything else (millis, pwm, adc, and anything that a library needs to do in initVariant), simply put your code in setup and leave loop empty - don't override main.
+
+### Initializers of peripherals
+While ovrriding these is niot rcommended, if main or init but you stil want to use soke of the featuresl, tbis might e a gii hiuce
+```c
+void init()             __attribute__((weak)); // This calls all of the others.
+void init_clock()       __attribute__((weak)); // this is called first, to initialize the system clock.
+void init_ADC0()        __attribute__((weak)); // this is called to initialize ADC.
+void init_timers();                            // this function calls the timer initialization functions. Overriding is not permitted.
+void init_TCA0()        __attribute__((weak)); // called by init_timers() - Don't override this if using TCA0 for millis.
+void init_TCD0()        __attribute__((weak)); // called by init_timers() - Does nothing if TCD0 is used as millis timer.
+void init_millis()      __attribute__((weak)); // called by init() after everything else and just before enabling interrupts and calling setup() - sets up and enables millis timekeeping.
+```
+They are called in the order shown above.
+
+Any of them can be overridden, but overriding them with anything other than an empty function is not recommended and is rarely a good idea except for debugging. If the peripheral isn't being used and you're desperate for flash (maybe on a small flash DD or EA series parts) these will save a tiny amount of flash. Don't override with anything other than an empry function. If you're initializing them differently, do it in setup().
+
+The timer initialization functions do different things if the timer is used for millis.
+
+#### init_clock
+Initializes the system clock so that it will run at the F_CPU passed to it. Don't override this unless you can ensure that the F_CPU that is passed via the compiler command line will be correct or as s desperate measure in debugging. Overriding it with an empty function may be useful when debugging exotic problems where you want to make sure that a problem isn't being caused by the clock configuration code. (and accept that the timekeeping will be wrong while debugging)
+
+*hod ever, if overriding main or init() you probably want to manually call this to maket timing an baud rate calculation work correctly*
+
+This is the wrong way to debug a problem that you think might be caused by a malfunctioning external clock, In that case, just build for internal clock.
+
+#### init_ADC0
+Initializes the ADC clock prescaler to get a legal frequency, sets up defaults and enables the ADC. It can be overridden with an empty function to prevent it from initializing the ADC to save flash if the ADC is not used. if main is overridden and tou want the right clock speed, you MUST  init_clock MUST be callld first in that case.
+
+#### init_ADC1
+As above for ADC1 on parts that have it. Must be called manualy. See the [Analog Reference](Ref_Analog.md)
+
+#### init_timers
+Calls initTCA9() and initTCA1() if TCA1 is present, and sets PORTMUX.TCAROUTEA() to match what variant specifies, then calls initTCBs(), and initTCD0(). No clear reason one would want to override
+
+#### init_TCA0
+Initialize the type A timer for PWM. The one for a timer used as millis must not be overridden. It is not recommended to override these at all except with an empty function in order to leave the peripheral in reset state (but takeOverTCAn() will also put it back in it's reset state. If you don't want to use analogWrite() through the timer, instead call takeOverTCAn() - which you need to do even if these are overridden if you don't want analogWrite() and digitalWrite() to manipulate the timer.
+
+#### init_TCBs
+I(Initialization of TCBs is only performed by servo, tone or third party libraries on the tinyAVR parts. If used for millis, it is handled throguh init_millis()
+
+#### init_TCD0
+Initializes the type D timer. It is not recommended to override this except with an empty function in order to leave the peripheral in reset state. This is particularly useful with the type D timer, which has no "hard reset" command like the TCA does, and it's got the enable-locked fields and the ENRDY bit - If you're going to take it over anyway, you'll have an easier time if you override this - you don't have to put your initialization code there (though you could), simply overriding it with an empty function will give you a clean start . As with the others, it is recommended to override with just an empty function in that case.
+
+#### init_millis
+Initializes and kicks off millis timekeeping. If millis is handled by a type B or D timer, it also performs all initialization of that timer. Overriding this (with an empty function) is for debugging ONLY - it is a way of leaving in place millis, micros (they will always return 0) and delay (it will hang forever) if you need to isolate the impact of the millis interrupt running.
+
+If you just want to turn off millis, set the millis timer to "disabled". That both gets rid of the ISR and provides a working delay().
+
+Note that the ISR will still be defined, but not enabled, if this is overridden
+
+### initVariant
+```c++
+void initVariant() __attribute__((weak)){;}
+```
+This is the ONLY one of these functions that is standard (other than init, setup, and loop, of course).
+
+initVariant is meant for variant files to call, but none of them ever do that on any core i've seen, and library authors use this sometimes for code that needs to run at startup.
+**DO NOT OVERRIDE THIS** in the sketch - it is reserved for library/core/board authors. It is part of the Arduino API and is present on all cores as far as I know.

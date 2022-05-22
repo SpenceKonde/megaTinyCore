@@ -60,7 +60,7 @@ void yield(void);
 #endif
 
 
-/* This is sorta silly. But normal round() builtin is bulkier and returns a float while arduino code written for other plaforms will expect
+/* This is sorta silly. But normal round() builtin is bulkier and returns a float while arduino code written for other platforms will expect
 integer types... This also has the same concerns about sideffects as before - except they're less likely to show up when
 starting from a float. Who does meFloat++? Certainly not as many as do constrain(myInt++,minval,maxval);
 */
@@ -71,7 +71,7 @@ starting from a float. Who does meFloat++? Certainly not as many as do constrain
 
 /* In the end, it is probably better to do this manually rather than using round(). Why?
 
-* If you know the value you're starting with is postiive, you can skip the first test and just add 0.5 and cast to integer type - saves space.
+* If you know the value you're starting with is positive, you can skip the first test and just add 0.5 and cast to integer type - saves space.
 * You can use the minimum size datatypes (wthis casts things to 4-byte values. Maybe the thing your rounding is, say -50.0 to 50.0 you can cast to a single byte for more compact code
 * You can choose which of the rounding strategies you wish to use. Because there are not less than TEN DIFFERENT STRATEGIES TO ROUND NUMBERS
 * Any of these approaches will result in smaller code:
@@ -100,8 +100,9 @@ Serial.print((uint16_t)reading);
 Serial.println("mV");
 
 
-* Yeah the last one is kind of a copoout,  but not only is it flash-efficient, it also runs *much* faster, because division
-* be it floating point or otherwise, is sloowwwwwwww on AVR. But that was no excuse for round being broken like it was.
+* Yeah the last one is kind of a copoout,  but not only is it flash-efficient, it also runs *much* faster, because division,
+* be it floating point or otherwise, is sloowwwwwwww on AVR. But the fact that there are better ways to round than round()
+* was not an excuse for it being broken like that.
 */
 
 

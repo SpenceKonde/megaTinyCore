@@ -134,6 +134,7 @@ atxy7.build.bootload=
 atxy7.build.printfabr=
 atxy7.build.attachabr=
 atxy7.build.wireabr=
+atxy7.build.pwmabr=
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -497,6 +498,7 @@ atxy6.build.bootload=
 atxy6.build.printfabr=
 atxy6.build.attachabr=
 atxy6.build.wireabr=
+atxy6.build.pwmabr=
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -866,6 +868,7 @@ atxy4.build.bootload=
 atxy4.build.printfabr=
 atxy4.build.attachabr=
 atxy4.build.wireabr=
+atxy4.build.pwmabr=
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -1234,6 +1237,7 @@ atxy2.build.bootload=
 atxy2.build.printfabr=
 atxy2.build.attachabr=
 atxy2.build.wireabr=
+atxy2.build.pwmabr=
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -1553,6 +1557,7 @@ microchip.build.bootload=
 microchip.build.printfabr=
 microchip.build.wireabr=
 microchip.build.attachabr=
+microchip.build.pwmabr=
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -1891,6 +1896,7 @@ atxy7o.bootloader.tool=avrdude
 atxy7o.build.printfabr=
 atxy7o.build.attachabr=
 atxy7o.build.wireabr=
+atxy7o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -2216,6 +2222,7 @@ atx27o.bootloader.tool=avrdude
 atx27o.build.printfabr=
 atx27o.build.attachabr=
 atx27o.build.wireabr=
+atx27o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -2533,6 +2540,7 @@ atxy6o.bootloader.tool=avrdude
 atxy6o.build.printfabr=
 atxy6o.build.attachabr=
 atxy6o.build.wireabr=
+atxy6o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -2866,6 +2874,7 @@ atx26o.bootloader.tool=avrdude
 atx26o.build.printfabr=
 atx26o.build.attachabr=
 atx26o.build.wireabr=
+atx26o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3183,6 +3192,7 @@ atxy4o.bootloader.tool=avrdude
 atxy4o.build.printfabr=
 atxy4o.build.attachabr=
 atxy4o.build.wireabr=
+atxy4o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3529,6 +3539,7 @@ atx24o.bootloader.tool=avrdude
 atx24o.build.printfabr=
 atx24o.build.attachabr=
 atx24o.build.wireabr=
+atx24o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3840,6 +3851,7 @@ atxy2o.bootloader.tool=avrdude
 atxy2o.build.printfabr=
 atxy2o.build.attachabr=
 atxy2o.build.wireabr=
+atxy2o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -4162,6 +4174,7 @@ microchipo.bootloader.tool=avrdude
 microchipo.build.printfabr=
 microchipo.build.wireabr=
 microchipo.build.attachabr=
+microchipo.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #

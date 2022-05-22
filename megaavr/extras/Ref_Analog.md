@@ -32,7 +32,7 @@ register to the value that is closest, but above the applied reference voltage. 
 4.3V, use ADCnREFSEL[0:2] = 0x3 [4.3V].
 ```
 However, one must NOT have ADCnREFEN bit set when using an external reference, so it's far from clear why the above is required, this warning was never present until 2.5.12, and nobody complained. This suggests that it one of the following is true:
-  a. Configuring refsel per the datasheet isn't that important afterall, or makes small enough difference in accuracy that it has gone unnoticed so far.
+  a. Configuring refsel per the datasheet isn't that important after all, or makes small enough difference in accuracy that it has gone unnoticed so far.
   b. Failure to configure refsel per the datasheet causes only poor ADC accuracy, and the few individuals using an external reference read the relevant paragraph in the datasheet and configured refsel.
   b. Configuring refsel per the datasheet is a *safeguard* against some undesirable outcome that could occur if ADCnREFEN was also set with an external reference.
   c. Configuring refsel per the datasheet is a safeguard against some undesirable outcome that could occur whether or not ADCnREFEN is set, but the undesirable outcome impacts the internal references only, and the few people who have encountered this have not encountered the consequences because the don't use the internal reference source
@@ -44,7 +44,7 @@ analogReference() as you know takes only a single argument, and the overhead of 
 
 3. Note the change from the heinous near random reference voltages used on the 0/1-series - which you often end up either checking against thresholds calculated at compile time or using floating point math in order to do anything useful with - to maximally convenient ones on everything released later than the 0/1-series. I say they are maximally convenient because with 12-bit resolution selected, 4.096V, 2.048V, and 1.024V references corresopond to 1 mV/LSB, 0.5mv/LSB, and 0.25mv/LSB.
 
-4. On 0/1-series, you must be sure to slow down the ADC clock with analogClockSpeed after choosing the 0.55V reference, as it has a much more restricted operating clock speed range: 100 - 260 kHZ. The other references can be used at 200 - 2000 kHz.
+4. On 0/1-series, you must be sure to slow down the ADC clock with analogClockSpeed when using the 0.55V reference, as it has a much more restricted operating clock speed range: 100 - 260 kHZ. The other references can be used at 200 - 2000 kHz.
 
 ## Internal Sources
 In addition to reading from pins, you can read from a number of internal sources - this is done just like reading a pin, except the constant listed in the table below is used instead of the pin name or pin number:
@@ -74,8 +74,8 @@ The hardware supports increasing the resolution of analogRead() to the limit of 
 ### A second ADC? *1-series only*
 On some parts, yes! The "good" 1-series parts (1614, 1616, 1617, 3216, and 3217) have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins (it can also read from DAC2). Currently, there are no plans to implement this in the core due to the large number of currently available pins. Instead, it is recommended that users who wish to "take over" an ADC to use it's more advanced functionality choose ADC1 for this purpose. See [ADC free-run and more](ADCFreerunAndMore.md) for some examples of what one might do to take advantage of it (though it has not been updated for the 2-series yet.  As of 2.0.5, megaTinyCore provides a function `init_ADC1()` which initializes ADC1 in the same way that ADC0 is (with correct prescaler for clock speed and VDD reference). On these parts, ADC1 can be used to read DAC1 (DACREF1) and DAC2 (DACREF2), these are channels `0x1B` and `0x1E` respectively. ~The core does not provide an equivalent to analogRead() for ADC1 at this time.~
 
-#### using ADC1 just like a second ADC0
-This is a heinous waste of the second ADC. However it can be done - the followiging functions are are provided, which are identical to their normal counterparts, on devices with the second ADC:
+#### Using ADC1 just like a second ADC0
+This is a heinous waste of the second ADC. However it can be done - the following functions are are provided, which are identical to their normal counterparts, on devices with the second ADC:
 * init_ADC1
 * analogReference1
 * analogClockSpeed1
@@ -92,14 +92,15 @@ megaTinyCore takes advantage of the improvements in the ADC on the newer AVR par
 This core includes the following ADC-related functions. Out of the box, analogRead() is intended to be directly compatible with the standard Arduino implementation. Additional functions are provided to use the advanced functionality of these parts and further tune the ADC to your application.
 
 ### getAnalogReference() and getDACReference()
-These return the numbers listes in the reference table at the top as a `uint8_t`
+These return the numbers listes in the reference table at the top as a `uint8_t` - you can for example test `if (getAnalogReference() == INTERNAL1V1)`
 
 ### analogRead(pin)
 The standard analogRead(). Single-ended, and resolution set by analogReadResolution(), default 10 for compatibility. Negative return values indicate an error that we were not able to detect at compile time. Return type is a 16-bit signed integer (`int` or `int16_t`).
 
 ### analogReadResolution(resolution)
-Sets resolution for the analogRead() function. Unlike stock version, this returns true/false. *If it returns false, the value passed was invalid, and resolution was set to the default, 10 bits*. Note that this can only happen when the value passed to it is determined at runtime - if you are passing a compile-time known constant which is invalid, we will issue a compile error. The only valid values are those that are supported natively by the hardware, plus 10 bit, even if not natively supported, for compatibility.
-Hence, the only valid values are 10 and 12. The EA-series will likely launch with the same 8bit resolution option as tinyAVR 2-series which would add 8 to that list.
+Sets resolution for the analogRead() function. Unlike stock version, this returns true/false. *If it returns false, the value passed was invalid, and resolution was set to the default, 10 bits*. Note that this can only happen when the value passed to it is determined at runtime - if you are passing a compile-time known constant which is invalid, we will issue a compile error. The only valid values are those that are supported natively by the hardware, plus 10 bit for compatibility where that is not natively supported (ie, the 2-series) for compatibility.
+
+Hence, the only valid values are 8, 10 and 12.
 
 This is different from the Zero/Due/etc implementations, which allow you to pass anything from 1-32, and rightshift the minimum resolution or leftshift the maximum resolution as needed to get the requested range of values. Within the limited resources of an 8-bit AVR with this is a silly waste of resources, and padding a reading with zeros so it matches the format of a more precise measuring method is in questionable territory in terms of best practices. Note also that we offer oversampling & decimation with `analogReadEnh()` and `analogReadDiff()`, which can extend the resolution while keep the extra bits meaningful at the cost of slowing down the reading. `analogReadResolution()` only controls the resolution of analogRead() itself. The other functions take desired resolution as an argument, and restore the previous setting.
 
@@ -109,7 +110,7 @@ speed. This returns a `bool` - it is `true` if value is valid.
 
 This value is used for all analog measurement functions.
 
-| Part Series | Sample time<br/>(default)  | Conversion time | Total analogRead() time | SAMPDUR/SAMPLEN | ADC clock sample time |
+| Part Series | Sample time<br/>(default)  | Conversion time | Total analogRead() time | Default SAMPLEN | ADC clock sample time |
 |-------------|--------------|-----------------|-------------------------|-----------------|-----------------------|
 | Classic AVR |        12 us |           92 us |                  104 us | No such feature | 1.5                   |
 | 0/1-series  |        12 us |       8.8-10 us |              20.8-22 us |     7, 9, or 13 | 2 + SAMPLEN           |
@@ -131,8 +132,8 @@ Enhanced `analogRead()` - Perform a single-ended read on the specified pin. `res
 | 2-series    | 1024 samples |  No             |             17 bits  | 0/1/2/4/8/16x |
 | EA-series   | 1024 samples |  No             |             17 bits  | 0/1/2/4/8/16x |
 
-**WARNING** trying to take 17-bit readings on a 2-series/EA-series will tale a long time for each sample. If the sample is changing, the results will be garbage.
-**WARNING** Extreme attention is resuired to make the least significant bits meaningful, especially when oversampling at decimating to 17 bits. This means very careful hardware design. Otherwise, you will be very accurately measuring the noise and error courses. I am praying that the EA-series will have AVDD on a separate power domain and invite us to filter it further to improve analog stability. In any event, quality external ADC reference is recommended when high accuracy is required.
+**WARNING** trying to take 17-bit readings on a 2-series/EA-series will take a long time for each sample. If the sample is changing, the results will be garbage.
+**WARNING** Extreme attention is required to make the least significant bits meaningful, especially when oversampling and decimating to 17 bits. This means very careful hardware design. Otherwise, you will be very accurately measuring the noise and error sources. I am praying that the EA-series will have AVDD on a separate power domain and invite us to filter it further to improve analog stability. In any event, quality external ADC reference is recommended when high accuracy is required.
 
 ```c++
   int32_t adc_reading = analogReadEnh(PIN_PD2, 13); //be sure to choose a pin with ADC support. The Dx-series and tinyAVR have ADC on very different sets of pins.
@@ -156,12 +157,12 @@ Differential `analogRead()` - returns a `long` (`int32_t`), not an `int` (`int16
 
 The 32-bit value returned should be between -65536 and 65535 at the extremes with the maximum 17-bit accumulation option, or, 32-times that if using raw accumulated values (-2.1 million to 2.1 million, approximately)
 
-Error values are negative numbers close to -2.1 billion, so it should not be challenging to valid values from errors.
+Error values are negative numbers close to -2.1 billion, so it should not be challenging to distinguish valid values from errors.
 
 ### analogClockSpeed(int16_t frequency = 0, uint8_t options = 0)
 The accepted options for frequency are -1 (reset ADC clock to core default (depends on part)), 0 (make no changes - just report current frequency) or a frequency, in kHz, to set the ADC clock to. Values between 125 and 1500 are considered valid for 0/1-series parts, up to 2000 kHZ for Dx-series, and for EA-series and 2-series parts 300-3000 with internal reference, and 300-6000 with Vdd or external reference. The prescaler options are discrete, not continuous, so there are a limited number of possible settings (the fastest and slowest of which are often outside the rated operating range). The core will choose the highest frequency which is within spec, and which does not exceed the value you requested. If a 1 is passed as the second argument, the validity check will be bypassed; this allows you to operate the ADC out of spec if you really want to, which may have unpredictable results. Microchiop documentation has provided little in the way of guidance on selecting this (or other ADC parameters) other than giving us the upper and lower bounds.
 
-**Regardless of what you pass it, it will return the frequency in kHz**
+**Regardless of what you pass it, it will return the frequency in kHz** as a `uint16_t`.
 
 The 0/1-series has prescalers in every power of two from 2 to 256, and at the extreme ends, typical operating frequencies will result in an ADC clock that is not in spec.
 
@@ -175,7 +176,7 @@ Serial.println(analogClockSpeed());     // prints something between 1000 and 150
 analogClockSpeed(300);                  // set to 300 kHz
 Serial.println(analogClockSpeed());     // prints a number near 300 - the closest to 300 that was possible without going over.
 
-// ****** For Dx-series *******
+// ****** For 0/1-series *******
 Serial.println(analogClockSpeed(3000)); // sets prescaler such that frequency of ADC clock is as
 // close to but not more than 2000 (kHz) which is the maximum supported according to the datasheet.
 // Any number of 2000 or higher will get same results.
@@ -186,7 +187,7 @@ Serial.println(analogClockSpeed(20));   // A ridiculously slow ADC clock request
 Serial.println(analogClockSpeed(20, 1)); // As above, but with the override of spec-check
 // enabled, so it will set it as close to 20 as it can (93.75) and return 93.
 
-// ****** For Ex-series *******
+// ****** For 2-series *******
 Serial.println(analogClockSpeed(20000));   // Above manufacurer max spec, so seeks out a value that
 // is no larger than that spec; 3000 if internal reference selected or 6000 otherwise.
 Serial.println(analogClockSpeed(20000,1)); // Above manufacturer's spec. but we instruct
@@ -230,7 +231,7 @@ The busy and disabled errors are the only ones that we never know at compile tim
 
 ### printADCRuntimeError(uint32_t error, &UartClass DebugSerial)
 Pass one of the above runtime errors and the name of a serial port to get a human-readable error message. This is wasteful of space, do don't include it in your code unless you need to.
-```
+```c++
 int32_t adc_reading=AnalogReadDiff(PIN_PA1, PIN_PA2);
 if (adc_reading < -32768 ) {
   Serial.println("An error was returned while taking a differential reading!")
@@ -252,7 +253,7 @@ Generate the argument for this by using one of the following constants, or bitwi
 * `ADC_STANDBY_OFF` Turn off ADC run standby mode                   *new 2.5.12*
 
 Example:
-```c
+```c++
 ADCPowerOptions(LOW_LAT_ON  | PGA_KEEP_ON );            //  low latency on. Turn the PGA on, and do not automatically shut it off. Maximum power consumption, minimum ADC delays.
 ADCPowerOptions(LOW_LAT_OFF | PGA_AUTO_OFF);            //  low latency off. Turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays. **ERRATA WARNING** turning off LOWLAT can cause problems on 2=series parts! See the errata for the sopecific part you are using.)
 ADCPowerOptions(ADC_DISABLE);                           //  turn off the ADC.
