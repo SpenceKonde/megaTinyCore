@@ -11,7 +11,7 @@
  */
 
 /* The 2-series temperature sensor on the other hand... well, frankly it seems to be
- * rather poorly calibrated. Batches are consistent amongst eachother - but not with
+ * rather poorly calibrated. Batches are consistent amongst each other - but not with
  * the actual temperature. One user reported getting the very reasonable 300 or 299K value
  * for every chip he tested, as expected.
  * I tested 5 1624 and 3224 chips at ambient temperature of around 85 F (302 K), and consistently
