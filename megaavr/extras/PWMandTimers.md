@@ -52,7 +52,7 @@ When working with timers, I constantly found myself calculating periods, resolut
 
 
 ## RTC - 16-bit Real Time Clock and Programmable Interrupt Timer
-This is covered separately because it is a very different sort of timer. More information will be available after I have comopleted the sleep and RTC timing library whenever that ends up being.
+This is covered separately because it is a very different sort of timer. More information will be available after I have completed the sleep and RTC timing library whenever that ends up being.
 
 When working with the RTC **be certain to read the relevant [errata](Errata.md)** - most tinyAVR 0/1-series parts have a silicon bug that forces both RTC and PIT to be enabled if either is to work, and one symptom of this is that RTC registers will never sync. So the usual `while(RTC.STATUS);` will hang.
 

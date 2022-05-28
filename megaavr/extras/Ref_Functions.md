@@ -1,5 +1,5 @@
 # Additional Functions in DxCore
-These are in addition to what is listed in the [Arduino Reference](https://arduino.cc/Reference).
+These are in addition to what is listed in the [Arduino Reference](https://www.arduino.cc/reference/en/).
 
 ## Error reporting
 One of the major challenges when writing embedded code is that there are no exceptions, so when something doesn't work correctly, you don't get an indication of what, exactly. prevented it from doing so. It's up to you to try to gather more data and analyze it to figure out where it is failing. Often, when you get to the end of it, the problem turns out to be something that one could have known ahead of time would certainly not work. While these methods are far from perfect, when we can determine at compile time that your code won't do what you are trying to make it do, will produce an error. These two "error" function calls are the mechanism used to actually create the error in almost all cases: compilation fails if any of these are referenced in the code after all constant folding and optimization.
