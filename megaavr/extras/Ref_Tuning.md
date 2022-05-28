@@ -15,9 +15,9 @@ Knowing this, you could make the internal oscillator run at whatever frequency b
 This section is about how to "tune" a chip and automatically store those magic OSCCAL constants in the USERROW - the one section of memory which will survive burn bootloader, as well as any action other than an active attempt to delete it or a chip erase on a locked chip. Doing this will make the "tuned" options far more accurate.
 
 ## Why not an external clock
-External clocks are great, with very accurate timing, better overclocking (the 1-series parts run at 32 MHz like that), etc. but it's and extra part - oh - and it needs it's own 0.01uf decoupling capacitor so 2 extra parts to place... and ordered from the cheapest chinese electronics vendors on aliexpress, prices bottom out at 50 cents or so, all told, and if you want to know what the specs are like, you're going to end paying more for the oscillator than the chip it's clocking. And on top of all that they take up a pin, and the traces involved need to be kept as short as possible like all high frequency lines) (Note that the tinyAVR 0/1/2-series Rev. C boards from my Tindie shop do provide pads for an external clock, with appropriately routed ultra-short trace and cuttable bridge to fully disconnect it from the through-hole for connecting header an added precaution against interference.
+External clocks are great, with very accurate timing, better overclocking (the 1-series parts run at 32 MHz like that), etc. but it's and extra part - oh - and it needs it's own 0.01uf decoupling capacitor so 2 extra parts to place... and ordered from the cheapest chinese electronics vendors on Aliexpress, prices bottom out at 50 cents or so, all told, and if you want to know what the specs are like, you're going to end paying more for the oscillator than the chip it's clocking. And on top of all that they take up a pin, and the traces involved need to be kept as short as possible like all high frequency lines) (Note that the tinyAVR 0/1/2-series Rev. C boards from my Tindie shop do provide pads for an external clock, with appropriately routed ultra-short trace and cuttable bridge to fully disconnect it from the through-hole for connecting header an added precaution against interference.
 
-If you don't need *perfect* clock accuracy, but do need a significantly different (probably higher) clock speed for whatever reason ("my sketch is running slowly" is not a good reason to overclock unless you know why it is slow and expect it to be slow at that clockspeed - and all you need is more clock cycles and you'd be able to process that data fast enough. The most common cause of sketches appearing to run slowly is waiting on some piece of blocking code that depends on exernal events - no amount of overclocking can fix this)
+If you don't need *perfect* clock accuracy, but do need a significantly different (probably higher) clock speed for whatever reason ("my sketch is running slowly" is not a good reason to overclock unless you know why it is slow and expect it to be slow at that clockspeed - and all you need is more clock cycles and you'd be able to process that data fast enough. The most common cause of sketches appearing to run slowly is waiting on some piece of blocking code that depends on external events - no amount of overclocking can fix this)
 
 ## Two tuning options
 
@@ -28,7 +28,7 @@ To make sure you get closest to to the target speed, you really ought to tune th
 * An Arduino with a crystal for it's main system clock (Or, if you happen to have a 500 Hz signal generator compatible with 5v)
   * Alternately. most oscilloscopes have a 1 kHz output. if this is the case, uncomment `#define ONEKHZMODE` - note that while this is a more accurate signal, there is more sampling noise due to the low granularity of the rather unsophisticated way we measure the time.
 * A tinyAVR 0-series, 1-series, or 2-series part. The 2-series overclock better.
-* A UPDI programming method (jtag2updi, or just serial adapter + resistor or schottky diode)
+* A UPDI programming method (jtag2updi, or just serial adapter + resistor or Schottky diode)
 * Some jumpers to connect the two.
 
 #### Step 1: Make your reference
@@ -90,7 +90,7 @@ The tuning will persist unless you explicitly erase the USERROW (also known as a
 #### Step 5: Removing or retuning
 Note that unless you select a tuned clock option, no tuning will be attempted or performed, so unless you need the full USERROW, there's no reason to remove this.
 
-To remove: Upload the example sketch "megaTinyDeTune" under megaTinyCore examples. Open serial at 115200, and type/send D to clear the tuning constants - alternately, your own sketch could just write the last 12 bytes of the USERROW to 0xFF weith USERSIG.h.
+To remove: Upload the example sketch "megaTinyDeTune" under megaTinyCore examples. Open serial at 115200, and type/send D to clear the tuning constants - alternately, your own sketch could just write the last 12 bytes of the USERROW to 0xFF with USERSIG.h.
 
 To retune: Repeat steps 2-3. Immediately after it is uploaded (must be no other reset or powercycle, and must not be running the bootloader), the tuning sketch will ALWAYS retune the chip. This allows you to fix a bad tuning, done for example far from operating conditions or with a malfunctioning reference clock.
 
@@ -113,7 +113,7 @@ void setup() {
 
   PA6  ON, PA7 OFF - No tuning. If not running anywhere close to the target speed, the guess was out of range.
     The part may be able to reach that speed if you run the tuning sketch on it - however there is never any
-    guarantee that a given part's oscillator will be able to reach a certain targert speed. However, in that
+    guarantee that a given part's oscillator will be able to reach a certain target speed. However, in that
     case the below pattern will be seen.
 
   PA6 OFF,  PA7 ON - Tuned, but tuning found this speed to be unreachable (typically encountered with 30/32 MHz)
@@ -167,9 +167,9 @@ Connect the tinyAVR to your computer and ISP programmer, make sure it has someth
 
 
 ## Future tuning sketch
-*Using a timebase to tune from is - of course - inconvenient. It's tantalyzing, because we are just so close to not needing that. Consider that the chip starts reasonably well tuned (at room temp, they're usually within 1%, and always close enough for UART). With the internal HF oscillator's factory cal, plus - from the SIGROW - the factory cal error term (on the 2-series parts, this is often on the just one or two parts per 1024 - truly a miracle of technology). That means that we alreadty have a known frequency reference. If we only had some independent timebase to compare that with, even a terribly inaccurate clock could be used - as long as it was stable (in terms of frequency) over the duration of a calibration cycle (which is only around 10 seconds), we could work out it's frequency from the internal clock at factory cal, and then the internal oscillator could be set to every calibration value possible and compared to that to figure out the appropriate value for the calibration to all the target speeds, just like the normal tuning sketch.... Now... uhh...*
+*Using a timebase to tune from is - of course - inconvenient. It's tantalizing, because we are just so close to not needing that. Consider that the chip starts reasonably well tuned (at room temp, they're usually within 1%, and always close enough for UART). With the internal HF oscillator's factory cal, plus - from the SIGROW - the factory cal error term (on the 2-series parts, this is often on the just one or two parts per 1024 - truly a miracle of technology). That means that we already have a known frequency reference. If we only had some independent timebase to compare that with, even a terribly inaccurate clock could be used - as long as it was stable (in terms of frequency) over the duration of a calibration cycle (which is only around 10 seconds), we could work out it's frequency from the internal clock at factory cal, and then the internal oscillator could be set to every calibration value possible and compared to that to figure out the appropriate value for the calibration to all the target speeds, just like the normal tuning sketch.... Now... uhh...*
 
-*Excuse me, Mr. Clock in the back, would you please sit down. Everyone else, pay attention, there's a lot of potential here. As I was saying - the dream would be for there to be some second independent oscillator on the chip... especially if there were some convenient way to prescale it down to something like the timescales I showed us earlier - 1 kHz, 500 Hz... or even slower - that could totally transform the experience of tuning a modern AVR! I say - this can be a reality some day, we must just look inside ourselv--**Hey! Stop!  What are you doing? Put that down! I'm serious, Clock, knock that off rig-- OW! mmmmphh*** **CRASH**tinkle.... *thud*
+*Excuse me, Mr. Clock in the back, would you please sit down. Everyone else, pay attention, there's a lot of potential here. As I was saying - the dream would be for there to be some second independent oscillator on the chip... especially if there were some convenient way to prescale it down to something like the timescales I showed us earlier - 1 kHz, 500 Hz... or even slower - that could totally transform the experience of tuning a modern AVR! I say - this can be a reality some day, we must just look inside ourselv--**Hey! Stop! What are you doing? Put that down! I'm serious, Clock, knock that off rig-- OW! mmmmphh*** **CRASH**tinkle.... *thud*
 
 
 *My name's Clock, and - unlike a certain instructor - I value yer Time, and I specialize in keeping it Real... I've got just what you need, right here....* (((to be continued)))

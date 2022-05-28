@@ -80,7 +80,7 @@ So, while many examples of direct port writes for classic AVRs will use |= and &
 ## VPORTx.OUT vs PORTx.OUTSET/PORTx.OUTCLR
 So, knowing all this, when is it more efficient to use `VPORTx.OUT |= PIN3_bm` and when is it more efficient to use `PORTx.OUTSET=PIN3_bm`?
 * When PIN3_bm is known at compile time, using `VPORTx.OUT |= PIN3_bm` is faster, and consumes less flash (likely 2 bytes less flash, 1 clock cycle faster).
-* If instead of referring to PB3 with `PIN3_bm` or `(1 << 3)`, or even `0x08` (`8` is also valid, but terrible practice, and 0x08 is not much better), a variable is used, it's value may not be compile time known. The compiler is sometimes very clever when performing "constant folding". But other times, it is quite the opposite, and will miss obvious chances. Unless you're sure it will be treated as a constant and `PORTx.OUTSET` should be used - `VPORTx.OUT |= 1 << not-a-constant` takes 4 bytes more flash, 2 more clock cycles **and is not atomic** - if an interrupt fires and modifies the register at just the wrong moment, between the read and the write, the value calculated from the pre-intterrupt read will be used the change that the interrupt made will be reversed.
+* If instead of referring to PB3 with `PIN3_bm` or `(1 << 3)`, or even `0x08` (`8` is also valid, but terrible practice, and 0x08 is not much better), a variable is used, it's value may not be compile time known. The compiler is sometimes very clever when performing "constant folding". But other times, it is quite the opposite, and will miss obvious chances. Unless you're sure it will be treated as a constant and `PORTx.OUTSET` should be used - `VPORTx.OUT |= 1 << not-a-constant` takes 4 bytes more flash, 2 more clock cycles **and is not atomic** - if an interrupt fires and modifies the register at just the wrong moment, between the read and the write, the value calculated from the pre-interrupt read will be used the change that the interrupt made will be reversed.
 * If the extreme performance of the VPORT access is not needed, considering the small penalty, is is likely better practice to use `PORTx.OUTSET` in any event, if your code is for public consumption, as it's purpose is much more immediately obvious to the uninitiated. Arduino users with little experience frequently reuse and modify sketches they find on the internet, and using the option that can safely deal with non-compiletime-known values reduces the likelihood of such careless modifications producing strange bugs. That in turn benefits the experienced Arduino users who end up helping them on the forums.
 
 
@@ -149,8 +149,8 @@ VPORTA.OUT |= (1 << bit);
 
 // * Several load instructions (LDS) to get the address of the port register. 6 clocks (3/each)
 // * an indirect load (LD) to load the value into a working register (ex, r0) 2 clocks
-// * an instruction to set the bit (ORI) in the working register  1 clock
-// * an indirect store (ST) to write the value in the working register to the VPORT.OUT register.  1 clock
+// * an instruction to set the bit (ORI) in the working register 1 clock
+// * an indirect store (ST) to write the value in the working register to the VPORT.OUT register. 1 clock
 //
 // What you hoped would be a 1 clock atomic operation that takes 2 bytes of flash is instead
 // likely a 10 clock, 14 byte routine that has a 3 clock window during which an interrupt could corrupt the result!
@@ -200,7 +200,7 @@ PORTx.INTFLAGS
 ```
 The DIR, OUT, IN, and INTFLAGS registers have the same functionality as the VPORTx registers of the same names, but they are slower to access.
 
-The `____SET` `____CLR`, `and ___TGL` registers are *special*.  When written, all bits corresponding to the bits written 1 are either set, cleared or toggled.
+The `____SET` `____CLR`, `and ___TGL` registers are *special*. When written, all bits corresponding to the bits written 1 are either set, cleared or toggled.
 
 In effect these:
 ```c
@@ -228,6 +228,6 @@ The behavior of the TGL registers is even stranger: if used with |= they'll turn
 None of that behavior is useful. Only use simple assignment with the SET/CLR/TGL registers.
 
 ### A sidenote: INTFLAGS
-While writing this, I realized that essentially, INTFLAGS is like a  `___CLR` register for a hidden register that you can't otherwise interact with.
+While writing this, I realized that essentially, INTFLAGS is like a `___CLR` register for a hidden register that you can't otherwise interact with.
 
 Elsewhere on these parts, aside from the INTFLAGS registers that most peripherals have, and the reset flag register, there are very few registers like this. TCA's have CTRLESET/CTRLECLR (and CTRLFSET/CTRLFCLR) (and no corresponding base register - all access is by reading the SET or CLR registers), and the Dx-series parts have the multi-pin config registers which are similar to but distinct from this type of register.

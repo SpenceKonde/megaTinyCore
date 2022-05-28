@@ -6,7 +6,7 @@ Developed by [MCUdude](https://github.com/MCUdude/).
 > The Event System (EVSYS) enables direct peripheral-to-peripheral signaling. It allows a change in one peripheral (the event generator) to trigger actions in other peripherals (the event users) through event channels, without using the CPU. It is designed to provide short and predictable response times between peripherals, allowing for autonomous peripheral control and interaction, and also for synchronized timing of actions in several peripheral modules. It is thus a powerful tool for reducing the complexity, size, and execution time of the software.
 
 ## Overview
-The event system allows routing of signals from event "generators" (outputs on various peripherals) through an event "channel", which one or more "event users" can be connected. When an event signal coming from the generator is is "active" or "high", the users connected to the same channel as the generator will perform certain specified actions depending on the peripheral. Generators are often the sorts of things that generate an interrupt if that is enabled - but some things can generate constant level events (such as following the state of a pin). The event users can do a wide variety of things. Opamps can be enabled and disabled entirely through events, the ACD can kick off a staged measurement. Type A and B timers can count them, and type B timers can measure their duration or time between them with input capture. USARTs can even use them as their RX input! This is nice and all - but what really makes the Event system reach it's potential is CCL (configurable custom logic) which can use events as inputs, in addiion to having access to several more internal sources of "event-like" signals - and being event generators in their own right.
+The event system allows routing of signals from event "generators" (outputs on various peripherals) through an event "channel", which one or more "event users" can be connected. When an event signal coming from the generator is is "active" or "high", the users connected to the same channel as the generator will perform certain specified actions depending on the peripheral. Generators are often the sorts of things that generate an interrupt if that is enabled - but some things can generate constant level events (such as following the state of a pin). The event users can do a wide variety of things. Op-amps can be enabled and disabled entirely through events, the ACD can kick off a staged measurement. Type A and B timers can count them, and type B timers can measure their duration or time between them with input capture. USARTs can even use them as their RX input! This is nice and all - but what really makes the Event system reach it's potential is CCL (configurable custom logic) which can use events as inputs, in addition to having access to several more internal sources of "event-like" signals - and being event generators in their own right.
 
 More information about the Event system and how it works can be found in the [Microchip Application Note AN2451](http://ww1.microchip.com/downloads/en/AppNotes/DS00002451B.pdf) and in the [megaAVR-0 family data sheet](http://ww1.microchip.com/downloads/en/DeviceDoc/megaAVR0-series-Family-Data-Sheet-DS40002015B.pdf).
 
@@ -63,11 +63,11 @@ Many parts with lower pincount do not have any options specific to a channel ava
 
 Notes:
 Yeah, all async channels have the AC1 and AC2 (assuming the part has it) but the numeric value isn't the same. Same goes for TCB1 and the sync channels.
-There are no ADC event eenerators on 0/1-series. Nope, I dunno why either. It's unfortunate that on the only AVRs with 2 ADCs, we can't fire events with them!
+There are no ADC event generators on 0/1-series. Nope, I dunno why either. It's unfortunate that on the only AVRs with 2 ADCs, we can't fire events with them!
 There are no SPI or USART generators, though those are not as useful (note: you can still get them from the CCL)
 The TCD events are async and **based on the TCD clock** *which may be faster than the peripheral clock*. If for example, you are feeding it to a CCL with the synchronizer enabled, events can be missed (this is considerably more concerning on the Dx-series parts, where the TCD has a PLL that can guarantee it is running faster than the system clock!)
 RTC events are async pulse events, but they are based on the RTC clock domain, which is typically hundreds of times slower than the main clock.
-While the analog comparator generators are available on every async channel, they are not interchangible; they have different numerical values on each one!
+While the analog comparator generators are available on every async channel, they are not interchangeable; they have different numerical values on each one!
 There is a general appearance of the designers having made a few poor decisions, but not having had the time to correct them prior to release resulting in all this weirdness. This is supported by the fact that the megaAVR 0-series and all other chips released since have had an almost identical even system, to each other, and different from the tiny 0/1-series.
 
 #### 2-series
@@ -161,7 +161,7 @@ The best you can do is pipe the outputs to a pin and read the pin....
 
 ## The Event class
 Class for interfacing with the Event systemn (`EVSYS`). Each event channel has its own object.
-Use the predefined objects `Event0`, `Event1`, `Event2`, `Event3`, `Event4`, `Event5`. These, alternately, are known as `EventSync0`, `EventSync1`, `EventAsync0`, `EventAsync1`, `EventAsync2`, `EventAsync3` on the tinyAVR 0-series and 1-series. Additionally, there is an `Event_empty` that is returned whenever you call a method that returns an Event reference, but it can't fulfil your request.  Note that not all generators are available on all channels; see the tables above. On 2-series, it's fairly simple, and, all else being equal,  the first channels are the most useful, so the standard rule of thumb of "whenever you use a generator that can go anywhere, use the highest number port" holds. With so many options for each pin, relative to the number of pins, that's unlikely to be a problem. The 0 and 1-series oparts are more complicated. Obviously,on 8 pin parts, the two channels that can do PORTA are the most valuable, and the 1 or 3 channels without them a better choice, when you have a choice. The sixth channel, present only on 1-series, has the RTC division options in place of pins. It is either critical to your application, or the least useful, with no middle ground.
+Use the predefined objects `Event0`, `Event1`, `Event2`, `Event3`, `Event4`, `Event5`. These, alternately, are known as `EventSync0`, `EventSync1`, `EventAsync0`, `EventAsync1`, `EventAsync2`, `EventAsync3` on the tinyAVR 0-series and 1-series. Additionally, there is an `Event_empty` that is returned whenever you call a method that returns an Event reference, but it can't fulfil your request. Note that not all generators are available on all channels; see the tables above. On 2-series, it's fairly simple, and, all else being equal, the first channels are the most useful, so the standard rule of thumb of "whenever you use a generator that can go anywhere, use the highest number port" holds. With so many options for each pin, relative to the number of pins, that's unlikely to be a problem. The 0 and 1-series oparts are more complicated. Obviously,on 8 pin parts, the two channels that can do PORTA are the most valuable, and the 1 or 3 channels without them a better choice, when you have a choice. The sixth channel, present only on 1-series, has the RTC division options in place of pins. It is either critical to your application, or the least useful, with no middle ground.
 
 
 ### Class Overview
@@ -198,7 +198,7 @@ Class methods for working with users or looking up generator or user numbers
 | Event::gen_from_peripheral()     | TCA_t, TCB_t, `CCL`, or AC_t | Return the generator for this peripheral <br/> second argument specified which generator, if several |
 | Event::user_from_peripheral()    | TCA_t, TCB_t, `CCL`, or USART_t | Return the user for this peripheral <br/> second argument specifies which user, if several |
 
-For the CCL, when looking up a generator, the second argumennt is the logic block number, for looking up a user, it is twice the logic block number for input A
+For the CCL, when looking up a generator, the second argument is the logic block number, for looking up a user, it is twice the logic block number for input A
 
 
 
@@ -377,9 +377,9 @@ Shown below, generators/user per instance  (second argument should be less than 
 | ACn        | 1 / 0 x1 | */0 x1-3 | 1 / 0 x1 | 1 / 0 x1 |  1 / 0 x1-3 |
 | USARTn     | 0 / 1 x1 | 0/1 x1   | ! / 1 x2 | !/1 x3-4 |  ! / 1 x2-6 |
 
-`*` - the tiny1 parts with 1 AC work normally. This is unfortuately not supported for tiny1 parts with the triple-AC configuration:
+`*` - the tiny1 parts with 1 AC work normally. This is unfortunately not supported for tiny1 parts with the triple-AC configuration:
 `**` - There is only one CCL peripheral, with multiple logic blocks. Each logic block has 1 event generator and 2 event users. If using the logic library, get the Logic instance number. The output generator is that number. The input is twice that number, and twice that number + 1.
-`***` - This peripheral is not supported becausse the generator numbers are channel dependent.
+`***` - This peripheral is not supported because the generator numbers are channel dependent.
 `!` - These parts do have an option, but we didn't bother to implement it because it isn't particularly useful. But the Event RX mode combined with the TX input to the CCL permit arbitrary remapping of RX and very flexible remapping of TX.
 
 And what they are:
