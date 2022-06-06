@@ -78,6 +78,7 @@ ADC_ACC1024	LITERAL1
 #	DxCore	/	megaTinyCore	digital	stuff
 openDrain	KEYWORD2
 openDrainFast	KEYWORD2
+pinModeFast	KEYWORD2
 digitalWriteFast	KEYWORD2
 digitalReadFast	KEYWORD2
 turnOffPWM	KEYWORD2

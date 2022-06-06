@@ -32,12 +32,12 @@
 #else
   /* we're on a tinyAVR.... */
   #if   ((MEGATINYCORE_SERIES == 0 && defined(__AVR_ATTinyxy4__)                      ) || \
-         (MEGATINYCORE_SERIES == 1 && defined(__AVR_ATTinyxy4__)  && FLASH_SIZE < 8192) || \
+         (MEGATINYCORE_SERIES == 1 && defined(__AVR_ATTinyxy4__)  && PROGMEM_SIZE <= 8192) || \
                                       defined(__AVR_ATtinyxy2__)                      )
     /* P0, N0. Nada mas - for 8-pin parts, 14-pin 0-series, and 14-pin "lesser" 1-series */
     #define ANALOG_COMP_PINS_TINY_FEW
   #elif  (MEGATINYCORE_SERIES == 0) || \
-         (MEGATINYCORE_SERIES == 1  /*20 or 24 pin parts now */   && FLASH_SIZE < 8192)
+         (MEGATINYCORE_SERIES == 1  /*20 or 24 pin parts now */   && PROGMEM_SIZE <= 8192)
     /* P0, P1, N0, N1 - for 20/24-pin 0-series, and 20/24-pin "lesser" 1-series */
     #define ANALOG_COMP_PINS_TINY_SOME
   #elif (MEGATINYCORE_SERIES == 1) // if above didn't catch it, we've got a "golden" 1-series
