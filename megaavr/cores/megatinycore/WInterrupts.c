@@ -288,10 +288,10 @@
     uint8_t port = digitalPinToPort(pin);
     uint8_t p = (port << 5) + bitpos;
     *(((volatile uint8_t*) &PORTA_PIN0CTRL) + p) &= 0xF1; // int off....
-    *((volatile uint8_t*) ((uint16_t)((port << 4)+3)))  = (1 << bitpos);// flag clear...
-    intFunc[port][bitpos] = NULL; // clear pointer.
+    *((volatile uint8_t*) ((uint16_t)((port << 4) + 3)))  = (1 << bitpos);// flag clear
+    intFunc[port][bitpos] = 0; // clear pointer
   }
-/* If not enabling attach on all ports always, instead the near-identical ISR definitions are in the WInterruptsA/B/C/D/E/F/G.c files.
+/* If not enabling attach on all ports always, instead the identical ISR definitions are in the WInterruptsA/B/C/D/E/F/G.c files.
  * Okay, so what the f-- is going on here?
  * To avoid each interrupt vector having it's own lengthy prologue and epilog separaely, which is needed in order for a function call to be made in an ISR
  * All we do is push an upper register onto the stack so can load a value twice the PORT number there, and jump to actual function that does the work here.
@@ -300,6 +300,7 @@
  * We finish the prologue but we need to push the Y pointer and r15 (call saved) for this routine. Then we slip out out of that assembly block just to grab the pointer to IntFunc array, which we need in a pointer reg;
  * The second block of inline ASM specifies that the pointer to the array of pointers to arrays of pointers to interrupt functions be passed in the X pointer register
  *
+ * Assembly is split up only so we can grab that address through that in a constraint.
  * We couldn't have done that any sooner, we had nowhere to put it. To that we add the pre-doubled port number - pointers are 2 bytes so we need that
  * doubling.
  *
@@ -526,4 +527,5 @@
   #if defined(PORTF_PORT_vect)
   IMPLEMENT_ISR(PORTF_PORT_vect, PF)
   #endif
+  // Nope, there was never attachInterrupt for PORTG and nobody complained for 2 years. Not going to change that  -Speence 3/5/22
 #endif

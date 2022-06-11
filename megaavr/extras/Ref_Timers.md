@@ -132,28 +132,28 @@ The output channels are only available through megaTinyCore on 20 and 24 pin par
 The type B timers are never used by megaTinyCore for PWM.
 
 #### PWM Frequencies
-The frequency of PWM output using the settings supplied by the core is shown in the table below. The "target" is 1 kHz, never less than 490 Hz or more than 1.5 kHz. As can be seen below, there are several frequencies where this has proven an unachievable goal. The upper end of that range is the point at which - if PWMing the gate of a MOSFET - you have to start giving thought to the gate charge and switching losses, and may not be able to directly drive the gate of a modern power MOSFET and expect to get acceptable results (ie, MOSFET turns on and off completely in each cycle, there is minimal distortion of the duty cycle, and it spends most of it's "on" time with the low resistance quoted in the datasheet, instead of something much higher that would cause it to overheat and fail). Not to say that it **definitely** will work with a given MOSFET under those conditions (see [the PWM section of my MOSFET guide](https://github.com/SpenceKonde/ProductInfo/blob/master/MOSFETs/Guide.md#pwm) ), but the intent was to try to keep the frequency low enough that that use case was viable (nobody wants to be forced into using a gate driver), without compromising the ability of the timers to be useful for timekeeping.
 
+The frequency of PWM output using the settings supplied by the core is shown in the table below. The "target" is 1 kHz, never less than 490 Hz or morethan 1.5 kHz. As can be seen below, there are several frequencies where this has proven an unachievable goal. The upper end of that range is the point at which - if PWMing the gate of a MOSFET - you have to start giving thought to the gate charge and switching losses, and may not be able to directly drive the gate of a modern power MOSFET and expect to get acceptable results (ie, MOSFET turns on and off completely in each cycle, there is minimal distortion of the duty cycle, and it spends most of it's "on" time with the low resistance quoted in the datasheet, instead of something much higher that would cause it to overheat and fail). Not to say that it **definitely** will work with a given MOSFET under those conditions (see [the PWM section of my MOSFET guide](https://github.com/SpenceKonde/ProductInfo/blob/master/MOSFETs/Guide.md#pwm) for calculations and a shared spreadsheet that helps calculate  ), but the intent was to try to keep the frequency low enough that that use case was viable (nobody wants to be forced into using a gate driver), without compromising the ability of the timers to be useful for timekeeping.
 ##### TCA0
 
-|   CLK_PER | Prescale A |   fPWM  |
-|-----------|------------|---------|
-|    20 MHz |         64 | 1225 Hz |
-|    16 MHz |         64 |  980 Hz |
-|    10 MHz |         64 |  613 Hz |
-|     8 MHz |         64 |  490 Hz |
-|     5 MHz |         16 | 1225 Hz |
-|     4 MHz |         16 |  980 Hz |
-|     1 MHz |          8 |  490 Hz |
+|   CLK_PER | Prescale |   fPWM  |
+|-----------|----------|---------|
+|    20 MHz |       64 | 1225 Hz |
+|    16 MHz |       64 |  980 Hz |
+|    10 MHz |       64 |  613 Hz |
+|     8 MHz |       64 |  490 Hz |
+|     5 MHz |       16 | 1225 Hz |
+|     4 MHz |       16 |  980 Hz |
+|     1 MHz |        8 |  490 Hz |
 
 ##### TCD0 (PC0, PC1 on 1-series only)
 
-*warning* - When using the Tuned Internal oscillator clock option, the PWM frequency will scale up or down with the CPU speed, as shown below for the highest and lowest tuned frequencies available for each. However, when an external clock source is used, the internal oscillator will be left at it's default calibration (16 or 20 MHz).
+*warning* - When using the Tuned Internal oscillator clock option, the PWM frequency will scale up or down with the CPU speed, as shown below for the highest and lowest tuned frequencies available for each. However, when an external clock source is used, the internal oscillator will be left at it's default calibration (16 or 20 MHz). This will be used for TCD PWM, which we always generate from the internal oscillator (though it can be set to an external clock source,
 
 
 | FREQSEL fuse  | TCD clock source | Sync Prescale | Count prescale | TOP |    fPWM |
 |---------------|------------------|---------------|----------------|-----|---------|
-| 0x02 (20 MHz) | OSCHF @ 32 MHz   |             1 |             32 | 509 | 1960 Hz |
+| 0x02 (20 MHz) | OSCHF @ 32 MHz   |             2 |             32 | 509 |  980 Hz |
 | 0x02 (20 MHz) | **OSCHF @ 20 MHz** |           1 |             32 | 509 | 1225 Hz |
 | 0x02 (20 MHz) | OSCHF @ 12 MHz   |             1 |             32 | 509 |  735 Hz |
 | 0x01 (16 MHz) | OSCHF @ 25 MHz   |             1 |             32 | 509 | 1531 Hz |
@@ -169,30 +169,42 @@ Unlike DxCore, where the overhead of identifying the timer and channel is low an
 
 Note: This cannot be made changeable at runtime; it *must* be a tools menu option, because the number of conditionals involved would cause unacceptable code bloat.
 
-| Option description      | TCA0 PWM        | 14pin     | 20pin         | 24pin     | Notes |
-|-------------------------|-----------------|-----------|---------------|-----------|-------_
-| Default (6-pins)        | PB0-2,PA3-5     | Yes       | Yes           | Yes       |       |
-| Avoid UART (6pins)      | PB0,1,5 PA3-5   | Yes       | Yes           | Yes       | No PB5 present on 15-pin parts.|
-| Avoid All Serial (6pin) | Varies          | B1-3,A3-5 | B3-5,C3,A4-5  | B3-5,C3-5 | Minimizes conflict between PWM and SPI/I2C/USART |
-| Avoid All Serial 2      | PB3-5, PC3-5    | No        | No            | Yes       | Minimizes conflict between PWM and SPI/I2C/USART. Also move TCD0 PWM to PA4, PA5 instead of PC0, PC1, 1-series only |
-| Avoid UART (3 pins)     | Varies          | B0-2      | B0,1,5        | B0,1,5    | Avoid UART pins when possible. PWM output buffering enabled. TCD0 PWM on PC0, PC1, if a 1-series part. |
-| Avoid UART (3 pins alt) | Varies          | B0-2      | B0,1,5        | B0,1,5    | Avoid UART pins when possible. PWM output buffering enabled. TCD0 PWM on PA4, PA5, if a 1-series part. *including 14 pin parts* ||
-| Avoid I2C (3 pins)      | Varies          | B1-3      | B3-5          | B3-5      | Avoid I2C pins when possible. PWM output buffering enabled. TCD0 PWM on PC0, PC1, if 1-series part. |
-| Avoid I2C (3 pins alt)  | Varies          | B1-3      | B3-5          | B3-5      | Avoid I2C pins when possible. PWM output buffering enabled. TCD0 PWM on PA4, PA5, if 1-series part. *including 14 pin parts* |
-| 4 pins, default on txy2 | PA1,2,3,7       | No        | No            | No        | 8-pin parts only, the default
-| 3 pins w/buffering      | PA1-3           | No        | No            | No        | 8-pin parts only, trade 4th pwm pin for buffering and a bit more flash.
-| TCA + TCD on 212/412    | PA1-3 TCD PA6/7 | No        | No            | No        | 8-pin 1-series only. 5 PWM pins. Flash hog.
+| Option description        | TCA0 PWM        | TCD0 PWM | 14pin | 20pin | 24pin | Notes |
+|---------------------------|-----------------|----------|-------|-------|-------|-------|
+| Default (6xTCA)           | PB0-2,PA3-5     | None     | Yes   | No    | No    | On 14-pin parts, this is default, Both of the TCD pins already have pwm from TCA which can't be remapped, TCD is not used for PWM on those   |
+| No TCD (6xTCA)            | PB0-2,PA3-5     | None     | No    | Yes   | Yes   | On 20/24-pin parts, this will save a non-negligible amount of flash, and improve performance of digitalWrite and analogWrite. No TCD PWM.  |
+| Default (6xTCA, 2xTCD)    | PB0-2,PA3-5     | PC0, PC1 | No    | Yes   | Yes   | On 14-pin 1-series, Both of the TCD pins already have pwm from TCA which can't be remapped, TCD is not used for PWM on those   |
+| Avoid UART (6xTCA, 2xTCD) | PB0,1,5 PA3-5   | PC0, PC1 | No    | Yes   | Yes   | On 20/24-pin parts we can avoid wasting any PWM channels on the USART pins |
+| Avoid Serial (6xTCA)      | PB1-3,PA3-5     | None     | Yes   | No    | No    | Minimizes conflict between PWM and SPI/I2C/USART as much as possible on 14-pin parts. No TCD0 PWM. |
+| Avoid Serial (6xTCA 2xTCD)| PB3-5,PC3-5     | PC0, PC1 | No    | No    | Yes   | Minimizes conflict between PWM and SPI/I2C/USART. TCD0 PWM on PA4, PA5. |
+| Avoid UART (3xbTCA, 2xTCD)| PB0-2           | PA4, PA5 | Yes   | No    | No    | Avoid UART pins when possible. 14-pin can't fully avoid USART pins. PWM output buffering enabled. TCD0 PWM on PA4, PA5. |
+| Avoid UART (3xbTCA, 2xTCD)| PB0,1,5         | PA4, PA5 | No    | Yes   | Yes   | Avoid UART pins completely. PWM output buffering enabled. TCD0 PWM on PA4, PA5. |
+| Avoid UART (3xbTCA, 2xTCD)| PB0,1,5         | PC0, PC1 | No    | Yes   | Yes   | Avoid UART pins completely. PWM output buffering enabled. TCD0 PWM on PC0, PC1 (note that these are also alternate pin mapping options USART1 on 2-series). |
+| Avoid UART (3xbTCA)       | PB0-2           | None     | Yes   | No    | No    | 14-pin can't fully avoid USART. PWM output buffering enabled. No TCD0 PWM - saves flash. |
+| Avoid UART (3xbTCA)       | PB3-5           | None     | No    | Yes   | Yes   | 14-pin can't fully avoid USART. PWM output buffering enabled. TCD0 PWM on PA4, PA5. |
+| Avoid I2C (3xbTCA, 2xTCD) | PB1-3           | PA4, PA5 | Yes   | No    | No    | 14-pin can't fully avoid I2C. You lose one of the PWM pins if you want I2C (though the 1-series - and only the 1-series - can move I2C to PA1 and PA2). PWM output buffering enabled. TCD0 PWM on PA4, PA5. |
+| Avoid I2C (3xbTCA, 2xTCD) | PB3-5           | PC0, PC1 | No    | Yes   | Yes   | Avoid I2C pins. PWM output buffering enabled. TCD0 PWM on PC0, PC1. |
+| Avoid I2C (3xbTCA, 2xTCD) | PB3-5           | PA4, PA5 | No    | Yes   | Yes   | Avoid I2C pins. PWM output buffering enabled. TCD0 PWM on PA4, PA5. |
+| Avoid I2C (3xbTCA)        | PB1-3           | None     | Yes   | No    | No    | Avoid I2C pins. PWM output buffering enabled. No TCD0 PWM - saves flash. |
+| Avoid I2C (3xbTCA)        | PB3-5           | None     | No    | Yes   | Yes   | Avoid I2C pins. PWM output buffering enabled. No TCD0 PWM - saves flash. |
+| Default 8-pin (4xTCA)     | PA1,2,3,7       | None     | No    | No    | No    | 8-pin parts only, the default
+| 3 pins (3xbTCA)           | PA1-3           | None     | No    | No    | No    | 8-pin parts only, trade 4th pwm pin for buffering and a bit more flash.
+| 5 pins (3xbTCA, 2xTCD)    | PA1-3           | PA6, PA7 | No    | No    | No    | 8-pin 1-series parts only. 5 PWM pins. A flash hog - these parts max out at just 4k of flash. The so-called "no glitch TCD" implementation is not used in order to save flash in this case.
+
+##### TCD PWM pins
+On the 14-pin parts, when TCA is used in split mode, the only pins available for TCD PWM are PA4 and PA5 - which are already the only outputs WO4 and WO5 of TCA0 on those parts. Hence, TCD PWM is not used in that configuration as it would just waste flash without giving you more PWM pins. When TCA is not used in split mode, that opens the door to TCD-generated PWM on the 14-pin 1-series parts. Also, alternate mappings of the TCA PWM pins make TCD PWM on PA4, PA5 reasonable to use on 24-pin parts depending on what alternate functions you need from the pins not used for PWM.
+If TCD PWM pins are not needed, disabling that functionality saves a bit of flash.
 
 ##### Buffering/3-pin mode? What's that?
 This means the following things will be done differently in the TCA configuration:
 * TCA is not run in split mode. There are only 3 output channels.
-* The PERBUF CMP0BUF, CMP1BUF, and CMP2BUF can be used instead of PER, CMP0, CMP1, or CMP2. When this is done, the changes are applied at the end of the current duty cycle, preventing glitches when those registers are changed. This is occasionally a problem with PWM for brightness control, where a very unlucky change of brightness can result in 1 period during which the LED stays on the whole time, and which an observer perceives as a flash, when the LED is supposed to be very dim.
+* The PERBUF CMP0BUF, CMP1BUF, and CMP2BUF can be used instead of PER, CMP0, CMP1, or CMP2, and analogWrite will do this. When the buffer registers are used, the changes are applied at the end of the current duty cycle, preventing glitches when those registers are changed. This is occasionally a problem with PWM for brightness control, where there would be a 1/255 chance analogWrite(pin,1) called when the duty cycle was previously 2, to cause the LED to be on for an entire PWM cycle. This is usually difficult to generate visible effects from, but in certain lighting situations has for reasons unclear, been problematic, resulting in a distracting flash when transitioning between very low brightness levels.
 * PER and prescaler are initialized the same was as above
 * However, because it is not in split mode, they can be changed to 16-bit values.
-* Changing the period requires writing a replacement for analogWrite() to set the duty cycle, but this isn't the hard part of such a project.
-* Changing the period will also mess up millis timekeeping if TCA used for that.
+  * In 2.6.x the megaTinyCore library will be expanded with functions to support this; it is conceptually surprisingly hard to do
 * Buffered mode uses slightly less flash.
   * If TCD is added as a result of changes to this menu option, that will increase the flash usage significantly.
+* The number of buffered channels is abbreviated bTCA in above table.
 
 ### Millis/Micros Timekeeping
 megaTinyCore supports use of TCA0 (used by default on non-1-series parts), any TCB, or the TCD (used by default on 1-series, because it is so hard to take over and reconfigure, nobody is going to do that.)

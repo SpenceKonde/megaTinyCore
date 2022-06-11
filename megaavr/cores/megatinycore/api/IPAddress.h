@@ -26,7 +26,7 @@
 // A class to make it easier to handle and pass around IP addresses
 
 class IPAddress : public Printable {
-  private:
+private:
     union {
       uint8_t bytes[4];  // IPv4 address
       uint32_t dword;
