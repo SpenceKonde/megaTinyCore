@@ -7,12 +7,24 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### Ongoing
 * Port enhanced documentation from DxCore.
 
+### Known issues that are not fixed **AND WILL NOT BE FIXED WITHOUT ASSISTANCE FROM EXPERTS**
+* Logic and Comparator are incompatible, however, I am unsure of what the correct way to fix this is. the suggestions I have received could break existing code, which is bad. But my knowledge of namespaces and enumerated types and all that mumbo jumbo that C++ added leaves me ill prepared to attempt without advise.
+* There is a problem with printable printf. I don't know what it is or why itcauses memory corruption. I await help from someone who understands this shit, until then it is recommended that users not use the printf() methods of pritnable classes. I have tried reading the code to figure itout, but I don;t even know which of like 3-5 files the problem is located in, let alone how to fix it :-(
+
 ### Planned 2.5.12
 * Okay fine now you can use ADC1 just like it was an ADC0, see the notes in [Analog Input (ADC) and output (DAC)](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md) for steps required to enable it.
 * You can now enable and disable the ADC with analogPowerOption() and enable/disable standby mode.
 * Fix issue with SSD bit being cleared when using beginTransaction().
 * Fix bug in Logic with pin inputs being handled improperly
 * Fix many documentation issues, improve docs generally.
+* Expand documentation significantly.
+* Fix issue with Wire with certain libraries.
+* Fix large number of issues with turning, add prescaled turning options 8, 7, 6, 5, 4, 1, MHz
+* Correct default option for Optiboot 2-series boards with 20 pins to be the one with alt reset.
+* Fix bug with event library and `long_soft_event` method.
+* Fix many serious bugs in event library.
+* Update toolchain to Azduino5
+* Lay groundwork in Event library for the new event system changes in the EA-series (There are now 2 generators per port, and 2 for RTC, accessible by all event channels, and a register on the peripheral controls which of the options is used for these two channels)
 
 ## Released Versions
 
