@@ -11,7 +11,7 @@ When execution reaches the application after reset or bootloader, it hits the re
 ```text
 Things most reasonable to override are marked with a + and the start of the line.
 Things that might make sense to override only with empty functions are marked with - at the start of the line.
-Things that might make sense call if main or init is oerwritten are marked with # atthe start of line
+Things that might make sense call if main or init is overwritten are marked with # at the start of line
 Sections defined by AVR-GCC are marked with S at start of the line.
 Things that you will likely break stuff without benefit by overriding are marked with X at start of line
 
@@ -28,7 +28,7 @@ S .init9: Jumps to main()
 -   init() - to initialize the peripherals so the core-provided functions work.
 #   init_clock() - This is called first, to initialize the system clock. You oughtn't override this, but if you override main you almost certainly want to call this
 #   init_ADC0() - This is called to initialize the ADC
-#   //init_ADC1() - on the 1-series w/16 or 32k flash, aka "Golden 1-series" series parts with a seocnd ADC, this function exists but it NOT called. See Ref_Analog.md.
+#   //init_ADC1() - on the 1-series w/16 or 32k flash, aka "Golden 1-series" series parts with a second ADC, this function exists but it NOT called. See Ref_Analog.md.
     init_timers() - This function calls the timer initialization functions
 -    init_TCA0() - Initialized TCA0 in split mode for PWM output. If you don't want PWM or need to use PWM in 16-bit mode or need buffering, AND are truly desperate for more flash, you can override with an empty function.
                     Don't do that if you are using TCA0 for millis, though.
@@ -59,9 +59,9 @@ void init_reset_flags() __attribute__((weak)) {
   GPIOR0 = flags;
 }
 ```
-This can be used to try to pick apart when you are getting unexpected resets (likely "dirty resets"), by doing something else when RSTCTRL.RSTFR == 0 - note that because it is run so early in the initialization process, and we're here because we called an ISR that doesn't exist or smashed the stack, you can count on very little working correctly; your best bet is probably to test theories and give output by writing I/O pins to, for example, turn on an LED. (Since you have no timekeeping yet, and are likely debugging a showstopping bug, you probably just want to write the LED pin with pinModeFast and digitalWriteFast, and then hang with while(1). Having multiple LEDs connected here really helps: turn on one LED for any dirty reset, and a second LED for the theory you're testing). You might, for example, want to determine if the dirty reset is coming about through a bad ISR: if `CPUINT.STATUS & (CPUINT_LVL0EX_bm | CPUINT_LVL1EX_bm)` that means it it thinks it's in an interrupt, but it's running non-interrupt initialization code, so one of two things happened: either a non-existant ISR was called, or a function called by an ISR`*` and which wasn't inlined was responsible for smashing the stack (as that won't cause a dirty reset until a `ret` or `reti` is executed, so if you smash the stack within the ISR proper, the reti will still execute, RSTCTRL.STATUS will be cleared, and *then* you'll end up in a dirty reset). See the [Reset Reference](Ref_Reset.md) for more information.
+This can be used to try to pick apart when you are getting unexpected resets (likely "dirty resets"), by doing something else when RSTCTRL.RSTFR == 0 - note that because it is run so early in the initialization process, and we're here because we called an ISR that doesn't exist or smashed the stack, you can count on very little working correctly; your best bet is probably to test theories and give output by writing I/O pins to, for example, turn on an LED. (Since you have no timekeeping yet, and are likely debugging a showstopping bug, you probably just want to write the LED pin with pinModeFast and digitalWriteFast, and then hang with while(1). Having multiple LEDs connected here really helps: turn on one LED for any dirty reset, and a second LED for the theory you're testing). You might, for example, want to determine if the dirty reset is coming about through a bad ISR: if `CPUINT.STATUS & (CPUINT_LVL0EX_bm | CPUINT_LVL1EX_bm)` that means it it thinks it's in an interrupt, but it's running non-interrupt initialization code, so one of two things happened: either a non-existent ISR was called, or a function called by an ISR`*` and which wasn't inlined was responsible for smashing the stack (as that won't cause a dirty reset until a `ret` or `reti` is executed, so if you smash the stack within the ISR proper, the reti will still execute, RSTCTRL.STATUS will be cleared, and *then* you'll end up in a dirty reset). See the [Reset Reference](Ref_Reset.md) for more information.
 
-`*` - Note that ISRs ought not call any function that the optimizer can't inline (`attachInterrupt` interrupts inherrently do this; there is no other way for an interrupt to be attached at runtime); the overhead is considerable, making it contrary to the principle that an ISR should run quickly. In some datasheets and official documentation, Microchip explicitly warns about the overhead of CALL/RCALL/ICALL within an ISR. While not all parts have this warning in the datasheet, it applies to all AVRs equally. This is, however, a performance issue, not the cause of a dirty reset - that would require the function called to contain severe bugs that overwrite the call stack or corrupt the stack pointer. If the offending function was inlined, then it would not think that it was in an ISR at the time of the dirty reset, since `reti` would have been executed - there would be no intervening `ret` that would trigger the dirty reset - but it would still be expected to generate a dirty reset.
+`*` - Note that ISRs ought not call any function that the optimizer can't inline (`attachInterrupt` interrupts inherently do this; there is no other way for an interrupt to be attached at runtime); the overhead is considerable, making it contrary to the principle that an ISR should run quickly. In some datasheets and official documentation, Microchip explicitly warns about the overhead of CALL/RCALL/ICALL within an ISR. While not all parts have this warning in the datasheet, it applies to all AVRs equally. This is, however, a performance issue, not the cause of a dirty reset - that would require the function called to contain severe bugs that overwrite the call stack or corrupt the stack pointer. If the offending function was inlined, then it would not think that it was in an ISR at the time of the dirty reset, since `reti` would have been executed - there would be no intervening `ret` that would trigger the dirty reset - but it would still be expected to generate a dirty reset.
 
 ### onPreMain
 ```c
@@ -117,7 +117,7 @@ int main() {
 This is the main program. The only things that run first are the things in the .initN sections - this means init_reset_flags(), onPreMain(), and class constructors. It can be overridden but in this case nothing will be initialized, and the clock will be 4 MHz internal when it is called. If you have a different speed selected, everything that depends on F_CPU (including the avrlibc delay.h) will have all timing wrong. Even if you override main, you probably want to call init_clock() at the start or be sure to compile for 4 MHz. If you just don't want to use the Arduino setup/loop structure, but you do want everything else (millis, pwm, adc, and anything that a library needs to do in initVariant), simply put your code in setup and leave loop empty - don't override main.
 
 ### Initializers of peripherals
-Overriding these is not reccomended. They're most likely to become relevant if you have overridden init() or main(), yet still want the peripheral in question initialized (which of course raises the question of why you overrode init() or main() in the first place). Occasionally useful for debugging, and that's why they exist.
+Overriding these is not recommended. They're most likely to become relevant if you have overridden init() or main(), yet still want the peripheral in question initialized (which of course raises the question of why you overrode init() or main() in the first place). Occasionally useful for debugging, and that's why they exist.
 ```c
 void init()             __attribute__((weak)); // This calls all of the others.
 void init_clock()       __attribute__((weak)); // this is called first, to initialize the system clock.
@@ -130,7 +130,7 @@ void init_millis()      __attribute__((weak)); // called by init() after everyth
 ```
 They are called in the order shown above.
 
-Any of them can be overridden, but overriding them with anything other than an empty function is not recommended and is rarely a good idea except for debugging. If the peripheral isn't being used and you're desperate for flash (maybe on a small flash DD or EA series parts) these will save a tiny amount of flash. Don't override with anything other than an empry function. If you're initializing them differently, do it in setup().
+Any of them can be overridden, but overriding them with anything other than an empty function is not recommended and is rarely a good idea except for debugging. If the peripheral isn't being used and you're desperate for flash (maybe on a small flash DD or EA series parts) these will save a tiny amount of flash. Don't override with anything other than an empty function. If you're initializing them differently, do it in setup().
 
 The timer initialization functions do different things if the timer is used for millis.
 
@@ -142,7 +142,7 @@ Initializes the system clock so that it will run at the F_CPU passed to it. Don'
 Changing this is the wrong way to debug a problem that you think might be caused by a malfunctioning external clock. In that case, just build for internal clock.
 
 #### init_ADC0
-Initializes the ADC clock prescaler to get a legal frequency, sets up defaults and enables the ADC. It can be overridden with an empty function to prevent it from initializing the ADC to save flash if the ADC is not used. if main is overridden and tou want the right clock speed, you MUST  init_clock MUST be callld first in that case.
+Initializes the ADC clock prescaler to get a legal frequency, sets up defaults and enables the ADC. It can be overridden with an empty function to prevent it from initializing the ADC to save flash if the ADC is not used. if main is overridden and tou want the right clock speed, you MUST init_clock MUST be called first in that case.
 
 #### init_ADC1
 As above for ADC1 on parts that have it. Must be called manually. See the [Analog Reference](Ref_Analog.md)
@@ -154,7 +154,7 @@ Calls initTCA0(), and then initTCD0() (if the part has one). There is no general
 Initialize the type A timer for PWM. The one for a timer used as millis must not be overridden. It is not recommended to override these at all except with an empty function in order to leave the peripheral in reset state (but takeOverTCA0() will also put it back in it's reset state. If you don't want to use analogWrite() through the timer, instead call takeOverTCA0() - which you need to do even if these are overridden if you don't want analogWrite() and digitalWrite() to manipulate the timer. As the tinyAVRs only have one TCA, there's no `init_TCA1()` and the PORTMUX configuration is handled in this function.
 
 #### init_TCBs does not exist in megaTinyCore
-Initialization of TCBs is only performed by servo, tone or third party libraries on the tinyAVR parts. If used for millis, it is handled throguh init_millis()
+Initialization of TCBs is only performed by servo, tone or third party libraries on the tinyAVR parts. If used for millis, it is handled through init_millis()
 
 #### init_TCD0
 Initializes the type D timer. It is not recommended to override this except with an empty function in order to leave the peripheral in reset state. This is particularly useful with the type D timer, which has no "hard reset" command like the TCA does, and it's got the enable-locked fields and the ENRDY bit - If you're going to take it over anyway, you'll have an easier time if you override this - you don't have to put your initialization code there (though you could), simply overriding it with an empty function will give you a clean start . As with the others, it is recommended to override with just an empty function in that case.

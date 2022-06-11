@@ -13,9 +13,9 @@ This is the documentation for the version included with with DxCore and megaTiny
 
 ## When is EEPROM erased?
 1. When a sketch manually erases some or all of it.
-2. IF using a non-optiboot configuration, it can optionally be erased every time new code is uploaded. This is controlled by the EESAVE fuse bit. On AVR DA and DB parts, this is a "safe" fuse and is set on all uploads. On AVR DD and ATTiny parts, it is not considered a safe fuse, since it is on the same fusebyte that can disable non-HV UPDI programming; on those parts you must do "burn bootloader" to apply these changes. Note that according to recent datasheet clarifications, on a locked chip, EESAVE is will preserve the EEPROM - at least on those chips. In the incredibly unlikly event that this matters to you, check the relevant eratta and datasheet clarification document.
+2. IF using a non-optiboot configuration, it can optionally be erased every time new code is uploaded. This is controlled by the EESAVE fuse bit. On AVR DA and DB parts, this is a "safe" fuse and is set on all uploads. On AVR DD and ATTiny parts, it is not considered a safe fuse, since it is on the same fusebyte that can disable non-HV UPDI programming; on those parts you must do "burn bootloader" to apply these changes. Note that according to recent datasheet clarifications, on a locked chip, EESAVE is will preserve the EEPROM - at least on those chips. In the incredibly unlikely event that this matters to you, check the relevant eratta and datasheet clarification document.
 
-See also the [USERSIG](../USERSIG/README.md) library which writes to the rather similar memory section known as the USERROW (aka "user signature space"), which is only erased if manually erased or if a locked chip is erased to unlock it (that will always restore the flash, EEPROM, and USERROW to blank state to protect proprietary or confidential information from leaking). Note that there are significant differences in the USERSIG library on tinyAVR and AVR Dx-series parts due to underlying differences in the NVM controller; on tinyAVR the library presents an identical interface to EEPROM. On DxCore, it is necessaey to call an additional function to commit the new data if an erase is required. See the linked readme file for more information.
+See also the [USERSIG](../USERSIG/README.md) library which writes to the rather similar memory section known as the USERROW (aka "user signature space"), which is only erased if manually erased or if a locked chip is erased to unlock it (that will always restore the flash, EEPROM, and USERROW to blank state to protect proprietary or confidential information from leaking). Note that there are significant differences in the USERSIG library on tinyAVR and AVR Dx-series parts due to underlying differences in the NVM controller; on tinyAVR the library presents an identical interface to EEPROM. On DxCore, it is necessary to call an additional function to commit the new data if an erase is required. See the linked readme file for more information.
 
 ## How to use it
 The EEPROM library is included with all hardware packages for hardware with that functionality (which is almost universal).
@@ -54,14 +54,14 @@ Specifying an address beyond the size of the EEPROM will wrap around to the begi
 You can view all the examples [here](examples/).
 
 ## Warning: Using EEPROM right at startup
-On the modern tinAVR devices (but not with any Dx-series parts) we have received at multiple reports from users of erratic faiures to correctly interact with the EEPROM immediately upon startup. There is considerable evidence that the cause of the problem was a slow-rising power supply, coupled with the specific brownout detection configuration. This issue is still not entirely understood, but it is suspected that it ends up doing the write very close to it's minimum voltage, when the chip may be running out of spec because the chip had by that point switched to it's full clock speed (and BOD is forced on during NVMCTRL operations. Try to avoid writing to the EEPROM immediately upon startup - maybe pick a longer SUT (startup tme), or simply wait until later into execution to perform the write, etc. Many times the impacted individuals found that even a delay of a few milliseconds was sufficient to ensure that it worked (Issue #452). A more rigorous approach is to measure the voltage before writing and make sure it is within the intended operational range.
+On the modern tinAVR devices (but not with any Dx-series parts) we have received at multiple reports from users of erratic failures to correctly interact with the EEPROM immediately upon startup. There is considerable evidence that the cause of the problem was a slow-rising power supply, coupled with the specific brownout detection configuration. This issue is still not entirely understood, but it is suspected that it ends up doing the write very close to it's minimum voltage, when the chip may be running out of spec because the chip had by that point switched to it's full clock speed (and BOD is forced on during NVMCTRL operations. Try to avoid writing to the EEPROM immediately upon startup - maybe pick a longer SUT (startup tme), or simply wait until later into execution to perform the write, etc. Many times the impacted individuals found that even a delay of a few milliseconds was sufficient to ensure that it worked (Issue #452). A more rigorous approach is to measure the voltage before writing and make sure it is within the intended operational range.
 
 
 ## Library functions
 
 ### `EEPROM.read(address)` [[*example*]](examples/eeprom_read/eeprom_read.ino)
 
-This function allows you to read a single byte of data from the eeprom.
+This function allows you to read a single byte of data from the EEPROM.
 Its only parameter is an `int` which should be set to the address you wish to read.
 
 The function returns an `unsigned char` containing the value read.
@@ -84,7 +84,7 @@ This function does not return any value.
 This function will retrieve any object from the EEPROM.
 Two parameters are needed to call this function. The first is an `int` containing the address that is to be written, and the second is the object you would like to read.
 
-This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
+This function returns a reference to the `object` passed in. It does not need to be used and is only returned for convenience.
 
 ### `EEPROM.put(address, object)` [[*example*]](examples/eeprom_put/eeprom_put.ino)
 
@@ -93,7 +93,7 @@ Two parameters are needed to call this function. The first is an `int` containin
 
 This function uses the *update* method to write its data, and therefore only rewrites changed cells.
 
-This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
+This function returns a reference to the `object` passed in. It does not need to be used and is only returned for convenience.
 
 ### Subscript operator: `EEPROM[address]` [[*example*]](examples/eeprom_crc/eeprom_crc.ino)
 
@@ -180,7 +180,7 @@ Writing to the EEPROM is very slow compared to basically anything else a microco
 During an Interrupt Service Routine (ISR), like a function that is executed as a result of attachInterrupt(), or one defined with `ISR()`, all interrupts are disabled (unless one has been marked as priority level 1; the core does not ever do this by default). That includes the millis timekeeping interrupt... and leaving interrupts disabled for longer than (typically) 1ms will result in `millis()` and `micros()` losing time. This will never happen for a single isolated byte write, since the CPU is only halted if an attempt is made to write the EEPROM while another write is already in progress.
 
 #### On DxCore and with the current version
-This library verifies that there is no EEPROM write in progress, disables interrupts, and then writes to the EEPROM and restores SREG turning interrupts back on unless they were already disabled globally. Hence, there will never be any millis time lost when writing a single byte, nor when writing more than one byte at a time (ex, using put with a multibyte value) outside of an ISR. Put simply it now cannot happen if all EEPROM writes are made from a normal (non-interrupt, interrupts not disabled) context. If the main application is writing to the EEPROM and, an extremely poorly timed interrupt that *also* writes to the EEPROM is triggered within an exrtremely narrow window, this could result in losing up to 10ms (DxCore, if we trust the 11ms figure) or 3ms (megaTinyCore) (this window is around 3 clock cycles, in the middle of EEPROM.write() between when we check the NVMCTRL.STATUS, and when we disable interrupts).
+This library verifies that there is no EEPROM write in progress, disables interrupts, and then writes to the EEPROM and restores SREG turning interrupts back on unless they were already disabled globally. Hence, there will never be any millis time lost when writing a single byte, nor when writing more than one byte at a time (ex, using put with a multibyte value) outside of an ISR. Put simply it now cannot happen if all EEPROM writes are made from a normal (non-interrupt, interrupts not disabled) context. If the main application is writing to the EEPROM and, an extremely poorly timed interrupt that *also* writes to the EEPROM is triggered within an extremely narrow window, this could result in losing up to 10ms (DxCore, if we trust the 11ms figure) or 3ms (megaTinyCore) (this window is around 3 clock cycles, in the middle of EEPROM.write() between when we check the NVMCTRL.STATUS, and when we disable interrupts).
 
 When more than 1 byte is written from a single interrupt (regardless of whether the bytes are done as part of a larger value or not), it will always lose time - up to 11ms or 4ms per byte after the first, less 1-2 times the millis resolution (typically 1ms, see the detailed timer usage documentation for details).
 

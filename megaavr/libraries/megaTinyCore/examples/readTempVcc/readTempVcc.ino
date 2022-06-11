@@ -127,6 +127,6 @@ void loop() {
   Serial.print("System temperature is: ");
   Serial.print(reading);
   Serial.println(" K");
-  Serial.pritnln("See notes in sketch on the accuracy (or rather the lack thereof) of the builtin temperature sensor");
+  Serial.println("See notes in sketch on the accuracy (or rather the lack thereof) of the builtin temperature sensor");
   delay(1000);
 }

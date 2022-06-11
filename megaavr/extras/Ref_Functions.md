@@ -1,5 +1,5 @@
 # Additional Functions in DxCore
-These are in addition to what is listed in the [Arduino Reference](https://arduino.cc/Reference).
+These are in addition to what is listed in the [Arduino Reference](https://www.arduino.cc/reference/en/).
 
 ## Error reporting
 One of the major challenges when writing embedded code is that there are no exceptions, so when something doesn't work correctly, you don't get an indication of what, exactly. prevented it from doing so. It's up to you to try to gather more data and analyze it to figure out where it is failing. Often, when you get to the end of it, the problem turns out to be something that one could have known ahead of time would certainly not work. While these methods are far from perfect, when we can determine at compile time that your code won't do what you are trying to make it do, will produce an error. These two "error" function calls are the mechanism used to actually create the error in almost all cases: compilation fails if any of these are referenced in the code after all constant folding and optimization.
@@ -38,7 +38,7 @@ As a reminder, we recommend getting in the habit of using PIN_Pxn notation rathe
 
 
 ### `uint8_t digitalPinToPort(pin)`
-(standard) Returns the port that a pin belongs to - these are constants named PA, PB, PC, etc (not to be confused with PORTA, which is the port struct itself). These have numeric values of 0-6 for the existing poerrts, PA to PG.
+(standard) Returns the port that a pin belongs to - these are constants named PA, PB, PC, etc (not to be confused with PORTA, which is the port struct itself). These have numeric values of 0-6 for the existing ports, PA to PG.
 
 ### `uint8_t digitalPinToBitPosition(pin)`
 (standard) Returns the bit position of a pin within a port, eg, `digitalPinToBitPosition(PIN_PA5)` will return 5.
@@ -80,8 +80,8 @@ If `p < NUM_DIGITAL_PINS`, p is a digital pin, and is returned as is. If it is e
 (Standard) Returns true if the pin has PWM available in the standard core configuration. This is a compile-time-known constant as long as the pin is, and does not account for the PORTMUX registers. Unlike
 
 ## Attach Interrupt Enable
-If using the old or default (all ports) options, these functions are not available; WInterrupt will define ALL port pin interrupt vectors if `attachInterrupt()` is referemced amywhere in the sketch or included library. This is the old behavior.
-If you are using the new implementation in manual mode you must call one of the following functions before attaching the interrupt (override `onPreMain()` if you need it ready for a class constructor. That port can have interrupts attached, but others cannot. That port cannot have manuallly written interrupts, which are typically 10-20 times faster), while the other ports can. I will also note that the implementation is hand-tuned assembly and that's still how slow it is. See the [Interrupt Reference for more information](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Interrupts.md).
+If using the old or default (all ports) options, these functions are not available; WInterrupt will define ALL port pin interrupt vectors if `attachInterrupt()` is referenced anywhere in the sketch or included library. This is the old behavior.
+If you are using the new implementation in manual mode you must call one of the following functions before attaching the interrupt (override `onPreMain()` if you need it ready for a class constructor. That port can have interrupts attached, but others cannot. That port cannot have manually written interrupts, which are typically 10-20 times faster), while the other ports can. I will also note that the implementation is hand-tuned assembly and that's still how slow it is. See the [Interrupt Reference for more information](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Interrupts.md).
 ```c
 void attachPortAEnable()
 void attachPortBEnable()
@@ -147,7 +147,7 @@ delay() must never be called when interrupts are disabled; it will delay forever
 
 If called with a constant argument (which you should strive to always do) it will use the highly accurate builtin `_delay_us()` from avrlibc. In that case, the timing will always be exact and the section below does not apply.
 
-If called with an argument not known at compile time, it will use an Arduino-style loop. These are pretty damned close, even for short delays (we ensure that even when delayMicroseconds is only called in one place, it will not be inlined, since it relies on the function call overhead); The speeds for which delayMicroseconds has a variable-time delay period implemented are the same on megaTinyCore and DxCore. Not all speeds are available on both cores. The table below applies only when the delay is not known constant at compile time. The minimum is the minimum length of any call to delayMicroseconds() - at 1 MHz, calling delayMicroseconds(x) where x is known only at runtime to have a value of 1 will result in a 16 us delay - that's how long the function call and initialization overhead takes. The resolution is always 1uS unless noted otherwise; at very low speeds, the loop takes several microseconds to run; at it's shortest, it's a 4 clock cycle loop (somee speeds use a slower loop - ex, 5/10/20 use a 5-clock-cycle loop, and so on - to make sure the clocks/us is evenly divisible by the length of the loop and to increase the maximum delay length)
+If called with an argument not known at compile time, it will use an Arduino-style loop. These are pretty damned close, even for short delays (we ensure that even when delayMicroseconds is only called in one place, it will not be inlined, since it relies on the function call overhead); The speeds for which delayMicroseconds has a variable-time delay period implemented are the same on megaTinyCore and DxCore. Not all speeds are available on both cores. The table below applies only when the delay is not known constant at compile time. The minimum is the minimum length of any call to delayMicroseconds() - at 1 MHz, calling delayMicroseconds(x) where x is known only at runtime to have a value of 1 will result in a 16 us delay - that's how long the function call and initialization overhead takes. The resolution is always 1uS unless noted otherwise; at very low speeds, the loop takes several microseconds to run; at it's shortest, it's a 4 clock cycle loop (some speeds use a slower loop - ex, 5/10/20 use a 5-clock-cycle loop, and so on - to make sure the clocks/us is evenly divisible by the length of the loop and to increase the maximum delay length)
 
 | Clock speed | Minimum delay | Maximum delay | Notes |
 |-------------|---------------|---------------|----|
@@ -243,7 +243,7 @@ Longer clock-counting delays are more efficiently done with the 3 cycle loop (ld
 Stop the timer being used for millis and disable the interrupt. This does not change the current count. Intended for internal use in the future timing and sleep library, so you would stop it before sleeping and start the RTC before going into standby sleep, or powerdown with the PIT.
 
 ### `void set_millis(uint32_t newmillis)`
-Sets the millisecond timer to the specified number of milliseconds. Be careful if you are setting to a number lower than the current millis count if you have any timeouts ongoing, since stanard best practice is to always subtract `(oldmillis - millis())` and these are unsigned. So setting it oldmillis-1 will make it look like 4.2xx billion ms have passed, and your timeout may expire.
+Sets the millisecond timer to the specified number of milliseconds. Be careful if you are setting to a number lower than the current millis count if you have any timeouts ongoing, since standard best practice is to always subtract `(oldmillis - millis())` and these are unsigned. So setting it oldmillis-1 will make it look like 4.2xx billion ms have passed, and your timeout may expire.
 
 ### `void restart_millis()`
 After having stopped millis either for sleep or to use timer for something else and optionally have set it to correct for passage of time, call this to restart it.

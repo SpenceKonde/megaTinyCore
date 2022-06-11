@@ -12,7 +12,7 @@ More information about CCL can be found in the [Microchip Application Note TB321
 These objects expose **all** configuration options as properties, described below, and provide methods to apply those settings, attach interrupts (2-series only) and enable and disable the CCL in general.
 
 ### Pin availability and Quick Reference
-This was simpler with 0/1-series (22 i/o pins, 10 CCL functions, none stacked onto the same pins), but with 2-series, 20 different CCL functions, crammed into just 22 GPIO pins, two of which have one blocks' input and one of the outputs for another. The ones with no inputs on lower pincount parts are more useful than one might expect; advanced use cases will often use mostly internal inputs - and the event system can always be used to get pin input in anyway - albeit at a cost of an event channel. If you do not require pin inputs, these should be used in preference to the logic blocks that do have them all else veing equa;l
+This was simpler with 0/1-series (22 i/o pins, 10 CCL functions, none stacked onto the same pins), but with 2-series, 20 different CCL functions, crammed into just 22 GPIO pins, two of which have one blocks' input and one of the outputs for another. The ones with no inputs on lower pincount parts are more useful than one might expect; advanced use cases will often use mostly internal inputs - and the event system can always be used to get pin input in anyway - albeit at a cost of an event channel. If you do not require pin inputs, these should be used in preference to the logic blocks that do have them all else being equal
 
 Logic Block |  IN0-2  | OUT | 8pin | ALT OUT | Availability |
 ------------|---------|-----|------|---------|--------------|
@@ -40,8 +40,8 @@ Logic3 OUT  | Not present   | Only alt out  | Only alt out  | Yes, both     |
 
 ### Overhead
 * On the 0/1-series, the overhead is approximately 546 bytes of flash and 26 bytes of RAM.
-* On the 2-series, with twice as many LUTs, it is much larger:  984 bytes and 60b RAM.
-* This is farily small for 16/32k parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series, but it it isn't an unreasonable amount of flash for the parts most people will be using. A future update will add a second slihtly modified version which removes attachInterrupt to permit manual implementation of the CCL interrupt, as any "attachInterrupt" scheme will always perform miserably (it is inherrent to calling a non-inlinable function on an AVR from within an ISR, with an overhead of over 50 clock cycles in the ISR and because the interrupt pointer is set at runtime, it can never be inlined.
+* On the 2-series, with twice as many LUTs, it is much larger: 984 bytes and 60b RAM.
+* This is fairly small for 16/32k parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series, but it it isn't an unreasonable amount of flash for the parts most people will be using. A future update will add a second slightly modified version which removes attachInterrupt to permit manual implementation of the CCL interrupt, as any "attachInterrupt" scheme will always perform miserably (it is inherent to calling a non-inlinable function on an AVR from within an ISR, with an overhead of over 50 clock cycles in the ISR and because the interrupt pointer is set at runtime, it can never be inlined.
 * Writing a constant value to 4 registers (the minimum plausible needed to configure a LUT) for 2 or 4 LUTs requires 56 or 112 bytes, respectively.
 
 ## Logic class overview
@@ -92,7 +92,7 @@ Properties setting input sources for the three inputs of this logic block.
 
 General notes:
 * Timer/Counter input sources are associated with a WO (Waveform Output) channel - they are logic 1 (true) when the PWM output on that channel is `HIGH` (See the datasheet I/O multiplexed signals chart to associate WO channels with pins)
-* The tinyAVR 0/1-series datasheets refer to the event channels as 0 and 1. On all subsequent parts, they are referred to as A and B. The Logic library always accepts both, though we receommend using event_a/event_b everywhere, as it is clear that that is the convention that Microchip chose to settle on.
+* The tinyAVR 0/1-series datasheets refer to the event channels as 0 and 1. On all subsequent parts, they are referred to as A and B. The Logic library always accepts both, though we recommend using event_a/event_b everywhere, as it is clear that that is the convention that Microchip chose to settle on.
 * See the version of this file distributed with MegaCoreX or DxCore for information on the corresponding options on those parts.
 * The point of `in::pin` to enable you to use a pin which is configured as an **output** too - either as a way to manually switch behavior, or when a pin is being controlled by a peripheral that is not directly accessible as an input. There are only a few cases like this that apply to tinyAVR parts (USART XDIR, TCA WO3-5 in split mode) and anything TWI come to mind)
 
@@ -337,7 +337,7 @@ Logic::stop(); // Stop CCL
 Method for enabling interrupts for a specific block.
 Valid arguments for the third parameters are `RISING`, `FALLING` and `CHANGE`.
 This method isn't available on tinyAVR 0/1-series as these parts cannot generate an interrupt from the CCL blocks.
-All forms of attachInterrupt, everywhere, are fundamentally evil, because they add a several microsecond overheead to the ISR simply because there is a call to a non-inlinable function;
+All forms of attachInterrupt, everywhere, are fundamentally evil, because they add a several microsecond overhead to the ISR simply because there is a call to a non-inlinable function;
 
 #### Usage
 ```c++
@@ -362,7 +362,7 @@ Logic0.detachInterrupt(); // Disable interrupts for block 0
 ## Reconfiguring
 There are TWO levels of "enable protection" on the CCL hardware. According to the Silicon Errata, only one of these is intended. As always, it's anyone's guess when or if this issue will be corrected in a future silicon rev, and if so, on which parts (it would appear that Microchip only became aware of the issue after the Dx-series parts were released - although it impacts all presently available parts, it is only listed in errata updated since mid-2020). Users are advised to proceed with use of workarounds, rather than delay work in the hopes of corrected silicon. The intended enable-protection is that a given logic block cannot be reconfigured while enabled. This is handled by `init()` - you can write your new setting to a logic block, call `LogicN.init()` and it will briefly disable the logic block, make the changes, and re-enable it.
 
-The unintended layer is that no logic block can be reconfigured without also disabling the whole CCL system. Changes can be freely made to the `Logic` classes, however, only the `init()` method will apply those changes, and you must call `Logic::stop()` before calling  `init()`, and `Logic::start()` afterwards. If/when parts become available where this is not necessary, this step may be omitted, and this library may be amended to provide a way to check.
+The unintended layer is that no logic block can be reconfigured without also disabling the whole CCL system. Changes can be freely made to the `Logic` classes, however, only the `init()` method will apply those changes, and you must call `Logic::stop()` before calling `init()`, and `Logic::start()` afterwards. If/when parts become available where this is not necessary, this step may be omitted, and this library may be amended to provide a way to check.
 
 ### Example
 ```c++
@@ -387,4 +387,4 @@ Logic::start(); // re-enable
 
 
 ## Note on terminology
-Yes, technically, C++ doesn't have "properties" or "methods" - these are "member variables" and "member functions" in C++ parlance. They mean the same thing. I've chosen to use the more familiar, preseent day terminology, because experienced C++ programmers will know what is meant, even if they roll their eyes, while the novices who have learned modern languages and Arduino, and probably never did any C++ specific stuff won't know what "member variables" and "member functions" are.
+Yes, technically, C++ doesn't have "properties" or "methods" - these are "member variables" and "member functions" in C++ parlance. They mean the same thing. I've chosen to use the more familiar, present day terminology, because experienced C++ programmers will know what is meant, even if they roll their eyes, while the novices who have learned modern languages and Arduino, and probably never did any C++ specific stuff won't know what "member variables" and "member functions" are.

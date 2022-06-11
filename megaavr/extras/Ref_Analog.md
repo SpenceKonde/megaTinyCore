@@ -20,7 +20,7 @@ Analog reference voltage can be selected as usual using analogReference(). Suppo
 ### Important notes regarding reference voltages
 
 
-1. We do not provide a reference named "INTERNAL" like some classic AVR cores do; because the available voltages vary, this would be a detriment to cross-compatibility - by generating code that would compile, but behave differently, that would introduce the potential for new bugs that would be difficult to debug. Especially since the internal reference voltage isn't the same one that classic AVRs where that usage was commonplace is.... and so these would behave wrongly no matter what was done; minor modifications to sketches are required wheever the internal references are used when porting from classic to modern AVRs.
+1. We do not provide a reference named "INTERNAL" like some classic AVR cores do; because the available voltages vary, this would be a detriment to cross-compatibility - by generating code that would compile, but behave differently, that would introduce the potential for new bugs that would be difficult to debug. Especially since the internal reference voltage isn't the same one that classic AVRs where that usage was commonplace is.... and so these would behave wrongly no matter what was done; minor modifications to sketches are required whenever the internal references are used when porting from classic to modern AVRs.
 
 
 2. As you can see in the table above, more conservative values were spec'ed for the 2-series. this could be because of increased sensitivity of the ADC to adverse operating conditions, or may reflect a generally more careful and deliberate approach taken with the 2-series (compare the length of the errata for the 2-series with the 1-series, for example).
@@ -40,9 +40,9 @@ However, one must NOT have ADCnREFEN bit set when using an external reference, s
 
 My guess (and it is ONLY A **GUESS**) is that b or c is the case, and the undesired outcome takes the form of damage to the selected analog reference. Which will usually be 0.55V. if all that was done was immediately set it to the external reference. That reference voltage is rarely used, so this could plausibly have gone unnoticed by megaTinyCore users.
 
-analogReference() as you know takes only a single argument, and the overhead of measuring an external reference voltaqge to determine what the internal reference should be set to in order to comply with that restriction would be prohibitive. If you are using the external reference on the 1-series parts, first call analogReference with a internal reference per their quoted instructions, then set it to the external reference.
+analogReference() as you know takes only a single argument, and the overhead of measuring an external reference voltage to determine what the internal reference should be set to in order to comply with that restriction would be prohibitive. If you are using the external reference on the 1-series parts, first call analogReference with a internal reference per their quoted instructions, then set it to the external reference.
 
-3. Note the change from the heinous near random reference voltages used on the 0/1-series - which you often end up either checking against thresholds calculated at compile time or using floating point math in order to do anything useful with - to maximally convenient ones on everything released later than the 0/1-series. I say they are maximally convenient because with 12-bit resolution selected, 4.096V, 2.048V, and 1.024V references corresopond to 1 mV/LSB, 0.5mv/LSB, and 0.25mv/LSB.
+3. Note the change from the heinous near random reference voltages used on the 0/1-series - which you often end up either checking against thresholds calculated at compile time or using floating point math in order to do anything useful with - to maximally convenient ones on everything released later than the 0/1-series. I say they are maximally convenient because with 12-bit resolution selected, 4.096V, 2.048V, and 1.024V references correspond to 1 mV/LSB, 0.5mv/LSB, and 0.25mv/LSB.
 
 4. On 0/1-series, you must be sure to slow down the ADC clock with analogClockSpeed when using the 0.55V reference, as it has a much more restricted operating clock speed range: 100 - 260 kHZ. The other references can be used at 200 - 2000 kHz.
 
@@ -72,7 +72,7 @@ DACREF0 is the the reference voltage for the analog comparator, AC0. On the 1-se
 The hardware supports increasing the resolution of analogRead() to the limit of the hardware's native resolution (10 or 12 bits); Additionally, we provide automatic oversampling and decimation up to the limit of what can be gathered using the accumulation feature allowing up to 13 bits of resolution (17 on 2-series); this is exposed through the `analogReadEnh()` function detailed below.
 
 ### A second ADC? *1-series only*
-On some parts, yes! The "good" 1-series parts (1614, 1616, 1617, 3216, and 3217) have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins (it can also read from DAC2). Currently, there are no plans to implement this in the core due to the large number of currently available pins. Instead, it is recommended that users who wish to "take over" an ADC to use it's more advanced functionality choose ADC1 for this purpose. See [ADC free-run and more](ADCFreerunAndMore.md) for some examples of what one might do to take advantage of it (though it has not been updated for the 2-series yet.  As of 2.0.5, megaTinyCore provides a function `init_ADC1()` which initializes ADC1 in the same way that ADC0 is (with correct prescaler for clock speed and VDD reference). On these parts, ADC1 can be used to read DAC1 (DACREF1) and DAC2 (DACREF2), these are channels `0x1B` and `0x1E` respectively. ~The core does not provide an equivalent to analogRead() for ADC1 at this time.~
+On some parts, yes! The "good" 1-series parts (1614, 1616, 1617, 3216, and 3217) have a second ADC, ADC1. On the 20 and 24-pin parts, these could be used to provide analogRead() on additional pins (it can also read from DAC2). Currently, there are no plans to implement this in the core due to the large number of currently available pins. Instead, it is recommended that users who wish to "take over" an ADC to use it's more advanced functionality choose ADC1 for this purpose. See [ADC free-run and more](ADCFreerunAndMore.md) for some examples of what one might do to take advantage of it (though it has not been updated for the 2-series yet. As of 2.0.5, megaTinyCore provides a function `init_ADC1()` which initializes ADC1 in the same way that ADC0 is (with correct prescaler for clock speed and VDD reference). On these parts, ADC1 can be used to read DAC1 (DACREF1) and DAC2 (DACREF2), these are channels `0x1B` and `0x1E` respectively. ~The core does not provide an equivalent to analogRead() for ADC1 at this time.~
 
 #### Using ADC1 just like a second ADC0
 This is a heinous waste of the second ADC. However it can be done - the following functions are are provided, which are identical to their normal counterparts, on devices with the second ADC:
@@ -160,7 +160,7 @@ The 32-bit value returned should be between -65536 and 65535 at the extremes wit
 Error values are negative numbers close to -2.1 billion, so it should not be challenging to distinguish valid values from errors.
 
 ### analogClockSpeed(int16_t frequency = 0, uint8_t options = 0)
-The accepted options for frequency are -1 (reset ADC clock to core default (depends on part)), 0 (make no changes - just report current frequency) or a frequency, in kHz, to set the ADC clock to. Values between 125 and 1500 are considered valid for 0/1-series parts, up to 2000 kHZ for Dx-series, and for EA-series and 2-series parts 300-3000 with internal reference, and 300-6000 with Vdd or external reference. The prescaler options are discrete, not continuous, so there are a limited number of possible settings (the fastest and slowest of which are often outside the rated operating range). The core will choose the highest frequency which is within spec, and which does not exceed the value you requested. If a 1 is passed as the second argument, the validity check will be bypassed; this allows you to operate the ADC out of spec if you really want to, which may have unpredictable results. Microchiop documentation has provided little in the way of guidance on selecting this (or other ADC parameters) other than giving us the upper and lower bounds.
+The accepted options for frequency are -1 (reset ADC clock to core default (depends on part)), 0 (make no changes - just report current frequency) or a frequency, in kHz, to set the ADC clock to. Values between 125 and 1500 are considered valid for 0/1-series parts, up to 2000 kHZ for Dx-series, and for EA-series and 2-series parts 300-3000 with internal reference, and 300-6000 with Vdd or external reference. The prescaler options are discrete, not continuous, so there are a limited number of possible settings (the fastest and slowest of which are often outside the rated operating range). The core will choose the highest frequency which is within spec, and which does not exceed the value you requested. If a 1 is passed as the second argument, the validity check will be bypassed; this allows you to operate the ADC out of spec if you really want to, which may have unpredictable results. Microchip documentation has provided little in the way of guidance on selecting this (or other ADC parameters) other than giving us the upper and lower bounds.
 
 **Regardless of what you pass it, it will return the frequency in kHz** as a `uint16_t`.
 
@@ -205,7 +205,7 @@ int returned_default = analogClockSpeed(-1); // reset to default value, around 1
 Serial.println(returned_default);  // will print the same as the first line, assuming you hadn't changed it prior to these lines.
 ```
 If anyone undertakes a study to determine the impact of different ADC clock frequency on accuracy, take care to adjust the sampling time to hold that constant. I would love to hear of any results; I imagine that lower clock speeds should be more accurate, but within the supported frequency range, I don't know whether these differences are worth caring about.
-I've been told that application notes with some guidance on how to best configure the ADC for different jobs is coming. Microchip is aware that the new ADC has a bewildering number of knobs compared to classic AVRs, where there was typically only 1 degree of freedom, the reference, which is simple to pick and undeerstand, since only one prescaler setting was in spec.
+I've been told that application notes with some guidance on how to best configure the ADC for different jobs is coming. Microchip is aware that the new ADC has a bewildering number of knobs compared to classic AVRs, where there was typically only 1 degree of freedom, the reference, which is simple to pick and understand, since only one prescaler setting was in spec.
 
 ### getAnalogReadResolution()
 Returns either 8, 10 or 12 (2-series only), the current resolution set for analogRead.
@@ -224,7 +224,7 @@ The busy and disabled errors are the only ones that we never know at compile tim
 |ADC_ERROR_DISABLED              |      -32767 | The ADC is disabled at this time. Did you disable it before going to sleep and not re-enable it?
 |ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL| -2100000000 | The specified pin or ADC channel does not exist or does support analog reads.
 |ADC_ENH_ERROR_BUSY              | -2100000001 | The ADC is busy with another conversion.
-|ADC_ENH_ERROR_RES_TOO_LOW       | -2100000003 | Minimum ADC resolution is 8 bits. If you really want less, you can always rightshit it.
+|ADC_ENH_ERROR_RES_TOO_LOW       | -2100000003 | Minimum ADC resolution is 8 bits. If you really want less, you can always rightshift it.
 |ADC_ENH_ERROR_RES_TOO_HIGH      | -2100000004 | Maximum resolution, using automatic oversampling and decimation is less than the requested resolution.
 |ADC_DIFF_ERROR_BAD_NEG_PIN      | -2100000005 | analogReadDiff() was called with a negative input that is not valid.
 |ADC_ENH_ERROR_DISABLED          | -2100000007 | The ADC is currently disabled. You must enable it to take measurements. Did you disable it before going to sleep and not re-enable it?
@@ -241,7 +241,7 @@ if (adc_reading < -32768 ) {
 
 ### ADCPowerOptions(options) *2-series only prior to 2.5.12* For compatibility, a much more limited version is provided for 0/1-series. See below
 The PGA requires powere when turned on. It is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that specifies valid gain > 0; if it is not already on, this will slow down the reading. By default we turn it off afterwards. There is also a "low latency" mode that, when enabled, keeps the ADC reference and related hardware running to prevent the delay (on order of tens of microseconds) before the next analog reading is taken. We use that by default, but it can be turned off with this function.
-Generate the argument for this by using one of the following constants, or bitwise-or'ing together a low latency option and a PGA option. If only one option is supplied, the other configuration will not be changed. Note that due to current errata, you **must** have LOW_LAT enabeld
+Generate the argument for this by using one of the following constants, or bitwise-or'ing together a low latency option and a PGA option. If only one option is supplied, the other configuration will not be changed. Note that due to current errata, you **must** have LOW_LAT enabled
 * `LOW_LAT_OFF`     Turn off low latency mode. *2-series only*
 * `LOW_LAT_ON`      Turn on low latency mode. *2-series only*
 * `PGA_OFF_ONCE`    Turn off the PGA now. Don't change settings; if not set to turn off automatically, that doesn't change. *2-series only*
@@ -249,29 +249,29 @@ Generate the argument for this by using one of the following constants, or bitwi
 * `PGA_AUTO_OFF`    Disable PGA now, and in future turn if off after use. *2-series only*
 * `ADC_ENABLE`      Enable the ADC if it is currently disabled.     *new 2.5.12*
 * `ADC_DISABLE`     Disable the ADC to save power in sleep modes.   *new 2.5.12*
-* `ADC_STANDBY_ON`  Turn on ADC run standbv mode                    *new 2.5.12*
+* `ADC_STANDBY_ON`  Turn on ADC run standby mode                    *new 2.5.12*
 * `ADC_STANDBY_OFF` Turn off ADC run standby mode                   *new 2.5.12*
 
 Example:
 ```c++
 ADCPowerOptions(LOW_LAT_ON  | PGA_KEEP_ON );            //  low latency on. Turn the PGA on, and do not automatically shut it off. Maximum power consumption, minimum ADC delays.
-ADCPowerOptions(LOW_LAT_OFF | PGA_AUTO_OFF);            //  low latency off. Turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays. **ERRATA WARNING** turning off LOWLAT can cause problems on 2=series parts! See the errata for the sopecific part you are using.)
+ADCPowerOptions(LOW_LAT_OFF | PGA_AUTO_OFF);            //  low latency off. Turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays. **ERRATA WARNING** turning off LOWLAT can cause problems on 2=series parts! See the errata for the specific part you are using.)
 ADCPowerOptions(ADC_DISABLE);                           //  turn off the ADC.
 ADCPowerOptions(ADC_ENABLE                              //  Turn the ADC back on. If LOWLAT mode was on, when you turned off the ADC it will still be on,. Same with the other options.
 ```
 
 As of 2.5.12 we will always disable and re-enable the ADC if touching LOWLAT, in the hopes that this will work around the lowlat errata consistently.
-**it is still recommended to call ADCPowerOptions(), if needed, before any other ADC-related functions** unless you fully understand the errata and the rammifications of your actions.
+**it is still recommended to call ADCPowerOptions(), if needed, before any other ADC-related functions** unless you fully understand the errata and the ramifications of your actions.
 **On most 2-series parts LOWLAT mode is REQUIRED in order to use the PGA when not using an internal reference, or measuring the DACREF!**
 
 
 Lowlat mode is enabled by default for this reason, as well as to generally improve performance. Disabling the ADC will end the power consumption associated with it.
 
-On 0/1-series parts, this function supports functions that are far more lited, sinmce there are few power optionas.
+On 0/1-series parts, this function supports functions that are far more limited, since there are few power options.
 Only the following are supported
 * `ADC_ENABLE`      Enable the ADC if it is currently disabled.     *new 2.5.12*
 * `ADC_DISABLE`     Disable the ADC to save power in sleep modes.   *new 2.5.12*
-* `ADC_STANDBY_ON`  Turn on ADC run standbv mode                    *new 2.5.12*
+* `ADC_STANDBY_ON`  Turn on ADC run standby mode                    *new 2.5.12*
 * `ADC_STANDBY_OFF` Turn off ADC run standby mode                   *new 2.5.12*
 
 In all cases, if no command to turn on or off an option is passed the current setting will remain unchanged
@@ -279,25 +279,25 @@ In all cases, if no command to turn on or off an option is passed the current se
 ### DAC Support
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage. This generates voltages between 0 and the selected VREF (which cannot be VDD, unfortunately). Set the DAC reference voltage via the `DACReference()` function - pass it one of the `INTERNAL` reference options listed under the ADC section above. This voltage must be half a volt lower than Vcc for the voltage reference to be accurate. The DAC is exposed via the analogWrite() function: Call `analogWrite(PIN_PA6,value)` to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin; note that unlike most* PWM pins `analogWrite(PIN_PA6,0)` and `analogWrite(PIN_PA6,255)` do not act as if you called digitalWrite() on the pin; 0 or 255 written to the `DAC0.DATA` register; thus you do not have to worry about it applying the full supply voltage to the pin (which you may have connected to sensitive devices that would be harmed by such a voltage) if let the calculation return 255; that will just output 255/256ths of the reference voltage.
 
-The 2-series and 0-series dont have DACs, though the 2-series analog comparator has a "DACREF" and 8-bit reference DAC that can only be used as one side of the AC. This should be used through the Comparator library.
+The 2-series and 0-series don't have DACs, though the 2-series analog comparator has a "DACREF" and 8-bit reference DAC that can only be used as one side of the AC. This should be used through the Comparator library.
 
 
 ## Analog *channel* identifiers
 The ADC is configured in terms of channel numbers, not pin numbers. analogRead() hence converts the number of a pin with an analog channel associated with it to the number of that analog channel, so there is no need to deal with the analog channel numbers. The one exception to that is in the case of the non-pin inputs, the constants like ADC_DAC and ADC_VDDDIV10. I have a simple system to internally signal when a number isn';'t an digital pin number, but is instead an analog channel number: Simply set the high bit. I refer to these as analog channel identifiers. When the high bit is masked off, these are the value that you must set the MUX to in order to use this input source. No AVR has ever had more than 127 pins, much less that many analog channels, so this shouldn't be an issue. With 254 valid values, the current design provides room for 127 digital pins and 127 analog inputs, where the largest modern AVRs have only 56 I/O pins (it will be a technical challenge to surpass that, because they don't have any more registers for the VPORTs, and analog multiplexers that only go up to 73 (they use the second highest bit to denote non-pin inputs. )
 
-These numbers (they do have defines in the variants, and `ADC_CH()` will take an analog channel number (ex, "0") and turn it into the analog channel identifier. But you never need to do that unless you're getting very deep into a custom ADC library) The most common example when channels are used is when reading from things that are not pins - like the internal tap on the DAC output, or the VDDDIV10 value to find the supply voltage. These may overlap with pin numbers. Also internally, channel numbers are sometimes passed between functions. They are defined for pins that exist as analog channels, with names of rthe form `AINn` but **you should never use the AIN values** except in truly extraordinary conditions, and even then it's probably inappropriate. However I felt like mention of them here wax needed. Some macros abd helper funbctions involved are:
+These numbers (they do have defines in the variants, and `ADC_CH()` will take an analog channel number (ex, "0") and turn it into the analog channel identifier. But you never need to do that unless you're getting very deep into a custom ADC library) The most common example when channels are used is when reading from things that are not pins - like the internal tap on the DAC output, or the VDDDIV10 value to find the supply voltage. These may overlap with pin numbers. Also internally, channel numbers are sometimes passed between functions. They are defined for pins that exist as analog channels, with names of the form `AINn` but **you should never use the AIN values** except in truly extraordinary conditions, and even then it's probably inappropriate. However I felt like mention of them here wax needed. Some macros abd helper functions involved are:
 
 ```text
-digitalPinToAnalogInput(pin)    - converts an digital pin to an anbalog channel *without* the bit that says it's a channel (designed for the very last step of analogRead preparationm where we turn the pin number into the channel to set the MUX)
+digitalPinToAnalogInput(pin)    - converts an digital pin to an anbalog channel *without* the bit that says it's a channel (designed for the very last step of analogRead preparation where we turn the pin number into the channel to set the MUX)
 digitalPinToAnalogInput1(pin)   - As above.... except for ADC1
 analogChannelToDigitalPin(p)    - converts an analog channel *number* to a digital pin.
 analogInputToDigitalPin(p)      - converts an analog channel identifier to a digital pin number.
 digitalOrAnalogPinToDigital(p)  - converts an analog channel identifier or digital pin to a digital pin number
-ADC_CH(channel number)          - converts channel numbers to analog chaannel identifier
+ADC_CH(channel number)          - converts channel numbers to analog channel identifier
 
 ```
 
 Try not to use these unless you're getting really deep into library development and direct interaction with the ADC; we provide all the constants you will need. listed above.
 
 ## A word of warning to capacitive touch sensing applications
-Libraries exist that use trickery and the ADC to measure capacitance, hence detect touch/proximity. Most of these libraries (since Atmel always locked up QTouch) relied on the leftover charge in the ADC S&H cap. The magnitute of this source of error is much larger on classic AVRs. It is considered undesirable (this is why when changing ADC channels in the past, you were advised to throw out the first couple of readings!) and with each generation, this has been reduced. There are still ways to do this effectively on the 2series, but require very different approaches.
+Libraries exist that use trickery and the ADC to measure capacitance, hence detect touch/proximity. Most of these libraries (since Atmel always locked up QTouch) relied on the leftover charge in the ADC S&H cap. The magnitude of this source of error is much larger on classic AVRs. It is considered undesirable (this is why when changing ADC channels in the past, you were advised to throw out the first couple of readings!) and with each generation, this has been reduced. There are still ways to do this effectively on the 2series, but require very different approaches.
