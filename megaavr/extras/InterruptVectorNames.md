@@ -47,7 +47,7 @@ Almost all flags *can* be manually cleared - the ones that can be cleared automa
 * When the purpose of the flag is to tell you that something is ready to be read, reading it clears the flag. ADC, serial interfaces, and TCB input capture do that.
 * The TWI interrupts work the same way - you need to read, write, or ack/nack something to respond to the bus event; doing so clears the flag too.
 * Sometimes interrupts like that can have error flags that can trigger them enabled too; those typically have to be manually cleared - by enabling them, you declare an intent to do something about them, so you're responsible for telling the hardware you did it.
-* USART, and SPI in buffered mode, have DRE interrupts whose flag can only be cleared by writing more data - otherwise you need to disable the interurpt from within the ISR. The TXC (transfer/transmit complete) flags are freqently polled rather than used to fire interrupts. It's not entirley clear from the datasheet if the EEPROM ready interrupt is like the DRE ones, or can be cleared manually.
+* USART, and SPI in buffered mode, have DRE interrupts whose flag can only be cleared by writing more data - otherwise you need to disable the interrupt from within the ISR. The TXC (transfer/transmit complete) flags are frequently polled rather than used to fire interrupts. It's not entirely clear from the datasheet if the EEPROM ready interrupt is like the DRE ones, or can be cleared manually.
 * The NMI is a very special interrupt - on tinyAVR it can only be triggered by `CRCSCAN` failure. It can be configured to be a normal interrupt *or* a so called non-maskable interrupt. In NMI mode, the part will sit there running the interrupt handler instead of running the corrupted firmware. This is very important for industrial users, who put these parts into cars or safety-critical equipment, because the corrupted part of the firmware might be the part that only gets called in a life-safety-critical moment. For example, imagine an airbag control chip in a car - the car could just ask it if it was working but without performing a CRC check on the flash, there would be no way to tell whether it's *actually* working - only that the part of the code which responds to the inquiries from the vehicles computer was. This lets you positively ensure that such partial functionality situations can never happen due to flash corruption or programming failure. The software can of course still have (literally) fatal bugs - but if you're making airbag controllers, you've got review teams and processes in place to checm that too. No matter what the damaged firmware tries to do, it cannot disable or bypass the NMI. Only loading working firmware and resetting it will clear the NMI. *Neither this software package nor Arduino in general are certified for or should ever be used for life-safety-critical applications* so this is not something likely to be or seen in Arduino-land.
 
 ### Example
@@ -58,8 +58,8 @@ ISR(PORTA_PORT_vect) {
   // otherwise if another interrupt condition happens when in the ISR, you'll miss that.
   // and VPORTs are faster than PORTSs. (saves 3 clocks and 4 bytes of flash to clear like that vs same thing with PORT.INTFLAGS...).
   // Or if you know the flag that it is (only one pin has the interrupt enabled, say PA2)
-  // VPORTA |= 1<<2; is fastest and smallerst (2 bytes 1 clock)
-  // remembrt to clear the interrupt flag that triggered it, if needed. In this case it is:
+  // VPORTA |= 1<<2; is fastest and smallest (2 bytes 1 clock)
+  // remember to clear the interrupt flag that triggered it, if needed. In this case it is:
 }
 ```
 ### Reminders
@@ -92,7 +92,7 @@ ISR_ALIAS(OTHER_INT_vect, SOME_INT_vect); // Zero overhead to point, it will sim
 ```
 
 ### Advanced Techniques: Almost empty interrupts
-You've got a pin interrupt to wake the part. So yher interrupt is almost empty, except for the damned intflag you  need to clear! But you're using a 2k part, and your're trying to scavenge a couple of bytes to make everything fit. Could you do something about the almost empty interrupt has to just clear the flag? If that's all you're doing, yes, for around 16 bytes of flash in return.
+You've got a pin interrupt to wake the part. So your interrupt is almost empty, except for the damned intflag you need to clear! But you're using a 2k part, and your're trying to scavenge a couple of bytes to make everything fit. Could you do something about the almost empty interrupt has to just clear the flag? If that's all you're doing, yes, for around 16 bytes of flash in return.
 ```c++
 
 /* Almost-empty interrupt:
@@ -102,14 +102,14 @@ You've got a pin interrupt to wake the part. So yher interrupt is almost empty, 
      You MUST use VPORTx.INTFLAGS... not PORTx.INTFLAGS. */
 ISR(PORTx_PORT_vect, ISR_NAKED) {
                                     // 5-6 clocks to reach the ISR
-  VPORTx.INTFLAGS |= 1 << bit_pos;  // 1 word,  1 clock. Clear the interrupt flag by writing 1 to it with sbi.
-  reti();                           // 1 word,  4 clocks. Return from the interrupt.
+  VPORTx.INTFLAGS |= 1 << bit_pos;  // 1 word, 1 clock. Clear the interrupt flag by writing 1 to it with sbi.
+  reti();                           // 1 word, 4 clocks. Return from the interrupt.
 }                   // This results in 2 words, 5 clocks. Total execution time (5 + (5 or 6) = ) 10 or 11 clocks
 /*This can be extended only slightly before things get much more complicated....
   The only things you can do within a naked interrupt without writing inline assembly are:
   - VPORTx.OUT, VPORTx.DIR, VPORTx.IN, VPORTx.INTFLAGS, or GPIORn |= 1 << constant.
   - VPORTx.OUT, VPORTx.DIR, or GPIORn &= ~(1 << constant).
-  - Those have the io register and bit number encoded in the function, and do not involve messign with working registers or SREG
+  - Those have the io register and bit number encoded in the function, and do not involve messing with working registers or SREG
   - if (VPORTx.OUT, VPORTx.DIR, VPORTx.IN, VPORTx.INTFLAGS, or GPIORn & (1 << constant)) {other allowed statement(s);}.
   - if (!(VPORTx.OUT, VPORTx.DIR, VPORTx.IN, VPORTx.INTFLAGS, or GPIORn & (1 << constant))) {other allowed statement(s);}.
   - those compile to sbic or sbis, skip next instruction if bit in IO register clear/set, the bit and register number are encoded in the instruction, so no working registers or SREG touched.
@@ -117,11 +117,11 @@ ISR(PORTx_PORT_vect, ISR_NAKED) {
 
   Departing EVEN SLIGHTLY from this list will leave you in nasal-demon territory!
   Behavior will be undefined which is overwhelmingly likely to manifest as a complete and total failure of the impacted
-  sketch the instant the ISR first fires, though unpredictable behavior later on as wel. I chose to include this only due to the extremne frequency with which one
+  sketch the instant the ISR first fires, though unpredictable behavior later on as wel. I chose to include this only due to the extreme frequency with which one
   will find themselves needing the sort of nearly empty ISR shown above to wake from sleep, and the fact that it saves nearly 1% of the available flash when you do it on a 2k part. 2k flash is painful!
 
 ```
 
 ### Assorted notes
 * Despite the fact that no PORTB/C_PORT_vect is defined for parts without those ports, there are unused vector slots where they would go on all parts. Same goes for the TCD0 vectors, even on 0-series parts.
-* The 5 vectors associated with the "good" 1-series parts take up vector slots on all parts with at least 8k of flash, but not on smaller ones; This means that hex files are not binary-compatible between 4k and 8k parts if they define interrupt vectors above the auspicious interrupt number 13. Note that binaries compiled for 8k or smaller parts, and for 16k and larger parts is never compatible if it uses any interrupts, because the vector size changes when you pass 8k. It strikes me as peciliar that the 8k parts waste that extra 10 bytes on vectors that no 8k parts use. Reclaiming that space to use for something - anything - else is nigh impossible, too. The Optiboot_x binaries included with megaTinyCore *are* portable across the entire product line because they do not make use of interrupts.
+* The 5 vectors associated with the "good" 1-series parts take up vector slots on all parts with at least 8k of flash, but not on smaller ones; This means that hex files are not binary-compatible between 4k and 8k parts if they define interrupt vectors above the auspicious interrupt number 13. Note that binaries compiled for 8k or smaller parts, and for 16k and larger parts is never compatible if it uses any interrupts, because the vector size changes when you pass 8k. It strikes me as peculiar that the 8k parts waste that extra 10 bytes on vectors that no 8k parts use. Reclaiming that space to use for something - anything - else is nigh impossible, too. The Optiboot_x binaries included with megaTinyCore *are* portable across the entire product line because they do not make use of interrupts.

@@ -65,7 +65,7 @@ However, they are not all equally capable, and there is only one ISR per port.
 
 Unlike classic AVRs, there is no analog of the `INT0` and `INT1` pins dedicated to a single pin - so the modern parts give all pins the capabilities of the `INTn` pins, while having the shared ISR behavior of the PCINTs - with the added bonus that some pins can even differentiate between rising and falling edges while in power-down sleep mode.
 
-**Be sure to read the section on fully and partially asynchronous pins below** before choosing a pin to use. Pins that are number 2 or 6 within a port behave slightly differently, and have enhanced capaiblilities, but also greater noise sensitivity.
+**Be sure to read the section on fully and partially asynchronous pins below** before choosing a pin to use. Pins that are number 2 or 6 within a port behave slightly differently, and have enhanced capabilities, but also greater noise sensitivity.
 
 ### The ISR
 Each port has one interrupt vector; their names are:
