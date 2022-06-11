@@ -45,6 +45,5 @@ class HardwareSerial : public Stream {
     virtual operator bool() = 0;
 };
 
-#ifndef NOSERIALEVENT
-  extern void serialEventRun(void) __attribute__((weak));
-#endif
+// XXX: Are we keeping the serialEvent API?
+// Spence: Apparently not.

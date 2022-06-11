@@ -41,6 +41,9 @@ uint32_t countPulseASM(volatile uint8_t *port, uint8_t bit, uint8_t stateMask, u
 
 typedef void (*voidFuncPtr)(void);
 
+#ifndef CORE_ATTACH_OLD
+  void __attribute__((naked)) __attribute__((noreturn)) isrBody();
+#endif
 #ifdef __cplusplus
 } // extern "C"
 #endif

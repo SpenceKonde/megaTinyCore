@@ -1,3 +1,5 @@
+
+
 // Display current tuning state in human readable form.
 
 int16_t getTunedOSCCAL(uint8_t osc, uint8_t target) {
@@ -102,7 +104,7 @@ int16_t getTunedOSCCAL(uint8_t osc, uint8_t target) {
     return -1; /* invalid center frequency */
   }
   #endif
-  return _SFR_MEM8(0x1300 + offset);
+  return _SFR_MEM8(offset);
 }
 
 const uint8_t speeds[] = {10, 12, 16, 20, 24, 25, 30, 32};

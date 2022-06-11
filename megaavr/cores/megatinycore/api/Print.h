@@ -89,7 +89,7 @@ class Print {
     size_t println(const Printable &);
     size_t println(void);
 
-    int16_t printf(const char *format, ...);
+    int16_t printf(const char *format, ...) __attribute__ ((format (printf, 2, 3)));
     int16_t printf(const __FlashStringHelper *format, ...);
 
     virtual void flush() { /* Empty implementation for backward compatibility */ }

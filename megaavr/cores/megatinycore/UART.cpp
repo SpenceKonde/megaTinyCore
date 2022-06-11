@@ -22,6 +22,8 @@
 #include "UART.h"
 #include "UART_private.h"
 
+// this next line disables the entire UART.cpp if there's no hardware serial
+#if defined(USART0) || defined(USART1) || defined(USART2) || defined(USART3) || defined(USART4) || defined(USART5)
 
 #if defined(HAVE_HWSERIAL0) || defined(HAVE_HWSERIAL1) || defined(HAVE_HWSERIAL2) || defined(HAVE_HWSERIAL3)
   // macro to guard critical sections when needed for large TX buffer sizes
@@ -176,8 +178,8 @@ ISR(USART1_TXC_vect, ISR_NAKED) {
     __builtin_unreachable();
 
   }
-#elif USE_ASM_RXC == 1
-  #warning "USE_ASM_RXC is set, but the buffer size is not supported, falling back to the classical RXC."
+#elif defined(USE_ASM_RXC) && USE_ASM_RXC == 1
+  #warning "USE_ASM_RXC is defined and this has more than one serial port, but the buffer size is not supported, falling back to the classical RXC."
 #else
   void UartClass::_rx_complete_irq(UartClass& uartClass) {
     // if (bit_is_clear(*_rxdatah, USART_PERR_bp)) {
@@ -303,7 +305,7 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
       "pop         r18"               "\n\t"  // pop old r18
       "pop         r31"               "\n\t"  // pop the Z that the isr pushed.
       "pop         r30"               "\n\t"
-      "reti"                        "\n"   // and RETI!
+      "reti"                          "\n"   // and RETI!
       ::);
     __builtin_unreachable();
   }
@@ -336,13 +338,7 @@ ISR(USART0_DRE_vect, ISR_NAKED) {
     if (uartClass._tx_buffer_head == txTail) {
       // Buffer empty, so disable "data register empty" interrupt
       ctrla &= ~(USART_DREIE_bm);
-      // if (uartClass._state & 2) { // Shouldn't need this - we turned this on in write();
-      //  ctrla |= USART_TXCIE_bm;  // in half duplex, turn on TXC interrupt, which will re-enable RX int.
-      //}
       usartModule->CTRLA = ctrla;
-      // } // else if (uartClass._state & 2) { // Why did I think I had to do this? We turned it on when we wrote...
-      // ctrla &= ~USART_TXCIE_bm;
-      // usartModule->CTRLA = ctrla;
     }
     uartClass._tx_buffer_tail = txTail;
   }
@@ -495,6 +491,8 @@ void UartClass::begin(unsigned long baud, uint16_t options) {
   if (ctrla & 0x04) {                       // is ODME option set?
     ctrlb |= USART_ODME_bm;                 // set the bit in what will become CTRLB
   }
+  // Baud setting done now we do the other options.
+  // that aren't in CTRLC;
   ctrla &= 0x2B;                            // Only LBME and RS485 (both of them); will get written to CTRLA, but we leave the event bit.
   if (ctrlb & USART_RXEN_bm) {              // if RX is to be enabled
     ctrla  |= USART_RXCIE_bm;               // we will want to enable the ISR.
@@ -603,7 +601,7 @@ void UartClass::end() {
   volatile USART_t * temp = _hwserial_module; /* compiler does a slightly better job with this. */
   temp -> CTRLB &= 0; //~(USART_RXEN_bm | USART_TXEN_bm);
   temp -> CTRLA &= 0; //~(USART_RXCIE_bm | USART_DREIE_bm | USART_TXCIE_bm);
-  temp -> STATUS =  USART_TXCIF_bm; // want to make sure no chanceofthat firing in error.
+  temp -> STATUS =  USART_TXCIF_bm; // want to make sure no chanceofthat firing in error. TXCIE only used in half duplex
   // clear any received data
   _rx_buffer_head = _rx_buffer_tail;
 
@@ -611,16 +609,27 @@ void UartClass::end() {
   // though the datasheetsays turning the TX module sets it to input.
   _state = 0;
 }
-  int UartClass::available(void) {
-    return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) & (SERIAL_RX_BUFFER_SIZE - 1); //% SERIAL_RX_BUFFER_SIZE;
-  }
 
-  int UartClass::peek(void) {
-    if (_rx_buffer_head == _rx_buffer_tail) {
-      return -1;
-    } else {
-      return _rx_buffer[_rx_buffer_tail];
-    }
+int UartClass::available(void) {
+  return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) & (SERIAL_RX_BUFFER_SIZE - 1);   //% SERIAL_RX_BUFFER_SIZE;
+}
+
+int UartClass::peek(void) {
+  if (_rx_buffer_head == _rx_buffer_tail) {
+    return -1;
+  } else {
+    return _rx_buffer[_rx_buffer_tail];
+  }
+}
+
+int UartClass::read(void) {
+  // if the head isn't ahead of the tail, we don't have any characters
+  if (_rx_buffer_head == _rx_buffer_tail) {
+    return -1;
+  } else {
+    unsigned char c = _rx_buffer[_rx_buffer_tail];
+    _rx_buffer_tail = (rx_buffer_index_t)(_rx_buffer_tail + 1) & (SERIAL_RX_BUFFER_SIZE - 1);   // % SERIAL_RX_BUFFER_SIZE;
+    return c;
   }
 
   int UartClass::read(void) {

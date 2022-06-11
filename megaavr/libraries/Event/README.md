@@ -301,7 +301,12 @@ Event0.set_user(user::ccl0_event_a); // Also set CCL0 Event 0/Event A in event u
 ```
 
 ### set_user_pin()
-This is the analog of set_user above - the difference being that it takes a pin number as an argument. This must be a pin that supports event output - the number of the pin within the port must be 2 or 7, and you cannot use both pin2 and pin 7 of the same port at the same time (if you're totally out of event out pins, but not CCL blocks, you can set up a CCL to use a)
+This is the analog of set_user above - the difference being that it takes a pin number as an argument. This must be a pin that supports event output - the number of the pin within the port must be 2 or 7, and you cannot use both pin 2 and pin 7 of the same port at the same time.
+
+```c++
+Event0.set_user_pin(PIN_PB2); //
+```
+Note: if you're totally out of event out pins, but not CCL blocks, you can set up a CCL to use the event channel as an input, and and use a CCL output pin; for example, if you set input 0 to be the event channel and masked the other inputs (and if this is all you're doing with it, that's what you'd do), you would want to set the truth table to 0x02.
 
 
 ### clear_user()
@@ -313,8 +318,12 @@ Event::clear_user(user::evouta); // Remove the user::evouta from whatever event 
 ```
 
 ### soft_event()
-Creates a single software event - users connected to that channel will react to it in the same way as they would to one caused by the generator the channel is connected to. This can be used either to force something which could occur naturally (ex: for testing) - or the your use case may be predicated on pulses being entirely software generated in this way. Note that a software event only lasts a single system clock cycle - so it will not pass through a CCL's filter (for example) which could be useful, but is more likely to be undesirable. The software events will invert the channel, and so will trigger something regardless of whether it needs a the event channel to go high or low. Using a Type B timer in 1-shot mode.
+Creates a single software event - users connected to that channel will react to it in the same way as they would to one caused by the generator the channel is connected to. This can be used either to force something which could occur naturally (ex: for testing) - or the your use case may be predicated on pulses being entirely software generated in this way. Note that a software event only lasts a single system clock cycle - so it will not pass through a CCL's filter (for example) which could be useful, but is more likely to be undesirable. The software events will invert the channel, and so will trigger something regardless of whether it needs a the event channel to go high or low.
 
+#### Usage
+```c++
+Event0.soft_event(); // Create a single software event on Event0
+```
 
 ### long_soft_event()
 soft_event() is only one system clock long. Often you need something a little longer. 2 clocks? 4 clocks maybe? Maybe it needs to get past the 'filter' on a CCL... Or you've got 2 things that need to happen a fraction of a microsecond apart; you've tried triggering one on the rising edge of a soft_event and the other on the falling edge, but it's just a hair too fast, and the other obvious solutions aren't viable due to the specifics of your scheme. The only way that a soft-event can last multiple system clocks is if the register is written every clock cycle. There is no time for a loop; only brute force (ie, a contiguous block of 'ST'ore instructions) will do the trick. Now in many ways this defeats the point of the event system; however, there are times when it is not entirely unreasonable to do this (as noted above), particularly if doing weird things with the CCLs, event system, and other peripherals.
@@ -351,7 +360,7 @@ Event0.stop(); // Stops the Event0 generator channel
 ```
 
 ### **gen_from_peripheral()** and **user_from_peripheral()**
-These two static methods allow you to pass a pointer to a peripheral module, and get back the generator or user associated with it. In this context the "Peripheral Modules" are the structs containing the registers, defined in the io headers; for example `TCB0` or `USART1` or `CCL`.
+These two static methods allow you to pass a reference to a peripheral module, and get back the generator or user associated with it. In this context the "Peripheral Modules" are the structs containing the registers, defined in the io headers; for example `TCB0` or `USART1` or `CCL`.
 
 This is most useful if you are writing portable (library) code that uses the Event library to interact with the event system. Say you made a library that lets users make one-shot pulses with timerB. You're not particularly interesting in getting your hands too dirty with the event system especially considering just how filthy the event system is on the 0/1-series. So you use the Event library to handle that part. You would of course need to know which timer to use - the natural way would be to ask the user to pass a reference or pointer. But then what? The fact that you've got the pointer to something which, as it happens, is TCB0 (which itself is annoying to determine from an unknown pointer)... though even KNOWING THAT, you're not able to use it with the event library, since it needs user::tcb0 (or user::tcb0_capt). As of the version distributed with megaTinyCore 2.5.0 and DxCore 1.4.0, there's a method for that. As the names imply, one gives generators, the other gives users. They take 2 arguments, the first being a pointer to a peripheral struct. The second, defaulting to 0, is the "type" of generator or user. Some peripherals have more than one event input or output. These are ordered in the same order as they are in the tables here and in the datasheet listings.
 
@@ -359,7 +368,7 @@ This is most useful if you are writing portable (library) code that uses the Eve
 ```c
 // Here we see a typical use case - you get the generator, and immediately ask Event to assign a channel to it and give that to you. After getting it, you test to make sure it's not Event_empty, which indicates that either gen_from_peripheral failed, or assign_generator was out of event channels. Either way that's probably the user's fault, so you decide to return an error code.
 uint8_t init(TCB_t* some_timer, /*and more arguments, most likely */) { // User could pass any TCB, and will expect your code to work!
-  &Event_TCBnCapt = Event::assign_generator(Event::gen_from_peripheral(TCA,1));
+  &Event_TCBnCapt = Event::assign_generator(Event::gen_from_peripheral(some_timer,0));
   if (_TCBnCapt.get_channel_number() == 255)
     return MY_ERROR_INVALID_TIMER_OR_NO_FREE_EVENT;
   doMoreCoolStuff();
@@ -369,16 +378,16 @@ uint8_t init(TCB_t* some_timer, /*and more arguments, most likely */) { // User 
 
 Shown below, generators/user per instance  (second argument should be less than this; zero-indexed), and the number of instances (for reference)
 
-| Peripheral |   tiny0  |   tiny1  |   tiny2  |   mega0  |  DA/DB/DB   |
-|------------|----------|----------|----------|----------|-------------|
-| TCAn       | 5 / 1 x1 | 5/1 x1   | 5 / 2 x1 | 5 / 1 x1 |  5 / 2 x1-2 |
-| TCBn       |    ***   |    ***   | 2 / 2 x2 | 1/1 x3-4 |  2 / 2 x2-5 |
-| CCL **     | 2 / 4    | 2 / 4    | 4 / 8    | 4 / 8    |4-6 / 8-12   |
-| ACn        | 1 / 0 x1 | */0 x1-3 | 1 / 0 x1 | 1 / 0 x1 |  1 / 0 x1-3 |
-| USARTn     | 0 / 1 x1 | 0/1 x1   | ! / 1 x2 | !/1 x3-4 |  ! / 1 x2-6 |
+| Peripheral |   tiny0  |   tiny1  |   tiny2  |   mega0  |  DA/DB/DB   |     EA     |
+|------------|----------|----------|----------|----------|-------------|------------|
+| TCAn       | 5 / 1 x1 | 5/1 x1   | 5 / 2 x1 | 5 / 1 x1 |  5 / 2 x1-2 | 5 / 2 x2   |
+| TCBn       |    ***   |    ***   | 2 / 2 x2 | 1/1 x3-4 |  2 / 2 x2-5 | 2 / 2 x3-4 |
+| CCL **     | 2 / 4    | 2 / 4    | 4 / 8    | 4 / 8    |4-6 / 8-12   | 4 / 8      |
+| ACn        | 1 / 0 x1 | */0 x1-3 | 1 / 0 x1 | 1 / 0 x1 |  1 / 0 x1-3 | 1 / 0 x1-2 |
+| USARTn     | 0 / 1 x1 | 0 / 1 x1 | ! / 1 x2 | !/1 x3-4 |  ! / 1 x2-6 | ! / 1 x2-3 |
 
 `*` - the tiny1 parts with 1 AC work normally. This is unfortuately not supported for tiny1 parts with the triple-AC configuration:
-`**` - There is only one CCL peripheral, with multiple logic blocks. Each logic block has 1 event generator and 2 event users. If using the logic library, get the Logic instance number. The output generator is that number. The input is twice that number, and twice that number + 1.
+`**` - There is only one CCL peripheral, with multiple logic blocks. Each logic block has 1 event generator and 2 event users. If using the logic library, get the Logic instance number. The output generator is that number. The inputs are twice that number, and twice that number + 1.
 `***` - This peripheral is not supported becausse the generator numbers are channel dependent.
 `!` - These parts do have an option, but we didn't bother to implement it because it isn't particularly useful. But the Event RX mode combined with the TX input to the CCL permit arbitrary remapping of RX and very flexible remapping of TX.
 

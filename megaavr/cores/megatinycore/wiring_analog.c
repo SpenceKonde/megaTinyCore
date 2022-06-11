@@ -25,9 +25,13 @@
 #include "wiring_private.h"
 #include "pins_arduino.h"
 #include "Arduino.h"
+#include <avr/pgmspace.h>
 
+/* magic value passsed as the negative pin to tell the _analogReadEnh() (which implements both th new ADC
+ * functions) to tell them what kind of mode it's to be used in. This also helps with providing useful and accurate
+ * error messages and codes at runtime, since we have no other way to report such.                                 */
 
-
+#define SINGLE_ENDED 254
 inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
   if (__builtin_constant_p(pin)) {
     if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)

@@ -5,7 +5,7 @@
 
 ## What is the EEPROM library?
 
-Th EEPROM library provides an easy to use interface to interact with the internal non-volatile storage found in AVR based Arduino boards. This version provides support for the tinyAVR 0/1/2-series, the megaAVR 0-series, and the AVR Dx-series, and is expected to work with the upcoming AVR Ex-series without modification.
+The EEPROM library provides an easy to use interface to interact with the internal non-volatile storage found in AVR based Arduino boards. This version provides support for the tinyAVR 0/1/2-series, the megaAVR 0-series, and the AVR Dx-series, and is expected to work with the upcoming AVR Ex-series without modification.
 
 It can be used exactly like the one included with the standard Arduino AVR core.
 
