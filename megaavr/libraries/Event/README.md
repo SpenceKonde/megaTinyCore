@@ -189,7 +189,6 @@ These class methods return a reference to an event channel (an Event&), or Event
 | Event::assign_generator()       | gen::generator_   | return channel that has that generator,<br/> pick one and set if none currently set |
 | Event::assign_generator_pin()   | uint8_t           | return channel that has that pin as generator,<br/> pick one and set if none currently set |
 
-
 Class methods for working with users or looking up generator or user numbers
 | Class Method                     | Argument Types               |                                                  |
 |----------------------------------|------------------------------|--------------------------------------------------|
