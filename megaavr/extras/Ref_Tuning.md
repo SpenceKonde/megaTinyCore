@@ -219,7 +219,7 @@ Switch selected clock to 16 MHz and repeat the process.
 
 This will overwrite anything you had stored in the last 12 bytes of the USERROW.
 
-### SelfTuning from external watch crystal.
+### SelfTuning from external watch crystal
 Connect a serial adapter to the alternate serrial pins  (since the default ones now have a crytal on them). Otherwise, proceed as avoce.
 
 Once the tuning is complete, you may disconnect the crystal and it's loading caps if they are not needed. (the loading caps are of such low value that they don't *need* to be removed)
