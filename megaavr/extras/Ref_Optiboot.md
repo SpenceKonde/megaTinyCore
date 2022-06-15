@@ -55,7 +55,7 @@ I hope this is clear enough.
 The "size" of the sketch as reported by avrdude during the upload process is 512b larger (the size of the bootloader) than the actual sketch size when a bootloader is in use (though the size reported at the end of the compile process is the correct size). The fact that the bootloader goes at the start of the flash instead of the end confuses avrdude. The size displayed by the IDE when you "verify" a sketch is correct, the value that avrdude displays is not.
 
 ## Entry Conditions
-Depending on your needs, you may want or need different configurations for when the bootloader should run and when it should just jump straight to the application. It determines this with the reset flags, which it clears, and then stashes in GPR.GPR0 right before jumping to app. It doesn't clear them until it jumps to app, so you do get to see what kind of reset was involved. We supply two versions, the "1-second autoreset" and the "8-second non-autoreset" version.
+Depending on your needs, you may want or need different configurations for when the bootloader should run and when it should just jump straight to the application. It determines this with the reset flags, which it clears, and then stashes in GPIOR0 right before jumping to app. It doesn't clear them until it jumps to app, so you do get to see what kind of reset was involved. We supply two versions, the "1-second autoreset" and the "8-second non-autoreset" version.
 
 | Version  | UPDI reset (UPDIRF) | Software Reset (SWRF) | WDT reset (WDRF) | External (EXTRF) | Brownout (BORF) | Power On Reset (PORF)| None        |
 |----------|---------------------|-----------------------|------------------|------------------|-----------------|----------------------|-------------|

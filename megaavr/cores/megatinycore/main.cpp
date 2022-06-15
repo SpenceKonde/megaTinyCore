@@ -70,7 +70,7 @@ int main() {
  * init_reset_Flags() should be overridden with one of the ones from the reset guide in any     *
  * production code.                                                                             *
  * If using optiboot, this will never be called, because Optiboot does the same thing.          *
- * By the time app runs, the flags will have been cleared and moved to GPR.GPR0 (it needs to    *
+ * By the time app runs, the flags will have been cleared and moved to GPIOR0 (it needs to    *
  * clear flags to honor bootloader entry conditions, so I didn't have a choice about that.      *
  * This function is called before *anything* else, so the chip is a blank slate - or it's       *
  * state is unknown. You're probably running at 4 MHz unless it was a dirty reset, in which     *

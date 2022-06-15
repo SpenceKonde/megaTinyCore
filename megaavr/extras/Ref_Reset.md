@@ -162,8 +162,8 @@ void loop() {
 
 void setup() {
   wdt_enable(); //we're super paranoid, so we turn on WDT immediately.
-  uint8_t resetflags = GPR.GPR0; // Optiboot stashes the reset flags here before clearing them to honor entry conditions
-  // GPR.GPR0 = 0; // no need to clear because this is reset at startup to 0 either way - unless you need it later..
+  uint8_t resetflags = GPIOR0; // Optiboot stashes the reset flags here before clearing them to honor entry conditions
+  // GPIOR0 = 0; // no need to clear because this is reset at startup to 0 either way - unless you need it later..
   if (resetflags == RSTCTRL_WDRF) { //means it was a WDT reset. In optiboot configurations, this should always be accompanied by another flag unless it was a wdt reset from the application.
     NotifyUserOfHangAndWDTReset();
   }
