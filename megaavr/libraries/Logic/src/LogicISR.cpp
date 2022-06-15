@@ -1,6 +1,6 @@
 #include <Logic.h>
 #if defined(CCL_CCL_vect)
-void _Logic_attachInterrupt(void (*userFunc)(void), uint8_t mode, uint8_t blocknbr ) {
+void _Logic_attachInterrupt(void (*userFunc)(void), uint8_t mode, uint8_t blocknbr) {
   CCL_INTMODE0_t intmode;
   switch (mode) { // Set RISING, FALLING or CHANGE interrupt trigger for a block output
     case RISING:
