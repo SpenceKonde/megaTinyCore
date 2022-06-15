@@ -5,7 +5,9 @@
  * approximate speed, and hence find the calibration values for key speeds.
  *
  */
-// *INDENT-OFF* AStyle woud have this be unreadable.
+// *INDENT-OFF*
+// AStyle woud have this be unreadable.
+
 #include <USERSIG.h>
 #define watchdogReset()  __asm__ __volatile__ ("wdr\n");
 #include "util/delay.h"
