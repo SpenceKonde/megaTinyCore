@@ -352,7 +352,6 @@ void               DACReference(uint8_t mode);
 
 uint8_t      getAnalogReference();
 uint8_t         getDACReference();
-uint8_t getAnalogSampleDuration();
 int8_t  getAnalogReadResolution();
 
 //
