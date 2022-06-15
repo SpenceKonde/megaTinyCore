@@ -152,6 +152,7 @@ int main() {
       init_reset_flags();
       onPreMain();
     }
+  #endif
 #else
   void _initThreeStuff() __attribute__ ((naked)) __attribute__((used)) __attribute__ ((section (".init3")));
   void _initThreeStuff() {

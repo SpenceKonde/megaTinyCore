@@ -88,7 +88,7 @@ extern "C"{
     #define ADC1_DACREF1  ADC1_DAC1
     #define ADC1_DAC2     ADC1_CH(0x1B) // see section 30.5.7 MUXPOS register.
     #define ADC1_DACREF2  ADC1_DAC2
-    #define getAnalogSampleDuration1()   ADC1.SAMPCTRL
+    inline uint8_t getAnalogSampleDuration1()   {return ADC1.SAMPCTRL;}
   #endif
   #define ADC_DEFAULT_SAMPLE_LENGTH 14
   #define ADC_ACC2        0x81
@@ -98,7 +98,7 @@ extern "C"{
   #define ADC_ACC32       0x85
   #define ADC_ACC64       0x86
 
-  #define getAnalogSampleDuration()   ADC0.SAMPCTRL
+ inline uint8_t getAnalogSampleDuration()   {return ADC0.SAMPCTRL;}
 
 #else
   /* ADC constants for 2-series */

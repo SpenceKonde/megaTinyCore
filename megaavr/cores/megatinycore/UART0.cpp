@@ -90,7 +90,7 @@
 #else
                 "rjmp _do_dre" "\n\t"
 #endif
-                ::"z"(&Serial0));
+                ::"z"(&Serial));
       __builtin_unreachable();
     }
   #endif
