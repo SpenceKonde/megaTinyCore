@@ -229,9 +229,9 @@ void initEVSYS() {
 }
 
 void initRTC() {
-  
+
   while (RTC.STATUS || RTC.PITSTATUS);
-  #if (HAS_EXT_XTAL==1) 
+  #if (HAS_EXT_XTAL==1)
       _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA, 0x32);
       _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA, 0x33);
     RTC.CLKSEL            = 0x02;
@@ -249,7 +249,7 @@ void configureCal(uint8_t cal) {
   _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB,     CLKCTRL_PDIV_4X_gc | CLKCTRL_PEN_bm); //prescale enabled, div by 4
   delay(10);
   _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,  cal); /* Switch to new clock - prescale of 4 already on */
-  _NOP(); //voodoo to prevent malfunctions from changing the clock live. 
+  _NOP(); //voodoo to prevent malfunctions from changing the clock live.
   delay(1);
   _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB,     CLKCTRL_PDIV_4X_gc);   //prescale disabled, div by 4
   delay(1);
