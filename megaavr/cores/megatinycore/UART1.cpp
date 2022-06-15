@@ -79,5 +79,5 @@
       __builtin_unreachable();
     }
   #endif
-  UartClass Serial1(&USART1, (uint8_t*)_usart1_pins, MUXCOUNT_USART1, HWSERIAL1_MUX_DEFAULT);
+  UartClass Serial1(&USART1, 1, HWSERIAL1_MUX_DEFAULT);
 #endif  // HWSERIAL1
