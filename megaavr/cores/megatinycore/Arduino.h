@@ -88,7 +88,8 @@ extern "C"{
     #define ADC1_DACREF1  ADC1_DAC1
     #define ADC1_DAC2     ADC1_CH(0x1B) // see section 30.5.7 MUXPOS register.
     #define ADC1_DACREF2  ADC1_DAC2
-    inline uint8_t getAnalogSampleDuration1()   {return ADC1.SAMPCTRL;}
+    inline uint8_t getAnalogSampleDuration1();
+    inline uint8_t getAnalogSampleDuration1(){return ADC1.SAMPCTRL;}
   #endif
   #define ADC_DEFAULT_SAMPLE_LENGTH 14
   #define ADC_ACC2        0x81
@@ -97,8 +98,9 @@ extern "C"{
   #define ADC_ACC16       0x84
   #define ADC_ACC32       0x85
   #define ADC_ACC64       0x86
+  inline uint8_t getAnalogSampleDuration();
+  inline uint8_t getAnalogSampleDuration(){return ADC0.SAMPCTRL;}
 
- inline uint8_t getAnalogSampleDuration()   {return ADC0.SAMPCTRL;}
 
 #else
   /* ADC constants for 2-series */
@@ -144,8 +146,6 @@ extern "C"{
   #define ADC_ACC512      0x89
   #define ADC_ACC1024     0x8A
 
-  #define getAnalogSampleDuration()   ((uint8_t)ADC0.CTRLE)
-
   #define LOW_LAT_ON      0x03
   #define LOW_LAT_OFF     0x02
   #define PGA_KEEP_ON     0x08
@@ -155,6 +155,9 @@ extern "C"{
   #define ADC_DISABLE     0x30
   #define ADC_STANDBY_ON  0xC0
   #define ADC_STANDBY_OFF 0x80
+
+  inline uint8_t getAnalogSampleDuration();
+  inline uint8_t getAnalogSampleDuration(){return ADC0.CTRLE;}
 
 #endif
 

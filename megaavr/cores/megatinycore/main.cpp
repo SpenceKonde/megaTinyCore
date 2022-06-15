@@ -4,8 +4,6 @@
    Free Software - LGPL 2.1, please see LICENCE.md for details */
 
 #include <Arduino.h>
-
-/* Required by some libraries to compile successfully. Even though it's nonsense in Arduino. */
 int atexit(void ( * /*func*/)()) { return 0; }
 
 void initVariant() __attribute__((weak));
