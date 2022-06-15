@@ -39,7 +39,7 @@ void _Logic_attachInterrupt(void (*userFunc)(void), uint8_t mode, uint8_t blockn
   intFuncCCL[blocknbr] = userFunc;
 }
 
-void _Logic_detachInterrupt() {
+void _Logic_detachInterrupt(uint8_t blocknbr) {
   // Disable interrupt for a given block output
   #if defined(CCL_TRUTH4)
   if (blocknbr > 4) {

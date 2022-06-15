@@ -1,13 +1,6 @@
 #include "Logic.h"
 // *INDENT-OFF* // This file was lovingly hand indented, thankyouverymuch!
 // Array for storing ISR function pointers
-#if defined(CCL_CCL_vect)
-  #if defined(TRUTH5)
-    static volatile voidFuncPtr intFuncCCL[6];
-  #else
-    static volatile voidFuncPtr intFuncCCL[4];
-  #endif
-#endif
 
 struct Logic::CCLBlock {
   const uint8_t number;
