@@ -217,7 +217,7 @@ void initEVSYS() {
 #if !defined(MEGATINYCORE) || MEGATINYCORE_SERIES == 2
   EVSYS.USERTCB0CAPT    = 0x02;
   EVSYS.CHANNEL1        = 0x0B; // PIT/64
-  EVSYS.USEREVSYSEVOUTA = 0x02; //conect evout pin to this
+  EVSYS.USEREVSYSEVOUTA = 0x02; //connect evout pin to this
   //PORTMUX.EVSYSROUTEA  = 1; //Route to PA7
 #else
   EVSYS.ASYNCCH3        = 0x11; //PIT/64

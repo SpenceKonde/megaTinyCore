@@ -196,7 +196,7 @@ The idea here is simple: Run RTC from internal 32kHz oscillator. This is inaccur
 
 Anywey, so Let's turn on the RTC and turn on the PIT! PIT/64 should be around 512 Hz
 
-Now grab a type B timer (not yer millis timer you fool! Who let you into this class?) Set that for requency measurement input capture mode, clock it from 'da system clock. Now you gonna be runnning very close to 16 or 20 MHz immediately after system reset and init_clock(), and so the expected ccmp values should be 31250 or 39063 (16,000,000 or 20,000,000 divided by 512). Adjust that by a factor of (sigrow correction)/1024...
+Now grab a type B timer (not yer millis timer you fool! Who let you into this class?) Set that for requency measurement input capture mode, clock it from 'da system clock. Now you gonna be running very close to 16 or 20 MHz immediately after system reset and init_clock(), and so the expected ccmp values should be 31250 or 39063 (16,000,000 or 20,000,000 divided by 512). Adjust that by a factor of (sigrow correction)/1024...
 "I'm a 2-series they don't give us our osciullator error during factory cal anymore!
 "Well OBVIOUSLY if you don't have a OSC ERR value in yer sig, you keep good enough time without it, so quit braggging." Now to find the true expected value,. Average a few captures (I'd, say, accumulate a power of 2 number of samples in an unsigned long and rightshfit the appropriate number of times - or leftshift the expected value that many times). Your sample will likely be within a percent or two of the expected, and now it's simple math to derive the frequency that the RTC is actually running at. You can now determine how many system clock cycles the TCB would count for the desired tuned speed, and just step through each cal value, time it a few times, until you find what you're looking for. And unlike that doddering fool who rambles up here every day, I've got the code you need right here! [SelfTuning example](../libraries/megatinycore/examples/SelfTuning/SelfTuning.ino)
 
@@ -204,14 +204,14 @@ Okay! Class dismissed, let's hit the beaches, I heard them AVR double-D's are th
 
 *As Mr. Clock struts towards the door a dog barks in the distance. Mr. Clock's expression turns to one of terror... He does a 180 and runs for the window himself, but before he can get there he is tackled by a huge, vicious dog*
 
-"It looks like someone wasn't paying attentione when I was talking about the windowed watchdog timer - which is the perfect way to return to controlled opperation after a wild pointer, unintentional infinite loop or..." looking at Mr. Clock, still pinnned by the watchdog " a misbehaving peripheral...... Remember, using the widnow lets you reset if WDR is issued to late **OR too early** And might I note that I don't belive Mr. Clock actually tested that code... Now, where was I.....
+"It looks like someone wasn't paying attentione when I was talking about the windowed watchdog timer - which is the perfect way to return to controlled operation after a wild pointer, unintentional infinite loop or..." looking at Mr. Clock, still pinnned by the watchdog " a misbehaving peripheral...... Remember, using the widnow lets you reset if WDR is issued to late **OR too early** And might I note that I don't believe Mr. Clock actually tested that code... Now, where was I.....
 
 Right.....
 *Using a timebase to tune from is - of course - inconvenient.* (the class starts over to a chorus of groans throughout the room)
 
 
 ### SelfTuning From Internal 32kHz Oscillator
-This is less accurate than a cryststal. Connnect a serial adapter to Serial, and open your favorite serial terminal (wwhich hopefully isn't the wretched serial monitor). Use UDPI to upload SelfTuning.ino without modification, with speed set to 20 MHz Internal.
+This is less accurate than a cryststal. Connect a serial adapter to Serial, and open your favorite serial terminal (wwhich hopefully isn't the wretched serial monitor). Use UDPI to upload SelfTuning.ino without modification, with speed set to 20 MHz Internal.
 
 Within under a minute the oscillator will be tuned based on it's default turning value after correcting for the oscillator error (except on 2-series, where internal oscillator error isn't in the sig row and 0-series which can't compile the sketch at all). Unless you have disabled debug output, you will get a play-by-play accounting of the process.
 
@@ -222,7 +222,7 @@ This will overwrite anything you had stored in the last 12 bytes of the USERROW.
 ### SelfTuning from external watch crystal.
 Connect a serial adapter to the alternate serrial pins  (since the default ones now have a crytal on them). Otherwise, proceed as avoce.
 
-Once the tuning is complete, you may disconnnect the crystal and it's loading caps if they are not needed. (the loading caps are of such low value that they don't *need* to be removed)
+Once the tuning is complete, you may disconnect the crystal and it's loading caps if they are not needed. (the loading caps are of such low value that they don't *need* to be removed)
 
 ### SelfTuning Caveats
 * Using a crystal requires a 1-series or 2-series part.
