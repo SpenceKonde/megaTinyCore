@@ -103,8 +103,6 @@ extern "C"{
   inline uint8_t getAnalogSampleDuration();
   inline uint8_t getAnalogSampleDuration() {return ADC0.SAMPCTRL;}
 #else
-
-#else
   /* ADC constants for 2-series */
   #define VDD             (0) /* ADC_REFSEL_VDD_gc    */
   #define DEFAULT         VDD /* Gee, I really wish these were named differently - both names are horrendously generic and could mean lots of different things that should be distinguished. */
