@@ -216,6 +216,10 @@ namespace sequencer {
   };
 };
 
+#if defined(CCL_CCL_vect)
+  void _Logic_AttachInterrupt(void (*userFunc)(void), uint8_t mode, uint8_t blocknbr);
+  void _Logic_DetachInterrupt(uint8_t blocknbr);
+#endif
 class Logic {
   public:
     static void start(bool state = true);
