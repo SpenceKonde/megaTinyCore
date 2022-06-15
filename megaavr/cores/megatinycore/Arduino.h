@@ -88,7 +88,7 @@ extern "C"{
     #define ADC1_DACREF1  ADC1_DAC1
     #define ADC1_DAC2     ADC1_CH(0x1B) // see section 30.5.7 MUXPOS register.
     #define ADC1_DACREF2  ADC1_DAC2
-    #define getAnalogSampleDuration1()   (ADC1.SAMPCTRL)
+    #define getAnalogSampleDuration1()   ADC1.SAMPCTRL
   #endif
   #define ADC_DEFAULT_SAMPLE_LENGTH 14
   #define ADC_ACC2        0x81
@@ -98,7 +98,7 @@ extern "C"{
   #define ADC_ACC32       0x85
   #define ADC_ACC64       0x86
 
-  #define getAnalogSampleDuration()   (ADC0.SAMPCTRL)
+  #define getAnalogSampleDuration()   ADC0.SAMPCTRL
 
 #else
   /* ADC constants for 2-series */
@@ -478,22 +478,6 @@ extern const uint8_t digital_pin_to_bit_mask[];
 extern const uint8_t digital_pin_to_bit_position[];
 extern const uint8_t digital_pin_to_timer[];
 
-
-#define digitalPinToPort(pin)               ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_port[pin]                            : NOT_A_PIN)
-#define digitalPinToBitPosition(pin)        ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_bit_position[pin]                    : NOT_A_PIN)
-#define digitalPinToBitMask(pin)            ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_bit_mask[pin]                        : NOT_A_PIN)
-#define digitalPinToTimer(pin)              ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_timer[pin]                           : NOT_ON_TIMER)
-#define portToPortStruct(port)              ((port < NUM_TOTAL_PORTS) ? ((PORT_t *) &PORTA + port)                          : NULL)
-#define digitalPinToPortStruct(pin)         ((pin  < NUM_TOTAL_PINS)  ? ((PORT_t *) &PORTA + digitalPinToPort(pin))         : NULL)
-#define analogPinToBitPosition(pin)         ((digitalPinToAnalogInput(pin) != NOT_A_PIN) ? digital_pin_to_bit_position[pin] : NOT_A_PIN)
-#define analogPinToBitMask(pin)             ((digitalPinToAnalogInput(pin) != NOT_A_PIN) ? digital_pin_to_bit_mask[pin]     : NOT_A_PIN)
-#define getPINnCTRLregister(port, bit_pos)  (((port != NULL) && (bit_pos < NOT_A_PIN)) ? ((volatile uint8_t *)&(port->PIN0CTRL) + bit_pos) : NULL)
-
-#define digitalPinToInterrupt(P) (P)
-
-#define portOutputRegister(P) ((volatile uint8_t *)(&portToPortStruct(P)->OUT))
-#define portInputRegister(P)  ((volatile uint8_t *)(&portToPortStruct(P)->IN))
-#define portModeRegister(P)   ((volatile uint8_t *)(&portToPortStruct(P)->DIR))
 
 
 
