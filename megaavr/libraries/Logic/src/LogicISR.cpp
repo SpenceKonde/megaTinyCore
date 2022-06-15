@@ -1,5 +1,6 @@
+#include <Logic.h>
 #if defined(CCL_CCL_vect)
-void Logic::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
+void _Logic_attachInterrupt(void (*userFunc)(void), uint8_t mode, uint8_t blocknbr ) {
   CCL_INTMODE0_t intmode;
   switch (mode) { // Set RISING, FALLING or CHANGE interrupt trigger for a block output
     case RISING:
@@ -15,31 +16,31 @@ void Logic::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
       return;
   }
   #if defined(CCL_TRUTH4)
-  if (block.number > 3) {
-    const int16_t intmode_bp = (block.number & 0x03) * 2;
+  if (blocknbr > 3) {
+    const int16_t intmode_bp = (blocknbr & 0x03) * 2;
     CCL.INTCTRL1 = (CCL.INTCTRL1 & ~(CCL_INTMODE0_gm << intmode_bp)) | (intmode << intmode_bp);
   } else {
-    const int16_t intmode_bp = (block.number & 0x03) * 2;
+    const int16_t intmode_bp = (blocknbr & 0x03) * 2;
     CCL.INTCTRL0 = (CCL.INTCTRL0 & ~(CCL_INTMODE0_gm << intmode_bp)) | (intmode << intmode_bp);
   }
   #else
-  const int16_t intmode_bp = block.number * 2;
+  const int16_t intmode_bp = blocknbr * 2;
   CCL.INTCTRL0 = (CCL.INTCTRL0 & ~(CCL_INTMODE0_gm << intmode_bp)) | (intmode << intmode_bp);
   #endif
   // Store function pointer
-  intFuncCCL[block.number] = userFunc;
+  intFuncCCL[blocknbr] = userFunc;
 }
 
-void Logic::detachInterrupt() {
+void _Logic_detachInterrupt() {
   // Disable interrupt for a given block output
   #if defined(CCL_TRUTH4)
-  if (block.number > 4) {
-    CCL.INTCTRL1 &= ~(CCL_INTMODE1_gm << ((block.number & 3) * 2));
+  if (blocknbr > 4) {
+    CCL.INTCTRL1 &= ~(CCL_INTMODE1_gm << ((blocknbr & 3) * 2));
   } else {
-    CCL.INTCTRL0 &= ~(CCL_INTMODE0_gm << (block.number * 2));
+    CCL.INTCTRL0 &= ~(CCL_INTMODE0_gm << (blocknbr * 2));
   }
   #else
-  CCL.INTCTRL0 &= ~(CCL_INTMODE0_gm << (block.number * 2));
+  CCL.INTCTRL0 &= ~(CCL_INTMODE0_gm << (blocknbr * 2));
   #endif
 }
 
