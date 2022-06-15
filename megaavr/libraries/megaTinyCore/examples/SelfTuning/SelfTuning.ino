@@ -6,7 +6,7 @@
  *
  */
 // *INDENT-OFF*
-// AStyle woud have this be unreadable.
+// AStyle would have this be unreadable.
 
 #include <USERSIG.h>
 #define watchdogReset()  __asm__ __volatile__ ("wdr\n");
