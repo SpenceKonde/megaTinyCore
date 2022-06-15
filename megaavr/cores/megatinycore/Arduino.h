@@ -96,17 +96,13 @@ extern "C"{
   #define ADC_ACC16       0x84
   #define ADC_ACC32       0x85
   #define ADC_ACC64       0x86
-  #if !defined(ADC_CTRLE)
-    #if defined(ADC1)
-      inline uint8_t getAnalogSampleDuration1();
-      inline uint8_t getAnalogSampleDuration1(){return ADC1.SAMPCTRL;}
-    #endif
-    inline uint8_t getAnalogSampleDuration();
-    inline uint8_t getAnalogSampleDuration(){return ADC0.SAMPCTRL;}
-  #else
-  inline uint8_t getAnalogSampleDuration();
-  inline uint8_t getAnalogSampleDuration(){return ADC0.CTRLE;}
+  #if defined(ADC1)
+    inline uint8_t getAnalogSampleDuration1();
+    inline uint8_t getAnalogSampleDuration1() {return ADC1.SAMPCTRL;}
   #endif
+  inline uint8_t getAnalogSampleDuration();
+  inline uint8_t getAnalogSampleDuration() {return ADC0.SAMPCTRL;}
+#else
 
 #else
   /* ADC constants for 2-series */
@@ -162,6 +158,8 @@ extern "C"{
   #define ADC_STANDBY_ON  0xC0
   #define ADC_STANDBY_OFF 0x80
 
+  inline uint8_t getAnalogSampleDuration();
+  inline uint8_t getAnalogSampleDuration() {return ADC0.CTRLE;}
 
 #endif
 
