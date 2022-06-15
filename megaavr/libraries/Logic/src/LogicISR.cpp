@@ -1,5 +1,13 @@
 #include <Logic.h>
 #if defined(CCL_CCL_vect)
+#if defined(CCL_CCL_vect)
+  #if defined(TRUTH5)
+    static volatile voidFuncPtr intFuncCCL[6];
+  #else
+    static volatile voidFuncPtr intFuncCCL[4];
+  #endif
+#endif
+
 void _Logic_attachInterrupt(void (*userFunc)(void), uint8_t mode, uint8_t blocknbr) {
   CCL_INTMODE0_t intmode;
   switch (mode) { // Set RISING, FALLING or CHANGE interrupt trigger for a block output
