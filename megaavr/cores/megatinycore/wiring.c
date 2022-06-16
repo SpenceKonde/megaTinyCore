@@ -83,7 +83,6 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
 #endif
 
 // overflow count is tracked for all timer options, even the RTC
-/
 
 #if !defined(MILLIS_USE_TIMERRTC)
 
