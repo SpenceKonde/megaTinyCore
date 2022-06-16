@@ -1136,17 +1136,16 @@ void loop() {
         if (pin != PIN_PA0 && pin != PIN_PA1) {
       #endif
     #endif
-      pinMode(pin, OUTPUT);
-      pinMode(pin, INPUT);
-      pinMode(pin, INPUT_PULLUP);
-      digitalWrite(pin, HIGH);
-      digitalWrite(pin, LOW);
-      openDrain(pin, LOW);
-      openDrain(pin, FLOATING);
-      digitalRead(pin);
-      analogWrite(pin, 0);
-      analogWrite(pin, 128);
-      analogWrite(pin, 255);
-    }
+    pinMode(pin, OUTPUT);
+    pinMode(pin, INPUT);
+    pinMode(pin, INPUT_PULLUP);
+    digitalWrite(pin, HIGH);
+    digitalWrite(pin, LOW);
+    openDrain(pin, LOW);
+    openDrain(pin, FLOATING);
+    digitalRead(pin);
+    analogWrite(pin, 0);
+    analogWrite(pin, 128);
+    analogWrite(pin, 255);
   }
 }

@@ -35,7 +35,7 @@
 extern "C" {
 #endif
 
-extern uint8_t PeripheralControl;
+extern uint8_t __PeripheralControl;
 
 uint32_t countPulseASM(volatile uint8_t *port, uint8_t bit, uint8_t stateMask, unsigned long maxloops);
 

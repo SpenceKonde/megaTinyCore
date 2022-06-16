@@ -1067,13 +1067,13 @@ void analogWrite(uint8_t pin, int val) {
   /* Get timer */
   /* megaTinyCore only - assumes only TIMERA0, TIMERD0, or DACOUT
    * can be returned here, all have only 1 bit set, so we can use
-   * PeripheralControl as a mask to see if they have taken over
+   * __PeripheralControl as a mask to see if they have taken over
    * any timers with minimum overhead - critical on these parts
    * Since nothing that will show up here can have more than one
    * one bit set, binary and will give 0x00 if that bit is cleared
    * which is NOT_ON_TIMER.
    */
-  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & PeripheralControl;
+  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & __PeripheralControl;
   /* end megaTinyCore-specific section */
 
   volatile uint8_t *timer_cmp_out; // must be volatile for this to be safe.
@@ -1208,19 +1208,19 @@ void analogWrite(uint8_t pin, int val) {
 
 void takeOverTCA0() {
   TCA0.SPLIT.CTRLA = 0;                                 // Stop TCA0
-  PeripheralControl &= ~TIMERA0;                        // Mark timer as user controlled
+  __PeripheralControl &= ~TIMERA0;                        // Mark timer as user controlled
   /* Okay, seriously? The datasheets and io headers disagree here */
   TCA0.SPLIT.CTRLESET = TCA_SPLIT_CMD_RESET_gc | 0x03;  // Reset TCA0
 }
 
 uint8_t digitalPinToTimerNow(uint8_t pin) {
-  return digitalPinToTimer(pin) & PeripheralControl;
+  return digitalPinToTimer(pin) & __PeripheralControl;
 }
 
 #if defined(TCD0)
 void takeOverTCD0() {
   TCD0.CTRLA = 0;                     // Stop TCD0
   _PROTECTED_WRITE(TCD0.FAULTCTRL,0); // Turn off all outputs
-  PeripheralControl &= ~TIMERD0;      // Mark timer as user controlled
+  __PeripheralControl &= ~TIMERD0;      // Mark timer as user controlled
 }
 #endif

@@ -35,14 +35,14 @@
   #error "CLOCK_SOURCE not defined. Must be 0 for internal, 1 for crystal, or 2 for external clock"
 #endif
 
-/* Declared in wiring_private.h
- * PeripheralControl is used to mark peripherals as being "taken over" by the user
+/*           __PeripheralControl is used to mark peripherals as being "taken over" by the user
  * 0x40 = TIMERD0
  * 0x10 = TIMERA0
+ * 0x08 = TIMERA1
  * Implementation and use is not portable between cores - tradeoffs are made which
  * trade generalizability for low resource use
  */
-uint8_t PeripheralControl = 0xFF;
+uint8_t __PeripheralControl = 0xFF;
 
 // the prescaler is set so that timer ticks every 64 clock cycles, and the
 // the overflow handler is called every 256 ticks.
@@ -83,7 +83,7 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
 #endif
 
 // overflow count is tracked for all timer options, even the RTC
-
+/
 
 #if !defined(MILLIS_USE_TIMERRTC)
 
