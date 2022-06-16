@@ -29,7 +29,7 @@
 #include "pins_arduino.h"
 
 inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
-  if (__builtin_constant_p(pin))
+  if (__builtin_constant_p(pin)) {
     if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
     // Exception made for NOT_A_PIN - code exists which relies on being able to pass this and have nothing happen.
     // While IMO very poor coding practice, these checks aren't here to prevent lazy programmers from intentionally
@@ -37,10 +37,11 @@ inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pi
     // Passing -1/255/NOT_A_PIN to the digital I/O functions is most likely intentional.
       badArg("Digital pin is constant, but not a valid pin");
     #if (CLOCK_SOURCE == 2)
-        if (pin == PIN_PA3)
+        if (pin == PIN_PA3) {
           badArg("Constant digital pin PIN_PA3, used for selected external osc, and is not available for other uses.");
+        }
     #endif
-
+  }
 }
 
 
