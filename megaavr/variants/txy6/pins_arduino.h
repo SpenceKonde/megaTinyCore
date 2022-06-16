@@ -205,6 +205,27 @@ static const uint8_t    A11 = PIN_PB0;
   static const uint8_t  A15 = PIN_PC3;
 #endif
 
+/* Not Recommended to use the AINn constants */
+#if MEGATINYCORE_SERIES != 2
+  #define AIN0               NOT_A_PIN
+#endif
+#define AIN1               ADC_CH(1)
+#define AIN2               ADC_CH(2)
+#define AIN3               ADC_CH(3)
+#define AIN4               ADC_CH(4)
+#define AIN5               ADC_CH(5)
+#define AIN6               ADC_CH(6)
+#define AIN7               ADC_CH(7)
+#define AIN8               ADC_CH(8)
+#define AIN9               ADC_CH(9)
+#define AIN10              ADC_CH(10)
+#define AIN11              ADC_CH(11)
+#if MEGATINYCORESERIES == 2
+  #define AIN12              ADC_CH(12)
+  #define AIN13              ADC_CH(13)
+  #define AIN14              ADC_CH(14)
+  #define AIN15              ADC_CH(15)
+#endif
 /*
             ####  ### #   #      ##  ####  ####   ##  #   #  ###
             #   #  #  ##  #     #  # #   # #   # #  #  # #  #
