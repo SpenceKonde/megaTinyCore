@@ -1,7 +1,7 @@
 // Display current tuning state in human readable form.
 int16_t getTunedOSCCAL(uint8_t osc, uint8_t target) {
   uint8_t offset = CLOCK_TUNE_START;
-  #if megaTinyCoreSeries != 2
+  #if MEGATINYCORE_SERIES != 2
   if (osc == 16) {
     switch (target) {
       case (25):

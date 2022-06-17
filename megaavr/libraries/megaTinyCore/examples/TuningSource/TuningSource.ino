@@ -51,7 +51,7 @@
       #error "Invalid or unusable custom output pin defined"
     #endif
   #else // TUNE_WITH_RTC
-    #if (defined(MEGATINYCORE) && MEGATINYCORESERIES < 2)
+    #if (defined(MEGATINYCORE) && MEGATINYCORE_SERIES < 2)
       #if  (!((defined(PIN_PA2) && TUNE_OUTPUT_PIN == PIN_PA2) || (defined(PIN_PB2) && TUNE_OUTPUT_PIN == PIN_PB2) || (defined(PIN_PC2) && TUNE_OUTPUT_PIN == PIN_PC2)))
         #error "Cannot use RTC derved tuning signal on this pin"
       #endif

@@ -220,7 +220,7 @@ static const uint8_t    A11 = PIN_PB0;
 #define AIN9               ADC_CH(9)
 #define AIN10              ADC_CH(10)
 #define AIN11              ADC_CH(11)
-#if MEGATINYCORESERIES == 2
+#if MEGATINYCORE_SERIES == 2
   #define AIN12              ADC_CH(12)
   #define AIN13              ADC_CH(13)
   #define AIN14              ADC_CH(14)
