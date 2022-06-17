@@ -66,7 +66,7 @@
   #if F_CPU == 1000000
     #define TUNE_PRESCALE (CLKCTRL_PEN_bm | (osccfg ? CLKCTRL_PDIV_16X_gc /* there is no CLKCTRL_PDIV_20X_gc - but this should be a cant-happen because we set the oscillator to 16 when
     telling it to run from 1 MHz. Unless optiboot is in use, and you compile and upload for the wrong osc base frequency, because you changed clock speed selection
-    and didn't reburn the bootloader *and* uploaded using optiboot with 1 MHz selected... */ : CLKCTRL_PDIV_16X_gc)
+    and didn't reburn the bootloader *and* uploaded using optiboot with 1 MHz selected... */ : CLKCTRL_PDIV_16X_gc))
     #define GUESSCAL ((osccal ? GUESS_20_16 : 0))
   #else
     #define _CLOCKSPERUS  (F_CPU / 1000000)

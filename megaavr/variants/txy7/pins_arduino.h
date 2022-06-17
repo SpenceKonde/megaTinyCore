@@ -198,7 +198,7 @@ static const uint8_t    A11 = PIN_PB0;
 
 /* Not Recommended to use the AINn constants */
 #if MEGATINYCORE_SERIES != 2
-#define AIN0               NOT_A_PIN
+  #define AIN0             NOT_A_PIN
 #endif
 #define AIN1               ADC_CH(1)
 #define AIN2               ADC_CH(2)
