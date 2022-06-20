@@ -5,6 +5,5 @@
 #ifndef HWSERIALNAME_HACK_H
   #define HWSERIALNAME_HACK_H
   #include <UART.h>
-  class HardwareSerial : public UartClass {
-  }
+  #define HardwareSerial UartClass
 #endif
