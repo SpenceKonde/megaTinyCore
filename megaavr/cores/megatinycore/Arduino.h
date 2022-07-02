@@ -414,7 +414,7 @@ Not enabled. Ugly ways to get delays at very small flash cost.
                     #define CLOCKS_PER_US   (F_CPU / 1000000);    // preprocessed away
                     #define DELAYCLOCKS     (0.8 * CLOCKS_PER_US) // say we wanted a 0.8 us delay.
                     uint8_t x = DELAYCLOCKS / 3;                  // preprocessed into a constant
-                    __asm__ __volatile__ ("dec %0"      "\n\t"    // before this, an ldi is used to load x into the input opperand %0
+                    __asm__ __volatile__ ("dec %0"      "\n\t"    // before this, an ldi is used to load x into the input operand %0
                                           "brne .-4"    "\n\t"
                       #if (DELAYCLOCKS % 3 == 2)                  // 2 clocks extra needed at end
                                           "rjmp .+0"    "\n\t"

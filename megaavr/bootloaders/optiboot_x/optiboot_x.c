@@ -701,7 +701,7 @@ static void do_nvmctrl(uint16_t address, uint8_t command, uint8_t data) {
   /*
   Optiboot is designed to fit in 512 bytes, with a minimum feature set.
   Some chips have a minimum bootloader size of 1024 bytes, and sometimes
-  it is desirable to add extra features even though 512bytes is exceedded.
+  it is desirable to add extra features even though 512bytes is exceeded.
   In that case, the BIGBOOT can be used.
   Our extra features so far don't come close to filling 1k, so we can
   add extra "frivolous" data to the image.   In particular, we can add

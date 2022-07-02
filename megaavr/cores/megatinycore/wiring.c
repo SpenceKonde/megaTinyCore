@@ -546,7 +546,7 @@ unsigned long millis() {
           "eor r1,r1"     "\n\t"  // clear out r1
           "sub %A0,r0"    "\n\t"  // Add the sum of terms that fit in a byte to what was ticks in old code.
           "sbc %B0,r1"    "\n"    // carry - see,this is why AVR needs a known zero.
-          : "+r" (ticks));        // Do the rest in C. ticks is a read/write opperand.
+          : "+r" (ticks));        // Do the rest in C. ticks is a read/write operand.
         microseconds = overflows * 1000 + ticks; // nice and clean.
 
       /* The Troublesome Tens - I initially fumbled this after the **now** r1 is 0 line
@@ -613,7 +613,7 @@ unsigned long millis() {
           "eor r1,r1"     "\n\t"  // restore zero_reg
           "add %A0,r0"    "\n\t"  // add to the shifted ticks
           "adc %B0,r1"    "\n"    // carry
-          : "+r" (ticks));        // Do the rest in C. ticks is a read/write opperand.
+          : "+r" (ticks));        // Do the rest in C. ticks is a read/write operand.
         microseconds = overflows * 1000 + ticks;
 /* replaces:
       #elif (F_CPU == 48000000UL) // Extreme overclocking
