@@ -12,7 +12,7 @@
     efficiency.
   Since C++17, there's four more each for new / delete, to support allocation
     of objects with alignment greater than __STDCPP_DEFAULT_NEW_ALIGNMENT__.
-    This has two major differences from the C++14 sized deallocaton.
+    This has two major differences from the C++14 sized deallocation.
     1. It cannot be simply ignored - they presumably wanted alignment for
     a reason; this implementation is not impossible, but nor is it trivial.
     2. If code used on C++14 or earlier is asking for the alignment aware
