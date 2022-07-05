@@ -27,7 +27,7 @@
 #pragma once
 
 #include <inttypes.h>
-#include "api/HardwareSerial.h"
+#include "Stream.h"
 #include "pins_arduino.h"
 #include "UART_constants.h"
 #include "UART_check_pins.h"
@@ -226,7 +226,7 @@ const uint8_t _usart_pins[][4] = {
 /* CHANGING THE MEMBER VARIABLES BETWEEN HERE AND THE OTHER SCARY COMMENT WILL COMPLETELY BREAK SERIAL
  * WHEN USE_ASM_DRE and/or USE_ASM_RXC is used! */
 /* DANGER DANGER DANGER */
-class UartClass : public HardwareSerial {
+class UartClass : public Stream {
   protected:
     volatile USART_t *const _hwserial_module;
     const uint8_t _module_number;
