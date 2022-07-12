@@ -109,7 +109,7 @@ ISR(RTC_PIT_vect)
 void setup() {
   RTC_init();                           /* Initialize the RTC timer */
   pinMode(7, OUTPUT);                   /* Configure pin#7 as an output */
-  //ADC0.CTRLA &= ~ADC_ENABLE_bm;         /* If you have a 2-Series part, uncomment this to disable the ADC*/
+  //ADC0.CTRLA &= ~ADC_ENABLE_bm;       /* If you have a 2-Series part, uncomment this to disable the ADC*/
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);  /* Set sleep mode to POWER DOWN mode */
   sleep_enable();                       /* Enable sleep mode, but not going to sleep yet */
 }
