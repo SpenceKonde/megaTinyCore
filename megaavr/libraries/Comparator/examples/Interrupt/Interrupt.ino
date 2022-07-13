@@ -31,7 +31,7 @@ void setup() {
 
   // Configure relevant comparator parameters
   Comparator.input_p = in_p::in0;       // Use positive input 0 (PA7)
-  #if MEGATINYCORESERIES == 0
+  #if MEGATINYCORE_SERIES == 0
   Comparator.input_n = in_n::vref;      // 0-series has no DACREF, so use vref directly.
   #else
   Comparator.input_n = in_n::dacref;    // Connect the negative pin to the DACREF voltage

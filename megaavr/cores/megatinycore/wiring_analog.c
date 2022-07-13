@@ -25,9 +25,13 @@
 #include "wiring_private.h"
 #include "pins_arduino.h"
 #include "Arduino.h"
+#include <avr/pgmspace.h>
 
+/* magic value passsed as the negative pin to tell the _analogReadEnh() (which implements both th new ADC
+ * functions) to tell them what kind of mode it's to be used in. This also helps with providing useful and accurate
+ * error messages and codes at runtime, since we have no other way to report such.                                 */
 
-
+#define SINGLE_ENDED 254
 inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
   if (__builtin_constant_p(pin)) {
     if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
@@ -185,9 +189,8 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
  * int16_t analogRead(uint8_t pin)
  *     The standard analogRead(). Single-ended, and resolution set by
  *     analogReadResolution(), default 10.
- *     A return value of -1 indicates that a bad pin was passed.
- *     A return value of -2 indicates the ADC was busy (Not yet enabled - will
- *     be an optional error in future update, maybe)
+ *     large negative values are returned in the event of an error condition.
+
  * bool analogReadResolution(uint8_t resolution)
  *     Sets resolution for the analogRead() function. Unlike stock version,
  *     this returns true/false. If it returns false, the value passed was
@@ -205,16 +208,16 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
  *     Returns true if value is valid; on 0/1-series maximum is 31 (33 ADC clock
  *     sampling duration); on 2-series any 8-bit value is valid, and duration is
  *     this many plus 0.5 (without PGA) or 1 (with PGA) ADC clocks.
- *     ADC clock is configured 1~1.25 MHz on 0/1, and ~2 MHz on 2-series.
+ *     ADC clock targeted by default at startup is 1~1.25 MHz on 0/1, and ~2 MHz on 2-series.
+ * uint8_t getAnalogSampleDuration()
+ *     Trivial macro (located in Arduino.h). Returns the argument that you would pass to
+ *     analogSampleDuration to get the current setting back (useful before
+ *     changing it to something exotic)
  * void ADCPowerOptions(uint8_t options)
- *     Only available on the 2-series (and future parts with a PGA).
- *     The PGA is enabled by any call to analogReadEnh or analogReadDiff that
- *     specifies valid gain > 0, by default we turn it off afterwards. But
- *     we can also keep it on all the time. This
- *      - disable PGA, turned on and off in future as above.
- *     1 - enable PGA, turned on and off in future as above.
+ *     0 - disable PGA, turned on and off in future as above.
+ *     1 - enable PGA ahead of time for the next measurement after which it will be turned off as above.
  *     2 - disable PGA, and in future turn if off immediately after use.
- *     3 - enable PGA, and don't turn it off when a gain=0 read is made.
+ *     3 - enable PGA, leave it on until explicitly turned off. This is a power hog.
  * int32_t analogReadEnh(uint8_t pin, int8_t res=ADC_NATIVE_RESOLUTION,
  *                                                          uint8_t gain=0)
  *     Enhanced analogRead(). Still single-ended, res is resolution in bits,
@@ -283,6 +286,14 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
  *    or PORTD/PORTE (for Dx-series), and the selection of available
  *    channels is more limited.
  *
+ * printADCRuntimeError(uint32_t error, &UartClass DebugSerial)
+ *   Prints a text description of an error returnedby analogRead,
+ *   analogReasdEnh(),or analogReadDiff() to the specified serial device
+ *   Ex:
+ *    printADCRuntimeError(-2100000003, &Serial);
+ *    will peinr "ADC_ENH_ERROR_RES_TOO_LOW"
+ *    Will print nothing and return false if the result wasn't an error
+ *    Inefficient of flash space..
  ****************************************************************************/
 
 
@@ -358,38 +369,79 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   }
 
   void ADCPowerOptions(uint8_t options) {
-    // 0b 0000 PPLL
+    // 0b SSEEPPLL
+    // SS = run standby
+    // 00 = no change to run standby
+    // 01 = no change to run standby
+    // 10 = turn off run standby
+    // 11 = turn on run standby
+    // EE = ENABLE
+    // 00 = Do not enable or disable ADC.
+    // 01 = Do not enable or disable ADC.
+    // 10 = Disable the ADC.
+    // 11 = Enable the ADC.
     // LL = LOWLAT
-    // 00 = No action.
-    // 01 = No action.
-    // 10 = LOWLAT on
-    // 11 = LOWLAT off
+    // 00 = Do nothing.  No change to whether ADC enabled or LOWLAT bit.
+    // 01 = Do nothing.  No change to whether ADC enabled or LOWLAT bit.
+    // 10 = LOWLAT on. No change to whether ADC enabled.
+    // 11 = LOWLAT off. No change to whether ADC enabled.
+    // 00 = Do nothing,
+    // 01 = Do nothing,
+    // 10 = LOWLAT on.
+    // 11 = LOWLAT off.
     // PP = PGA stay-on
     // 00 = No action
-    // 01 = Turn off PGA, settings unchanged. It will be enabled next time it is used until 01 or 11 is is passed to this.
+    // 01 = Turn off PGA, settings unchanged. It will be enabled next time is requested, but will not automatically turn off.
     // 10 = Turn on PGA, and don't turn it off automatically.
-    // 11 = turn off PGA now and automatically.
-    uint8_t lowlat = options & 0x03;
-    if (lowlat > 1) {
-      if (lowlat == 3)
+    // 11 = turn off PGA now and automatically after each use
+    uint8_t temp = ADC0.CTRLA; //performance.
+    if (options & 0x02) {
+      ADC0.CTRLA = 0; // hopwfully workaround lowlat errata by ensuring that everything is turned off.
+      // and configuring lowlat mode.
+      if (options & 0x01) {
+        ADC0.CTRLA |=  ADC_LOWLAT_bm;
+        temp |= ADC_LOWLAT_bm;
+      } else {
         ADC0.CTRLA &= ~ADC_LOWLAT_bm;
-      else
-        ADC0.CTRLA |= ADC_LOWLAT_bm;
+        temp &= ~ADC_LOWLAT_bm;
+      }
     }
-    uint8_t pgaen = options & 0x0C;
-    if (pgaen & 0x04) // turn off PGA.
+    if (options & 0x20) {
+      if (options & 0x10) {
+        temp |= 1; // ADC on
+      } else {
+        temp &= 0xFE; // ADC off
+      }
+    }
+    if (options & 0x80) {
+      if (options & 0x40) {
+        temp |= 0x80; // run standby
+      } else {
+        temp &= 0x7F; // no run standby
+      }
+    }
+    ADC0.CTRLA = temp; //now we apply enable and standby, and lowlat has been turned on, hopefully that's good enough for the errata.
+    if (options & 0x04) { // turn off PGA.
       ADC0.PGACTRL &= ~ADC_PGAEN_bm;
-    if (pgaen & 0x08) {
-      _analog_options = (_analog_options & 0x7F) | ((pgaen & 0x04)? 0 : 0x80);
+      if (options & 0x08)  {
+        _analog_options &= 0x7F;
+      } else {
+        _analog_options |= 0x80;
+      }
+    } else { // not instruction to turn off PGA
+      if (options & 0x08) { // is it in fact an instruction to turn on the PGA and leave it on?
+        ADC0.PGACTRL |= ADC_PGAEN_bm; // turn on the PGA
+        _analog_options &= 0x7F;      // turn off the auto-shutoff. If they told us to turn it on explicitly, surely they don't want us to turn it off of our own accord.
+      }
     }
-
+    // What a mess!
   }
+
   bool analogSampleDuration(uint8_t sampdur) {
-    // any uint8_t ius a legal value...
+    // any uint8_t is a legal value...
     ADC0.CTRLE = sampdur;
     return true;
   }
-
 
   int32_t _analogReadEnh(uint8_t pin, uint8_t neg, uint8_t res, uint8_t gain) {
     if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
@@ -475,7 +527,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     }
 
     // res > 0x80 (raw accumulate) or res == 8, res == 12 need no adjustment.
-    if (_analog_options & 0x80) {
+    if (_analog_options & 0x80) { // this bit controls autoshutoff of PGA.
       ADC0.PGACTRL &= ~ADC_PGAEN_bm;
     }
     return result;
@@ -547,6 +599,40 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   /*****************************************************
   START 0/1-series analogRead/analogReadXxxx functions
   *****************************************************/
+    void ADCPowerOptions(uint8_t options) {
+    if (__builtin_constant_p(options)) {
+      if (options & 0x0F) {
+        badArg("Only runstandby and enable/disable are supported - the hardware doesn't have LOWLAT nor the PGA");
+      }
+    }    // 0b SEE xxxx
+    // SS = run standby
+    // 00 = no change to run standby
+    // 01 = no change to run standby
+    // 10 = turn off run standby
+    // 11 = turn on run standby
+    // EE = ENABLE
+    // 00 = Do not enable or disable ADC.
+    // 01 = Do not enable or disable ADC.
+    // 10 = Disable the ADC.
+    // 11 = Enable the ADC.
+
+    uint8_t temp = ADC0.CTRLA; //performance.
+    if (options & 0x20) {
+      if (options & 0x10) {
+        temp |= 1; // ADC on
+      } else {
+        temp &= 0xFE; // ADC off
+      }
+    }
+    if (options & 0x80) {
+      if (options & 0x40) {
+        temp |= 0x80; // run standby
+      } else {
+        temp &= 0x7F; // no run standby
+      }
+    }
+    ADC0.CTRLA = temp; //now we apply enable and standby,
+  }
   void analogReference(uint8_t mode) {
     check_valid_analog_ref(mode);
     switch (mode) {
@@ -622,10 +708,9 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       return false;
     } else {
       ADC0.SAMPCTRL = dur;
-      return "true";
+      return true;
     }
   }
-
 
   int32_t analogReadEnh(uint8_t pin, uint8_t res, uint8_t gain) {
     if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
@@ -695,7 +780,10 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     badCall("This part does not have a differential ADC");
     return ADC_ENH_ERROR_NOT_DIFF_ADC;
   }
-
+  int32_t analogReadDiff1(__attribute__ ((unused)) uint8_t pos, __attribute__ ((unused))uint8_t neg, __attribute__ ((unused))uint8_t res, __attribute__ ((unused))uint8_t gain) {
+    badCall("This part does not have a differential ADC - and certainly not TWO OF THEM");
+    return ADC_ENH_ERROR_NOT_DIFF_ADC;
+  }
   static const int16_t adc_prescale_to_clkadc[0x09] =  {(F_CPU /  2000UL),(F_CPU /  4000UL),(F_CPU /  8000UL),(F_CPU / 16000UL),
   /* Doesn't get copied to ram because these all */     (F_CPU / 32000UL),(F_CPU / 64000UL),(F_CPU /128000UL),(F_CPU /256000UL),1};
 
@@ -734,7 +822,227 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     return adc_prescale_to_clkadc[(ADC0.CTRLC & ADC_PRESC_gm)];
   }
 
+#if defined(ADC1)
+/****************************************************/
+  // If we have two ADCs, while advise using only one, or controlling the second manually if advanced functionality is needed
+  // if you insist, you can treat it identically by appending '1' to the names of the analog functions.
+  void ADCPowerOptions1(uint8_t options) {
+    if (__builtin_constant_p(options)) {
+      if (options & 0x0F) {
+        badArg("Only runstandby and enable/disable are supported - the hardware doesn't have LOWLAT nor the PGA");
+      }
+    }
+    // 0b SSE xxxx
+    // SS = run standby
+    // 00 = no change to run standby
+    // 01 = no change to run standby
+    // 10 = turn off run standby
+    // 11 = turn on run standby
+    // EE = ENABLE
+    // 00 = Do not enable or disable ADC.
+    // 01 = Do not enable or disable ADC.
+    // 10 = Disable the ADC.
+    // 11 = Enable the ADC.
 
+    uint8_t temp = ADC1.CTRLA; //performance.
+    if (options & 0x20) {
+      if (options & 0x10) {
+        temp |= 1; // ADC on
+      } else {
+        temp &= 0xFE; // ADC off
+      }
+    }
+    if (options & 0x80) {
+      if (options & 0x40) {
+        temp |= 0x80; // run standby
+      } else {
+        temp &= 0x7F; // no run standby
+      }
+    }
+    ADC1.CTRLA = temp; //now we apply enable and standby
+  }
+  inline __attribute__((always_inline)) void check_valid_analog_pin1(pin_size_t pin) {
+    if (__builtin_constant_p(pin)) {
+      if (pin != ADC1_DAC1 && pin != ADC_INTREF && pin != ADC1_DAC2 && pin != ADC_GROUND) {
+        // above cases cover valid internal sources.
+        if (pin & 0x80) {
+          if ((pin & 0x3F) >= NUM_ANALOG_INPUTS)
+          {
+            badArg("analogRead called with constant channel that is neither valid analog channel nor valid pin");
+          }
+        } else {
+          pin = digitalPinToAnalogInput(pin);
+          if (pin == NOT_A_PIN) {
+            badArg("analogRead called with constant pin that is not a valid analog pin");
+          }
+        }
+      }
+    }
+  }
+
+  void analogReference1(uint8_t mode) {
+    check_valid_analog_ref(mode);
+    switch (mode) {
+      #if defined(EXTERNAL)
+        case EXTERNAL:
+      #endif
+      case VDD:
+        VREF.CTRLB &= ~VREF_ADC1REFEN_bm; // Turn off force-adc-reference-enable
+        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
+        // VREF.CTRLA does not need to be reconfigured, as the voltage references only supply their specified voltage when requested to do so by the ADC.
+        break;
+      case INTERNAL0V55:
+        VREF.CTRLC =  VREF.CTRLC & ~(VREF_ADC0REFSEL_gm); // These bits are all 0 for 0.55v reference, so no need to do the mode << VREF_ADC0REFSEL_gp here;
+        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; // per datasheet, recommended SAMPCAP=0 at ref < 1v
+        VREF.CTRLB |= VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
+        break;
+      case INTERNAL1V1:
+      case INTERNAL2V5:
+      case INTERNAL4V34:
+      case INTERNAL1V5:
+        VREF.CTRLC = (VREF.CTRLC & ~(VREF_ADC0REFSEL_gm)) | (mode << VREF_ADC0REFSEL_gp);
+        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v
+        break;
+    }
+  }
+  // requires a bit of explanation - basically, the groupcodes are the same for ADC0 and ADC1, just different register.
+  // VREF_ADC0REFSEL_gm == VREF_ADC1REFSEL_gm
+  // I wouldn't say the dual ADC thing was some of their best work.
+
+  int16_t analogClockSpeed1(int16_t frequency, uint8_t options) {
+    if (frequency == -1) {
+      frequency = 1450;
+    }
+    if (frequency > 0) {
+      bool using_0v55 = !(VREF.CTRLA & VREF_ADC0REFSEL_gm || ADC1.CTRLC & ADC_REFSEL_gm);
+      if ((options & 0x01) == 0) {
+        frequency = constrain(frequency, (using_0v55 ? 100: 200), (using_0v55 ? 260 : 1500));
+      }
+      uint8_t prescale = 0;
+      for (uint8_t i =0; i < 8; i++) {
+        int16_t clkadc = adc_prescale_to_clkadc[i];
+        prescale = i;
+        if ((frequency >= clkadc) || (adc_prescale_to_clkadc[i + 1] < ((options & 0x01) ? 2 : (using_0v55 ? 100 : 200)))) {
+          ADC1.CTRLC = (ADC1.CTRLC & ~ADC_PRESC_gm) | prescale;
+          break;
+        }
+      }
+    }
+    if (frequency < 0) {
+      return ADC_ERROR_INVALID_CLOCK;
+    }
+    return adc_prescale_to_clkadc[(ADC1.CTRLC & ADC_PRESC_gm)];
+  }
+
+  int16_t analogRead1(uint8_t pin) {
+    check_valid_analog_pin1(pin);
+
+    if (pin < 0x80) {
+      // If high bit set, it's a channel, otherwise it's a digital pin so we look it up..
+      pin = digitalPinToAnalogInput_ADC1(pin);
+    }
+    #if (PROGMEM_SIZE > 4096)
+      // don't waste flash on smallest parts.
+      if ((pin & 0x3F) > 0x1F) { // highest valid mux value for any 0 or 1-series part.
+        return ADC_ERROR_BAD_PIN_OR_CHANNEL;
+      }
+    #endif
+    if (!ADC1.CTRLA & 0x01) return ADC_ERROR_DISABLED;
+    pin &= 0x1F;
+    /* Reference should be already set up */
+    /* Select channel */
+    ADC1.MUXPOS = (pin << ADC_MUXPOS_gp);
+
+    #if defined(STRICT_ERROR_CHECKING)
+      if (ADC1.COMMAND) return ADC_ERROR_BUSY;
+    #endif
+
+    /* Start conversion */
+    ADC1.COMMAND = ADC_STCONV_bm;
+
+    /* Wait for result ready */
+    while (!(ADC1.INTFLAGS & ADC_RESRDY_bm));
+
+    /* Combine two bytes */
+    return ADC1.RES;
+  }
+
+
+  bool analogSampleDuration1(uint8_t dur) {
+    check_valid_duration(dur);
+    if (dur > 0x1F) {
+      ADC1.SAMPCTRL = 0x1F;
+      return false;
+    } else {
+      ADC1.SAMPCTRL = dur;
+      return true;
+    }
+  }
+
+  int32_t analogReadEnh1(uint8_t pin, uint8_t res, uint8_t gain) {
+    if (!(ADC1.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
+    check_valid_enh_res(res);
+    check_valid_analog_pin(pin);
+    if (__builtin_constant_p(gain)) {
+      if (gain != 0)
+        badArg("This part does not have an amplifier, gain argument must be omitted or given as 0");
+    }
+    uint8_t sampnum;
+    if (res & 0x80) { // raw accumulation
+      sampnum = res & 0x7F;
+      if (sampnum > 6) return ADC_ENH_ERROR_RES_TOO_HIGH;
+    } else {
+      if (res < ADC_NATIVE_RESOLUTION_LOW) return ADC_ENH_ERROR_RES_TOO_LOW;
+      if (res > 13) return ADC_ENH_ERROR_RES_TOO_HIGH;
+      sampnum = (res > ADC_NATIVE_RESOLUTION ? ((res - ADC_NATIVE_RESOLUTION) << 1) : 0);
+    }
+    if (pin < 0x80) {
+      // If high bit set, it's a channel, otherwise it's a digital pin so we look it up..
+      pin = digitalPinToAnalogInput_ADC1(pin);
+    }
+    #if (PROGMEM_SIZE > 4096)
+      // don't waste flash on smallest parts.
+      if ((pin & 0x7F) > 0x1F) { // highest valid mux value for any 0 or 1-series part.
+        return ADC_ERROR_BAD_PIN_OR_CHANNEL;
+      }
+    #endif
+    pin &= 0x1F;
+    ADC1.MUXPOS = pin;
+    #if defined(STRICT_ERROR_CHECKING) /* Strict error checking not yet implemented */
+      if (ADC1.COMMAND) return ADC_ENH_ERROR_BUSY;
+    #endif
+
+    uint8_t _ctrla = ADC1.CTRLA;
+    ADC1.CTRLA = ADC_ENABLE_bm | (res == ADC_NATIVE_RESOLUTION_LOW ? ADC_RESSEL_bm : 0);
+    // if (res > 0x80) {
+      ADC1.CTRLB = sampnum;
+    /*} else
+    if (res > ADC_NATIVE_RESOLUTION) {
+      ADC1.CTRLB = 2 * (res - ADC_NATIVE_RESOLUTION);
+    } else {
+      ADC1.CTRLB = 0;
+    }*/
+
+    ADC1.COMMAND = ADC_STCONV_bm;
+    while (!(ADC1.INTFLAGS & ADC_RESRDY_bm));
+    int32_t result = ADC1.RES;
+    if (res < 0x80 && res > ADC_NATIVE_RESOLUTION) {
+      uint8_t shift = res - ADC_NATIVE_RESOLUTION - 1;
+      while (shift) {
+        result >>= 1;
+        shift--;
+      }
+      uint8_t roundup = result & 0x01;
+      result >>= 1;
+      result += roundup;
+    } else if (res == ADC_NATIVE_RESOLUTION - 1) { // 9 bit res?!
+      result >>= 1;
+    } // res > 0x80 (raw accumulate) or res == 8, res == 10 need no adjustment;
+    ADC1.CTRLA = _ctrla;
+    ADC1.CTRLB = 0;
+    return result;
+  }
+  #endif
   /*****************************************************
    END 0/1-series analogRead/analogReadXxxx functions
   *****************************************************/
@@ -759,16 +1067,16 @@ void analogWrite(uint8_t pin, int val) {
   /* Get timer */
   /* megaTinyCore only - assumes only TIMERA0, TIMERD0, or DACOUT
    * can be returned here, all have only 1 bit set, so we can use
-   * PeripheralControl as a mask to see if they have taken over
+   * __PeripheralControl as a mask to see if they have taken over
    * any timers with minimum overhead - critical on these parts
    * Since nothing that will show up here can have more than one
    * one bit set, binary and will give 0x00 if that bit is cleared
    * which is NOT_ON_TIMER.
    */
-  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & PeripheralControl;
+  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & __PeripheralControl;
   /* end megaTinyCore-specific section */
 
-  uint8_t *timer_cmp_out;
+  volatile uint8_t *timer_cmp_out; // must be volatile for this to be safe.
   /* Find out Port and Pin to correctly handle port mux, and timer. */
   switch (digital_pin_timer) {
     case TIMERA0:
@@ -786,12 +1094,12 @@ void analogWrite(uint8_t pin, int val) {
         uint8_t offset = 0;
         if (bit_mask > 0x04) { // HCMP
           bit_mask <<= 1;      // mind the gap
-          offset = 1;          // used to offset the
+          offset = 1;          // if it's an hcmp, the offset of the compare register is 1 higher.
         }
         if      (bit_mask & 0x44) offset += 4;
         else if (bit_mask & 0x22) offset += 2;
-        timer_cmp_out = ((uint8_t *)(&TCA0.SPLIT.LCMP0)) + (offset);
-        (*timer_cmp_out) = (val);
+        timer_cmp_out = ((volatile uint8_t *)(&TCA0.SPLIT.LCMP0)) + (offset); //finally at the very end we get the actual pointer (since volatile variables should be treated like nuclear waste due to performance impact)
+        (*timer_cmp_out) = (val); // write to it - and we're done with it.
         TCA0.SPLIT.CTRLB |= bit_mask;
       }
       break;
@@ -808,19 +1116,18 @@ void analogWrite(uint8_t pin, int val) {
   #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
     case TIMERD0:
       {
-      #ifndef NO_GLITCH_TIMERD0
-        if (val < 1) { /* if zero or negative drive digital low */
-          digitalWrite(pin, LOW);
-        } else if (val > 254) { /* if max or greater drive digital high */
-          digitalWrite(pin, HIGH);
-        } else {
-      #endif
-        // Calculation of values to write to CMPxSET
-        // val is 1~254, so 255-val is 1~254. so we double it and subtract 1, now we have odd number between 1 and 507, corresponding to an even number of counts.
-        // Timer counts to 509, 510 counts including 0... so this gives us our promised 1/255~254/255 duty cycles, not 2/511th~509/511th...
-
-        // Now, if NO_GLITCH_TIMERD0 is defined, val can be anything...
-        #if defined(NO_GLITCH_TIMERD0)
+        //Glitches permitted: 0 or 255 will generate a glitch on the other channels and lose a tiny amount of time if used as millis timer. If you're doing that often enough though it adds up.
+        #if !defined(NO_GLITCH_TIMERD0)
+          if (val < 1) { /* if zero or negative drive digital low */
+            digitalWrite(pin, LOW);
+          } else if (val > 254) { /* if max or greater drive digital high */
+            digitalWrite(pin, HIGH);
+          } else {
+        #else
+        // Now, if NO_GLITCH_TIMERD0 is defined, val can legally be 0 or 255, which is to be interpreted as an instruction to keep the output constant LOW or HIGH.
+        // 0 requires no special action - 255-0 = 255, we're counting to 254 and thus will never reach the compare matchvalue.
+        // 255 on the other hand, requires us to invert the pin and set val to 0 to get the constant output. Setting the CMPxSET register to 0 produces a sub-system-clock spike
+        //(maybe you don't care. but depending on the application, this could be catastrophic!)
           uint8_t set_inven = 0;
           if (val < 1) {
             val = 0;        // this will "just work", we'll set it to the maximum, it will never match, and will stay LOW
@@ -829,11 +1136,14 @@ void analogWrite(uint8_t pin, int val) {
             set_inven = 1;  // but we invert the pin output with INVEN!
           }
         #endif
+        // Calculation of values to write to CMPxSET
+        // val is 1~254, so 255-val is 1~254.
 
         uint8_t oldSREG = SREG;
         cli(); // interrupts off... wouldn't due to have this mess interrupted and messed with...
-        while ((TCD0.STATUS & (TCD_ENRDY_bm | TCD_CMDRDY_bm)) != (TCD_ENRDY_bm | TCD_CMDRDY_bm)); // if previous sync/enable in progress, wait for it to finish.
-        // with interrupts off since an interrupt could trip these...
+        while ((TCD0.STATUS & (TCD_ENRDY_bm | TCD_CMDRDY_bm)) != (TCD_ENRDY_bm | TCD_CMDRDY_bm));
+        // if previous sync/enable in progress, wait for it to finish. This is dicey for sure, because we're waiting on a peripheral
+        // with interrupts off. But an interrupt could trigger one of those bits becoming unset, so we must do it this way.
         // set new values
         uint8_t fc_mask;
         if (bit_mask == 2) {  // PIN_PC1
@@ -856,7 +1166,7 @@ void analogWrite(uint8_t pin, int val) {
 
         #if defined(NO_GLITCH_TIMERD0)
           // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts)
-          // so if we're here, we're acting on either PC0 or PC1.
+          // so if we're here, we're acting on either PC0 or PC1. And NO_GLITCH mode is enabled
           if (set_inven == 0) {
             // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR)
             // or somewhere in between.
@@ -866,7 +1176,7 @@ void analogWrite(uint8_t pin, int val) {
               PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
             }
           } else {
-            // we *are* turning off PWM while forcing pin high - analogwrite(pin,255) was called on TCD0 PWM pin...
+            // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
             if (bit_mask == 1) {
               PORTC.PIN0CTRL |= PORT_INVEN_bm;
             } else {
@@ -898,19 +1208,19 @@ void analogWrite(uint8_t pin, int val) {
 
 void takeOverTCA0() {
   TCA0.SPLIT.CTRLA = 0;                                 // Stop TCA0
-  PeripheralControl &= ~TIMERA0;                        // Mark timer as user controlled
+  __PeripheralControl &= ~TIMERA0;                        // Mark timer as user controlled
   /* Okay, seriously? The datasheets and io headers disagree here */
   TCA0.SPLIT.CTRLESET = TCA_SPLIT_CMD_RESET_gc | 0x03;  // Reset TCA0
 }
 
 uint8_t digitalPinToTimerNow(uint8_t pin) {
-  return digitalPinToTimer(pin) & PeripheralControl;
+  return digitalPinToTimer(pin) & __PeripheralControl;
 }
 
 #if defined(TCD0)
 void takeOverTCD0() {
   TCD0.CTRLA = 0;                     // Stop TCD0
   _PROTECTED_WRITE(TCD0.FAULTCTRL,0); // Turn off all outputs
-  PeripheralControl &= ~TIMERD0;      // Mark timer as user controlled
+  __PeripheralControl &= ~TIMERD0;      // Mark timer as user controlled
 }
 #endif

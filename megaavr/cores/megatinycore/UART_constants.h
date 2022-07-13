@@ -7,30 +7,36 @@
  * These are values that get passed to the second argument of Serial.begin in
  * DxCore 1.4.0+ and megaTinyCore 2.5.0+.
  */
+/*"What the bloody hell are all these static casts for?!"
+ * Well, the io headers define them as enumerated types. From C++20 onwards mixing enums is deprecated. These static casts do not effect behavior for everyone else
+ * but makethe user experience significantly better for C++20 people.
+ * Note that C++ 20 is not supported by this core . This was done in response to a PR and has zero impact om everyone else. Changes to make life easier for users
+ * of unsupported versions of the standards that do not meet both of thoe criteria will not be addressed.
+ */
 
 #ifndef UART_CONSTANTS_H
   #define UART_CONSTANTS_H
 
-  #define SERIAL_PARITY_EVEN   (USART_PMODE_EVEN_gc)
-  #define SERIAL_PARITY_ODD    (USART_PMODE_ODD_gc)
-  #define SERIAL_PARITY_NONE   (USART_PMODE_DISABLED_gc)
-  #define SERIAL_PARITY_MASK   (USART_PMODE_gm)
+  #define SERIAL_PARITY_EVEN   (static_cast<uint8_t>(USART_PMODE_EVEN_gc))
+  #define SERIAL_PARITY_ODD    (static_cast<uint8_t>(USART_PMODE_ODD_gc))
+  #define SERIAL_PARITY_NONE   (static_cast<uint8_t>(USART_PMODE_DISABLED_gc))
+  #define SERIAL_PARITY_MASK   (static_cast<uint8_t>(USART_PMODE_gm))
 
-  #define SERIAL_STOP_BIT_1    (USART_SBMODE_1BIT_gc)
-  #define SERIAL_STOP_BIT_2    (USART_SBMODE_2BIT_gc)
-  #define SERIAL_STOP_BIT_MASK (USART_SBMODE_gm)
+  #define SERIAL_STOP_BIT_1    (static_cast<uint8_t>(USART_SBMODE_1BIT_gc))
+  #define SERIAL_STOP_BIT_2    (static_cast<uint8_t>(USART_SBMODE_2BIT_gc))
+  #define SERIAL_STOP_BIT_MASK (static_cast<uint8_t>(USART_SBMODE_gm))
 
-  #define SERIAL_DATA_5        (USART_CHSIZE_5BIT_gc & 0x04)
+  #define SERIAL_DATA_5        (static_cast<uint8_t>(USART_CHSIZE_5BIT_gc & 0x04))
   // Special case - we strip out bit 2 in order to detect use of high-byte modifiers without specifying low byte, which is presumably user error.
   // and default 8N1 instead of the hardware default of 5N1.
-  #define SERIAL_DATA_6        (USART_CHSIZE_6BIT_gc)
-  #define SERIAL_DATA_7        (USART_CHSIZE_7BIT_gc)
-  #define SERIAL_DATA_8        (USART_CHSIZE_8BIT_gc)
-  #define SERIAL_DATA_INVALID1 (badArg("This is a 'reserved' value and does not identify a character size"), 0x04)
-  #define SERIAL_DATA_INVALID2 (badArg("This is a 'reserved' value and does not identify a character size"), 0x05)
-  #define SERIAL_DATA_9L       (badArg("9-bit serial not supported"),0x06)
-  #define SERIAL_DATA_9H       (badArg("9-bit serial not supported"),0x07)
-  #define SERIAL_DATA_MASK     (USART_CHSIZE_gm)
+  #define SERIAL_DATA_6        (static_cast<uint8_t>(USART_CHSIZE_6BIT_gc))
+  #define SERIAL_DATA_7        (static_cast<uint8_t>(USART_CHSIZE_7BIT_gc))
+  #define SERIAL_DATA_8        (static_cast<uint8_t>(USART_CHSIZE_8BIT_gc))
+  #define SERIAL_DATA_INVALID1 (static_cast<uint8_t>(badArg("This is a 'reserved' value and does not identify a character size"), 0x04))
+  #define SERIAL_DATA_INVALID2 (static_cast<uint8_t>(badArg("This is a 'reserved' value and does not identify a character size"), 0x05))
+  #define SERIAL_DATA_9L       (static_cast<uint8_t>(badArg("9-bit serial not supported"),0x06))
+  #define SERIAL_DATA_9H       (static_cast<uint8_t>(badArg("9-bit serial not supported"),0x07))
+  #define SERIAL_DATA_MASK     (static_cast<uint8_t>(USART_CHSIZE_gm))
 /* 9-bit is a can of worms. Aggressive ones with sharp teeth,
  * hungry for soft fle-- oh, hm, it seems to be a typo, it says "flash"...
  *
@@ -44,17 +50,17 @@
  * could test if it was 0, and get rid of the SERIAL_CONFIG_VALID below.
  */
 
-  #define SERIAL_MODE_ASYNC     (USART_CMODE_ASYNCHRONOUS_gc)
-  #define SERIAL_MODE_MSPI      (USART_CMODE_MSPI_gc)
-  #define SERIAL_MODE_IRCOM     (USART_CMODE_IRCOM_gc)
-  #define SERIAL_MODE_SYNC      (USART_CMODE_SYNCHRONOUS_gc)
+  #define SERIAL_MODE_ASYNC     (static_cast<uint8_t>(USART_CMODE_ASYNCHRONOUS_gc))
+  #define SERIAL_MODE_MSPI      (static_cast<uint8_t>(USART_CMODE_MSPI_gc))
+  #define SERIAL_MODE_IRCOM     (static_cast<uint8_t>(USART_CMODE_IRCOM_gc))
+  #define SERIAL_MODE_SYNC      (static_cast<uint8_t>(USART_CMODE_SYNCHRONOUS_gc))
 /* MSPI doesn't use the Parity, have start or stop bits and is always 8 bit characters.
  * Sync and IRCOM modes are like ASync - but only */
 
 // Used only in MSPI mode.
-  #define SERIAL_MSPI_LSB       (USART_UDORD_bm)
-  #define SERIAL_MSPI_MSB       (0)
-  #define SERIAL_MSPI_PHASE     (USART_UCPHA_bm)
+  #define SERIAL_MSPI_LSB     (static_cast<uint8_t>(USART_UDORD_bm))
+  #define SERIAL_MSPI_MSB     (static_cast<uint8_t>(0))
+  #define SERIAL_MSPI_PHASE   (static_cast<uint8_t>(USART_UCPHA_bm))
 /* You can combine them yourself with | - but you need 5 things:
   * A SERIAL_MODE
   * A SERIAL_STOP_BIT option  (can be omitted for 1 SB)
@@ -93,18 +99,17 @@
   #define SERIAL_MSPI_LSB_FIRST_PHASE  (SERIAL_MODE_MSPI | SERIAL_MSPI_PHASE | SERIAL_MSPI_LSB)
 
 /* helper options for syncBegin() and mspiBegin() */
-  #define MSPIBEGIN_INVERT          (PIN_DIR_SET|PIN_INVERT_SET)
-  #define MSPIBEGIN_NORMAL          (PIN_DIR_SET|PIN_INVERT_CLR)
-  #define SYNCBEGIN_INVERT_MASTER   (PIN_DIR_SET|PIN_INVERT_SET)
-  #define SYNCBEGIN_NORMAL_MASTER   (PIN_DIR_SET|PIN_INVERT_CLR)
-  #define SYNCBEGIN_INVERT_SLAVE    (PIN_DIR_CLR|PIN_INVERT_SET)
-  #define SYNCBEGIN_NORMAL_SLAVE    (PIN_DIR_CLR|PIN_INVERT_CLR)
+  #define MSPIBEGIN_INVERT          (PIN_DIR_SET | PIN_INVERT_SET)
+  #define MSPIBEGIN_NORMAL          (PIN_DIR_SET | PIN_INVERT_CLR)
+  #define SYNCBEGIN_INVERT_MASTER   (PIN_DIR_SET | PIN_INVERT_SET)
+  #define SYNCBEGIN_NORMAL_MASTER   (PIN_DIR_SET | PIN_INVERT_CLR)
+  #define SYNCBEGIN_INVERT_SLAVE    (PIN_DIR_CLR | PIN_INVERT_SET)
+  #define SYNCBEGIN_NORMAL_SLAVE    (PIN_DIR_CLR | PIN_INVERT_CLR)
 /* helper defines to get pins currently selected by number */
   #define PIN_SERIAL_TX             (0)
   #define PIN_SERIAL_RX             (1)
   #define PIN_SERIAL_XCK            (2)
   #define PIN_SERIAL_XDIR           (3)
-
 
 /* Modifier Definitions  - these can be OR'ed with the other definition to turn on features like one-wire half duplex and more */
 #if defined(USART_RS4850_bm)
@@ -185,7 +190,9 @@
  *   rate that both ends are set to and don't need it. It's great if you need
  *   to meet the LIN specifications, of course, but that's not a typical or
  *   advisable Arduino use case...
- *
+ *   Based on persistent requests from users, who want it badly enough to try
+ *   hacking something together to make use of it anyway, a future version
+ *   will incorporate generic autobaud mode, even though it's pretty silly.
  */
 
 /* Everything contigured by the SERIAL_xPs constants goes right into CTRLC:
@@ -229,9 +236,9 @@
 
   /* These are not usable on these parts. badCall() gets pulled in if you use them. */
 
-  #define SERIAL_PARITY_MARK   (badArg("Mark as 'parity' is not supported, use an extra stop bit"),0)
-  #define SERIAL_PARITY_SPACE  (badArg("Space as 'parity' is not supported on AVR"),0)
-  #define SERIAL_STOP_BIT_1_5  (badArg("1.5 stop bits is not supported on AVR"),0)
+  #define SERIAL_PARITY_MARK   (badArg("'Mark' as parity is not supported, use an extra stop bit"),0)
+  #define SERIAL_PARITY_SPACE  (badArg("'Space' as parity is not supported on AVR"),0)
+  #define SERIAL_STOP_BIT_1_5  (badArg("1.5 stop bits is not a supported setting on AVR"),0)
   #define SERIAL_5M1  (SERIAL_MODE_ASYNC | SERIAL_STOP_BIT_1 | SERIAL_PARITY_MARK | SERIAL_DATA_5)
   #define SERIAL_6M1  (SERIAL_MODE_ASYNC | SERIAL_STOP_BIT_1 | SERIAL_PARITY_MARK | SERIAL_DATA_6)
   #define SERIAL_7M1  (SERIAL_MODE_ASYNC | SERIAL_STOP_BIT_1 | SERIAL_PARITY_MARK | SERIAL_DATA_7)

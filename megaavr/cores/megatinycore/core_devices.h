@@ -369,8 +369,15 @@
   #define TCA_SINGLE_EVACT_CNT_ANYEDGE_gc TCA_SINGLE_EVACTA_CNT_ANYEDGE_gc
   #define TCA_SINGLE_EVACT_CNT_HIGHLVL_gc TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc
   #define TCA_SINGLE_EVACT_UPDOWN_gc TCA_SINGLE_EVACTA_UPDOWN_gc
+  #define TCB_CLKSEL_CLKDIV1_gc TCB_CLKSEL_DIV1_gc
+  #define TCB_CLKSEL_CLKDIV2_gc TCB_CLKSEL_DIV2_gc
+  #define TCB_CLKSEL_CLKTCA_gc TCB_CLKSEL_TCA0_gc
+#else
+  #define TCB_CLKSEL_DIV1_gc  TCB_CLKSEL_CLKDIV1_gc
+  #define TCB_CLKSEL_DIV2_gc  TCB_CLKSEL_CLKDIV2_gc
+  #define TCB_CLKSEL_TCA0_gc  TCB_CLKSEL_CLKTCA_gc
+  #define TCB_CLKSEL_EVENT_gc  ({badArg("This processor does not support TCB count on event mode. Only Dx, Ex, and 2-series tiny support that");})
 #endif
-
 
 /* Make sure we error out quickly if told to use an RTC timing option that isn't available. */
 #if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_XOSC))

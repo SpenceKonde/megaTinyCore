@@ -1,13 +1,6 @@
 #include "Logic.h"
 // *INDENT-OFF* // This file was lovingly hand indented, thankyouverymuch!
 // Array for storing ISR function pointers
-#if defined(CCL_CCL_vect)
-  #if defined(TRUTH5)
-    static volatile voidFuncPtr intFuncCCL[6];
-  #else
-    static volatile voidFuncPtr intFuncCCL[4];
-  #endif
-#endif
 
 struct Logic::CCLBlock {
   const uint8_t number;
@@ -460,8 +453,8 @@ void Logic::init() {
     }
   }
   // Set inputs modes
-  block.LUTCTRLB = (input1 << CCL_INSEL1_gp) | (input0 << CCL_INSEL0_gp);
-  block.LUTCTRLC = (input2 << CCL_INSEL2_gp);
+  block.LUTCTRLB = ((input1 & 0x0f) << CCL_INSEL1_gp) | ((input0 & 0x0f) << CCL_INSEL0_gp);
+  block.LUTCTRLC = input2; /* pray that some day we need to handle a 4th input! */
 
   // Set truth table
   block.TRUTH = truth;
@@ -484,7 +477,7 @@ void Logic::init() {
                    | (enable ? CCL_ENABLE_bm : 0);
 }
 
-
+/*
 #if defined(CCL_CCL_vect)
 void Logic::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
   CCL_INTMODE0_t intmode;
@@ -580,5 +573,4 @@ ISR(CCL_CCL_vect) {
   }
   #endif // CCL_CCL_vect
 }
-
-#endif
+*/

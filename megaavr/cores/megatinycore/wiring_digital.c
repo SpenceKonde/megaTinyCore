@@ -29,14 +29,21 @@
 #include "pins_arduino.h"
 
 inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
-  if (__builtin_constant_p(pin))
+  if (__builtin_constant_p(pin)) {
     if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
     // Exception made for NOT_A_PIN - code exists which relies on being able to pass this and have nothing happen.
     // While IMO very poor coding practice, these checks aren't here to prevent lazy programmers from intentionally
     // taking shortcuts we disapprove of, but to call out things that are virtually guaranteed to be a bug.
     // Passing -1/255/NOT_A_PIN to the digital I/O functions is most likely intentional.
       badArg("Digital pin is constant, but not a valid pin");
+    #if (CLOCK_SOURCE == 2)
+        if (pin == PIN_PA3) {
+          badArg("Constant digital pin PIN_PA3, used for selected external osc, and is not available for other uses.");
+        }
+    #endif
+  }
 }
+
 
 inline __attribute__((always_inline)) void check_valid_pin_mode(uint8_t mode) {
   if (__builtin_constant_p(mode)) {
@@ -58,22 +65,22 @@ void pinConfigure(uint8_t pin, uint16_t pinconfig) {
   uint8_t bit_pos = digitalPinToBitPosition(pin);
   uint8_t setting = pinconfig & 0x03; // grab direction bits
   if (setting) {
-    *(portbase + setting) = bit_mask;
+    *(portbase + setting) = bit_mask; // DIR
   }
   pinconfig >>= 2;
   setting = pinconfig & 0x03; // as above, only for output
   if (setting) {
-    *(portbase + 4 + setting) = bit_mask;
+    *(portbase + 4 + setting) = bit_mask;  // OUT
   }
-  if (!(pinconfig & 0x03FFC)) return;
+  if (!(pinconfig & 0x3FFC)) return; // RETURN if we're done before we start this mess.
   pinconfig >>= 2;
   uint8_t oldSREG = SREG;
   cli();
   uint8_t pinncfg = *(portbase + 0x10 + bit_pos);
-  if (pinconfig & 0x08) {
-    pinncfg = (pinncfg & 0xF8) | (pinconfig & 0x07);
+  if (pinconfig & 0x08 ) {
+    pinncfg = (pinncfg & 0xF8 ) | (pinconfig & 0x07); // INPUT SENSE CONFIG
   }
-  uint8_t temp = pinconfig & 0x30;
+  uint8_t temp = pinconfig & 0x30; // PULLUP
   if (temp) {
     if (temp == 0x30) {
       pinncfg ^= 0x08;    // toggle pullup - of dubious utility
@@ -111,7 +118,7 @@ void pinConfigure(uint8_t pin, uint16_t pinconfig) {
     }
   }
   #endif
-  temp = pinconfig & 0x0C;
+  temp = pinconfig & 0x0C; // INVERT PIN
   if (temp) {
     if (temp == 0x0C) {
       pinncfg ^= 0x80;    // toggle invert - of dubious utility, but I'll accept it.
@@ -121,8 +128,8 @@ void pinConfigure(uint8_t pin, uint16_t pinconfig) {
       pinncfg |= 0x80;    // set
     }
   }
-  *(portbase + 0x10 + bit_pos)=pinncfg;
-  SREG = oldSREG; // re-enable interrupts
+  *(portbase + 0x10 + bit_pos) = pinncfg;
+  SREG=oldSREG; // re-enable interrupts
 }
 
 static inline uint8_t portToPortBaseOffset(uint8_t port);
@@ -143,11 +150,13 @@ void pinMode(uint8_t pin, uint8_t mode) {
     *(port_base + 1) = bit_mask;
   } else {
     *(port_base + 2) = bit_mask;
-    if (mode == 2) {
+    /* By unanimous decision of users who spoke up, we shall not st the output register to emulate classic AVRs.
+    if (mode == INPUT_PULLUP) {
       *(port_base + 5) = bit_mask;
     } else if (mode == 0) {
       *(port_base + 6) = bit_mask;
     }
+    */
   }
   port_base +=(uint8_t) digitalPinToBitPosition(pin) | (uint8_t) 0x10;
   bit_mask = *port_base;
@@ -167,13 +176,13 @@ void turnOffPWM(uint8_t pin) {
   /* Get pin's timer
    * megaTinyCore only - assumes only TIMERA0, TIMERD0, or DACOUT
    * can be returned here, all have only 1 bit set, so we can use
-   * PeripheralControl as a mask to see if they have taken over
+   * __PeripheralControl as a mask to see if they have taken over
    * any timers with minimum overhead - critical on these parts
    * Since nothing that will show up here can have more than one
    * one bit set, binary and will give 0x00 if that bit is cleared
    * which is NOT_ON_TIMER.
    */
-  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & PeripheralControl;
+  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & __PeripheralControl;
   /* end megaTinyCore-specific section */
   if (digital_pin_timer== NOT_ON_TIMER) {
     return;
@@ -264,20 +273,23 @@ void digitalWrite(uint8_t pin, uint8_t val) {
 
   /* Get port */
   PORT_t *port = digitalPinToPortStruct(pin);
-
-
-  /*
-  Set output to value
+  /* Set output to value
   This now runs even if port set INPUT in order to emulate
   the behavior of digitalWrite() on classic AVR devices, where
   you could digitalWrite() a pin while it's an input, to ensure
   that the value of the port was set correctly when it was
-  changed to an output. Code in the wild relies on this behavior.
-  */
+  changed to an output. Code in the wild relies on this behavior. */
 
   if (val == LOW) { /* If LOW */
     port->OUTCLR = bit_mask;
-  } else if (val == CHANGE) { /* If TOGGLE */
+  } else if (val == CHANGE) { /* If TOGGLE
+     * For the pullup setting part below
+     * we need to know if it's been set high or low
+     * otherwise the pullup state could get out of
+     * sync with the output bit. Annoying! But we should
+     * have to read it before writing OUTTGL, since that can
+     * have a 1 clock delay. So read first + invert */
+    val = !(port->OUT & bit_mask);
     port->OUTTGL = bit_mask;
     // Now, for the pullup setting part below
     // we need to know if it's been set high or low
@@ -356,7 +368,7 @@ inline __attribute__((always_inline)) void digitalWriteFast(uint8_t pin, uint8_t
   if (val == LOW)
     vport->OUT &= ~mask;
   else if (val == CHANGE)
-    vport->IN  |= mask;
+    vport->IN |= mask;
   else // HIGH
     vport->OUT |= mask;
 
@@ -369,7 +381,7 @@ int8_t digitalRead(uint8_t pin) {
   if (bit_mask == NOT_A_PIN) {
     return -1;
   }
-  // Origionbally the Arduino core this was derived from turned off PWM on the pin
+  // Originally the Arduino core this was derived from turned off PWM on the pin
   // I cannot fathom why, insofar as the Arduino team sees Arduino as an educational
   // tool, and I can't think of a better way to learn about PWM...
   //
@@ -417,13 +429,14 @@ void openDrain(uint8_t pin, uint8_t state) {
   if (state == LOW)
     port->DIRSET = bit_mask;
   else if (state == CHANGE)
-    port->DIRTGL = bit_mask;
-  else // assume FLOAT
-    port->DIRCLR = bit_mask;
+    port->DIRTGL=bit_mask;
+  else // assume FLOATING
+    port->DIRCLR=bit_mask;
   turnOffPWM(pin);
 }
 
-inline __attribute__((always_inline)) void openDrainFast(uint8_t pin, uint8_t val) {
+inline __attribute__((always_inline)) void openDrainFast(uint8_t pin, uint8_t val)
+{
   check_constant_pin(pin);
   check_valid_digital_pin(pin);
   if (pin == NOT_A_PIN) return; // sigh... I wish I didn't have to catch this... but it's all compile time known so w/e

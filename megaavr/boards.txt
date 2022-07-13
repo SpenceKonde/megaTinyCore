@@ -9,11 +9,11 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other         ##       ####       #    #   #
-#  contributors 2018-2021                  #  #      #         ##   ##   #
-#  megaTinyCore is free software.    # #     #       ###        #    #   #
+#  Copyright Spence Konde and other         ##       ####       #    ##  #
+#  contributors 2018-2021                  #  #      #         ##   #  # #
+#  megaTinyCore is free software.    # #     #       ###        #     #  #
 #  (LGPL v2.1) see LICENSE.md and    # #    #    ##     #  ##   #    #   #
-#  License section of README.md       #    ####  ##  ###   ##  ###  ###  #
+#  License section of README.md       #    ####  ##  ###   ##  ###  #### #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
@@ -134,6 +134,7 @@ atxy7.build.bootload=
 atxy7.build.printfabr=
 atxy7.build.attachabr=
 atxy7.build.wireabr=
+atxy7.build.pwmabr=
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -233,6 +234,12 @@ atxy7.menu.clock.1internal=1 MHz internal
 atxy7.menu.clock.20internaltuned=20 MHz internal - tuned
 atxy7.menu.clock.16internaltuned=16 MHz internal - tuned
 atxy7.menu.clock.12internaltuned=12 MHz internal - tuned
+atxy7.menu.clock.10internaltuned=10 MHz internal - tuned
+atxy7.menu.clock.8internaltuned=8 MHz internal - tuned
+atxy7.menu.clock.6internaltuned=6 MHz internal - tuned
+atxy7.menu.clock.5internaltuned=5 MHz internal - tuned
+atxy7.menu.clock.4internaltuned=4 MHz internal - tuned
+atxy7.menu.clock.1internaltuned=1 MHz internal - tuned
 atxy7.menu.clock.20extclock=20 MHz external clock
 atxy7.menu.clock.16extclock=16 MHz external clock
 atxy7.menu.clock.12extclock=12 MHz external clock
@@ -437,17 +444,11 @@ atxy7.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy7.menu.attach.allenabled=On all pins, new implementation.
 atxy7.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy7.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy7.menu.attach.manual=Only enabled ports
 atxy7.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy7.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy7.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy7.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy7.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy7.menu.attach.oldversion=Old version, may fix bugs.
 atxy7.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy7.menu.attach.manual.build.attachabr=.aMan
-atxy7.menu.attach.all_late.build.attachabr=.aL
-atxy7.menu.attach.manual_late.build.attachabr=.aLMan
 atxy7.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
@@ -503,6 +504,7 @@ atxy6.build.bootload=
 atxy6.build.printfabr=
 atxy6.build.attachabr=
 atxy6.build.wireabr=
+atxy6.build.pwmabr=
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -608,6 +610,12 @@ atxy6.menu.clock.1internal=1 MHz internal
 atxy6.menu.clock.20internaltuned=20 MHz internal - tuned
 atxy6.menu.clock.16internaltuned=16 MHz internal - tuned
 atxy6.menu.clock.12internaltuned=12 MHz internal - tuned
+atxy6.menu.clock.10internaltuned=10 MHz internal - tuned
+atxy6.menu.clock.8internaltuned=8 MHz internal - tuned
+atxy6.menu.clock.6internaltuned=6 MHz internal - tuned
+atxy6.menu.clock.5internaltuned=5 MHz internal - tuned
+atxy6.menu.clock.4internaltuned=4 MHz internal - tuned
+atxy6.menu.clock.1internaltuned=1 MHz internal - tuned
 atxy6.menu.clock.20extclock=20 MHz external clock
 atxy6.menu.clock.16extclock=16 MHz external clock
 atxy6.menu.clock.12extclock=12 MHz external clock
@@ -674,7 +682,27 @@ atxy6.menu.clock.30internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atxy6.menu.clock.32internaltuned.build.speed=32
 atxy6.menu.clock.32internaltuned.build.clocksource=0
 atxy6.menu.clock.32internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.10internaltuned.build.speed=10
+atxy6.menu.clock.10internaltuned.build.clocksource=0
+atxy6.menu.clock.10internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.8internaltuned.build.speed=8
+atxy6.menu.clock.8internaltuned.build.clocksource=0
+atxy6.menu.clock.8internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.6internaltuned.build.speed=6
+atxy6.menu.clock.6internaltuned.build.clocksource=0
+atxy6.menu.clock.6internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.5internaltuned.build.speed=5
+atxy6.menu.clock.5internaltuned.build.clocksource=0
+atxy6.menu.clock.5internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.4internaltuned.build.speed=4
+atxy6.menu.clock.4internaltuned.build.clocksource=0
+atxy6.menu.clock.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6.menu.clock.1internaltuned.build.speed=1
+atxy6.menu.clock.1internaltuned.build.clocksource=0
+atxy6.menu.clock.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atxy6.menu.clock.20internaltuned.bootloader.OSCCFG=0x02
+atxy6.menu.clock.10internaltuned.bootloader.OSCCFG=0x02
+atxy6.menu.clock.5internaltuned.bootloader.OSCCFG=0x02
 atxy6.menu.clock.24internaltuned.bootloader.OSCCFG=0x02
 atxy6.menu.clock.25internaltuned.bootloader.OSCCFG=0x02
 atxy6.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
@@ -812,17 +840,11 @@ atxy6.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy6.menu.attach.allenabled=On all pins, like usual
 atxy6.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy6.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy6.menu.attach.manual=Only enabled ports
 atxy6.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy6.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy6.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy6.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy6.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy6.menu.attach.oldversion=Old version, (may fix bugs)
 atxy6.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy6.menu.attach.manual.build.attachabr=.aMan
-atxy6.menu.attach.all_late.build.attachabr=.aL
-atxy6.menu.attach.manual_late.build.attachabr=.aLMan
 atxy6.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
@@ -878,6 +900,7 @@ atxy4.build.bootload=
 atxy4.build.printfabr=
 atxy4.build.attachabr=
 atxy4.build.wireabr=
+atxy4.build.pwmabr=
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -985,6 +1008,12 @@ atxy4.menu.clock.1internal=1 MHz internal
 atxy4.menu.clock.20internaltuned=20 MHz internal - tuned
 atxy4.menu.clock.16internaltuned=16 MHz internal - tuned
 atxy4.menu.clock.12internaltuned=12 MHz internal - tuned
+atxy4.menu.clock.10internaltuned=10 MHz internal - tuned
+atxy4.menu.clock.8internaltuned=8 MHz internal - tuned
+atxy4.menu.clock.6internaltuned=6 MHz internal - tuned
+atxy4.menu.clock.5internaltuned=5 MHz internal - tuned
+atxy4.menu.clock.4internaltuned=4 MHz internal - tuned
+atxy4.menu.clock.1internaltuned=1 MHz internal - tuned
 atxy4.menu.clock.20extclock=20 MHz external clock
 atxy4.menu.clock.16extclock=16 MHz external clock
 atxy4.menu.clock.12extclock=12 MHz external clock
@@ -1187,17 +1216,11 @@ atxy4.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy4.menu.attach.allenabled=On all pins, like usual
 atxy4.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy4.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy4.menu.attach.manual=Only enabled ports
 atxy4.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy4.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy4.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy4.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy4.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy4.menu.attach.oldversion=Old version, (may fix bugs)
 atxy4.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy4.menu.attach.manual.build.attachabr=.aMan
-atxy4.menu.attach.all_late.build.attachabr=.aL
-atxy4.menu.attach.manual_late.build.attachabr=.aLMan
 atxy4.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -1252,6 +1275,7 @@ atxy2.build.bootload=
 atxy2.build.printfabr=
 atxy2.build.attachabr=
 atxy2.build.wireabr=
+atxy2.build.pwmabr=
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -1318,6 +1342,12 @@ atxy2.menu.clock.1internal=1 MHz internal
 atxy2.menu.clock.20internaltuned=20 MHz internal - tuned
 atxy2.menu.clock.16internaltuned=16 MHz internal - tuned
 atxy2.menu.clock.12internaltuned=12 MHz internal - tuned
+atxy2.menu.clock.10internaltuned=10 MHz internal - tuned
+atxy2.menu.clock.8internaltuned=8 MHz internal - tuned
+atxy2.menu.clock.6internaltuned=6 MHz internal - tuned
+atxy2.menu.clock.5internaltuned=5 MHz internal - tuned
+atxy2.menu.clock.4internaltuned=4 MHz internal - tuned
+atxy2.menu.clock.1internaltuned=1 MHz internal - tuned
 atxy2.menu.clock.20extclock=20 MHz external clock
 atxy2.menu.clock.16extclock=16 MHz external clock
 atxy2.menu.clock.12extclock=12 MHz external clock
@@ -1514,17 +1544,11 @@ atxy2.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy2.menu.attach.allenabled=On all pins, like usual
 atxy2.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy2.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy2.menu.attach.manual=Only enabled ports
 atxy2.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy2.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy2.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy2.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy2.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy2.menu.attach.oldversion=Old version, (may fix bugs)
 atxy2.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy2.menu.attach.manual.build.attachabr=.aMan
-atxy2.menu.attach.all_late.build.attachabr=.aL
-atxy2.menu.attach.manual_late.build.attachabr=.aLMan
 atxy2.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -1577,6 +1601,7 @@ microchip.build.bootload=
 microchip.build.printfabr=
 microchip.build.wireabr=
 microchip.build.attachabr=
+microchip.build.pwmabr=
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -1675,6 +1700,12 @@ microchip.menu.clock.1internal=1 MHz internal
 microchip.menu.clock.20internaltuned=20 MHz internal - tuned
 microchip.menu.clock.16internaltuned=16 MHz internal - tuned
 microchip.menu.clock.12internaltuned=12 MHz internal - tuned
+microchip.menu.clock.10internaltuned=10 MHz internal - tuned
+microchip.menu.clock.8internaltuned=8 MHz internal - tuned
+microchip.menu.clock.6internaltuned=6 MHz internal - tuned
+microchip.menu.clock.5internaltuned=5 MHz internal - tuned
+microchip.menu.clock.4internaltuned=4 MHz internal - tuned
+microchip.menu.clock.1internaltuned=1 MHz internal - tuned
 microchip.menu.clock.24internaltuned=24 MHz internal - tuned, overclocked
 microchip.menu.clock.25internaltuned=25 MHz internal - tuned, overclocked
 microchip.menu.clock.30internaltuned=30 MHz internal - tuned, overclocked, may be unstable, req. 20 MHz fuse
@@ -1847,17 +1878,11 @@ microchip.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 microchip.menu.attach.allenabled=On all pins, like usual
 microchip.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-microchip.menu.attach.manual=Only enabled ports. Please see documentation.
+microchip.menu.attach.manual=Only enabled ports
 microchip.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-microchip.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-microchip.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-microchip.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-microchip.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 microchip.menu.attach.oldversion=Old version, (may fix bugs)
 microchip.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 microchip.menu.attach.manual.build.attachabr=.aMan
-microchip.menu.attach.all_late.build.attachabr=.aL
-microchip.menu.attach.manual_late.build.attachabr=.aLMan
 microchip.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
@@ -1921,6 +1946,7 @@ atxy7o.bootloader.tool=avrdude
 atxy7o.build.printfabr=
 atxy7o.build.attachabr=
 atxy7o.build.wireabr=
+atxy7o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -1986,6 +2012,12 @@ atxy7o.menu.clocko.1internal=1 MHz internal
 atxy7o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atxy7o.menu.clocko.16internaltuned=16 MHz internal - tuned
 atxy7o.menu.clocko.12internaltuned=12 MHz internal - tuned
+atxy7o.menu.clocko.10internaltuned=10 MHz internal - tuned
+atxy7o.menu.clocko.8internaltuned=8 MHz internal - tuned
+atxy7o.menu.clocko.6internaltuned=6 MHz internal - tuned
+atxy7o.menu.clocko.5internaltuned=5 MHz internal - tuned
+atxy7o.menu.clocko.4internaltuned=4 MHz internal - tuned
+atxy7o.menu.clocko.1internaltuned=1 MHz internal - tuned
 atxy7o.menu.clocko.20extclock=20 MHz external clock
 atxy7o.menu.clocko.16extclock=16 MHz external clock
 atxy7o.menu.clocko.12extclock=12 MHz external clock
@@ -2188,17 +2220,11 @@ atxy7o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy7o.menu.attach.allenabled=On all pins, like usual
 atxy7o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy7o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy7o.menu.attach.manual=Only enabled ports
 atxy7o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy7o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy7o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy7o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy7o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy7o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy7o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy7o.menu.attach.manual.build.attachabr=.aMan
-atxy7o.menu.attach.all_late.build.attachabr=.aL
-atxy7o.menu.attach.manual_late.build.attachabr=.aLMan
 atxy7o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -2252,6 +2278,7 @@ atx27o.bootloader.tool=avrdude
 atx27o.build.printfabr=
 atx27o.build.attachabr=
 atx27o.build.wireabr=
+atx27o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -2511,17 +2538,11 @@ atx27o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atx27o.menu.attach.allenabled=On all pins, like usual
 atx27o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atx27o.menu.attach.manual=Only enabled ports. Please see documentation.
+atx27o.menu.attach.manual=Only enabled ports
 atx27o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atx27o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atx27o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atx27o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atx27o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atx27o.menu.attach.oldversion=Old version, (may fix bugs)
 atx27o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atx27o.menu.attach.manual.build.attachabr=.aMan
-atx27o.menu.attach.all_late.build.attachabr=.aL
-atx27o.menu.attach.manual_late.build.attachabr=.aLMan
 atx27o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -2575,6 +2596,7 @@ atxy6o.bootloader.tool=avrdude
 atxy6o.build.printfabr=
 atxy6o.build.attachabr=
 atxy6o.build.wireabr=
+atxy6o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -2648,6 +2670,12 @@ atxy6o.menu.clocko.1internal=1 MHz internal
 atxy6o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atxy6o.menu.clocko.16internaltuned=16 MHz internal - tuned
 atxy6o.menu.clocko.12internaltuned=12 MHz internal - tuned
+atxy6o.menu.clocko.10internaltuned=10 MHz internal - tuned
+atxy6o.menu.clocko.8internaltuned=8 MHz internal - tuned
+atxy6o.menu.clocko.6internaltuned=6 MHz internal - tuned
+atxy6o.menu.clocko.5internaltuned=5 MHz internal - tuned
+atxy6o.menu.clocko.4internaltuned=4 MHz internal - tuned
+atxy6o.menu.clocko.1internaltuned=1 MHz internal - tuned
 atxy6o.menu.clocko.20extclock=20 MHz external clock
 atxy6o.menu.clocko.16extclock=16 MHz external clock
 atxy6o.menu.clocko.12extclock=12 MHz external clock
@@ -2850,17 +2878,11 @@ atxy6o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy6o.menu.attach.allenabled=On all pins, like usual
 atxy6o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy6o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy6o.menu.attach.manual=Only enabled ports
 atxy6o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy6o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy6o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy6o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy6o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy6o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy6o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy6o.menu.attach.manual.build.attachabr=.aMan
-atxy6o.menu.attach.all_late.build.attachabr=.aL
-atxy6o.menu.attach.manual_late.build.attachabr=.aLMan
 atxy6o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -2914,6 +2936,7 @@ atx26o.bootloader.tool=avrdude
 atx26o.build.printfabr=
 atx26o.build.attachabr=
 atx26o.build.wireabr=
+atx26o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3103,12 +3126,12 @@ atx26o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 #  UPDI and RESET PIN configuration and  #
 #       OPTIBOOT ENTRY conditions        #
 #----------------------------------------#
-atx26o.menu.resetpinopti_2.UPDI=No RST, UPDI enabled, 8 sec Optiboot after power on or SW reset
-atx26o.menu.resetpinopti_2.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
-atx26o.menu.resetpinopti_2.UPDI.bootloader.resetpinbits=01
 atx26o.menu.resetpinopti_2.UPDIaltrst=UPDI on PA0, RST on PB4 (Optiboot for 1 sec after reset)
 atx26o.menu.resetpinopti_2.UPDIaltrst.bootloader.file=optiboot_tx2z{bootloader.uartswap}_rst.hex
 atx26o.menu.resetpinopti_2.UPDIaltrst.bootloader.resetpinbits=11
+atx26o.menu.resetpinopti_2.UPDI=No RST, UPDI enabled, 8 sec Optiboot after power on or SW reset
+atx26o.menu.resetpinopti_2.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
+atx26o.menu.resetpinopti_2.UPDI.bootloader.resetpinbits=01
 atx26o.menu.resetpinopti_2.UPDIFastBoot=Optiboot for 1 sec. after power-on & SW reset, no RST pin
 atx26o.menu.resetpinopti_2.UPDIFastBoot.bootloader.file=optiboot_tx2z{bootloader.uartswap}_1sec.hex
 atx26o.menu.resetpinopti_2.UPDIFastBoot.bootloader.resetpinbits=01
@@ -3173,17 +3196,11 @@ atx26o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atx26o.menu.attach.allenabled=On all pins, like usual
 atx26o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atx26o.menu.attach.manual=Only enabled ports. Please see documentation.
+atx26o.menu.attach.manual=Only enabled ports
 atx26o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atx26o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atx26o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atx26o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atx26o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atx26o.menu.attach.oldversion=Old version, (may fix bugs)
 atx26o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atx26o.menu.attach.manual.build.attachabr=.aMan
-atx26o.menu.attach.all_late.build.attachabr=.aL
-atx26o.menu.attach.manual_late.build.attachabr=.aLMan
 atx26o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -3237,6 +3254,7 @@ atxy4o.bootloader.tool=avrdude
 atxy4o.build.printfabr=
 atxy4o.build.attachabr=
 atxy4o.build.wireabr=
+atxy4o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3318,6 +3336,12 @@ atxy4o.menu.clocko.1internal=1 MHz internal
 atxy4o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atxy4o.menu.clocko.16internaltuned=16 MHz internal - tuned
 atxy4o.menu.clocko.12internaltuned=12 MHz internal - tuned
+atxy4o.menu.clocko.10internaltuned=10 MHz internal - tuned
+atxy4o.menu.clocko.8internaltuned=8 MHz internal - tuned
+atxy4o.menu.clocko.6internaltuned=6 MHz internal - tuned
+atxy4o.menu.clocko.5internaltuned=5 MHz internal - tuned
+atxy4o.menu.clocko.4internaltuned=4 MHz internal - tuned
+atxy4o.menu.clocko.1internaltuned=1 MHz internal - tuned
 atxy4o.menu.clocko.20extclock=20 MHz external clock
 atxy4o.menu.clocko.16extclock=16 MHz external clock
 atxy4o.menu.clocko.12extclock=12 MHz external clock
@@ -3525,17 +3549,11 @@ atxy4o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy4o.menu.attach.allenabled=On all pins, like usual
 atxy4o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy4o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy4o.menu.attach.manual=Only enabled ports
 atxy4o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy4o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy4o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy4o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy4o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy4o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy4o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy4o.menu.attach.manual.build.attachabr=.aMan
-atxy4o.menu.attach.all_late.build.attachabr=.aL
-atxy4o.menu.attach.manual_late.build.attachabr=.aLMan
 atxy4o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -3589,6 +3607,7 @@ atx24o.bootloader.tool=avrdude
 atx24o.build.printfabr=
 atx24o.build.attachabr=
 atx24o.build.wireabr=
+atx24o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3843,17 +3862,11 @@ atx24o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atx24o.menu.attach.allenabled=On all pins, like usual
 atx24o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atx24o.menu.attach.manual=Only enabled ports. Please see documentation.
+atx24o.menu.attach.manual=Only enabled ports
 atx24o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atx24o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atx24o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atx24o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atx24o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atx24o.menu.attach.oldversion=Old version, (may fix bugs)
 atx24o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atx24o.menu.attach.manual.build.attachabr=.aMan
-atx24o.menu.attach.all_late.build.attachabr=.aL
-atx24o.menu.attach.manual_late.build.attachabr=.aLMan
 atx24o.menu.attach.oldversion.build.attachabr=.aOld
 
 ############################################################################
@@ -3906,6 +3919,7 @@ atxy2o.bootloader.tool=avrdude
 atxy2o.build.printfabr=
 atxy2o.build.attachabr=
 atxy2o.build.wireabr=
+atxy2o.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3970,6 +3984,12 @@ atxy2o.menu.clocko.1internal=1 MHz internal
 atxy2o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atxy2o.menu.clocko.16internaltuned=16 MHz internal - tuned
 atxy2o.menu.clocko.12internaltuned=12 MHz internal - tuned
+atxy2o.menu.clocko.10internaltuned=10 MHz internal - tuned
+atxy2o.menu.clocko.8internaltuned=8 MHz internal - tuned
+atxy2o.menu.clocko.6internaltuned=6 MHz internal - tuned
+atxy2o.menu.clocko.5internaltuned=5 MHz internal - tuned
+atxy2o.menu.clocko.4internaltuned=4 MHz internal - tuned
+atxy2o.menu.clocko.1internaltuned=1 MHz internal - tuned
 atxy2o.menu.clocko.20extclock=20 MHz external clock
 atxy2o.menu.clocko.16extclock=16 MHz external clock
 atxy2o.menu.clocko.12extclock=12 MHz external clock
@@ -4173,17 +4193,11 @@ atxy2o.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 atxy2o.menu.attach.allenabled=On all pins, like usual
 atxy2o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy2o.menu.attach.manual=Only enabled ports. Please see documentation.
+atxy2o.menu.attach.manual=Only enabled ports
 atxy2o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-atxy2o.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-atxy2o.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-atxy2o.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-atxy2o.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 atxy2o.menu.attach.oldversion=Old version, (may fix bugs)
 atxy2o.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy2o.menu.attach.manual.build.attachabr=.aMan
-atxy2o.menu.attach.all_late.build.attachabr=.aL
-atxy2o.menu.attach.manual_late.build.attachabr=.aLMan
 atxy2o.menu.attach.oldversion.build.attachabr=.aOld
 
 ##########################################################################
@@ -4234,6 +4248,7 @@ microchipo.bootloader.tool=avrdude
 microchipo.build.printfabr=
 microchipo.build.wireabr=
 microchipo.build.attachabr=
+microchipo.build.pwmabr=
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -4334,6 +4349,12 @@ microchipo.menu.clocko.1internal=1 MHz internal
 microchipo.menu.clocko.20internaltuned=20 MHz internal - tuned
 microchipo.menu.clocko.16internaltuned=16 MHz internal - tuned
 microchipo.menu.clocko.12internaltuned=12 MHz internal - tuned
+microchipo.menu.clocko.10internaltuned=10 MHz internal - tuned
+microchipo.menu.clocko.8internaltuned=8 MHz internal - tuned
+microchipo.menu.clocko.6internaltuned=6 MHz internal - tuned
+microchipo.menu.clocko.5internaltuned=5 MHz internal - tuned
+microchipo.menu.clocko.4internaltuned=4 MHz internal - tuned
+microchipo.menu.clocko.1internaltuned=1 MHz internal - tuned
 microchipo.menu.clocko.24internaltuned=24 MHz internal - tuned, overclocked
 microchipo.menu.clocko.25internaltuned=25 MHz internal - tuned, overclocked
 microchipo.menu.clocko.30internaltuned=30 MHz internal - tuned, overclocked, may be unstable, req. 20 MHz fuse
@@ -4448,10 +4469,10 @@ microchipo.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 #  UPDI and RESET PIN configuration and  #
 #       OPTIBOOT ENTRY conditions        #
 #----------------------------------------#
-microchip.menu.resetpin.UPDI=UPDI (no reset pin)
-microchip.menu.resetpin.UPDI.bootloader.resetpinbits=01
-microchip.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
-microchip.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
+microchipo.menu.resetpin.UPDI=UPDI (no reset pin)
+microchipo.menu.resetpin.UPDI.bootloader.resetpinbits=01
+microchipo.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
+microchipo.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
 # the microchip debuggers are not 12v tolerant so nothing that would need hv programming to reset is supported. And if you cut the straps to debugger, you shouldn't be using this board definition.
 
 #----------------------------------------#
@@ -4498,15 +4519,9 @@ microchipo.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 microchipo.menu.attach.allenabled=On all pins, like usual
 microchipo.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-microchipo.menu.attach.manual=Only enabled ports. Please see documentation.
+microchipo.menu.attach.manual=Only enabled ports
 microchipo.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
-microchipo.menu.attach.all_late=Only enabled ports, late clear. See documentation.
-microchipo.menu.attach.all_late.build.attachmode=-DCORE_ATTACH_LATECLEAR
-microchipo.menu.attach.manual_late=Only enabled ports, late clear. See documentation.
-microchipo.menu.attach.manual_late.build.attachmode=-DCORE_ATTACH_NONE -DCORE_ATTACH_LATECLEAR
 microchipo.menu.attach.oldversion=Old version, (may fix bugs)
 microchipo.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 microchipo.menu.attach.manual.build.attachabr=.aMan
-microchipo.menu.attach.all_late.build.attachabr=.aL
-microchipo.menu.attach.manual_late.build.attachabr=.aLMan
 microchipo.menu.attach.oldversion.build.attachabr=.aOld

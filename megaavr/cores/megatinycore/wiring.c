@@ -1,8 +1,14 @@
 /*
-  wiring.c - Partial implementation of the Wiring API for the ATmega8.
-  Part of Arduino - http://www.arduino.cc/
-
+  wiring.c - Partial implementation of the Wiring API
+  Originally part of Arduino - http://www.arduino.cc/
   Copyright (c) 2005-2006 David A. Mellis
+
+
+  Copyright (c) 2018-2021 Spence Konde
+  This has been ported to modern AVRs (Arduino team did that)
+  Almost every part of it has since been rewritten for
+  megaTinyCore and DxCore. This is the DxCore version, and is
+  part of DxCore.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -29,14 +35,14 @@
   #error "CLOCK_SOURCE not defined. Must be 0 for internal, 1 for crystal, or 2 for external clock"
 #endif
 
-/* Declared in wiring_private.h
- * PeripheralControl is used to mark peripherals as being "taken over" by the user
+/*           __PeripheralControl is used to mark peripherals as being "taken over" by the user
  * 0x40 = TIMERD0
  * 0x10 = TIMERA0
+ * 0x08 = TIMERA1
  * Implementation and use is not portable between cores - tradeoffs are made which
  * trade generalizability for low resource use
  */
-uint8_t PeripheralControl = 0xFF;
+uint8_t __PeripheralControl = 0xFF;
 
 // the prescaler is set so that timer ticks every 64 clock cycles, and the
 // the overflow handler is called every 256 ticks.
@@ -77,7 +83,6 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
 #endif
 
 // overflow count is tracked for all timer options, even the RTC
-
 
 #if !defined(MILLIS_USE_TIMERRTC)
 
@@ -540,8 +545,8 @@ unsigned long millis() {
           "add r0,r1"     "\n\t"  // + ticks >> 9
           "eor r1,r1"     "\n\t"  // clear out r1
           "sub %A0,r0"    "\n\t"  // Add the sum of terms that fit in a byte to what was ticks in old code.
-          "sbc %B0,r1"    "\n"    // carry - that's why you need a known 0 register!
-          : "+r" (ticks));        // Do the rest in C
+          "sbc %B0,r1"    "\n"    // carry - see,this is why AVR needs a known zero.
+          : "+r" (ticks));        // Do the rest in C. ticks is a read/write operand.
         microseconds = overflows * 1000 + ticks; // nice and clean.
 
       /* The Troublesome Tens - I initially fumbled this after the **now** r1 is 0 line
@@ -608,7 +613,7 @@ unsigned long millis() {
           "eor r1,r1"     "\n\t"  // restore zero_reg
           "add %A0,r0"    "\n\t"  // add to the shifted ticks
           "adc %B0,r1"    "\n"    // carry
-          : "+r" (ticks));        // Do the rest in C
+          : "+r" (ticks));        // Do the rest in C. ticks is a read/write operand.
         microseconds = overflows * 1000 + ticks;
 /* replaces:
       #elif (F_CPU == 48000000UL) // Extreme overclocking
@@ -1262,6 +1267,7 @@ void set_millis(__attribute__((unused))uint32_t newmillis)
 {
   #if defined(MILLIS_USE_TIMERNONE)
     badCall("set_millis() is only valid with millis timekeeping enabled.");
+    GPIOR0 |= newmillis; // keeps the compiler from warning about unused parameter, it's a compile error if this is reachable anyway.
   #else
     #if defined(MILLIS_USE_TIMERRTC)
       // timer_overflow_count = newmillis >> 16;
@@ -1300,7 +1306,9 @@ void init() {
   #endif
   /*************************** ENABLE GLOBAL INTERRUPTS *************************/
   // Finally, after everything is initialized, we go ahead and enable interrupts.
-  sei();
+  if (onAfterInit()) {
+    sei();
+  }
 }
 
   /******************************** CLOCK STUFF *********************************/
@@ -1368,14 +1376,16 @@ void __attribute__((weak)) init_clock() {
     uint8_t osccfg = FUSE.OSCCFG - 1; /****** "osccfg" IS A MAGIC NAME - DO NOT CHANGE IT ******/
     // The GUESSCAL, MAX_TUNING, TUNED_CALIBRATION_OFFSET and TUNE_PRESCALE symbols, which look like constants, aren't.
     // They're macros from tune_guesses.h and get replaced with (ternary operators and math involving osccfg), so what looks very simple here... actually isn't.
+    // Evertthing hard is done in tune_guesses.h
     if (TUNED_CALIBRATION_OFFSET == -1) {
       GPIOR0 |= 0x80;
       GPIOR0 |= 0x40;
       return; // we can't do that speed at all with this part and oscillator setting! Hopefully users notice their sketch is running
       // way too slow, and will read the docs which contain further instructions for diagnosis of these sort of problems.
     } else {
-      uint8_t tunedval=_SFR_MEM8(osccfg ? (0x1306 +  CLOCK_TUNE_START + TUNED_CALIBRATION_OFFSET) : (0x1300 +  CLOCK_TUNE_START + TUNED_CALIBRATION_OFFSET));
-      if (tunedval == 0xFF) {
+      uint8_t tunedval=_SFR_MEM8(((osccfg ? 0x1306 : 0x1300)   +  CLOCK_TUNE_START + TUNED_CALIBRATION_OFFSET));
+      uint8_t istuned =(!!_SFR_MEM8((osccfg ? 0x1306 : 0x1300) +  CLOCK_TUNE_START + HOME_TUNING_OFFSET));
+      if (!istuned) { {
         GPIOR0 |= 0x40;
         int temp = GUESSCAL;
         if (temp > MAX_TUNING) {             // uhoh, if we apply the default guess, we'd be setting it higher than it's maximum value!
@@ -1387,12 +1397,14 @@ void __attribute__((weak)) init_clock() {
         } else {
           tunedval = temp;
         }
-      } else if (tunedval & 0x80) {
+      }
+    } else if (tunedval == 0x80) {
         GPIOR0 |= 0x80;
         return; // this chip was tuned and it's oscillator found to be unable to reach target and/or the chip ceased to be opprate before reaching that speed
         // such that either the tuning sketch crashed or the incredilbly crude sanity check turned up an error.
       }
       _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
+      _NOP();
       _NOP();
     }
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, TUNE_PRESCALE);
@@ -1475,7 +1487,7 @@ void __attribute__((weak)) init_ADC0() {
   #endif
 }
 
-
+// Must be called manually.
 #ifdef ADC1
   __attribute__((weak)) void init_ADC1() {
     //                              30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz.
@@ -1549,15 +1561,35 @@ void __attribute__((weak)) init_TCA0() {
     TCA0.SPLIT.HCMP2 = 0;
   */
 
-  /* Use prescale appropriate for system clock speed */
+  /* Use prescale appropriate for system clock speed
+   * Detect conflict between wiring.c and timers.h if we spot them, as that indicates
+   * a defect in the core and would result in extremely bad behavior
+   */
 
-  #if (F_CPU > 25000000) //   use 256 divider when clocked over 25 MHz
+  #if (F_CPU > 30000000) // use 256 divider when clocked over 30 MHz
+    #if defined(MILLIS_USE_TIMERA0) && (TIME_TRACKING_TIMER_DIVIDER != 256)
+      #error "wiring.c and timers.h want to set millis timer TCA0 to different divider"
+    #endif
     TCA0.SPLIT.CTRLA   = (TCA_SPLIT_CLKSEL_DIV256_gc) | (TCA_SPLIT_ENABLE_bm);
-  #elif (F_CPU > 5000000) //  use 64 divider for everything in the middle
+  #elif (F_CPU > 5000000) // use 64 divider unless it's 5 MHz or under
+    #if defined(MILLIS_USE_TIMERA0) && (TIME_TRACKING_TIMER_DIVIDER != 64)
+      #error "wiring.c and timers.h want to set millis timer TCA0 to different divider"
+    #endif
     TCA0.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV64_gc) | (TCA_SPLIT_ENABLE_bm);
-  #elif (F_CPU > 1000000) // and use 16...
+  #elif (F_CPU > 1000000) // anything above 1 MHz
+    #if defined(MILLIS_USE_TIMERA0) && (TIME_TRACKING_TIMER_DIVIDER != 16)
+      #error "wiring.c and timers.h want to set millis timer TCA0 to different divider"
+    #endif
     TCA0.SPLIT.CTRLA   =  (TCA_SPLIT_CLKSEL_DIV16_gc) | (TCA_SPLIT_ENABLE_bm);
-  #else                   // or even 8 otherwise for really slow system clocks.
+  #else /* for 1 MHz and lower */
+    #if defined(MILLIS_USE_TIMERA0) && (TIME_TRACKING_TIMER_DIVIDER != 8)
+      #error "wiring.c and timers.h want to set millis timer TCA0 to different divider"
+    #endif
     TCA0.SPLIT.CTRLA   =   (TCA_SPLIT_CLKSEL_DIV8_gc) | (TCA_SPLIT_ENABLE_bm);
   #endif
 }
+
+
+__attribute__((weak)) void onPreMain() {;}
+__attribute__((weak)) void onBeforeInit() {;}
+__attribute__((weak)) uint8_t onAfterInit() {return 1;}

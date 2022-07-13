@@ -49,7 +49,7 @@
 #endif
 
 #ifndef LED_BUILTIN
-  #define LED_BUILTIN    (PIN_PA7)
+  #define LED_BUILTIN    (PIN_PA3)
 #endif
 
 /*

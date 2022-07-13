@@ -6,7 +6,7 @@
  * Copyright (c) 2006 Nicholas Zambetti, Modified by
  * 11/23/2006 David A. Mellis, 9/20/2010 Mark Sproul,
  * 8/24/2012 Alarus, 12/3/2013 Matthijs Kooijman
- * Others (unknown) 2013-2017, 2017-2021 Spence Konde
+ * unknown others 2013-2020, 2020-2022 Spence Konde
  */
 
 /* Each UartClass is defined in its own file, sine the linker pulls
@@ -16,6 +16,16 @@
  * UartClass instance in as well. Putting each instance in its own
  * file prevents the linker from pulling in any unused instances in the
  * first place.
+ * There are now two versions of each ISR. Except for TXC, which is trivial,
+ * both versions are stubs to call the real code (so it is not duplicated).
+ * The ASM versions are more efficient that calling normally can be because
+ * they completely ignore the ABI rules and do it the most efficient way
+ * they can. They'll stop working if anything changes, and it's not
+ * entirely clear whether the trick of dropping out of assembly while naked
+ * to grab the address is legal, though there's no reason it shouldn't be.
+ * The assembly implementations over in UART.cpp depends on the structure
+ * of the SerialClass. Any changes to the class member variables will
+ * require changes to the asm to match.
  */
 #include "Arduino.h"
 #include "UART.h"
@@ -32,14 +42,17 @@
     }
   #else
     ISR(USART0_TXC_vect) {
+      // only enabled in half duplex mode - we disable RX interrupt while sending.
+      // When we are done sending, we re-enable the RX interrupt and disable this one.
+      // Note that we do NOT clear TXC flag, which the flush() method relies on.
       uint8_t ctrla;
       while (USART0.STATUS & USART_RXCIF_bm) {
-        ctrla      = USART0.RXDATAL;
+        ctrla = USART0.RXDATAL;   // We sent these, so dump them, using local var as trashcan.
       }
-      ctrla        = USART0.CTRLA;
-      ctrla       |= USART_RXCIE_bm; // turn on receive complete
-      ctrla       &= ~USART_TXCIE_bm; // turn off transmit complete
-      USART0.CTRLA = ctrla;
+      ctrla = USART0.CTRLA;       // Get current CTRLA
+      ctrla |= USART_RXCIE_bm;    // turn on receive complete
+      ctrla &= ~USART_TXCIE_bm;   // turn off transmit complete
+      USART0.CTRLA = ctrla;       // Write it back to CTRLA.
     }
   #endif
 
@@ -72,7 +85,11 @@
                 "push  r31"    "\n\t"
                 :::);
       __asm__ __volatile__(
-                "jmp _do_dre"  "\n"
+#if PROGMEM_SIZE > 8192
+                "jmp _do_dre"  "\n\t"
+#else
+                "rjmp _do_dre" "\n\t"
+#endif
                 ::"z"(&Serial));
       __builtin_unreachable();
     }

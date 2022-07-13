@@ -117,7 +117,7 @@ flash.fetch_page(1); // Fetch flash page 1
 
 ### fetch_data()
 Fetches a given amount of data from flash. Note that the start and stop address is relative to the start of the flash space array.
-This means that  The span can't be larger than the size of the RAM buffer.
+This means that the span can't be larger than the size of the RAM buffer.
 
 #### Usage
 ```cpp

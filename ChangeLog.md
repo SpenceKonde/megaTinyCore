@@ -4,18 +4,42 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Changes not yet in release
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-### Planned 2.5.11
-* **CRITICAL BUGFIX** - I finally saw the bug in my attachInterrupt implementation. I had a operands of a load backwards. (#651)
-* Make it possible to have applications that use our USERSIG library be code compatible with DxCore by providing do-nothing functions in place of the required do-something flush(), pending() functions, add erase() and make everything match the return types and report success.
-* Documentation improvements in a few areas.
-* tinyNeoPixel should work at lower clock speeds now possibly down to 4 MHz!
-* Fix output asset names for Microchip board definitions.
-
-
 ### Ongoing
 * Port enhanced documentation from DxCore.
 
+### Known issues that are not fixed **AND WILL NOT BE FIXED WITHOUT ASSISTANCE FROM EXPERTS**
+* Logic and Comparator are incompatible, however, I am unsure of what the correct way to fix this is. the suggestions I have received could break existing code, which is bad. But my knowledge of namespaces and enumerated types and all that mumbo jumbo that C++ added leaves me ill prepared to attempt without advise.
+* There is a problem with printable printf. I don't know what it is or why itcauses memory corruption. I await help from someone who understands this shit, until then it is recommended that users not use the printf() methods of pritnable classes. I have tried reading the code to figure itout, but I don;t even know which of like 3-5 files the problem is located in, let alone how to fix it :-(
+
+### Planned 2.5.12
+* Okay fine now you can use ADC1 just like it was an ADC0, see the notes in [Analog Input (ADC) and output (DAC)](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md) for steps required to enable it.
+* You can now enable and disable the ADC with analogPowerOption() and enable/disable standby mode.
+* Fix issue with SSD bit being cleared when using beginTransaction().
+* Fix bug in Logic with pin inputs being handled improperly
+* Fix many documentation issues, improve docs generally.
+* Expand documentation significantly.
+* Fix issue with Wire with certain libraries.
+* Fix large number of issues with turning, add prescaled turning options 8, 7, 6, 5, 4, 1, MHz
+* Correct default option for Optiboot 2-series boards with 20 pins to be the one with alt reset.
+* Fix bug with event library and `long_soft_event` method.
+* Fix many serious bugs in event library.
+* Update toolchain to Azduino5
+* Lay groundwork in Event library for the new event system changes in the EA-series (There are now 2 generators per port, and 2 for RTC, accessible by all event channels, and a register on the peripheral controls which of the options is used for these two channels)
+
 ## Released Versions
+
+### 2.5.11
+* **CRITICAL BUGFIX** - I finally saw the bug in my attachInterrupt implementation. I had a operands of a load backwards. (#651)
+* **CRITICAL BUGFIX** - Apply changes from DxCore to SPI library where needed for new attachInterrupt behavior.
+* Make it possible to have applications that use our USERSIG library be code compatible with DxCore by providing do-nothing functions in place of dxcore's flush(), pending() functions, add erase() and make everything match the return types and report success.
+* Documentation improvements in a few areas.
+* Based on feedback, removed emulation of classicAVR pinMode() calls as regards the state of the PORTx.OUT register.
+* tinyNeoPixel 2.0.4, with support down to lower speeds, and inline assembly that is technically correct. (Before this it was only an accident of the deterministic avr-gcc register allocation and the fact that illegally written read-only operands represented variables that fell out of scope without being further used)
+* Fix output asset names for Microchip board definitions.
+* Preempt compatibility problems with libraries that assume a HardwareSerial.h file.
+* Improve user experience for people using updated compilers. Makes bit of a mess out of uart_constants.h though.
+* Fix bugs with compatibility in names of constants associated with no change in function, this time in association with TCB clock source
+* Fix issue with SerialUPDI when validating code where (size of sketch) % 512 = 1 or 2.
 
 ### 2.5.10
 * **CRITICAL BUGFIX** - attachInterrupt was broken on default mode for PORTA (#625)
@@ -24,7 +48,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * 2.5.8 is removed from board manager. Users with this installed will find that it is no longer available. Those unfortunate souls still on 1.8.9 but who upgraded will require manually deleting the packages folder inside the of the Arduino15 folder to install or otherwise modify the megatinycore package. This will eliminate the error message everyone has been seeing when the board.json. There was no way to eliminate the error which did not result breakage to users on 1.8.9 and earlier with 2.5.8 installed, and the error was producing far too many big reports. Users who are still on 1.8.9 should really upgrade. 1.8.13 is the recommended version currently due to serious bugs in the latest versions.
 
 ### 2.5.9
-* **CRITICAL BUGFIX** - no changes to code, just botched the json file tools-dependancies in trying to fix the avrdude version.
+* **CRITICAL BUGFIX** - no changes to code, just botched the json file tools-dependencies in trying to fix the avrdude version.
 
 ### 2.5.8
 * Respond more gracefully when data that doesn't fit in Wire buffer is "written".
@@ -33,7 +57,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### 2.5.7
 * Different (better) fix for the wire library issue fixed in 2.5.6, from @MX682X (#593), we no longer use the ring buffer, simplifying the code and saving flash
-* A bug in SerialUPDI which had been present since it's introduction but went unnoticed has been fixed. One of the last changes that went into Serial UPDI after almost all testing was done, was a "read chunking" option to work around an issue found in a serial adapter that was very flaky (it was a D11C programmed for serial adapter operation, with bugs). That particular buggy serial adapter however is used in the curiculum of a professor who had been driving the push to improve SerialUPDI, and getting uploads to work using that as a UPDI adapter was the entire reason for his and Quentin's involvement in this, so when we discovered that the issue was still there, -rc was added and we then confirmed that it could now upload and verify code successfully (note that the bug in the D11C serial firmware was corrected a few days later - there was a specific amount of data that when sent or received would crash it due to a bug in the USB library, which eventually was corrected) However, the standalone read functionality was not retested. Turns out it was TOTALLY BUSTED whether or not read chunks were requested. There were two issues here: First, the variable was called max_read_chunk in some places, and max_chunk_size in others. Second, when it finally filtered down to the read function, if read-chunk was specified, it only worked up to 256 bytes, because it would only ever use words if read-chunking was not requested, which imposed an unnecessary and incoherent limit, since not specifying it would use the maximum of 512b.
+* A bug in SerialUPDI which had been present since it's introduction but went unnoticed has been fixed. One of the last changes that went into Serial UPDI after almost all testing was done, was a "read chunking" option to work around an issue found in a serial adapter that was very flaky (it was a D11C programmed for serial adapter operation, with bugs). That particular buggy serial adapter however is used in the curriculum of a professor who had been driving the push to improve SerialUPDI, and getting uploads to work using that as a UPDI adapter was the entire reason for his and Quentin's involvement in this, so when we discovered that the issue was still there, -rc was added and we then confirmed that it could now upload and verify code successfully (note that the bug in the D11C serial firmware was corrected a few days later - there was a specific amount of data that when sent or received would crash it due to a bug in the USB library, which eventually was corrected) However, the standalone read functionality was not retested. Turns out it was TOTALLY BUSTED whether or not read chunks were requested. There were two issues here: First, the variable was called max_read_chunk in some places, and max_chunk_size in others. Second, when it finally filtered down to the read function, if read-chunk was specified, it only worked up to 256 bytes, because it would only ever use words if read-chunking was not requested, which imposed an unnecessary and incoherent limit, since not specifying it would use the maximum of 512b.
 * Serial UPDI: Change warning level of spammiest messages. Verbose output can now be enabled from the IDE, and the volume of output it generates is sane.
 * Add some comments in optiboot_x.c including prospective new version of flash_led which ensures that the led blinks at the correct speed regardless of OSCCFG fuse.
 * Not a change we made, just an observation: There is no more stylechecking on code because the tool we used has vanished from the internet and it's URL doesn't even resolve now.
@@ -51,14 +75,14 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * **Critical Bugfix** to correct attachInterrupt, which would corrupt the stack when used in the default mode. (DxCore #225)
 * Allow the DxCore names for RTC clock sources to be used.
 * **Critical Bugfix** to correct return values from Wire.endTransaction() to match the API. (DxCore #226)
-* Correct serious defect in new Wire library. The point of using 32b buffers is to match basically everything else, since having less than the assumed amount will cause failures to many libraries. However, we also stuff the slave address into the buffer, so 32 byte buffers only give us 31 bytes of data. This was detected when it broke the adafruit OLED library. Fixing it by enlarging the buffer and sacrificing power-of-2-ness cost 54-78 bytes of flash. I was able to get back around 40% of that for parts with buffer sizes under 128b (ie, all of the megaTinyCore; DxCore doesn't care since they got 130b buffers, though they need 131b or I should have just done 128b, cause we need 130b of "data" to write a 128b page to external eeproms) (#593)
+* Correct serious defect in new Wire library. The point of using 32b buffers is to match basically everything else, since having less than the assumed amount will cause failures to many libraries. However, we also stuff the slave address into the buffer, so 32 byte buffers only give us 31 bytes of data. This was detected when it broke the Adafruit OLED library. Fixing it by enlarging the buffer and sacrificing power-of-2-ness cost 54-78 bytes of flash. I was able to get back around 40% of that for parts with buffer sizes under 128b (ie, all of the megaTinyCore; DxCore doesn't care since they got 130b buffers, though they need 131b or I should have just done 128b, cause we need 130b of "data" to write a 128b page to external EEPROMs) (#593)
 * Correct typo in boards.txt impacting old wrong-sig ATtiny402's. (#592)
 
 ### 2.5.4
-* **CRITICAL BUGFIX**. Prior critical bugfix was unsuccessful because the flashsize test was comparing it to the wrong value. Additionally, the branch before a jmp, with it's offset specified numerically, needs to match the size of the rjmp or jmp instruction;  This corrects that.
+* **CRITICAL BUGFIX**. Prior critical bugfix was unsuccessful because the flashsize test was comparing it to the wrong value. Additionally, the branch before a jmp, with it's offset specified numerically, needs to match the size of the rjmp or jmp instruction; This corrects that.
 
 ### 2.5.3
-* **CRITICAL BUGFIX** Serial-using sketches wouldfail to compile if they were large enough.
+* **CRITICAL BUGFIX** Serial-using sketches would fail to compile if they were large enough.
 * Make software serial suck somewhat less by performing a single bitwise-and to calculate the result of the modulo operator, instead of dividing a 2-byte signed value which we know will never be larger than twice the buffer size (of 64) and hence fits in a single unsigned byte.
 
 ### 2.5.2
@@ -80,7 +104,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
   * Support for slave counting the bytes read by the master, and for slave to check whether it's in the middle of a transaction (for example, before sleeping)
 * Recent change to C++17 required additions to new.cpp and new.h, including sized deallocation (`delete`) and alignment-aware `new` and `delete` operators. The sized deallocation operator is called when existing code that worked before is compiled to the C++ 17 standard; since free() doesn't care about the size, implementation was straightforward. Discussion is ongoing about the aligned `new` and `delete` operators, which are also new in this version of the standards. It is likely that we will not support them, since other Arduino cores aren't even building to C++ 17 standard, so if your code needs aligned new/delete, it also won't work anywhere else in Arduino-land. While we are not shy about adding features, we do so only to support hardware features. If conditions change we will revisit this matter.
 * Using millis or micros (or rather attempting to) when they are unavailable due to millis being disabled, or in the case of micros, RTC used as millis time source, give better errors.
-* Clarified licence (for one thing, renamed to a .md so people can read it more easily, and know that it's readable if they're on windows) for tinyNeoPixel.
+* Clarified license (for one thing, renamed to a .md so people can read it more easily, and know that it's readable if they're on windows) for tinyNeoPixel.
 * Improved docs for tinyNeoPixel. The two libraries each have a README.md linking to a greatly expanded library document.
 * Document use of WDT for it's original purpose, to protect against hangs!
 * Actually prevent disabling warnings - -Wall for all! You should not be compiling code with warnings disabled, the vast majority of the time, they're pointing to problems, and in the cases that aren't bugs, they're still a weak point that future bugs could come from (and that people will comment on when you post the code on forums to ask for help). I thought I'd done this a long time ago. Also pull in some warning-related flags from DxCore, including making implicit function declarations error, since the implied declarations when this happens are basically never result in working code, but it occasionally compiles and malfunctions.
@@ -97,7 +121,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Adjust serial buffer size 512b and 1k parts by adding an intermediate 32b serial buffer size.
   * Parts with 512b are changed - from 16->32 for RX, TX unchanged at 16 (32->48 for each port used).
   * Parts with 1k are changed - from 64 to 32 for TX, RX unchanged at 64 (128->96 for each port used).
-  * Smaller and larger parts are unchanged. This mostly helps to smooth out the RAM usage curve as you change flash size - going from 256 to 512 didn't previously change the allocation, while the jump from 512b to 1k was alarmingly large. The fact that the 8k 2-series have  poirts each makes this more noticeable. This combined with another breakpoint led me to think that something else was broken.
+  * Smaller and larger parts are unchanged. This mostly helps to smooth out the RAM usage curve as you change flash size - going from 256 to 512 didn't previously change the allocation, while the jump from 512b to 1k was alarmingly large. The fact that the 8k 2-series have ports each makes this more noticeable. This combined with another breakpoint led me to think that something else was broken.
 * Officially deprecate jtag2updi.
 * Port micros and delay-microseconds improvements from DxCore.
 * Add a set of compatibility defines to make life easier for people porting non-Event-library event-using code to 0/1-series.
@@ -109,7 +133,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Update callbacks to match DxCore 1.4.0, most notably the init_reset_flags(). It will automatically clear reset flags if not overridden, stashing them in GPIOR0 (chosen because has lower overhead than a variable)
 * Platform.txt organization and commenting. Fix issues where defines were missing from lib-discovery phase.
 * Reduce flash footprint of pinMode.
-* Improve methods used to block attempts to use "upload using programmer" when an optiboot board is selected. That confiuration is guaranteed not to work, and we should not do things that we know 100% will not work. We would need a merged output file for this, but the IDE doesn;t make those for us here. (only over on attinycore, where they're not usable and we must go out of our way to delete the damned things)
+* Improve methods used to block attempts to use "upload using programmer" when an optiboot board is selected. That configuration is guaranteed not to work, and we should not do things that we know 100% will not work. We would need a merged output file for this, but the IDE doesn't make those for us here. (only over on attinycore, where they're not usable and we must go out of our way to delete the damned things)
 * Timers.h shared with DxCore.
 
 ### 2.4.2
@@ -132,10 +156,10 @@ Bad release. Use 2.4.2
 * Add some sketches to assist in aforementioned tuning feature, see megaTinyTuner (runs on chip being tuned) and TuningSource (runs on chip - hopefully one with a crystal - being used to tune) as well as megaTinyDeTune which erases them and documented them in Tuning.md
 * New version of SerialUPDI to fix issues some experienced at speeds above SLOW - those should now be fixed at 230400 baud. All speeds are a bit slower now with the CH340 adapter most severely impacted (this is what I use, so I am reminded of how serious this issue is every time I upload anything) Turbo does NOT have this change, and it is not compatible with all serial adapters. This is expected.
 * Correct tone() issues and improve efficiency of tone while catching out several corner cases that could malfunction. That file now includes a discussion in comments that should be helpful to someone who wants a way to output multiple tones at once.
-* clockcycle <-> microsecond macros were unavailable with millis off.  Nevermind the fact that with millis disabled, that's the only timebase you have. I just sorta grouped all the timing stuff together and disabled it without realizing some were used elsewhere, that is no longer the case. (#496, also found internally)
-* Correct issue with SPI.setClockDivider().  (#458)
-* Correct issue with Serial1.swap(1) swapping Serial instead of Serial onth TinyAVR 2-series. (#470)
-* Further corrections to Wire library behavior and documentation mirroring DxCore. No multi-master (ie, master/slave support) yet - needs too mcuh test for this timeframe.
+* clockcycle <-> microsecond macros were unavailable with millis off. Never mind the fact that with millis disabled, that's the only timebase you have. I just sorta grouped all the timing stuff together and disabled it without realizing some were used elsewhere, that is no longer the case. (#496, also found internally)
+* Correct issue with SPI.setClockDivider(). (#458)
+* Correct issue with Serial1.swap(1) swapping Serial instead of Serial on the TinyAVR 2-series. (#470)
+* Further corrections to Wire library behavior and documentation mirroring DxCore. No multi-master (ie, master/slave support) yet - needs too much test for this timeframe.
 * Removed menu options for converting UPDI pin to something else (except alt reset pin on 2-series) on non-optiboot boards. Expert users who have the necessary exotic programming tools can reenabling it by uncommenting lines in boards.txt (to get it to apply after every programming, part of your workflow if you use one device to do the HV reset, and a normal programmer to program it subsequently - not sure how common this is - I know less common than classic AVRs). This was never supposed to be an option.
 * Dead code removal and cleanup of main.cpp
 * Fixes to Print api missing a few standard api functions (#485)
@@ -153,7 +177,7 @@ Bad release. Use 2.4.2
 * Important info links to almost all important info.
 * Readme covers watchdog timer more thoroughly, including how to reset it.
 * Added page from which you can view the io headers from the github documentation, because it's a pain to dig for them on your local machine, and you'll inevitably want to have them at the ready.
-* Errata section updated with recently discovered bugs. Changed my asssment of the severity of a number of the bugs (for example, the RTC bugs are much higher severity now, because I have watched someone trying to figurte out how the hell the RTC worked; it wasn't pretty.)
+* Errata section updated with recently discovered bugs. Changed my assessment of the severity of a number of the bugs (for example, the RTC bugs are much higher severity now, because I have watched someone trying to figure out how the hell the RTC worked; it wasn't pretty.)
 * Correct bug when compiling tinyNeoPixel when no micros function is available.. **as the compile warning says, you are responsible for giving the LEDs enough time to update** in those cases. since we cannot ensure it without millis it. Previously this worked with the RTC options, but a typo prevented it from working with millis disabled entirely.
 * add `digitalPinToTimerNow()` to match DxCore; this is like digitalPinToTimer() only it will return NOT_ON_TIMER if you have used the timer takeover functions to assume full responsibility for management of a timer. Tie up some loose ends around the millis timer related defines when RTC with external source is in use.
 * Add support for using a pre-compiled library (that is, one distributed with .a files in place of the interesting parts of source code, typically as part of a proprietary license)
@@ -165,12 +189,12 @@ Bad release. Use 2.4.2
 * Expand Keywords.txt to include register names! (#386)
 * Add @MCUDude's Flash.h library (not the same as the DxCore library of same name and big-picture function) (#159)
 * Correct issue with compilation when using TCB0 as millis timing source on parts without TCB1 (#394)
-* Correct huge bug in tinyAVR 2-series analogReadEnh which adverselty impacted accuracy of readings by inadvertantkly setting CLK_ADC to F_CPU/2, which exceeds the spec by 33-233%.
-* add analogClockSpeed(int16_t frequency = 0, uint8_t options = 0). Call with no arguments or 0, and it will just return the current CLK_ADC speed. -1 will set it to the core defaults, and a number will set it to the fastest speed that does not exceed the supplied value. Speed is expressed as kHz. Set analogReference first, as this impacts the maximum and minimum ADC clock (0.55V reference requires much slower clock). This will respect the minimum and maximum clock speeds stated in the datasheet, and if you request something outside that range, it will not set it.  unless the lowest bit in `options` is set (that is cuerrently the only option).
+* Correct huge bug in tinyAVR 2-series analogReadEnh which adversely impacted accuracy of readings by inadvertently setting CLK_ADC to F_CPU/2, which exceeds the spec by 33-233%.
+* add analogClockSpeed(int16_t frequency = 0, uint8_t options = 0). Call with no arguments or 0, and it will just return the current CLK_ADC speed. -1 will set it to the core defaults, and a number will set it to the fastest speed that does not exceed the supplied value. Speed is expressed as kHz. Set analogReference first, as this impacts the maximum and minimum ADC clock (0.55V reference requires much slower clock). This will respect the minimum and maximum clock speeds stated in the datasheet, and if you request something outside that range, it will not set it. Unless the lowest bit in `options` is set (that is currently the only option).
 * Add bootloaders for 2-series parts. Correct a weakness in optiboot's implementation of the prime directive ("The application code shall not impact operation of the bootloader"). Poorly written code which jumped to the bootloader directly (or which malfunctioned and wound up running off the end of the flash or otherwise ending up with the program counter at 0x0000 without a reset) could, if it left peripheral registers in an adverse state, interfere with the operation of Optiboot; thus it is theoretically possible that if entry on POR was not enabled, and the app did this quickly enough, and the specifics of the adverse peripheral configuration also resulted in a hang or non-entry condition, the part could only be reprogrammed via UPDI. Now, very early in the initialization process, we check reset cause and if it's 0 (no reset since we cleared it before jumping to app after previous boot), we trigger a software reset, which is always an entry condition.
 * Add boards.txt entries for 2-series optiboot boards.
 * MASSIVE formatting overhaul in boards.txt - big headings that can be seen in the miniature view used to scroll on many editors. Everything is in the same order for all boards so I can add and remove lines with regexes.
-* Removed the board definitions for specific Microchip boards. These will be reimplemented as specific options in the other groups (eg, Curiosity1627 will show up wherever the 1627 is listed; difference will be that it will alwayus use the onboard debugger to upload (for non-bootloader configurations) and that LED_BUILTIN will match that hardware.
+* Removed the board definitions for specific Microchip boards. These will be reimplemented as specific options in the other groups (eg, Curiosity1627 will show up wherever the 1627 is listed; difference will be that it will always use the onboard debugger to upload (for non-bootloader configurations) and that LED_BUILTIN will match that hardware.
 * Remove 8-pin alternate serial pin bootloaders. That configuration does not require a separate bootloader - they were binary identical to the 14-24 pin alternate serial pins version.
 * Revise Logic library docs, add quick pin reference table to the readme.
 * Correct Wire library clock generation (#400). Enhance and correct Wire.pins() and Wire.swap() to work with new hardware and reject constant invalid arguments.
@@ -201,7 +225,7 @@ Bad release. Use 2.4.2
 * delayMicroseconds should now be more accurate at low clock speeds, short delays, and cases where the delay is known at compile time. Particularly noticeable is the case of things like delayMicroseconds(1) at 1 MHz, (for example) where the delay wound wind up being more like 16 us before.
 * delay() on parts with 4k+ of flash will now work with any argument that fits in an unsigned long. Previously when passed a value greater than 4.295 million, an internal calculation would overflow and the delay would return much faster. I felt that the 24 bytes was a justified price to pay where one has 4k or more flash. While very long delays are generally poor programming practice, this is Arduino - if there's one assumption we can rely on, it is that poor programming practices are highly likely to be encountered in the field, so we should try to support them.
 * delay() on parts with 2k of flash will retain the old implementation in the name of saving a bit of flash. 2k is not enough flash for anyone, especially on modern AVR where the I/O space is not used for peripheral registers (don't underestimate the magnitude of this effect - many register writes are twice the size that they were on classic AVR, and with more options on the peripherals, there are often more of them). Will now error if called with a compile time known value higher than 4.294 million (as in, "I want 2 hour delay so `delay(2UL*60*60*1000)`)
-* Wire buffer with 256b total ram now matches classic Uno/etc and the rest of the parts supported by this core at 32 byte I2C buffers; exceeding the bvuffer silently fails, leavig you waiting around for a call/zoom/etc which just kinda suuucks. . The only ones that don't 32b buffers within this core now are the parts with 128b rtam and 2k of flash. Since there are two buffers, they would have 50% of their SRAM as buffer, plus another 10%  or so of it being bpointers to heads and tails, just not tenable. Larger parts supported by DxCore will start getting 130b buffers at 4k of flash ( with nothing getting 64 or anything else in the middle)
+* Wire buffer with 256b total ram now matches classic Uno/etc and the rest of the parts supported by this core at 32 byte I2C buffers; exceeding the buffer silently fails, leaving you waiting around for a call/zoom/etc which just kinda suuucks. . The only ones that don't 32b buffers within this core now are the parts with 128b rtam and 2k of flash. Since there are two buffers, they would have 50% of their SRAM as buffer, plus another 10% or so of it being bpointers to heads and tails, just not tenable. Larger parts supported by DxCore will start getting 130b buffers at 4k of flash ( with nothing getting 64 or anything else in the middle)
 * non-Arduino-IDE tools may not pass all the defines that we expect - basically, no defines that we platform.txt and boards.txt can normally guarantee can be relied upon to be there!. If Arduino.txt does not see a MEGATINYCORE define, that must have happened. In this case, detect and define a placeholder - checking for that define is how other libraries recognize that this core is in use. Also check a few other important defines for existence, rather than assuming that because my boards.txt and platform.txt will always provide them, that they will be present and one of the valid options - the intent is simply to make sure we don't sleep-walk into a wacky wromg state (imagine an X which is always defined as A, B or C via the boards.txt/platform.txt configuration, one could do `/* well it's gotta be C then right? */`. But in a situation where we don't fully control the defines passed to the compiler through the command invocation with total certainty is supposed to be supported, we need to complain if there make sure we don't blindly assume that can't-happen-per-our-boards-and-platform-definitions actually can't happen, thus above situation needs to be `#if X==A` ..... `#elif X==B`  ..... `#elif X==C` ..... `#else      #error "X undefined or invalid, X must be #defined as A, B or C" #endif`. Doing this is less work than dealing with the support requests that would result from not doing so.
 * Add some defines to indicate features provided by the core.... This list will be expanded over time:
   * `CORE_HAS_FASTIO` - if defined as 1. indicates that digitalWriteFast() and digitalReadFast() is available.
@@ -216,7 +240,7 @@ Bad release. Use 2.4.2
   * `CORE_HAS_ANALOG_ENH` - This is 1 if the enhanced version of analogRead is available, with automatic oversampling and decimation to extend resolution to 13 or 17 bits (0/1 and 2-series respectively)
   * `CORE_HAS_ANALOG_DIFF` - This is 1 if the differential analogRead is available. It has same features as enhanced, except that it takes a differential measurement.
   * `ADC_MAX_OVERSAMPLED_RESOLUTION` - This is the maximum resolution obtainable via oversampling and decimation using those functions.
-  * `ADC_MAXIMUM_GAIN` - This is 0 for all parts except: Those with a programmable gain amplifier, in which case it is the maximum gain available, and those with one or more opamps, which return (indicating that yes there is a gain, but using it is complicated and device-specific.
+  * `ADC_MAXIMUM_GAIN` - This is 0 for all parts except: Those with a programmable gain amplifier, in which case it is the maximum gain available, and those with one or more op-amps, which return (indicating that yes there is a gain, but using it is complicated and device-specific.
 
 * Correct critical regression impacting PWM via TCA0 WO3, WO4, and WO5. (#335)
 * Correct canShow() in tinyNeoPixel to permit use when micros() is not available - skip the test and #warn the user that they must make sure that they don't call show() too frequently. WS2812-alikes need 50us pause (according to datasheet - internet says only 20us) in the data between consecutive frames to tell them that it's time to latch the data they got, and if they don't see that before you start blasting out more data, they'll think it's part of the same frame and never turn on.
@@ -242,7 +266,7 @@ Bad release. Use 2.4.2
 * Update avr-gcc toolchain to azduino3.
 
 ### 2.2.6
-* Fix for baud rate in twi.c from 2.2.4 actually broke it was worse than it was before. I'm bopeful that now it should again work.
+* Fix for baud rate in twi.c from 2.2.4 actually broke it was worse than it was before. I'm hopeful that now it should again work.
 * SPI library no longer requires knowing the SS pin when you call `SPI.pins()` - the SS pin has no special function with the library.
 
 ### 2.2.5
@@ -270,7 +294,7 @@ Bad release. Use 2.4.2
 * Fix nasty bug with Optiboot entry conditions (#259)
 * Add Ersatz Reset example sketch, and bootloader option.
 * Correct bug with bootloader version used on 14-24 pin parts when UPDI pin is configured as GPIO.
-* add `millisClockCyclesPerMicrosecond()`; what WAS `clockCyclesPerMicrosecond()` is now this - differemnce is that the `millisClockCyclesPerMicrosecond()` gives the number of clock cycles on the timebase for the millis timers (so, for TCD0 as millis clock, the unprescaled internal oscillator, otherwise same as `clockCyclesPerMicrosecond()`) - apparently other libraries use this for things that depend on the system clock... including my own Servo implementation! (it was tested before that was the default millis source on 3216/3217)... This is *really* nasty when it bites....
+* add `millisClockCyclesPerMicrosecond()`; what WAS `clockCyclesPerMicrosecond()` is now this - difference is that the `millisClockCyclesPerMicrosecond()` gives the number of clock cycles on the timebase for the millis timers (so, for TCD0 as millis clock, the unprescaled internal oscillator, otherwise same as `clockCyclesPerMicrosecond()`) - apparently other libraries use this for things that depend on the system clock... including my own Servo implementation! (it was tested before that was the default millis source on 3216/3217)... This is *really* nasty when it bites....
 * Fix Servo library - at long last! I never realized just *how* broken it was. (#195, #241)
 * What the heck? When were people going to tell me about the regression on TCD0 PWM pins?! It just didn't happen... botched refactoring of USE_TCD0_PWM AND regression to code from the bad old days before I knew how to get PWM and millis...(#249)
 * Reduced the magnitude of "glitches" possible on PWM pins when turning PWM off. Corrected PWM duty cycle calculations for TCD0 (it was (2 x dutycycle)/511 instead of (2 x dutycycle)/510 - no, it's not *supposed* to be 256ths, though it is very often implemented that way (if you count to 255, you get 256ths, because the timer considered 0 to be one count).
@@ -348,7 +372,7 @@ Urgent bugfixes for critical regressions introduced in 2.1.0.
 * Fix problem with millis not being entirely disabled when set to be disabled.
 * Ever so slightly improve baud rate accuracy, reduce space taken by `Serial.begin()` by a few bytes.
 * Fix compile error from Tone() on parts without a second type B timer (ie, everything not a 1614, 3216, 1616, 3217, or 1617) when TCB0 was selected as a millis source. (part of #189)
-* Correct bug in `micros()` timekeeping when TCA0 is used as `millis()` timing source (introduced in 1.1.9 - after the exhausive testing for these sorts of issues) (#189)
+* Correct bug in `micros()` timekeeping when TCA0 is used as `millis()` timing source (introduced in 1.1.9 - after the exhaustive testing for these sorts of issues) (#189)
 
 ### 2.0.2
 * Fix bug with 1MHz system clock with TCB as milis source (micros was broken)
@@ -371,7 +395,7 @@ Urgent bugfixes for critical regressions introduced in 2.1.0.
 * Remove all the UART/SPI/I2C pin mapping menus from tools submenus. Instead, use the newly added .swap() and .pins() methods on these objects to set the pins to be used.
 * WARNING: POTENTIALLY BREAKING CHANGE: **The default pins used for Serial on 8-pin parts in previous versions are not the "default" pins per datasheet (arduino pins 0 and 1); instead, the "alternate" pins were used by default (arduino pins 2 and 3). Note that on the Rev. - and Rev. A breakouts for these parts from my Tindie store, the serial lines from the FTDI header go to the alternate pins, not the "default" ones.** (this will be corrected in Rev. B of the board). If you have sketches/hardware using this, you will either need to move connections, or add Serial.swap(1); before calling `Serial.begin()`. I realize this is inconvenient, but that previous behavior should never have been the case, and, having finally accepted the fact, it was better to cut over quickly than let more people get used to the previous behavior and then change it later.
 * Improve ADC speed dramatically (it runs in about a quarter of the time it used to!) - I do not expect this to cause any issues with accuracy. The megaavr parts support much higher maximum ADC clock compared to the classic AVRs. We now set the ADC clock near to the top of it's range. In order to prevent this from hurting accuracy when reading high impedance sources, the ADC0.SAMPCTRL is set to SAMPLEN=14 instead of 0. This means samples will be taken for 16 ADC clocks instead of 2. Since the ADC clock is 8 times faster now, this should result in the same sampling time. See the ADC section for more information, including how to get even faster ADC readings from low impedance signals.
-* `digitalRead()`, `pinMode()`, and `digitalWrite()` were changed back to operating on uint8's instead of the PinMode, PinStatus, etc enums like the official megaavr core does (and unlike how every other core does it). Using the enums, while it was defensible from a software architecture perspective, caused a lot of breakage of common Arduino ideoms that have been in widespread use for ages, for very little benefit. This also applies to things that used BitOrder.
+* `digitalRead()`, `pinMode()`, and `digitalWrite()` were changed back to operating on uint8's instead of the PinMode, PinStatus, etc enums like the official megaavr core does (and unlike how every other core does it). Using the enums, while it was defensible from a software architecture perspective, caused a lot of breakage of common Arduino idioms that have been in widespread use for ages, for very little benefit. This also applies to things that used BitOrder.
 * `digitalRead()`, `pinMode()`, `digitalWrite()` and `analogWrite()` now take advantage of the unified memory architecture of the megaavr parts to improve performance and reduce flash usage by removing the `PROGMEM` attribute and accompanying pgm_read_byte() calls. This yields a significant improvement in performance of `analogWrite()` and `digitalRead()` in particular.
 * Remove the DAC reference voltage from tools submenu. Now, use the DACReference() function - it can take any of the `INTERNAL` reference arguments that would be passed to `analogReferece()`.
 * `digitalRead()` no longer turns off PWM and DAC output on the pin that is read. There was no technical need for this, and `digitalRead()` should not change the pin output state!

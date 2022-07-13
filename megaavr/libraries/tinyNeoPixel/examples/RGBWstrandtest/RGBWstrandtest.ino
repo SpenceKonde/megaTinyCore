@@ -1,8 +1,7 @@
 #include <tinyNeoPixel.h>
 
 
-#define PIN 2
-
+#define PIN PIN_PA2
 #define NUM_LEDS 60
 
 #define BRIGHTNESS 50

@@ -31,6 +31,7 @@ MD029: false                  # Ordered list item prefix
 MD033: false                  # Allow inline HTML
 MD036: false                  # Emphasis used instead of a heading
 MD037: false                  # Allow spaces around around emphacis marks because they are probably just rendering as the characters!
+MD046: false                  # allow both indented and fenced code blocks
 
 #################
 # Rules by tags #

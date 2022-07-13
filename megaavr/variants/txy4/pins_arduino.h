@@ -61,6 +61,9 @@
 
 #if MEGATINYCORE_SERIES != 2
   #define digitalPinToAnalogInput(p)  (((p) < 4) ? ((p) + 4) : ((p) == 11 ? 0 : (((p) > 7 && (p) < 11) ? ((p) - 7) : (((p) == 6) ? 10 : ((p) == 7 ? 11 : NOT_A_PIN)))))
+  #if defined(ADC1)
+    #define digitalPinToAnalogInput_ADC1(p) ((p) < 6 ? (p) :  NOT_A_PIN)
+  #endif
 #else
   /* 2-series MUX table says ADC channel 0 is tied to ground, not PA0 */
   #define digitalPinToAnalogInput(p)  (((p) < 4) ? ((p) + 4) : (((p) > 7 && (p) < 11) ? ((p) - 7) : (((p) == 6) ? 10 : ((p) == 7 ? 11 : NOT_A_PIN))))
@@ -151,6 +154,22 @@ static const uint8_t     A6 = PIN_PA6;
 static const uint8_t     A7 = PIN_PA7;
 static const uint8_t    A10 = PIN_PB1;
 static const uint8_t    A11 = PIN_PB0;
+
+/* Not Recommended to use the AINn constants */
+#if MEGATINYCORE_SERIES != 2
+  #define AIN0               NOT_A_PIN
+#endif
+#define AIN1               ADC_CH(1)
+#define AIN2               ADC_CH(2)
+#define AIN3               ADC_CH(3)
+#define AIN4               ADC_CH(4)
+#define AIN5               ADC_CH(5)
+#define AIN6               ADC_CH(6)
+#define AIN7               ADC_CH(7)
+#define AIN8               ADC_CH(8)
+#define AIN9               ADC_CH(9)
+#define AIN10              ADC_CH(10)
+#define AIN11              ADC_CH(11)
 
 /*
             ####  ### #   #      ##  ####  ####   ##  #   #  ###

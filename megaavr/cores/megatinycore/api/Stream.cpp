@@ -21,69 +21,66 @@
 
   findMulti/findUntil routines written by Jim Leonard/Xuth
 */
+#include "util/delay.h"
 
 #include "Common.h"
 #include "Stream.h"
 
+
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
+/*
+__attribute__ ((inline)) void wait_250_clocks() {
+  for (uint8_t i = 0; i < 245; i++) {
+    NOP();
+  }
+}
+*/
 
 int Stream::timedRead() {
-  #if !defined(DISABLEMILLIS)
+  #if !defined(MILLIS_USE_TIMERNONE)
   int c;
-  _startMillis = millis();
+  unsigned long startMillis = millis();
   do {
     c = read();
     if (c >= 0) {
       return c;
     }
-  } while (millis() - _startMillis < _timeout);
+  } while (millis() - startMillis < _timeout);
   return -1;     // -1 indicates timeout
   #else
-  int c; // @FIXME Why are we using an int for this?
-  // We can't use millis() to time ourselves, we will have to
-  // do this another way, timeout is no longer in milliseconds
-  // @TODO cycle-count the contents of this loop and figure out a proper
-  //   number for this, this is currently completely bogus based on
-  //   a complete and utter guess assuming 9.6MHz clock (ATTiny13 commonly)
-  //   This code shamelessly copied from github.com/sleemanj/ATTinyCore
-  uint32_t MaxLoops = _timeout << 10;
-  do {
+  int c; 
+  for (uint32_t i = 0; i < _timeout; i++) {
     c = read();
     if (c >= 0) {
       return c;
     }
-  } while (MaxLoops-- > 0);
+    _delay_us(980); //not 1000, b/c compensation for the rest
+  }
   return -1;     // -1 indicates timeout
   #endif
 }
 
 // private method to peek stream with timeout
 int Stream::timedPeek() {
-  #if !defined(DISABLEMILLIS)
+  #if !defined(MILLIS_USE_TIMERNONE)
   int c;
-  _startMillis = millis();
+  unsigned long startMillis = millis();
   do {
     c = peek();
     if (c >= 0) {
       return c;
     }
-  } while (millis() - _startMillis < _timeout);
+  } while (millis() - startMillis < _timeout);
   return -1;     // -1 indicates timeout
   #else
-  int c; // @FIXME Why are we using an int for this?
-  // We can't use millis() to time ourselves, we will have to
-  // do this another way, timeout is no longer in milliseconds
-  // @TODO cycle-count the contents of this loop and figure out a proper
-  //   number for this, this is currently completely bogus based on
-  //   a complete and utter guess assuming 9.6MHz clock (ATTiny13 commonly)
-  //   This code shamelessly copied from github.com/sleemanj/ATTinyCore
-  uint32_t MaxLoops = _timeout << 10;
-  do {
-    c = peek();
+  int c; 
+  for (uint32_t i = 0; i < _timeout; i++) {
+    c = read();
     if (c >= 0) {
       return c;
     }
-  } while (MaxLoops-- > 0);
+    _delay_us(980); //not 1000, b/c compensation for the rest
+  }
   return -1;     // -1 indicates timeout
   #endif
 }

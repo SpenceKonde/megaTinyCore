@@ -224,7 +224,7 @@ void     TWI_DisableMaster(struct   twiData *_data);
 void     TWI_DisableSlave(struct    twiData *_data);
 void     TWI_HandleSlaveIRQ(struct  twiData *_data);
 uint8_t  TWI_MasterWrite(struct     twiData *_data, bool send_stop);
-void     TWI_MasterSetBaud(struct   twiData *_data, uint32_t frequency);
+uint8_t  TWI_MasterSetBaud(struct   twiData *_data, uint32_t frequency);
 uint8_t  TWI_MasterRead(struct      twiData *_data, uint8_t bytesToRead, bool send_stop);
 void     TWI_SlaveInit(struct       twiData *_data, uint8_t address, uint8_t receive_broadcast, uint8_t second_address);
 uint8_t  TWI_MasterCalcBaud(uint32_t frequency);
