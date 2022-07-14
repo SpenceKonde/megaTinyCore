@@ -1380,12 +1380,14 @@ void __attribute__((weak)) init_clock() {
   int16_t TUNED_CALIBRATION_OFFSET = -1;   // magic name - do not change
   int8_t TUNE_PRESCALE = 0;                 // magic name - do not change
   uint8_t _osccfg;
-  #if defined(USING_BOOTLOADER)
-    #if USING_BOOTLOADER == 1
+  //#if defined(USING_BOOTLOADER)
+    //#if USING_BOOTLOADER == 1
       // If using Optiboot, then we do not know what value OSCFG was set to when it was bootloaded, so we have to determine it at runtime.
-      uint8_t _osccfg = FUSE.OSCCFG - 1; /****** "_osccfg" IS A MAGIC NAME - DO NOT CHANGE IT ******/
-    #endif
-  #elif !defined(USING_BOOTLOADER) || USING_BOOTLOADER == 0 // if we're not using a bootloader, this gets configured upon upload, and is a compile time known constant!
+    ///  uint8_t _osccfg = FUSE.OSCCFG - 1; /****** "_osccfg" IS A MAGIC NAME - DO NOT CHANGE IT ******/
+    //#else
+    //  uint8_t _osccfg = MCLKCTRL.
+    //#endif
+  //#elif !defined(USING_BOOTLOADER) || USING_BOOTLOADER == 0 // if we're not using a bootloader, this gets configured upon upload, and is a compile time known constant!
     #if MEGATINYCORE_SERIES == 2 && (_CLOCKSPERUS > 20 || _CLOCKSPERUS== 12 || _CLOCKSPERUS == 10 || _CLOCKSPERUS == 6 || _CLOCKSPERUS == 5)
       _osccfg = 1;
     #elif MEGATINYCORE_SERIES < 2 && (_CLOCKSPERUS > 20 || _CLOCKSPERUS == 10 || _CLOCKSPERUS == 5)
@@ -1393,7 +1395,7 @@ void __attribute__((weak)) init_clock() {
     #else
       _osccfg = 0;
     #endif
-  #endif
+  //#endif
   #include "tune_guesses.h"
     // The GUESSCAL, MAX_TUNING, TUNED_CALIBRATION_OFFSET and TUNE_PRESCALE symbols, which look like constants, aren't.
     // They're macros from tune_guesses.h and get replaced with (ternary operators and math involving osccfg), so what looks very simple here... actually isn't.
