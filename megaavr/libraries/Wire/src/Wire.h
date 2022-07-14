@@ -104,11 +104,12 @@ class TwoWire: public Stream {
 
     uint8_t requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop);
     uint8_t requestFrom(uint8_t address, uint8_t quantity);
+    /*
     uint8_t requestFrom(uint8_t address, size_t  quantity, bool    sendStop);
     uint8_t requestFrom(uint8_t address, size_t  quantity);
     uint8_t requestFrom(int     address, int     quantity, int     sendStop);
     uint8_t requestFrom(int     address, int     quantity);
-
+    */
     uint16_t writeRead(uint8_t quantity, uint8_t sendStop);
 
     virtual size_t write(uint8_t);
