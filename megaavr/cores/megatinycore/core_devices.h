@@ -257,6 +257,7 @@
 
 #define NOT_ON_TIMER 0x00
 #define TIMERA0 0x10
+#define TIMERA1 0x08        // Not present on any tinyAVR devices
 #define TIMERB0 0x20
 #define TIMERB1 0x21
 #define TIMERB2 0x22        // Not present on any tinyAVR 0/1/2-series

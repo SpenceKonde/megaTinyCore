@@ -60,11 +60,13 @@
     #error "TCA0, selected for millis, does not exist on this part"
   #endif
   #define MILLIS_TIMER TIMERA0
+  #define MILLIS_VECTOR TCA0_HUNF_vect
 #elif defined(MILLIS_USE_TIMERA1)
   #ifndef TCA1
     #error "TCA1, selected for millis, does not exist on this part"
   #endif
   #define MILLIS_TIMER TIMERA1
+  #define MILLIS_VECTOR TCA1_HUNF_vect
 #elif defined(MILLIS_USE_TIMERB0)
   #ifndef TCB0
     #error "TCB0, selected for millis, does not exist on this part"

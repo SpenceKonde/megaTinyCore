@@ -245,7 +245,7 @@
           "movw        r26,      r30"     "\n\t"  // copy of serial in X
           "add         r26,      r25"     "\n\t"  // SerialN + txtail
           "adc         r27,      r18"     "\n\t"  // X = &Serial + txtail
-    #if   SERIAL_RX_BUFFER_SIZE == 256            // RX buffer determines offset start of class.
+    #if   SERIAL_RX_BUFFER_SIZE == 256            // RX buffer determines offset from start of class to TX buffer
           "subi        r26,     0xEB"     "\n\t"  // There's no addi/adci, so we instead subtract (65536-(offset we want to add))
           "sbci        r27,     0xFE"     "\n\t"  // +277
           "ld          r24,        X"     "\n\t"  // grab the character
