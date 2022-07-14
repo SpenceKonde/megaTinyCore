@@ -17,7 +17,20 @@
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
-#  have the zoomed out view that you can scroll through.                 #
+#  have the zoomed out "minimap" that you can scroll through.            #
+#                                                                        #
+#  megaTinyCore 2.5.12 is being developed simultaneously with DxCore     #
+#  1.5.0. As the hardware is very similar, much code is shared, and that #
+#  is the version of DxCore most similar to this version of megaTinyCore #
+#                                                                        #
+#  DxCore gets it's minor version bump before we do because of the DD    #
+#  series support added there. The only changes planned that warrant a   #
+#  minor version bump is the PWM pin menu addition, which likely will    #
+#  will be deferred until some time after DxCore 1.5.0.                  #
+#  Less dramatic than the DD-series - but analogous PWM switching went   #
+#  into DxCore 1.5.0, but that's one of the areas of the hardware that   #
+#  is very different and cannot share code                               #
+#                                                                        #
 #  The board section headings have a triangle along the right edge       #
 #  if they are a non-bootloader definition. Optiboot sections have a     #
 #  line inside the right edge if they are for the 2-series parts.        #
@@ -239,6 +252,7 @@ atxy7.menu.clock.8internaltuned=8 MHz internal - tuned
 atxy7.menu.clock.6internaltuned=6 MHz internal - tuned
 atxy7.menu.clock.5internaltuned=5 MHz internal - tuned
 atxy7.menu.clock.4internaltuned=4 MHz internal - tuned
+atxy7.menu.clock.2internaltuned=2 MHz internal - tuned
 atxy7.menu.clock.1internaltuned=1 MHz internal - tuned
 atxy7.menu.clock.20extclock=20 MHz external clock
 atxy7.menu.clock.16extclock=16 MHz external clock
@@ -285,31 +299,55 @@ atxy7.menu.clock.30extclock.build.speed=30
 atxy7.menu.clock.30extclock.build.clocksource=2
 atxy7.menu.clock.32extclock.build.speed=32
 atxy7.menu.clock.32extclock.build.clocksource=2
-atxy7.menu.clock.20internaltuned.build.speed=20
-atxy7.menu.clock.20internaltuned.build.clocksource=0
-atxy7.menu.clock.20internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
-atxy7.menu.clock.16internaltuned.build.speed=16
-atxy7.menu.clock.16internaltuned.build.clocksource=0
-atxy7.menu.clock.16internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.1internaltuned.build.speed=1
+atxy7.menu.clock.1internaltuned.build.clocksource=0
+atxy7.menu.clock.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.2internaltuned.build.speed=2
+atxy7.menu.clock.2internaltuned.build.clocksource=0
+atxy7.menu.clock.2internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.4internaltuned.build.speed=4
+atxy7.menu.clock.4internaltuned.build.clocksource=0
+atxy7.menu.clock.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.5internaltuned.build.speed=5
+atxy7.menu.clock.5internaltuned.build.clocksource=0
+atxy7.menu.clock.5internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.5internaltuned.bootloader.OSCCFG=0x02
+atxy7.menu.clock.6internaltuned.build.speed=6
+atxy7.menu.clock.6internaltuned.build.clocksource=0
+atxy7.menu.clock.6internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.8internaltuned.build.speed=8
+atxy7.menu.clock.8internaltuned.build.clocksource=0
+atxy7.menu.clock.8internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.10internaltuned.build.speed=10
+atxy7.menu.clock.10internaltuned.build.clocksource=0
+atxy7.menu.clock.10internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.10internaltuned.bootloader.OSCCFG=0x02
 atxy7.menu.clock.12internaltuned.build.speed=12
 atxy7.menu.clock.12internaltuned.build.clocksource=0
 atxy7.menu.clock.12internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.12internaltuned.bootloader.OSCCFG={bootloader.osccfg24}
+atxy7.menu.clock.16internaltuned.build.speed=16
+atxy7.menu.clock.16internaltuned.build.clocksource=0
+atxy7.menu.clock.16internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.20internaltuned.build.speed=20
+atxy7.menu.clock.20internaltuned.build.clocksource=0
+atxy7.menu.clock.20internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.20internaltuned.bootloader.OSCCFG=0x02
 atxy7.menu.clock.24internaltuned.build.speed=24
 atxy7.menu.clock.24internaltuned.build.clocksource=0
 atxy7.menu.clock.24internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.24internaltuned.bootloader.OSCCFG=0x02
 atxy7.menu.clock.25internaltuned.build.speed=25
 atxy7.menu.clock.25internaltuned.build.clocksource=0
 atxy7.menu.clock.25internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.25internaltuned.bootloader.OSCCFG=0x02
 atxy7.menu.clock.30internaltuned.build.speed=30
 atxy7.menu.clock.30internaltuned.build.clocksource=0
 atxy7.menu.clock.30internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
 atxy7.menu.clock.32internaltuned.build.speed=32
 atxy7.menu.clock.32internaltuned.build.clocksource=0
 atxy7.menu.clock.32internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
-atxy7.menu.clock.20internaltuned.bootloader.OSCCFG=0x02
-atxy7.menu.clock.24internaltuned.bootloader.OSCCFG=0x02
-atxy7.menu.clock.25internaltuned.bootloader.OSCCFG=0x02
-atxy7.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
 atxy7.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
 atxy7.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy7.menu.clock.10internal.bootloader.OSCCFG=0x02
@@ -838,7 +876,7 @@ atxy6.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atxy6.menu.attach.allenabled=On all pins, like usual
+atxy6.menu.attach.allenabled=On all pins, with new implementation.
 atxy6.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atxy6.menu.attach.manual=Only enabled ports
 atxy6.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -1214,7 +1252,7 @@ atxy4.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atxy4.menu.attach.allenabled=On all pins, like usual
+atxy4.menu.attach.allenabled=On all pins, with new implementation.
 atxy4.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atxy4.menu.attach.manual=Only enabled ports
 atxy4.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -1542,7 +1580,7 @@ atxy2.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atxy2.menu.attach.allenabled=On all pins, like usual
+atxy2.menu.attach.allenabled=On all pins, with new implementation.
 atxy2.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atxy2.menu.attach.manual=Only enabled ports
 atxy2.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -1876,7 +1914,7 @@ microchip.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-microchip.menu.attach.allenabled=On all pins, like usual
+microchip.menu.attach.allenabled=On all pins, with new implementation.
 microchip.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 microchip.menu.attach.manual=Only enabled ports
 microchip.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -2218,7 +2256,7 @@ atxy7o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atxy7o.menu.attach.allenabled=On all pins, like usual
+atxy7o.menu.attach.allenabled=On all pins, with new implementation.
 atxy7o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atxy7o.menu.attach.manual=Only enabled ports
 atxy7o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -2536,7 +2574,7 @@ atx27o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atx27o.menu.attach.allenabled=On all pins, like usual
+atx27o.menu.attach.allenabled=On all pins, with new implementation.
 atx27o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atx27o.menu.attach.manual=Only enabled ports
 atx27o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -2876,7 +2914,7 @@ atxy6o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atxy6o.menu.attach.allenabled=On all pins, like usual
+atxy6o.menu.attach.allenabled=On all pins, with new implementation.
 atxy6o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atxy6o.menu.attach.manual=Only enabled ports
 atxy6o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -3194,7 +3232,7 @@ atx26o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atx26o.menu.attach.allenabled=On all pins, like usual
+atx26o.menu.attach.allenabled=On all pins, with new implementation.
 atx26o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atx26o.menu.attach.manual=Only enabled ports
 atx26o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -3547,7 +3585,7 @@ atxy4o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atxy4o.menu.attach.allenabled=On all pins, like usual
+atxy4o.menu.attach.allenabled=On all pins, with new implementation.
 atxy4o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atxy4o.menu.attach.manual=Only enabled ports
 atxy4o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -3860,7 +3898,7 @@ atx24o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atx24o.menu.attach.allenabled=On all pins, like usual
+atx24o.menu.attach.allenabled=On all pins, with new implementation.
 atx24o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atx24o.menu.attach.manual=Only enabled ports
 atx24o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -4191,7 +4229,7 @@ atxy2o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-atxy2o.menu.attach.allenabled=On all pins, like usual
+atxy2o.menu.attach.allenabled=On all pins, with new implementation.
 atxy2o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 atxy2o.menu.attach.manual=Only enabled ports
 atxy2o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
@@ -4517,7 +4555,7 @@ microchipo.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
-microchipo.menu.attach.allenabled=On all pins, like usual
+microchipo.menu.attach.allenabled=On all pins, with new implementation.
 microchipo.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 microchipo.menu.attach.manual=Only enabled ports
 microchipo.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE

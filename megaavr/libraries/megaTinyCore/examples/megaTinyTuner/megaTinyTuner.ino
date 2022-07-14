@@ -29,8 +29,8 @@ uint8_t stockCal;
 #if MEGATINYCORE_SERIES == 2
   const uint8_t homeindex        = 1;
   #if F_CPU == 16000000
-    const uint16_t speeds[]      = {12000, 16000, 20000, 24000, 25000, 30000, 65535};
-    const uint16_t PulseLens[]   = { 6000,  8000, 10000, 12000, 12500, 15000, 65535};
+    const uint16_t speeds[]      = {14000, 16000, 20000, 24000, 25000, 30000, 65535};
+    const uint16_t PulseLens[]   = { 7000,  8000, 10000, 12000, 12500, 15000, 65535};
     uint8_t CalBytes[]           = { 0x80,  0x80,  0x80,  0x80,  0x80,  0x80,  0x80};
     const uint8_t names[]        = {   12,    16,    20,    24,    25,    30,  0xFF};
     #define CAL_START (USER_SIGNATURES_SIZE-12)
@@ -44,15 +44,14 @@ uint8_t stockCal;
 #else  // 0/1 series
   const uint8_t homeindex        = 2;
   #if F_CPU == 16000000
-    const uint16_t speeds[]      = {10000, 12000, 16000, 20000, 24000, 25000, 65535};
-    const uint16_t PulseLens[]   = { 5000,  6000,  8000, 10000, 12000, 12500, 65535};
+    const uint16_t speeds[]      = {12000, 14000, 16000, 20000, 24000, 25000, 65535};
+    const uint16_t PulseLens[]   = { 6000,  7000,  8000, 10000, 12000, 12500, 65535};
     uint8_t CalBytes[]           = { 0x80,  0x80,  0x80,  0x80,  0x80,  0x80,  0x80};
     const uint8_t names[]        = {   10,    12,    16,    20,    24,    25,  0xFF};
     #define CAL_START (USER_SIGNATURES_SIZE-12)
   #elif F_CPU==20000000
-    const uint16_t speeds[]      = {12000, 16000, 20000, 24000, 25000, 30000, 65535};
-    const uint16_t PulseLens[] = { 4800,  6400,  8000,  9600, 10000, 12000, 65535};
-
+    const uint16_t speeds[]      = {14000, 16000, 20000, 24000, 25000, 30000, 65535};
+    const uint16_t PulseLens[]   = { 4800,  6400,  8000,  9600, 10000, 12000, 65535};
     uint8_t CalBytes[]           = { 0x80,  0x80,  0x80,  0x80,  0x80,  0x80,  0x80};
     const uint8_t names[]        = {   12,    16,    20,    24,    25,    30,  0xFF};
     #define CAL_START (USER_SIGNATURES_SIZE-6)
@@ -236,15 +235,15 @@ void loop() {
  *  why it no longer counts ticks 5/16ths faster than it should before the pulse starts. That was broken
  *  everywhere, on all parts. When a different problem with it was reported on ATTinyCore, it took me
  *  days to realize that it didn't work any better on an Uno (see, my test case was no pulse, just checking
- *  the timeout... you know, keep it simple). Best part was def. finding the optimization the compiler
- *  missed and using it to  get back exactly the space the fix cost....
+ *  the timeout... you know, keep it simple). Best part was, after fixing it, finding the optimization the compiler
+ *  missed and using it to get the exact same amount of flash back that was used for slowing the loop down before the pulse starts.
  *
  *  Compiler generated assembly is the pits, and if this example looks like it's in a deeper pit than
  *  usual, I agree. I think it's the ancient version of avr-gcc they had to use to get it to implement
- *  the tight loops as... tight loops instead of something weird and worse else. avr-gcc has been doing
+ *  the tight loops as... tight loops instead of something weird and worse. avr-gcc has been doing
  *  one-step-forward-one-step-back for years now. It'd be nice if Microchip would spend some of the money
  *  we're giving them to pay someone to clean up all the cruft that has built up in the compiler....
- *  But I think they'd much prefer people use their own closed source compiler. Only a madman would be
+ *  But I think they'd much prefer people use their own closed source compiler. IMO, Only a madman would be
  *  comfortable using a compiler where the source was secret.
  *  We could use input capture, sure, and it would look all sexy, and people would be like "oooh shiny"
  *  but this would have little impact on tuning accuracy. Maybe it would be more practical to do it

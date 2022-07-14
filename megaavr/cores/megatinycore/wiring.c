@@ -1341,7 +1341,10 @@ void __attribute__((weak)) init_clock() {
         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
       #elif (F_CPU == 4000000) // 16MHz prescaled by 4
         /* Clock DIV4 */
-        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_8X_gc));
+      #elif (F_CPU == 2000000) // 16MHz prescaled by 16
+        /* Clock DIV16 */
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
       #elif (F_CPU == 1000000) // 16MHz prescaled by 16
         /* Clock DIV16 */
         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
@@ -1371,25 +1374,52 @@ void __attribute__((weak)) init_clock() {
 
 
 #if defined(CLOCK_TUNE_INTERNAL)
-  #include "tune_guesses.h"
   void tune_internal() {
-    uint8_t osccfg = FUSE.OSCCFG - 1; /****** "osccfg" IS A MAGIC NAME - DO NOT CHANGE IT ******/
+  #define _CLOCKSPERUS (F_CPU/1000000)
+  int8_t GUESSCAL = -1;                     // magic name - do not change
+  int16_t TUNED_CALIBRATION_OFFSET = -1;   // magic name - do not change
+  int8_t TUNE_PRESCALE = 0;                 // magic name - do not change
+  uint8_t _osccfg;
+  #if defined(USING_BOOTLOADER)
+    #if USING_BOOTLOADER == 1
+      // If using Optiboot, then we do not know what value OSCFG was set to when it was bootloaded, so we have to determine it at runtime.
+      uint8_t _osccfg = FUSE.OSCCFG - 1; /****** "_osccfg" IS A MAGIC NAME - DO NOT CHANGE IT ******/
+    #endif
+  #elif !defined(USING_BOOTLOADER) || USING_BOOTLOADER == 0 // if we're not using a bootloader, this gets configured upon upload, and is a compile time known constant!
+    #if MEGATINYCORE_SERIES == 2 && (_CLOCKSPERUS > 20 || _CLOCKSPERUS== 12 || _CLOCKSPERUS == 10 || _CLOCKSPERUS == 6 || _CLOCKSPERUS == 5)
+      _osccfg = 1;
+    #elif MEGATINYCORE_SERIES < 2 && (_CLOCKSPERUS > 20 || _CLOCKSPERUS == 10 || _CLOCKSPERUS == 5)
+      _osccfg = 1;
+    #else
+      _osccfg = 0;
+    #endif
+  #endif
+  #include "tune_guesses.h"
     // The GUESSCAL, MAX_TUNING, TUNED_CALIBRATION_OFFSET and TUNE_PRESCALE symbols, which look like constants, aren't.
     // They're macros from tune_guesses.h and get replaced with (ternary operators and math involving osccfg), so what looks very simple here... actually isn't.
     // Evertthing hard is done in tune_guesses.h
+    if (__builtin_constant_p(TUNED_CALIBRATION_OFFSET)) {
+      if (TUNED_CALIBRATION_OFFSET == -1) {
+        badCall("It appears that you are attempting to set a 0/1-series part to 32 MHz or otheerwise set a bogus clock speed. Only 2-series parts can reach that without malfunctioning ");
+      }
+    }
     if (TUNED_CALIBRATION_OFFSET == -1) {
+
       GPIOR0 |= 0x80;
       GPIOR0 |= 0x40;
       return; // we can't do that speed at all with this part and oscillator setting! Hopefully users notice their sketch is running
       // way too slow, and will read the docs which contain further instructions for diagnosis of these sort of problems.
     } else {
-      uint8_t tunedval=_SFR_MEM8(((osccfg ? 0x1306 : 0x1300)   +  CLOCK_TUNE_START + TUNED_CALIBRATION_OFFSET));
-      uint8_t istuned =(!!_SFR_MEM8((osccfg ? 0x1306 : 0x1300) +  CLOCK_TUNE_START + HOME_TUNING_OFFSET));
-      if (!istuned) { {
+      uint8_t istuned =(_SFR_MEM8((_osccfg ? 0x1306 : 0x1300) +  CLOCK_TUNE_START + HOME_TUNING_OFFSET)) != 255;
+      uint8_t tunedval=_SFR_MEM8(((_osccfg ? 0x1306 : 0x1300) +  CLOCK_TUNE_START + TUNED_CALIBRATION_OFFSET));
+      if (!istuned) {
         GPIOR0 |= 0x40;
         int temp = GUESSCAL;
         if (temp > MAX_TUNING) {             // uhoh, if we apply the default guess, we'd be setting it higher than it's maximum value!
-          if (MAX_TUNING - temp > 5) return; // How far away are we? If it's more than 5, give up - better to be obviously broken than non-obviously broken
+          if (MAX_TUNING - temp > 5) {
+            GPIOR0 |= 0x80;
+            return; // How far away are we? If it's more than 5, give up - better to be obviously broken than non-obviously broken
+          }
           tunedval = MAX_TUNING;
         } else if (temp < 0) {               // uhoh, if we apply the default guess, we'd be setting it to a negative value (which would wrap around, resulting in the value being too high..
           if (temp < -5) return;             // How far away are we? If it's more than 5, give up - better to be obviously broken than non-obviously broken
@@ -1397,12 +1427,12 @@ void __attribute__((weak)) init_clock() {
         } else {
           tunedval = temp;
         }
-      }
-    } else if (tunedval == 0x80) {
+      } else if (tunedval == 0x80) {
         GPIOR0 |= 0x80;
         return; // this chip was tuned and it's oscillator found to be unable to reach target and/or the chip ceased to be opprate before reaching that speed
-        // such that either the tuning sketch crashed or the incredilbly crude sanity check turned up an error.
+        // such that either the tuning sketch crashed or the incredilbly crude sanity checks found that arithmatic produced incorrect results.
       }
+      // Udf
       _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);
       _NOP();
       _NOP();
@@ -1514,7 +1544,7 @@ void __attribute__((weak)) init_ADC0() {
   }
 #endif
 
-void __attribute__((weak)) init_timers()  {
+void init_timers()  {
   init_TCA0();
   #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && !defined(MILLIS_USE_TIMERD0))
     init_TCD0();

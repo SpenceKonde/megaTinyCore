@@ -17,7 +17,7 @@
 #if MEGATINYCORE_SERIES      == 2
   const uint8_t homeindex     = 1;
   #if F_CPU                  == 16000000
-    const float targets[6]    = {12.0, 16.0, 20.0, 24.0, 25.0, 30.0};
+    const float targets[6]    = {14.0, 16.0, 20.0, 24.0, 25.0, 30.0};
     #define CAL_START (USER_SIGNATURES_SIZE - 12)
   #elif F_CPU                == 20000000
     const float targets[6]    = {16.0, 20.0, 24.0, 25.0, 30.0, 32.0};
@@ -26,10 +26,10 @@
 #else  // 0/1 series
   const uint8_t homeindex     = 2;
   #if F_CPU                  == 16000000
-    const float targets[6]    = {10.0, 12.0, 16.0, 20.0, 24.0, 25.0};
+    const float targets[6]    = {12.0, 14.0, 16.0, 20.0, 24.0, 25.0};
     #define CAL_START (USER_SIGNATURES_SIZE - 12)
   #elif F_CPU                == 20000000
-    const float targets[6]    = {12.0, 16.0, 20.0, 24.0, 25.0, 30.0};
+    const float targets[6]    = {14.0, 16.0, 20.0, 24.0, 25.0, 30.0};
     #define CAL_START (USER_SIGNATURES_SIZE - 6)
   #endif
 #endif
