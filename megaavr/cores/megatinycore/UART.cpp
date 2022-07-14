@@ -133,14 +133,14 @@
             "push       r25"              "\n\t" //
             "push       r28"              "\n\t" //
             "push       r29"              "\n\t" //
-            "ldd        r28,    Z + 12"   "\n\t" // Load USART into Y pointer
+            "ldd        r28,    Z + 8"   "\n\t" // Load USART into Y pointer
     //      "ldd        r29,    Z + 13"   "\n\t" // We interact with the USART only this once
             "ldi        r29,      0x08"   "\n\t" // High byte always 0x08 for USART peripheral: Save-a-clock.
             "ldd        r24,    Y +  1"   "\n\t" // Y + 1 = USARTn.RXDATAH - load high byte first
             "ld         r25,         Y"   "\n\t" // Y + 0 = USARTn.RXDATAH - then low byte of RXdata
             "sbrc       r24,         1"   "\n\t" // if there's a parity error, then do nothing more. Copies the behavior of
             "rjmp  _end_rxc"              "\n\t" // stock implementation - framing errors are ok, apparently...
-            "ldd        r28,    Z + 17"   "\n\t" // load current head index
+            "ldd        r28,    Z + 13"   "\n\t" // load current head index
             "ldi        r24,         1"   "\n\t" // Clear r24 and initialize it with 1
             "add        r24,       r28"   "\n\t" // add current head index to it
     #if   SERIAL_RX_BUFFER_SIZE == 256
@@ -154,7 +154,7 @@
     #elif SERIAL_RX_BUFFER_SIZE == 16
             "andi       r24,      0x0F"   "\n\t" // Wrap the head around
     #endif
-            "ldd        r18,    Z + 18"   "\n\t" // load tail index
+            "ldd        r18,    Z + 14"   "\n\t" // load tail index
             "cp         r18,       r24"   "\n\t" // See if head is at tail. If so, buffer full. The incoming data is discarded,
             "breq  _end_rxc"              "\n\t" // because there is noplace to put it, and we just restore state and leave.
             "add        r28,       r30"   "\n\t" // r28 has what would be the next index in it.
@@ -162,7 +162,7 @@
             "ldi        r18,         0"   "\n\t" // need a known zero to carry.
             "adc        r29,       r18"   "\n\t" // carry - Y is now pointing 21 bytes before head
             "std     Y + 21,       r25"   "\n\t" // store the new char in buffer
-            "std     Z + 17,       r24"   "\n\t" // write that new head index.
+            "std     Z + 13,       r24"   "\n\t" // write that new head index.
           "_end_rxc:"                     "\n\t" //
             "pop        r29"              "\n\t" // Y Pointer was used for head and usart
             "pop        r28"              "\n\t" //
@@ -238,10 +238,10 @@
           "push        r28"               "\n\t"
           "push        r29"               "\n\t"
           "ldi         r18,        0"     "\n\t"
-          "ldd         r28,   Z + 12"     "\n\t"  // usart in Y
+          "ldd         r28,   Z + 8"     "\n\t"  // usart in Y
     //    "ldd         r29,   Z + 13"     "\n\t"  // usart in Y
           "ldi         r29,     0x08"     "\n\t"  // High byte always 0x08 for USART peripheral: Save-a-clock.
-          "ldd         r25,   Z + 20"     "\n\t"  // tx tail in r25
+          "ldd         r25,   Z + 16"     "\n\t"  // tx tail in r25
           "movw        r26,      r30"     "\n\t"  // copy of serial in X
           "add         r26,      r25"     "\n\t"  // SerialN + txtail
           "adc         r27,      r18"     "\n\t"  // X = &Serial + txtail
@@ -280,13 +280,13 @@
           "andi        r25,     0x0F"     "\n\t" // Wrap the tail around
     #endif
           "ldd         r24,   Y +  5"     "\n\t"  // Y + 5 = USART.CTRLA - get CTRLA into r24
-          "ldd         r18,   Z + 19"     "\n\t"  // txhead into r18
+          "ldd         r18,   Z + 15"     "\n\t"  // txhead into r18
           "cpse        r18,      r25"     "\n\t"  // if they're the same
           "rjmp  _done_dre_irq"           "\n\t"
           "andi        r24,     0xDF"     "\n\t"  // DREIE off
           "std      Y +  5,      r24"     "\n\t"  // write new ctrla
         "_done_dre_irq:"                  "\n\t"  // Beginning of the end of DRE
-          "std      Z + 20,      r25"     "\n\t"  // store new tail
+          "std      Z + 16,      r25"     "\n\t"  // store new tail
           "pop         r29"               "\n\t"  // pop Y
           "pop         r28"               "\n\t"  // finish popping Y
     #if PROGMEM_SIZE > 8192

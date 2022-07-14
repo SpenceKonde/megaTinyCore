@@ -116,7 +116,7 @@
       GUESSCAL = (SIGROW_OSCCAL20M0 + GUESS_20_16        );
       TUNED_CALIBRATION_OFFSET =                       (0);
     #endif
-  } else if(osccal == 0) {
+  } else if(_osccfg == 0) {
     #if _CLOCKSPERUS == 30
       GUESSCAL = (-1);
       TUNED_CALIBRATION_OFFSET =                      (-1);
