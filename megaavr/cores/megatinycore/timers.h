@@ -110,7 +110,7 @@
 #endif
 
 /* These allow other libraries to detect whether timing functions are available with #ifdef */
-#define delay delay
+//#define delay delay
 #define delayMicroseconds delayMicroseconds
 
 #if !defined(MILLIS_USE_TIMERNONE)
