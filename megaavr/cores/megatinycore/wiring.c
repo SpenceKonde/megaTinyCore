@@ -7,8 +7,7 @@
   Copyright (c) 2018-2021 Spence Konde
   This has been ported to modern AVRs (Arduino team did that)
   Almost every part of it has since been rewritten for
-  megaTinyCore and DxCore. This is the DxCore version, and is
-  part of DxCore.
+  megaTinyCore and DxCore.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -1376,36 +1375,30 @@ void __attribute__((weak)) init_clock() {
 #if defined(CLOCK_TUNE_INTERNAL)
   void tune_internal() {
   #define _CLOCKSPERUS (F_CPU/1000000)
-  int8_t GUESSCAL = -1;                     // magic name - do not change
-  int16_t TUNED_CALIBRATION_OFFSET = -1;   // magic name - do not change
-  int8_t TUNE_PRESCALE = 0;                 // magic name - do not change
-  uint8_t _osccfg;
-  //#if defined(USING_BOOTLOADER)
-    //#if USING_BOOTLOADER == 1
+  uint8_t _osccfg; // magic name - do not change
+  #if defined(USING_BOOTLOADER) && USING_BOOTLOADER == 1
       // If using Optiboot, then we do not know what value OSCFG was set to when it was bootloaded, so we have to determine it at runtime.
-    ///  uint8_t _osccfg = FUSE.OSCCFG - 1; /****** "_osccfg" IS A MAGIC NAME - DO NOT CHANGE IT ******/
-    //#else
-    //  uint8_t _osccfg = MCLKCTRL.
-    //#endif
-  //#elif !defined(USING_BOOTLOADER) || USING_BOOTLOADER == 0 // if we're not using a bootloader, this gets configured upon upload, and is a compile time known constant!
-    #if MEGATINYCORE_SERIES == 2 && (_CLOCKSPERUS > 20 || _CLOCKSPERUS== 12 || _CLOCKSPERUS == 10 || _CLOCKSPERUS == 6 || _CLOCKSPERUS == 5)
+      uint8_t _osccfg = FUSE.OSCCFG - 1; /****** "_osccfg" IS A MAGIC NAME - DO NOT CHANGE IT ******/
+  #else
+    // if not we set this when the
+    #if MEGATINYCORE_SERIES == 2 && (_CLOCKSPERUS > 20 || _CLOCKSPERUS== 12 || _CLOCKSPERUS == 10 || _CLOCKSPERUS == 6 || _CLOCKSPERUS == 5 || _CLOCKSPERUS == 3)
       _osccfg = 1;
-    #elif MEGATINYCORE_SERIES < 2 && (_CLOCKSPERUS > 20 || _CLOCKSPERUS == 10 || _CLOCKSPERUS == 5)
+    #elif MEGATINYCORE_SERIES < 2 && (_CLOCKSPERUS > 20 || _CLOCKSPERUS== 12 || _CLOCKSPERUS == 10 || _CLOCKSPERUS == 7 ||  _CLOCKSPERUS == 6 || _CLOCKSPERUS == 5 || _CLOCKSPERUS == 3)
       _osccfg = 1;
     #else
       _osccfg = 0;
     #endif
-  //#endif
+  #endif
   #include "tune_guesses.h"
     // The GUESSCAL, MAX_TUNING, TUNED_CALIBRATION_OFFSET and TUNE_PRESCALE symbols, which look like constants, aren't.
     // They're macros from tune_guesses.h and get replaced with (ternary operators and math involving osccfg), so what looks very simple here... actually isn't.
     // Evertthing hard is done in tune_guesses.h
     if (__builtin_constant_p(TUNED_CALIBRATION_OFFSET)) {
-      if (TUNED_CALIBRATION_OFFSET == -1) {
-        badCall("It appears that you are attempting to set a 0/1-series part to 32 MHz or otheerwise set a bogus clock speed. Only 2-series parts can reach that without malfunctioning ");
+      if (TUNED_CALIBRATION_OFFSET == 255) {
+        badCall("It appears that you are attempting to set a 0/1-series part to 32 MHz via tuning or otherwise set a bogus clock speed.");
       }
     }
-    if (TUNED_CALIBRATION_OFFSET == -1) {
+    if (TUNED_CALIBRATION_OFFSET == 255) {
 
       GPIOR0 |= 0x80;
       GPIOR0 |= 0x40;
