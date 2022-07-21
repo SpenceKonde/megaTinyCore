@@ -612,7 +612,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
   int32_t analogReadEnh( uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int32_t analogReadDiff(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int16_t analogClockSpeed(int16_t frequency = 0, uint8_t options = 0);
-  bool printADCRuntimeError(int32_t error, UartClass &__dbgser = Serial);
+  bool printADCRuntimeError(int32_t error, HardwareSerial &__dbgser = Serial);
   #if defined(ADC1)
     int32_t analogReadEnh1(uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
     int32_t analogReadDiff1(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);

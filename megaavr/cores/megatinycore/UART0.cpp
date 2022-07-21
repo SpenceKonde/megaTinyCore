@@ -9,23 +9,27 @@
  * unknown others 2013-2020, 2020-2022 Spence Konde
  */
 
-/* Each UartClass is defined in its own file, sine the linker pulls
+/* Each HardwareSerial is defined in its own file, sine the linker pulls
  * in the entire file when any element inside is used. --gc-sections can
  * additionally cause unused symbols to be dropped, but ISRs have the
  * "used" attribute so are never dropped and they keep the
- * UartClass instance in as well. Putting each instance in its own
+ * HardwareSerial instance in as well. Putting each instance in its own
  * file prevents the linker from pulling in any unused instances in the
  * first place.
- * There are now two versions of each ISR. Except for TXC, which is trivial,
- * both versions are stubs to call the real code (so it is not duplicated).
- * The ASM versions are more efficient that calling normally can be because
- * they completely ignore the ABI rules and do it the most efficient way
- * they can. They'll stop working if anything changes, and it's not
- * entirely clear whether the trick of dropping out of assembly while naked
- * to grab the address is legal, though there's no reason it shouldn't be.
+ * There are now two versions of each ISR. All versions are stubs to call
+ * the real code (so it is not duplicated). The ASM versions are more
+ * efficient than calling normally can ever be becausw they completely
+ * ignore the ABI rules for the transition from duplicated to shared
+ * code and call it the most effcieient way possiblem so the almost all of
+ * the flash overhead is in the shared section. They'll stop working if
+ * anything changes, and it's not entirely clear whether the trick of
+ * dropping out of assembly while naked to grab the address is legal,
+ * though there's no reason it shouldn't be.
  * The assembly implementations over in UART.cpp depends on the structure
  * of the SerialClass. Any changes to the class member variables will
  * require changes to the asm to match.
+ * This was done for 1.5.12 to correct a serious defect. amd fix a
+ * to make things work better with millis off, and free up 4 bytes of sram.
  */
 #include "Arduino.h"
 #include "UART.h"
@@ -33,6 +37,7 @@
 
 #if defined(USART0)
   #if defined(USE_ASM_TXC) && USE_ASM_TXC == 1 //&& defined(USART1) // No benefit to this if it's just one USART
+    // Note the difference vetween this and the other ISRs - here we don't care at all about the serial object, we just have to work with the USART
     ISR(USART0_TXC_vect, ISR_NAKED) {
       __asm__ __volatile__(
             "push  r30"         "\n\t" // push the low byte of Z
@@ -58,7 +63,7 @@
 
   #if !(defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/)
     ISR(USART0_RXC_vect) {
-      UartClass::_rx_complete_irq(Serial);
+      HardwareSerial::_rx_complete_irq(Serial);
     }
   #else
     ISR(USART0_RXC_vect, ISR_NAKED) {
@@ -76,7 +81,7 @@
        (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
        (SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
     ISR(USART0_DRE_vect) {
-      UartClass::_tx_data_empty_irq(Serial);
+      HardwareSerial::_tx_data_empty_irq(Serial);
     }
   #else
     ISR(USART0_DRE_vect, ISR_NAKED) {
@@ -95,5 +100,5 @@
     }
   #endif
 
-  UartClass Serial(&USART0, 0, HWSERIAL0_MUX_DEFAULT);
+  HardwareSerial Serial(&USART0, 0, HWSERIAL0_MUX_DEFAULT);
 #endif

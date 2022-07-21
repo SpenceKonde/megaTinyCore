@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "UART.h"
 
-bool printADCRuntimeError(int32_t error, UartClass &__dbgser) {
+bool printADCRuntimeError(int32_t error, HardwareSerial &__dbgser) {
   if (error < -2100000000) {
     uint8_t err = (uint8_t) (-2100000000 - error) ;
     switch (err) {
