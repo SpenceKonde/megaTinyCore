@@ -218,6 +218,7 @@ Returns the number of ADC clocks by which the minimum sample length has been ext
 ### ADC Runtime errors
 When taking an analog reading, you may receive a value near -2.1 billion - these are runtime error codes.
 The busy and disabled errors are the only ones that we never know at compile time.
+
 | Error name                     |     Value   | Notes
 |--------------------------------|-------------|---------------------------------------------------------------------
 |ADC_ERROR_INVALID_CLOCK         |      -32764 | Returned by analogSetClock() if, somehow, it fails to find an appropriate value. May be a cant-happen.
@@ -240,6 +241,22 @@ if (adc_reading < -32768 ) {
   printADCRuntimeError(adc_reading, Serial);
 }
 ```
+### analogIsError(value)
+Pass either the int16_t from analogRead or the int32_t from analogReadEnh to this to check if it's a valid value. If this returns a 1, that means that you got an error, and should be printing debugging information, not trying to make use of it.
+The logic used does depend on the type passed to it.
+```c++
+int32_t adcreading=analogReadEnh(PIN_PA1,12);
+if (analogIsError(adcreading)) {
+  Serial.print("Analog value returned was an error: ");
+  Serial.println(adcreading);
+}
+int16_t adcreading2=analogRead(PIN_PA1);
+if (analogIsError(adcreading2)) {
+  Serial.print("Analog value returned was an error: ");
+  Serial.println(adcreading2);
+}
+
+```
 
 ### ADCPowerOptions(options) *2-series only prior to 2.5.12* For compatibility, a much more limited version is provided for 0/1-series. See below
 The PGA requires powere when turned on. It is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that specifies valid gain > 0; if it is not already on, this will slow down the reading. By default we turn it off afterwards. There is also a "low latency" mode that, when enabled, keeps the ADC reference and related hardware running to prevent the delay (on order of tens of microseconds) before the next analog reading is taken. We use that by default, but it can be turned off with this function.
@@ -259,13 +276,12 @@ Example:
 ADCPowerOptions(LOW_LAT_ON  | PGA_KEEP_ON );            //  low latency on. Turn the PGA on, and do not automatically shut it off. Maximum power consumption, minimum ADC delays.
 ADCPowerOptions(LOW_LAT_OFF | PGA_AUTO_OFF);            //  low latency off. Turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays. **ERRATA WARNING** turning off LOWLAT can cause problems on 2=series parts! See the errata for the specific part you are using.)
 ADCPowerOptions(ADC_DISABLE);                           //  turn off the ADC.
-ADCPowerOptions(ADC_ENABLE                              //  Turn the ADC back on. If LOWLAT mode was on, when you turned off the ADC it will still be on,. Same with the other options.
+ADCPowerOptions(ADC_ENABLE);                            //  Turn the ADC back on. If LOWLAT mode was on, when you turned off the ADC it will still be on,. Same with the other options.
 ```
 
 As of 2.5.12 we will always disable and re-enable the ADC if touching LOWLAT, in the hopes that this will work around the lowlat errata consistently.
 **it is still recommended to call ADCPowerOptions(), if needed, before any other ADC-related functions** unless you fully understand the errata and the ramifications of your actions.
 **On most 2-series parts LOWLAT mode is REQUIRED in order to use the PGA when not using an internal reference, or measuring the DACREF!**
-
 
 Lowlat mode is enabled by default for this reason, as well as to generally improve performance. Disabling the ADC will end the power consumption associated with it.
 
