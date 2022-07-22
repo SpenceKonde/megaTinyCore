@@ -5,14 +5,14 @@ inline uint8_t analogIsError(int16_t adcval) {
   if(adcval < 0) {
     return 1;
   }
-  return 0
+  return 0;
 }
 inline uint8_t analogIsError(int32_t adcval) {
   union bytelong {
-    int32_t l,
-    uint8_t[4] b
+    int32_t l;
+    uint8_t[4] b;
   }
-  bytelong.l = adcval
+  bytelong.l = adcval;
   if (bytelong.b[3] == 0x82) {
     return 1;
   }
