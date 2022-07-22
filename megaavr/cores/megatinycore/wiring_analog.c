@@ -286,14 +286,18 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
  *    or PORTD/PORTE (for Dx-series), and the selection of available
  *    channels is more limited.
  *
- * printADCRuntimeError(uint32_t error, &UartClass DebugSerial)
+ * printADCRuntimeError(uint32_t error, &HardwareSerial DebugSerial)
  *   Prints a text description of an error returnedby analogRead,
  *   analogReasdEnh(),or analogReadDiff() to the specified serial device
  *   Ex:
  *    printADCRuntimeError(-2100000003, &Serial);
- *    will peinr "ADC_ENH_ERROR_RES_TOO_LOW"
+ *    will print "ADC_ENH_ERROR_RES_TOO_LOW"
  *    Will print nothing and return false if the result wasn't an error
- *    Inefficient of flash space..
+ *   This function is not an efficient user of flash space, it is meant as a
+ *   debugging aid.
+ * analogIsError(int16_t from analogRead or int32_t from analogReadEnh)
+ *   Returns 1 (true) if the value, assuming it came from an analogRead/Enh
+ *   function call, is not an analog reading but instead an error code.
  ****************************************************************************/
 
 
@@ -786,7 +790,6 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   }
   static const int16_t adc_prescale_to_clkadc[0x09] =  {(F_CPU /  2000UL),(F_CPU /  4000UL),(F_CPU /  8000UL),(F_CPU / 16000UL),
   /* Doesn't get copied to ram because these all */     (F_CPU / 32000UL),(F_CPU / 64000UL),(F_CPU /128000UL),(F_CPU /256000UL),1};
-
 
   /*
   Frequency in kHz.

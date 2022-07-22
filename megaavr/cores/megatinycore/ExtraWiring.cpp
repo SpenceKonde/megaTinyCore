@@ -1,6 +1,23 @@
 #include "Arduino.h"
-#include "UART.h"
+#include "HardwareSerial.h"
 
+inline uint8_t analogIsError(int16_t adcval) {
+  if(adcval < 0) {
+    return 1;
+  }
+  return 0
+}
+inline uint8_t analogIsError(int32_t adcval) {
+  union bytelong {
+    int32_t l,
+    uint8_t[4] b
+  }
+  bytelong.l = adcval
+  if (bytelong.b[3] == 0x82) {
+    return 1;
+  }
+  return 0;
+}
 bool printADCRuntimeError(int32_t error, HardwareSerial &__dbgser) {
   if (error < -2100000000) {
     uint8_t err = (uint8_t) (-2100000000 - error) ;

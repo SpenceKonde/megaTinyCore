@@ -612,12 +612,15 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
   int32_t analogReadEnh( uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int32_t analogReadDiff(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int16_t analogClockSpeed(int16_t frequency = 0, uint8_t options = 0);
-  bool printADCRuntimeError(int32_t error, HardwareSerial &__dbgser = Serial);
   #if defined(ADC1)
     int32_t analogReadEnh1(uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
     int32_t analogReadDiff1(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
     int16_t analogClockSpeed1(int16_t frequency = 0, uint8_t options = 0);
   #endif
+  // in ExtraWiring.cpp:
+  uint8_t analogIsError(int16_t val);
+  uint8_t analogIsError(int32_t val);
+  bool printADCRuntimeError(int32_t error, HardwareSerial &__dbgser = Serial);
 #endif
 
 // Include the variants
@@ -663,6 +666,7 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define CORE_HAS_OPENDRAIN 1
 #define CORE_HAS_PINCONFIG 1
 #define CORE_HAS_FASTPINMODE 1
+
 
 #if (MEGATINYCORE_SERIES == 2)
   // if analogReadEnh() supplied, this is defined as 1
