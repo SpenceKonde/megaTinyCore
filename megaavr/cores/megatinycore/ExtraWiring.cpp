@@ -7,13 +7,15 @@ inline uint8_t analogIsError(int16_t adcval) {
   }
   return 0;
 }
+union bytelong {
+  int32_t l;
+  uint8_t b[4];
+};
+
 inline uint8_t analogIsError(int32_t adcval) {
-  union bytelong {
-    int32_t l;
-    uint8_t[4] b;
-  }
-  bytelong.l = adcval;
-  if (bytelong.b[3] == 0x82) {
+  union bytelong bl;
+  bl.l = adcval;
+  if (bl.b[3] == 0x82) {
     return 1;
   }
   return 0;
