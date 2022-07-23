@@ -109,12 +109,14 @@ ISR(RTC_PIT_vect)
 void setup() {
   RTC_init();                           /* Initialize the RTC timer */
   pinMode(7, OUTPUT);                   /* Configure pin#7 as an output */
+  //ADC0.CTRLA &= ~ADC_ENABLE_bm;       /* If you have a 2-Series part, uncomment this to disable the ADC*/
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);  /* Set sleep mode to POWER DOWN mode */
   sleep_enable();                       /* Enable sleep mode, but not going to sleep yet */
 }
 
 void loop() {
   sleep_cpu();                          /* Sleep the device and wait for an interrupt to continue */
+  //ADC0.CTRLA |= ADC_ENABLE_bm;        /* If you have a 2-Series part, uncomment this to enable the ADC again*/
   digitalWrite(7, CHANGE);              /* Device woke up and toggle LED on pin#7 */
 }
 ```
@@ -123,6 +125,9 @@ The RTC is in it's own "clock domain" and the microcontroller has to "synchroniz
 
 ## Sleep and Serial ports
 If there are any serial ports which you print output to, before going to sleep, be sure to let them finish printing everything in their transmit buffer by calling `Serial.flush()`.
+
+## 2-Series ADC Power Consumption
+If you happen to have a 2-Series part, you might want to turn off and reenable the ADC by uncommenting the lines above. Without it, the ADC will consume about 130uA in POWER DOWN mode.
 
 ## Future Development
 There are plans for a library to provide improved wrappers around sleep modes, particularly regarding timekeeping. This will also provide a means to handle serial ports automatically - including waking the part upon seeing an incoming character on the serial port. The latter is more complicated than the datasheet implies due to a widespread silicon bug with SFD (Start-of-Frame Detection).
