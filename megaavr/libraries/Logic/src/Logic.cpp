@@ -1,5 +1,4 @@
 #include "Logic.h"
-// *INDENT-OFF* // This file was lovingly hand indented, thankyouverymuch!
 
 
 #if defined(CCL_TRUTH0)
