@@ -57,7 +57,16 @@
   #endif
 #endif
 
-
+// Legacy definitions
+namespace out          {
+  using namespace comparator::out;
+};
+namespace hyst          {
+  using namespace comparator::hyst;
+};
+namespace ref          {
+  using namespace comparator::ref;
+};
 namespace comparator {
   namespace out {
     enum output_t : uint8_t {

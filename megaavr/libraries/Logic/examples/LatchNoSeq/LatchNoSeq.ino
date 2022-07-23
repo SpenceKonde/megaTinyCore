@@ -79,7 +79,7 @@ void setup() {
 
 
   // Start the AVR logic hardware
-  Lologic::gic::start();
+  Logic::gic::start();
 }
 
 void loop() {
