@@ -258,7 +258,8 @@ if (analogIsError(adcreading2)) {
 
 ```
 
-### ADCPowerOptions(options) *2-series only prior to 2.5.12* For compatibility, a much more limited version is provided for 0/1-series. See below
+### ADCPowerOptions(options) *2-series only prior to 2.5.12*
+*For compatibility, a much more limited version is provided for 0/1-series. See below*
 The PGA requires powere when turned on. It is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that specifies valid gain > 0; if it is not already on, this will slow down the reading. By default we turn it off afterwards. There is also a "low latency" mode that, when enabled, keeps the ADC reference and related hardware running to prevent the delay (on order of tens of microseconds) before the next analog reading is taken. We use that by default, but it can be turned off with this function.
 Generate the argument for this by using one of the following constants, or bitwise-or'ing together a low latency option and a PGA option. If only one option is supplied, the other configuration will not be changed. Note that due to current errata, you **must** have LOW_LAT enabled
 * `LOW_LAT_OFF`     Turn off low latency mode. *2-series only*
