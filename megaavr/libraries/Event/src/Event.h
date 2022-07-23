@@ -21,43 +21,7 @@
 // *INDENT-OFF* astyle hates how we formatted this.
 // I mean, I do too, but I hated all the alternatives we tried even more.
 // Readable code always takes priority over formatting dogma. -Spence
-// Legacy definitions
-namespace gen          {
-  using namespace event::gen;
-};
-namespace gen0          {
-  using namespace event::gen0;
-};
-namespace gen1          {
-  using namespace event::gen1;
-};
-namespace gen2          {
-  using namespace event::gen2;
-};
-namespace gen3          {
-  using namespace event::gen3;
-};
-namespace gen4          {
-  using namespace event::gen4;
-};
-namespace gen5          {
-  using namespace event::gen5;
-};
-namespace gen6          {
-  using namespace event::gen6;
-};
-namespace gen7          {
-  using namespace event::gen7;
-};
-namespace gen8          {
-  using namespace event::gen8;
-};
-namespace gen9          {
-  using namespace event::gen9;
-};
-namespace user          {
-  using namespace event::user;
-};
+
 
 // Features present on all generator channels
 
@@ -1197,7 +1161,43 @@ namespace event {
     };
 #endif
 };
-
+// Legacy definitions
+namespace gen          {
+  using namespace event::gen;
+};
+namespace gen0          {
+  using namespace event::gen0;
+};
+namespace gen1          {
+  using namespace event::gen1;
+};
+namespace gen2          {
+  using namespace event::gen2;
+};
+namespace gen3          {
+  using namespace event::gen3;
+};
+namespace gen4          {
+  using namespace event::gen4;
+};
+namespace gen5          {
+  using namespace event::gen5;
+};
+namespace gen6          {
+  using namespace event::gen6;
+};
+namespace gen7          {
+  using namespace event::gen7;
+};
+namespace gen8          {
+  using namespace event::gen8;
+};
+namespace gen9          {
+  using namespace event::gen9;
+};
+namespace user          {
+  using namespace event::user;
+};
 
 class Event {
   public:
