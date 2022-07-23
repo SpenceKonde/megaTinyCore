@@ -257,7 +257,7 @@ uint8_t TUNED_CALIBRATION_OFFSET;
       GUESSCAL =       (SIGROW_OSCCAL16M0                      );
       TUNED_CALIBRATION_OFFSET =                             (2);
     } else if (_CLOCKSPERUS == 14 ) {// or 8 or 4 MHz
-      GUESSCAL =       (AIGROW_OSCCAL16M0 + GUESS_16_14        );
+      GUESSCAL =       (SIGROW_OSCCAL16M0 + GUESS_16_14        );
       TUNED_CALIBRATION_OFFSET =                             (1);
     } else if (_CLOCKSPERUS == 12) {
       GUESSCAL =       (SIGROW_OSCCAL16M0 + GUESS_16_12        );
