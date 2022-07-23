@@ -94,18 +94,6 @@ AltOUT |  PIN_PC6* |  PIN_PC6* |  PIN_PC6* |   n/a    | PIN_PC6* | PIN_PC6* |   
   AnalogComparator      Comparator0(0, AC0, PORTA.PIN7CTRL, PORTB.PIN5CTRL, PORTB.PIN1CTRL, PORTB.PIN6CTRL,                 PORTA.PIN6CTRL, PORTB.PIN4CTRL, PORTB.PIN0CTRL);
 #endif
 
-
-// Array for storing ISR function pointers
-#if defined(AC2_AC_vect)
-  static volatile voidFuncPtr intFuncAC[3];
-#elif defined(AC1_AC_vect)
-  static volatile voidFuncPtr intFuncAC[2];
-#elif defined(AC0_AC_vect)
-  static volatile voidFuncPtr intFuncAC[1];
-#else
-  #error "Unsupported part? This device does not have an analog comparator!"
-#endif
-
 /* A few notes on adaptations for megaTinyCore/DxCore
   1. There are two definitions for the comparator objects, depending on whether
   PORTE is defined. If it's not, we still need to feed the constructor something.
@@ -293,7 +281,7 @@ AnalogComparator::AnalogComparator(
 void AnalogComparator::init() {
   #if defined(DXCORE)
     // Set voltage reference
-    if (reference != ref::disable) {
+    if (reference != comparator::ref::disable) {
       VREF.ACREF = VREF_ALWAYSON_bm | reference;
     } else {
       VREF.ACREF &= ~VREF_ALWAYSON_bm;
@@ -322,13 +310,13 @@ void AnalogComparator::init() {
 
     // Prepare for output pin swap
     #if defined(DXCORE) && (defined(HAS_48_PINS) || defined(HAS_64_PINS))
-      if (output_swap == out::pin_swap) {
+      if (output_swap == comparator::out::pin_swap) {
         PORTMUX.ACROUTEA = ~(1 << comparator_number) | output_swap;
       }
     #endif
   #elif defined(MEGATINYCORE)
     // Set voltage reference
-    if (reference != ref::disable) {
+    if (reference != comparator::ref::disable) {
       if (comparator_number == 0) {
         #if defined(VREF_AC0REFEN_bm)
         /* 0/1-series and 2-series name it differently
@@ -396,7 +384,7 @@ void AnalogComparator::init() {
     AC.CTRLA = (AC.CTRLA & ~(AC_HYSMODE_gm | AC_OUTEN_bm)) | hysteresis | (output & 0x40);
   #else /* megaAVR 0-series */
     // Set voltage reference
-    if (reference != ref::disable)
+    if (reference != comparator::ref::disable)
     {
       VREF.CTRLA = (VREF.CTRLA & ~VREF_AC0REFSEL_AVDD_gc) | reference;
       VREF.CTRLB = VREF_AC0REFEN_bm;
@@ -413,110 +401,110 @@ void AnalogComparator::init() {
   // Now, we disable the appropriate pins...
   #if !defined(MEGATINYCORE) /* At least Dx and megaAVR can share this part */
     #if defined(ANALOG_COMP_PINS_DD)
-      if        (input_p == in_p::in0) {
+      if        (input_p == comparator::in_p::in0) {
         IN0_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in3) {
+      } else if (input_p == comparator::in_p::in3) {
         IN3_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in4) {
+      } else if (input_p == comparator::in_p::in4) {
         IN4_P = PORT_ISC_INPUT_DISABLE_gc;
       }
-      if        (input_n == in_n::in0) {
+      if        (input_n == comparator::in_n::in0) {
         IN0_N = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_n == in_n::in3) {
+      } else if (input_n == comparator::in_n::in3) {
         IN2_N = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_n == in_n::in4) {
+      } else if (input_n == comparator::in_n::in4) {
         IN3_N = PORT_ISC_INPUT_DISABLE_gc;
       }
     #elif defined(ANALOG_COMP_PINS_DA_DB) || defined(ANALOG_COMP_PINS_MEGA)
-      if        (input_p == in_p::in0) {
+      if        (input_p == comparator::in_p::in0) {
         IN0_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in1) {
+      } else if (input_p == comparator::in_p::in1) {
         IN1_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in2) {
+      } else if (input_p == comparator::in_p::in2) {
         IN2_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in3) {
+      } else if (input_p == comparator::in_p::in3) {
         IN3_P = PORT_ISC_INPUT_DISABLE_gc;
       }
-      if        (input_n == in_n::in0) {
+      if        (input_n == comparator::in_n::in0) {
         IN0_N = PORT_ISC_INPUT_DISABLE_gc;
       }
       #if !defined(ANALOG_COMP_NO_N1)
-      else if (input_n == in_n::in1) {
+      else if (input_n == comparator::in_n::in1) {
         IN1_N = PORT_ISC_INPUT_DISABLE_gc;
       }
       #endif
-      else if (input_n == in_n::in2) {
+      else if (input_n == comparator::in_n::in2) {
         IN2_N = PORT_ISC_INPUT_DISABLE_gc;
       }
     #elif defined(ANALOG_COMP_PINS_EA)
-      if        (input_p == in_p::in0) {
+      if        (input_p == comparator::in_p::in0) {
         IN0_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in1) {
+      } else if (input_p == comparator::in_p::in1) {
         IN1_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in2) {
+      } else if (input_p == comparator::in_p::in2) {
         IN2_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in3) {
+      } else if (input_p == comparator::in_p::in3) {
         IN3_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in4) {
+      } else if (input_p == comparator::in_p::in4) {
         IN4_P = PORT_ISC_INPUT_DISABLE_gc;
       }
-      if        (input_n == in_n::in0) {
+      if        (input_n == comparator::in_n::in0) {
         IN0_N = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_n == in_n::in1) {
+      } else if (input_n == comparator::in_n::in1) {
         IN1_N = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_n == in_n::in2) {
+      } else if (input_n == comparator::in_n::in2) {
         IN2_N = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_n == in_n::in3) {
+      } else if (input_n == comparator::in_n::in3) {
         IN3_N = PORT_ISC_INPUT_DISABLE_gc;
       }
     #endif
   #else /* tinyAVR */
-    if          (input_p == in_p::in0) {
+    if          (input_p == comparator::in_p::in0) {
       IN0_P   = PORT_ISC_INPUT_DISABLE_gc;
     }
     #if   defined(ANALOG_COMP_PINS_TINY_SOME)
-      else if   (input_p == in_p::in1) {
+      else if   (input_p == comparator::in_p::in1) {
         IN1_P = PORT_ISC_INPUT_DISABLE_gc;
       }
     #elif defined(ANALOG_COMP_PINS_TINY_GOLDEN_14)
-      else if   (input_p == in_p::in1) {
+      else if   (input_p == comparator::in_p::in1) {
         IN1_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in2) {
+      } else if (input_p == comparator::in_p::in2) {
         IN2_P = PORT_ISC_INPUT_DISABLE_gc;
       }
     #elif defined(ANALOG_COMP_PINS_TINY_TWO_14)
-      else if   (input_p == in_p::in2) {
+      else if   (input_p == comparator::in_p::in2) {
         IN2_P = PORT_ISC_INPUT_DISABLE_gc;
       }
     #elif defined(ANALOG_COMP_PINS_TINY_GOLDEN)
-      else if   (input_p == in_p::in1) {
+      else if   (input_p == comparator::in_p::in1) {
         IN1_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in2) {
+      } else if (input_p == comparator::in_p::in2) {
         IN2_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in3) {
+      } else if (input_p == comparator::in_p::in3) {
         IN3_P = PORT_ISC_INPUT_DISABLE_gc;
       }
     #elif defined(ANALOG_COMP_PINS_TINY_GOLDEN)
-      else if   (input_p == in_p::in1) {
+      else if   (input_p == comparator::in_p::in1) {
         IN1_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in2) {
+      } else if (input_p == comparator::in_p::in2) {
         IN2_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in3) {
+      } else if (input_p == comparator::in_p::in3) {
         IN3_P = PORT_ISC_INPUT_DISABLE_gc;
-      } else if (input_p == in_p::in4) {
+      } else if (input_p == comparator::in_p::in4) {
         IN4_P = PORT_ISC_INPUT_DISABLE_gc;
       }
     #endif
-    if          (input_n == in_n::in0) {
+    if          (input_n == comparator::in_n::in0) {
       IN0_N   = PORT_ISC_INPUT_DISABLE_gc;
     }
     #if defined(ANALOG_COMP_PINS_TINY_SOME)   || defined(ANALOG_COMP_PINS_TINY_TWO) || defined(ANALOG_COMP_PINS_TINY_GOLDEN)
-      else if   (input_n == in_n::in1) {
+      else if   (input_n == comparator::in_n::in1) {
         IN1_N = PORT_ISC_INPUT_DISABLE_gc;
       }
     #endif
     #if defined(ANALOG_COMP_PINS_TINY_TWO_14) || defined(ANALOG_COMP_PINS_TINY_TWO)
-      else if   (input_n == in_n::in2) {
+      else if   (input_n == comparator::in_n::in2) {
         IN2_N = PORT_ISC_INPUT_DISABLE_gc;
       }
     #endif
@@ -536,198 +524,113 @@ void AnalogComparator::stop(bool restorepins) {
   if (restorepins) {
     #if !defined(MEGATINYCORE) /* At least Dx and megaAVR can share this part */
       #if defined(ANALOG_COMP_PINS_DD)
-        if        (input_p == in_p::in0) {
+        if        (input_p == comparator::in_p::in0) {
           IN0_P = 0;
-        } else if (input_p == in_p::in3) {
+        } else if (input_p == comparator::in_p::in3) {
           IN3_P = 0;
-        } else if (input_p == in_p::in4) {
+        } else if (input_p == comparator::in_p::in4) {
           IN4_P = 0;
         }
-        if        (input_n == in_n::in0) {
+        if        (input_n == comparator::in_n::in0) {
           IN0_N = 0;
-        } else if (input_n == in_n::in3) {
+        } else if (input_n == comparator::in_n::in3) {
           IN2_N = 0;
-        } else if (input_n == in_n::in4) {
+        } else if (input_n == comparator::in_n::in4) {
           IN3_N = 0;
         }
       #elif defined(ANALOG_COMP_PINS_DA_DB) || defined(ANALOG_COMP_PINS_MEGA)
-        if        (input_p == in_p::in0) {
+        if        (input_p == comparator::in_p::in0) {
           IN0_P = 0;
-        } else if (input_p == in_p::in1) {
+        } else if (input_p == comparator::in_p::in1) {
           IN1_P = 0;
-        } else if (input_p == in_p::in2) {
+        } else if (input_p == comparator::in_p::in2) {
           IN2_P = 0;
-        } else if (input_p == in_p::in3) {
+        } else if (input_p == comparator::in_p::in3) {
           IN3_P = 0;
         }
-        if        (input_n == in_n::in0) {
+        if        (input_n == comparator::in_n::in0) {
           IN0_N = 0;
         }
         #if !defined(ANALOG_COMP_NO_N1)
-          else if (input_n == in_n::in1) {
+          else if (input_n == comparator::in_n::in1) {
             IN1_N = 0;
           }
         #endif
-        else if (input_n == in_n::in2) {
+        else if (input_n == comparator::in_n::in2) {
           IN2_N = 0;
         }
       #elif defined(ANALOG_COMP_PINS_EA)
-        if        (input_p == in_p::in0) {
+        if        (input_p == comparator::in_p::in0) {
           IN0_P = 0;
-        } else if (input_p == in_p::in1) {
+        } else if (input_p == comparator::in_p::in1) {
           IN1_P = 0;
-        } else if (input_p == in_p::in2) {
+        } else if (input_p == comparator::in_p::in2) {
           IN2_P = 0;
-        } else if (input_p == in_p::in3) {
+        } else if (input_p == comparator::in_p::in3) {
           IN3_P = 0;
-        } else if (input_p == in_p::in4) {
+        } else if (input_p == comparator::in_p::in4) {
           IN4_P = 0;
         }
-        if        (input_n == in_n::in0) {
+        if        (input_n == comparator::in_n::in0) {
           IN0_N = 0;
-        } else if (input_n == in_n::in1) {
+        } else if (input_n == comparator::in_n::in1) {
           IN1_N = 0;
-        } else if (input_n == in_n::in2) {
+        } else if (input_n == comparator::in_n::in2) {
           IN2_N = 0;
-        } else if (input_n == in_n::in3) {
+        } else if (input_n == comparator::in_n::in3) {
           IN3_N = 0;
         }
       #endif
     #else /* tinyAVR */
-      if          (input_p == in_p::in0) {
+      if          (input_p == comparator::in_p::in0) {
         IN0_P   = 0;
       }
       #if   defined(ANALOG_COMP_PINS_TINY_SOME)
-        else if   (input_p == in_p::in1) {
+        else if   (input_p == comparator::in_p::in1) {
           IN1_P = 0;
         }
       #elif defined(ANALOG_COMP_PINS_TINY_GOLDEN_14)
-        else if   (input_p == in_p::in1) {
+        else if   (input_p == comparator::in_p::in1) {
           IN1_P = 0;
-        } else if (input_p == in_p::in2) {
+        } else if (input_p == comparator::in_p::in2) {
           IN2_P = 0;
         }
       #elif defined(ANALOG_COMP_PINS_TINY_TWO_14)
-        else if   (input_p == in_p::in2) {
+        else if   (input_p == comparator::in_p::in2) {
           IN2_P = 0;
         }
       #elif defined(ANALOG_COMP_PINS_TINY_GOLDEN)
-        else if   (input_p == in_p::in1) {
+        else if   (input_p == comparator::in_p::in1) {
           IN1_P = 0;
-        } else if (input_p == in_p::in2) {
+        } else if (input_p == comparator::in_p::in2) {
           IN2_P = 0;
-        } else if (input_p == in_p::in3) {
+        } else if (input_p == comparator::in_p::in3) {
           IN3_P = 0;
         }
       #elif defined(ANALOG_COMP_PINS_TINY_GOLDEN)
-        else if   (input_p == in_p::in1) {
+        else if   (input_p == comparator::in_p::in1) {
           IN1_P = 0;
-        } else if (input_p == in_p::in2) {
+        } else if (input_p == comparator::in_p::in2) {
           IN2_P = 0;
-        } else if (input_p == in_p::in3) {
+        } else if (input_p == comparator::in_p::in3) {
           IN3_P = 0;
-        } else if (input_p == in_p::in4) {
+        } else if (input_p == comparator::in_p::in4) {
           IN4_P = 0;
         }
       #endif
-      if          (input_n == in_n::in0) {
+      if          (input_n == comparator::in_n::in0) {
         IN0_N   = 0;
       }
       #if defined(ANALOG_COMP_PINS_TINY_SOME)   || defined(ANALOG_COMP_PINS_TINY_TWO) || defined(ANALOG_COMP_PINS_TINY_GOLDEN)
-        else if   (input_n == in_n::in1) {
+        else if   (input_n == comparator::in_n::in1) {
           IN1_N = 0;
         }
       #endif
       #if defined(ANALOG_COMP_PINS_TINY_TWO_14) || defined(ANALOG_COMP_PINS_TINY_TWO)
-        else if   (input_n == in_n::in2) {
+        else if   (input_n == comparator::in_n::in2) {
           IN2_N = 0;
         }
       #endif
     #endif
   }
 }
-
-
-void AnalogComparator::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
-  #if !defined(DXCORE)
-  AC_INTMODE_t intmode;
-  switch (mode) {
-    // Set RISING, FALLING or CHANGE interrupt trigger for the comparator output
-    case RISING:
-      intmode = (AC_INTMODE_t)AC_INTMODE_POSEDGE_gc;
-      break;
-    case FALLING:
-      intmode = (AC_INTMODE_t)AC_INTMODE_NEGEDGE_gc;
-      break;
-    case CHANGE:
-      intmode = (AC_INTMODE_t)AC_INTMODE_BOTHEDGE_gc;
-      break;
-    default:
-      // Only RISING, FALLING and CHANGE is supported
-      return;
-  }
-  #else
-  AC_INTMODE_NORMAL_t intmode;
-  switch (mode) {
-    // Set RISING, FALLING or CHANGE interrupt trigger for the comparator output
-    case RISING:
-      intmode = (AC_INTMODE_NORMAL_t)AC_INTMODE_NORMAL_POSEDGE_gc;
-      break;
-    case FALLING:
-      intmode = (AC_INTMODE_NORMAL_t)AC_INTMODE_NORMAL_NEGEDGE_gc;
-      break;
-    case CHANGE:
-      intmode = (AC_INTMODE_NORMAL_t)AC_INTMODE_NORMAL_BOTHEDGE_gc;
-      break;
-    default:
-      // Only RISING, FALLING and CHANGE is supported
-      return;
-  }
-  #endif
-  // Store function pointer
-  intFuncAC[comparator_number] = userFunc;
-
-
-  // Set interrupt trigger and enable interrupt
-  #if !defined(DXCORE)
-  AC.CTRLA = (AC.CTRLA & ~AC_INTMODE_gm) | intmode ;
-  AC.INTCTRL = AC_CMP_bm;
-  #else
-  AC.INTCTRL = intmode | AC_CMP_bm;
-  #endif
-}
-
-void AnalogComparator::detachInterrupt() {
-  // Disable interrupt
-  AC.INTCTRL = 0;
-}
-
-#ifdef AC0_AC_vect
-ISR(AC0_AC_vect) {
-  // Run user function
-  intFuncAC[0]();
-
-  // Clear flag
-  AC0.STATUS = AC_CMP_bm;
-}
-#endif
-
-#ifdef AC1_AC_vect
-ISR(AC1_AC_vect) {
-  // Run user function
-  intFuncAC[1]();
-
-  // Clear flag
-  AC1.STATUS = AC_CMP_bm;
-}
-#endif
-
-#ifdef AC2_AC_vect
-ISR(AC2_AC_vect) {
-  // Run user function
-  intFuncAC[2]();
-
-  // Clear flag
-  AC2.STATUS = AC_CMP_bm;
-}
-#endif

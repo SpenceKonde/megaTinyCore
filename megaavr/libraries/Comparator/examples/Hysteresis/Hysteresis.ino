@@ -19,10 +19,10 @@
 
 void setup() {
   // Configure relevant comparator parameters
-  Comparator.input_p = in_p::in0;      // Use positive input 0 (PA7)
-  Comparator.input_n = in_n::in0;      // Use negative input 0 (PA6)
-  Comparator.hysteresis = hyst::large; // Use a 50mV hysteresis
-  Comparator.output = out::enable;     // Enable output on PIN_PA5 (digital pin 1)
+  Comparator.input_p = comparator::in_p::in0;      // Use positive input 0 (PA7)
+  Comparator.input_n = comparator::in_n::in0;      // Use negative input 0 (PA6)
+  Comparator.hysteresis = comparator::hyst::large; // Use a 50mV hysteresis
+  Comparator.output = comparator::out::enable;     // Enable output on PIN_PA5 (digital pin 1)
   //                                   // or PIN_PA3 (digital pin 4) on ATtiny402/202)
 
   // Initialize comparator
