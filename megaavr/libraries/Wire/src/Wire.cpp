@@ -259,7 +259,7 @@ void TwoWire::endSlave(void) {
  *@return     uint8_t
  *@retval     amount of bytes that were actually read. If 0, no read took place due to a bus error.
  */
-/* Spence: Oh ffs, why did we have all these type translating signatures to begin with when type convertion would automatically fix the problem for us
+/* Spence: Oh ffs, why did we have all these type translating signatures to begin with when type conversion would automatically fix the problem for us
  * so the worst anyone could say was that we would compile successfully instead of with obtuse errors,
  * if a user was using inappropriate types with values that get truncated in conversion, this wouldn't work for them with or without these
  * Buffer sizes listed in library documentation should not be exceeded, and the maximum a library can be configured for is 256 since it uses uint8_t's

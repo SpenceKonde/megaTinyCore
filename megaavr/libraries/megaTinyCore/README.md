@@ -1,13 +1,13 @@
 # megaTinyCore Utility Functions
 
-This library, initially anly to supply a keywords.txt, now supplies a few special functions
+This library, initially only to supply a keywords.txt, now supplies a few special functions
 
 ## Function reference
 
 ### Tuning related
 
 #### int16_t getTunedOSCCAL(uint8_t osc, uint8_t target)
-The argument passed for osc must be either 16 or 20 (reflecting the case when the nominal osciallator speed is set to 16 or 20 MHz). The 'target' frequency must be one of the allowed frequencies for your part at that speed **before prescaling**.
+The argument passed for osc must be either 16 or 20 (reflecting the case when the nominal oscillator speed is set to 16 or 20 MHz). The 'target' frequency must be one of the allowed frequencies for your part at that speed **before prescaling**.
 Hence, valid values are:
 12 (only available with 16 MHz 0/1-series), 14 (not on 20 MHz 2-series), 16, 20, 24, 25, 30 (not on 16 MHz 0/1-series), and 32 (2-series @ 20 only)
 It will return the stored tuning value, or one of th following 4 error codes:
@@ -32,6 +32,6 @@ Having two ready methods to reset from software has two benefits:
 The implementations are pulles straight from Ref_Reset, on account of a complaint from a user about there not being a wrapper around them and the difficulty of remembering how any SFR names are spelled on modern AVRs without both IO headers and datasheet open
 
 #### void ResetWithWDT()
-This will trigger a reset using the WDT, which wil occur within around 10 ms, and will busy wait until then.
+This will trigger a reset using the WDT, which will occur within around 10 ms, and will busy wait until then.
 #### void SoftwareReset()
 This will trigger a reset using the RSTCTRL, which will occur instantly.

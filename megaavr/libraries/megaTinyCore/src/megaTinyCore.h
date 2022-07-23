@@ -1,9 +1,10 @@
 #include <Arduino.h>
 // Display current tuning state in human readable form.
+// *INDENT-OFF*  display this code in human readable form instead of what astyle wants.
 int16_t getTunedOSCCAL(uint8_t osc, uint8_t target) {
-  if(__builtin_constant_p(osc)) {
+  if (__builtin_constant_p(osc)) {
     if (osc != 20 && osc !=16) {
-      badArg("The first argument must either 16 or 20, reflecting the nominal internal osciallator speed; it is a constant that is neither of those");
+      badArg("The first argument must either 16 or 20, reflecting the nominal internal oscillator speed; it is a constant that is neither of those");
     }
     if (__builtin_constant_p(target)) {
       #if MEGATINYCORE_SERIES == 2
@@ -12,7 +13,7 @@ int16_t getTunedOSCCAL(uint8_t osc, uint8_t target) {
         if ((target != 14 && target != 16 && target != 20 && target != 24 && target != 25) && ((osc == 16) && (target == 30) || ((osc == 20) && (target == 12) || target==32)))
       #endif
       {
-        badArg("The second argument must be a valid unprescaled tuned clock speed. Both arguments are constant, but the latter is not a valid target for te former. See Ref_tuning.md.");
+        badArg("The second argument must be a valid unprescaled tuned clock speed. Both arguments are constant, but the latter is not a valid target for the former. See Ref_tuning.md.");
       }
     }
   } else if (__builtin_constant_p(target)) {

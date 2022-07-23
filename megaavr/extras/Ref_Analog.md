@@ -324,14 +324,14 @@ Libraries exist that use trickery and the ADC to measure capacitance, hence dete
 
 Anyone staring at this problem for long enough will realize that they can connect the resistor from ground to the added "identification" pin, at the MCU end of the interconnect. You still need to protect it from harm, but there's no exposed power rail on the other resistor for it to short to, so your countermeasures can go down a few tiers, and it won't drain power while off unless you leave the pullup on. Even in the case that the resistor were unprotected, the likely failure modes involve the resistor either coming disconnected entirely (infinite resistance, Vpin = Vdd), or shorting to it's other lead (approx. zero resistance, Vpin = Gnd). But those two conditions are both immediately apparent from the measurement - a value near the the upper limit means there's nothing connected, or if something is connected, it lacks a working resistor.
 
-So you turn on the internal pullup, wait a few moments for the voltage to stabilize, and then read it with the ADC, and based on that you can determine what "bucket" the value falls into and that tells you what the gadget's "identification" resistor is, and hence what is connected. And you could even do it using a pin you were already using to detect if anythign was connected at all (ex, if it formerly grounded that pin, and now we adapt it to ) The internal pullup is... oh.... hmmm.... "between 30k and 50k" says the datasheet "around 30k" say forumgoers without being challenged. That's quite a range - wouldn't the bins need to be awfully large to catch all values with such large limits? And what if the voltage drop across the pullup is nonlinear with the current through it? And what about the supply voltage?
+So you turn on the internal pullup, wait a few moments for the voltage to stabilize, and then read it with the ADC, and based on that you can determine what "bucket" the value falls into and that tells you what the gadget's "identification" resistor is, and hence what is connected. And you could even do it using a pin you were already using to detect if anything was connected at all (ex, if it formerly grounded that pin, and now we adapt it to ) The internal pullup is... oh.... hmmm.... "between 30k and 50k" says the datasheet "around 30k" say forumgoers without being challenged. That's quite a range - wouldn't the bins need to be awfully large to catch all values with such large limits? And what if the voltage drop across the pullup is nonlinear with the current through it? And what about the supply voltage?
 
 ### So can I do that?
 Probably, assuming you';'re willing to calibrate each specimen
 
 Tests were conducted exactly as such a sketch would, except that to expedite things, I wired up 9 resistors from 22k to 470k that I planned to use, 1 per I/O pin not used by serial on an ATtiny1624, and 5V, 3.3V, and courtesy of a bad connection, 2.3v were tested.
 I found:
-Resistance decreases slightly as supply voltage increases; over the 2.7v interval tested, it was found to have an average (of the values of Rpullup calulated from the ADC measurements and known external resistance) of 33146 ohms on a particular specimen at 3.3v. ranging to 33862 at 2.3 and 32182 at 5 volts, that is around a 5% change over most of the operating voltage range. Not bad - and it's nearly linear with voltage.
+Resistance decreases slightly as supply voltage increases; over the 2.7v interval tested, it was found to have an average (of the values of Rpullup calculated from the ADC measurements and known external resistance) of 33146 ohms on a particular specimen at 3.3v. ranging to 33862 at 2.3 and 32182 at 5 volts, that is around a 5% change over most of the operating voltage range. Not bad - and it's nearly linear with voltage.
 How about with current? Within that range, the measurements varied by half of the tolerance of the  +/- 5% resistors (which these days are usually better than 5%), 2.5% which is a lot better than 30-50k
 Scrambling the connections and remeasuring yielded results inconsistent with concern over differing pin offset voltages. The estimated resistance was within except with the highest resistance (where, since it's near the edge of the scale, small changes make a large difference). hence most of that 5% range we thought we were seeing based on current can actually be attributed to resistor variation.
 
@@ -355,7 +355,7 @@ Rpu = Rpu<sub>cal</sub> + k1 V<sub>cal</sub> - k2 T<sub>cal</sub> + k2 T - k1 V
 
 Let's define T as the chip's temperature as measured by the onchip temperature sensor, normalized to the chip's operating temperature range by subtracting the minimum operating temperature (-40).
 
-```
+```c++
 // Rpu = Rpucal + k1*Vcal - k2 * Tcal + k2 * T - k1 * V
 // Hence, to make the result easy to use, we recommend
 typedef struct RPUcal_t {
@@ -375,7 +375,7 @@ else {
 
 ```
 If you can rely on the operating conditions being similar, you could calibrate it at those approximate conditions, store it in the user row, and then assume it's close enough (This depends on how accurately you need to know it, and how much voltage and temperature will vary), or instead of measuring at a second point, you can use estimates for k1 and k2: k1 = 215, k2 = 75, measured on a 1624. With my chip, the base value would be around 30100 with those calibration values, and thus the predicted pullup strength is:
-```
+```c++
 Rpu = 30100 + ((215 * getVoltageAsByte()) >> 5) + 76 * getTemperatureAsByte();
 ```
 

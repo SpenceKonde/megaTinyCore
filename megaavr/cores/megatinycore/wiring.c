@@ -1425,7 +1425,7 @@ void __attribute__((weak)) init_clock() {
       } else if (tunedval == 0x80) {
         GPIOR0 |= 0x80;
         return; // this chip was tuned and it's oscillator found to be unable to reach target and/or the chip ceased to be opprate before reaching that speed
-        // such that either the tuning sketch crashed or the incredilbly crude sanity checks found that arithmatic produced incorrect results.
+        // such that either the tuning sketch crashed or the incredilbly crude sanity checks found that arithmetic produced incorrect results.
       }
       // Udf
       _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA,tunedval);

@@ -18,7 +18,7 @@
  * first place.
  * There are now two versions of each ISR. All versions are stubs to call
  * the real code (so it is not duplicated). The ASM versions are more
- * efficient than calling normally can ever be becausw they completely
+ * efficient than calling normally can ever be because they completely
  * ignore the ABI rules for the transition from duplicated to shared
  * code and call it the most effcieient way possiblem so the almost all of
  * the flash overhead is in the shared section. They'll stop working if
@@ -37,7 +37,7 @@
 
 #if defined(USART0)
   #if defined(USE_ASM_TXC) && USE_ASM_TXC == 1 //&& defined(USART1) // No benefit to this if it's just one USART
-    // Note the difference vetween this and the other ISRs - here we don't care at all about the serial object, we just have to work with the USART
+    // Note the difference between this and the other ISRs - here we don't care at all about the serial object, we just have to work with the USART
     ISR(USART0_TXC_vect, ISR_NAKED) {
       __asm__ __volatile__(
             "push  r30"         "\n\t" // push the low byte of Z
