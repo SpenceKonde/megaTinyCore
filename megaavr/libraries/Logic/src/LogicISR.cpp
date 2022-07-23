@@ -98,7 +98,7 @@ ISR(CCL_CCL_vect) {
     // Clear flag
     CCL.INTFLAGS |= CCL_INT5_bm;
   }
-#endif // CCL_CCL_vect
+  #endif // CCL_CCL_vect
 }
 
 #endif

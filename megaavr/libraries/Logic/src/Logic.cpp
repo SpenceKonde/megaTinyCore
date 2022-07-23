@@ -85,8 +85,7 @@ void Logic::initInput(logic::in::input_t &input, PORT_t &port, const uint8_t pin
   }
 }
 
-void Logic::init()
-{
+void Logic::init() {
   // Clear LUTCTRLA in case the CCL block gets reinitialized
   block.LUTCTRLA = 0x00;
 
