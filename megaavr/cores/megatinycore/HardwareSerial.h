@@ -1,4 +1,3 @@
-
 /* UART.h - Hardware serial library, main header.
  * This library is free software released under LGPL 2.1.
  * See License.md for more information.
