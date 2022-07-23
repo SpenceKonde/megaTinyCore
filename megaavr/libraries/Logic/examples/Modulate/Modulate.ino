@@ -32,12 +32,12 @@ void setup() {
 
 
   Logic0.enable = true;               // Enable logic block 0
-  Logic0.input0 = in::tcb;            // TCB channel - TCB0. On everything except 0/1-series tinyAVR, that's because this is input 0.
-  //                                     On those, it's because there's a in::tcb1 option too...
-  Logic0.input1 = in::tca0;           // Use TCA0 WO1 as input0
-  Logic0.input2 = in::masked;         // mask input 2
-  Logic0.output = out::enable;        // Enable logic block 0 output pin or PA4 (ATtiny))
-  Logic0.filter = filter::disable;    // No output filter enabled
+  Logic0.input0 = logic::in::tcb;            // TCB channel - TCB0. On everything except 0/1-series tinyAVR, that's because this is input 0.
+  //                                     On those, it's because there's a logic::in::tcb1 option too...
+  Logic0.input1 = logic::in::tca0;           // Use TCA0 WO1 as input0
+  Logic0.input2 = logic::in::masked;         // mask input 2
+  Logic0.output = logic::out::enable;        // Enable logic block 0 output pin or PA4 (ATtiny))
+  Logic0.filter = logic::filter::disable;    // No output filter enabled
   Logic0.truth = 0x08;                // Set truth table - HIGH only if both high
 
   // Initialize logic block 0

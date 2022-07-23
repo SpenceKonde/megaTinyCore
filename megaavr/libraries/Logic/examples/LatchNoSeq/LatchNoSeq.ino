@@ -45,12 +45,12 @@ void setup() {
   EVSYS.ASYNCCH0 = EVSYS_ASYNCCH0_CCL_LUT0_gc;      // Use CCL LUT0 as event generator
   EVSYS.ASYNCUSER2 = EVSYS_ASYNCUSER2_ASYNCCH0_gc;  // ASYNCUSER2 is LUT0 event 0
   #endif
-  Logic0.input0 = in::event_0;                      // Use event 0 as input0
-  Logic0.input1 = in::input_pullup;                 // PA1 as input1 (RESET)
-  Logic0.input2 = in::input_pullup;                 // PA2 as input2 (SET)
-  // Logic0.output_swap = out::pin_swap; // Uncomment this line to route the output to alternate location, if available.
-  Logic0.output = out::enable;        // Enable logic block 0 output pin (see pinout chart)
-  Logic0.filter = filter::disable;    // No output filter enabled
+  Logic0.input0 = logic::in::event_0;                      // Use event 0 as input0
+  Logic0.input1 = logic::in::input_pullup;                 // PA1 as input1 (RESET)
+  Logic0.input2 = logic::in::input_pullup;                 // PA2 as input2 (SET)
+  // Logic0.output_swap = logic::out::pin_swap; // Uncomment this line to route the output to alternate location, if available.
+  Logic0.output = logic::out::enable;        // Enable logic block 0 output pin (see pinout chart)
+  Logic0.filter = logic::filter::disable;    // No output filter enabled
   Logic0.truth = 0x8E;                // Set truth table - HIGH only if both high
 
   // Initialize logic block 0
@@ -66,12 +66,12 @@ void setup() {
   EVSYS.ASYNCUSER4 = EVSYS_ASYNCUSER2_ASYNCCH0_gc;  // ASYNCUSER4 is LUT1 event 0
   #endif
 
-  Logic1.input0 = in::event_a;        // same distribution of inputs (though there isn't the tinyAVR PA0 issue forcing it here)
-  Logic1.input1 = in::input_pullup;   // get it from LUT 1 event a or event 0 (tinyAVR 0/1 documentation calls them 0 and 1 - Logic.h accepts both for all parts)
-  Logic1.input2 = in::input_pullup;
-  // Logic0.output_swap = out::pin_swap; // Uncomment this line to route the output to alternate location, if available.
-  Logic1.output = out::enable;        // Enable logic block 1 output pin (see pinout chart)
-  Logic1.filter = filter::disable;    // No output filter enabled
+  Logic1.input0 = logic::in::event_a;        // same distribution of inputs (though there isn't the tinyAVR PA0 issue forcing it here)
+  Logic1.input1 = logic::in::input_pullup;   // get it from LUT 1 event a or event 0 (tinyAVR 0/1 documentation calls them 0 and 1 - Logic.h accepts both for all parts)
+  Logic1.input2 = logic::in::input_pullup;
+  // Logic0.output_swap = logic::out::pin_swap; // Uncomment this line to route the output to alternate location, if available.
+  Logic1.output = logic::out::enable;        // Enable logic block 1 output pin (see pinout chart)
+  Logic1.filter = logic::filter::disable;    // No output filter enabled
   Logic1.truth = 0x8E;                // Set truth table - HIGH only if both high
 
   // Initialize logic block 0
@@ -79,7 +79,7 @@ void setup() {
 
 
   // Start the AVR logic hardware
-  Logic::start();
+  Lologic::gic::start();
 }
 
 void loop() {

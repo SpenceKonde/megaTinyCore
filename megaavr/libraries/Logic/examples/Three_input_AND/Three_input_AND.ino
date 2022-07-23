@@ -52,13 +52,13 @@ void setup() {
   EVSYS.ASYNCCH0 = EVSYS_ASYNCCH0_PORTA_PIN3_gc;    //
   EVSYS.ASYNCUSER2 = EVSYS_ASYNCUSER2_ASYNCCH0_gc;  // ASYNCUSER2 is LUT0 event 0
   #endif
-  Logic0.input0 = in::event_a;                      // Use LUT event 0/a as input 0
+  Logic0.input0 = logic::in::event_a;                      // Use LUT event 0/a as input 0
 
-  Logic0.input1 = in::input_pullup;   // Set PA1 as input with pullup
-  Logic0.input2 = in::input_pullup;   // Set PA2 as input with pullup
-  // Logic0.output_swap = out::pin_swap; // Uncomment this line to route the output to alternate location, if available.
-  Logic0.output = out::enable;        // Enable logic block 0 output pin or PA4
-  Logic0.filter = filter::disable;    // No output filter enabled
+  Logic0.input1 = logic::in::input_pullup;   // Set PA1 as input with pullup
+  Logic0.input2 = logic::in::input_pullup;   // Set PA2 as input with pullup
+  // Logic0.output_swap = logic::out::pin_swap; // Uncomment this line to route the output to alternate location, if available.
+  Logic0.output = logic::out::enable;        // Enable logic block 0 output pin or PA4
+  Logic0.filter = logic::filter::disable;    // No output filter enabled
   Logic0.truth = 0x80;                // Set truth table
 
   // Initialize logic block 0

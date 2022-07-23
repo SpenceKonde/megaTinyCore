@@ -65,21 +65,21 @@ void setup() {
 
 
   Logic0.enable = true;               // Enable logic block 0
-  Logic0.input0 = in::link;           // Use output of block 1
-  Logic0.input1 = in::masked;         // masked
-  Logic0.input2 = in::masked;         // masked
-  Logic0.output = out::enable;        // Enable logic block 0 output pin or PA4 (ATtiny))
-  Logic0.filter = filter::disable;    // No output filter enabled
+  Logic0.input0 = logic::in::link;           // Use output of block 1
+  Logic0.input1 = logic::in::masked;         // masked
+  Logic0.input2 = logic::in::masked;         // masked
+  Logic0.output = logic::out::enable;        // Enable logic block 0 output pin or PA4 (ATtiny))
+  Logic0.filter = logic::filter::disable;    // No output filter enabled
   Logic0.truth = 0x01;                // Set truth table - HIGH only if input low
   // Initialize logic block 0
   Logic0.init();
 
   Logic1.enable = true;               // Enable logic block 1
-  Logic1.input0 = in::feedback;       // use output of block 0 - link works on 0/1-series parts, but not on 2-series ones.
-  Logic1.input1 = in::masked;         // masked
-  Logic1.input2 = in::masked;         // masked
-  Logic1.output = out::enable;        // enable logic block 1 output pin - required on some parts for link to work, see errata.
-  Logic1.filter = filter::disable;    // No output filter enabled
+  Logic1.input0 = logic::in::feedback;       // use output of block 0 - link works on 0/1-series parts, but not on 2-series ones.
+  Logic1.input1 = logic::in::masked;         // masked
+  Logic1.input2 = logic::in::masked;         // masked
+  Logic1.output = logic::out::enable;        // enable logic block 1 output pin - required on some parts for link to work, see errata.
+  Logic1.filter = logic::filter::disable;    // No output filter enabled
   Logic1.truth = 0x02;                // Set truth table - HIGH only if input HIGH
   // Initialize logic block 1
   Logic1.init();
