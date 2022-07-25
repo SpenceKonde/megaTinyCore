@@ -171,13 +171,13 @@ extern "C"{
  * analogRead should never return a negative. Neither should analogReadEnh
  * but I decided to have only 2 sets of ADC errors, not three.  */
 
-#define ADC_ERROR_DISABLED                          -32767
-#define ADC_ERROR_BAD_PIN_OR_CHANNEL                -32765
-#define ADC_ERROR_BUSY                              -32766
-#define ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL       -2100000000
+#define ADC_ERROR_BAD_PIN_OR_CHANNEL                (-32001)
+#define ADC_ERROR_BUSY                              (-32002)
+#define ADC_ERROR_DISABLED                          (-32007)
+#define ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL       (-2100000001)
 // positive channel is not (0x80 | valid_channel) nor a digital pin number
 // referring to a pin with analog input.
-#define ADC_ENH_ERROR_BUSY                     (-2100000001)
+#define ADC_ENH_ERROR_BUSY                     (-2100000002)
 // The ADC is currently performing another conversion in the background (either
 // in free-running mode or a long-running burst conversion; taking a burst
 // accumulated reading and then calling a specified function when the result
@@ -196,8 +196,12 @@ extern "C"{
 // Never actually returned, because we give compile error here
 #define ADC_ENH_ERROR_DISABLED                 (-2100000007)
 // The ADC is not currently enabled. This error is disabled currently - if analogReadEnh encounters a disabled ADC, it will enable it, take the reading, and disable it again.
-#define ADC_ERROR_INVALID_CLOCK                     (-32764)
+#define ADC_ERROR_INVALID_CLOCK                     (-32255)
 // Returned by analogClockSpeed if the value in the register is currently unknown, or if an invalid frequency is requested.
+
+
+// only returned by analogCheckError()
+#define ADC_IMPOSSIBLE_VALUE                        (-127)
 
 
 #if (!defined(TCB_CLKSEL2_bm))
@@ -618,9 +622,10 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
     int16_t analogClockSpeed1(int16_t frequency = 0, uint8_t options = 0);
   #endif
   // in ExtraWiring.cpp:
-  uint8_t analogIsError(int16_t val);
-  uint8_t analogIsError(int32_t val);
+  int8_t analogCheckError(int16_t val);
+  int8_t analogCheckError(int32_t val);
   bool printADCRuntimeError(int32_t error, HardwareSerial &__dbgser = Serial);
+  bool printADCRuntimeError(int16_t error, HardwareSerial &__dbgser = Serial);
 #endif
 
 // Include the variants
