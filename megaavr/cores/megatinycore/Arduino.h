@@ -621,11 +621,6 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
     int32_t analogReadDiff1(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
     int16_t analogClockSpeed1(int16_t frequency = 0, uint8_t options = 0);
   #endif
-  // in ExtraWiring.cpp:
-  int8_t analogCheckError(int16_t val);
-  int8_t analogCheckError(int32_t val);
-  bool printADCRuntimeError(int32_t error, HardwareSerial &__dbgser = Serial);
-  bool printADCRuntimeError(int16_t error, HardwareSerial &__dbgser = Serial);
 #endif
 
 // Include the variants

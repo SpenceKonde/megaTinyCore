@@ -1,4 +1,14 @@
 #include <Arduino.h>
+  // in ADCErrors.cpp
+// ADC error interpretation helper functions
+#ifdef __cplusplus
+  int8_t analogCheckError(int16_t val);
+  int8_t analogCheckError(int32_t val);
+  bool printADCRuntimeError(int32_t error, HardwareSerial &__dbgser = Serial);
+  bool printADCRuntimeError(int16_t error, HardwareSerial &__dbgser = Serial);
+#endif
+
+
 // Display current tuning state in human readable form.
 // *INDENT-OFF*  display this code in human readable form instead of what astyle wants.
 int16_t getTunedOSCCAL(uint8_t osc, uint8_t target) {
