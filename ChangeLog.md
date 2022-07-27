@@ -3,12 +3,9 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Planned changes not yet implemented
 These items are in addition to what was listed under changes already in release.
 
-### Known bugs
-1. Logic and Comparator are incompatible with each other, which is unfortunate as they are meant to be used together. This must be fixed.
-2. Unconfirmed issue with Serial.printf and it's ilk.
-3. Critical bug that breaks SerialUPDI on new versions of python. This would be a priority zero issue if I knew how to fix it. Someone has told me that my version of yaml is old and I need to supply a newer one (they don't seem to understand that I have to "vendorize" the libraries otherwise windows won't work), but I don't really know how to go about this. I don't know how to use python, I know how to search stack overflow forinformation about python.
-4. All libraries that permit 'attaching' interrupts will pull in the ISR whether or not it is used. Since attached interrupts take much longer to enter and return from, and because the ISR is created and wastes flash even if it is not used in addition to preventing the user from creating a more performant ISR dedicated to their specific task, this needs to be fixed. The original author did not consider my original fix (which was hideous I don't argue that, but that's because Iknow C much better than I know C++ and the bug involves a class, but I only knew how to fix it in C. So of course the code was be a hideous hackhjob! It has been fixed on one of the libraries on megaCoreX in a more "classy" way and that fix will be brought to this core for logic, and then generalized to the other libraries.
-5. SerialUPDI uploads don't work if any file path contains spaces, because of missing quotes in platform.txt
+### Unconfirmed bugs
+1. Issue with Serial.printf and it's ilk. Suspect user error.
+2. SerialUPDI uploads don't work if any file path contains spaces, because of missing quotes in platform.txt? But I can't see where... Need example verbose upload attempt in order to further debug.
 
 #### Planned for 1.5.x
 From above list: 2, 3 (more liekly), plus inevitable DD bugs.
@@ -19,14 +16,13 @@ From above list: 3 (hopefully), 4, 1, 6, 5
 "Enhancements" are changes to the core which improve functionality and introduce new and exotic bugs. Sometimes called "Features", I prefer the term "enhancement". Calling it a feature, by my understanding of the semantics, means that it *does something new*,  or improvements in speed of core functions or reductions in code size without explicitly adding any new functionality.
 
 ### Planned 2.6.0
+* End hand maintenance of boards.txt in favor of generating it prior to release with a python script, in order to reduce duplication and human error (5 errors were found during the course of preliminary work on this!)
 * Add tools submenu to select from a number of PWM pin layouts. This will impact flash use (to a degree that will be noticed on small parts) as well as the time it takes for turnOffPWM() (thus digitalWrite()) and analogWrite() to execute.
 * Under consideration: analogWriteFast(pin, duty); this will require that pin be constant, allowing the determination of the PWM compare value register to be determined at compile time, rather than runtime. It is not planned for this function to actually turn the PWM on or off, only adjust the duty cycle of a pin already outputting PWM.
 
 ### Planned 2.5.12
 * Add support for Generic Autobaud mode for Serial (like DxCore 1.5.0)
-* Change class hierarchy for UARTs, as was done for Two_Wire (Wire.h), so that rather than pulling in api/HardwareSerial.h, and subclassing that definition of HardwareSerial (itself a subclass of Stream) as UartClass, we instead simply subclass Stream directly. UART.h will be renamed to HardwareSerial.h, HardwareSerial.h (a compatibility layer) will be renamed to UART.h and the latter adjusted to #define UartClass as HardwareSerial, and api/HardwareSerial.h will be gutted and simply #include <HardwareSerial.h) This will remove yet another piece of the disastrous "ArduinoAPI". I describe it as such because on low resource platforms like AVR; this will allow several functions currently declared virtual to lose that keyword, as the linker, even with LTO enabled, is not permitted to remove unused virtual functions. This is expected to significantly reduce binary size by about 300 bytes when serial is used. Credit goes to @
-* Improvement to stream timed read to make it work when millis is disabled, and to save 4 bytes of RAM. Note that this also requires all offsets used to access the Serial transmit and receive buffers to be reduced accordingly in the inline assembly in UART.cpp.
-* Package Azduino5 toolchain to retain parity with DxCore
+* Enhancement: Update to latest ATpacks with Azduino5 instead of Azduino4b compiler toolchain.
 
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
@@ -34,23 +30,26 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### Planned 2.5.12
 * Okay fine now you can use ADC1 just like it was an ADC0, see the notes in [Analog Input (ADC) and output (DAC)](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md) for steps required to enable it.
 * You can now enable and disable the ADC with analogPowerOption() and enable/disable standby mode.
-* Fix issue with SSD bit being cleared when using beginTransaction().
-* Fix bug in Logic with pin inputs being handled improperly
-* Fix many documentation issues, improve docs generally.
-*
+* BugfixL Fix issue with SSD bit being cleared when using beginTransaction().
+* Bugfix: Fix bug in Logic with pin inputs being handled improperly
+* Docs: Fix many documentation issues, improve docs generally.
 * Expand documentation significantly.
-* Fix issue with Wire with certain libraries.
-* Fix large number of issues with tuning, add prescaled tuning options 10, 8, 6, 5, 4, 2, and 1 MHz
-* Fix second large batch of tuning issues and improve readability.
-* Correct default option for Optiboot 2-series boards with 20 pins to be the one with alt reset.
-* Fix bug with event library and `long_soft_event` method.
-* Fix many serious bugs in event library.
-* Update toolchain to Azduino5.
-* Lay groundwork in Event library for the new event system changes in the EA-series (There will be 2 generators per port, and 2 for RTC - but all of these will be accessible by all event channels, and a register on the peripheral controls which of the options is used for these two channels). While inapplicable to tinyAVR, Event.h and Event.cpp distributed with DxCore and megaTinyCore is identical.
-* Add link to my article on AVR math speed (TLDR: avoid long long like the plague)
-* Rip out another piece of the flash-wasting boondoggle that was arduinoAPI. Inspired by @MX682X's revelation of a way to remove a layer of virtual class methods by changing the class hierarchy in #, I took it a step further. The uartClass was renamed HardwareSerial (they implemented the same API already) and the previous hardwareSerial class was removed. We also realize those 4 bytes of additional SRAM by not storing starttime for timed functions
-(since the implementation was blocking anyway)
-* Add analogIsError() to test whether value returned by analogead was actually an error code more efficiently than the compiler is able to figure out how to
+* Remove multiple signatures for Wire.Fix issue with Wire with certain libraries.
+* Bugfix: Correct tuning, particularly to speeds below 16 MHz. Boards should be retuned if 14 MHz-derived speed is to be used
+* Bugfix: Correct default option for Optiboot 2-series boards with 20 pins to be the one with alt reset.
+* Bugfix: `long_soft_event` method did not work correctly.
+* Enhancement: Lay groundwork in Event library for the new event system changes in the EA-series (There will be 2 generators per port, and 2 for RTC - but all of these will be accessible by all event channels, and a register on the peripheral controls which of the options is used for these two channels). While inapplicable to tinyAVR, Event.h and Event.cpp distributed with DxCore and megaTinyCore is identical.
+* Bugfix: Event was not functioning correctly on tinyAVR parts.
+* Doc: Add link to my article on AVR math speed (TLDR: avoid `int64_t` `long long` like the plague)
+* Major enhancement: Change class hierarchy for UARTs, as was done for Two_Wire (Wire.h), so that rather than pulling in api/HardwareSerial.h, and subclassing that definition of HardwareSerial (itself a subclass of Stream) as UartClass, we instead simply subclass Stream directly. UART.h will be renamed to HardwareSerial.h, HardwareSerial.h (a compatibility layer) will be renamed to UART.h and the latter adjusted to #define UartClass as HardwareSerial, and api/HardwareSerial.h will be gutted and simply #include <HardwareSerial.h) This will remove yet another piece of the disastrous "ArduinoAPI". I describe it as such because on low resource platforms like AVR; this will allow several functions currently declared virtual to lose that keyword, as the linker, even with LTO enabled, is not permitted to remove unused virtual functions. This is expected to significantly reduce binary size by about 300 bytes when serial is used. Credit goes to @MX624X. Like all the other big improvements.
+* Enhancement: Improvement to stream timed read to make it work when millis is disabled, and to save 4 bytes of RAM. Note that this also requires all offsets used to access the Serial transmit and receive buffers to be reduced accordingly in the inline assembly in UART.cpp.
+* New Feature: Add new functions to assist checking error codes in analogRead results.
+* Fix compatibility of Comparator, Event, and Logic.
+* New Feature: Permit Logic and Comparator ISRs to be defined manually if (and only if!) the `.attachInterrupt()` method of an instance of that class is not called. You can then manually create the ISR saving about 40 bytes and 50 clock cycles, give or take.
+* Bugfix: APPEND fuse was not being set, which broke the Flash.h module for non-"any" region mode.
+* Bugfix: 3224 optiboot maximum upload size was same as 1624. Oops.
+* Bugfix: Microchip boards in optiboot mode (admittedly a rare mode) were not subtracting the size of the bootloader from the chip capacity.
+* New Feature: megaTimyCore.h now provides functions to reset via WDT timeout and via software reset. If optiboot is used, the former will not run it, while the latter will.
 
 ## Released Versions
 

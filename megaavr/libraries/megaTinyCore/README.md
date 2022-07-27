@@ -5,6 +5,7 @@ This library, initially only to supply a keywords.txt, now supplies a few specia
 ## Function reference
 
 ### Tuning related
+There are things here specific how megaTinyCore handless tuning and how to do it.
 
 #### int16_t getTunedOSCCAL(uint8_t osc, uint8_t target)
 The argument passed for osc must be either 16 or 20 (reflecting the case when the nominal oscillator speed is set to 16 or 20 MHz). The 'target' frequency must be one of the allowed frequencies for your part at that speed **before prescaling**.
@@ -19,10 +20,9 @@ It will return the stored tuning value, or one of th following 4 error codes:
 ```
 
 #### void printTuningStatus()
-This will print out a description of the current tuning values stored in the USERROW - if any - to Serial. You must have called Serial.begin with appropriate parameters first.
+This will print out a description of the current tuning values stored in the USERROW - if any - to Serial; which must alreadty have been 'begun'
 
-
-Both of the above functions can be called regardless of whether tuning is currently enabled, and are probably most useful when it's not, so you can figure out why it's running at the wrong clock speed (which would cause serial to be gibberish)
+Both of the above functions can be called regardless of whether tuning is currently enabled, and are probably most useful when it's not, so you can figure out why it's running at the wrong clock speed with tuning enabled - but when it's enabled, serial comes out as gibberish. If you can read serial with the tuning enabled, then clearly the tuning itself works. It may not be tuned as accurately as you like,
 
 ### Reset Related
 Having two ready methods to reset from software has two benefits:
