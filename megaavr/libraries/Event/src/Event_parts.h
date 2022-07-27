@@ -1,6 +1,6 @@
 /* This file is ONLY included by Event.h and should never be included by any other code under any circumstances.
  * It is loaded at the start of Event.h so that the same code can be used even if the part is a tinyAVR 0/1-series with wacky event system.
- * Thia does a lot for tinyAVR 0/1-series, very little for 2-series, and nothing for anythign else.
+ * Thia does a lot for tinyAVR 0/1-series, very little for 2-series, and nothing for anything else.
  */
 #if !defined(EVENT_H)
   #error "This should only be included as part of Event.h"
@@ -780,15 +780,15 @@ namespace event {
       opamp2_ready      = 0x36,
 #endif
 // Likely the rest of 0x30 would be novel analog feature-related
-      porta_evgen0      = 0x40, // All current and anounced modern non-tiny parts have a PORTA
+      porta_evgen0      = 0x40, // All current and announced modern non-tiny parts have a PORTA
       porta_evgen1      = 0x41,
 #if defined(PORTB)          // PORTB is only on 48+ pin parts, and the whole thing is only 6 pins.
       portb_evgen0      = 0x42,
       portb_evgen1      = 0x43,
 #endif
-      portc_evgen0      = 0x44, // All current and anounced modern non-tiny parts have a PORTC
+      portc_evgen0      = 0x44, // All current and announced modern non-tiny parts have a PORTC
       portc_evgen1      = 0x45,
-      portd_evgen0      = 0x46, // All current and anounced modern non-tiny parts have a PORTD
+      portd_evgen0      = 0x46, // All current and announced modern non-tiny parts have a PORTD
       portd_evgen1      = 0x47,
 #if defined(PORTE)          // PORTE is only on 48+ pin parts.
       porte_evgen0      = 0x48,

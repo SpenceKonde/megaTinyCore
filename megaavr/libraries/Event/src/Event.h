@@ -11,10 +11,10 @@
  * and make *this* file less of a pain in the eye to read
  *
  * Status:
- * tinyAVR 0/1 - belived working
+ * tinyAVR 0/1 - believed working
  * tinyAVR 2 - working
  * DA, DB - working
- * DD - belived working
+ * DD - believed working
  * EA - needs new (but fairly easy to write) implementations of :
  * assign_* - to handle the fact that all channels are the same (HURAAAH!) and that pins and rtc generators are a bit more work to set up.
  * set_generator(uint8_t pin_number) - to handle to more complicated setup of pin generators.

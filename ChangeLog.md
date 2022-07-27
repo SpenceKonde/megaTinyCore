@@ -34,11 +34,12 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Bugfix: Fix bug in Logic with pin inputs being handled improperly
 * Docs: Fix many documentation issues, improve docs generally.
 * Expand documentation significantly.
-* Remove multiple signatures for Wire.Fix issue with Wire with certain libraries.
+* Remove multiple signatures for Wire.requestFrom to fix issues with Wire with certain libraries.
 * Bugfix: Correct tuning, particularly to speeds below 16 MHz. Boards should be retuned if 14 MHz-derived speed is to be used
 * Bugfix: Correct default option for Optiboot 2-series boards with 20 pins to be the one with alt reset.
 * Bugfix: `long_soft_event` method did not work correctly.
 * Enhancement: Lay groundwork in Event library for the new event system changes in the EA-series (There will be 2 generators per port, and 2 for RTC - but all of these will be accessible by all event channels, and a register on the peripheral controls which of the options is used for these two channels). While inapplicable to tinyAVR, Event.h and Event.cpp distributed with DxCore and megaTinyCore is identical.
+* Enhancement: Split up the Event and Logic library headers for improved readability.
 * Bugfix: Event was not functioning correctly on tinyAVR parts.
 * Doc: Add link to my article on AVR math speed (TLDR: avoid `int64_t` `long long` like the plague)
 * Major enhancement: Change class hierarchy for UARTs, as was done for Two_Wire (Wire.h), so that rather than pulling in api/HardwareSerial.h, and subclassing that definition of HardwareSerial (itself a subclass of Stream) as UartClass, we instead simply subclass Stream directly. UART.h will be renamed to HardwareSerial.h, HardwareSerial.h (a compatibility layer) will be renamed to UART.h and the latter adjusted to #define UartClass as HardwareSerial, and api/HardwareSerial.h will be gutted and simply #include <HardwareSerial.h) This will remove yet another piece of the disastrous "ArduinoAPI". I describe it as such because on low resource platforms like AVR; this will allow several functions currently declared virtual to lose that keyword, as the linker, even with LTO enabled, is not permitted to remove unused virtual functions. This is expected to significantly reduce binary size by about 300 bytes when serial is used. Credit goes to @MX624X. Like all the other big improvements.
@@ -50,6 +51,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Bugfix: 3224 optiboot maximum upload size was same as 1624. Oops.
 * Bugfix: Microchip boards in optiboot mode (admittedly a rare mode) were not subtracting the size of the bootloader from the chip capacity.
 * New Feature: megaTimyCore.h now provides functions to reset via WDT timeout and via software reset. If optiboot is used, the former will not run it, while the latter will.
+* Doc: made clear om PowerSave.md that the ADC must be disabled to get low standbby current.
 
 ## Released Versions
 

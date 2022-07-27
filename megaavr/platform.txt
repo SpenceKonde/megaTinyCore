@@ -245,7 +245,7 @@ tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/pr
 # ensuring that a part previously set to use a bootloader will be unbootloaded cleanly, instead of the
 # bootloader being erased but no sketches working)
 
-tools.serialupdi.program.pattern={upload.prog_interlock}"{cmd}" -u "{runtime.platform.path}/tools/prog.py"  -t {protocol} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 2:{bootloader.OSCCFG} 6:{bootloader.SYSCFG1 } 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write {program.verbose}
+tools.serialupdi.program.pattern={upload.prog_interlock}"{cmd}" -u "{runtime.platform.path}/tools/prog.py"  -t {protocol} {program.extra_params} -d {build.mcu}{upload.workaround} --fuses 2:{bootloader.OSCCFG} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} "-f{build.path}/{build.project_name}.hex" -a write {program.verbose}
 
 ###############
 # Expert Mode #

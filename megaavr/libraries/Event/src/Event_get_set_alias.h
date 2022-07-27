@@ -3,6 +3,8 @@
  * and set_generator with generators not present on all channels.
  * This file is not loaded if all channels on the part have the same generators (like on the upcoming EA-series)
  */
+
+// *INDENT-OFF* astyle hates how we formatted this.
 #if !defined(EVENT_H)
   #error "This should only be included as part of Event.h"
 #endif
