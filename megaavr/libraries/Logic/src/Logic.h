@@ -1,5 +1,5 @@
-#ifndef LOGIC_h
-#define LOGIC_h
+#ifndef LOGIC_H
+#define LOGIC_H
 
 #include <Arduino.h>
 
