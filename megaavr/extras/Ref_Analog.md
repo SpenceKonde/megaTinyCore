@@ -219,6 +219,7 @@ Returns the number of ADC clocks by which the minimum sample length has been ext
 When taking an analog reading, you may receive a value near -2.1 billion, or a negative value on a part without a differential ADC - these are runtime error codes.
 The busy and disabled errors are the only ones that we never know at compile time. I don't think analogClockSpeed can generate runtime errors - it should always do it's best to meet your request, and if it can't, return the closest it could find.
 Note that the numeric values, though not the names, of some of these were changed to make the error checking more efficient. As long as you used the named constants like you're supposed to you'll be fine. The values returned by checkAnalogError will not change in future releases, we make not guarantees about the values of the error constants themselves, though no changes are expected.
+
 | Error name                     |     Value   | analogCheckError val | Notes
 |--------------------------------|-------------|---------------------------------------------------------------------
 |ADC_ERROR_BAD_PIN_OR_CHANNEL    |      -32001 |                   -1 | The specified pin or ADC channel does not exist or does support analog reads.
@@ -235,7 +236,9 @@ Note that the numeric values, though not the names, of some of these were change
 
 The impossible values are checked for without testing all of the bytes for greater efficiency. If you see that result one of two things was the case: the value you passed in wasn't from analog read or had been cast to a different type before you passed it, or i, or was corrupted somehow (writing off end of adjacent array in memory? Overclocking too hard such that th chip was doing math wrong?).
 
-### printADCRuntimeError(uint32_t error, &UartClass DebugSerial)
+### Functions in megaTinyCore.h
+These functions are located in megaTinyCore.h - they do not require tight core integration to work,.
+#### printADCRuntimeError(uint32_t error, &UartClass DebugSerial)
 Pass one of the above runtime errors and the name of a serial port to get a human-readable error message. This is wasteful of space, do don't include it in your code unless you need to. Also, *you must not cast result to a different type before calling this. The logic is determined by whether it is passed a signed 32-bit value or a signed 16-bit one*
 ```c++
 int32_t adc_reading=AnalogReadDiff(PIN_PA1, PIN_PA2);
@@ -243,7 +246,7 @@ if (analogCheckError) { // an error occurred! Print a human readable value
   printADCRuntimeError(adc_reading, Serial);
 }
 ```
-### analogCheckError(value)
+#### analogCheckError(value)
 Pass either the int16_t from analogRead or the int32_t from analogReadEnh to this to check if it's a valid value. If this returns a 1, that means that you got an error, and should be printing debugging information, not trying to make use of it.
 *you must not cast result to a different type before calling this. The logic is determined by whether it is passed a signed 32-bit value or a signed 16-bit one*
 ```c++
