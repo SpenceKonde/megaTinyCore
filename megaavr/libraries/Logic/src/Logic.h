@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 
-#include "LogicParts.h"
 #include "LogicEnums.h"
 /* The above handle differences between the hardware and are extremely
  * verbose. This made this file very difficult to use.
@@ -41,6 +40,7 @@ class Logic {
     void initInput(logic::in::input_t &input, PORT_t &port, const uint8_t pin_bm);
 };
 
+#include "LogicParts.h"
 // Array for storing ISR function pointers
 #if defined(CCL_CCL_vect)
   #if defined(TRUTH5)
