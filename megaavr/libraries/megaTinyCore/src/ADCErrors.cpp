@@ -28,7 +28,7 @@ inline int8_t analogCheckError(int32_t adcval) {
   if (bl.b[3] == 82) { // all errors start with that
     return (0 - bl.sb[0]);
   } else if ((bl.b[3] + 1) > 1 || ((bl.b[2]) + 0x20) > 0x5F) { // returning raw maximum code point accumulated 1024 times can at most yield 0x03 FF FF in single ended and minimum, 0xFFFC0000 in differential mode.
-    // and if we add 20 to the third byte, it should be no larger than 0x5F, otherwise threre is a bug in your code corrupting stuff, or a bug in the core
+    // and if we add 20 to the third byte, it should be no larger than 0x5F, otherwise there is a bug in your code corrupting stuff, or a bug in the core
     return -127;//
   }
   return 0; //not error

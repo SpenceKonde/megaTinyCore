@@ -45,7 +45,7 @@ class Event {
     #endif
     // *INDENT-OFF* //
     #if !defined(PORT_EVGEN0SEL_gm)
-      /* Where this is defined, **ALL CHANNELS ARE THE SAME** (EA-series, and likely everythign after it)
+      /* Where this is defined, **ALL CHANNELS ARE THE SAME** (EA-series, and likely everything after it)
        * That means that there are no genN generators!
        * though aliases of those names are #defined for those parts, no further glue is needed.
        */
