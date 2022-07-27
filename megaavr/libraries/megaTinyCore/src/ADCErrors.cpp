@@ -9,7 +9,7 @@ union __BW {
 inline int8_t analogCheckError(int16_t adcval) {
   union __BW bw;
   bw.si = adcval;
-  if(bw.b[1] == 0x82) {
+  if (bw.b[1] == 0x82) {
     return bw.sb[0]; //returns error codes as negative numbers
   } else {
     return 0; //0 = not error
@@ -27,13 +27,13 @@ inline int8_t analogCheckError(int32_t adcval) {
   bl.sl = adcval;
   if (bl.b[3] == 82) { // all errors start with that
     return (0 - bl.sb[0]);
-  } else if ((bl.b[3] + 1) > 1 || ((bl.b[2])+0x20) > 0x5F) { // returning raw maximum code point accumulated 1024 times can at most yield 0x03 FF FF in single ended and minimum, 0xFFFC0000 in differential mode.
+  } else if ((bl.b[3] + 1) > 1 || ((bl.b[2]) + 0x20) > 0x5F) { // returning raw maximum code point accumulated 1024 times can at most yield 0x03 FF FF in single ended and minimum, 0xFFFC0000 in differential mode.
     // and if we add 20 to the third byte, it should be no larger than 0x5F, otherwise threre is a bug in your code corrupting stuff, or a bug in the core
     return -127;//
   }
   return 0; //not error
 }
-
+// *INDENT-OFF*
 bool printADCRuntimeError(int32_t adcval, HardwareSerial &__dbgser) {
   union __BL bl;
   bl.sl = adcval;
@@ -47,18 +47,18 @@ bool printADCRuntimeError(int32_t adcval, HardwareSerial &__dbgser) {
         __dbgser.println(F("Requested res < 8, minimum us 8-bit")); break;
       case 0xFC:
         __dbgser.println(F("Requested res is higher than a single burst can achieve.")); break;
-      #if defined(PGACTRL)
+#if defined(PGACTRL)
       case 0xFB:
         __dbgser.println(F("negative pin or channel does not exist or is not a valid")); break;
-      #endif
+#endif
       case 0xF9:
         __dbgser.println(F("The ADC has been disabled, re-enable it with ADCPowerOptions.")); break;
       default: {
         __dbgser.println(F("Error code not recognized"));
       }
-      return false;
     }
-  } else if ((bl.b[3] + 1) > 1 || ((bl.b[2])+0x20) > 0x5F) {
+    return false;
+  } else if ((bl.b[3] + 1) > 1 || ((bl.b[2]) + 0x20) > 0x5F) {
     __dbgser.println(F("Impossible value - outside maximum range of analogReadEnh"));
     return false;
   }
@@ -66,8 +66,8 @@ bool printADCRuntimeError(int32_t adcval, HardwareSerial &__dbgser) {
 }
 bool printADCRuntimeError(int16_t error, HardwareSerial &__dbgser) {
   union __BW bw;
-  bw.si=error;
-  if( bw.b[1] == 0x82)
+  bw.si = error;
+  if (bw.b[1] == 0x82) {
     switch (bw.b[0]) {
     case 0xFE:
       __dbgser.println("ADC is already doing a conversion"); break;
@@ -83,5 +83,6 @@ bool printADCRuntimeError(int16_t error, HardwareSerial &__dbgser) {
     __dbgser.println(F("Impossible value - outside maximum range of analogRead()"));
     return false;
   }
-return true;
+  return true;
 }
+// *INDENT-On*

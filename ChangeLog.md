@@ -35,7 +35,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Docs: Fix many documentation issues, improve docs generally.
 * Expand documentation significantly.
 * Remove multiple signatures for Wire.requestFrom to fix issues with Wire with certain libraries.
-* Bugfix: Correct tuning, particularly to speeds below 16 MHz. Boards should be retuned if 14 MHz-derived speed is to be used
+* Bugfix: Correct tuning, particularly to speeds below 16 MHz. Boards should be re-tuned if 14 MHz-derived speed is to be used
 * Bugfix: Correct default option for Optiboot 2-series boards with 20 pins to be the one with alt reset.
 * Bugfix: `long_soft_event` method did not work correctly.
 * Enhancement: Lay groundwork in Event library for the new event system changes in the EA-series (There will be 2 generators per port, and 2 for RTC - but all of these will be accessible by all event channels, and a register on the peripheral controls which of the options is used for these two channels). While inapplicable to tinyAVR, Event.h and Event.cpp distributed with DxCore and megaTinyCore is identical.

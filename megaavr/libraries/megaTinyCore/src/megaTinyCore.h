@@ -1,5 +1,5 @@
 #include <Arduino.h>
-  // in ADCErrors.cpp
+// in ADCErrors.cpp
 // ADC error interpretation helper functions
 #ifdef __cplusplus
   int8_t analogCheckError(int16_t val);

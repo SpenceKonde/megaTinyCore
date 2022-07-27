@@ -1,3 +1,17 @@
+/* This file is ONLY included by Event.h and should never be included by any other code under any circumstances.
+ * It is loaded at the start of Event.h so that the same code can be used even if the part is a tinyAVR 0/1-series with wacky event system.
+ * Thia does a lot for tinyAVR 0/1-series, very little for 2-series, and nothing for anything else.
+ */
+#if !defined(LOGIC_H)
+  #error "This should only be included as part of Event.h"
+#endif
+
+// *INDENT-OFF* astyle hates how we formatted this.
+// I mean, I do too, but I hated all the alternatives we tried even more.
+// Readable code always takes priority over formatting dogma. -Spence
+
+#ifndef LOGIC_EMUMS_H
+#define LOGIC_PARTS_H
 
 struct Logic::CCLBlock {
   const uint8_t number;
@@ -339,3 +353,5 @@ static const struct Logic::CCLBlock blocks[] = {
   },
   #endif
 };
+
+#endif
