@@ -1422,18 +1422,26 @@ namespace gen          {
   using namespace event::gen;
 };
 #if !defined(PORT_EVGEN0SEL_gm)
+  #if defined(EVSYS_CHANNEL0)
   namespace gen0          {
     using namespace event::gen0;
   };
+  #endif
+  #if defined(EVSYS_CHANNEL1)
   namespace gen1          {
     using namespace event::gen1;
   };
+  #endif
+  #if defined(EVSYS_CHANNEL2)
   namespace gen2          {
     using namespace event::gen2;
   };
+  #endif
+  #if defined(EVSYS_CHANNEL3)
   namespace gen3          {
     using namespace event::gen3;
   };
+  #endif
   #if defined(EVSYS_CHANNEL4)
   namespace gen4          {
     using namespace event::gen4;
