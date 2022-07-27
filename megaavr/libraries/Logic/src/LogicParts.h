@@ -1,9 +1,9 @@
-/* This file is ONLY included by Event.h and should never be included by any other code under any circumstances.
- * It is loaded at the start of Event.h so that the same code can be used even if the part is a tinyAVR 0/1-series with wacky event system.
+/* This file is ONLY included by Logic.h and should never be included by any other code under any circumstances.
+ * It is loaded at the start of Logic.h so that the same code can be used even if the part is a tinyAVR 0/1-series with wacky event system.
  * Thia does a lot for tinyAVR 0/1-series, very little for 2-series, and nothing for anything else.
  */
 #if !defined(LOGIC_H)
-  #error "This should only be included as part of Event.h"
+  #error "This should only be included as part of Logic.h"
 #endif
 
 // *INDENT-OFF* astyle hates how we formatted this.

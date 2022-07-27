@@ -3,10 +3,10 @@
 
 #include <Arduino.h>
 
-#include "LogicEnums.h"
 #include "LogicParts.h"
+#include "LogicEnums.h"
 /* The above handle differences between the hardware and are extremely
- * verbpse. This made this file very difficult to use.
+ * verbose. This made this file very difficult to use.
  */
 
 class Logic {
