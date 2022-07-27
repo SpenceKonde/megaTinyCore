@@ -1262,6 +1262,7 @@ namespace event {
 
 #if defined(PIN_PB0)
       /* all parts withunique options here a PORTB (ie, they're not 8-pin ones) */
+      #define HAS_SEPARATE_GEN3
       namespace gen3 {
         enum generator_t : uint8_t {
           pin_pb0      = 0x0A,
@@ -1290,6 +1291,7 @@ namespace event {
        * since it's all PORTC or the second and third AC.
        */
 #if defined(TINY_1_16K_PLUS) || defined(PIN_PC0)
+      #define HAS_SEPARATE_GEN4
       namespace gen4 {
         enum generator_t : uint8_t {
 #if defined(PIN_PC0)
@@ -1327,26 +1329,27 @@ namespace event {
     };
 
 #if defined(PIN_PB0)
+    #define HAS_SEPARATE_GEN1
       namespace gen1 {
         enum generator_t : uint8_t {
-          pin_pb0      = 0x08,
-          pin_pb1      = 0x09,
-          pin_pb2      = 0x0A,
-          pin_pb3      = 0x0B,
+        pin_pb0      = 0x08,
+        pin_pb1      = 0x09,
+        pin_pb2      = 0x0A,
+        pin_pb3      = 0x0B,
 #if defined(PIN_PB5)
-          pin_pb4      = 0x0C,
-          pin_pb5      = 0x0D,
+        pin_pb4      = 0x0C,
+        pin_pb5      = 0x0D,
 #endif
 #if defined(PIN_PB7)
-          pin_pb6      = 0x0E,
-          pin_pb7      = 0x0F,
+        pin_pb6      = 0x0E,
+        pin_pb7      = 0x0F,
 #endif
 #if defined(TINY_1_16K_PLUS)
-          tcb1         = 0x10,
-          tcb1_capt    = 0x10,
+        tcb1         = 0x10,
+        tcb1_capt    = 0x10,
 #endif
-        };
       };
+    };
 #endif
 #endif // end of  1-series only part.
 
@@ -1427,7 +1430,7 @@ namespace gen          {
     using namespace event::gen0;
   };
   #endif
-  #if defined(EVSYS_CHANNEL1)
+  #if defined(EVSYS_CHANNEL1) && (!defined(MEGATINYCORE) || defined(HAS_SEPARATE_GEN1)) /* otherwise there's no gen1 namespace because there would be nothing in it */
   namespace gen1          {
     using namespace event::gen1;
   };
@@ -1437,12 +1440,12 @@ namespace gen          {
     using namespace event::gen2;
   };
   #endif
-  #if defined(EVSYS_CHANNEL3)
-  namespace gen3          {
+  #if defined(EVSYS_CHANNEL3) && (!defined(MEGATINYCORE) || defined(HAS_SEPARATE_GEN3)) /* otherwise there's no gen3 namespace because there would be nothing in it */
+    namespace gen3          {
     using namespace event::gen3;
   };
   #endif
-  #if defined(EVSYS_CHANNEL4)
+  #if defined(EVSYS_CHANNEL4) && (!defined(MEGATINYCORE) || defined(HAS_SEPARATE_GEN4)) /* otherwise there's no gen4 namespace because there would be nothing in it */
   namespace gen4          {
     using namespace event::gen4;
   };
