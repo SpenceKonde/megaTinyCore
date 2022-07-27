@@ -2,6 +2,7 @@
  * It is loaded at the start of Event.h so that the same code can be used even if the part is a tinyAVR 0/1-series with wacky event system.
  * Thia does a lot for tinyAVR 0/1-series, very little for 2-series, and nothing for anything else.
  */
+// *INDENT-OFF*
 #if !defined(EVENT_H)
   #error "This should only be included as part of Event.h"
 #endif

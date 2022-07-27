@@ -109,7 +109,7 @@ void setup() {
     Serial.begin(FUSE.OSCCFG == 1 ? FALLBACK16 : FALLBACK20);
     Serial.println("Oscillator in fallback mode");
     if (errortype & 1) {
-      Serial.println("Chip configured to use external oscillator - but there was a problem":);
+      Serial.println("Chip configured to use external oscillator - but there was a problem");
       if (errortype & 4) {
         Serial.println("it isn't running from it now either but still wants to - Sounds like your oscillator isn't oscillating, probably a connection problem.");
         Serial.println("Reminder: These parts do not work with a crystal. only with an external clock, also called a \"oscillator\" or \"active crystal\".");
