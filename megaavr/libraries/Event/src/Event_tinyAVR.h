@@ -72,7 +72,7 @@
       #define EventAsync2    Event4
       #define EVSYS_CHANNEL4 EVSYS_ASYNCCH2
     #endif
-    #if defined(EVSYS_ASYNCCH3) MEGATINYCORE_SERIES ==1
+    #if defined(EVSYS_ASYNCCH3) && MEGATINYCORE_SERIES ==1
       #define EventAsync3    Event5
       #define EVSYS_CHANNEL5 EVSYS_ASYNCCH3
     #endif
