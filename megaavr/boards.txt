@@ -242,6 +242,7 @@ atxy7.menu.clock.10internal=10 MHz internal
 atxy7.menu.clock.8internal=8 MHz internal
 atxy7.menu.clock.5internal=5 MHz internal
 atxy7.menu.clock.4internal=4 MHz internal
+atxy7.menu.clock.2internal=2 MHz internal
 atxy7.menu.clock.1internal=1 MHz internal
 atxy7.menu.clock.20internaltuned=20 MHz internal - tuned
 atxy7.menu.clock.16internaltuned=16 MHz internal - tuned
@@ -278,6 +279,8 @@ atxy7.menu.clock.5internal.build.speed=5
 atxy7.menu.clock.5internal.build.clocksource=0
 atxy7.menu.clock.4internal.build.speed=4
 atxy7.menu.clock.4internal.build.clocksource=0
+atxy7.menu.clock.2internal.build.speed=2
+atxy7.menu.clock.2internal.build.clocksource=0
 atxy7.menu.clock.1internal.build.speed=1
 atxy7.menu.clock.1internal.build.clocksource=0
 atxy7.menu.clock.20extclock.build.speed=20
@@ -304,6 +307,7 @@ atxy7.menu.clock.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atxy7.menu.clock.2internaltuned.build.speed=2
 atxy7.menu.clock.2internaltuned.build.clocksource=0
 atxy7.menu.clock.2internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7.menu.clock.2internaltuned.bootloader.OSCCFG=0x02
 atxy7.menu.clock.4internaltuned.build.speed=4
 atxy7.menu.clock.4internaltuned.build.clocksource=0
 atxy7.menu.clock.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
@@ -351,6 +355,8 @@ atxy7.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
 atxy7.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy7.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy7.menu.clock.5internal.bootloader.OSCCFG=0x02
+atxy7.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # BOD VOLTAGE                            #
@@ -642,6 +648,7 @@ atxy6.menu.clock.10internal=10 MHz internal
 atxy6.menu.clock.8internal=8 MHz internal
 atxy6.menu.clock.5internal=5 MHz internal
 atxy6.menu.clock.4internal=4 MHz internal
+atxy6.menu.clock.2internal=2 MHz internal
 atxy6.menu.clock.1internal=1 MHz internal
 atxy6.menu.clock.20internaltuned=20 MHz internal - tuned
 atxy6.menu.clock.16internaltuned=16 MHz internal - tuned
@@ -677,6 +684,8 @@ atxy6.menu.clock.5internal.build.speed=5
 atxy6.menu.clock.5internal.build.clocksource=0
 atxy6.menu.clock.4internal.build.speed=4
 atxy6.menu.clock.4internal.build.clocksource=0
+atxy6.menu.clock.2internal.build.speed=2
+atxy6.menu.clock.2internal.build.clocksource=0
 atxy6.menu.clock.1internal.build.speed=1
 atxy6.menu.clock.1internal.build.clocksource=0
 atxy6.menu.clock.20extclock.build.speed=20
@@ -748,6 +757,8 @@ atxy6.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
 atxy6.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy6.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy6.menu.clock.5internal.bootloader.OSCCFG=0x02
+atxy6.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # BOD VOLTAGE                            #
@@ -1041,6 +1052,7 @@ atxy4.menu.clock.10internal=10 MHz internal
 atxy4.menu.clock.8internal=8 MHz internal
 atxy4.menu.clock.5internal=5 MHz internal
 atxy4.menu.clock.4internal=4 MHz internal
+atxy4.menu.clock.2internal=2 MHz internal
 atxy4.menu.clock.1internal=1 MHz internal
 atxy4.menu.clock.20internaltuned=20 MHz internal - tuned
 atxy4.menu.clock.16internaltuned=16 MHz internal - tuned
@@ -1050,6 +1062,7 @@ atxy4.menu.clock.8internaltuned=8 MHz internal - tuned
 atxy4.menu.clock.6internaltuned=6 MHz internal - tuned
 atxy4.menu.clock.5internaltuned=5 MHz internal - tuned
 atxy4.menu.clock.4internaltuned=4 MHz internal - tuned
+atxy4.menu.clock.1internaltuned=2 MHz internal - tuned
 atxy4.menu.clock.1internaltuned=1 MHz internal - tuned
 atxy4.menu.clock.20extclock=20 MHz external clock
 atxy4.menu.clock.16extclock=16 MHz external clock
@@ -1076,6 +1089,8 @@ atxy4.menu.clock.5internal.build.speed=5
 atxy4.menu.clock.5internal.build.clocksource=0
 atxy4.menu.clock.4internal.build.speed=4
 atxy4.menu.clock.4internal.build.clocksource=0
+atxy4.menu.clock.2internal.build.speed=2
+atxy4.menu.clock.2internal.build.clocksource=0
 atxy4.menu.clock.1internal.build.speed=1
 atxy4.menu.clock.1internal.build.clocksource=0
 atxy4.menu.clock.20extclock.build.speed=20
@@ -1132,6 +1147,9 @@ atxy4.menu.clock.5internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atxy4.menu.clock.4internaltuned.build.speed=4
 atxy4.menu.clock.4internaltuned.build.clocksource=0
 atxy4.menu.clock.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy4.menu.clock.2internaltuned.build.speed=2
+atxy4.menu.clock.2internaltuned.build.clocksource=0
+atxy4.menu.clock.2internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atxy4.menu.clock.1internaltuned.build.speed=1
 atxy4.menu.clock.1internaltuned.build.clocksource=0
 atxy4.menu.clock.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
@@ -1140,6 +1158,7 @@ atxy4.menu.clock.12internaltuned.bootloader.OSCCFG=0x02
 atxy4.menu.clock.10internaltuned.bootloader.OSCCFG=0x02
 atxy4.menu.clock.6internaltuned.bootloader.OSCCFG=0x02
 atxy4.menu.clock.5internaltuned.bootloader.OSCCFG=0x02
+atxy4.menu.clock.2internaltuned.bootloader.OSCCFG=0x02
 atxy4.menu.clock.24internaltuned.bootloader.OSCCFG=0x02
 atxy4.menu.clock.25internaltuned.bootloader.OSCCFG=0x02
 atxy4.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
@@ -1147,6 +1166,8 @@ atxy4.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
 atxy4.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy4.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy4.menu.clock.5internal.bootloader.OSCCFG=0x02
+atxy4.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # BOD VOLTAGE                            #
@@ -1396,6 +1417,7 @@ atxy2.menu.clock.10internal=10 MHz internal
 atxy2.menu.clock.8internal=8 MHz internal
 atxy2.menu.clock.5internal=5 MHz internal
 atxy2.menu.clock.4internal=4 MHz internal
+atxy2.menu.clock.2internal=2 MHz internal
 atxy2.menu.clock.1internal=1 MHz internal
 atxy2.menu.clock.20internaltuned=20 MHz internal - tuned
 atxy2.menu.clock.16internaltuned=16 MHz internal - tuned
@@ -1431,6 +1453,8 @@ atxy2.menu.clock.5internal.build.speed=5
 atxy2.menu.clock.5internal.build.clocksource=0
 atxy2.menu.clock.4internal.build.speed=4
 atxy2.menu.clock.4internal.build.clocksource=0
+atxy2.menu.clock.2internal.build.speed=2
+atxy2.menu.clock.2internal.build.clocksource=0
 atxy2.menu.clock.1internal.build.speed=1
 atxy2.menu.clock.1internal.build.clocksource=0
 atxy2.menu.clock.20extclock.build.speed=20
@@ -1498,6 +1522,8 @@ atxy2.menu.clock.30internaltuned.bootloader.OSCCFG=0x02
 atxy2.menu.clock.20internal.bootloader.OSCCFG=0x02
 atxy2.menu.clock.10internal.bootloader.OSCCFG=0x02
 atxy2.menu.clock.5internal.bootloader.OSCCFG=0x02
+atxy2.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # BOD VOLTAGE                            #
@@ -1771,6 +1797,7 @@ microchip.menu.clock.10internal=10 MHz internal
 microchip.menu.clock.8internal=8 MHz internal
 microchip.menu.clock.5internal=5 MHz internal
 microchip.menu.clock.4internal=4 MHz internal
+microchip.menu.clock.2internal=2 MHz internal
 microchip.menu.clock.1internal=1 MHz internal
 microchip.menu.clock.20internaltuned=20 MHz internal - tuned
 microchip.menu.clock.16internaltuned=16 MHz internal - tuned
@@ -1797,6 +1824,8 @@ microchip.menu.clock.5internal.build.speed=5
 microchip.menu.clock.5internal.build.clocksource=0
 microchip.menu.clock.4internal.build.speed=4
 microchip.menu.clock.4internal.build.clocksource=0
+microchip.menu.clock.2internal.build.speed=2
+microchip.menu.clock.2internal.build.clocksource=0
 microchip.menu.clock.1internal.build.speed=1
 microchip.menu.clock.1internal.build.clocksource=0
 microchip.menu.clock.20internaltuned.build.speed=20
@@ -1828,6 +1857,8 @@ microchip.menu.clock.32internaltuned.bootloader.OSCCFG=0x02
 microchip.menu.clock.20internal.bootloader.OSCCFG=0x02
 microchip.menu.clock.10internal.bootloader.OSCCFG=0x02
 microchip.menu.clock.5internal.bootloader.OSCCFG=0x02
+microchip.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # BOD VOLTAGE                            #
@@ -2083,6 +2114,7 @@ atxy7o.menu.clocko.10internal=10 MHz internal
 atxy7o.menu.clocko.8internal=8 MHz internal
 atxy7o.menu.clocko.5internal=5 MHz internal
 atxy7o.menu.clocko.4internal=4 MHz internal
+atxy7o.menu.clocko.2internal=2 MHz internal
 atxy7o.menu.clocko.1internal=1 MHz internal
 atxy7o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atxy7o.menu.clocko.16internaltuned=16 MHz internal - tuned
@@ -2119,6 +2151,8 @@ atxy7o.menu.clocko.5internal.build.speed=5
 atxy7o.menu.clocko.5internal.build.clocksource=0
 atxy7o.menu.clocko.4internal.build.speed=4
 atxy7o.menu.clocko.4internal.build.clocksource=0
+atxy7o.menu.clocko.2internal.build.speed=2
+atxy7o.menu.clocko.2internal.build.clocksource=0
 atxy7o.menu.clocko.1internal.build.speed=1
 atxy7o.menu.clocko.1internal.build.clocksource=0
 atxy7o.menu.clocko.20extclock.build.speed=20
@@ -2145,6 +2179,7 @@ atxy7o.menu.clocko.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atxy7o.menu.clocko.2internaltuned.build.speed=2
 atxy7o.menu.clocko.2internaltuned.build.clocksource=0
 atxy7o.menu.clocko.2internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy7o.menu.clocko.2internaltuned.bootloader.OSCCFG=0x02
 atxy7o.menu.clocko.4internaltuned.build.speed=4
 atxy7o.menu.clocko.4internaltuned.build.clocksource=0
 atxy7o.menu.clocko.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
@@ -2192,6 +2227,8 @@ atxy7o.menu.clocko.32internaltuned.bootloader.OSCCFG=0x02
 atxy7o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atxy7o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atxy7o.menu.clocko.5internal.bootloader.OSCCFG=0x02
+atxy70.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # BOD VOLTAGE                            #
@@ -2429,6 +2466,7 @@ atx27o.menu.clocko.10internal=10 MHz internal
 atx27o.menu.clocko.8internal=8 MHz internal
 atx27o.menu.clocko.5internal=5 MHz internal
 atx27o.menu.clocko.4internal=4 MHz internal
+atx27o.menu.clocko.2internal=2 MHz internal
 atx27o.menu.clocko.1internal=1 MHz internal
 atx27o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atx27o.menu.clocko.16internaltuned=16 MHz internal - tuned
@@ -2465,6 +2503,8 @@ atx27o.menu.clocko.5internal.build.speed=5
 atx27o.menu.clocko.5internal.build.clocksource=0
 atx27o.menu.clocko.4internal.build.speed=4
 atx27o.menu.clocko.4internal.build.clocksource=0
+atx27o.menu.clocko.2internal.build.speed=2
+atx27o.menu.clocko.2internal.build.clocksource=0
 atx27o.menu.clocko.1internal.build.speed=1
 atx27o.menu.clocko.1internal.build.clocksource=0
 atx27o.menu.clocko.20extclock.build.speed=20
@@ -2491,6 +2531,7 @@ atx27o.menu.clocko.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atx27o.menu.clocko.2internaltuned.build.speed=2
 atx27o.menu.clocko.2internaltuned.build.clocksource=0
 atx27o.menu.clocko.2internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atx27o.menu.clocko.2internaltuned.bootloader.OSCCFG=0x02
 atx27o.menu.clocko.4internaltuned.build.speed=4
 atx27o.menu.clocko.4internaltuned.build.clocksource=0
 atx27o.menu.clocko.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
@@ -2538,6 +2579,8 @@ atx27o.menu.clocko.32internaltuned.bootloader.OSCCFG=0x02
 atx27o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atx27o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atx27o.menu.clocko.5internal.bootloader.OSCCFG=0x02
+atx27o.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # MILLIS TIMER                           #
@@ -2802,6 +2845,7 @@ atxy6o.menu.clocko.10internal=10 MHz internal
 atxy6o.menu.clocko.8internal=8 MHz internal
 atxy6o.menu.clocko.5internal=5 MHz internal
 atxy6o.menu.clocko.4internal=4 MHz internal
+atxy6o.menu.clocko.2internal=2 MHz internal
 atxy6o.menu.clocko.1internal=1 MHz internal
 atxy6o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atxy6o.menu.clocko.16internaltuned=16 MHz internal - tuned
@@ -2838,6 +2882,8 @@ atxy6o.menu.clocko.5internal.build.speed=5
 atxy6o.menu.clocko.5internal.build.clocksource=0
 atxy6o.menu.clocko.4internal.build.speed=4
 atxy6o.menu.clocko.4internal.build.clocksource=0
+atxy6o.menu.clocko.2internal.build.speed=2
+atxy6o.menu.clocko.2internal.build.clocksource=0
 atxy6o.menu.clocko.1internal.build.speed=1
 atxy6o.menu.clocko.1internal.build.clocksource=0
 atxy6o.menu.clocko.20extclock.build.speed=20
@@ -2864,6 +2910,7 @@ atxy6o.menu.clocko.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atxy6o.menu.clocko.2internaltuned.build.speed=2
 atxy6o.menu.clocko.2internaltuned.build.clocksource=0
 atxy6o.menu.clocko.2internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy6o.menu.clocko.2internaltuned.bootloader.OSCCFG=0x02
 atxy6o.menu.clocko.4internaltuned.build.speed=4
 atxy6o.menu.clocko.4internaltuned.build.clocksource=0
 atxy6o.menu.clocko.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
@@ -2911,6 +2958,8 @@ atxy6o.menu.clocko.32internaltuned.bootloader.OSCCFG=0x02
 atxy6o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atxy6o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atxy6o.menu.clocko.5internal.bootloader.OSCCFG=0x02
+atxy6o.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # MILLIS TIMER                           #
@@ -3148,6 +3197,7 @@ atx26o.menu.clocko.10internal=10 MHz internal
 atx26o.menu.clocko.8internal=8 MHz internal
 atx26o.menu.clocko.5internal=5 MHz internal
 atx26o.menu.clocko.4internal=4 MHz internal
+atx26o.menu.clocko.2internal=2 MHz internal
 atx26o.menu.clocko.1internal=1 MHz internal
 atx26o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atx26o.menu.clocko.16internaltuned=16 MHz internal - tuned
@@ -3184,6 +3234,8 @@ atx26o.menu.clocko.5internal.build.speed=5
 atx26o.menu.clocko.5internal.build.clocksource=0
 atx26o.menu.clocko.4internal.build.speed=4
 atx26o.menu.clocko.4internal.build.clocksource=0
+atx26o.menu.clocko.2internal.build.speed=2
+atx26o.menu.clocko.2internal.build.clocksource=0
 atx26o.menu.clocko.1internal.build.speed=1
 atx26o.menu.clocko.1internal.build.clocksource=0
 atx26o.menu.clocko.20extclock.build.speed=20
@@ -3210,6 +3262,7 @@ atx26o.menu.clocko.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atx26o.menu.clocko.2internaltuned.build.speed=2
 atx26o.menu.clocko.2internaltuned.build.clocksource=0
 atx26o.menu.clocko.2internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atx26o.menu.clocko.2internaltuned.bootloader.OSCCFG=0x02
 atx26o.menu.clocko.4internaltuned.build.speed=4
 atx26o.menu.clocko.4internaltuned.build.clocksource=0
 atx26o.menu.clocko.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
@@ -3257,6 +3310,8 @@ atx26o.menu.clocko.32internaltuned.bootloader.OSCCFG=0x02
 atx26o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atx26o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atx26o.menu.clocko.5internal.bootloader.OSCCFG=0x02
+atx26o.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # MILLIS TIMER                           #
@@ -3529,6 +3584,7 @@ atxy4o.menu.clocko.10internal=10 MHz internal
 atxy4o.menu.clocko.8internal=8 MHz internal
 atxy4o.menu.clocko.5internal=5 MHz internal
 atxy4o.menu.clocko.4internal=4 MHz internal
+atxy4o.menu.clocko.2internal=2 MHz internal
 atxy4o.menu.clocko.1internal=1 MHz internal
 atxy4o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atxy4o.menu.clocko.16internaltuned=16 MHz internal - tuned
@@ -3565,6 +3621,8 @@ atxy4o.menu.clocko.5internal.build.speed=5
 atxy4o.menu.clocko.5internal.build.clocksource=0
 atxy4o.menu.clocko.4internal.build.speed=4
 atxy4o.menu.clocko.4internal.build.clocksource=0
+atxy4o.menu.clocko.2internal.build.speed=2
+atxy4o.menu.clocko.2internal.build.clocksource=0
 atxy4o.menu.clocko.1internal.build.speed=1
 atxy4o.menu.clocko.1internal.build.clocksource=0
 atxy4o.menu.clocko.20extclock.build.speed=20
@@ -3591,6 +3649,7 @@ atxy4o.menu.clocko.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atxy4o.menu.clocko.2internaltuned.build.speed=2
 atxy4o.menu.clocko.2internaltuned.build.clocksource=0
 atxy4o.menu.clocko.2internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy4o.menu.clocko.2internaltuned.bootloader.OSCCFG=0x02
 atxy4o.menu.clocko.4internaltuned.build.speed=4
 atxy4o.menu.clocko.4internaltuned.build.clocksource=0
 atxy4o.menu.clocko.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
@@ -3638,6 +3697,8 @@ atxy4o.menu.clocko.32internaltuned.bootloader.OSCCFG=0x02
 atxy4o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atxy4o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atxy4o.menu.clocko.5internal.bootloader.OSCCFG=0x02
+atxy4o.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # MILLIS TIMER                           #
@@ -3875,6 +3936,7 @@ atx24o.menu.clocko.10internal=10 MHz internal
 atx24o.menu.clocko.8internal=8 MHz internal
 atx24o.menu.clocko.5internal=5 MHz internal
 atx24o.menu.clocko.4internal=4 MHz internal
+atx24o.menu.clocko.2internal=2 MHz internal
 atx24o.menu.clocko.1internal=1 MHz internal
 atx24o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atx24o.menu.clocko.16internaltuned=16 MHz internal - tuned
@@ -3911,6 +3973,8 @@ atx24o.menu.clocko.5internal.build.speed=5
 atx24o.menu.clocko.5internal.build.clocksource=0
 atx24o.menu.clocko.4internal.build.speed=4
 atx24o.menu.clocko.4internal.build.clocksource=0
+atx24o.menu.clocko.2internal.build.speed=2
+atx24o.menu.clocko.2internal.build.clocksource=0
 atx24o.menu.clocko.1internal.build.speed=1
 atx24o.menu.clocko.1internal.build.clocksource=0
 atx24o.menu.clocko.20extclock.build.speed=20
@@ -3937,6 +4001,7 @@ atx24o.menu.clocko.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atx24o.menu.clocko.2internaltuned.build.speed=2
 atx24o.menu.clocko.2internaltuned.build.clocksource=0
 atx24o.menu.clocko.2internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atx24o.menu.clocko.2internaltuned.bootloader.OSCCFG=0x02
 atx24o.menu.clocko.4internaltuned.build.speed=4
 atx24o.menu.clocko.4internaltuned.build.clocksource=0
 atx24o.menu.clocko.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
@@ -3984,6 +4049,8 @@ atx24o.menu.clocko.32internaltuned.bootloader.OSCCFG=0x02
 atx24o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atx24o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atx24o.menu.clocko.5internal.bootloader.OSCCFG=0x02
+atx24o.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # MILLIS TIMER                           #
@@ -4233,6 +4300,7 @@ atxy2o.menu.clocko.10internal=10 MHz internal
 atxy2o.menu.clocko.8internal=8 MHz internal
 atxy2o.menu.clocko.5internal=5 MHz internal
 atxy2o.menu.clocko.4internal=4 MHz internal
+atxy2o.menu.clocko.2internal=2 MHz internal
 atxy2o.menu.clocko.1internal=1 MHz internal
 atxy2o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atxy2o.menu.clocko.16internaltuned=16 MHz internal - tuned
@@ -4269,6 +4337,8 @@ atxy2o.menu.clocko.5internal.build.speed=5
 atxy2o.menu.clocko.5internal.build.clocksource=0
 atxy2o.menu.clocko.4internal.build.speed=4
 atxy2o.menu.clocko.4internal.build.clocksource=0
+atxy2o.menu.clocko.2internal.build.speed=2
+atxy2o.menu.clocko.2internal.build.clocksource=0
 atxy2o.menu.clocko.1internal.build.speed=1
 atxy2o.menu.clocko.1internal.build.clocksource=0
 atxy2o.menu.clocko.20extclock.build.speed=20
@@ -4295,6 +4365,7 @@ atxy2o.menu.clocko.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
 atxy2o.menu.clocko.2internaltuned.build.speed=2
 atxy2o.menu.clocko.2internaltuned.build.clocksource=0
 atxy2o.menu.clocko.2internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
+atxy2o.menu.clocko.2internaltuned.bootloader.OSCCFG=0x02
 atxy2o.menu.clocko.4internaltuned.build.speed=4
 atxy2o.menu.clocko.4internaltuned.build.clocksource=0
 atxy2o.menu.clocko.4internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL
@@ -4342,6 +4413,8 @@ atxy2o.menu.clocko.32internaltuned.bootloader.OSCCFG=0x02
 atxy2o.menu.clocko.20internal.bootloader.OSCCFG=0x02
 atxy2o.menu.clocko.10internal.bootloader.OSCCFG=0x02
 atxy2o.menu.clocko.5internal.bootloader.OSCCFG=0x02
+atxy2o.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # MILLIS TIMER                           #
@@ -4623,6 +4696,7 @@ microchipo.menu.clocko.10internal=10 MHz internal
 microchipo.menu.clocko.8internal=8 MHz internal
 microchipo.menu.clocko.5internal=5 MHz internal
 microchipo.menu.clocko.4internal=4 MHz internal
+microchipo.menu.clocko.2internal=2 MHz internal
 microchipo.menu.clocko.1internal=1 MHz internal
 microchipo.menu.clocko.20internaltuned=20 MHz internal - tuned
 microchipo.menu.clocko.16internaltuned=16 MHz internal - tuned
@@ -4649,6 +4723,8 @@ microchipo.menu.clocko.5internal.build.speed=5
 microchipo.menu.clocko.5internal.build.clocksource=0
 microchipo.menu.clocko.4internal.build.speed=4
 microchipo.menu.clocko.4internal.build.clocksource=0
+microchipo.menu.clocko.2internal.build.speed=2
+microchipo.menu.clocko.2internal.build.clocksource=0
 microchipo.menu.clocko.1internal.build.speed=1
 microchipo.menu.clocko.1internal.build.clocksource=0
 microchipo.menu.clocko.20internaltuned.build.speed=20
@@ -4680,6 +4756,8 @@ microchipo.menu.clocko.32internaltuned.bootloader.OSCCFG=0x02
 microchipo.menu.clocko.20internal.bootloader.OSCCFG=0x02
 microchipo.menu.clocko.10internal.bootloader.OSCCFG=0x02
 microchipo.menu.clocko.5internal.bootloader.OSCCFG=0x02
+microchipo.menu.clock.2internal.bootloader.OSCCFG=0x02
+
 
 #----------------------------------------#
 # BOD VOLTAGE                            #
