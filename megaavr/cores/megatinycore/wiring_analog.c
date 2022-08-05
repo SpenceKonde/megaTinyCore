@@ -286,14 +286,18 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
  *    or PORTD/PORTE (for Dx-series), and the selection of available
  *    channels is more limited.
  *
- * printADCRuntimeError(uint32_t error, &UartClass DebugSerial)
+ * printADCRuntimeError(uint32_t error, &HardwareSerial DebugSerial)
  *   Prints a text description of an error returnedby analogRead,
  *   analogReasdEnh(),or analogReadDiff() to the specified serial device
  *   Ex:
  *    printADCRuntimeError(-2100000003, &Serial);
- *    will peinr "ADC_ENH_ERROR_RES_TOO_LOW"
+ *    will print "ADC_ENH_ERROR_RES_TOO_LOW"
  *    Will print nothing and return false if the result wasn't an error
- *    Inefficient of flash space..
+ *   This function is not an efficient user of flash space, it is meant as a
+ *   debugging aid.
+ * analogIsError(int16_t from analogRead or int32_t from analogReadEnh)
+ *   Returns 1 (true) if the value, assuming it came from an analogRead/Enh
+ *   function call, is not an analog reading but instead an error code.
  ****************************************************************************/
 
 
@@ -787,7 +791,6 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   static const int16_t adc_prescale_to_clkadc[0x09] =  {(F_CPU /  2000UL),(F_CPU /  4000UL),(F_CPU /  8000UL),(F_CPU / 16000UL),
   /* Doesn't get copied to ram because these all */     (F_CPU / 32000UL),(F_CPU / 64000UL),(F_CPU /128000UL),(F_CPU /256000UL),1};
 
-
   /*
   Frequency in kHz.
   If (options & 1) == 1, will set frequencies outside of safe operating range
@@ -1067,13 +1070,13 @@ void analogWrite(uint8_t pin, int val) {
   /* Get timer */
   /* megaTinyCore only - assumes only TIMERA0, TIMERD0, or DACOUT
    * can be returned here, all have only 1 bit set, so we can use
-   * PeripheralControl as a mask to see if they have taken over
+   * __PeripheralControl as a mask to see if they have taken over
    * any timers with minimum overhead - critical on these parts
    * Since nothing that will show up here can have more than one
    * one bit set, binary and will give 0x00 if that bit is cleared
    * which is NOT_ON_TIMER.
    */
-  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & PeripheralControl;
+  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & __PeripheralControl;
   /* end megaTinyCore-specific section */
 
   volatile uint8_t *timer_cmp_out; // must be volatile for this to be safe.
@@ -1208,19 +1211,19 @@ void analogWrite(uint8_t pin, int val) {
 
 void takeOverTCA0() {
   TCA0.SPLIT.CTRLA = 0;                                 // Stop TCA0
-  PeripheralControl &= ~TIMERA0;                        // Mark timer as user controlled
+  __PeripheralControl &= ~TIMERA0;                        // Mark timer as user controlled
   /* Okay, seriously? The datasheets and io headers disagree here */
   TCA0.SPLIT.CTRLESET = TCA_SPLIT_CMD_RESET_gc | 0x03;  // Reset TCA0
 }
 
 uint8_t digitalPinToTimerNow(uint8_t pin) {
-  return digitalPinToTimer(pin) & PeripheralControl;
+  return digitalPinToTimer(pin) & __PeripheralControl;
 }
 
 #if defined(TCD0)
 void takeOverTCD0() {
   TCD0.CTRLA = 0;                     // Stop TCD0
   _PROTECTED_WRITE(TCD0.FAULTCTRL,0); // Turn off all outputs
-  PeripheralControl &= ~TIMERD0;      // Mark timer as user controlled
+  __PeripheralControl &= ~TIMERD0;      // Mark timer as user controlled
 }
 #endif

@@ -57,153 +57,163 @@
   #endif
 #endif
 
-
-
-namespace out {
-  enum output_t : uint8_t {
-    disable         = 0x00,
-    disable_invert  = 0x80,
-    enable          = 0x40,
-    invert          = 0xC0,
-    enable_invert   = 0xC0,
-  };
-  enum pinswap_t : uint8_t {
-    no_swap  = 0x00,
-#if defined(DXCORE) && (defined(HAS_48_PINS) || defined(HAS_64_PINS))
-    pin_swap = 0x01
-#endif
-  };
-  enum initval_t : uint8_t {
-    init_low  = 0x00,
-    init_high = 0x40,
-  };
-};
-
-namespace hyst {
-  enum hysteresis_t : uint8_t {
-    disable = 0x00, // No hysteresis
-    small   = 0x02, // 10 mV
-    medium  = 0x04, // 25 mV
-    large   = 0x06, // 50 mV
-  };
-};
-
-#if defined(DXCORE)
-  namespace in_p {
-    enum inputP_t : uint8_t {
-      in0    = 0x00,
-  #ifndef __AVR_DD__
-      in1    = 0x01,
-      in2    = 0x02,
+namespace comparator {
+  namespace out {
+    enum output_t : uint8_t {
+      disable         = 0x00,
+      disable_invert  = 0x80,
+      enable          = 0x40,
+      invert          = 0xC0,
+      enable_invert   = 0xC0,
+    };
+    enum pinswap_t : uint8_t {
+      no_swap  = 0x00,
+  #if defined(DXCORE) && (defined(HAS_48_PINS) || defined(HAS_64_PINS))
+      pin_swap = 0x01
   #endif
-      in3    = 0x03,
-  #ifdef __AVR_DD__
-      in4    = 0x04,
-      pc3    = 0x04,
-  #endif
-      pd2    = 0x00,
-      pd6    = 0x03
+    };
+    enum initval_t : uint8_t {
+      init_low  = 0x00,
+      init_high = 0x40,
     };
   };
 
-  namespace in_n {
-    enum inputN_t : uint8_t {
-      in0    = 0x00,
-  #if !defined(ANALOG_COMP_NO_N1)
-      in1    = 0x01,
-      pd0    = 0x01,
-  #endif
-      in2    = 0x02,
-  #if defined(__AVR_DD__) || defined(__AVR_EA__)
-      in3    = 0x00, /* TBD - Will dacref change number, or will it's number be skipped? */
-  #endif
-      dacref = 0x03,
-      pd7    = 0x02,
-    };
-  };
-  // Unknown how these will be numbered on DD-series, which has an AINN3 and DACREF - initial header release is copied verbatim from DA/DB
-  // and the EA-series doesn't even have that available, and I'm not privy to the pre-release preliminary datasheets that I'm sure important
-  // customers are poring over now.
-#elif defined(MEGATINYCORE)
-  namespace in_p {
-    enum inputP_t : uint8_t {
-      in0    = 0x00,
-      #if !(defined(ANALOG_COMP_PINS_TINY_FEW) || defined(ANALOG_COMP_PINS_TINY_TWO_14))
-        in1    = 0x01,
-      #endif
-      #if !(defined(ANALOG_COMP_PINS_TINY_FEW) || defined(ANALOG_COMP_PINS_TINY_SOME))
-        in2    = 0x02,
-      #endif
-      #if defined(ANALOG_COMP_PINS_TINY_TWO) || defined(ANALOG_COMP_PINS_TINY_GOLDEN)
-        in3    = 0x03
-      #endif
+  namespace hyst {
+    enum hysteresis_t : uint8_t {
+      disable = 0x00, // No hysteresis
+      small   = 0x02, // 10 mV
+      medium  = 0x04, // 25 mV
+      large   = 0x06, // 50 mV
     };
   };
 
-  namespace in_n {
-    enum inputN_t : uint8_t {
-      in0      = 0x00,
-      #if !(defined(ANALOG_COMP_PINS_TINY_GOLDEN_14) || defined(ANALOG_COMP_PINS_TINY_TWO_14) || defined(ANALOG_COMP_PINS_TINY_GOLDEN_14))
-        in1    = 0x01,
-      #endif
-      #if defined(ANALOG_COMP_PINS_TINY_TWO) || defined(ANALOG_COMP_PINS_TINY_TWO_14)
-        in2    = 0x02,
-      #else
-        vref   = 0x02,
-      #endif
-      #if (MEGATINYCORE_SERIES != 0)
-        dacref = 0x03,
-      #endif
-    };
-  };
-#else /* megaAVR 0-series */
-  namespace in_p
-  {
-    enum inputP_t : uint8_t
-    {
-      in0    = 0x00,
-      in1    = 0x01,
-      in2    = 0x02,
-      in3    = 0x03,
-    };
-  };
-
-  namespace in_n
-  {
-    enum inputN_t : uint8_t
-    {
-      in0    = 0x00,
-      in1    = 0x01,
-      in2    = 0x02,
-      dacref = 0x03,
-    };
-  };
-#endif
-
-namespace ref {
-  enum reference_t : uint8_t {
-  #if !defined(MEGATINYCORE) || MEGATINYCORE_SERIES == 2
-
-      vref_1v024 = 0x00, // 1.024V
-      vref_2v048 = 0x01, // 2.048V
-      vref_2v500 = 0x02, // 2.5V
-      vref_2v5   = 0x02,
-      vref_4v096 = 0x03, // 4.096V
-      vref_vdd   = 0x07, // VDD as reference
-  #else
-      vref_0v55  = 0x00, // 0.55V
-      vref_1v1   = 0x01, // 1.1V
-      vref_1v5   = 0x04, // 1.5V
-      vref_2v5   = 0x02,
-      vref_4v3   = 0x03, // 4.3V
-  #endif
   #if defined(DXCORE)
-    vref_vrefa = 0x06, // External reference from the VREFA pin
+    namespace in_p {
+      enum inputP_t : uint8_t {
+        in0    = 0x00,
+    #ifndef __AVR_DD__
+        in1    = 0x01,
+        in2    = 0x02,
+    #endif
+        in3    = 0x03,
+    #ifdef __AVR_DD__
+        in4    = 0x04,
+        pc3    = 0x04,
+    #endif
+        pd2    = 0x00,
+        pd6    = 0x03
+      };
+    };
+
+    namespace in_n {
+      enum inputN_t : uint8_t {
+        in0    = 0x00,
+    #if !defined(ANALOG_COMP_NO_N1)
+        in1    = 0x01,
+        pd0    = 0x01,
+    #endif
+        in2    = 0x02,
+    #if defined(__AVR_DD__) || defined(__AVR_EA__)
+        in3    = 0x00, /* TBD - Will dacref change number, or will it's number be skipped? */
+    #endif
+        dacref = 0x03,
+        pd7    = 0x02,
+      };
+    };
+    // Unknown how these will be numbered on DD-series, which has an AINN3 and DACREF - initial header release is copied verbatim from DA/DB
+    // and the EA-series doesn't even have that available, and I'm not privy to the pre-release preliminary datasheets that I'm sure important
+    // customers are poring over now.
+  #elif defined(MEGATINYCORE)
+    namespace in_p {
+      enum inputP_t : uint8_t {
+        in0    = 0x00,
+        #if !(defined(ANALOG_COMP_PINS_TINY_FEW) || defined(ANALOG_COMP_PINS_TINY_TWO_14))
+          in1    = 0x01,
+        #endif
+        #if !(defined(ANALOG_COMP_PINS_TINY_FEW) || defined(ANALOG_COMP_PINS_TINY_SOME))
+          in2    = 0x02,
+        #endif
+        #if defined(ANALOG_COMP_PINS_TINY_TWO) || defined(ANALOG_COMP_PINS_TINY_GOLDEN)
+          in3    = 0x03
+        #endif
+      };
+    };
+
+    namespace in_n {
+      enum inputN_t : uint8_t {
+        in0      = 0x00,
+        #if !(defined(ANALOG_COMP_PINS_TINY_GOLDEN_14) || defined(ANALOG_COMP_PINS_TINY_TWO_14) || defined(ANALOG_COMP_PINS_TINY_GOLDEN_14))
+          in1    = 0x01,
+        #endif
+        #if defined(ANALOG_COMP_PINS_TINY_TWO) || defined(ANALOG_COMP_PINS_TINY_TWO_14)
+          in2    = 0x02,
+        #else
+          vref   = 0x02,
+        #endif
+        #if (MEGATINYCORE_SERIES != 0)
+          dacref = 0x03,
+        #endif
+      };
+    };
+  #else /* megaAVR 0-series */
+    namespace in_p
+    {
+      enum inputP_t : uint8_t
+      {
+        in0    = 0x00,
+        in1    = 0x01,
+        in2    = 0x02,
+        in3    = 0x03,
+      };
+    };
+
+    namespace in_n
+    {
+      enum inputN_t : uint8_t
+      {
+        in0    = 0x00,
+        in1    = 0x01,
+        in2    = 0x02,
+        dacref = 0x03,
+      };
+    };
   #endif
-  disable    = 0x08,
+
+  namespace ref {
+    enum reference_t : uint8_t {
+    #if !defined(MEGATINYCORE) || MEGATINYCORE_SERIES == 2
+
+        vref_1v024 = 0x00, // 1.024V
+        vref_2v048 = 0x01, // 2.048V
+        vref_2v500 = 0x02, // 2.5V
+        vref_2v5   = 0x02,
+        vref_4v096 = 0x03, // 4.096V
+        vref_vdd   = 0x07, // VDD as reference
+    #else
+        vref_0v55  = 0x00, // 0.55V
+        vref_1v1   = 0x01, // 1.1V
+        vref_1v5   = 0x04, // 1.5V
+        vref_2v5   = 0x02,
+        vref_4v3   = 0x03, // 4.3V
+    #endif
+    #if defined(DXCORE)
+      vref_vrefa = 0x06, // External reference from the VREFA pin
+    #endif
+    disable    = 0x08,
+    };
   };
 };
 
+// Legacy definitions
+namespace out          {
+  using namespace comparator::out;
+};
+namespace hyst          {
+  using namespace comparator::hyst;
+};
+namespace ref          {
+  using namespace comparator::ref;
+};
 class AnalogComparator {
   public:
     #if defined(ANALOG_COMP_PINS_DA_DB) || defined(ANALOG_COMP_PINS_MEGA)
@@ -304,15 +314,15 @@ class AnalogComparator {
       return AC;
     }
 
-    out::output_t      output         = out::disable;
+    comparator::out::output_t      output         = comparator::out::disable;
     #if defined(DXCORE)
-      out::pinswap_t     output_swap    = out::no_swap;
+      comparator::out::pinswap_t     output_swap    = comparator::out::no_swap;
     #endif
-    out::initval_t     output_initval = out::init_low;
-    hyst::hysteresis_t hysteresis     = hyst::disable;
-    in_p::inputP_t     input_p        = in_p::in0;
-    in_n::inputN_t     input_n        = in_n::in0;
-    ref::reference_t   reference      = ref::disable;
+    comparator::out::initval_t     output_initval = comparator::out::init_low;
+    comparator::hyst::hysteresis_t hysteresis     = comparator::hyst::disable;
+    in_comparator::p::inputP_t     input_p        = in_comparator::p::in0;
+    in_comparator::n::inputN_t     input_n        = in_comparator::n::in0;
+    comparator::ref::reference_t   reference      = comparator::ref::disable;
     uint8_t dacref = 0xff;
 
   private:

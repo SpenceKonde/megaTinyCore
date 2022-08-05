@@ -48,8 +48,8 @@ void setup() {
   pinMode(PIN_PA3, INPUT_PULLUP);                   // Could be done faster with direct port writes
   pinMode(PIN_PB0, INPUT_PULLUP);                   // Could be done faster with direct port writes
 
-  Logic0.input1 = in::event_a;                      // Use LUT event 0/A as input 1, which will take input from PA3
-  Logic1.input2 = in::event_b;                      // Use LUT event 1/B as input 2, which will take input from PB0
+  Logic0.input1 = logic::in::event_a;                      // Use LUT event 0/A as input 1, which will take input from PA3
+  Logic1.input2 = logic::in::event_b;                      // Use LUT event 1/B as input 2, which will take input from PB0
 
   #elif !defined(__AVR_ATtinyxy7__)
   // If it's neither 20-pin nor 24-pin part, cannot be used.
@@ -58,15 +58,15 @@ void setup() {
   #else
   // Otherwise it is an ATtiny with 24 pins, and no workaround is needed for
   // LUT1
-  Logic1.input1 = in::input_pullup;   // Set PC4 as input with pullup
-  Logic1.input2 = in::input_pullup;   // Set PC5 as input with pullup
+  Logic1.input1 = logic::in::input_pullup;   // Set PC4 as input with pullup
+  Logic1.input2 = logic::in::input_pullup;   // Set PC5 as input with pullup
 
   #endif
   // End of workaround code
 
-  Logic1.input0 = in::input_pullup;   // Set PC3 as input with pullup
-  Logic1.output = out::disable;       // Enable output pin
-  Logic1.filter = filter::disable;    // No output filter enabled
+  Logic1.input0 = logic::in::input_pullup;   // Set PC3 as input with pullup
+  Logic1.output = logic::out::disable;       // Enable output pin
+  Logic1.filter = logic::filter::disable;    // No output filter enabled
   Logic1.truth = 0x01;                // Set truth table
 
   // Initialize logic block 0
@@ -74,11 +74,11 @@ void setup() {
   // Block 0 output on PA3 on ATmega, PA5 on ATtiny.
 
   Logic0.enable = true;               // Enable logic block 0
-  Logic0.input0 = in::link;           // Route output from block 1 to this input internally
-  Logic0.input1 = in::input_pullup;   // Set PA1 as input with pullup
-  Logic0.input2 = in::input_pullup;   // Set PA2 as input with pullup
-  Logic0.output = out::enable;        // Enable logic block 0 output pin PA4 (ATtiny)
-  Logic0.filter = filter::disable;    // No output filter enabled
+  Logic0.input0 = logic::in::link;           // Route output from block 1 to this input internally
+  Logic0.input1 = logic::in::input_pullup;   // Set PA1 as input with pullup
+  Logic0.input2 = logic::in::input_pullup;   // Set PA2 as input with pullup
+  Logic0.output = logic::out::enable;        // Enable logic block 0 output pin PA4 (ATtiny)
+  Logic0.filter = logic::filter::disable;    // No output filter enabled
   Logic0.truth = 0xFE;                // Set truth table
 
   // Initialize logic block 0 and 1

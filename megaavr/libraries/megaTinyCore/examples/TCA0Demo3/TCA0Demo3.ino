@@ -9,6 +9,10 @@
  * intermediate frequencies) though if the frequency is constant, varying your input between
  * 0 and the period instead of using map() is desirable, as map may not be smooth. As a further
  * aside, if 78.125kHz is suitable, there is no need to disable split mode....
+ *
+ * Note: This sketch has been changed to output on PA1; this sketch is used in automated
+ * testing and would fail to compile if we tried to output on PA3 while external clock was
+ * in use due to a new trap to detect this invalid configuration.
  */
 
 #if defined(MILLIS_USE_TIMERA0) || !defined(__AVR_ATtinyxy2__)
@@ -17,21 +21,21 @@
 
 
 void setup() {
-  // We will be outputting PWM on PA3 on an 8-pin part
-  pinMode(PIN_PA3, OUTPUT);                     // PA3 - TCA0 WO0, pin 4 on 8-pin parts
-  PORTMUX.CTRLC     = PORTMUX_TCA00_DEFAULT_gc; // turn off PORTMUX, returning WO0 to PA3
+  // We will be outputting PWM on PA1 on an 8-pin part
+  pinMode(PIN_PA1, OUTPUT);                     // PA1 - TCA0 WO1, pin 4 on 8-pin parts
+  //PORTMUX.CTRLC     = PORTMUX_TCA00_DEFAULT_gc; // turn off PORTMUX, returning WO0 to PA3 //not needed if outputting on WO1/PA1 instead which we do in order to ensure that this compiles in automated testing
   takeOverTCA0();                               // this replaces disabling and resettng the timer, required previously.
-  TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); // Single slope PWM mode, PWM on WO0
+  TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc); // Single slope PWM mode, PWM on WO0
   TCA0.SINGLE.PER   = 0x00FF;                   // Count all the way up to 0x00FF (255) - 8-bit PWM
   //                                               At 20MHz, this gives ~78.125kHz PWM
-  TCA0.SINGLE.CMP0  = 0;
+  TCA0.SINGLE.CMP1  = 0;
   TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; // enable the timer with no prescaler
 }
 
 void loop() { // Lets generate some output just to prove it works
   static byte pass = 0;
   static unsigned int duty  = 255;
-  TCA0.SINGLE.CMP0 = duty-- ; // step down the duty cycle each iteration through loop;
+  TCA0.SINGLE.CMP1 = duty-- ; // step down the duty cycle each iteration through loop;
   delay(100);                 // so we can see the duty cycle changing over time on the scope/with an LED
   if (!duty) {
     if (pass == 0) {          // After the first pass, lets go up to 100kHz

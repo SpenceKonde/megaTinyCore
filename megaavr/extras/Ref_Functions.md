@@ -12,8 +12,7 @@ digitalWrite(pinnbr, HIGH); // This will also error, because there is no chance 
 volatile uint8_t pinnumber = 100;
 digitalWrite(pinnumber, HIGH); // This will not error at compile time, because the compiler cannot optimize away or assume values for a volatile variable.
 ```
-Note that in the case of the digital I/O functions, NOT_A_PIN (255) _is_ permitted because a fair amount of code in the wild expects to be able to do that.
-
+Note that in the case of the digital I/O functions, NOT_A_PIN (255) *IS* permitte
 ### `void badArg("msg")`
 This function is what we call when user code passed an argument to a function that is guaranteed to give results without meaning or requested something which is not achievable, and we know at compile time, such as `analogRead(pin without analog input option)`. The message will indicate the nature of the problem.
 

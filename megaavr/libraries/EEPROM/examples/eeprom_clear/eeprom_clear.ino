@@ -11,9 +11,10 @@
 #include <EEPROM.h>
 
 void setup() {
-  // initialize the LED pin as an output.
+  // initialize the LED pin as an output - skip if LED_BUILTIN is PIN_PA3 and using external clock source. We test for this to ensure that the sketch will compile successfully and can be used for CI testing
+  #if CLOCK_SOURCE != 2 || LED_BUILTIN != PIN_PA3
   pinMode(LED_BUILTIN, OUTPUT);
-
+  #endif
   /*
    * Iterate through each byte of the EEPROM storage.
 
@@ -34,7 +35,9 @@ void setup() {
   }
 
   // turn the LED on when we're done
+  #if CLOCK_SOURCE != 2 || LED_BUILTIN != PIN_PA3
   digitalWrite(LED_BUILTIN, HIGH);
+  #endif
 }
 
 void loop() {

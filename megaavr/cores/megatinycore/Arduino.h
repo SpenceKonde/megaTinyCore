@@ -25,7 +25,6 @@
 #include "api/ArduinoAPI.h"
 #include "UART_constants.h"
 #include "core_devices.h"
-#include "device_timer_pins.h"
 /* Gives names to all the timer pins - relies on core_devices.h being included first.*/
 /* These names look like:
  * PIN_TCD0_WOC_DEFAULT
@@ -89,7 +88,6 @@ extern "C"{
     #define ADC1_DACREF1  ADC1_DAC1
     #define ADC1_DAC2     ADC1_CH(0x1B) // see section 30.5.7 MUXPOS register.
     #define ADC1_DACREF2  ADC1_DAC2
-    #define getAnalogSampleDuration1()   (ADC1.SAMPCTRL)
   #endif
   #define ADC_DEFAULT_SAMPLE_LENGTH 14
   #define ADC_ACC2        0x81
@@ -98,9 +96,12 @@ extern "C"{
   #define ADC_ACC16       0x84
   #define ADC_ACC32       0x85
   #define ADC_ACC64       0x86
-
-  #define getAnalogSampleDuration()   (ADC0.SAMPCTRL)
-
+  #if defined(ADC1)
+    inline uint8_t getAnalogSampleDuration1();
+    inline uint8_t getAnalogSampleDuration1() {return ADC1.SAMPCTRL;}
+  #endif
+  inline uint8_t getAnalogSampleDuration();
+  inline uint8_t getAnalogSampleDuration() {return ADC0.SAMPCTRL;}
 #else
   /* ADC constants for 2-series */
   #define VDD             (0) /* ADC_REFSEL_VDD_gc    */
@@ -145,8 +146,6 @@ extern "C"{
   #define ADC_ACC512      0x89
   #define ADC_ACC1024     0x8A
 
-  #define getAnalogSampleDuration()   ((uint8_t)ADC0.CTRLE)
-
   #define LOW_LAT_ON      0x03
   #define LOW_LAT_OFF     0x02
   #define PGA_KEEP_ON     0x08
@@ -156,6 +155,9 @@ extern "C"{
   #define ADC_DISABLE     0x30
   #define ADC_STANDBY_ON  0xC0
   #define ADC_STANDBY_OFF 0x80
+
+  inline uint8_t getAnalogSampleDuration();
+  inline uint8_t getAnalogSampleDuration() {return ADC0.CTRLE;}
 
 #endif
 
@@ -169,13 +171,13 @@ extern "C"{
  * analogRead should never return a negative. Neither should analogReadEnh
  * but I decided to have only 2 sets of ADC errors, not three.  */
 
-#define ADC_ERROR_DISABLED                          -32767
-#define ADC_ERROR_BAD_PIN_OR_CHANNEL                -32765
-#define ADC_ERROR_BUSY                              -32766
-#define ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL       -2100000000
+#define ADC_ERROR_BAD_PIN_OR_CHANNEL                (-32001)
+#define ADC_ERROR_BUSY                              (-32002)
+#define ADC_ERROR_DISABLED                          (-32007)
+#define ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL       (-2100000001)
 // positive channel is not (0x80 | valid_channel) nor a digital pin number
 // referring to a pin with analog input.
-#define ADC_ENH_ERROR_BUSY                     (-2100000001)
+#define ADC_ENH_ERROR_BUSY                     (-2100000002)
 // The ADC is currently performing another conversion in the background (either
 // in free-running mode or a long-running burst conversion; taking a burst
 // accumulated reading and then calling a specified function when the result
@@ -194,8 +196,12 @@ extern "C"{
 // Never actually returned, because we give compile error here
 #define ADC_ENH_ERROR_DISABLED                 (-2100000007)
 // The ADC is not currently enabled. This error is disabled currently - if analogReadEnh encounters a disabled ADC, it will enable it, take the reading, and disable it again.
-#define ADC_ERROR_INVALID_CLOCK                     (-32764)
+#define ADC_ERROR_INVALID_CLOCK                     (-32255)
 // Returned by analogClockSpeed if the value in the register is currently unknown, or if an invalid frequency is requested.
+
+
+// only returned by analogCheckError()
+#define ADC_IMPOSSIBLE_VALUE                        (-127)
 
 
 #if (!defined(TCB_CLKSEL2_bm))
@@ -346,7 +352,6 @@ void               DACReference(uint8_t mode);
 
 uint8_t      getAnalogReference();
 uint8_t         getDACReference();
-uint8_t getAnalogSampleDuration();
 int8_t  getAnalogReadResolution();
 
 //
@@ -413,7 +418,7 @@ Not enabled. Ugly ways to get delays at very small flash cost.
                     #define CLOCKS_PER_US   (F_CPU / 1000000);    // preprocessed away
                     #define DELAYCLOCKS     (0.8 * CLOCKS_PER_US) // say we wanted a 0.8 us delay.
                     uint8_t x = DELAYCLOCKS / 3;                  // preprocessed into a constant
-                    __asm__ __volatile__ ("dec %0"      "\n\t"    // before this, an ldi is used to load x into the input opperand %0
+                    __asm__ __volatile__ ("dec %0"      "\n\t"    // before this, an ldi is used to load x into the input operand %0
                                           "brne .-4"    "\n\t"
                       #if (DELAYCLOCKS % 3 == 2)                  // 2 clocks extra needed at end
                                           "rjmp .+0"    "\n\t"
@@ -479,22 +484,6 @@ extern const uint8_t digital_pin_to_bit_mask[];
 extern const uint8_t digital_pin_to_bit_position[];
 extern const uint8_t digital_pin_to_timer[];
 
-
-#define digitalPinToPort(pin)               ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_port[pin]                            : NOT_A_PIN)
-#define digitalPinToBitPosition(pin)        ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_bit_position[pin]                    : NOT_A_PIN)
-#define digitalPinToBitMask(pin)            ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_bit_mask[pin]                        : NOT_A_PIN)
-#define digitalPinToTimer(pin)              ((pin  < NUM_TOTAL_PINS)  ? digital_pin_to_timer[pin]                           : NOT_ON_TIMER)
-#define portToPortStruct(port)              ((port < NUM_TOTAL_PORTS) ? ((PORT_t *) &PORTA + port)                          : NULL)
-#define digitalPinToPortStruct(pin)         ((pin  < NUM_TOTAL_PINS)  ? ((PORT_t *) &PORTA + digitalPinToPort(pin))         : NULL)
-#define analogPinToBitPosition(pin)         ((digitalPinToAnalogInput(pin) != NOT_A_PIN) ? digital_pin_to_bit_position[pin] : NOT_A_PIN)
-#define analogPinToBitMask(pin)             ((digitalPinToAnalogInput(pin) != NOT_A_PIN) ? digital_pin_to_bit_mask[pin]     : NOT_A_PIN)
-#define getPINnCTRLregister(port, bit_pos)  (((port != NULL) && (bit_pos < NOT_A_PIN)) ? ((volatile uint8_t *)&(port->PIN0CTRL) + bit_pos) : NULL)
-
-#define digitalPinToInterrupt(P) (P)
-
-#define portOutputRegister(P) ((volatile uint8_t *)(&portToPortStruct(P)->OUT))
-#define portInputRegister(P)  ((volatile uint8_t *)(&portToPortStruct(P)->IN))
-#define portModeRegister(P)   ((volatile uint8_t *)(&portToPortStruct(P)->DIR))
 
 
 
@@ -627,7 +616,6 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
   int32_t analogReadEnh( uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int32_t analogReadDiff(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
   int16_t analogClockSpeed(int16_t frequency = 0, uint8_t options = 0);
-  bool printADCRuntimeError(int32_t error, UartClass &__dbgser = Serial);
   #if defined(ADC1)
     int32_t analogReadEnh1(uint8_t pin,              uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
     int32_t analogReadDiff1(uint8_t pos, uint8_t neg, uint8_t res = ADC_NATIVE_RESOLUTION, uint8_t gain = 0);
@@ -678,6 +666,7 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define CORE_HAS_OPENDRAIN 1
 #define CORE_HAS_PINCONFIG 1
 #define CORE_HAS_FASTPINMODE 1
+
 
 #if (MEGATINYCORE_SERIES == 2)
   // if analogReadEnh() supplied, this is defined as 1

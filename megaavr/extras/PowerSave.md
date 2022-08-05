@@ -109,12 +109,14 @@ ISR(RTC_PIT_vect)
 void setup() {
   RTC_init();                           /* Initialize the RTC timer */
   pinMode(7, OUTPUT);                   /* Configure pin#7 as an output */
+  //ADC0.CTRLA &= ~ADC_ENABLE_bm;       /* If you have a 2-Series part, uncomment this to disable the ADC*/
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);  /* Set sleep mode to POWER DOWN mode */
   sleep_enable();                       /* Enable sleep mode, but not going to sleep yet */
 }
 
 void loop() {
   sleep_cpu();                          /* Sleep the device and wait for an interrupt to continue */
+  //ADC0.CTRLA |= ADC_ENABLE_bm;        /* If you have a 2-Series part, uncomment this to enable the ADC again*/
   digitalWrite(7, CHANGE);              /* Device woke up and toggle LED on pin#7 */
 }
 ```
@@ -123,6 +125,9 @@ The RTC is in it's own "clock domain" and the microcontroller has to "synchroniz
 
 ## Sleep and Serial ports
 If there are any serial ports which you print output to, before going to sleep, be sure to let them finish printing everything in their transmit buffer by calling `Serial.flush()`.
+
+## 2-Series ADC Power Consumption
+When using a 2-series part, the ADC should be disabled during power down sleep mode, as it will otherwise consume 130uA continuously, almost 2 orders of magnitude more than the rest of the chip in this mode just like on classic AVRs. It may be related to the LOWLAT mode, but the LOWLAT mode needs to be enabled on some 2-series parts due to one of the few errata known for the new ADC. Turning off the ADC during sleep is currently our recommended workaround and can be doone by clearing the `ADC_ENABLE` bit of `ADC0.CTRLA` (and setting it upon wake) or using the `ADCPowerOptions()` function as detailed in [the Analog reference document](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md#adcpoweroptionsoptions-2-series-only-prior-to-2512)
 
 ## Future Development
 There are plans for a library to provide improved wrappers around sleep modes, particularly regarding timekeeping. This will also provide a means to handle serial ports automatically - including waking the part upon seeing an incoming character on the serial port. The latter is more complicated than the datasheet implies due to a widespread silicon bug with SFD (Start-of-Frame Detection).

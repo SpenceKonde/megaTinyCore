@@ -1,7 +1,13 @@
+// This file will be optimized away if attachInterrupt or detachInterrupt isn't used in
+// user program, thanks to dot_a_linkage set in library.properties
+
+#include "Logic.h"
+
 #if defined(CCL_CCL_vect)
 void Logic::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
   CCL_INTMODE0_t intmode;
-  switch (mode) { // Set RISING, FALLING or CHANGE interrupt trigger for a block output
+  switch (mode) {
+    // Set RISING, FALLING or CHANGE interrupt trigger for a block output
     case RISING:
       intmode = CCL_INTMODE0_RISING_gc;
       break;
@@ -11,7 +17,8 @@ void Logic::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
     case CHANGE:
       intmode = CCL_INTMODE0_BOTH_gc;
       break;
-    default: // Only RISING, FALLING and CHANGE is supported
+    default:
+      // Only RISING, FALLING and CHANGE is supported
       return;
   }
   #if defined(CCL_TRUTH4)

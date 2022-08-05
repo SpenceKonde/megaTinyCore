@@ -16,7 +16,11 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
   Modified Spence Konde 2021 - constants removed.
+  Modified Spence Konde 2022 - commemt out the entire class. .
 */
+
+//#prama never
+/*
 
 #pragma once
 
@@ -47,3 +51,4 @@ class HardwareSerial : public Stream {
 
 // XXX: Are we keeping the serialEvent API?
 // Spence: Apparently not.
+*/

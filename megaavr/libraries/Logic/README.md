@@ -49,15 +49,15 @@ Logic3 OUT  | Not present   | Only alt out  | Only alt out  | Yes, both     |
 | Property    | namespace or type   |  Function                                    |
 |-------------|---------------------|----------------------------------------------|
 | enable      | bool                |  Enable or disable logic block               |
-| input0      | in::                |  Selects input 0                             |
-| input1      | in::                |  Selects input 1                             |
-| input2      | in::                |  Selects input 2                             |
-| output      | out::               |  'enable'/'disable' output pin               |
-| output_swap | out::               |  'no_swap/'pin_swap' use alt output pin      |
-| filter      | filter::            |  'filter'/'sync' or 'disable' filter         |
-| edgedetect  | edgedetect::        |  'enable'/'disable' edge detect mode         |
-| sequencer   | sequencer::         |  selects the sequecer, even #'ed blocks only |
-| clocksource | clocksource::       |  select clock source, if not async.          |
+| input0      | logic::in::         |  Selects input 0                             |
+| input1      | logic::in::         |  Selects input 1                             |
+| input2      | logic::in::         |  Selects input 2                             |
+| output      | logic::out::        |  'enable'/'disable' output pin               |
+| output_swap | logic::out::        |  'no_swap/'pin_swap' use alt output pin      |
+| filter      | logic::filter::     |  'filter'/'sync' or 'disable' filter         |
+| edgedetect  | logic::edgedetect:: |  'enable'/'disable' edge detect mode         |
+| sequencer   | logic::sequencer::  |  selects the sequecer, even #'ed blocks only |
+| clocksource | logic::clocksource::|  select clock source, if not async.          |
 | truth       | uint8_t             |  truth table                                 |
 
 | Methods             | Function
@@ -99,31 +99,31 @@ General notes:
 #### Accepted values for tinyAVR 0/1-series parts
 
 ``` c++
-in::masked;           // Pin not in use
-in::unused;           // Synonym for masked
-in::disable;          // Synonym for masked
-in::feedback;         // Connect output of logic block 0 or the sequencer if in use, to this input
-in::link;             // Connect output of the other logic block to this input
-in::event_0;          // Connect input to event a
-in::event_a;          // Connect input to event a (preferred)
-in::event_1;          // Connect input to event b
-in::event_b;          // Connect input to event b (preferred)
-in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode (imagine using an OUTPUT to switch modes)
-in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on
-in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off
-in::input;            // Synonym for input_no_pullup
-in::ac0;              // Connect input to the output of analog comparator (AC0) **WEIRD**
-in::ac;               // Synonym for ac0 for compatibility with everything else.
-in::tcb0;             // Connect input to TCB0 WO **WEIRD**
-in::tcb;              // Synonym for tcb0 for compatibility with everything else.
-in::tca0;             // Connect input to TCA0 WO0~2 for input 0~2
-in::tca;              // Synonym for tca0
-in::tcd;              // Connect input to TCD0 WOA, WOB, WOA for input 0, 1, 2
-in::usart;            // Connect input to USART0 XCK and TXD for input 0, 1  **WEIRD**
-in::spi;              // Connect input to SPI0 SCK, MOSI, MISO for input 0, 1, 2  **WEIRD**
-in::ac1;              // Connect input to AC1 OUT (input 0, 1 on parts with 3 ACs only)  **WEIRD**
-in::tcb1;             // Connect input to TCB1 WO (input 0, 1 on parts with 2 TCBs only)  **WEIRD**
-in::ac2;              // Connect input to AC2 OUT (input 0, 1 on parts with 3 ACs only)  **WEIRD**
+logic::in::masked;           // Pin not in use
+logic::in::unused;           // Synonym for masked
+logic::in::disable;          // Synonym for masked
+logic::in::feedback;         // Connect output of logic block 0 or the sequencer if in use, to this input
+logic::in::link;             // Connect output of the other logic block to this input
+logic::in::event_0;          // Connect input to event a
+logic::in::event_a;          // Connect input to event a (preferred)
+logic::in::event_1;          // Connect input to event b
+logic::in::event_b;          // Connect input to event b (preferred)
+logic::in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode (imagine using an OUTPUT to switch modes)
+logic::in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on
+logic::in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off
+logic::in::input;            // Synonym for input_no_pullup
+logic::in::ac0;              // Connect input to the output of analog comparator (AC0) **WEIRD**
+logic::in::ac;               // Synonym for ac0 for compatibility with everything else.
+logic::in::tcb0;             // Connect input to TCB0 WO **WEIRD**
+logic::in::tcb;              // Synonym for tcb0 for compatibility with everything else.
+logic::in::tca0;             // Connect input to TCA0 WO0~2 for input 0~2
+logic::in::tca;              // Synonym for tca0
+logic::in::tcd;              // Connect input to TCD0 WOA, WOB, WOA for input 0, 1, 2
+logic::in::usart;            // Connect input to USART0 XCK and TXD for input 0, 1  **WEIRD**
+logic::in::spi;              // Connect input to SPI0 SCK, MOSI, MISO for input 0, 1, 2  **WEIRD**
+logic::in::ac1;              // Connect input to AC1 OUT (input 0, 1 on parts with 3 ACs only)  **WEIRD**
+logic::in::tcb1;             // Connect input to TCB1 WO (input 0, 1 on parts with 2 TCBs only)  **WEIRD**
+logic::in::ac2;              // Connect input to AC2 OUT (input 0, 1 on parts with 3 ACs only)  **WEIRD**
 ```
 
 Notes specific to ATtiny 0/1-series:
@@ -142,25 +142,25 @@ Notes specific to ATtiny 0/1-series:
 
 #### Accepted values for tinyAVR 2-series
 ``` c++
-in::masked;           // Pin not in use
-in::unused;           // Pin not in use
-in::disable;          // Pin not in use
-in::feedback;         // Connect output of sequencer (if used) or even logic block (n or n-1) to this input
-in::link;             // Connect output of logic block n+1 to this input, or block 0 for the last block.
-in::event_0;          // Connect input to event a
-in::event_a;          // Connect input to event a (preferred)
-in::event_1;          // Connect input to event b
-in::event_b;          // Connect input to event b (preferred)
-in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode
-in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on
-in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off
-in::input;            // Synonym for input_no_pullup
-in::ac;               // Connect input to the output of the internal analog comparator AC0.
-in::uart;             // Connect input to UART TX. Input 0 connects to UART0 TX, input 1 to UART1 TX. Not available on input 2. XCK is not available (though it can be accessed via the event system)
-in::spi;              // Connect input to SPI. Input 0 and 1 connect to MOSI, and input 2 connects to SCK. MISO not available.
-in::tca0;             // Connect input to TCA0. Input 0 connects to WO0, input 1 to WO1 and input2 to WO2
-in::tca;              // Synonym for tca0
-in::tcb;              // Connect input to a TCB. Input 0 connects to TCB0 W0, input 1 to TCB1 WO. Not available on input 2.
+logic::in::masked;           // Pin not in use
+logic::in::unused;           // Pin not in use
+logic::in::disable;          // Pin not in use
+logic::in::feedback;         // Connect output of sequencer (if used) or even logic block (n or n-1) to this input
+logic::in::link;             // Connect output of logic block n+1 to this input, or block 0 for the last block.
+logic::in::event_0;          // Connect input to event a
+logic::in::event_a;          // Connect input to event a (preferred)
+logic::in::event_1;          // Connect input to event b
+logic::in::event_b;          // Connect input to event b (preferred)
+logic::in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode
+logic::in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on
+logic::in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off
+logic::in::input;            // Synonym for input_no_pullup
+logic::in::ac;               // Connect input to the output of the internal analog comparator AC0.
+logic::in::uart;             // Connect input to UART TX. Input 0 connects to UART0 TX, input 1 to UART1 TX. Not available on input 2. XCK is not available (though it can be accessed via the event system)
+logic::in::spi;              // Connect input to SPI. Input 0 and 1 connect to MOSI, and input 2 connects to SCK. MISO not available.
+logic::in::tca0;             // Connect input to TCA0. Input 0 connects to WO0, input 1 to WO1 and input2 to WO2
+logic::in::tca;              // Synonym for tca0
+logic::in::tcb;              // Connect input to a TCB. Input 0 connects to TCB0 W0, input 1 to TCB1 WO. Not available on input 2.
 ```
 
 Notes for tinyAVR 2-series:
@@ -171,90 +171,90 @@ Notes for tinyAVR 2-series:
 
 #### Usage
 ``` c++
-Logic0.input0 = in::link;         // Connect output from block 1 to input 0 of block 0
-Logic0.input1 = in::input;        // Connect the input 1 from block 0 to its GPIO
-Logic0.input2 = in::input_pullup; // Connect the input 2 from block 0 to its GPIO, with pullup on
+Logic0.input0 = logic::in::link;         // Connect output from block 1 to input 0 of block 0
+Logic0.input1 = logic::in::input;        // Connect the input 1 from block 0 to its GPIO
+Logic0.input2 = logic::in::input_pullup; // Connect the input 2 from block 0 to its GPIO, with pullup on
 ```
 
 #### Default state
-`LogicN.inputN` defaults to `in::unused` if not specified in the user program.
+`LogicN.inputN` defaults to `logic::in::unused` if not specified in the user program.
 
 
 ### output
 Property controlling the logic block output pin behavior. Note that the output of the logic block still can be used internally if the output pin is disabled (though on some tinyAVR 0/1-series silicon, this doesn't work, see the errata for the parts you are working with). The pin's direction and output value are overridden, so you do not need to set the pin `OUTPUT` first.
 Accepted values:
 ```c++
-out::disable; // Disable the output GPIO pin. Useful when triggering an interrupt instead.
-out::enable;  // Enable the output GPIO pin
+logic::out::disable; // Disable the output GPIO pin. Useful when triggering an interrupt instead.
+logic::out::enable;  // Enable the output GPIO pin
 ```
 
 #### Usage
 ```c++
-Logic0.output = out::disable; // Disable the output GPIO pin.
+Logic0.output = logic::out::disable; // Disable the output GPIO pin.
 ```
 
 #### Default state
-`LogicN.output` defaults to `out::disable` if not specified in the user program.
+`LogicN.output` defaults to `logic::out::disable` if not specified in the user program.
 
 
 ### output_swap
-Property controlling whether to use the default or alternate output pin. No effect if output = out::disable. See the pinout diagrams in the [core this is part of](../../../README.md) or the datasheet for more information.
+Property controlling whether to use the default or alternate output pin. No effect if output = logic::out::disable. See the pinout diagrams in the [core this is part of](../../../README.md) or the datasheet for more information.
 Accepted values:
 ```c++
-out::no_swap;  // Use default pin position, pin 3 on the port
-out::pin_swap; // Use alternative position, pin 6 on the port
+logic::out::no_swap;  // Use default pin position, pin 3 on the port
+logic::out::pin_swap; // Use alternative position, pin 6 on the port
 ```
 
 #### Usage
 ```c++
-Logic0.output_swap = out::no_swap; // No pin swap for output of block0
+Logic0.output_swap = logic::out::no_swap; // No pin swap for output of block0
 ```
 
 #### Default state
-`LogicN.output_swap` defaults to `out::no_swap` if not specified in the user program.
+`LogicN.output_swap` defaults to `logic::out::no_swap` if not specified in the user program.
 
 
 ### filter
 Property to control whether the output is passed through a filter or synchronizer. Useful when multiple logic blocks are connected internally to prevent race conditions and glitches that could arise due to the asynchronous nature of CCL. Alternately, the delay itself may be desirable, or it can be combined with a configuration which inverts it's own output (and would otherwise oscillate asynchronously), but is clocked by some other source; this will then act to divide that clock speed by 4 (synchronizer) or 8 (filter).
 Accepted values:
 ```c++
-filter::disable;      // No filter used, asynchronous output.
-filter::synchronizer; // Connect synchronizer to output; delays output by 2 clock cycles.
-filter::synch;        // Syntactic sugar for synchronizer
-filter::sync;         // Syntactic sugar for synchronizer
-filter::filter;       // Connect filter to output; delays output by 4 clock cycles, only passes output that is stable for >2 clock cycles.
+logic::filter::disable;      // No filter used, asynchronous output.
+logic::filter::synchronizer; // Connect synchronizer to output; delays output by 2 clock cycles.
+logic::filter::synch;        // Syntactic sugar for synchronizer
+logic::filter::sync;         // Syntactic sugar for synchronizer
+logic::filter::filter;       // Connect filter to output; delays output by 4 clock cycles, only passes output that is stable for >2 clock cycles.
 ```
 
 #### Usage
 ```c++
-Logic0.filter = filter::filter; // Enable filter on output of block 0
+Logic0.filter = logic::filter::filter; // Enable filter on output of block 0
 ```
 
 See also [Prescaling Clocks with CCLs](https://github.com/SpenceKonde/AVR-Guidance/blob/master/CCL_EVSYS_hacks/CCL_prescaling.md)
 
 #### Default state
-`LogicN.filter` defaults to `filter::disable` if not specified in the user program.
+`LogicN.filter` defaults to `logic::filter::disable` if not specified in the user program.
 
 
 ### clocksource
 Property to set the clock source for the logic block; this is used for the synchronizer, filter, edge detector, and sequential logic that uses a clock (otherwise, the logic blocks are asynchronous - and shockingly fast. If you rig them up so that they oscillate (ie set the input to feedback, and output the opposite of the input), it can reach upwards of 100 MHz!). Note that 32kHz-derived and unprescaled clock options are not available on 0-series and 1-series parts; keep this in mind if backwards portability is important. If sequential logic is used, it is clocked from the clock source used by the even-numbered logic block, assuming it uses any clock at all.
 Accepted values:
 ```c++
-clocksource::clk_per;      // Clock from the peripheral clock (ie, system clock)
-clocksource::in2;          // Clock from the selected input2; it is treated as a 0 in the truth table.
-clocksource::oschf;        // Clock from the **unprescaled** internal HF oscillator. Same as clk_per if system clock not prescaled. tinyAVR 2-series (and Dx-series)
-clocksource::osc32k;       // Clock from the internal 32.768 kHz oscillator - tinyAVR 2-series only (and Dx-series)
-clocksource::osc1k;        // Clock from the internal 32.768 kHz oscillator prescaled by 32 - tinyAVR 2-series only (and Dx-series)
+logic::clocksource::clk_per;      // Clock from the peripheral clock (ie, system clock)
+logic::clocksource::in2;          // Clock from the selected input2; it is treated as a 0 in the truth table.
+logic::clocksource::oschf;        // Clock from the **unprescaled** internal HF oscillator. Same as clk_per if system clock not prescaled. tinyAVR 2-series (and Dx-series)
+logic::clocksource::osc32k;       // Clock from the internal 32.768 kHz oscillator - tinyAVR 2-series only (and Dx-series)
+logic::clocksource::osc1k;        // Clock from the internal 32.768 kHz oscillator prescaled by 32 - tinyAVR 2-series only (and Dx-series)
 ```
 
 
 #### Usage
 ```c++
-Logic2.clocksource = clocksource::oschf; // Set block 2 to use unprescaled high frequency internal oscillator.
+Logic2.clocksource = logic::clocksource::oschf; // Set block 2 to use unprescaled high frequency internal oscillator.
 ```
 
 #### Default state
-`LogicN.clocksource` defaults to `clocksource::clk_per` if not specified in the user program.
+`LogicN.clocksource` defaults to `logic::clocksource::clk_per` if not specified in the user program.
 
 
 
@@ -262,8 +262,8 @@ Logic2.clocksource = clocksource::oschf; // Set block 2 to use unprescaled high 
 Property to enable the edge detector. The edge detector can be used to generate a pulse when detecting a rising edge on its input. To detect a falling edge, the TRUTH table should be programmed to provide inverted output. "In order to avoid unpredictable behavior, a valid filter option must be enabled" (note: that's what the datasheet says; it's not clear whether you can get the unpredictable behavior, or if the edge detecter won't be connected unless a filter or synchronizer is enabled). Note that the edge detector is likely only of use when the output is being used for sequential logic or as the input to another logic block; it looks particularly useful on the odd LUT input to a J-K flip-flop sequential logic unit.
 
 ```c++
-edgedetect::disable;      // No edge detection used
-edgedetect::enable;       // Edge detection used
+logic::edgedetect::disable;      // No edge detection used
+logic::edgedetect::enable;       // Edge detection used
 ```
 
 ### sequencer
@@ -271,22 +271,22 @@ Property controlling the "sequencer" for this pair of logic blocks - these are l
 
 Accepted values:
 ```c++
-sequencer::disable;      // No sequencer connected
-sequencer::d_flip_flop;  // D flip flop sequencer connected
-sequencer::jk_flip_flop; // JK flip flop sequencer connected
-sequencer::d_latch;      // Gated D latch sequencer connected - note that on most tinyAVR 0/1-series parts, this doesn't work. See the Errata.
-sequencer::rs_latch;     // RS latch sequencer connected
+logic::sequencer::disable;      // No sequencer connected
+logic::sequencer::d_flip_flop;  // D flip flop sequencer connected
+logic::sequencer::jk_flip_flop; // JK flip flop sequencer connected
+logic::sequencer::d_latch;      // Gated D latch sequencer connected - note that on most tinyAVR 0/1-series parts, this doesn't work. See the Errata.
+logic::sequencer::rs_latch;     // RS latch sequencer connected
 ```
 
 Note that it is possible to use the `feedback` input to in many cases obtain similar behavior without using two logic blocks.
 
 #### Usage
 ```c++
-Logic0.sequencer = sequencer::disable; // Disable sequencer
+Logic0.sequencer = logic::sequencer::disable; // Disable sequencer
 ```
 
 #### Default state
-`LogicN.sequencer` defaults to `sequencer::disable` if not specified in the user program.
+`LogicN.sequencer` defaults to `logic::sequencer::disable` if not specified in the user program.
 
 
 ### truth

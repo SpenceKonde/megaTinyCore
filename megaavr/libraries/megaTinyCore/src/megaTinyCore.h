@@ -1,110 +1,149 @@
+#include <Arduino.h>
+// in ADCErrors.cpp
+// ADC error interpretation helper functions
+#ifdef __cplusplus
+  int8_t analogCheckError(int16_t val);
+  int8_t analogCheckError(int32_t val);
+  bool printADCRuntimeError(int32_t error, HardwareSerial &__dbgser = Serial);
+  bool printADCRuntimeError(int16_t error, HardwareSerial &__dbgser = Serial);
+#endif
 
 
 // Display current tuning state in human readable form.
-
+// *INDENT-OFF*  display this code in human readable form instead of what astyle wants.
 int16_t getTunedOSCCAL(uint8_t osc, uint8_t target) {
+  if (__builtin_constant_p(osc)) {
+    if (osc != 20 && osc !=16) {
+      badArg("The first argument must either 16 or 20, reflecting the nominal internal oscillator speed; it is a constant that is neither of those");
+    }
+    if (__builtin_constant_p(target)) {
+      #if MEGATINYCORE_SERIES == 2
+        if ((target != 16 && target != 20 && target != 24 && target != 25 && target != 30) && ((osc == 20) && (target == 14) || ((osc == 16) && (target == 32))))
+      #else
+        if ((target != 14 && target != 16 && target != 20 && target != 24 && target != 25) && ((osc == 16) && (target == 30) || ((osc == 20) && (target == 12) || target==32)))
+      #endif
+      {
+        badArg("The second argument must be a valid unprescaled tuned clock speed. Both arguments are constant, but the latter is not a valid target for the former. See Ref_tuning.md.");
+      }
+    }
+  } else if (__builtin_constant_p(target)) {
+    #if MEGATINYCORE_SERIES == 2
+      if (target != 14 && target != 16 && target != 20 && target != 24 && target != 25 && target != 30 && target !=32)
+    #else
+      if (target != 12 && target != 14 && target != 16 && target != 20 && target != 24 && target != 25 && target != 30)
+    #endif
+    {
+      badArg("The second argument must be a valid unprescaled tuned clock speed")
+    }
+  }
   uint8_t offset = CLOCK_TUNE_START;
-  #if megaTinyCoreSeries != 2
-  if (osc == 16) {
-    switch (target) {
-      case (25):
-        offset++;
-      /* fall-through */
-      case (24):
-        offset++;
-      /* fall-through */
-      case (20):
-        offset++;
-      /* fall-through */
-      case (16):
-        offset++;
-      /* fall-through */
-      case (12):
-        offset++;
-      /* fall-through */
-      case (10): /* do nothing, but don't run default */
-        break;   /* Hey, it was easy to write, and this is the first time in my life that the switch/case fall-through has made things easier */
-      default:
-        return -2; /* invalid target frequency */
+  #if MEGATINYCORE_SERIES != 2
+    if (osc == 16) {
+      switch (target) {
+        case (25):
+          offset++;
+        /* fall-through */
+        case (24):
+          offset++;
+        /* fall-through */
+        case (20):
+          offset++;
+        /* fall-through */
+        case (16):
+          offset++;
+        /* fall-through */
+        case (14):
+          offset++;
+        /* fall-through */
+        case (12): /* do nothing, but don't run default */
+          break;   /* Hey, it was easy to write, and this is the first time in my life that the switch/case fall-through has made things easier */
+        default:
+          return -2; /* invalid target frequency */
+      }
+    } else if (osc == 20) {
+      offset += 6;
+      switch (target) {
+        case (30):
+          offset++;
+        /* fall-through */
+        case (25):
+          offset++;
+        /* fall-through */
+        case (24):
+          offset++;
+        /* fall-through */
+        case (20):
+          offset++;
+        /* fall-through */
+        case (16):
+          offset++;
+        /* fall-through */
+        case (14): /* do nothing, but don't run default */
+          break;
+        default:
+          return -2; /* invalid target frequency */
+      }
+    } else {
+      return -1; /* invalid center frequency */
     }
-  } else if (osc == 20) {
-    offset += 6;
-    switch (target) {
-      case (30):
-        offset++;
-      /* fall-through */
-      case (25):
-        offset++;
-      /* fall-through */
-      case (24):
-        offset++;
-      /* fall-through */
-      case (20):
-        offset++;
-      /* fall-through */
-      case (16):
-        offset++;
-      /* fall-through */
-      case (12): /* do nothing, but don't run default */
-        break;
-      default:
-        return -2; /* invalid target frequency */
-    }
-  } else {
-    return -1; /* invalid center frequency */
-  }
   #else /* 2-series can go higher */
-  speedlist_offset = 1;
-  if (osc == 16) {
-    switch (target) {
-      case (30):
-        offset++;
-      /* fall-through */
-      case (25):
-        offset++;
-      /* fall-through */
-      case (24):
-        offset++;
-      /* fall-through */
-      case (20):
-        offset++;
-      /* fall-through */
-      case (16):
-        offset++;
-      /* fall-through */
-      case (12): /* do nothing, but don't run default */
-        break;
-      default:
-        return -2; /* invalid target frequency */
+    speedlist_offset = 1;
+    if (osc == 16) {
+      switch (target) {
+        case (30):
+          offset++;
+        /* fall-through */
+        case (25):
+          offset++;
+        /* fall-through */
+        case (24):
+          offset++;
+        /* fall-through */
+        case (20):
+          offset++;
+        /* fall-through */
+        case (16):
+          offset++;
+        /* fall-through */
+        case (14): /* do nothing, but don't run default */
+          break;
+        default:
+          return -2; /* invalid target frequency */
+      }
+    } else if (osc == 20) {
+      offset += 6;
+      switch (target) {
+        case (32):
+          offset++;
+        /* fall-through */
+        case (30):
+          offset++;
+        /* fall-through */
+        case (25):
+          offset++;
+        /* fall-through */
+        case (24):
+          offset++;
+        /* fall-through */
+        case (20):
+          offset++;
+        /* fall-through */
+        case (16): /* do nothing, but don't run default */
+          break;
+        default:
+          return -2; /* invalid target frequency */
+      }
+    } else {
+      return -1; /* invalid center frequency */
     }
-  } else if (osc == 20) {
-    offset += 6;
-    switch (target) {
-      case (32):
-        offset++;
-      /* fall-through */
-      case (30):
-        offset++;
-      /* fall-through */
-      case (25):
-        offset++;
-      /* fall-through */
-      case (24):
-        offset++;
-      /* fall-through */
-      case (20):
-        offset++;
-      /* fall-through */
-      case (16): /* do nothing, but don't run default */
-        break;
-      default:
-        return -2; /* invalid target frequency */
-    }
-  } else {
-    return -1; /* invalid center frequency */
-  }
   #endif
-  return _SFR_MEM8(offset);
+  uint8_t retval = _SFR_MEM8(offset);
+  if (retval == 255) {
+    return -3; /*chip not tuned*/
+  } else if (retval == 0x80) {
+    return -4; /* Chip tuned and found to not achieve target speed */
+}
+  return retval(offset);
 }
 
 const uint8_t speeds[] = {10, 12, 16, 20, 24, 25, 30, 32};
@@ -179,4 +218,14 @@ void printTuningStatus() {
     }
     Serial.println();
   }
+}
+
+// Reset immdiately using software reset. The bootloader, if present will run.
+inline void ResetWithWDT() {
+  _PROTECTED_WRITE(WDT.CTRLA,WDT_PERIOD_8CLK_gc); //enable the WDT, minimum timeout
+  while (1); // spin until reset
+}
+
+inline void SoftwareReset() {
+  _PROTECTED_WRITE(RSTCTRL.SWRR,1);
 }

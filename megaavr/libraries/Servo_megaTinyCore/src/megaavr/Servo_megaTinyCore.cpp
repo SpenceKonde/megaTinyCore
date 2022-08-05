@@ -38,12 +38,12 @@ void ServoHandler(int timer) {
   // For timing tests:
   // Uncomment the following and place them as you need within the ISR to make a record.
   // uint16_t count=_timer->CNT;
-  // GPR.GPR0=count;
-  // GPR.GPR1=count>>8;
+  // GPIOR0=count;
+  // GPIOR1=count>>8;
   // Check and print them as needed from loop; might make sense to have a tight loop just checking and recording max/etc depending on what
   // sort of bug you have to squash - but isn't this a lovely trick with the pointer to GPRs?
   // volatile uint16_t* ptr;
-  // ptr=(volatile uint16_t*)&GPR.GPR0;
+  // ptr=(volatile uint16_t*)&GPIOR0;
   // uint16_t TicksMeasured;
   // cli(); TicksMeasured=*ptr; sei();
   // Serial.println(*ptr);

@@ -1,4 +1,4 @@
-/* UART_private.h - Constructor for UartClass
+/* UART_private.h - Constructor for HardwareSerial
  * This library is free software released under LGPL 2.1.
  * See License.md for more information.
  * This file is part of megaTinyCore
@@ -15,7 +15,7 @@
 #if defined(USART0) || defined(USART1)
 /* Significant changes in UART.cpp, UART.h, and UART_swap.h required to support more UARTs */
 
-UartClass::UartClass(volatile USART_t *hwserial_module, uint8_t module_number, uint8_t mux_default) :
+HardwareSerial::HardwareSerial(volatile USART_t *hwserial_module, uint8_t module_number, uint8_t mux_default) :
     _hwserial_module(hwserial_module), _module_number(module_number), _pin_set(mux_default) {
 }
 

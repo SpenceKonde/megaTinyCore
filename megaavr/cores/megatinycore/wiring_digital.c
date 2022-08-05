@@ -29,17 +29,21 @@
 #include "pins_arduino.h"
 
 inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
-  if (__builtin_constant_p(pin))
+  if (__builtin_constant_p(pin)) {
     if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
     // Exception made for NOT_A_PIN - code exists which relies on being able to pass this and have nothing happen.
     // While IMO very poor coding practice, these checks aren't here to prevent lazy programmers from intentionally
     // taking shortcuts we disapprove of, but to call out things that are virtually guaranteed to be a bug.
     // Passing -1/255/NOT_A_PIN to the digital I/O functions is most likely intentional.
       badArg("Digital pin is constant, but not a valid pin");
-    #elif (CLOCK_SOURCE == 1)
-        if (pin ==3 )
-          badArg("Digital pin is constant, PIN_PA3, used for selected external osc, and is nor available for other uses.");
+    #if (CLOCK_SOURCE == 2)
+        if (pin == PIN_PA3) {
+          badArg("Constant digital pin PIN_PA3, used for selected external osc, and is not available for other uses.");
+        }
+    #endif
+  }
 }
+
 
 inline __attribute__((always_inline)) void check_valid_pin_mode(uint8_t mode) {
   if (__builtin_constant_p(mode)) {
@@ -172,13 +176,13 @@ void turnOffPWM(uint8_t pin) {
   /* Get pin's timer
    * megaTinyCore only - assumes only TIMERA0, TIMERD0, or DACOUT
    * can be returned here, all have only 1 bit set, so we can use
-   * PeripheralControl as a mask to see if they have taken over
+   * __PeripheralControl as a mask to see if they have taken over
    * any timers with minimum overhead - critical on these parts
    * Since nothing that will show up here can have more than one
    * one bit set, binary and will give 0x00 if that bit is cleared
    * which is NOT_ON_TIMER.
    */
-  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & PeripheralControl;
+  uint8_t digital_pin_timer =  digitalPinToTimer(pin) & __PeripheralControl;
   /* end megaTinyCore-specific section */
   if (digital_pin_timer== NOT_ON_TIMER) {
     return;
