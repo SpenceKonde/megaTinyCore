@@ -37,7 +37,7 @@ The "unqualified" BOD voltages are not listed in the datasheet, but were referen
 
 
 ## Clock Options
-These parts do not support an external HF crystal, only an external clock, and/or a watch crystak for the RTC.
+These parts do not support an external HF crystal, only an external clock, and/or a watch crystal for the RTC.
  MHz | Source          | Notes
  ----|-----------------|-------
   20 | Internal        | Default, typical for 5V systems

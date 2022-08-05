@@ -110,7 +110,7 @@ int main(); // the Big One!
 ```
 
 ### `Related: uint8_t digitalPinToInterrupt(P)`
-This is an obsolete macro that is only present for compatibility with old code. It has nothing do do and simply expands to the sole arguent.
+This is an obsolete macro that is only present for compatibility with old code. It has nothing do do and simply expands to the sole argument.
 
 
 ## Analog Functions
@@ -185,7 +185,7 @@ delayMicroseconds():
 * Is always a pure cycle-counting busy-wait delay.
 * Interrupts will lengthen the delay
   * Disable interrupts during the timing critical section if that is problematic
-* Should be uaes only for short delays
+* Should be used only for short delays
   * If interrupts are disabled for more than 1000us millis() timekeeping can lose time.
   * Function may not work correctly with values higher than 16383us unless the delay is a compile time known constant.
 * Delays should be constants known at compile time (hence subject to constant folding) whenever possible.
