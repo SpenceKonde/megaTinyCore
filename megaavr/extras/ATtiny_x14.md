@@ -7,7 +7,7 @@ Flash           | 2048 bytes | 4096 bytes | 8192 bytes | 16384 bytes
 Flash w/Optiboot| 1536 bytes | 3584 bytes | 7680 bytes | 15872 bytes
 RAM             |  128 bytes |  256 bytes |  512 bytes |  2048 bytes
 EEPROM          |   64 bytes |  128 bytes |  128 bytes |   256 bytes
-Bootloader (optional) | Optiboot (absolutely not recommended) | Optiboot (not recommended)| Optiboot (awkard but viable, not recommended) | Optiboot (awkard but viable, not recommended)
+Bootloader (optional) | Optiboot (absolutely not recommended) | Optiboot (not recommended)| Optiboot (awkward but viable, not recommended) | Optiboot (awkward but viable, not recommended)
 GPIO Pins       |  11 usable |  11 usable |  11 usable |   11 usable
 ADC Channels    |   9 usable |   9 usable |   9 usable |    9 usable
 DAC             |        Yes |        Yes |        Yes |         Yes
