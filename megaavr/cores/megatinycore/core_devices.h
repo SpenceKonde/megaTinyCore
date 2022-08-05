@@ -13,199 +13,369 @@
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx27__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 32
 #elif defined(__AVR_ATtiny1627__)
   #define MEGATINYCORE_MCU 1627
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx27__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 16
 #elif defined(__AVR_ATtiny827__)
   #define MEGATINYCORE_MCU 827
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx27__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 8
 #elif defined(__AVR_ATtiny427__)
   #define MEGATINYCORE_MCU 427
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx27__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 4
 #elif defined(__AVR_ATtiny3226__)
   #define MEGATINYCORE_MCU 3226
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx26__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 32
 #elif defined(__AVR_ATtiny1626__)
   #define MEGATINYCORE_MCU 1626
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx26__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 16
 #elif defined(__AVR_ATtiny826__)
   #define MEGATINYCORE_MCU 826
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx26__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 8
 #elif defined(__AVR_ATtiny426__)
   #define MEGATINYCORE_MCU 426
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx26__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 4
 #elif defined(__AVR_ATtiny3224__)
   #define MEGATINYCORE_MCU 3224
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx24__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 32
 #elif defined(__AVR_ATtiny1624__)
   #define MEGATINYCORE_MCU 1624
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx24__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 16
 #elif defined(__AVR_ATtiny824__)
   #define MEGATINYCORE_MCU 824
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx24__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 8
 #elif defined(__AVR_ATtiny424__)
   #define MEGATINYCORE_MCU 424
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx24__
   #define __AVR_ATtinyxy4__
-#elif defined(__AVR_ATtiny3217__)
+  #define _AVR_FLASH__ 4
+#elif defined(__AVR_ATti4ny3217__)
   #define MEGATINYCORE_MCU 3217
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx17__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 32
 #elif defined(__AVR_ATtiny1617__)
   #define MEGATINYCORE_MCU 1617
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx17__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny817__)
   #define MEGATINYCORE_MCU 817
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx17__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny417__)
   #define MEGATINYCORE_MCU 417
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx17__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny3207__)
   #define MEGATINYCORE_MCU 3207
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx07__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny1607__)
   #define MEGATINYCORE_MCU 1607
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx07__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny807__)
   #define MEGATINYCORE_MCU 807
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx07__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny407__)
   #define MEGATINYCORE_MCU 407
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx07__
   #define __AVR_ATtinyxy7__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny3216__)
   #define MEGATINYCORE_MCU 3216
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny1616__)
   #define MEGATINYCORE_MCU 1616
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny816__)
   #define MEGATINYCORE_MCU 816
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny416__)
   #define MEGATINYCORE_MCU 416
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx16__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny1606__)
   #define MEGATINYCORE_MCU 1606
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny806__)
   #define MEGATINYCORE_MCU 806
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny406__)
   #define MEGATINYCORE_MCU 406
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny214__)
   #define MEGATINYCORE_MCU 214
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx14__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny1614__)
   #define MEGATINYCORE_MCU 1614
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx14__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny814__)
   #define MEGATINYCORE_MCU 814
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx14__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny414__)
   #define MEGATINYCORE_MCU 414
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx14__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny204__)
   #define MEGATINYCORE_MCU 204
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx04__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny804__)
   #define MEGATINYCORE_MCU 804
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx04__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny404__)
   #define MEGATINYCORE_MCU 404
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx04__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny1604__)
   #define MEGATINYCORE_MCU 1604
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx04__
   #define __AVR_ATtinyxy4__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny212__)
   #define MEGATINYCORE_MCU 212
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx12__
   #define __AVR_ATtinyxy2__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny412__)
   #define MEGATINYCORE_MCU 412
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx12__
   #define __AVR_ATtinyxy2__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny202__)
   #define MEGATINYCORE_MCU 202
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx02__
   #define __AVR_ATtinyxy2__
+  #define _AVR_FLASH__ 2
 #elif defined(__AVR_ATtiny402__)
   #define MEGATINYCORE_MCU 402
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx02__
   #define __AVR_ATtinyxy2__
+  #define _AVR_FLASH__ 2
 #else
   #error "Can't-happen: unknown chip somehow being used!"
 #endif
+
+#if MEGATINYCORE_SERIES == 0
+  #define _AVR_FAMILY "T0"
+  #define __AVR_TINY_0__
+#elif MEGATINYCORE_SERIES == 1
+  #define _AVR_FAMILY "T1"
+  #define __AVR_TINY_1__
+#elif MEGATINYCORE_SERIES == 2
+  #define _AVR_FAMILY "T2"
+  #define __AVR_TINY_2__
+#endif
+
+#if defined(__AVR_ATtinyxy7__)
+  #define HAS_24_PINS
+  #define _AVR_PINCOUUNT (24)
+#elif defined(__AVR_ATtinyxy6__)
+  #define HAS_20_PINS
+  #define _AVR_PINCOUUNT (20)
+#elif defined(__AVR_ATtinyxy4__)
+  #define HAS_14_PINS
+  #define _AVR_PINCOUUNT (14)
+#elif defined(__AVR_ATtinyxy2__)
+  #define HAS_8_PINS
+  #define _AVR_PINCOUUNT (8)
+#else
+  #error "Unrecognized number of pins"
+#endif
+
+#if defined(AC2)
+  #define _AVR_AC_COUNT      (3)
+#elif defined(AC1)
+  #define _AVR_AC_COUNT      (2)
+#elif defined(AC0)
+  #define _AVR_AC_COUNT      (1)
+#else
+  #define _AVR_AC_COUNT      (0)
+#endif
+
+#if defined(ADC1)
+  #define _AVR_ADC_COUNT     (2)
+#elif
+  #define _AVR_ADC_COUNT     (1)
+#else
+  #define _AVR_ADC_COUNT     (0)
+  #warning "No ADC? No supported parts exist, something is wrong"
+#endif
+
+
+#if defined(OPAMP2)
+  #define _AVR_OPAMP_COUNT   (3)
+#elif defined(OPAMP1)
+  #define _AVR_OPAMP_COUNT   (2)
+#elif defined(OPAMP0)
+  #define _AVR_OPAMP_COUNT   (1)
+#else
+  #define _AVR_OPAMP_COUNT   (0)
+#endif
+
+
+#if defined(CCL_TRUTH4)
+  #define _AVR_LUT_COUNT     (6)
+#elif defined(CCL_TRUTH2)
+  #define _AVR_LUT_COUNT     (4)
+#elif defined(CCL_TRUTH0)
+  #define _AVR_LUT_COUNT     (2)
+#else
+  #warning "No AC? No supported parts exist, something is wrong"
+#endif
+
+
+#if defined(TCA1)
+  #define _AVR_TCA_COUNT     (2)
+#elif defined(TCA0)
+  #define _AVR_TCA_COUNT     (1)
+#else
+  #warning "No TCA? No supported parts exist, something is wrong"
+#endif
+
+#if defined(TCB5)
+  #define _AVR_TCB_COUNT     (6)
+#elif defined(TCB4)
+  #define _AVR_TCB_COUNT     (5)
+#elif defined(TCB3)
+  #define _AVR_TCB_COUNT     (4)
+#elif defined(TCB2)
+  #define _AVR_TCB_COUNT     (3)
+#elif defined(TCB1)
+  #define _AVR_TCB_COUNT     (2)
+#elif defined(TCB0)
+  #define _AVR_TCB_COUNT     (1)
+#else
+  #warning "No TCBs? No such parts exist, something is wrong"
+#endif
+
+#if defined(TCD1)
+  #define _AVR_TCD_COUNT     (1)
+#else
+  #define _AVR_TCD_COUNT     (0)
+#endif
+
+#if defined(TWI1)
+  #define _AVR_TWI_COUNT     (2)
+#elif defined(TWI1)
+  #define _AVR_TWI_COUNT     (1)
+#else
+  #define _AVR_TWI_COUNT     (0)
+  #warning "No TWI? No supported parts like tht exist..."
+#endif
+
+#if defined(USART5)
+  #define _AVR_USART_COUNT     (6)
+#elif defined(USART4)
+  #define _AVR_USART_COUNT     (5)
+#elif defined(USART3)
+  #define _AVR_USART_COUNT     (4)
+#elif defined(USART2)
+  #define _AVR_USART_COUNT     (3)
+#elif defined(USART1)
+  #define _AVR_USART_COUNT     (2)
+#elif defined(USART0)
+  #define _AVR_USART_COUNT     (1)
+#else
+  #warning "No USARTs? No such parts exist, something is wrong";
+#endif
+
+
+
+## Part number determination
+#define _AVR_FAMILY // String - "DA", "DB", "DD, "DU, "EA" or "T0", "T1", "T2" depending on what kind of part it is.
+#define _AVR_PINCOUNT // The number of physical pins
+#define _AVR_FLASH // Flash size, in KB - these three can be used to print the human readable part number easily.
 
 /* Used for AttachInterrupt to reduce RAM use. */
 #ifdef __AVR_ATtinyxy4__
