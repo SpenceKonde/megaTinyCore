@@ -15,7 +15,7 @@
  *     the slave address 0x54.
  *   Otherwise it writes the data on Wire1 to the slave address 0x64.
  * Uncomment it for the Address Mask slave example:
- *   If the first element is a 0-7, that will be the first digit (in hexacecimal)
+ *   If the first element is a 0-7, that will be the first digit (in hexadecimal)
  *     of the address, ex, '5test' would go to 0x54, and '2test' would go to 0x24
  *   Otherwise, it will send to address 0 (general call). Which as I understand
  *     the specification is only supposed to have a single byte payload, but NXP

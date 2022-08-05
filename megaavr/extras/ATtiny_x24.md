@@ -37,7 +37,7 @@ The "unqualified" BOD voltages are not listed in the datasheet, but were referen
 
 
 ## Clock Options
-These parts do not support an external HF crystal, only an external clock, and/or a watch crystak for the RTC.
+These parts do not support an external HF crystal, only an external clock, and/or a watch crystal for the RTC.
  MHz | Source          | Notes
  ----|-----------------|-------
   20 | Internal        | Default, typical for 5V systems
@@ -80,7 +80,7 @@ Notice that some 1-series features - mostly the extravagances of the "golden" 1-
 
 The super ADC can accumulate 1024 samples in a single burst read; decimation of the accumulated value so all of the digits are meaningful can give up to 17-bits of accuracy. For advanced ADC functionality, several new functions are provided, see ADC section of the main readme for more information.
 
-Optiboot is supported, but unlike the higher pincount 2-series devices, you can't have an alternate reset pin here (the pin it can be moved to doesn't exist), so these have the same reset-pain as the 1-series; this is why optiboot is marked 'not recommended' even on parts that have plenty of flash. We default to TCB1 for millis, since there is no type D timer, and because we have TCB0 for tone or TCB-dependant libraries, and TCA0 is more likely to be needed than a second TCB - [taking over TCA0](TakingOverTCA0.md) seems to be quite popular; TCB1 also has the additional benefit of having the lowestr overhead both for the interrupt millis/micros.
+Optiboot is supported, but unlike the higher pincount 2-series devices, you can't have an alternate reset pin here (the pin it can be moved to doesn't exist), so these have the same reset-pain as the 1-series; this is why optiboot is marked 'not recommended' even on parts that have plenty of flash. We default to TCB1 for millis, since there is no type D timer, and because we have TCB0 for tone or TCB-dependant libraries, and TCA0 is more likely to be needed than a second TCB - [taking over TCA0](TakingOverTCA0.md) seems to be quite popular; TCB1 also has the additional benefit of having the lowest overhead both for the interrupt millis/micros.
 
 
 ## Buy official megaTinyCore breakouts and support continued development

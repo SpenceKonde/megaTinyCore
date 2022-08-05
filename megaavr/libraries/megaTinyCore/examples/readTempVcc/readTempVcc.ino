@@ -1,4 +1,4 @@
-/* Minimal demo of uaing the ADC to read temperature and operating voltage
+/* Minimal demo of using the ADC to read temperature and operating voltage
  *
  * Reading Vdd on the 2-series is VERY easy though, because there's a channel
  * called VDDDIV10, and the core presents it as ADC_VDDDIV10. Care to guess
@@ -18,7 +18,7 @@
  * got results between 313 and 318K. Running at 3.3V instead of 5V would lower the calculated
  * temperature by around 2K. It is most certainly not 105 F in my workshop, even though it is a warm day.
  *
- * So as regards temp sensing on the 2-series, YMMVG
+ * So as regards temp sensing on the 2-series, YMMV
  */
 
 
@@ -55,7 +55,7 @@ uint16_t readSupplyVoltage() { // returns value in millivolts to avoid floating 
   return reading;
   #else
   analogReference(INTERNAL1V024);
-  Serial.print(analogReadEnh(ADC_VDDDIV10, 12)); // throwaway reading just for goood measure.
+  Serial.print(analogReadEnh(ADC_VDDDIV10, 12)); // throwaway reading just for good measure.
   Serial.println(" (discarded)");
   int32_t vddmeasure = analogReadEnh(ADC_VDDDIV10, 12); // Take it at 12 bits
   Serial.println(vddmeasure);
