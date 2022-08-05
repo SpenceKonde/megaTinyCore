@@ -1,0 +1,95 @@
+##########################################################################
+#                                                                        #
+#                       ########                 #####                   #
+#                          ##                   ##```                    #
+#  #   # ####  ###   ##    ##   ### #   # #   # ##      ###  ####  ####  #
+#  ## ## #    #     #  #   ##    #  ##  #  # #  ##     #   # #   # #     #
+#  # # # ###  #  ## ####   ##    #  # # #   #   ##     #   # ####  ###   #
+#  #   # #    #   # #  #   ##    #  #  ##   #   ##___  #   # # #   #     #
+#  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
+#________________________________________________________________________#
+#                                                                        #
+#  Copyright Spence Konde and other         ##       ####       #    ##  #
+#  contributors 2018-2021                  #  #      #         ##   #  # #
+#  megaTinyCore is free software.    # #     #       ###        #     #  #
+#  (LGPL v2.1) see LICENSE.md and    # #    #    ##     #  ##   #    #   #
+#  License section of README.md       #    ####  ##  ###   ##  ###  #### #
+#________________________________________________________________________#
+#                                                                        #
+#  Now reformatted for easy navigation with text editing tools which     #
+#  have the zoomed out "minimap" that you can scroll through.            #
+#                                                                        #
+#  megaTinyCore 2.5.12 is being developed simultaneously with DxCore     #
+#  1.5.0. As the hardware is very similar, much code is shared, and that #
+#  is the version of DxCore most similar to this version of megaTinyCore #
+#                                                                        #
+#  DxCore gets it's minor version bump before we do because of the DD    #
+#  series support added there. The only changes planned that warrant a   #
+#  minor version bump is the PWM pin menu addition, which likely will    #
+#  will be deferred until some time after DxCore 1.5.0.                  #
+#  Less dramatic than the DD-series - but analogous PWM switching went   #
+#  into DxCore 1.5.0, but that's one of the areas of the hardware that   #
+#  is very different and cannot share code                               #
+#                                                                        #
+#  The board section headings have a triangle along the right edge       #
+#  if they are a non-bootloader definition. Optiboot sections have a     #
+#  line inside the right edge if they are for the 2-series parts.        #
+#                                                                        #
+##########################################################################
+#                                                                        #
+#          ###  #   #  ####   #   #  ####  #   #  #   #   ###            #
+#         #     #   #  #   #  ## ##  #     ##  #  #   #  #               #
+#          ###  #   #  ####   # # #  ###   # # #  #   #   ###            #
+#             # #   #  #   #  #   #  #     #  ##  #   #      #           #
+#          ###   ###   ####   #   #  ####  #   #   ###    ###            #
+#________________________________________________________________________#
+# The *opti menus are for Optiboot board definitions - We name them
+# differently when the option takes on different meaning for a bootloaded
+# board. Eg - UPDI can set fuses, so OSCCFG is set on all uploads and
+# you don't need to burn bootloader to change clock speed.
+# 2.4.3 - the TCD0CFG fuse handling is U G L Y - but there isn't really
+# another way to do it with the tools we get as hardware package folks.
+
+menu.chip=Chip
+# used in place of the chip menu for official Microchip boards
+menu.board_name=Board Name
+menu.clock=Clock
+menu.clocko=Clock (burn bootloader usually req'd see docs)
+menu.millis=millis()/micros() Timer
+menu.startuptime=Startup Time
+menu.startuptimeopti=Startup Time (burn bootloader req'd)
+menu.bodvoltage=BOD Voltage Level (burn bootloader req'd)
+menu.bodmode=BOD Mode when Active/Sleeping (burn bootloader req'd)
+menu.eesave=Save EEPROM (burn bootloader req'd)
+menu.bootloaderuart=UART for Bootloader (burn bootloader req'd)
+menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
+menu.resetpinopti=UPDI/Reset Pin and Optiboot Entry (burn bootloader req'd)
+menu.resetpinopti_2=UPDI/alt-RST pins and Optiboot Entry (burn bootloader req'd)
+menu.attach=attachInterrupt() Version
+menu.printf=printf()
+menu.wiremode=Wire (Wire.h/I2C) Library mode
+
+##########################################################################
+#                                                                        #
+###              ####    ###    ###   ####   ####    ###               ###
+#####            #   #  #   #  #   #  #   #  #   #  #                #####
+#######          ####   #   #  #####  ####   #   #   ###           #######
+#####            #   #  #   #  #   #  #  #   #   #      #            #####
+###              ####    ###   #   #  #   #  ####    ###               ###
+#________________________________________________________________________#
+##########################################################################
+# Names listed at the top so they can be kept in consistent format
+
+atxy7.name=ATtiny3227/3217/1627/1617/1607/827/817/807/427/417
+atxy6.name=ATtiny3226/3216/1626/1616/1606/826/816/806/426/416/406
+atxy4.name=ATtiny3224/1624/1614/1604/824/814/804/424/414/404/214/204
+atxy2.name=ATtiny412/402/212/202
+microchip.name=Official Microchip Board
+atxy7o.name=ATtiny3217/1617/1607/817/807/417 w/Optiboot
+atx27o.name=ATtiny3227/1627/827/427 w/Optiboot
+atxy6o.name=ATtiny3216/1616/1606/816/806/416/406 w/Optiboot
+atx26o.name=ATtiny3226/1626/826/426 w/Optiboot
+atxy4o.name=ATtiny1614/1604/814/804/414/404 w/Optiboot
+atx24o.name=ATtiny3224/1624/824/424 w/Optiboot
+atxy2o.name=ATtiny412/402/212/202 w/Optiboot
+microchipo.name=Official Microchip Board w/Optiboot

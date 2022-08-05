@@ -793,7 +793,6 @@
           uint8_t t = *p++;
           printHex(t);
         }
-        println();
         return p;
       }
       volatile uint16_t * HardwareSerial::printHex(volatile uint16_t* p, uint8_t len, char sep, bool swaporder) {
@@ -802,7 +801,6 @@
           uint16_t t = *p++;
           printHex(t, swaporder);
         }
-        println();
         return p;
       }
   #endif
