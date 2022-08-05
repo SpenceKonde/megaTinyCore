@@ -8,8 +8,8 @@ Let's use that - it's better than gitter ever was, and it's all on one site.
 It is less buggy than all prior 2.5.x releases.
 
 ## WARNING: NOT COMPATIBLE WITH 2.0.x version of the IDE due to critical regressions.
-These bugs in the IDE prevent board settings from being correctly recognized. Please direct your complaints to the Arduino team. We do not intend to make any effort to support working around the errors of the arduino team *in beta software*. Working around it in released versions is hard enough. If and when the third party hardware is ammededed with a clear description of the intended behavior, I will fix it. I am *not* going to fix or *allow fixes* for bugs thare aren't even acknowledged by the Arduino team as such and may or may not be considerered intended. That is **not our bug** and your fury dhould be directed to to the people who broke software that was working perfectly fine.  
- 
+These bugs in the IDE prevent board settings from being correctly recognized. Please direct your complaints to the Arduino team. We do not intend to make any effort to support working around the errors of the arduino team *in beta software*. Working around it in released versions is hard enough. If and when the third party hardware is amended with a clear description of the intended behavior, I will fix it. I am *not* going to fix or *allow fixes* for bugs that aren't even acknowledged by the Arduino team as such and may or may not be considered intended. That is **not our bug** and your fury should be directed to to the people who broke software that was working perfectly fine.
+
 V1.8.13 is the "golden version" and the only one I recommend. All the more recent ones gained bugs, and its the last version with a substantial improvement
 
 ### Notice Regarding Update Issues
@@ -59,7 +59,7 @@ As of 2.3.2, with the dramatic improvements in performance, and the proven relia
 #### Coming before year end 2022: HV programming tool
 An HV programming tool to be called HyperUPDI is expected to be available (though silicon shortages may limit quantities) by year end. It is *not* intended to replace SerialUPDI.
 * HV programming support for AVR-DD, AVR-EA, and tinyAVR parts, allowing the UPDI pin to be used as GPIO without precluding further programming.
-* An on-board buffer will allow data to be sent in chunks of 2k or more. The result of this will be a dramatic improvement in programming speed. I expect an improvement of perhapse 5-10% on Dx-series vs SerialUPDI (as it is already very close to the theoretical maximum) - but the benefits on tinyAVR c will be considerably greater, as at TURBO speed they spent half their time in a USB latency period/
+* An on-board buffer will allow data to be sent in chunks of 2k or more. The result of this will be a dramatic improvement in programming speed. I expect an improvement of perhaps 5-10% on Dx-series vs SerialUPDI (as it is already very close to the theoretical maximum) - but the benefits on tinyAVR c will be considerably greater, as at TURBO speed they spent half their time in a USB latency period/
 * When a normal serial console is used to access it, it will operate in passthrough mode, featuring the classic FTDI pinout.
 * When in programming mode, the nominal CTS line is used to output the UPDI signal. Many boards (including those I sell) now have a solder-jumper to connect CTS to UPDI. This will allow a you to upload via UPDI and then open the serial console without changing any connections nor the use of a bootloader!
 * It will utilize a new upload script (neither Prog.py nor avrdude) which leverages the python installation we bring in for SerialUPDI already.

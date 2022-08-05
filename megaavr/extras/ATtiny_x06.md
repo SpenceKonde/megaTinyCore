@@ -7,7 +7,7 @@ Flash (program memory)   | 4096 bytes| 8192 bytes | 16384 bytes
 Flash w/Optiboot   | 3584 bytes| 7680 bytes | 15872 bytes
 RAM  | 256 bytes | 512 bytes | 1024 bytes
 EEPROM | 128 bytes | 128 bytes | 256 bytes
-Bootloader (optional) | Optiboot (not recommended) |  Optiboot (awkard but viable, not recommended) | Optiboot (awkard but viable, not recommended)
+Bootloader (optional) | Optiboot (not recommended) |  Optiboot (awkward but viable, not recommended) | Optiboot (awkward but viable, not recommended)
 GPIO Pins | 18 (17 usable) | 18 (17 usable) | 18 (17 usable)
 ADC Channels | 12 (11 usable) | 12 (11 usable) | 12 (11 usable)
 DAC | No | No | No
@@ -51,7 +51,7 @@ When external clock is used as system clock source, it cannot be used for any ot
 
 The tuned options are new in 2.4.0 - see the [tuned internal oscillator guide](Ref_Tuning.md) for more information before using these options.
 ## The issue with bootloader
-* There's no dedicated reset pin. So there is no way to do the traditional autoreset circuit to reset the chip to upload with a bootloader unless you disable UPDI (requiring HV UPDI to undo - I've got a half dozen boards that are bricked until I have time to get an hvupdi programming setup together to resurrect them). Either you manually power cycle it just prior to trying to upload, or you have some sort of ersatz-reset solution coupled to an autoreset circuit, or handle it in some other bespoke way. Regardless of the approach, short of disabling UPDI to get a reset pin (which is irreversible without an HV UPDI programmer), none of them are as convenient a development cycle as we're used to. In most cases, the most convenient development configuration is to simply use UPDI programming, and leave any serial connection open while programming via UPDI using a programmer on a different port.
+* There's no dedicated reset pin. So there is no way to do the traditional autoreset circuit to reset the chip to upload with a bootloader unless you disable UPDI (requiring HV UPDI to undo - I've got a half dozen boards that are bricked until I have time to get an HVUPDI programming setup together to resurrect them). Either you manually power cycle it just prior to trying to upload, or you have some sort of ersatz-reset solution coupled to an autoreset circuit, or handle it in some other bespoke way. Regardless of the approach, short of disabling UPDI to get a reset pin (which is irreversible without an HV UPDI programmer), none of them are as convenient a development cycle as we're used to. In most cases, the most convenient development configuration is to simply use UPDI programming, and leave any serial connection open while programming via UPDI using a programmer on a different port.
 * It takes 512b of flash - which may be a substantial fraction of the total.
 * The benefits of using as bootloader vs UPDI programming are debatable, in light of how easily a serial adapter can be converted to a UPDI perogrammer.
 
