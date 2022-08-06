@@ -257,7 +257,7 @@
   #define __AVR_TINY_2__
 #endif
 
-#if defined(__AVR_ATtinyxy7__)
+#if   defined(__AVR_ATtinyxy7__)
   #define HAS_24_PINS
   #define _AVR_PINCOUUNT (24)
 #elif defined(__AVR_ATtinyxy6__)
@@ -339,6 +339,7 @@
   #warning "No TCBs? No such parts exist, something is wrong"
 #endif
 
+
 #if defined(TCD1)
   #define _AVR_TCD_COUNT     (1)
 #else
@@ -347,7 +348,7 @@
 
 #if defined(TWI1)
   #define _AVR_TWI_COUNT     (2)
-#elif defined(TWI1)
+#elif defined(TWI0)
   #define _AVR_TWI_COUNT     (1)
 #else
   #define _AVR_TWI_COUNT     (0)
