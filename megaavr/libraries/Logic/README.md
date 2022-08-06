@@ -384,7 +384,8 @@ Logic::start(); // re-enable
 
 ```
 
-
+## Tips and tricks
+The CCL combined with the event system is the most powerful peripheral on the modern AVRs. I've been adding to a [compendium of non-obvious uses of it, like prescaling clocks.](Tricks_and_Tips.md)
 
 ## Note on terminology
 Yes, technically, C++ doesn't have "properties" or "methods" - these are "member variables" and "member functions" in C++ parlance. They mean the same thing. I've chosen to use the more familiar, present day terminology, because experienced C++ programmers will know what is meant, even if they roll their eyes, while the novices who have learned modern languages and Arduino, and probably never did any C++ specific stuff won't know what "member variables" and "member functions" are.

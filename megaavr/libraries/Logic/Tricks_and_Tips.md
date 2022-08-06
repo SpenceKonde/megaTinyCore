@@ -75,7 +75,7 @@ LUT:
 * 111: Per application requirements - logic block is getting contradictroy signals
 Ergo: TRUTH = 0x0b??001110 = 0x07, 0x47, 0x87, 0xC7
 
-Of those the last two should have the same value, unless you want very high speed oscillation. So, that means eith 0x07 or 0xC7.
+Of those the last two should have the same value, unless you want very high speed oscillation. So, that means with 0x07 or 0xC7.
 
 ### D-Type latch
 X: Feedback
