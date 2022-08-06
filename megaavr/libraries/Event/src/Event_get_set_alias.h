@@ -16,7 +16,7 @@
   void get_generator_channel(event::gen0::generator_t generator) { get_generator_channel((event::gen::generator_t)generator); }
   void set_generator(event::gen0::generator_t generator) { set_generator((event::gen::generator_t)generator); }
 #endif
-#if defined(EVSYS_CHANNEL1)
+#if defined(EVSYS_CHANNEL1) && defined(HAS_SEPARATE_GEN1)
   void get_generator_channel(event::gen1::generator_t generator) { get_generator_channel((event::gen::generator_t)generator); }
   void set_generator(event::gen1::generator_t generator) { set_generator((event::gen::generator_t)generator); }
 #endif
@@ -24,11 +24,11 @@
   void get_generator_channel(event::gen2::generator_t generator) { get_generator_channel((event::gen::generator_t)generator); }
   void set_generator(event::gen2::generator_t generator) { set_generator((event::gen::generator_t)generator); }
 #endif
-#if defined(EVSYS_CHANNEL3)
+#if defined(EVSYS_CHANNEL3) && defined(HAS_SEPARATE_GEN3)
   void get_generator_channel(event::gen3::generator_t generator) { get_generator_channel((event::gen::generator_t)generator); }
   void set_generator(event::gen3::generator_t generator) { set_generator((event::gen::generator_t)generator); }
 #endif
-#if defined(EVSYS_CHANNEL4)
+#if defined(EVSYS_CHANNEL4) && defined(HAS_SEPARATE_GEN4)
   void get_generator_channel(event::gen4::generator_t generator) { get_generator_channel((event::gen::generator_t)generator); }
   void set_generator(event::gen4::generator_t generator) { set_generator((event::gen::generator_t)generator); }
 #endif
