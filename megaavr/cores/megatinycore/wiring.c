@@ -1341,7 +1341,7 @@ void __attribute__((weak)) init_clock() {
       #elif (F_CPU == 4000000) // 16MHz prescaled by 4
         /* Clock DIV4 */
         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
-      #elif (F_CPU == 2000000) // 16MHz prescaled by 16
+      #elif (F_CPU == 2000000) // 16MHz prescaled by 8
         /* Clock DIV8 */
         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_8X_gc));
       #elif (F_CPU == 1000000) // 16MHz prescaled by 16
