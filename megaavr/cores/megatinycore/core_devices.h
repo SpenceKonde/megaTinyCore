@@ -257,22 +257,6 @@
   #define __AVR_TINY_2__
 #endif
 
-#if   defined(__AVR_ATtinyxy7__)
-  #define HAS_24_PINS
-  #define _AVR_PINCOUUNT (24)
-#elif defined(__AVR_ATtinyxy6__)
-  #define HAS_20_PINS
-  #define _AVR_PINCOUUNT (20)
-#elif defined(__AVR_ATtinyxy4__)
-  #define HAS_14_PINS
-  #define _AVR_PINCOUUNT (14)
-#elif defined(__AVR_ATtinyxy2__)
-  #define HAS_8_PINS
-  #define _AVR_PINCOUUNT (8)
-#else
-  #error "Unrecognized number of pins"
-#endif
-
 #if defined(AC2)
   #define _AVR_AC_COUNT      (3)
 #elif defined(AC1)
@@ -392,6 +376,7 @@
 #ifdef __AVR_ATtinyxy2__
   #define _AVR_PINCOUNT 8
 #endif
+
 
 // #define OUTPUT_PULLUP 3  // not implemented
 
