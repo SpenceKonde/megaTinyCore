@@ -1340,10 +1340,10 @@ void __attribute__((weak)) init_clock() {
         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
       #elif (F_CPU == 4000000) // 16MHz prescaled by 4
         /* Clock DIV4 */
-        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_8X_gc));
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_4X_gc));
       #elif (F_CPU == 2000000) // 16MHz prescaled by 16
-        /* Clock DIV16 */
-        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
+        /* Clock DIV8 */
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_8X_gc));
       #elif (F_CPU == 1000000) // 16MHz prescaled by 16
         /* Clock DIV16 */
         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc));
