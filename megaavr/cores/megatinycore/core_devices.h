@@ -372,10 +372,6 @@
 
 
 
-## Part number determination
-#define _AVR_FAMILY // String - "DA", "DB", "DD, "DU, "EA" or "T0", "T1", "T2" depending on what kind of part it is.
-#define _AVR_PINCOUNT // The number of physical pins
-#define _AVR_FLASH // Flash size, in KB - these three can be used to print the human readable part number easily.
 
 /* Used for AttachInterrupt to reduce RAM use. */
 #ifdef __AVR_ATtinyxy4__
