@@ -1,7 +1,7 @@
 # Internal oscillators and Tuning on tinyAVR devices
 All of the 0/1/2-series tinyAVR devices have an internal high-frequency oscillator which is generally used as the main oscillator; it's the only option you have other than and external clock, or running from the 32kHz internal oscillator (which makes execution of any code painfully slow and is not supported by megaTinyCore - running anything other than very carefully written straight C making use of no Arduino API functions is hopelessly slow, which is why we don't support it). For brevity and familiarity to classic AVR users, we will use the familiar name, `OSCCAL` to refer to the oscillator calibration register - this is `CLKCTRL.OSC20MCALIBA` on the tinyAVR parts.
 
-## IMPORTANT NOTE - If you tuned prior to 2.5.13, you must tune again to get correct results
+## IMPORTANT NOTE - If you tuned prior to 2.6.0, you must tune again to get correct results
 It was found that many oscillators couldn't be turned down enough to reach the speeds that we were targeting, so we added 14 MHz as a clock speed tune to on configurations except a tinyAVR 2-series @ 20 MHz, where we felt it more valuable to squeeze in the magic 32 MHz option than 14 MHz. Note that this is only relevant when uploading using Optiboot - over UPDI we set the base osc speed during upload
 
 
