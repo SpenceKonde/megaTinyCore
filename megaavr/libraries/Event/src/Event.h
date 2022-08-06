@@ -36,9 +36,14 @@ class Event {
     static Event& assign_generator_pin(uint8_t pin_number);
 
     #if defined(TINY_0_OR_1_SERIES)
-      void get_generator_channel(event::gens::generator_t generator) { get_generator_channel((event::gen::generator_t)generator); }
-      void set_generator(event::gens::generator_t generator) { set_generator((event::gen::generator_t)generator); }
+      void get_generator_channel(event::gens::generator_t generator) {
+        get_generator_channel((event::gen::generator_t)generator);
+      }
+      void set_generator(event::gens::generator_t generator) {
+        set_generator((event::gen::generator_t)generator);
+      }
     #endif
+    // *INDENT-OFF*
     #if !defined(PORT_EVGEN0SEL_gm)
       /* Where this is defined, **ALL CHANNELS ARE THE SAME** (EA-series, and likely everything after it)
        * That means that there are no genN generators!
@@ -46,6 +51,7 @@ class Event {
        */
       #include "Event_get_set_alias.h" // otherwise we need some unsightly glue to make get and set generator work
     #endif
+    // *INDENT-ON*
     static int8_t get_user_channel_number(event::user::user_t event_user);
     static Event& get_user_channel(event::user::user_t event_user);
     void set_user(event::user::user_t event_user);
