@@ -8,7 +8,7 @@
 #include <avr/io.h>
 #include <core_parameters.h>
 //#defines to identify part families
-#if defined(__AVR_ATtiny3227__)
+#if   defined(__AVR_ATtiny3227__)
   #define MEGATINYCORE_MCU 3227
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx27__
@@ -80,7 +80,7 @@
   #define __AVR_ATtinyx24__
   #define __AVR_ATtinyxy4__
   #define _AVR_FLASH__ 4
-#elif defined(__AVR_ATti4ny3217__)
+#elif defined(__AVR_ATtiny3217__)
   #define MEGATINYCORE_MCU 3217
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx17__
