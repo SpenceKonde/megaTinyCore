@@ -5,7 +5,7 @@
 Let's use that - it's better than gitter ever was, and it's all on one site.
 
 ### 2.5.11 is now available
-It is less buggy than all prior 2.5.x releases.
+It is less buggy than all prior 2.5.x releases
 
 ## WARNING: NOT COMPATIBLE WITH 2.0.x version of the IDE due to critical regressions.
 These bugs in the IDE prevent board settings from being correctly recognized. Please direct your complaints to the Arduino team. We do not intend to make any effort to support working around the errors of the arduino team *in beta software*. Working around it in released versions is hard enough. If and when the third party hardware is amended with a clear description of the intended behavior, I will fix it. I am *not* going to fix or *allow fixes* for bugs that aren't even acknowledged by the Arduino team as such and may or may not be considered intended. That is **not our bug** and your fury should be directed to to the people who broke software that was working perfectly fine.
