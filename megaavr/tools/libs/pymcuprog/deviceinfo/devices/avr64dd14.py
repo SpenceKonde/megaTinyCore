@@ -31,7 +31,7 @@ DEVICE_INFO = {
 
     # internal_sram
     'internal_sram_address_byte': 0x6000,
-    'internal_sram_size_bytes': 0x2000,
+    'internal_sram_size_bytes': 0x800,
     'internal_sram_page_size_bytes': 1,
     'internal_sram_read_size_bytes': 1,
     'internal_sram_write_size_bytes': 1,

@@ -8,7 +8,7 @@ But since Microchip hasn't done this, it was deduced from device packs by Spence
 from pymcuprog.deviceinfo.eraseflags import ChiperaseEffect
 
 DEVICE_INFO = {
-    'name': 'avr64dd32',
+    'name': 'avr64dd20',
     'architecture': 'avr8x',
 
     # eeprom
@@ -81,5 +81,5 @@ DEVICE_INFO = {
     'interface': 'UPDI',
     'address_size': '24-bit',
     'prog_clock_khz': 1800,
-    'device_id': 0x1E961A,
+    'device_id': 0x1E961C,
 }
