@@ -3,7 +3,7 @@
 We have received many questions from users about how to take over TCA0 to generate 16-bit PWM or change the output frequency. There are a few non-obvious complications here, and this document aims to clear up these confusions. First, before you begin, make sure you have a recemt version of megaTinyCore installed. This document references functions added in the 2.3.x versions; pre-2.x versions further contain significant differences that render much of this document inapplicable. What is written here largely applies to TCA1 on the AVR Dx-series parts, and is expected to apply to the AVR EA-series as well, though no definitive information on those parts beyond their mention in the AVR EA-series technical brief has been released. It it unlikely that any relevant changes will be madem but not impossible.
 
 ## For far more information on type A timers
-Microchip has made available a Technical Brief describing the capabilities of the Type A timer, which is arguably the most powerful timer available on modern AVR devices (one could argue that the type D timer on the AVR DA, DB, and DD-series parts is more powerful (the same case is harder to make in the case of the tinyAVR 1-series, where there is no PLL to clock it from). I tend to disagree with that; while it is unquestionably more complex and is capable of some tasks which the TCA is not, it is applicable to significantly fewer use cases, and far more challenging to configure). That technical brief describes all applications of the type A timer, not just PWM (and also assumes it is starting from power on reset (POR) state; if you are using code from there, you can call takeOverTCA0() to both reset it to this state, and ensure that the core does not subsequently mess with it).
+Microchip has made available a Technical Brief describing the capabilities of the Type A timer, which is arguably the most powerful timer available on modern AVR devices (it's this or the type D timer, but while that is unquestionably more complex and is capable of some tasks which the TCAs are not, it is applicable to significantly fewer use cases, and far more challenging to configure). That technical brief describes all applications of the type A timer, not just PWM (and also assumes it is starting from power on reset (POR) state; if you are using code from there, you can call `takeOverTCA0()` or `takeOverTCA1()` to both reset it to this state, and ensure that the core does not subsequently mess with it).
 
 [Technical Brief 3217: Getting started with TCA](https://www.microchip.com/en-us/application-notes/tb3217)
 
@@ -49,7 +49,7 @@ PORTMUX.CTRLC = PORTMUX_TCA00_ALTERNATE_gc; // Move it to PA7
 ```
 
 ## Examples
-Now for the fun part - example code!
+Now for the fun part - example code! What's so much fun about example code? Because you can steal it and re-use it, of course!
 
 A note about the pin numbers - we use the PORT_Pxn notation to refer to pins; when I mention in the comments the pin number, that is an Arduino (logical) pin number, not a physical pin number (generally, this documentation does not refer to physical pin numbers except on the pinout charts). Because the mappings of peripherals to pins by the port and pin within the port is constant across the non-8-pin parts, this means the examples (except the one for 8-pin parts) will all work on all 14, 20, and 24-pin parts - and neither the mapping nor timer has changed between the 0-series and 2-series (okay, the timer's EVCTRL register was expanded on the 2-series and it can take a second event now and it can use all event generators because the weird event system of the 0/1-series was replaced with a normal one, but that's way beyond the scope of this document).
 
@@ -85,32 +85,36 @@ ISR(TCA0_OVF_vect) { //on overflow, we will increment TCA0.CMP0, this will happe
 
 
 ### Example 2: Variable frequency and duty cycle PWM
-This generates PWM similar to above (though without the silly interrupt to change the duty cycle), but takes it a step further with two functions to set the duty cycle and frequency.
+This generates PWM similar to the first example (though without the silly interrupt to change the duty cycle), but takes it a step further and into more practical territory with two functions to set the duty cycle and frequency. Calling those instead of this PWMDemo() function is all you'd need to make use of this. Somewhere I think I have the same functionality implemented for the classic AVR "Timer1" style 16-bit timers.
+
 ```c++
-#if defined(MILLIS_USE_TIMERA0)||defined(__AVR_ATtinyxy2__)
-  #error "This sketch takes over TCA0, don't use for millis here.  Pin mappings on 8-pin parts are different"
+#if defined(MILLIS_USE_TIMERA0)
+#error "This sketch takes over TCA0, don't use for millis here."
 #endif
 
-unsigned int Period=0xFFFF;
+uint8_t OutputPin     = PIN_PB0;
 
-void setup() {                // We will be outputting PWM on PB0
-  pinMode(PIN_PB0, OUTPUT);   // PB0 - TCA0 WO0, pin7 on 14-pin parts
-  takeOverTCA0();             // This replaces disabling and resettng the timer, required previously.
-  TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc);
-  TCA0.SINGLE.PER   = Period; // Count all the way up to 0xFFFF
-  //                             At 20MHz, this gives ~305Hz PWM
-  TCA0.SINGLE.CMP0  = 0;
-  TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; //enable the timer with no prescaler
+unsigned int Period   = 0xFFFF;
+
+void setup() {
+  pinMode(OutputPin, OUTPUT);
+  PORTMUX.TCAROUTEA   = (PORTMUX.TCAROUTEA & ~(PORTMUX_TCA0_gm)) | PORTMUX_TCA0_PORTC_gc;
+  takeOverTCA0();                             // This replaces disabling and resettng the timer, required previously.
+  TCA0.SINGLE.CTRLB   = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc);
+                                              // Single slope PWM mode, PWM on WO0
+  TCA0.SINGLE.PER     = Period;               // Count all the way up to 0xFFFF
+  TCA0.SINGLE.CMP1    = 0;                    // At 20MHz, this gives ~305Hz PWM
+  TCA0.SINGLE.CTRLA   = TCA_SINGLE_ENABLE_bm; // Enable the timer with no prescaler
 }
 
 void loop() {
-  PWMDemo(150000);  // 150kHz
-  PWMDemo(70000);   // 70kHz
-  PWMDemo(15000);   // 15kHz
-  PWMDemo(3000);    // 3kHz
-  PWMDemo(120);     // 120Hz
-  PWMDemo(35);      // 35Hz
-  PWMDemo(13);      // 13Hz
+  PWMDemo(150000);    // 150kHz
+  PWMDemo(70000);     // 70kHz
+  PWMDemo(15000);     // 15kHz
+  PWMDemo(3000);      // 3kHz
+  PWMDemo(120);       // 120Hz
+  PWMDemo(35);        // 35Hz
+  PWMDemo(13);        // 13Hz
 }
 
 void PWMDemo(unsigned long frequency){
@@ -132,20 +136,22 @@ void setFrequency(unsigned long freqInHz) {
   byte presc = 0;
   while (tempperiod > 65536 && presc < 7) {
     presc++;
-    tempperiod      = tempperiod >> (presc > 4 ? 2 : 1);
+    tempperiod = tempperiod >> (presc > 4 ? 2 : 1);
   }
-  Period            = tempperiod;
+  Period = tempperiod;
   TCA0.SINGLE.CTRLA = (presc << 1) | TCA_SINGLE_ENABLE_bm;
-  TCA0.SINGLE.PER   = Period;
+  TCA0.SINGLE.PER = Period;
 }
 ```
 
-### Example 3: High speed 8-bit PWM on PA3 on 8-pin part
-A user requested (#152) high speed PWM on PA3 on an 8-pin part. They wanted split mode disabled, and PWM frequency higher than 62KHz. This is indeed possible - though do note that the maximum frequency of PWM possible with a full 8 bits of resolution and 20MHz system clock is 78.125 kHz (20000000/256) - and the next higher frequency for which perfect 8-bit resolution is possible is half that, 39.061 kHz. Higher fequencies require lower resolution (see above example for one approach, which can also be used for intermediate frequencies) though if the frequency is constant, varying your input between 0 and the period instead of using map() is desirable, as map may not be smooth. As a further aside, if 78.125kHz is suitable, there is no need to disable split mode....
+### Example 3: High speed 8-bit PWM
+A megaTinyCore user requested (#152) high speed PWM. They wanted split mode disabled, and PWM frequency higher than 62KHz. This is indeed possible - though do note that the maximum frequency of PWM possible with a full 8 bits of resolution is 78.125 kHz when running at 20 MHz (20000000/256); at 24, it's 93.75 kHz, and overclocked to 32 MHz, 125 kHz. The next higher frequency for which perfect 8-bit resolution is possible is half of those frequencies. Higher fequencies require lower resolution (see above example for one approach, which can also be used for intermediate frequencies) though if the frequency is constant, varying your input between 0 and the period instead of using map() is desirable, as map may not be smooth. As a further aside, if 78.125kHz is suitable, there is no need to disable split mode. It strikes me now, as I adapt this example for the Dx-series parts, that 62 KHz is almost exactly the maximum possible for 8-bit PWM at 16 MHz system clock. I'm pretty sure there's a connection!
+
+Do note that if pushing the PWM frequency is your aim, you can go considerably higher by using the Type D timer - it is rated for a TCD clock of up to 48 MHz.... (and I was able to generate PWM from it without anomalies with it clocked at 128 MHz (32 MHz system clock multiplied by 4) - these parts have a ton of headroom on frequency at room temp and under non-adverse conditions)
 
 ```c++
-#if defined(MILLIS_USE_TIMERA0) || !defined(__AVR_ATtinyxy2__)
-  #error "This sketch is for an 8-pin part and takes over TCA0"
+#if defined(MILLIS_USE_TIMERA0)
+#error "This sketch takes over TCA0, don't use for millis here."
 #endif
 
 
@@ -185,15 +191,18 @@ void loop() { // Lets generate some output just to prove it works
 ```
 
 ### Example 4: Quick bit of fun with split mode
-A quick example of how cool split mode can be - You can get two different PWM frequencies out of the same timer! Split mode only has one mode - both halves of the timer independently count down.
+A quick example of how cool split mode can be - You can get two different PWM frequencies out of the same timer. Split mode only has one mode - both halves of the timer independently count down.
+
+Here, we've made it even more interesting by using two frequencies almost identical to each other.... they will "beat" against each other weith a frequency of 1.43 Hz (366 Hz / 256). You should be able to observe that with a bicolor LED (and appropriate resistor) between the two pins. These have two LEDs with opposite polarity, typically a red and a green, connected between two pins... the question is - what will it look like? How will it be different from a single color LED? Make predictions and then test them. When I (Spence) did this, my prediction was wrong.
+
 ```c++
-#if defined(MILLIS_USE_TIMERA0) || defined(__AVR_ATtinyxy2__)
-  #error "This sketch takes over TCA0, don't use for millis here.  Pin mappings on 8-pin parts are different"
+#if defined(MILLIS_USE_TIMERA0)
+#error "This sketch takes over TCA0, don't use for millis here."
 #endif
 
 
 void setup() {
-  // We will be outputting PWM on PB0 amd PA5
+  // We will be outputting PWM on PD2 amd PD3
   // No need to enable split mode - core has already done that for us.
   pinMode(PIN_PB0, OUTPUT); // PB0 - TCA0 WO0, pin7 on 14-pin parts
   pinMode(PIN_PA5, OUTPUT); // PA5 - TCA0 WO5, pin1 on 14-pin parts

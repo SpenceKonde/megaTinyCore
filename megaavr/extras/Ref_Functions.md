@@ -4,15 +4,15 @@ These are in addition to what is listed in the [Arduino Reference](https://www.a
 ## Error reporting
 One of the major challenges when writing embedded code is that there are no exceptions, so when something doesn't work correctly, you don't get an indication of what, exactly. prevented it from doing so. It's up to you to try to gather more data and analyze it to figure out where it is failing. Often, when you get to the end of it, the problem turns out to be something that one could have known ahead of time would certainly not work. While these methods are far from perfect, when we can determine at compile time that your code won't do what you are trying to make it do, will produce an error. These two "error" function calls are the mechanism used to actually create the error in almost all cases: compilation fails if any of these are referenced in the code after all constant folding and optimization.
 
-Internally these are often implemented with with the compiler test `__builtin_constant_p()` which returns true if the argument is a compile-time known constant value subject to constant folding:
+Internally these are often used with the compiler test `__builtin_constant_p()` which returns true if the argument is a compile-time known constant value subject to constant folding:
 ```c
-digitalWrite(100, HIGH);    // This tests whether the pin is known to be invalid at compile time, and since nothing supported by this core has 100 pins, will error.
+digitalWrite(100, HIGH); // This tests whether the pin is known to be invalid at compile time, and since nothing supported by this core has 100 pins, will error.
 uint8_t pinnbr = 100;
 digitalWrite(pinnbr, HIGH); // This will also error, because there is no chance for pinnbr to be anything other than 100.
 volatile uint8_t pinnumber = 100;
-digitalWrite(pinnumber, HIGH); // This will not error at compile time, because the compiler cannot optimize away or assume values for a volatile variable.
+digitalWrite(pinnumber, HIGH); // This will not error at compile time, because the compiler cannot optimize away the volatile variable.
 ```
-Note that in the case of the digital I/O functions, NOT_A_PIN (255) *IS* permitte
+Note that in the case of the digital I/O functions, NOT_A_PIN (255) *IS* permitted
 ### `void badArg("msg")`
 This function is what we call when user code passed an argument to a function that is guaranteed to give results without meaning or requested something which is not achievable, and we know at compile time, such as `analogRead(pin without analog input option)`. The message will indicate the nature of the problem.
 
@@ -76,7 +76,7 @@ These return pointers to the port output, input and direction registers (output 
 If `p < NUM_DIGITAL_PINS`, p is a digital pin, and is returned as is. If it is equal to `ADC_CH(n)` where n is a valid analog channel it is converted to the digital pin, and if anything else, it returns NOT_A_PIN.
 
 ### `uint8_t digitalPinHasPWM(p)`
-(Standard) Returns true if the pin has PWM available in the standard core configuration. This is a compile-time-known constant as long as the pin is, and does not account for the PORTMUX registers. Unlike
+(Standard) Returns true if the pin has PWM available in the standard core configuration. This is a compile-time-known constant as long as the pin is, and does not account for the PORTMUX registers.
 
 ## Attach Interrupt Enable
 If using the old or default (all ports) options, these functions are not available; WInterrupt will define ALL port pin interrupt vectors if `attachInterrupt()` is referenced anywhere in the sketch or included library. This is the old behavior.
@@ -110,7 +110,7 @@ int main(); // the Big One!
 ```
 
 ### `Related: uint8_t digitalPinToInterrupt(P)`
-This is an obsolete macro that is only present for compatibility with old code. It has nothing do do and simply expands to the sole argument.
+This is an obsolete macro that is only present for compatibility with old code. It has nothing to do and simply expands to the sole argument.
 
 
 ## Analog Functions
@@ -247,8 +247,17 @@ Sets the millisecond timer to the specified number of milliseconds. Be careful i
 ### `void restart_millis()`
 After having stopped millis either for sleep or to use timer for something else and optionally have set it to correct for passage of time, call this to restart it.
 
+### `void nudge_millis(uint16_t ms)`
+This is not yet implemented as we assess whether it is a useful or appropriate addition, and how it fits in with set millis().
+~Sets the millisecond timer forward by the specified number of milliseconds. Currently only implemented for TCB, TCA implementation will be added in a future release. This allows a clean way to advance the timer without needing to do the work of reading the current value, adding, and passing to `set_millis()`  It is intended for use before  (added becauise *I* needed it, but simple enough).
+The intended use case is when you know you're disabling interrupts for a long time (milliseconds), and know exactly how long that is (ex, to update neopixels), and want to nudge the timer
+forward by that much to compensate. That's what *I* wanted it for.~
+
+### `_switchInternalToF_CPU()`
+Call this if you are running from the internal clock, but it is not at F_CPU - likely when overriding `onClockTimeout()`  `onClockFailure()` is generally useless.
+
 ## PWM control
-See [Timer Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Timers.md)
+See [Timer Reference](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Timers.md)
 ```text
   void takeOverTCA0()
   void takeOverTCD0()

@@ -3,7 +3,7 @@ This core includes a number of features to provide more control or performance w
 
 ## Ballpark overhead figures
 The digital I/O functions are astonishingly inefficient. This isn't my fault - it's the Arduino API's fault
-Single call to the function, volatile variables used as arguments to the functions to prevent compiler from making assumptions about their values.
+Single call to the function, volatile variables used as argumentsto the functions to prevent compiler from making assumptions about their values.
 
 The comparison to the fast I/O functions is grossly unfair, because the fast I/O functions have constant arguments - but this gives an idea of the scale.
 Remember also that executing 1 word of code (2 bytes) takes 1 clock cycle, though not all of the code paths are traversed every time.
@@ -21,8 +21,11 @@ Remember also that executing 1 word of code (2 bytes) takes 1 clock cycle, thoug
 | pinConfigure() 3   |  +232 |  +250 | Unconstrained
 | digitalWriteFast() |    +2 |    +2 | With constant arguments.
 | pinModeFast()      |   +12 |   +12 | With constant arguments.
-| Serial.begin()     | +1444 | +1442 | For comparison. Anything "printable" pulls in a lot of bloat.
 
+pinConfigure called with second argument constrained to 0x00-0x0F (setting only direction and output value) (1), with it constrained to that plus configuring pullups (2), and without restrictions (3).
+About 200 bytes of that space is used for lookup tables, not instructions.
+
+This is why the fast digital I/O functions exist.
 
 This is why the fast digital I/O functions exist, and why there are people who habitually do `VPORTA.OUT |= 0x80;` instead of `digitalWrite(PIN_PA7,HIGH);`
 

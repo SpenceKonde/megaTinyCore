@@ -61,14 +61,13 @@ void init_reset_flags() __attribute__((weak)) {
 ```
 This can be used to try to pick apart when you are getting unexpected resets (likely "dirty resets"), by doing something else when RSTCTRL.RSTFR == 0 - note that because it is run so early in the initialization process, and we're here because we called an ISR that doesn't exist or smashed the stack, you can count on very little working correctly; your best bet is probably to test theories and give output by writing I/O pins to, for example, turn on an LED. (Since you have no timekeeping yet, and are likely debugging a showstopping bug, you probably just want to write the LED pin with pinModeFast and digitalWriteFast, and then hang with while(1). Having multiple LEDs connected here really helps: turn on one LED for any dirty reset, and a second LED for the theory you're testing). You might, for example, want to determine if the dirty reset is coming about through a bad ISR: if `CPUINT.STATUS & (CPUINT_LVL0EX_bm | CPUINT_LVL1EX_bm)` that means it it thinks it's in an interrupt, but it's running non-interrupt initialization code, so one of two things happened: either a non-existent ISR was called, or a function called by an ISR`*`,  wasn't inlined and smashed the stack (the dirty reset can occur after smashing the stack only when a `ret` or `reti` is executed, so if you smash the stack within the ISR proper, the reti will still execute, RSTCTRL.STATUS will be cleared, and *then* you'll end up in a dirty reset). See the [Reset Reference](Ref_Reset.md) for more information.
 
-`*` - Note that ISRs ought not call any function that the optimizer can't inline (`attachInterrupt` interrupts inherently do this; there is no other way for an interrupt to be attached at runtime, which is why attached interrupts perform so poorly); the overhead is considerable, making it contrary to the principle that an ISR should run quickly. In some datasheets and official documentation, Microchip explicitly warns about the overhead of CALL/RCALL/ICALL within an ISR. While not all parts have this warning in the datasheet, it applies to all AVRs equally. This is, however, a performance issue, not the cause of a dirty reset - that would require the function called to contain severe bugs that overwrite the call stack or corrupt the stack pointer. If the offending function was inlined, then it would not think that it was in an ISR at the time of the dirty reset, since `reti` would have been executed - there would be no intervening `ret` that would trigger the dirty reset while still in the ISR, but rather the the dirty reset would happen immediately following the conclusion of the interrupt.
 
 ### onPreMain
 ```c
 void onPreMain() __attribute__((weak)) {
 }
 ```
-This is the recommended way to run code before the class constructors. Runs after init_reset_flags, so it won't run on a dirty reset.
+This is the recommended way to run code before the class constructors. Runs after init_reset_flags, so it won't run on a dirty reset if reset flags are being cleared as they should be.
 
 
 ### onAfterInit
@@ -108,7 +107,8 @@ int main() {
   setup();
   for (;;) {
     loop();
-    #ifdef ENABLE_SERIAL_EVENT /* this is never true unless core is modified */
+    #ifdef ENABLE_SERIAL_EVENT /* this is never true unless core is modified
+      This option is strongly deprecated and Serial Event's days i nthe core are numbered. Users of serialEvent should begin migration with a sense of urgency*/
       if (serialEventRun) serialEventRun();
     #endif
   }

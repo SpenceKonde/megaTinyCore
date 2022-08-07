@@ -3,20 +3,83 @@ It is often useful to identify what options are selected on the menus from withi
 
 You cannot check for options that depend on the fuses at compile-time, because we don't know what they will be - sketch can be uploaded separately from setting them.
 
-## Millis timer
-The option used for the millis/micros timekeeping is given by a define of the form `USE_MILLIS_TIMERxx`. Possible options are:
+## Timer identification from within code
+You may need to know programmatically what millis source is in use. There are several defines to help with this.
+There are the legacy ones:
 * `MILLIS_USE_TIMERA0`
 * `MILLIS_USE_TIMERB0`
-* `MILLIS_USE_TIMERB1` (2-series and 16k+ 1-series)
-* `MILLIS_USE_TIMERD0` (1-series only)
-* `MILLIS_USE_TIMERNONE` (if it is disabled)
+* `MILLIS_USE_TIMERB1`
+* `MILLIS_USE_TIMERB2`
+* `MILLIS_USE_TIMERB3`
+* `MILLIS_USE_TIMERB4`
+* `MILLIS_USE_TIMERD0`
+* `MILLIS_USE_TIMERRTC`
+* `MILLIS_USE_TIMERNONE`
+
+It is often more convenient to use these newer macros, which identify instead testing the millis time,.
+
+### Millis timer and vector
+* `MILLIS_TIMER`
+* `MILLIS_VECTOR`
+
+#### Millis timer codes
+These are the values that the MILLIS_TIMER may be defined as:
+
+| Name            | Numeric value | Meaning                             |
+|-----------------|---------------|----------------------------------------------------------
+| `NOT_ON_TIMER`  |          0x00 | Millis is disabled
+| `NONE`          |          0x00 | Millia ia disabled
+| `TIMERA0`       |          0x10 | Millis is generated from TCA0
+| `TIMERA1`       |          0x08 | Millis is generated from TCA1
+| `TIMERB0`       |          0x20 | Millis is generated from TCB0
+| `TIMERB1`       |          0x21 | Millis is generated from TCB1
+| `TIMERB2`       |          0x23 | Millis is generated from TCB2
+| `TIMERB3`       |          0x23 | Millis is generated from TCB3
+| `TIMERB4`       |          0x24 | Millis is generated from TCB4
+| `TIMERD0`       |          0x40 | Not planned for implementation on DxCore.
+| `TIMERRTC`      |          0x80 | (not yet implemented on DxCore)
+| `TIMERRTC_XTAL` |          0x81 | (not yet implemented on DxCore)
+| `TIMERRTC_XOSC` |          0x82 | (not yet implemented on DxCore)
+
+
+However, the other bits are also used when digitalPinToTimer/Now() are used:
+
+* For TCA's, the three lowest bits indicate the channel of the pin.
+* For TCBs, if 0x30 is also set, that's the alternate pin.
+* For TCD it is the form 0b0xx10yyy where xx is the WO channel and yyy is the PORTMUX setting.
+
+To to find the millis timer:
+```c
+if (MILLIS_TIMER & 0x40) {
+  //timer D (not available on DxCore)
+} else if (MILLIS_TIMER & 0x10) {
+  //TCA0
+} else if (MILLIS_TIMER & 0x08){
+  //TCA1
+} else if (MILLIS_TIMER & 0x20) {
+  //timer B, look to othr nybble to find wheich one
+} else if (MILLIS_TIMER & 0x80) {
+  //RTC
+}
+
+
+```
+### Timer identifier interpretation
+These are 8-bit values.
+0x10-0x15 are TCA0.
+0x08-0x0C is TCA1
+0x20-0x2F is a TCB
+0x30-0x3F is a TCB alt pin (not yet implemented)
+0x40-0x77 is a TCD pin (high nybble is the bit within the group, low nybble is the mux)
+0x80  is the DAC output pin
+
 
 ### Using to check that correct menu option is selected
 If your sketch requires that the B0 is used as the millis timer, for example:
 
 ```c++
-#ifdef MILLIS_USE_TIMERD0
-  #error "This sketch is not compatible with TCD0 as millis timer."
+#ifndef MILLIS_USE_TIMERB2
+  #error "This sketch is written for use with TCB2 as the millis timing source"
 #endif
 ```
 
@@ -28,6 +91,23 @@ This core provides an additional define depending on the number of pins on the p
 * `MEGATINYCORE_SERIES` - 0, 1, or 2 depending on whether it's a 0, 1, or 2-series part.
 * `__AVR_ATtinyxyz__` - where z, and optionally x and y are substituted with those parts of the part number, ex: `__AVR_ATtinyxy4__` or `__AVR_ATtinyx02__`. The fully substituted form is provided by the compiler.
 * `_AVR_PINCOUNT` - The number of physical pins
+* `_AVR_FLASH` - Flash size, in KB - these three can be used to print the human readable part number easily.
+
+## Peripheral detection
+These do exactly what you expect.
+* `_AVR_AC_COUNT`
+* `_AVR_ADC_COUNT`
+* `_AVR_DAC_COUNT`
+* `_AVR_OPAMP_COUNT`
+* `_AVR_LUT_COUNT`
+* `_AVR_TCA_COUNT`
+* `_AVR_TCB_COUNT`
+* `_AVR_TCD_COUNT`
+* `_AVR_TWI_COUNT`
+* `_AVR_USART_COUNT`
+
+
+## Identifying DxCore version
 These define the version of the core:
 * `MEGATINYCORE` - megaTinyCore version number, as string. If it's "Unknown 2.5.0+" or similar, see below.
 * `MEGATINYCORE_MAJOR` - megaTinyCore major version

@@ -132,7 +132,8 @@ millis() and PWM can coexist on TCA0 or TCD0, but not on a TCB.
 ### PWM via analogWrite()
 #### TCAn
 The core reconfigures the type A timers in split mode, so each can generate up to 6 PWM channels simultaneously. The `LPER` and `HPER` registers are set to 254, giving a period of 255 cycles (it starts from 0), thus allowing 255 levels of dimming (though 0, which would be a 0% duty cycle, is not used via analogWrite, since `analogWrite(pin,0)` calls `digitalWrite(pin,LOW)` to turn off PWM on that pin). This is used instead of a PER=255 because `analogWrite(255)` in the world of Arduino is 100% on, and sets that via `digitalWrite()`, so if it counted to 255, the arduino API would provide no way to set the 255/256th duty cycle). Additionally, modifications would be needed to make `millis()`/`micros()` timekeeping work without drift when TCA is selected for timekeeping. Preventing drift is easy with PER = 254, but hard at PER = 255 (.
-The core supports generating PWM using up to 6 channels per timer. On DxCore it supports the alternate pins via reading the current PORTMUX setting, and as of 1.5.0, even the 3-channel mappings are supported. TCA0 can go on pin 0-5 in any port (though they must all be on the same port, while TCA has a more limited selection (see the part specific documentation). We default to configuring it for PD on 28/32 pin parts, PA on 14 and 20-pin  and PC on 48/64 pin ones).
+
+Alternate pins are not supported for TCA PWM at this time. A tools submenu option may be added in the future
 
 `analogWrite()` checks the `PORTMUX.TCAROUTEA` register. On parts with a working TCD portmux (ie, DD-series).
 
@@ -160,7 +161,8 @@ The output channels are only available through megaTinyCore on 20 and 24 pin par
 #### TCBn
 The type B timers are never used by megaTinyCore for PWM.
 
-#### PWM Frequencies
+### PWM Frequencies
+The frequency of PWM output using the settings supplied by the core is shown in the table below. The "target" is 1 kHz, never less than 490 Hz or morethan 1.5 kHz. As can be seen below, there are several frequencies where this has proven an unachievable goal. The upper end of that range is the point at which - if PWMing the gate of a MOSFET - you have to start giving thought to the gate charge and switching losses, and may not be able to directly drive the gate of a modern power MOSFET and expect to get acceptable results (ie, MOSFET turns on and off completely in each cycle, there is minimal distortion of the duty cycle, and it spends most of it's "on" time with the low resistance quoted in the datasheet, instead of something much higher that would cause it to overheat and fail). Not to say that it **definitely** will work with a given MOSFET under those conditions (see [the PWM section of my MOSFET guide](https://github.com/SpenceKonde/ProductInfo/blob/master/MOSFETs/Guide.md#pwm) ), but the intent was to try to keep the frequency low enough that that use case was viable (nobody wants to be forced into using a gate driver), without compromising the ability of the timers to be useful for timekeeping.
 
 The frequency of PWM output using the settings supplied by the core is shown in the table below. The "target" is 1 kHz, never less than 490 Hz or morethan 1.5 kHz. As can be seen below, there are several frequencies where this has proven an unachievable goal. The upper end of that range is the point at which - if PWMing the gate of a MOSFET - you have to start giving thought to the gate charge and switching losses, and may not be able to directly drive the gate of a modern power MOSFET and expect to get acceptable results (ie, MOSFET turns on and off completely in each cycle, there is minimal distortion of the duty cycle, and it spends most of it's "on" time with the low resistance quoted in the datasheet, instead of something much higher that would cause it to overheat and fail). Not to say that it **definitely** will work with a given MOSFET under those conditions (see [the PWM section of my MOSFET guide](https://github.com/SpenceKonde/ProductInfo/blob/master/MOSFETs/Guide.md#pwm) for calculations and a shared spreadsheet that helps calculate  ), but the intent was to try to keep the frequency low enough that that use case was viable (nobody wants to be forced into using a gate driver), without compromising the ability of the timers to be useful for timekeeping.
 ##### TCA0
@@ -192,7 +194,7 @@ The frequency of PWM output using the settings supplied by the core is shown in 
 This section is incomplete and will be expanded at a later date.
 
 #### Planned new PWM options for 2.6.x versions
-Starting from 2.6.0, we are planning to add an additional tools submenu, PWM pin configuration. This functionality is not yet implemented
+Starting from 2.6.x, we are planning to add an additional tools submenu, PWM pin configuration. This functionality is not yet implemented
 
 Unlike DxCore, where the overhead of identifying the timer and channel is low and flash abounds, the calculations are longer and the resources more limited here. Thus, we cannot offer automatic PWM moving by simply setting PORTMUX like we could there, however, starting in 2.6.0, there will be a tools menu to select from several PWM layouts.
 
@@ -352,6 +354,8 @@ Except when the resolution is way down near the minimum, the device spends more 
 #### TCBn for millis timekeeping
 When a TCB is used for `millis()` timekeeping, it is set to run at the system clock prescaled by 2 (except at 1 or 2 MHz system clock) and tick over every millisecond. This makes the millis ISR very fast, and provides 1ms resolution at all but the slowest speeds for millis. The `micros()` function also has 1 us or almost-1 us resolution at all clock speeds (though there are small deterministic distortions due to the performance shortcuts used for the microsecond calculations (see appendix below). The only reason these excellent timers are not used by default except on parts with two TCBs and no TCD (that is, on the 2-series) is that too many other useful things need a TCB.
 
+### TCBn for millis timekeeping
+When TCB2 (or other type B timer) is used for `millis()` timekeeping, it is set to run at the system clock prescaled by 2 (1 at 1 MHz system clock) and tick over every millisecond. This makes the millis ISR very fast, and provides 1ms resolution at all speeds for millis. The `micros()` function also has 1 us or almost-1 us resolution at all clock speeds (though there are small deterministic distortions due to the performance shortcuts used for the microsecond calculations. The type B timer is an ideal timer for millis, however, they;re also good for a lot of other things too.  Ot is anticipated that as libraries for IR, 433MHz OOK'ed remote control, and similar add support for the modern AVR parts, that these timers will see even more use.
 
 |Note | CLK_PER | millis() | micros() | % in ISR | micros() time | Terms used             |
 |-----|---------|----------|----------|----------|---------------|------------------------|
