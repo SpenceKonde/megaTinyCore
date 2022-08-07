@@ -8,7 +8,7 @@
     ;
   }
 #endif
-#define SERIAL_DEBUG (1)
+#define SERIAL_DEBUG
 #ifdef PIN_PA5  // Unless it lacks that pin, use PA5 (Arduino pin 1).
   #define TUNING_PIN PIN_PA5   // Tune with PA5 on these parts
   #define FORCE_PIN PIN_PA6    // If this pin is pulled low within 30 seconds of power on,
@@ -91,10 +91,6 @@ void setup() {
     stockCal = (*(uint8_t *)(0x1100 + 24));
   #else
     #error "This sketch must be compiled for 16 MHz or 20 MHz only (and should be uploaded and tuned once at each)"
-  #endif
-  #ifdef SERIAL_DEBUG
-    Serial.printHex(stockCal);
-    Serial.printHex(TuningDone);
   #endif
   #ifdef FORCE_PIN
     pinMode(FORCE_PIN, INPUT_PULLUP);
@@ -196,9 +192,6 @@ void loop() {
     for (byte x = 0; x < 64; x++)   //  64 for 0/1-series
   #endif
   {
-    #if defined(SerialDebug)
-       Serial.print((GPIOR1<<8)+GPIOR0)
-    #endif
     watchdogReset();
     _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, x); /* Switch to new clock - prescale of 4 already on */
     _NOP();
@@ -225,10 +218,6 @@ void loop() {
           #endif
           {
             i = 100; // set to impossible value to reach normally.
-            #if defined(SERIAL_DEBUG)
-              volatile uint16_t* t = (volatile uint16_t*)(uint16_t)&GPIOR0;
-              *t = temp;
-            #endif
           }
           pulselen += temp;
            i++;
@@ -236,21 +225,8 @@ void loop() {
         if (i == 8 || i == 16) {
           done = 1;
         }
+
       }
-      #if defined(SERIAL_DEBUG)
-        uint8_t curcal = x;
-        _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, stockCal);
-        _NOP();
-        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 2);// prescale disabled. 
-        _NOP(); 
-        // All that to log serial
-        Serial.printHex(x);
-        Serial.print(",");
-        Serial.printHex(pulselen);
-        Serial.flush();
-        _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, curcal);
-        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 3); // prescale enabled, div by 4: Slow back down so we can safely increment the speed next pass through loop.
-      #endif
 /*      Hey hey, wait a minute, pulseIn()?
  *      Do we actually trust that function's accuracy? On all parts?
  *      It's a block of inscrutable compiler generated assembly supplied as a .S file!
@@ -316,8 +292,8 @@ void loop() {
     }
 
     _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 3); // prescale enabled, div by 4: Slow back down so we can safely increment the speed next pass through loop.
-
     if (writeme != 0x80 && TuningDone != 1) {
+
       USERSIG.write(CAL_START + currentTarget, writeme);
     }
     lastpulselen = pulselen; // Today is just tomorrow's yesterday.
@@ -347,6 +323,5 @@ void loop() {
     }
     Serial.flush();
   #endif
-  while(1);
-  //_PROTECTED_WRITE(RSTCTRL_SWRR, RSTCTRL_SWRE_bm);
+  _PROTECTED_WRITE(RSTCTRL_SWRR, RSTCTRL_SWRE_bm);
 }

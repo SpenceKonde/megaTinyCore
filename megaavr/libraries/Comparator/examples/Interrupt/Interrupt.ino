@@ -25,10 +25,14 @@
 |***********************************************************************/
 
 #include <Comparator.h>
+/* This flag will be set true by the interrupt. Since it's modified in
+ * an interrupt but read outside of that interrupt, it must be volatile.
+ */
+volatile bool int_fired = 0;
 
 void setup() {
   // Configure serial port
-  Serial.begin(57600);
+  Serial.begin(115200);
 
   // Configure relevant comparator parameters
   Comparator.input_p = comparator::in_p::in0;       // Use positive input 0 (PA7)
@@ -53,10 +57,29 @@ void setup() {
 }
 
 void loop() {
-
+  if (int_fired) { // Check our flag here
+    Serial.println("Output of analog comparator went high!");
+    int_fired = 0; // clear our flag so we don't sit there spamming the serial port
+  }
 }
 
 // This function runs when an interrupt occurs
 void interruptFunction() {
+  /* You might want to do this, but no! Do not do this!
   Serial.println("Output of analog comparator went high!");
+  * Avoid printing to serial within an ISR. The print functions can potentially block for,
+  * in the worst case (tx buffer full when print is started), as long as the entire string
+  * takes to print (calculated as characters divided by baud/10 - each byte is sent as
+  * 10 bits, because there's a start and stop bit. At best, this would cause millis to lose
+  * time, and at worst block other critical functions. If you really need to, printing a
+  * single character is much less of a hazard than a longer message, and is acceptable for
+  * debugging purposes (though still undesirable), as that both reduces the worst case
+  * execution time and reduces the chance of there being any blocking delay- only a completely
+  * full TX buffer would cause it. This also makes it harder for the interrupt to fire so
+  * frequently that the messages it tries to print will outrun the serial port - which is the
+  * nightmare scenario.
+  * The correct approach is what we demonstrate - set a flag that you can check on the
+  * next pass through loop.
+  */
+  int_fired = 1; // This can be kept short and fast,
 }

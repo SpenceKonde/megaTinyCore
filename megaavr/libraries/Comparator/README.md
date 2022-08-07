@@ -192,13 +192,6 @@ Comparator.output = comparator::out::enable; // Enable output comparator's outpu
 #### Default state
 `Comparator.output` defaults to `comparator::out::disable` if not specified in the user program.
 
-### output_swap
-Variable for pin swapping the physical output pin to its alternative position, if available. There is only an alternate pin available on Dx/Ex-series on parts with at least 48 pins and is **not available on megaAVR 0-series, or any tinyAVR parts**.
-Accepted values:
-```c++
-comparator::out::no_swap;  // Use default pin position
-comparator::out::pin_swap; // Use alternative position - this option is only available for Dx and Ex parts with at least 48 pins.
-```
 
 #### Usage
 ```c++
