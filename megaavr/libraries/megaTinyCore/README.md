@@ -33,5 +33,6 @@ The implementations are pulles straight from Ref_Reset, on account of a complain
 
 #### void ResetWithWDT()
 This will trigger a reset using the WDT, which will occur within around 10 ms, and will busy wait until then.
+
 #### void SoftwareReset()
 This will trigger a reset using the RSTCTRL, which will occur instantly.
