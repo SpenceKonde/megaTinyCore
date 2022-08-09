@@ -583,3 +583,4 @@
 #endif
 // tinyAVR thus far doesn't have the TTL input level option. Probably MVIO only.
 #define PORT_HAS_INLVL 0
+#endif
