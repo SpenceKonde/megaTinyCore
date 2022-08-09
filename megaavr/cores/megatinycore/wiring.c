@@ -1299,7 +1299,7 @@ void set_millis(__attribute__((unused))uint32_t newmillis)
 }
 
 void nudge_millis(__attribute__((unused)) uint16_t nudgesize) {
-  #if (MILLIS_TIMER &= 0x78) /* 0x40 matches TCDs, 0x20 matches TCBs, 0x10 matches TCA0 0x08 matches TCA1, so OR them together and AND it with the timer to make sure it's not RTC, disabled, etc.  */
+  #if (MILLIS_TIMER & 0x78) /* 0x40 matches TCDs, 0x20 matches TCBs, 0x10 matches TCA0 0x08 matches TCA1, so OR them together and AND it with the timer to make sure it's not RTC, disabled, etc.  */
     uint8_t oldSREG=SREG;
     cli();
     timer_millis += nudgesize;
