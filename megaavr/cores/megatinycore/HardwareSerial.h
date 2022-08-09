@@ -258,25 +258,29 @@ class HardwareSerial : public Stream {
     void                   begin(uint32_t baud, uint16_t options);
     void                     end();
     // printHex!
-    void                printHex(const     uint8_t              b);
-    void                printHex(const      int8_t  b)              {printHex((uint8_t )   b);           }
-    void                printHex(const        char  b)              {printHex((uint8_t )   b);           }
-    void                printHex(const    uint16_t  w, bool s = 0);
-    void                printHex(const     int16_t  w, bool s = 0)  {printHex((uint16_t)w, s);           }
-    void                printHex(const    uint32_t  l, bool s = 0);
-    void                printHex(const     int32_t  l, bool s = 0)  {printHex((uint32_t)l, s);           }
-    void              printHexln(const      int8_t  b)              {printHex((uint8_t )   b); println();}
-    void              printHexln(const        char  b)              {printHex((uint8_t )   b); println();}
-    void              printHexln(const     uint8_t  b)              {printHex(             b); println();}
-    void              printHexln(const    uint16_t  w, bool s = 0)  {printHex(          w, s); println();}
-    void              printHexln(const    uint32_t  l, bool s = 0)  {printHex(          l, s); println();}
-    void              printHexln(const     int16_t  w, bool s = 0)  {printHex((uint16_t)w, s); println();}
-    void              printHexln(const     int32_t  l, bool s = 0)  {printHex((uint32_t)l, s); println();}
+    void                  printHex(const     uint8_t              b);
+    void                  printHex(const      int8_t  b)              {printHex((uint8_t )   b);           }
+    void                  printHex(const        char  b)              {printHex((uint8_t )   b);           }
+    void                  printHex(const    uint16_t  w, bool s = 0);
+    void                  printHex(const     int16_t  w, bool s = 0)  {printHex((uint16_t)w, s);           }
+    void                  printHex(const    uint32_t  l, bool s = 0);
+    void                  printHex(const     int32_t  l, bool s = 0)  {printHex((uint32_t)l, s);           }
+    void                printHexln(const      int8_t  b)              {printHex((uint8_t )   b); println();}
+    void                printHexln(const        char  b)              {printHex((uint8_t )   b); println();}
+    void                printHexln(const     uint8_t  b)              {printHex(             b); println();}
+    void                printHexln(const    uint16_t  w, bool s = 0)  {printHex(          w, s); println();}
+    void                printHexln(const    uint32_t  l, bool s = 0)  {printHex(          l, s); println();}
+    void                printHexln(const     int16_t  w, bool s = 0)  {printHex((uint16_t)w, s); println();}
+    void                printHexln(const     int32_t  l, bool s = 0)  {printHex((uint32_t)l, s); println();}
     // The pointer-versions for mass printing uint8_t and uint16_t arrays.
-    uint8_t *           printHex(          uint8_t* p, uint8_t len, char sep = 0            );
-    uint16_t *          printHex(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
-    volatile uint8_t *  printHex(volatile  uint8_t* p, uint8_t len, char sep = 0            );
-    volatile uint16_t * printHex(volatile uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
+    uint8_t *             printHex(          uint8_t* p, uint8_t len, char sep = 0            );
+    uint16_t *            printHex(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
+    volatile uint8_t *    printHex(volatile  uint8_t* p, uint8_t len, char sep = 0            );
+    volatile uint16_t *   printHex(volatile uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
+    uint8_t *           printHexln(          uint8_t* p, uint8_t len, char sep = 0            ) {         uint8_t* ret;   ret=printHex(p, len, sep);    println(); return ret;}
+    uint16_t *          printHexln(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0) {         uint16_t* ret;  ret=printHex(p, len, sep, s); println(); return ret;}
+    volatile uint8_t *  printHexln(volatile  uint8_t* p, uint8_t len, char sep = 0            ) {volatile uint8_t* ret;   ret=printHex(p, len, sep);    println(); return ret;}
+    volatile uint16_t * printHexln(volatile uint16_t* p, uint8_t len, char sep = 0, bool s = 0) {volatile uint16_t* ret;  ret=printHex(p, len, sep, s); println(); return ret;}
 
     virtual int availableForWrite(void);
     virtual int available(void);
