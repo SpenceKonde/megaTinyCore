@@ -2,7 +2,7 @@
  * Copyright (c) 2005-2013 Arduino Team.  All right reserved.
  * And presumably from then until 2018 when this was forked
  * for megaTinyCore. Copyright 2018-2022 Spence Konde
- * Part of megaTinyCore, which adds Arduino support for the 
+ * Part of megaTinyCore, which adds Arduino support for the
  * ATtiny 0/1/2-series microcontrollers from Microchip.
  * megaTinyCore is free software (LGPL 2.1)
  * See LICENSE.txt for full legal boilerplate if you must */
