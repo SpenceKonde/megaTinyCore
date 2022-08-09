@@ -165,7 +165,7 @@ The type B timers are never used by megaTinyCore for PWM.
 The frequency of PWM output using the settings supplied by the core is shown in the table below. The "target" is 1 kHz, never less than 490 Hz or morethan 1.5 kHz. As can be seen below, there are several frequencies where this has proven an unachievable goal. The upper end of that range is the point at which - if PWMing the gate of a MOSFET - you have to start giving thought to the gate charge and switching losses, and may not be able to directly drive the gate of a modern power MOSFET and expect to get acceptable results (ie, MOSFET turns on and off completely in each cycle, there is minimal distortion of the duty cycle, and it spends most of it's "on" time with the low resistance quoted in the datasheet, instead of something much higher that would cause it to overheat and fail). Not to say that it **definitely** will work with a given MOSFET under those conditions (see [the PWM section of my MOSFET guide](https://github.com/SpenceKonde/ProductInfo/blob/master/MOSFETs/Guide.md#pwm) ), but the intent was to try to keep the frequency low enough that that use case was viable (nobody wants to be forced into using a gate driver), without compromising the ability of the timers to be useful for timekeeping.
 
 The frequency of PWM output using the settings supplied by the core is shown in the table below. The "target" is 1 kHz, never less than 490 Hz or morethan 1.5 kHz. As can be seen below, there are several frequencies where this has proven an unachievable goal. The upper end of that range is the point at which - if PWMing the gate of a MOSFET - you have to start giving thought to the gate charge and switching losses, and may not be able to directly drive the gate of a modern power MOSFET and expect to get acceptable results (ie, MOSFET turns on and off completely in each cycle, there is minimal distortion of the duty cycle, and it spends most of it's "on" time with the low resistance quoted in the datasheet, instead of something much higher that would cause it to overheat and fail). Not to say that it **definitely** will work with a given MOSFET under those conditions (see [the PWM section of my MOSFET guide](https://github.com/SpenceKonde/ProductInfo/blob/master/MOSFETs/Guide.md#pwm) for calculations and a shared spreadsheet that helps calculate  ), but the intent was to try to keep the frequency low enough that that use case was viable (nobody wants to be forced into using a gate driver), without compromising the ability of the timers to be useful for timekeeping.
-##### TCA0
+#### TCA0
 
 |   CLK_PER | Prescale |   fPWM  |
 |-----------|----------|---------|
@@ -177,7 +177,7 @@ The frequency of PWM output using the settings supplied by the core is shown in 
 |     4 MHz |       16 |  980 Hz |
 |     1 MHz |        8 |  490 Hz |
 
-##### TCD0 (PC0, PC1 on 1-series only)
+#### TCD0 (PC0, PC1 on 1-series only)
 
 *warning* - When using the Tuned Internal oscillator clock option, the PWM frequency will scale up or down with the CPU speed, as shown below for the highest and lowest tuned frequencies available for each. However, when an external clock source is used, the internal oscillator will be left at it's default calibration (16 or 20 MHz). This will be used for TCD PWM, which we always generate from the internal oscillator (though it can be set to an external clock source,
 
@@ -193,7 +193,7 @@ The frequency of PWM output using the settings supplied by the core is shown in 
 
 This section is incomplete and will be expanded at a later date.
 
-#### Planned new PWM options for 2.6.x versions
+### Planned new PWM options for 2.6.x versions
 Starting from 2.6.x, we are planning to add an additional tools submenu, PWM pin configuration. This functionality is not yet implemented
 
 Unlike DxCore, where the overhead of identifying the timer and channel is low and flash abounds, the calculations are longer and the resources more limited here. Thus, we cannot offer automatic PWM moving by simply setting PORTMUX like we could there, however, starting in 2.6.0, there will be a tools menu to select from several PWM layouts.
@@ -222,11 +222,11 @@ Note: This cannot be made changeable at runtime; it *must* be a tools menu optio
 | 3 pins (3xbTCA)           | PA1-3           | None     | No    | No    | No    | 8-pin parts only, trade 4th pwm pin for buffering and a bit more flash.
 | 5 pins (3xbTCA, 2xTCD)    | PA1-3           | PA6, PA7 | No    | No    | No    | 8-pin 1-series parts only. 5 PWM pins. A flash hog - these parts max out at just 4k of flash. The so-called "no glitch TCD" implementation is not used in order to save flash in this case.
 
-##### TCD PWM pins
+#### TCD PWM pins
 On the 14-pin parts, when TCA is used in split mode, the only pins available for TCD PWM are PA4 and PA5 - which are already the only outputs WO4 and WO5 of TCA0 on those parts. Hence, TCD PWM is not used in that configuration as it would just waste flash without giving you more PWM pins. When TCA is not used in split mode, that opens the door to TCD-generated PWM on the 14-pin 1-series parts. Also, alternate mappings of the TCA PWM pins make TCD PWM on PA4, PA5 reasonable to use on 24-pin parts depending on what alternate functions you need from the pins not used for PWM.
 If TCD PWM pins are not needed, disabling that functionality saves a bit of flash.
 
-##### Buffering/3-pin mode? What's that?
+#### Buffering/3-pin mode? What's that?
 This means the following things will be done differently in the TCA configuration:
 * TCA is not run in split mode. There are only 3 output channels.
 * The PERBUF CMP0BUF, CMP1BUF, and CMP2BUF can be used instead of PER, CMP0, CMP1, or CMP2, and analogWrite will do this. When the buffer registers are used, the changes are applied at the end of the current duty cycle, preventing glitches when those registers are changed. This is occasionally a problem with PWM for brightness control, where there would be a 1/255 chance analogWrite(pin,1) called when the duty cycle was previously 2, to cause the LED to be on for an entire PWM cycle. This is usually difficult to generate visible effects from, but in certain lighting situations has for reasons unclear, been problematic, resulting in a distracting flash when transitioning between very low brightness levels.

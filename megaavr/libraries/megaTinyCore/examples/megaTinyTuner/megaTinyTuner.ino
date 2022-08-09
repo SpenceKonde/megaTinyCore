@@ -241,8 +241,8 @@ void loop() {
         uint8_t curcal = x;
         _PROTECTED_WRITE(CLKCTRL_OSC20MCALIBA, stockCal);
         _NOP();
-        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 2);// prescale disabled. 
-        _NOP(); 
+        _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 2);// prescale disabled.
+        _NOP();
         // All that to log serial
         Serial.printHex(x);
         Serial.print(",");

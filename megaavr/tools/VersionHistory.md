@@ -1,5 +1,5 @@
 # SerialUPDI
-## 1.2.4 - Fix "Hashable" error on linux.
+## 1.2.4 - Fix "Hashable" error on linux
 Due to an outdated version of YAML and Pythons failure to maintain consistent behavior, Serial UPDI was broken on fully updated linux systems. This is no longer the case.
 Added AVR64DDxx device files.
 Synthesized the AVR32/16DD files because Microchip hasn't released those despite having been shipping them for a month.
