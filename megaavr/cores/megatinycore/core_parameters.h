@@ -12,7 +12,7 @@
   // The whole purpose of this file is largely for for the purpose of being something that can be included anywhere to make sure we know what core we are
   // which becomes more and more important as more code is shared between the cores.
 
-  #define MEGATINYCORE "Unknown 2.5.0+"
+  #define MEGATINYCORE "Unknown 2.6.0+"
   #if !defined(MEGATINYCORE_NUM)
     #if !(defined(MEGATINYCORE_MAJOR) && defined(MEGATINYCORE_MINOR) && defined(MEGATINYCORE_PATCH) && defined(MEGATINYCORE_RELEASED))
       #warning "All of the version defines are missing, please correct your build environment; it is likely failing to define other critical values"

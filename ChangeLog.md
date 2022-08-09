@@ -7,13 +7,10 @@ These items are in addition to what was listed under changes already in release.
 1. Issue with Serial.printf and it's ilk. Suspect user error.
 2. SerialUPDI uploads don't work if any file path contains spaces, because of missing quotes in platform.txt? But I can't see where... Need example verbose upload attempt in order to further debug.
 
-#### Planned for 1.5.x
-From above list: 2, 3 (more liekly), plus inevitable DD bugs.
-#### Planned for 1.5.0
-From above list: 3 (hopefully), 4, 1, 6, 5
-
 ### Planned enhancements
-"Enhancements" are changes to the core which improve functionality and introduce new and exotic bugs. Sometimes called "Features", I prefer the term "enhancement". Calling it a feature, by my understanding of the semantics, means that it *does something new*,  or improvements in speed of core functions or reductions in code size without explicitly adding any new functionality.
+"Enhancements" are changes to the core which improve functionality and introduce new and exotic bugs. Sometimes called "Features", I prefer the term "enhancement". Calling it a feature, by my understanding of the semantics, means that it *does something new*. But many times changes are made that neither fix a bug or do something new, but rather just do something it already does faster, using less flash, or with better compile time error detection. All things that, as well as new features, would add to the
+
+"Enhancements" are changes to the core which improve functionality and introduce new and exotic bugs. Sometimes called "Features", I prefer the term "enhancement". Calling it a feature, by my understanding of the semantics, means that it *does something new*. But many times changes are made that neither fix a bug or do something new, but rather just do something it already does faster, using less flash, or with better compile time error detection. All things that, as well as new features, would add to the
 
 ### Planned 2.6.0
 * End hand maintenance of boards.txt in favor of generating it prior to release with a python script, in order to reduce duplication and human error (5 errors were found during the course of preliminary work on this!)

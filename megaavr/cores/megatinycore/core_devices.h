@@ -5,6 +5,8 @@
  * Spence Konde 2021 - megaTinyCore is free software (LGPL 2.1)
  * See LICENSE.txt for full legal boilerplate if you must */
 
+#ifndef Core_Devices_h
+#define Core_Devices_h
 #include <avr/io.h>
 #include <core_parameters.h>
 //#defines to identify part families
@@ -352,6 +354,7 @@
 #elif defined(USART0)
   #define _AVR_USART_COUNT     (1)
 #else
+  #define _AVR_USART_COUNT     (0)
   #warning "No USARTs? No such parts exist, something is wrong";
 #endif
 

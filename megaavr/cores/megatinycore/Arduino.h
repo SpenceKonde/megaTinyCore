@@ -1,8 +1,17 @@
-/*
- * Arduino.h - Main include file for the Arduino SDK
-  Copyright (c) 2005-2013 Arduino Team.  All right reserved.
+/* Arduino.h - Main include file for the Arduino SDK
+ * Copyright (c) 2005-2013 Arduino Team.  All right reserved.
  * And presumably from then until 2018 when this was forked
  * for megaTinyCore. Copyright 2018-2022 Spence Konde
+ * Part of megaTinyCore, which adds Arduino support for the 
+ * ATtiny 0/1/2-series microcontrollers from Microchip.
+ * megaTinyCore is free software (LGPL 2.1)
+ * See LICENSE.txt for full legal boilerplate if you must */
+/*************************************************************
+ * This file contains the stuff I think people are most likely
+ * to need to refer to. The minutia has all been pushed into
+ * core_devices.h if it's independent of pins_arduino.h or into
+ * pinswap.h if it relates to PORTMUX, which is a great volume
+ * of stuff nobody should have to read.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,6 +27,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+ /*
+ * That means functions and macros that may be used by user code
+ * (except for part-feature ones - those are clearly documented
+ * in the readme if they are ready for users).
+ * I also try to put detailed comments in where appropriate.
+ *************************************************************/
 
 #ifndef Arduino_h
 #define Arduino_h
@@ -352,6 +367,7 @@ void               DACReference(uint8_t mode);
 
 uint8_t      getAnalogReference();
 uint8_t         getDACReference();
+uint8_t getAnalogSampleDuration();
 int8_t  getAnalogReadResolution();
 
 //
@@ -371,7 +387,7 @@ void          turnOffPWM(uint8_t pinNumber               );
 uint8_t PWMoutputTopin(uint8_t timer, uint8_t channel);
 // Realized we're not going to be able to make generic code without this.
 
-
+// Again as above, but this time with the unwieldy 8-byte integer datatype as the base
 // avr-libc defines _NOP() since 1.6.2
 // Really? Better tell avr-gcc that, it seems to disagree...
 #ifndef _NOP
@@ -385,8 +401,8 @@ uint8_t PWMoutputTopin(uint8_t timer, uint8_t channel);
 #endif
 #ifndef _NOP8
   #define _NOP8()   __asm__ __volatile__ ("rjmp .+2"  "\n\t"   /* 2 clk jump over next instruction */ \
-                                          "ret"       "\n\t"   /* 2 clk return (wha? why here?) */    \
-                                          "rcall .-4" "\n\t" ) /* 4 clk "Oh, I see. We jump over a return (2 clock) call it, and then immediately return." */
+                                          "ret"       "\n\t"   /* 4 clk return "wha? why here?" */    \
+                                          "rcall .-4" "\n\t" ) /* 2 clk "Oh, I see. We jump over a return (2 clock) call it, and then immediately return." */
 #endif
 
 /*
@@ -444,6 +460,25 @@ Not enabled. Ugly ways to get delays at very small flash cost.
 #ifndef _SWAP
   #define _SWAP(n) __asm__ __volatile__ ("swap %0"  "\n\t" :"+r"((uint8_t)(n)));
 #endif
+// internally used - fast multiply by 0x20 that assumes x < 8, so you can add it to a uint8_t* to PORTA or member of PORTA,
+// and get the corresponding value for the other port, or equivalently it can be added to 0x0400 which is the address of PORTA.
+// Valid only with a valid port number, which must be verified first
+// This exists to sidestep inefficiency of compiler generated code when you only know the port at runtime, for the very common task of
+// addressing a port register by port number and offset. Trashes the variable you pass it
+/*
+#define _WRITE_VALUE_TO_PORT_OFFSET(p,o,v) ({
+          __asm__ __volatile__ (
+            "swap %0A"        "\n\t" // start with a 16-bit pointer register
+            "add %0A, %0A "   "\n\t" // low byte for port register is port * 0x20 - so swap nybbles and leftshift to do in 2 cycles.
+            "ldi %0B, 0x04"   "\n\t" // high byte for all port registers is 0x0400
+            "add %0A, %1"     "\n\t" // add the offset within the port
+            "st %a0, %2"      "\n\t" // write the value
+           :"+e"(uint16_t)(p)
+           :"r"  (uint8_t)(o),
+            "r"  (uint8_t)(v)
+          );
+})
+*/
 uint16_t clockCyclesPerMicrosecond();
 uint32_t clockCyclesToMicroseconds(uint32_t cycles);
 uint32_t microsecondsToClockCycles(uint32_t microseconds);
@@ -623,7 +658,6 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
   #endif
 #endif
 
-// Include the variants
 #include "pins_arduino.h"
 
 // Based on those, some ugly formulae for "smart-pin" defines that follow the mux regs around:

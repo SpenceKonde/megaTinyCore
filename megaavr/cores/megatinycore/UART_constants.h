@@ -112,28 +112,46 @@
   #define PIN_SERIAL_XDIR           (3)
 
 /* Modifier Definitions  - these can be OR'ed with the other definition to turn on features like one-wire half duplex and more */
-#if defined(USART_RS4850_bm)
-  #define SERIAL_RS485         (((uint16_t) USART_RS4850_bm) << 8)// 0x0100
-  #define SERIAL_RS485_OTHER   (((uint16_t) USART_RS4851_bm) << 8)// 0x0200 tinyAVR 0/1 - that wacky, other RS485 mode.
+#if defined(USART_RS485_0_bm) || defined(USART_RS4850_bm)
+  #define SERIAL_RS485         (((uint16_t) USART_RS485_0_bm) << 8)// 0x0100
+  #define SERIAL_RS485_OTHER   (((uint16_t) USART_RS485_1_bm) << 8)// 0x0200 tinyAVR 0/1 - that wacky, other RS485 mode.
 #else
   #define SERIAL_RS485         (((uint16_t) USART_RS485_bm)  << 8)// 0x0100
 #endif
-  #define SERIAL_OPENDRAIN      ((uint16_t)                0x0400)// 0x0400
-  #define SERIAL_LOOPBACK      (((uint16_t) USART_LBME_bm)   << 8)// 0x0800
-  #define SERIAL_TX_ONLY       (((uint16_t) USART_RXEN_bm)   << 8)// 0x8000 The TXEN/RXEN bits are swapped - we invert the meaning of this bit.
-  #define SERIAL_RX_ONLY       (((uint16_t) USART_TXEN_bm)   << 8)// 0x4000 so if not specified, you get a serial port with both pins. Do not specify both. That will not enable anything.
+#define   SERIAL_OPENDRAIN      ((uint16_t)                 0x0400)// 0x0400
+#define   SERIAL_LOOPBACK      (((uint16_t) USART_LBME_bm)    << 8)// 0x0800
+#define   SERIAL_TX_ONLY       (((uint16_t) USART_RXEN_bm)    << 8)// 0x8000 The TXEN/RXEN bits are swapped - we invert the meaning of this bit.
+#define   SERIAL_RX_ONLY       (((uint16_t) USART_TXEN_bm)    << 8)// 0x4000 so if not specified, you get a serial port with both pins. Do not specify both. That will not enable anything.
+#define   SERIAL_EVENT_RX       ((uint16_t)                 0x2000)// 0x2000
 //#define SERIAL_MODE_SYNC      Defined Above                     // 0x0040 - works much like a modifier to enable synchronous mode.
 // See the Serial reference for more information as additional steps are required
   #define SERIAL_HALF_DUPLEX     (SERIAL_LOOPBACK | SERIAL_OPENDRAIN)
   //
 
+#define SERIAL_AUTOBAUD                     (0x80000000) // OR with baud rate for topology 3 in Ref. Serial
+#define SERIAL_REQUIRE_AUTOBAUD             (0xFFFFFFFF) // Specify autobaud... plus an obscenely fast baud rate. The other device must send a sync frame. Good for slaves in topology 2, or in topology 1
+#define SERIAL_MAKE_AUTOBAUD(intial_baud)   ((__asm__ __volatile__ ("ori %D0, 0x80" "\n\t" : "+d" (uint32_t)(initial_baud))), initial_baud) // Like ORing the baud rate, only faster, if it works;
 
-/* CTRLA is interrupt flags, plus 3 some options relevant to RS485
+#define SERIAL_AUTOBAUD_DISABLED
+
+/* Cumulative generally negative statii */
+#define SERIAL_WRITTEN              0x01 // Indicates that one or more character has been written to this serial port since begin called, used internally
+#define SERIAL_HALF_DUPLEX_ENABLED  0x02 // Indicates we are in half duplex mode. Used internally to control when interrupts are switched
+#define SERIAL_PARITY_ERROR         0x04 // Indicates that since getStatus() was last called there has been one or more parity error. Parity error characters are not retained.
+#define SERIAL_FRAME_ERROR          0x08 // Indicates that since getStatus() was last called there has been one or more framing error, this usually indicates a baud mismatch
+#define SERIAL_AUTOBAUD_SYNC        0x10 // Indicates that a fresh baud rate has been set.
+/* Some parts are afflicted by an errata that requires the receiver to be bounced to restore functiong the core does this automatically. */
+#define SERIAL_OVERFLOW_RING        0x20 // Indicates that the *RING BUFFER* lost data due to overflow - you are not calling read() as fast as data is coming in.
+#define SERIAL_AUTOBAUD_BADSYNC     0x40 // Indicates that an unsuccessful sync attempt was made. On parts known to be impacted by the errata, (AVR32DD20/14 - and maybe others)
+#define SERIAL_OVERFLOW_HARDWARE    0x80 // Indicates that the HARDWARE buffer overflowed because interrupts were disabled for too long while receiving data.
+
+
+/* CTRLA is interrupt flags, plus 3 options relevant to RS485
  *
  * | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 | USARTn.CTRLA
  * |---|---|---|---|---|---|---|---|
- * |RXC|TXC|DRE|RXS| - |ABE| ? | - |  Interrupt Enable bits
- * | -   -   -   - |LBM| - | RS485 |
+ * |RXC|TXC|DRE|RXS| - |ABE| - | - | Interrupt Enable bits
+ * | -   -   -   - |LBM| - | RS485 | RS485 stuff
  *
  * LBME - Loopback Mode Enable turns off RX and ties that channel to TX
  * RS485 - RS485 mode tells it to drive XDIR pin HIGH while transmitting in
@@ -182,7 +200,8 @@
  *   LIN mode has more constraints in accordance with that stadatd, while
  *   generic mode has clearly just disabled the checks and added a WFB or
  *   "wait for break" option so you can use autobaud without having to
- *   guess what baud it's using. Serial implements no support for this.
+ *   guess what baud it's using.
+ *
  *   These parts have no trouble keeping a clock accurate enough for serial
  *   and since you need to have control over the software on the the device
  *   that it's talking so you can make it send the break/sync, and you are

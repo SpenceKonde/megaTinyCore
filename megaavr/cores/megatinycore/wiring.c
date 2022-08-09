@@ -7,7 +7,8 @@
   Copyright (c) 2018-2021 Spence Konde
   This has been ported to modern AVRs (Arduino team did that)
   Almost every part of it has since been rewritten for
-  megaTinyCore and DxCore.
+  megaTinyCore and DxCore. This is the megaTinyCore version, and is
+  part of megaTinyCore.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -27,6 +28,9 @@
 
 #include "wiring_private.h"
 #include "util/delay.h"
+
+void init_timers();
+
 #ifndef F_CPU
   #error "F_CPU not defined. F_CPU must always be defined as the clock frequency in Hz"
 #endif
@@ -1256,7 +1260,7 @@ void __attribute__((weak)) init_millis()
       _timer->INTCTRL = TCB_CAPT_bm;
       // Clear timer mode (since it will have been set as PWM by init())
       _timer->CTRLB = 0;
-      // CLK_PER/1 is 0b00,. CLK_PER/2 is 0b01, so bitwise OR of valid divider with enable works
+      // CLK_PER/1 is 0b00, . CLK_PER/2 is 0b01, so bitwise OR of valid divider with enable works
       _timer->CTRLA = TIME_TRACKING_TIMER_DIVIDER|TCB_ENABLE_bm;  // Keep this last before enabling interrupts to ensure tracking as accurate as possible
     #endif
   #endif
@@ -1294,6 +1298,16 @@ void set_millis(__attribute__((unused))uint32_t newmillis)
   #endif
 }
 
+void nudge_millis(__attribute__((unused)) uint16_t nudgesize) {
+  #if (MILLIS_TIMER &= 0x78) /* 0x40 matches TCDs, 0x20 matches TCBs, 0x10 matches TCA0 0x08 matches TCA1, so OR them together and AND it with the timer to make sure it's not RTC, disabled, etc.  */
+    uint8_t oldSREG=SREG;
+    cli();
+    timer_millis += nudgesize;
+    SREG=oldSREG;
+  #else
+    #warning "Timer correction not yet supported for this timer.");
+  #endif
+}
 
 void init() {
   // Initializes hardware: First we configure the main clock, then fire up the other peripherals
