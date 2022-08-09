@@ -371,7 +371,11 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       }
     }
   }
-
+  bool analogSampleDuration(uint8_t sampdur) {
+    // any uint8_t is a legal value...
+    ADC0.CTRLE = sampdur;
+    return true;
+  }
   void ADCPowerOptions(uint8_t options) {
     // 0b SSEEPPLL
     // SS = run standby
@@ -441,11 +445,6 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     // What a mess!
   }
 
-  bool analogSampleDuration(uint8_t sampdur) {
-    // any uint8_t is a legal value...
-    ADC0.CTRLE = sampdur;
-    return true;
-  }
 
   int32_t _analogReadEnh(uint8_t pin, uint8_t neg, uint8_t res, uint8_t gain) {
     if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
@@ -603,6 +602,16 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   /*****************************************************
   START 0/1-series analogRead/analogReadXxxx functions
   *****************************************************/
+    bool analogSampleDuration(uint8_t dur) {
+      check_valid_duration(dur);
+      if (dur > 0x1F) {
+        ADC0.SAMPCTRL = 0x1F;
+        return false;
+      } else {
+        ADC0.SAMPCTRL = dur;
+        return true;
+      }
+    }
     void ADCPowerOptions(uint8_t options) {
     if (__builtin_constant_p(options)) {
       if (options & 0x0F) {
@@ -705,16 +714,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     }
   }
 
-  bool analogSampleDuration(uint8_t dur) {
-    check_valid_duration(dur);
-    if (dur > 0x1F) {
-      ADC0.SAMPCTRL = 0x1F;
-      return false;
-    } else {
-      ADC0.SAMPCTRL = dur;
-      return true;
-    }
-  }
+
 
   int32_t analogReadEnh(uint8_t pin, uint8_t res, uint8_t gain) {
     if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
