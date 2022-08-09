@@ -4,12 +4,12 @@
 #include <Servo.h>
 
 #if (F_CPU > 10000000)
-  #define usToTicks(_us)    ((( (_us) / 2) * clockCyclesPerMicrosecond()))            // converts microseconds to tick
+  #define usToTicks(_us)    ((((_us) / 2) * clockCyclesPerMicrosecond()))            // converts microseconds to tick
   #define ticksToUs(_ticks) (((unsigned) (_ticks) * 2) / clockCyclesPerMicrosecond()) // converts from ticks back to microseconds
   #define TRIM_DURATION  51                                                           // compensation ticks to trim adjust delays in the ISR
 #else
-  #define usToTicks(_us)    ((( _us) * clockCyclesPerMicrosecond()))                  // converts microseconds to tick
-  #define ticksToUs(_ticks) (((unsigned) _ticks) / clockCyclesPerMicrosecond())       // converts from ticks back to microseconds
+  #define usToTicks(_us)    ((( _us) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
+  #define ticksToUs(_ticks) (((unsigned) _ticks) / clockCyclesPerMicrosecond())      // converts from ticks back to microseconds
   #define TRIM_DURATION  102                                                          // compensation ticks to trim adjust delays in the ISR
 #endif
 

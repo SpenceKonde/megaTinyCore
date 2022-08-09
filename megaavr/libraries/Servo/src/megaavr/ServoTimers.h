@@ -17,8 +17,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
   This version was designed for and will be included with:
-  megaTinyCore 2.3.0+
-  DxCore 1.3.2+
+  megaTinyCore 2.6.0+
+  DxCore 1.5.0+
 */
 
 #ifndef __SERVO_TIMERS_H__
@@ -44,6 +44,7 @@
   #else
     #define USE_TIMERB3
   #endif
+  // 14 and 20-pin AVR DD-series parts do not have a third type B timer!
 #elif defined(SERVO_USE_TIMERB2)
   #if !defined(TCB2)
     #error "SERVO_USE_TIMERB2 is defined, but there is no TCB2 on selected part."
@@ -84,14 +85,19 @@
 static volatile __attribute__((used))  TCB_t *_timer =
 #if defined(USE_TIMERB0)
   &TCB0;
+  #define SERVO_INT_vect TCB0_INT_vect
 #elif defined(USE_TIMERB1)
   &TCB1;
+  #define SERVO_INT_vect TCB1_INT_vect
 #elif defined(USE_TIMERB2)
   &TCB2;
+  #define SERVO_INT_vect TCB2_INT_vect
 #elif defined(USE_TIMERB3)
   &TCB3;
+  #define SERVO_INT_vect TCB3_INT_vect
 #elif defined(USE_TIMERB4)
   &TCB4;
+  #define SERVO_INT_vect TCB4_INT_vect
 #endif
 
 typedef enum {

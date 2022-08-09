@@ -224,7 +224,7 @@ class tinyNeoPixel {
              output is often used for pixel brightness in animation effects.
   */
   static uint8_t    sine8(uint8_t x) { // 0-255 in, 0-255 out
-    #if (__AVR_ARCH__==103 || defined(MAPPED_PROGMEM))
+    #if (__AVR_ARCH__==103 || defined(PROGMEM_MAPPED))
       return _NeoPixelSineTable[x];
     #else     // We had to put it in PROGMEM, and that's how we get it out
       return pgm_read_byte(&_NeoPixelSineTable[x]); // 0-255 in, 0-255 out
@@ -244,7 +244,7 @@ class tinyNeoPixel {
   */
 
   static uint8_t    gamma8(uint8_t x) {
-    #if (__AVR_ARCH__==103 || defined(MAPPED_PROGMEM))
+    #if (__AVR_ARCH__==103 || defined(PROGMEM_MAPPED))
       return _NeoPixelGammaTable[x];
     #else
       return pgm_read_byte(&_NeoPixelGammaTable[x]);
