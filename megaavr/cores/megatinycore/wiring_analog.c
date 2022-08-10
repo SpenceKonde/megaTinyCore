@@ -622,7 +622,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       return true;
     }
   }
- uint8_t getAnalogSampleDuration() {return ADC1.SAMPCTRL;}
+ uint8_t getAnalogSampleDuration() {return ADC0.SAMPCTRL;}
  #ifdef ADC1
    uint8_t getAnalogSampleDuration1() {return ADC1.SAMPCTRL;}
  #endif
