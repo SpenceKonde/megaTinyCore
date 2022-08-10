@@ -114,7 +114,6 @@ extern "C"{
   #if defined(ADC1)
     inline uint8_t getAnalogSampleDuration1();
     uint8_t getAnalogSampleDuration1() {return ADC1.SAMPCTRL;}
- #endif
   #endif
 #else
   /* ADC constants for 2-series */
