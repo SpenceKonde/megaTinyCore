@@ -10,7 +10,7 @@
 // pull the pin to ground momentarily.  On a high -> low
 // transition the button press logic will execute.
 
-#define PIXEL_PIN    0    // Digital IO pin connected to the NeoPixels
+#define PIXEL_PIN    PIN_PA3    // Digital IO pin connected to the NeoPixels
 
 #define PIXEL_COUNT 16
 

@@ -2,9 +2,13 @@
 A library for interfacing with the CCL (Configurable Custom Logic) peripherals on modern AVR MCUs.
 Developed by MCUdude for use with [MegaCoreX](https://github.com/MCUdude/MegaCoreX), adapted to tinyAVR 0/1-series parts by [Tadashi G. Takaoka](https://github.com/tgtakaoka), and to 2-series and Dx-series by [Spence Konde](https://github.com/SpenceKonde)
 Correction of several issues on the tinyAVR parts and adaptation of examples by [Spence Konde](https://github.com/SpenceKonde).
-All of the examples assume the use of megaTinyCore, MegaCoreX or DxCore as appropriate (code is generally directly portable between megaAVR 0-series, tinyAVR 2-series and AVR Dx-series parts, minor modifications may be required for porting to or from tinyAVR 0/1-series parts). This document is focused on the tinyAVR parts. For information on this library relating to the megaAVR or AVR Dx-series parts, see the version of this document included with MegaCoreX or DxCore.
-
+All of the examples assume the use of megaTinyCore, MegaCoreX or DxCore as appropriate (code is generally directly portable between megaAVR 0-series, tinyAVR 2-series and AVR Dx-series parts, minor modifications may be required for porting to or from tinyAVR 0/1-series parts). This document is focused on the Dx-series parts. For information on this library relating to the megaAVR or tinyAVR parts, see the version of this document included with MegaCoreX or megaTinyCore.
 More information about CCL can be found in the [Microchip Application Note TB3218](http://ww1.microchip.com/downloads/en/AppNotes/TB3218-Getting-Started-with-CCL-90003218A.pdf) and in the [megaAVR-0 family data sheet](http://ww1.microchip.com/downloads/en/DeviceDoc/megaAVR0-series-Family-Data-Sheet-DS40002015B.pdf) and the datasheet for the part in question.
+
+
+## Invelid/reserved options
+Note that there exist reserved and invalid values for many bitfields here. This library does not support specifying these, and no comprehensive investigation has been undertaken to exclude the existence of useful ones. A discovery of useful ones
+
 
 ## Logic
 `Logic` is the class the library provides for interfacing with a built-in logic block (sometimes referred to as `LUT`s, from the "LookUp Table" - though it is a curious use of language, that is what Microchip refers to them as; we try to avoid it, since it is ). Use the predefined objects `Logic0`, `Logic1`, `Logic2` and `Logic3`. The logic blocks are paired, each pair sharing a single sequencer and `feedback` channel. `Logic2` and `Logic3` are only available on tinyAVR 2-series parts.
@@ -297,6 +301,21 @@ In2:in0 are treated as a 3-bit number (so 0-7), that bit number (starting from 0
 
 Ex: If in1 and in0 are high, and in2 is low, input is 3, (0b011 = 3). If the truth table is 0x89 - `0b10001001` - then the output will be high (0b1000*1*001). Put another way, the output it high if `truth & (1 << input)` is true.
 
+During development, it is often ~helpful~ necessary to draw out a table like:
+
+| IN2 | IN1 | IN0 | OUTPUT |
+|-----|-----|-----|--------|
+|   0 |   0 |   0 |      0 |
+|   0 |   0 |   1 |      0 |
+|   0 |   1 |   0 |      1 |
+|   0 |   1 |   1 |      0 |
+|   1 |   0 |   0 |      1 |
+|   1 |   0 |   1 |      0 |
+|   1 |   1 |   0 |      1 |
+|   1 |   1 |   1 |      1 |
+Which would translate into a truth value of 0b11010100 or 0xD4.
+
+
 #### Usage
 ```c++
 Logic0.truth = 0xF0;
@@ -305,10 +324,10 @@ Logic0.truth = 0xF0;
 #### Default state
 `LogicN.truth` defaults to `0x00` if not specified in the user program.
 
-## Methods
+## Logic Methods
 
 ### init()
-Method for initializing a logic block; this is what actually applies the settings above, writing to the registers of the CCL peripheral.
+Method for initializing a logic block; the settings you have previously configured will be applied and pins configured as requested at this time only.
 
 #### Usage
 ```c++
@@ -318,7 +337,7 @@ Logic1.init(); // Initialize block 1
 
 
 ### start()
-Static method for starting the CCL hardware after desired blocks have been initialized using `LogicN.init()`.
+Static method for starting the CCL hardware after desired blocks have been initialized using `LogicN.init()`. See the section below on reconfiguring.
 
 #### Usage
 ```c++
@@ -377,15 +396,15 @@ Logic0.truth=0x79;      // changed truth table for LUT0
 // At this point Logic1 not enabled, and logic0 is still using the old settings
 
 Logic::stop();  // have to turn off Logic0 too, even though I might not want to
-Logic0.init();  // apply changes to logic block 0
-Logic1.init();  // apply settings to logic block 1 for the first time
+Logic1.init();  // apply changes to logic block 1
+Logic3.init();  // apply settings to logic block 3 for the first time
 Logic::start(); // re-enable
 
 
 ```
 
-## Tips and tricks
-The CCL combined with the event system is the most powerful peripheral on the modern AVRs. I've been adding to a [compendium of non-obvious uses of it, like prescaling clocks.](Tricks_and_Tips.md)
+## Think outside the box
+To consider the CCL system as simply a built-in multifunction gate IC is to greatly undersell it. The true power of the CCL is in it's ability to use events directly, and to take inputs from almost everything. Even doing neat stuff like the above 0xD4 truth table on an even-numbered logic block with input 2 set to feedback to make an R/S latch without using the second logic block is only scratching the surface of what these can do! Taking that a step farther... you could then use the odd-numbered logic block with that same feedback to, say, switch between two waveforms being output by one of the PWM timers...
 
 ## Note on terminology
-Yes, technically, C++ doesn't have "properties" or "methods" - these are "member variables" and "member functions" in C++ parlance. They mean the same thing. I've chosen to use the more familiar, present day terminology, because experienced C++ programmers will know what is meant, even if they roll their eyes, while the novices who have learned modern languages and Arduino, and probably never did any C++ specific stuff won't know what "member variables" and "member functions" are.
+Yes, technically, C++ doesn't have "properties" or "methods" - these are "member variables" and "member functions" in C++ parlance. They mean the same thing. I've chosen to use the more familiar, preseent day terminology.

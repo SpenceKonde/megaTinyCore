@@ -273,22 +273,21 @@ void TwoWire::endSlave(void) {
 uint8_t TwoWire::requestFrom(uint8_t  address,  uint8_t  quantity)                   {
          return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) 1);
 }
-/*
-uint8_t TwoWire::requestFrom(uint8_t  address,  size_t   quantity,  bool     sendStop) {
-         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) sendStop);
-}
-uint8_t TwoWire::requestFrom(uint8_t  address,  size_t   quantity)                   {
-         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) 1);
-}
-uint8_t TwoWire::requestFrom(int16_t  address,  int16_t  quantity,  int16_t  sendStop) {
-         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) sendStop);
-}
-uint8_t TwoWire::requestFrom(int16_t  address,  int16_t  quantity)                   {
-         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) 1);
-}
-*/
+//uint8_t TwoWire::requestFrom(uint8_t  address,  size_t   quantity,  bool     sendStop) {
+//         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) sendStop);
+//
+//uint8_t TwoWire::requestFrom(uint8_t  address,  size_t   quantity)                   {
+//         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) 1);
+//}
+//uint8_t TwoWire::requestFrom(int16_t  address,  int16_t  quantity,  int16_t  sendStop) {
+//         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) sendStop);
+//}
+//uint8_t TwoWire::requestFrom(int16_t  address,  int16_t  quantity)                   {
+//         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) 1);
+//}
 uint8_t TwoWire::requestFrom(uint8_t  address,  uint8_t  quantity,  uint8_t sendStop) {
   if (quantity > BUFFER_LENGTH) {
+    // Can't do a __builtin_constant_p check here because classes make the optimizer lose the plot.
     quantity = BUFFER_LENGTH;
   }
   vars._clientAddress = address << 1;
@@ -315,6 +314,8 @@ void TwoWire::beginTransmission(uint8_t address) {
     uint8_t* txHead  = &(vars._bytesToWrite);
   #endif
   if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
+    // Spence: pretty sure this doesn't work. Constant folding and autoinlining doesn't seem to happen correctly when constants are passed to class methods, even when called a single time... .
+    // C++ stuff confuses the optimizer almost as much as me. I know  C not C++.
     badArg("Supplied address seems to be 8 bit. Only 7-bit-addresses are supported");
     return;
   }

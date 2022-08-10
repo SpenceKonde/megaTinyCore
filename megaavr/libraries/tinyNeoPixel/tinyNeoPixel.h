@@ -24,7 +24,7 @@
 #include <Arduino.h>
 
 #if (__AVR_ARCH__ < 100)
-  #error "This version of the library only supports AVRxt parts (tinyAVR 0/1/2-series, megaAVR 0-series and the AVR Dx/Ex-series parts. For the classic AVR version, get from ATTinyCore package"
+  #error "This version of the library only supports AVRxt parts (tinyAVR 0/1/2-series, megaAVR 0-series and the AVR DA/DB/DD parts. For tinyNeoPixel, for classic AVR, get from ATTinyCore package"
 #endif
 
 // The order of primary colors in the NeoPixel data stream can vary
@@ -107,7 +107,7 @@ normal variable, and it won't be copied to RAM.
 AVRxt devices with too much flash for all of it to be mapped
 which includes the AVR64Dx and AVR128Dx parts. DxCore defines a
 .section for the area of PROGMEM that is mapped by default, and
-a MAPPED_PROGMEM macro. A variable declared const MAPPED_PROGMEM can
+a PROGMEM_MAPPED macro. A variable declared const PROGMEM_MAPPED can
 be accessed normally, but will be stored in the flash and not copied to RAM.
 
 Finally, if neither of those are an option - it gets declared with PROGMEM
@@ -122,9 +122,9 @@ for x in range(256):
 #if (__AVR_ARCH__==103)
   // All out flash is mapped - yay!
   static const uint8_t _NeoPixelSineTable[256] = {
-#elif defined(MAPPED_PROGMEM)
+#elif defined(PROGMEM_MAPPED)
   // Some of it is - but we can put stuff there - yay!
-  static const uint8_t MAPPED_PROGMEM _NeoPixelSineTable[256] = {
+  static const uint8_t PROGMEM_MAPPED _NeoPixelSineTable[256] = {
 #else
   // Back to progmem...
   static const uint8_t PROGMEM _NeoPixelSineTable[256] = {
@@ -157,9 +157,9 @@ for x in range(256):
 #if (__AVR_ARCH__==103)
   // All our flash is mapped - yay!
   static const uint8_t _NeoPixelGammaTable[256] = {
-#elif defined(MAPPED_PROGMEM)
+#elif defined(PROGMEM_MAPPED)
   // Some of it is - but we can put stuff there - yay!
-  static const uint8_t MAPPED_PROGMEM _NeoPixelGammaTable[256] = {
+  static const uint8_t PROGMEM_MAPPED _NeoPixelGammaTable[256] = {
 #else
   // Back to progmem...
   static const uint8_t PROGMEM _NeoPixelGammaTable[256] = {
@@ -227,7 +227,7 @@ class tinyNeoPixel {
              output is often used for pixel brightness in animation effects.
   */
   static uint8_t    sine8(uint8_t x) { // 0-255 in, 0-255 out
-    #if (__AVR_ARCH__==103 || defined(MAPPED_PROGMEM))
+    #if (__AVR_ARCH__==103 || defined(PROGMEM_MAPPED))
       return _NeoPixelSineTable[x];
     #else     // We had to put it in PROGMEM, and that's how we get it out
       return pgm_read_byte(&_NeoPixelSineTable[x]); // 0-255 in, 0-255 out
@@ -246,7 +246,7 @@ class tinyNeoPixel {
              need to provide your own gamma-correction function instead.
   */
   static uint8_t    gamma8(uint8_t x) {
-    #if (__AVR_ARCH__==103 || defined(MAPPED_PROGMEM))
+    #if (__AVR_ARCH__==103 || defined(PROGMEM_MAPPED))
       return _NeoPixelGammaTable[x];
     #else
       return pgm_read_byte(&_NeoPixelGammaTable[x]);
