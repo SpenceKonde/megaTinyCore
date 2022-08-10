@@ -377,7 +377,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     return true;
   }
 
-  uint8_t getAnalogSampleDuration() {return ADC1.CTRLE;}
+  uint8_t getAnalogSampleDuration() {return ADC0.CTRLE;}
 
   void ADCPowerOptions(uint8_t options) {
     // 0b SSEEPPLL
