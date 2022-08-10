@@ -376,6 +376,9 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     ADC0.CTRLE = sampdur;
     return true;
   }
+
+  uint8_t getAnalogSampleDuration() {return ADC1.CTRLE;}
+
   void ADCPowerOptions(uint8_t options) {
     // 0b SSEEPPLL
     // SS = run standby
@@ -602,75 +605,86 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   /*****************************************************
   START 0/1-series analogRead/analogReadXxxx functions
   *****************************************************/
-    bool analogSampleDuration(uint8_t dur) {
-      check_valid_duration(dur);
-      if (dur > 0x1F) {
-        ADC0.SAMPCTRL = 0x1F;
-        return false;
-      } else {
-        ADC0.SAMPCTRL = dur;
-        return true;
-      }
-    }
-    void ADCPowerOptions(uint8_t options) {
-    if (__builtin_constant_p(options)) {
-      if (options & 0x0F) {
-        badArg("Only runstandby and enable/disable are supported - the hardware doesn't have LOWLAT nor the PGA");
-      }
-    }    // 0b SEE xxxx
-    // SS = run standby
-    // 00 = no change to run standby
-    // 01 = no change to run standby
-    // 10 = turn off run standby
-    // 11 = turn on run standby
-    // EE = ENABLE
-    // 00 = Do not enable or disable ADC.
-    // 01 = Do not enable or disable ADC.
-    // 10 = Disable the ADC.
-    // 11 = Enable the ADC.
 
-    uint8_t temp = ADC0.CTRLA; //performance.
-    if (options & 0x20) {
-      if (options & 0x10) {
-        temp |= 1; // ADC on
-      } else {
-        temp &= 0xFE; // ADC off
-      }
-    }
-    if (options & 0x80) {
-      if (options & 0x40) {
-        temp |= 0x80; // run standby
-      } else {
-        temp &= 0x7F; // no run standby
-      }
-    }
-    ADC0.CTRLA = temp; //now we apply enable and standby,
-  }
-  void analogReference(uint8_t mode) {
-    check_valid_analog_ref(mode);
-    switch (mode) {
-      #if defined(EXTERNAL)
-        case EXTERNAL:
-      #endif
-      case VDD:
-        VREF.CTRLB &= ~VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
-        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
-        // VREF.CTRLA does not need to be reconfigured, as the voltage references only supply their specified voltage when requested to do so by the ADC.
-        break;
-      case INTERNAL0V55:
-        VREF.CTRLA =  VREF.CTRLA & ~(VREF_ADC0REFSEL_gm); // These bits are all 0 for 0.55v reference, so no need to do the mode << VREF_ADC0REFSEL_gp here;
-        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; // per datasheet, recommended SAMPCAP=0 at ref < 1v
-        VREF.CTRLB |= VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
-        break;
-      case INTERNAL1V1:
-      case INTERNAL2V5:
-      case INTERNAL4V34:
-      case INTERNAL1V5:
-        VREF.CTRLA = (VREF.CTRLA & ~(VREF_ADC0REFSEL_gm)) | (mode << VREF_ADC0REFSEL_gp);
-        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v
-        break;
+  inline __attribute__((always_inline)) void check_valid_duration(uint8_t samplen) {
+    if (__builtin_constant_p(samplen)) {
+      if (samplen > 31)
+        badArg("Maximum SAMPLEN = 31 on these parts (33 ADC clocks)");
     }
   }
+  bool analogSampleDuration(uint8_t dur) {
+    check_valid_duration(dur);
+    if (dur > 0x1F) {
+      ADC0.SAMPCTRL = 0x1F;
+      return false;
+    } else {
+      ADC0.SAMPCTRL = dur;
+      return true;
+    }
+  }
+ uint8_t getAnalogSampleDuration() {return ADC1.SAMPCTRL;}
+ #ifdef ADC1
+   uint8_t getAnalogSampleDuration1() {return ADC1.SAMPCTRL;}
+ #endif
+  void ADCPowerOptions(uint8_t options) {
+  if (__builtin_constant_p(options)) {
+    if (options & 0x0F) {
+      badArg("Only runstandby and enable/disable are supported - the hardware doesn't have LOWLAT nor the PGA");
+    }
+  }    // 0b SEE xxxx
+  // SS = run standby
+  // 00 = no change to run standby
+  // 01 = no change to run standby
+  // 10 = turn off run standby
+  // 11 = turn on run standby
+  // EE = ENABLE
+  // 00 = Do not enable or disable ADC.
+  // 01 = Do not enable or disable ADC.
+  // 10 = Disable the ADC.
+  // 11 = Enable the ADC.
+
+  uint8_t temp = ADC0.CTRLA; //performance.
+  if (options & 0x20) {
+    if (options & 0x10) {
+      temp |= 1; // ADC on
+    } else {
+      temp &= 0xFE; // ADC off
+    }
+  }
+  if (options & 0x80) {
+    if (options & 0x40) {
+      temp |= 0x80; // run standby
+    } else {
+      temp &= 0x7F; // no run standby
+    }
+  }
+  ADC0.CTRLA = temp; //now we apply enable and standby,
+}
+void analogReference(uint8_t mode) {
+  check_valid_analog_ref(mode);
+  switch (mode) {
+    #if defined(EXTERNAL)
+      case EXTERNAL:
+    #endif
+    case VDD:
+      VREF.CTRLB &= ~VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
+      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
+      // VREF.CTRLA does not need to be reconfigured, as the voltage references only supply their specified voltage when requested to do so by the ADC.
+      break;
+    case INTERNAL0V55:
+      VREF.CTRLA =  VREF.CTRLA & ~(VREF_ADC0REFSEL_gm); // These bits are all 0 for 0.55v reference, so no need to do the mode << VREF_ADC0REFSEL_gp here;
+      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; // per datasheet, recommended SAMPCAP=0 at ref < 1v
+      VREF.CTRLB |= VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
+      break;
+    case INTERNAL1V1:
+    case INTERNAL2V5:
+    case INTERNAL4V34:
+    case INTERNAL1V5:
+      VREF.CTRLA = (VREF.CTRLA & ~(VREF_ADC0REFSEL_gm)) | (mode << VREF_ADC0REFSEL_gp);
+      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v
+      break;
+  }
+}
 
 
   int analogRead(uint8_t pin) {
@@ -707,123 +721,117 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   }
 
 
-  inline __attribute__((always_inline)) void check_valid_duration(uint8_t samplen) {
-    if (__builtin_constant_p(samplen)) {
-      if (samplen > 31)
-        badArg("Maximum SAMPLEN = 31 on these parts (33 ADC clocks)");
-    }
+
+
+
+int32_t analogReadEnh(uint8_t pin, uint8_t res, uint8_t gain) {
+  if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
+  check_valid_enh_res(res);
+  check_valid_analog_pin(pin);
+  if (__builtin_constant_p(gain)) {
+    if (gain != 0)
+      badArg("This part does not have an amplifier, gain argument must be omitted or given as 0");
   }
-
-
-
-  int32_t analogReadEnh(uint8_t pin, uint8_t res, uint8_t gain) {
-    if (!(ADC0.CTRLA & 0x01)) return ADC_ENH_ERROR_DISABLED;
-    check_valid_enh_res(res);
-    check_valid_analog_pin(pin);
-    if (__builtin_constant_p(gain)) {
-      if (gain != 0)
-        badArg("This part does not have an amplifier, gain argument must be omitted or given as 0");
+  uint8_t sampnum;
+  if (res & 0x80) { // raw accumulation
+    sampnum = res & 0x7F;
+    if (sampnum > 6) return ADC_ENH_ERROR_RES_TOO_HIGH;
+  } else {
+    if (res < ADC_NATIVE_RESOLUTION_LOW) return ADC_ENH_ERROR_RES_TOO_LOW;
+    if (res > 13) return ADC_ENH_ERROR_RES_TOO_HIGH;
+    sampnum = (res > ADC_NATIVE_RESOLUTION ? ((res - ADC_NATIVE_RESOLUTION) << 1) : 0);
+  }
+  if (pin < 0x80) {
+    // If high bit set, it's a channel, otherwise it's a digital pin so we look it up..
+    pin = digitalPinToAnalogInput(pin);
+  }
+  #if (PROGMEM_SIZE > 4096)
+    // don't waste flash on smallest parts.
+    if ((pin & 0x7F) > 0x1F) { // highest valid mux value for any 0 or 1-series part.
+      return ADC_ERROR_BAD_PIN_OR_CHANNEL;
     }
-    uint8_t sampnum;
-    if (res & 0x80) { // raw accumulation
-      sampnum = res & 0x7F;
-      if (sampnum > 6) return ADC_ENH_ERROR_RES_TOO_HIGH;
-    } else {
-      if (res < ADC_NATIVE_RESOLUTION_LOW) return ADC_ENH_ERROR_RES_TOO_LOW;
-      if (res > 13) return ADC_ENH_ERROR_RES_TOO_HIGH;
-      sampnum = (res > ADC_NATIVE_RESOLUTION ? ((res - ADC_NATIVE_RESOLUTION) << 1) : 0);
-    }
-    if (pin < 0x80) {
-      // If high bit set, it's a channel, otherwise it's a digital pin so we look it up..
-      pin = digitalPinToAnalogInput(pin);
-    }
-    #if (PROGMEM_SIZE > 4096)
-      // don't waste flash on smallest parts.
-      if ((pin & 0x7F) > 0x1F) { // highest valid mux value for any 0 or 1-series part.
-        return ADC_ERROR_BAD_PIN_OR_CHANNEL;
-      }
-    #endif
-    pin &= 0x1F;
-    ADC0.MUXPOS = pin;
-    #if defined(STRICT_ERROR_CHECKING) /* Strict error checking not yet implemented */
-      if (ADC0.COMMAND) return ADC_ENH_ERROR_BUSY;
-    #endif
+  #endif
+  pin &= 0x1F;
+  ADC0.MUXPOS = pin;
+  #if defined(STRICT_ERROR_CHECKING) /* Strict error checking not yet implemented */
+    if (ADC0.COMMAND) return ADC_ENH_ERROR_BUSY;
+  #endif
 
-    uint8_t _ctrla = ADC0.CTRLA;
-    ADC0.CTRLA = ADC_ENABLE_bm | (res == ADC_NATIVE_RESOLUTION_LOW ? ADC_RESSEL_bm : 0);
-    // if (res > 0x80) {
-      ADC0.CTRLB = sampnum;
-    /*} else
-    if (res > ADC_NATIVE_RESOLUTION) {
-      ADC0.CTRLB = 2 * (res - ADC_NATIVE_RESOLUTION);
-    } else {
-      ADC0.CTRLB = 0;
-    }*/
-
-    ADC0.COMMAND = ADC_STCONV_bm;
-    while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
-    int32_t result = ADC0.RES;
-    if (res < 0x80 && res > ADC_NATIVE_RESOLUTION) {
-      uint8_t shift = res - ADC_NATIVE_RESOLUTION - 1;
-      while (shift) {
-        result >>= 1;
-        shift--;
-      }
-      uint8_t roundup = result & 0x01;
-      result >>= 1;
-      result += roundup;
-    } else if (res == ADC_NATIVE_RESOLUTION - 1) { // 9 bit res?!
-      result >>= 1;
-    } // res > 0x80 (raw accumulate) or res == 8, res == 10 need no adjustment;
-    ADC0.CTRLA = _ctrla;
+  uint8_t _ctrla = ADC0.CTRLA;
+  ADC0.CTRLA = ADC_ENABLE_bm | (res == ADC_NATIVE_RESOLUTION_LOW ? ADC_RESSEL_bm : 0);
+  // if (res > 0x80) {
+    ADC0.CTRLB = sampnum;
+  /*} else
+  if (res > ADC_NATIVE_RESOLUTION) {
+    ADC0.CTRLB = 2 * (res - ADC_NATIVE_RESOLUTION);
+  } else {
     ADC0.CTRLB = 0;
-    return result;
-  }
+  }*/
 
-  int32_t analogReadDiff(__attribute__ ((unused)) uint8_t pos, __attribute__ ((unused))uint8_t neg, __attribute__ ((unused))uint8_t res, __attribute__ ((unused))uint8_t gain) {
-    badCall("This part does not have a differential ADC");
-    return ADC_ENH_ERROR_NOT_DIFF_ADC;
-  }
-  int32_t analogReadDiff1(__attribute__ ((unused)) uint8_t pos, __attribute__ ((unused))uint8_t neg, __attribute__ ((unused))uint8_t res, __attribute__ ((unused))uint8_t gain) {
-    badCall("This part does not have a differential ADC - and certainly not TWO OF THEM");
-    return ADC_ENH_ERROR_NOT_DIFF_ADC;
-  }
-  static const int16_t adc_prescale_to_clkadc[0x09] =  {(F_CPU /  2000UL),(F_CPU /  4000UL),(F_CPU /  8000UL),(F_CPU / 16000UL),
-  /* Doesn't get copied to ram because these all */     (F_CPU / 32000UL),(F_CPU / 64000UL),(F_CPU /128000UL),(F_CPU /256000UL),1};
-
-  /*
-  Frequency in kHz.
-  If (options & 1) == 1, will set frequencies outside of safe operating range
-  Otherwise, will be constrained to between 300 and 3000 (if internal reference used) or 300 and 6000 if not.
-  Note: analogReference does NOT check this! So set the clock speed after reference if you want that guardrail.
-  0 takes action, and -1 sets to default.
-  */
-
-
-  int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
-    if (frequency == -1) {
-      frequency = 1450;
+  ADC0.COMMAND = ADC_STCONV_bm;
+  while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
+  int32_t result = ADC0.RES;
+  if (res < 0x80 && res > ADC_NATIVE_RESOLUTION) {
+    uint8_t shift = res - ADC_NATIVE_RESOLUTION - 1;
+    while (shift) {
+      result >>= 1;
+      shift--;
     }
-    if (frequency > 0) {
-      bool using_0v55 = !(VREF.CTRLA & VREF_ADC0REFSEL_gm || ADC0.CTRLC & ADC_REFSEL_gm);
-      if ((options & 0x01) == 0) {
-        frequency = constrain(frequency, (using_0v55 ? 100: 200), (using_0v55 ? 260 : 1500));
+    uint8_t roundup = result & 0x01;
+    result >>= 1;
+    result += roundup;
+  } else if (res == ADC_NATIVE_RESOLUTION - 1) { // 9 bit res?!
+    result >>= 1;
+  } // res > 0x80 (raw accumulate) or res == 8, res == 10 need no adjustment;
+  ADC0.CTRLA = _ctrla;
+  ADC0.CTRLB = 0;
+  return result;
+}
+
+int32_t analogReadDiff(__attribute__ ((unused)) uint8_t pos, __attribute__ ((unused))uint8_t neg, __attribute__ ((unused))uint8_t res, __attribute__ ((unused))uint8_t gain) {
+  badCall("This part does not have a differential ADC");
+  return ADC_ENH_ERROR_NOT_DIFF_ADC;
+}
+int32_t analogReadDiff1(__attribute__ ((unused)) uint8_t pos, __attribute__ ((unused))uint8_t neg, __attribute__ ((unused))uint8_t res, __attribute__ ((unused))uint8_t gain) {
+  badCall("This part does not have a differential ADC - and certainly not TWO OF THEM");
+  return ADC_ENH_ERROR_NOT_DIFF_ADC;
+}
+static const int16_t adc_prescale_to_clkadc[0x09] =  {(F_CPU /  2000UL),(F_CPU /  4000UL),(F_CPU /  8000UL),(F_CPU / 16000UL),
+/* Doesn't get copied to ram because these all */     (F_CPU / 32000UL),(F_CPU / 64000UL),(F_CPU /128000UL),(F_CPU /256000UL),1};
+
+/*
+Frequency in kHz.
+If (options & 1) == 1, will set frequencies outside of safe operating range
+Otherwise, will be constrained to between 300 and 3000 (if internal reference used) or 300 and 6000 if not.
+Note: analogReference does NOT check this! So set the clock speed after reference if you want that guardrail.
+0 takes action, and -1 sets to default.
+*/
+
+
+int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
+  if (frequency == -1) {
+    frequency = 1450;
+  }
+  if (frequency > 0) {
+    bool using_0v55 = !(VREF.CTRLA & VREF_ADC0REFSEL_gm || ADC0.CTRLC & ADC_REFSEL_gm);
+    if ((options & 0x01) == 0) {
+      frequency = constrain(frequency, (using_0v55 ? 100: 200), (using_0v55 ? 260 : 1500));
+    }
+    uint8_t prescale = 0;
+    for (uint8_t i =0; i < 8; i++) {
+      int16_t clkadc = adc_prescale_to_clkadc[i];
+      prescale = i;
+      if ((frequency >= clkadc) || (adc_prescale_to_clkadc[i + 1] < ((options & 0x01) ? 2 : (using_0v55 ? 100 : 200)))) {
+        ADC0.CTRLC = (ADC0.CTRLC & ~ADC_PRESC_gm) | prescale;
+        break;
       }
-      uint8_t prescale = 0;
-      for (uint8_t i =0; i < 8; i++) {
-        int16_t clkadc = adc_prescale_to_clkadc[i];
-        prescale = i;
-        if ((frequency >= clkadc) || (adc_prescale_to_clkadc[i + 1] < ((options & 0x01) ? 2 : (using_0v55 ? 100 : 200)))) {
-          ADC0.CTRLC = (ADC0.CTRLC & ~ADC_PRESC_gm) | prescale;
-          break;
-        }
-      }
     }
-    if (frequency < 0) {
-      return ADC_ERROR_INVALID_CLOCK;
-    }
-    return adc_prescale_to_clkadc[(ADC0.CTRLC & ADC_PRESC_gm)];
   }
+  if (frequency < 0) {
+    return ADC_ERROR_INVALID_CLOCK;
+  }
+  return adc_prescale_to_clkadc[(ADC0.CTRLC & ADC_PRESC_gm)];
+}
 
 #if defined(ADC1)
 /****************************************************/
