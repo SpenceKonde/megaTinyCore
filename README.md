@@ -73,7 +73,7 @@ An HV programming tool to be called HyperUPDI is expected to be available (thoug
 * Due to the considerably more complex hardware, HyperUPDI will obviously not be a $1 device like SerialUPDI (which I expect most people will continue to use)
 
 #### Really coming before year end 2022: Superior serial adapters
-A single-port version that switches between UPDI and normal mode and 5v and 3.3v, and exposes all model liason pins is a near certainty.
+A single-port version that switches between UPDI and normal mode and 5v and 3.3v (via physical switches), and exposes all modem liason pins is a near certainty.
 
 #### (New in 2.5.6) What's With All The Different SerialUPDI Options?
 Depending on adapter model, and operating system, it has been found that different timing settings are required; however, settings needed to keep even 230400 baud from failing on Linux/Mac with most adapters impose a much larger time penalty on Windows, where the OS's serial handling is slow enough that nothing needs that delay...

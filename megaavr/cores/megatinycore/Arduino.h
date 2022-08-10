@@ -111,9 +111,9 @@ extern "C"{
   #define ADC_ACC16       0x84
   #define ADC_ACC32       0x85
   #define ADC_ACC64       0x86
+    inline uint8_t getAnalogSampleDuration() {return ADC0.SAMPCTRL;}
   #if defined(ADC1)
-    inline uint8_t getAnalogSampleDuration1();
-    uint8_t getAnalogSampleDuration1() {return ADC1.SAMPCTRL;}
+    inline uint8_t getAnalogSampleDuration1() {return ADC1.SAMPCTRL;}
   #endif
 #else
   /* ADC constants for 2-series */
