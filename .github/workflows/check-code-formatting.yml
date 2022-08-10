@@ -54,7 +54,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Check code formatting
-        uses: per1234/artistic-style-action@v1
+        uses: per1234/artistic-style-action@main
         with:
           options-file-path: ${{ env.OPTIONS_FILE_PATH }}
           name-patterns: |
@@ -86,7 +86,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Check code formatting
-        uses: per1234/artistic-style-action@v1
+        uses: per1234/artistic-style-action@main
         with:
           options-file-path: ${{ env.OPTIONS_FILE_PATH }}
           name-patterns: |
@@ -102,7 +102,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Check code formatting
-        uses: per1234/artistic-style-action@v1
+        uses: per1234/artistic-style-action@main
         with:
           options-file-path: ${{ env.OPTIONS_FILE_PATH }}
           name-patterns: |
