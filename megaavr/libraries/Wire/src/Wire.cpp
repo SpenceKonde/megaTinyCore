@@ -186,20 +186,6 @@ void TwoWire::begin(uint8_t address, bool receive_broadcast, uint8_t second_addr
   }
   TWI_SlaveInit(&vars, address, receive_broadcast, second_address);
 }
-void TwoWire::begin(uint8_t address, bool receive_broadcast) {
-  if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
-    badArg("Supplied address seems to be 8 bit. Only 7 bit addresses are supported");
-    return;
-  }
-  TWI_SlaveInit(&vars, address, receive_broadcast, second_address);
-}
-void TwoWire::begin(uint8_t address) {
-  if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
-    badArg("Supplied address seems to be 8 bit. Only 7 bit addresses are supported");
-    return;
-  }
-  TWI_SlaveInit(&vars, address, receive_broadcast, second_address);
-}
 
 /**
  *@brief      setClock sets the baud register to get the desired frequency
