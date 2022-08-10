@@ -391,3 +391,14 @@ Rpu = 30100 + ((215 * getVoltageAsByte()) >> 5) + 76 * getTemperatureAsByte();
 An even more accurate way to calculate the pullup strength would be to recall that there was negligible variation between pins - if you can spare a microcontroller pin, a reference resistor could be used, and the calibration performed "live" at the actual conditions.
 
 Through these methods, it is possible to use the internal pullup as one side of a resistor divider for this sort of purpose, provided that you can ensure that the temperature and voltage variations are either small or account for them (and/or the precision required low enough) that simply measuring it at approximately those conditions will give you a suitable calibration value. As long as the number of buckets you need to sort values into remains small, it runs on a regulated power supply, and the device will operate at comfortable human living temperatures, only a single point calibration should be needed. It may in fact be found as a larger sample of chips are tested that even this is unnecessary; maybe Microchip has really good control over their process, and while their datasheets give them great leeway, they actually repeatedly hit the bullseye. My initial testing seems to suggest that that may be the case, at least within part families - Every 2-series I tested has been within a kOhm or two!
+
+## Microchip Documentation
+Has been much expanded and I'm very happy to see this sort of document produced before the EA release. Wondering about the numbering? Well, TB stands for Technical Brief, which is different in some way from an Application Note (AN)
+* [TB3256 - How to Use the 12-Bit Differential ADC with PGA in Single Mode](https://www.microchip.com/content/dam/mchp/documents/MCU08/ApplicationNotes/ApplicationNotes/TB3256-How-to-Use-the-12-Bit-Differential-ADC-with-PGA-in-Single-Mode-DS90003256A.pdf)
+* [AN4225 - Maximizing the Signal: Tips and Tricks to Properly Acquiring Analog Signals](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ApplicationNotes/ApplicationNotes/Max-Signal-Properly-TipsTrick-Acq-Analog-Signals-DS00004225.pdf)
+* [TB3254 - How to Use the 12-Bit Differential ADC with PGA in Burst Accumulation Mode
+](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ApplicationNotes/ApplicationNotes/TB3254-How-to-Use-the-12-Bit-Differential-ADC-Burst-Accumulation-Mode-DS90003254A.pdf)
+* [TB3256 - How to Use the 12-Bit Differential ADC with PGA in Single Mode]()
+* [TB3257 - How to Use the 12-Bit Differential ADC in Series Accumulation Mode]()
+* [TB3256 - How to Use the 12-Bit Differential ADC with PGA in Single Mode]()
+* [TB3256 - How to Use the 12-Bit Differential ADC with PGA in Single Mode]()
