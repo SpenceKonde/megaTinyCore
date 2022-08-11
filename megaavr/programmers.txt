@@ -1,4 +1,4 @@
-serialupdi.name=SerialUPDI - 230400 baud, 2.7V+ (Mac/Linux: usually CH340 only, Win: most adapters)
+serialupdi.name=SerialUPDI - 230400 baud
 serialupdi.protocol=uart
 serialupdi.program.extra_params=-u {serial.port} -b 230400
 serialupdi.program.protocol=uart
@@ -12,7 +12,7 @@ serialupdi230k_wd1.program.protocol=uart
 serialupdi230k_wd1.program.tool=serialupdi
 serialupdi230k_wd1.bootloader.tool=serialupdi
 
-serialupdi57k.name=SerialUPDI - SLOW: 57600 baud, any platform, any voltage, any adapter.
+serialupdi57k.name=SerialUPDI - SLOW: 57600 baud
 serialupdi57k.protocol=uart
 serialupdi57k.program.extra_params=-u {serial.port} -b 57600
 serialupdi57k.program.protocol=uart
@@ -83,14 +83,14 @@ atmelice_updi.program.protocol=jtagice3_updi
 atmelice_updi.program.tool=avrdude
 atmelice_updi.program.extra_params=-Pusb
 
-pickit4_updi.name=PICkit4
+pickit4_updi.name=PICkit4 (UPDI mode)
 pickit4_updi.communication=usb
 pickit4_updi.protocol=pickit4_updi
 pickit4_updi.program.protocol=jtagice3_updi
 pickit4_updi.program.tool=avrdude
 pickit4_updi.program.extra_params=-Pusb
 
-snap_updi.name=MPLAB SNAP
+snap_updi.name=MPLAB SNAP (UPDI mode)
 snap_updi.communication=usb
 snap_updi.protocol=snap_updi
 snap_updi.program.protocol=jtagice3_updi

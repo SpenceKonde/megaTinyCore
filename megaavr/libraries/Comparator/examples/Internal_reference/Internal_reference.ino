@@ -1,12 +1,11 @@
 /***********************************************************************|
-| tinyAVR 0/1/2-series analog comparator library                        |
+| Modern AVR Comparator library for tinyAVR 0/1/2, megaAVR0, Dx, and  Ex|
 |                                                                       |
-| Internal_reference.ino                                                |
-|                                                                       |
-| A library for interfacing with the tinyAVR analog comparator(s).      |
 | Developed in 2019 by MCUdude    https://github.com/MCUdude/           |
 | Ported to tinyAVR 2021 by Spence Konde for megaTinyCore               |
 | https://github.com/SpenceKonde/megaTinyCore                           |
+| Ported to tinyAVR 2022 by Spence Konde for DxCore                     |
+| https://github.com/SpenceKonde/DxCore                                 |
 |                                                                       |
 | In this example we use an internal reference voltage instead of an    |
 | external one on the negative pin. This eliminates the need for an     |

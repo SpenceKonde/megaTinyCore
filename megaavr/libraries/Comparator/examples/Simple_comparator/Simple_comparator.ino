@@ -1,12 +1,9 @@
 /***********************************************************************|
-| tinyAVR 0/1/2-series analog comparator library                        |
-|                                                                       |
-| Simple_comparator.ino                                                 |
-|                                                                       |
-| A library for interfacing with the tinyAVR analog comparator(s).      |
-| Developed in 2019 by MCUdude  https://github.com/MCUdude/             |
-| Ported to tinyAVR 2021 by Spence Konde for megaTinyCore               |
+| Developed in 2019 by MCUdude    https://github.com/MCUdude/           |
 | https://github.com/SpenceKonde/megaTinyCore                           |
+| Ported to tinyAVR 2021 by Spence Konde for megaTinyCore               |
+| Ported to tinyAVR 2022 by Spence Konde for DxCore                     |
+| https://github.com/SpenceKonde/DxCore                                 |
 |                                                                       |
 | In this example we use the negative and positive input 0 of the       |
 | comparator. The output goes high if the positive input is higher than |

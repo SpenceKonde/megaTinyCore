@@ -1,7 +1,7 @@
 # USERSIG Library V2.0.2 for megaTinyCore
 
-**Written by:** _Spence Konde_
-**Based on EEPROM.h by:** Christopher Andrews
+**Written by:** *Spence Konde*
+**Based on EEPROM.h by:** *Christopher Andrews*
 
 ## What is the USERSIG library
 
@@ -24,15 +24,10 @@ The Dx-series uses a different version of the library, which is included with Dx
 Specifying an address beyond the size of the USEROW will wrap around to the beginning.
 
 ## Write Endurance
-There is no specification given in the datasheet. You should treat the USERROW as if had a limit of 10k write/erase cycle, like flash; that has been confirmed to me in the context of the Dx-series parts by a well-placed source - however, I do not know if the same is true on tinyAVR, or if (like it's erase and write procedures) it is instead like EEPROM.
-
-## The last 12 bytes of the USERROW
-If (and only if) you have used the included tuning sketch to calibrate the internal oscillator for other frequencies, we store that calibration data in the USERROW, at the last 12 addresses. The last 6 get the values used with the internal oscillator at nominally 20 MHz, and the next-to-last 6 get the values for when the internal oscillator is set for a 16 MHz nominal frequency: Hence you have only 20 bytes available. If you are using the "tuned" oscillator options, you should avoid overwriting the last 12 bytes - or at least the one for the frequency you are tuning for (this includes the case where the tuning sketch has never been run, and you're using the tuned internal oscillator option and relying on us to guess the correct calibration value - we'll mistake your value for the calibration value); if you do, your new value will be used as the calibration value, and at the next reset, you'll wonder why your "24 MHz" tuning has turned into 17.3 MHz or some other wacky frequency.
-
-Those locations are only used when Tools -> Clock is set to "Internal xx MHz (tuned)" - other clock options do not require such measures.
+There is no specification given in the datasheet. You should treat the USERROW as if had a limit of comparable to flash. That has been confirmed to me in the context of the Dx-series parts by a well-placed source - however, I do not know if the same is true on tinyAVR, or if (like it's erase and write procedures) it is instead like EEPROM. The datasheets of Dx-series parts consistently refer to it being like flash, while the datasheets of the tinyAVRs compare it to EEPROM - but never is the context of write endurance discussed). This may be more of an issue now that the write endurance of the DA and DB systems for flash has been reduced by a factor of 10.
 
 ## How to use it
-The USERSIG library is included with megaTinyCore. To add its functionality to your sketch you'll need to reference the library header file. You do this by adding an include directive to the top of your sketch.
+The USERSIG library is included with DxCore. To add its functionality to your sketch you'll need to reference the library header file. You do this by adding an include directive to the top of your sketch.
 
 ```Arduino
 #include <USERSIG.h>
@@ -58,12 +53,12 @@ You can view all the examples [here](examples/).
 This function allows you to read a single byte of data from the USERSIG.
 Its only parameter is an `byte` which should be set to the address you wish to read.
 
-The function returns an `unsigned char` containing the value read.
+The function returns an `uint8_t` (byte) containing the value read.
 
 ### `USERSIG.write(address, value)` [[_example_]](examples/usersig_write/usersig_write.ino)
 
-The `write()` method allows you to write a single byte of data to the USERSIG.
-Two parameters are needed. The first is a `byte` containing the address that is to be written, and the second is the data to be written, a `byte`.
+The `write()` method allows you to write a single byte of data to the USERROW.
+Two parameters are needed. The first is an `int` containing the address that is to be written, and the second is the data to be written, a `byte`.
 
 This function always returns an 1 as an `int8_t`, indicating that a single byte was written to the NVM. (on DxCore, it can also return a 0, indicating that the data has not yet been written, and that flush() must be called to write it).
 

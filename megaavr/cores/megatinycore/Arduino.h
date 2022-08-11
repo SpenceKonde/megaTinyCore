@@ -111,11 +111,6 @@ extern "C"{
   #define ADC_ACC16       0x84
   #define ADC_ACC32       0x85
   #define ADC_ACC64       0x86
-  #if defined(ADC1)
-    inline uint8_t getAnalogSampleDuration1();
-    inline uint8_t getAnalogSampleDuration1() {return ADC1.SAMPCTRL;}
-  #endif
-  inline uint8_t getAnalogSampleDuration() {return ADC0.SAMPCTRL;}
 #else
   /* ADC constants for 2-series */
   #define VDD             (0) /* ADC_REFSEL_VDD_gc    */
@@ -170,7 +165,6 @@ extern "C"{
   #define ADC_STANDBY_ON  0xC0
   #define ADC_STANDBY_OFF 0x80
 
-  inline uint8_t getAnalogSampleDuration() {return ADC0.CTRLE;}
 
 #endif
 
@@ -365,7 +359,6 @@ void               DACReference(uint8_t mode);
 
 uint8_t      getAnalogReference();
 uint8_t         getDACReference();
-uint8_t getAnalogSampleDuration();
 int8_t  getAnalogReadResolution();
 
 //

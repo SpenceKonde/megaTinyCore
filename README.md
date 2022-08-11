@@ -34,10 +34,11 @@ This document is best viewed online if you installed via board manager - [https:
 ## Getting Started
 ### [Wiring](Wiring.md)
 ### [Installation](Installation.md)
-### **Arduino 1.8.13 is recommended**
+### **Arduino 1.8.13 is *strongly* recommended**
 Older versions do not properly handle the programmers in the tools -> programmers menu, which degrades the UX rapidly as the number of installed cores increases. They are not suitable.
 
-The newest versions (1.8.17, 1.8.18, and 1.8.19) may generate a "panic: no major version found" error and fail to compile any sketch. This bug is because versions starting with 1.8.14 do not expand the version property in platform.txt - [a relative of this bug](https://github.com/arduino/arduino-cli/pull/1830)  This is used only for manual installations and can be ignored if you install the core only via boards manager. If you want a manual install under 1.8.19 you must edit platform.txt to manually expand the version number (for example, verson=2.6.0). We appear to be back to the bad old days where only a small fraction of IDE releases are any good. :-(
+The newest versions starting with 1.8.14 (including 1.8.17, 1.8.18, and 1.8.19) may generate a "panic: no major version found" error and fail to compile any sketch. This bug is because versions starting with 1.8.14 do not expand the version property in platform.txt - [a relative of this bug](https://github.com/arduino/arduino-cli/pull/1830)  This is used only for manual installations and can be ignored if you install the core only via boards manager. If you want a manual install under 1.8.19 you must edit platform.txt to manually expand the version number (for example, verson=2.6.0). We appear to be back to the bad old days where only a small fraction of IDE releases are any good. :-(
+
 
 When megaTinyCore is installed through board manager, the required version of the toolchain is installed automatically. All 0/1/2-Series parts are supported with no extra steps.
 
@@ -58,7 +59,7 @@ The UPDI programming interface is a single-wire interface for programming (and d
 ### From a USB-Serial Adapter With SerialUPDI (pyupdi-style - Recommended)
 Before megaTinyCore existed, there was a tool called [pyupdi](https://github.com/mraardvark/pyupdi) - a simple Python program for uploading to UPDI-equipped microcontrollers using a serial adapter modified by the addition of a single resistor. But pyupdi was not readily usable from the Arduino IDE, and so this was not an option. As of 2.2.0, megaTinyCore brings in a portable Python implementation, which opens a great many doors; Originally we were planning to adapt pyupdi, but at the urging of its author and several Microchip employees, we have instead based this functionality on [pymcuprog](https://pypi.org/project/pymcuprog/), a "more robust" tool developed and "maintained by Microchip" which includes the same serial-port upload feature, only without the performance optimizations. **If installing manually** you must [add the Python package](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/tools/ManualPython.md) appropriate to your operating system in order to use this upload method (a system Python installation is not sufficient, nor is one necessary).
 
-Read the [SerialUPDI documentation](https://github.com/SpenceKonde/AVR-Guidance/blob/master/UPDI/jtag2updi.md) for information on the wiring.
+Read the [**SerialUPDI documentation**](https://github.com/SpenceKonde/AVR-Guidance/blob/master/UPDI/jtag2updi.md) for information on the wiring.
 
 As of 2.3.2, with the dramatic improvements in performance, and the proven reliability of the wiring scheme using a diode instead of a resistor, and in light of the flakiness of the jtag2updi firmware, this is now the recommended programming method. As of this version, programming speed has been increased by as much as a factor of 20, and now far exceeds what was possible with jtag2updi (programming via jtag2updi is roughly comparable in speed to programming via SerialUPDI on the "SLOW" speed option, 57600 baud; the normal 230400 baud version programs about three times faster than the SLOW version or jtag2updi, while the "TURBO" option (runs at 460800 baud and increases upload speed by approximately 50% over the normal one. The TURBO speed version should only be used with devices running at 4.5v or more, as we have to run the UPDI clock faster to keep up (it is also not expected to be compatible with all serial adapters - this is an intentional tradeoff for improved performance), but it allows for upload and verification of a 32kB sketch in 4 seconds.
 
@@ -72,6 +73,9 @@ An HV programming tool to be called HyperUPDI is expected to be available (thoug
 * Because of the built in awareness of the UPDI protocol and the NVMCTRL of supported parts other features like partial erase (to supplement Flash.h on the Dx-series).
 * Voltage options of 5V, 3.3V, and V<sub>target</sub> will be selectable with a slide switch, allowing programming where the target voltage is as low as 1.8V, programming devices running directly off LiPo batteries at 3.7-4.2v and so on.
 * Due to the considerably more complex hardware, HyperUPDI will obviously not be a $1 device like SerialUPDI (which I expect most people will continue to use)
+
+#### Really coming before year end 2022: Superior serial adapters
+A single-port version that switches between UPDI and normal mode and 5v and 3.3v (via physical switches), and exposes all modem liaison pins is a near certainty.
 
 #### (New in 2.5.6) What's With All The Different SerialUPDI Options?
 Depending on adapter model, and operating system, it has been found that different timing settings are required; however, settings needed to keep even 230400 baud from failing on Linux/Mac with most adapters impose a much larger time penalty on Windows, where the OS's serial handling is slow enough that nothing needs that delay...
@@ -131,7 +135,7 @@ This is currently used only for the last few releases, and should fix the avrdud
   * ATtiny 25/45/85, 24/44/84, 261/461/861, 48/88, and the small and strange 43 and 4313/2313, and in 2.0.0, the 26 as well as the final-four (which show hints of experimentation in the direction of the modern AVRs), the ATtiny 441/841, 1634 and 828
   * ATtiny15 (obsolete) and ATtiny28L (still in active production, but functionally obsolete). Both of those parts are like, really terrible. These are among the first tinyAVRs - when transistors were more expensive, and they hadn't yet decided what tradeoffs were sensible for tinyAVRs. I reckon that was figured out by trial and error, and these would constitute the errors). They had yet to standardize the 8 MHz internal oscillator (t15's has a 6.4MHz internal oscillator, and the 28 a mere 1.2 MHz). On, and the t28 doesn't even have SRAM. The tiny15 ceased production a while back, being replaced with the 25/45/85, and while Microchip still makes the t28, they've jacked the price way up to encourage people to move to something at least a little less ancient. I imagine they'd love to cease production of them to focus on parts don't have specs that were low end two decades ago.
 * ATtiny13 (a smaller less featureful 8-pin part - Use [MicroCore](https://github.com/MCUdude/MicroCore) by @MCUdude (I never support parts with under 1k of flash)
-* ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the CPU core they use is gimped: All the memory access operations are slower than classic AVRs (which are mostly slower than modern ones) and as if that all weren't enough, they also lack multiplication (like AVRe), and have only working registers r16-r31.  and half as many working registers. But [attiny10core](https://github.com/technoblogy/attiny10core) supports them!
+* ATtiny5, 10, 11, and the other "reduced core" devices - these kinda suck. Not only do they have 1k or less flash and practically no RAM, the CPU core they use is gimped: All the memory access operations are slower than classic AVRs (which are mostly slower than modern ones) and as if that all weren't enough, they also lack multiplication (like AVRe), and have only working registers r16-r31. and half as many working registers. But [attiny10core](https://github.com/technoblogy/attiny10core) supports them!
 * Anything else [**See this document for a list of AVR part families and what arduino cores they work with**](https://github.com/SpenceKonde/AVR-Guidance/blob/master/AVRFamilies_And_Compatibility/ArduinoCores.md)
 
 ## Overall Part Comparison
@@ -153,12 +157,12 @@ TWI, SPI, USART0, AC0, are unchanged, as is NVMCTRL (the changes required to the
 
 megaTinyCore provides an analogRead() implementation, and more powerful functions to use the oversampling and PGA (see the analog feature section below).
 
-Oh, and one more thing... the UPDI pin configuration has the old options - UPDI, I/O, or Reset... and a new one: UPDI on PA0, with hardware RESET pin on PB4! Optiboot will finally be a viable and comfortable option at least  on the parts that have a PB4, ie, not the 14-pin parts. Which also happen to be (if my Tindie store sales are any indication) the most popular kind.
+Oh, and one more thing... the UPDI pin configuration has the old options - UPDI, I/O, or Reset... and a new one: UPDI on PA0, with hardware RESET pin on PB4! Optiboot will finally be a viable and comfortable option at least on the parts that have a PB4, ie, not the 14-pin parts. Which also happen to be (if my Tindie store sales are any indication) the most popular kind.
 
 ### Dark Times Likely Loom Ahead for tinyAVR as a Product Line
 Do you think there will be a 3 series? I do not. DD and the EA's are clearly coming after them and taking up strategic positions around tinyAVR territory. I think it's only a matter of time before the brand is eliminated like they did megaavr after the megaAVR 0-series. This is not necessarily a bad thing: All the Dx and EA series parts are very similar in pin mappings and and behavior. The tinies are less consistent. Most irritating of all, the pin numbering is whack on the tinyAVRs: It starts off in order, then PORTB is in reverse order, then PORTC back to normal? Give me a break! And this bit about the UPDI being on PA0? Ugh! On everything else it's way down at PF7. Since tradition is to use pin 0 for the first pin, and have the last number be the pin that you can't use without setting a fuse that makes the chip hard to program, that was what led to the less optimal pin numbering we got. I'd have much rathered be able to number them counterclockwise starting with A0 without breaking unwritten conventions of Arduino code.
 
-I predict, that in 2-4 years time, there's an AVR DA, DB, DD. DU (the USB one), EA, and D/E/F-series parts down to pincounts of 8 and 64-pin parts with 128k flash and the new ADC. And nothing else branded ATtiny (another big mystery is if they're ever going to replace the ATmega2560 with a modern AVR with 100 total pins (probably 80-88 of which are I/O); That would present two issues - first, past 56 I/O pins there are no more VPORT registers left - the low I/O space is full with 28 VPORT and 4 GPIORs. How will they handle the 4 extra ports? (on the 2560, they were just second class ports that were accessed more slowly and didn't have single cycle access. [I have some musings about it and the feasibility with how few opcodes are available in appendix A here.](https://github.com/SpenceKonde/AVR-Guidance/blob/master/LowLevel/ReadingAVRHex.md)
+I predict, that in 2-4 years time, there's an AVR DA, DB, DD. DU (the USB one), EA, and D/E/F-series parts down to pincounts of 8 and 64-pin parts with 128k flash and the new ADC. And nothing else branded ATtiny (another big mystery is if they're ever going to replace the ATmega2560 with a modern AVR with 100 total pins (probably 80-88 of which are I/O); That would present two issues - first, past 56 I/O pins there are no more VPORT registers left - the low I/O space is full with 28 VPORT and 4 GPIORs. How will they handle the 4 extra ports? (on the 2560, they were just second class ports that were accessed more slowly and didn't have single cycle access. [I have some musings about it and the feasibility with how few opcodes are available in appendix A here.](https://github.com/SpenceKonde/AVR-Guidance/blob/master/LowLevel/ReadingAVRHex.md). Then again if they're still selling those ancient things for over ten bucks, why would they want to change that?!
 
 ## Buying tinyAVR 1-Series and 2-Series Breakout Boards
 I sell breakout boards with regulator, UPDI header, and Serial header in my tindie shop, as well as the bare boards. Buying from my store helps support further development on the core, and is a great way to get started using these exciting new parts with Arduino. Currently ATtiny1624 boards are available, but the 20 and 24-pin parts will not be sold as an assembled board until a newly revised PCB design is back from the board house to enable autoreset on the alt-reset pin. There is also a 14-pin board revision coming - thought it is largely cosmetic. The yellow solder mask has got to go, as the readability seemed to get worse in the last several batches. The new boards also standardize a 0.6" spacing between the rows of pins, instead of the current 0.7" spacing, so you will be able to, for example, put machined pin header onto them and plug them into a wide-DIP socket, or use them with our prototyping board optimized for that row spacing. Assembled 0-Series boards are being discontinued, and will not be restocked once they sell out. The same will happen for the 16k 2-Series parts once the 32k ones are available.
@@ -189,13 +193,12 @@ The type D timer is only used for PWM on 20/24 pin 1-Series parts. On the smalle
 Unlike almost every other AVR ever, there are additional "bonus" features based on the flash-size of parts within a family. The 16k and 32k versions (only) have a few extra features (which also don't appear to have been considered for pricing) - they all have 2k of ram, whether 16k or 32k, they have 3 analog comparators (including a window mode), a second - desperately needed - type B timer - and weirdest of all they have a second ADC, differing only in which pins the channels correspond to!
 
 ## Memory-mapped Flash: No Need to Declare PROGMEM
-Unlike classic AVRs, on the these parts, *the flash is mapped to the same address space as the rest of the memory*. This means `pgm_read_*_near()` is not needed to read directly from flash. Because of this, the compiler automatically puts any variable declared `const` into PROGMEM, and accesses it appropriately - you no longer need to explicitly declare them as PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either, though to maintain compatibility  with some third party libraries, f() still declares it's argument PROGMEM.
+Unlike classic AVRs, on the these parts, *the flash is mapped to the same address space as the rest of the memory*. This means `pgm_read_*_near()` is not needed to read directly from flash. Because of this, the compiler automatically puts any variable declared `const` into PROGMEM, and accesses it appropriately - you no longer need to explicitly declare them as PROGMEM. This includes quoted string literals, so the F() macro is no longer needed either, though to maintain compatibility with some third party libraries, f() still declares it's argument PROGMEM.
 
 However, do note that if you explicitly declare a variable PROGMEM, you must still use the `pgm_read` functions to read it, just like on classic AVRs. When a variable is declared PROGMEM on parts with memory mapped flash, the pointer is offset (address is relative to start of flash, not start of address space); this same offset is applied when using the `pgm_read_*_near()` macros. Do note that declaring things PROGMEM and accessing with `pgm_read_*_near` functions, although it works fine, is slower and wastes a small amount of flash (compared to simply declaring the variables const); the same goes for the F() macro with constant strings in 2.1.0 and later (for a period of time before 2.1.0, `F()` did nothing - but that caused problems for third party libraries). The authors maintained that the problem was with the core, not the library, and my choice was to accept less efficiency, or deny my users access to popular libraries). Using the `F()` macro may be necessary for compatibility with some third party libraries (the specific cases that forced the return of `F()` upon us were not of that sort - we were actually able to make the ones I knew of work with the F()-as-noop code, and they took up a few bytes less flash as a result).
 
 ### Automotive (VAO) Versions
 The automotive versions should also work. You must always select the 16 MHz-derived clock speeds on these parts. They do not support 20 MHz operation.
-
 
 ## megaTinyCore - Features, options, and guidelines
 Now on to the good part, where we get to talk about how all this is exposed by megaTinyCore. We will start with the matter of how you should refer to pins for best results, and then move on to core features, menu options, before ending with a series of links to documents with more detail on various subsystems.
@@ -208,7 +211,7 @@ This core uses a simple scheme for assigning the Arduino pin numbers: Pins are n
 In order to prevent all confusion about pin identities and eliminate ambiguity, we recommend using the PIN_Pxn notation to refer to pins unless you are using a development board with different numbers or names for the pins printed on it. This will maximize portability of your code to other similar hardware and make it easier to look up information on the pins you are using in the relevant datasheets, should that be necessary.
 
 ### PIN_Pxn Port Pin Numbers (recommended)
-**This is the recommended way to refer to pins** `#defines` are also provided of form `PIN_Pxn`, where `x` is A, B, or C, and `n` is a number 0-7 - (Not to be confused with the PIN_An defines described below). These just resolve to the digital pin number of the pin in question - they don't go through a different code path or anything. However, they have particular utility in writing code that works across the product line with peripherals that are linked to certain pins (by Port), as most peripherals are. Several pieces of demo code in the documentation take advantage of this. Direct port manipulation is possible as well - and in fact several powerful additional options are available for it - see [direct port manipulation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_DirectPortManipulation.md).
+**This is the recommended way to refer to pins** `#defines` are also provided of form `PIN_Pxn`, where `x` is A, B, or C, and `n` is a number 0-7 - (Not to be confused with the PIN_An defines described below). These just resolve to the digital pin number of the pin in question - they don't go through a different code path or anything. However, they have particular utility in writing code that works across the product line with peripherals that are linked to certain pins (by Port), as most peripherals are. Several pieces of demo code in the documentation take advantage of this. Direct port manipulation is possible as well - and in fact several powerful additional options are available for it - see [**direct port manipulation**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_DirectPortManipulation.md).
 
 **`PIN_Pxn` - not `Pxn`, and not `PIN_xn` - those mean different things!**
 
@@ -228,15 +231,24 @@ These parts (well, the 1/2-Series at least - the 0-Series is more of a budget op
 * 8  MHz Internal (2.7v-5.5v - typical for 3.3v systems)
 * 5  MHz Internal (1.8v-5.5v)
 * 4  MHz Internal (1.8v-5.5v)
+* 2  MHz Internal (1.8v-5.5v)
 * 1  MHz Internal (1.8v-5.5v)
-* 20 MHz Internal (tuned)
-* 16 MHz Internal (tuned)
-* 12 MHz Internal (tuned)
 * 20 MHz External Clock (4.5v-5.5v)
 * 16 MHz External Clock (4.5v-5.5v)
 * 12 MHz External Clock (2.7v-5.5v)
 * 10 MHz External Clock (2.7v-5.5v)
 * 8  MHz External Clock (2.7v-5.5v)
+* 6  MHz Internal (tuned)
+* 5  MHz Internal (tuned)
+* 4  MHz Internal (tuned)
+* 2  MHz Internal (tuned)
+* 1  MHz Internal (tuned)
+* 7  MHz Internal (tuned, for masochists)
+* 8  MHz Internal (tuned)
+* 10 MHz Internal (tuned)
+* 12 MHz Internal (tuned)
+* 16 MHz Internal (tuned)
+* 20 MHz Internal (tuned)
 * 24 MHz Internal (tuned, overclocked)
 * 25 MHz Internal (tuned, overclocked)
 * 30 MHz Internal (tuned, overclocked) - 0/1-Series require "20MHz" OSCCFG fuse setting; 2-Series parts may or may not be able to reach 30 with "16 MHz" selected.
@@ -246,18 +258,19 @@ These parts (well, the 1/2-Series at least - the 0-Series is more of a budget op
 * 30 MHz External clock (Overclocked aggressively)
 * 32 MHz External clock (Overclocked aggressively)
 
+**We make no claims about voltage or temperature ranges for overclocked parts - all we claim is that at least one of chips we have worked at that speed** at room temperature and 5v.
 
 **Important - Read about [Tuning](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md) before selecting any tuned option!**
 
-More information on these clock speeds can be found in the [Clock Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Clocks.md)
+More information on these clock speeds can be found in the [**Clock Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Clocks.md)
 
 Voltages shown are those guaranteed to work by manufacturer specifications. Unless pushing the bounds of the operating temperature range, these parts will typically do far better (2-Series generally work at 32 MHz and 5v @ room temperature even from internal oscillator; the 0/1-Series will likewise usually work at 32 MHz with external clock provided the power supply is a stable 5.0-5.5V).
 
 No action is required to set the `OSCCFG` fuse when the sketch is uploaded via UPDI. When uploaded through Optiboot, the fuse cannot be changed, so whatever was chosen when the bootloader was burned is what is used, and only "burn bootloader" or uploading a sketch via UPDI will change that.
 
-All internal oscillator clock speed options use the factory default calibration unless a "tuned" option is selected, in which case the calibration is adjusted as documented in the [tuning documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md).
+All internal oscillator clock speed options use the factory default calibration unless a "tuned" option is selected, in which case the calibration is adjusted as documented in the [**Tuning Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md). This can be used to get 16 MHz operation on an optiboot chip fused for 20 MHz and vice versa.
 
-See [Speed Grade reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_SpeedGrades.md) for more information on the manufacturer's speed grades. Note that those are the voltages and clock speeds at which it is guaranteed to work. These parts are intended to be suitable for use in applications where an unexpected glitch of some description could pose a hazard to persons or property (think cars, industrial equipment, airplanes - places where people could die if the part malfunctioned). Many hobby users will be far more relaxed about the potential for stability issues, with crashes being little more than a nuisance, and the extremes of the extended temperature range parts being far beyond what we would ever need. *Our testing has found that the official speed grades are extremely conservative, and that is the basis of the options in the menu*.
+See [**Speed Grade reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_SpeedGrades.md) for more information on the manufacturer's speed grades. Note that those are the voltages and clock speeds at which it is guaranteed to work. These parts are intended to be suitable for use in applications where an unexpected glitch of some description could pose a hazard to persons or property (think cars, industrial equipment, airplanes, nuclear reactors - places where people could die if the part malfunctioned). Many hobby users will be far more relaxed about the potential for stability issues, with crashes being little more than a nuisance, and the extremes of the extended temperature range parts being far beyond what we would ever need. If your device is running (with conformal coating ofc) at the bottom of a pot of boiling water, I wouldn't expect it to overclock... *Our testing has found that the official speed grades are extremely conservative, and that is the basis of the options in the menu*.
 
 **It has been established that the extended temperature parts overclock better** which makes sense. A part that is spec'ed to run at 20 MHz at 125C would be expected to have a better chance of running at 32 MHz at room temperature than one spec'ed only to run at 20 MHz only at 105C
 
@@ -312,7 +325,7 @@ There are more options than on classic AVR for resetting, including if the code 
 See the [**Reset and Watchdog (WDT) Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md).
 
 ### Improved Digital I/O
-This core adds a number of new features include fast digital I/O (1-14 clocks depending on what's known at compile time, and 2-28 bytes of flash, and for configuring all per-pin settings the hardware has with `pinConfigure()`.
+This core adds a number of new features include fast digital I/O (1-14 clocks depending on what's known at compile time, and 2-28 bytes of flash (pin number must be known at compile time for the `________Fast()` functions, and for configuring all per-pin settings the hardware has with `pinConfigure()`.
 
 See the [**Improved Digital I/O Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Digital.md).
 
@@ -321,7 +334,7 @@ All of the 0/1-Series parts have a single hardware serial port (UART or USART); 
 
 Prior to putting the part into a sleep mode, or otherwise disabling it's ability to transmit, be sure that it has finished sending the data in the buffer by calling `Serial.flush()`, otherwise the serial port will emit corrupted characters and/or fail to complete transmission of a message.
 
-See the [**Serial Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Serial.md) for a full list of options. As of 2.5.0, almost every type of functionality that the serial hardware can do is supported, including RS485 mode, half-duplex (via LBME and ODME), and even synchronous and Master SPI mode!
+See the [**Serial Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Serial.md) for a full list of options. As of 2.5.0, almost every type of functionality that the serial hardware can do is supported, including RS485 mode, half-duplex (via LBME and ODME), and even synchronous and Master SPI mode, and 2.6.0 will add autobaud, even though it's not very useful.
 
 ### SPI Support
 All of these parts have a single hardware SPI peripheral. It works like the one on official Arduino boards using the SPI.h library. See the pinout charts for the location of these pins. On 8-pin parts, the only option for the SS pin is PA0 (the UPDI/reset pin); this does not matter for the purposes of this core though, because, like the official library, this only operates as a master, and the SS pin is used only when potentially acting as a slave.
@@ -339,13 +352,13 @@ This core disables the SS pin, meaning the "SS" pin can be used for whatever pur
 ### I2C (TWI) Support
 All of these parts have a single hardware I2C (TWI) peripheral. It presents an API compatible with the standard Arduino implementation, but with added support for multiple slave addresses, answering general call addresses and - most excitingly - simultaneous master and slave operation! (new in 2.5.0).
 
-This is fully documented in the [Wire library reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Wire/README.md).
+This is fully documented in the [**Wire library reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Wire/README.md).
 
 ### PWM Support
 The core provides hardware PWM via the standard `analogWrite()` function. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available. On all other parts except 1-Series parts with 20 or 24 pins, 6 PWM pins are available, all driven by Timer A (TCA0). The 20 and 24 pin 1-Series parts have two additional pins, driven by TCD0. The 2-Series apparently traded TCD0 for a second serial port and a super-fancy ADC - those parts also all have 6 PWM pins. The Type B (TCBn) timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A and they are often too useful to justify using a whole TCB for. However, you can take them over if you need to generate PWM at different frequencies, though the fact that the prescaler cannot differ from the type A timer limits this use as well. See the pinout charts for a list of which pins support PWM.
 
 **Note that TCA0 (the type A timer) on all parts is configured by the core at startup to operate in split mode in order to support the most PWM pins possible with `analogWrite()`. As of the 2.2.x versions, a `takeOverTCA0()` function has been added, which can be called to instruct the core not write to TCA0-registers nor assume any particular mode or behavior for TCA0. `analogWrite()` will not generate PWM except on pins driven by TCD0 on the 20/24-pin parts nor will `digitalWrite()` turn it off if you want to reconfigure TCA0 for other purposes, please refer to the below guide and "hard reset" the timer back to stock configuration.**
-#### [Taking over TCA0](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/TakingOverTCA0.md)
+#### [**Taking over TCA0**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/TakingOverTCA0.md)
 
 #### PWM on TCD0 Pins (PIN_PC0 and PIN_PC1 - 10,11 on x16, 12,13 on x17)
 The 3216, 1616, 816, 416, and the 3217, 1617 and 817 have two additional PWM pins driven by Timer D (PC0 and PC1 - pins 10 and 11 on x16, 12 and 13 on x17). Timer D is an asynchronous (async) timer, and the outputs can't be enabled or disabled without briefly stopping the timer. This results in a brief glitch on the other PWM pin (if it is currently outputting PWM) and doing so requires slightly longer - though the duration of this glitch is under 1 us. If TCD is used as the millis timer - which is the default on any part that has a type D timer (in order to keep the timers that are more readily repurposed available - TCD0 is not an easy peripheral to work with), this will result in `millis()` losing a very small amount of time (under 1 us) every time PWM is turned on or off on a TCD pin.
@@ -370,7 +383,7 @@ Support for `tone()` is provided on all parts using TCB0, unless TCB1 is present
 ### millis()/micros() Timekeeping Options
 megaTinyCore provides the option to use any available timer on a part for the `millis()`/`micros()` timekeeping, controlled by a Tools submenu. It can be disabled entirely if needed to save flash, allow use of all timer interrupts or eliminate the periodic background interrupt. By default, TCD0 will be used by on parts that have one - otherwise TCA0 will be used (in versions prior to 1.1.9, TCA0 was used by default on parts that could output PWM with TCD0 on pins not available for TCA0 PWM). All timers available on the parts can be used: TCA0, TCD0 (on parts that have it), TCB0, TCB1 (where present) and the RTC. Many of these - particularly the non-default options, involve tradeoffs. In brief, TCA0 is a very versatile timer that users often want to reconfigure, TCD0 loses a small amount of time when PWM is turned on or off on the two TCD0 PWM pins (10,11 on 20-pin parts, 12,13 on 24-pin parts), TCB0 conflicts with `Servo` and `tone()` on parts that don't have TCB1, and when the RTC is used `micros()` is not available at all because the clock isn't fast enough. With these limitations in mind, the timer selection menu provides a way to move `millis()`/`micros()` to the timer most appropriate for your needs.
 
-For more information, on the hardware timers of the supported parts, and how they are used by megaTinyCore's built-in functionality, see the [Timers and megaTinyCore](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Timers.md).
+For more information, on the hardware timers of the supported parts, and how they are used by megaTinyCore's built-in functionality, see the [**Timers and megaTinyCore Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Timers.md).
 
 2.3.0 fixed a long-standing (though surprisingly low impact) "time travel" bug.
 
@@ -572,7 +585,13 @@ These guides are older; some are still relevant.
 This has been recently updated and will likely be turned into a Ref_TCA0.
 ### [Advanced ADC Features - For 0/1-Series Only](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ADCFreerunAndMore.md)
 This document describes how (on the 0 and 1 Series only) the ADC can be taken over and reconfigured, with particular attention to free running mode. The 2-Series ADC is different, and it would require changes to reflect those differences.
-
+### Official Microchip documents that are of notable value
+#### [TB3262 - AVR1000b: Getting Started with Writing C-Code for AVR MCUs](https://ww1.microchip.com/downloads/en/Appnotes/AVR1000b-Getting-Started-Writing-C-Code-for-AVR-DS90003262B.pdf)
+A delightful document on bare metal programming in C.
+#### [AVR Instruction Set Manual](https://ww1.microchip.com/downloads/en/DeviceDoc/AVR-InstructionSet-Manual-DS40002198.pdf)
+The bible of the AVR instruction set. Like any such tome, it is a very lengthy document which contains timeless wisdom from the creator(s) in obtuse and challenging language and a confusing syntax.If you are writing assembly, you probably have this document open most of the time.
+#### See also the recently written ones listed in [the analog reference](Ref_Analog.md)
+As promised, a bunch of additional information was released; Unfortunately it leaves some of the key questions unanswered.
 ## List of Tools sub-menus
 * Tools -> Chip - sets the specific part within a selected family to compile for and upload to.
 * Tools -> Clock - sets the clock speed. You must burn bootloader after changing between 16/8/4/1MHz and 20/10/5MHz to apply the changes (ie, changing from 20MHz to 10MHz does not require burning bootloader, changing from 20MHz to 16MHz does). A virgin chip will be set to use the 20MHz internal oscillator as its base clock source, so 20/10/5MHz clock speed options should work without an initial "burn bootloader" - though we still recommend it to ensure that all other fuses are set to the values you expect.
@@ -604,8 +623,6 @@ Earlier versions of megaTinyCore enabled the internal pullup resistors on the I2
 ### Serial Does Not Manipulate Interrupt Priority
 The official core for the (similar) megaAVR 0-Series parts, which megaTinyCore was based on, fiddles with the interrupt priority (bet you didn't know that!) in methods that are of dubious wisdoom. megaTinyCore does not do this, saving several hundred bytes of flash in the process, and fixing at least one serious bug which could result in the microcontroller hanging if Serial was used in ways that everyone tells you not to use it, but which frequently work anyway. Writing to Serial when its buffer is full, or calling `Serial.flush()` with interrupts disabled, or during another ISR (which you *really shouldn't do*) will behave as it does on classic AVRs and simply block, manually calling the transmit handlers, until there is space in the buffer for all of the data waiting to be written or the buffer is empty (for `flush()`). On th stock megaAVR core, this could hang forever.
 
-
-
 ### SerialEvent Support is Dropped
 This is deprecated on the official core and is, and always has been, a dreadful misfeature. Dropped as of 2.3.0.
 
@@ -613,7 +630,7 @@ This is deprecated on the official core and is, and always has been, a dreadful 
 On official cores, and most third party ones, the `digitalRead()` function turns off PWM when called on a pin. This behavior is not documented by the Arduino reference. This interferes with certain optimizations, makes `digitalRead()` take at least twice as long (likely much longer) as it needs to and generally makes little sense. Why should a "read" operation change the thing it's called on? We have a function that alters the pin it's called on: `digitalWrite()`. There does not seem to be a logically coherent reason for this and, insofar as Arduino is supposed to be an educational platform it makes simple demonstrations of what PWM is non-trivial (imagine setting a pin to output PWM, and then looking at the output by repeatedly reading the pin).
 
 ### `digitalWrite()` and `INPUT` Pins
-Like the official "megaavr" core, calling `digitalWrite()` on a pin currently set `INPUT` will enable or disable the pullups as appropriate.  `digitalWrite()` also supports "CHANGE" as an option; on the official core, this will turn the pullup on, regardless of which state the pin was previously in, instead of toggling the state of it. The state of the pullup is now set to match the value that the port output register was just set to.
+Like the official "megaavr" core, calling `digitalWrite()` on a pin currently set `INPUT` will enable or disable the pullups as appropriate. `digitalWrite()` also supports "CHANGE" as an option; on the official core, this will turn the pullup on, regardless of which state the pin was previously in, instead of toggling the state of it. The state of the pullup is now set to match the value that the port output register was just set to.
 
 This was done because of the huge volume of code that makes use of this behavior. We experimented with making pinMode() do the inverse for INPUT and INPUT_PULLUP, but this was removed by unanimous agreement by everyone in the discussion thread.
 

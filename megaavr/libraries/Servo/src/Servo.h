@@ -37,7 +37,8 @@
   The servos are pulsed in the background using the value most recently
   written using the write() method.
 
-
+  Note that analogWrite of PWM on pins associated with the timer are
+  disabled when the first servo is attached.
 
   The methods are:
 
