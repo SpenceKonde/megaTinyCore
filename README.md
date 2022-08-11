@@ -37,7 +37,7 @@ This document is best viewed online if you installed via board manager - [https:
 ### **Arduino 1.8.13 is recommended**
 Older versions do not properly handle the programmers in the tools -> programmers menu, which degrades the UX rapidly as the number of installed cores increases. They are not suitable.
 
-The newest versions (1.8.17, 1.8.18, and 1.8.19) may generate a "panic: no major version found" error and fail to compile any sketch. It is not clear what triggers this bug, as it is not a missing major version define. The major, minor, and patch versions are specified in platform.txt. We appear to be back to the bad old days where only a small fraction of IDE releases are any good. :-(
+The newest versions (1.8.17, 1.8.18, and 1.8.19) may generate a "panic: no major version found" error and fail to compile any sketch. This bug is because versions starting with 1.8.14 do not expand the version property in platform.txt - [a relative of this bug](https://github.com/arduino/arduino-cli/pull/1830)  This is used only for manual installations and can be ignored if you install the core only via boards manager. If you want a manual install under 1.8.19 you must edit platform.txt to manually expand the version number (for example, verson=2.6.0). We appear to be back to the bad old days where only a small fraction of IDE releases are any good. :-(
 
 When megaTinyCore is installed through board manager, the required version of the toolchain is installed automatically. All 0/1/2-Series parts are supported with no extra steps.
 
