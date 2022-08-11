@@ -204,13 +204,12 @@ void SPIClass::usingInterrupt(uint8_t interruptNumber) {
 }
 
 void SPIClass::notUsingInterrupt(uint8_t interruptNumber) {
-  if ((interruptNumber == NOT_AN_INTERRUPT)) {
+  if ((interruptNumber == NOT_AN_INTERRUPT))
     return;
   }
 
-  if (interruptMode & SPI_IMODE_GLOBAL) {
-    return;  // can't go back, as there is no reference count
-  }
+  if (interruptMode & SPI_IMODE_GLOBAL)
+    return; // can't go back, as there is no reference count
 
   if (interruptNumber < 32) {
     interruptMask_lo &= ~(1 << interruptNumber);
@@ -232,7 +231,7 @@ void SPIClass::detachMaskedInterrupts() {
   uint8_t shift = 0;
   while (temp != 0) {
     if (temp & 1) {
-      volatile uint8_t *pin_ctrl_reg = getPINnCTRLregister(portToPortStruct(shift / 8), shift % 8);
+      volatile uint8_t* pin_ctrl_reg = getPINnCTRLregister(portToPortStruct(shift / 8), shift % 8);
       irqMap[shift] = *pin_ctrl_reg;
       *pin_ctrl_reg &= ~(PORT_ISC_gm);
     }
@@ -243,7 +242,7 @@ void SPIClass::detachMaskedInterrupts() {
   shift = 32;
   while (temp != 0) {
     if (temp & 1) {
-      volatile uint8_t *pin_ctrl_reg = getPINnCTRLregister(portToPortStruct(shift / 8), shift % 8);
+      volatile uint8_t* pin_ctrl_reg = getPINnCTRLregister(portToPortStruct(shift / 8), shift % 8);
       irqMap[shift] = *pin_ctrl_reg;
       *pin_ctrl_reg &= ~(PORT_ISC_gm);
     }
@@ -257,7 +256,7 @@ void SPIClass::reattachMaskedInterrupts() {
   uint8_t shift = 0;
   while (temp != 0) {
     if (temp & 1) {
-      volatile uint8_t *pin_ctrl_reg = getPINnCTRLregister(portToPortStruct(shift / 8), shift % 8);
+      volatile uint8_t* pin_ctrl_reg = getPINnCTRLregister(portToPortStruct(shift / 8), shift % 8);
       *pin_ctrl_reg |= irqMap[shift];
     }
     temp = temp >> 1;
@@ -267,7 +266,7 @@ void SPIClass::reattachMaskedInterrupts() {
   shift = 32;
   while (temp != 0) {
     if (temp & 1) {
-      volatile uint8_t *pin_ctrl_reg = getPINnCTRLregister(portToPortStruct(shift / 8), shift % 8);
+      volatile uint8_t* pin_ctrl_reg = getPINnCTRLregister(portToPortStruct(shift / 8), shift % 8);
       *pin_ctrl_reg |= irqMap[shift];
     }
     temp = temp >> 1;
@@ -348,10 +347,10 @@ void SPIClass::setClockDivider(uint8_t div) {
 
 byte SPIClass::transfer(uint8_t data) {
   /*
-    The following NOP introduces a small delay that can prevent the wait
-    loop from iterating when running at the maximum speed. This gives
-    about 10% more speed, even if it seems counter-intuitive. At lower
-    speeds it is unnoticed.
+  * The following NOP introduces a small delay that can prevent the wait
+  * loop from iterating when running at the maximum speed. This gives
+  * about 10% more speed, even if it seems counter-intuitive. At lower
+  * speeds it is unnoticed.
   */
   asm volatile("nop");
 
