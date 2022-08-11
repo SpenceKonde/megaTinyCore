@@ -12,10 +12,11 @@ Let's use that - it's better than gitter ever was, and it's all on one site.
 
 All that remains is ensuring that everything that needs to be ported from DxCore is ported first. Oh, putting together the new toolchain version.
 
-## WARNING: NOT COMPATIBLE WITH 2.0.x version of the IDE due to critical regressions
-These bugs in the IDE prevent board settings from being correctly recognized. Please direct your complaints to the Arduino team. We do not intend to make any effort to support working around the errors of the arduino team *in beta software*. Working around it in released versions is hard enough. If and when the third party hardware is amended with a clear description of the intended behavior, I will fix it. I am *not* going to fix or *allow fixes* for bugs that aren't even acknowledged by the Arduino team as such and may or may not be considered intended. That is **not our bug** and your fury should be directed to to the people who broke software that was working perfectly fine.
+## WARNING: IDE 2.0.x unsupported and all versions prior to 2.0.0-RC9.2 known to have critical regressions
+These bugs in the IDE prevent board settings from being correctly recognized. Pull-requests with workarounds to undocumented beta behaviour will not be accepted. [This thread tracks known issues with 2.0 and workarounds](https://github.com/SpenceKonde/megaTinyCore/discussions/760). If you use unsupported software please reproduce all issues in 1.8.13 before reporting.
 
 V1.8.13 is the "golden version" and the only one I recommend. All the more recent ones gained bugs, and its the last version with a substantial improvement
+V1.8.14+ are known to crash due to [a relative of this bug](https://github.com/arduino/arduino-cli/pull/1830) when you install the core manually in your arduino folder and not when you install the core via boards manager
 
 ### Notice Regarding Update Issues
 Well, I screwed up fairly badly in handling the board manager json. The short version of the story is that I discovered a bug in 2.4.3 that required no changes to the core, just a board manager change. So I changed the json file (big mistake). Anyone who installed after that change would get a java null pointer exception when trying to upgrade. But I didn't realize this until I had already done a release in 2.5.x, then realized I'd missed that fix, and modified the board manager json after release. Then I finally made the connection between having done that and the flood of support inquiries relating to being unable to upgrade.
