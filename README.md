@@ -73,7 +73,7 @@ An HV programming tool to be called HyperUPDI is expected to be available (thoug
 * Due to the considerably more complex hardware, HyperUPDI will obviously not be a $1 device like SerialUPDI (which I expect most people will continue to use)
 
 #### Really coming before year end 2022: Superior serial adapters
-A single-port version that switches between UPDI and normal mode and 5v and 3.3v (via physical switches), and exposes all modem liason pins is a near certainty.
+A single-port version that switches between UPDI and normal mode and 5v and 3.3v (via physical switches), and exposes all modem liaison pins is a near certainty.
 
 #### (New in 2.5.6) What's With All The Different SerialUPDI Options?
 Depending on adapter model, and operating system, it has been found that different timing settings are required; however, settings needed to keep even 230400 baud from failing on Linux/Mac with most adapters impose a much larger time penalty on Windows, where the OS's serial handling is slow enough that nothing needs that delay...
@@ -266,7 +266,7 @@ Voltages shown are those guaranteed to work by manufacturer specifications. Unle
 
 No action is required to set the `OSCCFG` fuse when the sketch is uploaded via UPDI. When uploaded through Optiboot, the fuse cannot be changed, so whatever was chosen when the bootloader was burned is what is used, and only "burn bootloader" or uploading a sketch via UPDI will change that.
 
-All internal oscillator clock speed options use the factory default calibration unless a "tuned" option is selected, in which case the calibration is adjusted as documented in the [**Tuning Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md). This can be used to get 16 MHz operation on an optiboot chip fused for 20 MHz and vise versa.
+All internal oscillator clock speed options use the factory default calibration unless a "tuned" option is selected, in which case the calibration is adjusted as documented in the [**Tuning Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md). This can be used to get 16 MHz operation on an optiboot chip fused for 20 MHz and vice versa.
 
 See [**Speed Grade reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_SpeedGrades.md) for more information on the manufacturer's speed grades. Note that those are the voltages and clock speeds at which it is guaranteed to work. These parts are intended to be suitable for use in applications where an unexpected glitch of some description could pose a hazard to persons or property (think cars, industrial equipment, airplanes, nuclear reactors - places where people could die if the part malfunctioned). Many hobby users will be far more relaxed about the potential for stability issues, with crashes being little more than a nuisance, and the extremes of the extended temperature range parts being far beyond what we would ever need. If your device is running (with conformal coating ofc) at the bottom of a pot of boiling water, I wouldn't expect it to overclock... *Our testing has found that the official speed grades are extremely conservative, and that is the basis of the options in the menu*.
 
