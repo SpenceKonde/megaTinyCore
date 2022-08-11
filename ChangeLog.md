@@ -27,7 +27,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### Planned 2.5.12
 * Okay fine now you can use ADC1 just like it was an ADC0, see the notes in [Analog Input (ADC) and output (DAC)](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md) for steps required to enable it.
 * You can now enable and disable the ADC with analogPowerOption() and enable/disable standby mode.
-* BugfixL Fix issue with SSD bit being cleared when using beginTransaction().
+* Bugfix: Fix issue with SSD bit being cleared when using beginTransaction().
 * Bugfix: Fix bug in Logic with pin inputs being handled improperly
 * Docs: Fix many documentation issues, improve docs generally.
 * Expand documentation significantly.
@@ -47,8 +47,9 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Bugfix: APPEND fuse was not being set, which broke the Flash.h module for non-"any" region mode.
 * Bugfix: 3224 optiboot maximum upload size was same as 1624. Oops.
 * Bugfix: Microchip boards in optiboot mode (admittedly a rare mode) were not subtracting the size of the bootloader from the chip capacity.
-* New Feature: megaTimyCore.h now provides functions to reset via WDT timeout and via software reset. If optiboot is used, the former will not run it, while the latter will.
+* New Feature: megaTinyCore.h now provides functions to reset via WDT timeout and via software reset. If optiboot is used, the former will not run it, while the latter will.
 * Doc: made clear om PowerSave.md that the ADC must be disabled to get low standbby current.
+* Unenhancement: Remove getAnalogSampleDuration(), as I could not make anything compile with that in and had worked on it over a day.
 
 ## Released Versions
 
