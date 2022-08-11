@@ -5,7 +5,7 @@ megaTinyCore requires a version of the IDE later than 1.6.3; - it may require a 
 ```diff
 -version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}
 +version=2.6.0
-``` 
+```
 it will then work with V1.8.19.
 
 Additional critical regressions are observed on 2.0.x beta and RC versions prior to RC9.2, those should not be used at all - board settings are randomly overwritten, fuses get set wrong, bad stuff happens.
