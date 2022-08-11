@@ -588,7 +588,7 @@ This document describes how (on the 0 and 1 Series only) the ADC can be taken ov
 A delightful document on bare metal programming in C.
 #### [AVR Instruction Set Manual](https://ww1.microchip.com/downloads/en/DeviceDoc/AVR-InstructionSet-Manual-DS40002198.pdf)
 The bible of the AVR instruction set. Like any such tome, it is a very lengthy document which contains timeless wisdom from the creator(s) in obtuse and challenging language and a confusing syntax.If you are writing assembly, you probably have this document open most of the time.
-#### See also the recently written ones listed in [the analog reference](Ref_Analog.md)
+#### See also the recently written ones listed in [the analog reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md)
 As promised, a bunch of additional information was released; Unfortunately it leaves some of the key questions unanswered.
 ## List of Tools sub-menus
 * Tools -> Chip - sets the specific part within a selected family to compile for and upload to.
