@@ -269,9 +269,6 @@ void TwoWire::endSlave(void) {
  * that had to be specified on a per-request basis, it could be extended without changing the function signature and just adding some
  * constants you could pass that would enable it, like with UART.
  */
-uint8_t TwoWire::requestFrom(uint8_t  address,  uint8_t  quantity)                   {
-         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) 1);
-}
 //uint8_t TwoWire::requestFrom(uint8_t  address,  size_t   quantity,  bool     sendStop) {
 //         return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) sendStop);
 //
