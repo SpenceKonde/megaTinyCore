@@ -179,7 +179,7 @@ void TwoWire::begin(void) {
  *
  *@return     void
  */
-void TwoWire::begin(uint8_t address, bool receive_broadcast, uint8_t second_address) {
+void TwoWire::begin(uint8_t address, uint8_t receive_broadcast, uint8_t second_address) {
   if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
     badArg("Supplied address seems to be 8 bit. Only 7 bit addresses are supported");
     return;
