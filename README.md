@@ -12,10 +12,16 @@ Let's use that - it's better than gitter ever was, and it's all on one site.
 
 All that remains is ensuring that everything that needs to be ported from DxCore is ported first. Oh, putting together the new toolchain version.
 
-## WARNING: NOT COMPATIBLE WITH 2.0.x version of the IDE due to critical regressions
-These bugs in the IDE prevent board settings from being correctly recognized. Please direct your complaints to the Arduino team. We do not intend to make any effort to support working around the errors of the arduino team *in beta software*. Working around it in released versions is hard enough. If and when the third party hardware is amended with a clear description of the intended behavior, I will fix it. I am *not* going to fix or *allow fixes* for bugs that aren't even acknowledged by the Arduino team as such and may or may not be considered intended. That is **not our bug** and your fury should be directed to to the people who broke software that was working perfectly fine.
+## WARNING: IDE 2.0.x unsupported and all versions prior to 2.0.0-RC9.2 known to have critical regressions
+These bugs in the IDE prevent board settings from being correctly recognized. Pull-requests with workarounds to undocumented beta behaviour will not be accepted. [This thread tracks known issues with 2.0 and workarounds](https://github.com/SpenceKonde/megaTinyCore/discussions/760). If you use unsupported software please reproduce all issues in 1.8.13 before reporting.
 
-V1.8.13 is the "golden version" and the only one I recommend. All the more recent ones gained bugs, and its the last version with a substantial improvement
+V1.8.13 is the "golden version" and the only one I recommend. All the more recent ones gained bugs, and its the last version with a substantial improvement. Be aware it does have a vulnerable version of Log4J.
+V1.8.14+ are known to crash due to [this bug](https://github.com/arduino/Arduino/issues/11813) when you install the core manually in your arduino folder and not when you install the core via boards manager. If you are manually edit platform.txt with
+```diff
+-version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}
++version=2.6.0
+```
+it will then work with V1.8.19.
 
 ### Notice Regarding Update Issues
 Well, I screwed up fairly badly in handling the board manager json. The short version of the story is that I discovered a bug in 2.4.3 that required no changes to the core, just a board manager change. So I changed the json file (big mistake). Anyone who installed after that change would get a java null pointer exception when trying to upgrade. But I didn't realize this until I had already done a release in 2.5.x, then realized I'd missed that fix, and modified the board manager json after release. Then I finally made the connection between having done that and the flood of support inquiries relating to being unable to upgrade.
@@ -36,7 +42,8 @@ This document is best viewed online if you installed via board manager - [https:
 ### **Arduino 1.8.13 is *strongly* recommended**
 Older versions do not properly handle the programmers in the tools -> programmers menu, which degrades the UX rapidly as the number of installed cores increases. They are not suitable.
 
-The next version added a bug that would fail with "panic: no major version found" error and fail to compile any sketch. It is not clear what triggers this bug, as it is not a missing major version define. The major, minor, and patch versions are specified in platform.txt. We appear to be back to the bad old days where only a small fraction of IDE releases are any good. :-(
+The newest versions starting with 1.8.14 (including 1.8.17, 1.8.18, and 1.8.19) may generate a "panic: no major version found" error and fail to compile any sketch. This bug is because versions starting with 1.8.14 do not expand the version property in platform.txt - [this bug](https://github.com/arduino/Arduino/issues/11813). This is used only for manual installations and can be ignored if you install the core only via boards manager. If you want a manual install under 1.8.19 you must edit platform.txt to manually expand the version number (for example, version=2.6.0). We appear to be back to the bad old days where only a small fraction of IDE releases are any good. :-(
+
 
 When megaTinyCore is installed through board manager, the required version of the toolchain is installed automatically. All 0/1/2-Series parts are supported with no extra steps.
 
