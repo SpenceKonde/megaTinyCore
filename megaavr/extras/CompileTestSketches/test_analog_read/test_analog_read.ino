@@ -66,7 +66,7 @@ void loop() {
   #endif
 
 
-  //getAnalogSampleDuration(); Has to be removed because it prevented all sketches from compiling for reasons I could't fathom
+  //getAnalogSampleDuration(); Has to be removed because it prevented all sketches from compiling for reasons I couldn't fathom
   analogSampleDuration(10);
   analogClockSpeed(1000);
 
