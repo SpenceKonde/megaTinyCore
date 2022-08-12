@@ -48,34 +48,34 @@ You can view all the examples [here](examples/).
 
 ## Library functions
 
-### `USERSIG.read(address)` [[_example_]](examples/usersig_read/usersig_read.ino)
+### `USERSIG.read(address)` [[*example*]](examples/usersig_read/usersig_read.ino)
 
 This function allows you to read a single byte of data from the USERSIG.
 Its only parameter is an `byte` which should be set to the address you wish to read.
 
 The function returns an `uint8_t` (byte) containing the value read.
 
-### `USERSIG.write(address, value)` [[_example_]](examples/usersig_write/usersig_write.ino)
+### `USERSIG.write(address, value)` [[*example*]](examples/usersig_write/usersig_write.ino)
 
 The `write()` method allows you to write a single byte of data to the USERROW.
 Two parameters are needed. The first is an `int` containing the address that is to be written, and the second is the data to be written, a `byte`.
 
 This function always returns an 1 as an `int8_t`, indicating that a single byte was written to the NVM. (on DxCore, it can also return a 0, indicating that the data has not yet been written, and that flush() must be called to write it).
 
-### `USERSIG.update(address, value)` [[_example_]](examples/usersig_update/usersig_update.ino)
+### `USERSIG.update(address, value)` [[*example*]](examples/usersig_update/usersig_update.ino)
 
 This function is similar to `USERSIG.write()` however this method will only write data if the cell contents pointed to by `address` is different to `value`. This method can help prevent unnecessary wear on the USERSIG cells.
 
 This function always returns 1 as an `int8_t`, indicating that a single byte was either written to the NVM, or was verified to not need to be written to the NVM (on DxCore, it can also return a 0, indicating that the data has not yet been written, and that flush() must be called to write it).
 
-### `USERSIG.get(address, object)` [[_example_]](examples/usersig_get/usersig_get.ino)
+### `USERSIG.get(address, object)` [[*example*]](examples/usersig_get/usersig_get.ino)
 
 This function will retrieve any object from the USERSIG.
 Two parameters are needed to call this function. The first is a `byte` containing the address that is to be written, and the second is the object you would like to read.
 
 This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
 
-### `USERSIG.put(address, object)` [[_example_]](examples/usersig_put/usersig_put.ino)
+### `USERSIG.put(address, object)` [[*example*]](examples/usersig_put/usersig_put.ino)
 
 This function will write any object to the USERSIG.
 Two parameters are needed to call this function. The first is a `byte` containing the address that is to be written, and the second is the object you would like to write.
@@ -86,7 +86,7 @@ This function returns a reference to the `object` passed in. It does not need to
 
 This should be obvious, but don't use `USERSIG.put()` to store something that won't fit in the USERROW. Addresses wrap around, and what you saved will come out looking very different.
 
-### **Subscript operator:** `USERSIG[address]` [[_example_]](examples/usersig_crc/usersig_crc.ino)
+### **Subscript operator:** `USERSIG[address]` [[*example*]](examples/usersig_crc/usersig_crc.ino)
 
 This operator allows using the identifier `USERSIG` like an array.
 USERSIG cells can be read _and_ **_written_** directly using this method.
