@@ -91,7 +91,7 @@ void loop() {
      * you should always enable warnings!
      */
     long pressure = (((long)pressure_data_high << 16) | pressure_data_low) / 4;
-    \\ display the temperature:
+    // display the temperature:
     Serial.println("\tPressure [Pa]=" + String(pressure));
   }
 }

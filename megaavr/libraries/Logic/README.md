@@ -45,7 +45,7 @@ Logic3 OUT  | Not present   | Only alt out  | Only alt out  | Yes, both     |
 ### Overhead
 * On the 0/1-series, the overhead is approximately 546 bytes of flash and 26 bytes of RAM.
 * On the 2-series, with twice as many LUTs, it is much larger: 984 bytes and 60b RAM.
-* This is fairly small for 16/32k parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series, but it it isn't an unreasonable amount of flash for the parts most people will be using. As of 2.6.0 if no ISR is attached or deteched, that overhead will not be pulled in.. 
+* This is fairly small for 16/32k parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series, but it it isn't an unreasonable amount of flash for the parts most people will be using. As of 2.6.0 if no ISR is attached or deteched, that overhead will not be pulled in, allowing a more performant manually defined interrupt to be written by the user (any "attach" type thing costs around 50 clock cycles)
 * Writing a constant value to 4 registers (the minimum plausible needed to configure a LUT) for 2 or 4 LUTs requires 56 or 112 bytes, respectively.
 
 ## Logic class overview
