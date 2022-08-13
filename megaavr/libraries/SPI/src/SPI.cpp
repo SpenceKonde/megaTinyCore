@@ -204,7 +204,7 @@ void SPIClass::usingInterrupt(uint8_t interruptNumber) {
 }
 
 void SPIClass::notUsingInterrupt(uint8_t interruptNumber) {
-  if ((interruptNumber == NOT_AN_INTERRUPT))
+  if ((interruptNumber == NOT_AN_INTERRUPT)){
     return;
   }
 
@@ -225,6 +225,7 @@ void SPIClass::notUsingInterrupt(uint8_t interruptNumber) {
     #endif
   }
 }
+
 
 void SPIClass::detachMaskedInterrupts() {
   uint64_t temp = interruptMask_lo;
