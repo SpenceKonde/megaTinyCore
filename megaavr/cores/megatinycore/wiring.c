@@ -1299,7 +1299,7 @@ void set_millis(__attribute__((unused))uint32_t newmillis)
 }
 
 void nudge_millis(__attribute__((unused)) uint16_t nudgesize) {
-  #if (!(MILLIS_TIMER & 0x80)) /* if not disabled or RTC-bbased  */
+  #if (!(MILLIS_TIMER & 0x80 || MILLIS_TIMER == NOT_ON_TIMER)) /* if not disabled or RTC-bbased  */
     uint8_t oldSREG=SREG;
     cli();
     timer_millis += nudgesize;
