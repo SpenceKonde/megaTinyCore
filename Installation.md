@@ -1,6 +1,6 @@
 # Installing megaTinyCore
 
-## Supported IDE versions 
+## Supported IDE versions
 megaTinyCore requires a version of the IDE later than 1.6.3; - it may require a much more recent version of the IDE; this has not been tested. It has been tested with 1.8.9 and 1.8.13. 1.8.14 introduced a serious regression that prevents all compilation ("panic no major version found" when 1) the major version uses variable substitution and 2) it only impacts manual installation). When it manifests, it effects ALL board definitions. Versions prior to 1.8.13 are impacted by a serious bug in the list of programmers they present (they assume all programmers can program all parts). Hence we recommended 1.8.13. To use with 1.8.14+, you need to patch platform.txt:
 ```diff
 -version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}

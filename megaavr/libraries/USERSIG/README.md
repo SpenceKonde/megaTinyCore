@@ -80,7 +80,7 @@ This function returns a reference to the `object` passed in. It does not need to
 This function will write any object to the USERSIG.
 Two parameters are needed to call this function. The first is a `byte` containing the address that is to be written, and the second is the object you would like to write.
 
-This function uses the _update_ method to write its data, and therefore only rewrites changed cells.
+This function uses the *update* method to write its data, and therefore only rewrites changed cells.
 
 This function returns a reference to the `object` passed in. It does not need to be used and is only returned for conveience.
 
@@ -89,7 +89,7 @@ This should be obvious, but don't use `USERSIG.put()` to store something that wo
 ### **Subscript operator:** `USERSIG[address]` [[*example*]](examples/usersig_crc/usersig_crc.ino)
 
 This operator allows using the identifier `USERSIG` like an array.
-USERSIG cells can be read _and_ **_written_** directly using this method.
+USERSIG cells can be read *and* ***written*** directly using this method.
 
 This operator returns a reference to the USERSIG cell.
 
