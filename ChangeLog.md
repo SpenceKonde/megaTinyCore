@@ -12,26 +12,24 @@ These items are in addition to what was listed under changes already in release.
 
 "Enhancements" are changes to the core which improve functionality and introduce new and exotic bugs. Sometimes called "Features", I prefer the term "enhancement". Calling it a feature, by my understanding of the semantics, means that it *does something new*. But many times changes are made that neither fix a bug or do something new, but rather just do something it already does faster, using less flash, or with better compile time error detection. All things that, as well as new features, would add to the
 
-### Planned 2.6.0
-* End hand maintenance of boards.txt in favor of generating it prior to release with a python script, in order to reduce duplication and human error (5 errors were found during the course of preliminary work on this!)
+### Planned 2.6.x
 * Add tools submenu to select from a number of PWM pin layouts. This will impact flash use (to a degree that will be noticed on small parts) as well as the time it takes for turnOffPWM() (thus digitalWrite()) and analogWrite() to execute.
 * Under consideration: analogWriteFast(pin, duty); this will require that pin be constant, allowing the determination of the PWM compare value register to be determined at compile time, rather than runtime. It is not planned for this function to actually turn the PWM on or off, only adjust the duty cycle of a pin already outputting PWM.
 
-### Planned 2.5.12
+### Planned 2.6.0
 * Add support for Generic Autobaud mode for Serial (like DxCore 1.5.0)
-* Enhancement: Update to latest ATpacks with Azduino5 instead of Azduino4b compiler toolchain.
 
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-### Planned 2.5.12
+### Planned 2.6.0
 * Okay fine now you can use ADC1 just like it was an ADC0, see the notes in [Analog Input (ADC) and output (DAC)](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md) for steps required to enable it.
 * You can now enable and disable the ADC with analogPowerOption() and enable/disable standby mode.
 * Bugfix: Fix issue with SSD bit being cleared when using beginTransaction().
 * Bugfix: Fix bug in Logic with pin inputs being handled improperly
 * Docs: Fix many documentation issues, improve docs generally.
-* Expand documentation significantly.
-* Remove multiple signatures for Wire.requestFrom to fix issues with Wire with certain libraries.
+* Docs: Expand documentation significantly.
+* Bugfix: Remove multiple signatures for Wire.requestFrom to fix issues with Wire with certain libraries.
 * Bugfix: Correct tuning, particularly to speeds below 16 MHz. Boards should be re-tuned if 14 MHz-derived speed is to be used
 * Bugfix: Correct default option for Optiboot 2-series boards with 20 pins to be the one with alt reset.
 * Bugfix: `long_soft_event` method did not work correctly.
@@ -41,6 +39,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Doc: Add link to my article on AVR math speed (TLDR: avoid `int64_t` `long long` like the plague)
 * Major enhancement: Change class hierarchy for UARTs, as was done for Two_Wire (Wire.h), so that rather than pulling in api/HardwareSerial.h, and subclassing that definition of HardwareSerial (itself a subclass of Stream) as UartClass, we instead simply subclass Stream directly. UART.h will be renamed to HardwareSerial.h, HardwareSerial.h (a compatibility layer) will be renamed to UART.h and the latter adjusted to #define UartClass as HardwareSerial, and api/HardwareSerial.h will be gutted and simply #include <HardwareSerial.h) This will remove yet another piece of the disastrous "ArduinoAPI". I describe it as such because on low resource platforms like AVR; this will allow several functions currently declared virtual to lose that keyword, as the linker, even with LTO enabled, is not permitted to remove unused virtual functions. This is expected to significantly reduce binary size by about 300 bytes when serial is used. Credit goes to @MX624X. Like all the other big improvements.
 * Enhancement: Improvement to stream timed read to make it work when millis is disabled, and to save 4 bytes of RAM. Note that this also requires all offsets used to access the Serial transmit and receive buffers to be reduced accordingly in the inline assembly in UART.cpp.
+* Correct bug when waking from sleep mode via TWI address match (Thanks @MX682X. You are one of our MVPs)
 * New Feature: Add new functions to assist checking error codes in analogRead results.
 * Fix compatibility of Comparator, Event, and Logic.
 * New Feature: Permit Logic and Comparator ISRs to be defined manually if (and only if!) the `.attachInterrupt()` method of an instance of that class is not called. You can then manually create the ISR saving about 40 bytes and 50 clock cycles, give or take.
@@ -49,6 +48,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Bugfix: Microchip boards in optiboot mode (admittedly a rare mode) were not subtracting the size of the bootloader from the chip capacity.
 * New Feature: megaTinyCore.h now provides functions to reset via WDT timeout and via software reset. If optiboot is used, the former will not run it, while the latter will.
 * Doc: made clear om PowerSave.md that the ADC must be disabled to get low standbby current.
+* Enhancement - great deal of harmonization with DxCore.
 * Unenhancement: Remove getAnalogSampleDuration(), as I could not make anything compile with that in and had worked on it over a day.
 
 ## Released Versions

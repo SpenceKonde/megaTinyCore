@@ -15,6 +15,7 @@ USPtr	KEYWORD2
 #######################################
 
 update	KEYWORD2
+pending	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

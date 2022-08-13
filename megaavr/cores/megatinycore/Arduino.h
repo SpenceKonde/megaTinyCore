@@ -711,5 +711,4 @@ static const uint8_t SCK  = PIN_SPI_SCK;
   #endif
 #endif
 
-
 #endif

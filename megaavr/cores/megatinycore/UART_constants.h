@@ -26,7 +26,7 @@
   #define SERIAL_STOP_BIT_2    (static_cast<uint8_t>(USART_SBMODE_2BIT_gc))
   #define SERIAL_STOP_BIT_MASK (static_cast<uint8_t>(USART_SBMODE_gm))
 
-  #define SERIAL_DATA_5        (static_cast<uint8_t>(USART_CHSIZE_5BIT_gc & 0x04))
+  #define SERIAL_DATA_5        (static_cast<uint8_t>(USART_CHSIZE_5BIT_gc | 0x04))
   // Special case - we strip out bit 2 in order to detect use of high-byte modifiers without specifying low byte, which is presumably user error.
   // and default 8N1 instead of the hardware default of 5N1.
   #define SERIAL_DATA_6        (static_cast<uint8_t>(USART_CHSIZE_6BIT_gc))

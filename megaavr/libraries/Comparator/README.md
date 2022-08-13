@@ -39,7 +39,11 @@ Comparator input pins should not be set as OUTPUT except in truly unusual cases.
 Like the other basic wrappers around modern avr peripherals (logic, ZCD, event), until the `init()` method is called, none of the requested settings have been written to the peripheral. This is correct and intended behavior, and allows modifying multiple options as close to simultaneously as possible. Nothing prevents you from calling `init()` on an enabled comparator if need be.
 
 ### The POWER and LPMODE options are not supported currently
-On Dx-series parts, each analog comparator can be configured for one of three power profiles. The higher the number, the lower the power consumption and the slower the response. Currently the Comparator library always uses the highest power, fastest response option. On the tinyAVR and megaAVR parts, there is instead an LPMODE (Low Power Mode) which can be either on or off. Comparator always sets it to 0. An option to configure this may be made available in the future if there is user demand.
+On Dx-series parts, each analog comparator can be configured for one of three power profiles. The higher the number, the lower the power consumption and the slower the response. Currently the Comparator library always uses the highest power, fastest response option. This may be changed in a future release if there is call for such a feature.
+
+Early versions of the header specified a fourth value, but this was removed from both the datasheet and the io header before release. It may or may not secretly still be present (my guess would be that it is, just like the 4x PLL multiplier), but there was likely a reason that it was struck from the documentation (likely, that it didn't work, was inaccurate, or didn't save power).
+
+On the tinyAVR and megaAVR parts, there is instead an LPMODE (Low Power Mode) which can be either on or off. Comparator always sets it to 0. An option to configure this may be made available in the future if there is user demand.
 
 ### Window Mode is not supported
 Thus far all modern AVR parts with more than 1 comparator have had a "windowed mode" that can be selected to group 2 comparators into a single "windowed" comparator, where both comparators must use the same positive input, while the negative inputs define the upper and lower bounds of the "window", and interrupts can be generated when the state rises above, or falls below the input, or when it enters or leaves the window.

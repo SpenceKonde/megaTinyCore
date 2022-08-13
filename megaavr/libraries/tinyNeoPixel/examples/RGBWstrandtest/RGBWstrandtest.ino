@@ -1,7 +1,7 @@
 #include <tinyNeoPixel.h>
 
 
-#define PIN PIN_PA2
+#define PIN PIN_PA2 // chosen because all parts have it
 #define NUM_LEDS 60
 
 #define BRIGHTNESS 50
@@ -45,7 +45,7 @@ void colorWipe(uint32_t c, uint8_t wait) {
 }
 
 void pulseWhite(uint8_t wait) {
-  for (int j = 0; j < 256 ; j++) {
+  for (int j = 0; j < 256; j++) {
     for (uint16_t i = 0; i < strip.numPixels(); i++) {
       strip.setPixelColor(i, strip.Color(0, 0, 0, tinyNeoPixel::gamma8(j)));
     }
@@ -53,7 +53,7 @@ void pulseWhite(uint8_t wait) {
     strip.show();
   }
 
-  for (int j = 255; j >= 0 ; j--) {
+  for (int j = 255; j >= 0; j--) {
     for (uint16_t i = 0; i < strip.numPixels(); i++) {
       strip.setPixelColor(i, strip.Color(0, 0, 0, tinyNeoPixel::gamma8(j)));
     }
@@ -69,10 +69,10 @@ void rainbowFade2White(uint8_t wait, int rainbowLoops, int whiteLoops) {
   uint32_t wheelVal;
   int redVal, greenVal, blueVal;
 
-  for (int k = 0 ; k < rainbowLoops ; k ++) {
+  for (int k = 0; k < rainbowLoops; k ++) {
     for (int j = 0; j < 256; j++) { // 5 cycles of all colors on wheel
 
-      for (unsigned int i = 0; i < strip.numPixels(); i++) {
+      for (uint16_t i = 0; i < strip.numPixels(); i++) {
 
         wheelVal = Wheel(((i * 256 / strip.numPixels()) + j) & 255);
 
@@ -104,9 +104,9 @@ void rainbowFade2White(uint8_t wait, int rainbowLoops, int whiteLoops) {
   delay(500);
 
 
-  for (int k = 0 ; k < whiteLoops ; k ++) {
+  for (int k = 0; k < whiteLoops; k ++) {
 
-    for (int j = 0; j < 256 ; j++) {
+    for (int j = 0; j < 256; j++) {
 
       for (uint16_t i = 0; i < strip.numPixels(); i++) {
         strip.setPixelColor(i, strip.Color(0, 0, 0, tinyNeoPixel::gamma8(j)));
@@ -115,7 +115,7 @@ void rainbowFade2White(uint8_t wait, int rainbowLoops, int whiteLoops) {
     }
 
     delay(2000);
-    for (int j = 255; j >= 0 ; j--) {
+    for (int j = 255; j >= 0; j--) {
 
       for (uint16_t i = 0; i < strip.numPixels(); i++) {
         strip.setPixelColor(i, strip.Color(0, 0, 0, tinyNeoPixel::gamma8(j)));
@@ -134,8 +134,8 @@ void whiteOverRainbow(uint8_t wait, uint8_t whiteSpeed, uint8_t whiteLength) {
     whiteLength = strip.numPixels() - 1;
   }
 
-  unsigned int head = whiteLength - 1;
-  unsigned int tail = 0;
+  uint16_t head = whiteLength - 1;
+  uint16_t tail = 0;
 
   int loops = 3;
   int loopNum = 0;

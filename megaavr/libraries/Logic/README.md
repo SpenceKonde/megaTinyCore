@@ -45,24 +45,24 @@ Logic3 OUT  | Not present   | Only alt out  | Only alt out  | Yes, both     |
 ### Overhead
 * On the 0/1-series, the overhead is approximately 546 bytes of flash and 26 bytes of RAM.
 * On the 2-series, with twice as many LUTs, it is much larger: 984 bytes and 60b RAM.
-* This is fairly small for 16/32k parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series, but it it isn't an unreasonable amount of flash for the parts most people will be using. A future update will add a second slightly modified version which removes attachInterrupt to permit manual implementation of the CCL interrupt, as any "attachInterrupt" scheme will always perform miserably (it is inherent to calling a non-inlinable function on an AVR from within an ISR, with an overhead of over 50 clock cycles in the ISR and because the interrupt pointer is set at runtime, it can never be inlined.
+* This is fairly small for 16/32k parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series, but it it isn't an unreasonable amount of flash for the parts most people will be using. As of 2.6.0 if no ISR is attached or deteched, that overhead will not be pulled in.. 
 * Writing a constant value to 4 registers (the minimum plausible needed to configure a LUT) for 2 or 4 LUTs requires 56 or 112 bytes, respectively.
 
 ## Logic class overview
 
-| Property    | namespace or type   |  Function                                    |
-|-------------|---------------------|----------------------------------------------|
-| enable      | bool                |  Enable or disable logic block               |
-| input0      | logic::in::         |  Selects input 0                             |
-| input1      | logic::in::         |  Selects input 1                             |
-| input2      | logic::in::         |  Selects input 2                             |
-| output      | logic::out::        |  'enable'/'disable' output pin               |
-| output_swap | logic::out::        |  'no_swap/'pin_swap' use alt output pin      |
-| filter      | logic::filter::     |  'filter'/'sync' or 'disable' filter         |
-| edgedetect  | logic::edgedetect:: |  'enable'/'disable' edge detect mode         |
-| sequencer   | logic::sequencer::  |  selects the sequecer, even #'ed blocks only |
-| clocksource | logic::clocksource::|  select clock source, if not async.          |
-| truth       | uint8_t             |  truth table                                 |
+| Property    | namespace or type           | Function                                    |
+|-------------|-----------------------------|---------------------------------------------|
+| enable      | bool                        | Enable or disable logic block               |
+| input0      | logic::in::                 | Selects input 0                             |
+| input1      | logic::in::                 | Selects input 1                             |
+| input2      | logic::in::                 | Selects input 2                             |
+| output      | logic::out::                | 'enable'/'disable' output pin               |
+| output_swap | logic::out::                | 'no_swap/'pin_swap' use alt output pin      |
+| filter      | logic::filter::             | 'filter'/'sync' or 'disable' filter         |
+| edgedetect  | logic::edgedetect::         | 'enable'/'disable' edge detect mode         |
+| sequencer   | logic::sequencer::          | selects the sequecer, even #'ed blocks only |
+| clocksource | logic::clocksource::        | select clock source, if not async.          |
+| truth       | uint8_t                     | truth table                                 |
 
 | Methods             | Function
 |---------------------|-----------------------------------------------------------------------------|
@@ -404,7 +404,7 @@ Logic::start(); // re-enable
 ```
 
 ## Think outside the box
-To consider the CCL system as simply a built-in multifunction gate IC is to greatly undersell it. The true power of the CCL is in it's ability to use events directly, and to take inputs from almost everything. Even doing neat stuff like the above 0xD4 truth table on an even-numbered logic block with input 2 set to feedback to make an R/S latch without using the second logic block is only scratching the surface of what these can do! Taking that a step farther... you could then use the odd-numbered logic block with that same feedback to, say, switch between two waveforms being output by one of the PWM timers...
+To consider the CCL system as simply a built-in multifunction gate IC is to greatly undersell it. The true power of the CCL is in it's ability to use events directly, and to take inputs from almost everything. Even doing neat stuff like the above 0xD4 truth table on an even-numbered logic block with input 2 set to feedback to make an R/S latch without using the second logic block is only scratching the surface of what these can do! Taking that a step farther... you could then use the odd-numbered logic block with that same feedback to, say, switch between two waveforms being output by one of the PWM timers... see the [Tricks and Tips page](Tricks_and_Tips.md)
 
 ## Note on terminology
 Yes, technically, C++ doesn't have "properties" or "methods" - these are "member variables" and "member functions" in C++ parlance. They mean the same thing. I've chosen to use the more familiar, preseent day terminology.

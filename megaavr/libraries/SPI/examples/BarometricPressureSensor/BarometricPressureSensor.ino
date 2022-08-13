@@ -1,46 +1,51 @@
 /*
-  SCP1000 Barometric Pressure Sensor Display
+ * SCP1000 Barometric Pressure Sensor Display
+ *
+ * Shows the output of a Barometric Pressure Sensor on a
+ * Uses the SPI library. For details on the sensor, see:
+ * http://www.sparkfun.com/commerce/product_info.php?products_id=8161
+ * http://www.vti.fi/en/support/obsolete_products/pressure_sensors/
+ *
+ * This sketch adapted from Nathan Seidle's SCP1000 example for PIC:
+ * http://www.sparkfun.com/datasheets/Sensors/SCP1000-Testing.zip
 
-  Shows the output of a Barometric Pressure Sensor on a
-  Uses the SPI library. For details on the sensor, see:
-  http://www.sparkfun.com/commerce/product_info.php?products_id=8161
-  http://www.vti.fi/en/support/obsolete_products/pressure_sensors/
-
-  This sketch adapted from Nathan Seidle's SCP1000 example for PIC:
-  http://www.sparkfun.com/datasheets/Sensors/SCP1000-Testing.zip
-
-  Circuit:
-  SCP1000 sensor attached to pins 6, 7, 10 - 13:
-  DRDY: pin 6
-  CSB: pin 7
-  MOSI: pin 11
-  MISO: pin 12
-  SCK: pin 13
-
-  created 31 July 2010
-  modified 14 August 2010
-  by Tom Igoe
-*/
+ * Circuit:
+   * SCP1000 sensor attached to pins 2 pins of your choice and the SPI pins
+   * DRDY: Can be any pin
+   * CSB: Can be any pin
+   * MOSI (This can be used as the name of a pin)
+   * MISO (This can be used as the name of a pin)
+   * SCK (This can be used as the name of a pin)
+   * See https://github.com/SpenceKonde/DxCore/blob/master/megaavr/libraries/SPI/README.md for more information
+ * created  7/31/10
+ * modified 8/14/10
+ * modified 1/22/21 to correct a bug present from the very beginning
+ * modified 8/11/22 to confirm with Azduino conventions
+ * Note: This sensor may no longer be available, and better ones certainly are.
+ * This is maintained as an example of how to use SPI directly without a library for the device.
+ * by Tom Igoe
+ */
 
 // the sensor communicates using SPI, so include the library:
 #include <SPI.h>
 
 // Sensor's memory register addresses:
-const int PRESSURE = 0x1F;      // 3 most significant bits of pressure
-const int PRESSURE_LSB = 0x20;  // 16 least significant bits of pressure
-const int TEMPERATURE = 0x21;   // 16 bit temperature reading
-const byte READ = 0b11111100;     // SCP1000's read command
-const byte WRITE = 0b00000010;   // SCP1000's write command
+const int PRESSURE      = 0x1F;         // 3 most significant bits of pressure
+const int PRESSURE_LSB  = 0x20;         // 16 least significant bits of pressure
+const int TEMPERATURE   = 0x21;         // 16 bit temperature reading
+const byte READ         = 0b11111100;   // SCP1000's read command
+const byte WRITE        = 0b00000010;   // SCP1000's write command
 
 // pins used for the connection with the sensor
 // the other you need are controlled by the SPI library):
-const int dataReadyPin = 6;
-const int chipSelectPin = 7;
+const int dataReadyPin  = PIN_PA0;  // not the best pins, but present on all parts (this is part of the compile test suite)
+const int chipSelectPin = PIN_PA1;  // see above
 
 void setup() {
   Serial.begin(9600);
 
   // start the SPI library:
+  //SPI.swap(...) uncomment and fill in a number if you need to use alternate pins.
   SPI.begin();
 
   // initialize the  data ready and chip select pins:
@@ -77,13 +82,16 @@ void loop() {
     // Read the pressure data lower 16 bits:
     unsigned int pressure_data_low = readRegister(0x20, 2);
     // combine the two parts into one 19-bit number:
-    long pressure = ((((unsigned long)pressure_data_high) << 16) | pressure_data_low) >> 2;
-    // SK 2021: Unfamiliar with this sensor, so not sure if divididing this by 4 was the correct thing to do (seems dubious)
-    // but 2 rightshifts are no worse, and generally better practice in case the compiler decides to do something dumb.
-    // No matter what, it is key to cast the high byte to a 32-bit datatype before we leftshift it 16 times, otherwise
-    // it will get zero'ed out because we shifted all those bits so far they fell off the end... (this is why you should leave warnings on, folks).
-
-    // display the temperature:
+    /* 1/22/21: Fix bug dating back to the dark ages in example
+     * pressure_data_high is a 16-bit datatype, if you leftshift 16 bits
+     * you have 0. The fact that you then assign the result to a larger
+     * variable that could fit those extra bits isn't the compiler's
+     * concern.
+     * More than anything else, what this demonstrates is why
+     * you should always enable warnings!
+     */
+    long pressure = (((long)pressure_data_high << 16) | pressure_data_low) / 4;
+    \\ display the temperature:
     Serial.println("\tPressure [Pa]=" + String(pressure));
   }
 }
@@ -143,4 +151,11 @@ void writeRegister(byte thisRegister, byte thisValue) {
 
   // take the chip select high to de-select:
   digitalWrite(chipSelectPin, HIGH);
+  /* Best Practices note: If the pin is constant and known at compile
+   * time, use digitalWriteFast and pinModeFast
+   * These have the same syntax, but the pin (and ideally the value)
+   * must be constant and known at compile time but if you can get rid of
+   * all digitalWrite and pinMode() calls, you're rewarded with several hundred bytes
+   * of flash. And the it executes in 1 clock instead of potentially several hundred
+   */
 }
