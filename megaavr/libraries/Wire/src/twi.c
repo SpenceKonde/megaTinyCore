@@ -117,7 +117,7 @@ void TWI_SlaveInit(struct twiData *_data, uint8_t address, uint8_t receive_broad
   _data->_module->SCTRLA       = TWI_DIEN_bm | TWI_APIEN_bm | TWI_PIEN_bm  | TWI_ENABLE_bm;
 
   /* Bus Error Detection circuitry needs Master enabled to work */
-  _data->_module->MCTRLA = TWI_ENABLE_bm;
+  //_data->_module->MCTRLA = TWI_ENABLE_bm;
 }
 
 
@@ -307,10 +307,10 @@ uint8_t TWI_MasterCalcBaud(uint32_t frequency) {
  *            to an error or because of an empty txBuffer
  */
 uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
-  #if defined(TWI_MERGE_BUFFERS)                              // Same Buffers for tx/rx
+  #if defined(TWI_MERGE_BUFFERS)                          // Same Buffers for tx/rx
     uint8_t* txHead   = &(_data->_bytesToReadWrite);
     uint8_t* txBuffer =   _data->_trBuffer;
-  #else                                                       // Separate tx/rx Buffers
+  #else                                                   // Separate tx/rx Buffers
     uint8_t* txHead   = &(_data->_bytesToWrite);
     uint8_t* txBuffer =   _data->_txBuffer;
   #endif
@@ -346,10 +346,10 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
       }
     #endif
 
-    if   (currentStatus & (TWI_ARBLOST_bm | TWI_BUSERR_bm)) {     // Check for Bus error
-        module->MSTATUS = (TWI_ARBLOST_bm | TWI_BUSERR_bm);       // reset error flags
-        TWI_SET_ERROR(TWI_ERR_BUS_ARB);                           // set error flag
-        break;                                                    // leave RX loop
+    if   (currentStatus & TWI_ARBLOST_bm) {     // Check for Bus error
+        module->MSTATUS = TWI_ARBLOST_bm;       // reset error flags
+        TWI_SET_ERROR(TWI_ERR_BUS_ARB);         // set error flag
+        break;                                  // leave TX loop
     }
 
     if (currentSM == TWI_BUSSTATE_IDLE_gc) {                      // Bus has not sent START yet and is not BUSY
@@ -399,11 +399,11 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop)  {
  *@retval     amount of bytes that were actually read. If 0, no read took place due to a bus error
  */
 uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_stop) {
-  #if defined(TWI_MERGE_BUFFERS)                                // Same Buffers for tx/rx
+  #if defined(TWI_MERGE_BUFFERS)                            // Same Buffers for tx/rx
     uint8_t* rxHead   = &(_data->_bytesToReadWrite);
     uint8_t* rxTail   = &(_data->_bytesReadWritten);
     uint8_t* rxBuffer =   _data->_trBuffer;
-  #else                                                         // Separate tx/rx Buffers
+  #else                                                     // Separate tx/rx Buffers
     uint8_t* rxHead   = &(_data->_bytesToRead);
     uint8_t* rxTail   = &(_data->_bytesRead);
     uint8_t* rxBuffer =   _data->_rxBuffer;
@@ -442,10 +442,10 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
         }
       #endif
 
-      if (currentStatus & (TWI_ARBLOST_bm | TWI_BUSERR_bm)) {   // Check for Bus error
-        module->MSTATUS = (TWI_ARBLOST_bm | TWI_BUSERR_bm);     // reset error flags
-        TWIR_SET_ERROR(TWI_ERR_BUS_ARB);                        // set error flag
-        break;                                                  // leave TX loop
+      if (currentStatus & TWI_ARBLOST_bm) {   // Check for Bus error
+        module->MSTATUS = TWI_ARBLOST_bm;     // reset error flags
+        TWIR_SET_ERROR(TWI_ERR_BUS_ARB);      // set error flag
+        break;                                // leave TX loop
       }
 
       if (command != 0) {
@@ -530,41 +530,37 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
 
   uint8_t clientStatus = _data->_module->SSTATUS;
 
-  if (clientStatus & (TWI_BUSERR_bm | TWI_COLL_bm)) {   // if Bus error/Collision was detected
-    _data->_module->SDATA;                              // Read data to remove Status flags
-    (*rxHead) = 0;                                      // Abort
-    (*txHead) = 0;                                      // Abort
-  } else {                                              // No Bus error/Collision was detected
-    #if defined(TWI_MANDS)
-      _data->_bools._toggleStreamFn = 0x01;             // reroute stream functions to slave elements
-    #endif
+  #if defined(TWI_MANDS)
+    _data->_bools._toggleStreamFn = 0x01;             // reroute stream functions to slave elements
+  #endif
 
-    if (clientStatus & TWI_APIF_bm) {  // Address/Stop Bit set
-      if (clientStatus & TWI_AP_bm) {    // Address bit set
-        if (clientStatus & TWI_DIR_bm) {   // Master is reading
-          SlaveIRQ_AddrRead(_data);
-        } else {                          // Master is writing
-          SlaveIRQ_AddrWrite(_data);
-        }
-      } else {                          // Stop bit set
-        SlaveIRQ_Stop(_data);
+  if (clientStatus & TWI_APIF_bm) {  // Address/Stop Bit set
+    if (clientStatus & TWI_AP_bm) {    // Address bit set
+      // No need to check for BUSERR here. If there is a START after a START, head and tail are reset anyway
+      if (clientStatus & TWI_DIR_bm) {  // Master is reading
+        SlaveIRQ_AddrRead(_data);
+      } else {                          // Master is writing
+        SlaveIRQ_AddrWrite(_data);
       }
-    } else if (clientStatus & TWI_DIF_bm) {  // Data bit set
-      if (clientStatus & TWI_DIR_bm) {         // Master is reading
-        if ((clientStatus & TWI_RXACK_bm) && _data->_bools._ackMatters) {  // RXACK bit is set and it matters
-          SlaveIRQ_DataReadNack(_data);
-        } else {                                // RXACK bit not set
-          SlaveIRQ_DataReadAck(_data);
-        }
-      } else {                                // Master is writing
-        SlaveIRQ_DataWrite(_data);
-      }
+    } else {                          // Stop bit set
+      SlaveIRQ_Stop(_data);
     }
-
-    #if defined(TWI_MANDS)
-      _data->_bools._toggleStreamFn = 0x00;
-    #endif
+  } else if (clientStatus & TWI_DIF_bm) {  // Data bit set
+    if (clientStatus & TWI_DIR_bm) {         // Master is reading
+      if ((clientStatus & TWI_COLL_bm) ||    // If a collision was detected, or
+         ((clientStatus & TWI_RXACK_bm) && _data->_bools._ackMatters)) {  // RXACK bit is set and it matters
+        SlaveIRQ_DataReadNack(_data);
+      } else {                               // RXACK bit not set
+        SlaveIRQ_DataReadAck(_data);
+      }
+    } else {                               // Master is writing
+      SlaveIRQ_DataWrite(_data);
+    }
   }
+
+  #if defined(TWI_MANDS)
+    _data->_bools._toggleStreamFn = 0x00;
+  #endif
 }
 
 
@@ -658,8 +654,6 @@ void SlaveIRQ_Stop(struct twiData *_data) {
 
   _data->_module->SSTATUS = TWI_APIF_bm;      // Clear Flag, no further action needed
   NotifyUser_onReceive(_data);                // Notify user program "onReceive" if necessary
-  (*rxHead) = 0;                              // User should have handled all data, if not, set available rxBytes to 0
-  (*rxTail) = 0;
 }
 
 /**
