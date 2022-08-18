@@ -503,6 +503,9 @@ class Backend(object):
 
         return self.programmer.read_memory(memory_name=memory_name, offset=offset_byte, numbytes=numbytes, max_read_chunk=max_read_chunk)
 
+    def unlock(self):
+        self.programmer.unlock()
+
     def write_memory(self, data, memory_name=MemoryNames.FLASH, offset_byte=0, blocksize=0, pagewrite_delay=0):
         """
         Write target device memory

@@ -32,10 +32,7 @@ def get_nvm_access_provider(transport, device_info, interface="", packpath=None,
     if DeviceInfoKeys.INTERFACE in device_info:
         interface = device_info[DeviceInfoKeys.INTERFACE].lower()
 
-    if architecture in ['pic16', 'pic18', 'pic24']:
-        from .nvmpic import NvmAccessProviderCmsisDapPic
-        accessprovider = NvmAccessProviderCmsisDapPic(transport, device_info, packpath, options=options)
-    elif architecture == 'avr8x':
+    if architecture == 'avr8x':
         if isinstance(transport, str):
             if interface == 'updi':
                 from .nvmserialupdi import NvmAccessProviderSerial
@@ -52,12 +49,6 @@ def get_nvm_access_provider(transport, device_info, interface="", packpath=None,
             else:
                 from .nvmspi import NvmAccessProviderCmsisDapSpi
                 accessprovider = NvmAccessProviderCmsisDapSpi(transport, device_info)
-    elif architecture == 'cortex-m0plus':
-        from .nvmmzeroplus import NvmAccessProviderCmsisDapMZeroPlus
-        accessprovider = NvmAccessProviderCmsisDapMZeroPlus(transport, device_info, frequency)
-    elif architecture == 'avr32':
-        from .nvmavr32 import NvmAccessProviderCmsisDapAvr32
-        accessprovider = NvmAccessProviderCmsisDapAvr32(transport, device_info)
 
     return accessprovider
 

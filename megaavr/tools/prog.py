@@ -27,7 +27,7 @@ def main():
     parser.add_argument("-a", "--action",
                         type=str,
                         default="",
-                        help="Action to perform {write, read, erase}.")
+                        help="Action to perform {write, read, erase, lock, unlock}.")
 
     parser.add_argument("-b", "--baudrate",
                         type=str,
@@ -274,6 +274,23 @@ def pymcuprog_basic(args, fuses_dict):
         run_pymcu_action(pymcu._action_erase, backend,
                          memory=pymcu.MemoryNameAliases.ALL,
                          offset=0)
+    elif args.action == "lock":
+        if args.device.startswith("avr"):
+            run_pymcu_action(pymcu._action_write, backend,
+                             offset=0,
+                             literal=[0, 0, 0, 0],
+                             memory=pymcu.MemoryNames.LOCKBITS,
+                             verify=True,
+                             filename=None)
+        else:
+            run_pymcu_action(pymcu._action_write, backend,
+                             offset=0,
+                             literal=[1],
+                             memory=pymcu.MemoryNames.LOCKBITS,
+                             verify=True,
+                             filename=None)
+    elif args.action == "unlock":
+        pass
 
     # close session
     backend.end_session()

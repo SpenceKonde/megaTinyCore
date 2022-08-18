@@ -149,6 +149,9 @@ class Programmer:
             memory_info = self.device_memory_info.memory_info_by_name(memory_name)
         self.device_model.erase(memory_info=memory_info, address=address)
 
+    def unlock(self):
+        self.device_model.unlock()
+
     def write_memory(self, data, memory_name, offset=0, blocksize=0, pagewrite_delay=0):
         """
         Write memory on the device

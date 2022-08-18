@@ -97,6 +97,10 @@ class NvmAccessProviderSerial(NvmAccessProvider):
             self.logger.error("Device is locked. Performing unlock with chip erase.\nError: ('%s')", inst)
             self.avr.unlock()
 
+    def unlock(self):
+        self.logger.debug("Unlocking chip...")
+        self.avr.unlock()
+
     def write(self, memory_info, offset, data, blocksize=0, pagewrite_delay=0):
         """
         Write the memory with data
