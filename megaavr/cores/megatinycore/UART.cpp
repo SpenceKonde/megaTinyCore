@@ -364,7 +364,7 @@
         // -Spence 10/23/20
         // Invoke interrupt handler only if conditions data register is empty
         if ((*_hwserial_module).STATUS & USART_DREIF_bm) {
-          if (_tx_buffer_head != _tx_buffer_tail) {
+          if (_tx_buffer_head == _tx_buffer_tail) {
             // Buffer empty, so disable "data register empty" interrupt
             (*_hwserial_module).CTRLA &= (~USART_DREIE_bm);
 
