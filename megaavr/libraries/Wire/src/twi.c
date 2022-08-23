@@ -529,7 +529,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
   #endif
 
   uint8_t clientStatus = _data->_module->SSTATUS;
-
+   _data->_module->SSTATUS &= ~(TWI_APIF_bm | TWI_DIF_bm); // remove Status flags to prevent ISR from being called again
   #if defined(TWI_MANDS)
     _data->_bools._toggleStreamFn = 0x01;             // reroute stream functions to slave elements
   #endif
