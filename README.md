@@ -13,7 +13,11 @@ Let's use that - it's better than gitter ever was, and it's all on one site.
 All that remains is ensuring that everything that needs to be ported from DxCore is ported first. Oh, putting together the new toolchain version.
 
 ## WARNING: IDE 2.0.x unsupported and all versions prior to 2.0.0-RC9.2 known to have critical regressions
-These bugs in the IDE prevent board settings from being correctly recognized. Pull-requests with workarounds to undocumented beta behaviour will not be accepted. [This thread tracks known issues with 2.0 and workarounds](https://github.com/SpenceKonde/megaTinyCore/discussions/760). If you use unsupported software please reproduce all issues in 1.8.13 before reporting.
+These bugs in the IDE prevent board settings from being correctly recognized. Pull-requests with workarounds to undocumented beta behaviour will not be accepted. [This thread tracks known issues with 2.0 and workarounds](https://github.com/SpenceKonde/megaTinyCore/discussions/760). 
+
+## WARNING: IDE 1.1.14 and later are incompatible with manual installation until 2.6.0 is finished. If you use unsupported software please reproduce all issues in 1.8.13 before reporting.
+
+## WARNING: IDE 1.1.12 and earlier display all programmers always; that is, incompatible ISP programmers will be shown for these UPDI parts, and these UPDI programmers will be shown for parts that use ISP programming or other methods. If multiple cores feature a programmer of a specific name it will appear twice, but if the cores are not very similar in design, only the (identically named) 
 
 V1.8.13 is the "golden version" and the only one I recommend. All the more recent ones gained bugs, and its the last version with a substantial improvement. Be aware it does have a vulnerable version of Log4J.
 V1.8.14+ are known to crash due to [this bug](https://github.com/arduino/Arduino/issues/11813) when you install the core manually in your arduino folder and not when you install the core via boards manager. If you are manually edit platform.txt with
