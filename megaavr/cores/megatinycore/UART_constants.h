@@ -139,11 +139,13 @@
 #define SERIAL_HALF_DUPLEX_ENABLED  0x02 // Indicates we are in half duplex mode. Used internally to control when interrupts are switched
 #define SERIAL_PARITY_ERROR         0x04 // Indicates that since getStatus() was last called there has been one or more parity error. Parity error characters are not retained.
 #define SERIAL_FRAME_ERROR          0x08 // Indicates that since getStatus() was last called there has been one or more framing error, this usually indicates a baud mismatch
-#define SERIAL_AUTOBAUD_SYNC        0x10 // Indicates that a fresh baud rate has been set.
-/* Some parts are afflicted by an errata that requires the receiver to be bounced to restore functiong the core does this automatically. */
-#define SERIAL_OVERFLOW_RING        0x20 // Indicates that the *RING BUFFER* lost data due to overflow - you are not calling read() as fast as data is coming in.
-#define SERIAL_AUTOBAUD_BADSYNC     0x40 // Indicates that an unsuccessful sync attempt was made. On parts known to be impacted by the errata, (AVR32DD20/14 - and maybe others)
-#define SERIAL_OVERFLOW_HARDWARE    0x80 // Indicates that the HARDWARE buffer overflowed because interrupts were disabled for too long while receiving data.
+#define SERIAL_AUTOBAUD_ENABLED     0x10 // Autobaud enabled. 0booaaeehw
+#define SERIAL_AUTOBAUD_SYNC        0x20 // Indicates that a fresh baud rate has been set.
+/* Some parts are afflicted by an errata that requires the receiver to be bounced to restore functioning after ICSIF is set and then cleared. the core does this automatically. */
+#define SERIAL_AUTOBAUD_BADSYNC     0x30 // Indicates that an unsuccessful sync attempt was made. On parts known to be impacted by the errata, (AVR32DD20/14 - and maybe others)
+                                         // RXEN must be turned off and back on after clearing this. That is done when checkStatus() is called and finds ISFIF set.
+#define SERIAL_OVERFLOW_RING        0x40 // Indicates that the *RING BUFFER* lost data due to overflow - you are not calling read() as fast as data is coming in.
+#define SERIAL_OVERFLOW_HARDWARE    0x80 // Indicates that the *HARDWARE* buffer overflowed because interrupts were disabled for too long while receiving data.
 
 
 /* CTRLA is interrupt flags, plus 3 options relevant to RS485

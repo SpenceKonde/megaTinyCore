@@ -1,5 +1,22 @@
 # SerialUPDI
+
+## 1.3.y
+(planned)
+Error messages currently suck as bad as the avrdude ones. This is *not* acceptable. True verbose mode is so excessively verbose that it is useless to anyone but me, Quentin, and a few people at Microchip. and there is no reason for that to be the case other than
+
+## 1.3.x
+(planned)
+Add EEPROM action to write the EEPROM data if requested.
+Add LOCKEDUSERROW action to write to the userrow of a locked chip.
+Fix unlock() so that when run interactively, it will check if the chip is locked and prompt the user if they try to unlock an unlocked chip unless a "yes I'm really sure" flag is passed.
+
+
+8/18/2022
+## 1.3.0
+Add actions lock and unlock. Lock writes the value 0x00 to te lock fuse, unlock executes a chip erase. Chip erase erases the everything except fuses and (if EESAVE is set) EEPROM (my understanding is that userrow is not erased unless the chip is locked). Additionally and most importantly, the lockbits themselves are reset.
+
 ## 1.2.4 - Fix "Hashable" error on linux
+8/2022
 Due to an outdated version of YAML and Pythons failure to maintain consistent behavior, Serial UPDI was broken on fully updated linux systems. This is no longer the case.
 Added AVR64DDxx device files.
 Synthesized the AVR32/16DD files because Microchip hasn't released those despite having been shipping them for a month.

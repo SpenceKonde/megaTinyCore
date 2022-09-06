@@ -11,21 +11,7 @@
  * to need to refer to. The minutia has all been pushed into
  * core_devices.h if it's independent of pins_arduino.h or into
  * pinswap.h if it relates to PORTMUX, which is a great volume
- * of stuff nobody should have to read.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * of stuff nobody should have to read.=
  */
  /*
  * That means functions and macros that may be used by user code
@@ -495,7 +481,132 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
 uint16_t millisClockCyclesPerMicrosecond();
 unsigned long millisClockCyclesToMicroseconds(unsigned long cycles);
 unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
+/* Timers and Timer-like-things
+ * These are used for two things: Identifying the timer on a pin in
+ * digitalPinToTimer(), and for the MILLIS_TIMER define that users can test to
+ * verify which timer is being used for millis.
+ *
+ * Prior to 1.3.x TCAs were all 0x1_, TCBs 0x2_. But in order to make the
+ * take-over tracking work efficiently I needed a dedicated bit for each TCA.
+ * so that we can just do (__PeripheralControl | TIMERA0) to test if user has
+ * taken over the timer. Hence, all the "big" timers (those which have a
+ * takeOverTCxn() function and which PORTMUX moves en masse instead of one at
+ * a time) have their own bit within these macros.
+ * Note also that the digital_pin_to_timer table doesn't list these anymore.\
+ * There are two functions within the core that need to know this:
+ * AnalogWrite, and turnOffPWM. These each carry their own implementation of
+ * logic to identify the timer and channel; the only other cases in which these
+ * pins need ro be identified are within user code, where the pin mapping can
+ * be chosen freely (subject to user code needing access to other pins), so
+ * it does not present the complexity of the core library which must work with
+ * the pins in ANY of 7, 2, or 5 mappings (for TCA0, TCA1 and TCD0 respectively)
+ *
+ * Prior to this change, only the arbitrarily chosen core default timer pin-
+ * mapping was supported, so this was a dramatic leap forward in capabilitt.
+ *
+ * The DAC is listed here because analogWrite() uses it almost exactly like
+ * a PWM timer.
+ * RTC can be used as a millis timekeeping source (well, not currently on
+ * DxCore, but it can on megaTinyCore, and might one day be possible on DxCore
+ * though I'm not sure I want to implement it that way).
+ *****************************************************************************/
+/* More may be implemented here in the future */
 
+#define NOT_ON_TIMER    (0x00)
+#define TIMERA0         (0x10) // A "simple" type A timer mapping doesn't get constants for the WO channels.
+#define TIMERA1         (0x08) // Formerly 0x11 - giving it a dedicated bit makes the takeover tracking easy and efficient instead of being a morass of tests and bitmath.
+#define TIMERB0         (0x20) // TCB0
+#define TIMERB1         (0x21) // TCB1
+#define TIMERB2         (0x22) // TCB2
+#define TIMERB3         (0x23) // TCB3
+#define TIMERB4         (0x24) // TCB4
+#define TIMERD0         (0x70) // If any of these bits match it's potentially on TCD0
+#define DACOUT          (0x80)
+/* The above are all used in the digitalPinToTimer() macro and appear in the timer table, in addition to being how we identify millis timer.
+ * For the millis timer, there's nothing weird here.
+ * But the timer table constants contain more information than that for these. When user code interprets the timer table entries it is critical to do it right:
+ *  1. If 0x40 is set, TCD0 can output here. bits 4 and 5 contain information on what channel, and bits 0-2 specify what the PORTMUX must be set to.
+ *  2. If 0x20 us set, there is a TCB can output PWM there.
+ *    2a. If 0x20 is set, check 0x10 - if that's set, it's the alt pin mapping. This is currently not returned by the table, and I assess it to be unlikely to be of use
+ *  4. If 0x10 is set, it's a TCA0 pin. This is never used in the timer table, but digitalPinToTimerNow() can return it.
+ *  5. If 0x08 is set, it's a TCA1 pin. This is never used in the timer table, but digitalPinToTimerNow() can return it.
+ * Ergo, use bitwise ands
+ */
+
+#define TIMERRTC        (0x90) // RTC with internal osc
+#define TIMERRTC_XTAL   (0x91) // RTC with crystal
+#define TIMERRTC_CLK    (0x92) // RTC with ext clock
+
+/* Not used in table */
+#define TIMERA0_MUX0    (0x10) // Mapping0 (PORTA 0-5)
+#define TIMERA0_MUX1    (0x11) // Mapping1 (PORTB 0-5)
+#define TIMERA0_MUX2    (0x12) // Mapping2 (PORTC 0-5)
+#define TIMERA0_MUX3    (0x13) // Mapping3 (PORTD 0-5)
+#define TIMERA0_MUX4    (0x14) // Mapping4 (PORTE 0-5)
+#define TIMERA0_MUX5    (0x15) // Mapping5 (PORTF 0-5)
+#define TIMERA0_MUX6    (0x16) // Mapping6 (PORTG 0-5)
+#define TIMERA0_MUX7    (0x17) // Mapping7 (PORTA 0-5)
+#define TIMERA1_MUX0    (0x08) // Mapping0 (PORTB 0-5)
+#define TIMERA1_MUX1    (0x09) // Mapping1 (PORTC 4-6) - only three channels available.
+#define TIMERA1_MUX2    (0x0A) // Mapping2 (PORTE 4-6) - only three channels available.
+#define TIMERA1_MUX3    (0x0B) // Mapping3 (PORTG 0-5) - DB-series only due to errata.
+#define TIMERA1_MUX4    (0x0C) // Mapping4 (PORTA 4-6) - only three channels available.
+#define TIMERA1_MUX5    (0x0D) // Mapping5 (PORTD 4-6) - only three channels available.
+
+/* Not used in table or at all, yet */
+#define TIMERB0_ALT     (0x30) // TCB0 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+#define TIMERB1_ALT     (0x31) // TCB1 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+#define TIMERB2_ALT     (0x32) // TCB2 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+#define TIMERB3_ALT     (0x33) // TCB3 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+#define TIMERB4_ALT     (0x34) // TCB4 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+#define TIMERB0_ALT     (0x30) // TCB0 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+#define TIMERB1_ALT     (0x31) // TCB1 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+#define TIMERB2_ALT     (0x32) // TCB2 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+#define TIMERB3_ALT     (0x33) // TCB3 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+#define TIMERB4_ALT     (0x34) // TCB4 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+
+
+ // 0b01MC 0mmm - the 3 lowest bits refer to the PORTMUX.
+//                            bit C specifies whether it's channel A (0) or B (1). If M is 1 it is WOC outputting chan A or WOB outputting D.
+//                            WOD outputting A or WOC outputting B is not supported by the core. WOB outputting A or WOA outputting B is not supported by the hardware.
+//                            Hence, PORTMUX.TCDROUTEA == (timer table entry) & (0x07)
+//                            and any table entry > 0x40 but less than 0x80 could be a TCD
+//
+#define TIMERD0_0WOA      (0x40) // PORTA
+#define TIMERD0_0WOB      (0x50)
+#define TIMERD0_0WOC      (0x60)
+#define TIMERD0_0WOD      (0x70)
+#define TIMERD0_1WOA      (0x41) // PORTB
+#define TIMERD0_1WOB      (0x51)
+#define TIMERD0_1WOC      (0x61)
+#define TIMERD0_1WOD      (0x71)
+#define TIMERD0_2WOA      (0x42) // PORTF
+#define TIMERD0_2WOB      (0x52)
+#define TIMERD0_2WOC      (0x62)
+#define TIMERD0_2WOD      (0x72)
+#define TIMERD0_3WOA      (0x43) // PORTG
+#define TIMERD0_3WOB      (0x53)
+#define TIMERD0_3WOC      (0x63)
+#define TIMERD0_3WOD      (0x73)
+#define TIMERD0_4WOA      (0x44) // this is PA4, duplicates mux 0.
+#define TIMERD0_4WOB      (0x54) // this is PA5, duplicates mux 0.
+#define TIMERD0_4WOC      (0x64) // second half is PORTD
+#define TIMERD0_4WOD      (0x74)
+/*
+// For future use
+#define TIMERD0_5WOA      (0x45) // hypothetical TCD0 WOA ALT5
+#define TIMERD0_5WOB      (0x55) // hypothetical TCD0 WOB ALT5
+#define TIMERD0_5WOC      (0x65) // hypothetical TCD0 WOC ALT5
+#define TIMERD0_5WOD      (0x75) // hypothetical TCD0 WOD ALT5
+#define TIMERD0_6WOA      (0x46) // hypothetical TCD0 WOA ALT6
+#define TIMERD0_6WOB      (0x56) // hypothetical TCD0 WOB ALT6
+#define TIMERD0_6WOC      (0x66) // hypothetical TCD0 WOC ALT6
+#define TIMERD0_6WOD      (0x76) // hypothetical TCD0 WOD ALT6
+#define TIMERD0_7WOA      (0x47) // hypothetical TCD0 WOA ALT7
+#define TIMERD0_7WOB      (0x57) // hypothetical TCD0 WOB ALT7
+#define TIMERD0_7WOC      (0x67) // hypothetical TCD0 WOC ALT7
+#define TIMERD0_7WOD      (0x77) // hypothetical TCD0 WOD ALT7
+*/
 
 __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us);
 
@@ -636,6 +747,80 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
 #ifdef __cplusplus
 } // extern "C"
 #endif
+/********************************************************************************
+ * CORE AND HARDWARE FEATURE SUPPORT  *
+ * CORE_HAS_FASTIO is 1 when digitalReadFast and digitalWriteFast are supplied, and 2 when openDrainFast and pinModeFast are as well.
+ * CORE_HAS_OPENDRAIN
+ * CORE_HAS_PINCONFIG is 1 if pinConfig is supplied. The allows full configuration of any pin. It is 2 if it accepts commas instead of bitwise or between configuration parameters (NYI)
+ * CORE_HAS_FASTPINMODE is 1 if pinModeFast is supplied
+ * CORE_HAS_ANALOG_ENH is 0 if no analogReadEnh is supplied, 1 if it is, and 2 if it is supplied and both core and hardware support a PGA.
+ * CORE_HAS_ANALOG_DIFF is 0 if no analogReadDiff is supplied, 1 if it's DX-like (Vin < VREF), and 2 if it's a proper
+ * differential ADC, supported in both hardware and software. The value -1 is also valid and indicates it's a classic AVR with a  * differential ADC, see the documentation for the core.
+ * CORE_HAS_TIMER_TAKEOVER is 1 if takeOverTCxn functions are provided to tell the core not to automatically use all
+ * type A and D timers.
+ * CORE_HAS_TIMER_RESUME is 1 if resumeTCAn functions are provided to hand control back to the core and reinitialize them.
+ * CORE_DETECTS_TCD_PORTMUX is 1 if the TCD portmux works correctly on the hardware and is used by the core, 0 if it would be if
+ * the harware worked, and not defined at all if the hardware doesnt have such a feature even in theory
+ * CORE_SUPPORT_LONG_TONES is 1 if the core supports the three argument tone for unreasonably long tones.
+ ********************************************************************************/
+#define CORE_HAS_FASTIO                 (2)
+#define CORE_HAS_OPENDRAIN              (1)
+#define CORE_HAS_PINCONFIG              (1)
+#define CORE_HAS_FASTPINMODE            (1)
+
+#define CORE_HAS_TIMER_TAKEOVER         (1)
+#define CORE_HAS_TIMER_RESUME           (0)
+#if (MEGATINYCORE_SERIES == 2)
+  #define CORE_HAS_ANALOG_ENH           (2)
+  #define CORE_HAS_ANALOG_DIFF          (2)
+#else
+  #define CORE_HAS_ANALOG_ENH           (1)
+  #define CORE_HAS_ANALOG_DIFF          (0)
+#endif
+
+#ifndef CORE_SUPPORT_LONG_TONES
+  #if (PROGMEM_SIZE > 8192)
+    #define CORE SUPPORT_LONG_TONES 1
+  #endif
+#endif
+
+/* Hardware capabilities (ADC)
+ * ADC_DIFFERENTIAL is 1 for a half-way differential ADC like DX-serie has, 2 for a real one like EA-series will    *
+ * ADC_MAX_OVERSAMPLED_RESOLUTION is the maximum resolution attainable by oversampling and decimation               *
+ * ADC_NATIVE_RESOLUTION is the higher of the two native ADC resolutions. Either 10 or 12                           *
+ * ADC_NATIVE_RESOLUTION_LOW is the lower of the two native ADC resolutions. Either 8 or 10. Can't be deduced from  *
+ * above. All permutations where the "native resolution" is higher are extant somewhere                             *
+ * ADC_MAXIMUM_ACCUMULATE is the maximum number of sameples that can be accumulated by the burst accumulation mode  *
+ * ADC_MAXIMUM_SAMPDUR is the maximum sample duration value. Refer to the core documentation or datasheet for detail*
+ * ADC_RESULT_SIZE is the size (in bits) of the registers that hold the ADC result. V2.0 ADC has 32, others have 16 *
+ * ADC_MAXIMUM_GAIN is defined if there is a way to amplify the input to the ADC. If you have to use onchip opamps  *
+ * and the chip has them, it's -1, otherwise it is the maximum multiplier
+ * ADC_REFERENCE_SET is 1 if the references are the weird ones that tinyAVR 0 and 1 use, and 2 if they are 1.024,   *
+ * 2.048, 4.096 and 2.5V like civilized parts */
+
+#if MEGATINYCORE_SERIES != 2
+  #define ADC_DIFFERENTIAL                (0)
+  #define ADC_MAX_OVERSAMPLED_RESOLUTION (13)
+  #define ADC_NATIVE_RESOLUTION          (10)
+  #define ADC_NATIVE_RESOLUTION_LOW       (8)
+  #define ADC_MAXIMUM_ACCUMULATE         (64)
+  #define ADC_MAXIMUM_SAMPDUR          (0x1F)
+  #define ADC_RESULT_SIZE                (16)
+  #define ADC_REFERENCE_SET               (1)
+#else
+  #define ADC_DIFFERENTIAL                (2)
+  #define ADC_MAX_OVERSAMPLED_RESOLUTION (17)
+  #define ADC_NATIVE_RESOLUTION          (12)
+  #define ADC_NATIVE_RESOLUTION_LOW       (8)
+  #define ADC_MAXIMUM_ACCUMULATE       (1024)
+  #define ADC_MAXIMUM_SAMPDUR          (0xFF)
+  #define ADC_RESULT_SIZE                (32)
+  #define ADC_REFERENCE_SET               (2)
+  #define ADC_MAXIMUM_GAIN             (16)
+#endif
+
+/* Oh and DB/DD can use inlvl to ajust trigger points. */
+#define PORT_HAS_INLVL 0
 
 #ifdef __cplusplus
   #include "UART.h"
@@ -687,28 +872,94 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 
 
 
-#define CORE_HAS_FASTIO 2
-#define CORE_HAS_OPENDRAIN 1
-#define CORE_HAS_PINCONFIG 1
-#define CORE_HAS_FASTPINMODE 1
-
-
-#if (MEGATINYCORE_SERIES == 2)
-  // if analogReadEnh() supplied, this is defined as 1
-  #define CORE_HAS_ANALOG_ENH 1
-  // if analogReadDiff() supplied, this is defined as 1
-  #define CORE_HAS_ANALOG_DIFF 1
-#else
-  #define CORE_HAS_ANALOG_ENH 1
-  // if analogReadDiff() supplied, this is defined as 1
-  #define CORE_HAS_ANALOG_DIFF 0
+// A little bit of trickery - this allows Serial to be defined as something other than USART0
+// Use case is for boards where the main serial port is not USART0 to be used without the user
+// having to find/replace Serial with Serial2 or whatever on their existing code if that's where
+// the monitor is. It requires that the board be defined by a variant file
+#ifndef Serial
+  #define Serial Serial0 // Error here? Check for missing ; previous line in sketch.
 #endif
 
+/* Moved from pins_arduino.h to reduce code duplication - also made better decisions */
+// These serial port names are intended to allow libraries and architecture-neutral
+// sketches to automatically default to the correct port name for a particular type
+// of use.  For example, a GPS module would normally connect to SERIAL_PORT_HARDWARE_OPEN,
+// the first hardware serial port whose RX/TX pins are not dedicated to another use.
+//
+// SERIAL_PORT_MONITOR        Port which normally prints to the Arduino Serial Monitor
+//
+// SERIAL_PORT_USBVIRTUAL     Port which is USB virtual serial
+//
+// SERIAL_PORT_LINUXBRIDGE    Port which connects to a Linux system via Bridge library
+//
+// SERIAL_PORT_HARDWARE       Hardware serial port, physical RX & TX pins.
+//
+// SERIAL_PORT_HARDWARE_OPEN  Hardware serial ports which are open for use.  Their RX & TX
+//                            pins are NOT connected to anything by default.
 
-#ifndef SUPPORT_LONG_TONES
-  #if (PROGMEM_SIZE > 8192)
-    #define SUPPORT_LONG_TONES 1
+// First, we allow a define to be passed (lkely from boards.txt - though it could
+// come from pins_arduino, I suppose) to force a certain port here. The plan is
+// that I will pass defines from board definitions specifying this for the Curiosity
+// Nano boards, in order to improve the user experience there - though this may be
+// obliviated by the Serial/Serial0 thing just above, which has the advantage of
+// transparently adapting user code as well.
+
+#if !defined(SERIAL_PORT_MONITOR)
+  #if defined(SERIAL_PORT_BOOT)
+    #define SERIAL_PORT_MONITOR       SERIAL_PORT_BOOT
+  #else
+    #define SERIAL_PORT_MONITOR       Serial
   #endif
 #endif
+
+// Following example in the Arduino Mega, where despite having 4 serial ports, they
+// use Serial for both SERIAL_PORT_MONITOR and SERIAL_PORT_HARDWARE, I will not
+// try to spread around the ports we use for these defines - if we're
+// going to declare some other port to be the "main" serial port, with the monitor
+// on it and all, we should be consistent about that, right? *shrug*
+//#define SERIAL_PORT_HARDWARE      SERIAL_PORT_MONITOR
+
+// If we have USART2 (ie, we are not a DD-series) we will declare that to be
+// SERIAL_PORT_HARDWARE_OPEN, so that on a DB-series, libraries are less likely to
+// squabble over the more powerful USART1 - USART1 being more powerful because it
+// is on PORTC, the MVIO port.
+/*
+#if !defined(SERIAL_PORT_MONITOR)
+  #if defined(USART2) && (SERIAL_PORT_MONITOR != Serial2) && (!defined(SERIAL_PORT_BOOT) || SERIAL_PORT_BOOT != Serial2)
+    #define SERIAL_PORT_HARDWARE_OPEN Serial2
+  #else
+    #if (SERIAL_PORT_MONITOR != Serial0 ) && (!defined(SERIAL_PORT_BOOT) || SERIAL_PORT_BOOT != Serial0)
+      #define SERIAL_PORT_HARDWARE_OPEN Serial0
+    #else
+      #define SERIAL_PORT_HARDWARE_OPEN Serial1
+    #endif
+  #endif
+#endif
+#if !defined(SERIAL_PORT_MVIO) && defined(MVIO)
+// DD-series parts with 20-or-fewer pins will not have a PC0 for the TX line of
+// Serial1, so it can't be their MVIO serial port (without involving the event
+// system, of course) - but they can get a serial port on MVIO pins with USART0
+// and an alternate mapping. So for those parts only, Serial is their MVIO port.
+// For everyone else it's Serial1, and for non-DD parts, that is the only port
+// that could be used with MVIO (again, short of rerouting signals with
+// the event system)
+// Note that if MVIO is disabled, we cannot detect that.
+  #if defined(DD_14_PINS) || defined(DD_20_PINS)
+    #define SERIAL_PORT_MVIO Serial0
+    #define SERIAL_PORT_MVIO_MUX 0x04 // TX PC1 RX PC2
+  #else
+    #define SERIAL_PORT_MVIO Serial1
+  #endif
+#endif
+*/
+
+// Spence Konde: This is a bit silly - but it does have some utility. I am of the
+// opinion that anything that needs to use a serial port or other peripheral of
+// which a chip may have several, and it needs to be sure to pick the "right" one
+// it should ASK THE USER - what good does it do that the GPS picked the first
+// open serial port, if the user tied it to a different port? Or thought they
+// were going to use software serial "like they always did" (*shudder*)
+
+
 
 #endif

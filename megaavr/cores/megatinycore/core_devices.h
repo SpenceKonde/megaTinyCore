@@ -1,14 +1,16 @@
-/* Core Parts - a part of Arduino.h for megaTinyCore 2.3.0 and later
+/* core_devices  - a part of Arduino.h for megaTinyCore 2.3.0 and later and DxCore 1.4.0, but
+ * which takes ion much greater importance (and girth) with the toolchain update in 2.6 and 1.6)
  * This is directly included by Arduino.h and nothing else; it just moves
- * clutter out of that file.
+ * clutter out of that file. You should not directly include this file ever.
  *
- * Spence Konde 2021 - megaTinyCore is free software (LGPL 2.1)
+ * Spence Konde 2021 -2022- megaTinyCore and DxCore are free software (LGPL 2.1)
  * See LICENSE.txt for full legal boilerplate if you must */
 
 #ifndef Core_Devices_h
 #define Core_Devices_h
 #include <avr/io.h>
 #include <core_parameters.h>
+#define PROGMEM_MAPPED // All modern tinyAVRs have mapped flash.
 //#defines to identify part families
 #if   defined(__AVR_ATtiny3227__)
   #define MEGATINYCORE_MCU 3227
@@ -400,29 +402,6 @@
 #define PG 6
 #define NUM_TOTAL_PORTS 7
 
-// These are used for two things: identifying the timer on a pin
-// and for the MILLIS_TIMER define that the uses can test which timer
-// actually being used for millis is actually being used
-// Reasoning these constants are what they are:
-// Low 3 bits are the number of that peripheral
-// other bits specify the type of timer
-// TCA=0x10, TCB=0x20, TCD=0x40, DAC=0x80, RTC=0x90
-// Things that aren't hardware timers with output compare are after that
-// DAC output isn't a timer, but has to be treated as such by PINMODE
-
-#define NOT_ON_TIMER 0x00
-#define TIMERA0 0x10
-#define TIMERA1 0x08        // Not present on any tinyAVR devices
-#define TIMERB0 0x20
-#define TIMERB1 0x21
-#define TIMERB2 0x22        // Not present on any tinyAVR 0/1/2-series
-#define TIMERB3 0x23        // Not present on any tinyAVR 0/1/2-series
-#define TIMERB4 0x24        // Not present on any tinyAVR 0/1/2-series
-#define TIMERD0 0x40        // 1-series only
-#define DACOUT 0x80         // 1-series only. "PWM" output source only
-#define TIMERRTC 0x90       // millis timing source only
-#define TIMERRTC_XTAL 0x91  // 1/2-series only, millis timing source only
-#define TIMERRTC_XOSC 0x92  // 1/2-series only, millis timing source only
 
 #if MEGATINYCORE_SERIES <= 2
   #define RTC_CLKSEL_OSC32K_gc  RTC_CLKSEL_INT32K_gc
@@ -432,25 +411,23 @@
 
 #if MEGATINYCORE_SERIES == 2
 /* Initial version of the IO headers omits these definitions!
- * Either that, or the datasheet includes them in error. The calibration
- * numbers are... maybe not the most useful values though, as the oscillator
- * error is very small. These are in the 0 to 4 range. Which is to be expected
- * since the granularityy of the calbyte is half what it was on the 0/1-series.
+ * then some versions had them, then the removed them all and stopped
+ * performing the cal at all (which was not as usuful as on 0/1-series)
  */
-  #if !defined(SIGROW_OSC16ERR3V)
-    #define SIGROW_OSC16ERR3V (SIGROW.reserved_3[0])
+ #if !defined(SIGROW_OSC16ERR3V)
+    #define SIGROW_OSC16ERR3V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions"])
   #endif
   #if !defined(SIGROW_OSC16ERR5V)
-    #define SIGROW_OSC16ERR5V (SIGROW.reserved_3[1])
+    #define SIGROW_OSC16ERR5V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions"])
   #endif
   #if !defined(SIGROW_OSC20ERR3V)
-    #define SIGROW_OSC20ERR3V (SIGROW.reserved_3[2])
+    #define SIGROW_OSC20ERR3V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions"])
   #endif
   #if !defined(SIGROW_OSC20ERR5V)
-    #define SIGROW_OSC20ERR5V (SIGROW.reserved_3[3])
+    #define SIGROW_OSC20ERR5V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions"])
   #endif
 #else
-  /* 0/1-series, on the other hand, doesm't have these.... */
+  /* 0/1-series, on the other hand, doesm't have these defined even though they are present */
   #if !defined(SIGROW_OSCCAL16M0)
     #define SIGROW_OSCCAL16M0 _SFR_MEM8(0x1118)
   #endif
@@ -516,6 +493,16 @@
 
 #define CLOCK_TUNE_START (USER_SIGNATURES_SIZE - 12)
 
+/* Microchip has shown a tendency to rename registers bitfields and similar between product lines, even when the behavior is identical.
+ * This is a major hindrance to writing highly portable code which I assume is what most people wish to do. It certainly beats having
+ * to run code through find replace making trivial changes, forcing a fork where you would rather not have one.
+ * Since having to adjust code to match the arbitrary and capricious whims of the header generation scheme kinda sucks, we try to catch
+ * all the places they do this and provide a macro for backwards compatibility. For some bizarre reason you may wish to turn this off
+ * maybe in preparation for jumping to another development environment like Microchip Studio that does not use Arduino cores.
+ * Instead of backwards compatibilily, you want the opposite, which some wags have called "Backwards combatibility"
+ * Defining BACKWARD_COMBATIBILITY_MODE turns off all of these definitions that paper over name changes.
+ */
+
 /* Add a feature - yay!
  * Rename registers so people can't carry code back and forth - booo!
  */
@@ -541,46 +528,4 @@
     #error "Only the tinyAVR 1-series and 2-series parts with at least 8 pins support external RTC timebase"
   #endif
 #endif
-
- /* HARDWARE FEATURES - Used by #ifdefs and as constants in calculations in
-  * the core and in libraries; it is hoped that these are at least somewhat
-  * useful to users, as well. These are described in more detail in the
-  * README. */
-
-#if (MEGATINYCORE_SERIES == 2)
-  #define ADC_NATIVE_RESOLUTION 12
-  #define ADC_NATIVE_RESOLUTION_LOW 8
-  // 1 if hardware has a differential ADC - separate from core support
-  #define ADC_DIFFERENTIAL 1
-  // 0 if hardware has no PGA, otherwise maximum PGA gain
-  #define ADC_MAXIMUM_GAIN 16
-  // Maximum burst accumulation
-  #define ADC_MAXIMUM_ACCUMULATE 1024
-  // Maximum resolution obtainable by using maximum accumulate option and decimating that.
-  #define ADC_MAX_OVERSAMPLED_RESOLUTION 17
-  // Maximum SAMPLEN or SAMPDUR
-  #define ADC_MAXIMUM_SAMPDUR 0xFF
-  // ADC Result Size (bits)
-  #define ADC_RESULT_SIZE 32
-#else
-  #define ADC_NATIVE_RESOLUTION 10
-  #define ADC_NATIVE_RESOLUTION_LOW 8
-  // 1 if hardware has a differential ADC - separate from core support
-  #define ADC_DIFFERENTIAL 0
-  // 0 if hardware has no PGA, otherwise maximum PGA gain
-  #define ADC_MAXIMUM_GAIN 0
-  // Maximum burst accumulation
-  #define ADC_MAXIMUM_ACCUMULATE 64
-  // Maximum resolution obtainable by using maximum accumulate option and decimating that.
-  #define ADC_MAX_OVERSAMPLED_RESOLUTION 13
-  // Maximum SAMPLEN or SAMPDUR
-  #define ADC_MAXIMUM_SAMPDUR 0x1F
-  // ADC Result Size (bits)
-  #define ADC_RESULT_SIZE 16
-  // if (ADC_NATIVE_RESOLUTION + Log2(ADC_MAXIMUM_ACCUMULATE)) > ADC_RESULT_SIZE, long accumulations are truncated.
-  // with maximum accumulation of 0/1, for example, 10 + 6 = 16, so it will just fit.
-  // On 2-series, 12 + 10 = 22 out of 32 bits; they could have gotten away with a 24-bit register.
-#endif
-// tinyAVR thus far doesn't have the TTL input level option. Probably MVIO only.
-#define PORT_HAS_INLVL 0
 #endif

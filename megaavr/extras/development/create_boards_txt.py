@@ -1,6 +1,6 @@
 import re
 subsections={
-  "buildparam":{
+  "buildparams":{
     "heading":"#                                        #\n# BUILD PARAMETERS                       #\n#________________________________________#",
     "entries":[
       "build.text_section_start=.text=0x0",
@@ -17,7 +17,7 @@ subsections={
       "build.export_merged_output=false"
     ],
   },
-  "bootparam_updi":{
+  "bootparams_updi":{
     "heading":"#----------------------------------------#\n# BOOTLOADING PARAMETERS (FUSES)         #\n#________________________________________#",
     "entries":[
       "bootloader.WDTCFG=0x00",
@@ -34,7 +34,7 @@ subsections={
       "bootloader.serialupdistring=-aerase",
     ],
   },
-  "bootparam_opti":{
+  "bootparams_opti":{
     "heading":"#----------------------------------------#\n# BOOTLOADING PARAMETERS (FUSES)         #\n#________________________________________#",
     "entries":[
       "bootloader.WDTCFG=0x00",
@@ -49,7 +49,7 @@ subsections={
       "bootloader.tool=avrdude",
     ],
   },
-  "exportparam":{
+  "exportparams":{
     "heading":"#----------------------------------------#\n# Exported hex/lst/map names will        #\n# indicate selected options. These       #\n# are only to do that, nothing else      #\n#________________________________________#",
     "entries":[
       "build.bootload=",
@@ -59,7 +59,7 @@ subsections={
       "build.pwmabr="
     ],
   },
-  "uploadparam_updi":{
+  "uploadparams_updi":{
     "heading":"#----------------------------------------#\n# ALL UPLOADING VIA UPDI                 #\n#________________________________________#",
     "entries":[
       "upload.tool=avrdude",
@@ -67,7 +67,7 @@ subsections={
       "upload.prog_interlock="
     ],
   },
-  "uploadparam_opti":{
+  "uploadparams_opti":{
     "heading":"#----------------------------------------#\n# ALL UPLOADING VIA OPTIBOOT             #\n#________________________________________#",
     "entries":[
       "upload.tool=avrdude",
@@ -296,7 +296,7 @@ subsections={
       "menu.clocko.1internaltuned.build.clocksource=0",
       "menu.clocko.1internaltuned.build.tuned=-DCLOCK_TUNE_INTERNAL",
     ]
-  }
+  },
   "bodmenu":{
     "heading":"#----------------------------------------#\n# BOD VOLTAGE                            #\n#________________________________________#",
     "entries":[
@@ -363,13 +363,13 @@ subsections={
       "menu.millis.rtcxtal=RTC w/w32.768 kHz ext. crystal (1/2-series only, no micros)",
       "menu.millis.rtcxosc=RTC w/w32.768 kHz ext. oscillator (1/2-series only, no micros)",
       "menu.millis.disabled.build.millistimer=NONE",
-      "menu.millis.timera.build.millistimer=A0",
-      "menu.millis.timerd.build.millistimer=D0",
-      "menu.millis.timerb0.build.millistimer=B0",
-      "menu.millis.timerb1.build.millistimer=B1",
-      "menu.millis.rtc.build.millistimer=RTC",
-      "menu.millis.rtcxtal.build.millistimer=RTC_XTAL",
-      "menu.millis.rtcxosc.build.millistimer=RTC_XOSC",
+      "menu.millis.timera.build.millistimer='A0'",
+      "menu.millis.timerd.build.millistimer='D0'",
+      "menu.millis.timerb0.build.millistimer='B0'",
+      "menu.millis.timerb1.build.millistimer='B1'",
+      "menu.millis.rtc.build.millistimer='RTC'",
+      "menu.millis.rtcxtal.build.millistimer='RTC_XTAL'",
+      "menu.millis.rtcxosc.build.millistimer='RTC_XOSC'",
     ],
   },
   "pinconfigupdimenu":{
@@ -439,27 +439,25 @@ subsections={
 }
 
 
-flashtosram={"2":["256","256",0],"4":[0,"2048","512"],"8":["512","512","1024"],"16":["1024","2048","2048"],"32":[0,"2048","3072"]}
-
 seriesbuildparams=[
-  [
+  {
     "build.millistimer":"A0"
-  ],
-  [
-    "bootloader.TCD0CFG_avrdude":"\"-Ufuse4:w:0x00:m\""
+  },
+  {
+    "bootloader.TCD0CFG_avrdude":"\"-Ufuse4:w:0x00:m\"",
     "bootloader.TCD0CFG_serialupdi":"4:0x00"
-  ],
-  [
-    "bootloader.altreset":"11"
-    "build.millistimer":"B1"
+  },
+  {
+    "bootloader.altreset":"11",
+    "build.millistimer":"B1",
     "bootloader.SYSCFG0":"0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}"
-  ]
+  }
 ]
 
 devices = {
   "atxy7":{
     "heading":"############################################################################\n#                                                                          #\n#                                 ##    #  #     ####   ###  #   #       ###\n#  ATtiny3227/3217               #  #   #  #     #   #   #   ##  #     #####\n#  ATtiny1627/1617/1607            #    #### === ####    #   # # #   #######\n#  ATtiny827/817/807              #        #     #       #   #  ##     #####\n#  ATtiny427/417/407             ####      #     #      ###  #   #       ###\n#__________________________________________________________________________#",
-    "sections_include":["buildparams","bootparams_updi","exportparams","uploadparams_updi","board_name","clockmenu","bodmenu","bodmodemenu","eeprommenu","millismenu","pinconfigupdimenu","sutmenu","twimenu","printfmenu","intmodemenu"],
+    "sections_include":["buildparams","bootparams_updi","exportparams","uploadparams_updi","chipname","clockmenu","bodmenu","bodmodemenu","eeprommenu","millismenu","pinconfigupdimenu","sutmenu","twimenu","printfmenu","intmodemenu"],
     "menus":{
       "chip":{
         "3227":{},
@@ -577,7 +575,7 @@ devices = {
       }
     }
   },
-  "HEADER_OPTIBOOT":"##########################################################################\n##########################################################################\n#                                                                        #\n#           ###   ####   #####  ###  ####    ###    ###   #####          #\n#          #   #  #   #    #     #   #   #  #   #  #   #    #            #\n#          #   #  ####     #     #   ####   #   #  #   #    #            #\n#          #   #  #        #     #   #   #  #   #  #   #    #            #\n#           ###   #        #    ###  ####    ###    ###     #            #\n#________________________________________________________________________#\n##########################################################################\n
+  "HEADER_OPTIBOOT":"##########################################################################\n##########################################################################\n#                                                                        #\n#           ###   ####   #####  ###  ####    ###    ###   #####          #\n#          #   #  #   #    #     #   #   #  #   #  #   #    #            #\n#          #   #  ####     #     #   ####   #   #  #   #    #            #\n#          #   #  #        #     #   #   #  #   #  #   #    #            #\n#           ###   #        #    ###  ####    ###    ###     #            #\n#________________________________________________________________________#\n##########################################################################\n",
   "atxy7o":{
     "heading":"############################################################################\n#  WITH OPTIBOOT                                                           #\n#  0/1-series                   ##    #  #     ####   ###  #   #           #\n#                              #  #   #  #     #   #   #   ##  #           #\n#  ATtiny3217/1617               #    #### === ####    #   # # #           #\n#  ATtiny1607/817               #        #     #       #   #  ##           #\n#  ATtiny807/417               ####      #     #      ###  #   #           #\n#__________________________________________________________________________#",
     "sections_include":["buildparams","bootparams_opti","exportparams","uploadparams_opti","board_name","clockomenu","bodmenu","bodmodemenu","millismenu","pinconfigoptimenu","sutmenu","twimenu","printfmenu","intmodemenu"],
@@ -778,9 +776,13 @@ devices = {
   }
 }
 
+BADDATA = "An attempt was made to look up the specs for a part that does not exist"
+
+flashtosram={"2":["128","256",BADDATA],"4":["256","256","512"],"8":["512","512","1024"],"16":["1024","2048","2048"],"32":[BADDATA,"2048","3072"]}
+
 def printProp(board,string):
-  print(board+string)
-  print(board+string,file = f1)
+  print(board+"="+string)
+  print(board+"="+string,file = f1)
 def printLit(string):
   print(string)
   print(string,file = f1)
@@ -795,19 +797,47 @@ def printMenuItems(board,menuname,menuoption,optionproplist):
   for z in optionproplist:
     printProp(x,"menu."+menuname+"."+menuoption+"."+z)
 
-def partNumberToSeries
+def partNumberToSeries(partnum):
+  retval=int(partnum[2])
+  if retval != 0 and retval !=1 and retval != 2:
+    print("An attempt was made to look up the series for a "+partnum)
+  return retval
+def partNumberToPinCount(partnum):
+  pcs=[-1,-1,8,-1,14,-1,20,24]
+  retval=pcs[int(partnum[3])]
+  if retval==-1:
+    print("An attempt was made to look up the pincount for a "+partnum)
+  return retvalue
 
-def printChipOrBoardMenu(menudef, )
+def partNumberToFlash(partnum):
+  if len(partnum) < 3:
+    print("An attempt was made to look up the flash for nonexistent chip "+partnum)
 
-clocklist={}
-opticlocklist={}
-baudlist={}
+def nameToNum(name):
+  retval = name
+  if len(name) == 0 or len (name) >8:
+    print("nameToNum passed invalid value "+name)
+  retval = retval.lstrip("xcnmpfw")
+  retval = retval.rstrip("o")
+  return retval
+
 def printProp(board,string):
   print(board+"."+string)
-  print(board+"."+string,file = f1)
+  print(board+"."+string, file = f1)
 def printLit(string):
   print(string)
   print(string,file = f1)
+
+def printSection(sectname):
+  sbs = subsections[sectname]
+  printLit('\n'+sbs["heading"])
+
+  for entry in sbs["entries"]:
+    if entry == "chipname":
+      for ch in dev[""]
+    else:
+      printProp(dev,entry)
+
 
 fhead = open("boards_header.txt")
 fheadtext=fhead.read()
@@ -815,14 +845,14 @@ fhead.close()
 f1 = open("boards.txt","w")
 printLit(fheadtext)
 for dev in devices:
-  if (dev == "OPTIBOOT_HEADER"):
-    printLit(devices[dev])
-  else:
-    td=devices[dev];
-    printLit(td["heading"])
-    for sect in td["sections_include"]:
-      if td.sect.sect["replace"] != True:
-        for
-      for line in sect.menu[entries]:
-        print("")
+   if (dev == "HEADER_OPTIBOOT"):
+     printLit(devices[dev])
+   else:
+     td=devices[dev];
+     print(td)
+     printLit(td["heading"])
+     for sect in td["sections_include"]:
+      printSection(sect)
+
+
 

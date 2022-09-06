@@ -1644,6 +1644,7 @@ microchip.build.clocksource=0
 microchip.build.core=megatinycore
 microchip.build.variant=txy7
 microchip.build.tuned=
+microchip.build.board=If you see this, please report this bug promptly. It should never be shown.
 microchip.build.printf=
 microchip.build.wire=MORS
 microchip.build.attachmode=-DCORE_ATTACH_ALL

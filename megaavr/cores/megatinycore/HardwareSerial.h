@@ -1,13 +1,16 @@
+// Many cores use HardwareSerial.h and HardwareSerial. However, the core from which this was derived names them differently.
+// This only rarely a problem - but it causes problems when libraries want to #include HardwareSerial.h and expect it to provide a class of that name, instead of UartClass. Soon after this workaround, it was realized that there was an extra layer in the class hierarchy forcing multiple virtual functions and explained why serial was a space hog
+
 /* UART.h - Hardware serial library, main header.
  * This library is free software released under LGPL 2.1.
  * See License.md for more information.
- * This file is part of megaTinyCore.
+ * This file is part of DxCore and/or megaTinyCore
  *
  * Copyright (c) 2006 Nicholas Zambetti, Modified by
  * 11/23/2006 David A. Mellis, 9/20/2010 Mark Sproul,
  * 8/24/2012 Alarus, 12/3/2013 Matthijs Kooijman
- * Others (unknown) 2013-2017, 2017-2021 Spence Konde
- * and 2021 MX682X
+ * Others (unknown) 2013-2017, 2017-2022 Spence Konde
+ * and 2021-2022 MX682X
  *
  * Modified 28 September 2010 by Mark Sproul
  * Modified 14 August 2012 by Alarus
@@ -38,17 +41,30 @@
  * using a ring buffer, in which head is the index of the location to which
  * to write the next incoming character and tail is the index of the
  * location from which to read.
- * NOTE: a "power of 2" buffer size is required. The compiler misses chances
- * to optimize power-of-2 buffers sizes, so disallowing them saves flash.
- * I see no compelling reason to permit non-power-of-2 ring buffer length.
- *      -Spence
+ * NOTE: a "power of 2" buffer size is **REQUIRED** - the compiler
+ * was missing optimizations, and there's no particular reason to have
+ * a weird sized buffer, and several reasons not to.
  *
- * WARNING: When buffer sizes are increased to > 256, the buffer index
- * variables are automatically increased in size, but the extra
- * atomicity guards needed for that are not implemented. This will
- * often work, but occasionally a race condition can occur that makes
- * Serial behave erratically. See https://github.com/arduino/Arduino/issues/2405
- * This is definitely fixed for TX. I am not confident that it is for RX.
+ * More than 256b buffers imposes a considerable performance penalty,
+ * - one large enough to obliviate the entire purpose, because of the
+ * need to make the access to the current index atomic. This atomic
+ * block is costly - it's a macro for cli and sei
+ * implemented in inline assembly, which sounds fast. But the optimizer
+ * can reorder instructions *and isn't smart enough not to here* without the
+ *  ": memory" clobber to create a memory barrier. This ensures that it
+ * is atomic, but significantly hurts performance. (theoretical worst case
+ * is 94 clocks, real-world is usually far less, but I'll only say "less"
+ * The functions in question have considerable register pressure). But,
+ * it unquestionably would impact USART performance at high speeeds.
+ *
+ * * The USE_ASM_* options can be disabled by defining them as 0 either in variant pins_arduino.h
+ * The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file (
+ * as defines in pins_arduino.h) or boards.txt as (By passing them as extra flags).
+ * Note that buffer sizes must be powers of 2 only no matter how you override it.
+ * The alternative is doing division to get the modulo every time instead of a single clock bitwise and, which further lowers the
+ * maximum RX speed (which, without the ASM implementation, is already lower than what the receiver is capable of).
+ * The defaults below are only used if the relevant macro isn't already defined.
+ * Since the USE_ASM_* = 1 option is apparently working, we do not recommend disabling it, as it will waste flash and hurt performance.
  *
  * Flash versus RAM table
  * |       |  modern tinyAVR series parts   | Other modern parts   |
@@ -65,26 +81,28 @@
  * This ratio is remarkably consistent. No AVR part was ever made with
  * less than 8:1 flash:ram, nor more than 16:1, since first ATmegas!
  * The sole exception? The ATmega2560/2561 has only 4k RAM.
- * (to be fair, you are allowed to use external RAM - also I think
- * a unique feature)
+ * (to be fair, you are allowed to use external RAM - which was a very rare feature
  */
 #if !defined(USE_ASM_TXC)
-  #define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART, 50 for 2.
+  #define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART and 44b for each additional one
 #endif
 
 #if !defined(USE_ASM_RXC)
-  #define USE_ASM_RXC 1    // This now works. Saves only 4b for 1 usart but 102 for 2.
+  #define USE_ASM_RXC 1    // This now works. Saves only 4b for 1 usart but 98 for each additional one
 #endif
 
 #if !defined(USE_ASM_DRE)
-  #define USE_ASM_DRE 1      // This is the hard one...Depends on BOTH buffers, and has that other method of calling it. saves 34b for 1 USART 102 for 2
+  #define USE_ASM_DRE 1      // This is the hard one...Depends on BOTH buffers, and has that other method of calling it. saves 34b for 1 USART and 68b for each additional one
 #endif
 // savings:
 // 44 total for 0/1,
 // 301 for 2-series, which may be nearly 9% of the total flash!
 // The USE_ASM_* options can be disabled by defining them as 0 either in variant pins_arduino.h
 // The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file (as defines in pins_arduino.h) or boards.txt as (By passing them as extra flags).
-// note that buffer sizes must be powers of 2 omly.
+// note that buffer sizes must be powers of 2 only.
+
+
+
 #if !defined(SERIAL_TX_BUFFER_SIZE)
   #if   (INTERNAL_SRAM_SIZE  < 1024)  // 128/256b/512b RAM
     #define SERIAL_TX_BUFFER_SIZE 16
@@ -94,7 +112,7 @@
     #define SERIAL_TX_BUFFER_SIZE 64  // 2k/3k RAM
   #endif
 #endif
-#if !defined(SERIAL_RX_BUFFER_SIZE)
+#if !defined(SERIAL_RX_BUFFER_SIZE)   // could be overridden by boards.txt
   #if   (INTERNAL_SRAM_SIZE <  512)  // 128/256b RAM
     #define SERIAL_RX_BUFFER_SIZE 16
     // current tx buffer position = SerialClass + txtail + 37
@@ -114,6 +132,7 @@
 #else
   typedef uint8_t  tx_buffer_index_t;
 #endif
+// I am not convinced > 256b is safe for the RX buffer....
 #if (SERIAL_RX_BUFFER_SIZE > 256)
   typedef uint16_t rx_buffer_index_t;
 #else
@@ -143,6 +162,7 @@
 #endif
 
 
+/* Macros to help the rare few who want sync or MSPI mode */
 #define syncBegin(port, baud, config, syncopts) ({\
   if ((config & 0xC0) == 0x40)                    \
     {pinConfigure(port.getPin(2), syncopts);      \
@@ -232,7 +252,10 @@ class HardwareSerial : public Stream {
     const uint8_t _module_number;
     uint8_t _pin_set;
 
-    uint8_t _state; /* 0b000000hw */
+    uint8_t _state; /* 0bv000fphw */
+    // v = Overflow has happened at hardware level. Interrupts were disabled for too long.
+    // f = One or more framing errors have occurred.
+    // p = One or more parity errors has occurred.
     // h = half duplex with open drain - disable RX while TX.
     // w = written (like old _written)
 
@@ -244,10 +267,10 @@ class HardwareSerial : public Stream {
     // Don't put any members after these buffers, since only the first
     // 32 bytes of this struct can be accessed quickly using the ldd
     // instruction.
-    volatile unsigned char _rx_buffer[SERIAL_RX_BUFFER_SIZE];
-    volatile unsigned char _tx_buffer[SERIAL_TX_BUFFER_SIZE];
+    volatile uint8_t _rx_buffer[SERIAL_RX_BUFFER_SIZE];
+    volatile uint8_t _tx_buffer[SERIAL_TX_BUFFER_SIZE];
 /* DANGER DANGER DANGER */
-/* ANY CHANGES BETWEEN OTHER SCARY COMMENT AND THIS ONE WILL BREAK SERIAL when USE_ASM_DRE or USE_ASM_RXC is used! */
+/* ANY CHANGES BETWEEN OTHER SCARY COMMENT AND THIS ONE WILL BREAK SERIAL IF THEY CHANGE RAM USED BY CLASS! */
 /* DANGER DANGER DANGER */
 
   public:
@@ -277,10 +300,26 @@ class HardwareSerial : public Stream {
     uint16_t *            printHex(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
     volatile uint8_t *    printHex(volatile  uint8_t* p, uint8_t len, char sep = 0            );
     volatile uint16_t *   printHex(volatile uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
-    uint8_t *           printHexln(          uint8_t* p, uint8_t len, char sep = 0            ) {         uint8_t* ret;   ret=printHex(p, len, sep);    println(); return ret;}
-    uint16_t *          printHexln(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0) {         uint16_t* ret;  ret=printHex(p, len, sep, s); println(); return ret;}
-    volatile uint8_t *  printHexln(volatile  uint8_t* p, uint8_t len, char sep = 0            ) {volatile uint8_t* ret;   ret=printHex(p, len, sep);    println(); return ret;}
-    volatile uint16_t * printHexln(volatile uint16_t* p, uint8_t len, char sep = 0, bool s = 0) {volatile uint16_t* ret;  ret=printHex(p, len, sep, s); println(); return ret;}
+    uint8_t *           printHexln(          uint8_t* p, uint8_t len, char sep = 0            ) {
+      uint8_t* ret;
+      ret=printHex(p, len, sep);
+      println(); return ret;
+    }
+    uint16_t *          printHexln(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0) {
+      uint16_t* ret;  ret=printHex(p, len, sep, s); println(); return ret;
+    }
+    volatile uint8_t *  printHexln(volatile  uint8_t* p, uint8_t len, char sep = 0            ) {
+      volatile uint8_t* ret;
+      ret=printHex(p, len, sep);
+      println();
+      return ret;
+    }
+    volatile uint16_t * printHexln(volatile uint16_t* p, uint8_t len, char sep = 0, bool s = 0) {
+        volatile uint16_t* ret;
+        ret=printHex(p, len, sep, s);
+        println();
+        return ret;
+      }
 
     virtual int availableForWrite(void);
     virtual int available(void);
@@ -296,14 +335,36 @@ class HardwareSerial : public Stream {
     explicit operator bool() {
       return true;
     }
-    uint8_t getPin(uint8_t pin);
+    uint8_t autoBaudWFB();
+    void simpleSync();
+    uint8_t autobaudWFB_and_wait(uint8_t n);
+    uint8_t waitForSync();
+    uint8_t autobaudWFB_and_request(uint8_t n = 2);
+    uint8_t getStatus() {
+      uint8_t ret = _statuscheck(_hwserial_module->CTRLB, _hwserial_module->STATUS, _state);
+      if ((ret & 0x30) == 0x30) {
+        _hwserial_module->STATUS = USART_ISFIF_bm;
+        #if defined(ERRATA_ISFIF)
+          uint8_t ctrlb _hwserial_module->CTRLB;
+          uint8_t rxoff = ctrlb & (~USART_RXEN_bm);
+          _hwserial_module->CTRLB = rxoff;
+          _hwserial_module->CTRLB = ctrlb;
+        #endif
+      }
+      _state &= 0x03; // Clear the errors we just reported.
+      return ret;
+    }
+
+    uint8_t getPin(uint8_t pin); //wrapper around static _getPin
 
     // Interrupt handlers - Not intended to be called externally
-    #if !(USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16))
+    #if !(USE_ASM_RXC == 1 && \
+         (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16))
       static void _rx_complete_irq(HardwareSerial& uartClass);
     #endif
-    #if !(USE_ASM_DRE == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
-                              (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
+    #if !(USE_ASM_DRE == 1 && \
+         (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+         (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
       static void _tx_data_empty_irq(HardwareSerial& uartClass);
     #endif
 
@@ -311,10 +372,37 @@ class HardwareSerial : public Stream {
     void _poll_tx_data_empty(void);
     static void        _set_pins(uint8_t port_num, uint8_t mux_setting, uint8_t enmask);
     static uint8_t _pins_to_swap(uint8_t port_num, uint8_t tx_pin, uint8_t rx_pin);
-};
+    /* Return value is:
+     * 0bRT
+     * R = RX_ENABLED
+     * T = TX_ENABLED
+     *
+     *
+     *
+     *
+     *
+     *
+     */
+    static uint8_t _statuscheck(uint8_t ctrlb, uint8_t status, uint8_t state) {
+      uint8_t ret = state;
+      // We have now: |HW OVF| RING OVF|_____|_______|FrameError|ParityError|HalfDuplex|Written|
+      // now we fill high nybble
+      if ((ctrlb & 0x06) == 0x04) {
+        // Autobaud
+        if (status & USART_BDF_bm) {
+          ret |= SERIAL_AUTOBAUD_SYNC;
+        } else if (status & USART_ISFIF_bm) {
+          ret |= SERIAL_AUTOBAUD_BADSYNC;
+        } else {
+          ret |= SERIAL_AUTOBAUD_ENABLED;
+        }
+      }
+      return ret;
+    }
+  };
 
 #if defined(USART0)
-  extern HardwareSerial Serial;
+  extern HardwareSerial Serial0;
 #endif
 #if defined(USART1)
   extern HardwareSerial Serial1;

@@ -3,7 +3,7 @@
  * See License.md for more information.
  * This file is part of megaTinyCore
  *
- * Totally rewrittem 2021 by Spence Konde and MX682X.
+ * Totally rewritten 2021-22 by Spence Konde and MX682X.
  * The original version was written in 2006 by Nicholas
  * Zambetti, and modified 11/23/2006 by David A. Mellis,
  * 9/20/2010 by Mark Sproul, 8/24/2012 by Alarus, and
@@ -19,4 +19,4 @@ HardwareSerial::HardwareSerial(volatile USART_t *hwserial_module, uint8_t module
     _hwserial_module(hwserial_module), _module_number(module_number), _pin_set(mux_default) {
 }
 
-#endif
+#endif  // whole file

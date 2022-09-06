@@ -129,6 +129,7 @@
             "push       r18"              "\n\t" // r30 and r31 pushed before this.
             "in         r18,      0x3f"   "\n\t" // Save SREG
             "push       r18"              "\n\t" //
+            "push       r19"              "\n\t" // Ugh we needed another register....
             "push       r24"              "\n\t" //
             "push       r25"              "\n\t" //
             "push       r28"              "\n\t" //
@@ -137,9 +138,13 @@
     //      "ldd        r29,    Z +  9"   "\n\t" // We interact with the USART only this once
             "ldi        r29,      0x08"   "\n\t" // High byte always 0x08 for USART peripheral: Save-a-clock.
             "ldd        r24,    Y +  1"   "\n\t" // Y + 1 = USARTn.RXDATAH - load high byte first
-            "ld         r25,         Y"   "\n\t" // Y + 0 = USARTn.RXDATAH - then low byte of RXdata
-            "sbrc       r24,         1"   "\n\t" // if there's a parity error, then do nothing more. Copies the behavior of
-            "rjmp  _end_rxc"              "\n\t" // stock implementation - framing errors are ok, apparently...
+            "ld         r25,         Y"   "\n\t" // Y + 0 = USARTn.RXDATAL - then low byte of RXdata
+            "andi       r24,      0x46"   "\n\t" // extract framing, parity bits.
+            "lsl        r24"              "\n\t" // leftshift them one place
+            "ldd        r19,    Z + 12"   "\n\t" // load _state
+            "or         r19,       r24"   "\n\t" // bitwise or with errors extracted from _state
+            "sbrc       r24,         2"   "\n\t" // if there's a parity error, then do nothing more (note the leftshift).
+            "rjmp  _end_rxc"              "\n\t" // Copies the behavior of stock implementation - framing errors are ok, apparently...
             "ldd        r28,    Z + 13"   "\n\t" // load current head index
             "ldi        r24,         1"   "\n\t" // Clear r24 and initialize it with 1
             "add        r24,       r28"   "\n\t" // add current head index to it
@@ -156,18 +161,22 @@
     #endif
             "ldd        r18,    Z + 14"   "\n\t" // load tail index
             "cp         r18,       r24"   "\n\t" // See if head is at tail. If so, buffer full. The incoming data is discarded,
-            "breq  _end_rxc"              "\n\t" // because there is noplace to put it, and we just restore state and leave.
+            "breq  _buff_full_rxc"        "\n\t" // because there is noplace to put it, and we just restore state and leave.
             "add        r28,       r30"   "\n\t" // r28 has what would be the next index in it.
             "mov        r29,       r31"   "\n\t" // and this is the high byte of serial instance
             "ldi        r18,         0"   "\n\t" // need a known zero to carry.
             "adc        r29,       r18"   "\n\t" // carry - Y is now pointing 17 bytes before head
             "std     Y + 17,       r25"   "\n\t" // store the new char in buffer
             "std     Z + 13,       r24"   "\n\t" // write that new head index.
+          "_buff_full_rxc:"               "\n\t"
+            "ori        r19,      0x40"   "\n\t" // record that there was a ring buffer overflow.
           "_end_rxc:"                     "\n\t" //
+            "std     Z + 12,       r19"   "\n\t" // record new state including new errors
             "pop        r29"              "\n\t" // Y Pointer was used for head and usart
             "pop        r28"              "\n\t" //
             "pop        r25"              "\n\t" // r25 held the received character
             "pop        r24"              "\n\t" // r24 held rxdatah, then the new head.
+            "pop        r19"              "\n\t" // restore r19 which held the value that State will have after this.
             "pop        r18"              "\n\t" // Restore saved SREG
             "out       0x3f,       r18"   "\n\t" // and write back
             "pop        r18"              "\n\t" // used as tail pointer and z known zero.

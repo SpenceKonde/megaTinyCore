@@ -100,5 +100,5 @@
     }
   #endif
 
-  HardwareSerial Serial(&USART0, 0, HWSERIAL0_MUX_DEFAULT);
+  HardwareSerial Serial0(&USART0, 0, HWSERIAL0_MUX_DEFAULT);
 #endif
