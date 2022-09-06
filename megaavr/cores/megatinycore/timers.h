@@ -158,7 +158,7 @@
 
 /* TYPE-D TIMERS */
 #if defined(MEGATINYCORE)
-  /* TCD0 on megaTinyCore is run from the unprescaled clock, at either 20 or 16 MHz depending on the fuse settign.
+  /* TCD0 on megaTinyCore is run from the unprescaled clock, at either 20 or 16 MHz depending on the fuse setting.
    * It will always use a count prescale of 32. If the system clock is cranked all the way back to 1 MHz, though
    * we knock it down by another factor of 2 because otherwise the interrupts were taking a large fraction of
    * available CPU time. */

@@ -6,7 +6,7 @@
 Flash           |  4096 bytes |  8192 bytes |     16384 bytes | 32768 bytes
 RAM             |   256 bytes |   512 bytes |      2048 bytes |  2048 bytes
 EEPROM          |   128 bytes |   128 bytes |       256 bytes |   256 bytes
-Optiboot Bootloader | not recommended | Awkard but viable | Awkard but viable | Awkard but viable |
+Optiboot Bootloader | not recommended | Awkward but viable | Awkward but viable | Awkward but viable |
 GPIO Pins       | 18/17 avail | 18/17 avail |     18/17 avail | 18/17 avail
 ADC Channels    | 11 usable   | 11 usable   |       11 usable |   11 usable
 DAC             |         Yes |         Yes |             Yes |         Yes

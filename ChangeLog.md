@@ -455,7 +455,7 @@ Urgent bugfixes for critical regressions introduced in 2.1.0.
 * Lots of expanded documentatio
 
 ### 1.1.8
-* Fix critical bug introduced in 1.1.7 that prevented compilation with TCA0 as millis sourc
+* Fix critical bug introduced in 1.1.7 that prevented compilation with TCA0 as millis source
 
 ### 1.1.7
 * Make Servo library work independently of TCA0 prescaler

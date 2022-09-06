@@ -138,7 +138,7 @@ This is currently used only for the last few releases, and should fix the avrdud
 * Anything named like "AVR##XX##" where X is a letter and # is a number - you want my [DxCore](https://github.com/SpenceKonde/DxCore) for those
 * All of the classic (pre-2016) tinyAVR parts - these are almost all supported by one of my other cores [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore)
   * ATtiny 25/45/85, 24/44/84, 261/461/861, 48/88, the two small and ones (strange 43 and 4313/2313), and in 2.0.0, the 26 as well as the final-four (which show hints of experimentation in the direction of the modern AVRs), the ATtiny 441/841, 1634 and 828 plus the even stranger 26. 
-* Anything else [**See this document for a list of AVR part families and what arduino cores they work with**](https://github.com/SpenceKonde/AVR-Guidance/blob/master/AVRFamilies_And_Compatibility/ArduinoCores.md) - almsot everything has a core that offers support, usually by myself or MCUdude. 
+* Anything else [**See this document for a list of AVR part families and what arduino cores they work with**](https://github.com/SpenceKonde/AVR-Guidance/blob/master/AVRFamilies_And_Compatibility/ArduinoCores.md) - almost everything has a core that offers support, usually by myself or MCUdude. 
 
 ## Overall Part Comparison
 [**See this document covering all modern AVRs**](https://github.com/SpenceKonde/AVR-Guidance/blob/master/AVRFamilies_And_Compatibility/ModernAVRs.md)

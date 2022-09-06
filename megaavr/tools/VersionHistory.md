@@ -13,7 +13,7 @@ Fix unlock() so that when run interactively, it will check if the chip is locked
 
 8/18/2022
 ## 1.3.0
-Add actions lock and unlock. Lock writes the value 0x00 to te lock fuse, unlock executes a chip erase. Chip erase erases the everything except fuses and (if EESAVE is set) EEPROM (my understanding is that userrow is not erased unless the chip is locked). Additionally and most importantly, the lockbits themselves are reset.
+Add actions lock and unlock. Lock writes the value 0x00 to the lock fuse, unlock executes a chip erase. Chip erase erases the everything except fuses and (if EESAVE is set) EEPROM (my understanding is that userrow is not erased unless the chip is locked). Additionally and most importantly, the lockbits themselves are reset.
 
 ## 1.2.4 - Fix "Hashable" error on linux
 8/2022

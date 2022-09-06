@@ -117,7 +117,7 @@ ISR(PORTx_PORT_vect, ISR_NAKED) {
 
   Departing EVEN SLIGHTLY from this list will leave you in nasal-demon territory!
   Behavior will be undefined which is overwhelmingly likely to manifest as a complete and total failure of the impacted
-  sketch the instant the ISR first fires, though unpredictable behavior later on as wel. I chose to include this only due to the extreme frequency with which one
+  sketch the instant the ISR first fires, though unpredictable behavior later on as well. I chose to include this only due to the extreme frequency with which one
   will find themselves needing the sort of nearly empty ISR shown above to wake from sleep, and the fact that it saves nearly 1% of the available flash when you do it on a 2k part. 2k flash is painful!
 
 ```

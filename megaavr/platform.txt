@@ -149,7 +149,7 @@ recipe.hooks.savehex.presavehex.2.pattern.macosx=cp "{build.path}/{build.project
 
 ## Unused but required parameters
 # Uploading without verification is prohibited. Since there is no checksum or verification of success at any point in the upload process otherwise,
-# if verificiation was disabled, an upload problem could look like a code problem, and you could debug it unsuccessfully for days with no progress.
+# if verification was disabled, an upload problem could look like a code problem, and you could debug it unsuccessfully for days with no progress.
 tools.avrdude.program.verify=
 tools.avrdude.upload.verify=
 # the erase pattern, if defined, is used I think immediately prior to bootloading only, but bootloading can be done in a single operation; there is no need for this.
@@ -375,7 +375,7 @@ recipe.hooks.savehex.presavehex.2.pattern.macosx=cp "{build.path}/{build.project
 
 ## Unused but required parameters
 # Uploading without verification is prohibited. Since there is no checksum or verification of success at any point in the upload process otherwise,
-# if verificiation was disabled, an upload problem could look like a code problem, and you could debug it unsuccessfully for days with no progress.
+# if verification was disabled, an upload problem could look like a code problem, and you could debug it unsuccessfully for days with no progress.
 tools.avrdude.program.verify=
 tools.avrdude.upload.verify=
 # the erase pattern, if defined, is used I think immediately prior to bootloading only, but bootloading can be done in a single operation; there is no need for this.

@@ -90,7 +90,7 @@ You will quickly notice that assembly is non-linear it will often jump off to so
   * You cannot follow assembly backwards. The place where a jump or branch lands *is not marked*.
     * Someone with time on their hands could write a script to annotate assembly listings, find all the places that jumps, calls, and branches land and mark the end of that line; except for `ijmp` and `icall`.
   * If one function is only ever called before another one but there are calls to the second function without the first, the first might be located immediately before the second, with no ret instruction, so it just keeps executing the next function when the first function is called
-* While not often encountered in files exported by Arduino, if you ever find yourself looking at a series of instructions with no source (perhaps you don't have the source) and you see a stretch of nonsensical instrucions, remember to consider the possibility that they aren't instructions at all, but rather constant data (which is normally not included in assembly listings - when the disassembler knows where the non-instructions are )
+* While not often encountered in files exported by Arduino, if you ever find yourself looking at a series of instructions with no source (perhaps you don't have the source) and you see a stretch of nonsensical instructions, remember to consider the possibility that they aren't instructions at all, but rather constant data (which is normally not included in assembly listings - when the disassembler knows where the non-instructions are )
  <!-- markdownlint-restore -->
 
 ### Working register?

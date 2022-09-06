@@ -404,7 +404,7 @@ unsigned long millis() {
        * Finally, the artifacts of the calculation that are unavoidable should be distributed uniformly.
        * Undershooting or overshooting 999 endpoint at the counter's maximum value is the usual
        * source of large jumps (at the overflow point) in either direction. Terms should, as much as
-       * possible alternate between positive and negative to minimize artifacs.
+       * possible alternate between positive and negative to minimize artifacts.
        *
        * The most popular/important speeds are hand-implemented in assembly because the compiler
        * was doing a miserable job of it - wasting 20-30% of the execution time and it's one of the few

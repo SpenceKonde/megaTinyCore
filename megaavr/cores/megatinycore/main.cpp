@@ -76,7 +76,7 @@ int main() {
  * clear flags to honor bootloader entry conditions, so I didn't have a choice about that.      *
  * This function is called before *anything* else, so the chip is a blank slate - or it's       *
  * state is unknown. You're probably running at 4 MHz unless it was a dirty reset, in which     *
- * case it could be anything. No timekeeping is possible, period. Tne only exception is the     *
+ * case it could be anything. No timekeeping is possible, period. The only exception is the     *
  * WDT reset timer with is independent of the HF oscillators and is designed to reset you out   *
  * of hangs amd bad states fthat you end up with when a bug causes the code but not the         *
  * hardware to reset,                                                                           *

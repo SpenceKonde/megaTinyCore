@@ -1,5 +1,5 @@
 # Robust/production checklist
-I hear of a lot of people deploying devices they designed at a scale of hundreds of devices who have made clear that they have not due dilligence w/regards to design of the firmware and/or hardware and have barely tested anything,
+I hear of a lot of people deploying devices they designed at a scale of hundreds of devices who have made clear that they have not due diligence w/regards to design of the firmware and/or hardware and have barely tested anything,
 
 I've tried not to stray too far from the main subject of DxCore - without too much success because a lot of things that people need to do and aren't doing are not specific to DxCore...
 

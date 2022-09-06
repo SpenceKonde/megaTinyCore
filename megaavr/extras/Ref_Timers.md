@@ -448,7 +448,7 @@ Whenever a function supplied by the core returns a representation of a timer, th
 | TIMERPIT     |  0x98 |       PIT  | Reserved for future |
 | DACOUT **    |  0x80 |      DAC0  |       analogWrite |
 0/NOT_ON_TIMER will be returned if the specified pin has no timer.
-`*` Currently, the 3 low bits are don't-care bits. At some point in the future we may pass arouind the compare channel in the 3 lsb when using for PWM. No other timer will ever be numbered 0x10-0x17, nor 0x08-0x0F. 0x18-0x1F is reserved for hypothetical future parts with a third TCA. Hence to test for TCA type: `(timerType = MILLIS_TIMER & 0xF8; if (timerType==TIMERA0) { ... })`
+`*` Currently, the 3 low bits are don't-care bits. At some point in the future we may pass around the compare channel in the 3 lsb when using for PWM. No other timer will ever be numbered 0x10-0x17, nor 0x08-0x0F. 0x18-0x1F is reserved for hypothetical future parts with a third TCA. Hence to test for TCA type: `(timerType = MILLIS_TIMER & 0xF8; if (timerType==TIMERA0) { ... })`
 `**` A hypothetical part with multiple DACs with output buffers will have extend up into 0x8x.
 
 All other unforeseen timer-like peripherals will be assigned to values above 0x9F

@@ -23,7 +23,7 @@
     #if MEGATINYCORE_SERIES == 1 && PROGMEM_SIZE > 8192
       /* The elite tinyAVR 1-series parts with 16k or more of flash were blessed with peripherals
        * well beyond what lesser 1-series parts got (3 AC's, a second ADC, and some other stuff
-       * Microchip didn't do a good job of advertising this differece, nor do they appear to account for it in pricing.
+       * Microchip didn't do a good job of advertising this difference, nor do they appear to account for it in pricing.
        * The premium on 1607 over an 807 (which adds only 8k flash and 512b ram) is 3 cents in 5k+ qty, 5 cents in small quantity
        * The premium on 1617 over an 817 (which adds 8k flash, 1.5k ram, 2 comparators, external vref, plus a whole second ADC) is... 3 cents in 5k+ quantity, 2 cents in small quantity (O_o).
        * The premium on a 3217 over a 1617 (which adds only the flash and nothing else)?... 6 cents in 5k+ qty (9 cents in small quantity)

@@ -27,7 +27,7 @@
 #include "Arduino.h"
 #include <avr/pgmspace.h>
 
-/* magic value passsed as the negative pin to tell the _analogReadEnh() (which implements both th new ADC
+/* magic value passed as the negative pin to tell the _analogReadEnh() (which implements both th new ADC
  * functions) to tell them what kind of mode it's to be used in. This also helps with providing useful and accurate
  * error messages and codes at runtime, since we have no other way to report such.                                 */
 

@@ -15,7 +15,7 @@
  * Modified 28 September 2010 by Mark Sproul
  * Modified 14 August 2012 by Alarus
  * Modified 3 December 2013 by Matthijs Kooijman
- * Modified by SOMEONE around 2016-2017; hardware seriel didn't port itself to the megaAVR 0-series.
+ * Modified by SOMEONE around 2016-2017; hardware serial didn't port itself to the megaAVR 0-series.
  * Modified 2017-2021 by Spence Konde for megaTinyCore and DxCore.
  * Modified late 2021 by Spence Konde and MX682X for DxCore
  * 12/26/21: Correct bug introduced in my ASM macros. -Spence

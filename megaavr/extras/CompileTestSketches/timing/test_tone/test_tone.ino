@@ -35,6 +35,6 @@ void loop() {
     VPORTA.OUT &= ~128;
   */
 //#else
-  #warning "Tone reqires a type B timer but the only one we have is in use. Skip"
+  #warning "Tone requires a type B timer but the only one we have is in use. Skip"
 //#endif
 }
