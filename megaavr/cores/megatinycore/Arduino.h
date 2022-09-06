@@ -496,7 +496,7 @@ unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
  * There are two functions within the core that need to know this:
  * AnalogWrite, and turnOffPWM. These each carry their own implementation of
  * logic to identify the timer and channel; the only other cases in which these
- * pins need ro be identified are within user code, where the pin mapping can
+ * pins need to be identified are within user code, where the pin mapping can
  * be chosen freely (subject to user code needing access to other pins), so
  * it does not present the complexity of the core library which must work with
  * the pins in ANY of 7, 2, or 5 mappings (for TCA0, TCA1 and TCD0 respectively)
@@ -760,7 +760,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
  * type A and D timers.
  * CORE_HAS_TIMER_RESUME is 1 if resumeTCAn functions are provided to hand control back to the core and reinitialize them.
  * CORE_DETECTS_TCD_PORTMUX is 1 if the TCD portmux works correctly on the hardware and is used by the core, 0 if it would be if
- * the harware worked, and not defined at all if the hardware doesnt have such a feature even in theory
+ * the hardware worked, and not defined at all if the hardware doesn't have such a feature even in theory
  * CORE_SUPPORT_LONG_TONES is 1 if the core supports the three argument tone for unreasonably long tones.
  ********************************************************************************/
 #define CORE_HAS_FASTIO                 (2)
@@ -819,7 +819,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
   #define ADC_MAXIMUM_GAIN             (16)
 #endif
 
-/* Oh and DB/DD can use inlvl to ajust trigger points. */
+/* Oh and DB/DD can use inlvl to adjust trigger points. */
 #define PORT_HAS_INLVL 0
 
 #ifdef __cplusplus
