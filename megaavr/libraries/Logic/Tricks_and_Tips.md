@@ -19,9 +19,9 @@ LUT:
 
 TRUTH = 0x01
 
-This will oscillate at around 80-100 MHz and is highly sensitive to conditions.
+With no clock, this will oscillate at around 80-100 MHz and is highly sensitive to conditions.
 
-It's much more useful if you put a clock source in, typically the system clock.
+It's much more useful if you put a clock source in, typically the system clock - See below for how to use this as a clock prescaler.
 
 ## Switch
 X: Input A
@@ -48,10 +48,10 @@ Combine with count on event to switch between two inputs based on the value of t
 
 
 ## Feedback
-The "Feedback" channel is the **output of the sequencer if used, and the even LUT in that pair if not**
+The "Feedback" channel is the **output of the sequencer if used, and the even LUT in that pair if not**,
 
 ### But I need feedback on an ODD LUT
-Then pay the price in the form of one event channel: Use the output as a generator, and set one of the event inputs of the CCL block to that channel
+"Ya can't get there from here" The only way to do this is he price in the form of one event channel: Use the output as a generator, and set one of the event inputs of the CCL block to that channel
 
 ## Sequential logic with just one LUT
 You can simulate some sequential logic units with just one LUT!
@@ -73,9 +73,7 @@ LUT:
 * 101: 0
 * 110: Per application requirements - logic block is getting contradictroy signals
 * 111: Per application requirements - logic block is getting contradictroy signals
-Ergo: TRUTH = 0x0b??001110 = 0x07, 0x47, 0x87, 0xC7
-
-Of those the last two should have the same value, unless you want very high speed oscillation. So, that means with 0x07 or 0xC7.
+Ergo: TRUTH = 0x0b??001110 = 0x07, 0xC7. Using 0x47 or 0x87 will result in high speed oscillation, which is rarely desirable.
 
 ### D-Type latch
 X: Feedback
@@ -130,54 +128,56 @@ Generally, I would argue that if you're using more than 3 LUTs, you should consi
 |    20 | 16 | 4 | 4 |      ADD2 |       ADD |    - |  4 | 4 | - |       ADD |         - |  - | - | - |   - |    3 |      1 |
 |    24 | 16 | 4 | 4 |      ADD2 |       ADD |    - |  8 | 8 | - |       ADD |         - |  - | - | - |   - |    3 |      1 |
 |    28 |  8 | 4 | 4 |       ADD |       ADD |   20 |  8 | 4 | 4 |       ADD |       ADD | 12 | 4 | 8 | ADD |    6 |      0 |
-|    32 | 32 | 4 | 8 |       MUL |           |    - |  - | - | - |         - |         - |  - | - | - |   - |    2 |      0 |
+|    32 | 32 | 4 | 8 |       MUL |         - |    - |  - | - | - |         - |         - |  - | - | - |   - |    2 |      0 |
 |    36 |  8 | 4 | 4 |       ADD |       ADD |   28 | 12 | 4 | 8 |       ADD |       ADD | 16 | 8 | 8 | ADD |    6 |      0 |
 |    40 |  8 | 4 | 4 |       ADD |       ADD |   32 | 16 | 8 | 8 |       ADD |       ADD | 16 | 8 | 8 | ADD |    6 |      0 |
-|    44 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  - | 4 | 8 |       ADD |         - |  - | - | - |   - |    4 |      2 |
-|    48 | 16 | 4 | 4 |      ADD2 |       ADD |    - | 32 | 4 | - |       ADD |  ADD4MUL5 |  - | 4 | 4 |   - |    5 |      1 |
-|    52 | 32 | 4 | 8 |       MUL |       ADD |    - | 16 | 4 | 4 |       MUL |      ADD4 |  - | 4 | - |   - |    5 |      1 |
-|    64 | 64 | 8 | 8 |       MUL |           |    - |  - | - | - |         - |         - |  - | - | - |   - |    2 |      0 |
+|    44 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  * | 4 | 8 |       ADD |         - |  - | - | - |   - |    4 |      2 |
+|    48 | 16 | 4 | 4 |      ADD2 |       ADD |    - | 32 | 4 | - |       ADD |  ADD4MUL5 |  * | 4 | 4 |   - |    5 |      1 |
+|    52 | 32 | 4 | 8 |       MUL |       ADD |    - | 16 | 4 | 4 |       MUL |      ADD4 |  4 | 4 | - |   - |    5 |      1 |
+|    64 | 64 | 8 | 8 |       MUL |         - |    - |  - | - | - |         - |         - |  - | - | - |   - |    2 |      0 |
 |    76 | 12 | 4 | 8 |       ADD |       ADD |   64 |  8 | 4 | 4 |       ADD |       MUL |  8 | 4 | 4 | ADD |    6 |      0 |
-|    80 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  - | 8 | 8 |       ADD |         - |  - | - | - |   - |    4 |      2 |
-|    84 | 64 | 8 | 8 |       MUL |       ADD |    - | 16 | 8 | 8 |       ADD |      ADD4 |  - | 4 | - |   - |    5 |      1 |
-|    88 |  8 | 4 | 4 |       ADD |  ADD2MUL3 |    - |  - | 4 | 4 |       ADD |  ADD4MUL5 |  - | 4 | 4 |   - |    6 |      1 |
-|    96 |  8 | 4 | 4 |       ADD |       ADD |    - | 12 | 4 | 8 |       ADD |      MUL4 |  - | 4 | - |   - |    5 |      1 |
-|   100 | 64 | 8 | 8 |       MUL |       ADD |    - | 32 | 4 | 8 |       MUL |      ADD4 |  - | 4 | - |   - |    5 |      1 |
-|   108 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  - | 4 | 8 |       ADD |  ADD4MUL5 |  - | 4 | 4 | ADD |    6 |      1 |
+|    80 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  * | 8 | 8 |       ADD |         - |  - | - | - |   - |    4 |      2 |
+|    84 | 64 | 8 | 8 |       MUL |       ADD |    - | 16 | 8 | 8 |       ADD |      ADD4 |  4 | 4 | - |   - |    5 |      1 |
+|    88 |  8 | 4 | 4 |       ADD |  ADD2MUL3 |    - |  * | 4 | 4 |       ADD |  ADD4MUL5 |  * | 4 | 4 |   - |    6 |      1 |
+|    96 |  8 | 4 | 4 |       ADD |       ADD |    - | 12 | 4 | 8 |       ADD |      MUL4 |  4 | 4 | - |   - |    5 |      1 |
+|   100 | 64 | 8 | 8 |       MUL |       ADD |    - | 32 | 4 | 8 |       MUL |      ADD4 |  4 | 4 | - |   - |    5 |      1 |
+|   108 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  * | 4 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 4 | ADD |    6 |      1 |
 |   128 | 16 | 4 | 4 |      MUL2 |       MUL |    - |  8 | 8 | 1 |       MUL |         - |  - | - | - |   - |    3 |      1 |
 |   140 | 12 | 4 | 8 |       ADD |       ADD |  128 | 16 | 8 | 8 |       ADD |       MUL |  8 | 4 | 4 | ADD |    6 |      0 |
 |   144 | 12 | 4 | 8 |       ADD |       MUL |    - | 12 | 4 | 8 |       ADD |         - |  - | - | - |   - |    4 |      1 |
-|   152 |  8 | 4 | 4 |       ADD |  ADD2MUL3 |    - |  - | 4 | 4 |       ADD |  ADD4MUL5 |  - | 4 | 8 |   - |    6 |      1 |
-|   160 |  8 | 4 | 4 |       ADD |       MUL |    - | 12 | 4 | 8 |       ADD |      ADD4 |  - | 8 | - |   - |    5 |      1 |
-|   172 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  - | 4 | 8 |       ADD |  ADD4MUL5 |  - | 4 | 8 |   - |    6 |      1 |
+|   152 |  8 | 4 | 4 |       ADD |  ADD2MUL3 |    - |  * | 4 | 4 |       ADD |  ADD4MUL5 |  * | 4 | 8 |   - |    6 |      1 |
+|   160 |  8 | 4 | 4 |       ADD |       MUL |    - | 12 | 4 | 8 |       ADD |      ADD4 |  4 | 8 | - |   - |    5 |      1 |
+|   172 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  - | 4 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 8 |   - |    6 |      1 |
 |   192 | 16 | 8 | 8 |       ADD |       MUL |    - | 12 | 4 | 8 |       ADD |         - |  - | - | - |   - |    4 |      1 |
 |   204 | 12 | 4 | 8 |       ADD |       ADD |  192 | 16 | 8 | 8 |       ADD |       MUL | 12 | 4 | 8 | ADD |    6 |      0 |
-|   208 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  - | 8 | 8 |       ADD |  ADD4MUL5 |  - | 4 | 4 |   - |    6 |      1 |
+|   208 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  * | 8 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 4 |   - |    6 |      1 |
 |   224 | 32 | 4 | 8 |       MUL |       ADD |  192 | 16 | 8 | 8 |       ADD |       MUL | 12 | 4 | 8 | ADD |    6 |      0 |
 |   256 | 16 | 4 | 4 |       MUL |       MUL |    - | 16 | 4 | 4 |       MUL |         - |  - | - | - |   - |    4 |      1 |
 |   268 | 12 | 4 | 8 |       ADD |       ADD |  256 | 16 | 8 | 8 |       ADD |       MUL | 16 | 8 | 8 | ADD |    6 |      0 |
-|   288 | 12 | 4 | 8 |       ADD |       MUL |    - | 16 | 8 | 8 |       ADD |      ADD4 |  - | 8 | - |   - |    5 |      1 |
-|   300 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  - | 4 | 8 |       ADD |  ADD4MUL5 |  - | 8 | 8 |   - |    6 |      2 |
-|   336 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  - | 8 | 8 |       ADD |  ADD4MUL5 |  - | 4 | 8 |   - |    6 |      2 |
-|   384 | 16 | 8 | 8 |       ADD |       MUL |    - | 16 | 4 | 4 |       MUL |      ADD4 |  - | 8 | - |   - |    5 |      1 |
-|   512 | 64 | 8 | 8 |       MUL |       ADD |    - | 16 | 8 | 8 |       ADD |      MUL4 |  - | 4 | - |   - |    5 |      1 |
+|   288 | 12 | 4 | 8 |       ADD |       MUL |    - | 16 | 8 | 8 |       ADD |      ADD4 |  8 | 8 | - |   - |    5 |      1 |
+|   300 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  * | 4 | 8 |       ADD |  ADD4MUL5 |  * | 8 | 8 |   - |    6 |      2 |
+|   336 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  * | 8 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 8 |   - |    6 |      2 |
+|   384 | 16 | 8 | 8 |       ADD |       MUL |    - | 16 | 4 | 4 |       MUL |      ADD4 |  8 | 8 | - |   - |    5 |      1 |
+|   512 | 64 | 8 | 8 |       MUL |       ADD |    - | 16 | 8 | 8 |       ADD |      MUL4 |  4 | 4 | - |   - |    5 |      1 |
 |   576 | 12 | 4 | 8 |       ADD |       MUL |   48 | 32 | 4 | 8 |       MUL |       ADD | 16 | 4 | 4 | MUL |    6 |      2 |
-|   592 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  - | 8 | 8 |       ADD |  ADD4MUL5 |  - | 8 | 8 |   - |    6 |      1 |
-|   640 | 16 | 4 | 4 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |      ADD4 |  - | 8 | - |   - |    5 |      2 |
+|   592 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  * | 8 | 8 |       ADD |  ADD4MUL5 |  * | 8 | 8 |   - |    6 |      1 |
+|   640 | 16 | 4 | 4 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |      ADD4 |  8 | 8 | - |   - |    5 |      2 |
 |   768 | 12 | 4 | 8 |       ADD |       MUL |   64 | 32 | 4 | 8 |       MUL |       ADD | 32 | 4 | 8 | MUL |    6 |      2 |
 |  1024 | 32 | 4 | 8 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |         - |  - | - | - |   - |    4 |      2 |
-|  1088 | 16 | 4 | 4 |      MUL2 |       MUL |    - | 68 | 8 | 1 |       MUL |  ADD4MUL5 |  - | 8 | 4 | MUL |    5 |      3 |
-|  1152 | 12 | 4 | 8 |       ADD |       MUL |    - | 16 | 8 | 8 |       ADD |      MUL4 |  - | 8 | - |   - |    5 |      1 |
+|  1088 | 16 | 4 | 4 |      MUL2 |       MUL |    - | 68 | 8 | 8 |       MUL |  ADD4MUL5 |  * | 8 | 4 | MUL |    5 |      3 |
+|  1152 | 12 | 4 | 8 |       ADD |       MUL |    - | 16 | 8 | 8 |       ADD |      MUL4 |  8 | 8 | - |   - |    5 |      1 |
 |  1280 | 16 | 4 | 4 |       MUL |       MUL |   80 | 16 | 4 | 4 |       MUL |       ADD | 64 | 8 | 8 | MUL |    6 |      2 |
-|  1536 | 16 | 8 | 8 |       ADD |       MUL |    - | 16 | 4 | 4 |       MUL |      MUL4 |  - | 8 | - |   - |    5 |      2 |
-|  2048 | 16 | 4 | 4 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |      MUL4 |  - | 8 | - |   - |    5 |      2 |
-|  2304 | 32 | 4 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      ADD4 |  - | 8 | - |   - |    5 |      2 |
+|  1536 | 16 | 8 | 8 |       ADD |       MUL |    - | 16 | 4 | 4 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 |
+|  2048 | 16 | 4 | 4 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 |
+|  2304 | 32 | 4 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      ADD4 |  8 | 8 | - |   - |    5 |      2 |
 |  4096 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |         - |  - | - | - |   - |    4 |      2 |
-|  4608 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      ADD4 |  - | 8 | 4 | ADD |    5 |      2 |
-|  8192 | 32 | 4 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      MUL4 |  - | 8 | - |   - |    5 |      2 |
+|  4608 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      ADD4 | 12 | 8 | 4 | ADD |    5 |      2 |
+|  8192 | 32 | 4 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 |
 | 16384 | 16 | 8 | 8 |       ADD |       MUL | 1024 | 32 | 4 | 8 |       MUL |       MUL | 32 | 4 | 8 | MUL |    6 |      2 |
 | 24576 | 12 | 4 | 8 |       ADD |       MUL | 2048 | 32 | 4 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      2 |
-| 32768 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      MUL4 |  - | 8 | 4 |   - |    5 |      2 |
+| 32768 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 |
 | 65536 | 16 | 8 | 8 |       ADD |       MUL | 4096 | 64 | 8 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      3 |
 |131072 | 64 | 8 | 8 |       MUL |       MUL | 2048 | 32 | 4 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      3 |
 |262144 | 64 | 8 | 8 |       MUL |       MUL | 4096 | 64 | 8 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      3 |
+
+`*` - This column is cannot express a value for the two combined pair of LUTs LUTs in the case where one of them is added to the lower LUTs, and the whole thing multiplied by the other.

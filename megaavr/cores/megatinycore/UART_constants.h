@@ -129,17 +129,17 @@
   //
 
 #define SERIAL_AUTOBAUD                     (0x80000000) // OR with baud rate for topology 3 in Ref. Serial
-#define SERIAL_REQUIRE_AUTOBAUD             (0xFFFFFFFF) // Specify autobaud... plus an obscenely fast baud rate. The other device must send a sync frame. Good for slaves in topology 2, or in topology 1
-#define SERIAL_MAKE_AUTOBAUD(intial_baud)   ((__asm__ __volatile__ ("ori %D0, 0x80" "\n\t" : "+d" (uint32_t)(initial_baud))), initial_baud) // Like ORing the baud rate, only faster, if it works;
+#define SERIAL_DEMAND_AUTOBAUD              (0xFFFFFFFF) // Specify autobaud... plus an obscenely fast baud rate. The other device must send a sync frame. Good for slaves in topology 2, or in topology 1
+#define SERIAL_MAKE_AUTOBAUD(intial_baud)   ((__asm__ __volatile__ ("ori %D0, 0x80" "\n\t" : "+d" (uint32_t)(initial_baud))),initial_baud) // Like ORing the baud rate, only faster, if it works;
 
-#define SERIAL_AUTOBAUD_DISABLED
+#define SERIAL_AUTOBAUD_DISABLED    0x00
 
 /* Cumulative generally negative statii */
 #define SERIAL_WRITTEN              0x01 // Indicates that one or more character has been written to this serial port since begin called, used internally
 #define SERIAL_HALF_DUPLEX_ENABLED  0x02 // Indicates we are in half duplex mode. Used internally to control when interrupts are switched
 #define SERIAL_PARITY_ERROR         0x04 // Indicates that since getStatus() was last called there has been one or more parity error. Parity error characters are not retained.
 #define SERIAL_FRAME_ERROR          0x08 // Indicates that since getStatus() was last called there has been one or more framing error, this usually indicates a baud mismatch
-#define SERIAL_AUTOBAUD_ENABLED     0x10 // Autobaud enabled. 0booaaeehw
+#define SERIAL_AUTOBAUD_ENABLED     0x10 // Autobaud enabled.
 #define SERIAL_AUTOBAUD_SYNC        0x20 // Indicates that a fresh baud rate has been set.
 /* Some parts are afflicted by an errata that requires the receiver to be bounced to restore functioning after ICSIF is set and then cleared. the core does this automatically. */
 #define SERIAL_AUTOBAUD_BADSYNC     0x30 // Indicates that an unsuccessful sync attempt was made. On parts known to be impacted by the errata, (AVR32DD20/14 - and maybe others)

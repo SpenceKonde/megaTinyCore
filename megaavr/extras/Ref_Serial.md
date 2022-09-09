@@ -182,38 +182,66 @@ As the second argument to begin, you should pass the modifiers bitwise or'ed wit
 If you use the two argument form of Serial.begin() be certain to remember to pass the constant, not just a modifier.
 
 ### Autobaud mode
-As of 2.6.0, generic autobaud can be enabled. This can be done either through bitwise OR with SERIAL_AUTOBAUD, or using SERIAL_MAKE_AUTOBAUD(baud), or by passing SERIAL_DEMAND_AUTOBAUD as the baud rate, which makes it use the maximum baud rate so any sync field will be seen without having to generate a long break. It's important to keep in mind that both sides must understand that this is the case. There are at least 6 general approaches:
-1. Use SERIAL_AUTOBAUD on the autobaud device. The other device MUST send a sync.
-2. Use SERIAL_AUTOBAUD_START on both. Both devices can talk at default speed, but if they see framing errors, they should `Serial.doubleBreak(); Serial.write(0x55);` which will be seen as a sync, and the other baud rate will now match.
-3. Use SERIAL_AUTOBAUD on one device, other uses fixed baud rate unknown to first device. Other device must start initial communication with a simple-sync (`Serial.write(0x00),Serial.write(0x55)`)
-4. Use SERIAL_AUTOBAUD_START on one device, other uses fixed baud rate. If non-autobaud device gets framing errors, it it could be either slow or fast, so use `Serial.doubleBreak(); Serial.write(0x55);` to sync
-5. Use either mode on autobaud device. If  SERIAL_AUTOBAUD used, communication must start with simple-sync as above. Otherwise they begin talking at their preconfigured speeds that must match. Under conditions determined by the programmer, the devices must agree when to switch baud rate. Autobauder will then WFB and await sync simple-sync.
+As of 2.6.0, generic autobaud can be enabled. This can be done either through bitwise OR with SERIAL_AUTOBAUD, or using SERIAL_MAKE_AUTOBAUD(baud), or by passing SERIAL_DEMAND_AUTOBAUD as the baud rate, which makes it use the maximum baud rate so any sync field will be seen without having to generate a long break. It's important to keep in mind that both sides must understand that this is the case. There are at a number of
+2. Use SERIAL_AUTOBAUD on both. Both devices can talk at default speed, but if they see framing errors, they should `Serial.doubleBreak(); Serial.write(0x55);` which will be seen as a sync, and the other baud rate will now match.
+3. Use SERIAL_DEMAND_AUTOBAUD on one device, other uses fixed baud rate unknown to first device. Other device must start initial communication with a simple-sync (`Serial.write(0x00),Serial.write(0x55)`)
+4. Use SERIAL_AUTOBAUD on one device, other uses fixed baud rate. If non-autobaud device gets framing errors, it could be either slow or fast, so use `Serial.doubleBreak(); Serial.write(0x55);` to sync
+5. Use either mode on autobaud device. If  SERIAL_DEMAND_AUTOBAUD used, communication must start with simple-sync as above. Otherwise they begin talking at their preconfigured speeds that must match. Under conditions determined by the programmer, the devices must agree when to switch baud rate. Autobauder will then WFB and await sync simple-sync.
 6. A kludgey multidrop one-to-many master-slave topology is in use. All slaves use SERIAL_AUTOBAUD. Master begins communication with a simple-sync sent to all slaves, who now know the baud rate. If master sees framing errors, `Serial.doubleBreak(); Serial.write(0x55);` will resync.
-There are doubtless others. Autobaud device can be made more forgiving by reacting to framing errors by emptying the receive buffer (which since it's getting framing errors is full of gibberish), setting WFB, and then doing something like `Serial.sendTestFrams();` to hopefully trigger a framing error on the other device. The other device should wait 1 byte-period, and then empty it's receive buffer (full of gibberish because framing errors) and send a sync when it gets a framing error.
+There are doubtless other approaches
+
+**WARNING** Any device with autobaud should call Serial.getStatus routinely, as this will reset the receiver and allow reception to continue after a bad sync field.
 
 ```c++
-Serial.begin(SERIAL_AUTOBAUD); // Sets serial port to an invalid (far too fast) baud. Other device expected to send SYNC as first message.
-Serial.begin(SERIAL_AUTOBAUD_START | 115200); // starts serial at 115200, but in autobaud mode, so if it receives framing errors, it can trigger a WFB. It should also send something at that point which the target will see as a framing error (ex: Serial.autobaudWFB(); Serial.write(0x00); Serial.write(0x00);; This will result in 0 0000 0000 1 0 0000 0000 1 on the wire. Framing error is when it sees a non-1 stop bit, indicating baud rate mismatch. Unless baud rates are matched or the the other baud rate is half of this one or less, it will see framing error. The nulls must be sent consecutively.
+Serial.begin(SERIAL_DEMAND_AUTOBAUD); // Sets serial port to an invalid (far too fast) baud. Other device expected to send SYNC as first message.
+Serial.begin(SERIAL_AUTOBAUD | 115200); // starts serial at 115200, but in autobaud mode, so if it receives framing errors, it can trigger a WFB. It should also send something at that point which the target will see as a framing error (ex: Serial.autobaudWFB(); Serial.write(0x00); Serial.write(0x00);; This will result in 0 0000 0000 1 0 0000 0000 1 on the wire. Framing error is when it sees a non-1 stop bit, indicating baud rate mismatch. Unless baud rates are matched or the the other baud rate is half of this one or less, it will see framing error. The nulls must be sent consecutively.
 ```
 
 #### Three types of sync for autobaud
 There are three ways to generate sync
 
 ##### Serial.simpleSync()
-This clears anything in the RX buffer (should be nothing) sends a 0x00 followed by a 0x55 sync char (`Serial.write(0x00); Serial.write(0x55)`). It is appropriate only when you know the other device has just started up with SERIAL_AUTOBAUD, or has set WFB. This
+Should only be called by the device talking TO a device with autobaud enabled
+This clears anything in the RX buffer (should be nothing) sends a 0x00 followed by a 0x55 sync char (`Serial.write(0x00); Serial.write(0x55)`). It is appropriate only when you know the other device has just started up with SERIAL_DEMAND_AUTOBAUD, or has set WFB.
 
 #### `Serial.breakAndSync(uint8_t factor = 1)`
-Clears the receive buffer (which if sync is needed, we know contains garbage. A break is then generated by inverting the pin, waiting 8ms, and then uninverting it and,
+Should only be called by the device talking TO a device with autobaud enabled.
+
+Clears the receive buffer (which if sync is needed, we know contains garbage. A break is then generated by inverting the pin, waiting 8ms, and then uninverting it (this is long enough that it's virtually guaranteed to be seen as a break) and send a sync character.
 
 ##### `Serial.autobaudWFB()`
+Should only be called by the device using autobaud.
+
 The next low of any length received will be treated as a break and expected to be followed by a sync field. Somehow the other device must know when to do this.
 
 ##### `Serial.autobaudWFB_and_request(n = 2)`
+Should only be called by the device using autobaud
+
 This will execute Serial.flush() to clear the transmit buffer, if not already empty (which it hopefully should be) then set Serial.autobaudWFB() and send two (or more) nulls. The application code on the other side should see the framing error, and must reply with a sync.
 
 ##### `Serial.waitForSync()`
 Can be called by the device that has autobaud enabled (and may have set WFB) to wait up to 8ms for an expected sync packet. It keeps track of how long it was in that loop and will set millis() ahead by 1 ms less than that period of time (since the interrupt flag will also be set, causing the interrupt to fire immediately upon reenabling interrupts)
 
+##### See Serial.getStatus() below
+This is critical for both sides when using autobaud
+
+### Serial.getStatus()
+This function returns a byte encoding the current status of the serial port.
+| Bit   | Cleared? | Constant name              | Notes
+|-------|----------|----------------------------|--------------------------------------
+| 0     | No       | SERIAL_WRITTEN             | Serial port has transmitted any data since begin() was called. Used internally.
+| 1     | No       | SERIAL_HALF_DUPLEX_ENABLED | Serial port is operating in half duplex mode. Used internally.
+| 2     | Yes      | SERIAL_PARITY_ERROR        | A Parity Error has been encountered since the last time this was called. This clears that record.
+| 3     | Yes      | SERIAL_FRAME_ERROR         | A Framing Error has been encountered since the last time this was called indicating baud mismatch. This clears that record.
+|4,5=00 | No       | SERIAL_AUTOBAUD_DISABLED   | Bits 4 and 5 are combined to express autobaud conditions. 00 = autobaud not enabled
+|4,5=01 | No       | SERIAL_AUTOBAUD_ENABLED    | 01 = Autobaud enabled. Nothing else to report
+|4,5=10 | No       | SERIAL_AUTOBAUD_SYNC       | 10 = Autobaud enabled. The last character received was a sync character and we are now operating at a new baud rate.
+|4,5=11 | Yes      | SERIAL_AUTOBAUD_BADSYNC    | 11 = Autobaud enabled. An inconsistent sync field has been received. If this is the case, we clear the error flag. <br/> Additionally, due to a widespread errata, we must also turn off RXEN and turn it back on to restore RX functionality. As the extent of this erratum is not clear, we do the workaround everywhere unless we learn that some parts are definitely not impacted.
+| 6     | Yes      | SERIAL_OVERFLOW_RING       | Indicates that the *RING BUFFER* filled up and characters were dropped (because data was coming in, but application was not calling Serial.read() often enough to keep up). getStatus clears that record.
+| 7     | Yes      | SERIAL_OVERFLOW_HARDWARE   | A buffer overflow at the hardware level has occurred; This happens when interrupts are disabled for too long while receivign data. getStatus() clears this record
+
+Since getStatus also clears the errors, be sure to store the first value you get from it if you are looking for multiple errors.
+In the case of autobaud, both sides should probably be using this - non-autobaud device would check for framing errors that indicate a need to sync, and then attempt to do so, while the autobaud device would need to watch out for ISFIF, which disables receiveing until addressed.
 
 ### Loopback Mode
 When Loopback mode is enabled, the RX pin is released, and TX is internally connected to Rx. This is only a functional loopback test port, because another device couldn't drive the line low without fighting for control over the pin with this device. Loopback mode itself isn't very useful. But see below.
@@ -232,14 +260,14 @@ RS485 mode in combination with RX_ONLY will simply set the pin to an output, but
 * Loopback + Open Drain + RX485: In this mode, it will work perfectly for the case where there is an external line driver IC but it has only a single TX/RX combined wire and a TX_Enable pin (terminology may vary). This configuration is probablty more common than full duplex RS485 by a large margin. You almost never see more than 1 differential RS485 pair set up.
 
 #### Half-duplex schemes change the behavior of Serial in important ways
-Normally, RX functionality is not disabled unless the user specifically requests it. Bytes received at any time will be placed into the buffer by the USARTn RxC interrupt as long as it is not full. With loopback mode enabled, you receive all the characters you transmit. That's fine for just loopback - since TX is actively driven high when idle, you can't exactly receive data any other way. When Open Drain mode is also active, though, the stuff that you sent would end up intermixed with actual received data. This is not very helpful (It would be nice to check the received data for to ensure there were no collisions. However, this is challenging since you'd have to keep a record of what you sent to compare it to. There are almost 3 bytes of buffer (receive is double-buffered, plus the incoming shift register; but transmit is handled by the DRE interrupt, while receive is handled by the RXC interrupt, so it would need to implement ring buffer that both of these could access.... But those are written in assembly with n alarming small number of clockcycles after the end of the ISR before the next character has to be dealt with (see Appendix A). So under these circumstances behavior regarding RX is altered slightly. Rigorously, the condition is when both TX and RX are enabled, loopback mode is set
+Normally, RX functionality is not disabled unless the user specifically requests it. Bytes received at any time will be placed into the buffer by the USARTn RxC interrupt as long as it is not full. With loopback mode enabled, you receive all the characters you transmit. That's fine for just loopback - since TX is actively driven high when idle, you can't exactly receive data any other way. When Open Drain mode is also active, though, the stuff that you sent would end up intermixed with actual received data. This is not very helpful (It would be nice to check the received data for to ensure there were no collisions. However, this is challenging since you'd have to keep a record of what you sent to compare it to. There are almost 3 bytes of buffer (receive is double-buffered, plus the incoming shift register; but transmit is handled by the DRE interrupt, while receive is handled by the RXC interrupt, so it would need to implement ring buffer that both of these could access.... But those are written in assembly with n alarming small number of clockcycles after the end of the ISR before the next character has to be dealt with (see Appendix A). So under these circumstances behavior regarding RX is altered slightly. Rigorously, the condition is when both TX and RX are enabled, loopback mode is set:
 
 ```text
 CTRLA: LBME
 CTRLB: ODME and TXEN and RXEN
 ```
 
-In this case, Any *write* will temporarily disable the RXC interrupt, and enable the TXC interrupt. When the TXC interrupt executes indicating that all data has been sent, it will disable itself after reading RXDATAL until the RXC flag is cleared (to flush out the characters you sent), and enable the RXC interrupt again. We considered the idea of checking the received data against the
+In this case, Any *write* will temporarily disable the RXC interrupt, and enable the TXC interrupt. When the TXC interrupt executes indicating that all data has been sent, it will read RXDATAL until the RXC flag is cleared (to flush out the characters you sent) discarding the values, and enable the RXC interrupt again. We considered the idea of checking the received data against the sent data, but that turned out to present profound difficulties.
 
 That configuration will result from calling the two argument version of begin() with SERIAL_OPEN_DRAIN and SERIAL_LOOPBACK, or equivalently, SERIAL_HALF_DUPLEX, and neither SERIAL_TX_ONLY nor SERIAL_RX_ONLY.
 
@@ -363,9 +391,9 @@ While there's always some dead time between bits, that is usually *very* small, 
 
 [AVR Baud Rate Accuracy Chart](https://docs.google.com/spreadsheets/d/1uzU_HqWEpK-wQUo4Q7FBZGtHOo_eY4P_BAzmVbKCj6Y/edit?usp=sharing)
 
-It was mentioned previously that one of most common places to encounter grossly inaccurate baud rates is classic AVRs. This example illustrates just *how bad* one of the most popular baud rate was on classic AVRs, namely 115200 baud. "Well it says the baud rate can be up to 1/8th the system clock, this is less than a quarter if this, no problem" you think... Nope - on a classic AVR, you've dug a hole, covered it with a tablecloth, and waited until the sun had set to take a walk: You're begging for trouble.
+It was mentioned previously that one of most common places to encounter grossly inaccurate baud rates is classic AVRs. This example illustrates just *how bad* one of the most popular baud rate was on classic AVRs, namely 115200 baud. "Well it says the baud rate can be up to 1/8th the system clock, and I'm running at 8 MHz, no problem" you think "And see, it talks just fine to my other classic AVR". Nope. When you do this, you've dug a big hole, covered it with a tablecloth and waited until the sun went down. Adding a modern AVR or anything with a decent baud rate generator is then taking a late night stroll in the area of that covered hole. You're begging for trouble
 
-Imagine 4 ATmega328p's - one has a crystal and runs at 16 MHz, and three that all run at 8 MHz - one using a crystal, and the others the internal oscillator, which is 2% fast on one and 2% slow on the other - both easily within spec. The 8 MHz one with the w/crystal can talk to the other 8 MHz ones. The crystal-less ones are on the edge when they try to talk to each other due to the variation between them being about the limit - small temperature differences could push it either way, and since the maximum error isn't quite symmetric (it's easier to receive something if you're 4% too fast than if 4% too slow, according to the datasheet), sometimes the temperatures might conspire such that the fast one could receive from the slow one, but not the other way around (It doesn't quite depend on the "phase of the moon" but if one is near a window, it could depend on whether it's sunny out). The slow crystal-less one can't even talk to a serial adapter, but the other three can, and the fast crystal-less one can also talk to the 16 MHz one, but neither of the other 8 MHz ones can.
+To illustrate how crap the classic AVR baud generators were, imagine 4 ATmega328p's - one has a crystal and runs at 16 MHz, and three that all run at 8 MHz - one using a crystal, and the others the internal oscillator, which is 2% fast on one and 2% slow on the other - both easily within spec. The 8 MHz one with the w/crystal can talk to the other 8 MHz ones. The crystal-less ones are on the edge when they try to talk to each other due to the variation between them being about the limit - small temperature differences could push it either way, and since the maximum error isn't quite symmetric (it's easier to receive something if you're 4% too fast than if 4% too slow, according to the datasheet), sometimes the temperatures might conspire such that the fast one could receive from the slow one, but not the other way around (It doesn't quite depend on the "phase of the moon" but if one is near a window, it could depend on whether it's sunny out, and hence the one in the window is warmer). The slow crystal-less one can't even talk to a serial adapter, but the other three can, and the fast crystal-less one can also talk to the 16 MHz one, but neither of the other 8 MHz ones can.
 
 Now, imagine you were to reconfigure the serial port on the 16 MHz one, so that it didn't run with U2X enabled. Suddenly, it goes from being 2% fast, to being 3.5% slow - Neither of these is correct, and both of them contribute to problems, but having gotten a net 5.5% slower, it can now talk to the 8 MHz devices no problem!
 
@@ -374,22 +402,19 @@ Now consider dropping a tinyAVR 1/2-series (ex, 1614) in there, and it's a fract
 * The 16 MHz classic is running 2.12% fast assuming perfect clock due to calculation error with U2X - and 3.5% slow without it. Ironically, this will improve communication with the classic AVRs and hinder it with the modern AVR whose baud rate is closest to the "correct" value.
 * The 8 MHz one with a crystal is 3.5% slow - but it will do worse than the 16 MHz one at receiving, even though they're both calculating a baud rate 3.5% low), because U2X reduces the allowable baud error. The faster of them is hence net 2.5% slow, while the other one is a mindnumbing 5.5% slow.
 * The tiny will likely have no trouble talking the fast crystalless or the 16 MHz with crystal and U2X - though it may have trouble when U2X is turned off.
-* The surprise though is that the tiny might have trouble even talking to the 8MHz one with a crystal.
+* The biggest surprise is probably that it probably can't talk to the 8 MHz one with the crystal!
 
-It would come as no surprise to the owner of that hypothetical quarrelsome quartet when their new tinyAVR couldn't talk to some of them. However, someone who had been using classic AVRs with crystals in an existing setup, and they were all talking only to other classic AVRs might be unaware that their "115200 baud" is actually 111111 baud and something with a nearly accurate baud rate, which is off slightly in the other direction, would have problems communicating with them. They would probably blame the modern AVR (I have had that discussion a few times).
+Now, it would come as no surprise to the owner of that hypothetical quarrelsome quartet when their new tinyAVR couldn't talk to some of them. However, someone who had been using classic AVRs with crystals in an existing setup, and they were all talking only to other classic AVRs might be unaware that their "115200 baud" is actually 111111 baud and something with a nearly accurate baud rate, which is off slightly in the other direction, would have problems communicating with them. They would probably blame the modern AVR, and angrilly open an issue on megaTinyCore. I've been through this argument several times. "No, sir, your classic AVRs are not communicating at 115200 baud. That is not possible at 8 MHz, see this chart, see, they're running at 111111 baud, which is more than 4% slow. There is nothing wrong with megaTinyCore; 115200 baud is simply not an appropriate baud rate for an 8 MHz classic AVR, their baud generator just sucks".
 
-In the old days, people would often advise "lower the baud rate" as a solution. This would help baud calculation error, but it was of zero benefit if the oscillator accuracy was the limit, and if the speed was still high enough that calculation error was significant, could make it worse. On classic AVRs, it was not that unusual to find parts where, at certain unfavorable speeds, UART was flaky. What's surprising is that the incredibly popular 115200 and 57600 bauds were some of the worst for 8 and 16 MHz parts! 76800 is nearly perfect on 8 MHz with U2X, and that or twice that are nearly perfect at 16MHz - but instead we use some of the least accurately calculated clock speeds.
+In the old days, people would often advise "lower the baud rate" as a solution. This would help baud calculation error, but it was of zero benefit if the oscillator accuracy was the limit, and if the speed was still high enough that calculation error was significant, could make it worse. On classic AVRs, it was not that unusual to find parts where, at certain unfavorable speeds, UART was flaky. What's surprising is that the incredibly popular 115200 and 57600 bauds were some of the worst for 8 and 16 MHz parts! For good baud rate accuracy (and hence successful communication with parts that get baud rates right in all cases) 76800 is nearly perfect on 8 MHz with U2X, and that or twice that are nearly perfect at 16MHz. It's a mystery to me why classic AVR arduino-land is so thick with inappropriate baud rates.
 
-In the old days, people would often advise "lower the baud rate" as a solution. This would help baud calculation error, but it was of zero benefit if the oscillator accuracy was the limit, and if the speed was still high enough that calculation error was significant, could make it worse.  On classic AVRs, it was not that unusual to find parts where, at certain unfavorable speeds, UART was flaky. And generally speaking, the incredibly popular 115200 and 57600 bauds were some of the worst for 8 and 16 MHz parts! 76800 is nearly perfect on 8 MHz
- with U2X, and that or twice that are nearly perfect at 16MHz.
-
-The point of this is to demonstrate by example just how large the error baud rate error was on classic AVRs, due to the way they generated the baud rate from the system clock by integer division - and the only way to fix it on those parts is to use a "UART crystal" and clock the whole chip at some weird speed like 7.37 MHz or 9.21, and so on. This adversely impacts the runtime of `micros()` to a lesser extent, the accuracy of timekeeping in general.
+The point of this is to demonstrate by example just how large the baud rate error was on classic AVRs, due to the way they generated the baud rate from the system clock by integer division - and the only way to fix it on those parts is to use baud rates that that table shows come out nearly on target, or clock the chip from  a "UART crystal" such that the whole chip runs at some weird speed like 7.37 MHz or 9.21, and so on. This adversely impacts the runtime of `micros()` to a lesser extent, the accuracy of timekeeping in general.
 
 #### Bringing this back to modern AVRs
-So, you should all be very, very thankful for the new fractional baud rate generators, which are responsible for the charts linked below being a sea of sub 1% and mostly 0.1% error at most. Here, your problem isn't the baud rate calculation. It's usually not the oscillator either, which is rarely even 1% off on any modern AVR. No, your problem 9 times out of 10, is going to be that the device you're talking to generating an incorrect baud rate, more often than not this encountered when talking to a classic AVR . The path of least resistance with such legacy devices? They probably aren't worth trying to find a way to improve the baud accuracy on. Instead, just nudge the baud rate the modern AVR up or down 2% (whichever fixes it) and make note that that role in the system ought to be on the list to replace with newer hardware.
+So, **you should all be very, very thankful for the new fractional baud rate generators**, which are responsible for the charts linked below being a sea of sub 1% and mostly 0.1% error for modern AVRs. When there is an apparent baud rate mismatch when a modern AVR is talking to another device, the problem is not the baud rate calulation. It's usually not the oscillator either, which is rarely even 1% off on any modern AVR. No, your problem 9 times out of 10 is going to be that the device you're talking to generating an incorrect baud rate (for classic AVRs, the table lists them; for other devices you can measure it with a scope to see what their actual baud rate is. The path of least resistance (and no scope needed) with such legacy devices is crude but effective. Since the legacy device likely cannot be coerced to produce the correct baud rate, you can instead just nudge the baud rate the modern AVR up or down 2% (whichever fixes it - it's only 2 options to try and one of them will work). Make note that that the legacy devices' baud rate is off, that it should be replaced by newer hardware.
 
 ### Baud rate reference chart
-See the [**AVR Baud Rate Chart**](https://docs.google.com/spreadsheets/d/1uzU_HqWEpK-wQUo4Q7FBZGtHOo_eY4P_BAzmVbKCj6Y/edit?usp=sharing) in google sheets for a table of actual vs requested baud rates.
+See the [**AVR Baud Rate Chart**](https://docs.google.com/spreadsheets/d/1uzU_HqWEpK-wQUo4Q7FBZGtHOo_eY4P_BAzmVbKCj6Y/edit?usp=sharing) in google sheets for a table of actual vs requested baud rates. (same chart as linked above)
 
 ### Final table of this section
 **Total Error vs Data Frame Size**
@@ -404,12 +429,34 @@ First three columns are normal mode, last three are U2X, which is used if you ar
 | (8+1 parity) 9 bits | -4.19% | +4.14% | +/- 1.5 % | -3.61% | +3.53% | +/- 1.5 % |
 |(9+1 parity) 10 bits | -3.83% | +3.78% | +/- 1.5 % | -3.30% | +3.23% | +/- 1.0 % |
 
-That table is from the receiver's perspective - notice how baud rate does not appear there: *baud rate only has larger than marginal impact error when it changes baud division calculations*. Otherwise, it's all about the number of bits, and the magnitude of the mismatch (and if U2X is in use - it is favorable if you have larger baud rate calculation error without it, which is often the case on classic AVRs. Classic AVRs always used it on Arduino land... because they desperately needed anything that would lower the baud rate calculation error. On a modern AVR, however, U2X mode is only favorable if you can't otherwise reach the required speed.
+That table is from the receiver's perspective - notice how baud rate does not appear there: It's all about the number of bits, and the magnitude of the mismatch (and if U2X is in use - it is favorable if you have larger baud rate calculation error without it, which is often the case on classic AVRs. Classic AVRs always used it on Arduino land... because they desperately needed anything that would lower the baud rate calculation error. On a modern AVR, however, U2X mode is only favorable if you can't otherwise reach the required speed). Now, obviously the baud rate changes the baud rate calculation error (at least on a classic AVR) but that is the only way that baud rate makes a difference. The common chorus of "Lower the baud rate" is not exactly accurate here, because among commonly used baud rates on classic AVRs, certain frequencies are very favorable and othrs are not - though if you lower it enough, you do get rid of all the calculation error. That may be why 9600 baud was so popular. You will notice that in the examples I now use a baud rate of 115200 baud. That's because we are no longer using legacy parts with crap baud generators, and the slow speed of transmission at 9600 baud resulted in frequent confusion when they were logging data faster than the serial port could output it, and wondering why it was so slow.
+
+### Okay, THIS is the final table
+Communication with classic AVRs, preferred bauds vs F_CPU
+| Baud rate | 4 MHz | 8 MHz  | 12 MHz | 16 MHz | 20 MHz | 24 MHz (o/c) |
+|-----------|-------|--------|--------|--------|--------|----------------------|
+|  38400    | **Great** | **Great**  | **Great**  | **Great**  | **Great**  | **Great**    |
+|  57600    | No    |2.1% slo| **Great**  |0.8% fst|1.3% slo| **Great**                |
+|  76800    | Ha!   | **Great** | No     | **Great**  |1.7% fst| 2.3% fast            |
+| 115200    | Ha!   | No     | **Great**  |2.1% slo|1.4% slo| **Great**                |
+| 153600    | Ha!   | No     | No     | **Great**  |1.7% fst| 2.3% fast            |
+
+A UART clock would have a table like:
+| Baud rate | Most any uart clock |
+|-----------|-----------|
+| 38400     | **Great** |
+| 57600     | **Great** |
+| 76800     | **Great** |
+| 115200    | **Great** |
+| 153600    | **Great** |
+| 230400    | **Great** |
+| 460800    | **Great** |
+
+Anyway, enough about classic AVRs, let us look forward, not back!
 
 ### Minimum and Maximum baud rates
-Like Classic AVRs the maximum baud rate is F_CPU / 8, using the `U2X` mode, which is still the case.
+Like Classic AVRs the maximum baud rate is F_CPU / 8, using the `U2X` mode, which is still the case. The minimum is now F_CPU/16768 in non-U2X mode.
 
-Unlike classic AVRs, the gap between the theoretical maximum and the practical maximum is much smaller thanks to the fractional baud rate generator". On the older parts there were "gaps" between adjacent UART clock division values. Since the numbers used for standard baud rates don't resemble round numbers, people who needed accurate baud rates would use crystals with bizarre frequencies like 18.42 MHz, so it could be divided down to the match standard baud rates. That - unsurprisingly - led to slower, less accurate timekeeping, where it was supported by an Arduino core at all. Luckily, the days of UART crystals are over! Instead of supplying a whole number, the value passed to the fractional baud rate generator is in 64ths, so as long as it is within the supported range of baud rates, the farthest any two settings are from each other is 1/64, or 1.56%, so the highest baud rate error from the calculation is half that, comfortably within the limits of USART 0.78%. This corresponds to baud rates just below the maximum possible for a given system clock, which for typically used clock speeds is far above what would commmonly be used.
 
 #### Maximums
 The highest baud rates possible are listed below. In practice, below 1 mbaud, it is rare to see baud rates not based on UART clocks; 921600 is much more common that 1 mbaud and so on:

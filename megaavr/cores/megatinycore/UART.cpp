@@ -137,6 +137,11 @@
             "ldd        r28,    Z +  8"   "\n\t" // Load USART into Y pointer
     //      "ldd        r29,    Z +  9"   "\n\t" // We interact with the USART only this once
             "ldi        r29,      0x08"   "\n\t" // High byte always 0x08 for USART peripheral: Save-a-clock.
+  #if defined(ERRATA_USART_WAKE)                 // This bug appears to be near-universal
+            "ldd        r18,    Y +  6"   "\n\t"
+            "andi       r18,      0xEF"   "\n\t"
+            "std      Y + 6,       r18"   "\n\t" // turn off SFD interrupt before reading RXDATA so we don't corrupt the next character.
+  #endif
             "ldd        r24,    Y +  1"   "\n\t" // Y + 1 = USARTn.RXDATAH - load high byte first
             "ld         r25,         Y"   "\n\t" // Y + 0 = USARTn.RXDATAL - then low byte of RXdata
             "andi       r24,      0x46"   "\n\t" // extract framing, parity bits.
@@ -179,7 +184,7 @@
             "pop        r19"              "\n\t" // restore r19 which held the value that State will have after this.
             "pop        r18"              "\n\t" // Restore saved SREG
             "out       0x3f,       r18"   "\n\t" // and write back
-            "pop        r18"              "\n\t" // used as tail pointer and z known zero.
+            "pop        r18"              "\n\t" // used as tail offset, and then as known zero.
             "pop        r31"              "\n\t" // end with Z which the isr pushed to make room for
             "pop        r30"              "\n\t" // pointer to serial instance
             "reti"                        "\n"   // return
@@ -190,6 +195,9 @@
     #elif defined(USE_ASM_RXC) && USE_ASM_RXC == 1
       #warning "USE_ASM_RXC is defined and this has more than one serial port, but the buffer size is not supported, falling back to the classical RXC."
     #else
+      #if defined(PERMIT_USART_WAKE)
+        #error "USART Wake is not supported by the non-ASM RXC interrupt handler"
+      #endif
       void HardwareSerial::_rx_complete_irq(HardwareSerial& HardwareSerial) {
         // if (bit_is_clear(*_rxdatah, USART_PERR_bp)) {
         uint8_t rxDataH = HardwareSerial._hwserial_module->RXDATAH;
@@ -373,7 +381,7 @@
         // -Spence 10/23/20
         // Invoke interrupt handler only if conditions data register is empty
         if ((*_hwserial_module).STATUS & USART_DREIF_bm) {
-          if (_tx_buffer_head != _tx_buffer_tail) {
+          if (_tx_buffer_head == _tx_buffer_tail) {
             // Buffer empty, so disable "data register empty" interrupt
             (*_hwserial_module).CTRLA &= (~USART_DREIE_bm);
 

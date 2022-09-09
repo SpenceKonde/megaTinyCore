@@ -538,7 +538,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     return result;
   }
 
-  inline __attribute__((always_inline)) int32_t analogReadEnh(uint8_t pin, uint8_t res, uint8_t gain) {
+  int32_t analogReadEnh(uint8_t pin, uint8_t res, uint8_t gain) {
     check_valid_enh_res(res);
     check_valid_analog_pin(pin);
     if (__builtin_constant_p(gain)) {
@@ -548,7 +548,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     return _analogReadEnh(pin, SINGLE_ENDED, res, gain);
   }
 
-  inline __attribute__((always_inline)) int32_t analogReadDiff(uint8_t pos, uint8_t neg, uint8_t res, uint8_t gain) {
+  int32_t analogReadDiff(uint8_t pos, uint8_t neg, uint8_t res, uint8_t gain) {
     check_valid_enh_res(res);
     check_valid_analog_pin(pos);
     check_valid_negative_pin(neg);

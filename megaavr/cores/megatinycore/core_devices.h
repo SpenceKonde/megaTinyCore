@@ -415,16 +415,16 @@
  * performing the cal at all (which was not as usuful as on 0/1-series)
  */
  #if !defined(SIGROW_OSC16ERR3V)
-    #define SIGROW_OSC16ERR3V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions"])
+    #define SIGROW_OSC16ERR3V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions")]
   #endif
   #if !defined(SIGROW_OSC16ERR5V)
-    #define SIGROW_OSC16ERR5V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions"])
+    #define SIGROW_OSC16ERR5V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions")]
   #endif
   #if !defined(SIGROW_OSC20ERR3V)
-    #define SIGROW_OSC20ERR3V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions"])
+    #define SIGROW_OSC20ERR3V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions")]
   #endif
   #if !defined(SIGROW_OSC20ERR5V)
-    #define SIGROW_OSC20ERR5V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions"])
+    #define SIGROW_OSC20ERR5V (SIGROW.reserved_3[badCall("the SIGROW does not contain error information about the main oscillator except on very early versions")]
   #endif
 #else
   /* 0/1-series, on the other hand, doesm't have these defined even though they are present */
@@ -519,8 +519,9 @@
   #define TCB_CLKSEL_DIV1_gc  TCB_CLKSEL_CLKDIV1_gc
   #define TCB_CLKSEL_DIV2_gc  TCB_CLKSEL_CLKDIV2_gc
   #define TCB_CLKSEL_TCA0_gc  TCB_CLKSEL_CLKTCA_gc
-  #define TCB_CLKSEL_EVENT_gc  ({badArg("This processor does not support TCB count on event mode. Only Dx, Ex, and 2-series tiny support that");})
+  #define TCB_CLKSEL_EVENT_gc  (badArg("This processor does not support TCB count on event mode. Only Dx, Ex, and 2-series tiny support that"))
 #endif
+#define ERRATA_USART_WAKE // It is likely that this impacts all extant parts.
 
 /* Make sure we error out quickly if told to use an RTC timing option that isn't available. */
 #if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_XOSC))

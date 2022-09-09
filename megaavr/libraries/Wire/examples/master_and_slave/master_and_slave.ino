@@ -21,7 +21,7 @@ int8_t len = 0;
 
 void setup() {
   Wire.onReceive(receiveDataWire);  // Set the slave receive ISR
-  //Wire.enableDualMode(false)      // used to use seperate pins for master and slave. If enabled,
+  //Wire.enableDualMode(false)      // used to use separate pins for master and slave. If enabled,
   //                                   it would disable the loopback feature this example relies upon
   //Wire.swap()                     // used to select the pins of the master and the slave
   
