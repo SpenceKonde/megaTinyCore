@@ -49,10 +49,9 @@ jobs:
         - megaavr/libraries/USERSIG/examples/usersig_put
         - megaavr/libraries/USERSIG/examples/usersig_read
         - megaavr/libraries/Wire/examples/digital_potentiometer
-        - megaavr/libraries/Wire/examples/master_write
-        - megaavr/libraries/Wire/examples/slave_read
-        - megaavr/libraries/Wire/examples/slave_write
-        - megaavr/libraries/Wire/examples/master_read
+        - megaavr/libraries/Wire/examples/slave_write_read
+        - megaavr/libraries/Wire/examples/master_and_slave
+        - megaavr/libraries/Wire/examples/master_write_read
         - megaavr/libraries/Wire/examples/slave_secondary_address
         - megaavr/libraries/megaTinyCore/examples/ModernRevSer
         - megaavr/libraries/megaTinyCore/examples/readTempVcc
