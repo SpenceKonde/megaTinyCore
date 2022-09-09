@@ -519,14 +519,12 @@
   #define TCB_CLKSEL_DIV1_gc  TCB_CLKSEL_CLKDIV1_gc
   #define TCB_CLKSEL_DIV2_gc  TCB_CLKSEL_CLKDIV2_gc
   #define TCB_CLKSEL_TCA0_gc  TCB_CLKSEL_CLKTCA_gc
-  #define TCB_CLKSEL_EVENT_gc  (badArg("This processor does not support TCB count on event mode. Only Dx, Ex, and 2-series tiny support that"))
+  #define TCB_CLKSEL_EVENT_gc  (badCall("This processor does not support TCB count on event mode. Only Dx, Ex, and 2-series tiny support that"))
 #endif
-#define ERRATA_USART_WAKE // It is likely that this impacts all extant parts.
-
 /* Make sure we error out quickly if told to use an RTC timing option that isn't available. */
 #if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_XOSC))
   #if (MEGATINYCORE_SERIES == 0 || defined(__AVR_ATtinyxy2__))
-    #error "Only the tinyAVR 1-series and 2-series parts with at least 8 pins support external RTC timebase"
+    #error "Only the tinyAVR 1-series and 2-series parts with at least 14 pins support external RTC timebase"
   #endif
 #endif
 #endif

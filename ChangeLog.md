@@ -49,7 +49,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Docs: made clear om PowerSave.md that the ADC must be disabled to get low standbby current.
 * Docs: Add link to my article on AVR math speed (TLDR: avoid `int64_t` `long long` like the plague)
 * Docs: Fix many documentation issues, improve docs generally.
-* Docs: Expand documentation significantly.
+* Docs: Expand documentation significantly, and document the new serial features.
 * Unenhancement: Remove getAnalogSampleDuration(), as I could not make anything compile with that in and had worked on it over a day.
 
 ## Released Versions

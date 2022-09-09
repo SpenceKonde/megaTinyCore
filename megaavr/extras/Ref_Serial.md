@@ -241,7 +241,7 @@ This function returns a byte encoding the current status of the serial port.
 | 7     | Yes      | SERIAL_OVERFLOW_HARDWARE   | A buffer overflow at the hardware level has occurred; This happens when interrupts are disabled for too long while receivign data. getStatus() clears this record
 
 Since getStatus also clears the errors, be sure to store the first value you get from it if you are looking for multiple errors.
-In the case of autobaud, both sides should probably be using this - non-autobaud device would check for framing errors that indicate a need to sync, and then attempt to do so, while the autobaud device would need to watch out for ISFIF, which disables receiveing until addressed.
+In the case of autobaud, both sides should probably be using this - non-autobaud device would check for framing errors that indicate a need to sync, and then attempt to do so, while the autobaud device would need to watch out for ISFIF, which disables receiving until addressed.
 
 ### Loopback Mode
 When Loopback mode is enabled, the RX pin is released, and TX is internally connected to Rx. This is only a functional loopback test port, because another device couldn't drive the line low without fighting for control over the pin with this device. Loopback mode itself isn't very useful. But see below.
@@ -411,7 +411,7 @@ In the old days, people would often advise "lower the baud rate" as a solution. 
 The point of this is to demonstrate by example just how large the baud rate error was on classic AVRs, due to the way they generated the baud rate from the system clock by integer division - and the only way to fix it on those parts is to use baud rates that that table shows come out nearly on target, or clock the chip from  a "UART crystal" such that the whole chip runs at some weird speed like 7.37 MHz or 9.21, and so on. This adversely impacts the runtime of `micros()` to a lesser extent, the accuracy of timekeeping in general.
 
 #### Bringing this back to modern AVRs
-So, **you should all be very, very thankful for the new fractional baud rate generators**, which are responsible for the charts linked below being a sea of sub 1% and mostly 0.1% error for modern AVRs. When there is an apparent baud rate mismatch when a modern AVR is talking to another device, the problem is not the baud rate calulation. It's usually not the oscillator either, which is rarely even 1% off on any modern AVR. No, your problem 9 times out of 10 is going to be that the device you're talking to generating an incorrect baud rate (for classic AVRs, the table lists them; for other devices you can measure it with a scope to see what their actual baud rate is. The path of least resistance (and no scope needed) with such legacy devices is crude but effective. Since the legacy device likely cannot be coerced to produce the correct baud rate, you can instead just nudge the baud rate the modern AVR up or down 2% (whichever fixes it - it's only 2 options to try and one of them will work). Make note that that the legacy devices' baud rate is off, that it should be replaced by newer hardware.
+So, **you should all be very, very thankful for the new fractional baud rate generators**, which are responsible for the charts linked below being a sea of sub 1% and mostly 0.1% error for modern AVRs. When there is an apparent baud rate mismatch when a modern AVR is talking to another device, the problem is not the baud rate calculation. It's usually not the oscillator either, which is rarely even 1% off on any modern AVR. No, your problem 9 times out of 10 is going to be that the device you're talking to generating an incorrect baud rate (for classic AVRs, the table lists them; for other devices you can measure it with a scope to see what their actual baud rate is. The path of least resistance (and no scope needed) with such legacy devices is crude but effective. Since the legacy device likely cannot be coerced to produce the correct baud rate, you can instead just nudge the baud rate the modern AVR up or down 2% (whichever fixes it - it's only 2 options to try and one of them will work). Make note that that the legacy devices' baud rate is off, that it should be replaced by newer hardware.
 
 ### Baud rate reference chart
 See the [**AVR Baud Rate Chart**](https://docs.google.com/spreadsheets/d/1uzU_HqWEpK-wQUo4Q7FBZGtHOo_eY4P_BAzmVbKCj6Y/edit?usp=sharing) in google sheets for a table of actual vs requested baud rates. (same chart as linked above)
@@ -501,6 +501,7 @@ The maximum baud rate while operating as slave in synchronous mode is F_CPU / 4 
 |     57600 |             Common | Often used to upload to 8 MHz classic AVRs (a bad choice) |
 |     76800 |               Rare | A standard speed, but not commonly used.  This is what <br/> people SHOULD bootload classic 16 MHz AVRs at |
 |    115200 |        Very Common | Most common modern bootloader speed, Great default now  |
+|    153600 |               Rare |
 |    172800 |          Unheardof | You would expect this - but its not actually used anywhere |
 |    230400 |           Uncommon | The first non-exotic speed higher than 115200           |
 |    256000 |            V. Rare |  Looka like the math would be easy. Nope. Not really.   |
@@ -512,7 +513,10 @@ The maximum baud rate while operating as slave in synchronous mode is F_CPU / 4 
 
 These are some of the most common; Most - but not all - adapters can generate nearly arbitrary baud rates. The CP2102 has a preprogrammed list, though the vendor has a utility that can change them. The HT42B534 has no mechanism for changing the supported baud rates baud rates, etc. Low-end serial adapters usually cap out at 1.5, 2. or 3mbaud. The highest I have seen is 6 mbaud, available only on FTDI's top-end parts, and which is fast enough that the wire's electrical properties that we normally neglect would become relevant; physics would make communication fiddly.
 
-*fun project idea:* Make a true "autobaud" system that monitors listens to serial at an unknown baud rate, figures out what it is, and then configures the Serial appropriate. You'd want the RX line of the serial port, and probably a event input pin piped to a type B timer, such that you could keep measuring to see what the shortest time between two transitions that you see is 1 bit period. 1-over-period = baud rate.
+*fun project idea:* Make a true "autobaud" system that monitors serial at an unknown baud rate, figures out what it is, and then configures the Serial appropriate. You'd want the RX line of the serial port, and probably a event input pin piped to a type B timer, such that you could keep measuring to see what the shortest time between two transitions that you see is. That's 1 bit period. 1-over-period = baud rate.
+
+## Waking from sleep on USART
+To do this you must set the SFDEN bit in the USART immediately before sleeping, and you must not set the SFD interrupt. The chip will still be woken when a character is received. As of 2.6.0, the RX routine will clear SFDEN before reading the character, so this becomes viable. In previous versions this would not work due to the ubiquitous errata.
 
 
 ## Appendix A: Notes on the ISR implementation
