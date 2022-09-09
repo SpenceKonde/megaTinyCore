@@ -1,8 +1,8 @@
 # Wire (TWI/I2C)
-All of these parts have a single I2C/TWI module, and Wire.h provides the usual API - and then some.
+All of these parts have at least one I2C/TWI module, and Wire.h provides the usual API - and then some.
 
 ## NEW in megaTinyCore 2.5.0/DxCore 1.4.0 - totally rewritten Wire library thanks to @MX682X
-Should be 100% backwards compatible, use less flash, and have a new menu option to enable both master AND slave instead of the usual master OR slave. This uses the same pair of pins (this is termed "multimaster mode" in the 'biz). Enabling increases binary size, and allocates another buffer for data (out of RAM), snd being the less common use case, we choose to default to the more efficient implementation in light the stringent constraints on these parts. Parts with "Dual Mode" have the option to use a separate pair of pins for the slave functionality.
+Should be 100% backwards compatible, use less flash, and have a new menu option to enable both master AND slave instead of the usual master OR slave. This uses the same pair of pins (this is termed "multimaster mode" in the 'biz). Enabling increases binary size, and allocates another buffer for data (out of RAM), and being the less common use case, we choose to default to the more efficient implementation in light the stringent constraints on these parts. Parts with "Dual Mode" have the option to use a separate pair of pins for the slave functionality.
 
 ## Pin Mappings (tinyAVR)
 | Pincount | Default  | Alt (1-series only) |
@@ -10,11 +10,38 @@ Should be 100% backwards compatible, use less flash, and have a new menu option 
 |   8-pin  | PA2, PA1 |                     |
 | 14+ pin  | PB0, PB1 | PA2, PA1            |
 
-Shown as SCL, SDA. There are no alternate TWI pin mapping options for the 0-series or 2-series devices - but all 1-series devices except the 8-pin ones have two pinsets for TWI/I2C.
+## Pin Mappings (AVR Dx-series)
+| Mapping | TWI0 M/S | TWI0 Dual | TWI1 M/S | TWI1 Dual |
+|---------|----------|-----------|----------|-----------|
+| Default | PA2, PA3 | PC2,  PC3 | PF2, PF3 | PB2,  PB3 |
+| Alt1    | PA2, PA3 | PC6,  PC7 | PF2, PF3 | PB6,  PB7 |
+| Alt2    | PC2, PC3 | PC6,  PC7 | PB2, PB3 | PB6,  PB7 |
+| Alt3    | PA0, PA1 | PC2,  PC3 |    N/A   |    N/A    |
 
-`Wire.swap(pin_set)` will set the the pin mapping to the specified set of pins. See API reference below for details.
+Notes:
+* Alt3 is only available on AVR DD-series (and possibly EA-series).
+* Alt1 is not available on parts which do not have PC6 and PC7 (for TWI0) or PB6, PB7 (for TWI1) because it would duplicate Default.
+* But Alt2 is, since its's primary pins are different - though dual mode is not available if the pins aren't present. 
+* TWI1 only has the default mapping available on 32-pin parts. 48-pin and 64-pin parts are needed for dual mode (32-pin parts don't have a PORTB) and 64-pin parts needed for Alt1 (since PB6 and PB7 only exist on 64-pin parts). Alt2 is available on 48 and 64-pin parts only, for the same reason.  
+* In all cases the pins are listed as SCL, SDA.
 
-`Wire.pins(SDA pin, SCL pin)` - this will set the mapping to whichever mapping has the specified pins `SDA` and `SCL`. See API reference below for details.
+Availability of pin mappings by pincount for AVR Dx-series
+| Pin Pair | Function | 64 pin | 48 pin | 32 pin | 28 pin | 20 pin | 14 pin |
+|----------|----------|--------|--------|--------|--------|--------|--------|
+| PA0, PA1 | M/S only | n/a    | n/a    | For DD | For DD | Yes    | Yes    |
+| PA2, PA3 | M/S only | Yes    | Yes    | Yes    | Yes    | Yes    | No     |
+| PC2, PC3 | Either   | Yes    | Yes    | Yes    | Yes    | Yes    | Yes    |
+| PC6, PC7 | Dualmode | Yes    | Yes    | No     | No     | No     | No     |
+| PF2, PF3 | M/S only | Yes    | Yes    | Yes    | No     | No     | No     |
+| PB2, PB3 | Either   | Yes    | Yes    | No     | No     | No     | No     |
+| PB6, PB7 | Dualmode | Yes    | No     | No     | No     | No     | No     |
+
+`Wire.swap(pin_set)` will set the the pin mapping to the specified set of pin.  See API reference below for details.
+
+`Wire.pins(SDA pin, SCL pin)` - this will set the mapping to whichever mapping has the specified pins `SDA` and `SCL`. See API reference below for details. Only covered the master/slave pins, not the dual-mode pins. If you want the mode with the pins that can't do dual mode slave (PA2/3, or PF2/3) but with the alternate slave pins, you MUST use Wire.swap().
+
+## Official specification of I2C
+https://www.nxp.com/docs/en/user-guide/UM10204.pdf
 
 ## Overview - I2C, what is it?
 I2C (known by many names, see note at end) uses two pins, a clock (SCL) and data (SDA) for communication among two or more compatible devices. This is an open drain bus - external pullup resistors keep the two lines HIGH, and devices communicate by driving the pins low or releasing them. Data is clocked on the rising edge - this is important, as you will see.
@@ -159,9 +186,7 @@ This method is available ONLY if both TWI0 and TWI1 are present on the device, b
 ```c++
 enableDualMode(bool fmp_enable);      // Moves the Slave to dedicated pins
 ```
-This enables the "Dual Mode" which moves the slave functionality to a second pair of pins, such that there is a SCL/SDA pair for the master and an SCL/SDA pair for the slave. Some parameters (such as Fast Mode+ support) can be enabled separately for the slave. This must be called before `Wire.begin()` This is only available on megaAVR 0-series, and AVR Dx and Ex-series. The version of this document included with such parts will list the slave mode pinsets.
-
-This will generate an error if referenced on a tinyAVR, as the tinyAVR parts only support master + slave operation from the same pins.
+This enables the "Dual Mode" which moves the slave functionality to a second pair of pins, such that there is a SCL/SDA pair for the master and an SCL/SDA pair for the slave. Some parameters (such as Fast Mode+ support) can be enabled separately for the slave. This must be called before `Wire.begin()` This is only available on megaAVR 0-series, and AVR Dx and Ex-series, not tinyAVR. The version of this document included with such parts will list the slave mode pinsets. This will generate an error if referenced on a tinyAVR.
 
 ### Standard methods and features significant differences
 ```c++
@@ -235,16 +260,14 @@ In 2.5.4/1.4.4 it was reported that the return value of this method did not matc
 
 | Value | Meaning                                                        | Standard |
 |-------|----------------------------------------------------------------|----------|
-|  0x00 | Success                                                        | Yes      | TWI_ERR_SUCCESS
-|  0x01 | TX buffer overflow. Not used.                                  | Yes      | TWI_ERR_DATA_TOO_LONG
-|  0x02 | Address was NAK'd                                              | Yes      | TWI_ERR_ACK_ADR
-|  0x03 | Data was NAK'd                                                 | Yes      | TWI_ERR_ACK_DAT
-|  0x04 | Unknown error                                                  | Yes      | TWI_ERR_UNDEFINED
-|  0x11 | Line held low or not pulled up                                 | No       | TWI_ERR_PULLUPS
-|  0x12 | Arbitration lost                                               | No       | TWI_ERR_BUS_ARB
-|  0x13 | Buffer overflow on master read                                 | No       | TWI_ERR_BUF_OVERFLOW
-|  0x14 | Something is holding the clock                                 | No       | TWI_ERR_CLKHLD
-
+|  0x00 | Success                                                        | Yes      |
+|  0x01 | TX buffer overflow. Not used.                                  | Yes      |
+|  0x02 | Timeout waiting for ack of address                             | Yes      |
+|  0x03 | Timeout waiting for ack of data                                | Yes      |
+|  0x04 | Unknown error                                                  | Yes      |
+|  0x10 | Arbitration lost                                               | No       |
+|  0x11 | Line held low or not pulled up                                 | No       |
+|  0xFF | Bus in unknown state (begin() not called?)                     | No       |
 
 In the case of a TX buffer overflow, when it gets to endTransmission, this looks the same as a full buffer, because write() didn't put the excess data into the buffer, and returned a number smaller than the number of bytes passed to it. I'm not sure how error code 1 could ever happen.
 

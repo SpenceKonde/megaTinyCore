@@ -60,8 +60,8 @@ void setup() {
   // 2nd argument: listen to general broadcast or "general call" (address 0x00)
   // 3rd argument: bits 7-1: second address if bit 0 is set true
   //               or bit mask of an address if bit 0 is set false
-  Wire.begin(0x54, true, WIRE_ADDRESS_MASK(0x70));
-  // Hence, we an address whose hexadecimal representation ends in 4 will match.
+  Wire.begin(0x54, true, WIRE_ADDRESS_MASK(0xF0));
+  // Hence, we will match any address that with 4 (in 7 bits, 0xF0 will be 0b1111000, so the 4 high bits will always match).
   Wire.onReceive(receiveDataWire);
 
   // Initialize serial port - if you need to swap pins, remember to do so.

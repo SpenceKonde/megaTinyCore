@@ -174,12 +174,6 @@ struct twiDataBools {       // using a struct so the compiler can use skip if bi
   bool _ackMatters:       1;
 };
 
-/* My original idea was to pass the whole TwoWire class as a  */
-/* Pointer to this functions but this didn't work of course.  */
-/* But I had the idea: since the class is basically just a    */
-/* struct, why not just put the relevant variables in one     */
-/* and pass that as a pointer? So now this exists and it      */
-/* seems to work.                                             */
 
 struct twiData {
   TWI_t *_module;
@@ -187,6 +181,7 @@ struct twiData {
   #if defined(TWI_READ_ERROR_ENABLED)
     uint8_t _errors;
   #endif
+  uint8_t _bytesTransmittedS;
   uint8_t _clientAddress;
   #if defined(TWI_MERGE_BUFFERS)
     uint8_t _bytesToReadWrite;
@@ -216,7 +211,6 @@ struct twiData {
 };
 
 
-uint8_t  TWI_advancePosition(uint8_t           pos);  // returns the next Position with Round-Robin functionality
 void     TWI_MasterInit(struct      twiData *_data);
 void     TWI_Flush(struct           twiData *_data);
 void     TWI_Disable(struct         twiData *_data);

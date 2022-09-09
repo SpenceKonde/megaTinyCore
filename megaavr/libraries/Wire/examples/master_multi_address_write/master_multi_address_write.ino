@@ -13,16 +13,17 @@
  * Leave it commented out for the Secondary Address example:
  *   If the first element is a number, it will write the data on Wire to
  *     the slave address 0x54.
- *   Otherwise it writes the data on Wire1 to the slave address 0x64.
+ *   Otherwise it writes the data on Wire to the slave address 0x64.
  * Uncomment it for the Address Mask slave example:
  *   If the first element is a 0-7, that will be the first digit (in hexadecimal)
  *     of the address, ex, '5test' would go to 0x54, and '2test' would go to 0x24
- *   Otherwise, it will send to address 0 (general call). Which as I understand
- *     the specification is only supposed to have a single byte payload, but NXP
- *     does not make the specification available to the unwashed (and unpaying)
- *     masses so I'm not privy to the list of legal values for it. Suffice to say
- *     it is likely to confuse anything other than the slave sketch that happens
- *     to be on the bus.
+ *   Otherwise, it will send to address 0 (general call). According to the I2C Rev 7.0
+ *     Specification, it requires a payload of at least 1 byte, the first being one of the
+ *     two following codes:
+ *     0x06 - Reset and use the new address programmed beforehand
+ *     0x04 - just use the new address programmed beforehand.
+ *     All other codes are usually ignored.
+ *
  *
  * To use this, you need to connect the SCL and SDA pins of this device to the
  * SCL and SDA pins of a second device running the Slave Secondary Address example or
@@ -97,9 +98,7 @@ void sendDataWire() {
   MySerial.printHex(address);
   MySerial.println();
   Wire.beginTransmission(address);
-  for (uint8_t i = 0; i < len; i++) {
-    Wire.write(input[i]);          // Write the received data to the buffer
-  }
+  Wire.write(input, len);
 
   #if defined(DUAL_ADDRESS_ONLY)
   Wire.write("\r\n");              // add new line and carriage return for the Serial monitor

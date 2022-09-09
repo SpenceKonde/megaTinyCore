@@ -17,10 +17,10 @@
  * We also define a variable WriteMask[32] which contains a series of constants, one for each "register"
  * only bits that are a 1 can be written.
  * The others will remain unchanged.
- * 0-4 are fully writable
- * the 5 low bits of 5 are writable
- * 6 and 7 are fully writable,
- * 8-11 only allow the 2 low bits in each nybble to be written
+ * 0-4 are fully writeable
+ * the 5 low bits of 5 are writeable
+ * 6 and 7 are fully writeable,
+ * 8-11 only allow the 2 low bits in each nibble to be written
  * 12-15 are read-only
  * 16 and 17 allow only the low nybble to be written
  * 18 and 19 allow only the high nybble to be written.
@@ -82,20 +82,23 @@ void receiveHandler(int numbytes) {
     uint8_t unchangedbits = (DeviceRegisters[WirePointer] & ~WriteMask[WirePointer]);
     DeviceRegisters[WirePointer] = (Wire.read() & WriteMask[WirePointer]) | unchangedbits;
     WirePointer++;          // increment the pointer.
-    WirePointer &= 0x1F;    // Wrap aroubd if it's gone over 32;
+    WirePointer &= 0x1F;    // Wrap around if it's gone over 32;
     numbytes--;             // decrement remaining bytes.
   }
 }
-/* This one is weirder. The way the onRequest behaves and what it needs to do is very counterintuitive (and this model is probably part
+/* This one is weirder. The way the onRequest behaves and what it needs to do is very counter-intuitive (and this model is probably part
  * of WHY all Arduino I2C slave devices use wire like "serial with a clock" instead of like a civilised device....)
  *
  * the handler registered with onRequest is called when the slave gets a packet that matches it's address, set to read; This is called
  * once, and prints out all of the data that the master *might* request. It then does not fire again until the next start condition
- * followed by a matching address. If the master gets all the data the slave prepared, the slave NACKs the first byte beyond what it has.
- * and the standard API does not provide any means for the slave to determine in any way how much the master read!
+ * followed by a matching address. There is a chance that the master might NACK a transmission before it was completed. The Arduino API does
+ * not allow to track how many bytes were actually written by the Slave. This is fixed with getBytesRead().
  *
  * Without the getBytesRead() extension, there is no way for a slave written through the Arduino API to react to whether the master has
- * something - and that's a very common behavior in commercial I2C devices.
+ * read something something - and that's a very common behaviour in commercial I2C devices.
+ *
+ * Another thing to consider is that, if the there is a buffer underflow, the TWI will keep the SDA lines released, making the master think
+ * a 0xFF was transmitted.
  */
 void requestHandler() {
   // We will start reading from the pointer.
