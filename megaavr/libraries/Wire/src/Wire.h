@@ -118,8 +118,8 @@ class TwoWire: public Stream {
     inline size_t write(unsigned int  n) {  return      write((uint8_t)     n);}
     inline size_t write(int           n) {  return      write((uint8_t)     n);}
     using Print::write;
-    
-    
+
+
     size_t readBytes(uint8_t * data, size_t quantity) {return readBytes((char *) data, quantity);}
     size_t readBytes(char * data, size_t quantity);
 

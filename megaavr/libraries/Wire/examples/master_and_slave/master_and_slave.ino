@@ -8,7 +8,7 @@
  * the slave pins are the same as the master pins. This creates a loopback mode,
  * in which the sent millis value is received in the same device and is printed back to
  * the Serial Monitor.
- * 
+ *
  */
 
 #include <Wire.h>
@@ -24,10 +24,10 @@ void setup() {
   //Wire.enableDualMode(false)      // used to use separate pins for master and slave. If enabled,
   //                                   it would disable the loopback feature this example relies upon
   //Wire.swap()                     // used to select the pins of the master and the slave
-  
+
   Wire.begin();                     // Enables the master functionality
   Wire.begin(0x54);                 // Enables the slave functionality
-  
+
   MySerial.begin(115200);           // Use 115200 baud - this is the 2020's, and these are modern AVRs.
 }
 
@@ -56,13 +56,13 @@ void sendDataWire() {
   #ifndef MILLIS_USE_TIMERNONE
   ms = millis();    // overwrite the default value
   #endif
-   
+
   Wire.beginTransmission(0x54);     // prepare transmission to slave with address 0x54
   Wire.write((uint8_t) ms);
   Wire.write((uint8_t)(ms >> 8));
   Wire.write((uint8_t)(ms >> 16));
   Wire.write((uint8_t)(ms >> 24));
-  
+
   Wire.endTransmission();     // finish transmission
 }
 

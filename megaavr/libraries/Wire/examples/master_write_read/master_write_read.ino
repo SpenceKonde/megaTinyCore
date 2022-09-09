@@ -75,7 +75,7 @@ void sendDataWire() {
   Wire.write(input, len);
   Wire.write("\r\n");               // add new line and carriage return for the Serial monitor
   err = Wire.endTransmission();     // finish transmission
-  
+
 #ifdef DECODE_ERROR
 
   switch (err) {
@@ -84,12 +84,12 @@ void sendDataWire() {
     case 0x03:  MySerial.println("Data was NACK'd"); break;
     case 0x04:  MySerial.println("Unknown error occurred"); break;
     case 0x05:  MySerial.println("Transmission time-outed"); break;
-    // The library also supports some extended errors that might give a hint on what is failing. 
+    // The library also supports some extended errors that might give a hint on what is failing.
     case 0x10:  MySerial.println("Wire is uninitialized"); break;
     case 0x11:  MySerial.println("Pullups are missing"); break;
     case 0x12:  MySerial.println("Arbitration lost"); break;
   }
-  
+
 #endif /* DECODE_ERROR */
 #endif /* ENABLE_WRITE_TO */
 }

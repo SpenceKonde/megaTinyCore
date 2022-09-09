@@ -619,7 +619,7 @@ uint8_t TwoWire::getBytesRead() {
 uint8_t TwoWire::slaveTransactionOpen() {
    if (vars._module->SSTATUS & (TWI_DIR_bm | TWI_AP_bm)) return 2;
    if (vars._module->SSTATUS & TWI_AP_bm) return 1; // Slave Status is a volatile register, thus two loads
-   // Why are we doing it this way?! Why not read the status into a local variable and compare to that, saving 3 clock cycles and 4 bytes of flash? 
+   // Why are we doing it this way?! Why not read the status into a local variable and compare to that, saving 3 clock cycles and 4 bytes of flash?
    return 0;
 }
 
@@ -714,7 +714,7 @@ void TwoWire::onSlaveIRQ(TWI_t *module) {          // This function is static an
     } else if (module == &TWI1) {
       TWI_HandleSlaveIRQ(&(Wire1.vars));
     }
-  #else                                 // Otherwise, only one Wire object is being used anyway, no need to check 
+  #else                                 // Otherwise, only one Wire object is being used anyway, no need to check
     (void)module;
     TWI_HandleSlaveIRQ(&(Wire.vars));
   #endif

@@ -634,7 +634,7 @@ void SlaveIRQ_Stop(struct twiData *_data) {
 
   _data->_module->SSTATUS = TWI_APIF_bm;      // Clear Flag, no further action needed
   NotifyUser_onReceive(_data);                // Notify user program "onReceive" if necessary
-  
+
   (*txHead) = 0;
   (*rxHead) = 0;
 }

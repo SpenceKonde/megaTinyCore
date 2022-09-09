@@ -7,7 +7,7 @@
  *
  * If the #define ENABLE_RECEIVE is set, every byte in a Master Write is
  * printed to the Serial Monitor.
- * 
+ *
  * If the #define ENABLE_REQUEST is set, the slave sends its millis()
  * (or placeholder) value to the master.
  *

@@ -137,8 +137,8 @@ This is currently used only for the last few releases, and should fix the avrdud
 ## Parts not supported by megaTinyCore
 * Anything named like "AVR##XX##" where X is a letter and # is a number - you want my [DxCore](https://github.com/SpenceKonde/DxCore) for those
 * All of the classic (pre-2016) tinyAVR parts - these are almost all supported by one of my other cores [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore)
-  * ATtiny 25/45/85, 24/44/84, 261/461/861, 48/88, the two small and ones (strange 43 and 4313/2313), and in 2.0.0, the 26 as well as the final-four (which show hints of experimentation in the direction of the modern AVRs), the ATtiny 441/841, 1634 and 828 plus the even stranger 26. 
-* Anything else [**See this document for a list of AVR part families and what arduino cores they work with**](https://github.com/SpenceKonde/AVR-Guidance/blob/master/AVRFamilies_And_Compatibility/ArduinoCores.md) - almost everything has a core that offers support, usually by myself or MCUdude. 
+  * ATtiny 25/45/85, 24/44/84, 261/461/861, 48/88, the two small and ones (strange 43 and 4313/2313), and in 2.0.0, the 26 as well as the final-four (which show hints of experimentation in the direction of the modern AVRs), the ATtiny 441/841, 1634 and 828 plus the even stranger 26.
+* Anything else [**See this document for a list of AVR part families and what arduino cores they work with**](https://github.com/SpenceKonde/AVR-Guidance/blob/master/AVRFamilies_And_Compatibility/ArduinoCores.md) - almost everything has a core that offers support, usually by myself or MCUdude.
 
 ## Overall Part Comparison
 [**See this document covering all modern AVRs**](https://github.com/SpenceKonde/AVR-Guidance/blob/master/AVRFamilies_And_Compatibility/ModernAVRs.md)
@@ -417,7 +417,7 @@ Serial.printf("Milliseconds since start: %ld\n", millis());
 Note that using this method will pull in just as much bloat as `sprintf()` and is subject to the same limitations as printf - by default, floating point values aren't printed. You can use this with all serial ports
 You can choose to have a full `printf()` implementation from a Tools submenu if you want to print floating point numbers, at a cost of some additional flash.
 
-#### **WARNING^^ `printf()` and Variants Thereof Have Many Pitfalls
+#### **WARNING** `printf()` and Variants Thereof Have Many Pitfalls
 There are a considerable number of ways to screw up with `printf()`. Some of the recent issues that have come up:
 * Formatting specifiers have modifiers that they must be paired with depending on the datatype being printed, for all except one type. See the table of ones that I expect will work below (it was cribbed from [cplusplus.com/reference/cstdio/printf/](https://www.cplusplus.com/reference/cstdio/printf/), and then I chopped off all the rows that aren't applicable, which is most of them). Apparently many people are not fully aware (or at all aware) of how important this is - even when they think they know how to use printf(), and may have done so on previously (on a desktop OS, with 32-bit ints and no reason to use smaller datatypes for simple stuff).
 * There are (as of 1.4.0) warnings enabled for format specifiers that don't match the the arguments, but you should not rely on them. Double check what you pass to `printf()` - `printf()` bugs are a common cause of software bugs in the real world. Be aware that *while you can use F() on the format string, there are no warnings for invalid format strings in that case*; a conservative programmer would first make the app work without F() around the format string, and only switch to F() once the format string was known working.
@@ -436,7 +436,7 @@ The table below comprises the relevant lines from that table - many standard typ
 
 Notice that there is no line for 64 bit types in the table above; these are not supported (support for 64-bit types is pretty spotty, which is not surprising. Variables of that size are hard to work with on an 8-bit microcontroller with just 32 working registers). This applies to all versions of `printf()` - the capability is not supplied by avr-libc.
 
-There are reports of memory corruption with printf, I suspect it is misunderstandign of above that is actually at hand here. 
+There are reports of memory corruption with printf, I suspect it is misunderstandign of above that is actually at hand here.
 
 #### Selectable `printf()` Implementation
 A Tools submenu lets you choose from three levels of `printf()`: full `printf()` with all features, the default one that drops float support to save 1k of flash, and the minimal one drops almost everything and for another 450 bytes flash saving (will be a big deal on the 16k and 8k parts. Less so on 128k ones). Note that selecting any non-default option here *will cause it to be included in the binary even if it's never called* - and if it's never called, it normally wouldn't be included. So an empty sketch will take more space with minimal `printf()` selected than with the default, while a sketch that uses `printf()` will take less space with minimal `printf()` vs default.

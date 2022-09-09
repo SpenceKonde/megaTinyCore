@@ -138,11 +138,11 @@ bool TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin) {
             PORTMUX.CTRLB &= ~PORTMUX_TWI0_bm;
             return false;
           }
-        #else // tinyAVR 0/1 without TWI multiplexer options 
+        #else // tinyAVR 0/1 without TWI multiplexer options
            return (sda_pin == PIN_WIRE_SDA);
         #endif
-// --- Dx series ---       
-      #elif defined(PORTMUX_TWIROUTEA)     
+// --- Dx series ---
+      #elif defined(PORTMUX_TWIROUTEA)
         uint8_t portmux = (PORTMUX.TWIROUTEA & ~PORTMUX_TWI0_gm);
         #if      defined(PIN_WIRE_SDA_PINSWAP_3)
           if (sda_pin == PIN_WIRE_SDA_PINSWAP_3) {
@@ -287,7 +287,7 @@ void TWI0_usePullups() {
         port->PIN0CTRL |= PORT_PULLUPEN_bm;
         port->PIN1CTRL |= PORT_PULLUPEN_bm;
         port->OUTCLR    = 0x03;  // bits 0 and 1
-      } else 
+      } else
     #endif
     {
       port->PIN2CTRL |= PORT_PULLUPEN_bm;
@@ -368,7 +368,7 @@ bool TWI1_Pins(uint8_t sda_pin, uint8_t scl_pin) {
   #if defined(PIN_WIRE1_SDA)
     if (TWI_checkPins(sda_pin, scl_pin) == false) {
       return false;
-    }/* End of test for compile time known SDA and SCL pins requested */ 
+    }/* End of test for compile time known SDA and SCL pins requested */
     #if (defined(PIN_WIRE1_SDA_PINSWAP_1) || defined(PIN_WIRE1_SDA_PINSWAP_2))
       #if defined(PORTMUX_TWIROUTEA)
       uint8_t portmux =  PORTMUX.TWIROUTEA & ~PORTMUX_TWI1_gm;
@@ -463,7 +463,7 @@ void TWI1_usePullups() {
     port->OUTCLR = 0x0C;  // bits 2 and 3
     port->PIN2CTRL |= PORT_PULLUPEN_bm;
     port->PIN3CTRL |= PORT_PULLUPEN_bm;
-    
+
     #if defined(TWI_DUALCTRL)
       if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
         if (PORTMUX_TWI1_DEFAULT_gc == portmux) {
