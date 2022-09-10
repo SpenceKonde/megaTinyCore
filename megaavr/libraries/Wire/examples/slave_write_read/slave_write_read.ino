@@ -27,13 +27,13 @@
 
 
 void setup() {
-#ifdef ENABLE_RECEIVE
+  #ifdef ENABLE_RECEIVE
   Wire.onReceive(receiveDataWire);  // give the Wire library the name of the function
   //                                   that will be called on a master write event
-#endif
-#ifdef ENABLE_REQUEST
+  #endif
+  #ifdef ENABLE_REQUEST
   Wire.onRequest(transmitDataWire); // same as above, but master read event
-#endif
+  #endif
 
   Wire.begin(0x54);                 // join i2c bus with address 0x54
   MySerial.begin(115200);

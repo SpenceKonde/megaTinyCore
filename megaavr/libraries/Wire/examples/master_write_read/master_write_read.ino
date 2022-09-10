@@ -99,15 +99,15 @@ void requestDataWire() {
   uint8_t len = 4;
   uint32_t ms = 0;
   if (len == Wire.requestFrom(0x54, len, 0x01)) {    // request from slave
-      ms  = (uint32_t)Wire.read();               // read out 32-bit wide data
-      ms |= (uint32_t)Wire.read() <<  8;
-      ms |= (uint32_t)Wire.read() << 16;
-      ms |= (uint32_t)Wire.read() << 24;
-      MySerial.println(ms);              // print the milliseconds from Slave
+    ms  = (uint32_t)Wire.read();               // read out 32-bit wide data
+    ms |= (uint32_t)Wire.read() <<  8;
+    ms |= (uint32_t)Wire.read() << 16;
+    ms |= (uint32_t)Wire.read() << 24;
+    MySerial.println(ms);              // print the milliseconds from Slave
   } else {
-  #ifdef DECODE_ERROR
+    #ifdef DECODE_ERROR
     MySerial.println("Wire.requestFrom() failed");
-  #endif
+    #endif
   }
   #endif
 }
