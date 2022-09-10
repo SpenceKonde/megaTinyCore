@@ -44,7 +44,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * New Feature: Yow you can use ADC1 just like it was an ADC0, see the notes in [Analog Input (ADC) and output (DAC)](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md) for steps required to enable it. This does not use space if not enabled.
 * New Feature: Add new functions to assist checking error codes in analogRead results.
 * New Feature: Permit Logic and Comparator ISRs to be defined manually if (and only if!) the `.attachInterrupt()` method of an instance of that class is not called. You can then manually create the ISR saving about 40 bytes and 50 clock cycles, give or take.
-* New Feature: megaTinyCore.h now provides functions to reset via WDT timeout and via software reset. If optiboot is used, the former will not run it, while the latter will.\
+* New Feature: megaTinyCore.h now provides functions to reset chip via WDT timeout and via software reset. If optiboot is used, the former will not run it, while the latter will.
 * New Feature: Add option for serial autobaud use, record cumulative errors USART has encountered and provide method to view and clear them.
 * New Feature: Support SFD to wake on USART. User is otherwise responsible to configuring this and should be aware that in order to be able to receive the characters, we turn it off after receiving a character.
 * Docs: made clear om PowerSave.md that the ADC must be disabled to get low standbby current.

@@ -628,7 +628,6 @@ void loop() {
       trashbag = analogReadDiff(PIN_A13,ADC_GROUND,ADC_NATIVE_RESOLUTION);
     #endif
   #endif
-
   #ifdef PIN_A14
     trashbag = analogRead(PIN_A14);
     for (int8_t res = 8; res < ADC_MAX_OVERSAMPLED_RESOLUTION; res++) {
@@ -1347,4 +1346,5 @@ void loop() {
       trashbag = analogReadDiff(PIN_A31,ADC_GROUND,ADC_NATIVE_RESOLUTION);
     #endif
   #endif
+
 }
