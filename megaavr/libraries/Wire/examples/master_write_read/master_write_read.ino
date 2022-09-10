@@ -68,7 +68,7 @@ void readFromSerial() {
 }
 
 void sendDataWire() {
-#ifdef ENABLE_WRITE_TO
+  #ifdef ENABLE_WRITE_TO
 
   uint8_t err = 0;
   Wire.beginTransmission(0x54);     // prepare transmission to slave with address 0x54
@@ -76,7 +76,7 @@ void sendDataWire() {
   Wire.write("\r\n");               // add new line and carriage return for the Serial monitor
   err = Wire.endTransmission();     // finish transmission
 
-#ifdef DECODE_ERROR
+  #ifdef DECODE_ERROR
 
   switch (err) {
     case 0x00:  MySerial.println("Wire transmit was successful"); break;
@@ -90,12 +90,12 @@ void sendDataWire() {
     case 0x12:  MySerial.println("Arbitration lost"); break;
   }
 
-#endif /* DECODE_ERROR */
-#endif /* ENABLE_WRITE_TO */
+  #endif /* DECODE_ERROR */
+  #endif /* ENABLE_WRITE_TO */
 }
 
 void requestDataWire() {
-#ifdef ENABLE_READ_FROM
+  #ifdef ENABLE_READ_FROM
   uint8_t len = 4;
   uint32_t ms = 0;
   if (len == Wire.requestFrom(0x54, len, 0x01)) {    // request from slave
@@ -105,9 +105,9 @@ void requestDataWire() {
       ms |= (uint32_t)Wire.read() << 24;
       MySerial.println(ms);              // print the milliseconds from Slave
   } else {
-#ifdef DECODE_ERROR
+  #ifdef DECODE_ERROR
     MySerial.println("Wire.requestFrom() failed");
-#endif
+  #endif
   }
-#endif
+  #endif
 }

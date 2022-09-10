@@ -21,8 +21,8 @@ Should be 100% backwards compatible, use less flash, and have a new menu option 
 Notes:
 * Alt3 is only available on AVR DD-series (and possibly EA-series).
 * Alt1 is not available on parts which do not have PC6 and PC7 (for TWI0) or PB6, PB7 (for TWI1) because it would duplicate Default.
-* But Alt2 is, since its's primary pins are different - though dual mode is not available if the pins aren't present. 
-* TWI1 only has the default mapping available on 32-pin parts. 48-pin and 64-pin parts are needed for dual mode (32-pin parts don't have a PORTB) and 64-pin parts needed for Alt1 (since PB6 and PB7 only exist on 64-pin parts). Alt2 is available on 48 and 64-pin parts only, for the same reason.  
+* But Alt2 is, since its's primary pins are different - though dual mode is not available if the pins aren't present.
+* TWI1 only has the default mapping available on 32-pin parts. 48-pin and 64-pin parts are needed for dual mode (32-pin parts don't have a PORTB) and 64-pin parts needed for Alt1 (since PB6 and PB7 only exist on 64-pin parts). Alt2 is available on 48 and 64-pin parts only, for the same reason.
 * In all cases the pins are listed as SCL, SDA.
 
 Availability of pin mappings by pincount for AVR Dx-series
@@ -41,7 +41,7 @@ Availability of pin mappings by pincount for AVR Dx-series
 `Wire.pins(SDA pin, SCL pin)` - this will set the mapping to whichever mapping has the specified pins `SDA` and `SCL`. See API reference below for details. Only covered the master/slave pins, not the dual-mode pins. If you want the mode with the pins that can't do dual mode slave (PA2/3, or PF2/3) but with the alternate slave pins, you MUST use Wire.swap().
 
 ## Official specification of I2C
-https://www.nxp.com/docs/en/user-guide/UM10204.pdf
+[From NXP, the current owner of the relevant IP](https://www.nxp.com/docs/en/user-guide/UM10204.pdf)
 
 ## Overview - I2C, what is it?
 I2C (known by many names, see note at end) uses two pins, a clock (SCL) and data (SDA) for communication among two or more compatible devices. This is an open drain bus - external pullup resistors keep the two lines HIGH, and devices communicate by driving the pins low or releasing them. Data is clocked on the rising edge - this is important, as you will see.

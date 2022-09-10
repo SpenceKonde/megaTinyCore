@@ -16,12 +16,11 @@ These items are in addition to what was listed under changes already in release.
 * Add tools submenu to select from a number of PWM pin layouts. This will impact flash use (to a degree that will be noticed on small parts) as well as the time it takes for turnOffPWM() (thus digitalWrite()) and analogWrite() to execute.
 * Under consideration: analogWriteFast(pin, duty); this will require that pin be constant, allowing the determination of the PWM compare value register to be determined at compile time, rather than runtime. It is not planned for this function to actually turn the PWM on or off, only adjust the duty cycle of a pin already outputting PWM.
 
-### Planned 2.6.0
-
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-### Planned 2.6.0
+## Released Versions
+### 2.6.0
 * You can now enable and disable the ADC with analogPowerOption() and enable/disable standby mode.
 * Bugfix: Fix issue with SSD bit being cleared when using beginTransaction().
 * Bugfix: Fix bug in Logic with pin inputs being handled improperly.
@@ -39,6 +38,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Workaround: mysterious issues with detecting the major version.
 * Major enhancement: Change class hierarchy for UARTs, as was done for Two_Wire (Wire.h), so that rather than pulling in api/HardwareSerial.h, and subclassing that definition of HardwareSerial (itself a subclass of Stream) as UartClass, we instead simply subclass Stream directly. UART.h will be renamed to HardwareSerial.h, HardwareSerial.h (a compatibility layer) will be renamed to UART.h and the latter adjusted to #define UartClass as HardwareSerial, and api/HardwareSerial.h will be gutted and simply #include <HardwareSerial.h) This will remove yet another piece of the disastrous "ArduinoAPI". I describe it as such because on low resource platforms like AVR; this will allow several functions currently declared virtual to lose that keyword, as the linker, even with LTO enabled, is not permitted to remove unused virtual functions. This reduces binary size when using serial significantly, despite significant new features. Credit goes to @MX624X.
 * Enhancement: Split up the Event and Logic library headers for improved readability.
+* Enhancement: RTC millis does not interfere with waking on RTC compare match. (PR #793)
+* Enhancement: great deal of harmonization with DxCore.
 * Enhancement: Improvement to stream timed read to make it work when millis is disabled, and to save 4 bytes of RAM. Note that this also requires all offsets used to access the Serial transmit and receive buffers to be reduced accordingly in the inline assembly in UART.cpp.
 * New Feature: Yow you can use ADC1 just like it was an ADC0, see the notes in [Analog Input (ADC) and output (DAC)](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md) for steps required to enable it. This does not use space if not enabled.
 * New Feature: Add new functions to assist checking error codes in analogRead results.
@@ -46,14 +47,11 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * New Feature: megaTinyCore.h now provides functions to reset via WDT timeout and via software reset. If optiboot is used, the former will not run it, while the latter will.\
 * New Feature: Add option for serial autobaud use, record cumulative errors USART has encountered and provide method to view and clear them.
 * New Feature: Support SFD to wake on USART. User is otherwise responsible to configuring this and should be aware that in order to be able to receive the characters, we turn it off after receiving a character.
-* Enhancement - great deal of harmonization with DxCore.
 * Docs: made clear om PowerSave.md that the ADC must be disabled to get low standbby current.
 * Docs: Add link to my article on AVR math speed (TLDR: avoid `int64_t` `long long` like the plague)
 * Docs: Fix many documentation issues, improve docs generally.
 * Docs: Expand documentation significantly, and document the new serial features.
 * Unenhancement: Remove getAnalogSampleDuration(), as I could not make anything compile with that in and had worked on it over a day.
-
-## Released Versions
 
 ### 2.5.11
 * **CRITICAL BUGFIX** - I finally saw the bug in my attachInterrupt implementation. I had a operands of a load backwards. (#651)
