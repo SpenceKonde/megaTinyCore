@@ -179,7 +179,13 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
       timer_millis += 2;
     #endif
   #else
-    #if !defined(MILLIS_USE_TIMERRTC) // TCA0 or TCD0
+    #if defined(MILLIS_USE_TIMERRTC)
+      // if RTC is used as timer, we only increment the overflow count
+      // Overflow count isn't used for TCB's
+      if (RTC.INTFLAGS & RTC_OVF_bm) {
+        timer_overflow_count++;
+      }
+    #else // TCA0 or TCD0
       uint32_t m = timer_millis;
       uint16_t f = timer_fract;
       m += MILLIS_INC;
@@ -191,10 +197,8 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
       }
       timer_fract = f;
       timer_millis = m;
+      timer_overflow_count++;
     #endif
-    // if RTC is used as timer, we only increment the overflow count
-    // Overflow count isn't used for TCB's
-    timer_overflow_count++;
   #endif
   /* Clear flag */
   #if defined(MILLIS_USE_TIMERA0)
@@ -202,7 +206,7 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
   #elif defined(MILLIS_USE_TIMERD0)
     TCD0.INTFLAGS = TCD_OVF_bm;
   #elif defined(MILLIS_USE_TIMERRTC)
-    RTC.INTFLAGS = RTC_OVF_bm;
+    RTC.INTFLAGS = RTC_OVF_bm | RTC_CMP_bm;
   #else // timerb
     _timer->INTFLAGS = TCB_CAPT_bm;
   #endif
