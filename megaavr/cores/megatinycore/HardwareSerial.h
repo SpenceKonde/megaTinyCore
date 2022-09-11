@@ -30,7 +30,7 @@
 #pragma once
 
 #include <inttypes.h>
-#include "Stream.h"
+#include "api/Stream.h"
 #include "pins_arduino.h"
 #include "UART_constants.h"
 #include "UART_check_pins.h"
@@ -80,8 +80,8 @@
  * |  128k |       -  |       -  |       -  |   -  |  16384 |   -  |
  * This ratio is remarkably consistent. No AVR part was ever made with
  * less than 8:1 flash:ram, nor more than 16:1, since first ATmegas!
- * The sole exception? The ATmega2560/2561 has only 4k RAM.
- * (to be fair, you are allowed to use external RAM - which was a very rare feature
+ * The sole exception? The ATmega2560/2561 has only 8k RAM, a 32:1 flash to ram ratio.
+ * (to be fair, you are allowed to use external RAM - which was a very rare feature indeed,
  */
 #if !defined(USE_ASM_TXC)
   #define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART and 44b for each additional one
@@ -97,8 +97,8 @@
 // savings:
 // 44 total for 0/1,
 // 301 for 2-series, which may be nearly 9% of the total flash!
-// The USE_ASM_* options can be disabled by defining them as 0 either in variant pins_arduino.h
-// The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file (as defines in pins_arduino.h) or boards.txt as (By passing them as extra flags).
+// The USE_ASM_* options can be disabled by defining them as 0 (in the same way that buffer sizes can be overridden)
+// The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file (as defines in pins_arduino.h) or boards.txt (By passing them as extra flags).
 // note that buffer sizes must be powers of 2 only.
 
 
