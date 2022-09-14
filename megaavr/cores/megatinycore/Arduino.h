@@ -697,14 +697,14 @@ extern const uint8_t digital_pin_to_timer[];
 // reserved                  (0x0400) // reserved
 // reserved                  (0x0800) // reserved
 // reserved                  (0x0C00) // reserved
-#define PIN_INLVL_TTL        (0x1000) // TTL INPUT LEVELS - MVIO parts only
-#define PIN_INLVL_ON         (0x1000) // alias MVIO parts only
-#define PIN_INLVL_SET        (0x1000) // alias MVIO parts only
-#define PIN_INLVL_SCHMITT    (0x2000) // SCHMITT INPUT LEVELS - MVIO parts only
-#define PIN_INLVL_OFF        (0x2000) // alias MVIO parts only
-#define PIN_INLVL_CLR        (0x2000) // alias MVIO parts only
+#define PIN_INLVL_TTL        (0x1000) // TTL INPUT LEVELS - DD, DB, EA (maybe all future non-tinies!)
+#define PIN_INLVL_ON         (0x1000) // alias
+#define PIN_INLVL_SET        (0x1000) // alias
+#define PIN_INLVL_SCHMITT    (0x2000) // SCHMITT INPUT LEVELS
+#define PIN_INLVL_OFF        (0x2000) // alias
+#define PIN_INLVL_CLR        (0x2000) // alias
 // reserved                  (0x3000) // INLVL TOGGLE - not supported. If you tell me a reasonable use case
-// I'll do it.each possible value is handled separately, slowing it down, and I don't think this would get used.
+// I'll do it. But when would you ever just want to switch the inlvl from whatever it is now? Don't you want to put it to either schmitt or ttl and know which one you want?each possible value is handled separately, slowing it down, and I don't think this would get used.
 #define PIN_INVERT_ON        (0x4000) // PIN INVERT ON
 #define PIN_INVERT_SET       (0x4000) // alias
 #define PIN_INVERT_OFF       (0x8000) // PIN INVERT OFF
@@ -738,11 +738,13 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
 #define portModeRegister(P)   ((volatile uint8_t *)(&portToPortStruct(P)->DIR))
 #if defined(PORTA_EVGENCTRL) //Ex-series only - this all may belong in the Event library anyway, but since the conditional is never met, this code is never used.
   #define portEventRegister(p)  ((volatile uint8_t *)(&portToPortStruct(P)->EVGENCTRL))
-  uint8_t setEventPin(uint8_t pin, uint8_t number); // preliminary thought - pass a pin number, it looks up port, and from there the event control register and sets it.
+  uint8_t _setRTCEventChan(uint8_t val, uint8_t chan);
+  uint8_t _setEventPin(uint8_t pin, uint8_t number); // preliminary thought - pass a pin number, it looks up port, and from there the event control register and sets it.
   //Number being 0 or 1 or 255 to pick the lowest numbered one not set. Returns event channel number TBD if that should be the EVSYS valus or 0 or 1. If "Pick unused ome" is requested but both already assigned, will return 255
-  uint8_t getPortEventConfig(uint8_t port); // just shorthand for looking up the port and returning it's EVGENCTRL value
-  uint8_t setRTCEventChan(uint8_t div, uint8_t number); // number is 0, 1 or 255 like above, div is log(2) of the divisor (ie, for 2^5, his would be 5).
-  uint8_t getRTCEventConfig(); //simply returns the RTC channel configuration. Will likely return 255 if called on non Ex
+  uint8_t _getPortEventConfig(uint8_t port); // just shorthand for looking up the port and returning it's EVGENCTRL value
+  uint8_t _setRTCEventChan(uint8_t vail, uint8_t chan); // number is 0, 1 or 255 like above, div is log(2) of the divisor (ie, for 2^5, his would be 5).
+  uint8_t _getRTCEventConfig(); //simply returns the RTC channel configuration. Will likely return 255 if called on non Ex
+  uint8_t _RTCPrescaleToVal(uint16_t prescale)
 #endif
 #ifdef __cplusplus
 } // extern "C"
@@ -940,7 +942,8 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 // Serial1, so it can't be their MVIO serial port (without involving the event
 // system, of course) - but they can get a serial port on MVIO pins with USART0
 // and an alternate mapping. So for those parts only, Serial is their MVIO port.
-// For everyone else it's Serial1, and for non-DD parts, that is the only port
+// For everyone else it's Serial1, and for non-DD parts, that is the only serial port connected to thr mvio
+// serial port.
 // that could be used with MVIO (again, short of rerouting signals with
 // the event system)
 // Note that if MVIO is disabled, we cannot detect that.

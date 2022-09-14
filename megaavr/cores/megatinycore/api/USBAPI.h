@@ -26,7 +26,8 @@
 //================================================================================
 //  Low level API
 
-typedef struct __attribute__((packed)) {
+typedef struct __attribute__((packed))
+{
   union {
     uint8_t bmRequestType;
     struct {
@@ -38,22 +39,22 @@ typedef struct __attribute__((packed)) {
   uint8_t   bRequest;
   uint8_t   wValueL;
   uint8_t   wValueH;
-  uint16_t   wIndex;
-  uint16_t   wLength;
+  uint16_t  wIndex;
+  uint16_t  wLength;
 } USBSetup;
 
 //================================================================================
 //================================================================================
 
-int USB_SendControl(uint8_t flags, const void *d, int len);
-int USB_RecvControl(void *d, int len);
-int USB_RecvControlLong(void *d, int len);
+int USB_SendControl(uint8_t flags, const void* d, int len);
+int USB_RecvControl(void* d, int len);
+int USB_RecvControlLong(void* d, int len);
 
-uint8_t  USB_Available(uint8_t ep);
+uint8_t USB_Available(uint8_t ep);
 uint8_t USB_SendSpace(uint8_t ep);
-int USB_Send(uint8_t ep, const void *data, int len);  // blocking
-int USB_Recv(uint8_t ep, void *data, int len);    // non-blocking
-int USB_Recv(uint8_t ep);              // non-blocking
+int USB_Send(uint8_t ep, const void* data, int len);  // blocking
+int USB_Recv(uint8_t ep, void* data, int len);    // non-blocking
+int USB_Recv(uint8_t ep);             // non-blocking
 void USB_Flush(uint8_t ep);
 
 #endif

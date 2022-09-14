@@ -172,7 +172,7 @@ tools.avrdude.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
 tools.avrdude.program.params.verbose=-v
 tools.avrdude.program.params.quiet=-q -q
 tools.avrdude.program.params.noverify=-V
-tools.avrdude.program.pattern={upload.prog_interlock}"{cmd.path}" "-C{config.path}" {program.verbose} {program.verify} -p{build.mcu} -c{protocol} {program.extra_params} "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse7:w:{bootloader.CODESIZE}:m" "-Ufuse8:w:{bootloader.BOOTSIZE}:m""-Ufuse9:w:{bootloader.CODEIZE}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+tools.avrdude.program.pattern={upload.prog_interlock}"{cmd.path}" "-C{config.path}" {program.verbose} {program.verify} -p{build.mcu} -c{protocol} {program.extra_params} "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse7:w:{bootloader.APPEND}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 
 ## Used for "upload" through bootloader
 tools.avrdude.upload.params.verbose=-v
@@ -183,7 +183,7 @@ tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} {up
 ## Used for Tools -> Burn Bootloader
 tools.avrdude.bootloader.params.verbose=-v
 tools.avrdude.bootloader.params.quiet=-q -q
-tools.avrdude.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} -e "-Ufuse0:w:{bootloader.WDTCFG}:m" "-Ufuse1:w:{bootloader.BODCFG}:m" "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse7:w:{bootloader.BOOTSIZE}:m" "-Ufuse9:w:{bootloader.CODESIZE}:m" "{bootloader.avrdudestring}"
+tools.avrdude.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} -e "-Ufuse0:w:{bootloader.WDTCFG}:m" "-Ufuse1:w:{bootloader.BODCFG}:m" "-Ufuse5:w:{bootloader.SYSCFG0}:m" "-Ufuse6:w:{bootloader.SYSCFG1}:m" "-Ufuse8:w:{bootloader.BOOTEND}:m" "-Ufuse7:w:{bootloader.APPEND}:m" "{bootloader.avrdudestring}"
 
 ## OTA/Remote upload
 # This functionality has never been tested with these parts. The maintainers of this core have no idea what this is, or whether it is expected to work.

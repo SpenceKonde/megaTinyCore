@@ -40,9 +40,14 @@
     // Note the difference between this and the other ISRs - here we don't care at all about the serial object, we just have to work with the USART
     ISR(USART0_TXC_vect, ISR_NAKED) {
       __asm__ __volatile__(
-            "push  r30"         "\n\t" // push the low byte of Z
-            "ldi r30, 0x00"     "\n\t" // and put the low bit of this USART there - 0x20 * n
-            "jmp _do_txc"      "\n\t" // _do_txc pushes the other necessary registers and loads 0x08 into the high byte.
+            "push  r30"           "\n\t" // push the low byte of Z
+            "ldi r30, 0x20"       "\n\t" // and put the low bit of this USART there - 0x20 * n
+#if PROGMEM_SIZE > 8192
+            "jmp _do_txc"         "\n\t"
+#else
+            "rjmp _do_txc"        "\n\t"
+#endif // _do_txc pushes the other necessary registers and loads 0x08 into the high byte.
+       // The reason this is possible here and not elsewhere is because TXC only needs the USART, while the others need the HardwareSerial instance.
             :::);
     }
   #else
@@ -66,16 +71,20 @@
       HardwareSerial::_rx_complete_irq(Serial);
     }
   #else
-    ISR(USART0_RXC_vect, ISR_NAKED) {
-      __asm__ __volatile__(
-            "push      r30"     "\n\t"
-            "push      r31"     "\n\t"
-            :::);
-      __asm__ __volatile__(
-            "jmp   _do_rxc"     "\n\t"
-            ::"z"(&Serial));
-      __builtin_unreachable();
-  }
+      ISR(USART0_RXC_vect, ISR_NAKED) {
+        __asm__ __volatile__(
+              "push      r30"     "\n\t"
+              "push      r31"     "\n\t"
+              :::);
+        __asm__ __volatile__(
+#if PROGMEM_SIZE > 8192
+              "jmp   _do_rxc"     "\n\t"
+#else
+              "rjmp   _do_rxc"    "\n\t"
+#endif
+              ::"z"(&Serial1));
+        __builtin_unreachable();
+    }
   #endif
   #if !(defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && \
        (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
@@ -95,10 +104,10 @@
 #else
                 "rjmp _do_dre" "\n\t"
 #endif
-                ::"z"(&Serial));
+                ::"z"(&Serial0));
       __builtin_unreachable();
     }
   #endif
 
-  HardwareSerial Serial0(&USART0, 0, HWSERIAL0_MUX_DEFAULT);
+  HardwareSerial Serial0(&USART0, 0, HWSERIAL0_MUX_DEFAULT); //Elsewhere we define an alias of Serial for this :-)
 #endif

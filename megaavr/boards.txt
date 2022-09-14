@@ -9,27 +9,19 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other         ##       ####       #    ##  #
-#  contributors 2018-2021                  #  #      #         ##   #  # #
-#  megaTinyCore is free software.    # #     #       ###        #     #  #
-#  (LGPL v2.1) see LICENSE.md and    # #    #    ##     #  ##   #    #   #
-#  License section of README.md       #    ####  ##  ###   ##  ###  #### #
+#  Copyright Spence Konde and other         ##        ###         #      #
+#  contributors 2018-2021                  #  #      #           ##      #
+#  megaTinyCore is free software.    # #     #       ####         #      #
+#  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##    #      #
+#  License section of README.md       #    ####  ##   ###   ##   ###     #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
 #  have the zoomed out "minimap" that you can scroll through.            #
 #                                                                        #
-#  megaTinyCore 2.5.12 is being developed simultaneously with DxCore     #
+#  megaTinyCore 2.6.0-1 is being developed simultaneously with DxCore    #
 #  1.5.0. As the hardware is very similar, much code is shared, and that #
 #  is the version of DxCore most similar to this version of megaTinyCore #
-#                                                                        #
-#  DxCore gets it's minor version bump before we do because of the DD    #
-#  series support added there. The only changes planned that warrant a   #
-#  minor version bump is the PWM pin menu addition, which likely will    #
-#  will be deferred until some time after DxCore 1.5.0.                  #
-#  Less dramatic than the DD-series - but analogous PWM switching went   #
-#  into DxCore 1.5.0, but that's one of the areas of the hardware that   #
-#  is very different and cannot share code                               #
 #                                                                        #
 #  The board section headings have a triangle along the right edge       #
 #  if they are a non-bootloader definition. Optiboot sections have a     #

@@ -6,7 +6,7 @@
  * Copyright (c) 2006 Nicholas Zambetti, Modified by
  * 11/23/2006 David A. Mellis, 9/20/2010 Mark Sproul,
  * 8/24/2012 Alarus, 12/3/2013 Matthijs Kooijman
- * Others (unknown) 2013-2017, 2017-2021 Spence Konde
+ * unknown others 2013-2020, 2020-2022 Spence Konde
  */
 
 #include "Arduino.h"
@@ -38,9 +38,10 @@
       USART1.CTRLA = ctrla;
     }
   #endif
-  #if !(USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16))
+
+  #if !(defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/)
     ISR(USART1_RXC_vect) {
-      HardwareSerial::_rx_complete_irq(Serial1);
+      HardwareSerial::_rx_complete_irq(Serial);
     }
   #else
       ISR(USART1_RXC_vect, ISR_NAKED) {
@@ -58,10 +59,11 @@
         __builtin_unreachable();
     }
   #endif
-  #if !(USE_ASM_DRE == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
-                            (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
+  #if !(defined(USE_ASM_DRE) && USE_ASM_DRE == 1 && \
+       (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+       (SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
     ISR(USART1_DRE_vect) {
-      HardwareSerial::_tx_data_empty_irq(Serial1);
+      HardwareSerial::_tx_data_empty_irq(Serial);
     }
   #else
     ISR(USART1_DRE_vect, ISR_NAKED) {

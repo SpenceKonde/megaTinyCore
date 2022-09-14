@@ -42,7 +42,7 @@ This document is best viewed online if you installed via board manager - [https:
 ### **Arduino 1.8.13 is *strongly* recommended**
 Older versions do not properly handle the programmers in the tools -> programmers menu, which degrades the UX rapidly as the number of installed cores increases. They are not suitable.
 
-The newest versions starting with 1.8.14 (including 1.8.17, 1.8.18, and 1.8.19) may generate a "panic: no major version found" error and fail to compile any sketch. This bug is because versions starting with 1.8.14 do not expand the version property in platform.txt - [this bug](https://github.com/arduino/Arduino/issues/11813). This is used only for manual installations and can be ignored if you install the core only via boards manager. If you want a manual install under 1.8.19 you must edit platform.txt to manually expand the version number (for example, version=2.6.0). We appear to be back to the bad old days where only a small fraction of IDE releases are any good. :-(
+The newest versions starting with 1.8.14 (including 1.8.17, 1.8.18, and 1.8.19) may generate a "panic: no major version found" error and fail to compile any sketch. This bug is because versions starting with 1.8.14 do not expand the version property in platform.txt - [this bug](https://github.com/arduino/Arduino/issues/11813). This is used only for manual installations and can be ignored if you install the core only via boards manager. If you want a manual install under 1.8.19 you must edit platform.txt to manually expand the version number (for example, version=2.6.0). We appear to be back to the bad old days where only a small fraction of IDE releases are any good. The current verion of tix uxws  crude workaround
 
 
 When megaTinyCore is installed through board manager, the required version of the toolchain is installed automatically. All 0/1/2-Series parts are supported with no extra steps.
@@ -309,13 +309,15 @@ As a result **in 2.2.0 and later, you no longer need to 'burn bootloader' to swi
 This core *always* uses Link Time Optimization to reduce flash usage - all versions of the compiler which support the tinyAVR 0/1/2-Series parts also support LTO, so there is no need to make it optional, as was done with ATTinyCore. This was a HUGE improvement in codesize when introduced, typically on the order of 5-20%!
 
 
-## Exposed peripheral features
+## Exposed Hardware Features
 
-### Enhanced ADC support
-These parts all have a large number of analog inputs. The 0/1-Series have a 10-bit ADC - sometimes 2 for the 16k and 32k 1-Series parts, while the 2-Series has one of the most advanced ADCs ever featured on an AVR, with 12 bit resolution and true differential measurement capability. They can be read with `analogRead()` like on a classic AVR, and megaTinyCore defaults to 10-bit resolution. You can change to the full 12-bit with `analogReadResolution()`, and use the enhanced analogRead functions to take automatically oversampled, decimated readings for higher resolution and to take differential measurements. There are major differences between the 0/1-Series and the 2-Series, and that is all detailed in the [**ADC Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md). Particularly since the release of 1.3.0 and megaTinyCore 2.3.0, a number of enhanced ADC features have been added to expose more of the power of the sophisticated ADC in these parts to users, these are detailed in the the ADC Reference.
+### ADC Support
+These parts all have a large number of analog inputs - DA and DB-series have up to 22 analog inputs, while the DD-series has analog input on every pin that is not used to drive the HF crystal (though the pins on PORTC are only supported when MVIO is turned off). They can be read with `analogRead()` like on a normal AVR, and we default to 10-bit resolution; you can change to the full 12-bit with `analogReadResolution()`, and use the enhanced analogRead functions to take automatically oversampled, decimated readings for higher resolution and to take differential measurements. There are 4 internal voltage references in 1.024, 2.048, 4.096 and 2.5V, plus support for external reference voltage (and Vdd of course). ADC readings are taken 3 times faster than an classic AVR, and that speed can be doubled again if what you are measuring is low impedance, or extend the sampling time by a factor greatly for reading very high impedance sources. This is detailed in the analog reference.
 
 ### DAC Support
-The 1-Series parts have an 8-bit DAC which can generate a real analog voltage. Note that this provides low current and can only be used as a voltage reference or control voltage; it cannot be used to power other devices. This generates voltages between 0 and the selected `VREF` - which cannot be VDD, unfortunately. Set the DAC reference voltage via the `DACReference()` function - pass it any of the ADC reference options listed under the ADC section above (except VDD). Call `analogWrite()` on the DAC pin (PA6) to set the voltage to be output by the DAC. To turn off the DAC output, call `digitalWrite()` or `turnOffPWM()` on that pin.
+The Dx-series parts have a 10-bit DAC which can generate a real analog voltage (note that this provides low current and can only be used as a voltage reference or control voltage, it cannot be used to power other devices). This generates voltages between 0 and the selected `VREF` (unlike the tinyAVR 1-series, this can be Vcc!). Set the DAC reference voltage via the DACR`eference()` function - pass it any of the ADC reference options listed under the ADC section above (including VDD!). Call `analogWrite()` on the DAC pin (PD6) to set the voltage to be output by the DAC (this uses it in 8-bit mode). To turn off the DAC output, call `digitalWrite()` or `turnOffPWM()` on that pin.
+
+There may be additional options to configure the DAC on the EA-series.
 
 See the [**ADC and DAC Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Analog.md) for the full details.
 
@@ -324,7 +326,7 @@ Using the `An` constants for analog pins is deprecated - the recommended practic
 ### Watchdog Timer, Software Reset
 There are more options than on classic AVR for resetting, including if the code gets hung up somehow. The watchdog timer can only reset (use the RTC and PIT for timed interrupts).
 
-See the [**Reset and Watchdog (WDT) Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md).
+See the [**Reset and Watchdog (WDT) Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md)and (The core-auxiliary library, megaTinyCore/.)[../megaavr/libraries/megaTinyCore/README.md]
 
 ### Improved Digital I/O
 This core adds a number of new features include fast digital I/O (1-14 clocks depending on what's known at compile time, and 2-28 bytes of flash (pin number must be known at compile time for the `________Fast()` functions, and for configuring all per-pin settings the hardware has with `pinConfigure()`.
@@ -354,7 +356,10 @@ This core disables the SS pin, meaning the "SS" pin can be used for whatever pur
 ### I2C (TWI) Support
 All of these parts have a single hardware I2C (TWI) peripheral. It presents an API compatible with the standard Arduino implementation, but with added support for multiple slave addresses, answering general call addresses and - most excitingly - simultaneous master and slave operation! (new in 2.5.0).
 
-This is fully documented in the [**Wire library reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Wire/README.md).
+See **[Wire.h documentation](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Wire/README.md)** for full description and details. The harware I2C is one of the more complicated peripherals. Wire has had a lot of hot new enhancements recently check it out. 
+
+
+
 
 ### PWM Support
 The core provides hardware PWM via the standard `analogWrite()` function. On the 8-pin parts (412, 212, 402, 204), 4 PWM pins are available. On all other parts except 1-Series parts with 20 or 24 pins, 6 PWM pins are available, all driven by Timer A (TCA0). The 20 and 24 pin 1-Series parts have two additional pins, driven by TCD0. The 2-Series apparently traded TCD0 for a second serial port and a super-fancy ADC - those parts also all have 6 PWM pins. The Type B (TCBn) timers cannot be used for additional PWM pins - their output pins are the same as those available with Timer A and they are often too useful to justify using a whole TCB for. However, you can take them over if you need to generate PWM at different frequencies, though the fact that the prescaler cannot differ from the type A timer limits this use as well. See the pinout charts for a list of which pins support PWM.
@@ -448,8 +453,12 @@ Advanced users can instead set up interrupts manually, ignoring `attachInterrupt
 
 For full information and example, see [the Interrupt Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Interrupts.md).
 
-### Improved Export Compiled Binary
-The Sketch -> Export Compiled Binary option has been significantly enhanced in megaTinyCore and it now provides a record of settings when the export was performed, assembly listings and a memory map to assist in optimization and reducing flash usage.
+### Assembler Listing generation
+Like my other cores, Sketch -> Export compiled binary will generate an assembly listing in the sketch folder. A memory map is also created. The formatting of the memory map leaves something to be desired, and I've written a crude script to try to improve it, see the Export reference for more information.
+see [**Exported Files documentation**](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Export.md)
+
+### EESAVE configuration option
+The EESAVE fuse can be controlled via the Tools -> Save EEPROM menu. If this is set to "EEPROM retained", when the board is erased during programming, the EEPROM will not be erased. If this is set to "EEPROM not retained", uploading a new sketch will clear out the EEPROM memory. Note that this only applies when programming via UPDI - programming through the bootloader never touches the EEPROM. Burning the bootloader is not required to apply this change on DA and DB parts, as that fuse is "safe". It IS required on DD-series parts, because its on the same fuse that controls whether the UPDI pins is acting as UPDI or I/O
 
 See the [Export Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Export.md).
 
@@ -619,9 +628,11 @@ There are however a few cautions warranted regarding megaTinyCore - either areas
 
 ### Direct Register Manipulation
 If you are manually manipulating registers controlling a peripheral, except as specifically noted in relevant reference pages, the stated behavior of API functions can no longer be assured. It may work like you hope, it may not, and it is not a bug if it does not, and you should not assume that calling said API functions will not adversely impact the rest of your application. For example, if you "take over" TCA0, you should not expect that using `analogWrite()` - except on the two pins on the 20/24-pin parts controlled by TCD0 - will work for generating PWM. If you reconfigure TCA0 except as noted in Ref_Timers, without calling `takeOverTCA0`, both `analogWrite()` and `digitalWrite()` on a PWM pin may disrupt your changed configuration.
+## Differences in Behavior between DxCore and Official Cores
+While we generally make an effort to emulate the official Arduino core, there are a few cases where the decision was made to have different behavior to avoid compromising the overall functionality; the official core is disappointing on many levels. The following is a (hopefully nearly complete) list of these cases.
 
 ### I2C **Requires** External Pullup Resistors
-Earlier versions of megaTinyCore enabled the internal pullup resistors on the I2C pins. This is no longer done; they are miles away from being strong enough to meet the I2C specifications. It was decided that it is preferably for it to fail consistently without external ones than to work under simple conditions with the internal ones, yet fail under more demanding ones (more devices, longer wires, etc).
+Earlier versions of megaTinyCore, and possibly very early versions of DxCore enabled the internal pullup resistors on the I2C pins. This is no longer done automatically - they are not strong enough to meet the I2C specifications, and it is preferable for it to fail consistently without external ones than to work under simple conditions with the internal ones, yet fail under more demanding ones (more devices, longer wires, etc). However, as a testing aid, we supply Wire.`usePullups()` to turn on the weak internal pullups. If `usePullups()` ever fixes anything, you should install external pullups straight away. Our position is that whenever external pullups are not present, I2C is not expected to work. Remember that many modules include their own on-board pullups. For more information, including on the appropriate values for pullups, see the [Wire library documentation](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/libraries/Wire/README.md)
 
 ### Serial Does Not Manipulate Interrupt Priority
 The official core for the (similar) megaAVR 0-Series parts, which megaTinyCore was based on, fiddles with the interrupt priority (bet you didn't know that!) in methods that are of dubious wisdoom. megaTinyCore does not do this, saving several hundred bytes of flash in the process, and fixing at least one serious bug which could result in the microcontroller hanging if Serial was used in ways that everyone tells you not to use it, but which frequently work anyway. Writing to Serial when its buffer is full, or calling `Serial.flush()` with interrupts disabled, or during another ISR (which you *really shouldn't do*) will behave as it does on classic AVRs and simply block, manually calling the transmit handlers, until there is space in the buffer for all of the data waiting to be written or the buffer is empty (for `flush()`). On th stock megaAVR core, this could hang forever.
@@ -682,8 +693,8 @@ The 32 "high I/O registers" are used even less - they only contain the the stack
 ## License
 megaTinyCore itself is released under the [LGPL 2.1](LICENSE.md). It may be used, modified, and distributed freely, and it may be used as part of an application which, itself, is not open source (though any modifications to these libraries must be released under the LGPL as well). Unlike LGPLv3, if this is used in a commercial product, you are not required to provide means for users to update it.
 
-The megaTinyCore hardware package (and by extension this repository) contains megaTinyCore as well as libraries, bootloaders, and tools. These are released under the same license, *unless specified otherwise*. For example, tinyNeoPixel and tinyNeoPixel_Static, being based on Adafruit's library, is released under GPLv3, as described in the `LICENSE.md` in those subfolders and within the body of the library files themselves.
+The DxCore hardware package (and by extension this repository) contains DxCore as well as libraries, bootloaders, and tools. These are released under the same license, *unless specified otherwise*. For example, tinyNeoPixel and tinyNeoPixel_Static, being based on Adafruit's library, are released under GPLv3, as described in the LICENSE.md in those subfolders and within the body of the library files themselves.
 
-The pyupdi-style serial uploader in megaavr/tools is built on pymcuprog from Microchip, which ~is not open source~ *has now been released under the open source MIT license!*
+The pyupdi-style serial uploader in megaavr/tools is a substantially renovated version of pymcuprog from Microchip, which ~is not open source~ *has now been released under the open source MIT license!*.
 
-Any third party tools or libraries installed on behalf of megaTinyCore when installed via Board Manager (including but not limited to, for example, avr-gcc and avrdude) are covered by different licenses as described in their license files.
+Any third party tools or libraries installed on behalf of megaTinyCoreCore when installed via board manager (including but not limited to, for example, avr-gcc and avrdude) are covered by different licenses as described in their respective license files.

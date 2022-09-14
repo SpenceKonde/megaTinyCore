@@ -372,16 +372,30 @@ class HardwareSerial : public Stream {
     void _poll_tx_data_empty(void);
     static void        _set_pins(uint8_t port_num, uint8_t mux_setting, uint8_t enmask);
     static uint8_t _pins_to_swap(uint8_t port_num, uint8_t tx_pin, uint8_t rx_pin);
-    /* Return value is:
-     * 0bRT
-     * R = RX_ENABLED
-     * T = TX_ENABLED
+
+
+    /* _statuscheck() - the static side to getStatus(). Static methods have no concept of which instance they are called from. This gives the optimizer more handholds
+     * As you probably know, the optimizer's hands are pretty tightly bound when working with a normal class method, but it has a much freer hand in static methods.
+     * Return value is:
+     * 0HRaaFPHW
+     * H = Hardware RX buffer overflowed because interrupts were disabled for too long while trying to receive data.
+     * R = Ring buffer suffered an overflow. When you check Serial.available, use a while loop to read in characters until nothing is left in the ring buffer.
+     * aa = Autobaud state:
+     * 00 = Disabled
+     * 01 = SERIAL_AUTOBAUD_ENABLED
+     * 10 = SERIAL_AUTOBAUD_SYNC
+     * 11 = SERIAL_AUTOBAUD_BADSYNC - This is Bad News, bro. Baaaaaad news. You tried to do autobaud, but got something that wasn't a sync, and some parts have an errata
+     *      that results in the receiver disabling itself until you clear this, turn off RXEN, and turn it back on. This ugly kludge is implemented by getStatus, which calls
+     *      this function. Currently only DD parts have this erratum, but I won't trust that until I've seen more recent errata that don't list it (my prediction is anything
+     *      with the SFDEN bug has the ISFIF one too, which would be most or all modern AVRs)
+     * F = SERIAL_FRAME_ERROR - A framing error has occurred since you last called this, indicating mismatched baud settings. See Serial Reference.
+     * P = SERIAL_PARITY_ERROR - A parity error has occurred since you last called this, and the bad character did not make it to the application.
+     *     When using parity mode, but mismatched baud settings, you will get a mixture of gibberish + framing error set, and
+     *     parity errors.
+     * H = SERIAL_HALF_DUPLEX_ENABLED - indicates that half duplex mode is enabled.
      *
-     *
-     *
-     *
-     *
-     *
+     * Test for these errors like st = Serial.getStatus(); if (st & SERIAL_FRAME_ERROR) { ... }
+     * For the autobaud ones with 2 bits: if (st & SERIAL_AUTOBAUD_BADSYNC) { // If it wasn't fixed by the core, you'd have to take action. But it is}
      */
     static uint8_t _statuscheck(uint8_t ctrlb, uint8_t status, uint8_t state) {
       uint8_t ret = state;
