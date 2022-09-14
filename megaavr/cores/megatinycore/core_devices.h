@@ -3735,91 +3735,113 @@
     #define USART_RXPL_3_bm USART_RXPL3_bm
   #elif defined(USART_RXPL_3_bm)
     deprecated_constant_name USART_RXPL3_bm = USART_RXPL_3_bm;
+  #endif
   #if !defined(USART_RXPL_3_bp) && defined(USART_RXPL3_bp)
     #define USART_RXPL_3_bp USART_RXPL3_bp
   #elif defined(USART_RXPL_3_bp)
     deprecated_constant_name USART_RXPL3_bp = USART_RXPL_3_bp;
+  #endif
   #if !defined(USART_RXPL_4_bm) && defined(USART_RXPL4_bm)
     #define USART_RXPL_4_bm USART_RXPL4_bm
   #elif defined(USART_RXPL_4_bm)
     deprecated_constant_name USART_RXPL4_bm = USART_RXPL_4_bm;
+  #endif
   #if !defined(USART_RXPL_4_bp) && defined(USART_RXPL4_bp)
     #define USART_RXPL_4_bp USART_RXPL4_bp
   #elif defined(USART_RXPL_4_bp)
     deprecated_constant_name USART_RXPL4_bp = USART_RXPL_4_bp;
+  #endif
   #if !defined(USART_RXPL_5_bm) && defined(USART_RXPL5_bm)
     #define USART_RXPL_5_bm USART_RXPL5_bm
   #elif defined(USART_RXPL_5_bm)
     deprecated_constant_name USART_RXPL5_bm = USART_RXPL_5_bm;
+  #endif
   #if !defined(USART_RXPL_5_bp) && defined(USART_RXPL5_bp)
     #define USART_RXPL_5_bp USART_RXPL5_bp
   #elif defined(USART_RXPL_5_bp)
     deprecated_constant_name USART_RXPL5_bp = USART_RXPL_5_bp;
+  #endif
   #if !defined(USART_RXPL_6_bm) && defined(USART_RXPL6_bm)
     #define USART_RXPL_6_bm USART_RXPL6_bm
   #elif defined(USART_RXPL_6_bm)
     deprecated_constant_name USART_RXPL6_bm = USART_RXPL_6_bm;
+  #endif
   #if !defined(USART_RXPL_6_bp) && defined(USART_RXPL6_bp)
     #define USART_RXPL_6_bp USART_RXPL6_bp
   #elif defined(USART_RXPL_6_bp)
     deprecated_constant_name USART_RXPL6_bp = USART_RXPL_6_bp;
+  #endif
 /* VPORT.INTFLAGS */
   #if !defined(VPORT_INT_0_bm) && defined(VPORT_INT0_bm)
     #define VPORT_INT_0_bm VPORT_INT0_bm
   #elif defined(VPORT_INT_0_bm)
     deprecated_constant_name VPORT_INT0_bm = VPORT_INT_0_bm;
+  #endif
   #if !defined(VPORT_INT_0_bp) && defined(VPORT_INT0_bp)
     #define VPORT_INT_0_bp VPORT_INT0_bp
   #elif defined(VPORT_INT_0_bp)
     deprecated_constant_name VPORT_INT0_bp = VPORT_INT_0_bp;
+  #endif
   #if !defined(VPORT_INT_1_bm) && defined(VPORT_INT1_bm)
     #define VPORT_INT_1_bm VPORT_INT1_bm
   #elif defined(VPORT_INT_1_bm)
     deprecated_constant_name VPORT_INT1_bm = VPORT_INT_1_bm;
+  #endif
   #if !defined(VPORT_INT_1_bp) && defined(VPORT_INT1_bp)
     #define VPORT_INT_1_bp VPORT_INT1_bp
   #elif defined(VPORT_INT_1_bp)
     deprecated_constant_name VPORT_INT1_bp = VPORT_INT_1_bp;
+  #endif
   #if !defined(VPORT_INT_2_bm) && defined(VPORT_INT2_bm)
     #define VPORT_INT_2_bm VPORT_INT2_bm
   #elif defined(VPORT_INT_2_bm)
     deprecated_constant_name VPORT_INT2_bm = VPORT_INT_2_bm;
+  #endif
   #if !defined(VPORT_INT_2_bp) && defined(VPORT_INT2_bp)
     #define VPORT_INT_2_bp VPORT_INT2_bp
   #elif defined(VPORT_INT_2_bp)
     deprecated_constant_name VPORT_INT2_bp = VPORT_INT_2_bp;
+  #endif
   #if !defined(VPORT_INT_3_bm) && defined(VPORT_INT3_bm)
     #define VPORT_INT_3_bm VPORT_INT3_bm
   #elif defined(VPORT_INT_3_bm)
     deprecated_constant_name VPORT_INT3_bm = VPORT_INT_3_bm;
+  #endif
   #if !defined(VPORT_INT_3_bp) && defined(VPORT_INT3_bp)
     #define VPORT_INT_3_bp VPORT_INT3_bp
   #elif defined(VPORT_INT_3_bp)
     deprecated_constant_name VPORT_INT3_bp = VPORT_INT_3_bp;
+  #endif
   #if !defined(VPORT_INT_4_bm) && defined(VPORT_INT4_bm)
     #define VPORT_INT_4_bm VPORT_INT4_bm
   #elif defined(VPORT_INT_4_bm)
     deprecated_constant_name VPORT_INT4_bm = VPORT_INT_4_bm;
+  #endif
   #if !defined(VPORT_INT_4_bp) && defined(VPORT_INT4_bp)
     #define VPORT_INT_4_bp VPORT_INT4_bp
   #elif defined(VPORT_INT_4_bp)
     deprecated_constant_name VPORT_INT4_bp = VPORT_INT_4_bp;
+  #endif
   #if !defined(VPORT_INT_5_bm) && defined(VPORT_INT5_bm)
     #define VPORT_INT_5_bm VPORT_INT5_bm
   #elif defined(VPORT_INT_5_bm)
     deprecated_constant_name VPORT_INT5_bm = VPORT_INT_5_bm;
+  #endif
   #if !defined(VPORT_INT_5_bp) && defined(VPORT_INT5_bp)
     #define VPORT_INT_5_bp VPORT_INT5_bp
   #elif defined(VPORT_INT_5_bp)
     deprecated_constant_name VPORT_INT5_bp = VPORT_INT_5_bp;
+  #endif
   #if !defined(VPORT_INT_6_bm) && defined(VPORT_INT6_bm)
     #define VPORT_INT_6_bm VPORT_INT6_bm
   #elif defined(VPORT_INT_6_bm)
     deprecated_constant_name VPORT_INT6_bm = VPORT_INT_6_bm;
+  #endif
   #if !defined(VPORT_INT_6_bp) && defined(VPORT_INT6_bp)
     #define VPORT_INT_6_bp VPORT_INT6_bp
   #elif defined(VPORT_INT_6_bp)
     deprecated_constant_name VPORT_INT6_bp = VPORT_INT_6_bp;
+  #endif
   #if !defined(VPORT_INT_7_bm) && defined(VPORT_INT7_bm)
     #define VPORT_INT_7_bm VPORT_INT7_bm
   #elif defined(VPORT_INT_7_bm)
@@ -3829,6 +3851,7 @@
     #define VPORT_INT_7_bp VPORT_INT7_bp
   #elif defined(VPORT_INT_7_bp)
     deprecated_constant_name VPORT_INT7_bp = VPORT_INT_7_bp;
+  #endif
   /* ======= VREF ======= */
   #if !defined(VREF_REFSEL_0_bm) && defined(VREF_REFSEL0_bm)
     #define VREF_REFSEL_0_bm VREF_REFSEL0_bm
