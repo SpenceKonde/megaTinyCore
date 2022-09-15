@@ -22,8 +22,10 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### Planned 2.6.1 (critical update)
 * Bugfix: Correct several USART bugs that snuck through, including some thought to have been fixed months ago.
 * Bugfix: Azduino5 was no good. Same filesystem structure error as usual, moved to Azduino6.
-* Bugfix: The 4000 lines of workarounds for compatibility issues introduced by the toolchain update didn't make it into the megaTinyCore.
+* Bugfix: The 4000 lines of workarounds for compatibility issues introduced by the toolchain update didn't make it into the megaTinyCore release.
 * Bugfix: The platform.txt file had been trashed by a bungled merge and tried to upload based on params that didn't exist.
+* Bugfix: Correct an include path that confused some alternative IDEs.
+* Bugfix: Correct compile error involving RS485 USART configuration.
 
 
 ## Released Versions

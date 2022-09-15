@@ -161,6 +161,7 @@ This starts the serial port. Options should be made by combining the constant re
 
 #### Modifiers
 * SERIAL_RS485        - Enables RS485 mode.
+* SERIAL_RS485_OTHER  - Enables the "other" RS485 mode, whatever that is (see note)
 * SERIAL_OPENDRAIN    - Sets port to open-drain mode
 * SERIAL_LOOPBACK     - Enables single wire operation and internally connects tx to rx.
 * SERIAL_TX_ONLY      - Enables only Tx.
@@ -168,6 +169,13 @@ This starts the serial port. Options should be made by combining the constant re
 * SERIAL_EVENT_RX     - Enables the event input
 * SERIAL_HALF_DUPLEX  - Synonym for (SERIAL_OPENDRAIN | SERIAL_LOOPBACK)
 * SERIAL_MODE_SYNC    - Uses synchronous mode instead of asynchronous. See notes below, additional configuration required.
+
+Note:
+The "other" RS485 mode, according to the ATtiny3216/3217 datasheet:
+"Writing RS485[1] to ‘1’ enables the RS-485 mode which automatically sets the TXD pin to output one clock cycle
+before starting transmission and sets it back to input when the transmission is complete."
+
+Obviously this begs the question of how any of the devices involved are supposed to prevent collisions - I don't think there *is* a way. That would explain why this feature was removed from the Dx-series documentation (it was present in the initial DA-series IO headers, and is likely still in the hardware...).
 
 #### MSPI options
 * SERIAL_MSPI_MSB_FIRST

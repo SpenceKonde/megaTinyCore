@@ -28,7 +28,7 @@
 */
 
 #pragma once
-
+#include "core_devices.h"
 #include <inttypes.h>
 #include "api/Stream.h"
 #include "pins_arduino.h"
@@ -180,8 +180,12 @@
 // tinyAVR 0/1-series has 2 bits devoted to RS485, supporting normal (00), RS485 with XDIR driven to control
 // an external line driver (01), and some other mysterious mode (10) the function of which is unclear. There is
 // evidence that this poorly documented feature is also present in other hardware, and was only removed on paper.
-#if defined(USART_RS4850_bm) && !defined(USART_RS485_bm)
-  #define USART_RS485_bm USART_RS4850_bm
+#if !defined(USART_RS485_bm)
+  #if defined(USART_RS485_0_bm)
+    #define USART_RS485_bm USART_RS485_0_bm
+  #else
+    #define USART_RS485_bm 0x01
+  #endif
 #endif
 #if defined(__AVR_ATtinyxy2__) // 8-pin parts use a different set of pin mappings.
 const uint8_t _usart_pins[][4] = {{PIN_PA6, PIN_PA7, PIN_PA3, PIN_PA0},{PIN_PA1, PIN_PA2, NOT_A_PIN, NOT_A_PIN}};
