@@ -19,6 +19,13 @@ These items are in addition to what was listed under changes already in release.
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
+### Planned 2.6.1 (critical update)
+* Bugfix: Correct several USART bugs that snuck through, including some thought to have been fixed months ago.
+* Bugfix: Azduino5 was no good. Same filesystem structure error as usual, moved to Azduino6.
+* Bugfix: The 4000 lines of workarounds for compatibility issues introduced by the toolchain update didn't make it into the megaTinyCore.
+* Bugfix: The platform.txt file had been trashed by a bungled merge and tried to upload based on params that didn't exist.
+
+
 ## Released Versions
 ### 2.6.0
 * You can now enable and disable the ADC with analogPowerOption() and enable/disable standby mode.

@@ -82,7 +82,7 @@
 #else
               "rjmp   _do_rxc"    "\n\t"
 #endif
-              ::"z"(&Serial1));
+              ::"z"(&Serial0));
         __builtin_unreachable();
     }
   #endif
