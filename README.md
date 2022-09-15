@@ -4,7 +4,7 @@
 We have a Github Discussions section now. When a problem is *definitely* a defect in the core, you will reduce the time taken to fix it if you create an issue, as I prioritize issues over catching up on discussions.
 
 ### 2.6.0 is out - rejoice
-Improved flash footprint of serial significantly while adding features, wire can wake slave from sleep without corrupting data, and much, much more, see [the Changelog](Changelog.md).
+Improved flash footprint of serial significantly while adding features, wire can wake slave from sleep without corrupting data, and much, much more, see [the Changelog](ChangeLog.md).
 
 ## IMPORTANT WARNINGS
 
