@@ -1925,9 +1925,14 @@
   #endif
 
   /* ======= PORT ======= */
-  #if !defined(PORT_INT_0_bm) && defined(PORT_INT0_bm)
+
+/* commenting out for now - not sure what if anything should replace this but was hitting the #error I inserted because these are defined and being set as constants
+#if !defined(PORT_INT_0_bm) && defined(PORT_INT0_bm)
     #define PORT_INT_0_bm PORT_INT0_bm
   #elif defined(PORT_INT_0_bm)
+    #if defined(PORT_INT0_bm)
+      #error("FUBAR - will cause compile error below")
+    #endif
     deprecated_constant_name PORT_INT0_bm = PORT_INT_0_bm;
   #endif
 
@@ -2021,6 +2026,7 @@
     deprecated_constant_name PORT_INT7_bp = PORT_INT_7_bp;
   #endif
 
+ */
   #if !defined(PORT_ISC_0_bm) && defined(PORT_ISC0_bm)
     #define PORT_ISC_0_bm PORT_ISC0_bm
   #elif defined(PORT_ISC_0_bm)
