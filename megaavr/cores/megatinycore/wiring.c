@@ -173,11 +173,26 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
   // (volatile variables must be read from memory on every access)
 
   #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
-    #if (F_CPU > 2000000)
-      timer_millis++; // that's all we need to do!
-    #else
-      timer_millis += 2;
+    __asm__ __volatile__(
+    "ld         r24,      X""\n\t" //
+    "subi       r24, %[DEC]""\n\t" //
+    "st          X+,    r24""\n\t" //
+    "ld         r24,      X""\n\t" //
+    "sbci       r24, %[DEC]""\n\t" //
+    "st          X+,    r24""\n\t" //
+    "ld         r24,      X""\n\t" //
+    "sbci       r24, %[DEC]""\n\t" //
+    "st          X+,    r24""\n\t" //
+    "ld         r24,      X""\n\t" //
+    "sbci       r24, %[DEC]""\n\t" //
+    "st           X,    r24""\n\t" //
+    ::      "x" (&timer_millis),
+    #if(F_CPU>1000000)
+        [DEC] "M" (0xFF) // sub 0xFF is the same as to add 1
+    #else // if it's 1<Hz, we set the millis timer to only overflow every 2 milliseconds, intentionally sacrificing resolution.
+        [DEC] "M" (0xFE) // sub 0xFE is the same as to add 2
     #endif
+    );
   #else
     #if defined(MILLIS_USE_TIMERRTC)
       // if RTC is used as timer, we only increment the overflow count
