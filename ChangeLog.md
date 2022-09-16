@@ -22,7 +22,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Released Versions
 
-### Planned 2.6.1 (critical update)
+### 2.6.1 (critical update)
 * 2.6.0 Bugfix: Correct several USART bugs that snuck through, including an apparent regression that would prevent proper serial operation.
 * 2.6.0 Bugfix: Azduino5 was no good. Same filesystem structure error as usual, moved to Azduino6.
 * 2.6.0 Bugfix: The 4000 lines of workarounds for compatibility issues introduced by the toolchain update didn't make it into the megaTinyCore release.
@@ -44,7 +44,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Bugfix: `long_soft_event` method did not work correctly.
 * Bugfix: Removed attempted optimization by inlining analogReadEnh; I had wrongly assumed that it would then not inline the call to `_analogReadEnh`. Well, it wound up inlining it, with the result being exactly what I had hoped to prevent. I don't think this made it into a release.
 * Bugfix: Event was not functioning correctly on tinyAVR parts.
-* Bugfix: Correct bug when waking from sleep mode via TWI address match (Thanks @MX682X. You are one of our MVPs) - sleepy TWI slaves now work reliably in all sleep modes.
+* Bugfix: Correct bug(s) when waking from sleep mode via TWI (aka I2C/Wire) address match (Thanks @MX682X. You are one of our MVPs). TWI slaves should now *reliably* wake on address match and other wake sources from all sleep modes.
 * Bugfix: 3224 optiboot maximum upload size was same as 1624. Oops.
 * Bugfix: Microchip boards in optiboot mode (admittedly a rare mode) were not subtracting the size of the bootloader from the chip capacity.
 * Enhancement: Lay groundwork in Event library for the new event system changes in the EA-series (There will be 2 generators per port, and 2 for RTC - but all of these will be accessible by all event channels, and a register on the peripheral controls which of the options is used for these two channels). While inapplicable to tinyAVR, Event.h and Event.cpp distributed with DxCore and megaTinyCore is identical.

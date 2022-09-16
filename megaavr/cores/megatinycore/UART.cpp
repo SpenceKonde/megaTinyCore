@@ -189,7 +189,7 @@
             "reti"                        "\n\t" // return
           "_buff_full_rxc:"               "\n\t" // potential improvement: move _buff_full_rxc to after the reti, and then rjmp back, saving 2 clocks for the common case
             "ori        r19,      0x40"   "\n\t" // record that there was a ring buffer overflow. 1 clk
-            "rjmp _end_rxc"               "\n\t" // and now jump back to end. That way we don't need to jump over this inthe middle of the common case.
+            "rjmp _end_rxc"               "\n\t" // and now jump back to end. That way we don't need to jump over this in the middle of the common case.
             ::); // total: 77 or 79 clocks, just barely squeaks by for cyclic RX of up to RX_BUFFER_SIZE characters.
         __builtin_unreachable();
 

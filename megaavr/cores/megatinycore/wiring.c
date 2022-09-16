@@ -794,7 +794,7 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
         return -1;
       }
     #endif
-#else // MILLIS_USE_TIMERNONE defined - we have nither of these functions.
+#else // MILLIS_USE_TIMERNONE defined - we have neither of these functions.
     /* Uses should not call millis() or micros() if the core timekeeping has been disabled. Usually, encountering this error either means
      * that they disabled millis earlier for some other sketch, and the preferences were saved with that - or that they are using a library
      * with a dependence on the timekeeping facilities. Sometimes these are meaningful, other times it is only for a feature that isn't

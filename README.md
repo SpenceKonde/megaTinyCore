@@ -326,7 +326,7 @@ Using the `An` constants for analog pins is deprecated - the recommended practic
 ### Watchdog Timer, Software Reset
 There are more options than on classic AVR for resetting, including if the code gets hung up somehow. The watchdog timer can only reset (use the RTC and PIT for timed interrupts).
 
-See the [**Reset and Watchdog (WDT) Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md)and (The core-auxiliary library, megaTinyCore/.)[../megaavr/libraries/megaTinyCore/README.md]
+See the [**Reset and Watchdog (WDT) Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md) and [The core-auxiliary library megaTinyCore](megaavr/libraries/megaTinyCore/README.md)
 
 ### Improved Digital I/O
 This core adds a number of new features include fast digital I/O (1-14 clocks depending on what's known at compile time, and 2-28 bytes of flash (pin number must be known at compile time for the `________Fast()` functions, and for configuring all per-pin settings the hardware has with `pinConfigure()`.
