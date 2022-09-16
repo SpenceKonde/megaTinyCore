@@ -184,7 +184,7 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
       "ld         r24,      X"  "\n\t" // X points to LSB of timer_millis, load the LSB
       #if (F_CPU > 2000000)            // if it's 1 or 2 MHz, millis timer overflows every 2ms, intentionally sacrificing resolution for reduced time spent in ISR
       "subi       r24,   0xFF"  "\n\t" // sub 0xFF is the same as to add 1
-      #else 
+      #else
       "subi       r24,   0xFE"  "\n\t" // sub 0xFE is the same as to add 2
       #endif
       "st          X+,    r24"  "\n\t" // Store incremented value back to X, post-increment X
