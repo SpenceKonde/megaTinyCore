@@ -1,5 +1,6 @@
 # Changelog
 This page documents (nearly) all bugfixes and enhancements that produce visible changes in behavior throughout the history of megaTinyCore. Note that this document is maintained by a human, who is - by nature - imperfect (this is also why there are so many bugs to fix); sometimes the changelog may not be updated at the same time as the changes go in, and occasionally a change is missed entirely in the changelog, though this is rare. Change descriptions may be incomplete or unclear; this is not meant to be an indepth reference.
+
 ## Planned changes not yet implemented
 These items are in addition to what was listed under changes already in release.
 
@@ -19,17 +20,20 @@ These items are in addition to what was listed under changes already in release.
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-### Planned 2.6.1 (critical update)
-* Bugfix: Correct several USART bugs that snuck through, including some thought to have been fixed months ago.
-* Bugfix: Azduino5 was no good. Same filesystem structure error as usual, moved to Azduino6.
-* Bugfix: The 4000 lines of workarounds for compatibility issues introduced by the toolchain update didn't make it into the megaTinyCore release.
-* Bugfix: The platform.txt file had been trashed by a bungled merge and tried to upload based on params that didn't exist.
-* Bugfix: Correct an include path that confused some alternative IDEs.
-* Bugfix: Correct compile error involving RS485 USART configuration.
-* Bugfix: Comparator library namespace error fixed.
-
-
 ## Released Versions
+
+### Planned 2.6.1 (critical update)
+* 2.6.0 Bugfix: Correct several USART bugs that snuck through, including an apparent regression that would prevent proper serial operation.
+* 2.6.0 Bugfix: Azduino5 was no good. Same filesystem structure error as usual, moved to Azduino6.
+* 2.6.0 Bugfix: The 4000 lines of workarounds for compatibility issues introduced by the toolchain update didn't make it into the megaTinyCore release.
+* 2.6.0 Bugfix: The platform.txt file had been trashed by a bungled merge and tried to upload based on params that didn't exist.
+* 2.6.0 Bugfix: Correct an include path that confused some alternative IDEs.
+* 2.6.0 Bugfix: Correct compile error involving RS485 USART configuration.
+* 2.6.0 Bugfix: Comparator library namespace error fixed. (thanks @ObviousInRetrospect)
+* 2.6.0 Bugfix: Advertised 2 MHz internal option was not actually available in non-tuned configurations. Prior to 2.6.0 there was no intent to support this.
+* Enhancement: millis with a type B timer is over 25% faster, and uses 30% less flash for the ISR. (thanks @MX683X)
+* Bugfix: Correct a few anomalies in boards.txt.
+
 ### 2.6.0
 * You can now enable and disable the ADC with analogPowerOption() and enable/disable standby mode.
 * Bugfix: Fix issue with SSD bit being cleared when using beginTransaction().
