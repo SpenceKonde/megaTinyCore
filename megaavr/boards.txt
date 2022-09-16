@@ -10,7 +10,7 @@
 #________________________________________________________________________#
 #                                                                        #
 #  Copyright Spence Konde and other         ##        ###         #      #
-#  contributors 2018-2021                  #  #      #           ##      #
+#  contributors 2018-2022                  #  #      #           ##      #
 #  megaTinyCore is free software.    # #     #       ####         #      #
 #  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##    #      #
 #  License section of README.md       #    ####  ##   ###   ##   ###     #
@@ -19,7 +19,7 @@
 #  Now reformatted for easy navigation with text editing tools which     #
 #  have the zoomed out "minimap" that you can scroll through.            #
 #                                                                        #
-#  megaTinyCore 2.6.0-1 is being developed simultaneously with DxCore    #
+#  megaTinyCore 2.6.1 is being developed simultaneously with DxCore    #
 #  1.5.0. As the hardware is very similar, much code is shared, and that #
 #  is the version of DxCore most similar to this version of megaTinyCore #
 #                                                                        #
@@ -1033,6 +1033,7 @@ atxy4.menu.clock.10internal=10 MHz internal
 atxy4.menu.clock.8internal=8 MHz internal
 atxy4.menu.clock.5internal=5 MHz internal
 atxy4.menu.clock.4internal=4 MHz internal
+atxy4.menu.clock.2internal=2 MHz internal
 atxy4.menu.clock.1internal=1 MHz internal
 atxy4.menu.clock.20internaltuned=20 MHz internal - tuned
 atxy4.menu.clock.16internaltuned=16 MHz internal - tuned
@@ -1068,6 +1069,8 @@ atxy4.menu.clock.5internal.build.speed=5
 atxy4.menu.clock.5internal.build.clocksource=0
 atxy4.menu.clock.4internal.build.speed=4
 atxy4.menu.clock.4internal.build.clocksource=0
+atxy4.menu.clock.2internal.build.speed=2
+atxy4.menu.clock.2internal.build.clocksource=0
 atxy4.menu.clock.1internal.build.speed=1
 atxy4.menu.clock.1internal.build.clocksource=0
 atxy4.menu.clock.20extclock.build.speed=20
@@ -3868,6 +3871,7 @@ atx24o.menu.clocko.10internal=10 MHz internal
 atx24o.menu.clocko.8internal=8 MHz internal
 atx24o.menu.clocko.5internal=5 MHz internal
 atx24o.menu.clocko.4internal=4 MHz internal
+atx24o.menu.clocko.2internal=2 MHz internal
 atx24o.menu.clocko.1internal=1 MHz internal
 atx24o.menu.clocko.20internaltuned=20 MHz internal - tuned
 atx24o.menu.clocko.16internaltuned=16 MHz internal - tuned
@@ -3904,6 +3908,8 @@ atx24o.menu.clocko.5internal.build.speed=5
 atx24o.menu.clocko.5internal.build.clocksource=0
 atx24o.menu.clocko.4internal.build.speed=4
 atx24o.menu.clocko.4internal.build.clocksource=0
+atx24o.menu.clocko.2internal.build.speed=2
+atx24o.menu.clocko.2internal.build.clocksource=0
 atx24o.menu.clocko.1internal.build.speed=1
 atx24o.menu.clocko.1internal.build.clocksource=0
 atx24o.menu.clocko.20extclock.build.speed=20

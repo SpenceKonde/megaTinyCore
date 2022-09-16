@@ -188,7 +188,7 @@ inline unsigned long microsecondsToMillisClockCycles(unsigned long microseconds)
     "st           X,    r24""\n\t" // Until all 4 bytes were handled
     :
     :  "x" (&timer_millis),
-    #if(F_CPU>1000000)
+    #if(F_CPU>2000000)
       [DEC]  "M" (0xFF) // sub 0xFF is the same as to add 1
     #else // if it's 1<Hz, we set the millis timer to only overflow every 2 milliseconds, intentionally sacrificing resolution.
       [DEC]  "M" (0xFE) // sub 0xFE is the same as to add 2
