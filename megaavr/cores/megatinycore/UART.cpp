@@ -69,6 +69,7 @@
       copy of it is small. Savings for several is gets large fast! Performance is better, but not much.
       Biggest advantage is for 2-series with the dual UARTs, but potentially as little as 4k of flash.
 
+    TXC isr  starts from this:
     ISR(USART1_TXC_vect, ISR_NAKED) {
       __asm__ __volatile__(
                 "push  r30"         "\n\t" // 1
@@ -109,7 +110,7 @@
       }
     #endif
     /*
-
+      We are starting from this:
       ISR(USART0_RXC_vect, ISR_NAKED) {
         __asm__ __volatile__(
               "push      r30"     "\n\t"
@@ -117,7 +118,7 @@
               :::);
         __asm__ __volatile__(
               "rjmp   do_rxc"     "\n\t"
-              ::"z"(&Serial));
+              ::"z"(&Serialn));
         __builtin_unreachable();
       }
 
@@ -125,7 +126,7 @@
     #if (USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) )
       void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_rxc(void) {
         __asm__ __volatile__(
-          "_do_rxc:"                      "\n\t" //
+          "_do_rxc:"                      "\n\t" // We start out 11-13 clocks after the interrupt
             "push       r18"              "\n\t" // r30 and r31 pushed before this.
             "in         r18,      0x3f"   "\n\t" // Save SREG
             "push       r18"              "\n\t" //
@@ -136,13 +137,13 @@
             "push       r29"              "\n\t" //
             "ldd        r28,    Z +  8"   "\n\t" // Load USART into Y pointer
     //      "ldd        r29,    Z +  9"   "\n\t" // We interact with the USART only this once
-            "ldi        r29,      0x08"   "\n\t" // High byte always 0x08 for USART peripheral: Save-a-clock.
-  #if defined(ERRATA_USART_WAKE)                 // This bug appears to be near-universal
+            "ldi        r29,      0x08"   "\n\t" // High byte always 0x08 for USART peripheral: Save-a-clock. 11 clocks to here
+  #if defined(ERRATA_USART_WAKE)                 // This bug appears to be near-universal, 4 clocks to workaround.
             "ldd        r18,    Y +  6"   "\n\t"
             "andi       r18,      0xEF"   "\n\t"
             "std      Y + 6,       r18"   "\n\t" // turn off SFD interrupt before reading RXDATA so we don't corrupt the next character.
   #endif
-            "ldd        r24,    Y +  1"   "\n\t" // Y + 1 = USARTn.RXDATAH - load high byte first
+            "ldd        r24,    Y +  1"   "\n\t" // Y + 1 = USARTn.RXDATAH - load high byte first - 16 clocks from here to next endif
             "ld         r25,         Y"   "\n\t" // Y + 0 = USARTn.RXDATAL - then low byte of RXdata
             "andi       r24,      0x46"   "\n\t" // extract framing, parity bits.
             "lsl        r24"              "\n\t" // leftshift them one place
@@ -164,7 +165,7 @@
     #elif SERIAL_RX_BUFFER_SIZE == 16
             "andi       r24,      0x0F"   "\n\t" // Wrap the head around
     #endif
-            "ldd        r18,    Z + 14"   "\n\t" // load tail index
+            "ldd        r18,    Z + 14"   "\n\t" // load tail index This to _end_rxc is 11 clocks unless the buffer was full, in which case it's 8.
             "cp         r18,       r24"   "\n\t" // See if head is at tail. If so, buffer full. The incoming data is discarded,
             "breq  _buff_full_rxc"        "\n\t" // because there is noplace to put it, and we just restore state and leave.
             "add        r28,       r30"   "\n\t" // r28 has what would be the next index in it.
@@ -173,11 +174,9 @@
             "adc        r29,       r18"   "\n\t" // carry - Y is now pointing 17 bytes before head
             "std     Y + 17,       r25"   "\n\t" // store the new char in buffer
             "std     Z + 13,       r24"   "\n\t" // write that new head index.
-          "_buff_full_rxc:"               "\n\t"
-            "ori        r19,      0x40"   "\n\t" // record that there was a ring buffer overflow.
           "_end_rxc:"                     "\n\t" //
-            "std     Z + 12,       r19"   "\n\t" // record new state including new errors
-            "pop        r29"              "\n\t" // Y Pointer was used for head and usart
+            "std     Z + 12,       r19"   "\n\t" // record new state including new errors 9 pops + 1 out + 1 reti +1 std = 24 clocks
+            "pop        r29"              "\n\t" // Y Pointer was used for head and usart.
             "pop        r28"              "\n\t" //
             "pop        r25"              "\n\t" // r25 held the received character
             "pop        r24"              "\n\t" // r24 held rxdatah, then the new head.
@@ -187,8 +186,11 @@
             "pop        r18"              "\n\t" // used as tail offset, and then as known zero.
             "pop        r31"              "\n\t" // end with Z which the isr pushed to make room for
             "pop        r30"              "\n\t" // pointer to serial instance
-            "reti"                        "\n"   // return
-            ::);
+            "reti"                        "\n\t" // return
+          "_buff_full_rxc:"               "\n\t" // potential improvement: move _buff_full_rxc to after the reti, and then rjmp back, saving 2 clocks for the common case
+            "ori        r19,      0x40"   "\n\t" // record that there was a ring buffer overflow. 1 clk
+            "rjmp _end_rxc"               "\n\t" // and now jump back to end. That way we don't need to jump over this inthe middle of the common case.
+            ::); // total: 77 or 79 clocks, just barely squeaks by for cyclic RX of up to RX_BUFFER_SIZE characters.
         __builtin_unreachable();
 
       }
@@ -225,7 +227,7 @@
       }
     #endif
     /*
-
+    DRE starts just like RXC
     ISR(USART0_DRE_vect, ISR_NAKED) {
       __asm__ __volatile__(
                 push  r30
@@ -233,7 +235,7 @@
                 :::);
       __asm__ __volatile__(
                 "rjmp do_dre"   "\n\t"
-                ::"z"(&Serial));
+                ::"z"(&Serialn));
       __builtin_unreachable();
 
     */
@@ -313,7 +315,7 @@
           "brts        .+2"               "\n\t"  // hop over the next insn if T bit set, means entered through do_dre, rather than poll_dre
           "rjmp _poll_dre_done"           "\n\t"  // 8k parts can use RJMP
     #endif
-          "pop         r27"               "\n\t"  // and continue with popping registers.
+          "pop         r27"               "\n\t"  // and continue with popping registers. 21 clocks left
           "pop         r26"               "\n\t"
           "pop         r25"               "\n\t"
           "pop         r24"               "\n\t"
@@ -387,28 +389,30 @@
 
             return;
           }
-          #if !(USE_ASM_DRE == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128  || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
-                                    (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128  || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
+    #if !(USE_ASM_DRE == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128  || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
+                              (SERIAL_TX_BUFFER_SIZE == 256 || SERIAL_TX_BUFFER_SIZE == 128  || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
             _tx_data_empty_irq(*this);
-          #else
-            #ifdef USART1
-              void * thisSerial = this;
-            #endif
+    #else // We're using ASM DRE
+      #ifdef USART1
+        void * thisSerial = this;
+      #endif
             __asm__ __volatile__(
-                    "clt"              "\n\t" // Clear the T flag to signal to the ISR that we got there from here.
-    #if PROGMEM_SIZE > 8192
+                    "clt"              "\n\t" // Clear the T flag to signal to the ISR that we got there from here. This is safe per the ABI - The T-flag can be treated like R0
+      #if PROGMEM_SIZE > 8192
                     "jmp _poll_dre"    "\n\t"
-    #else
+      #else
                     "rjmp _poll_dre"    "\n\t"
-    #endif
+      #endif
                     "_poll_dre_done:"    "\n"
-    #ifdef USART1
+      #ifdef USART1
                     ::"z"((uint16_t)thisSerial)
-    #else
-                    ::"z"(&Serial)
+      #else
+                    ::"z"(&Serial0)
+      #endif
+                    : "r18","r19","r24","r25","r26","r27"); // these got saved and restored in the ISR context, but here we don't need top and in many cases no action is needed.
+                    // the Y pointer was already handled, because as a call-saved register, it would always need to be saved and restored, so we save 4 words of flash by doing that after
+                    // jumps into the middle of the ISR, and before it jumps back here.
     #endif
-                    : "r18","r19","r24","r25","r26","r27");
-          #endif
         }
       }
       // In case interrupts are enabled, the interrupt routine will be invoked by itself

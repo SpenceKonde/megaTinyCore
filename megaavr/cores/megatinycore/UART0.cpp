@@ -40,7 +40,7 @@
     // Note the difference between this and the other ISRs - here we don't care at all about the serial object, we just have to work with the USART
     ISR(USART0_TXC_vect, ISR_NAKED) {
       __asm__ __volatile__(
-            "push  r30"           "\n\t" // push the low byte of Z
+            "push  r30"           "\n\t" // push the low byte of Z - we start out 5-6 clocks behind the ball, these three instructions take 4-5 -> 9 or 11 by th time we reach _do_txc
             "ldi r30, 0x20"       "\n\t" // and put the low bit of this USART there - 0x20 * n
 #if PROGMEM_SIZE > 8192
             "jmp _do_txc"         "\n\t"
@@ -73,7 +73,7 @@
   #else
       ISR(USART0_RXC_vect, ISR_NAKED) {
         __asm__ __volatile__(
-              "push      r30"     "\n\t"
+              "push      r30"     "\n\t" //we start out 5-6 clocks behind the ball, then do 2 push + 2 ldi + 2-3 for jump = 11 or 13 clocks to _do_rxc (and dre is the same)
               "push      r31"     "\n\t"
               :::);
         __asm__ __volatile__(
