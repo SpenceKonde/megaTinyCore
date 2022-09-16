@@ -320,8 +320,8 @@ class AnalogComparator {
     #endif
     comparator::out::initval_t     output_initval = comparator::out::init_low;
     comparator::hyst::hysteresis_t hysteresis     = comparator::hyst::disable;
-    in_comparator::p::inputP_t     input_p        = in_comparator::p::in0;
-    in_comparator::n::inputN_t     input_n        = in_comparator::n::in0;
+    comparator::in_p::inputP_t     input_p        = comparator::in_p::in0;
+    comparator::in_n::inputN_t     input_n        = comparator::in_n::in0;
     comparator::ref::reference_t   reference      = comparator::ref::disable;
     uint8_t dacref = 0xff;
 
