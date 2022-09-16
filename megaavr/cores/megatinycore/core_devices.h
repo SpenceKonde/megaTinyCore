@@ -362,7 +362,7 @@
 #endif
 /* In case you need to greatly change the operating frequency of the chip on the fly, and accept that it will trash millis and so on.
  * That's why it's not documented or in Arduino.h, but this subfile - it's about as blunt an instrument as it gets, and resorting to
- * methods like this can result in bizzare and unexpected behavior that can be difficult to diagnose if you don't suspect clock issues */
+ * methods like this can result in bizarre and unexpected behavior that can be difficult to diagnose if you don't suspect clock issues */
 #define  _setPrescale2x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_2X_gc | CLKCTRL_PEN_bm)))
 #define  _setPrescale4x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_4X_gc | CLKCTRL_PEN_bm)))
 #define  _setPrescale8x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_8X_gc | CLKCTRL_PEN_bm)))
