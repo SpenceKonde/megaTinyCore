@@ -208,6 +208,16 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
       :: "x" (&timer_millis),          // we are changing the value of this, so to be strictly correct, this must be declared input output - though in this case it doesn't matter
          [PTCLR] "m" (_timer->INTFLAGS)
       ); // grrr, sublime highlights this as invalid syntax because it gets confused by the ifdef's and odd syntax on inline asm
+      /* ISR in C:
+        ISR (TCBx_INT_vect) {       // x depends on user configuration
+          #if (F_CPU > 2000000)
+            timer_millis += 1;
+          #else
+            timer_millis += 2;
+          #endif
+          _timer->INTFLAGS = TCB_CAPT_bm;   // reset Interrupt flag of TCBx
+        }
+      */
     #else
       #if defined(MILLIS_USE_TIMERRTC)
         // if RTC is used as timer, we only increment the overflow count
