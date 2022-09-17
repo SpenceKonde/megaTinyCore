@@ -153,59 +153,18 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
   #elif defined(MILLIS_USE_TIMERRTC)
     ISR(RTC_CNT_vect)
   #else //otherwise it's a TCB *or* no MILLIS_USE_TIMER macros are defined, including MILLIS_USE_TIMER_NONE
-    #if defined(MEGATINYCORE) // tinyAVRs use the dart board approach to locating the peripherals :-(
-      #if defined(MILLIS_USE_TIMERB0)
-        #if (MEGATINYCORE_SERIES != 2)
-          #define _CLEARFLAG "sts  0x0A46, r24"
-        #else
-          #define _CLEARFLAG "sts  0x0A86, r24"
-        #endif
-        ISR(TCB0_INT_vect, ISR_NAKED)
-      #elif defined(MILLIS_USE_TIMERB1)
-        #if (MEGATINYCORE_SERIES != 2)
-          #define _CLEARFLAG "sts  0x0A56, r24"
-        #else
-          #define _CLEARFLAG "sts  0x0A96, r24"
-        #endif
-        ISR(TCB1_INT_vect, ISR_NAKED)
-      #else
-        #error "No millis timer selected, but not disabled - cannot determine millis vector"
-      #endif
-    #elif defined(DXCORE) //Dx and Ex series start their TCB's at 0xB00
-      #if defined(MILLIS_USE_TIMERB0)
-        #define _CLEARFLAG "sts  0x0B06, r24"
-        ISR(TCB0_INT_vect, ISR_NAKED)
-      #elif defined(MILLIS_USE_TIMERB1)
-        #define _CLEARFLAG "sts  0x0B16, r24"
-        ISR(TCB1_INT_vect, ISR_NAKED)
-      #elif defined(MILLIS_USE_TIMERB2)
-        #define _CLEARFLAG "sts  0x0B26, r24"
-        ISR(TCB2_INT_vect, ISR_NAKED)
-      #elif defined(MILLIS_USE_TIMERB3)
-        #define _CLEARFLAG "sts  0x0B36, r24"
-        ISR(TCB3_INT_vect, ISR_NAKED)
-      #elif defined(MILLIS_USE_TIMERB4)
-        #define _CLEARFLAG "sts  0x0B46, r24"
-        ISR(TCB4_INT_vect, ISR_NAKED)
-      #else
-        #error "No millis timer selected, but not disabled - cannot determine millis vector"
-      #endif
-    #else //Otherwise it would have to be.... a mega0-series (which this file isn't designed to support) but in the interest of making this code usable on all modern AVRs:
-      #if defined(MILLIS_USE_TIMERB0)
-        #define _CLEARFLAG "sts  0x0A86, r24"
-        ISR(TCB0_INT_vect, ISR_NAKED)
-      #elif defined(MILLIS_USE_TIMERB1)
-        #define _CLEARFLAG "sts  0x0A96, r24"
-        ISR(TCB1_INT_vect, ISR_NAKED)
-      #elif defined(MILLIS_USE_TIMERB2)
-        #define _CLEARFLAG "sts  0x0AA6, r24"
-        ISR(TCB2_INT_vect, ISR_NAKED)
-      #elif defined(MILLIS_USE_TIMERB3)
-        #define _CLEARFLAG "sts  0x0AB6, r24"
-        ISR(TCB3_INT_vect, ISR_NAKED)
-      #else
-        #error "No millis timer selected, but not disabled - cannot determine millis vector"
-      #endif
+    #if defined(MILLIS_USE_TIMERB0)
+      ISR(TCB0_INT_vect, ISR_NAKED)
+    #elif defined(MILLIS_USE_TIMERB1)
+      ISR(TCB1_INT_vect, ISR_NAKED)
+    #elif defined(MILLIS_USE_TIMERB2)
+      ISR(TCB2_INT_vect, ISR_NAKED)
+    #elif defined(MILLIS_USE_TIMERB3)
+      ISR(TCB3_INT_vect, ISR_NAKED)
+    #elif defined(MILLIS_USE_TIMERB4)
+      ISR(TCB4_INT_vect, ISR_NAKED)
+    #else
+      #error "No millis timer selected, but not disabled - cannot determine millis vector"
     #endif
   #endif // end of ISR statement, now for the ISR body
   {
@@ -223,7 +182,11 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
       "in         r24,   0x3F"  "\n\t" // Need to save SREG too
       "push       r24"          "\n\t" // and push the SREG value  - 7 clocks here + the 5-6 to enter the ISR depending on flash and sketch size, 12-13 total
       "ld         r24,      X"  "\n\t" // X points to LSB of timer_millis, load the LSB
-      "subi       r24, %[DEC]"  "\n\t" // "decrement" (actually increment) it by the desired value
+      #if (F_CPU > 2000000)            // if it's 1 or 2 MHz, millis timer overflows every 2ms, intentionally sacrificing resolution for reduced time spent in ISR
+      "subi       r24,   0xFF"  "\n\t" // sub 0xFF is the same as to add 1
+      #else
+      "subi       r24,   0xFE"  "\n\t" // sub 0xFE is the same as to add 2
+      #endif
       "st          X+,    r24"  "\n\t" // Store incremented value back to X, post-increment X
       "ld         r24,      X"  "\n\t" // now second byte pointed to by X, load that
       "sbci       r24,   0xFF"  "\n\t" // because this is sbci, it treats carry bit like subtraction, and unless we did just roll over the last byte
@@ -235,21 +198,26 @@ inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
       "sbci       r24,   0xFF"  "\n\t" //
       "st           X,    r24"  "\n\t" // ... until all 4 bytes were handled, at 4 clocks and 3 words per byte -> 16 clocks
       "ldi        r24,   0x01"  "\n\t" // This is the TCB intflag, which we will store with sts using the line #defined above. 1 clock
-      _CLEARFLAG                "\n\t" // defined above. Yes, the preprocessor lets you do dumb shit like this! 2 clocks for sts
+      "sts   %[PTCLR],    r24"  "\n\t" // defined above. Yes, the preprocessor lets you do dumb shit like this! 2 clocks for sts
       "pop        r24"          "\n\t" // pop r24 to get the old SREG value - 2 clock
       "out       0x3F,    r24"  "\n\t" // restore SREG - 1 clock
       "pop        r24"          "\n\t"
       "pop        r27"          "\n\t"
       "pop        r26"          "\n\t" // 6 more clocks popping registers in reverse order.
       "reti"                    "\n\t" // and 4 clocks for reti - total 12/13 + 16 + 2 + 1 + 6 + 4 = 41/42 clocks total, and 7+16+3+6 = 32 words, vs 60-61 clocks and 40 words
-      :: "x" (&timer_millis),           // we are changing the value of this, so to be strictly correct, this must be declared input output - though in this case it doesn't matter
-      #if (F_CPU > 2000000)
-         [DEC]  "M" (0xFF) // sub 0xFF is the same as to add 1
-      #else // if it's 1 or 2 MHz, we set the millis timer to only overflow every 2 milliseconds, intentionally sacrificing resolution for reduced time spent in ISR
-         [DEC]  "M" (0xFE) // sub 0xFE is the same as to add 2
-      #endif
-      // No clobber because the register is saved and restored, and this is a naked isr, so it doesn't get prologue or epilogue generated.
+      :: "x" (&timer_millis),          // we are changing the value of this, so to be strictly correct, this must be declared input output - though in this case it doesn't matter
+         [PTCLR] "m" (_timer->INTFLAGS)
       ); // grrr, sublime highlights this as invalid syntax because it gets confused by the ifdef's and odd syntax on inline asm
+      /* ISR in C:
+        ISR (TCBx_INT_vect) {       // x depends on user configuration
+          #if (F_CPU > 2000000)
+            timer_millis += 1;
+          #else
+            timer_millis += 2;
+          #endif
+          _timer->INTFLAGS = TCB_CAPT_bm;   // reset Interrupt flag of TCBx
+        }
+      */
     #else
       #if defined(MILLIS_USE_TIMERRTC)
         // if RTC is used as timer, we only increment the overflow count
