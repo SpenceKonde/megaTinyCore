@@ -39,7 +39,7 @@ def get_nvm_access_provider(transport, device_info, interface="", packpath=None,
         if isinstance(transport, str):
             if interface == 'updi':
                 from .nvmserialupdi import NvmAccessProviderSerial
-                accessprovider = NvmAccessProviderSerial(transport, device_info, baud=frequency)
+                accessprovider = NvmAccessProviderSerial(transport, device_info, baud=frequency, options=options)
         elif interface == 'updi':
             from .nvmupdi import NvmAccessProviderCmsisDapUpdi
             accessprovider = NvmAccessProviderCmsisDapUpdi(transport, device_info=device_info,
