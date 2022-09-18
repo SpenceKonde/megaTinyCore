@@ -11,6 +11,7 @@ from .deviceinfo import deviceinfo
 from .deviceinfo.deviceinfokeys import DeviceInfoKeysAvr, DeviceMemoryInfoKeys
 from .deviceinfo.memorynames import MemoryNames
 from .serialupdi.application import UpdiApplication
+from .pymcuprog_errors import PymcuprogDeviceLockedError
 
 import math
 
@@ -44,7 +45,7 @@ class NvmAccessProviderSerial(NvmAccessProvider):
     NVM Access the Python AVR way
     """
 
-    def __init__(self, port, device_info, baud):
+    def __init__(self, port, device_info, baud, options=None):
         self.avr = None
         NvmAccessProvider.__init__(self, device_info)
         if not baud:
@@ -55,9 +56,11 @@ class NvmAccessProviderSerial(NvmAccessProvider):
 
         self.avr.read_device_info()
         try:
-            self.avr.enter_progmode()
+            chip_erase_locked_device = options and options.get("chip-erase-locked-device", False)
+            self.avr.enter_progmode(chip_erase_locked_device)
         except IOError as inst:
             self.logger.error("Device is locked.\nError:\n%s", inst)
+            raise PymcuprogDeviceLockedError()
 
     def read_device_id(self):
         """

@@ -208,7 +208,7 @@ class UpdiApplication:
         if not self.wait_unlocked(100):
             raise PymcuprogError("Failed to chip erase using key")
 
-    def enter_progmode(self):
+    def enter_progmode(self, chip_erase_locked_device=False):
         """
         Enters into NVM programming mode
         """
@@ -236,6 +236,11 @@ class UpdiApplication:
 
         # And wait for unlock
         if not self.wait_unlocked(100):
+            if chip_erase_locked_device:
+                self.logger.error("Device locked, performing chip erase to unlock")
+                self.unlock()
+                self.enter_progmode() # need to retry, since in_prog_mode() will fail presently
+                return
             raise IOError("Failed to enter NVM programming mode: device is locked")
 
         # Check for NVMPROG flag
