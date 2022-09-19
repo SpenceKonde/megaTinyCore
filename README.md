@@ -3,13 +3,13 @@
 ## [Questions? Cases where you don't know whether the problem is in your code or the core? Things to show off?](https://github.com/SpenceKonde/megaTinyCore/discussions)
 We have a Github Discussions section now. When a problem is *definitely* a defect in the core, you will reduce the time taken to fix it if you create an issue, as I prioritize issues over catching up on discussions.
 
-### 2.6.0 is out - rejoice
+### 2.6.1 is out - rejoice
 Improved flash footprint of serial significantly while adding features, wire can wake slave from sleep without corrupting data, and much, much more, see [the Changelog](ChangeLog.md).
 
 ## IMPORTANT WARNINGS
 
-### IDE 2.0.x unsupported and all versions prior to 2.0.0-RC9.2 known to have critical regressions
-These bugs in the IDE prevent board settings from being correctly recognized. Pull-requests with workarounds to undocumented beta behaviour will not be accepted. [This thread tracks known issues with 2.0 and workarounds](https://github.com/SpenceKonde/megaTinyCore/discussions/760). If you use unsupported software please reproduce all issues in 1.8.13 before reporting.
+### IDE 2.0.x unsupported. If you use it, use the release not an old RC: all versions prior to 2.0.0-RC9.2 known to have critical regressions
+These bugs in the IDE prevent board settings from being correctly recognized. [This thread tracks known issues with 2.0 and workarounds](https://github.com/SpenceKonde/megaTinyCore/discussions/760). If you use unsupported software please reproduce all issues in 1.8.13 before reporting.
 
 V1.8.13 is the "golden version" and the only one I recommend. All the more recent ones gained bugs, and its the last version with a substantial improvement. Be aware it does have a vulnerable version of Log4J.
 Prior to megaTinyCore 2.6.0, manual installation of megaTinyCore would cause V1.8.14 of the IDE to crash due to [this bug](https://github.com/arduino/Arduino/issues/11813) when you install the core manually in your arduino folder and not when you install the core via boards manager. If you are manually edit platform.txt with
