@@ -21,7 +21,7 @@
   Modified 2019-2021 by Spence Konde for megaTinyCore and DxCore.
   This version is part of megaTinyCore and DxCore; it is not expected
   to work with other hardware or cores without modifications.
-  Modified 2021 by MX682X for the Wire library rewriting project
+  Modified 2021-2022 by MX682X for the Wire library rewriting project
 */
 
 #ifndef TWI_PINS_H
@@ -32,17 +32,19 @@
 #include "avr/io.h"
 
 
-void   TWI0_ClearPins();
-bool   TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin);
-bool   TWI0_swap(uint8_t state);
-void   TWI0_usePullups();
+void    TWI0_ClearPins();
+bool    TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin);
+bool    TWI0_swap(uint8_t state);
+void    TWI0_usePullups();
+uint8_t TWI0_checkPinLevel();
 
 
 #if defined (TWI1)
-  void   TWI1_ClearPins();
-  bool   TWI1_Pins(uint8_t sda_pin, uint8_t scl_pin);
-  bool   TWI1_swap(uint8_t state);
-  void   TWI1_usePullups();
+  void    TWI1_ClearPins();
+  bool    TWI1_Pins(uint8_t sda_pin, uint8_t scl_pin);
+  bool    TWI1_swap(uint8_t state);
+  void    TWI1_usePullups();
+  uint8_t TWI1_checkPinLevel();
 #endif
 
-#endif /* TWI_DRIVER_H */
+#endif /* TWI_PINS_H */

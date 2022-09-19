@@ -18,7 +18,7 @@
 
   Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
 
-  Modified 2021 by MX682X for megaTinyCore and DxCore.
+  Modified 2021-2022 by MX682X for megaTinyCore and DxCore.
   Added Support for Simultaneous master/slave, dual mode and Wire1.
 */
 
@@ -86,26 +86,20 @@ class TwoWire: public Stream {
       return endTransmission(true);
     }
 
-    uint8_t requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop = 0x01);
-    /*
-    uint8_t requestFrom(uint8_t address, size_t  quantity, bool    sendStop);
-    uint8_t requestFrom(uint8_t address, size_t  quantity);
-    uint8_t requestFrom(int     address, int     quantity, int     sendStop);
-    uint8_t requestFrom(int     address, int     quantity);
-    */
-    uint16_t writeRead(uint8_t quantity, uint8_t sendStop);
+    uint8_t requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop = 1);
 
     virtual size_t write(uint8_t);
     virtual size_t write(const uint8_t *, size_t);
     virtual int available(void);
     virtual int read(void);
     virtual int peek(void);
-    virtual void flush(void);
+    void flush(void);
 
     uint8_t getIncomingAddress(void);
     uint8_t getBytesRead(void);
     uint8_t slaveTransactionOpen(void);
-    void    enableDualMode(bool fmp_enable);      // Moves the Slave to dedicated pins
+    uint8_t checkPinLevels(void);             // Can be used to make sure after boot that SDA/SCL are high
+    void    enableDualMode(bool fmp_enable);  // Moves the Slave to dedicated pins
 
     void selectSlaveBuffer();
     void deselectSlaveBuffer();

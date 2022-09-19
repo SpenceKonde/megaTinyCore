@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2021 MX682X
+  Copyright (c) 2022 MX682X
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -167,11 +167,11 @@ SOFTWARE.
 
 
 struct twiDataBools {       // using a struct so the compiler can use skip if bit is set/cleared
-  uint8_t _reserved:      4;
   bool _toggleStreamFn:   1;  // used to toggle between Slave and Master elements when TWI_MANDS defined
   bool _hostEnabled:      1;
   bool _clientEnabled:    1;
   bool _ackMatters:       1;
+  uint8_t _reserved:      4;
 };
 
 
