@@ -8,7 +8,7 @@ Improved flash footprint of serial significantly while adding features, wire can
 
 ## IMPORTANT WARNINGS
 
-### IDE 2.0.x unsupported. If you use it, use the release not an old RC: all versions prior to 2.0.0-RC9.2 known to have critical regressions.
+### IDE 2.0.x unsupported. If you use it, use the release not an old RC: all versions prior to 2.0.0-RC9.2 known to have critical regressions
 These bugs in the IDE prevent board settings from being correctly recognized. [This thread tracks known issues with 2.0 and workarounds](https://github.com/SpenceKonde/megaTinyCore/discussions/760). If you use unsupported software please reproduce all issues in 1.8.13 before reporting.
 
 V1.8.13 is the "golden version" and the only one I recommend. All the more recent ones gained bugs, and its the last version with a substantial improvement. Be aware it does have a vulnerable version of Log4J.
