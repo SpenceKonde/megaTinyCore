@@ -75,12 +75,12 @@ void TWI0_ClearPins() {
   #if defined(DXCORE)
     uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm; // registers are volatile, so it's bulky to recheck multiple times.
     if (portmux == PORTMUX_TWI0_ALT2_gc) {                // make sure we don't get errata'ed
-      VPORTC.OUT &= ~0x0C;  // bits 2 and 3
+      PORTC.OUTCLR = 0x0C;  // bits 2 and 3
     } else {
       #if defined(__AVR_DD__)
-        VPORTA.OUT &= (portmux == PORTMUX_TWI0_ALT3_gc ? ~0x03 : ~0x0C)
+        PORTA.OUTCLR = (portmux == PORTMUX_TWI0_ALT3_gc ? 0x03 : 0x0C)
       #else
-        VPORTA.OUT &= ~0x0C;  // bits 2 and 3
+        PORTA.OUTCLR = 0x0C;  // bits 2 and 3
       #endif
     }
     #if defined(TWI_DUALCTRL)
@@ -88,10 +88,10 @@ void TWI0_ClearPins() {
         #if defined(__AVR_DD__)
           if ((portmux == PORTMUX_TWI0_DEFAULT_gc) || 
               (portmux == PORTMUX_TWI0_ALT3_gc)) {
-            VPORTC.OUT &= ~0x0C; // AVR DD only has one set of slave only pins.
+            PORTC.OUTCLR = 0x0C; // AVR DD only has one set of slave only pins.
           }
         #else
-          VPORTC.OUT &= (portmux == PORTMUX_TWI0_DEFAULT_gc ? ~0x0C : ~0xC0)
+          PORTC.OUTCLR = (portmux == PORTMUX_TWI0_DEFAULT_gc ? 0x0C : 0xC0)
         #endif
       }
     #endif
@@ -100,14 +100,14 @@ void TWI0_ClearPins() {
       if ((PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
         // make sure we don't get errata'ed - make sure their bits in the
         // PORTx.OUT registers are 0.
-        VPORTA.OUT &= ~0x06;  // if swapped it's on PA1, PA2
+        PORTA.OUTCLR = 0x06;  // if swapped it's on PA1, PA2
       } else {
-        VPORTB.OUT &= ~0x03;  // else PB0, PB1
+        PORTB.OUTCLR = 0x03;  // else PB0, PB1
       }
     #elif defined(__AVR_ATtinyxy2__)
-      VPORTA.OUT &= ~0x06;  // 8-pin parts always have it on PA1/2
+      PORTA.OUTCLR = 0x06;  // 8-pin parts always have it on PA1/2
     #else
-      VPORTB.OUT &= ~0x03;  // else, zero series, no remapping, it's on PB0, PB1
+      PORTB.OUTCLR = 0x03;  // else, zero series, no remapping, it's on PB0, PB1
   #endif
 #endif
 }
@@ -139,7 +139,7 @@ bool TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin) {
            return (sda_pin == PIN_WIRE_SDA);
         #endif
 // --- Dx series ---
-      #elif defined(PORTMUX_TWIROUTEA)     
+      #elif defined(PORTMUX_TWIROUTEA)
         uint8_t portmux = (PORTMUX.TWIROUTEA & ~PORTMUX_TWI0_gm);
         #if      defined(PIN_WIRE_SDA_PINSWAP_3)
           if (sda_pin == PIN_WIRE_SDA_PINSWAP_3) {
@@ -399,18 +399,18 @@ void TWI1_ClearPins() {
     #if defined(PORTMUX_TWIROUTEA)
       #if defined(PIN_WIRE1_SDA_PINSWAP_2)
         if ((PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm) == PORTMUX_TWI1_ALT2_gc) {  // make sure we don't get errata'ed
-          VPORTB.OUT &= ~0x0C;  // bits 2 and 3
+          PORTB.OUTCLR = 0x0C;  // bits 2 and 3
         } else
       #endif
       {
-        VPORTF.OUT &= ~0x0C;  // bits 2 and 3
+        PORTF.OUTCLR = 0x0C;  // bits 2 and 3
       }
       #if defined(TWI_DUALCTRL)
         if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
           if ((PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm) == PORTMUX_TWI1_DEFAULT_gc) {
-            VPORTB.OUT &= ~0x0C;  // bits 2 and 3
+            PORTB.OUTCLR = 0x0C;  // bits 2 and 3
           } else {
-            VPORTB.OUT &= ~0xC0;  // bits 6 and 7
+            PORTB.OUTCLR = 0xC0;  // bits 6 and 7
           }
         }
       #endif
@@ -423,7 +423,7 @@ bool TWI1_Pins(uint8_t sda_pin, uint8_t scl_pin) {
   #if defined(PIN_WIRE1_SDA)
     if (TWI_checkPins(sda_pin, scl_pin) == false) {
       return false;
-    }/* End of test for compile time known SDA and SCL pins requested */ 
+    }/* End of test for compile time known SDA and SCL pins requested */
     #if (defined(PIN_WIRE1_SDA_PINSWAP_1) || defined(PIN_WIRE1_SDA_PINSWAP_2))
       #if defined(PORTMUX_TWIROUTEA)
       uint8_t portmux =  PORTMUX.TWIROUTEA & ~PORTMUX_TWI1_gm;

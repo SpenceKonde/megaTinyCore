@@ -618,7 +618,6 @@ uint8_t TwoWire::slaveTransactionOpen() {
   if (!(status & TWI_AP_bm)) return 0;  // If AP bit is cleared, last match was a stop condition -> not in transaction.
   if (status & TWI_DIR_bm) return 2;    // DIR bit will be 1 if last address match was for read
   return 1;                             // Otherwise it was a write.
-   //return (vars._bools._slaveTrStatus);
 }
 
 
