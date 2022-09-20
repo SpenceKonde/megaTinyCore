@@ -86,7 +86,7 @@ void TWI0_ClearPins() {
     #if defined(TWI_DUALCTRL)
       if (TWI0.DUALCTRL & TWI_ENABLE_bm) {
         #if defined(__AVR_DD__)
-          if ((portmux == PORTMUX_TWI0_DEFAULT_gc) || 
+          if ((portmux == PORTMUX_TWI0_DEFAULT_gc) ||
               (portmux == PORTMUX_TWI0_ALT3_gc)) {
             PORTC.OUTCLR = 0x0C; // AVR DD only has one set of slave only pins.
           }
@@ -135,7 +135,7 @@ bool TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin) {
             PORTMUX.CTRLB &= ~PORTMUX_TWI0_bm;
             return false;
           }
-        #else // tinyAVR 0/1 without TWI multiplexer options 
+        #else // tinyAVR 0/1 without TWI multiplexer options
            return (sda_pin == PIN_WIRE_SDA);
         #endif
 // --- Dx series ---
@@ -294,7 +294,7 @@ void TWI0_usePullups() {
         port->OUTCLR    = 0x03;  // bits 0 and 1
         port->PIN0CTRL |= PORT_PULLUPEN_bm;
         port->PIN1CTRL |= PORT_PULLUPEN_bm;
-      } else 
+      } else
     #endif
     {
       port->OUTCLR    = 0x0C;  // bits 2 and 3
@@ -363,11 +363,11 @@ uint8_t TWI0_checkPinLevel(void) {
       #warning "Something went wrong. No TWI0 related Port was defined"
       return 0;
     #endif
-    
+
     #if defined(__AVR_DD__)
       if (3 == portmux) {
         return ((vport->IN & 0x03);
-      } else 
+      } else
     #endif
     {
       return ((vport->IN & 0x0C) >> 2);
@@ -527,7 +527,7 @@ void TWI1_usePullups() {
   port->OUTCLR = 0x0C;  // bits 2 and 3
   port->PIN2CTRL |= PORT_PULLUPEN_bm;
   port->PIN3CTRL |= PORT_PULLUPEN_bm;
-  
+
   #if defined(TWI_DUALCTRL)
     if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
       if (PORTMUX_TWI1_DEFAULT_gc == portmux) {

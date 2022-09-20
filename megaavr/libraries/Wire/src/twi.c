@@ -502,7 +502,7 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
  *
  *@return     void
  */
- 
+
 void TWI_HandleSlaveIRQ(struct twiData *_data) {
   // The following assembly helps the compiler to optimize variable access. It does not realize that accessing the
   // struct members is faster and smaller by using a second displacement register (Y). Usually the Y register is
@@ -566,7 +566,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
         (*txHead) = 0;                          // reset buffer positions so the Master can start writing at zero.
         (*txTail) = 0;
         (*address) = _data->_module->SDATA;     // saving address to expose to the user sketch
-        
+
         if (_data->user_onRequest != NULL) {
           _data->user_onRequest();
         }
@@ -614,7 +614,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
         }
       }
     } else {                                  // Master is writing
-      rxBuffer[(*rxHead)] = _data->_module->SDATA;  // reading SDATA will clear the DATA IRQ flag  
+      rxBuffer[(*rxHead)] = _data->_module->SDATA;  // reading SDATA will clear the DATA IRQ flag
       (*rxHead)++;                                  // Advance Head
       if ((*rxHead) < (BUFFER_LENGTH-1)) {            // if buffer is not yet full
         action = TWI_SCMD_RESPONSE_gc;                // "Execute Acknowledge Action succeeded by reception of next byte"
@@ -653,7 +653,7 @@ void pushSleep() {
     } else {
       sleepStackLoc = SLPCTRL.CTRLA;        // save sleep settings to sleepStack
       SLPCTRL.CTRLA = sleepStackLoc & 0x01; // Set to IDLE if sleep was enabled
-    }                                       // If 
+    }
     sleepStack = sleepStackLoc;
   #else
     sleepStack = SLPCTRL.CTRLA;           // save old sleep State
@@ -667,7 +667,7 @@ void popSleep() {
     if (sleepStackLoc > 0) {      // only do something if sleep was enabled
       if (sleepStackLoc > 0x10) {   // only decrement if pushed once before
         sleepStackLoc = (sleepStackLoc - 0x10);   // upper nibble
-      } else {                    // at 0 we are about to put sleep back 
+      } else {                    // at 0 we are about to put sleep back
         SLPCTRL.CTRLA = sleepStackLoc;  // restore sleep
         sleepStackLoc = 0;              // reset everything
       }
