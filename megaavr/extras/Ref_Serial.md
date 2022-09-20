@@ -110,7 +110,7 @@ These basic options all conveniently reside in a single register.
 The modern tinyAVR and AVR Dx-series parts have a number of additional features. A few of these were available on classic AVRs (and just not exposed), but most of them are new.
 to use these, they should be coombined with one of the optionsfrom the table above using the bitwise or operator. More than one of these modifiers can be used, though many of them do not make sense in combination. When using the two argument form of Serial.begin(), remember to pass the constant (such as SERIAL_8N1) not just a modifier.
 
-```
+```C
 Serial.begin(115200, (SERIAL_8N1 | SERIAL_TX_ONLY));
 Serial1.begin(9600, (SERIAL_HALF_DUPLEX | SERIAL_RS485));
 ```
