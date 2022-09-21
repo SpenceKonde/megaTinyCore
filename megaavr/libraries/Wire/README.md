@@ -1,6 +1,9 @@
 # Wire (TWI/I2C)
 All of these parts have at least one I2C/TWI module, and Wire.h provides the usual API - and then some.
 
+## NEW in megaTinyCore 2.6.2/DxCore 1.5.1 - sleep guard for TWI
+Prior to this version, there were two bugs in the code that prevented a reliable operation of the TWI in Power-Down and Stand-By Sleep modes. Now, the library only allows IDLE sleep while a slave transaction is open, to avoid making the bus unusable. Details in paragraph "Wire & Sleep"
+
 ## NEW in megaTinyCore 2.5.0/DxCore 1.4.0 - totally rewritten Wire library thanks to @MX682X
 Should be 100% backwards compatible, use less flash, and have a new menu option to enable both master AND slave instead of the usual master OR slave. This uses the same pair of pins (this is termed "multimaster mode" in the 'biz). Enabling increases binary size, and allocates another buffer for data (out of RAM), and being the less common use case, we choose to default to the more efficient implementation in light the stringent constraints on these parts. Parts with "Dual Mode" have the option to use a separate pair of pins for the slave functionality.
 
@@ -123,7 +126,7 @@ The official megaAVR 0-series core that megaTinyCore was based on in the distant
 DA and DB devices have all of these options. Others only have the first two
 * Master or Slave (normal mode) - This uses the least flash and ram. At any given time Wire can be a master or a slave, but not both and you must call Wire.end(), and then the appropriate form of begin() for the mode you want to enable.
 * Master And Slave - In this mode, an argumentless call to begin will start the master functionality, and a call to the form with one or more arguments will start the slave version. Both can run at the same time either using DualMode, or on the same pins (multi-master).
-* Master or Slave x2 - In this mode, there is a Wire, and a Wire1 - corresponding to TWI0 and TWI peripherals.
+* Master or Slave x2 - In this mode, there is a Wire, and a Wire1 - corresponding to TWI0 and TWI1 peripherals.
 * Master and Slave x2 - Combination of the two above options - Both Wire and Wire1 can each be both a master and a slave.
 
 
@@ -157,7 +160,7 @@ This method is only useful when operating as a slave. See the register model exa
 ```c++
 uint8_t slaveTransactionOpen();
 ```
-This method, when called by the slave will return a value indicating whether there is currently an ongoing transfer. This is of particular use when the slave device is going to go to sleep but doesn't want to cut off a transaction in the middle. This could be polled until false prior to entering sleep. Remember - the onReceive handler is called at the end of a write, while the onRequest handler is called at the beginning of a read, and nothing is called at the end. This is only useful in slave mode. When operating as a master in Master or Slave mode, this simply returns 0.
+This method, when called by the slave will return a value indicating whether the slave is busy after a matching address has been received. If you want to change sleep modes while the slave is enabled, make sure this returns 0. Otherwise, two things may happen: The TWI bus may become unresponsive, or your changes will be overwritten with the setting that was present before the most recent address match interrupt. When the slave is disabled, the function will always return 0.
 
 ```c++
 endMaster();
@@ -174,19 +177,24 @@ usePullups();
 ```
 Unlike the official core, we do not automatically turn on the internal pullups, specifically because it can hide problems in simple tests - but not more complicated cases. Combined with the frustrating failure modes of I2C in general (not specific to this library) this can lead to a very challenging debugging experience if/when it does manifest as most I2C devices are added or longer wires are used, possibly dependent on orientation and spatial organization. Thus, we require that you read this paragraph and recognize that it could fail unpredictably before enabling the internal pullups. This is particularly problematic since Arduino users are accustomed to not having to think much about things like wire length and capacitance of wire; this is one of only a few cases where they often become relevant.
 
+```c++
+uint8_t checkPinLevels();
+```
+This function returns the level of the master TWI pins, depending on the used TWI module and port multiplexer settings. Bit 0 represents SDA line and bit 1 represents SCL line. This is useful on initialisation, where you want to make sure that all devices have their pins ready in open-drain mode. A value of 0x03 indicates that both lines have a HIGH level and the bus is ready.
+
 #### Additional New Methods not available on all parts
-These new methods are available exclusively for part with certain specialized hardware; Most full-size parts support enableDualMode (but tinyAVR does not), while only the DA and DB-series parts have the second TWI interface that swapModule requires.
+These new methods are available exclusively for parts with certain specialized hardware; Most full-size parts support enableDualMode (but tinyAVR does not), while only the DA and DB-series parts have the second TWI interface that swapModule requires.
 ```c++
 swapModule(TWI_t *twi_module);
 ```
-This function is only available if the hardware has one module (DA or DB with 32+ pins); this allows you to swap the Wire object over to use TWI1, allowing the TWI1 pins to be used without creating both Wire and Wire1 - either because you need to use a library hardcoded to use Wire, not Wire1, or because you need to use the TWI0 pins. This must be called first, before `Wire.enableDualMode()` or `Wire.begin()`. Accepts `&TWI0` and `&TWI1` as arguments.
+This function is only available if the hardware has two modules (DA or DB with 32+ pins); this allows you to swap the Wire object over to use TWI1, allowing the TWI1 pins to be used without creating both Wire and Wire1 - either because you need to use a library hardcoded to use Wire, not Wire1, or because you need to use the TWI0 pins. This must be called first, before `Wire.enableDualMode()` or `Wire.begin()`. Accepts `&TWI0` and `&TWI1` as arguments.
 
 This method is available ONLY if both TWI0 and TWI1 are present on the device, but the tools -> Wire mode menu is not set to an option that creates Wire1. The point is to provide a facility to, without the overhead of both Wire modules, use the TWI1 pins instead of the TWI0 pins.
 
 ```c++
 enableDualMode(bool fmp_enable);      // Moves the Slave to dedicated pins
 ```
-This enables the "Dual Mode" which moves the slave functionality to a second pair of pins, such that there is a SCL/SDA pair for the master and an SCL/SDA pair for the slave. Some parameters (such as Fast Mode+ support) can be enabled separately for the slave. This must be called before `Wire.begin()` This is only available on megaAVR 0-series, and AVR Dx and Ex-series, not tinyAVR. The version of this document included with such parts will list the slave mode pinsets. This will generate an error if referenced on a tinyAVR.
+This enables the "Dual Mode" which moves the slave functionality to a second pair of pins, such that there is a SCL/SDA pair for the master and an SCL/SDA pair for the slave. Some parameters (such as Fast Mode+ support) can be enabled separately for the slave. This must be called before `Wire.begin()` This is only available on megaAVR 0-series, and AVR Dx and Ex-series, not tinyAVR. The version of this document included with such parts will list the slave mode pin-sets. This will generate an error if referenced on a tinyAVR.
 
 ### Standard methods and features significant differences
 ```c++
@@ -199,11 +207,11 @@ It does NOT turn on the pullups on any pin - unlike the standard version.
 ```c++
 begin(uint8_t  address, bool receive_broadcast = 0, uint8_t second_address = 0);
 ```
-This starts the slave Wire functionality. *It does not start master functionality - when both are enabled, begin() and begin(address) must be called*. The second and third arguments are optional.. The first argument simply specifies the slave address to listen on (like on standard `Wire.begin()`), the second argument enables receiving of general call addresses, and the third allows specification of either a second address, or a mask.
+This starts the slave Wire functionality. *It does not start master functionality - when both are enabled, begin() and begin(address) must be called*. The second and third arguments are optional. The first argument simply specifies the slave address to listen on (like on standard `Wire.begin()`), the second argument enables receiving of general call addresses, and the third allows specification of either a second address, or a mask.
 
-If receive_broadcast is true, the handler selected by `Wire.onReceive()` will be called when a "General Call" message is seen, containing the data or command included with it. General call commands are always writes, perhaps obviously (since more than one device attempting to respond would result in nothing but gibberish). My understanding is that general calls are always followed by a 1 byte command, and some or all of these values are reserved for certain purposes; I have not been successful at finding that list online, other that finding references to the I2C spec and that 0x00 is a software reset command. If not specified, this defaults to `false`; it must be specified if the third argument is used.
+If receive_broadcast is true, the handler selected by `Wire.onReceive()` will be called when a "General Call" message is seen, containing the data or command included with it. General call commands are always writes, perhaps obviously (since more than one device attempting to respond would result in nothing but gibberish). According to the specification, a general call is followed by a 1 byte command, either 0x06 or 0x04 (0x00 is forbidden). The commands instruct the slave to use a previously programmed address, where 0x06 also instructs the slave to do a software-reset (not implemented by Wire library). If not specified, this defaults to `false`; it must be specified if the third argument is used.
 
-If second_address is supplied, two options can be used. In both cases a 7 bit address is supplied in the largest 7 bits (that is, leftshifted once from the traditional Arduino representation); it's function is controlled by the the least significant bit - if the LSB is 1, it's a second address matched in addition to the first. Otherwise, bits that are 1's are not masked off, and are not considered. Two helper macros are provided - these are meant for the sole purpose of code readability - the macro names are self explanatory.
+If second_address is supplied, two options can be used. In both cases a 7 bit address is supplied in the largest 7 bits (that is, left-shifted once from the traditional Arduino representation); it's function is controlled by the the least significant bit - if the LSB is 1, it's a second address matched in addition to the first. Otherwise, bits that are 1's are not masked off, and are not considered. Two helper macros are provided - these are meant for the sole purpose of code readability - the macro names are self explanatory.
 ```c++
 #define WIRE_ALT_ADDRESS(alt_address) ((alt_address << 1) | 0x01)
 #define WIRE_ADDRESS_MASK(mask) (mask << 1)
@@ -221,7 +229,7 @@ If (and only if) the Master and Slave option is selected in the Tools -> Wire mo
 ```c++
 setClock(uint32_t);
 ```
-The `setClock()` method has it's usual function. `Wire.setClock()` is not exact. The hardware clock generator monitors the SCL line, and begins the next pulse only after the pin has returned to HIGH and been there for a requisite amount of time. The length of these times, t<sub>high</sub> and t<sub>low</sub> are controlled by the `TWIn.MBAUD` register, which is what setClock() changes. But the period of each cycle is composed of 4 parts: t<sub>high</sub> +t<sub>fall</sub> + t<sub>low</sub> + <sub>fall</sub>. the high and low times are controlled by this register, and tFall is influenced by whether the part is set to "FM+ mode" (this drives the pin harder). As described above, the factor limiting the speed of I2C as the speed gets faster is the rise time, which is controlled solely by the total strength of all the pullups on the bus, and the capacitance of the bus. Since the baud generator adapts to electrical conditions, which are not known to the software, this clock setting would only match with one combination of pullup strength and bus capacitance, amd at the extremes, the difference in clock speed with the same baud rate set but different electrical conditions on the bus could be 50% or more. *This is preferable to the alternative approach of ignoring the electrical conditions, setting a fixed clock speed, and failing to transfer data under adverse electrical conditions*.
+The `setClock()` method has it's usual function. `Wire.setClock()` is not exact. The hardware clock generator monitors the SCL line, and begins the next pulse only after the pin has returned to HIGH and been there for a requisite amount of time. The length of these times, t<sub>high</sub> and t<sub>low</sub> are controlled by the `TWIn.MBAUD` register, which is what setClock() changes. But the period of each cycle is composed of 4 parts: t<sub>high</sub> +t<sub>fall</sub> + t<sub>low</sub> + <sub>fall</sub>. the high and low times are controlled by this register, and tFall is influenced by whether the part is set to "FM+ mode" (this drives the pin harder). As described above, the factor limiting the speed of I2C as the speed gets faster is the rise time, which is controlled solely by the total strength of all the pullups on the bus, and the capacitance of the bus. Since the baud generator adapts to electrical conditions, which are not known to the software, this clock setting would only match with one combination of pullup strength and bus capacitance, and at the extremes, the difference in clock speed with the same baud rate set but different electrical conditions on the bus could be 50% or more. *This is preferable to the alternative approach of ignoring the electrical conditions, setting a fixed clock speed, and failing to transfer data under adverse electrical conditions*.
 
 `Wire.setClock()`  must be called after `Wire.begin()`, and will briefly disable the TWI interface to make the necessary changes. It will handle setting the `FMPEN` bit to enable "Fast Mode Plus" for speeds in excess of what Fast Mode is capable of. Anything above 400 kHz will set the FMPEN bit to enable Fast Mode Plus (in dual mode, the slave pins must have this configured separately, since the slave needs to be warned ahead of time to expect Fast Mode Plus). Fast Mode and Standard are indistinguishable from the software's perspective.  Most parts these days support fast mode, and ones that support Fast Mode+ are common. You must be sure to run the bus at a speed compatible with all connected devices and for which the pullup is sufficient. See the discussion above for more about pullups. If not specified, the default is to approximate 100 kHz SCL clock speed. The speeds chosen by this method are more likely to be lower than you asked for than higher - this helps prevent accidentally using a higher clock speed than your other devices support. If it is problematic that the exact speed cannot be controlled tightly for I2C, the I2C bus is not the appropriate technology for your application. SPI allows the clock speed to be known with certainty at compile time (and allows much higher transfer speeds because it isn't limited by the rise-time of the open drain line)
 
@@ -265,13 +273,14 @@ In 2.5.4/1.4.4 it was reported that the return value of this method did not matc
 |  0x02 | Timeout waiting for ack of address                             | Yes      |
 |  0x03 | Timeout waiting for ack of data                                | Yes      |
 |  0x04 | Unknown error                                                  | Yes      |
+|  0x05 | Timeout                                                        | Yes      |
 |  0x10 | Arbitration lost                                               | No       |
 |  0x11 | Line held low or not pulled up                                 | No       |
 |  0xFF | Bus in unknown state (begin() not called?)                     | No       |
 
 In the case of a TX buffer overflow, when it gets to endTransmission, this looks the same as a full buffer, because write() didn't put the excess data into the buffer, and returned a number smaller than the number of bytes passed to it. I'm not sure how error code 1 could ever happen.
 
-### Methods that have their standard behavior
+### Methods that have their standard behaviour
 The implementation isn't identical, but the behaviour is unchanged - or differ only in an irrelevant and implicitly convertible return or argument type (some versions of the official core have sizes returned as `size_t` for example; Nothing that any AVR will ever likely to involve single I2C-related function calls that act on 256 or more bytes; using a `uint8_t` helps to reduce flash size).
 ```c++
     void beginTransmission(uint8_t address);
@@ -305,6 +314,11 @@ The implementation isn't identical, but the behaviour is unchanged - or differ o
 5. In onReceive handler, stages all the data the master can read at this time (up to the size of the Wire Buffer) noted above.
 6. Slave releases clock and ack's.
 7. Master clocks in 1 while slave sends them, master ACKs each one before nacking when done and generating a stop condition.
+
+## Wire and Sleep
+Between 2.5.0 and 2.6.1, the library was checking the BUSERR flag and aborted a transmission and the data if it there was an error. However, when a device was in Stand-by(SB) or Power-Down(PD) sleep mode, the BUSERR bit would be set on the STOP condition, rendering any received transmission like it never happened. Upon investigating, following theory was concluded: The BUSERR circuitry relies on CLK_PER, which was disabled in sleep. Because of this it never registered the START condition and just saw two STOP conditions on the bus - an invalid state. It was decided to not check for BUSERR at all, as often other errors would also cover the BUSERR cases.
+Furthermore, with SB and PD sleep, the library was prone to leave the TWI bus in an undefined state, where both lines would be kept pulled low. This happened, because the TWI can wake the CPU from SB/PD only on an address match, not on a data interrupt. When the code puts the CPU to sleep between an address match and the data interrupt, the slave will keep the SCL line low and the TWI stays unresponsive. There was an attempt to mitigate this in 2.6.1 with `slaveTransactionOpen()`, but it ended up being kind of ugly.
+With 2.6.2 however, the Wire library makes sure, that the CPU can not enter SB/PD sleep mode between an address match interrupt and a STOP condition. This is achieved by buffering the current sleep setting and changing the sleep setting to IDLE. At a STOP condition, the buffered value is copied back to the register. This method was chosen, because it offers a further reduction of power consumption, as the CPU can stay in IDLE between data interrupts, as well as preventing the TWI bus of becoming unresponsive. Furthermore, the only thing the user has to do is to call `sleep_cpu()` repeatedly as long as no other jobs have to be executed. If not, the CPU will just wake up on the next data interrupt and stay awake, increasing power consumption.
 
 ## Why are there so many names for this protocol?
 Wire, TWI (Two Wire Interface), Two Wire, IIC, I2C-compatible, I2C, I<sup>2</sup>C... The reason for this is that I2C (and the explicitly formatted version of it, I<sup>2</sup>C) are trademarked by Phillips (now NXP) which has historically been very litigious, and would go after manufacturers of parts that didn't pay license fees. So devices that could communicate with and which were I2C in all but name proliferated. The last patent expired a while ago, but they still hold the trademarks, so other manufacturers persist in using their names. The actual terms described in the specification claim to cover to all devices that "can" communicate over I2C, and make exception only for FPGAs, where the person programming them also was supposed to get a license. It seems that the litigation wars have cooled somewhat now, though I still would be mighty careful if I was designing microcontrollers. In any event, Atmel always called it TWI, and that tradition was not lost when Microchip purchased them. . So where did this name come from? IIC was apparently the inspiration: "Inter-Integrated Circuit".
