@@ -20,6 +20,11 @@ These items are in addition to what was listed under changes already in release.
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
+## Unreleased changes
+
+### Planned 2.6.2 (if it doesn't turn into a rolling disaster as 1.6.1)
+* Serial UPDI Chip erase via the Protected KEY Interface didn't happen, it was relying on the chip erase nvmctrl command, wehich can't be usedon a locked chip, or one spamming software resets
+
 ## Released Versions
 
 ### 2.6.1 (critical update)
