@@ -21,7 +21,7 @@
   Modified 2019-2021 by Spence Konde for megaTinyCore and DxCore.
   This version is part of megaTinyCore and DxCore; it is not expected
   to work with other hardware or cores without modifications.
-  Modified 2021 by MX682X for the Wire library rewriting project
+  Modified 2021-22 by MX682X for the Wire library rewriting project
 */
 // *INDENT-OFF*   astyle wants this file to be completely unreadable with no indentation for the many preprocessor conditionals!
 #ifndef TWI_PINS_H
@@ -72,33 +72,30 @@ bool TWI_checkPins(uint8_t sda_pin, uint8_t scl_pin) {
 }
 
 void TWI0_ClearPins() {
-  #ifdef PORTMUX_TWIROUTEA
-    uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm; // registers are volatile, so this is bulky to recheck multiple times.
-    if (portmux == PORTMUX_TWI0_ALT2_gc) {
-      // make sure we don't get errata'ed - make sure their bits in the
-      // PORTx.OUT registers are 0.
+  #if defined(DXCORE)
+    uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm; // registers are volatile, so it's bulky to recheck multiple times.
+    if (portmux == PORTMUX_TWI0_ALT2_gc) {                // make sure we don't get errata'ed
       PORTC.OUTCLR = 0x0C;  // bits 2 and 3
     } else {
-      #if !defined(__AVR_DD__)
-        PORTA.OUTCLR = 0x0C;  // bits 2 and 3
+      #if defined(__AVR_DD__)
+        PORTA.OUTCLR = (portmux == PORTMUX_TWI0_ALT3_gc ? 0x03 : 0x0C)
       #else
-        PORTA.OUTCLR = (portmux == 3 ? 0x03 : 0x0C)
+        PORTA.OUTCLR = 0x0C;  // bits 2 and 3
       #endif
     }
     #if defined(TWI_DUALCTRL)
       if (TWI0.DUALCTRL & TWI_ENABLE_bm) {
-        #if !defined(__AVR_DD__)
-          if (portmux == PORTMUX_TWI0_DEFAULT_gc) {
-            PORTC.OUTCLR = 0x0C;  // bits 2 and 3
-          } else {
-            PORTC.OUTCLR = 0xC0;  // bits 6 and 7
+        #if defined(__AVR_DD__)
+          if ((portmux == PORTMUX_TWI0_DEFAULT_gc) ||
+              (portmux == PORTMUX_TWI0_ALT3_gc)) {
+            PORTC.OUTCLR = 0x0C; // AVR DD only has one set of slave only pins.
           }
         #else
-          PORTC.OUTCLR = 0x0C; // AVR DD only has one set of slave only pins.
+          PORTC.OUTCLR = (portmux == PORTMUX_TWI0_DEFAULT_gc ? 0x0C : 0xC0)
         #endif
       }
     #endif
-  #else  // megaTinyCore
+  #elif defined(MEGATINYCORE)  /* tinyAVR 0/1-series */
     #if defined(PORTMUX_TWI0_bm)
       if ((PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
         // make sure we don't get errata'ed - make sure their bits in the
@@ -281,86 +278,144 @@ void TWI0_usePullups() {
   // make sure we don't get errata'ed - make sure their bits in the output registers are off!
   #if defined(DXCORE)
     uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm;
-    PORT_t *port = portToPortStruct(portmux == PORTMUX_TWI0_ALT2_gc ? PC : PA);
+    PORT_t *port;
+    #if (defined (PORTA) && defined (PORTC))
+      ((portmux == PORTMUX_TWI0_ALT2_gc) ? (port = &PORTC) : (port = &PORTA));
+    #elif defined (PORTA)
+      port = &PORTA;
+    #elif defined (PORTC)
+      port = &PORTC;
+    #else
+      #warning "Something went wrong. No TWI0 related Port was defined"
+      return;
+    #endif
     #if defined(__AVR_DD__)
       if (3 == portmux) {
+        port->OUTCLR    = 0x03;  // bits 0 and 1
         port->PIN0CTRL |= PORT_PULLUPEN_bm;
         port->PIN1CTRL |= PORT_PULLUPEN_bm;
-        port->OUTCLR    = 0x03;  // bits 0 and 1
       } else
     #endif
     {
+      port->OUTCLR    = 0x0C;  // bits 2 and 3
       port->PIN2CTRL |= PORT_PULLUPEN_bm;
       port->PIN3CTRL |= PORT_PULLUPEN_bm;
-      port->OUTCLR    = 0x0C;  // bits 2 and 3
     }
     #if defined(TWI_DUALCTRL)   //Also handle client pins, if enabled
       if (true == ((TWI0.DUALCTRL) & TWI_ENABLE_bm)) {
         #if defined(__AVR_DD__)
-          if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == PORTMUX_TWI0_DEFAULT_gc ||
-              (PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == PORTMUX_TWI0_ALT3_gc) {
+          if (portmux == PORTMUX_TWI0_DEFAULT_gc ||
+              portmux == PORTMUX_TWI0_ALT3_gc) {
+            PORTC.OUTCLR    = 0x0C;
             PORTC.PIN2CTRL |= PORT_PULLUPEN_bm;
             PORTC.PIN3CTRL |= PORT_PULLUPEN_bm;
-            PORTC.OUTCLR    = 0x0C;
           }
         #else
-          if ((PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm) == PORTMUX_TWI0_DEFAULT_gc) {
+          if (portmux == PORTMUX_TWI0_DEFAULT_gc) {
+            PORTC.OUTCLR    = 0x0C;  // bits 2 and 3
             PORTC.PIN2CTRL |= PORT_PULLUPEN_bm;
             PORTC.PIN3CTRL |= PORT_PULLUPEN_bm;
-            PORTC.OUTCLR    = 0x0C;  // bits 2 and 3
           } else {
+            PORTC.OUTCLR    = 0xC0;  // bits 6 and 7
             PORTC.PIN6CTRL |= PORT_PULLUPEN_bm;
             PORTC.PIN7CTRL |= PORT_PULLUPEN_bm;
-            PORTC.OUTCLR    = 0xC0;  // bits 6 and 7
           }
         #endif
       }
     #endif
-  #else  // megaTinyCore
+  #elif defined(MEGATINYCORE)  /* tinyAVR 0/1-series */
     #if defined(PORTMUX_TWI0_bm)
       if (true == (PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
+        PORTA.OUTCLR    = 0x06;
         PORTA.PIN2CTRL |= PORT_PULLUPEN_bm;
         PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
-        PORTA.OUTCLR    = 0x06;
       } else {
+        PORTB.OUTCLR    = 0x03;  // bits 1 and 0.
         PORTB.PIN1CTRL |= PORT_PULLUPEN_bm;
         PORTB.PIN0CTRL |= PORT_PULLUPEN_bm;
-        PORTB.OUTCLR    = 0x03;  // bits 1 and 0.
       }
     #elif defined(__AVR_ATtinyxy2__)
+      PORTA.OUTCLR    = 0x06;  // bits 2 and 1.
       PORTA.PIN2CTRL |= PORT_PULLUPEN_bm;
       PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
-      PORTA.OUTCLR    = 0x06;  // bits 2 and 1.
     #else
+      PORTB.OUTCLR    = 0x03;  // bits 1 and 0.
       PORTB.PIN1CTRL |= PORT_PULLUPEN_bm;
       PORTB.PIN0CTRL |= PORT_PULLUPEN_bm;
-      PORTB.OUTCLR    = 0x03;  // bits 1 and 0.
     #endif
   #endif
 }
-#if defined(TWI1)
-void TWI1_ClearPins() {
-  #if defined(PORTMUX_TWIROUTEA)
-    #if defined(PIN_WIRE1_SDA_PINSWAP_2)
-      if ((PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm) == PORTMUX_TWI1_ALT2_gc) {
-      // make sure we don't get errata'ed - make sure their bits in the
-      // PORTx.OUT registers are 0.
-      PORTB.OUTCLR = 0x0C;  // bits 2 and 3
+
+//Check if TWI0 Master pins have a HIGH level: Bit0 = SDA, Bit 1 = SCL
+uint8_t TWI0_checkPinLevel(void) {
+  #if defined(DXCORE)     /* Dx-series */
+    #if (defined (VPORTA) && defined (VPORTC))
+      uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm;
+    #endif
+    VPORT_t *vport;
+    #if (defined (VPORTA) && defined (VPORTC))
+      ((portmux == PORTMUX_TWI0_ALT2_gc) ? (vport = &VPORTC) : (vport = &VPORTA));
+    #elif defined (VPORTA)
+      vport = &VPORTA;
+    #elif defined (VPORTC)
+      vport = &VPORTC;
+    #else
+      #warning "Something went wrong. No TWI0 related Port was defined"
+      return 0;
+    #endif
+
+    #if defined(__AVR_DD__)
+      if (3 == portmux) {
+        return ((vport->IN & 0x03);
       } else
     #endif
     {
-      PORTF.OUTCLR = 0x0C;  // bits 2 and 3
+      return ((vport->IN & 0x0C) >> 2);
     }
-    #if defined(TWI_DUALCTRL)
-      if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
-        if ((PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm) == PORTMUX_TWI1_DEFAULT_gc) {
-          PORTB.OUTCLR = 0x0C;  // bits 2 and 3
-        } else {
-          PORTB.OUTCLR = 0xC0;  // bits 6 and 7
-        }
+  #elif defined(MEGATINYCORE)  /* tinyAVR 0/1-series */
+    #if defined(PORTMUX_TWI0_bm)  // Has a pin multiplexer
+      if (true == (PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
+        return ((VPORTA.IN & 0x06) >> 1);
+      } else {
+        return (VPORTB.IN & 0x03);
       }
+    #elif defined(__AVR_ATtinyxy2__)  // No pin multiplexer
+      return ((VPORTA.IN & 0x06) >> 1);
+    #else
+      return (VPORTB.IN & 0x03);
     #endif
-  #endif   // Only Dx-Series has 2 TWI
+  #else /* Neither Dx Nor MegaTiny Core */
+    #warning "No Core defined, don't know the pins to check"
+    return 0;
+  #endif
+}
+
+
+
+
+#if defined(TWI1)
+void TWI1_ClearPins() {
+  #if defined (TWI_USING_WIRE1)
+    #if defined(PORTMUX_TWIROUTEA)
+      #if defined(PIN_WIRE1_SDA_PINSWAP_2)
+        if ((PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm) == PORTMUX_TWI1_ALT2_gc) {  // make sure we don't get errata'ed
+          PORTB.OUTCLR = 0x0C;  // bits 2 and 3
+        } else
+      #endif
+      {
+        PORTF.OUTCLR = 0x0C;  // bits 2 and 3
+      }
+      #if defined(TWI_DUALCTRL)
+        if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
+          if ((PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm) == PORTMUX_TWI1_DEFAULT_gc) {
+            PORTB.OUTCLR = 0x0C;  // bits 2 and 3
+          } else {
+            PORTB.OUTCLR = 0xC0;  // bits 6 and 7
+          }
+        }
+      #endif
+    #endif   // Only DA/DB has 2 TWI
+  #endif
 }
 
 
@@ -456,29 +511,61 @@ bool TWI1_swap(uint8_t state) {
 
 
 void TWI1_usePullups() {
-  #if defined(TWI1)
-    uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm;
-    PORT_t *port = portToPortStruct(portmux == PORTMUX_TWI1_ALT2_gc ? PB : PF);
+  uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm;
+  PORT_t *port;
+  #if (defined (PORTB) && defined (PORTF))
+    ((portmux == PORTMUX_TWI1_ALT2_gc) ? (port = &PORTB) : (port = &PORTF));
+  #elif defined (PORTB)
+    port = &PORTB;
+  #elif defined (PORTF)
+    port = &PORTF;
+  #else
+    #warning "Something went wrong. No TWI1 related Port was defined"
+    return;
+  #endif
 
-    port->OUTCLR = 0x0C;  // bits 2 and 3
-    port->PIN2CTRL |= PORT_PULLUPEN_bm;
-    port->PIN3CTRL |= PORT_PULLUPEN_bm;
+  port->OUTCLR = 0x0C;  // bits 2 and 3
+  port->PIN2CTRL |= PORT_PULLUPEN_bm;
+  port->PIN3CTRL |= PORT_PULLUPEN_bm;
 
-    #if defined(TWI_DUALCTRL)
-      if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
-        if (PORTMUX_TWI1_DEFAULT_gc == portmux) {
-          PORTB.OUTCLR = 0x0C;  // bits 2 and 3
-          PORTB.PIN2CTRL |= PORT_PULLUPEN_bm;
-          PORTB.PIN3CTRL |= PORT_PULLUPEN_bm;
-        } else {
-          PORTB.OUTCLR = 0xC0;  // bits 6 and 7
-          PORTB.PIN6CTRL |= PORT_PULLUPEN_bm;
-          PORTB.PIN7CTRL |= PORT_PULLUPEN_bm;
-        }
+  #if defined(TWI_DUALCTRL)
+    if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
+      if (PORTMUX_TWI1_DEFAULT_gc == portmux) {
+        PORTB.OUTCLR = 0x0C;  // bits 2 and 3
+        PORTB.PIN2CTRL |= PORT_PULLUPEN_bm;
+        PORTB.PIN3CTRL |= PORT_PULLUPEN_bm;
+      } else {
+        PORTB.OUTCLR = 0xC0;  // bits 6 and 7
+        PORTB.PIN6CTRL |= PORT_PULLUPEN_bm;
+        PORTB.PIN7CTRL |= PORT_PULLUPEN_bm;
       }
-    #endif
+    }
   #endif
 }
-#endif
 
-#endif /* TWI_DRIVER_H */
+//Check if TWI1 Master pins have a HIGH level: Bit0 = SDA, Bit 1 = SCL
+uint8_t TWI1_checkPinLevel(void) {
+  #if defined(DXCORE)     /* Dx-series */
+    #if (defined (VPORTB) && defined (VPORTF))
+      uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm;
+    #endif
+    VPORT_t *vport;
+    #if (defined (VPORTB) && defined (VPORTF))
+      ((portmux == PORTMUX_TWI1_ALT2_gc) ? (vport = &VPORTB) : (vport = &VPORTF));
+    #elif defined (VPORTB)
+      vport = &VPORTB;
+    #elif defined (VPORTF)
+      vport = &VPORTF;
+    #else
+      #warning "Something went wrong. No TWI1 related Port was defined"
+      return 0;
+    #endif
+    return ((vport->IN & 0x0C) >> 2);
+  #else /* No Core */
+    #warning "No Core defined, don't know the pins to check"
+    return 0;
+  #endif
+}
+#endif  /* defined(TWI1) */
+
+#endif /* TWI_PINS_H */

@@ -21,7 +21,7 @@
   Modified 2019-2021 by Spence Konde for megaTinyCore and DxCore.
   This version is part of megaTinyCore and DxCore; it is not expected
   to work with other hardware or cores without modifications.
-  Modified extensively 2021 by MX682X for megaTinyCore and DxCore.
+  Modified extensively 2021-22 by MX682X for megaTinyCore and DxCore.
   Added Support for Simultaneous host/client, dual mode and Wire1.
 */
 // *INDENT-OFF*   astyle wants this file to be completely unreadable with no indentation for the many preprocessor conditionals!
@@ -287,8 +287,6 @@ void TwoWire::beginTransmission(uint8_t address) {
     uint8_t* txHead  = &(vars._bytesToWrite);
   #endif
   if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
-    // Spence: pretty sure this doesn't work. Constant folding and autoinlining doesn't seem to happen correctly when constants are passed to class methods, even when called a single time... .
-    // C++ stuff confuses the optimizer almost as much as me.
     badArg("Supplied address seems to be 8 bit. Only 7-bit-addresses are supported");
     return;
   }
@@ -519,10 +517,7 @@ size_t TwoWire::readBytes(char* data, size_t quantity) {
  *@retval     byte in the buffer or -1 if buffer is empty
  */
 int TwoWire::peek(void) {
-
-  uint8_t *rxHead;
-  uint8_t *rxTail;
-  uint8_t *rxBuffer;
+  uint8_t *rxHead, *rxTail, *rxBuffer;
 
   #if defined(TWI_MANDS)                         // Add following if host and client are split
     if (vars._bools._toggleStreamFn == 0x01) {
@@ -582,6 +577,7 @@ uint8_t TwoWire::getIncomingAddress(void) {
   #endif
 }
 
+
 /**
  *@brief      getBytesRead provides a facility for the slave to check how many bytes were
  *              successfully read by the master.
@@ -601,6 +597,7 @@ uint8_t TwoWire::getBytesRead() {
   return num;
 }
 
+
 /**
  *@brief      slaveTransactionOpen provides a facility for the slave to determine if a there
  *              is an ongoing transaction when called outside of one of the handlers.
@@ -617,11 +614,12 @@ uint8_t TwoWire::getBytesRead() {
  */
 
 uint8_t TwoWire::slaveTransactionOpen() {
-   if (vars._module->SSTATUS & (TWI_DIR_bm | TWI_AP_bm)) return 2;
-   if (vars._module->SSTATUS & TWI_AP_bm) return 1; // Slave Status is a volatile register, thus two loads
-   // Why are we doing it this way?! Why not read the status into a local variable and compare to that, saving 3 clock cycles and 4 bytes of flash?
-   return 0;
+  uint8_t status = vars._module->SSTATUS;
+  if (!(status & TWI_AP_bm)) return 0;  // If AP bit is cleared, last match was a stop condition -> not in transaction.
+  if (status & TWI_DIR_bm) return 2;    // DIR bit will be 1 if last address match was for read
+  return 1;                             // Otherwise it was a write.
 }
+
 
 /**
  *@brief      enableDualMode enables the splitting of host and client pins
@@ -641,6 +639,33 @@ void TwoWire::enableDualMode(bool fmp_enable) {
   #else
     badCall("enableDualMode was called, but device does not support it");
     (void) fmp_enable;    // Disable unused variable warning
+  #endif
+}
+
+
+/**
+ *@brief      checkPinLevels returns the pin level of the Master SDA/SCL pins
+ *
+ *            useful when you want to make sure the bus is ready and there is
+ *              no device that might take longer to switch its pins to open-drain.
+ *              In a multi-master system, a return value of 0x03 does not guarantee
+ *              that the bus is IDLE.
+ *
+ *@param      none
+ *
+ *@return     uint8_t - SDA level is represented with bit 0, SCL with bit 1. Bus ready with 0x03
+ */
+uint8_t TwoWire::checkPinLevels(void) {
+  #if defined(TWI1)
+    if (&TWI0 == vars._module)  {
+      return TWI0_checkPinLevel();
+    } else if (&TWI1 == vars._module)  {
+      return TWI1_checkPinLevel();
+    } else {
+      return false;
+    }
+  #else
+    return TWI0_checkPinLevel();
   #endif
 }
 
