@@ -520,20 +520,21 @@
 
 #if !defined(BACKWARD_COMBATIBILITY_MODE)
   // We default to seeking compatibility. for COMBATability you would uncomment that #define, and that turns all these off.
-
-  #if defined(RTC_CLKSEL)
   /* Man they just *HAD* to change the names of these values that get assigned to the same register and do the same thing didn't they?
-   * Worse still we can't even verify that they are present... just blindly define and pray. Enums can't be seen by macros   */
-    #define RTC_CLKSEL_INT32K_gc              RTC_CLKSEL_OSC32K_gc
-    #define RTC_CLKSEL_INT1K_gc               RTC_CLKSEL_OSC1K_gc
-    #if defined(RTC_CLKSEL0_bm) //Seriously?!
-      #define RTC_CLKSEL_TOSC32K_gc           RTC_CLKSEL_XOSC32K_gc
-      #define RTC_CLKSEL_XTAL32K_gc           RTC_CLKSEL_XOSC32K_gc
-    #else
-      #define RTC_CLKSEL_TOSC32K_gc           RTC_CLKSEL_XTAL32K_gc
-      #define RTC_CLKSEL_XOSC32K_gc           RTC_CLKSEL_XTAL32K_gc
-    #endif
-    // for when they notice the IO header doesn't match the datasheet and have to "fix" something...
+   * Worse still we can't even verify that they are present... just blindly define and pray. Enums can't be seen by macros
+   */
+   // tinyAVR has TOSC32K (tinyOscillator?)
+  #if defined(MEGATINYCORE)
+    #define RTC_CLKSEL_OSC32K_gc            RTC_CLKSEL_INT32K_gc
+    #define RTC_CLKSEL_OSC1K_gc             RTC_CLKSEL_INT1K_gc
+    #define RTC_CLKSEL_XTAL32K_gc           RTC_CLKSEL_TOSC32K_gc
+    #define RTC_CLKSEL_XOSC32K_gc           RTC_CLKSEL_TOSC32K_gc
+  #else
+// Dx has an XOSC32K
+    #define RTC_CLKSEL_INT32K_gc            RTC_CLKSEL_OSC32K_gc
+    #define RTC_CLKSEL_INT1K_gc             RTC_CLKSEL_OSC1K_gc
+    #define RTC_CLKSEL_TOSC32K_gc           RTC_CLKSEL_XOSC32K_gc
+    #define RTC_CLKSEL_XTAL32K_gc           RTC_CLKSEL_XOSC32K_gc
   #endif
   /* General Purpose Register names, GPR.GPRn, vs GPIORn vs GPIOn
    * They now appear to have decided they don't like either of the previous conventions, one just a few years old. Now they are grouping
@@ -541,13 +542,8 @@
    * I/O occurring here (ofc they were referring to the IN and OUT instructions, which can be used on these), but I certainly wouldn't
    * have changed a convention like this, at least not when I had just done so a few years prior. */
 
-  // All non-xmega pre-Dx-series parts call them GPIORn instead of GPR.GPRn/GPR_GPRn
-  #ifndef GPIOR0
-    #define GPIOR0                           (GPR_GPR0)
-    #define GPIOR1                           (GPR_GPR1)
-    #define GPIOR2                           (GPR_GPR2)
-    #define GPIOR3                           (GPR_GPR3)
-  #endif
+  // All non-xmega pre-Dx-series modern AVR parts call them GPIORn instead of GPR.GPRn/GPR_GPRn
+  // Some classics called them GPIOn.
 
   /* In one xMega AVR, they were GPIOn, rather than GPIORn
    * One? Yup: The ATxmega32d4. Not the 32d3, nor the 32e5, nor anything else. All the xmega's have GPIORs
@@ -565,52 +561,31 @@
    * heads screwed on properly and realized that 4 GPIOR-- excuse me, GPRs, 4 awkward VPORTs and
    * 12 unused addresses in the low I/O space was maybe not the best design decision made in the
    * xmega line, and decided that wasn't a winning formula */
-  #ifndef GPIO0
-    #define GPIO0                           (GPR_GPR0)
-    #define GPIO_GPIO0                      (GPR_GPR0)
-    #define GPIO1                           (GPR_GPR1)
-    #define GPIO_GPIO1                      (GPR_GPR1)
-    #define GPIO2                           (GPR_GPR2)
-    #define GPIO_GPIO2                      (GPR_GPR2)
-    #define GPIO3                           (GPR_GPR3)
-    #define GPIO_GPIO3                      (GPR_GPR3)
+  #if !defined(GPIOR0)
+    #define GPIOR0                            (_SFR_MEM8(0x001C))
+    #define GPIOR1                            (_SFR_MEM8(0x001D))
+    #define GPIOR2                            (_SFR_MEM8(0x001E))
+    #define GPIOR3                            (_SFR_MEM8(0x001F))
   #endif
-  /* They are are the 4 registers in the GPR "peripheral", GPR.GPR0, GPR.GPR1, GPR.GPR2, and GPR.GPR3!
-   * Let's not split hairs about whether calling 4 registers that do absolutely nothing other than being
-   * located at addresses 0x1C, 0x1D, 0x1E and 0x1F allowing use of all the glorious instructions that brings
-   * SBI, CBI, SBIS, SBIC, IN, and OUT, is enough to qualify as a peripheral.
-   * Anyway - the flat names were used because if we don't, in some situations that winds up causing weird
-   * problems. */
-
-  /* Code written for tinyAVR's TCA EVACT, which is identical to EVACTA on newer parts, would not work
-   * even though they have the same functionality
-   */
-  #if !defined(TCA_SINGLE_CNTAEI_bm)
-    #define TCA_SINGLE_CNTAEI_bm TCA_SINGLE_CNTEI_bm
-  #elif !defined(TCA_SINGLE_CNTEI_bm)
-    #define TCA_SINGLE_CNTEI_bm TCA_SINGLE_CNTAEI_bm
+  #if !defined(GPIO0)
+    #define GPIO0                             (_SFR_MEM8(0x001C))
+    #define GPIO1                             (_SFR_MEM8(0x001D))
+    #define GPIO2                             (_SFR_MEM8(0x001E))
+    #define GPIO3                             (_SFR_MEM8(0x001F))
   #endif
-  #if !defined(TCA_SINGLE_CNTAEI_bp)
-    #define TCA_SINGLE_CNTAEI_bp TCA_SINGLE_CNTEI_bp
-  #elif !defined(TCA_SINGLE_CNTEI_bp)
-    #define TCA_SINGLE_CNTEI_bp TCA_SINGLE_CNTAEI_bp
+  #if !defined(GPIO_GPIOR0)
+    #define GPIO_GPIO0                        (_SFR_MEM8(0x001C))
+    #define GPIO_GPIO1                        (_SFR_MEM8(0x001D))
+    #define GPIO_GPIO2                        (_SFR_MEM8(0x001E))
+    #define GPIO_GPIO3                        (_SFR_MEM8(0x001F))
   #endif
-  #if !defined(TCA_SINGLE_EVACTA_gm)
-    #define TCA_SINGLE_EVACTA_gm TCA_SINGLE_EVACT_gm
-  #elif !defined(TCA_SINGLE_EVACT_gm)
-    #define TCA_SINGLE_EVACT_gm TCA_SINGLE_EVACTA_gm
+  #if !defined(GPR_GPR0)
+    #define GPIO_GPIO0                        (_SFR_MEM8(0x001C))
+    #define GPIO_GPIO1                        (_SFR_MEM8(0x001D))
+    #define GPIO_GPIO2                        (_SFR_MEM8(0x001E))
+    #define GPIO_GPIO3                        (_SFR_MEM8(0x001F))
   #endif
-  #if !defined(TCA_SINGLE_EVACTA_gp)
-    #define TCA_SINGLE_EVACTA_gp TCA_SINGLE_EVACT_gp
-    #define TCA_SINGLE_EVACTA_CNT_POSEDGE_gc   TCA_SINGLE_EVACTA_CNT_POSEDGE_gc
-    #define TCA_SINGLE_EVACTA_CNT_ANYEDGE_gc   TCA_SINGLE_EVACTA_CNT_ANYEDGE_gc
-    #define TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc   TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc
-    #define TCA_SINGLE_EVACTA_UPDOWN_gc        TCA_SINGLE_EVACTA_UPDOWN_gc
-  #elif !defined(TCA_SINGLE_EVACT_gp)
-    #define TCA_SINGLE_EVACT_gp TCA_SINGLE_EVACTA_gp
-  #endif
-
-
+ // The naming of this has gotten so confusing. I give up, we all know where the registers are.
   #if defined (CLKCTRL_SELHF_bm)
     /* They changed the damned name after selling the part for 6 months!
      * annoyingly you can't even test if it's using the new version of the headers because it's an enum! */
@@ -648,27 +623,34 @@
     #define CLKCTRL_FRQSEL_28M_gc (CLKCTRL_FREQSEL_28M_gc)  /* 28 MHz system clock unofficial - this will just error out if used since it will replace one undefined symbol with another */
     #define CLKCTRL_FRQSEL_32M_gc (CLKCTRL_FREQSEL_32M_gc)  /* 32 MHz system clock unofficial - this will just error out if used since it will replace one undefined symbol with another */
   #endif
-  // Note that it is intended to not hide the fact that 28 and 32 MHz are not official. If you choose it from the menu, it says "Overclocked" next to the speed too. We refer to them with the numeric constants in the wiring.c, so it doesn't matter when used that way.
-  // And now the most freaking boneheaded move from Microchip in a long while: They realized that they should have had some sort of delimiter between the bit number within a bitfield, and the name of the bitfield, since the names of many bitfields end in numbers,
-  // So they went ahead and made that change. That is what's called a "breaking change", really for no reason except codes style. Most companies even if they decided to go that route, would never do that without introducuing a compatibility layer.
-  // That wanton disregard for backwards compatibility is not acceptable in an Arduino core nor in a commercial product.
-  // Using the old names will produce warnings. These deprecated names should be fixed as support for these FOUR THOUSAND LINES of bandaids WILL BE REMOBVED in 1.6.0!
-  //typedef const uint8_t __attribute__ ((deprecated("\nMicrochip changed the spelling of bits within a bitfiels (macros that end in the bitnumber followed by _bm or _bp), you are using the old name, ex PERIPH_BITFIRLD1_bm.\nYou should use PERIPH_BITFIELD_1_bm; we do not guarantee that this 4000-line bandaid will not be removed in the future.\r\nWhy did they do this? Beats me. Ask their support folks - if enough of us do it, they might hesitate next time they have the urge to mass rename things in their headers")))  deprecated_constant_name;
 
-  // Okay, well that fix didn't work so well. back to plan A.
   /* Add a feature - yay!
    * Rename registers so people can't carry code back and forth - booo!
    */
-  #ifndef TCA_SINGLE_CNTEI_bm
-    #if !defined(TCA_SINGLE_CNTAEI_bm)
+  // TCA V1.0 - tinyAVR 0/1, megaAVR 0
+  // this only has one event input, but code needs to be able to flow smoothly
+  // so we define macros named after he the new version pointing to the old version of event input A.
+  // Obviously, we can't do anythign about the unfortunate soul who tries to use input B.
+  #if !defined(TCA_SINGLE_CNTAEI_bm)
     #define TCA_SINGLE_CNTAEI_bm TCA_SINGLE_CNTEI_bm
-  #elif !defined(TCA_SINGLE_CNTEI_bm)
-    #define TCA_SINGLE_CNTEI_bm TCA_SINGLE_CNTAEI_bm
+    #define TCA_SINGLE_EVACTA_POSEDGE_gc TCA_SINGLE_EVACTA_CNT_POSEDGE_gc
+    #define TCA_SINGLE_EVACTA_CNT_ANYEDGE_gc TCA_SINGLE_EVACTA_CNT_ANYEDGE_gc
+    #define TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc
+    #define TCA_SINGLE_EVACTA_UPDOWN_gc TCA_SINGLE_EVACTA_UPDOWN_gc
   #endif
+  // TCA V1.1 - DA, DB, tinyAVR 2?
+  //  with two inputs changes the names the existing ones to specify channel A
+  // We add in the non-postfixed ana
+  #if !defined(TCA_SINGLE_CNTEI_bm)
+    #define _TCA_
+    #define TCA_SINGLE_CNTEI_bm TCA_SINGLE_CNTAEI_bm
     #define TCA_SINGLE_EVACT_POSEDGE_gc TCA_SINGLE_EVACTA_CNT_POSEDGE_gc
     #define TCA_SINGLE_EVACT_CNT_ANYEDGE_gc TCA_SINGLE_EVACTA_CNT_ANYEDGE_gc
     #define TCA_SINGLE_EVACT_CNT_HIGHLVL_gc TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc
     #define TCA_SINGLE_EVACT_UPDOWN_gc TCA_SINGLE_EVACTA_UPDOWN_gc
+  #endif
+
+  #if (!defined(MEGATINYCORE) || MEGATINYCORE_SERIES >= 2)
     #define TCB_CLKSEL_CLKDIV1_gc TCB_CLKSEL_DIV1_gc
     #define TCB_CLKSEL_CLKDIV2_gc TCB_CLKSEL_DIV2_gc
     #define TCB_CLKSEL_CLKTCA_gc TCB_CLKSEL_TCA0_gc
@@ -684,7 +666,14 @@
       #error "Only the tinyAVR 1-series and 2-series parts with at least 14 pins support external RTC timebase"
     #endif
   #endif
+  // And now, it it appears that they realized that they should have had some sort of delimiter between the bit number within a bitfield, and the name of the bitfield, since the names of many bitfields end in numbers,
+  // So they went ahead and made that change. Without any compatibility layer.
 
+  // Well, I'd wanted to make deprecation warnings come up only if they were used. I was unuccessful.
+
+  // typedef const uint8_t __attribute__ ((deprecated("\nMicrochip changed the spelling of bits within a bitfiels (macros that end in the bitnumber followed by _bm or _bp), you are using the old name, ex PERIPH_BITFIRLD1_bm.\nYou should use PERIPH_BITFIELD_1_bm; we do not guarantee that this 4000-line bandaid will not be removed in the future.\r\nWhy did they do this? Beats me. Ask their support folks - if enough of us do it, they might hesitate next time they have the urge to mass rename things in their headers")))  deprecated_constant_name;
+
+  // Okay, well that fix didn't work so well. back to plan A.
   /* ======= ACs ======= */
   #if !defined(AC_HYSMODE_0_bm) && defined(AC_HYSMODE0_bm)
     #define AC_HYSMODE_0_bm AC_HYSMODE0_bm

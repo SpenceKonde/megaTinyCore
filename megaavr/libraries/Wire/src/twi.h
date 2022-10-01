@@ -90,8 +90,7 @@ SOFTWARE.
  * addition to being astonishingly unreliable, and byte oriented
  * data storage is more useful for typical applications of AVRs
  * than file-oriented storage.
- * If 130 bytes are not enough, the maximum supported buffer size
- * is 256 bytes without modifications to the library.
+ * The maximum supported buffer length is 255 bytes.
  */
 #ifndef BUFFER_LENGTH
   #if (RAMSIZE < 256)

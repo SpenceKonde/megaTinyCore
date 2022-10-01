@@ -2,10 +2,8 @@
 | Modern AVR Comparator library for tinyAVR 0/1/2, megaAVR0, Dx, and  Ex|
 |                                                                       |
 | Developed in 2019 by MCUdude    https://github.com/MCUdude/           |
-| Ported to tinyAVR 2021 by Spence Konde for megaTinyCore               |
-| https://github.com/SpenceKonde/megaTinyCore                           |
-| Ported to tinyAVR 2022 by Spence Konde for DxCore                     |
-| https://github.com/SpenceKonde/DxCore                                 |
+| Ported to tinyAVR & Dx-series by Spence Konde for megaTinyCore and    |
+| DxCore 2021-2022: https://github.com/SpenceKonde/                     |
 |                                                                       |
 | In this example we use an internal reference voltage instead of an    |
 | external one on the negative pin. This eliminates the need for an     |
@@ -90,7 +88,3 @@ void interruptFunction() {
   */
   int_fired = 1; // This can be kept short and fast,
 }
-
-/* Note that we now support manually defininng interrupts - if neither attach or detach
- * are referenced, efficient interrupts will execute around 50 clocks faster
- */

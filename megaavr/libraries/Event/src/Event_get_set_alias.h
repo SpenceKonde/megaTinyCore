@@ -8,7 +8,7 @@
 #if !defined(EVENT_H)
   #error "This should only be included as part of Event.h"
 #endif
-
+/* *INDENT-OFF* */
 #ifndef EVENT_GET_SET_ALIAS_H
 #define EVENT_GET_SET_ALIAS_H
 
