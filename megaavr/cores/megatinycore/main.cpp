@@ -72,7 +72,7 @@ int main() {
  * init_reset_Flags() should be overridden with one of the ones from the reset guide in any     *
  * production code.                                                                             *
  * If using optiboot, this will never be called, because Optiboot does the same thing.          *
- * By the time app runs, the flags will have been cleared and moved to GPIOR0 (it needs to    *
+ * By the time app runs, the flags will have been cleared and moved to GPIOR0* (it needs to     *
  * clear flags to honor bootloader entry conditions, so I didn't have a choice about that.      *
  * This function is called before *anything* else, so the chip is a blank slate - or it's       *
  * state is unknown. You're probably running at 4 MHz unless it was a dirty reset, in which     *
@@ -91,7 +91,11 @@ int main() {
  * gather data about the nature of the fault. For example, turn on an LED if\ LVL0EX is set     *
  * meaning you got here from a missing ISR. With one of those little boards with 6 LEDs on      *
  * (many are available reasonably cheaply on aliexpress et al.) end up being very useful        *
- * for this sort of thing.                                                                      */
+ * for this sort of thing.
+ *
+ * * The register in question is GPIOR0 on megaTinyCore, GPR.GPR0 on Dx-series, but both names  *
+ * are aliases of eachother per core_devices for compatibility
+ */
 
   /* Minimum: Reset if we wound up here through malfunction - this relies on user clearing the  *
    * register on startup, which is rarely done in Arduino land.                                 */

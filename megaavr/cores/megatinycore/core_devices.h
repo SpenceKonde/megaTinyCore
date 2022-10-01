@@ -515,6 +515,140 @@
  * Instead of backwards compatibilily, you want the opposite, which some wags have called "Backwards combatibility"
  * Defining BACKWARD_COMBATIBILITY_MODE turns off all of these definitions that paper over name changes.
  */
+
+// #define BACKWARD_COMBATIBILITY_MODE
+
+#if !defined(BACKWARD_COMBATIBILITY_MODE)
+  // We default to seeking compatibility. for COMBATability you would uncomment that #define, and that turns all these off.
+
+  #if defined(RTC_CLKSEL)
+  /* Man they just *HAD* to change the names of these values that get assigned to the same register and do the same thing didn't they?
+   * Worse still we can't even verify that they are present... just blindly define and pray. Enums can't be seen by macros   */
+    #define RTC_CLKSEL_INT32K_gc              RTC_CLKSEL_OSC32K_gc
+    #define RTC_CLKSEL_INT1K_gc               RTC_CLKSEL_OSC1K_gc
+    #if defined(RTC_CLKSEL0_bm) //Seriously?!
+      #define RTC_CLKSEL_TOSC32K_gc           RTC_CLKSEL_XOSC32K_gc
+      #define RTC_CLKSEL_XTAL32K_gc           RTC_CLKSEL_XOSC32K_gc
+    #else
+      #define RTC_CLKSEL_TOSC32K_gc           RTC_CLKSEL_XTAL32K_gc
+      #define RTC_CLKSEL_XOSC32K_gc           RTC_CLKSEL_XTAL32K_gc
+    #endif
+    // for when they notice the IO header doesn't match the datasheet and have to "fix" something...
+  #endif
+  /* General Purpose Register names, GPR.GPRn, vs GPIORn vs GPIOn
+   * They now appear to have decided they don't like either of the previous conventions, one just a few years old. Now they are grouping
+   * them under a "General Purpose Register". "peripheral". I cannot argue that GPR doesn't make more sense, as there's not really any
+   * I/O occurring here (ofc they were referring to the IN and OUT instructions, which can be used on these), but I certainly wouldn't
+   * have changed a convention like this, at least not when I had just done so a few years prior. */
+
+  // All non-xmega pre-Dx-series parts call them GPIORn instead of GPR.GPRn/GPR_GPRn
+  #ifndef GPIOR0
+    #define GPIOR0                           (GPR_GPR0)
+    #define GPIOR1                           (GPR_GPR1)
+    #define GPIOR2                           (GPR_GPR2)
+    #define GPIOR3                           (GPR_GPR3)
+  #endif
+
+  /* In one xMega AVR, they were GPIOn, rather than GPIORn
+   * One? Yup: The ATxmega32d4. Not the 32d3, nor the 32e5, nor anything else. All the xmega's have GPIORs
+   * and their headers list the GPIOn names too. But.... there is only a single header
+   * file with them not marked as "Deprecated": ATxmega32D4
+   * 24 of the 46 xmega parts with headers in the compiler packages (including the 32d3 and 32e5) had the
+   * 4 GPIOR's that we have, and had GPIOn and GPIO_GPIOn present but marked as deprecated.
+   * On those parts, these are at addresses 0x0000-0x003, and 0x0004-0x000F do not appear to be used.
+   * The other 22.... had THE ENTIRE FIRST HALF OF THE LOW I/O SPACE as GPIOR0-GPIORF!
+   * Which ones got all of them and which ones only got 4 seems to have been chosen in typical
+   * Atmel fashion (in other words, randomly). No apparent pattern in time or other parameters.
+   * Either way, that left them with space for only 4 VPORT register sets (like the ones we got)
+   * These had to be configured to point to the desired port.
+   * I'm sure everyone is grateful for the fact that the folks designing the Dx-series have their
+   * heads screwed on properly and realized that 4 GPIOR-- excuse me, GPRs, 4 awkward VPORTs and
+   * 12 unused addresses in the low I/O space was maybe not the best design decision made in the
+   * xmega line, and decided that wasn't a winning formula */
+  #ifndef GPIO0
+    #define GPIO0                           (GPR_GPR0)
+    #define GPIO_GPIO0                      (GPR_GPR0)
+    #define GPIO1                           (GPR_GPR1)
+    #define GPIO_GPIO1                      (GPR_GPR1)
+    #define GPIO2                           (GPR_GPR2)
+    #define GPIO_GPIO2                      (GPR_GPR2)
+    #define GPIO3                           (GPR_GPR3)
+    #define GPIO_GPIO3                      (GPR_GPR3)
+  #endif
+  /* They are are the 4 registers in the GPR "peripheral", GPR.GPR0, GPR.GPR1, GPR.GPR2, and GPR.GPR3!
+   * Let's not split hairs about whether calling 4 registers that do absolutely nothing other than being
+   * located at addresses 0x1C, 0x1D, 0x1E and 0x1F allowing use of all the glorious instructions that brings
+   * SBI, CBI, SBIS, SBIC, IN, and OUT, is enough to qualify as a peripheral.
+   * Anyway - the flat names were used because if we don't, in some situations that winds up causing weird
+   * problems. */
+
+  /* Code written for tinyAVR's TCA EVACT, which is identical to EVACTA on newer parts, would not work
+   * even though they have the same functionality
+   */
+  #if !defined(TCA_SINGLE_CNTAEI_bm)
+    #define TCA_SINGLE_CNTAEI_bm TCA_SINGLE_CNTEI_bm
+  #elif !defined(TCA_SINGLE_CNTEI_bm)
+    #define TCA_SINGLE_CNTEI_bm TCA_SINGLE_CNTAEI_bm
+  #endif
+  #if !defined(TCA_SINGLE_CNTAEI_bp)
+    #define TCA_SINGLE_CNTAEI_bp TCA_SINGLE_CNTEI_bp
+  #elif !defined(TCA_SINGLE_CNTEI_bp)
+    #define TCA_SINGLE_CNTEI_bp TCA_SINGLE_CNTAEI_bp
+  #endif
+  #if !defined(TCA_SINGLE_EVACTA_gm)
+    #define TCA_SINGLE_EVACTA_gm TCA_SINGLE_EVACT_gm
+  #elif !defined(TCA_SINGLE_EVACT_gm)
+    #define TCA_SINGLE_EVACT_gm TCA_SINGLE_EVACTA_gm
+  #endif
+  #if !defined(TCA_SINGLE_EVACTA_gp)
+    #define TCA_SINGLE_EVACTA_gp TCA_SINGLE_EVACT_gp
+    #define TCA_SINGLE_EVACTA_CNT_POSEDGE_gc   TCA_SINGLE_EVACTA_CNT_POSEDGE_gc
+    #define TCA_SINGLE_EVACTA_CNT_ANYEDGE_gc   TCA_SINGLE_EVACTA_CNT_ANYEDGE_gc
+    #define TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc   TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc
+    #define TCA_SINGLE_EVACTA_UPDOWN_gc        TCA_SINGLE_EVACTA_UPDOWN_gc
+  #elif !defined(TCA_SINGLE_EVACT_gp)
+    #define TCA_SINGLE_EVACT_gp TCA_SINGLE_EVACTA_gp
+  #endif
+
+
+  #if defined (CLKCTRL_SELHF_bm)
+    /* They changed the damned name after selling the part for 6 months!
+     * annoyingly you can't even test if it's using the new version of the headers because it's an enum! */
+    #define CLKCTRL_SELHF_CRYSTAL_gc CLKCTRL_SELHF_XTAL_gc
+  #endif
+  /* And one version later they did it again... */
+  #if !defined(CLKCTRL_FREQSEL_gm) && defined(CLKCTRL_FRQSEL_gm)
+    #define CLKCTRL_FREQSEL_gm     (CLKCTRL_FRQSEL_gm)      /*    Group Mask                  */
+    #define CLKCTRL_FREQSEL_gp     (CLKCTRL_FRQSEL_gp)      /*    Group Position              */
+    //                                                      /*    Group Codes                 */
+    #define CLKCTRL_FREQSEL_1M_gc  (CLKCTRL_FRQSEL_1M_gc)   /*  1 MHz system clock            */
+    #define CLKCTRL_FREQSEL_2M_gc  (CLKCTRL_FRQSEL_2M_gc)   /*  2 MHz system clock            */
+    #define CLKCTRL_FREQSEL_3M_gc  (CLKCTRL_FRQSEL_3M_gc)   /*  3 MHz system clock            */
+    #define CLKCTRL_FREQSEL_4M_gc  (CLKCTRL_FRQSEL_4M_gc)   /*  4 MHz system clock default    */
+    #define CLKCTRL_FREQSEL_8M_gc  (CLKCTRL_FRQSEL_8M_gc)   /*  8 MHz system clock            */
+    #define CLKCTRL_FREQSEL_12M_gc (CLKCTRL_FRQSEL_12M_gc)  /* 12 MHz system clock            */
+    #define CLKCTRL_FREQSEL_16M_gc (CLKCTRL_FRQSEL_16M_gc)  /* 16 MHz system clock            */
+    #define CLKCTRL_FREQSEL_20M_gc (CLKCTRL_FRQSEL_20M_gc)  /* 20 MHz system clock            */
+    #define CLKCTRL_FREQSEL_24M_gc (CLKCTRL_FRQSEL_24M_gc)  /* 24 MHz system clock            */
+    #define CLKCTRL_FREQSEL_28M_gc (CLKCTRL_FRQSEL_28M_gc)  /* 28 MHz system clock unofficial - this will just error out if used since it will replace one undefined symbol with another */
+    #define CLKCTRL_FREQSEL_32M_gc (CLKCTRL_FRQSEL_32M_gc)  /* 32 MHz system clock unofficial - this will just error out if used since it will replace one undefined symbol with another */
+  #elif defined(CLKCTRL_FRQSEL_gm) && !defined(CLKCTRL_FREQSEL_gm)
+    #define CLKCTRL_FRQSEL_gm     (CLKCTRL_FREQSEL_gm)      /*    Group Mask                  */
+    #define CLKCTRL_FRQSEL_gp     (CLKCTRL_FREQSEL_gp)      /*    Group Position              */
+    //                                                      /*    Group Codes                 */
+    #define CLKCTRL_FRQSEL_1M_gc  (CLKCTRL_FREQSEL_1M_gc)   /*  1 MHz system clock            */
+    #define CLKCTRL_FRQSEL_2M_gc  (CLKCTRL_FREQSEL_2M_gc)   /*  2 MHz system clock            */
+    #define CLKCTRL_FRQSEL_3M_gc  (CLKCTRL_FREQSEL_3M_gc)   /*  3 MHz system clock            */
+    #define CLKCTRL_FRQSEL_4M_gc  (CLKCTRL_FREQSEL_4M_gc)   /*  4 MHz system clock default    */
+    #define CLKCTRL_FRQSEL_8M_gc  (CLKCTRL_FREQSEL_8M_gc)   /*  8 MHz system clock            */
+    #define CLKCTRL_FRQSEL_12M_gc (CLKCTRL_FREQSEL_12M_gc)  /* 12 MHz system clock            */
+    #define CLKCTRL_FRQSEL_16M_gc (CLKCTRL_FREQSEL_16M_gc)  /* 16 MHz system clock            */
+    #define CLKCTRL_FRQSEL_20M_gc (CLKCTRL_FREQSEL_20M_gc)  /* 20 MHz system clock            */
+    #define CLKCTRL_FRQSEL_24M_gc (CLKCTRL_FREQSEL_24M_gc)  /* 24 MHz system clock            */
+    #define CLKCTRL_FRQSEL_28M_gc (CLKCTRL_FREQSEL_28M_gc)  /* 28 MHz system clock unofficial - this will just error out if used since it will replace one undefined symbol with another */
+    #define CLKCTRL_FRQSEL_32M_gc (CLKCTRL_FREQSEL_32M_gc)  /* 32 MHz system clock unofficial - this will just error out if used since it will replace one undefined symbol with another */
+  #endif
+  // Note that it is intended to not hide the fact that 28 and 32 MHz are not official. If you choose it from the menu, it says "Overclocked" next to the speed too. We refer to them with the numeric constants in the wiring.c, so it doesn't matter when used that way.
   // And now the most freaking boneheaded move from Microchip in a long while: They realized that they should have had some sort of delimiter between the bit number within a bitfield, and the name of the bitfield, since the names of many bitfields end in numbers,
   // So they went ahead and made that change. That is what's called a "breaking change", really for no reason except codes style. Most companies even if they decided to go that route, would never do that without introducuing a compatibility layer.
   // That wanton disregard for backwards compatibility is not acceptable in an Arduino core nor in a commercial product.
@@ -522,12 +656,15 @@
   //typedef const uint8_t __attribute__ ((deprecated("\nMicrochip changed the spelling of bits within a bitfiels (macros that end in the bitnumber followed by _bm or _bp), you are using the old name, ex PERIPH_BITFIRLD1_bm.\nYou should use PERIPH_BITFIELD_1_bm; we do not guarantee that this 4000-line bandaid will not be removed in the future.\r\nWhy did they do this? Beats me. Ask their support folks - if enough of us do it, they might hesitate next time they have the urge to mass rename things in their headers")))  deprecated_constant_name;
 
   // Okay, well that fix didn't work so well. back to plan A.
-#if !defined(BACKWARD_COMBATIBILITY_MODE)
   /* Add a feature - yay!
    * Rename registers so people can't carry code back and forth - booo!
    */
   #ifndef TCA_SINGLE_CNTEI_bm
+    #if !defined(TCA_SINGLE_CNTAEI_bm)
+    #define TCA_SINGLE_CNTAEI_bm TCA_SINGLE_CNTEI_bm
+  #elif !defined(TCA_SINGLE_CNTEI_bm)
     #define TCA_SINGLE_CNTEI_bm TCA_SINGLE_CNTAEI_bm
+  #endif
     #define TCA_SINGLE_EVACT_POSEDGE_gc TCA_SINGLE_EVACTA_CNT_POSEDGE_gc
     #define TCA_SINGLE_EVACT_CNT_ANYEDGE_gc TCA_SINGLE_EVACTA_CNT_ANYEDGE_gc
     #define TCA_SINGLE_EVACT_CNT_HIGHLVL_gc TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc
