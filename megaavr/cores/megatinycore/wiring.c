@@ -279,13 +279,14 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
       */
     #else // TCA0 or TCD0, also naked
       __asm__ __volatile__(
-      // ISR prologue (overall 8 words / 8 clocks):
-      "push       r24"            "\n\t" // we use two registers other than the pointer
+      // ISR prologue (overall 9 words / 9 clocks):
+      "push       r24"            "\n\t" // we use three more registers other than the pointer
       "in         r24,     0x3F"  "\n\t" // Need to save SREG too
       "push       r24"            "\n\t" // and push the SREG value
-      "push       r25"            "\n\t" // get a second byte for buffer
-      // timer_fract handling (13 words / 16/18 clocks):
-      "clt"                       "\n\t" // Clear Temp bit in SREG, we'll use it later
+      "push       r25"            "\n\t" // second byte
+      "push       r23"            "\n\t" // third byte
+      // timer_fract handling (13 words / 15/16 clocks):
+      "ldi        r23, %[MIINC]"  "\n\t" // load MILLIS_INC. (part of timer_millis handling)
       "ld         r24,        Z"  "\n\t" // lo8(timingStruct.timer_fract).
       "ldd        r25,      Z+1"  "\n\t" // hi8(timingStruct.timer_fract)
       "subi       r24,%[LFRINC]"  "\n\t" // use (0xFFFF - FRACT_INC) and use the lower and higher byte to add by subtraction
@@ -297,17 +298,13 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
       "brlo               lower"  "\n\t" // skip next three instructions if it was lower
       "st         Z,        r24"  "\n\t" // Overwrite the just stored value with the decremented value
       "std        Z+1,      r25"  "\n\t" // seems counter-intuitive, but it requires less registers
-      "set"                       "\n\t" // set T flag that indicates that FRACT_MAX was reached
+      "subi       r23,     0xFF"  "\n\t" // increment the MILLIS_INC by one, if FRACT_MAX was reached
       "lower:"                    "\n\t" // land here if fract was lower then FRACT_MAX
-      // timer_millis handling (16 words / 21 clocks):
-      "ldi        r24, %[MIINC]"  "\n\t" // load MILLIS_INC. unable to do a compile-time check (MILLIS_INC == 0) for further optimization
-      "brtc              tClear"  "\n\t" // 1 cycle if false, 2 if true (T bit will be set more often then cleared, so prefer T == false)
-      "subi       r24,     0xFF"  "\n\t" // increment the MILLIS_INC by one, if the FRACT_MAX was reached, indicated by T flag
-      "tClear:"                   "\n\t" // land here, if T bit was NOT set
+      // timer_millis handling (13 words / 17 clocks):
       "ldd        r25,      Z+2"  "\n\t" // lo16.lo8(timingStruct.timer_millis)
-      "add        r25,      r24"  "\n\t" // add r24 to r25. r24 depends on MILLIS_INC and if FRACT_MAX was reached
+      "add        r25,      r23"  "\n\t" // add r23 to r25. r23 depends on MILLIS_INC and if FRACT_MAX was reached
       "std        Z+2,      r25"  "\n\t" //
-      "ldi        r24,     0x00"  "\n\t" // get a 0x00 to adc with. Problem: can't subi 0x00 without loosing the carry
+      "ldi        r24,     0x00"  "\n\t" // get a 0x00 to adc with. Problem: can't subi 0x00 without losing the carry
       "ldd        r25,      Z+3"  "\n\t" // lo16.hi8(timingStruct.timer_millis)
       "adc        r25,      r24"  "\n\t" //
       "std        Z+3,      r25"  "\n\t" //
@@ -333,14 +330,15 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
       // timer interrupt flag reset handling (3 words / 3 clocks):
       "ldi        r24, %[CLRFL]"  "\n\t" // This is the TCx interrupt clear bitmap
       "sts   %[PTCLR],      r24"  "\n\t" // write to Timer interrupt status register to clear flag. 2 clocks for sts
-      // ISR epilogue (7 words / 15/16 clocks):
+      // ISR epilogue (8 words / 17/18 clocks):
+      "pop        r23"            "\n\t"
       "pop        r25"            "\n\t"
       "pop        r24"            "\n\t" // pop r24 to get the old SREG value - 2 clock
       "out       0x3F,      r24"  "\n\t" // restore SREG - 1 clock
       "pop        r24"            "\n\t"
       "pop        r31"            "\n\t"
       "pop        r30"            "\n\t"
-      "reti"                      "\n\t" // total 79 - 82 clocks total, and 59 words, vs 104-112 clocks and 84 words
+      "reti"                      "\n\t" // total 77 - 79 clocks total, and 58 words, vs 104-112 clocks and 84 words
       :: "z" (&timingStruct),            // we are changing the value of this, so to be strictly correct, this must be declared input output - though in this case it doesn't matter
         [LFRINC] "M" (((0x0000 - FRACT_INC)    & 0xFF)),
         [HFRINC] "M" (((0x0000 - FRACT_INC)>>8 & 0xFF)),
@@ -352,19 +350,17 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
       );
 
       /* ISR ASM logic written out in C:
-        bool T = 0; // - part of SREG
         // timer_fract handling:
+        uint8_t temp = MILLIS_INC;
         uint16_t f = timingStruct.timer_fract;
         f -= 0xFFFF;
         timingStruct.timer_fract = f;
         f -= FRACT_MAX;
         if (f > FRACT_MAX) {
           timingStruct.timer_fract = f;
-          T = 1;
+          temp++;
         }
         // timer_millis handling:
-        uint8_t temp = MILLIS_INC;
-        if (T) temp += 1;
         timingStruct.timer_millis += temp;
         // timer_overflow_count handling:
         timingStruct.timer_overflow_count -= 0xFFFFFFFF;
