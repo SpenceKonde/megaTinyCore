@@ -9,17 +9,17 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other         ##        ###         #      #
-#  contributors 2018-2021                  #  #      #           ##      #
-#  megaTinyCore is free software.    # #     #       ####         #      #
+#  Copyright Spence Konde and other         ##        ###         ##     #
+#  contributors 2018-2021                  #  #      #           #  #    #
+#  megaTinyCore is free software.    # #     #       ####          #     #
 #  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##    #      #
-#  License section of README.md       #    ####  ##   ###   ##   ###     #
+#  License section of README.md       #    ####  ##   ###   ##   ####    #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
 #  have the zoomed out "minimap" that you can scroll through.            #
 #                                                                        #
-#  megaTinyCore 2.6.0-1 is being developed simultaneously with DxCore    #
+#  megaTinyCore 2.6.0-2 is being developed simultaneously with DxCore    #
 #  1.5.0. As the hardware is very similar, much code is shared, and that #
 #  is the version of DxCore most similar to this version of megaTinyCore #
 #                                                                        #
@@ -2037,8 +2037,6 @@ atxy7o.build.clocksource=0
 atxy7o.build.core=megatinycore
 atxy7o.build.mrelax= -mrelax
 
-atxy7o.build.mrelax= -mrelax
-
 atxy7o.build.variant=txy7
 atxy7o.build.tuned=
 atxy7o.build.printf=
@@ -2081,7 +2079,8 @@ atxy7o.upload.workaround=
 atxy7o.upload.tool=avrdude
 atxy7o.upload.protocol=arduino
 atxy7o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atxy7o.upload.extra_params=-D -P{serial.port} -b115200
+atxy7o.upload.extra_params=-D -P{serial.port}
+atxy7o.upload.speed=115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 24-pin Optiboot 0/1-series tinyAVR submenus #
@@ -2408,9 +2407,6 @@ atx27o.build.board=AVR_ATtinyxy7
 atx27o.build.clocksource=0
 atx27o.build.core=megatinycore
 atx27o.build.mrelax= -mrelax
-
-atx27o.build.mrelax= -mrelax
-
 atx27o.build.variant=txy7
 atx27o.build.tuned=
 atx27o.build.printf=
@@ -2453,7 +2449,8 @@ atx27o.upload.workaround=
 atx27o.upload.tool=avrdude
 atx27o.upload.protocol=arduino
 atx27o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atx27o.upload.extra_params=-D -P{serial.port} -b115200
+atx27o.upload.extra_params=-D -P{serial.port}
+atx27o.upload.speed=115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 24-pin Optiboot 0/1-series tinyAVR submenus #
@@ -2766,9 +2763,6 @@ atxy6o.build.board=AVR_ATtinyxy6
 atxy6o.build.clocksource=0
 atxy6o.build.core=megatinycore
 atxy6o.build.mrelax= -mrelax
-
-atxy6o.build.mrelax= -mrelax
-
 atxy6o.build.variant=txy6
 atxy6o.build.tuned=
 atxy6o.build.printf=
@@ -2811,7 +2805,8 @@ atxy6o.upload.workaround=
 atxy6o.upload.tool=avrdude
 atxy6o.upload.protocol=arduino
 atxy6o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atxy6o.upload.extra_params=-D -P{serial.port} -b115200
+atxy6o.upload.extra_params=-D -P{serial.port}
+atxy6o.upload.speed=115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 20-pin Optiboot 0/1-series tinyAVR submenus #
@@ -3147,9 +3142,6 @@ atx26o.build.board=AVR_ATtinyxy6
 atx26o.build.clocksource=0
 atx26o.build.core=megatinycore
 atx26o.build.mrelax= -mrelax
-
-atx26o.build.mrelax= -mrelax
-
 atx26o.build.variant=txy6
 atx26o.build.tuned=
 atx26o.build.printf=
@@ -3192,7 +3184,8 @@ atx26o.upload.workaround=
 atx26o.upload.tool=avrdude
 atx26o.upload.protocol=arduino
 atx26o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atx26o.upload.extra_params=-D -P{serial.port} -b115200
+atx26o.upload.extra_params=-D -P{serial.port}
+atx26o.upload.speed=115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 20-pin Optiboot 2-series tinyAVR submenus   #
@@ -3505,9 +3498,6 @@ atxy4o.build.board=AVR_ATtinyxy4
 atxy4o.build.clocksource=0
 atxy4o.build.core=megatinycore
 atxy4o.build.mrelax= -mrelax
-
-atxy4o.build.mrelax= -mrelax
-
 atxy4o.build.variant=txy4
 atxy4o.build.tuned=
 atxy4o.build.printf=
@@ -3550,7 +3540,8 @@ atxy4o.upload.workaround=
 atxy4o.upload.tool=avrdude
 atxy4o.upload.protocol=arduino
 atxy4o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atxy4o.upload.extra_params=-D -P{serial.port} -b115200
+atxy4o.upload.extra_params=-D -P{serial.port}
+atxy4o.upload.speed=115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 14-pin Optiboot 0/1-series tinyAVR submenus #
@@ -3896,9 +3887,6 @@ atx24o.build.board=AVR_ATtinyxy4
 atx24o.build.clocksource=0
 atx24o.build.core=megatinycore
 atx24o.build.mrelax= -mrelax
-
-atx24o.build.mrelax= -mrelax
-
 atx24o.build.variant=txy4
 atx24o.build.tuned=
 atx24o.build.printf=
@@ -3941,7 +3929,8 @@ atx24o.upload.workaround=
 atx24o.upload.tool=avrdude
 atx24o.upload.protocol=arduino
 atx24o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atx24o.upload.extra_params=-D -P{serial.port} -b115200
+atx24o.upload.extra_params=-D -P{serial.port}
+atx24o.upload.speed=115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 # 14-pin Optiboot 2-series tinyAVR submenus   #
@@ -4290,7 +4279,8 @@ atxy2o.upload.workaround=
 atxy2o.upload.tool=avrdude
 atxy2o.upload.protocol=arduino
 atxy2o.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-atxy2o.upload.extra_params=-D -P{serial.port} -b115200
+atxy2o.upload.extra_params=-D -P{serial.port}
+atxy2o.upload.speed=115200
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 #  8-pin Optiboot 0/1-series tinyAVR submenus #
@@ -4608,9 +4598,6 @@ microchipo.build.bootload=opti
 microchipo.build.clocksource=0
 microchipo.build.core=megatinycore
 microchipo.build.mrelax= -mrelax
-
-microchipo.build.mrelax= -mrelax
-
 microchipo.build.mcu=attiny{build.attiny}
 microchipo.build.f_cpu={build.speed}000000L
 microchipo.build.tuned=
@@ -4651,7 +4638,8 @@ microchipo.upload.workaround=
 microchipo.upload.tool=avrdude
 microchipo.upload.protocol=arduino
 microchipo.upload.prog_interlock="ERROR: Upload using programmer is not supported on optiboot boards"
-microchipo.upload.extra_params=-D -P{serial.port} -b115200
+microchipo.upload.extra_params=-D -P{serial.port}
+microchipo.upload.speed=115200
 
 #----------------------------------------#
 # CHIP                                   #

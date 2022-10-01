@@ -229,7 +229,7 @@ tools.serialupdi.upload.pattern=echo "This can't happen, but has to be here or a
 # write fuses 0, 1, 2, 5, 6, 7, 8.
 # 2 is always written 0 (sets clock to use HF osc, not 32kHz ULP).
 # Fuses 3 and 4 are reserved.
-tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:0x00 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} {bootloader.pymcuprogstring} {bootloader.verbose}
+tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/prog.py" -t {protocol} {program.extra_params} -d {build.mcu} --fuses 0:{bootloader.WDTCFG} 1:{bootloader.BODCFG} 2:0x00 5:{bootloader.SYSCFG0} 6:{bootloader.SYSCFG1} 7:{bootloader.APPEND} 8:{bootloader.BOOTEND} {bootloader.serialupdistring} {bootloader.verbose}
 
 ## Program pattern (all uploads through SerialUPDI)
 # Program will set fuses 2, 6 and 8 only. Fuses 0 and 4 are not written because the core never configures that.
