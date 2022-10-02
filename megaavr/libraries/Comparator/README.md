@@ -128,7 +128,8 @@ This property configures the DACREF value - this voltage can be selected as the 
 
 <img src="http://latex.codecogs.com/svg.latex?V_{DACREF} = \frac{Comparator.dacref}{256} * Comparator.reference" border="0"/>
 
-Or, in words, the the voltage from ACn.DACREF is dacref 256th's of the reference voltage.
+Or, in words, the the voltage from ACn.DACREF is that many 256th's of the reference voltage
+*(it does not appear to be `ACn.DACREF + 1` 256'ths interestingly enough, which is what one would naively expect, and would be strictly speaking slightly better) -SK*
 
 #### Usage
 ``` c++
@@ -224,23 +225,43 @@ Comparator.output_initval = comparator::out::init_high;
 
 ### Which properties work where
 
-|                    Option | DA/DB |  DD |  EA | Tiny0 | Tiny1 | Tiny1+ | Tiny2 | Mega0 |
-|---------------------------|-------|-----|-----|-------|-------|--------|-------|-------|
-|     comparator::in_p::in0 |   All |Some | All |   All |   All |    All |   All |   All |
-|     comparator::in_p::in1 |   All | All | All |  Some |  Some |    All |  Some |   All |
-|     comparator::in_p::in2 |   All | All | All |    No |    No |    All |   All |   All |
-|     comparator::in_p::in3 |   All | All | All |    No |    No |   Some |  Some |   All |
-|     comparator::in_p::in4 |    No | All | All |    No |    No |     No |    No |    No |
-|     comparator::in_n::in0 |   All |Some | All |   All |   All |    All |   All |   All |
-|     comparator::in_n::in1 |  Some |  No | All |  Some |  Some |    All |  Some |   All |
-|     comparator::in_n::in2 |   All |  No | All |    No |    No |   Some |  Some |   All |
-|     comparator::in_n::in3 |    No | All | All |    No |    No |     No |   All |    No |
-|    comparator::in_n::vref |    No |  No |  No |   All |   All |    All |    No |    No |
-|  comparator::in_n::dacref |   All | All | All |    No |   All |    All |   All |   All |
-| comparator::out::pin_swap |  Some |  No |Some |    No |    No |     No |    No |    No |
-Where it is marked "Some", this will depend on pincount. Check the chart further up for more information. All means that **at least one comparator** on all pincounts has the specified input, **not that they all have it**. We do not guarantee that the library will reject attempts to specify invalid pins, and on parts with more than one comparator, it can only reject them if they are absent for ALL comparators (ex, AINN1 is always PD0 on Dx-series, and DB-series parts with 28 or 32 pins don't have that pin, so specifying `comparator::in_n::in0` will be rejected with a compile error. A tiny1614 has AINP1 for AC2 and AINP2 for AC0 and AC1. Using `comparator::in_p::in1` for AC0 or AC1 will not result in any compile error, nor will using `comparator::in_p::in2` with AC2). Use extra care on parts with multiple comparators.
+|                    Option | DA/DB   |  DD  |  EA | Tiny0 | Tiny1 | Tiny1+ | Tiny2 | Mega0 |
+|---------------------------|---------|------|-----|-------|-------|--------|-------|-------|
+| comparator::in_p::in0     |     All | 28p+ | All |   All |   All |    All |   All |   All |
+| comparator::in_p::in1     |       * |  All |   * |  Some |  20p+ | 14/20p |  20p+ |   All |
+| comparator::in_p::in2     |       * |  All |   * |    No |    No |    All |   All |   All |
+| comparator::in_p::in3     |     All |  All | All |    No |    No |   20p+ |   24p |   All |
+| comparator::in_p::in4     |      No |   ** | All |    No |    No |     No |    No |    No |
+| comparator::in_n::in0     |     All |  All | All |   All |   All |    All |   All |   All |
+| comparator::in_n::in1     |       * |   No | All |  20p+ |  20p+ | 14/20p |  20p+ |   All |
+| comparator::in_n::in2     |       * |   No | All |    No |    No |   14p+ |   All |   All |
+| comparator::in_n::in3     |      No |   ** | All |    No |    No | 20/24p |  20p+ |    No |
+| comparator::in_n::vref    |      No |   No |  No |   All |   All |    All |    No |    No |
+| comparator::in_n::dacref  |     All |  All | All |    No |   All |    All |   All |   All |
+| comparator::out::pin_swap |    48p+ |   No |48p+ |    No |    No |     No |    No |    No |
 
-## Comparator class methods
+
+`*` This is messy for the DA/DB, as they have three comparators, and 1 pin for ALL comparators is for 1 comparator are unavailable unless the part has 48+ pins
+
+|                    Option | DA < 48p | DB < 48p | EA < 48p | All 48p+ | Prediction (by SK)    |
+|---------------------------|----------|----------|----------|----------------------------------|
+| comparator::in_p::in1     | AC1, AC2 | AC1, AC2 |      AC1 |          |                  48p+ |
+| comparator::in_p::in2     |      AC1 |      AC1 |      AC1 |      All |                  48p+ |
+| comparator::in_n::in1     |      All |       No |      All |      All | MVIO-off or 48p+ only |
+| comparator::in_n::in2     | AC0, AC1 | AC0, AC1 |      All | AC0, AC1 |    Likely not for AC2 |
+
+*The really mysterious one is negative input 2 for AC2. It is listed as being on the same physical pin, PD7. as negative input 0. This would imply that the two settings are identical and in practice AC2 never has an AINN2, as I read it. Anyone got info on any possible difference?*
+
+
+`**` On the AVR DD, these are PC2 and PC3, some of the few pins found on all parts. However, they are only available for use as AC or ADC inputs if MVIO is disabled. Until the product brief of a product featuring both MVIO and the new ADC, we won't know if this is going to be an ongoing thing. My sense is it will reamain - I think the reason for it is that the ADC is powered from the AVDD domain, which is internally tied to VDD, and that sets the safe voltage on an analog input or analog comparator pin should not exceed AVDD by more than a fraction of a volt, and that would be clamped by the protection diode. If that's all it does, I'd expect it to be a "paper limitation" and that the silicon would do it just fine in MVIO mode as long as the voltages were below both VDD and VDDIO2 and otherwise just provide garbage results (GIGO). I'd have expect this in the form of an electrical characteristic, though - usually they don't like to put front and center the limitation on a peripheral. Perhapse the internal current path would have been more destructive than that, and after thorough study (perhaps helping to explain why it took 2 years from product brief to release). When the first new device with both MVIO and the good ACs gets it's product brief released, we'll know whether this will be permanent or not. My money is on "permanent". But who know when the Microchip Pre-Santa will bring us such a treat?
+
+Where it is marked "`__p`, it is only available on the specified pincount and larger. `__p/__p` indicates that the options are available for some comparators at or above the first pincount, and all at or above the second. `*` indicates that it's a weird one, and see the note above Check the chart further up for more information. All means that **at least one comparator** on all pincounts has the specified input, **not that they all have it**. We do not guarantee that the library will reject attempts to specify invalid pins, and on parts with more than one comparator, it can only reject them if they are absent for ALL comparators (ex, AINN1 is always PD0 on Dx-series, and DB-series parts with 28 or 32 pins don't have that pin, so specifying `comparator::in_n::in0` will be rejected with a compile error. A tiny1614 has AINP1 for AC2 and AINP2 for AC0 and AC1. Using `comparator::in_p::in1` for AC0 or AC1 will not result in any compile error, nor will using `comparator::in_p::in2` with AC2). Use extra care on parts with multiple comparators.
+
+### A brief and silly diversion before the method documentation..
+*The Microchip pre-santa rides around several years early stuffing product briefs down your chimney, telling you the essential specs of your gift (well, gift is a stretch, but ordering option doesn't have the right ring to it), and everyone gets the same thing. But it doesn't say when it will arrive - it brought us the DD brief in June 2020 and the 2-series brief around then too (I think), the EA brief in Sept 2020, and has since been silent other than a one document that was just as quickly snatched away by the pre-grinch. The Microchip Santa himself rides around around on whatever day christmas is delayed to due to supply shortages, putting pieces of silicon in our ~stockings~ stockrooms's if we've been good (he knows what you've backordered, he knows what has been shipped, he knows if your code's bad or good, make it good if you want your..) - nevermind* -SK
+
+## Comparator methods
+Comparator provides a few ~methods~ member functions to provide th
 
 ### init()
 The init() method applies all the settings you have specified by writing them to the peripheral registers. You must call this after specifying the desired options to write them to the peripheral registers.
@@ -315,7 +336,22 @@ This method simply returns a reference to the analog comparator struct which it 
  * way too many comparators */
 MyComparator.init(); // initialize the comparator - let's assume it was configured a few lines before this example begins.
 AC_t& AC_struct = MyComparator.getPeripheral(); // Grab the ACn struct - AC0, AC1, AC2, etc.
-AC_struct.CTRLA |= AC_LPMODE_bm | AC_RUNSTBY_bm // Reduce power consumption at expense of response time and leave on in standby
+/* For tinyAVR and megaAVR the's LPMODE and or not-LPMODE*/
+AC_struct.CTRLA |= AC_LPMODE_bm | AC_RUNSTBY_bm ; // Reduce power consumption at expense of response time and leave on in standby
+/* for Dx there are 3 power profiles, this has slowest response time and lowerst power:
+  AC_struct.CTRLA |= AC_PROFILE2_gc | AC_RUNSTBY_bm; // Reduce power consumption at expense of response time and leave on in standby
+ * and Ex adds a third:
+  AC_struct.CTRLA |= AC_PROFILE3_gc | AC_RUNSTBY_bm; // Reduce power consumption at expense of response time and leave on in standby
+ * DA's initial headers listed profile 3. One imagines they found it wasn't up to internal standards, and airbrushed it out of the datasheet
+ * like they did with the 4x clock multiplier. That option works (and the PLL can be run ~2.5x overclock at room temp o_o) so I'm cautiously
+ * optimistic that this would work on a Dx except under adverse conditions/*
+  AC_struct.CTRLA |= 0x18 | AC_RUNSTBY_bm; // CTRLA is 0bSO_PPHHE where
+  S = RUNSTBY, O = OUTEN, P = POWER, H = Hysteresis, and E = Enable. POWER = 3 is marked as reserved on the Dx, but was PROFILE3 in preliminary headers.
+ */
 MyComparator.start();   // Enable the comparator
 enterStandbySleep();  // enter standby sleep mode until the comparator interrupt fires, waking it up.
 ```
+
+## *Future development*
+*shouldn't LP_MODE/PROFILE and RUNSTBY be properties, and treated like everything else? Why **aren't** they? I would imagine that wanting to wake on the AC int would be one of the most common uses of that interrupt.
+They certainly **want** to be properties and it would make the library more coherent. But it would come at a 4-8 bytes of flash (unsure if per comparator or total) and 1 or 2 bytes of ram per comparator, depending on implementation details. Probably wouldn't be popular with people on 212's, but that's a pretty small overhead considering the general level of bloat introduced by classy wrappers around peripherals like Logic, Comparator and Opamp). Maybe a new optional argument to start it in low power, low power - run standby, and run standby (corespondingly more options on DxCore of course). Because how often are you going to be changing the mode once you've turned it on? That's an odd use case (and in any case, the intuitive solution of calling start with a different argument to change it would behave as expected. By passing as the argument the value to be written to the CTRLA register it would have almost no overhead, too. -SK

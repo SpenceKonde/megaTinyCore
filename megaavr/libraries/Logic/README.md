@@ -7,7 +7,7 @@ More information about CCL can be found in the [Microchip Application Note TB321
 
 
 
-### Pin availability and Quick Reference (Dx-series)
+## Pin availability and Quick Reference (Dx-series)
 
 Logic Block |  IN0-2  | OUT | ALT OUT | Availability  | Notes:
 ------------|---------|-----|---------|---------------|-----------------------------
@@ -35,9 +35,7 @@ Logic5 Out  | Not present on DD     | Not present on DD   | Not present on 28pin
 Notice how logic block 2 and 3 on 14/20 pin DD and logic block 5 on 48-pin parts have no dedicated pins. If you are not using pin input or output, use these logic blocks to conserve the more useful ones when not precluded by other considerations.
 
 
-
-
-### Pin availability and Quick Reference (tinyAVR)
+## Pin availability and Quick Reference (tinyAVR)
 This was simpler with 0/1-series (22 i/o pins, 10 CCL functions, none stacked onto the same pins), but with 2-series, 20 different CCL functions, crammed into just 22 GPIO pins, two of which have one blocks' input and one of the outputs for another. The ones with no inputs on lower pincount parts are more useful than one might expect; advanced use cases will often use mostly internal inputs - and the event system can always be used to get pin input in anyway - albeit at a cost of an event channel. If you do not require pin inputs, these should be used in preference to the logic blocks that do have them all else being equal
 
 Logic Block |  IN0-2  | OUT | 8pin | ALT OUT | Availability |
@@ -48,7 +46,7 @@ Logic2      | PB0-PB2 | PB3 |  --- |     PB6 |     2-series |
 Logic3      | PC0-PC2 | PC4 |  --- |     PA5 |     2-series |
 
 * Inputs are always in consecutive order counting by bit position (not physical order).
-* All logic blocks present *on tinyAVR* always have an output pin, but may not have input pins.
+* All logic blocks present *on tinyAVR* always have an output pin, but may not have input pins. *This is not true of Dx and Ex-series parts* which bind each LUT to a port - they gain in consistency, but sacrifice coherance and effectiveness ("Why do we have 3 logic blocks with no output pins and all these pins with hardly any special functions?" versus "How did they choose the pin mapping for this thing, by throwing darts at a diagam? There's no rhyme or reason to any of it!")
 * `Logic2` and `Logic3` are present only on the 2-series.
 
 Logic Block |  8-pin        | 14-pin        | 20-pin        | 24-pin        |
@@ -70,9 +68,9 @@ Logic3 OUT  | Not present   | Only alt out  | Only alt out  | Yes, both     |
 
 
 ### Invelid/reserved options
-Note that there exist reserved and invalid values for many of the bitfields controlled by the properties of the logic block. This library does not support specifying these. No comprehensive investigation has been undertaken to exclude the existence of of hidden and/or broken features.
+Note that there exist reserved and invalid values for many of the bitfields controlled by the properties of the logic block, as well as reserved bits with no known or documented function. This library does not support specifying these. No comprehensive investigation has been undertaken to exclude the existence of of hidden and/or broken features, nor is there any reason to expect that such... just clear evidence of a pattern of features getting "airbrushed out" of the documentation without removal from the silicon. sometimes this is probably dictated by expedience alone. There addresses of registers
 
-*A discovery of an undocumented or reserved option which was found to do something potentially useful gives the usual reward for undocumented features: an assembled breakout board featuring an impacted part (of your choice), or a quantity of bare boards of your choice from my [tindie store](https://tindie.com/stores/drazzy) of equal value.* See details at [https://github/SpenceKonde/AVR_Research/blob/master/Bounties.md](https://github.com/SpenceKonde/AVR_Research/blob/main/Bounties.md)
+*A discovery of an undocumented or reserved option which has been found to do something potentially useful gives the usual (or it would be usual, except that there are essen) reward for undocumented features: an assembled breakout board featuring an impacted part (of your choice), or a quantity of bare boards of your choice from my [tindie store](https://tindie.com/stores/drazzy) of equal value.* See details at [https://github/SpenceKonde/AVR_Research/blob/master/Bounties.md](https://github.com/SpenceKonde/AVR_Research/blob/main/Bounties.md)
 
 
 ### Overhead
@@ -109,14 +107,14 @@ Compatibility note: Since the version released with metaTinyCore 2.6.1 and DxCor
 
 The correct order for for initialization is:
 1. Set the properties as required for your application.
-2. Attach any interrupts if using attachInterrupt. Note that interrupts may also be defined manually - if this is done, you must avoid calling LogicN.attachInterrupt and LogicN.detachInterrupt on any logic block, and write to the appriopriate registers to enable them. Interrupts defined this way, particularly if short and simple, will execute much faster. Refer to the datasheet for more information.
+2. Attach any interrupts if using attachInterrupt. Note that interrupts may also be defined manually - if this is done, you must avoid calling LogicN.attachInterrupt and LogicN.detachInterrupt on any logic block, and write to the appropriate registers to enable them. Interrupts defined this way, particularly if short and simple, will execute much faster. Refer to the datasheet for more information.
 2. call `LogicN.init()` to write those properties to the CCL registers.
 
-The correct proceedure for modifying the configuration of one or more logic blocks:
+The correct procedure for modifying the configuration of one or more logic blocks:
 1. Set the properties as required for all logic blocks being changed.
 2. Call `Logic::stop()`.
 3. Call `LogicN.init()` on all logic blocks that have been changed.
-3. call `Logic::start()` to restart the CCL as a whole.
+4. Call `Logic::start()` to restart the CCL as a whole.
 
 ## Properties
 
@@ -222,7 +220,7 @@ Notes specific to ATtiny 0/1-series:
 * CCL0's IN0 pin is on PA0, which is nominally the UPDI pin. This may limit the usefulness of CCL0 on the ATtiny parts (though it may work as long as the input cannot be mistaken for a UPDI activation command); configuring UPDI as GPIO prevents further programming via UPDI except via HV programming. One can always use the event system to substitute another input for IN0; This is demonstrated in the three input example.
 * Only the ATtiny1614, 1616, 1617, 3216, and 3217 have TCB1, AC1, and AC2.
 * **Errata warning** Many parts in circulation are impacted by an errata (though not all - some never had it, while the 32k parts have gotten a die rev that fixes it. On effected parts, the link input does not work unless pin output of the other logic block is enabled. Check the applicable errata and datasheet clarification document from Microchip to see if your part is impacted.
-* **Coompatibility warning** These were the first AVRs with CCL. They made some decisions that they realized weren't such a good idea afterall and changed for parts released more recently. Most importantly, for TCBs and ACs, as well as USARTs, the peripheral number used is the input number. SPI on these parts makes MISO available supposedly. Later parts do not. Later parts also only make USART TXD available - though you can get XCK from the event system.
+* **Coompatibility warning** These were the first AVRs with CCL. They made some decisions that they realized weren't such a good idea after all and changed for parts released more recently. Most importantly, for TCBs and ACs, as well as USARTs, the peripheral number used is the input number. SPI on these parts makes MISO available supposedly. Later parts do not. Later parts also only make USART TXD available - though you can get XCK from the event system.
 * USART option will use XCK on input 0, TXD on input 1, and is not valid for input 2.
   * MISO is (supposedly) available as an input when SPI is used as the input.
   * Parts with two TCBs or three ACs give them their own channel on 0/1-series. Obviously there wouldn't be enough channels for this if it were done on a Dx with 5 TCBs, and 3 ACs. The other parts that have multiples of these (2-series and Dx) have one channel for this, and the input number selects which one is used, but only the first two can be used.

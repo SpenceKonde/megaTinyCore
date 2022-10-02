@@ -630,7 +630,7 @@
   // TCA V1.0 - tinyAVR 0/1, megaAVR 0
   // this only has one event input, but code needs to be able to flow smoothly
   // so we define macros named after he the new version pointing to the old version of event input A.
-  // Obviously, we can't do anythign about the unfortunate soul who tries to use input B.
+  // Obviously, we can't do anything about the unfortunate soul who tries to use input B.
   #if !defined(TCA_SINGLE_CNTAEI_bm)
     #define TCA_SINGLE_CNTAEI_bm TCA_SINGLE_CNTEI_bm
     #define TCA_SINGLE_EVACTA_POSEDGE_gc TCA_SINGLE_EVACTA_CNT_POSEDGE_gc

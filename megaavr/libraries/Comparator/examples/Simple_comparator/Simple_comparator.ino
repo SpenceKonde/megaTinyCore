@@ -1,15 +1,20 @@
 /***********************************************************************|
-| AVR DA/DB analog comparator library                                   |
+| Modern AVR analog comparator library                                  |
 |                                                                       |
 | Simple_comparator.ino                                                 |
 |                                                                       |
-| A library for interfacing with the AVR DA/DB analog comparator.       |
-| Developed in 2019 by MCUdude                                          |
+| A library for interfacing with the modern AVR analog comparator(s).   |
+| Developed in 2019-2022 by MCUdude                                     |
 | https://github.com/MCUdude/                                           |
+|                                                                       |
+| Ported to tinyAVR 2020-2021 by Spence Konde.                          |
 |                                                                       |
 | In this example we use the negative and positive input 0 of the       |
 | comparator. The output goes high if the positive input is higher than |
 | the negative input, and low otherwise.                                |
+|
+| In effect this turns the three pins into the inputs and outputs of a  |
+| LM339-like chip, except that these are rail to rail
 |***********************************************************************/
 
 #include <Comparator.h>

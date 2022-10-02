@@ -94,7 +94,7 @@ int main() {
  * for this sort of thing.
  *
  * * The register in question is GPIOR0 on megaTinyCore, GPR.GPR0 on Dx-series, but both names  *
- * are aliases of eachother per core_devices for compatibility
+ * are aliases of each other per core_devices for compatibility
  */
 
   /* Minimum: Reset if we wound up here through malfunction - this relies on user clearing the  *
