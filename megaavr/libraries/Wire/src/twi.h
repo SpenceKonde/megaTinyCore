@@ -90,8 +90,12 @@ SOFTWARE.
  * addition to being astonishingly unreliable, and byte oriented
  * data storage is more useful for typical applications of AVRs
  * than file-oriented storage.
- * The maximum supported buffer length is 255 bytes.
+ * If the standard buffer size is not enough, the supported maximum
+ * is 32.767 (due to size_t), without further modifications
+ * to the library. Buffer lengths below 255 are highly recommended
+ * though.
  */
+
 #ifndef BUFFER_LENGTH
   #if (RAMSIZE < 256)
     #define BUFFER_LENGTH 16
@@ -100,6 +104,13 @@ SOFTWARE.
   #else
     #define BUFFER_LENGTH 130
   #endif
+#endif
+
+
+#if (BUFFER_LENGTH > 255)
+  typedef uint16_t twi_buffer_index_t;
+#else
+  typedef uint8_t  twi_buffer_index_t;
 #endif
 
 
@@ -180,21 +191,21 @@ struct twiData {
   #if defined(TWI_READ_ERROR_ENABLED)
     uint8_t _errors;
   #endif
-  uint8_t _bytesTransmittedS;
+  twi_buffer_index_t _bytesTransmittedS;
   uint8_t _clientAddress;
   #if defined(TWI_MERGE_BUFFERS)
-    uint8_t _bytesToReadWrite;
-    uint8_t _bytesReadWritten;
+    twi_buffer_index_t _bytesToReadWrite;
+    twi_buffer_index_t _bytesReadWritten;
   #else
-    uint8_t _bytesToWrite;
-    uint8_t _bytesToRead;
-    uint8_t _bytesRead;     // Used in slave mode exclusively
-    uint8_t _bytesWritten;  // Used in slave mode exclusively
+    twi_buffer_index_t _bytesToWrite;
+    twi_buffer_index_t _bytesToRead;
+    twi_buffer_index_t _bytesRead;     // Used in slave mode exclusively
+    twi_buffer_index_t _bytesWritten;  // Used in slave mode exclusively
   #endif
   #if defined(TWI_MANDS)
     uint8_t _incomingAddress;
-    uint8_t _bytesToReadWriteS;
-    uint8_t _bytesReadWrittenS;
+    twi_buffer_index_t _bytesToReadWriteS;
+    twi_buffer_index_t _bytesReadWrittenS;
   #endif
   void (*user_onRequest)(void);
   void (*user_onReceive)(int);
@@ -218,8 +229,9 @@ void     TWI_DisableSlave(struct    twiData *_data);
 void     TWI_HandleSlaveIRQ(struct  twiData *_data);
 uint8_t  TWI_MasterWrite(struct     twiData *_data, bool send_stop);
 uint8_t  TWI_MasterSetBaud(struct   twiData *_data, uint32_t frequency);
-uint8_t  TWI_MasterRead(struct      twiData *_data, uint8_t bytesToRead, bool send_stop);
 void     TWI_SlaveInit(struct       twiData *_data, uint8_t address, uint8_t receive_broadcast, uint8_t second_address);
 uint8_t  TWI_MasterCalcBaud(uint32_t frequency);
+
+twi_buffer_index_t  TWI_MasterRead(struct twiData *_data, twi_buffer_index_t bytesToRead, bool send_stop);
 
 #endif
