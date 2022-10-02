@@ -346,7 +346,7 @@ uint8_t TwoWire::endTransmission(bool sendStop) {
  */
 size_t TwoWire::write(uint8_t data) {
   uint8_t* txBuffer;
-  twi_buffer_index_t *txHead; 
+  twi_buffer_index_t *txHead;
   #if defined(TWI_MANDS)                   // Add following if host and client are split
     if (vars._bools._toggleStreamFn == 0x01) {
       txHead   = &(vars._bytesToReadWriteS);
