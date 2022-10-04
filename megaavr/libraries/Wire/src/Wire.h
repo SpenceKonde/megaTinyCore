@@ -86,7 +86,7 @@ class TwoWire: public Stream {
       return endTransmission(true);
     }
 
-    uint8_t requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop = 1);
+    twi_buffer_index_t requestFrom(uint8_t address, twi_buffer_index_t quantity, uint8_t sendStop = 1);
 
     virtual size_t write(uint8_t);
     virtual size_t write(const uint8_t *, size_t);
@@ -96,7 +96,7 @@ class TwoWire: public Stream {
     void flush(void);
 
     uint8_t getIncomingAddress(void);
-    uint8_t getBytesRead(void);
+    twi_buffer_index_t getBytesRead(void);
     uint8_t slaveTransactionOpen(void);
     uint8_t checkPinLevels(void);             // Can be used to make sure after boot that SDA/SCL are high
     void    enableDualMode(bool fmp_enable);  // Moves the Slave to dedicated pins

@@ -158,7 +158,7 @@ void TWI_Disable(struct twiData *_data) {
  */
 void TWI_DisableMaster(struct twiData *_data) {
   if (true == _data->_bools._hostEnabled) {
-    _data->_module->MCTRLA      = 0x00;  // has to stay enabled for bus error circuitry
+    _data->_module->MCTRLA      = 0x00;
     _data->_module->MBAUD       = 0x00;
     _data->_bools._hostEnabled  = 0x00;
   }
@@ -293,12 +293,14 @@ uint8_t TWI_MasterCalcBaud(uint32_t frequency) {
  *            to an error or because of an empty txBuffer
  */
 uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop) {
+  uint8_t* txBuffer;
+  twi_buffer_index_t *txHead;
   #if defined(TWI_MERGE_BUFFERS)                          // Same Buffers for tx/rx
-    uint8_t* txHead   = &(_data->_bytesToReadWrite);
-    uint8_t* txBuffer =   _data->_trBuffer;
+    txHead   = &(_data->_bytesToReadWrite);
+    txBuffer =   _data->_trBuffer;
   #else                                                   // Separate tx/rx Buffers
-    uint8_t* txHead   = &(_data->_bytesToWrite);
-    uint8_t* txBuffer =   _data->_txBuffer;
+    txHead   = &(_data->_bytesToWrite);
+    txBuffer =   _data->_txBuffer;
   #endif
 
   TWI_t *module = _data->_module;     // Compiler treats the pointer to the TWI module as volatile and
@@ -306,7 +308,7 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop) {
   TWI_INIT_ERROR;
   uint8_t currentSM;
   uint8_t currentStatus;
-  uint8_t dataWritten = 0;
+  twi_buffer_index_t dataWritten = 0;
   #if defined (TWI_TIMEOUT_ENABLE)
     uint16_t timeout = 0;
   #endif
@@ -383,22 +385,24 @@ uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop) {
  *
  *
  *@param      struct twiData *_data is a pointer to the structure that holds the Wire variables
- *@param      uint8_t bytesToRead is the desired amount of bytes to read. When finished, a
+ *@param      uint8_t/uint16_t bytesToRead is the desired amount of bytes to read. When finished, a
  *              NACK is issued.
  *@param      bool send_stop enables the STOP condition at the end of a write
  *
- *@return     uint8_t amount of actually read bytes
+ *@return     uint8_t/uint16_t - amount of actually read bytes
  *@retval     amount of bytes that were actually read. If 0, no read took place due to a bus error
  */
-uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_stop) {
+twi_buffer_index_t TWI_MasterRead(struct twiData *_data, twi_buffer_index_t bytesToRead, bool send_stop) {
+  uint8_t* rxBuffer;
+  twi_buffer_index_t *rxHead, *rxTail;
   #if defined(TWI_MERGE_BUFFERS)                            // Same Buffers for tx/rx
-    uint8_t* rxHead   = &(_data->_bytesToReadWrite);
-    uint8_t* rxTail   = &(_data->_bytesReadWritten);
-    uint8_t* rxBuffer =   _data->_trBuffer;
+    rxHead   = &(_data->_bytesToReadWrite);
+    rxTail   = &(_data->_bytesReadWritten);
+    rxBuffer =   _data->_trBuffer;
   #else                                                     // Separate tx/rx Buffers
-    uint8_t* rxHead   = &(_data->_bytesToRead);
-    uint8_t* rxTail   = &(_data->_bytesRead);
-    uint8_t* rxBuffer =   _data->_rxBuffer;
+    rxHead   = &(_data->_bytesToRead);
+    rxTail   = &(_data->_bytesRead);
+    rxBuffer =   _data->_rxBuffer;
   #endif
 
   (*rxTail) = 0;                      // Reset counter
@@ -407,7 +411,7 @@ uint8_t TWI_MasterRead(struct twiData *_data, uint8_t bytesToRead, bool send_sto
                                       // creates bloat-y code, using a local variable fixes that
 
   TWIR_INIT_ERROR;             // local variable for errors
-  uint8_t dataRead = 0;
+  twi_buffer_index_t dataRead = 0;
 
   if ((module->MSTATUS & TWI_BUSSTATE_gm) != TWI_BUSSTATE_UNKNOWN_gc) {
     uint8_t currentSM;
@@ -513,7 +517,8 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
 
   __asm__ __volatile__("\n\t": "=&y" (_data) : "0" (_data));  // force _data into Y and instruct to not change Y
 
-  uint8_t *address, *txHead, *txTail, *txBuffer, *rxHead, *rxTail, *rxBuffer;
+  uint8_t *address,  *txBuffer, *rxBuffer;
+  twi_buffer_index_t *txHead, *txTail,  *rxHead, *rxTail;
   #if defined(TWI_MANDS)
     address = &(_data->_incomingAddress);
     txHead  = &(_data->_bytesToReadWriteS);
@@ -615,8 +620,8 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
       }
     } else {                                  // Master is writing
       rxBuffer[(*rxHead)] = _data->_module->SDATA;  // reading SDATA will clear the DATA IRQ flag
-      (*rxHead)++;                                  // Advance Head
-      if ((*rxHead) < (BUFFER_LENGTH-1)) {            // if buffer is not yet full
+      if ((*rxHead) < (BUFFER_LENGTH-1)) {          // if buffer is not yet full
+        (*rxHead)++;                                  // Advance Head
         action = TWI_SCMD_RESPONSE_gc;                // "Execute Acknowledge Action succeeded by reception of next byte"
       } else {                                      // else buffer would overflow with next byte
         action = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc;  // "Execute ACK Action succeeded by waiting for any Start (S/Sr) condition"

@@ -256,11 +256,11 @@ void TwoWire::endSlave(void) {
  *@param      int/uint8_t/size_t quantity - the amount of bytes that are expected to be received
  *@param      int/bool sendStop - if the transaction should be terminated with a STOP condition
  *
- *@return     uint8_t
+ *@return     uint8_t/uint16_t
  *@retval     amount of bytes that were actually read. If 0, no read took place due to a bus error.
  */
-uint8_t TwoWire::requestFrom(uint8_t  address,  uint8_t  quantity,  uint8_t sendStop) {
-  if (quantity > BUFFER_LENGTH) {
+twi_buffer_index_t TwoWire::requestFrom(uint8_t  address,  twi_buffer_index_t quantity,  uint8_t sendStop) {
+  if (quantity >= BUFFER_LENGTH) {
     quantity = BUFFER_LENGTH;
   }
   vars._clientAddress = address << 1;
@@ -281,10 +281,11 @@ uint8_t TwoWire::requestFrom(uint8_t  address,  uint8_t  quantity,  uint8_t send
  *@return     void
  */
 void TwoWire::beginTransmission(uint8_t address) {
+  twi_buffer_index_t *txHead;
   #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-    uint8_t* txHead  = &(vars._bytesToReadWrite);
+    txHead  = &(vars._bytesToReadWrite);
   #else                                           // Separate tx/rx Buffers
-    uint8_t* txHead  = &(vars._bytesToWrite);
+    txHead  = &(vars._bytesToWrite);
   #endif
   if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
     badArg("Supplied address seems to be 8 bit. Only 7-bit-addresses are supported");
@@ -344,9 +345,8 @@ uint8_t TwoWire::endTransmission(bool sendStop) {
  *@retval     1 if successful, 0 if the buffer is full
  */
 size_t TwoWire::write(uint8_t data) {
-  uint8_t* txHead;
   uint8_t* txBuffer;
-
+  twi_buffer_index_t *txHead;
   #if defined(TWI_MANDS)                   // Add following if host and client are split
     if (vars._bools._toggleStreamFn == 0x01) {
       txHead   = &(vars._bytesToReadWriteS);
@@ -388,8 +388,8 @@ size_t TwoWire::write(uint8_t data) {
  *@retval     amount of bytes copied
  */
 size_t TwoWire::write(const uint8_t *data, size_t quantity) {
-  uint8_t i = 0;  // uint8_t since we don't use bigger buffers
-  uint8_t qty = quantity > BUFFER_LENGTH ? BUFFER_LENGTH : quantity; //Don't overfill the buffer.
+  twi_buffer_index_t i = 0;
+  twi_buffer_index_t qty = (quantity >= BUFFER_LENGTH) ? BUFFER_LENGTH : quantity; //Don't overfill the buffer.
   for (; i < qty; i++) {
     if (write(*(data + i)) == 0) break;   // break if buffer full
   }
@@ -444,8 +444,8 @@ int TwoWire::available(void) {
  *@retval     byte in the buffer or -1 if buffer is empty
  */
 int TwoWire::read(void) {
-  uint8_t *rxHead, *rxTail, *rxBuffer;
-
+  uint8_t *rxBuffer;
+  twi_buffer_index_t *rxHead, *rxTail;
   #if defined(TWI_MANDS)                         // Add following if host and client are split
     if (vars._bools._toggleStreamFn == 0x01) {
       rxHead   = &(vars._bytesToReadWriteS);
@@ -493,7 +493,7 @@ int TwoWire::read(void) {
  *@retval     actually read bytes.
  */
 size_t TwoWire::readBytes(char* data, size_t quantity) {
-  uint8_t i = 0;
+  twi_buffer_index_t i = 0;
   for (; i < quantity; i++) {
     int16_t c = read();
     if (c < 0) break;   // break if buffer empty
@@ -517,8 +517,8 @@ size_t TwoWire::readBytes(char* data, size_t quantity) {
  *@retval     byte in the buffer or -1 if buffer is empty
  */
 int TwoWire::peek(void) {
-  uint8_t *rxHead, *rxTail, *rxBuffer;
-
+  uint8_t *rxBuffer;
+  twi_buffer_index_t *rxHead, *rxTail;
   #if defined(TWI_MANDS)                         // Add following if host and client are split
     if (vars._bools._toggleStreamFn == 0x01) {
       rxHead   = &(vars._bytesToReadWriteS);
@@ -586,13 +586,13 @@ uint8_t TwoWire::getIncomingAddress(void) {
  *            Calling this will reset the counter, since it is an unusual use case for
  *              that to not be the next thing you do.
  *
- *@return     uint8_t
+ *@return     uint8_t/uint16_t
  *@retval     Number of bytes read by a master from this device acting as a slave since
  *              the last time this was called.
  */
 
-uint8_t TwoWire::getBytesRead() {
-  uint8_t num = vars._bytesTransmittedS;
+twi_buffer_index_t TwoWire::getBytesRead() {
+  twi_buffer_index_t num = vars._bytesTransmittedS;
   vars._bytesTransmittedS = 0;
   return num;
 }
