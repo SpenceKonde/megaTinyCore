@@ -319,28 +319,29 @@ while (digitalReadFast(pinb)); // make sure our pulse is over - can be omitted i
 
 ### TCAn for millis timekeeping
 When TCA0 is used as the millis timekeeping source, it is set to run at the system clock prescaled by 8 when system clock is 1MHz, 16 when system clock is <=5 MHz, and 64 for faster clock speeds, with a period of 255 (as with PWM). This provides a `millis()`  resolution of 1-2ms, and is effecively not higher than 1ms between 16 and 30 MHz, while `micros()` resolution remains at 4 us or less. At 32 MHz or higher, to continue generating PWM output within the target range, we are forced to switch to a larger prescaler (by a factor of 4), so the resolution figures fall by a similar amount, and the ISR is called that much less often.
+It 2.6.3 ISR performance was improved greatly. an average 29% improvement!
 
 #### TCA timekeeping resolution
 |   CLK_PER | millis() | micros() | % in ISR | micros() time |
 |-----------|----------|----------|----------|---------------|
 |    32 MHz |  2.04 ms |   8.0 us |   0.19 % |          4 us |
-|    30 MHz |  0.54 ms |   2.1 us |   0.72 % |   aprx   4 us |
-|    28 MHz |  0.58 ms |   2.3 us |   0.72 % |          4 us |
-|    25 MHz |  0.65 ms |   2.6 us |   0.72 % |   aprx   4 us |
-|    24 MHz |  0.68 ms |   2.7 us |   0.72 % |          5 us |
-|    20 MHz |  0.82 ms |   3.2 us |   0.72 % |          7 us |
-|    16 MHz |  1.02 ms |   4.0 us |   0.72 % |          9 us |
-| !  14 MHz |  1.14 ms |   4.6 us |   0.72 % |   aprx  10 us |
-|    12 MHz |  1.36 ms |   5.3 us |   0.72 % |         10 us |
-|    10 MHz |  1.63 ms |   6.4 us |   0.72 % |         14 us |
-|     8 MHz |  2.04 ms |   8.0 us |   0.72 % |         17 us |
-| !   7 MHz |  0.58 ms |   2.3 us |   2.99 % |   aprx  18 us |
-| !   6 MHz |  0.68 ms |   2.7 us |   2.99 % |   aprx  19 us |
-|     5 MHz |  0.82 ms |   3.2 us |   2.99 % |         27 us |
-|     4 MHz |  1.02 ms |   4.0 us |   2.99 % |         33 us |
-| !   3 MHz |  0.68 ms |   2.7 us |   5.98 % |   aprx  45 us |
-| !   2 MHz |  1.02 ms |   4.0 us |   5.98 % |   aprx  60 us |
-|     1 MHz |  2.04 ms |   8.0 us |   5.98 % |        112 us |
+|    30 MHz |  0.54 ms |   2.1 us |   0.51 % |   aprx   4 us |
+|    28 MHz |  0.58 ms |   2.3 us |   0.51 % |          4 us |
+|    25 MHz |  0.65 ms |   2.6 us |   0.51 % |   aprx   4 us |
+|    24 MHz |  0.68 ms |   2.7 us |   0.51 % |          5 us |
+|    20 MHz |  0.82 ms |   3.2 us |   0.51 % |          7 us |
+|    16 MHz |  1.02 ms |   4.0 us |   0.51 % |          9 us |
+| !  14 MHz |  1.14 ms |   4.6 us |   0.51 % |   aprx  10 us |
+|    12 MHz |  1.36 ms |   5.3 us |   0.51 % |         10 us |
+|    10 MHz |  1.63 ms |   6.4 us |   0.51 % |         14 us |
+|     8 MHz |  2.04 ms |   8.0 us |   0.51 % |         17 us |
+| !   7 MHz |  0.58 ms |   2.3 us |   2.13 % |   aprx  18 us |
+| !   6 MHz |  0.68 ms |   2.7 us |   2.13 % |   aprx  19 us |
+|     5 MHz |  0.82 ms |   3.2 us |   2.13 % |         27 us |
+|     4 MHz |  1.02 ms |   4.0 us |   2.13 % |         33 us |
+| !   3 MHz |  0.68 ms |   2.7 us |   3.55 % |   aprx  45 us |
+| !   2 MHz |  1.02 ms |   4.0 us |   3.55 % |   aprx  60 us |
+|     1 MHz |  2.04 ms |   8.0 us |   3.55 % |        112 us |
 
 `!` - Theoretical, these speeds are not supported and have not been tested
 
@@ -356,28 +357,29 @@ When a TCB is used for `millis()` timekeeping, it is set to run at the system cl
 
 ### TCBn for millis timekeeping
 When TCB2 (or other type B timer) is used for `millis()` timekeeping, it is set to run at the system clock prescaled by 2 (1 at 1 MHz system clock) and tick over every millisecond. This makes the millis ISR very fast, and provides 1ms resolution at all speeds for millis. The `micros()` function also has 1 us or almost-1 us resolution at all clock speeds (though there are small deterministic distortions due to the performance shortcuts used for the microsecond calculations. The type B timer is an ideal timer for millis, however, they';'re also good for a lot of other things too. It is anticipated that as libraries for IR, 433MHz OOK'ed remote control, and similar add support for the modern AVR parts, that these timers will see even more use.
+ISR exec time was hastened markedly - a 25% decrease, meaninmg less time spent incrementing millis and more on your code.
 
 |Note | CLK_PER | millis() | micros() | % in ISR | micros() time | Terms used             |
 |-----|---------|----------|----------|----------|---------------|------------------------|
-|  †  |  32 MHz |     1 ms |     1 us |   0.20 % |          3 us | 1                      |
-|     |  30 MHz |     1 ms |  1.07 us |   0.22 % |        < 6 us | 5 (3,4,7,8)            |
-| !   |  28 MHz |     1 ms |  1.14 us |   0.23 % |       <= 6 us | 5/7 (2,3,5,6 ~8,9~ )   |
-| !   |  27 MHz |     1 ms |  1.18 us |   0.24 % |       <= 6 us | 4 (2,4,9)              |
-|     |  25 MHz |     1 ms |  1.28 us |   0.26 % |       <= 6 us | 3/5 ( ~1,~ 2, ~4,~ 5)  |
-|   * |  24 MHz |     1 ms |  1.33 us |   0.27 % |          5 us | 9 (0-7, 9)             |
-|   * |  20 MHz |     1 ms |     1 us |   0.33 % |          6 us | 6 (2,4,6,8,10)         |
-|  †  |  16 MHz |     1 ms |     1 us |   0.40 % |          6 us | 1                      |
-| !   |  14 MHz |     1 ms |  1.14 us |   0.47 % | approx. 12 us | 5/7 (2,3,5,6 ~8,9~ )   |
-|   * |  12 MHz |     1 ms |  1.33 us |   0.54 % |         10 us | 9 (0-7, 9)             |
-|     |  10 MHz |     1 ms |     1 us |   0.65 % |         10 us | 6 (2,4,6,8,10)         |
-|  †  |   8 MHz |     1 ms |     1 us |   0.80 % |         11 us | 1                      |
-| !   |   7 MHz |     1 ms |  1.14 us |   0.94 % | approx. 25 us | 5/7 (2,3,5,6 ~8,9~ )   |
-| ! * |   6 MHz |     1 ms |  1.33 us |   1.08 % |       > 20 us | 9 (0-7, 9)             |
+|  †  |  32 MHz |     1 ms |     1 us |   0.14 % |          3 us | 1                      |
+|     |  30 MHz |     1 ms |  1.07 us |   0.16 % |        < 6 us | 5 (3,4,7,8)            |
+| !   |  28 MHz |     1 ms |  1.14 us |   0.17 % |       <= 6 us | 5/7 (2,3,5,6 ~8,9~ )   |
+| !   |  27 MHz |     1 ms |  1.18 us |   0.18 % |       <= 6 us | 4 (2,4,9)              |
+|     |  25 MHz |     1 ms |  1.28 us |   0.19 % |       <= 6 us | 3/5 ( ~1,~ 2, ~4,~ 5)  |
+|   * |  24 MHz |     1 ms |  1.33 us |   0.20 % |          5 us | 9 (0-7, 9)             |
+|   * |  20 MHz |     1 ms |     1 us |   0.24 % |          6 us | 6 (2,4,6,8,10)         |
+|  †  |  16 MHz |     1 ms |     1 us |   0.30 % |          6 us | 1                      |
+| !   |  14 MHz |     1 ms |  1.14 us |   0.34 % | approx. 12 us | 5/7 (2,3,5,6 ~8,9~ )   |
+|   * |  12 MHz |     1 ms |  1.33 us |   0.40 % |         10 us | 9 (0-7, 9)             |
+|     |  10 MHz |     1 ms |     1 us |   0.48 % |         10 us | 6 (2,4,6,8,10)         |
+|  †  |   8 MHz |     1 ms |     1 us |   0.61 % |         11 us | 1                      |
+| !   |   7 MHz |     1 ms |  1.14 us |   0.72 % | approx. 25 us | 5/7 (2,3,5,6 ~8,9~ )   |
+| ! * |   6 MHz |     1 ms |  1.33 us |   0.81 % |       > 20 us | 9 (0-7, 9)             |
 |   * |   5 MHz |     1 ms |     1 us |   1.30 % |         23 us | 6 (2,4,6,8,10)         |
-|  †  |   4 MHz |     1 ms |     1 us |   1.60 % |         21 us | 1                      |
-| ! * |   3 MHz |     1 ms |  1.33 us |   2.16 % |       > 40 us | 9 (0-7, 9)             |
-| !†  |   2 MHz |     2 ms |     1 us |   1.60 % |         39 us | 1                      |
-|  †  |   1 MHz |     2 ms |     1 us |   3.25 % |         78 us | 1                      |
+|  †  |   4 MHz |     1 ms |     1 us |   1.18 % |         21 us | 1                      |
+| ! * |   3 MHz |     1 ms |  1.33 us |   1.61 % |       > 40 us | 9 (0-7, 9)             |
+| !†  |   2 MHz |     2 ms |     1 us |   1.18 % |         39 us | 1                      |
+|  †  |   1 MHz |     2 ms |     1 us |   2.60 % |         78 us | 1                      |
 
 `!` - Theoretical, these speeds are not supported and have not been tested. % time in ISR and micros return times, where given are theoretically calculated, not experimentally verified.
 `†` - Naturally ideal - no ersatz division is needed for powers of 2
