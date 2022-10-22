@@ -64,6 +64,44 @@ TwoWire::TwoWire(TWI_t *twi_module) {
  *@retval     true if change was successful
  */
 bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
+  if (__builtin_constant_p(sda_pin) && __builtin_constant_p(scl_pin)) {
+    if (!(
+      #if defined(PIN_WIRE_SDA)
+          (sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL) ||
+      #endif
+      #if defined(PIN_WIRE_SDA_PINSWAP_1)
+          (sda_pin == PIN_WIRE_SDA_PINSWAP_1 && scl_pin == PIN_WIRE_SCL_PINSWAP_1) ||
+      #endif
+      #if defined(PIN_WIRE_SDA_PINSWAP_2)
+          (sda_pin == PIN_WIRE_SDA_PINSWAP_2 && scl_pin == PIN_WIRE_SCL_PINSWAP_2) ||
+      #endif
+      #if defined(PIN_WIRE_SDA_PINSWAP_3)
+          (sda_pin == PIN_WIRE_SDA_PINSWAP_3 && scl_pin == PIN_WIRE_SCL_PINSWAP_3) ||
+      #endif
+      #if defined(PIN_WIRE1_SDA)
+          (sda_pin == PIN_WIRE1_SDA && scl_pin == PIN_WIRE1_SCL) ||
+      #endif
+      #if defined(PIN_WIRE1_SDA_PINSWAP_1)
+          (sda_pin == PIN_WIRE1_SDA_PINSWAP_1 && scl_pin == PIN_WIRE1_SCL_PINSWAP_1) ||
+      #endif
+      #if defined(PIN_WIRE1_SDA_PINSWAP_2)
+          (sda_pin == PIN_WIRE1_SDA_PINSWAP_2 && scl_pin == PIN_WIRE1_SCL_PINSWAP_2) ||
+      #endif
+        false)) { // SDA and SCL are always next to each other
+      #if defined(TWI1)
+        badArg("Pins passed to Wire.pins() or Wire1.pins() known at compile time to be invalid");
+      #else
+        badArg("Pins passed to Wire.pins() known at compile time to be invalid");
+      #endif
+    }
+  }
+  /* The above blob of code is entirely removed by the compiler - it either generates the compile error or doesn't, and nothing is evaluated at runtime
+   * This was for a time in twi_pins.c - but that prevented it from ever firing, because constant folding doesn't happen if it's in a different file
+   * and hence a different compilation unit. This still will only catch the case where the pins are not a valid pin combination. The construction below, I think
+   * is enough to render the optimizer unable to do the sort of things it needs to in order to do this.
+   * Using both Wire.pins() and Wire1.pins() within the same sketch may also be enough to defang the optimizer such that it can't check these.
+   * I don't see a way around that, though... but this will at least catch the majority of cases. -SK 10/5/22.
+   */
   #if defined(TWI1)
     if (&TWI0 == vars._module)  {
       return TWI0_Pins(sda_pin, scl_pin);
@@ -88,6 +126,56 @@ bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
  *@retval     true if change was successful
  */
 bool TwoWire::swap(uint8_t state) {
+  if (__builtin_constant_p(state)) {
+    #if defined(TWI1) // DA and DB have a second TwI, TWI1. Both have swap levels 0-2. Swap 1 and 2 of TWI1 and swap 1 of TWI0 are unavailable with under 48 pins.
+      if (!(
+        #if defined(PIN_WIRE1_SDA_PINSWAP_2) || defined(PIN_WIRE_SDA_PINSWAP_2)
+          state == 2 ||
+        #endif
+        #if defined(PIN_WIRE1_SDA_PINSWAP_1) || defined(PIN_WIRE_SDA_PINSWAP_1)
+          state == 1 ||
+        #endif
+        #if defined(PIN_WIRE_SDA) || defined(PIN_WIRE1_SDA)
+          state == 0 ||
+        #endif
+        false)) {
+          if (state > 3) {
+            badArg("The requested swap level is not available on any current or announced part - did you pass a bitmask instead of a number?")
+          } else if (state == 3){
+            badArg("Swap level 3 is not available on DA or DB devices, only swaps 0, 1 and 2.")
+          } else {
+            badArg("The requested swap level is not available on this part.")
+            return false
+          }
+        }
+
+    #elif defined(TWI0) // case for one TWI, TWI0
+      if (!(
+        #if defined(PIN_WIRE_SDA_PINSWAP_3)
+          state == 3 ||
+        #endif
+        #if defined(PIN_WIRE_SDA_PINSWAP_2)
+          state == 2 ||
+        #endif
+        #if defined(PIN_WIRE_SDA_PINSWAP_1)
+          state == 1 ||
+        #endif
+        #if defined(PIN_WIRE_SDA)
+          state == 0 ||
+        #endif
+        false)) {
+          if (state > 3) {
+            badArg("The requested swap level is known at compiletime to be one that is not available on any part. (did you pass a bitmask instead of a number?)")
+          } else {
+            badArg("The requested swap level is not available on this part.")
+            return false
+          }
+        }
+
+    #else
+      #error "This library (Wire.h) is for modern AVRs, and all parts announced or in production have a TWI0"
+    #endif
+  }
   #if defined(TWI1)
     if (&TWI0 == vars._module) {
       return TWI0_swap(state);
@@ -181,7 +269,7 @@ void TwoWire::begin(void) {
  */
 void TwoWire::begin(uint8_t address, bool receive_broadcast, uint8_t second_address) {
   if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
-    badArg("Supplied address seems to be 8 bit. Only 7 bit addresses are supported");
+    badArg("TWI addresses must be supplied in 7-bit format. The read/write bit is handled by the library");
     return;
   }
   TWI_SlaveInit(&vars, address, receive_broadcast, second_address);
@@ -242,7 +330,106 @@ void TwoWire::endSlave(void) {
   TWI_DisableSlave(&vars);
 }
 #endif
+/**
+ *@brief      specialConfig allows configuring of wacky features.
+ *            smbus evel: Vihmin and Vilmax are normally 0.7*Vdd (or VDDIO on MVIO pins) and 0.3*Vdd respectively. This option sets them to the SMBus 3.0 levels:
+ *            In this mode, any voltage below 0.8V is guaranteed to be a LOW, and anything above 1.35 or 1.45 (see electrical characteristics in datasheet)
+ *            This is of great utility for communication with lower voltage devices, especially where you don't have MVIO. Can also be set independantly if dual mode used.
+ *            loongsetup: The setup times are normally 4 system clocks, however this can be doubled for disagreeable devices and/or adverse bus conditions
+ *            Four options are available for the SDA hold times. sda_hold_dual handles the dual pins. This is used for SMBus 2.0 compatibility.
+ *              WIRE_SDA_HOLD_OFF 0 - hold time off (default)
+ *              WIRE_SDA_HOLD_50  1 - short hold time
+ *              WIRE_SDA_HOLD_300 2 - meets SMBus 2.0 spec in typical cases
+ *              WIRE_SDA_HOLD_500 3 - meets SMBus 2.0 across all corner cases
+ *
+ *            Returns a value between 0 and 7. 0 indicates all is well.
+ *            it is otherwise bitwis combination of three error conditions (the first two of which we will stop compilation if they are constants and wrong)
+ *            0x01 - smbuslevel must be 0 on parts that don't support it, you passed something else.
+ *            0x02 - sda_hold_dual or smbuslevel_dual must be 0 if there is no dual mode
+ *
+ *@param      bool smbuslvl, bool longsetup, uint8_t sda_hold, uint8_t sda_hold_dual
+ *
+ *@return     uint8_t
+ *            0x01 = smbus level ignored because part does not support it
+ *            0x02 = sda_hold_dual ignored because part does not have dual mode.
+ *            0x04 = sda_hold_dual ignored because dual mode not enabled.
+ */
 
+uint8_t TwoWire::specialConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smbuslvl_dual, uint8_t sda_hold_dual) {
+  uint8_t ret = 0;
+  #if !defined(TWI_INPUTLVL_bm) // if there's no input level option, we want to notify the user with an error so they don't think they have a feature they don't
+    if (__builtin_constant_p(smbuslvl))  { //but they could be passign a zero, which is legal. See if it's constant...
+      if (smbuslvl) {                      // and non-zero, in which case error:
+        badCall("the smbus level option is not present on these parts. You need a Dx for that.");
+      }
+    } else if (smbuslvldual) { //same deal for dual mode
+      if (smbuslvldual) {
+        badCall("the smbus level option is not present on these parts. You need a Dx for that.");
+      }
+    // the above will always fold to nothing or and error, and does not bloat binary
+    // but we may not know at compiletime what will be passed, so we have to have a runtime test.
+    }
+      else if (smbuslvl || smbuslvldual) {
+        ret         |= 1; //
+        smbuslvl     = 0; // We don't HAVE this option here, so zero out the option we pass along.
+       //#if defined(TWI_DUALCTRL)
+       //   smbuslvldual = 0; // no need to 0 - variable is no longer used, w/out dual ctrl, theres also not going to be smbus levels.
+       //#endif
+      }
+    }
+  #endif
+  if (__builtin_constant_p(sda_hold))  {
+    if (sda_hold > 3) {
+      badArg("Only 0, 1, 2 and 3 are valid SDA hold options. Suggest using the named constants.")
+    }
+  } else if (sda_hold > 3) {
+    ret |= 0x08;
+    sda_hold = 0;
+  }
+
+  #if !defined(TWI_DUALCTRL) // if no dual control, let user know with an error that they're trying to use dual mode features
+    if (__builtin_constant_p(sda_hold_dual))  {
+      if (sda_hold_dual) {
+        badCall("Dual Mode is not supported on this part, sda_hold_dual and smbuslvl_dual must be omitted or 0");
+      }
+    }
+    if (__builtin_constant_p(smbuslvl_dual))  {
+      if (smbuslvl_dual) {
+        badCall("Dual Mode is not supported on this part, smbuslvl_dual must be omitted or 0");
+      }
+    }
+    else { //not compiletime constant so have to check at runtime
+      if (sda_hold_dual) { // only hav to do SDA hold 0 - already caught bad input levels.
+        ret |= 2; //error code.
+        //sda_hold_dual= 0; not needed to zero out if no dual mode, we don't use this value anmore.
+      }
+    }
+  #else
+    if (__builtin_constant_p(sda_hold_dual))  {
+      if (sda_hold_dual > 3) {
+        badArg("Only 0, 1, 2 and 3 are valid SDA hold options. Suggest using the named constants.")
+      }
+    } else if (sda_hold_dual > 3) {
+      ret |= 0x08;
+      sda_hold_dual = 0;
+    }
+  #endif
+  // Now we actually call the function in twi_pins.
+  // Notice how the non-dualctrl parts also don't have smbus levels!
+  #if defined(TWI1) // TWI_DUALCTRL is also defined here - everything with TWI1 has dual mode
+    if (&TWI0 == vars._module) {
+      return ret | TWI0_setConfig(smbuslvl, longsetup, smbuslvl_dual, sda_hold_dual);
+    } else if (&TWI1 == vars._module) {
+      return ret | TWI1_setConfig(smbuslvl, longsetup, smbuslvl_dual, sda_hold_dual);
+    }
+  #else
+    #if defined(TWI_DUALCTRL) // And nothing without dual mode has smbus levels either.
+      return ret | TWI0_setConfig(smbuslvl, longsetup, sda_hold, smbuslvl_dual, sda_hold_dual);
+    #else
+      return ret | TWI0_setConfig(longsetup, sda_hold);
+    #endif
+  #endif
+}
 
 
 /**

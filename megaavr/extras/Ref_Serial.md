@@ -202,19 +202,58 @@ Many peripherals have a couple of 16-bit registers, amongst a sea of 16-bit ones
   00:00:00:00:00:00
 */
 ```
+### Serial.begin(uint32_t baud, uint16_t options)
+This starts the serial port. Options should be made by combining the constant referring to the desired character size, parity and stop bit length, zero or more of the modifiers below
+
+#### Basic USART options
+
+| Data Size | Parity | 1 stop bit | 1 stop bit |
+|-----------|--------|------------|------------|
+| 5 bit     |  NONE  | SERIAL_5N1 | SERIAL_5N2 |
+| 6 bit     |  NONE  | SERIAL_6N1 | SERIAL_6N2 |
+| 7 bit     |  NONE  | SERIAL_7N1 | SERIAL_7N2 |
+| 8 bit     |  NONE  | SERIAL_8N1 | SERIAL_8N2 |
+| 5 bit     |  EVEN  | SERIAL_5E1 | SERIAL_5E2 |
+| 6 bit     |  EVEN  | SERIAL_6E1 | SERIAL_6E2 |
+| 7 bit     |  EVEN  | SERIAL_7E1 | SERIAL_7E2 |
+| 8 bit     |  EVEN  | SERIAL_8E1 | SERIAL_8E2 |
+| 5 bit     |   ODD  | SERIAL_5O1 | SERIAL_5O2 |
+| 6 bit     |   ODD  | SERIAL_6O1 | SERIAL_6O2 |
+| 7 bit     |   ODD  | SERIAL_7O1 | SERIAL_7O2 |
+| 8 bit     |   ODD  | SERIAL_8O1 | SERIAL_8O2 |
 
 
+#### Modifiers
+* SERIAL_RS485        - Enables RS485 mode.
+* SERIAL_OPENDRAIN    - Sets port to open-drain mode
+* SERIAL_LOOPBACK     - Enables single wire operation and internally connects tx to rx.
+* SERIAL_TX_ONLY      - Enables only Tx.
+* SERIAL_RX_ONLY      - Enables only Rx.
+* SERIAL_EVENT_RX     - Enables the event input
+* SERIAL_HALF_DUPLEX  - Synonym for (SERIAL_OPENDRAIN | SERIAL_LOOPBACK)
+* SERIAL_MODE_SYNC    - Uses synchronous mode instead of asynchronous. See notes below, additional configuration required.
+
+#### MSPI options
+* SERIAL_MSPI_MSB_FIRST
+* SERIAL_MSPI_LSB_FIRST
+* SERIAL_MSPI_MSB_FIRST_PHASE
+* SERIAL_MSPI_LSB_FIRST_PHASE
+
+
+As the second argument to begin, you should pass the modifiers bitwise or'ed with any modifiers.
+`Serial1.begin(115200,(SERIAL_8N1 | SERIAL_OPENDRAIN | SERIAL_RS485 ))`
+
+If you use the two argument form of Serial.begin() be certain to remember to pass the constant, not just a modifier.
 
 ### Autobaud mode
-As of 2.6.0, generic autobaud can be enabled. This can be done either through bitwise OR with SERIAL_AUTOBAUD, or using SERIAL_MAKE_AUTOBAUD(baud), or by passing SERIAL_DEMAND_AUTOBAUD as the baud rate, which makes it use the maximum baud rate so any sync field will be seen without having to generate a long break. It's important to keep in mind that both sides must understand that this is the case. There are at a number of
-2. Use SERIAL_AUTOBAUD on both. Both devices can talk at default speed, but if they see framing errors, they should `Serial.doubleBreak(); Serial.write(0x55);` which will be seen as a sync, and the other baud rate will now match.
-3. Use SERIAL_REQUIRE_AUTOBAUD on one device, other uses fixed baud rate unknown to first device. Other device must start initial communication with a simple-sync (`Serial.write(0x00),Serial.write(0x55)`)
-4. Use SERIAL_AUTOBAUD on one device, other uses fixed baud rate. If non-autobaud device gets framing errors, it could be either slow or fast, so use `Serial.doubleBreak(); Serial.write(0x55);` to sync
-5. Use either mode on autobaud device. If  SERIAL_DEMAND_AUTOBAUD used, communication must start with simple-sync as above. Otherwise they begin talking at their preconfigured speeds that must match. Under conditions determined by the programmer, the devices must agree when to switch baud rate. Autobauder will then WFB and await sync simple-sync.
+As of 1.5.0, generic autobaud can be enabled. This can be done either through bitwise OR with SERIAL_AUTOBAUD, or using SERIAL_MAKE_AUTOBAUD(baud), or by passing SERIAL_DEMAND_AUTOBAUD as the baud rate, which makes it use the maximum baud rate so any sync field will be seen without having to generate a long break. It's important to keep in mind that both sides must understand that this is the case. There are at least 6 general approaches:
+1. Use SERIAL_AUTOBAUD on the autobaud device. The other device MUST send a sync.
+2. Use SERIAL_AUTOBAUD_START on both. Both devices can talk at default speed, but if they see framing errors, they should `Serial.doubleBreak(); Serial.write(0x55);` which will be seen as a sync, and the other baud rate will now match.
+3. Use SERIAL_AUTOBAUD on one device, other uses fixed baud rate unknown to first device. Other device must start initial communication with a simple-sync (`Serial.write(0x00),Serial.write(0x55)`)
+4. Use SERIAL_AUTOBAUD_START on one device, other uses fixed baud rate. If non-autobaud device gets framing errors, it it could be either slow or fast, so use `Serial.doubleBreak(); Serial.write(0x55);` to sync
+5. Use either mode on autobaud device. If  SERIAL_AUTOBAUD used, communication must start with simple-sync as above. Otherwise they begin talking at their preconfigured speeds that must match. Under conditions determined by the programmer, the devices must agree when to switch baud rate. Autobauder will then WFB and await sync simple-sync.
 6. A kludgey multidrop one-to-many master-slave topology is in use. All slaves use SERIAL_AUTOBAUD. Master begins communication with a simple-sync sent to all slaves, who now know the baud rate. If master sees framing errors, `Serial.doubleBreak(); Serial.write(0x55);` will resync.
-There are doubtless other approaches
-
-**WARNING** Any device with autobaud should call Serial.getStatus routinely, as this will reset the receiver and allow reception to continue after a bad sync field.
+There are doubtless others. Autobaud device can be made more forgiving by reacting to framing errors by emptying the receive buffer (which since it's getting framing errors is full of gibberish), setting WFB, and then doing something like `Serial.sendTestFrams();` to hopefully trigger a framing error on the other device. The other device should wait 1 byte-period, and then empty it's receive buffer (full of gibberish because framing errors) and send a sync when it gets a framing error.
 
 ```c++
 Serial.begin(SERIAL_DEMAND_AUTOBAUD); // Sets serial port to an invalid (far too fast) baud. Other device expected to send SYNC as first message.
@@ -484,8 +523,9 @@ A UART clock would have a table like:
 Anyway, enough about classic AVRs, let us look forward, not back!
 
 ### Minimum and Maximum baud rates
-Like Classic AVRs the maximum baud rate is F_CPU / 8, using the `U2X` mode, which is still the case. The minimum is now F_CPU/16768 in non-U2X mode.
+Like Classic AVRs the maximum baud rate is F_CPU / 8, using the `U2X` mode, which is still the case.
 
+Unlike classic AVRs, the gap between the theoretical maximum and the practical maximum is much smaller thanks to the fractional baud rate generator". On the older parts there were "gaps" between adjacent UART clock division values. Since the numbers used for standard baud rates don't resemble round numbers, people who needed accurate baud rates would use crystals with bizarre frequencies like 18.42 MHz, so it could be divided down to the match standard baud rates. That - unsurprisingly - led to slower, less accurate timekeeping, where it was supported by an Arduino core at all. Luckily, the days of UART crystals are over! Instead of supplying a whole number, the value passed to the fractional baud rate generator is in 64ths, so as long as it is within the supported range of baud rates, the farthest any two settings are from each other is 1/64, or 1.56%, so the highest baud rate error from the calculation is half that, comfortably within the limits of USART 0.78%. This corresponds to baud rates just below the maximum possible for a given system clock, which for typically used clock speeds is far above what would commmonly be used.
 
 #### Maximums
 The highest baud rates possible are listed below. In practice, below 1 mbaud, it is rare to see baud rates not based on UART clocks; 921600 is much more common that 1 mbaud and so on:

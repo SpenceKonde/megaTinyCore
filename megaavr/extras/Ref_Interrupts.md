@@ -217,7 +217,7 @@ ISR(PERIPHERAL_INT_vect) {
 }
 ```
 
-Note: `if (VPORTx.INTFLAGS & (1 << n))` is a maximally efficient way to test for a bit in a `VPORTx.anything` register or one of the 4 GPIORn/GPIOn/GPIORn. Those registers (like many assorted important registers on classic AVRs - and unlike any other registers besides VPORTs and GPR/GPIOR/GPIO (`*`) registers (over the past 6 years, they've been known by every one of those officially) are in the "Low I/O space", and instructions for atomic bit-level access exist. (set, clear, and skip-if-set/cleared).
+Note: `if (VPORTx.INTFLAGS & (1 << n))` is a maximally efficient way to test for a bit in a `VPORTx.anything` register or one of the 4 GPIORn/GPIOn/GPR.GPRn. Those registers (like many assorted important registers on classic AVRs - and unlike any other registers besides VPORTs and GPR/GPIOR/GPIO (`*`) registers (over the past 6 years, they've been known by every one of those officially) are in the "Low I/O space", and instructions for atomic bit-level access exist. (set, clear, and skip-if-set/cleared).
 
 
 ## If you don't need to do anything in the ISR
@@ -345,4 +345,3 @@ ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 ```
 
 
-`*` Those registers have, between 2015 and 2021 been called GPIORn. GPIOn, and GPIORn. At this rate, buy 2030, we'll have

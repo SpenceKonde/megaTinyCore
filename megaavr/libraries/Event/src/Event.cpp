@@ -1034,7 +1034,7 @@ void Event::soft_event() {
   #endif
 }
 
-static void __attribute__((__unused__)) _long_soft_event(uint8_t channel, uint8_t length);    // holds the bulky assembly routine for the long softevent.
+static void __attribute__((unused))  _long_soft_event(uint8_t channel, uint8_t length);    // holds the bulky assembly routine for the long softevent.
 
 void Event::long_soft_event(uint8_t length) {
   _long_soft_event(channel_number, length);
@@ -1071,27 +1071,27 @@ static void _long_soft_event(uint8_t channel, uint8_t length) {
     "breq long_soft4" "\n\t" // equal to 4 -> 4
     "cpi %1, 10"      "\n\t" // compare with 8
     "brcs long_soft6" "\n\t" // less than 10 (but more than 4) -> 6
-    "breq long_soft10""\n\t" // equal to 10 -> 10
-    "st Z, %0"        "\n\t" // otherwise they get 16.
-    "st Z, %0"        "\n\t"
-    "st Z, %0"        "\n\t"
-    "st Z, %0"        "\n\t"
-    "st Z, %0"        "\n\t"
-    "st Z, %0"        "\n\t"
+    "breq long_soft10""\n\t" // equal to 10 -> 10otherwise they get 16.
+    "st Z, %0"        "\n\t" // 16.
+    "st Z, %0"        "\n\t" // 15
+    "st Z, %0"        "\n\t" // 14
+    "st Z, %0"        "\n\t" // 13
+    "st Z, %0"        "\n\t" // 12
+    "st Z, %0"        "\n\t" // 11
   "long_soft10:"      "\n\t"
-    "st Z, %0"        "\n\t"
-    "st Z, %0"        "\n\t"
-    "st Z, %0"        "\n\t"
-    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t" // 10
+    "st Z, %0"        "\n\t" // 9
+    "st Z, %0"        "\n\t" // 8
+    "st Z, %0"        "\n\t" // 7
   "long_soft6:"       "\n\t"
-    "st Z, %0"        "\n\t"
-    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t" // 6
+    "st Z, %0"        "\n\t" // 5
   "long_soft4:"       "\n\t"
-    "st Z, %0"        "\n\t"
-    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t" // 4
+    "st Z, %0"        "\n\t" // 3
   "long_soft2:"       "\n\t"
-    "st Z, %0"        "\n\t"
-    "st Z, %0"        "\n\t"
+    "st Z, %0"        "\n\t" // 2
+    "st Z, %0"        "\n\t" // 1
     "out 0x3f, r0"    "\n"   // restore SREG, reenabling interrupts.
     ::"r"((uint8_t) channel),"d"((uint8_t) length),"z" ((uint16_t) strobeaddr));
 }

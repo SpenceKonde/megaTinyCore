@@ -58,6 +58,16 @@ extern "C" {
 // While a mask is specified by leftshifting the mask, and leaving low bit 0.
 #define WIRE_ADDRESS_MASK(mask) (mask << 1)
 
+#define WIRE_SDA_HOLD_OFF 0
+#define WIRE_SDA_HOLD_50  1
+#define WIRE_SDA_HOLD_300 2
+#define WIRE_SDA_HOLD_500 3
+
+#define WIRE_SDA_SETUP_4  0
+#define WIRE_SDA_SETUP_8  1
+
+#define WIRE_I2C_LEVELS  0
+#define WIRE_SMBUS_LEVELS  1
 
 class TwoWire: public Stream {
   private:
@@ -94,7 +104,7 @@ class TwoWire: public Stream {
     virtual int read(void);
     virtual int peek(void);
     void flush(void);
-
+    uint8_t specialConfig(bool smbuslvl = 0, bool longsetup = 0, uint8_t sda_hold = 0, bool smbuslvl_dual = 0, uint8_t sda_hold_dual = 0);
     uint8_t getIncomingAddress(void);
     twi_buffer_index_t getBytesRead(void);
     uint8_t slaveTransactionOpen(void);

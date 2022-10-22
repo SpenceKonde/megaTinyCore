@@ -22,10 +22,21 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Unreleased changes
 
-### Planned 2.6.2 (if it doesn't turn into a rolling disaster as 1.6.1)
-* Serial UPDI Chip erase via the Protected KEY Interface didn't happen, it was relying on the chip erase nvmctrl command, wehich can't be usedon a locked chip, or one spamming software resets
+## Released versions
 
-## Released Versions
+### Planned 2.6.2
+* Serial UPDI Chip erase via the Protected KEY Interface didn't happen, it was relying on the chip erase nvmctrl command, which can't be used on a locked chip, or, for that matter, one spamming software resets.
+* Serial UPDI ID for AVR32DB48 corrected
+* Burn Bootloader corrected
+* Undesired quote stripping bug workaround for windows cmd /C
+* Wire updated to latest from MX682X, and then several fixes implemented.
+  * Additionally several extremely niche features added
+  * Compiletime error checking fixed
+* Wire additionally worked over by me:
+  * Add a hacky option to enable the compatibility settings, most importantly the SMbus levels for talking to MUCH lower voltage parts.
+  * Fix compile time error checking as is best possible with in the limitations of the system (for pins, swap, and special options)
+
+* Doc Enhancements
 
 ### 2.6.1 (critical update)
 * 2.6.0 Bugfix: Correct several USART bugs that snuck through, including an apparent regression that would prevent proper serial operation.

@@ -67,7 +67,7 @@ These return pointers to the port output, input and direction registers (output 
 (standard) Returns the analog input number used internally. Only useful when fully taking over the ADC either directly or as part of a sketch.
 
 ### `uint8_t analogChannelToDigitalPin(p)`
-(not standard) Returns the pin number corresponding to an analog channel identifier. It is very rarely necessary or appropriate to use the analog channel numbers that correspond to digital pins (just pass the digital pin); in the event that you do need this lookup, though, this may be of value.
+Returns the pin number corresponding to an analog channel identifier. This is simply the analog input number with the high bit set via the ADC_CH() macro. Think long and hard if you find yourself needing this, it is rarely important on DxCore since you can always refer to pins with the digital pin number or even better, PxN notation.
 
 ### `uint8_t analogInputToDigitalPin(p)`
 (standard) Returns the digital pin number associated with an analog input number. Only useful when fully taking over the ADC either directly or as part of a sketch.

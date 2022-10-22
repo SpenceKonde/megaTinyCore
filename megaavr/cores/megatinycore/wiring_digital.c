@@ -176,6 +176,22 @@ void pinMode(uint8_t pin, uint8_t mode) {
     }
     */
   }
+  // Now an interesting question:
+  // Is this faster?
+  //
+  //    port_base +=(uint8_t) digitalPinToBitPosition(pin)
+  //     bit_mask = *port_base+0x10
+  //
+  // It ought to be slightly faster. After we have loaded the bit positionm, either we combine with 0x10 (1 clock)
+  // add to port base (2 clocks, even though this will never result in a carry for any valid port that exist)
+  // then ld (2 clocks).
+  // Or after loading the bit position, we can add it to port_base (2 clocks)
+  // then load with displacement 2 clocks. IFF the compiler puts this pointer into Y or Z, it is faster and smaller
+  // by 2 bytes and one clock.
+  // If it's in the X register though, things that would be a load with displacement are instead turned into a adiw/ld/sbiw sequence.
+  // (since X doesn't do displacement) so in that case it would be 1 word longer and 3 clocks slower.
+  // Hand-written asssembly that explointed the fact that this never results in a carry (and hence only acts on one byte)
+  // saves anotther 1 clock and
   port_base +=(uint8_t) digitalPinToBitPosition(pin) | (uint8_t) 0x10;
   bit_mask = *port_base;
   if (mode & 2) {

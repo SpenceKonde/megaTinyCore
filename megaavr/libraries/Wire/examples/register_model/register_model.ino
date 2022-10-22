@@ -20,7 +20,7 @@
  * 0-4 are fully writeable
  * the 5 low bits of 5 are writeable
  * 6 and 7 are fully writeable,
- * 8-11 only allow the 2 low bits in each nibble to be written
+ * 8-11 only allow the 2 low bits in each nybble to be written
  * 12-15 are read-only
  * 16 and 17 allow only the low nybble to be written
  * 18 and 19 allow only the high nybble to be written.

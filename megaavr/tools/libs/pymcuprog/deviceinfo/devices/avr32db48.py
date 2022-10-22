@@ -82,5 +82,5 @@ DEVICE_INFO = {
     'interface': 'UPDI',
     'address_size': '24-bit',
     'prog_clock_khz': 1800,
-    'device_id': 0x1E9532,
+    'device_id': 0x1E9535,
 }

@@ -561,16 +561,17 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
 
   if (clientStatus & TWI_APIF_bm) {  // Address/Stop Bit set
     if (clientStatus & TWI_AP_bm) {    // Address bit set
+      uint8_t payload = _data->_module->SDATA;  // read address from data register
       if (clientStatus & TWI_DIR_bm) {  // Master is reading
         if ((*rxHead) > 0) {                    // There is no way to identify a REPSTART,
-          popSleep();                           // Workaround: On REPSTART there are two pushes, but one pop otherwise
+          popSleep();                           // (have to treat REPSTART as another pop for sleep)
           if (_data->user_onReceive != NULL) {  // so when a Master Read occurs after a Master write
             _data->user_onReceive((*rxHead));   // issue a call to the user callback first
           }
         }
+        (*address) = payload;                   // saving address to expose to the user sketch
         (*txHead) = 0;                          // reset buffer positions so the Master can start writing at zero.
         (*txTail) = 0;
-        (*address) = _data->_module->SDATA;     // saving address to expose to the user sketch
 
         if (_data->user_onRequest != NULL) {
           _data->user_onRequest();
@@ -578,12 +579,12 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
         if ((*txHead) == 0) {                   // If no data to transmit, send NACK
           action = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc;  // NACK + "Wait for any Start (S/Sr) condition"
         } else {
-          action = TWI_SCMD_RESPONSE_gc;      // "Execute Acknowledge Action succeeded by reception of next byte"
+          action = TWI_SCMD_RESPONSE_gc;        // "Execute Acknowledge Action succeeded by reception of next byte"
         }
       } else {                          // Master is writing
-        (*address) = _data->_module->SDATA;
         action = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by reception of next byte"
-        (*rxHead) = 0;                    // reset buffer positions so the Master can start writing at zero.
+        (*address) = payload;           // saving address to expose to the user sketch
+        (*rxHead) = 0;                  // reset buffer positions so the Master can start writing at zero.
         (*rxTail) = 0;
       }
       pushSleep();
@@ -619,12 +620,15 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
         }
       }
     } else {                                  // Master is writing
-      rxBuffer[(*rxHead)] = _data->_module->SDATA;  // reading SDATA will clear the DATA IRQ flag
-      if ((*rxHead) < (BUFFER_LENGTH-1)) {          // if buffer is not yet full
+      uint8_t payload = _data->_module->SDATA;      // reading SDATA will clear the DATA IRQ flag
+      if ((*rxHead) < BUFFER_LENGTH) {              // make sure that we don't have a buffer overflow in case Master ignores NACK
+        rxBuffer[(*rxHead)] = payload;              // save data
         (*rxHead)++;                                  // Advance Head
-        action = TWI_SCMD_RESPONSE_gc;                // "Execute Acknowledge Action succeeded by reception of next byte"
-      } else {                                      // else buffer would overflow with next byte
-        action = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc;  // "Execute ACK Action succeeded by waiting for any Start (S/Sr) condition"
+        if ((*rxHead) < BUFFER_LENGTH) {              // if buffer is not yet full
+          action = TWI_SCMD_RESPONSE_gc;                // "Execute Acknowledge Action succeeded by reception of next byte"
+        } else {                                      // else buffer would overflow with next byte
+          action = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc;  // "Execute ACK Action succeeded by waiting for any Start (S/Sr) condition"
+        }
       }
     }
   }

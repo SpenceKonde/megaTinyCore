@@ -1,7 +1,7 @@
 # Wire (TWI/I2C)
 All of these parts have at least one I2C/TWI module, and Wire.h provides the usual API - and then some.
 
-## NEW in megaTinyCore 2.6.2/DxCore 1.5.1 - sleep guard for TWI
+## NEW in megaTinyCore 2.6.2/DxCore 1.5.0 - sleep guard for TWI
 Prior to this version, there were two bugs in the code that prevented a reliable operation of the TWI in Power-Down and Stand-By Sleep modes. Now, the library only allows IDLE sleep while a slave transaction is open, to avoid making the bus unusable. Details in paragraph "Wire & Sleep"
 
 ## NEW in megaTinyCore 2.5.0/DxCore 1.4.0 - totally rewritten Wire library thanks to @MX682X
@@ -10,68 +10,77 @@ Should be 100% backwards compatible, use less flash, and have a new menu option 
 ## Pin Mappings (tinyAVR)
 | Pincount | Default  | Alt (1-series only) |
 |----------|----------|---------------------|
-|   8-pin  | PA2, PA1 |                     |
-| 14+ pin  | PB0, PB1 | PA2, PA1            |
+|   8-pin  | PA1, PA2 |                     |
+| 14+ pin  | PB1, PB0 | PA1, PA2            |
+
+Given as SDA, SCL - notice that the pins within PORTB aren't numbered in the same direction as PORTA and PORTC. Some peripherals follow the numbering of the pins within the port; this is not one of those - it follows the order of the pins as they are oriented around the part. Just be glad they came to their senses
 
 ## Pin Mappings (AVR Dx-series)
-| Mapping | TWI0 M/S | TWI0 Dual | TWI1 M/S | TWI1 Dual |
-|---------|----------|-----------|----------|-----------|
-| Default | PA2, PA3 | PC2,  PC3 | PF2, PF3 | PB2,  PB3 |
-| Alt1    | PA2, PA3 | PC6,  PC7 | PF2, PF3 | PB6,  PB7 |
-| Alt2    | PC2, PC3 | PC6,  PC7 | PB2, PB3 | PB6,  PB7 |
-| Alt3    | PA0, PA1 | PC2,  PC3 |    N/A   |    N/A    |
+| Mapping | TWI0 M/S | TWI0 Dual | TWI1 M/S | TWI1 Dual | swap |
+|---------|----------|-----------|----------|-----------|------|
+| Default | PA2, PA3 | PC2,  PC3 | PF2, PF3 | PB2,  PB3 |    0 |
+| Alt1    | PA2, PA3 | PC6,  PC7 | PF2, PF3 | PB6,  PB7 |    1 |
+| Alt2    | PC2, PC3 | PC6,  PC7 | PB2, PB3 | PB6,  PB7 |    2 |
+| Alt3    | PA0, PA1 | PC2,  PC3 |    N/A   |    N/A    |    3 |
 
 Notes:
-* Alt3 is only available on AVR DD-series (and possibly EA-series).
-* Alt1 is not available on parts which do not have PC6 and PC7 (for TWI0) or PB6, PB7 (for TWI1) because it would duplicate Default.
-* But Alt2 is, since its's primary pins are different - though dual mode is not available if the pins aren't present.
-* TWI1 only has the default mapping available on 32-pin parts. 48-pin and 64-pin parts are needed for dual mode (32-pin parts don't have a PORTB) and 64-pin parts needed for Alt1 (since PB6 and PB7 only exist on 64-pin parts). Alt2 is available on 48 and 64-pin parts only, for the same reason.
-* In all cases the pins are listed as SCL, SDA.
+* Only tinyAVR has the backwards port weirdness. Dx and Ex have all ports in the same order, and SDA is always 1 pin before SCL.
+* Alt3 is only available on AVR DD-series, EA-series and likely future Dx and Ex parts).
+* Alt1 is not available on parts which do not have PC6 and PC7 (for TWI0) or PB6, PB7 (for TWI1) because it would be identical to the default mapping.
+* Alt2 is available on those parts, since its's primary pins are different - though dual mode is not available if the pins aren't present.
+* If a part does not have the listed SCL and SDA pins, that mapping is not available on those parts.
+* In all cases the pins are listed as SDA, SCL.
 
 Availability of pin mappings by pincount for AVR Dx-series
-| Pin Pair | Function | 64 pin | 48 pin | 32 pin | 28 pin | 20 pin | 14 pin |
-|----------|----------|--------|--------|--------|--------|--------|--------|
-| PA0, PA1 | M/S only | n/a    | n/a    | For DD | For DD | Yes    | Yes    |
-| PA2, PA3 | M/S only | Yes    | Yes    | Yes    | Yes    | Yes    | No     |
-| PC2, PC3 | Either   | Yes    | Yes    | Yes    | Yes    | Yes    | Yes    |
-| PC6, PC7 | Dualmode | Yes    | Yes    | No     | No     | No     | No     |
-| PF2, PF3 | M/S only | Yes    | Yes    | Yes    | No     | No     | No     |
-| PB2, PB3 | Either   | Yes    | Yes    | No     | No     | No     | No     |
-| PB6, PB7 | Dualmode | Yes    | No     | No     | No     | No     | No     |
+| Pin Pair | Function       | 64 pin | 48 pin | 32 pin | 28 pin | 20 pin | 14 pin |
+|----------|----------------|--------|--------|--------|--------|--------|--------|
+| PA0, PA1 | M/S only       | No `**`| For EA | For DD | For DD | Yes    | Yes    |
+| PA2, PA3 | M/S only       | Yes    | Yes    | Yes    | Yes    | Yes    | No     |
+| PC2, PC3 | Either         | Yes    | Yes    | Yes    | Yes    | Yes    | Yes    |
+| PC6, PC7 | Dualmode Slave | Yes    | Yes    | No     | No     | No     | No     |
+| PF2, PF3 | M/S only       | Yes    | Yes    | Yes    | No     | No     | No     |
+| PB2, PB3 | Either         | Yes    | Yes    | No     | No     | No     | No     |
+| PB6, PB7 | Dualmode Slave | Yes    | No     | No     | No     | No     | No     |
 
-`Wire.swap(pin_set)` will set the the pin mapping to the specified set of pin.  See API reference below for details.
+`*` - This is a Wire1 pin option, and is only available where there are two TWI interfaces (currently, the DA and DB series).
 
-`Wire.pins(SDA pin, SCL pin)` - this will set the mapping to whichever mapping has the specified pins `SDA` and `SCL`. See API reference below for details. Only covered the master/slave pins, not the dual-mode pins. If you want the mode with the pins that can't do dual mode slave (PA2/3, or PF2/3) but with the alternate slave pins, you MUST use Wire.swap().
+`**` - There is no part - either currently available or announced which supports the Alt3 (PA0, PA1) mapping which is available in a 64-pin version. The DA and DB-series do not support the Alt3 mapping.
+
+`Wire.swap(pin_set)` will set the the pin mapping to the specified pin set. See API reference below for details.
+
+`Wire.pins(SDA pin, SCL pin)` - this will set the mapping to whichever mapping has the specified pins `SDA` and `SCL`. See API reference below for details. Wire.pins() only supports specifying mapping by pins for the master/slave pins, not the dualmode slave only pins. If you want the mode with the pins that can't do dual mode slave (PA2/3, or PF2/3) but with the alternate slave pins, you MUST use Wire.swap().
 
 ## Official specification of I2C
 [From NXP, the current owner of the relevant IP](https://www.nxp.com/docs/en/user-guide/UM10204.pdf)
 
 ## Overview - I2C, what is it?
-I2C (known by many names, see note at end) uses two pins, a clock (SCL) and data (SDA) for communication among two or more compatible devices. This is an open drain bus - external pullup resistors keep the two lines HIGH, and devices communicate by driving the pins low or releasing them. Data is clocked on the rising edge - this is important, as you will see.
-In each transaction, one device, the "master" or "host" initiates communication by writing a "start condition" followed by clocking out a an 1 byte address. The "slave" or "client" device with that address (the address depends on the part; it may be fixed, software-configurable, set by an address pin state, etc - see the datasheet) will send a single bit in response (the ACK bit). The lowest bit of the address indicates whether the master is going to read or write. For a write, it will continue clocking out another byte when it gets the ACK bit, and this will repeat until either the slave refuses to ACK a byte (a NOACK) or the master is done sending. For a read, the after the address is ACK'ed, the master will generate the clock, and allow the slave to control the data line. The master will ack each byte until has read as many bytes as it is attempting to.
+I2C (known by many names, see note at end) uses two pins, a clock (SCL) and data (SDA) for communication among two or more compatible devices. This is an open drain bus - external pullup resistors (*which you must include in your design*) keep the two lines HIGH when idle, and devices communicate by driving the pins low or releasing them. Data is clocked on the rising edge (this is a more important detail than usual, as you will see).
+In each transaction, one device, the "master" or "host" initiates communication by writing a "start condition" followed by clocking out a an 1 byte address. The "slave" or "client" device with that address will send a single bit in response (the ACK bit). When using this library to make a slave device, this is configurable. Otherwise, it may be fixed, software-configurable, set by an address pin state, etc; Refer to the applicable datasheet.) The lowest bit of the address indicates whether the master is going to read or write. For a write, it will continue clocking out another byte when it gets the ACK bit, and this will repeat until either the slave refuses to ACK a byte (a NOACK) or the master is done sending. For a read, the after the address is ACK'ed, the master will continue to provide a clock, and allow the slave to control the data line. The master will ACK each byte until has read as many bytes as it is attempting to.
 
 A start or stop condition is simply the data line being changed while the clock line is high; SDA H->L while SCL is high is a start, SDA L-> H is a stop. Otherwise, SDA is only asserted (driven low) or released when SCL is low. The "ACK" bit is generated by whichever device is receiving data, by driving SDA low after the 8th bit is received. A NACK is simply not doing so (so a device that "sends" a NACK, and a device that is not present at all, look the same to the master).
 
-There is one more wrinkle. A slave device might be busy, and need some time to be able to receive data. I2C provides for that by permitting the slave to "stretch the clock" - On the ACK bit, a slave that will need more time to before it can handle the response will drive the SCL low before the master releases it. The slave then can process the incoming message, assert SDA to NACK, and then release the SCL, the master will see the rising edge, and that SDA was LOW, and recognize it as an ACK (or as a NACK if the slave did not assert SDA). Wire as slave, for examples, stretches the clock at the start of a read operation while the onRequest interrupt runs.
+There is one more wrinkle. A slave device might be busy, and need some time to be able to receive data. I2C provides for that by permitting the slave to "stretch the clock" - On the ACK bit, a slave that needs more more time before it can handle additional incoming data (for a write) or output a response (for a read) will drive the SCL and SDA lines LOW before the master releases them (a slave that doesn't need more time can simply hold SDA low to ACK). The slave then can process the incoming message, and either continue holding SDA low to ACK or release it to NACK, and then release SCL. The master will see the rising edge, and that SDA was LOW, and recognize it as an ACK (or as a NACK if the slave released SDA), and generate the last clock pulse (to signal to a slave that ACKed to release the data line). The Wire library, when acting as slave, for example, stretches the clock at the start of a read operation while the onRequest interrupt runs.
 
-When I2C works, it is fantastically convenient. Lots of devices can be added, there is a huge selection of available parts, and while speeds are lower than SPI, they are almost always fast enough. It is easy to use, and the addressing allows hardware to be changed with minimal inconvenience. Because it's open drain, you can interface 3.3v and 5v devices easily. It's a wonderful interface. The Wire library lets you make your own I2C/Wire devices from Arduino, and everything is great. Until it's not.
+When I2C works, it is fantastically convenient. Lots of devices can be added, there is a huge selection of available parts, and while speeds are lower than SPI, they are almost always fast enough. It is easy to use, and the addressing allows hardware to be changed with minimal inconvenience. Because it's open drain, you can interface 3.3v and 5v devices easily. The Wire library lets you make your own I2C/Wire devices from Arduino. The interface you get from Wire makes it very easy to use, you don't need to worry about "dummy bytes" like SPI, or either device being able to start a transaction (like you would if communicating over USART, and everything is great... Until it's not.
 
-One problem with I2C compared to other serial data buses is that because it has two wires, both of which are bidirectional, and because there is no external slave select pin (which can act as a failsafe to prevent one malfunctioning device from taking out the whole bus, usually either all devices on an I2C bus work, or nothing does. SPI requires more pins - but will almost never render the whole bus inoperative even when it's SS pin is not driven low. Even a completely hosed SPI device will usually let go of MISO when SS is raised. With I2C, the two most common failure modes are that one device doesn't respond, and the master waits forever (as opposed to SPI, which will typically clock in a bunch of zeros). Many I2C libraries will just wait forever for a response, and the code will be hung. The other, overlapping, most common problem is that a slave hangs while holding the clock and sometimes the data line low. At that point, and a power cycle is often needed to revive it. It also requires *external* pullup resistors, but works *just barely* with the internal ones, but often becomes unreliable when more devices are added.
+The main problem (other than the low speed, which is unavoidable on an open-drain bus) with I2C compared to other serial data buses is that because it has two wires, both of which are bidirectional, and because there is no external slave select pin (which generally acts as a failsafe), nothing prevents one malfunctioning device from taking out the whole bus. Usually either all devices on an I2C bus work, or nothing does. While SPI requires more pins, even a completely hosed SPI device will usually let go of MISO when its SS pin is raised (barring physical damage to the pin). With I2C, the most common problem is that a slave - for some reason - hangs while holding the clock and sometimes the data line as well low. At that point, and a power cycle is often needed to revive it. It can be difficult to figure out which device is malfunctioning, because when you start disconnecting things, if power to the slave is interrupted, it will release SCL and SDA, until you run your code again and whatever it is that confuses the slave happens again. It also requires *external* pullup resistors, (it *just barely works* in simple cases with the internal ones, but becomes unreliable when more devices are added).
 
 ## Pullups and logic levels
 **The I2C interface is almost never within spec without external pullups.** If you aren't using breakout boards that have their own already installed, you need to add your own. Two pullups are needed, one connects SCL to Vcc, the other connects SDA to Vcc. If the parts run at different voltages, that is an added consideration - the pullups must go to the highest voltage that all parts tolerate, and that voltage must be high enough to be recognized as a HIGH by all parts. This can also require stronger pullups and lower speeds since the rise-time that matters is from the least favorable device's perspective for both minimum and maximum values of the pullups (usually the low voltage device's low input, and the higher voltage device's high threshold).
 
 |  Wire Mode |    Frequency | Supported |  Pin drive |   Maximum Pullup Value (ohms and pF)   |  Minimum pullup value (total)   |
 |------------|--------------|-----------|------------|----------------------------------------|---------------------------------|
-| Standard   |   100,000 Hz |       Yes |  Under 3mA | R<sub>pu</sub>=1,180,000/C<sub>B</sub> | (V<sub>pu</sub> - 0.4V)  / 3 mA |
-| Fast Mode  |   400,000 Hz |       Yes |  Under 3mA | R<sub>pu</sub>=  354,000/C<sub>B</sub> | (V<sub>pu</sub> - 0.4V)  / 3 mA |
-| Fast Mode+ | 1,000,000 Hz |       Yes | Up to 20mA | R<sub>pu</sub>=  141,600/C<sub>B</sub> | (V<sub>pu</sub> - 0.2*Vdd/20 mA |
+| Standard   |   100,000 Hz |       Yes |  Under 3mA | R<sub>pu</sub>=1,180,000/C<sub>B</sub> | (V<sub>pu</sub> - (0.2*Vdd or 0.4V))  / 3 mA |
+| Fast Mode  |   400,000 Hz |       Yes |  Under 3mA | R<sub>pu</sub>=  354,000/C<sub>B</sub> | (V<sub>pu</sub> - (0.2*Vdd or 0.4V))  / 3 mA |
+| Fast Mode+ | 1,000,000 Hz |       Yes | Up to 20mA | R<sub>pu</sub>=  141,600/C<sub>B</sub> | (V<sub>pu</sub> - (0.2*Vdd or 0.4V))/20 mA |
 
-If you know the bus capacitance, you can calculate it the maximum value with that using these numbers from the AVR DB-series datasheet (the units have been multiplied through - if the bus capacitance is 50 pF (around 3-4 devices allowing for capacitance, in standard mode you would need pullups of less than 23.6k ohms, in Fast Mode you would need 7k pullups, and in Fast Mode Plus you would need 2.8k pullups). Unfortunately, you don't know the bus capacitance, and few of us have the equipment to measure it: It's the sum of the capacitance of the I2C pin on each device (which you know from the datasheet, usually), plus the stray capacitance from wires, PCBs, breadboard, etc. For the minimum, it's a simple application of Ohm's law and the V<sub>IHMAX</sub> for the I2C pins (often different from other I/O pins when acting as I2C), those numbers are what the spec guarantees. At 5V it would be 1.5k for Standard or Fast Mode, and 200 for Fast Mode Plus.
+If you know the bus capacitance, you can calculate the maximum value with that using these numbers from the AVR DB-series datasheet (the units have been multiplied through - if the bus capacitance is 50 pF (around 3-4 devices allowing for stray capacitance, in Standard Mode you would need pullups of less than 23.6k ohms, in Fast Mode you would need 7k pullups, and in Fast Mode Plus you would need 2.8k pullups). Unfortunately, you don't know the bus capacitance, and few of us have the equipment to measure it: It's the sum of the capacitance of the I2C pin on each device (which you know from the datasheet - usually), plus the stray capacitance from wires, PCBs, breadboard, etc. For the minimum, it's a simple application of Ohm's law and the V<sub>ILMIN</sub> and the pin drive strength - if the pins can't overcome the pullup to get an unambiguous LOW, obviously nothing will work. Note that both the thresholds and the drive strength are generally different from other I/O pins when acting as I2C. These numbers are guaranteed by the specification to work, provided the other devices in use also conform to the spec. At 5V it would be 1.5k for Standard or Fast Mode, and 200 for Fast Mode Plus.
 
-None of that accounts for the fact that wires, particularly long ones, have non-zero inductance. *I2C was designed to be used between ICs on a circuit board* and long wires can significantly degrade it's performance, requiring stronger pullups and/or lower speeds than you would otherwise require - note that while this lowers the maximum value, it is no help with the low end. Most people don't calculate the pullup values - we take an educated guess, and the window is wide enough that standard mode is rarely a problem. For small numbers of parts at standard speed, **4.7k is a good default value**, and *1.5-10k will generally be fine*. At higher frequencies, a smaller resistor might be required, see `Wire.setClock()` for the recommended values.
+None of that accounts for the fact that wires, particularly long ones, have non-zero inductance, and the impact of this on rise and fall times is harder to calculate. *I2C was designed to be used between ICs on a circuit board* and long wires will degrade it's performance, requiring stronger pullups and/or lower speeds than you would otherwise be able to use - note that while lowering the speed allows you to use weaker pullups or survive a higher bus capacitance, the minimum pullup value (hence strongest pullups) that can be used is fixed. Most people don't calculate the pullup values - we take an educated guess, and the window is wide enough that standard mode is rarely a problem. For small numbers of parts at standard speed, **4.7k is a good default value**, and *1.5-10k will generally be fine*. At higher frequencies, a smaller resistor might be required, see `Wire.setClock()` for the recommended values. When pulling up to a voltage lower than 5V, you typically need stronger pullups - but this is not usually a problem, since the minimum pullup value also falls.
 
-The internal pullups, however, are typically in the area of 30-50k. That may be okay for 2 devices at standard speed. Even 3-4 devices gets dicey, and wiring could sink even the 2-device case. By default, most classic AVR cores, including the official ones, turn on the internal pullups - giving a default configuration that would work under simple conditions. But as more devices were added, the bus would fail unpredictably, and the failures are often difficult to pin down and intermittent (one would typically wind up debugging a system right on the edge of failing). We don't enable them by default. If you want to use the pullups instead of using external ones, go ahead, calling `Wire.usePullups()` after choosing the pins will enable the internal pullups - but do so only with the knowledge that if I2C doesn't work later, the lack of external pullups is one of the most likely causes.
+The internal pullups, however, are typically in the area of 30-50k. That may be okay for 2 devices at standard speed. Even 3-4 devices gets dicey, and wiring could sink even the 2-device case. By default, most classic AVR cores, including the official ones, turn on the internal pullups - giving a default configuration that would work under simple conditions. But as more devices were added, the bus would fail unpredictably, and the failures are often difficult to pin down and intermittent (one would typically wind up debugging a system right on the edge of failing). We don't enable them by default. If you want to use the internal (insufficient) pullups instead of using external ones, go ahead, calling `Wire.usePullups()` after choosing the pins- but do so only with the knowledge that it only has a chance of working on small networks, and may be unreliable or unusable on larger one.  *Wire.usePullups() is intended for debuggign only! If it fixes anything, check the external pullups, becasue one or both are absent or not connected properly*
+
+The ease of using multiple voltages on an open drain bus was mentioned above, but it's worth elaborating a bit here. The standard certainly doesn't guarantee that a 5V device will recognize an I2C line only pulled up to 3.3V as high (though it generally will) - but on the AVR Dx and AVR Ex parts, there's an option to let you do far better than that: "SMBUS 3.0" voltage levels. This option also, by lowering the threshold voltages, can help cope with high bus capacitance (be careful of the case where devices running at over 3.3v are present which don't have this option enabled, especially if pushing to higher clock speeds. )
 
 ## Valid Addresses
 Addresses are 7 bits - 8 bits are sent, and the least significant one indicates if it's a read or write operation. This leaves 128 addresses, however, some of them are "reserved", and have a special semantic meaning in I2C and I2C-compatible protocols.
@@ -80,8 +89,8 @@ Addresses are 7 bits - 8 bits are sent, and the least significant one indicates 
 |      0x00 |     0b0000000 | General Call, followed by single byte command           |
 |      0x01 |     0b0000001 | Reserved for compatibility w/CBUS protocol (obsolete)   |
 |      0x02 |     0b0000010 | Reserved for compatibility w/other bus protocols        |
-|      0x03 |     0b00001xx | Master Code for HS I2C  (AVRs do not support this mode) |
-| 0x08-0x6F |               | Available                                               |
+| 0x04-0x07 |     0b00001xx | Master Code for HS I2C  (AVRs do not support this mode) |
+| 0x08-0x6F |               | Available - this leaves 104 addresses                   |
 | 0x78-0x7B |     0b11110xx | Start of a 10-bit address (Wire supports as master)     |
 | 0x7C-0x7F |     0b11111xx | Reserved for future use                                 |
 
@@ -106,12 +115,13 @@ Thankfully, assuming the hardware is able to handle the job, there is no special
 
 ## Initialization order
 There is a right and a wrong order to call the configuration functions. This order should work:
-1. Wire.swapModule(&TWI1); (AVR DA/DB for special use cases)
-2. Wire.swap(pinset) or Wire.pins(sclpin, sdapin)  (if needed for desired pins).
+1. Wire.swapModule(&TWI1); (AVR DA/DB for special use cases only)
+2. Wire.swap(pinset) or Wire.pins(sclpin, sdapin).
 3. Wire.enableDualMode(fmplus_enable); (AVR Dx and megaAVR 0-series only, if needed)
-4. Wire.usePullups() if you must...
+4. Wire.usePullups() *for debugging only - if this fixes it, take it out and add appripriate external pullups)*
 5. Wire.begin() and/or Wire.begin(address, ...)
-6. Wire.setClock(); (effects master mode only)
+6. Wire.setClock(); (effects master mode only, if needed)
+7. Wire.specialConfig() (optional)
 
 See the API reference below for more information.
 
@@ -124,10 +134,10 @@ The official megaAVR 0-series core that megaTinyCore was based on in the distant
 
 ### New Tools submenu: Wire Mode
 DA and DB devices have all of these options. Others only have the first two
-* Master or Slave (normal mode) - This uses the least flash and ram. At any given time Wire can be a master or a slave, but not both and you must call Wire.end(), and then the appropriate form of begin() for the mode you want to enable.
+* Master or Slave (default) - This uses the least flash and ram. At any given time Wire can be a master or a slave, but not both and you must call Wire.end(), and then the appropriate form of begin() for the mode you want to enable.
 * Master And Slave - In this mode, an argumentless call to begin will start the master functionality, and a call to the form with one or more arguments will start the slave version. Both can run at the same time either using DualMode, or on the same pins (multi-master).
 * Master or Slave x2 - In this mode, there is a Wire, and a Wire1 - corresponding to TWI0 and TWI1 peripherals.
-* Master and Slave x2 - Combination of the two above options - Both Wire and Wire1 can each be both a master and a slave.
+* Master and Slave x2 - Combination of the two above options - Both Wire and Wire1 are provided, and *both* can be both a master and a slave at the same time, for a total of 4 pairs of I2C pins (note: having more than one I2C slave defined at once is not recommended, though this library should work. )
 
 
 ### Methods not present in official Arduino Wire library
@@ -157,10 +167,11 @@ I had always wondered why Arduino sketches that implemented slave functionality 
 
 This method is only useful when operating as a slave. See the register model example for a demonstration of how one might use it.
 
+
 ```c++
 uint8_t slaveTransactionOpen();
 ```
-This method, when called by the slave will return a value indicating whether the slave is busy after a matching address has been received. If you want to change sleep modes while the slave is enabled, make sure this returns 0. Otherwise, two things may happen: The TWI bus may become unresponsive, or your changes will be overwritten with the setting that was present before the most recent address match interrupt. When the slave is disabled, the function will always return 0.
+This method, when called by an I2C slave, will return a value indicating whether the slave is busy (that is, if it has received a read command matching its address, but has either not sent any data, or has sent some data, but has not yet received a NACK after transmitting a byte to the master (which would indicate that the master is done reading from it) - in other words, if it is in the process of sending requested data to the master). If you want to enter sleep mode or change which sleep mode is selected you must make sure this returns 0. Otherwise, Bad Things can happen, which may include the bus becoming hung until the chip is reset (that is, going to sleep as slave while a transaction is open is a way that an AVR can be one of those badly behaved devices mentioned above that can get into a state where they hold onto one or both of the I2C lines and prevent all bus operation)
 
 ```c++
 endMaster();
@@ -195,6 +206,68 @@ This method is available ONLY if both TWI0 and TWI1 are present on the device, b
 enableDualMode(bool fmp_enable);      // Moves the Slave to dedicated pins
 ```
 This enables the "Dual Mode" which moves the slave functionality to a second pair of pins, such that there is a SCL/SDA pair for the master and an SCL/SDA pair for the slave. Some parameters (such as Fast Mode+ support) can be enabled separately for the slave. This must be called before `Wire.begin()` This is only available on megaAVR 0-series, and AVR Dx and Ex-series, not tinyAVR. The version of this document included with such parts will list the slave mode pin-sets. This will generate an error if referenced on a tinyAVR.
+
+
+```c++
+specialConfig(bool smbuslvl = 0, bool longsetup = 0, uint8_t sda_hold = 0, bool smbuslvl_dual = 0, uint8_t sda_hold_dual = 0);
+```
+New in 2.6.2/1.5.0
+There are up to three options currently supported that tweak behavior as regarding time and voltage levels. Most users should have no need to use these, but they are sometimes needed for compatibility particularly with strange voltage levels.
+
+Feature      | TinyAVR 0/1/2 | megaAVR 0 | Dx/Ex |
+-------------|---------------|-----------|-------|
+SMBus levels | No            | No        | Yes   |
+Long setup   | Yes           | Yes       | Yes   |
+SDA hold     | Yes, no dual  | Yes       | Yes*  |
+
+`*` This option on the DA-series is impacted by errata on 128k parts two values are swapped.
+
+#### SMBus levels
+Enabling this (DxOnly) changes the input levels, making them drastically lower. Thresholds as always are the maximum voltage that is still low enough to guarantee will read as low, and the minimum voltage guaranteed to be a high. These normally depend on Vdd - in SMBus voltage level mode, they do not. This is very useful for communicating with lower voltage devices - this is something that is most useful on either the DA (where there is no MVIO) or when the system contains three different voltage levels (say, the AVR running at 5v, using MVIO to talk to a 3.3v device, wishing to use some 1.8V I2C devices).
+
+Vdd               | SMBus levels |  1.8V |  2.5V |  3.3V | 5.0V |
+------------------|--------------|-------|-------|-------|------|
+Vin Low (max)     |        0.80V | 0.54V | 0.75V | 0.99V | 1.5V |
+Vin High (min)    | *      1.35V | 1.26V | 1.75V | 2.31V | 3.5V |
+
+`*` The DA and DD datasheets imply that the minimum guaranteed high is 1.45V in SMbus mode if running at less than 2.5v
+
+
+#### SDA setup and hold times.
+The setup time for SDA can be either 4 or 8 cycles. May be required for compatibility with some unusual devices.
+
+The hold time can be turned off, or set to 50, 300 or 500 ns. A non-default option is required to comply with SMBus protocol.
+
+#### Dual mode options
+Both the voltage levels and the hold times can be configured for the dual mode pins individually parts with those features.
+
+#### Constants associated with configSpecial.
+```C++
+#define WIRE_SDA_HOLD_OFF 0
+#define WIRE_SDA_HOLD_50  1
+#define WIRE_SDA_HOLD_300 2
+#define WIRE_SDA_HOLD_500 3
+
+#define WIRE_SDA_SETUP_4  0
+#define WIRE_SDA_SETUP_8  1
+
+#define WIRE_I2C_LEVELS  0
+#define WIRE_SMBUS_LEVELS  1
+```
+
+This method should always return 0 (success). We try to error if compiletime known invalid values are passed.
+
+If not:
+
+| Return value | Meaning                                            |
+|--------------|----------------------------------------------------|
+| 0x00         | Successful                                         |
+| 0x01         | SMBus level requested on part without that feature |
+| 0x02         | Dual mode options passed. Part does not support dual mode |
+| 0x04         | Dual mode options passed, dual mode present, but not enabled. See the startup order. |
+| 0x08         | Invalid sda hold value passed (must be 0 - 3 or one of the named cosntants). The default is used instead |
+
+Linear combinations are possible 0x0B indicates that you asked for smbus levels, and dual mode options, and you passed an invalid value for the SDA hold times.
 
 ### Standard methods and features significant differences
 ```c++

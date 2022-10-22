@@ -1,11 +1,10 @@
 /***********************************************************************|
-| megaAVR Configurable Custom Logic library                             |
+| Configurable Custom Logic library                                     |
+| Developed in 2019 by MCUdude. https://github.com/MCUdude/             |
+| Example by Spence Konde                                               |
 |                                                                       |
-| LatchNoSeq.ino                                                        |
-|                                                                       |
-| A library for interfacing with the megaAVR Configurable Custom Logic. |
-| Developed in 2019 by MCUdude.                                         |
-| https://github.com/MCUdude/                                           |
+| LatchNoSeq.ino - Getting "RS Latch" like behavior with a single even  |
+| numbered LUT.                                                         |
 |                                                                       |
 | In this example we use the configurable logic peripherals in AVR      |
 | to act as a "latch" WITHOUT using both LUTs and the sequencer         |
@@ -24,6 +23,9 @@
 | that pin                                  | 1 | 1 | 1 | 1 |           |
 |                                                                       |
 | The sky (well, and the number of LUTs) is the limit!!                 |
+|                                                                       |
+| Warning: This involves EVSYS, which is very different on tiny0/1 vs   |
+| everything else.  This code is not directly usable on other parts     | 
 |***********************************************************************/
 
 #include <Logic.h>

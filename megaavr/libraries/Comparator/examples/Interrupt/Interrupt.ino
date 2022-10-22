@@ -6,11 +6,14 @@
 | DxCore 2021-2022: https://github.com/SpenceKonde/                     |
 |                                                                       |
 | In this example we use an internal reference voltage instead of an    |
-| external one on the negative pin. This eliminates the need for an     |
-| external voltage divider to generate a reference. Note that the       |
-| internal reference requires a stable voltage to function properly.    |
-| Instead of using a physical output pin we're instead triggering an    |
-| interrupt that will run a user defined function.                      |
+| external one on the negative pin. This makes it possible to give a    |
+| demo of the library being used for an interrupt, without requiring    |
+| external wiring. Comparing an applied voltage with an internally      |
+| generated voltage is one of the most common applications of the ACs.  |
+|                                                                       |
+| Indeed, plausible use cases that involve other modes of opperation    |
+| not exactly common, particularly in Arduino-land.                     |
+|                                                                       |
 |                                                                       |
 | This is the formula for the generated voltage:                        |
 | Vdacref = (DACREF / 256) * Vref                                       |
@@ -20,12 +23,17 @@
 |                                                                       |
 | Warning: The 0/1-series have references of 0.55, 1.1, 1.5, 2.5, and   |
 |   4.3 Volts. The 2-series has 1.024, 2.048, 4.096, and 2.5 Volts.     |
+|   you need at least a half volt or so of headroom between VRef and    |
+|   Vdd to get an approximately correct reference voltage.              |
 |                                                                       |
 | Warning: On the 1-series, the DACREF for AC0 is the same DAC that can |
-|   output on PIN_PA6 - if both are in use, both will have the same     |
-|   reference and setting! This is not an issue with AC1 or AC2 on the  |
-|   parts that have these (only 1-series parts with 16k or 32k of flash |
-|   have the second and third comparator)                               |
+|   output on PIN_PA6. Turning on the analog output will impact the     |
+|   DACREF for AC0! This is not an issue with AC1 or AC2 on the parts   |
+|   that have these (only 1-series parts with 16k or 32k of flash have  |
+|   the second and third comparator)                                    |
+|   This is also not an issue with any subsequent parts, as the AVR Dx- |
+|   series and later do not use the same DAC for the DACREF as the      |
+|   physical DAC output pin.                                            |
 |                                                                       |
 |***********************************************************************/
 

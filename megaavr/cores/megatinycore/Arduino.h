@@ -435,7 +435,7 @@ Not enabled. Ugly ways to get delays at very small flash cost.
 
 // The fastest way to swap nybbles
 #ifndef _SWAP
-  #define _SWAP(n) __asm__ __volatile__ ("swap %0"  "\n\t" :"+r"((uint8_t)(n)));
+  #define _SWAP(n) __asm__ __volatile__ ("swap %0"  "\n\t" :"+r"((uint8_t)(n)))
 #endif
 // internally used - fast multiply by 0x20 that assumes x < 8, so you can add it to a uint8_t* to PORTA or member of PORTA,
 // and get the corresponding value for the other port, or equivalently it can be added to 0x0400 which is the address of PORTA.
@@ -456,6 +456,73 @@ Not enabled. Ugly ways to get delays at very small flash cost.
           );
 })
 */
+
+//
+#define _ADDLOW(a,b) __asm__ __volatile__ ("add %0A, %1"  "\n\t" :"+r"((uint16_t)(a)):"r"((uint8_t) b))
+#define _SUBLOW(a,b) __asm__ __volatile__ ("sub %0A, %1"  "\n\t" :"+r"((uint16_t)(a)):"r"((uint8_t) b))
+/* This is dirty trick that has benefit when a  16-bit value is a, and an 8-bit value b is added to it
+ * and it is known that under all circumstances, thisw will absolutely never cause a carry
+ * (that is, will never change the high byte), butthe compiler does not realize that this is the case,
+ * this dirty macro directly adds (or subtracts) an 8 bit value to (or from) a 16-bit value, with no
+ * provision for carrying. That is it will only impact the low byte. You are probably wondering why this
+ * is such a common situation that we care about saving one clock cycle. The reason is that is is incredibly
+ * common when working with SFRs for onchip peripherals. The code may not know which instance of a peripheral
+ * it will be passed, but the author does know that the value is 32 or 64 or 128-byte aligned.
+ * Now if the offset is constant and less than 64 and you don't change the pointer, it's usually better to
+ * just do this:
+ *
+ * uint8_t foo = *(base_pointer + 17);
+ *
+ * at least in the absence of enough register pressure that it resorts to using the X register, which imposes a 4 clock 2 byte penalty.
+ * but if the value is not constant,
+ *
+ * base_pointer += bar; // where bar is a uint8_t such that (base_poimter & 0cFF) + bar < 0x100.
+ *
+ * takes 2 clocks for the math. But if for example, you know that base_pointer is 32-aligned, and bar will always be between oh,
+ * 0x10 and 0x17, you would know that you could always safely add bar, whatever value in that restricted range it is, to base_pointer
+ * and it would only take 1 clock.
+ * This can be roughly translated to "whenever you are working with any peripheral by getting a pointer to it, but the offset you want
+ * bounded but variable, For example, you get the port base register, amd now you need the PIMnCTRL register. n is 0-7, and the
+ * PINnCTRL registers are located at +0x10 to +0x17, and ports are 32-bit aligned, so adding that to the register will never change the high
+ * byte of the address. These are sometimes used when a somewhat time-sensitive function which is called very frequently has to performs
+ * such manipulations. Don't use unless you ae damned certain that you meet the conditions, and the funvtion is called constantly
+ * Mostly intended for internal use
+ */
+#define _MAKEPTR_DISPLACE(newptt, highbyte, lowbyte) ((uint8_t*) (__asm__ __volitile("ldi %0B, %1 " "\n\t" "mov %0A, %2 " "\n\t":"+b"((uint16_t) newptr):"M" ((uint8_t) highbyte), "r" ((uint8_t ), lowbyte))
+#define          _MAKEPTR(newptt, highbyte, lowbyte) ((uint8_t*) (__asm__ __volitile("ldi %0B, %1 " "\n\t" "mov %0A, %2 " "\n\t":"+e"((uint16_t) newptr):"M" ((uint8_t) highbyte), "r" ((uint8_t ), lowbyte))
+
+/* Very similar to te above. Passed a poimter as two bytes, the high byte constant and the low byte mot, this finds use in the same sort
+ * of situatios/ See tje I/O headers: each class of peripherals often has the same high byte for all addresses. Ports (0x0400, 0x0420, 0x0440
+ * and so on. The most freqently used functions get speciakl attention paid to this as a small gain adds up for the most commonly called functons
+ * usage is typically sdmething like
+ *    lowbyte = (_SWAP(usartnbr)); // passed from,elsewhre io the code, which must be free of bugs!
+ *    lowbyte <<= 1;(
+ *    volatile uint8_t *myptr l
+ *    _MAKEPTR_DISPLACE(myptr. 0x08, lowbyte)
+ * Now, myptr points to the start of the specified USART, in just 2 clock cycles, instead of the typical 4 the compiler creates.
+ * most helful under the most constrained conditions (in an ISR, or a core fuction that gets called right and left.
+ *
+ * _MAKEPTR should be used when you are only reading from that one address, or consective addresses starting there, so it can use the X, Y or Z register
+ * _MAKEPTR_DISPLACE uses only X or Y register, and should be used if you expect to be accessing registers with an address up to 63 higher and in
+ * consecutive order, This will usually be enough to convince the compiler to not then move it into a different pointer.
+ *
+ */
+#define      _SETHIGH(a,b) __asm__ __volatile__ ("mov %0B,  %1"  "\n\t" :"+r"((uint16_t)(a)):"r"((uint8_t) b))
+#define _SETHIGHCONST(a,b) __asm__ __volatile__ ("ldi %0B,  %1"  "\n\t" :"+d"((uint16_t)(a)):"M"((uint8_t) b))
+#define        _CLRHIGH(a) __asm__ __volatile__ ("eor %0B, %0B"  "\n\t" :"+r"((uint16_t)(a)))
+/* More dumb macros to allow surgery on half of a16-bit (likely poimter) value in minimum time.
+ * Clear (set to 0), setting to, setting to an existing (preferably local and already in a register) variable vaue
+ * and
+ * _SETHIGH(a,b) sets the high byte of 16-bit local variable to the variable b. This makes no guarantees about it being able to be used as a pointer
+ * _SETHIGHCONST(a,b) As above, but b is a compile time known constant, rather than a previously calculated result
+ */
+
+#define      _SETLOW(a,b) __asm__ __volatile__ ("mov %0A,  %1"  "\n\t" :"+r"((uint16_t)(a)):"r"((uint8_t) b))
+#define _SETLOWCONST(a,b) __asm__ __volatile__ ("ldi %0A,  %1"  "\n\t" :"+d"((uint16_t)(a)):"M"((uint8_t) b))
+#define        _CLRLOW(a) __asm__ __volatile__ ("eor %0A, %0A"  "\n\t" :"+r"((uint16_t)(a)))
+/* As above, except for low byte */
+
+//
 uint16_t clockCyclesPerMicrosecond();
 uint32_t clockCyclesToMicroseconds(uint32_t cycles);
 uint32_t microsecondsToClockCycles(uint32_t microseconds);
