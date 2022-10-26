@@ -343,75 +343,112 @@ int main(void) {
   //  SP points to RAMEND
 
   __asm__ __volatile__("clr __zero_reg__");  // known-zero required by avr-libc
-#define RESET_EXTERNAL (RSTCTRL_EXTRF_bm|RSTCTRL_UPDIRF_bm|RSTCTRL_SWRF_bm)
-  #ifndef FANCY_RESET_LOGIC
-  ch = RSTCTRL.RSTFR;   // get reset cause
-  #ifdef START_APP_ON_POR
-  // If WDRF is set  OR nothing except BORF and PORF are set, that's not bootloader entry condition
-  // so jump to app - this is for when UPDI pin is used as reset, so we go straight to app on start.
-  // 11/14: NASTY bug - we also need to check for no reset flags being set (ie, direct entry)
-  // and run bootloader in that case, otherwise bootloader won't run, among other things, after fresh
-  // bootloading!
-  if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~(RSTCTRL_BORF_bm | RSTCTRL_PORF_bm)))))) {
-  #else
-  // If WDRF is set  OR nothing except BORF is set, that's not bootloader entry condition
-  // so jump to app - let's see if this works okay or not...
-  if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~RSTCTRL_BORF_bm))))) {
-  #endif
-    // Start the app.
-    // Dont bother trying to stuff it in r2, which requires heroic effort to fish out
-    // we'll put it in GPIOR0 where it won't get stomped on.
-    //__asm__ __volatile__ ("mov r2, %0\n" :: "r" (ch));
-    RSTCTRL.RSTFR = ch; //clear the reset causes before jumping to app...
-    GPIOR0 = ch; // but, stash the reset cause in GPIOR0 for use by app...
-    watchdogConfig(WDT_PERIOD_OFF_gc);
-    __asm__ __volatile__(
-      "jmp app\n"
-    );
-  }
-  #else
-  /*
-     Protect as much Reset Cause as possible for application
-     and still skip bootloader if not necessary
-  */
-  ch = RSTCTRL.RSTFR;
-  if (ch != 0) {
-    /*
-       We want to run the bootloader when an external reset has occurred.
-       On these mega0/XTiny chips, there are three types of ext reset:
-        reset pin (may not exist), UPDI reset, and SW-request reset.
-       One of these reset causes, together with watchdog reset, should
-        mean that Optiboot timed out, and it's time to run the app.
-       Other reset causes (notably poweron) should run the app directly.
-       If a user app wants to utilize and detect watchdog resets, it
-        must make sure that the other reset causes are cleared.
-    */
-    if (ch & RSTCTRL_WDRF_bm) {
-      if (ch & RESET_EXTERNAL) {
-        /*
-           Clear WDRF because it was most probably set by wdr in
-           bootloader.  It's also needed to avoid loop by broken
-           application which could prevent entering bootloader.
-        */
-        RSTCTRL.RSTFR = RSTCTRL_WDRF_bm;
-      }
-    }
-    if (!((ch & RESET_EXTERNAL)) {
-    /*
-       save the reset flags in the designated register.
-       This can be saved in a main program by putting code in
-       .init0 (which executes before normal c init code) to save R2
-       to a global variable.
-    */
-    __asm__ __volatile__("mov r2, %0\n" :: "r"(ch));
-
-      // switch off watchdog
+  #define RESET_EXTERNAL (RSTCTRL_EXTRF_bm|RSTCTRL_UPDIRF_bm|RSTCTRL_SWRF_bm)
+  #if !defined(FANCY_RESET_LOGIC)
+    ch = RSTCTRL.RSTFR;   // get reset cause
+    #if defined(START_APP_ON_POR)
+      // If WDRF is set  OR nothing except BORF and PORF are set, that's not bootloader entry condition
+      // so jump to app - this is for when UPDI pin is used as reset, so we go straight to app on start.
+      // 11/14: NASTY bug - we also need to check for no reset flags being set (ie, direct entry)
+      // and run bootloader in that case, otherwise bootloader won't run, among other things, after fresh
+      // bootloading!
+      if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~(RSTCTRL_BORF_bm | RSTCTRL_PORF_bm)))))) {
+    #elif defined(START_APP_UNLESS_SWR)
+      // Immediately runs application code unless a software reset was issued.
+      // in this case, the user application must use a software reset (or contain a bug that leads to a
+      // dirty reset, which in turn leads to this firing a software reset which would then trigger the bootloader)
+      // This option violates the Bootloader Prime Directive:
+      //   The operation of the bootloader and it's recognition of entry conditions valid or invalid shall not be
+      //   impacted in any way by the application, and even a maximally perverse application shalt not prevent the
+      //   bootloader from running when a valid entry condition occurs.
+      // Therefor, it is unfit for use by those without HV programmers unless PA0 is left in the default UPDI mode,
+      // and where reprogramming via UPDI is not unduely inconvenient. An application which never triggered a
+      // software reset (for example, blink or bare minimum) will leave the chip in a "bricked" state, requiring
+      // UPDI programming to unbrick and restore bootloader functionality.
+      // Added 10/26/22 Spence Konde
+      if (ch && !(ch & RSTCTRL_SWRF_bm)) {
+    #else
+      // If WDRF is set  OR nothing except BORF is set, that's not bootloader entry condition
+      // so jump to app - let's see if this works okay or not...
+      if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~RSTCTRL_BORF_bm))))) {
+    #endif
+      // Start the app.
+      // Dont bother trying to stuff it in r2, which requires heroic effort to fish out
+      // we'll put it in GPIOR0 where it won't get stomped on.
+      //__asm__ __volatile__ ("mov r2, %0\n" :: "r" (ch));
+      RSTCTRL.RSTFR = ch; //clear the reset causes before jumping to app...
+      GPIOR0 = ch; // but, stash the reset cause in GPIOR0 for use by app...
       watchdogConfig(WDT_PERIOD_OFF_gc);
       __asm__ __volatile__(
-        "jmp 512\n"
+        "jmp app\n"
       );
     }
-  }
+  #else
+    /**************************************************************
+    | START BLOCK OF CODE THAT IS NOT USED - FANCY_RESET_LOGIC is
+    | kryptonite. We must assume that user code is not clearing the flags
+    | and in that case, it is impossible to differentiate a valid entry
+    | condition from a dirty reset or an invalid entry condition.
+    | This is a funcamental conceptual flaw in the ideal of the invisible
+    | bootloader - but even when not using the bootloader, megaTinyCore
+    | and DxCore will do the right thing (check reset flags, if zero, trigger
+    | SWR, otherwise clear and stash result in GPIOR0 for user retrival if
+    | needed). It is critical that we never run the bootloader or application
+    | if no reset cause is reported, because both the cores and Optiboot assume
+    | that all peripherals are in their default configuration at startup, and
+    | if that assumption is violated, the behavior of both optiboot and the core
+    | are undefined, and will depend on the state the app left behind.
+    **************************************************************/
+    /*
+       Protect as much Reset Cause as possible for application
+       and still skip bootloader if not necessary
+    */
+    ch = RSTCTRL.RSTFR;
+    if (ch != 0) {
+      /*
+         We want to run the bootloader when an external reset has occurred.
+         On these mega0/XTiny chips, there are three types of ext reset:
+          reset pin (may not exist), UPDI reset, and SW-request reset.
+         One of these reset causes, together with watchdog reset, should
+          mean that Optiboot timed out, and it's time to run the app.
+         Other reset causes (notably poweron) should run the app directly.
+         If a user app wants to utilize and detect watchdog resets, it
+          must make sure that the other reset causes are cleared.
+      */
+      if (ch & RSTCTRL_WDRF_bm) {
+        if (ch & RESET_EXTERNAL) {
+          /*
+             Clear WDRF because it was most probably set by wdr in
+             bootloader.  It's also needed to avoid loop by broken
+             application which could prevent entering bootloader.
+
+             Note that the issue here with not clearing the WDRF would be that once one WDRF fired, for example after
+             optiboot ran and exited, it would never be run again unless user code cleared it which would be perverse.
+          */
+          RSTCTRL.RSTFR = RSTCTRL_WDRF_bm;
+        }
+      }
+      if (!((ch & RESET_EXTERNAL))) {
+      /*
+         save the reset flags in the designated register.
+         This can be saved in a main program by putting code in
+         .init0 (which executes before normal c init code) to save R2
+         to a global variable.
+      */
+      __asm__ __volatile__("mov r2, %0\n" :: "r"(ch));
+
+        // switch off watchdog
+        watchdogConfig(WDT_PERIOD_OFF_gc);
+        __asm__ __volatile__(
+          "jmp 512\n"
+        );
+      }
+    /**************************************************************
+    | END BLOCK OF CODE THAT IS NOT USED
+    | Comments are here to help readers not get thrown off by this
+    | Since *I* do and I wrote the damned code...........
+    **************************************************************/
+    }
   #endif // Fancy reset cause stuff
 
   watchdogReset();
@@ -420,7 +457,7 @@ int main(void) {
   MYUART_TXPORT.DIR |= MYUART_TXPIN; // set TX pin to output
   MYUART_TXPORT.OUT |= MYUART_TXPIN;  // and "1" as per datasheet
   #if defined (MYUART_PMUX_VAL)
-  MYPMUX_REG = MYUART_PMUX_VAL;  // alternate pinout to use
+    MYPMUX_REG = MYUART_PMUX_VAL;  // alternate pinout to use
   #endif
   if ((FUSE_OSCCFG & FUSE_FREQSEL_gm) == FREQSEL_16MHZ_gc) {
     MYUART.BAUD = BAUD_SETTING_16;
@@ -437,24 +474,24 @@ int main(void) {
   watchdogConfig(WDTPERIOD);
 
   #if (LED_START_FLASHES > 0) || defined(LED_DATA_FLASH) || defined(LED_START_ON)
-  /* Set LED pin as output */
-  LED_PORT.DIR |= LED;
+    /* Set LED pin as output */
+    LED_PORT.DIR |= LED;
   #endif
 
   #if LED_START_FLASHES > 0
-  /* Flash onboard LED to signal entering of bootloader */
-  # ifdef LED_INVERT
-  flash_led(LED_START_FLASHES * 2 + 1);
-  # else
-  flash_led(LED_START_FLASHES * 2);
-  # endif
+    /* Flash onboard LED to signal entering of bootloader */
+    #ifdef LED_INVERT
+      flash_led(LED_START_FLASHES * 2 + 1);
+    #else
+      flash_led(LED_START_FLASHES * 2);
+    #endif
   #else
-  #if defined(LED_START_ON)
-  # ifndef LED_INVERT
-  /* Turn on LED to indicate starting bootloader (less code!) */
-  LED_PORT.OUT |= LED;
-  # endif
-  #endif
+    #if defined(LED_START_ON)
+      #ifndef LED_INVERT
+        /* Turn on LED to indicate starting bootloader (less code!) */
+        LED_PORT.OUT |= LED;
+      #endif
+    #endif
   #endif
 
   /* Forever loop: exits by causing WDT reset */
@@ -570,7 +607,7 @@ int main(void) {
 }
 
 void putch(char ch) {
-  while (0 == (MYUART.STATUS & USART_DREIF_bm))
+  while (!(MYUART.STATUS & USART_DREIF_bm))
     ;
   MYUART.TXDATAL = ch;
 }
@@ -585,7 +622,7 @@ uint8_t getch(void) {
     watchdogReset();
   }
   #ifdef LED_DATA_FLASH
-  LED_PORT.IN |= LED;
+    LED_PORT.IN |= LED;
   #endif
 
   return ch;
@@ -608,49 +645,49 @@ void verifySpace() {
 }
 
 #if LED_START_FLASHES > 0
-void flash_led(uint8_t count) {
-  uint16_t delay;  // at 20MHz/6, a 16bit delay counter is enough
-  while (count--) {
-    LED_PORT.IN |= LED;
-    // delay assuming 20Mhz OSC.  It's only to "look about right", anyway.
-    for (delay = ((20E6 / 6) / 150); delay; delay--) {
-      watchdogReset();
-      if (MYUART.STATUS & USART_RXCIF_bm) {
-        return;
+  void flash_led(uint8_t count) {
+    uint16_t delay;  // at 20MHz/6, a 16bit delay counter is enough
+    while (count--) {
+      LED_PORT.IN |= LED;
+      // delay assuming 20Mhz OSC.  It's only to "look about right", anyway.
+      for (delay = ((20E6 / 6) / 150); delay; delay--) {
+        watchdogReset();
+        if (MYUART.STATUS & USART_RXCIF_bm) {
+          return;
+        }
       }
     }
+    watchdogReset(); // for breakpointing
   }
-  watchdogReset(); // for breakpointing
-}
-/* An argument can be made that we should always flash at the same speed:
- * though I don't think this particularly matters. I would expect this to add
- * lds, cpse, and two rjmps to the code for a total of 10 bytes.
- * I will likely do this next time I have to recompile it all. Provided, that is,
- * we still have that much space. Should probably #ifdef it so it can be
- * turned on or off by passing a define to compiler.
- */
-/*
+  /* An argument can be made that we should always flash at the same speed:
+   * though I don't think this particularly matters. I would expect this to add
+   * lds, cpse, and two rjmps to the code for a total of 10 bytes.
+   * I will likely do this next time I have to recompile it all. Provided, that is,
+   * we still have that much space. Should probably #ifdef it so it can be
+   * turned on or off by passing a define to compiler.
+   */
+  /*
 
-void flash_led(uint8_t count) {
-  uint16_t delay;  // at 20MHz/6, a 16bit delay counter is enough
-  while (count--) {
-    LED_PORT.IN |= LED; // Ensure same LED flash speed regardless of OSCCFG.
-    if ((FUSE_OSCCFG & FUSE_FREQSEL_gm) == FREQSEL_16MHZ_gc) {
-      delay = ((16E6 / 6) / 150)
-    } else {
-      delay = ((20E6 / 6) / 150)
-    }
-    for (; delay; delay--) {
-      watchdogReset();
-      if (MYUART.STATUS & USART_RXCIF_bm) {
-        return;
+  void flash_led(uint8_t count) {
+    uint16_t delay;  // at 20MHz/6, a 16bit delay counter is enough
+    while (count--) {
+      LED_PORT.IN |= LED; // Ensure same LED flash speed regardless of OSCCFG.
+      if ((FUSE_OSCCFG & FUSE_FREQSEL_gm) == FREQSEL_16MHZ_gc) {
+        delay = ((16E6 / 6) / 150)
+      } else {
+        delay = ((20E6 / 6) / 150)
+      }
+      for (; delay; delay--) {
+        watchdogReset();
+        if (MYUART.STATUS & USART_RXCIF_bm) {
+          return;
+        }
       }
     }
+    watchdogReset(); // for breakpointing
   }
-  watchdogReset(); // for breakpointing
-}
 
- */
+   */
 #endif
 
 
@@ -666,34 +703,34 @@ void watchdogConfig(uint8_t x) {
 
 
 #ifndef APP_NOSPM
-/*
-   Separate function for doing nvmctrl stuff.
-   It's needed for application to do manipulate flash, since only the
-    bootloader can write or erase flash, or write to the flash alias areas.
-   Note that this is significantly different in the details than the
-    do_spm() function provided on older AVRs.  Same "vector", though.
+  /*
+     Separate function for doing nvmctrl stuff.
+     It's needed for application to do manipulate flash, since only the
+      bootloader can write or erase flash, or write to the flash alias areas.
+     Note that this is significantly different in the details than the
+      do_spm() function provided on older AVRs.  Same "vector", though.
 
-   How it works:
-   - if the "command" is legal, write it to NVMCTRL.CTRLA
-   - if the command is not legal, store data to *address
-   - wait for NVM to complete
+     How it works:
+     - if the "command" is legal, write it to NVMCTRL.CTRLA
+     - if the command is not legal, store data to *address
+     - wait for NVM to complete
 
-   For example, to write a flash page:
-   Copy each byte with
-     do_nvmctrl(flashOffset+MAPPED_PROGMEM_START, 0xFF, *inputPtr);
-   Erase and write page with
-     do_nvmctrl(0, NVMCTRL_CMD_PAGEERASEWRITE_gc, 0);
-*/
-static void do_nvmctrl(uint16_t address, uint8_t command, uint8_t data)  __attribute__((used));
-static void do_nvmctrl(uint16_t address, uint8_t command, uint8_t data) {
-  if (command <= NVMCTRL_CMD_gm) {
-    _PROTECTED_WRITE_SPM(NVMCTRL.CTRLA, command);
-    while (NVMCTRL.STATUS & (NVMCTRL_FBUSY_bm | NVMCTRL_EEBUSY_bm))
-      ; // wait for flash and EEPROM not busy, just in case.
-  } else {
-    *(uint8_t *)address = data;
+     For example, to write a flash page:
+     Copy each byte with
+       do_nvmctrl(flashOffset+MAPPED_PROGMEM_START, 0xFF, *inputPtr);
+     Erase and write page with
+       do_nvmctrl(0, NVMCTRL_CMD_PAGEERASEWRITE_gc, 0);
+  */
+  static void do_nvmctrl(uint16_t address, uint8_t command, uint8_t data)  __attribute__((used));
+  static void do_nvmctrl(uint16_t address, uint8_t command, uint8_t data) {
+    if (command <= NVMCTRL_CMD_gm) {
+      _PROTECTED_WRITE_SPM(NVMCTRL.CTRLA, command);
+      while (NVMCTRL.STATUS & (NVMCTRL_FBUSY_bm | NVMCTRL_EEBUSY_bm))
+        ; // wait for flash and EEPROM not busy, just in case.
+    } else {
+      *(uint8_t *)address = data;
+    }
   }
-}
 #endif
 
 
@@ -753,7 +790,6 @@ static void do_nvmctrl(uint16_t address, uint8_t command, uint8_t data) {
     #endif
   #endif
   OPTFLASHSECT const char f_version[] = "Version=" xstr(OPTIBOOT_MAJVER) "." xstr(OPTIBOOT_MINVER);
-
 #endif
 
 // Dummy application that will loop back into the bootloader if not overwritten
