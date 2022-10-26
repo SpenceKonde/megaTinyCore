@@ -319,7 +319,8 @@ while (digitalReadFast(pinb)); // make sure our pulse is over - can be omitted i
 
 ### TCAn for millis timekeeping
 When TCA0 is used as the millis timekeeping source, it is set to run at the system clock prescaled by 8 when system clock is 1MHz, 16 when system clock is <=5 MHz, and 64 for faster clock speeds, with a period of 255 (as with PWM). This provides a `millis()`  resolution of 1-2ms, and is effecively not higher than 1ms between 16 and 30 MHz, while `micros()` resolution remains at 4 us or less. At 32 MHz or higher, to continue generating PWM output within the target range, we are forced to switch to a larger prescaler (by a factor of 4), so the resolution figures fall by a similar amount, and the ISR is called that much less often.
-It 2.6.3 ISR performance was improved greatly. an average 29% improvement!
+
+In 2.6.2, the same techniques used for TCB were applied to TCA, improving the ISR performance by an average of 29%, reducing time spent in the isr and increasing the time spent executing your code
 
 #### TCA timekeeping resolution
 |   CLK_PER | millis() | micros() | % in ISR | micros() time |
@@ -357,7 +358,7 @@ When a TCB is used for `millis()` timekeeping, it is set to run at the system cl
 
 ### TCBn for millis timekeeping
 When TCB2 (or other type B timer) is used for `millis()` timekeeping, it is set to run at the system clock prescaled by 2 (1 at 1 MHz system clock) and tick over every millisecond. This makes the millis ISR very fast, and provides 1ms resolution at all speeds for millis. The `micros()` function also has 1 us or almost-1 us resolution at all clock speeds (though there are small deterministic distortions due to the performance shortcuts used for the microsecond calculations. The type B timer is an ideal timer for millis, however, they';'re also good for a lot of other things too. It is anticipated that as libraries for IR, 433MHz OOK'ed remote control, and similar add support for the modern AVR parts, that these timers will see even more use.
-ISR exec time was hastened markedly - a 25% decrease, meaninmg less time spent incrementing millis and more on your code.
+ISR execution time was decreased by 25% from 2.6.1 of megaTinyCore through reimplementation of the ISR is assembly, meaninmg less time spent incrementing millis and more on your code.
 
 |Note | CLK_PER | millis() | micros() | % in ISR | micros() time | Terms used             |
 |-----|---------|----------|----------|----------|---------------|------------------------|
@@ -379,7 +380,7 @@ ISR exec time was hastened markedly - a 25% decrease, meaninmg less time spent i
 |  †  |   4 MHz |     1 ms |     1 us |   1.18 % |         21 us | 1                      |
 | ! * |   3 MHz |     1 ms |  1.33 us |   1.61 % |       > 40 us | 9 (0-7, 9)             |
 | !†  |   2 MHz |     2 ms |     1 us |   1.18 % |         39 us | 1                      |
-|  †  |   1 MHz |     2 ms |     1 us |   2.60 % |         78 us | 1                      |
+|  †  |   1 MHz |     2 ms |     1 us |   2.36 % |         78 us | 1                      |
 
 `!` - Theoretical, these speeds are not supported and have not been tested. % time in ISR and micros return times, where given are theoretically calculated, not experimentally verified.
 `†` - Naturally ideal - no ersatz division is needed for powers of 2

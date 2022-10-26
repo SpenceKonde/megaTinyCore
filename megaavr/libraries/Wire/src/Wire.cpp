@@ -140,12 +140,12 @@ bool TwoWire::swap(uint8_t state) {
         #endif
         false)) {
           if (state > 3) {
-            badArg("The requested swap level is not available on any current or announced part - did you pass a bitmask instead of a number?")
+            badArg("The requested swap level is not available on any current or announced part - did you pass a bitmask instead of a number?");
           } else if (state == 3){
-            badArg("Swap level 3 is not available on DA or DB devices, only swaps 0, 1 and 2.")
+            badArg("Swap level 3 is not available on DA or DB devices, only swaps 0, 1 and 2.");
           } else {
-            badArg("The requested swap level is not available on this part.")
-            return false
+            badArg("The requested swap level is not available on this part.");
+            return false;
           }
         }
 
@@ -165,10 +165,10 @@ bool TwoWire::swap(uint8_t state) {
         #endif
         false)) {
           if (state > 3) {
-            badArg("The requested swap level is known at compiletime to be one that is not available on any part. (did you pass a bitmask instead of a number?)")
+            badArg("The requested swap level is known at compiletime to be one that is not available on any part. (did you pass a bitmask instead of a number?)");
           } else {
-            badArg("The requested swap level is not available on this part.")
-            return false
+            badArg("The requested swap level is not available on this part.");
+            return false;
           }
         }
 
@@ -268,9 +268,11 @@ void TwoWire::begin(void) {
  *@return     void
  */
 void TwoWire::begin(uint8_t address, bool receive_broadcast, uint8_t second_address) {
-  if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
-    badArg("TWI addresses must be supplied in 7-bit format. The read/write bit is handled by the library");
-    return;
+  if (__builtin_constant_p(address)) {
+    if (address > 0x7F) {     // Compile-time check if address is actually 7 bit long
+      badArg("TWI addresses must be supplied in 7-bit format. The read/write bit is handled by the library");
+      return;
+    }
   }
   TWI_SlaveInit(&vars, address, receive_broadcast, second_address);
 }
