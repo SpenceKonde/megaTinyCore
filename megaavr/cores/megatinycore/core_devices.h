@@ -250,6 +250,26 @@
   #error "Can't-happen: unknown chip somehow being used!"
 #endif
 
+/* Used for AttachInterrupt to reduce RAM use. */
+#ifdef __AVR_ATtinyxy4__
+  #define PORTB_PINS 4
+  #define _AVR_PINCOUNT 14
+#endif
+#ifdef __AVR_ATtinyxy6__
+  #define PORTB_PINS 6
+  #define PORTC_PINS 4
+  #define _AVR_PINCOUNT 20
+#endif
+#ifdef __AVR_ATtinyxy7__
+  #define PORTB_PINS 8
+  #define PORTC_PINS 6
+  #define _AVR_PINCOUNT 24
+#endif
+#ifdef __AVR_ATtinyxy2__
+  #define _AVR_PINCOUNT 8
+#endif
+#define MEGATINYCORE_NUM (((MEGATINYCORE_MAJOR << 24)+(MEGATINYCORE_MINOR << 16)+(MEGATINYCORE_PATCH << 8)+MEGATINYCORE_RELEASED))
+
 #if MEGATINYCORE_SERIES == 0
   #define _AVR_FAMILY "T0"
   #define __AVR_TINY_0__
@@ -269,7 +289,7 @@
   #define _AVR_AC_COUNT      (1)
 #else
   #define _AVR_AC_COUNT      (0)
-  #warning "No AC? No supported parts exist without one, something is wrong"
+  #error "No AC? No supported parts exist without one, something is wrong"
 #endif
 
 #if defined(ADC1)
@@ -278,7 +298,7 @@
   #define _AVR_ADC_COUNT     (1)
 #else
   #define _AVR_ADC_COUNT     (0)
-  #warning "No ADC? No supported parts exist without one, something is wrong"
+  #error "No ADC? No supported parts exist without one, something is wrong"
 #endif
 
 
@@ -309,7 +329,7 @@
 #elif defined(TCA0)
   #define _AVR_TCA_COUNT     (1)
 #else
-  #warning "No TCA? No supported parts exist without one, something is wrong"
+  #error "No TCA? No supported parts exist without one, something is wrong"
 #endif
 
 #if defined(TCB5)
@@ -325,7 +345,7 @@
 #elif defined(TCB0)
   #define _AVR_TCB_COUNT     (1)
 #else
-  #warning "No TCBs? No supported parts exist without one, something is wrong"
+  #error "No TCBs? No supported parts exist without one, something is wrong"
 #endif
 
 
@@ -340,9 +360,17 @@
 #elif defined(TWI0)
   #define _AVR_TWI_COUNT     (1)
 #else
-  #define _AVR_TWI_COUNT     (0)
-  #warning "No TWI? No supported parts exist without one, something is wrong"
+  #error "No TWI? No supported parts exist without one, something is wrong"
 #endif
+
+#if defined(SPI1)
+  #define _AVR_SPI_COUNT     (2)
+#elif defined(SPI0)
+  #define _AVR_SPI_COUNT     (1)
+#else
+  #error "No SPI? No supported parts exist without one, something is wrong"
+#endif
+
 
 #if defined(USART5)
   #define _AVR_USART_COUNT     (6)
@@ -357,12 +385,93 @@
 #elif defined(USART0)
   #define _AVR_USART_COUNT     (1)
 #else
-  #define _AVR_USART_COUNT     (0)
-  #warning "No USARTs? No supported parts exist without one, something is wrong"
+  #error "No USARTs? No supported parts exist without one, something is wrong"
 #endif
+
+#if defined(ZCD3)
+  #define _AVR_ZCD_COUNT     (1) /* Only the DD's have ZCD3, which is their ZCD0 by a different name, since it uses different pins */
+#elif defined(ZCD2)
+  #define _AVR_ZCD_COUNT     (3)
+#elif defined(ZCD1)
+  #define _AVR_ZCD_COUNT     (2)
+#elif defined(ZCD0)
+  #define _AVR_ZCD_COUNT     (1)
+#else
+  #define _AVR_ZCD_COUNT     (0)
+#endif
+
+#if defined(DAC2)
+  #define _AVR_DAC_COUNT     (3)
+#elif defined(DAC1)
+  #define _AVR_DAC_COUNT     (2)
+#elif defined(DAC0)
+  #define _AVR_DAC_COUNT     (1) /* Note that thus far, no DAC other than DAC0 has ever been able to output data. DAC1 and DAC2 are just the DACREFs for AC1 and AC2 on tinyAVR 1-series parts.*/
+#else
+  #define _AVR_DAC_COUNT     (0)
+#endif
+
+
+/* PORT names and the NOT_A_* definitions - used EVERYWHERE! */
+
+#define NOT_A_PIN 255
+#define NOT_A_PORT 255
+#define NOT_AN_INTERRUPT 255
+#define NOT_A_MUX 255
+#define MUX_NONE 128
+
+#if defined(MEGATINYCORE)
+  #define PA 0
+  #if _AVR_PINCOUNT > 8
+    #define PB 1
+    #if _AVR_PINCOUNT > 14
+      #define PC 2
+      #define NUM_TOTAL_PORTS 3
+    #else
+      #define PC NOT_A_PORT
+      #define NUM_TOTAL_PORTS 2
+    #endif
+  #else
+    #define PB NOT_A_PORT
+    #define PC NOT_A_PORT
+    #define NUM_TOTAL_PORTS 1
+  #endif
+  #define PD NOT_A_PORT
+  #define PE NOT_A_PORT
+  #define PF NOT_A_PORT
+  #define PG NOT_A_PORT
+#else
+  #define PA 0
+  #if defined(PORTB)
+    #define PB 1
+  #else
+    #define PB NOT_A_PORT
+  #endif
+  #define PC 2
+  #define PD 3
+  #if defined(PORTE)
+    #define PE 4
+  #else
+    #define PE NOT_A_PORT
+  #endif
+  #define PF 5
+  #if defined(PORTG)
+    #define PG 6
+    #define NUM_TOTAL_PORTS 7
+  #else
+    #define PG NOT_A_PORT
+    #define NUM_TOTAL_PORTS 6
+  #endif
+#endif
+
+
+
 /* In case you need to greatly change the operating frequency of the chip on the fly, and accept that it will trash millis and so on.
  * That's why it's not documented or in Arduino.h, but this subfile - it's about as blunt an instrument as it gets, and resorting to
- * methods like this can result in bizarre and unexpected behavior that can be difficult to diagnose if you don't suspect clock issues */
+ * methods like this can result in bizarre and unexpected behavior that can be difficult to diagnose if you don't suspect clock issues
+ *
+ * Yes, the nomenclature is strange (I'm refering to the "x"; commonly used for multiplication yet the mathematical opperation in question
+ * is divison. The symbol for that is not valid in names in C). I didn't start it, but there's no obviously better option, so X it stays.
+ */
 #define  _setPrescale2x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_2X_gc | CLKCTRL_PEN_bm)))
 #define  _setPrescale4x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_4X_gc | CLKCTRL_PEN_bm)))
 #define  _setPrescale8x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_8X_gc | CLKCTRL_PEN_bm)))
@@ -375,45 +484,6 @@
 #define _setPrescale24x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_24X_gc | CLKCTRL_PEN_bm)))
 #define _setPrescale48x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_48X_gc | CLKCTRL_PEN_bm)))
 
-
-/* Used for AttachInterrupt to reduce RAM use. */
-#ifdef __AVR_ATtinyxy4__
-  #define PORTB_PINS 4
-  #define _AVR_PINCOUNT 14
-#endif
-#ifdef __AVR_ATtinyxy6__
-  #define PORTB_PINS 6
-  #define PORTC_PINS 4
-  #define _AVR_PINCOUNT 20
-#endif
-#ifdef __AVR_ATtinyxy7__
-  #define PORTB_PINS 8
-  #define PORTC_PINS 6
-  #define _AVR_PINCOUNT 24
-#endif
-#ifdef __AVR_ATtinyxy2__
-  #define _AVR_PINCOUNT 8
-#endif
-
-
-// #define OUTPUT_PULLUP 3  // not implemented
-
-/* PORT names and the NOT_A_* definitions - used EVERYWHERE! */
-
-#define NOT_A_PIN 255
-#define NOT_A_PORT 255
-#define NOT_AN_INTERRUPT 255
-#define NOT_A_MUX 255
-#define MUX_NONE 128
-
-#define PA 0
-#define PB 1
-#define PC 2
-#define PD 3
-#define PE 4
-#define PF 5
-#define PG 6
-#define NUM_TOTAL_PORTS 7
 
 
 #if MEGATINYCORE_SERIES <= 2
@@ -580,10 +650,10 @@
     #define GPIO_GPIO3                        (_SFR_MEM8(0x001F))
   #endif
   #if !defined(GPR_GPR0)
-    #define GPIO_GPIO0                        (_SFR_MEM8(0x001C))
-    #define GPIO_GPIO1                        (_SFR_MEM8(0x001D))
-    #define GPIO_GPIO2                        (_SFR_MEM8(0x001E))
-    #define GPIO_GPIO3                        (_SFR_MEM8(0x001F))
+    #define GPR_GPR0                        (_SFR_MEM8(0x001C))
+    #define GPR_GPR1                        (_SFR_MEM8(0x001D))
+    #define GPR_GPR2                        (_SFR_MEM8(0x001E))
+    #define GPR_GPR3                        (_SFR_MEM8(0x001F))
   #endif
  // The naming of this has gotten so confusing. I give up, we all know where the registers are.
   #if defined (CLKCTRL_SELHF_bm)

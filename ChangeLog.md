@@ -24,19 +24,25 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Released versions
 
-### Planned 2.6.2
-* Serial UPDI Chip erase via the Protected KEY Interface didn't happen, it was relying on the chip erase nvmctrl command, which can't be used on a locked chip, or, for that matter, one spamming software resets.
+### 2.6.2 (critical update)
+* Critical bugfix: Burn Bootloader corrected
+* Bugfix: Serial UPDI Chip erase via the Protected KEY Interface didn't happen, it was relying on the chip erase nvmctrl command, which can't be used on a locked chip, or, for that matter, one spamming software resets.
 * Serial UPDI ID for AVR32DB48 corrected
-* Burn Bootloader corrected
-* Undesired quote stripping bug workaround for windows cmd /C
-* Wire updated to latest from MX682X, and then several fixes implemented.
-  * Additionally several extremely niche features added
-  * Compiletime error checking fixed
-* Wire additionally worked over by me:
-  * Add a hacky option to enable the compatibility settings, most importantly the SMbus levels for talking to MUCH lower voltage parts.
-  * Fix compile time error checking as is best possible with in the limitations of the system (for pins, swap, and special options)
+* Bugfix: Undesired quote stripping bug workaround for windows cmd /C
+* Enhancement: Wire updated to latest from MX682X
+  * Sleep works correctly on devices acting as I2C slave.
+  * Wire now supports a 256byte buffer (not recommended, but it does)
+* Enhancement: Wire further modified:
+  * Add a hacky option to enable the compatibility settings, most importantly the SMbus levels for talking to lower voltage parts.
+  * Fix compile time error checking as is best possible within the limitations of the system (for pins, swap, and special options)
+  * Wire doc enhancements
+* Docs: General doc enhancements, particularly to Ref_Reset.
+* Bugfix: Corrected half-duplex mode, which turned out to be a long and slow crawl, bringing work to a standstill for like a week
+* Bugfix: MEGATINYCORE_NUM macro was gone.
+* Bugfix: Add the missing #defines for peripheral count and reorganize core_devices to make porting easier, fix CORE_SUPPORT_LONG_TONES misspelling.
+* Bugfix: Eliminate warnings from redefinition of macros.
+* Enhancement: Add missing keywords for core #defines for feature ID.
 
-* Doc Enhancements
 
 ### 2.6.1 (critical update)
 * 2.6.0 Bugfix: Correct several USART bugs that snuck through, including an apparent regression that would prevent proper serial operation.

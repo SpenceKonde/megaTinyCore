@@ -461,7 +461,7 @@ Not enabled. Ugly ways to get delays at very small flash cost.
 #define _ADDLOW(a,b) __asm__ __volatile__ ("add %0A, %1"  "\n\t" :"+r"((uint16_t)(a)):"r"((uint8_t) b))
 #define _SUBLOW(a,b) __asm__ __volatile__ ("sub %0A, %1"  "\n\t" :"+r"((uint16_t)(a)):"r"((uint8_t) b))
 /* This is dirty trick that has benefit when a  16-bit value is a, and an 8-bit value b is added to it
- * and it is known that under all circumstances, thisw will absolutely never cause a carry
+ * and it is known that under all circumstances, this will absolutely never cause a carry
  * (that is, will never change the high byte), butthe compiler does not realize that this is the case,
  * this dirty macro directly adds (or subtracts) an 8 bit value to (or from) a 16-bit value, with no
  * provision for carrying. That is it will only impact the low byte. You are probably wondering why this
@@ -849,7 +849,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
 
 #ifndef CORE_SUPPORT_LONG_TONES
   #if (PROGMEM_SIZE > 8192)
-    #define CORE SUPPORT_LONG_TONES 1
+    #define CORE_SUPPORT_LONG_TONES 1
   #endif
 #endif
 
