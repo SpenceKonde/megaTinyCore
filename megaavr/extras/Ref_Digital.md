@@ -6,15 +6,15 @@ The digital I/O functions are astonishingly inefficient. This isn't my fault - i
 Single call to the function, volatile variables used as argumentsto the functions to prevent compiler from making assumptions about their values.
 
 The comparison to the fast I/O functions is grossly unfair, because the fast I/O functions have constant arguments - but this gives an idea of the scale.
-Remember also that executing 1 word of code (2 bytes) takes 1 clock cycle, though not all of the code paths are traversed every time.
+Remember also that executing 1 word of code (2 bytes) takes 1 clock cycle, though not all of the code paths are traversed for all pins (indeed, we know that large portions will be skipped for all pins, because each pin can have only one PWM timer, but on the other hand, there are a few small loops in there). Gives an idea of the scale.
 
 | Function           | t3224 | t3216 | Notes
 |--------------------|-------|-------|-------------------------
 | pinMode()          |  +128 |  +146 |
-| digitalWrite()     |  +198 |  +340 | Calls turnOffPWM()
+| digitalWrite()     |  +198 |  +340 | Calls turnOffPWM(), included in figures.
 | both of above      |  +296 |  +438 | Calls turnOffPWM()
 | openDrain()        |  +128 |  +262 | Calls turnOffPWM()
-| turnOffPWM()       |   +72 |  +228 | 3216 has the complicated type D timer
+| turnOffPWM()       |   +72 |  +228 | 3216 has the complicated type D timer, so this is huge.
 | digitalRead()      |   +76 |   +78 | Official core calls turnOffPWM (we don't)
 | pinConfigure() 1   |  +104 |  +116 | Only direction/output level
 | pinConfigure() 2   |  +202 |  +220 | Only pullup, input sense, and direction/outlevel
@@ -22,12 +22,12 @@ Remember also that executing 1 word of code (2 bytes) takes 1 clock cycle, thoug
 | digitalWriteFast() |    +2 |    +2 | With constant arguments.
 | pinModeFast()      |   +12 |   +12 | With constant arguments.
 
-pinConfigure called with second argument constrained to 0x00-0x0F (setting only direction and output value) (1), with it constrained to that plus configuring pullups (2), and without restrictions (3).
+The takeaways from this should be that:
+* digitalWrite() can easily take 35-75 or more clock cycle with turnOffPWM and then over 50 itself. So digitalWrite can take up to 7 us per call (at 20 MHz; digitalWriteFast takes 0.05 us), and it is by far the worst offender. A small consolation is that turnOffPWM does not execute the entire block of code for all parts. It checks which timer is used, and uses that block, which very roughly gives 70 clocks on a TCA pin, around 150 ona TCD pin. And considerably fewer on a pin with no pwm, though it still has to determine that the pin doesn't have pwm.
+* If you know you won't have PWM coming out of a pin, pinConfigure is faster than pinMode() and digitalWrite(). Especially if only setting up the more common properties.
+* pinConfigure called with second argument constrained to 0x00-0x0F (setting only direction and output value) (1), with it constrained to that plus configuring pullups (2), and without restrictions (3).
 About 200 bytes of that space is used for lookup tables, not instructions.
-
-This is why the fast digital I/O functions exist.
-
-This is why the fast digital I/O functions exist, and why there are people who habitually do `VPORTA.OUT |= 0x80;` instead of `digitalWrite(PIN_PA7,HIGH);`
+* This is why the fast digital I/O functions exist.
 
 It's also why I am not comfortable automatically switching digital I/O to "fast" type when constant arguments are given. The normal functions are just SO SLOW that you're sure to break code that hadn't realized they were depending on the time it took for digital write, even if just for setup or hold time for the thing it's talking to.
 ## openDrain()
@@ -66,7 +66,7 @@ VPORTD.OUT |= 1 << 0; // The previous line is syntactic sugar for this. Beyond b
 | digitalWriteFast()  | 10 words  | 6 words  | 1 words         |
 | pinModeFast()       |      N/A  |     N/A  | 1 word if OUTPUT<br/>6 otherwise |
 
-Execution time is 1 or sometimes 2 clocks per word that is actually executed (not all of them are in the multiple possibility options. in the case of the "any option" digitalWrite, it's 5-7 (there are some that )
+Execution time is 1 or sometimes 2 clocks per word that is actually executed (not all of them are in the multiple possibility options. in the case of the "any option" digitalWrite, it's 5-7
 Note that the HIGH/LOW numbers include the overhead of a `(val ? HIGH : LOW)` which is required in order to get that result. That is how the numbers were generated - you can use a variable of volatile uint8_t and that will prevent the compiler from assuming anything about it's value. It is worth noting that when both pin and value are constant, this is 2-3 times faster and uses less flash than *even the call to the normal digital IO function*, much less the time it takes for the function itself (which is many times that. The worst offender is the normal digitalWrite(), because it also has to check for PWM functionality and then turn it off if enabled (and the compiler isn't allowed to skip this if you never use PWM).
 
 1 word is 2 bytes; when openDrainFast is not setting the pin FLOATING, it needs an extra word to set the output to low level as well (just in case). This was something I debated, but decided that since it could be connected to a lower voltage part and damage caused if a HIGH was output, ensuring that that wasn't what it would do seemed justified; if CHANGE is an option, it also uses an extra 2 words because instead of a single instruction against VPORT.IN, it needs to load the pin bit mask into a register (1 word) and use STS to write it (2 words) - and it also does the clearing of the output value - hence how we end up with the penalty of 4 for the unrestricted case vs digitalWriteFast.
@@ -84,7 +84,7 @@ Getting a 1 or 0 into a variable is slower and uses more flash; I can think of a
 ## turnOffPWM(uint8_t pin) is exposed
 This used to be a function only used within wiring_digital. It is now exposed to user code - as the name suggests it turns off PWM (only if analogWrite() could have put it there) for the given pin. It's performance is similar to analogWrite (nothing to get excited over), but sometimes an explicit function to turn off PWM and not change anything else is preferable: Recall that digitalWrite calls this (indeed, as shown in the above table, it's one of the main reasons digitalWrite is so damned bloated on the DX-series parts!), and that large code takes a long time to run. DigitalWrite thus does a terrible job of bitbanging. It would not be unreasonable to call this to turn off PWM, but avoid digitalWrite entirely. The pin will return to whatever state it was in before being told to generate PWM, unless digitalWriteFast() or direct writes to the port register have been used since. If the pin is set input,
 
-## Finding current PWM timer, if any
+## Finding current PWM timer, if any: digitalPinToTimerNow() (DxCore only)
 On many cores, there is a `digitalPinToTimer(pin)` macro, mostly for internal use, which returns the timer associated with the pin. On DxCore there is the added complication that we account for the TCA portmux register, and digitalPinToTimer() only returns non-TCA timers. For the PORTMUX-aware test, call `digialPinToTimerNow(pin)` instead.
 
 ## pinConfigure()
@@ -147,7 +147,7 @@ The configurable input level option (`INLVL`) is only available on parts with MV
 Multi-pin configuration registers, which allow setting PINnCTRL en masse are only available on AVR Dx-series.
 
 ## Note on number of pins and future parts
-The most any announced AVR has had is 86 digital pins, the ATmega2560; In the modern AVR era, the digital pin maximum is 55, and the maximum possible without rearchitecting how pins are accessed is 56 (ie, if UPDI could be turned into I/O on DA/DB we are already there). There is no way for an AVR that allows the same bit-level access to we have on all pins currently to more than 56 pins. Each port takes up 4 of the 32 addresses in the low I/O space for the VPORT registers, on which the single cycle bit-level access relies. Only time will tell how this is handled,
+The most any announced AVR has had is 86 digital pins, the ATmega2560; In the modern AVR era, the digital pin maximum is 55, and the maximum possible without rearchitecting how pins are accessed is 56 (ie, if UPDI could be turned into I/O on DA/DB we are already there). There is no way for an AVR that allows the same bit-level access that we enjoy to have it on on all pins to have more than 56 pins. Each port takes up 4 of the 32 addresses in the low I/O space for the VPORT registers, on which the single cycle bit-level access relies. Only time will tell how this is handled.
 * **No VPORTH or higher** - This is clean, simple, and limiting in some ways, but probably the best route. If you needed to use VPORT access, you'll just need to use the lower 7 ports for it. Surely you don't need 57+ pins all with VPORT atomic single cycle access! This is also, in my judgement, most likely based on the fact that on the ATmega2560, the only precedent we have for running out of low I/O registers for pins, they didn't even put ports H through L into the high I/O space.
-* **VPORTs in High I/O** - There are many ways of dealing with it using a new set of differently behaving registers in the high I/O space. None of them retain the arbitrary compile-time-known-bit-write-is-one-clock of current VPORTs. At 8 registers per port, you could make a series of N operations on a bit or number of bits take N+1 clocks, and keep them atomic. This would mean a VPORT.DIR/DIRCLR/DIRSET, and VPORT.OUT/OUTSET/OUTCLR and VPORT.IN(writing to IN toggles, and there was never a single cycle DIR toggle). and VPORT.INTFLAGS. That's viable, though with the other registers in that, you could get at most only 3 more ports - which is only 24 pins: You couldn't quite do it for a 100 pin chip). Other solutions would lower capability and comprehensibility in exchange for squeezing in more pins. No matter how you do it, it doesn't really solve the problem.
+* **VPORTs in High I/O** - The only way that this really solves any problems is by if they were to extend SBI/CBI/SBIC/SBIS to another 16 registers, enough to bring it to the same approximate I/O pin count as the 2560. This would only take 16 x 8 x 4 = 512 opcodes (unlike other instruction set wishlist items like displacement on X, which would require more opcodes than are unused), and one might note that they seem to have left themselves room for this in the instruction set around the current SBI/CBI isns. But the need for updated toolchains would be painful indeed. This would generate the best product.
 * **VPORTs that can be remapped at runtime** - The stuff of library author's nightmares. You'd have some subset of the VPORTs (or maybe all of them) could be remapped. If you put the register for that in the high I/O space it could be written quickly. But this will cause unaware old code to break by writing to the wrong pins if it didn't know to check for it, and any code that used them (ie, code that is supposed to be fast) might have to check the mapping first. This is most like what was done on the XMegas, but also serves as a shining example of the over-complexity that I think doomed those parts to poor uptake and slow death. The best of these bad approaches would probably be to have VPORTG changed into say VPORTX. Could configure it with a register in the high I/O space so it was 2 cycle overhead to write (1 for LDI port number, 1 to OUT to register). That way all code for other ports wouldn't worry, and port G is present on the fewest parts so the least code would be impacted if ported, and would be straightforward to document

@@ -86,36 +86,51 @@ If your sketch requires that the B0 is used as the millis timer, for example:
 ## Identifying part family within sketch
 When writing code that may be compiled for a variety of target chips, it is often useful to detect which chip it is running on.
 
-This core provides an additional define depending on the number of pins on the part and it's family (which identifies it's peripheral selection) and the DxCore version:
-* `MEGATINYCORE_MCU` - The part number, as a number (ex, 3224 or 1607)
-* `MEGATINYCORE_SERIES` - 0, 1, or 2 depending on whether it's a 0, 1, or 2-series part.
-* `__AVR_ATtinyxyz__` - where z, and optionally x and y are substituted with those parts of the part number, ex: `__AVR_ATtinyxy4__` or `__AVR_ATtinyx02__`. The fully substituted form is provided by the compiler.
+This core provides an additional define depending on the number of pins on the part and it's family (which identifies it's peripheral selection) and the core version:
+* For megaTinyCore:
+  * `MEGATINYCORE_MCU` - The part number, as a number (ex, 3224 or 1607)
+  * `MEGATINYCORE_SERIES` - 0, 1, or 2 depending on whether it's a 0, 1, or 2-series part.
+  * `__AVR_ATtinyxyz__` - where z, and optionally x and y are substituted with those parts of the part number, ex: `__AVR_ATtinyxy4__` or `__AVR_ATtinyx02__`. The fully substituted form is provided by the compiler.
+* For DxCore:
+  * `__AVR_DA__`, `__AVR_DB__` `__AVR_DD__` or `__AVR_EA__` as appropriate, and
+*
 * `_AVR_PINCOUNT` - The number of physical pins
 * `_AVR_FLASH` - Flash size, in KB - these three can be used to print the human readable part number easily.
 
 ## Peripheral detection
-These do exactly what you expect.
-* `_AVR_AC_COUNT`
-* `_AVR_ADC_COUNT`
-* `_AVR_DAC_COUNT`
-* `_AVR_OPAMP_COUNT`
-* `_AVR_LUT_COUNT`
-* `_AVR_TCA_COUNT`
-* `_AVR_TCB_COUNT`
-* `_AVR_TCD_COUNT`
-* `_AVR_TWI_COUNT`
-* `_AVR_USART_COUNT`
+These do exactly what you expect: they give the number of instances of a particular peripheral present.
+* `_AVR_AC_COUNT` - 1, 2, or 3
+* `_AVR_ADC_COUNT` - 1, except on tinyAVR 1-series, where it may be 2.
+* `_AVR_DAC_COUNT` - 0, 1, or 3.
+* `_AVR_OPAMP_COUNT` - 0 except on DB-series, where it's 1-3.
+* `_AVR_LUT_COUNT` - 2 (tiny 0/1), 6 (DA/DB w/48 or 64 pins) otherwise 4.
+* `_AVR_SPI_COUNT` - 1 except for DA/DB which has 2.
+* `_AVR_TCA_COUNT` - 2 on DA/DB with 48+ pins and all EA, otherwise 1.
+* `_AVR_TCB_COUNT` - 1-5
+* `_AVR_TCD_COUNT` - 0 or 1, but they named the peripheral TCD0, not TCD, so there's hope... if you just can't get enough of this incredibly complicated peripheral. You could certainly do some strange things with more than one.
+* `_AVR_TWI_COUNT` - 1 or 2.
+* `_AVR_USART_COUNT` - 1 (tinyAVR 0, 1-series) or 2 to 6 otherwise.
+* `_AVR_ZCD_COUNT` - 1-3 on Dx-series only, else 0.
 
+If we find none of a peripheral that all supported parts have, we generate an error as this is indicative of something very strange going on which should not be ignored.
+Note that while tinyAVR 1-series parts may have 3 DACs, only DAC0 can output to a pin - the rest are what became the DACREF feature on later parts. Also, the AVR DD-series has a ZCD3 - but only that, and at the memory address of ZCD0 (it acts on different pins on the DD-series, though, which is likely why they gave it a different name). (&)
 
-## Identifying DxCore version
+## Identifying core version
 These define the version of the core:
-* `MEGATINYCORE` - megaTinyCore version number, as string. If it's "Unknown 2.5.0+" or similar, see below.
-* `MEGATINYCORE_MAJOR` - megaTinyCore major version
-* `MEGATINYCORE_MINOR` - megaTinyCore minor version
-* `MEGATINYCORE_PATCH` - megaTinyCore patch version
-* `MEGATINYCORE_RELEASED` - 1 if a released version, 0 if unreleased (ie, installed from github between releases).
-* `MEGATINYCORE_NUM` - megaTinyCore version, as unsigned long.
-
+* For megaTinyCore:
+  * `MEGATINYCORE` - megaTinyCore version number, as string. If it's "Unknown 2.5.0+" or similar, see below.
+  * `MEGATINYCORE_MAJOR` - megaTinyCore major version
+  * `MEGATINYCORE_MINOR` - megaTinyCore minor version
+  * `MEGATINYCORE_PATCH` - megaTinyCore patch version
+  * `MEGATINYCORE_RELEASED` - 1 if a released version, 0 if unreleased (ie, installed from github between releases).
+  * `MEGATINYCORE_NUM` - megaTinyCore version, as unsigned long.
+* For DxCore:
+  * `DXCORE` - DxCore version number, as string. If it's "Unknown 1.5.0+" or similar, see below.
+  * `DXCORE_MAJOR` - DxCore major version
+  * `DXCORE_MINOR` - DxCore minor version
+  * `DXCORE_PATCH` - DxCore patch version
+  * `DXCORE_RELEASED` - 1 if a released version, 0 if unreleased (ie, installed from github between releases).
+  * `DXCORE_NUM` - DxCore version, as unsigned long.
 ```c++
 Serial.println(MEGATINYCORE);
 Serial.print(MEGATINYCORE_MAJOR);
@@ -140,6 +155,10 @@ Unknown 2.5.0+
 2 5 1 0
 02050100
 ```
+Identical behavior can be seen with DxCore, just with different names for the variables.
+
+Note also that Serial.`printHexln()` can also be used; this is slightly smaller and faster, and has some additional useful features, See [Serial Reference](Ref_Serial.md)
+
 The various numeric representations of version are of interest to those writing libraries or code meant to be run by others. They are meant to ensure that there is always an easy way to test against specific versions (for when a release contains a regression), as well as an "X or better" type test. Warning: In some third party development environments, the `MEGATINYCORE` define is lost. Since that's how we tell people to detect if DxCore is in use (`#if defined(MEGATINYCORE)`) we now detect that and put define it as "Unknown 1.3.7+" (where the number changes whenever I happen to notice it while editing the file for a new version). `MEGATINYCORE_NUM` is by far the easiest way to detect if a certain fix or patch is present.
 
 
@@ -159,22 +178,23 @@ There are a number of macros for determining what (if any) features the core sup
 * `CORE_HAS_TIMER_RESUME = 0`- if defined as 1, the corresponding `resumeTCxn()` functions, which reinitialize them and return them to their normal core-integrated functions, are available. Not available on megaTinyCore.
 * `ADC_NATIVE_RESOLUTION = 10 or 12`- This is the maximum resolution, in bits, of the ADC without using oversampling.
 * `ADC_NATIVE_RESOLUTION_LOW = 8` - The ADC has a resolution setting that chooses between ADC_NATIVE_RESOLUTION, and a lower resolution.
-* `ADC_DIFFERENTIAL = 0 or 2` - This is defined as 1 if the part has a basic differential ADC (no gain, and V<sub>analog_in</sub> constrained to between Gnd and V<sub>Ref</sub>), and 2 if it has a full-featured one. It does not indicate whether said differential capability is exposed by the core. This is 0 for 0/1-series and 2 for 2-series. If it's defined as -1, it has differential capability in the way that classic AVRs do. See also `CORE_HAS_ANALOG_DIFF`
+* `ADC_DIFFERENTIAL = 0, 1, or 2` - This is defined as 1 if the part has a basic differential ADC (no gain, and V<sub>analog_in</sub> constrained to between Gnd and V<sub>Ref</sub>, as on the Dx-series), and 2 if it has a full-featured one. It does not indicate whether said differential capability is exposed by the core. This is 0 for 0/1-series and 2 for 2-series. Classic AVRs on ATTinyCore 2.0.0+ will define this as -1 if they have a differential ADC, as their ADC takes differential channels in a totally different way. See also `CORE_HAS_ANALOG_DIFF`
 * `SUPPORT_LONG_TONES = 0 or 1` - On some modern AVR cores, an intermediate value in the tone duration calculation can overflow (which is timed by counting times the pin is flipped) leading to a maximum duration of 4.294 million millisecond. This is worst at high frequencies, and can manifest at durations as short as 65 seconds worst case. Working around this, however, costs some flash, so megaTinyCore only supports long tones on parts with more than 8k of flash. If `SUPPORT_LONG_TONES` is defined as 1, as long as (duration * frequency)/500 < 4.294 billion, the duration will not be truncated. If it is defined as 0, the bug was known to the core maintainer and they chose not to fully correct it (eg, to save flash) but took the obvious step to reduce the impact, it will be truncated if (duration * frequency) exceeds 4.294 billion. If `SUPPORT_LONG_TONES` is not defined at all, the bug may be present in its original form, in which case the duration will be truncated if (duration * frequency) exceeds 2.14 billion.
 * `CORE_HAS_ANALOG_ENH = 1` - If defined as 1, `analogReadEnh()` (enhanced analogRead) is available. Otherwise, it is not; it is 1 for all parts on recent versions of megaTinyCore.
-* `CORE_HAS_ANALOG_DIFF = 0 or 1` - If defined as 1, `analogReadDiff()` (differential enhanced analogRead) is available. Otherwise, it is not. 1 for 2-series, 0 for others. It has same features as enhanced, except that it takes a differential measurement. If this is -128, (128 unsigned), it is a classic AVR, not a modern one with a differential ADC, and the core's analogRead implementation accepts the constants listed in the core documentation to make an analogRead
+* `CORE_HAS_ANALOG_DIFF = 0 or 1` - If defined as 1, `analogReadDiff()` (differential enhanced analogRead) is available. Otherwise, it is not. 1 for 2-series, 0 for others. It has same features as enhanced, except that it takes a differential measurement. If this is -128, (128 unsigned), it is a classic AVR, not a modern one with a differential ADC, and the core's analogRead implementation accepts the constants listed in the core documentation to make an analogRead of a differential pair.
 
 ## Hardware feature detection
-* `ADC_MAX_OVERSAMPLED_RESOLUTION = 13 or 17` - If either `CORE_HAS_ANALOG_ENH` or `CORE_HAS_ANALOG_DIFF` is 1, this will be defined as the maximum resolution obtainable automatically via oversampling and decimation using those functions.
-* `ADC_MAXIMUM_GAIN = 0 or 16` - The 2-series has a programmable gain amplifier on it's ADC; the others do not. If this is defined as a positive number, it is the maximum gain available (16 on the EA). If this is defined as 0 that means there is no way to amplify an analog signal we might want to measure (if this is a problem you need external op-amps). If this is defined as -1 (or 255 if stuffed into a uint8), there are one or more `OPAMP` peripherals available which could be directed towards the same purpose, though more deliberation and part specific work would be needed; they may be more flexible in some ways, but they are very rigid in others (for example, in that there is only one pin option for them. If it is defined as -128 (128 in a uint8) there is a gain stage on the differential ADC, but it is specified along with the pair of pins, not with separate configuration options. This also means that it's *NOT* a modern AVR! This is generally what is done on all classic AVRs with a differential ADC) so the available gain options depend on which pins are being measured, and there is a different procedure to use it, as detailed in the core documentation (ex, ATTinyCore 2.0.0 and later). If it is undefined, there is unheard-of no support exposed through the core, and it may not be a feature of the hardware at all.
+* `ADC_MAX_OVERSAMPLED_RESOLUTION` - If either `CORE_HAS_ANALOG_ENH` or `CORE_HAS_ANALOG_DIFF` is 1, this will be defined as the maximum resolution obtainable automatically via oversampling and decimation using those functions. 13 for 0/1-series tinies, 15 for Dx-series and 17 for tinyAVR 2-series and Ex-series.
+* `ADC_MAXIMUM_GAIN = 0 or 16` - The 2-series has a programmable gain amplifier on it's ADC; the others do not. If this is defined as a positive number, it is the maximum gain available (16 on the EA). If this is defined as 0 that means there is no way to amplify an analog signal we might want to measure (if this is a problem you need external op-amps). If this is defined as -1 (or 255 if stuffed into a uint8), there are one or more `OPAMP` peripherals available which could be directed towards that purpose, though more deliberation and part specific work would be needed; they may be more flexible in some ways, but they are very rigid in others (for example, in that there is only one pin option for them. If it is defined as -128 (128 in a uint8) there is a gain stage on the differential ADC, but it is specified along with the pair of pins, not with separate configuration options. This also means that it's *NOT* a modern AVR! This is generally what is done on all classic AVRs with a differential ADC) so the available gain options depend on which pins are being measured, and there is a different procedure to use it, as detailed in the core documentation (ex, ATTinyCore 2.0.0 and later). If it is undefined, there is no support exposed through the core, and it may not be a feature of the hardware at all.
 * `PORT_ID_INLVL = 0` - Some Dx-series parts have an input level option on a per-pin basis. TinyAVRs do not.
 
 ## Compatibility macros
 Occasionally Microchip has not kept the names of registers or bitfields consistent between families of parts, even when the function was not changed. In some cases these have even been changed between versions of the ATpack! The places where we've papered over identical register functionality with different names are:
-* The `GPIO`/`GPIOR` registers - The old names will work too, `GPIORn` is recommended for maximum compatibility.
-* The `TCA_SINGLE_EVACT` bitfield - This was changed to `TCA_SINGLE_EVACTA` on the Dx, as were it's group codes. Both names will work, permitting code portability from tinyAVR to Dx.
+* The `GPIO`/`GPIOR`/`GPR` registers - The old names will work too, `GPIORn` is recommended for maximum compatibility.
+* The `TCA_SINGLE_EVACT` bitfield - This was changed to `TCA_SINGLE_EVACTA` on the Dx and 2-series, as were it's group codes. Both names will work, permitting code portability - obviously, though, if you used TCA_SINGLE_EVACTB on a Dx, there's no hope to port the code to a 0/1-series: that functionality just doesn't exist
 * The `RTC_CLKSEL` group codes were renamed on non-tiny parts. Both names will work on both cores, permitting code portability from tinyAVR to Dx.
-* The `EVSYS` user registers were numbered but not named on 0/1-series. The new names work on those parts. The names with numbers only work on 0/1-series.
+* The `EVSYS` user registers were numbered but not named on 0/1-series. We provide defines that allow the newer, sane names to be used. The new names work on those parts. The names with numbers only work on 0/1-series.
+* Every bit in a multibit bitfield was changed to include an underscore between the rest of the name and the bit number. Yes, every single one. Both names will work on this core.
 
 
 ## Identifying Timers
@@ -188,13 +208,12 @@ Each timer has a number associated with it, as shown below. This may be used by 
 #define TIMERA1 0x08        // Not present on any tinyAVR; only on AVR DA and DB-series parts with at least 48 pins and AVR EA-series parts
 #define TIMERB0 0x20        // Present on all modern AVRs
 #define TIMERB1 0x21        // Not present on any tinyAVR 0-series or tinyAVR 1-series parts with 2, 4, or 8k of flash
-#define TIMERB2 0x22        // Not present on any tinyAVR
-#define TIMERB3 0x23        // Not present on any tinyAVR
-#define TIMERB4 0x24        // Not present on any tinyAVR
-#define TIMERB5 0x25        // Not present on any tinyAVR
+#define TIMERB2 0x22        // Not present on any tinyAVR, only 28+ pin Dx-series
+#define TIMERB3 0x23        // Not present on any tinyAVR, only 48/64-pin Dx-series
+#define TIMERB4 0x24        // Not present on any tinyAVR, only 64-pin Dx-series
 #define TIMERD0 0x40        // Present only on tinyAVR 1-series and AVR Dx-series parts.
 #define DACOUT 0x80         // Not a timer, obviously - but used like one by analogWrite()
-#define TIMERRTC 0x90       // Usable for millis only
-#define TIMERRTC_XTAL 0x91  // Usable for millis only
-#define TIMERRTC_XOSC 0x92  // Usable for millis only
+#define TIMERRTC 0x90       // Usable for millis only, not PWM
+#define TIMERRTC_XTAL 0x91  // Usable for millis only, not PWM
+#define TIMERRTC_XOSC 0x92  // Usable for millis only, not PWM
 ```
