@@ -84,7 +84,8 @@
  * (to be fair, you are allowed to use external RAM - which was a very rare feature indeed,
  */
 #if !defined(USE_ASM_TXC)
-  #define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART and 44b for each additional one
+  #define USE_ASM_TXC 2    // A bit slower than 1 in exchange for halfduplex.
+//#define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART and 44b for each additional one
 #endif
 
 #if !defined(USE_ASM_RXC)
@@ -100,8 +101,6 @@
 // The USE_ASM_* options can be disabled by defining them as 0 (in the same way that buffer sizes can be overridden)
 // The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file (as defines in pins_arduino.h) or boards.txt (By passing them as extra flags).
 // note that buffer sizes must be powers of 2 only.
-
-
 
 #if !defined(SERIAL_TX_BUFFER_SIZE)
   #if   (INTERNAL_SRAM_SIZE  < 1024)  // 128/256b/512b RAM
@@ -256,8 +255,14 @@ class HardwareSerial : public Stream {
     const uint8_t _module_number;
     uint8_t _pin_set;
 
-    uint8_t _state; /* 0bv000fphw */
+    volatile uint8_t _state; /* 0bvV__fphw */
+    // Of course this has to be volatile! We started writing it in 2.6.x from ISRs in opaque asm.
+    // Bit E ("There's an echo in here") is used if halfduplex mode is enabled, and when RXC reads the buffer,
+    // it also reads state, and if this bit is set, clears the bit and exits the ISR. The opposite of a parity
+    // error, which sets it's bit and exits the isr except that it doesn't care if it's already set) .
     // v = Overflow has happened at hardware level. Interrupts were disabled for too long.
+    // V = ring buffer overflow has occurred.
+    // _ = reserved
     // f = One or more framing errors have occurred.
     // p = One or more parity errors has occurred.
     // h = half duplex with open drain - disable RX while TX.
@@ -341,6 +346,7 @@ class HardwareSerial : public Stream {
     }
     uint8_t autoBaudWFB();
     void simpleSync();
+
     uint8_t autobaudWFB_and_wait(uint8_t n);
     uint8_t waitForSync();
     uint8_t autobaudWFB_and_request(uint8_t n = 2);

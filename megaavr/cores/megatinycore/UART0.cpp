@@ -50,6 +50,22 @@
        // The reason this is possible here and not elsewhere is because TXC only needs the USART, while the others need the HardwareSerial instance.
             :::);
     }
+#elif defined(USE_ASM_TXC) && USE_ASM_TXC == 2
+    ISR(USART0_TXC_vect, ISR_NAKED) {
+        __asm__ __volatile__(
+              "push      r30"     "\n\t"
+              "push      r31"     "\n\t"
+              :::);
+        __asm__ __volatile__(
+#if PROGMEM_SIZE > 8192
+              "jmp   _do_txc"     "\n\t"
+#else
+              "rjmp   _do_txc"    "\n\t"
+#endif
+              ::"z"(&Serial0));
+        __builtin_unreachable();
+    }
+
   #else
     ISR(USART0_TXC_vect) {
       // only enabled in half duplex mode - we disable RX interrupt while sending.
@@ -66,7 +82,7 @@
     }
   #endif
 
-  #if !(defined(USE_ASM_RXC) && USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/)
+  #if !(defined(USE_ASM_RXC) && (USE_ASM_RXC == 1 || USE_ASM_RXC == 2) && (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/)
     ISR(USART0_RXC_vect) {
       HardwareSerial::_rx_complete_irq(Serial);
     }
@@ -75,6 +91,7 @@
         __asm__ __volatile__(
               "push      r30"     "\n\t" //we start out 5-6 clocks behind the ball, then do 2 push + 2 ldi + 2-3 for jump = 11 or 13 clocks to _do_rxc (and dre is the same)
               "push      r31"     "\n\t"
+              "cbi   0x1F, 0"     "\n\t"
               :::);
         __asm__ __volatile__(
 #if PROGMEM_SIZE > 8192
@@ -95,14 +112,15 @@
   #else
     ISR(USART0_DRE_vect, ISR_NAKED) {
       __asm__ __volatile__(
-                "push  r30"    "\n\t"
-                "push  r31"    "\n\t"
+                "push  r30"       "\n\t"
+                "push  r31"       "\n\t"
+                "cbi   0x1F, 0"   "\n\t"
                 :::);
       __asm__ __volatile__(
 #if PROGMEM_SIZE > 8192
-                "jmp _do_dre"  "\n\t"
+                "jmp _do_dre"     "\n\t"
 #else
-                "rjmp _do_dre" "\n\t"
+                "rjmp _do_dre"    "\n\t"
 #endif
                 ::"z"(&Serial0));
       __builtin_unreachable();

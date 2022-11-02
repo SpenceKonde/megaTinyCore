@@ -117,6 +117,7 @@
   #define SERIAL_RS485_OTHER   (((uint16_t) USART_RS485_1_bm) << 8)// 0x0200 tinyAVR 0/1
 #else
   #define SERIAL_RS485         (((uint16_t) USART_RS485_bm)  << 8)// 0x0100
+  #define SERIAL_RS485_OTHER   (((uint16_t) USART_RS485_bm)  << 9)// 0x0200
 #endif
 #define   SERIAL_OPENDRAIN      ((uint16_t)                 0x0400)// 0x0400
 #define   SERIAL_LOOPBACK      (((uint16_t) USART_LBME_bm)    << 8)// 0x0800

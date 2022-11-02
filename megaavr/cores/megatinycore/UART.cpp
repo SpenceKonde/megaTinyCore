@@ -38,10 +38,14 @@
       #   ###  ####
       #      # # #
      ### ####  #  */
+    /* There ain't no such thing as a free lunch. Every new feature makes these worse.
+    USE_ASM_TXC 2 takes an additional 2 words/2 clocks vs 1
+    USE_ASM_RXC 2 takes an additional 5 words/5 clocks vs 1
+    RXC takes another 3 words/4 clocks if SDF errata compensation is needed.
+    Both USE_ASM_RXC and USE_ASM_TXC must be mode 2 for half duplex to work
 
-    /*************************************
-     Transmit Complete for Half Duplex
-      This is a more efficient and scalable version of the TXC ISR, the original implementation is below:
+    Transmit Complete for Half Duplex
+       This is a more efficient and scalable version of the TXC ISR, the original implementation is below:
 
 
 
@@ -57,17 +61,17 @@
         USART1.CTRLA = ctrla;
       }
 
-      in the USARTn.cpp, there's something like this that puts the low byte of the address of the USART into r30
-      after saving the register. Then it just jumps to this routine, which loads the (always the same) high byte!
-      and finishes up clearing out the other register we will need and saving the SREG. The logic is very simple,
-      It's just ugly. It gets worse for the other interrupts because we have to work with the class, not just the
-      hardware. Crucially the only thing different betweren the USARTs here isthe addressthey're working with.
-      Much of the benefit comes from being able to get the benefits of functionsin terms of flash use without the
-      penalties that come with using a true CALL instruction in an ISR (50-80 byte prologue + epiloge), and also
-      being aware that the X register can't do displacement when planning what goes in which regiseser... which
-      is not avr-gcc's strong suite, and often ends up displacing from the X with adiw/sbiw spam. savings for one
-      copy of it is small. Savings for several is gets large fast! Performance is better, but not much.
-      Biggest advantage is for 2-series with the dual UARTs, but potentially as little as 4k of flash.
+    In the USARTn.cpp, there's something like this that puts the low byte of the address of the USART into r30
+  after saving the register. Then it just jumps to this routine, which loads the (always the same) high byte!
+  and finishes up clearing out the other register we will need and saving the SREG. The logic is very simple,
+  It's just ugly. It gets worse for the other interrupts because we have to work with the class, not just the
+  hardware. Crucially the only thing different betweren the USARTs here isthe addressthey're working with.
+  Much of the benefit comes from being able to get the benefits of functionsin terms of flash use without the
+  penalties that come with using a true CALL instruction in an ISR (50-80 byte prologue + epiloge), and also
+  being aware that the X register can't do displacement when planning what goes in which regiseser... which
+  is not avr-gcc's strong suite, and often ends up displacing from the X with adiw/sbiw spam. savings for one
+  copy of it is small. Savings for several is gets large fast! Performance is better, but not much.
+  Biggest advantage is for 2-series with the dual UARTs, but potentially as little as 4k of flash.
 
     TXC isr  starts from this:
     ISR(USART1_TXC_vect, ISR_NAKED) {
@@ -78,10 +82,49 @@
                 :::);
     }
 
-
     */
 
-    #if USE_ASM_TXC == 1
+    #if USE_ASM_TXC == 2
+      void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_txc(void) {
+        __asm__ __volatile__(
+        "_do_txc:"                      "\n\t" // We start out 11-13 clocks after the interrupt
+            "push       r24"              "\n\t" // r30 and r31 pushed before this.
+            "in         r24,      0x3f"   "\n\t"  // Save SREG
+            "push       r24"              "\n\t"  //
+            "push       r25"              "\n\t"  //
+            "push       r28"              "\n\t"  //
+            "push       r29"              "\n\t"  //
+            "ldd        r28,   Z +  8"    "\n\t"  // Load USART into Y pointer, low byte
+            "ldi        r29,     0x08"    "\n\t"  // all USARTs are 0x08n0 where n is an even hex digit.
+            "ldd        r25,   Y +  5"    "\n\t"  // Y + 5 = USARTn.CTRLA read CTRLA
+          "_txc_flush_rx:"                "\n\t"  // start of rx flush loop.
+            "ld         r24,        Y"    "\n\t"  // Y + 0 = USARTn.RXDATAL rx data
+            "ldd        r24,   Y +  4"    "\n\t"  // Y + 4 = USARTn.STATUS
+            "sbrc       r24,        7"    "\n\t"  // if RXC bit is clear...
+            "rjmp       _txc_flush_rx"    "\n\t"  // .... skip this jump to remove more from the buffer.
+            "andi       r25,     0xBF"    "\n\t"  // clear TXCIE
+            "ori        r25,     0x80"    "\n\t"  // set RXCIE
+            "std     Y +  5,      r25"    "\n\t"  // store CTRLA
+//          "ldd        r24,   Z + 12"    "\n\t"
+//          "ahha,   always,     true"    "\n\t"  // wait, if we're in TXC, We are in half duplex mode, duuuuh
+//          "sbrs       r24,        2"    "\n\t"  // if we're in half duplex skip...
+//          "rjmp      .+ 6"              "\n\t"  // a jump over the next three instructoins. Do do them iff in half duplex only
+//          "ori        r24,     0x10"    "\n\t"  // add the "there's an echo in here" bit
+//          "std     Z + 12,      r24"    "\n\t"  // Store modified state
+            "pop        r29"              "\n\t"
+            "pop        r28"              "\n\t"
+            "pop        r25"              "\n\t"
+            "pop        r24"              "\n\t"  // pop r24 to get old SREG back
+            "out       0x3F,      r24"    "\n\t"  // restore sreg.
+            "pop        r24"              "\n\t"  // pop r24 restore it
+            "pop        r31"              "\n\t"  // and r31
+            "pop        r30"              "\n\t"  // Pop the register the ISR did
+            "reti"                        "\n"    // return from the interrupt.
+            ::
+          );
+        __builtin_unreachable();
+      }
+    #elif USE_ASM_TXC == 1
       void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_txc(void) {
         __asm__ __volatile__(
           "_do_txc:"                  "\n\t"  //
@@ -93,13 +136,13 @@
           "_txc_flush_rx:"            "\n\t"  // start of rx flush loop.
             "ld       r24,        Z"  "\n\t"  // Z + 0 = USARTn.RXDATAL rx data
             "ldd      r24,   Z +  4"  "\n\t"  // Z + 4 = USARTn.STATUS
-            "sbrs     r24,        7"  "\n\t"  // if RXC bit is set...
+            "sbrc     r24,        7"  "\n\t"  // if RXC bit is set...
             "rjmp     _txc_flush_rx"  "\n\t"  // .... skip this jump to remove more from the buffer.
             "ldd      r24,   Z +  5"  "\n\t"  // Z + 5 = USARTn.CTRLA read CTRLA
             "andi     r24,     0xBF"  "\n\t"  // clear TXCIE
             "ori      r24,     0x80"  "\n\t"  // set RXCIE
             "std   Z +  5,      r24"  "\n\t"  // store CTRLA
-            "pop      r24"            "\n\t"  // pop r24, xcontaining old sreg.
+            "pop      r24"            "\n\t"  // pop r24, containing old sreg.
             "out     0x3f,      r24"  "\n\t"  // restore it
             "pop      r24"            "\n\t"  // pop r24 to get it's old value back
             "pop      r31"            "\n\t"  // and r31
@@ -123,7 +166,8 @@
       }
 
     */
-    #if (USE_ASM_RXC == 1 && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) )
+
+    #if ((USE_ASM_RXC == 1) && (SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) )
       void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_rxc(void) {
         __asm__ __volatile__(
           "_do_rxc:"                      "\n\t" // We start out 11-13 clocks after the interrupt
@@ -143,7 +187,7 @@
             "andi       r18,      0xEF"   "\n\t"
             "std      Y + 6,       r18"   "\n\t" // turn off SFD interrupt before reading RXDATA so we don't corrupt the next character.
   #endif
-            "ldd        r24,    Y +  1"   "\n\t" // Y + 1 = USARTn.RXDATAH - load high byte first - 16 clocks from here to next endif
+            "ldd        r24,    Y +  1"   "\n\t" // Y + 1 = USARTn.RXDATAH - load high byte first - 16 clocks from here to next
             "ld         r25,         Y"   "\n\t" // Y + 0 = USARTn.RXDATAL - then low byte of RXdata
             "andi       r24,      0x46"   "\n\t" // extract framing, parity bits.
             "lsl        r24"              "\n\t" // leftshift them one place
@@ -151,6 +195,17 @@
             "or         r19,       r24"   "\n\t" // bitwise or with errors extracted from _state
             "sbrc       r24,         2"   "\n\t" // if there's a parity error, then do nothing more (note the leftshift).
             "rjmp  _end_rxc"              "\n\t" // Copies the behavior of stock implementation - framing errors are ok, apparently...
+    //#if USE_ASM_TXC == 2 && USE_ASM_RXC == 2
+            //"sbic      0x1F,         0"   "\n\t"
+            //"sbi       0x01,         2"   "\n\t"
+            //"sbrs       r19,         4"   "\n\t" // Is there an echo in here?
+            //"rjmp       storechar"      "\n\t" // if not skip these next isns       "\n\t"
+            //"sbic      0x1F,         0"   "\n\t"
+            //"sbi       0x02,         4"   "\n\t"
+            //"andi       r19,      0xEF"   "\n\t" // clear t
+            //"rjmp  _end_rxc"              "\n\t"
+    //       "storechar:"
+    //#endif
             "ldd        r28,    Z + 13"   "\n\t" // load current head index
             "ldi        r24,         1"   "\n\t" // Clear r24 and initialize it with 1
             "add        r24,       r28"   "\n\t" // add current head index to it
@@ -174,8 +229,9 @@
             "adc        r29,       r18"   "\n\t" // carry - Y is now pointing 17 bytes before head
             "std     Y + 17,       r25"   "\n\t" // store the new char in buffer
             "std     Z + 13,       r24"   "\n\t" // write that new head index.
-          "_end_rxc:"                     "\n\t" //
-            "std     Z + 12,       r19"   "\n\t" // record new state including new errors 9 pops + 1 out + 1 reti +1 std = 24 clocks
+          "_end_rxc:"                     "\n\t"
+            "std     Z + 12,       r19"   "\n\t" // record new state including new errors
+                                       // Epilogue: 9 pops + 1 out + 1 reti +1 std = 24 clocks
             "pop        r29"              "\n\t" // Y Pointer was used for head and usart.
             "pop        r28"              "\n\t" //
             "pop        r25"              "\n\t" // r25 held the received character
@@ -566,7 +622,7 @@
       #endif
       const uint8_t* muxrow = &(_usart_pins[mod_nbr + mux_set][0]);
       if ((enmask & 0x40 && !(enmask & 0x08))) {
-        pinMode(muxrow[0], OUTPUT); // If and only if TX is enabled and open drain isn't should the TX pin be output.
+        pinMode(muxrow[0], OUTPUT); // If and only if TX is enabled and open drain isn't should the TX interrupt be used. .
       } else if (enmask & 0x50) { // if it is enabled but is in open drain mode, or is disabled, but loopback is enabled
         // TX should be INPUT_PULLUP.
         pinMode(muxrow[0], INPUT_PULLUP);
@@ -620,7 +676,7 @@
       // Disable receiver and transmitter as well as the RX complete and the data register empty interrupts.
       // TXCIE only used in half duplex - we can just turn the damned thing off yo!
       volatile USART_t * temp = _hwserial_module; /* compiler does a slightly better job with this. */
-      temp -> CTRLB &= 0; //~(USART_RXEN_bm | USART_TXEN_bm);
+      temp -> CTRLB = 0b01011010; // clear all the flags tht need a 1 written to clear
       temp -> CTRLA &= 0; //~(USART_RXCIE_bm | USART_DREIE_bm | USART_TXCIE_bm);
       temp -> STATUS =  USART_TXCIF_bm; // want to make sure no chanceofthat firing in error. TXCIE only used in half duplex
       // clear any received data
@@ -748,6 +804,7 @@
           (*_hwserial_module).CTRLA = ctrla;
         } else {
           // Enable "data register empty interrupt"
+
           (*_hwserial_module).CTRLA |= USART_DREIE_bm;
         }
         return 1;
