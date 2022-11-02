@@ -409,7 +409,7 @@ uint8_t TwoWire::specialConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, 
   #else
     if (__builtin_constant_p(sda_hold_dual))  {
       if (sda_hold_dual > 3) {
-        badArg("Only 0, 1, 2 and 3 are valid SDA hold options. Suggest using the named constants.")
+        badArg("Only 0, 1, 2 and 3 are valid SDA hold options. Suggest using the named constants.");
       }
     } else if (sda_hold_dual > 3) {
       ret |= 0x08;
