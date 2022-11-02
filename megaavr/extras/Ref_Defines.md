@@ -92,8 +92,8 @@ This core provides an additional define depending on the number of pins on the p
   * `MEGATINYCORE_SERIES` - 0, 1, or 2 depending on whether it's a 0, 1, or 2-series part.
   * `__AVR_ATtinyxyz__` - where z, and optionally x and y are substituted with those parts of the part number, ex: `__AVR_ATtinyxy4__` or `__AVR_ATtinyx02__`. The fully substituted form is provided by the compiler.
 * For DxCore:
-  * `__AVR_DA__`, `__AVR_DB__` `__AVR_DD__` or `__AVR_EA__` as appropriate, and
-*
+  * `__AVR_DA__`, `__AVR_DB__` `__AVR_DD__` or `__AVR_EA__` as appropriate.
+* `_AVR_FAMILY` - "T0", "T1", "T2", "DA", "DB", "DD" or "EA"
 * `_AVR_PINCOUNT` - The number of physical pins
 * `_AVR_FLASH` - Flash size, in KB - these three can be used to print the human readable part number easily.
 
