@@ -472,7 +472,7 @@ uint8_t TWI0_checkPinLevel(void) {
 }
 
 #if defined(TWI_DUALCTRL) // full version for parts with dual mode and likely input level too
-  uint8_t TWI0_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smbuslvl_dual. uint8_t sda_hold_dual) {
+  uint8_t TWI0_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smbuslvl_dual, uint8_t sda_hold_dual) {
     uint8_t cfg = TWI0.CTRLA & 0x03;
     sda_hold <<= 2; // get these into the right place in the byte
     sda_hold_dual <<= 2;
@@ -482,7 +482,7 @@ uint8_t TWI0_checkPinLevel(void) {
     if (longsetup) {
       cfg |= 0x10;
     }
-    cfg |= sdahold;
+    cfg |= sda_hold;
     TWI0.CTRLA = cfg;
     #if defined(TWI0_DUALCTRL)
       cfg_dual = TWI1.DUALCTRL & 0x03;
@@ -504,7 +504,7 @@ uint8_t TWI0_checkPinLevel(void) {
     if (longsetup) {
       cfg |= 0x10;
     }
-    cfg |= sdahold;
+    cfg |= sda_hold;
     TWI0.CTRLA = cfg;
     return 0; // return success - all other errors are checked for before this is called.
   }
@@ -666,7 +666,7 @@ uint8_t TWI1_checkPinLevel(void) {
 }
 
 // All devices with TWI1 have dual mode and the most have the smbus levels; the exceptions are caught before this is called
-uint8_t TWI1_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smbuslvl_dual. uint8_t sda_hold_dual) {
+uint8_t TWI1_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smbuslvl_dual, uint8_t sda_hold_dual) {
   uint8_t cfg = TWI1.CTRLA & 0x03;
   if (smbuslvl) {
     cfg |= 0x40;
@@ -674,7 +674,7 @@ uint8_t TWI1_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smb
   if (longsetup) {
     cfg |= 0x10;
   }
-  cfg |= sdahold;
+  cfg |= sda_hold;
   TWI1.CTRLA = cfg;
   #if defined(TWI1_DUALCTRL)
     cfg_dual = TWI1.DUALCTRL & 0x03;
