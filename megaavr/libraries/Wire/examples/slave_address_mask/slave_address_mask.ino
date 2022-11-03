@@ -60,13 +60,21 @@ void setup() {
   // 2nd argument: listen to general broadcast or "general call" (address 0x00)
   // 3rd argument: bits 7-1: second address if bit 0 is set true
   //               or bit mask of an address if bit 0 is set false
-  Wire.begin(0x54, true, WIRE_ADDRESS_MASK(0xF0));
-  // Hence, we will match any address that with 4 (in 7 bits, 0xF0 will be 0b1111000, so the 4 high bits will always match).
+  //               or use WIRE_ALT_ADDRESS(7-bit address)
+  //               or use WIRE_ADDRESS_MASK(7-bit address mask)
+  // Those macros shift the address and put the appropriate LSBit in, but make the authors intent clearer.
+  // 7-bit addresses and masks are between 0x01 and 0x7F. Higher values will produce a warning about implicit truncation
+  // (generally happens because you shifted the value you passed to the above macros first - either pass the number manually shifted
+  // or use the macro on the unshifted value.
+  Wire.begin(0x54, true, WIRE_ADDRESS_MASK(0x78));
+  // This will start TWI slave with an "address" of 0x54, but because it will ignore the 4 most significant bits,
+  // only the 3 low bits of the address will be used, so it could just as well have been 0x74 or 0x04 or 0x4C. It will
+  // match addresses 0bxxxx100 where x is a don't-care.
   Wire.onReceive(receiveDataWire);
 
   // Initialize serial port - if you need to swap pins, remember to do so.
   // MySerial.swap(1);
-  MySerial.begin(115200);       // Uses 115200 baud - this is the 2020's, and these are modern AVRs.
+  MySerial.begin(115200);
 }
 
 void loop() {
