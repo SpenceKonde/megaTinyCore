@@ -1259,7 +1259,7 @@ event::gen::generator_t Event::gen_from_peripheral(TCA_t& timer, uint8_t event_t
   uint8_t retval = -1;
   if (event_type < 5) {
     #if defined(TINY_0_OR_1_SERIES)
-      if (timer == &TCA0) {
+      if (&timer == &TCA0) {
         retval = event_type +2;
       }
     #else
