@@ -1103,7 +1103,8 @@ static void _long_soft_event(uint8_t channel, uint8_t length) {
  * @param state Optional parameter. Defaults to true
  */
 
-event::gen::generator_t Event::gen_from_peripheral(TCB_t& timer, uint8_t event_type) {
+event::gen::generator_t Event::gen_from_peripheral(__attribute__((unused))TCB_t& timer, __attribute__((unused)) uint8_t event_type) {
+  // Both args marked potentially unused, because on 0 and 1-series parts the generator numbers depend on the channel and it's a giant mess.
   uint8_t gentype = -1;
   #if defined(TINY_0_OR_1_SERIES)
     badCall("gen_from_peripheral() does not support channel-specific generators. The TCBs on 0/1-series are.");
@@ -1192,7 +1193,7 @@ event::user::user_t Event::user_from_peripheral(TCB_t& timer, uint8_t user_type)
 }
 
 
-event::gen::generator_t Event::gen_from_peripheral(AC_t& comp)
+event::gen::generator_t Event::gen_from_peripheral(__attribute__((unused)) AC_t& comp) // mark as potentially unused so we don't get warning w/error
 {
   #if defined(TINY_1_16K_PLUS)
     badCall("gen_from_peripheral() does not support channel-specific generators. The AC's larger 1-series are.");
@@ -1258,7 +1259,9 @@ event::gen::generator_t Event::gen_from_peripheral(TCA_t& timer, uint8_t event_t
   uint8_t retval = -1;
   if (event_type < 5) {
     #if defined(TINY_0_OR_1_SERIES)
-      retval = event_type +2;
+      if (timer == &TCA0) {
+        retval = event_type +2;
+      }
     #else
       if (&TCA0 == &timer) {
         retval = event_type + 0x80;
