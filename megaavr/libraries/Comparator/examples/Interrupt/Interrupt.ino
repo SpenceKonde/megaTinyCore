@@ -11,7 +11,7 @@
 | external wiring. Comparing an applied voltage with an internally      |
 | generated voltage is one of the most common applications of the ACs.  |
 |                                                                       |
-| Indeed, plausible use cases that involve other modes of opperation    |
+| Indeed, plausible use cases that involve other modes of operation    |
 | not exactly common, particularly in Arduino-land.                     |
 |                                                                       |
 |                                                                       |

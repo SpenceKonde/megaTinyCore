@@ -469,8 +469,8 @@
  * That's why it's not documented or in Arduino.h, but this subfile - it's about as blunt an instrument as it gets, and resorting to
  * methods like this can result in bizarre and unexpected behavior that can be difficult to diagnose if you don't suspect clock issues
  *
- * Yes, the nomenclature is strange (I'm refering to the "x"; commonly used for multiplication yet the mathematical opperation in question
- * is divison. The symbol for that is not valid in names in C). I didn't start it, but there's no obviously better option, so X it stays.
+ * Yes, the nomenclature is strange (I'm referring to the "x"; commonly used for multiplication yet the mathematical operation in question
+ * is division. The symbol for that is not valid in names in C). I didn't start it, but there's no obviously better option, so X it stays.
  */
 #define  _setPrescale2x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_2X_gc | CLKCTRL_PEN_bm)))
 #define  _setPrescale4x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_4X_gc | CLKCTRL_PEN_bm)))

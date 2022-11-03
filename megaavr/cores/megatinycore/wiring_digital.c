@@ -190,7 +190,7 @@ void pinMode(uint8_t pin, uint8_t mode) {
   // by 2 bytes and one clock.
   // If it's in the X register though, things that would be a load with displacement are instead turned into a adiw/ld/sbiw sequence.
   // (since X doesn't do displacement) so in that case it would be 1 word longer and 3 clocks slower.
-  // Hand-written asssembly that explointed the fact that this never results in a carry (and hence only acts on one byte)
+  // Hand-written assembly that explointed the fact that this never results in a carry (and hence only acts on one byte)
   // saves anotther 1 clock and
   port_base +=(uint8_t) digitalPinToBitPosition(pin) | (uint8_t) 0x10;
   bit_mask = *port_base;

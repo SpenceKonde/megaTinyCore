@@ -676,7 +676,7 @@
       // Disable receiver and transmitter as well as the RX complete and the data register empty interrupts.
       // TXCIE only used in half duplex - we can just turn the damned thing off yo!
       volatile USART_t * temp = _hwserial_module; /* compiler does a slightly better job with this. */
-      temp -> CTRLB = 0b01011010; // clear all the flags tht need a 1 written to clear
+      temp -> CTRLB = 0b01011010; // clear all the flags that need a 1 written to clear
       temp -> CTRLA &= 0; //~(USART_RXCIE_bm | USART_DREIE_bm | USART_TXCIE_bm);
       temp -> STATUS =  USART_TXCIF_bm; // want to make sure no chanceofthat firing in error. TXCIE only used in half duplex
       // clear any received data

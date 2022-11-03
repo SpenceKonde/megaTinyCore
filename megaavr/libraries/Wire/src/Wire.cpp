@@ -165,7 +165,7 @@ bool TwoWire::swap(uint8_t state) {
         #endif
         false)) {
           if (state > 3) {
-            badArg("The requested swap level is known at compiletime to be one that is not available on any part. (did you pass a bitmask instead of a number?)");
+            badArg("The requested swap level is known at compile time to be one that is not available on any part. (did you pass a bitmask instead of a number?)");
           } else {
             badArg("The requested swap level is not available on this part.");
             return false;
@@ -336,7 +336,7 @@ void TwoWire::endSlave(void) {
  *@brief      specialConfig allows configuring of wacky features.
  *            smbus evel: Vihmin and Vilmax are normally 0.7*Vdd (or VDDIO on MVIO pins) and 0.3*Vdd respectively. This option sets them to the SMBus 3.0 levels:
  *            In this mode, any voltage below 0.8V is guaranteed to be a LOW, and anything above 1.35 or 1.45 (see electrical characteristics in datasheet)
- *            This is of great utility for communication with lower voltage devices, especially where you don't have MVIO. Can also be set independantly if dual mode used.
+ *            This is of great utility for communication with lower voltage devices, especially where you don't have MVIO. Can also be set independently if dual mode used.
  *            loongsetup: The setup times are normally 4 system clocks, however this can be doubled for disagreeable devices and/or adverse bus conditions
  *            Four options are available for the SDA hold times. sda_hold_dual handles the dual pins. This is used for SMBus 2.0 compatibility.
  *              WIRE_SDA_HOLD_OFF 0 - hold time off (default)
@@ -369,13 +369,13 @@ uint8_t TwoWire::specialConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, 
         badCall("the smbus level option is not present on these parts. You need a Dx for that.");
       }
     // the above will always fold to nothing or and error, and does not bloat binary
-    // but we may not know at compiletime what will be passed, so we have to have a runtime test.
+    // but we may not know at compile time what will be passed, so we have to have a runtime test.
     }
       else if (smbuslvl || smbuslvldual) {
         ret         |= 1; //
         smbuslvl     = 0; // We don't HAVE this option here, so zero out the option we pass along.
        //#if defined(TWI_DUALCTRL)
-       //   smbuslvldual = 0; // no need to 0 - variable is no longer used, w/out dual ctrl, theres also not going to be smbus levels.
+       //   smbuslvldual = 0; // no need to 0 - variable is no longer used, w/out dual ctrl, there's also not going to be smbus levels.
        //#endif
       }
     }
@@ -400,8 +400,8 @@ uint8_t TwoWire::specialConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, 
         badCall("Dual Mode is not supported on this part, smbuslvl_dual must be omitted or 0");
       }
     }
-    else { //not compiletime constant so have to check at runtime
-      if (sda_hold_dual) { // only hav to do SDA hold 0 - already caught bad input levels.
+    else { //not compile time constant so have to check at runtime
+      if (sda_hold_dual) { // only have to do SDA hold 0 - already caught bad input levels.
         ret |= 2; //error code.
         //sda_hold_dual= 0; not needed to zero out if no dual mode, we don't use this value anmore.
       }

@@ -115,6 +115,8 @@
 /*   :                                                    */
 /* 4.1 WestfW: put version number in binary.              */
 /**********************************************************/
+/* *INDENT-OFF* - astyle hates optiboot                   */
+/**********************************************************/
 
 #define OPTIBOOT_MAJVER 9
 #define OPTIBOOT_MINVER 1
@@ -361,7 +363,7 @@ int main(void) {
       //   The operation of the bootloader and it's recognition of entry conditions valid or invalid shall not be
       //   impacted in any way by the application, and even a maximally perverse application shalt not prevent the
       //   bootloader from running when a valid entry condition occurs.
-      // Therefor, it is unfit for use by those without HV programmers unless PA0 is left in the default UPDI mode,
+      // Therefore, it is unfit for use by those without HV programmers unless PA0 is left in the default UPDI mode,
       // and where reprogramming via UPDI is not unduely inconvenient. An application which never triggered a
       // software reset (for example, blink or bare minimum) will leave the chip in a "bricked" state, requiring
       // UPDI programming to unbrick and restore bootloader functionality.
@@ -392,7 +394,7 @@ int main(void) {
     | This is a funcamental conceptual flaw in the ideal of the invisible
     | bootloader - but even when not using the bootloader, megaTinyCore
     | and DxCore will do the right thing (check reset flags, if zero, trigger
-    | SWR, otherwise clear and stash result in GPIOR0 for user retrival if
+    | SWR, otherwise clear and stash result in GPIOR0 for user retrieval if
     | needed). It is critical that we never run the bootloader or application
     | if no reset cause is reported, because both the cores and Optiboot assume
     | that all peripherals are in their default configuration at startup, and

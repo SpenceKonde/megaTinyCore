@@ -78,7 +78,7 @@ If you know the bus capacitance, you can calculate the maximum value with that u
 
 None of that accounts for the fact that wires, particularly long ones, have non-zero inductance, and the impact of this on rise and fall times is harder to calculate. *I2C was designed to be used between ICs on a circuit board* and long wires will degrade it's performance, requiring stronger pullups and/or lower speeds than you would otherwise be able to use - note that while lowering the speed allows you to use weaker pullups or survive a higher bus capacitance, the minimum pullup value (hence strongest pullups) that can be used is fixed. Most people don't calculate the pullup values - we take an educated guess, and the window is wide enough that standard mode is rarely a problem. For small numbers of parts at standard speed, **4.7k is a good default value**, and *1.5-10k will generally be fine*. At higher frequencies, a smaller resistor might be required, see `Wire.setClock()` for the recommended values. When pulling up to a voltage lower than 5V, you typically need stronger pullups - but this is not usually a problem, since the minimum pullup value also falls.
 
-The internal pullups, however, are typically in the area of 30-50k. That may be okay for 2 devices at standard speed. Even 3-4 devices gets dicey, and wiring could sink even the 2-device case. By default, most classic AVR cores, including the official ones, turn on the internal pullups - giving a default configuration that would work under simple conditions. But as more devices were added, the bus would fail unpredictably, and the failures are often difficult to pin down and intermittent (one would typically wind up debugging a system right on the edge of failing). We don't enable them by default. If you want to use the internal (insufficient) pullups instead of using external ones, go ahead, calling `Wire.usePullups()` after choosing the pins- but do so only with the knowledge that it only has a chance of working on small networks, and may be unreliable or unusable on larger one.  *Wire.usePullups() is intended for debuggign only! If it fixes anything, check the external pullups, becasue one or both are absent or not connected properly*
+The internal pullups, however, are typically in the area of 30-50k. That may be okay for 2 devices at standard speed. Even 3-4 devices gets dicey, and wiring could sink even the 2-device case. By default, most classic AVR cores, including the official ones, turn on the internal pullups - giving a default configuration that would work under simple conditions. But as more devices were added, the bus would fail unpredictably, and the failures are often difficult to pin down and intermittent (one would typically wind up debugging a system right on the edge of failing). We don't enable them by default. If you want to use the internal (insufficient) pullups instead of using external ones, go ahead, calling `Wire.usePullups()` after choosing the pins- but do so only with the knowledge that it only has a chance of working on small networks, and may be unreliable or unusable on larger one.  *Wire.usePullups() is intended for debuggign only! If it fixes anything, check the external pullups, because one or both are absent or not connected properly*
 
 The ease of using multiple voltages on an open drain bus was mentioned above, but it's worth elaborating a bit here. The standard certainly doesn't guarantee that a 5V device will recognize an I2C line only pulled up to 3.3V as high (though it generally will) - but on the AVR Dx and AVR Ex parts, there's an option to let you do far better than that: "SMBUS 3.0" voltage levels. This option also, by lowering the threshold voltages, can help cope with high bus capacitance (be careful of the case where devices running at over 3.3v are present which don't have this option enabled, especially if pushing to higher clock speeds. )
 
@@ -118,7 +118,7 @@ There is a right and a wrong order to call the configuration functions. This ord
 1. Wire.swapModule(&TWI1); (AVR DA/DB for special use cases only)
 2. Wire.swap(pinset) or Wire.pins(sclpin, sdapin).
 3. Wire.enableDualMode(fmplus_enable); (AVR Dx and megaAVR 0-series only, if needed)
-4. Wire.usePullups() *for debugging only - if this fixes it, take it out and add appripriate external pullups)*
+4. Wire.usePullups() *for debugging only - if this fixes it, take it out and add appropriate external pullups)*
 5. Wire.begin() and/or Wire.begin(address, ...)
 6. Wire.setClock(); (effects master mode only, if needed)
 7. Wire.specialConfig() (optional)
@@ -241,7 +241,7 @@ The setup time for SDA can be either 4 or 8 cycles. May be required for compatib
 The hold time can be turned off, or set to 50, 300 or 500 ns. A non-default option is required to comply with SMBus protocol.
 
 **Dual mode options**
-Both the voltage levels and the hold times can be configured for the dual mode pins independantly from the master/slave pins on parts with those features.
+Both the voltage levels and the hold times can be configured for the dual mode pins independently from the master/slave pins on parts with those features.
 
 
 **Constants associated with specialConfig()**.

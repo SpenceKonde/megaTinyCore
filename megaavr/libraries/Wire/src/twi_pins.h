@@ -49,12 +49,11 @@ uint8_t TWI0_checkPinLevel();
   bool    TWI1_swap(uint8_t state);
   void    TWI1_usePullups();
   uint8_t TWI1_checkPinLevel();
-//  Much of this is commeted out because nothing with a TWI1 doesn't have SMBus levels
-//  #if defined(TWI_DUALCTRL)
-      uint8_t TWI1_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smbuslvl_dual. uint8_t sda_hold_dual);
-//  #else
-//    uint8_t TWI1_setConfig(bool longsetup, uint8_t sda_hold);
-//  #endif
-  #endif
-
+  //  Much of this is commented out because nothing with a TWI1 doesn't have SMBus levels
+  //  #if defined(TWI_DUALCTRL)
+  uint8_t TWI1_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smbuslvl_dual. uint8_t sda_hold_dual);
+  //  #else
+  //    uint8_t TWI1_setConfig(bool longsetup, uint8_t sda_hold);
+  //  #endif
+#endif
 #endif /* TWI_PINS_H */

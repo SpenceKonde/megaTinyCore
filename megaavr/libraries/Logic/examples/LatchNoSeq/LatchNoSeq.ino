@@ -25,7 +25,7 @@
 | The sky (well, and the number of LUTs) is the limit!!                 |
 |                                                                       |
 | Warning: This involves EVSYS, which is very different on tiny0/1 vs   |
-| everything else.  This code is not directly usable on other parts     | 
+| everything else.  This code is not directly usable on other parts     |
 |***********************************************************************/
 
 #include <Logic.h>

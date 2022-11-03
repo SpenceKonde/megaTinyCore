@@ -485,24 +485,24 @@ Not enabled. Ugly ways to get delays at very small flash cost.
  * bounded but variable, For example, you get the port base register, amd now you need the PIMnCTRL register. n is 0-7, and the
  * PINnCTRL registers are located at +0x10 to +0x17, and ports are 32-bit aligned, so adding that to the register will never change the high
  * byte of the address. These are sometimes used when a somewhat time-sensitive function which is called very frequently has to performs
- * such manipulations. Don't use unless you ae damned certain that you meet the conditions, and the funvtion is called constantly
+ * such manipulations. Don't use unless you ae damned certain that you meet the conditions, and the function is called constantly
  * Mostly intended for internal use
  */
 #define _MAKEPTR_DISPLACE(newptt, highbyte, lowbyte) ((uint8_t*) (__asm__ __volitile("ldi %0B, %1 " "\n\t" "mov %0A, %2 " "\n\t":"+b"((uint16_t) newptr):"M" ((uint8_t) highbyte), "r" ((uint8_t ), lowbyte))
 #define          _MAKEPTR(newptt, highbyte, lowbyte) ((uint8_t*) (__asm__ __volitile("ldi %0B, %1 " "\n\t" "mov %0A, %2 " "\n\t":"+e"((uint16_t) newptr):"M" ((uint8_t) highbyte), "r" ((uint8_t ), lowbyte))
 
-/* Very similar to te above. Passed a poimter as two bytes, the high byte constant and the low byte mot, this finds use in the same sort
- * of situatios/ See tje I/O headers: each class of peripherals often has the same high byte for all addresses. Ports (0x0400, 0x0420, 0x0440
- * and so on. The most freqently used functions get speciakl attention paid to this as a small gain adds up for the most commonly called functons
+/* Very similar to the above. Passed a poimter as two bytes, the high byte constant and the low byte not, this finds use in the same sort
+ * of situatios/ See the I/O headers: each class of peripherals often has the same high byte for all addresses. Ports (0x0400, 0x0420, 0x0440
+ * and so on. The most freqently used functions get speciakl attention paid to this as a small gain adds up for the most commonly called functions
  * usage is typically sdmething like
  *    lowbyte = (_SWAP(usartnbr)); // passed from,elsewhre io the code, which must be free of bugs!
  *    lowbyte <<= 1;(
  *    volatile uint8_t *myptr l
  *    _MAKEPTR_DISPLACE(myptr. 0x08, lowbyte)
  * Now, myptr points to the start of the specified USART, in just 2 clock cycles, instead of the typical 4 the compiler creates.
- * most helful under the most constrained conditions (in an ISR, or a core fuction that gets called right and left.
+ * most helful under the most constrained conditions (in an ISR, or a core function that gets called right and left.
  *
- * _MAKEPTR should be used when you are only reading from that one address, or consective addresses starting there, so it can use the X, Y or Z register
+ * _MAKEPTR should be used when you are only reading from that one address, or consecutive addresses starting there, so it can use the X, Y or Z register
  * _MAKEPTR_DISPLACE uses only X or Y register, and should be used if you expect to be accessing registers with an address up to 63 higher and in
  * consecutive order, This will usually be enough to convince the compiler to not then move it into a different pointer.
  *
@@ -511,7 +511,7 @@ Not enabled. Ugly ways to get delays at very small flash cost.
 #define _SETHIGHCONST(a,b) __asm__ __volatile__ ("ldi %0B,  %1"  "\n\t" :"+d"((uint16_t)(a)):"M"((uint8_t) b))
 #define        _CLRHIGH(a) __asm__ __volatile__ ("eor %0B, %0B"  "\n\t" :"+r"((uint16_t)(a)))
 /* More dumb macros to allow surgery on half of a16-bit (likely poimter) value in minimum time.
- * Clear (set to 0), setting to, setting to an existing (preferably local and already in a register) variable vaue
+ * Clear (set to 0), setting to, setting to an existing (preferably local and already in a register) variable value
  * and
  * _SETHIGH(a,b) sets the high byte of 16-bit local variable to the variable b. This makes no guarantees about it being able to be used as a pointer
  * _SETHIGHCONST(a,b) As above, but b is a compile time known constant, rather than a previously calculated result
