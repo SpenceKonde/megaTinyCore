@@ -24,6 +24,10 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Released versions
 
+### 2.6.3 (2.6.2 respin due to json error)
+* Correct installation error from trying to install non-functional withdrawn version of toolchain. 
+* Correct missing comma in Comparator.cpp. 
+
 ### 2.6.2 (critical update)
 * Critical bugfix: Burn Bootloader corrected
 * Bugfix: Serial UPDI Chip erase via the Protected KEY Interface didn't happen, it was relying on the chip erase nvmctrl command, which can't be used on a locked chip, or, for that matter, one spamming software resets.
