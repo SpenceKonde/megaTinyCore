@@ -37,7 +37,7 @@ jobs:
         - megaavr/libraries/Wire/examples/SFRRanger_reader
         - megaavr/libraries/tinyNeoPixel/examples/RGBWstrandtest
         - megaavr/extras/CompileTestSketches/test_analog_read
-        - megaavr/libraries/Optiboot_flasher/examples/Flash_get_put
+        - megaavr/libraries/Optiboot_flasher/examples/Flash_put_get
         - megaavr/libraries/Wire/examples/slave_address_mask
         - megaavr/libraries/Wire/examples/master_multi_address_write
       available-flash-4kB-plus-true-sketch-paths: |
