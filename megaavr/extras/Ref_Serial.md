@@ -73,6 +73,7 @@ PIN_SERIAL_RX
 PIN_SERIAL_XCK
 PIN_SERIAL_XDIR
 ```
+**Warning** - on DD-series parts, this may return an inaccurate values in two specific cases. For the case of USART0 mapping 4, XDIR (that pin does not exist, but we return the the non-existent pin instead), and for USART1, mapping 0, TX on 14/20 pin parts (that pin doesn't exist, but we return it anyway).
 
 This function is meant for use by libraries to allow them to figure out which pin is in use without duplicating the logic we have already implemented.
 

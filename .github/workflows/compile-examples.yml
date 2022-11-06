@@ -37,6 +37,7 @@ jobs:
         - megaavr/libraries/Wire/examples/SFRRanger_reader
         - megaavr/libraries/tinyNeoPixel/examples/RGBWstrandtest
         - megaavr/extras/CompileTestSketches/test_analog_read
+        - megaavr/libraries/Optiboot_flasher/examples/Flash_get_put
         - megaavr/libraries/Wire/examples/slave_address_mask
         - megaavr/libraries/Wire/examples/master_multi_address_write
       available-flash-4kB-plus-true-sketch-paths: |
@@ -87,6 +88,11 @@ jobs:
         - megaavr/libraries/Servo_megaTinyCore/examples/Knob
         - megaavr/libraries/Servo_megaTinyCore/examples/ServoMaxTest
         - megaavr/libraries/Servo_megaTinyCore/examples/Sweep
+        - megaavr/libraries/Comparator/Hysteresis
+        - megaavr/libraries/Comparator/Internal_reference
+        - megaavr/libraries/Comparator/Interrupt
+        - megaavr/libraries/Comparator/simple_comparator
+        - megaavr/libraries/Event/simple_event
       IO-class-6-plus-true-sketch-paths: |
         - megaavr/libraries/Logic/examples/Five_input_NOR
       IO-class-2-series-1-sketch-paths: |

@@ -268,7 +268,6 @@
 #ifdef __AVR_ATtinyxy2__
   #define _AVR_PINCOUNT 8
 #endif
-#define MEGATINYCORE_NUM (((MEGATINYCORE_MAJOR << 24)+(MEGATINYCORE_MINOR << 16)+(MEGATINYCORE_PATCH << 8)+MEGATINYCORE_RELEASED))
 
 #if MEGATINYCORE_SERIES == 0
   #define _AVR_FAMILY "T0"
@@ -590,6 +589,8 @@
 
 #if !defined(BACKWARD_COMBATIBILITY_MODE)
   // We default to seeking compatibility. for COMBATability you would uncomment that #define, and that turns all these off.
+
+  #if defined(RTC_CLKSEL)
   /* Man they just *HAD* to change the names of these values that get assigned to the same register and do the same thing didn't they?
    * Worse still we can't even verify that they are present... just blindly define and pray. Enums can't be seen by macros
    */
@@ -693,7 +694,15 @@
     #define CLKCTRL_FRQSEL_28M_gc (CLKCTRL_FREQSEL_28M_gc)  /* 28 MHz system clock unofficial - this will just error out if used since it will replace one undefined symbol with another */
     #define CLKCTRL_FRQSEL_32M_gc (CLKCTRL_FREQSEL_32M_gc)  /* 32 MHz system clock unofficial - this will just error out if used since it will replace one undefined symbol with another */
   #endif
+  // Note that it is intended to not hide the fact that 28 and 32 MHz are not official. If you choose it from the menu, it says "Overclocked" next to the speed too. We refer to them with the numeric constants in the wiring.c, so it doesn't matter when used that way.
+  // And now the most freaking boneheaded move from Microchip in a long while: They realized that they should have had some sort of delimiter between the bit number within a bitfield, and the name of the bitfield, since the names of many bitfields end in numbers,
+  // So they went ahead and made that change. That is what's called a "breaking change", really for no reason except codes style. Most companies even if they decided to go that route, would never do that without introducuing a compatibility layer.
+  // That wanton disregard for backwards compatibility is not acceptable in an Arduino core nor in a commercial product.
+  // Using the old names will produce warnings. These deprecated names should be fixed as support for these FOUR THOUSAND LINES of bandaids WILL BE REMOBVED in 1.6.0!
+  //typedef const uint8_t __attribute__ ((deprecated("\nMicrochip changed the spelling of bits within a bitfiels (macros that end in the bitnumber followed by _bm or _bp), you are using the old name, ex PERIPH_BITFIRLD1_bm.\nYou should use PERIPH_BITFIELD_1_bm; we do not guarantee that this 4000-line bandaid will not be removed in the future.\r\nWhy did they do this? Beats me. Ask their support folks - if enough of us do it, they might hesitate next time they have the urge to mass rename things in their headers")))  deprecated_constant_name;
 
+  // Okay, well that fix didn't work so well. back to plan A.
+#if !defined(BACKWARD_COMBATIBILITY_MODE)
   /* Add a feature - yay!
    * Rename registers so people can't carry code back and forth - booo!
    */
@@ -4799,8 +4808,64 @@
   #if !defined(WDT_WINDOW_0_bm) && defined(WDT_WINDOW0_bm)
     #define WDT_WINDOW_0_bm WDT_WINDOW0_bm
   #elif defined(WDT_WINDOW_0_bm)
-    //deprecated_constant_name WDT_WINDOW0_bm = WDT_WINDOW_0_bm;
     #define WDT_WINDOW0_bm WDT_WINDOW_0_bm //Deprecated as of Q2 2022 header change.
   #endif
-#endif
-#endif
+  #if !defined(WDT_WINDOW_0_bp) && defined(WDT_WINDOW0_bp)
+    #define WDT_WINDOW_0_bp WDT_WINDOW0_bp
+  #elif defined(WDT_WINDOW_0_bp)
+    #define WDT_WINDOW0_bp WDT_WINDOW_0_bp; //Deprecated as of Q2 2022 header change
+  #endif
+  #if !defined(WDT_WINDOW_1_bm) && defined(WDT_WINDOW1_bm)
+    #define WDT_WINDOW_1_bm WDT_WINDOW1_bm
+  #elif defined(WDT_WINDOW_1_bm)
+    #define WDT_WINDOW1_bm WDT_WINDOW_1_bm; //Deprecated as of Q2 2022 header change
+  #endif
+  #if !defined(WDT_WINDOW_1_bp) && defined(WDT_WINDOW1_bp)
+    #define WDT_WINDOW_1_bp WDT_WINDOW1_bp
+  #elif defined(WDT_WINDOW_1_bp)
+    #define WDT_WINDOW1_bp WDT_WINDOW_1_bp; //Deprecated as of Q2 2022 header change
+  #endif
+  #if !defined(WDT_WINDOW_2_bm) && defined(WDT_WINDOW2_bm)
+    #define WDT_WINDOW_2_bm WDT_WINDOW2_bm
+  #elif defined(WDT_WINDOW_2_bm)
+    #define WDT_WINDOW2_bm WDT_WINDOW_2_bm; //Deprecated as of Q2 2022 header change
+  #endif
+  #if !defined(WDT_WINDOW_2_bp) && defined(WDT_WINDOW2_bp)
+    #define WDT_WINDOW_2_bp WDT_WINDOW2_bp
+  #elif defined(WDT_WINDOW_2_bp)
+    #define WDT_WINDOW2_bp WDT_WINDOW_2_bp; //Deprecated as of Q2 2022 header change
+  #endif
+  #if !defined(WDT_WINDOW_3_bm) && defined(WDT_WINDOW3_bm)
+    #define WDT_WINDOW_3_bm WDT_WINDOW3_bm
+  #elif defined(WDT_WINDOW_3_bm)
+    #define WDT_WINDOW3_bm WDT_WINDOW_3_bm; //Deprecated as of Q2 2022 header change
+  #endif
+  #if !defined(WDT_WINDOW_3_bp) && defined(WDT_WINDOW3_bp)
+    #define WDT_WINDOW_3_bp WDT_WINDOW3_bp
+  #elif defined(WDT_WINDOW_3_bp)
+    #define WDT_WINDOW3_bp WDT_WINDOW_3_bp; //Deprecated as of Q2 2022 header change
+  #endif
+
+  /* ======= ZCD ======= */
+  #if !defined(ZCD_INTMODE_0_bm) && defined(ZCD_INTMODE0_bm)
+    #define ZCD_INTMODE_0_bm ZCD_INTMODE0_bm
+  #elif defined(ZCD_INTMODE_0_bm)
+    #define ZCD_INTMODE0_bm ZCD_INTMODE_0_bm; //Deprecated as of Q2 2022 header change
+  #endif
+  #if !defined(ZCD_INTMODE_0_bp) && defined(ZCD_INTMODE0_bp)
+    #define ZCD_INTMODE_0_bp ZCD_INTMODE0_bp
+  #elif defined(ZCD_INTMODE_0_bp)
+    #define ZCD_INTMODE0_bp ZCD_INTMODE_0_bp; //Deprecated as of Q2 2022 header change
+  #endif
+  #if !defined(ZCD_INTMODE_1_bm) && defined(ZCD_INTMODE1_bm)
+    #define ZCD_INTMODE_1_bm ZCD_INTMODE1_bm
+  #elif defined(ZCD_INTMODE_1_bm)
+    #define ZCD_INTMODE1_bm ZCD_INTMODE_1_bm; //Deprecated as of Q2 2022 header change
+  #endif
+  #if !defined(ZCD_INTMODE_1_bp) && defined(ZCD_INTMODE1_bp)
+    #define ZCD_INTMODE_1_bp ZCD_INTMODE1_bp
+  #elif defined(ZCD_INTMODE_1_bp)
+    #define ZCD_INTMODE1_bp ZCD_INTMODE_1_bp; //Deprecated as of Q2 2022 header change
+  #endif
+#endif /* this is the end of the backwards compatibility defines */
+#endif // end of core_devices

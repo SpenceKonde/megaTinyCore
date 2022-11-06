@@ -159,7 +159,7 @@ void pinMode(uint8_t pin, uint8_t mode) {
   check_valid_digital_pin(pin);         /* generate compile error if a constant that is not a valid pin is used as the pin */
   check_valid_pin_mode(mode);           /* generate compile error if a constant that is not a valid pin mode is used as the mode */
   uint8_t bit_mask = digitalPinToBitMask(pin);
-  if ((bit_mask == NOT_A_PIN) || (mode > 3)) {
+  if ((bit_mask == NOT_A_PIN) || (mode > INPUT_PULLUP)) {
     return;                             /* ignore invalid pins passed at runtime */
   }
   volatile uint8_t * port_base = ((volatile uint8_t *) (uint16_t)(0x0400 | portToPortBaseOffset(digitalPinToPort(pin))));
@@ -202,9 +202,15 @@ void pinMode(uint8_t pin, uint8_t mode) {
   *port_base = bit_mask;
 }
 
-
-
-void turnOffPWM(uint8_t pin) {
+/* This turns off PWM, if enabled. It is called automatically on every digitalWrite();
+ * This function can end up executing a heckovalotta code for one simple
+ * Note that it only operates on the PWM source with priority - TCA > TCD > TCB/DAC
+ * the order of the cases here doesn't matter - which one has priority is determined in
+ * digitalPinToTimerNow() in wiring_analog.c. That's why it's recommended to make sure
+ * that no pin you're about to move the PWM output of a TCA onto is currently outputting
+ * PWM. It can also be used from user code (unlike on the stock core). */
+void turnOffPWM(uint8_t pin)
+{
   /* Actually turn off compare channel, not the timer */
 
   /* Get pin's timer

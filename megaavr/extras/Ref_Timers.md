@@ -315,6 +315,7 @@ while (digitalReadFast(pinb)); // make sure our pulse is over - can be omitted i
 ```
 `*` internal oscillator is usually within a percent at room temperature, and within half a percent is common. We're assuming that at the moment millis started, an ideal stopwatch was started, and when it indicated 100us had gone by, drove the pin low effectively instantaneously.
 
+A table is presented for each type of timer comparing the percentage of CPU time spent in the ISR, the resolution of the timekeeping functions, and the execution time of micros. Typically `micros()`  can have one of three execution times, the shortest one being overwhelmingly more common, and the differences between them are small.
 
 
 ### TCAn for millis timekeeping

@@ -1,6 +1,15 @@
 #ifndef __CORE_PARAMETERS_H__
 #define __CORE_PARAMETERS_H__
 
+#if !defined(MEGATINYCORE_NUM)
+  #if !(defined(MEGATINYCORE_MAJOR) && defined(MEGATINYCORE_MINOR) && defined(MEGATINYCORE_PATCH) && defined(MEGATINYCORE_RELEASED))
+    #warning "All of the version defines are missing, please correct your build environment; it is likely failing to define other critical values"
+    // Version related defines now handled in platform.txt
+  #else
+    #define MEGATINYCORE_NUM ((MEGATINYCORE_MAJOR << 24) + (MEGATINYCORE_MINOR << 16) + (MEGATINYCORE_PATCH << 8) + MEGATINYCORE_RELEASED)
+  #endif
+#endif
+
 #if !(defined(MEGATINYCORE) || defined(DXCORE) || defined(ATTIYNCORE))
 
   // This define can get black-hole'ed somehow (reported on platformio) likely the ugly syntax to pass a string define from platform.txt via a -D
@@ -13,17 +22,9 @@
   // which becomes more and more important as more code is shared between the cores.
 
   #define MEGATINYCORE "Unknown 2.6.1+"
-  #if !defined(MEGATINYCORE_NUM)
-    #if !(defined(MEGATINYCORE_MAJOR) && defined(MEGATINYCORE_MINOR) && defined(MEGATINYCORE_PATCH) && defined(MEGATINYCORE_RELEASED))
-      #warning "All of the version defines are missing, please correct your build environment; it is likely failing to define other critical values"
-      // Version related defines now handled in platform.txt
-    #else
-      #define MEGATINYCORE_NUM ((MEGATINYCORE_MAJOR << 24) + (MEGATINYCORE_MINOR << 16) + (MEGATINYCORE_PATCH << 8) + MEGATINYCORE_RELEASED)
-    #endif
-  #endif
 #else
   #if defined(DXCORE) || defined(ATTINYCORE)
-    #error "This is megaTinyCore being compiled, but DXCORE and/or ATTINYCORE is defined already"
+    #error "This is megaTinyCore being compiled, but DXCORE and/or ATTINYCORE is defined already, something is way wrong."
   #endif
 #endif
 #endif

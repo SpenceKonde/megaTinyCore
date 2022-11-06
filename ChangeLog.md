@@ -25,8 +25,9 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ## Released versions
 
 ### 2.6.3 (2.6.2 respin due to json error)
-* Correct installation error from trying to install non-functional withdrawn version of toolchain. 
-* Correct missing comma in Comparator.cpp. 
+* Correct installation error from trying to install non-functional withdrawn version of toolchain.
+* Correct issues with compiling Comparator library.
+* Ensure that at least one test per library is in the CI list.
 
 ### 2.6.2 (critical update)
 * Critical bugfix: Burn Bootloader corrected

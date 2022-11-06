@@ -83,8 +83,8 @@ AltOUT |  PIN_PC6* |  PIN_PC6* |  PIN_PC6* |   n/a    | PIN_PC6* | PIN_PC6* |   
 #elif defined(ANALOG_COMP_PINS_TINY_GOLDEN)
   /* other golden 1-series: 3 AC P0, P1 (AC1 on 24 only), P2, P3, N0, N1*/
   AnalogComparator      Comparator0(0, AC0, PORTA.PIN7CTRL, PORTB.PIN5CTRL, PORTB.PIN1CTRL, PORTA.PIN6CTRL,                 PORTA.PIN6CTRL, PORTB.PIN4CTRL);
-  AnalogComparator      Comparator0(1, AC1, PORTA.PIN7CTRL, PORTB.PIN6CTRL, PORTB.PIN0CTRL, PORTA.PIN4CTRL,                 PORTA.PIN5CTRL, PORTB.PIN7CTRL);
-  AnalogComparator      Comparator0(2, AC2, PORTA.PIN6CTRL, PORTB.PIN0CTRL, PORTB.PIN5CTRL, PORTA.PIN7CTRL,                 PORTA.PIN7CTRL, PORTB.PIN6CTRL);
+  AnalogComparator      Comparator1(1, AC1, PORTA.PIN7CTRL, PORTB.PIN6CTRL, PORTB.PIN0CTRL, PORTA.PIN4CTRL,                 PORTA.PIN5CTRL, PORTB.PIN7CTRL);
+  AnalogComparator      Comparator2(2, AC2, PORTA.PIN6CTRL, PORTB.PIN0CTRL, PORTB.PIN5CTRL, PORTA.PIN7CTRL,                 PORTA.PIN7CTRL, PORTB.PIN6CTRL);
 
 #elif defined(ANALOG_COMP_PINS_TINY_TWO_14)
   /* 14-pin 2-series: 1 AC P0, P2, N0, N2*/
@@ -239,7 +239,7 @@ AnalogComparator::AnalogComparator(
                                    register8_t& in0_p,
                                    register8_t& in1_p,
                                    register8_t& in2_p,
-                                   register8_t& in3_p
+                                   register8_t& in3_p,
                                    register8_t& in0_n,
                                    register8_t& in1_n
                                    )
