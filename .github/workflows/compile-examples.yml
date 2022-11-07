@@ -91,8 +91,8 @@ jobs:
         - megaavr/libraries/Comparator/examples/Hysteresis
         - megaavr/libraries/Comparator/examples/Internal_reference
         - megaavr/libraries/Comparator/examples/Interrupt
-        - megaavr/libraries/Comparator/examples/simple_comparator
-        - megaavr/libraries/Event/examples/simple_event
+        - megaavr/libraries/Comparator/examples/Simple_comparator
+        - megaavr/libraries/Event/examples/Simple_event
       IO-class-6-plus-true-sketch-paths: |
         - megaavr/libraries/Logic/examples/Five_input_NOR
       IO-class-2-series-1-sketch-paths: |
