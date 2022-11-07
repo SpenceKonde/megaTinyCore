@@ -703,7 +703,6 @@
   //typedef const uint8_t __attribute__ ((deprecated("\nMicrochip changed the spelling of bits within a bitfiels (macros that end in the bitnumber followed by _bm or _bp), you are using the old name, ex PERIPH_BITFIRLD1_bm.\nYou should use PERIPH_BITFIELD_1_bm; we do not guarantee that this 4000-line bandaid will not be removed in the future.\r\nWhy did they do this? Beats me. Ask their support folks - if enough of us do it, they might hesitate next time they have the urge to mass rename things in their headers")))  deprecated_constant_name;
 
   // Okay, well that fix didn't work so well. back to plan A.
-#if !defined(BACKWARD_COMBATIBILITY_MODE)
   /* Add a feature - yay!
    * Rename registers so people can't carry code back and forth - booo!
    */
