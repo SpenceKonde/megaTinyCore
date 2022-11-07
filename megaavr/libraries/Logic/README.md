@@ -77,6 +77,7 @@ Note that there exist reserved and invalid values for many of the bitfields cont
 * On the 0/1-series, the overhead is approximately 546 bytes of flash and 26 bytes of RAM.
 * On the 2-series, with twice as many LUTs, it is much larger: 984 bytes and 60b RAM.
 * This is fairly small for 16/32k parts - it cannot be ignored on a 4k part, particularly not a 4k 2-series, but it it isn't an unreasonable amount of flash for the parts most people will be using. As of 2.6.0 if no ISR is attached or detached, that overhead will not be pulled in, allowing a more performant manually defined interrupt to be written by the user (any "attach" type thing costs around 50 clock cycles)
+* These size concerns are not much of a problem on most Dx-series parts.
 * Writing a constant value to 4 registers (the minimum plausible needed to configure a LUT) for 2 or 4 LUTs requires 56 or 112 bytes, respectively.
 
 ## Logic class overview
@@ -254,6 +255,14 @@ Notes for tinyAVR 2-series:
 * If input on the highest-number Logic3 is set to link, it will use the output of Logic0
 * If you need to link input to logic block other than block N+1, or if you need feedback output from the an odd-numbered logic block, use the event system.
 * Not all pin inputs are available on all parts (see table above). The event system can be used to bring in input from other pins.
+
+#### Input "value"
+As shown above not all inputs are equal, particularly on tinyAVR 2-series and Dx/Ex-series, nor are all instances of the peripherals that can generate inputs equal. This effect is most prominent on devices with smaller numbers of pins and peripherals, particularly the DD-series. However, unlike with the event system it is harder to give specific guidance, because the type of inputs needed will vary so much. This challenge manifests most acutely on the 2-series tinyAVR and the DD-series parts with low pincount, which have fewer instances of peripherals (2 TCB, 1 AC, 2 USART). The larger DD's have another TCB, but are still limited to 2 USARTs and 1 AC. On all parts, input 2 is also very special - it's the only input that you can use to clock the filter/synchronizer ande sequential logic - this means that you can't get the SPI SCK input this way unless you're using it as the clock for the logic block (though that's probably the thing one would be most likely to use that for). This constraint only applies to using one of these inputs as the clock - you can used the internal oscillator, 32kHz internal
+
+On the larger DA/DB parts, there is a similar but opposite consideration - USART0-2 and TCB0-2 are more valuable than other instances of the same peripheral - if you are using them as CCL inputs. Because of it's use as the clock input, though USART2, AC2, and TCB2 are marginally less useful.
+
+You may find that your choice of analog comparator or other peripheral is dictated by what other peripherals you need to use. In some cases, you can use an event channel to bring that in. In other cases, you may need to use an additional logic block to grab a key channel, output it unchanged, and bring it in via a link input.
+
 
 #### Usage
 ``` c++
@@ -506,10 +515,15 @@ The unintended layer is that no logic block can be reconfigured without also dis
 
 Logic1.truth=0x55;      // new truth table
 Logic1.input2=tca0;     // and different input 2
-Logic1.enabled=true;    // enable another LUT
-Logic0.truth=0x79;      // changed truth table for LUT0
+Logic3.enabled=true;    // enable another LUT
+Logic3.input0=in::link; // Use link from LUT0
+Logic3.input1=in::ac;   // and the analog comparator
+Logic3.input2=in::pin;  // and the LUT3 IN2 pin
+Logic3.truth=0x79;      // truth table for LUT3
 
-// At this point Logic1 not enabled, and logic0 is still using the old settings
+Logic3.attachInterrupt(RISING,interruptFunction);
+
+// Interrupt now attached - but - Logic3 not enabled, and logic1 is using old settings
 
 Logic::stop();  // have to turn off Logic0 too, even though I might not want to
 Logic1.init();  // apply changes to logic block 1

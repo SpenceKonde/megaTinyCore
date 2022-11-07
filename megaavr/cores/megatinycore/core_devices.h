@@ -591,21 +591,22 @@
   // We default to seeking compatibility. for COMBATability you would uncomment that #define, and that turns all these off.
 
   #if defined(RTC_CLKSEL)
-  /* Man they just *HAD* to change the names of these values that get assigned to the same register and do the same thing didn't they?
-   * Worse still we can't even verify that they are present... just blindly define and pray. Enums can't be seen by macros
-   */
-   // tinyAVR has TOSC32K (tinyOscillator?)
-  #if defined(MEGATINYCORE)
-    #define RTC_CLKSEL_OSC32K_gc            RTC_CLKSEL_INT32K_gc
-    #define RTC_CLKSEL_OSC1K_gc             RTC_CLKSEL_INT1K_gc
-    #define RTC_CLKSEL_XTAL32K_gc           RTC_CLKSEL_TOSC32K_gc
-    #define RTC_CLKSEL_XOSC32K_gc           RTC_CLKSEL_TOSC32K_gc
-  #else
-// Dx has an XOSC32K
-    #define RTC_CLKSEL_INT32K_gc            RTC_CLKSEL_OSC32K_gc
-    #define RTC_CLKSEL_INT1K_gc             RTC_CLKSEL_OSC1K_gc
-    #define RTC_CLKSEL_TOSC32K_gc           RTC_CLKSEL_XOSC32K_gc
-    #define RTC_CLKSEL_XTAL32K_gc           RTC_CLKSEL_XOSC32K_gc
+    /* Man they just *HAD* to change the names of these values that get assigned to the same register and do the same thing didn't they?
+     * Worse still we can't even verify that they are present... just blindly define and pray. Enums can't be seen by macros
+     */
+     // tinyAVR has TOSC32K (tinyOscillator?)
+    #if defined(MEGATINYCORE)
+      #define RTC_CLKSEL_OSC32K_gc            RTC_CLKSEL_INT32K_gc
+      #define RTC_CLKSEL_OSC1K_gc             RTC_CLKSEL_INT1K_gc
+      #define RTC_CLKSEL_XTAL32K_gc           RTC_CLKSEL_TOSC32K_gc
+      #define RTC_CLKSEL_XOSC32K_gc           RTC_CLKSEL_TOSC32K_gc
+    #else
+      // Dx has an XOSC32K
+      #define RTC_CLKSEL_INT32K_gc            RTC_CLKSEL_OSC32K_gc
+      #define RTC_CLKSEL_INT1K_gc             RTC_CLKSEL_OSC1K_gc
+      #define RTC_CLKSEL_TOSC32K_gc           RTC_CLKSEL_XOSC32K_gc
+      #define RTC_CLKSEL_XTAL32K_gc           RTC_CLKSEL_XOSC32K_gc
+    #endif
   #endif
   /* General Purpose Register names, GPR.GPRn, vs GPIORn vs GPIOn
    * They now appear to have decided they don't like either of the previous conventions, one just a few years old. Now they are grouping

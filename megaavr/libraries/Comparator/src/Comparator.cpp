@@ -38,7 +38,7 @@ AltOUT |  PIN_PC6* |  PIN_PC6* |  PIN_PC6* |   n/a    | PIN_PC6* | PIN_PC6* |   
 #elif defined(ANALOG_COMP_PINS_DD)
   /* DD:1 AC:  P0, P3, P4, N0, N2, N3 */
   #if defined(AC0_AC_vect)
-    AnalogComparator    Comparator0(0, AC0, PORTD.PIN2CTRL,                                 PORTD.PIN6CTRL, PORTC.PIN3CTRL, PORTD.PIN3CTRL,                 PORTD.PIN7CTRL, PORTC.PIN2CTRL);
+    AnalogComparator    Comparator0(0, AC0, PORTD.PIN2CTRL,                                 PORTD.PIN6CTRL, (IS_MVIO_ENABLED() ? AC_NULL_REG : PORTC.PIN3CTRL)  PORTC.PIN3CTRL, PORTD.PIN3CTRL,                 PORTD.PIN7CTRL, (IS_MVIO_ENABLED() ? AC_NULL_REG : PORTC.PIN2CTRL));
   #endif
 #elif defined(ANALOG_COMP_PINS_EA)
   /* EA:2 ACs: P0, P1, P2, P3, P4, N0, N1, N2, N3 */
