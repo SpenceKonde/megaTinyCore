@@ -700,12 +700,10 @@
   // So they went ahead and made that change. That is what's called a "breaking change", really for no reason except codes style. Most companies even if they decided to go that route, would never do that without introducuing a compatibility layer.
   // That wanton disregard for backwards compatibility is not acceptable in an Arduino core nor in a commercial product.
   // Using the old names will produce warnings. These deprecated names should be fixed as support for these FOUR THOUSAND LINES of bandaids WILL BE REMOBVED in 1.6.0!
-  //typedef const uint8_t __attribute__ ((deprecated("\nMicrochip changed the spelling of bits within a bitfiels (macros that end in the bitnumber followed by _bm or _bp), you are using the old name, ex PERIPH_BITFIRLD1_bm.\nYou should use PERIPH_BITFIELD_1_bm; we do not guarantee that this 4000-line bandaid will not be removed in the future.\r\nWhy did they do this? Beats me. Ask their support folks - if enough of us do it, they might hesitate next time they have the urge to mass rename things in their headers")))  deprecated_constant_name;
+  // typedef const uint8_t __attribute__ ((deprecated("\nMicrochip changed the spelling of bits within a bitfiels (macros that end in the bitnumber followed by _bm or _bp), you are using the old name, ex PERIPH_BITFIRLD1_bm.\nYou should use PERIPH_BITFIELD_1_bm; we do not guarantee that this 4000-line bandaid will not be removed in the future.\r\nWhy did they do this? Beats me. Ask their support folks - if enough of us do it, they might hesitate next time they have the urge to mass rename things in their headers")))  deprecated_constant_name;
 
   // Okay, well that fix didn't work so well. back to plan A.
-  /* Add a feature - yay!
-   * Rename registers so people can't carry code back and forth - booo!
-   */
+
   // TCA V1.0 - tinyAVR 0/1, megaAVR 0
   // this only has one event input, but code needs to be able to flow smoothly
   // so we define macros named after he the new version pointing to the old version of event input A.
