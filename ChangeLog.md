@@ -27,7 +27,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### 2.6.4 (2.6.3 respin due to critical compile error impacting all sketches)
 * Correct compile error encountered in all cases.
 * Correct compile error encountered in the SimpleEvent example.
-* Add support for configuring the WDT via fuses. These are set on all uploads, but ONLY for non-optiboot boards. To prevent difficulties that may be encoutered when reprogramming. Because of the reliance of Optiboot on the WDT, the WDT must not be forced on when using Optiboot.
+* Add support for configuring the WDT via fuses. These are set on all uploads, but ONLY for non-optiboot boards. To prevent difficulties that may be encountered when reprogramming. Because of the reliance of Optiboot on the WDT, the WDT must not be forced on when using Optiboot.
 * Correct problems with CI changes.
 * Correct issues relating to the fuse configuration set when uploading.
 
