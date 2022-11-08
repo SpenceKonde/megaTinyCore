@@ -60,6 +60,8 @@ menu.resetpinopti_2=UPDI/alt-RST pins and Optiboot Entry (burn bootloader req'd)
 menu.attach=attachInterrupt() Version
 menu.printf=printf()
 menu.wiremode=Wire (Wire.h/I2C) Library mode
+menu.WDTtimeout=WDT timeout (note that it cannot be disabled if set here!)
+menu.WDTwindow=WDT window (if desired)
 
 ##########################################################################
 #                                                                        #
@@ -116,7 +118,7 @@ atxy7.build.export_merged_output=false
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
 #________________________________________#
-atxy7.bootloader.WDTCFG=0x00
+atxy7.bootloader.WDTCFG=0b{bootloader.wdtwindowbits}{bootloader.wdttimeoutbits}
 atxy7.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy7.bootloader.OSCCFG=0x01
 atxy7.bootloader.TCD0CFG_avrdude=
@@ -490,6 +492,44 @@ atxy7.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy7.menu.attach.manual.build.attachabr=.aMan
 atxy7.menu.attach.oldversion.build.attachabr=.aOld
 
+#----------------------------------------#
+# WDT MODE                               #
+#________________________________________#
+atxy7.menu.WDTtimeout.disabled=Disabled (recommended)
+atxy7.menu.WDTtimeout.8seconds=Window remains open for 8 Seconds
+atxy7.menu.WDTtimeout.4seconds=Window remains open for 4 Seconds
+atxy7.menu.WDTtimeout.2seconds=Window remains open for 2 Seconds
+atxy7.menu.WDTtimeout.1second=Window remains open for 1 Second
+atxy7.menu.WDTtimeout.500msec=Window remains open for 500 milliseconds
+atxy7.menu.WDTtimeout.250msec=Window remains open for 250 milliseconds
+atxy7.menu.WDTtimeout.125msec=Window remains open for 125 milliseconds
+atxy7.menu.WDTwindow.disabled=No delay before window "opens"
+atxy7.menu.WDTwindow.8seconds=8 Second before window "opens"
+atxy7.menu.WDTwindow.4seconds=4 Second before window "opens"
+atxy7.menu.WDTwindow.2seconds=2 Second before window "opens"
+atxy7.menu.WDTwindow.1second=1 Second before window "opens"
+atxy7.menu.WDTwindow.500msec=500 millisecond before window "opens"
+atxy7.menu.WDTwindow.250msec=250 millisecond before window "opens"
+atxy7.menu.WDTwindow.125msec=125 millisecond before window "opens"
+atxy7.menu.WDTwindow.63msec=62.5 millisecond before window "opens"
+atxy7.menu.WDTtimeout.disabled.bootloader.wdttimeoutbits=0000
+atxy7.menu.WDTtimeout.8seconds.bootloader.wdttimeoutbits=1011
+atxy7.menu.WDTtimeout.4seconds.bootloader.wdttimeoutbits=1010
+atxy7.menu.WDTtimeout.2seconds.bootloader.wdttimeoutbits=1001
+atxy7.menu.WDTtimeout.1second.bootloader.wdttimeoutbits=1000
+atxy7.menu.WDTtimeout.500msec.bootloader.wdttimeoutbits=0111
+atxy7.menu.WDTtimeout.250msec.bootloader.wdttimeoutbits=0110
+atxy7.menu.WDTtimeout.125msec.bootloader.wdttimeoutbits=0101
+atxy7.menu.WDTwindow.disabled.bootloader.wdtwindowbits=0000
+atxy7.menu.WDTwindow.8seconds.bootloader.wdtwindowbits=1011
+atxy7.menu.WDTwindow.4seconds.bootloader.wdtwindowbits=1010
+atxy7.menu.WDTwindow.2seconds.bootloader.wdtwindowbits=1001
+atxy7.menu.WDTwindow.1second.bootloader.wdtwindowbits=1000
+atxy7.menu.WDTwindow.500msec.bootloader.wdtwindowbits=0111
+atxy7.menu.WDTwindow.250msec.bootloader.wdtwindowbits=0110
+atxy7.menu.WDTwindow.125msec.bootloader.wdtwindowbits=0101
+atxy7.menu.WDTwindow.63msec.bootloader.wdtwindowbits=0100
+
 ##########################################################################
 #  Non-bootloader                                                        #
 #                                ##    ###      ####   ###  #   #      ###
@@ -507,9 +547,6 @@ atxy6.build.board=AVR_ATtinyxy6
 atxy6.build.clocksource=0
 atxy6.build.core=megatinycore
 atxy6.build.mrelax= -mrelax
-
-atxy6.build.mrelax= -mrelax
-
 atxy6.build.variant=txy6
 atxy6.build.tuned=
 atxy6.build.printf=
@@ -523,7 +560,7 @@ atxy6.build.export_merged_output=false
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
 #________________________________________#
-atxy6.bootloader.WDTCFG=0x00
+atxy6.bootloader.WDTCFG=0b{bootloader.wdtwindowbits}{bootloader.wdttimeoutbits}
 atxy6.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy6.bootloader.OSCCFG=0x01
 atxy6.bootloader.TCD0CFG_avrdude=
@@ -900,6 +937,44 @@ atxy6.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy6.menu.attach.manual.build.attachabr=.aMan
 atxy6.menu.attach.oldversion.build.attachabr=.aOld
 
+#----------------------------------------#
+# WDT MODE                               #
+#________________________________________#
+atxy6.menu.WDTtimeout.disabled=Disabled (recommended)
+atxy6.menu.WDTtimeout.8seconds=Window remains open for 8 Seconds
+atxy6.menu.WDTtimeout.4seconds=Window remains open for 4 Seconds
+atxy6.menu.WDTtimeout.2seconds=Window remains open for 2 Seconds
+atxy6.menu.WDTtimeout.1second=Window remains open for 1 Second
+atxy6.menu.WDTtimeout.500msec=Window remains open for 500 milliseconds
+atxy6.menu.WDTtimeout.250msec=Window remains open for 250 milliseconds
+atxy6.menu.WDTtimeout.125msec=Window remains open for 125 milliseconds
+atxy6.menu.WDTwindow.disabled=No delay before window "opens"
+atxy6.menu.WDTwindow.8seconds=8 Second before window "opens"
+atxy6.menu.WDTwindow.4seconds=4 Second before window "opens"
+atxy6.menu.WDTwindow.2seconds=2 Second before window "opens"
+atxy6.menu.WDTwindow.1second=1 Second before window "opens"
+atxy6.menu.WDTwindow.500msec=500 millisecond before window "opens"
+atxy6.menu.WDTwindow.250msec=250 millisecond before window "opens"
+atxy6.menu.WDTwindow.125msec=125 millisecond before window "opens"
+atxy6.menu.WDTwindow.63msec=62.5 millisecond before window "opens"
+atxy6.menu.WDTtimeout.disabled.bootloader.wdttimeoutbits=0000
+atxy6.menu.WDTtimeout.8seconds.bootloader.wdttimeoutbits=1011
+atxy6.menu.WDTtimeout.4seconds.bootloader.wdttimeoutbits=1010
+atxy6.menu.WDTtimeout.2seconds.bootloader.wdttimeoutbits=1001
+atxy6.menu.WDTtimeout.1second.bootloader.wdttimeoutbits=1000
+atxy6.menu.WDTtimeout.500msec.bootloader.wdttimeoutbits=0111
+atxy6.menu.WDTtimeout.250msec.bootloader.wdttimeoutbits=0110
+atxy6.menu.WDTtimeout.125msec.bootloader.wdttimeoutbits=0101
+atxy6.menu.WDTwindow.disabled.bootloader.wdtwindowbits=0000
+atxy6.menu.WDTwindow.8seconds.bootloader.wdtwindowbits=1011
+atxy6.menu.WDTwindow.4seconds.bootloader.wdtwindowbits=1010
+atxy6.menu.WDTwindow.2seconds.bootloader.wdtwindowbits=1001
+atxy6.menu.WDTwindow.1second.bootloader.wdtwindowbits=1000
+atxy6.menu.WDTwindow.500msec.bootloader.wdtwindowbits=0111
+atxy6.menu.WDTwindow.250msec.bootloader.wdtwindowbits=0110
+atxy6.menu.WDTwindow.125msec.bootloader.wdtwindowbits=0101
+atxy6.menu.WDTwindow.63msec.bootloader.wdtwindowbits=0100
+
 ##########################################################################
 #  Non-bootloader                                                        #
 #                                #    #  #     ####   ###  #   #       ###
@@ -915,12 +990,8 @@ atxy4.build.text_section_start=.text=0x0
 atxy4.build.millistimer=D0
 atxy4.build.board=AVR_ATtinyxy4
 atxy4.build.clocksource=0
-atxy4.build.clocksource=0
 atxy4.build.core=megatinycore
 atxy4.build.mrelax= -mrelax
-
-atxy4.build.mrelax= -mrelax
-
 atxy4.build.variant=txy4
 atxy4.build.tuned=
 atxy4.build.printf=
@@ -934,7 +1005,7 @@ atxy4.build.export_merged_output=false
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
 #________________________________________#
-atxy4.bootloader.WDTCFG=0x00
+atxy4.bootloader.WDTCFG=0b{bootloader.wdtwindowbits}{bootloader.wdttimeoutbits}
 atxy4.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy4.bootloader.OSCCFG=0x01
 atxy4.bootloader.TCD0CFG_avrdude=
@@ -1312,6 +1383,44 @@ atxy4.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy4.menu.attach.manual.build.attachabr=.aMan
 atxy4.menu.attach.oldversion.build.attachabr=.aOld
 
+#----------------------------------------#
+# WDT MODE                               #
+#________________________________________#
+atxy4.menu.WDTtimeout.disabled=Disabled (recommended)
+atxy4.menu.WDTtimeout.8seconds=Window remains open for 8 Seconds
+atxy4.menu.WDTtimeout.4seconds=Window remains open for 4 Seconds
+atxy4.menu.WDTtimeout.2seconds=Window remains open for 2 Seconds
+atxy4.menu.WDTtimeout.1second=Window remains open for 1 Second
+atxy4.menu.WDTtimeout.500msec=Window remains open for 500 milliseconds
+atxy4.menu.WDTtimeout.250msec=Window remains open for 250 milliseconds
+atxy4.menu.WDTtimeout.125msec=Window remains open for 125 milliseconds
+atxy4.menu.WDTwindow.disabled=No delay before window "opens"
+atxy4.menu.WDTwindow.8seconds=8 Second before window "opens"
+atxy4.menu.WDTwindow.4seconds=4 Second before window "opens"
+atxy4.menu.WDTwindow.2seconds=2 Second before window "opens"
+atxy4.menu.WDTwindow.1second=1 Second before window "opens"
+atxy4.menu.WDTwindow.500msec=500 millisecond before window "opens"
+atxy4.menu.WDTwindow.250msec=250 millisecond before window "opens"
+atxy4.menu.WDTwindow.125msec=125 millisecond before window "opens"
+atxy4.menu.WDTwindow.63msec=62.5 millisecond before window "opens"
+atxy4.menu.WDTtimeout.disabled.bootloader.wdttimeoutbits=0000
+atxy4.menu.WDTtimeout.8seconds.bootloader.wdttimeoutbits=1011
+atxy4.menu.WDTtimeout.4seconds.bootloader.wdttimeoutbits=1010
+atxy4.menu.WDTtimeout.2seconds.bootloader.wdttimeoutbits=1001
+atxy4.menu.WDTtimeout.1second.bootloader.wdttimeoutbits=1000
+atxy4.menu.WDTtimeout.500msec.bootloader.wdttimeoutbits=0111
+atxy4.menu.WDTtimeout.250msec.bootloader.wdttimeoutbits=0110
+atxy4.menu.WDTtimeout.125msec.bootloader.wdttimeoutbits=0101
+atxy4.menu.WDTwindow.disabled.bootloader.wdtwindowbits=0000
+atxy4.menu.WDTwindow.8seconds.bootloader.wdtwindowbits=1011
+atxy4.menu.WDTwindow.4seconds.bootloader.wdtwindowbits=1010
+atxy4.menu.WDTwindow.2seconds.bootloader.wdtwindowbits=1001
+atxy4.menu.WDTwindow.1second.bootloader.wdtwindowbits=1000
+atxy4.menu.WDTwindow.500msec.bootloader.wdtwindowbits=0111
+atxy4.menu.WDTwindow.250msec.bootloader.wdtwindowbits=0110
+atxy4.menu.WDTwindow.125msec.bootloader.wdtwindowbits=0101
+atxy4.menu.WDTwindow.63msec.bootloader.wdtwindowbits=0100
+
 ############################################################################
 #  Non-bootloader                                                          #
 #                                     ###      ####   ###  #   #         ###
@@ -1342,7 +1451,7 @@ atxy2.build.attachmode=-DCORE_ATTACH_ALL
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
 #________________________________________#
-atxy2.bootloader.WDTCFG=0x00
+atxy2.bootloader.WDTCFG=0b{bootloader.wdtwindowbits}{bootloader.wdttimeoutbits}
 atxy2.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 atxy2.bootloader.OSCCFG=0x01
 atxy2.bootloader.TCD0CFG_avrdude=
@@ -1661,6 +1770,44 @@ atxy2.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 atxy2.menu.attach.manual.build.attachabr=.aMan
 atxy2.menu.attach.oldversion.build.attachabr=.aOld
 
+#----------------------------------------#
+# WDT MODE                               #
+#________________________________________#
+atxy2.menu.WDTtimeout.disabled=Disabled (recommended)
+atxy2.menu.WDTtimeout.8seconds=Window remains open for 8 Seconds
+atxy2.menu.WDTtimeout.4seconds=Window remains open for 4 Seconds
+atxy2.menu.WDTtimeout.2seconds=Window remains open for 2 Seconds
+atxy2.menu.WDTtimeout.1second=Window remains open for 1 Second
+atxy2.menu.WDTtimeout.500msec=Window remains open for 500 milliseconds
+atxy2.menu.WDTtimeout.250msec=Window remains open for 250 milliseconds
+atxy2.menu.WDTtimeout.125msec=Window remains open for 125 milliseconds
+atxy2.menu.WDTtimeout.63msec=Window remains open for 62.5 milliseconds
+atxy2.menu.WDTwindow.disabled=No delay before window "opens"
+atxy2.menu.WDTwindow.8seconds=8 Second before window "opens"
+atxy2.menu.WDTwindow.4seconds=4 Second before window "opens"
+atxy2.menu.WDTwindow.2seconds=2 Second before window "opens"
+atxy2.menu.WDTwindow.1second=1 Second before window "opens"
+atxy2.menu.WDTwindow.500msec=500 millisecond before window "opens"
+atxy2.menu.WDTwindow.250msec=250 millisecond before window "opens"
+atxy2.menu.WDTwindow.125msec=125 millisecond before window "opens"
+atxy2.menu.WDTtimeout.disabled.bootloader.wdttimeoutbits=0000
+atxy2.menu.WDTtimeout.8seconds.bootloader.wdttimeoutbits=1011
+atxy2.menu.WDTtimeout.4seconds.bootloader.wdttimeoutbits=1010
+atxy2.menu.WDTtimeout.2seconds.bootloader.wdttimeoutbits=1001
+atxy2.menu.WDTtimeout.1second.bootloader.wdttimeoutbits=1000
+atxy2.menu.WDTtimeout.500msec.bootloader.wdttimeoutbits=0111
+atxy2.menu.WDTtimeout.250msec.bootloader.wdttimeoutbits=0110
+atxy2.menu.WDTtimeout.125msec.bootloader.wdttimeoutbits=0101
+atxy2.menu.WDTwindow.disabled.bootloader.wdtwindowbits=0000
+atxy2.menu.WDTwindow.8seconds.bootloader.wdtwindowbits=1011
+atxy2.menu.WDTwindow.4seconds.bootloader.wdtwindowbits=1010
+atxy2.menu.WDTwindow.2seconds.bootloader.wdtwindowbits=1001
+atxy2.menu.WDTwindow.1second.bootloader.wdtwindowbits=1000
+atxy2.menu.WDTwindow.500msec.bootloader.wdtwindowbits=0111
+atxy2.menu.WDTwindow.250msec.bootloader.wdtwindowbits=0110
+atxy2.menu.WDTwindow.125msec.bootloader.wdtwindowbits=0101
+atxy2.menu.WDTwindow.63msec.bootloader.wdtwindowbits=0100
+
 ############################################################################
 #  Non-bootloader                                                          #
 # Curiosity Nano    #   # ###  ### ####   ###   ### #  # ### ####        ###
@@ -1677,9 +1824,6 @@ microchip.build.millistimer=D0
 microchip.build.clocksource=0
 microchip.build.core=megatinycore
 microchip.build.mrelax= -mrelax
-
-microchip.build.mrelax= -mrelax
-
 microchip.build.variant=txy7
 microchip.build.tuned=
 microchip.build.board=If you see this, please report this bug promptly. It should never be shown.
@@ -1694,7 +1838,7 @@ microchip.build.board=Microchip Placeholder
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
 #________________________________________#
-microchip.bootloader.WDTCFG=0x00
+microchip.bootloader.WDTCFG=0b0b{bootloader.wdtwindowbits}{bootloader.wdttimeoutbits}
 microchip.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 microchip.bootloader.OSCCFG=0x01
 microchip.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
@@ -2006,6 +2150,43 @@ microchip.menu.attach.oldversion=Old version, (may fix bugs)
 microchip.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 microchip.menu.attach.manual.build.attachabr=.aMan
 microchip.menu.attach.oldversion.build.attachabr=.aOld
+
+#----------------------------------------#
+# WDT MODE                               #
+#________________________________________#
+microchip.menu.WDTtimeout.disabled=Disabled (recommended)
+microchip.menu.WDTtimeout.8seconds=Window remains open for 8 Seconds
+microchip.menu.WDTtimeout.4seconds=Window remains open for 4 Seconds
+microchip.menu.WDTtimeout.2seconds=Window remains open for 2 Seconds
+microchip.menu.WDTtimeout.1second=Window remains open for 1 Second
+microchip.menu.WDTtimeout.500msec=Window remains open for 500 milliseconds
+microchip.menu.WDTtimeout.250msec=Window remains open for 250 milliseconds
+microchip.menu.WDTwindow.disabled=No delay before window "opens"
+microchip.menu.WDTwindow.8seconds=8 Second before window "opens"
+microchip.menu.WDTwindow.4seconds=4 Second before window "opens"
+microchip.menu.WDTwindow.2seconds=2 Second before window "opens"
+microchip.menu.WDTwindow.1second=1 Second before window "opens"
+microchip.menu.WDTwindow.500msec=500 millisecond before window "opens"
+microchip.menu.WDTwindow.250msec=250 millisecond before window "opens"
+microchip.menu.WDTwindow.125msec=125 millisecond before window "opens"
+microchip.menu.WDTwindow.63msec=62.5 millisecond before window "opens"
+microchip.menu.WDTtimeout.disabled.bootloader.wdttimeoutbits=0000
+microchip.menu.WDTtimeout.8seconds.bootloader.wdttimeoutbits=1011
+microchip.menu.WDTtimeout.4seconds.bootloader.wdttimeoutbits=1010
+microchip.menu.WDTtimeout.2seconds.bootloader.wdttimeoutbits=1001
+microchip.menu.WDTtimeout.1second.bootloader.wdttimeoutbits=1000
+microchip.menu.WDTtimeout.500msec.bootloader.wdttimeoutbits=0111
+microchip.menu.WDTtimeout.250msec.bootloader.wdttimeoutbits=0110
+microchip.menu.WDTtimeout.125msec.bootloader.wdttimeoutbits=0101
+microchip.menu.WDTwindow.disabled.bootloader.wdtwindowbits=0000
+microchip.menu.WDTwindow.8seconds.bootloader.wdtwindowbits=1011
+microchip.menu.WDTwindow.4seconds.bootloader.wdtwindowbits=1010
+microchip.menu.WDTwindow.2seconds.bootloader.wdtwindowbits=1001
+microchip.menu.WDTwindow.1second.bootloader.wdtwindowbits=1000
+microchip.menu.WDTwindow.500msec.bootloader.wdtwindowbits=0111
+microchip.menu.WDTwindow.250msec.bootloader.wdtwindowbits=0110
+microchip.menu.WDTwindow.125msec.bootloader.wdtwindowbits=0101
+microchip.menu.WDTwindow.63msec.bootloader.wdtwindowbits=0100
 
 ##########################################################################
 ##########################################################################
