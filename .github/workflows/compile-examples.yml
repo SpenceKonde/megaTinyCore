@@ -28,7 +28,8 @@ jobs:
 
     env:
       platform-name: megaTinyCore:megaavr
-
+      bootloader-optiboot-o-flash-7_5kB-plus-true-sketch-paths: |
+        - megaavr/libraries/Optiboot_flasher/examples/Flash_put_get
       available-flash-7_5kB-plus-true-sketch-paths: |
         - megaavr/libraries/EEPROM/examples/eeprom_get
         - megaavr/libraries/USERSIG/examples/usersig_get
@@ -37,7 +38,6 @@ jobs:
         - megaavr/libraries/Wire/examples/SFRRanger_reader
         - megaavr/libraries/tinyNeoPixel/examples/RGBWstrandtest
         - megaavr/extras/CompileTestSketches/test_analog_read
-        - megaavr/libraries/Optiboot_flasher/examples/Flash_put_get
         - megaavr/libraries/Wire/examples/slave_address_mask
         - megaavr/libraries/Wire/examples/master_multi_address_write
       available-flash-4kB-plus-true-sketch-paths: |
@@ -214,6 +214,7 @@ jobs:
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
             ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
+            ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
@@ -245,7 +246,7 @@ jobs:
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
             ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
-
+            ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
@@ -274,6 +275,8 @@ jobs:
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
+            ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', (matrix.available-flash-kB >= 3.5 && (matrix.peripheral-class == 2 || (matrix.peripheral-class == 1 && matrix-available-flash-kB >= 15.5))))] }}
+            ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
@@ -303,7 +306,7 @@ jobs:
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
             ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
-
+            ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
@@ -332,7 +335,7 @@ jobs:
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
-
+            ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
@@ -362,7 +365,7 @@ jobs:
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
             ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
-
+            ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
@@ -392,6 +395,7 @@ jobs:
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
             ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
+            ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
@@ -421,7 +425,7 @@ jobs:
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
             ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
-
+            ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
@@ -451,7 +455,7 @@ jobs:
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
             ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
-
+            ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
           platforms: |
