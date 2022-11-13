@@ -419,17 +419,18 @@ uint8_t TwoWire::specialConfig( __attribute__ ((unused)) bool smbuslvl, __attrib
   // Notice how the non-dualctrl parts also don't have smbus levels!
   #if defined(TWI1) // TWI_DUALCTRL is also defined here - everything with TWI1 has dual mode
     if (&TWI0 == vars._module) {
-      return ret | TWI0_setConfig(smbuslvl, longsetup, smbuslvl_dual, sda_hold_dual);
+      ret |= TWI0_setConfig(smbuslvl, longsetup, sda_hold, smbuslvl_dual, sda_hold_dual);
     } else if (&TWI1 == vars._module) {
-      return ret | TWI1_setConfig(smbuslvl, longsetup, smbuslvl_dual, sda_hold_dual);
+      ret |= TWI1_setConfig(smbuslvl, longsetup, sda_hold, smbuslvl_dual, sda_hold_dual);
     }
   #else
     #if defined(TWI_DUALCTRL) // And nothing without dual mode has smbus levels either.
-      return ret | TWI0_setConfig(smbuslvl, longsetup, sda_hold, smbuslvl_dual, sda_hold_dual);
+      ret |= TWI0_setConfig(smbuslvl, longsetup, sda_hold, smbuslvl_dual, sda_hold_dual);
     #else
-      return ret | TWI0_setConfig(longsetup, sda_hold);
+      ret |= TWI0_setConfig(longsetup, sda_hold);
     #endif
   #endif
+  return ret;
 }
 
 

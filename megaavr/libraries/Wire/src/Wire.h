@@ -132,10 +132,10 @@ class TwoWire: public Stream {
     using Print::write;
 
 
-    size_t readBytes(uint8_t * data, size_t quantity) {
-      return readBytes((char *) data, quantity);
+    size_t readBytes(uint8_t *data, size_t quantity) {
+      return readBytes((char *)data, quantity);
     }
-    size_t readBytes(char * data, size_t quantity);
+    size_t readBytes(char *data, size_t quantity);
 
     #if defined(TWI_READ_ERROR_ENABLED) && defined(TWI_ERROR_ENABLED)
     uint8_t returnError();
