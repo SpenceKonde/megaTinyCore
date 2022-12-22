@@ -299,7 +299,7 @@ class NvmUpdiAvrDx(NvmUpdi):
         """
         nvm_command = constants.UPDI_V1_NVMCTRL_CTRLA_FLASH_WRITE
 
-        if bulkwrite == 0 or address == 0x800000:
+        if bulkwrite == 0 or (address & 32767) == 0:
             # Check that NVM controller is ready
             if not self.wait_flash_ready():
                 raise Exception("Timeout waiting for flash ready before page buffer clear ")

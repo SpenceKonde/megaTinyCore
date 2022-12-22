@@ -13,13 +13,14 @@ Addresses in the USERSIG area are given by by a `byte`, not an `int`, as all rel
 
 | AVR Device                          | USERROW size | Supported | Erase granularity and mode |
 |-------------------------------------|--------------|-----------|----------------------------|
-| tinyAVR 0/1/2-series                |          32b |       Yes | Byte, handled automatically|
+| tinyAVR 0/1/2-series except 3216/7  |          32b |       Yes | Byte, handled automatically|
+| tinyAVR 3216, 3217                  |          64b |       Yes | Byte, handled automatically|
 | megaAVR 0-series (8k or 16k flash)  |          32b |       Yes | Byte, handled automatically|
 | megaAVR 0-series (32k or 48k flash) |          64b |       Yes | Byte, handled automatically|
 | DA, DB, DD-series (all flash sizes) |          32b | On DxCore | 32b, app must handle erase |
 | EA-series (all flash sizes)         |          64b |   Not yet | TBD                        |
 
-The Dx-series uses a different version of the library, which is included with DxCore. It presents almost the same API, but not quite - this one is functionally identical to EEPROM, except that all functions that modify values have a return value of 1, and a few no-op functions that always return 0 are provided for code compatibility, and it has a way to manually erase the USERROW (also for compatibility). Those parts have hardware which cannot be made to look like EEPROM in the same way. See the library documentation for DxCore for more information, or the section at below for just what you need to know to make sure your code works on DxCore too..
+The Dx-series uses a different version of the library, which is included with DxCore. They both provide the same API, but here because there is 1b erase granularity, this one is functionally identical to EEPROM,  all functions that modify values have a return value of 1, and a few no-op functions that always return 0 are provided for code compatibility with the Dx version. It also has a way to manually erase the USERROW (also for compatibility). On the Dx-series parts, the USERROW acts more like flash and less like EEPROM, with no erase granularity at all. Those parts have hardware which cannot be made to look like EEPROM in the same way. See the library documentation for DxCore for more information, or the section at below for just what you need to know to make sure your code works on DxCore too..
 
 Specifying an address beyond the size of the USEROW will wrap around to the beginning.
 
@@ -27,7 +28,7 @@ Specifying an address beyond the size of the USEROW will wrap around to the begi
 There is no specification given in the datasheet. You should treat the USERROW as if had a limit of comparable to flash. That has been confirmed to me in the context of the Dx-series parts by a well-placed source - however, I do not know if the same is true on tinyAVR, or if (like it's erase and write procedures) it is instead like EEPROM. The datasheets of Dx-series parts consistently refer to it being like flash, while the datasheets of the tinyAVRs compare it to EEPROM - but never is the context of write endurance discussed). This may be more of an issue now that the write endurance of the DA and DB systems for flash has been reduced by a factor of 10.
 
 ## How to use it
-The USERSIG library is included with DxCore. To add its functionality to your sketch you'll need to reference the library header file. You do this by adding an include directive to the top of your sketch.
+The USERSIG library is included with megaTinyCore and DxCore. To add its functionality to your sketch you'll need to reference the library header file. You do this by adding an include directive to the top of your sketch.
 
 ```Arduino
 #include <USERSIG.h>
@@ -114,7 +115,7 @@ This function returns a `byte` containing the number of bytes in the user signat
 
 
 ### `USERSIG.flush()`
-By analogy with the stream flush() method, commits any pending writes to the NVM. This function does nothing on megaTinyCore, as the library always immediately commits all changes to the NVM because there is no reason not to (unlike DxCore).
+By analogy with the stream flush() method, commits any pending writes to the NVM. This function does nothing on megaTinyCore, as the library always immediately commits all changes to the NVM because there is no reason not to (unlike DxCore, where we cannot erase bytes individually, but must erase the whole flash as one monolithic entity.).
 
 It always returns 0 as a `int8_t`, indicating success. On DxCore it can also return negative numbers; those indicate errors.
 
@@ -137,7 +138,7 @@ DxCore provides a version of this library which accommodates it's more constrain
 
 To ensure code compatibility with DxCore, there are two very simple things your code must do. This is associated with negligible overhead and there's no good reason not to do it:
 1. You must always call flush(); after writing a series of values, unless the last write is performed by passing an object 5 bytes or more in size to USERSIG.put() (in which case it is unnecessary, but harmless).
-2. You must not attempt to write to the USERROW from within an interrupt (the usefulness of this was felt to be too small to justify the overhead needed to deal with this - writing to NVM from within an interrupt is inadvisable in general and we recommend against it in EEPROM.h too, where it causes millis to lose time).
+2. You must not attempt to write to the USERROW from within an interrupt (the usefulness of this was felt to be too small to justify the overhead needed to deal with this - writing to NVM from within an interrupt is inadvisable in general and we recommend against it when writing EEPROM too - it causes millis to lose time).
 
 ---
 

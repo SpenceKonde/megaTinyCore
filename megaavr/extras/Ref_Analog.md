@@ -18,38 +18,39 @@ Analog reference voltage can be selected as usual using analogReference(). Suppo
 | `EXTERNAL` (16k and 32k 1-series only) | V<sub>ref</sub>+0.4V |                           |        |
 
 ### Important notes regarding reference voltages
+1. We do not provide a reference named "INTERNAL" like some classic AVR cores do; because the available voltages vary, this would be a detriment to cross-compatibility - by generating code that would compile, but behave differently, that would introduce the potential for new problems that would be difficult to debug. Especially since the internal reference voltage isn't the same one that classic AVRs where that usage was commonplace make it more likely to cause problems than solve them. If things would behave wrongly no matter what (which is the case), you're better off getting compile-time errors than incorrect behavior at runtime; In this case the modifications are minor - changing some constants that things are being multiplied or divided by, and the name of the reference.
 
-
-1. We do not provide a reference named "INTERNAL" like some classic AVR cores do; because the available voltages vary, this would be a detriment to cross-compatibility - by generating code that would compile, but behave differently, that would introduce the potential for new bugs that would be difficult to debug. Especially since the internal reference voltage isn't the same one that classic AVRs where that usage was commonplace is.... and so these would behave wrongly no matter what was done; minor modifications to sketches are required whenever the internal references are used when porting from classic to modern AVRs.
-
-
-2. From careful examination of the table above it can be seen that the minimum Vdd for a given reference voltage is slightly larger for the 2-series - You need slightly more headroom; about 0.5v, compared with around 0.4v for the 1-series. This could be a real effect (ie, increased sensitivity of the ADC to adverse operating conditions), or may simply reflect the more careful and organized approach that appears to have been taken on the 2-series parts in general (consider that 2-series parts have 1 specific errata, and around a half-dozen that impact every modern AVR, while each 0 and 1-series pincount has it's own mob of a few dozen, most of which are not common to all parts in the series).
-
-3. The External Reference option on the 16k and 32k 1-series parts - like most of the other features specific to just those parts - was added is a somewhat slapdash manner. They say, and I quote:
-```text
-When using the external reference voltage VREFA, configure ADCnREFSEL[0:2] in the corresponding VREF.CTRLn
-register to the value that is closest, but above the applied reference voltage. For external references higher than
-4.3V, use ADCnREFSEL[0:2] = 0x3 [4.3V].
-```
-However, one must NOT have ADCnREFEN bit set when using an external reference, so it's far from clear why the above is required, this warning was never present until 2.5.12, and nobody complained. This suggests that it one of the following is true:
-  a. Configuring refsel per the datasheet isn't that important after all, or makes small enough difference in accuracy that it has gone unnoticed so far.
-  b. Failure to configure refsel per the datasheet causes only poor ADC accuracy, and the few individuals using an external reference read the relevant paragraph in the datasheet and configured refsel or thought "Damn the ADC on these parts sucks" and has kept that observation to themselves.
-  b. Configuring refsel per the datasheet is a *safeguard* against some undesirable outcome that could occur *if ADCnREFEN was also set with an external reference*.
-  c. Configuring refsel per the datasheet is a safeguard against some undesirable outcome that could occur whether or not ADCnREFEN is set, but the undesirable outcome impacts the internal references only, and the few people who have encountered this have not encountered the consequences because the don't use the internal reference source
-  d. Configuring refsel per the datasheet is a safeguard against some undesirable outcome that would cause visible consequences for the running sketch, regardless of whether ADCnREFEN is set, and this has only gone unnoticed because nobody who didn't read that section of the datasheet and do it has tried to use an external voltage reference, or if they have, when it didn't work, they kept that information to themselves.
-  e. Everyone using extenrnal references has read that part of the datasheet, and thus nobody has encountered this condition. In this case, it could do anything from functioning normally to exploding, to raising the dead, and we wouldn't know.
-  f. Nobody has tried using the external reference, period.
-
-My guess (and it is ONLY A **GUESS**) is that b or c is the case, and the undesired outcome takes the form of damage to the selected analog reference. Which will usually be 0.55V. if all that was done was immediately set it to the external reference. That reference voltage is rarely used, so this could plausibly have gone unnoticed by megaTinyCore users.
-
-analogReference() as you know takes only a single argument, and the overhead of measuring an external reference voltage to determine what the internal reference should be set to in order to comply with that restriction would be prohibitive. If you are using the external reference on the 1-series parts, first call analogReference with a internal reference per their quoted instructions, then set it to the external reference, if you're concerned about that. I would love to know more about whether this step is truly important.
+2. From careful examination of the table above it can be seen that the minimum Vdd for a given reference voltage is slightly larger for the 2-series - You need slightly more headroom; about 0.5v, compared with around 0.4v for the 1-series. This could be a real effect (ie, increased sensitivity of the ADC to adverse operating conditions), or may simply reflect the more conservative approach that appears to have been taken to QA of 2-series parts in general (consider that 2-series parts have a total of 5 errata, with no new ones a year after release, and 4 of those impacted all modern AVRs released at the time. Compare to the 0 and 1-series each 0 and 1-series flash size has it's own grab-bag of a few dozen, most of which are on some but not all tinyAVR parts, nothing else, none of which were fixed on the last die rev for 16k 1-series, and some of which are really nasty.
 
 3. Note the change from the heinous near random reference voltages used on the 0/1-series - which you often end up either checking against thresholds calculated at compile time or using floating point math in order to do anything useful with - to maximally convenient ones on everything released later than the 0/1-series. I say they are maximally convenient because with 12-bit resolution selected, 4.096V, 2.048V, and 1.024V references correspond to 1 mV/LSB, 0.5mv/LSB, and 0.25mv/LSB.
 
 4. On 0/1-series, you must be sure to slow down the ADC clock with analogClockSpeed when using the 0.55V reference, as it has a much more restricted operating clock speed range: 100 - 260 kHZ. The other references can be used at 200 - 2000 kHz.
 
+5. The External Reference option **on the 16k and 32k 1-series parts** - like most of the other features specific to just those parts - was added is a somewhat slapdash manner. They say, and I quote:
+```text
+When using the external reference voltage VREFA, configure ADCnREFSEL[0:2] in the corresponding VREF.CTRLn
+register to the value that is closest, but above the applied reference voltage. For external references higher than
+4.3V, use ADCnREFSEL[0:2] = 0x3 [4.3V].
+```
+And they also say that one must NOT have ADCnREFEN bit set when using an external reference, this warning was never present in the megaTinyCore docs until 1.5.12, and nobody complained. This suggests that it one of the following is true:
+  a. Configuring refsel per the datasheet isn't that important after all; alternately, it may just make the reference less accuratem, or otherwise throw off the accuracy enough to keep it from meeting spec, but not by enough that people who triggered it noticed.
+  b. Failure to configure refsel per the datasheet causes only poor ADC accuracy, and the few individuals using an external reference either read the relevant paragraph in the datasheet and configured refsel or else thought "Damn the ADC on these parts sucks" but kept that observation to themselves.
+  c. Configuring refsel per the datasheet is a *safeguard* against some undesirable outcome that could occur *if ADCnREFEN was also accidentally set* with an external reference enabled.
+  d. Configuring refsel per the datasheet is a safeguard against some undesirable outcome that could occur *whether or not ADCnREFEN is set*, but the undesirable outcome impacts the current internal reference only, and the few people who have encountered this have not realized, because they had the default 0.55V ref selected when they were using the external ref, and if they later used the internal reference, they didn't use the 0.55V one.
+  e. Configuring refsel per the datasheet is a safeguard against some undesirable outcome that would cause visible consequences for the running sketch, regardless of whether ADCnREFEN is set, and this has only gone unnoticed because nobody who didn't read that section of the datasheet either have not tried to use an external voltage reference, or if they have, when whatever consequences occured, they kept that information to themselves.
+  f. Everyone using extenrnal references has read that part of the datasheet, and thus nobody has encountered this condition. In this case, it could do anything from functioning normally to exploding, to raising the dead, and we wouldn't know.
+  g. Nobody has tried using the external reference, period.
+
+My guess (and it is ONLY A **GUESS**) is that b, c, or possibly d is the case, and that in the case of c and d, the undesired outcome takes the form of damage to the selected analog reference. Which will usually be 0.55V, since why would you change the internal reference if you had an external one connected unless you'd read that paragraph. That reference voltage is rarely used, so even if it was easy to destroy that reference, this could plausibly have gone unnoticed by megaTinyCore users.
+
+I think possibility g is unlikely - someone probably tried it at some point. And f is only a theoretical possibility. We all know that most people haven't made a study of the datasheet and some haven't even taken a cursory look, especially for peripherals that normally handled by Arduino API functions.
+
+analogReference() as you know takes only a single argument, and the overhead of measuring an external reference voltage to determine what the internal reference should be set to in order to comply with that restriction would be prohibitive. If you are using the external reference on the 1-series parts, first call analogReference with a internal reference per their quoted instructions, then set it to the external reference, if you're concerned about that. I would love to know more about how important this step is. I might even attemt to see if I could demonstrate that issue. at the possible expense of an internal reference on a 1614.
+
+
 ## Internal Sources
 In addition to reading from pins, you can read from a number of internal sources - this is done just like reading a pin, except the constant listed in the table below is used instead of the pin name or pin number:
+
 | tinyAVR 0/1-series                     | tinyAVR 2-series                    | AVRDA            | AVRDB             | AVRDD             | AVR EA           |
 |----------------------------------------|-------------------------------------|------------------|-------------------|-------------------|------------------|
 | `ADC_INTREF`                           | `ADC_VDDDIV10`                      | `ADC_TEMPERATURE`| `ADC_VDDDIV10`    | `ADC_VDDDIV10`    | `ADC_VDDDIV10`   |
@@ -57,18 +58,44 @@ In addition to reading from pins, you can read from a number of internal sources
 | `ADC_DAC0` (1-series only)             | `ADC_GROUND` (offset calibration?)  | `ADC_DACREF0` *  | `ADC_GROUND` *    | `ADC_GROUND`      | `ADC_GROUND`     |
 | `ADC_GROUND` (offset calibration?)     | `ADC_DACREF0`                       | `ADC_DACREF1` *  | `ADC_DACREF0` *   | `ADC_DACREF0`     | `ADC_DACREF0`    |
 | `ADC_DACREF0` (alias of ADC_DAC0)      | `ADC_DAC0` (alias of `ADC_DACREF0`) | `ADC_DACREF2` *  | `ADC_DACREF1` *   | `ADC_DAC0`        | `ADC_DACREF1`    |
-| `ADC_PTC` (not particularly useful)    |                                     | `ADC_DAC0`       | `ADC_DACREF2` *   | `ADC_VDDIO2DIV10` | `ADC_DAC0`       |
-| 'ADC1_DACREF1' (16/32k 1-series only)† |                                     |                  | `ADC_DAC0` *      | `ADC_BGTEMPSNSE`? |                  |
-| 'ADC1_DACREF2' (16/32k 1-series only)† |                                     |                  | `ADC_VDDIO2DIV10` |                   |                  |
+| `ADC_PTC` (not particularly useful)    | *see note*                          | `ADC_DAC0`       | `ADC_DACREF2` *   | `ADC_VDDIO2DIV10` | `ADC_DAC0`       |
+| `ADC1_DACREF1` (16/32k 1-series only)† |                                     |                  | `ADC_DAC0` *      |                   |                  |
+| `ADC1_DACREF2` (16/32k 1-series only)† |                                     |                  | `ADC_VDDIO2DIV10` |                   |                  |
 
 
-The Ground internal sources are presumably meant to help correct for offset error. On Classic AVRs they made a point of talking about offset cal for differential channels. They are thus far silent on this, though a great deal of tech briefs related to the new ADC has been coming out, greatly improving the quality of the available information.
+The Ground internal sources are presumably meant to help correct for offset error. On Classic AVRs they made a point of talking about offset cal for differential channels. They are thus far silent on this, despite a great number of tech briefs related to the new ADC has been coming out, greatly improving the quality of the available information.
 
-DACREF0 is the the reference voltage for the analog comparator, AC0. On the 1-series, this is the same as the `DAC0` voltage (yup, the analog voltage is shared). Analog comparators AC1 and AC2 on 1-series parts with at least 16k of flash also have a DAC1 and DAC2 to generate a reference voltage for them (though it does not have an output buffer). On the 2-series, this is only used as the AC0 reference voltage; it cannot be output to a pin. . Unlike the AVR DA-series parts, which have neither `VDDDIV10` nor `INTREF` as an option so reading the reference voltage through `DACREF0` was the only way to determine the operating voltage, there is not a clear use case for the ability to measure this voltage.
+DACREF0 is the the reference voltage for the analog comparator, AC0. On the 1-series, this is the same as the `DAC0` voltage (yup, the analog voltage is shared). Analog comparators AC1 and AC2 on 1-series parts with at least 16k of flash also have a DAC1 and DAC2 to generate a reference voltage for them (though it does not have an output buffer). On the 2-series, this is only used as the AC0 reference voltage; it cannot be output to a pin. Unlike the AVR DA-series parts, which have neither `VDDDIV10` nor `INTREF` as an option, hence reading the reference voltage through `DACREF0` was the only way to determine the operating voltage there's less of a clear use case on the tinyAVR 2-series, or the DB, DD, or EA-series parts. To what end are you measuring a voltage which you are in control of? To see how accurate the reference is?
+At least there's a plausible use of the DAC input: recognizing that the voltage is off. On all parts there's the possibility of a load on it that's too big dragging it downwards. The DA and DB parts also have a lifetime drift issue (per errata) when the DAC is used without the output buffer.
 
 `*` Note that the I/O headers omit several options listed in the datasheet; For Dx-series, DACREF options aren't listed in the I/O headers for MUXPOS or Ground, but we still provide the constants listed above, consistent with the datasheet.
 `?` The DD-series lists a "BGTEMPSENSE" option in preliminary material, but it was removed by launch. It is unclear if this was ever implemented or if it exists in the silicon.
-`†` This options is available only on ADC1 of the tinyAVR 1-series parts with 16k+ flash, the smaller chips have neither the DACREFs nor the second ADC to measure them with.
+
+### Measuring VDD on 0/1-series
+So the only way to measure Vdd as you can see from the tables above is to measure the internal reference, with the reference set to VDD.
+
+But you probably want to use either the 1V1, 1V5, or 2V5 reference, not the default 0.55V one... But if you choose one of those, it switches the reference to internal! Don't worry - there's a very simple solution:
+```c++
+analogReference(INTERNAL2V5); // set reference to the desired voltage, and set that as the ADC reference.
+analogReference(VDD); // Set the ADC reference to VDD. Voltage selected previously is still the selected, just not set as the ADC reference.
+analogRead(ADC_INT_REF); // proceed to measure the analog reference.
+```
+
+On the 2-series, of course, there's no need for such silliness:
+```c++
+analogReference(INTERNAL1V024);
+analogRead(ADC_VDDDIV10); // Nothing weird on the 2-series.
+// 1V024 gives 1 mV per LSB. We're measuring VDD divided by 10, so VDD = 10mV * result.
+// If we switched to 12-bit resolution first, it would be 2.5 mV per LSB.
+// say we went further and did this:
+uint32_t raw = analogReadEnh(ADC_VDDDIV10,13); // automatically accumulate 4 samples and decimate to get 13 bits
+// that gives us 1.25 mV/LSB, or the raw reading is 0.8 times the voltage in mV.
+// This can be efficiently converted like so:
+uint16_t vdd = raw;
+vdd += vdd >> 2;  //equivalent to vdd = vdd + vdd/4, but faster and smaller than division, and much faster than using floating point values.
+// vdd now holds the voltage of VDD expressed in millivolts
+```
+
 
 ### Analog Resolution
 The hardware supports increasing the resolution of analogRead() to the limit of the hardware's native resolution (10 or 12 bits); Additionally, we provide automatic oversampling and decimation up to the limit of what can be gathered using the accumulation feature allowing up to 13 bits of resolution (17 on 2-series); this is exposed through the `analogReadEnh()` function detailed below.
@@ -95,21 +122,21 @@ The hardware supports increasing the resolution of analogRead() to the limit of 
 
 
 ## ADC Function Reference
-This core includes the following ADC-related functions. Out of the box, analogRead() is intended to be directly compatible with the standard Arduino implementation. Additional functions are provided to use the advanced functionality of these parts and further tune the ADC to your application.
+This core includes the following ADC-related functions. Out of the box, analogRead() is intended to be directly compatible with the standard Arduino implementation. Additional functions are provided to use the advanced functionality of these parts and further tune the ADC to your application. Several functions are unique to the cores I maintain. The functions here are marked with (standard), consisting of implementation notes for fully standard stuff (rarely important) or important notes about cases when these function don't work (the official core has thsoe cases too, they just don't document them) (usually important), (semi-standard) something that is standard on some arduino cores but not official AVR cores and/or which works differently here), or (one of more of mTC, DxC, and ATC - these are the three cores I maintain, megaTinyCore, DxCore and ATTinyCore).
 
-### getAnalogReference() and getDACReference()
+### (mTC/DxC) getAnalogReference() and getDACReference()
 These return the numbers listes in the reference table at the top as a `uint8_t` - you can for example test `if (getAnalogReference() == INTERNAL1V1)`
 
-### analogRead(pin)
+### (standard) analogRead(pin)
 The standard analogRead(). Single-ended, and resolution set by analogReadResolution(), default 10 for compatibility. Negative return values indicate an error that we were not able to detect at compile time. Return type is a 16-bit signed integer (`int` or `int16_t`).
 
-### analogReadResolution(resolution)
+### (semi-standard) analogReadResolution(resolution)
 Sets resolution for the analogRead() function. Unlike stock version, this returns true/false. *If it returns false, the value passed was invalid, and resolution was set to the default, 10 bits*. Note that this can only happen when the value passed to it is determined at runtime - if you are passing a compile-time known constant which is invalid, we will issue a compile error. The only valid values are those that are supported natively by the hardware, plus 10 bit, even if not natively supported, for compatibility.
 Hence, the only valid values are 10 and 12. The EA-series will likely launch with the same 8bit resolution option as tinyAVR 2-series which would add 8 to that list.
 
 This is different from the Zero/Due/etc implementations, which allow you to pass anything from 1-32, and rightshift the minimum resolution or leftshift the maximum resolution as needed to get the requested range of values. Within the limited resources of an 8-bit AVR with this is a silly waste of resources, and padding a reading with zeros so it matches the format of a more precise measuring method is in questionable territory in terms of best practices. Note also that we offer oversampling & decimation with `analogReadEnh()` and `analogReadDiff()`, which can extend the resolution while keep the extra bits meaningful at the cost of slowing down the reading. `analogReadResolution()` only controls the resolution of analogRead() itself. The other functions take desired resolution as an argument, and restore the previous setting.
 
-### analogSampleDuration(duration)
+### (mTC/DxC) analogSampleDuration(duration)
 Sets sampling duration (SAMPLEN), the sampling time will be 2 + SAMPLEN ADC clock cycles. Sampling time is the time the sample and hold capacitor is connected to the source before beginning conversion. For high impedance voltage sources, use a longer sample length. For faster reads, use a shorter sample length.
 speed. This returns a `bool` - it is `true` if value is valid.
 
@@ -127,7 +154,7 @@ This value is used for all analog measurement functions.
 
 On the 2-series, we are at least given some numbers: 8pF for the sample and hold cap, and 10k input resistance so a 10k source impedance would give 0.16us time constant, implying that even a 4 ADC clock sampling time is excessive, but at such clock speeds, impedance much above that would need a longer sampling period.
 
-### analogReadEnh(pin, res=ADC_NATIVE_RESOLUTION, gain=0)
+### (mTC/DxC) analogReadEnh(pin, res=ADC_NATIVE_RESOLUTION, gain=0)
 Enhanced `analogRead()` - Perform a single-ended read on the specified pin. `res` is resolution in bits, which may range from 8 to `ADC_MAX_OVERSAMPLED_RESOLUTION`. This maximum is 13 bits for 0/1-series parts, and 17 for 2-series. If this is less than the native ADC resolution, that resolution is used, and then it is right-shifted 1, 2, or 3 times; if it is more than the native resolution, the accumulation option which will take 4<sup>n</sup> samples (where `n` is `res` native resolution) is selected. Note that maximum sample burst reads are not instantaneous, and in the most extreme cases can take milliseconds. Depending on the nature of the signal - or the realtime demands of your application - the time required for all those samples may limit the resolution that is acceptable. The accumulated result is then decimated (rightshifted n places) to yield a result with the requested resolution, which is returned. See [Atmel app note AVR121](https://ww1.microchip.com/downloads/en/appnotes/doc8003.pdf) - the specific case of the new ADC on the Ex and tinyAVR 2-series is discussed in the newer DS40002200 from Microchip, but it is a rather vapid document). Alternately, to get the raw accumulated ADC readings, pass one of the `ADC_ACC_n` constants for the second argument where `n` is a power of 2 up to 64 (0/1-series), or up to 1024 (2-series). Be aware that the lowest bits of a raw accumulated reading should not be trusted.; they're noise, not data (which is why the decimation step is needed, and why 4x the samples are required for every extra bit of resolution instead of 2x). On 2-series parts *the PGA can be used for single ended measurements*. Valid options for gain on the 2-series are 0 (PGA disabled, default), 1 (unity gain - may be appropriate under some circumstances, though I don't know what those are), or powers of 2 up to 16 (for 2x to 16x gain). On AVR Dx and tinyAVR 0/1-series parts, the gain argument should be omitted or 0; these do not have a PGA.
 
 | Part Series | Max Acc.     | result trunc?   | Maximum acc+decimate | Max PGA gain  |
@@ -151,7 +178,7 @@ Enhanced `analogRead()` - Perform a single-ended read on the specified pin. `res
 
 Negative values from ADC_ENH always indicate a runtime error; these values are easily recognized, as they are huge negative numbers
 
-### analogReadDiff(positive, negative, res=ADC_NATIVE_RESOLUTION, gain=0)
+### (mTC/DxC) analogReadDiff(positive, negative, res=ADC_NATIVE_RESOLUTION, gain=0)
 Differential `analogRead()` - returns a `long` (`int32_t`), not an `int` (`int16_t`). Performs a differential read using the specified pins as the positive and negative inputs. Any analog input pin can be used for the positive side, but only pins on PORTD/PORTE (AVR Dx-series), or the constants `ADC_GROUND` or `ADC_DAC0` can be used as the negative input. Information on available negative pins for the Ex-series is not yet available, but is expected to be a subset of available analog pins. The result returned is the voltage on the positive side, minus the voltage on the negative side, measured against the selected analog reference. The `res` parameter works the same way as for `analogReadEnh()`, as does the `gain` function. Gain becomes FAR more useful here than in single-ended mode as you can now take a very small difference and "magnify" it to make it easier to measure. Be careful when measuring very small values here, this is a "real" ADC not an "ideal" one, so there is a non-zero error, and through oversampling and/or gain, you can magnify that such that it looks like a signal.
 
 On the Dx-series, the measured voltages must be less than VRef; this makes differential ADC measurements on these parts significantly less powerful than the Ex-series, where the input can extend as much as 100mV beyond the supply rails, permitting use to measure current through a high-side sense resistor against the 1.024 V reference.
@@ -164,14 +191,32 @@ On the Dx-series, the measured voltages must be less than VRef; this makes diffe
 
 The 32-bit value returned should be between -65536 and 65535 at the extremes with the maximum 17-bit accumulation option, or, 32-times that if using raw accumulated values (-2.1 million to 2.1 million, approximately)
 
-**ERRATA ALERT** There is a mildly annoying silicon bug in early revisions of the AVR DA parts (as of a year post-release in 2021, these are still the only ones available) where whatever pin the ADC positive multiplexer is pointed at, digital reads are disabled. This core works around it by always setting the the ADC multiplexer to point at ADC_GROUND when it is not actively in use; however, be aware that you cannot, say, set an interrupt on a pin being subject to analogReads (not that this is particularly useful).
 
-### analogClockSpeed(int16_t frequency = 0, uint8_t options = 0)
-The accepted options for frequency are -1 (reset ADC clock to core default, 1-1.35 MHz), 0 (make no changes - just report current frequency) or a frequency, in kHz, to set the ADC clock to. Values between 125 and 2000 are considered valid for Dx-series parts and Ex-series parts 300-3000 with internal reference, and 300-6000 with Vdd or external reference. The prescaler options are discrete, not continuous, so there are a limited number of possible settings (the fastest and slowest of which are often outside the rated operating range). The core will choose the highest frequency which is within spec, and which does not exceed the value you requested. If a 1 is passed as the third argument, the validity check will be bypassed; this allows you to operate the ADC out of spec if you really want to, which may have unpredictable results. Microchip documentation has provided little in the way of guidance on selecting this (or other ADC parameters) other than giving us the upper and lower bounds.
+### (mTC/DxC) analogClockSpeed(int16_t frequency = 0, uint8_t options = 0)
+The accepted options for frequency are -1 (reset ADC clock to core default, 1-1.35 MHz), 0 (make no changes - just report current frequency) or a frequency, in kHz, to set the ADC clock to.
+
+| Part series | F_ADCmin | F_ADCmax | Reference | Prescalers                  |
+|-------------|----------|----------|-----------|-----------------------------|
+| tinyAVR 0/1 | 100      | 250      | 0.55V     | 8 from 2 to 256             |
+| tinyAVR 0/1 | 200      | 1500     | All other | 8 from 2 to 256             |
+| tinyAVR 0/1 | 200      | 2000     | Not 0.55V | Must use 8-bit resolution   |
+| tinyAVR 2   | 300      | 6000     | Internal  | 16 from 2 to 64             |
+| tinyAVR 2   | 300      | 6000     | External  | 16 from 2 to 64             |
+| AVR Dx      | 125      | 2000     | All       | 14 from 2 to 256            |
+| AVR EA      | 300      | 3000     | Internal  | 16 from 2 to 64             |
+| AVR EA      | 300      | 6000     | External  | 16 from 2 to 64             |
+
+Values between 125 and 2000 are considered valid for Dx-series parts and Ex-series parts 300-3000 with internal reference, and 300-6000 with Vdd or external reference. The prescaler options are discrete, not continuous, so there are a limited number of possible settings (the fastest and slowest of which are often outside the rated operating range). The core will choose the highest frequency which is within spec, and which does not exceed the value you requested.
+
+On any non-DX parts, you must call analogClockSpeed AFTER analogReference, since that changes the limits. On tiny 0/1, you should also be sure that if using in 8-bit mode you call analogReadResolution first, as the new prescaller is calculated when the function is called, and not at any other time. The 2-series and EA only care whether the reference is internal or Vdd/external, so you con't need to re-call this when changing between internal references. Note that changing internal references does not recalculate the speed and make sure it's legal (it has no way to report that to you if it is to adhere to the API), and the same goes for analogReadResolution.
+
+If a 1 is passed as the second argument, the validity check will be bypassed; this allows you to operate the ADC out of spec if you really want to, which may have unpredictable results. Microchip documentation has provided little in the way of guidance on selecting this (or other ADC parameters) other than giving us the upper and lower bounds. On tinyAVR 0.1-series, the dutycycle will be dutifuly set if it's above 1500.
 
 **Regardless of what you pass it, it will return the frequency in kHz** as a `uint16_t`.
 
-The 0/1-series has prescalers in every power of two from 2 to 256, and at the extreme ends, typical operating frequencies will result in an ADC clock that is not in spec.
+The 0/1-series has prescalers in every power of two from 2 to 256, and at the extreme ends, typical operating frequencies will result in an ADC clock that is not in spec. Hence the second argument, Currently there is only one option: If a 1 or anything with the 1's bit set is passed, that tells the core to disregard the spec'ed minimum and maximum, and get as close to the value you asked for as possible, however accuracy may suffer and/or functionality may be impaired
+
+On the 0/1-series, it is noted that if analog resolution is set to 8 instead of 10 (can be done with analogReadResolution), up to 2000 MHz is supported. In this case, however, 50% duty cycle must be enabled, otherwise (when F_ACD <= 15000) 50% duty cycle must not be used. .
 
 The 2-series has a much richer selection of prescalers: Every even number up to 16, then 20, 24, 28, 32, 40, 48, 56, and 64, giving considerably more precision in this adjustment.
 
@@ -214,10 +259,10 @@ Serial.println(returned_default);  // will print the same as the first line, ass
 If anyone undertakes a study to determine the impact of different ADC clock frequency on accuracy, take care to adjust the sampling time to hold that constant. I would love to hear of any results; I imagine that lower clock speeds should be more accurate, but within the supported frequency range, I don't know whether these differences are worth caring about.
 I've been told that application notes with some guidance on how to best configure the ADC for different jobs is coming. Microchip is aware that the new ADC has a bewildering number of knobs compared to classic AVRs, where there was typically only 1 degree of freedom, the reference, which is simple to pick and understand, since only one prescaler setting was in spec.
 
-### getAnalogReadResolution()
+### (mTC/DxC) getAnalogReadResolution()
 Returns either 8, 10 or 12 (2-series only), the current resolution set for analogRead.
 
-### getAnalogSampleDuration()
+### (mTC/DxC) getAnalogSampleDuration()
 Returns the number of ADC clocks by which the minimum sample length has been extended.
 
 ### ADC Runtime errors
@@ -239,7 +284,44 @@ Note that the numeric values, though not the names, of some of these were change
 |ADC_IMPOSSIBLE_VALUE            |         N/A |                 -127 | 16-bit value > 4095, or 32-bit value that's not an error code and is outside the range of -2,097,152-4,194,303 (raw 1024-sample accumulation range.
 |Potentially valid reading       |see previous |                    0 | If there is some combinations of settings that could get this value without an error condition it returns 0.
 
-The impossible values are checked for without testing all of the bytes for greater efficiency. If you see that result one of two things was the case: the value you passed in wasn't from analog read or had been cast to a different type before you passed it, or i, or was corrupted somehow (writing off end of adjacent array in memory? Overclocking too hard such that th chip was doing math wrong?).
+The impossible values are checked for without testing all of the bytes for greater efficiency. If you see that result one of two things was the case: the value you passed in wasn't from analog read or had been cast to a different type before you passed it, or it or was corrupted somehow (writing off end of adjacent array in memory? Overclocking too hard such that the chip was doing math wrong?).
+
+### (mTC/DxC - New!) ADCPowerOptions(options) *2-series only prior to 2.5.12*
+*For compatibility, a much more limited version is provided for 0/1-series. See below*
+The PGA requires power when turned on. It is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that specifies valid gain > 0; if it is not already on, this will slow down the reading. By default we turn it off afterwards. There is also a "low latency" mode that, when enabled, keeps the ADC reference and related hardware running to prevent the delay (on order of tens of microseconds) before the next analog reading is taken. We use that by default, but it can be turned off with this function.
+Generate the argument for this by using one of the following constants, or bitwise-or'ing together a low latency option and a PGA option. If only one option is supplied, the other configuration will not be changed. Note that due to current errata, you **must** have LOW_LAT enabled
+* `LOW_LAT_OFF`     Turn off low latency mode. *2-series only*
+* `LOW_LAT_ON`      Turn on low latency mode. *2-series only*
+* `PGA_OFF_ONCE`    Turn off the PGA now. Don't change settings; if not set to turn off automatically, that doesn't change. *2-series only*
+* `PGA_KEEP_ON`     Enable PGA. Disable the automatic shutoff of the PGA. *2-series only*
+* `PGA_AUTO_OFF`    Disable PGA now, and in future turn if off after use. *2-series only*
+* `ADC_ENABLE`      Enable the ADC if it is currently disabled.     *new 2.5.12*
+* `ADC_DISABLE`     Disable the ADC to save power in sleep modes.   *new 2.5.12*
+* `ADC_STANDBY_ON`  Turn on ADC run standby mode                    *new 2.5.12*
+* `ADC_STANDBY_OFF` Turn off ADC run standby mode                   *new 2.5.12*
+
+Example:
+```c++
+ADCPowerOptions(LOW_LAT_ON  | PGA_KEEP_ON );            //  low latency on. Turn the PGA on, and do not automatically shut it off. Maximum power consumption, minimum ADC delays.
+ADCPowerOptions(LOW_LAT_OFF | PGA_AUTO_OFF);            //  low latency off. Turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays. **ERRATA WARNING** turning off LOWLAT can cause problems on 2=series parts! See the errata for the specific part you are using.)
+ADCPowerOptions(ADC_DISABLE);                           //  turn off the ADC.
+ADCPowerOptions(ADC_ENABLE);                            //  Turn the ADC back on. If LOWLAT mode was on, when you turned off the ADC it will still be on,. Same with the other options.
+```
+
+As of 2.5.12 we will always disable and re-enable the ADC if touching LOWLAT, in the hopes that this will work around the lowlat errata consistently.
+**it is still recommended to call ADCPowerOptions(), if needed, before any other ADC-related functions** unless you fully understand the errata and the ramifications of your actions.
+**On most 2-series parts LOWLAT mode is REQUIRED in order to use the PGA to measure anything except the DAC or temperature sensor if using VDD as a reference! See the errata; this is the only erratum with teeth tht got through their internal testing. They're getting better, when not using an internal reference, or measuring the DACREF!, and disabling the ADC is REQUIRED for acceptable sleep power consumption.**
+
+Lowlat mode is enabled by default for this reason, as well as to generally improve performance. Disabling the ADC will end the power consumption associated with it.
+
+On 0/1-series parts, this function supports functions that are far more limited, since there are few power options.
+Only the following are supported
+* `ADC_ENABLE`      Enable the ADC if it is currently disabled.     *new 2.5.12*
+* `ADC_DISABLE`     Disable the ADC to save power in sleep modes.   *new 2.5.12*
+* `ADC_STANDBY_ON`  Turn on ADC run standby mode                    *new 2.5.12*
+* `ADC_STANDBY_OFF` Turn off ADC run standby mode                   *new 2.5.12*
+
+In all cases, if no command to turn on or off an option is passed the current setting will remain unchanged.
 
 ### Functions in megaTinyCore.h
 These functions are located in megaTinyCore.h - they do not require tight core integration to work,.
@@ -269,47 +351,10 @@ if (analogCheckError(adcreading2)) {
 
 ```
 
-### ADCPowerOptions(options) *2-series only prior to 2.5.12*
-*For compatibility, a much more limited version is provided for 0/1-series. See below*
-The PGA requires power when turned on. It is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that specifies valid gain > 0; if it is not already on, this will slow down the reading. By default we turn it off afterwards. There is also a "low latency" mode that, when enabled, keeps the ADC reference and related hardware running to prevent the delay (on order of tens of microseconds) before the next analog reading is taken. We use that by default, but it can be turned off with this function.
-Generate the argument for this by using one of the following constants, or bitwise-or'ing together a low latency option and a PGA option. If only one option is supplied, the other configuration will not be changed. Note that due to current errata, you **must** have LOW_LAT enabled
-* `LOW_LAT_OFF`     Turn off low latency mode. *2-series only*
-* `LOW_LAT_ON`      Turn on low latency mode. *2-series only*
-* `PGA_OFF_ONCE`    Turn off the PGA now. Don't change settings; if not set to turn off automatically, that doesn't change. *2-series only*
-* `PGA_KEEP_ON`     Enable PGA. Disable the automatic shutoff of the PGA. *2-series only*
-* `PGA_AUTO_OFF`    Disable PGA now, and in future turn if off after use. *2-series only*
-* `ADC_ENABLE`      Enable the ADC if it is currently disabled.     *new 2.5.12*
-* `ADC_DISABLE`     Disable the ADC to save power in sleep modes.   *new 2.5.12*
-* `ADC_STANDBY_ON`  Turn on ADC run standby mode                    *new 2.5.12*
-* `ADC_STANDBY_OFF` Turn off ADC run standby mode                   *new 2.5.12*
-
-Example:
-```c++
-ADCPowerOptions(LOW_LAT_ON  | PGA_KEEP_ON );            //  low latency on. Turn the PGA on, and do not automatically shut it off. Maximum power consumption, minimum ADC delays.
-ADCPowerOptions(LOW_LAT_OFF | PGA_AUTO_OFF);            //  low latency off. Turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays. **ERRATA WARNING** turning off LOWLAT can cause problems on 2=series parts! See the errata for the specific part you are using.)
-ADCPowerOptions(ADC_DISABLE);                           //  turn off the ADC.
-ADCPowerOptions(ADC_ENABLE);                            //  Turn the ADC back on. If LOWLAT mode was on, when you turned off the ADC it will still be on,. Same with the other options.
-```
-
-As of 2.5.12 we will always disable and re-enable the ADC if touching LOWLAT, in the hopes that this will work around the lowlat errata consistently.
-**it is still recommended to call ADCPowerOptions(), if needed, before any other ADC-related functions** unless you fully understand the errata and the ramifications of your actions.
-**On most 2-series parts LOWLAT mode is REQUIRED in order to use the PGA when not using an internal reference, or measuring the DACREF!, and disabling the ADC is REQUIRED for acceptable sleep power consumption.**
-
-Lowlat mode is enabled by default for this reason, as well as to generally improve performance. Disabling the ADC will end the power consumption associated with it.
-
-On 0/1-series parts, this function supports functions that are far more limited, since there are few power options.
-Only the following are supported
-* `ADC_ENABLE`      Enable the ADC if it is currently disabled.     *new 2.5.12*
-* `ADC_DISABLE`     Disable the ADC to save power in sleep modes.   *new 2.5.12*
-* `ADC_STANDBY_ON`  Turn on ADC run standby mode                    *new 2.5.12*
-* `ADC_STANDBY_OFF` Turn off ADC run standby mode                   *new 2.5.12*
-
-In all cases, if no command to turn on or off an option is passed the current setting will remain unchanged
-
 ### DAC Support
-The 1-series parts have an 8-bit DAC which can generate a real analog voltage. This generates voltages between 0 and the selected VREF (which cannot be VDD, unfortunately). Set the DAC reference voltage via the `DACReference()` function - pass it one of the `INTERNAL` reference options listed under the ADC section above. This voltage must be half a volt lower than Vcc for the voltage reference to be accurate. The DAC is exposed via the analogWrite() function: Call `analogWrite(PIN_PA6,value)` to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin; note that unlike most* PWM pins `analogWrite(PIN_PA6,0)` and `analogWrite(PIN_PA6,255)` do not act as if you called digitalWrite() on the pin; 0 or 255 written to the `DAC0.DATA` register; thus you do not have to worry about it applying the full supply voltage to the pin (which you may have connected to sensitive devices that would be harmed by such a voltage) if let the calculation return 255; that will just output 255/256ths of the reference voltage.
+The 1-series parts have an 8-bit DAC which can generate a real analog voltage. This generates voltages between 0 and the selected VREF (which cannot be VDD, unfortunately). Set the DAC reference voltage via the `DACReference()` function - pass it one of the `INTERNAL` reference options listed under the ADC section above. This voltage must be half a volt lower than Vcc for the voltage reference to be accurate. The DAC is exposed via the analogWrite() function: Call `analogWrite(PIN_PA6,value)` to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin; note that unlike most PWM pins served by TCA0, `analogWrite(PIN_PA6,0)` and `analogWrite(PIN_PA6,255)` do not act as if you called digitalWrite() on the pin; 0 or 255 written to the `DAC0.DATA` register. Thus when using a lower reference voltage, you do not have to worry about it applying the full supply voltage to the pin if you pass it 255. (which you may have connected to sensitive devices that would be harmed by such a voltage) if let the calculation return 255; that will just output 255/256ths of the reference voltage.
 
-The 2-series and 0-series don't have DACs, though the 2-series analog comparator has a "DACREF" and 8-bit reference DAC that can only be used as one side of the AC. This should be used through the Comparator library.
+The 2-series and 0-series don't have DACs, though the 2-series analog comparator has a "DACREF" an 8-bit reference DAC that can only be used as one side of the AC. This should be used through the Comparator library.
 
 ## Analog *channel* identifiers
 The ADC is configured in terms of channel numbers, not pin numbers. analogRead() hence converts the number of a pin with an analog channel associated with it to the number of that analog channel, so there is no need to deal with the analog channel numbers. The one exception to that is in the case of the non-pin inputs, the constants like ADC_DAC and ADC_VDDDIV10. I have a simple system to internally signal when a number isn';'t an digital pin number, but is instead an analog channel number: Simply set the high bit. I refer to these as analog channel identifiers. When the high bit is masked off, these are the value that you must set the MUX to in order to use this input source. No AVR has ever had more than 127 pins, much less that many analog channels, so this shouldn't be an issue. With 254 valid values, the current design provides room for 127 digital pins and 127 analog inputs, where the largest modern AVRs have only 56 I/O pins (it will be a technical challenge to surpass that, because they don't have any more registers for the VPORTs, and analog multiplexers that only go up to 73 (they use the second highest bit to denote non-pin inputs. )
@@ -331,23 +376,26 @@ Try not to use these unless you're getting really deep into library development 
 ## A word of warning to capacitive touch sensing applications
 Libraries exist that use trickery and the ADC to measure capacitance, hence detect touch/proximity. Most of these libraries (since Atmel always locked up QTouch) relied on the leftover charge in the ADC S&H cap. The magnitude of this source of error is much larger on classic AVRs. It is considered undesirable (this is why when changing ADC channels in the past, you were advised to throw out the first couple of readings!) and with each generation, this has been reduced. There are still ways to do this effectively on the 2series, but require very different approaches.
 
-## ADC, resistor dividers, and the internal pullup
-**Dirty trick** - sometimes it is desirable to have a means of measuring the approximate resistance of something. The most obvious example is when you are trying to determine parameters of a device that doesn't have the means to actively communicate, but which you otherwise control. For example, you have 5 different gadgets you can connect. The gadgets do not have an output built in - they just take power, ground, and a signal, and the output the external behavior of the gadgets (which might be lights that glow based on the input, motors that spin at a speed controlled by the input, etc). Unfortunately your application requirements dictate that you must be able to connect any of the gadgets to the device, using as few additional pins as possible (ideally 1), and as few external parts as possible. Since you only need to know if you have a Gadget of type 0, 1, 2, 3, or 4, you might add a resistor divider between power and ground on the gadget. This uses 1 pin and 2 external components, but you can easily distinguish far more than 5 values. There are a couple of pitfalls here though - first, while the current lost to this divider would be trivial compared to a motor while running or a light while on, if you need low standby power consumption, you can't have a resistor divider sitting there draining power continuously. Also, the resistors should be close to the point where the connection to the microcontroller is made, so as to ensure that it's supply rail and ground are at the same voltage as those of the microcontroller. High currents and long wires would push values to the middle were the resistors located at the gadget end of the gadget<->MCU interconnect - which is okay, I guess, except that you need to add a pair of resistors to the end of a cable, and so there are going to be pieces of exposed conductor carrying the supply voltage right next to one tied to ground, requiring particular care in that end of the interconnect, which may not be practical (for example, if you're confined to using a common crimp type connector, those don't have a connector body that can shield your resistor pair, so you need to add not just insulation but armor around it to prevent a short during handling.
 
-Anyone staring at this problem for long enough will realize that they can connect the resistor from ground to the added "identification" pin, at the MCU end of the interconnect. You still need to protect it from harm, but there's no exposed power rail on the other resistor for it to short to, so your countermeasures can go down a few tiers, and it won't drain power while off unless you leave the pullup on. Even in the case that the resistor were unprotected, the likely failure modes involve the resistor either coming disconnected entirely (infinite resistance, Vpin = Vdd), or shorting to it's other lead (approx. zero resistance, Vpin = Gnd). But those two conditions are both immediately apparent from the measurement - a value near the the upper limit means there's nothing connected, or if something is connected, it lacks a working resistor.
+## **Dirty trick** ADC, resistor dividers, and the internal pullup
+Sometimes it is desirable to have a means of measuring the approximate resistance of something. The most obvious example is when you are trying to determine parameters of a device that doesn't have the means to actively communicate, but which you otherwise control. For example, you have 5 different gadgets you can connect to your gadget controller (maybe it can handle more than one maybe not, doesn't matter). The gadgets do not have an output built in - they just take power, ground, and a signal, and their output is the external behavior of the gadgets (which might be lights that glow based on the input, motors that spin at a speed controlled by the input, etc). Unfortunately your application requirements dictate that you must be able to connect any of the gadgets to the device. You are tightly constrained on available pins, and you don't want to have to add a controller just so the device can annouce which of a few possibilities it is.
+
+A classic way is to realize you don't need to sort it into that many buckers, five in this case. So you might add a resistor divider between power and ground on the gadget, and connect that to the ID pin. This uses 1 pin and 2 external components, but you can easily distinguish far more than 5 values. There are a couple of pitfalls here though - first, while the current lost to this divider would be trivial compared to a motor while running or a light while on, if you need low standby power consumption, you can't have a resistor divider sitting there draining power continuously. Also, the resistors should be close to the point where the connection to the microcontroller is made, so as to ensure that it's supply rail and ground are at the same voltage as those of the microcontroller. High currents and long wires would push values to the middle were the resistors located at the gadget end of the gadget<->MCU interconnect - which is okay, I guess, except that you need to add a pair of resistors to the end of a cable, and so there are going to be pieces of exposed conductor carrying the supply voltage right next to one tied to ground, requiring particular care in that end of the interconnect, which may not be practical (for example, if you're confined to using a common crimp type connector, those don't have a connector body that can shield your resistor pair, so you need to add not just insulation but armor around it to prevent a short during handling.
+
+You could solve both problems at once and save a resistor - if only there was some sort of built in resistor that could be controlled ny the MCU. "Like an internal pullup?" Exactly! You can connect one resistor from ground to the added "identification" pin, at the MCU end of the interconnect. You still need to protect it from harm, but there's no exposed power rail on the other resistor for it to short to, so your countermeasures can go down a few tiers, and it won't drain power while off unless you leave the pullup on. Even in the case that the resistor were unprotected, the likely failure modes involve the resistor either coming disconnected entirely (infinite resistance, Vpin = Vdd), or shorting to it's other lead (approx. zero resistance, Vpin = Gnd). But those two conditions are both immediately apparent from the measurement - a value near the the upper limit means there's nothing connected, or if something is connected, it lacks a working resistor.
 
 So you turn on the internal pullup, wait a few moments for the voltage to stabilize, and then read it with the ADC, and based on that you can determine what "bucket" the value falls into and that tells you what the gadget's "identification" resistor is, and hence what is connected. And you could even do it using a pin you were already using to detect if anything was connected at all (ex, if it formerly grounded that pin, and now we adapt it to ) The internal pullup is... oh.... hmmm.... "between 30k and 50k" says the datasheet "around 30k" say forum-goers without being challenged. That's quite a range - wouldn't the bins need to be awfully large to catch all values with such large limits? And what if the voltage drop across the pullup is nonlinear with the current through it? And what about the supply voltage?
 
 ### So can I do that?
-Probably, assuming you';'re willing to calibrate each specimen
+Yeah - What's not entirely clear right now is exactly readily generalizable the measurements on any given part are, but signs are encouraging.
 
 Tests were conducted exactly as such a sketch would, except that to expedite things, I wired up 9 resistors from 22k to 470k that I planned to use, 1 per I/O pin not used by serial on an ATtiny1624, and 5V, 3.3V, and courtesy of a bad connection, 2.3v were tested.
 I found:
 Resistance decreases slightly as supply voltage increases; over the 2.7v interval tested, it was found to have an average (of the values of Rpullup calculated from the ADC measurements and known external resistance) of 33146 ohms on a particular specimen at 3.3v. ranging to 33862 at 2.3 and 32182 at 5 volts, that is around a 5% change over most of the operating voltage range. Not bad - and it's nearly linear with voltage.
 How about with current? Within that range, the measurements varied by half of the tolerance of the  +/- 5% resistors (which these days are usually better than 5%), 2.5% which is a lot better than 30-50k
-Scrambling the connections and remeasuring yielded results inconsistent with concern over differing pin offset voltages. The estimated resistance was within except with the highest resistance (where, since it's near the edge of the scale, small changes make a large difference). hence most of that 5% range we thought we were seeing based on current can actually be attributed to resistor variation.
+Scrambling the connections and remeasuring yielded results inconsistent with concern over differences between the pullups on the part. The estimated resistance was almost spot on. Hence some of the error we had previously interpreted as a consequence of differences between pins was actually due to differences between the resistors.
 
-No temperature testing was done as I lack appropriate facilities. I'm not going to cook my board in a (somehow moisture sealed) double boiler to get 100C or run tests under boiling computer spray duster (using it as freeze spray, while effective, is highly environmentally irresponsible. Tetrafluoroethane is a much stronger greenhouse gas than CO2 - if you boil off a little over a pound of it, over the next 20 years, it's as if you'd burned an extra ton of coal just to test the ADC at -25C (that was the closest to the -40 spec I could come up with a way of reaching that's "hardware store", though one could then put a vacuum pump on it to lower it's boiling point further to keep it closer to -40. That sounds crude, but that's actually a very common way of generating ultra low temperatures for scientific experiments. When liquid helium at atmospheric pressure isn't cold enough but you're working with macroscopic items so you can't use laser cooling, you can pump down the pressure of the liquid helium, and it gets the temperature a bit lower). But what I just described with computer spray duster being used to chill a circuit board, yeah it's as crude as it sounds. But I'll take the datasheet's word, which is that the difference is typically around +/- 18%
+No temperature testing was done as I lack appropriate facilities. I'm not going to cook my board in a (somehow moisture sealed) double boiler to get 100C or run tests under boiling computer spray duster (using it as freeze spray, while effective, is highly environmentally irresponsible. Tetrafluoroethane is a much stronger greenhouse gas than CO2 - if you boil off a little over a pound of it, over the next 20 years, it's as if you'd burned an extra ton of coal just to test the ADC at -25C (that was the closest to the -40 spec I could come up with a way of reaching that's "hardware store", though one could then put a vacuum pump on it to lower it's boiling point further to keep it closer to -40. That sounds crude, but that's actually a very common way of generating ultra low temperatures for scientific experiments. When liquid helium at atmospheric pressure isn't cold enough but you're working with macroscopic items so you can't use laser cooling, you can pump down the pressure of the liquid helium, and it gets the temperature a bit lower). But what I just described with computer spray duster being used to chill a circuit board, yeah it's as crude as it sounds. But I'll take the datasheet's word, which is that the difference is typically around +/- 18% over the whole -40-125C range. The vast majority of applications are used when it's in a much narrower range than that. Microchip seems to be inconsistent with how conjservative their specs are. So some experimentation at the expected extremes would be wrothwhile.
 
 ### So how to do it right?
 We know that Rpu is a function of T and V, the individual specimen.
@@ -365,7 +413,7 @@ From that, we can see that:
 
 Rpu = Rpu<sub>cal</sub> + k1 V<sub>cal</sub> - k2 T<sub>cal</sub> + k2 T - k1 V
 
-Let's define T as the chip's temperature as measured by the on-chip temperature sensor, normalized to the chip's operating temperature range by subtracting the minimum operating temperature (-40).
+Let's define T as the chip's temperature as measured by the on-chip temperature sensor, normalized to the chip's operating temperature range by subtracting the minimum operating temperature (-40) (that is, adding 40. .
 
 ```c++
 // Rpu = Rpucal + k1*Vcal - k2 * Tcal + k2 * T - k1 * V
@@ -390,10 +438,19 @@ If you can rely on the operating conditions being similar, you could calibrate i
 ```c++
 Rpu = 30100 + ((215 * getVoltageAsByte()) >> 5) + 76 * getTemperatureAsByte();
 ```
+#### I gotta calibrate? That sounds like work
+Yeah, I know. I didn't like that either.
 
-An even more accurate way to calculate the pullup strength would be to recall that there was negligible variation between pins - if you can spare a microcontroller pin, a reference resistor could be used, and the calibration performed "live" at the actual conditions.
+An even more accurate way to calculate the pullup strength would be to recall that there was negligible variation between pins on any specimen - if you can spare a microcontroller pin, a reference resistor can be used. You would not need to perform any calibration step. You could convert the measured value into an inferred Rpu, and then use that and the measurement on a pin to find the calculated resistance attached to the pin.
 
-Through these methods, it is possible to use the internal pullup as one side of a resistor divider for this sort of purpose, provided that you can ensure that the temperature and voltage variations are either small or account for them (and/or the precision required low enough) that simply measuring it at approximately those conditions will give you a suitable calibration value. As long as the number of buckets you need to sort values into remains small, it runs on a regulated power supply, and the device will operate at comfortable human living temperatures, only a single point calibration should be needed. It may in fact be found as a larger sample of chips are tested that even this is unnecessary; maybe Microchip has really good control over their process, and while their datasheets give them great leeway, they actually repeatedly hit the bullseye. My initial testing seems to suggest that that may be the case, at least within part families - Every 2-series I tested has been within a kOhm or two!
+Through these methods, it is possible to use the internal pullup as one side of a resistor divider for this sort of purpose, provided that you can ensure that the temperature and voltage variations are either small or account for them (and/or the precision required low enough) that simply measuring it at approximately those conditions will give you a suitable calibration value.
+
+#### It may be even easier
+As long as the number of buckets you need to sort values into remains small, it runs on a regulated power supply, and the device will operate at comfortable human living temperatures, only a single point calibration should be needed. *It may in fact be found as a larger sample of chips are tested that even this is unnecessary; maybe Microchip has really good control over their process, and while their datasheets give them great leeway, they actually repeatedly hit the bullseye*. My initial testing seems to suggest that that may be the case, at least within part families - Every 2-series I tested has been within a kOhm or two! They are certainly considerablly closer than they promise on max clock speed, another property that varies with voltage and temperature, esp. on 2-series!
+
+I will soon find out, as I'm using this scheme and hoping to just have a table stored thats the same everywhere. They'll be 424-based nodes, regulated 5v and 15-35C worst case. I'm optimistic currently that the 10 buckets. will work.
+
+
 
 ## Microchip Documentation
 Has been much expanded and I'm very happy to see this sort of document produced before the EA release. Wondering about the numbering? Well, TB stands for Technical Brief, which is different in some way from an Application Note (AN), and obviously a whitepaper or "Datasheet" (DS) is something else altogether. Even when they're about the same length and contain similar types of content. S

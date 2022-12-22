@@ -236,10 +236,11 @@ def pymcuprog_basic(args, fuses_dict):
     # print fuses
     if args.fuses_print:
         run_pymcu_action(pymcu._action_read, backend,
-                         memory=pymcu.MemoryNames.FUSES,
-                         offset=0,
-                         bytes=0,
-                         filename=None)
+                        memory=pymcu.MemoryNames.FUSES,
+                        offset=0,
+                        bytes=0,
+                         filename=None,
+                        max_read_chunk=None)
 
     # actions
     if args.action == "write":

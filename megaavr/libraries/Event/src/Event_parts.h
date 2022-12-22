@@ -753,10 +753,10 @@ namespace event {
       ac1_out           = 0x21,
 #endif
 #if defined(ac2) // An Ex with three AC would not surprise me
-      ac2_out           = 0x21,
+      ac2_out           = 0x22,
 #endif
 #if defined(ac3) // An Ex with fourAC would not surprise me
-      ac3_out           = 0x21,
+      ac3_out           = 0x23,
 #endif
       adc0_ready        = 0x24,
       adc0_sample       = 0x25,
@@ -765,7 +765,7 @@ namespace event {
       zcd1_out          = 0x32,
 #endif
 #if defined(ZCD1)
-      zcd1_out          = 0x32,
+      zcd1_out          = 0x33,
 #endif
 #if defined(ZCD2)
       zcd2_out          = 0x32,
@@ -839,8 +839,9 @@ namespace event {
 #if defined(USART6)
       usart6_xck        = 0x66,
 #endif
-#if defined(USART7) // The highest number of USARTs that naturally fit this numbering coincides with the maximum plausible number on a 100 pin chip
-      usart7_xck        = 0x67,
+#if defined(USART7) // The highest number of USARTs that naturally fit this numbering coincides with somewhere around what we'd expect on a 100 pin part.
+      usart7_xck        = 0x67, //which would have... maybe 86 I/O pins if we allow for ample power and ground pins., meaning 4 new ports, adding at most 32 new pins.
+                                // If they were willing to go as far as extending the architecture, there is still room enough for just over 1500 instructions. 512 of them could - with compiler support - provide 4 more first class ports!
 #endif
       spi0_sck          = 0x68,
 #if defined(SPI1)   // I fully expect to see Ex-series parts with more SPI ports and higher pincounts.
@@ -853,7 +854,8 @@ namespace event {
       tca0_cmp1         = 0x85,
       tca0_cmp2         = 0x86,
 #endif
-#if defined(TCA1)  // I fully expect to see Ex-series parts with only 1 TCA, in low pincounts.
+#if defined(TCA1)  // EA-series parts have 2 TCA's, but if they go to very low pincounts with an "ED-series" which will probably not be called that
+                   // these would probably lose the second timer.
       tca1_ovf_lunf     = 0x88,
       tca1_hunf         = 0x89,
       tca1_cmp0         = 0x8C,

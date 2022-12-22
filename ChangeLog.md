@@ -4,14 +4,8 @@ This page documents (nearly) all bugfixes and enhancements that produce visible 
 ## Planned changes not yet implemented
 These items are in addition to what was listed under changes already in release.
 
-### Unconfirmed bugs
-1. Issue with Serial.printf and it's ilk. Suspect user error.
-2. SerialUPDI uploads don't work if any file path contains spaces, because of missing quotes in platform.txt? But I can't see where... Need example verbose upload attempt in order to further debug.
-
 ### Planned enhancements
-"Enhancements" are changes to the core which improve functionality and introduce new and exotic bugs. Sometimes called "Features", I prefer the term "enhancement". Calling it a feature, by my understanding of the semantics, means that it *does something new*. But many times changes are made that neither fix a bug or do something new, but rather just do something it already does faster, using less flash, or with better compile time error detection. All things that, as well as new features, would add to the
-
-"Enhancements" are changes to the core which improve functionality and introduce new and exotic bugs. Sometimes called "Features", I prefer the term "enhancement". Calling it a feature, by my understanding of the semantics, means that it *does something new*. But many times changes are made that neither fix a bug or do something new, but rather just do something it already does faster, using less flash, or with better compile time error detection. All things that, as well as new features, would add to the
+"Enhancements" are changes to the core which improve functionality and/or introduce new and exotic bugs. Sometimes called "Features", I prefer the term "enhancement". Calling it a feature, by my understanding of the semantics, means that it *does something new*. But many times changes are made that neither fix a bug or do something new, but rather just do something it already does faster, using less flash, or with better compile time error detection. All things that, as well as new features, would qualify as an enhancement.
 
 ### Planned 2.6.x
 * Add tools submenu to select from a number of PWM pin layouts. This will impact flash use (to a degree that will be noticed on small parts) as well as the time it takes for turnOffPWM() (thus digitalWrite()) and analogWrite() to execute.
@@ -21,6 +15,7 @@ These items are in addition to what was listed under changes already in release.
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
 ## Unreleased changes
+
 
 ## Released versions
 

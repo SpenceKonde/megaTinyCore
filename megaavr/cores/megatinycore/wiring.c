@@ -128,10 +128,6 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
       return (microseconds * millisClockCyclesPerMicrosecond());
     }
 
-    #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
-      #define MILLIS_USE_TIMERBX
-    #endif
-
 
     #if defined (MILLIS_USE_TIMERA0)
       #ifndef TCA0
@@ -204,16 +200,16 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
   #define MILLIS_INC (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/1000)
 
   struct sTimeMillis {
-    #if defined(MILLIS_USE_TIMERBX)     // Now TCB as millis source does not need fraction
+    #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))     // Now TCB as millis source does not need fraction
       volatile uint32_t timer_millis;   // That's all we need to track here
 
     #elif defined(MILLIS_USE_TIMERRTC)  // RTC
       volatile uint16_t timer_overflow_count;
 
     #else                               // TCAx or TCD0
-      uint16_t timer_fract;
-      uint32_t timer_millis;
-      uint32_t timer_overflow_count;
+      volatile uint16_t timer_fract;
+      volatile uint32_t timer_millis;
+      volatile uint32_t timer_overflow_count;
 
     #endif
   } timingStruct;
@@ -234,7 +230,7 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
       "push       r30"          "\n\t" // First we make room for the pointer to timingStruct by pushing the Z registers
       "push       r31"          "\n\t" //
       ::);
-    #if defined(MILLIS_USE_TIMERBX)
+    #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
       __asm__ __volatile__(
       "push       r24"            "\n\t" // we only use two register other than the pointer
       "in         r24,     0x3F"  "\n\t" // Need to save SREG too
@@ -382,7 +378,7 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
         timingStruct.timer_overflow_count++;
         *_timerS.intStatusReg = _timerS.intClear;
       */
-    #endif /* defined(MILLIS_USE_TIMERBX) */
+    #endif /* (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)) */
     }
   #endif /* defined (MILLIS_USE_TIMERRTC)*/
 
@@ -432,6 +428,8 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
   unsigned long millis() {
     // return timer_overflow_count; // for debugging timekeeping issues where these variables are out of scope from the sketch
     unsigned long m;
+    // disable interrupts while we read timer_millis or we might get an
+    // inconsistent value (e.g. in the middle of a write to timer_millis)
     uint8_t oldSREG = SREG;
     cli();
     #if defined(MILLIS_USE_TIMERRTC)
@@ -492,7 +490,7 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
   #if !defined(MILLIS_USE_TIMERRTC)
   unsigned long micros() {
     uint32_t overflows, microseconds;
-    #if (defined(MILLIS_USE_TIMERD0) || defined(MILLIS_USE_TIMERBX))
+    #if (defined(MILLIS_USE_TIMERD0) || (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)))
       uint16_t ticks;
     #else /* TCA */
       uint8_t ticks;
@@ -518,7 +516,7 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
      * so we shouldn't increment overflows, or interrupts are disabled and micros isn't expected to work so it
      * doesn't matter.
      * Get current number of overflows and timer count */
-    #if !(defined(MILLIS_USE_TIMERBX))
+    #if !((defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)))
       overflows = timingStruct.timer_overflow_count;
     #else
       overflows = timingStruct.timer_millis;
@@ -533,7 +531,7 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
     #else // timerb
       if ((flags & TCB_CAPT_bm) && !(ticks & 0xFF00)) {
     #endif
-    #if (defined(MILLIS_USE_TIMERBX) && !(F_CPU > 2000000UL))
+    #if ((defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)) && !(F_CPU > 2000000UL))
       overflows +=2;
     #else
       overflows++;
@@ -554,7 +552,7 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
       #if defined(CLOCK_TUNE_INTERNAL) && !(F_CPU == 16000000UL || F_CPU ==  20000000UL || F_CPU ==  8000000UL || F_CPU ==  10000000UL || F_CPU ==  4000000UL || F_CPU ==  5000000UL)
         #warning "TCD is not supported as a millis timing source when the oscillator is tuned to a frequency other than 16 or 20 MHz. Timing results will be wrong - use TCA0 or a TCB."
       #endif
-    #elif defined(MILLIS_USE_TIMERBX)
+    #elif (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
       /* Ersatz Division for TCBs - now with inline assembly!
        *
        * It's well known that division is an operator you want to avoid like the plague on AVR.
@@ -1393,7 +1391,7 @@ void restart_millis()
     #elif defined(MILLIS_USE_TIMERD0)
       TCD0.CTRLA          = 0x00;
       while (TCD0.STATUS & 0x01);
-    #elif defined(MILLIS_USE_TIMERBX) // It's a type b timer
+    #elif (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)) // It's a type b timer
       _timer->CTRLB       = 0;
     #endif
     init_millis();

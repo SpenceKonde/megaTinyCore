@@ -19,7 +19,10 @@ call omake tinyx2z1sec
 call omake tinyx2zalt1sec
 call omake tinyx2zu1alt1sec
 
-call omake xplained817
 call omake xplained416
+call omake xplainedmini817
+call omake xplainedpro817
+call omake xplainedpro3217
 call omake curiosity1607
 call omake curiosity1627
+call omake curiosity3217

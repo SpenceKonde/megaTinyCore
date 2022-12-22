@@ -52,7 +52,7 @@ Availability of pin mappings by pincount for AVR Dx-series
 
 ## Official specification of I2C
 ~From NXP, the current owner of the relevant IP~
-Thaaat didn't last long did it?
+Gee, that link didn't last long did it....
 
 ## Overview - I2C, what is it?
 I2C (known by many names, see note at end) uses two pins, a clock (SCL) and data (SDA) for communication among two or more compatible devices. This is an open drain bus - external pullup resistors (*which you must include in your design*) keep the two lines HIGH when idle, and devices communicate by driving the pins low or releasing them. Data is clocked on the rising edge (this is a more important detail than usual, as you will see).

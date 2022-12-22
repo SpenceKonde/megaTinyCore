@@ -37,16 +37,49 @@
 #include <avr/interrupt.h>
 
 #ifdef __cplusplus
-extern "C"{
+  extern "C"{
 #endif
-  // Constant checks error handler
-  void badArg(const char*) __attribute__((error("")));
-  void badCall(const char*) __attribute__((error("")));
+
+/* we call badArg() when we know at compile time that one or more arguments passed to
+ * the function is nonsensical or doomed to generate useless output. For example,
+ * analogWrite() on a constant pin that will never support PWM, or digitalWrite() on
+ * a pin number that is neither a pin nor NOT_A_PIN (which silently does nothing for
+ * compatibility).
+ * badCall() on the other hand is called if we know that regardless of what arguments
+ * are passed, that function is nonsensical with current settings, for example, millis()
+ * when millis timekeeping has been disabled */
+
+#if !defined(LTODISABLED)
+  void badArg(const char*)    __attribute__((error("")));
+  void badCall(const char*)   __attribute__((error("")));
+  // The fast digital I/O functions only work when the pin is known at compile time.
   inline __attribute__((always_inline)) void check_constant_pin(pin_size_t pin)
   {
-    if (!__builtin_constant_p(pin))
+    if(!__builtin_constant_p(pin))
       badArg("Fast digital pin must be a constant");
   }
+#else
+  void badArg(const char*);
+  void badCall(const char*);
+  void check_constant_pin(pin_size_t pin);
+  #if defined(ARDUINO_MAIN) // We need to make sure these substitutes for the badArg and badCall functions are generated once and only once.
+    // They must not attempt to actully detect any error if LTO is disabled
+    void badArg(__attribute__((unused))const char* c) {
+      return;
+    }
+    void badCall(__attribute__((unused))const char* c) {
+      return;
+    }
+    void check_constant_pin(__attribute__((unused))pin_size_t pin) {
+      return;
+    }
+  #endif // Intentionally outside of the above #if so that your console gets fucking spammed with this warning.
+  // The linker errors you turned off LTO to better understand will still be at the bottom.
+  #warning "LTO is disabled. digitalWriteFast(), digitalReadFast(), pinModeFast() and openDrainFast() are unavailable, delayMicroseconds() for short delays and delay() with millis timing disabled is less accuratetest. Unsupported forms of 'new' compile without errors (but always return a NULL pointer). Additionally, functions which normally generate a compile error when passed a value that is known to be invalid at compile time will not do so. The same is true of functions which are not valid with the currently selected tools submenu options."
+  #warning "This mode is ONLY for debugging LINK-TIME ERRORS that are reported by the linker as being located at .text+0, and you can't figure out where the bug is from other information it provides. As noted above, while this may make compilation succeed, it will only turn compile-time errors into incorrect runtime behavior, which is much harder to debug. As soon as the bug that forced this to be used is fixed, switch back to the standard platform.txt!"
+  #warning "UART implementation is forcibly downgraded, Flash.h writes are replaced with NOPs, and pin interrupts are downgraded to the old (less efficient) implementation. All uploading is disabled, and behavior of exported binaries may vary from normal behavior arbitrarily."
+#endif
+         
 /* ADC-related stuff */
 /* With 2.3.0, we do the same thing as ATTinyCore and DxCore to specify
    that something is a channel number: set the high bit 1, since it is
@@ -351,11 +384,20 @@ int8_t  getAnalogReadResolution();
 // DIGITAL I/O EXTENDED FUNCTIONS
 // Covered in documentation.
 void           openDrain(uint8_t pinNumber,   uint8_t val);
-int8_t   digitalReadFast(uint8_t pinNumber               );
-void    digitalWriteFast(uint8_t pinNumber,   uint8_t val);
-void         pinModeFast(uint8_t pinNumber,  uint8_t mode);
-void       openDrainFast(uint8_t pinNumber,   uint8_t val);
-void        pinConfigure(uint8_t pinNumber, uint16_t mode);
+#if !defined(LTODISABLED)
+  int8_t   digitalReadFast(uint8_t pinNumber               );
+  void    digitalWriteFast(uint8_t pinNumber,   uint8_t val);
+  void         pinModeFast(uint8_t pinNumber,  uint8_t mode);
+  void       openDrainFast(uint8_t pinNumber,   uint8_t val);
+#elif defined(FAKE_FAST_IO)
+  // Should be enabled if, and only if, you are debugging something that you can't debug with LTO enabled, AND
+  // your code makes use of the fast functions. Note that this drastically alters behavior of code that calls them, taking, in some cases, two orders of magnitude longer
+  #warning "FAKE_FAST_IO code should **never** be expected to work correctly running on hardware. It is just here to provide a way to get past missing definition errors when you are forced to disable LTO for debugging."
+  #define      digitalRead(uint8_t pinNumber               );
+  #define     digitalWrite(uint8_t pinNumber,   uint8_t val);
+  #define          pinMode(uint8_t pinNumber,  uint8_t mode);
+  #define        openDrain(uint8_t pinNumber,   uint8_t val);
+  #endif
 void          turnOffPWM(uint8_t pinNumber               );
 
 // Not a function, still important
@@ -587,7 +629,7 @@ unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
 #define TIMERB2         (0x22) // TCB2
 #define TIMERB3         (0x23) // TCB3
 #define TIMERB4         (0x24) // TCB4
-#define TIMERD0         (0x70) // If any of these bits match it's potentially on TCD0
+#define TIMERD0         (0x40) // If any of these bits match it's potentially on TCD0
 #define DACOUT          (0x80)
 /* The above are all used in the digitalPinToTimer() macro and appear in the timer table, in addition to being how we identify millis timer.
  * For the millis timer, there's nothing weird here.
@@ -613,12 +655,12 @@ unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
 #define TIMERA0_MUX5    (0x15) // Mapping5 (PORTF 0-5)
 #define TIMERA0_MUX6    (0x16) // Mapping6 (PORTG 0-5)
 #define TIMERA0_MUX7    (0x17) // Mapping7 (PORTA 0-5)
-#define TIMERA1_MUX0    (0x08) // Mapping0 (PORTB 0-5)
-#define TIMERA1_MUX1    (0x09) // Mapping1 (PORTC 4-6) - only three channels available.
-#define TIMERA1_MUX2    (0x0A) // Mapping2 (PORTE 4-6) - only three channels available.
-#define TIMERA1_MUX3    (0x0B) // Mapping3 (PORTG 0-5) - DB-series only due to errata.
-#define TIMERA1_MUX4    (0x0C) // Mapping4 (PORTA 4-6) - only three channels available.
-#define TIMERA1_MUX5    (0x0D) // Mapping5 (PORTD 4-6) - only three channels available.
+#define TIMERA1_MUX0    (0x08) // Mapping0 (PORTB 0-5) - 48+ pin only.
+#define TIMERA1_MUX1    (0x09) // Mapping1 (PORTC 4-6) - only three channels available. 48+ pin only.
+#define TIMERA1_MUX2    (0x0A) // Mapping2 (PORTE 4-6) - only three channels available. DB-series only due to errata. 64-pin parts only
+#define TIMERA1_MUX3    (0x0B) // Mapping3 (PORTG 0-5) - DB-series only due to errata. 64-pin parts only.
+#define TIMERA1_MUX4    (0x0C) // Mapping4 (PORTA 4-6) - only three channels available. New on EA-series.
+#define TIMERA1_MUX5    (0x0D) // Mapping5 (PORTD 4-6) - only three channels available. New on EA-series.
 
 /* Not used in table or at all, yet */
 #define TIMERB0_ALT     (0x30) // TCB0 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
@@ -690,95 +732,6 @@ extern const uint8_t digital_pin_to_timer[];
 
 
 
-
-// These are used as the second argument to pinConfigure(pin, configuration)
-// You can bitwise OR as many of these as you want, or just do one. Very
-// flexible function; not the world's fastest though. Directives are handled
-// in the order they show up on this list, by pin function:
-// PIN_DIR      Direction
-// PIN_OUT      Output value
-// PIN_ISC      Enable and interrupt mode. If interrupts are turned on w/out the ISR, it will trigger dirty reset.
-// PIN_PULLUP   Pullups
-// PIN_INLVL    Input levels (MVIO parts only - everything else is schmitt trigger only, except on I2C pins acting as I2C with SMBus levels enabled. )
-// PIN_INVERT   Invert pin
-//
-// Systematically named constants can be made by combining those names with the postfixes here
-// except for PIN_ISC which is not a non-binary option. Valid values are listed below.
-// _SET, _CLR, and _TGL can be used as a postfix on all binary options.
-// _TOGGLE and _TGL are interchangeable as well.
-// Additional names are defined where they might be easier to remember.
-// It's not an accident that the PORT options have PIN_(name of register in PORTx)
-// as an alias.
-// Microchip can add one more binary option >.>
-
-/* normal PORT binary options */
-#define PIN_DIR_SET          (0x0001) // OUTPUT
-#define PIN_DIRSET           (0x0001) // alias
-#define PIN_DIR_OUTPUT       (0x0001) // alias
-#define PIN_DIR_OUT          (0x0001) // alias
-#define PIN_DIR_CLR          (0x0002) // INPUT
-#define PIN_DIRCLR           (0x0002) // alias
-#define PIN_DIR_INPUT        (0x0002) // alias
-#define PIN_DIR_IN           (0x0002) // alias
-#define PIN_DIR_TGL          (0x0003) // TOGGLE INPUT/OUTPUT
-#define PIN_DIRTGL           (0x0003) // alias
-#define PIN_DIR_TOGGLE       (0x0003) // alias
-#define PIN_OUT_SET          (0x0004) // HIGH
-#define PIN_OUTSET           (0x0004) // alias
-#define PIN_OUT_HIGH         (0x0004) // alias
-#define PIN_OUT_CLR          (0x0008) // LOW
-#define PIN_OUTCLR           (0x0008) // alias
-#define PIN_OUT_LOW          (0x0008) // alias
-#define PIN_OUT_TGL          (0x000C) // CHANGE/TOGGLE
-#define PIN_OUTTGL           (0x000C) // alias
-#define PIN_OUT_TOGGLE       (0x000C) // alias
-// reserved                  (0x0010) // reserved - couldn't be combined with the ISC options
-// reserved                  (0x0020) // reserved - couldn't be combined with the ISC options
-// reserved                  (0x0030) // reserved - couldn't be combined with the ISC options
-// reserved                  (0x0040) // reserved - couldn't be combined with the ISC options
-// reserved                  (0x0050) // reserved - couldn't be combined with the ISC options
-// reserved                  (0x0060) // reserved - couldn't be combined with the ISC options
-// reserved                  (0x0070) // reserved - couldn't be combined with the ISC options
-/* Interrupt and input enable nybble is: 0b1nnn to set to option n, or 0b0xxx to not, and ignore those bits. */
-#define PIN_ISC_ENABLE       (0x0080) // No interrupts and enabled.
-#define PIN_INPUT_ENABLE     (0x0080) // alias
-#define PIN_ISC_CHANGE       (0x0090) // CHANGE
-#define PIN_INT_CHANGE       (0x0090) // alias
-#define PIN_ISC_RISE         (0x00A0) // RISING
-#define PIN_INT_RISE         (0x00A0) // alias
-#define PIN_ISC_FALL         (0x00B0) // FALLING
-#define PIN_INT_FALL         (0x00B0) // alias
-#define PIN_ISC_DISABLE      (0x00C0) // DISABLED
-#define PIN_INPUT_DISABLE    (0x00C0) // alias
-#define PIN_ISC_LEVEL        (0x00D0) // LEVEL
-#define PIN_INT_LEVEL        (0x00D0) // alias
-/* PINnCONFIG binary options */
-#define PIN_PULLUP_ON        (0x0100) // PULLUP ON
-#define PIN_PULLUP           (0x0100) // alias
-#define PIN_PULLUP_SET       (0x0100) // alias
-#define PIN_PULLUP_OFF       (0x0200) // PULLUP OFF
-#define PIN_PULLUP_CLR       (0x0200) // alias
-#define PIN_NOPULLUP         (0x0200) // alias
-#define PIN_PULLUP_TGL       (0x0300) // PULLUP TOGGLE
-#define PIN_PULLUP_TOGGLE    (0x0300) // alias
-// reserved                  (0x0400) // reserved
-// reserved                  (0x0800) // reserved
-// reserved                  (0x0C00) // reserved
-#define PIN_INLVL_TTL        (0x1000) // TTL INPUT LEVELS - DD, DB, EA (maybe all future non-tinies!)
-#define PIN_INLVL_ON         (0x1000) // alias
-#define PIN_INLVL_SET        (0x1000) // alias
-#define PIN_INLVL_SCHMITT    (0x2000) // SCHMITT INPUT LEVELS
-#define PIN_INLVL_OFF        (0x2000) // alias
-#define PIN_INLVL_CLR        (0x2000) // alias
-// reserved                  (0x3000) // INLVL TOGGLE - not supported. If you tell me a reasonable use case
-// I'll do it. But when would you ever just want to switch the inlvl from whatever it is now? Don't you want to put it to either schmitt or ttl and know which one you want?each possible value is handled separately, slowing it down, and I don't think this would get used.
-#define PIN_INVERT_ON        (0x4000) // PIN INVERT ON
-#define PIN_INVERT_SET       (0x4000) // alias
-#define PIN_INVERT_OFF       (0x8000) // PIN INVERT OFF
-#define PIN_INVERT_CLR       (0x8000) // alias
-#define PIN_INVERT_TGL       (0xC000) // PIN_INVERT_TOGGLE
-#define PIN_INVERT_TOGGLE    (0xC000) // alias
-
 /*
 Supplied by Variant file:
 #define digitalPinToAnalogInput(p)      // Given digital pin (p), returns the analog channel number, or NOT_A_PIN if the pin does not suipport analog input.
@@ -789,6 +742,7 @@ Yes, these are poorky named and do not use analog input, analog pin, and analog 
 See Ref_Analog.md for more information of the representations of "analog pins". I blame Arduino for the original sin of "analog pins" as a concept in the first place.
 */
 
+#include "pins_arduino.h"
 #define digitalPinToPort(pin)               (((pin)     < NUM_TOTAL_PINS ) ?                          digital_pin_to_port[pin]                 : NOT_A_PIN)
 #define digitalPinToBitPosition(pin)        (((pin)     < NUM_TOTAL_PINS ) ?                  digital_pin_to_bit_position[pin]                 : NOT_A_PIN)
 #define digitalPinToBitMask(pin)            (((pin)     < NUM_TOTAL_PINS ) ?                      digital_pin_to_bit_mask[pin]                 : NOT_A_PIN)
@@ -902,10 +856,201 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
     int16_t analogClockSpeed1(int16_t frequency = 0, uint8_t options = 0);
   #endif
 #endif
+#if !defined(NUM_I2C_PINS)
+  #define NUM_I2C_PINS                  (2) // per I2C port in use - this number is nonsensical without qualification is is only for compatibility.
+#endif
+#if !defined(NUM_SPI_PINS)
+  #define NUM_SPI_PINS                  (3) // per SPI port in use - this number is nonsensical without qualification is is only for compatibility.
+#endif
+#if !defined(NUM_TOTAL_FREE_PINS)
+  #define NUM_TOTAL_FREE_PINS           (PINS_COUNT - NUM_INTERNALLY_USED_PINS)
+#endif
+#if !defined(NUM_TOTAL_PINS)
+  #define NUM_TOTAL_PINS                (NUM_DIGITAL_PINS) /* Used the same way as NUM_DIGITAL_PINS. so it doesn't mean what it's named  - I didn't make the convention*/
+#endif
 
-#include "pins_arduino.h"
+inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
+  if (__builtin_constant_p(pin)) {
+    if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN) {
+    // Exception made for NOT_A_PIN - code exists which relies on being able to pass this and have nothing happen.
+    // While IMO very poor coding practice, these checks aren't here to prevent lazy programmers from intentionally
+    // taking shortcuts we disapprove of, but to call out things that are virtually guaranteed to be a bug.
+    // Passing -1/255/NOT_A_PIN to the digital I/O functions is most likely intentional.
+      badArg("Digital pin is constant, but not a valid pin");
+    }
+  #if (CLOCK_SOURCE == 2)
+    #if defined(MEGATINYCORE)
+      if (pin == PIN_PA3) {
+        badArg("Constant digital pin PIN_PA3 is used for the external osc, and is not available for other uses.");
+      }
+    #else
+      if (pin == PIN_PA0) {
+        badArg("Constant digital pin PIN_PA0 is used for the external osc, and is not available for other uses.");
+      }
+    #endif
+  #elif CLOCK_SOURCE == 1
+    if (pin < 2) {
+      badArg("Pin PA0 and PA1 cannot be used for digital I/O because those are used for external crystal clock.");
+    }
+  #elif defined(XTAL_PINS_HARDWIRED)
+    if (pin < 2) {
+      badArg("On the selected board, PA0 and PA1 are hardwired to the crystal. They may not be used for other purposes.");
+    }
+  #endif
+  }
+}
+/*******************************************************************
+ * PIN CONFIGURE Set any or all pin settings, easily invert, etc   *
+ *******************************************************************
+// These are used as the second argument to pinConfigure(pin, configuration)
+// You can bitwise OR as many of these as you want, or just do one. Very
+// flexible function; not the world's fastest though. Directives are handled
+// in the order they show up on this list, by pin function:
+// PIN_DIR      Direction
+// PIN_OUT      Output value
+// PIN_ISC      Enable and interrupt mode. If interrupts are turned on w/out the ISR, it will trigger dirty reset.
+// PIN_PULLUP   Pullups
+// PIN_INLVL    Input levels (MVIO parts only - everything else is schmitt trigger only, except on I2C pins acting as I2C with SMBus levels enabled. )
+// PIN_INVERT   Invert pin
+//
+// Systematically named constants can be made by combining those names with the postfixes here
+// except for PIN_ISC which is not a non-binary option. Valid values are listed below.
+// _SET, _CLR, and _TGL can be used as a postfix on all binary options.
+// _TOGGLE and _TGL are interchangeable as well.
+// Additional names are defined where they might be easier to remember.
+// It's not an accident that the PORT options have PIN_(name of register in PORTx)
+// as an alias.
+// Microchip can add one more binary option >.>                    */
 
-// Based on those, some ugly formulae for "smart-pin" defines that follow the mux regs around:
+
+/* External defintitions */
+/* Actual implementation is in wiring_extra.c (or .cpp, if I find that I'm not able tomake it work with .c)
+ * Because of the incrutable rules of C++ scoping, you can define an inline function or a template function in a header....
+ * and not in the body of a separate file, while the opposite is true for ANY OTHER KIND OF FUNCTION. */
+
+void __pinconfigure(const uint8_t digital_pin, uint16_t pin_config);
+void _pinconfigure(uint8_t pin, uint16_t pin_config);
+void pinConfigure(uint8_t digital_pin, uint16_t pin_config);
+
+#ifdef __cplusplus
+typedef enum : uint16_t
+{
+ // OUTPUT
+  PIN_DIR_SET        = 0x0001,
+  PIN_DIRSET         = 0x0001,
+  PIN_DIR_OUTPUT     = 0x0001,
+  PIN_DIR_OUT        = 0x0001,
+ // INPUT
+  PIN_DIR_CLR        = 0x0002,
+  PIN_DIRCLR         = 0x0002,
+  PIN_DIR_INPUT      = 0x0002,
+  PIN_DIR_IN         = 0x0002,
+ // TOGGLE INPUT/OUTPUT
+  PIN_DIR_TGL        = 0x0003,
+  PIN_DIRTGL         = 0x0003,
+  PIN_DIR_TOGGLE     = 0x0003,
+ // HIGH
+  PIN_OUT_SET        = 0x0004,
+  PIN_OUTSET         = 0x0004,
+  PIN_OUT_HIGH       = 0x0004,
+ // LOW
+  PIN_OUT_CLR        = 0x0008,
+  PIN_OUTCLR         = 0x0008,
+  PIN_OUT_LOW        = 0x0008,
+// CHANGE/TOGGLE
+  PIN_OUT_TGL        = 0x000C,
+  PIN_OUTTGL         = 0x000C,
+  PIN_OUT_TOGGLE     = 0x000C,
+//Interrupt disabled but input buffer enabled
+  PIN_ISC_ENABLE     = 0x0080,
+  PIN_INPUT_ENABLE   = 0x0080,
+ // Interrupt on change
+  PIN_ISC_CHANGE     = 0x0090,
+  PIN_INT_CHANGE     = 0x0090,
+// Interrupt on rising edge
+  PIN_ISC_RISE       = 0x00A0,
+  PIN_INT_RISE       = 0x00A0,
+// Interrupt on falling edge
+  PIN_ISC_FALL       = 0x00B0,
+  PIN_INT_FALL       = 0x00B0,
+// Interrupt and input buffer disabled
+  PIN_ISC_DISABLE    = 0x00C0,
+  PIN_INPUT_DISABLE  = 0x00C0,
+// Interrupt enabled with sense on low level
+  PIN_ISC_LEVEL      = 0x00D0,
+  PIN_INT_LEVEL      = 0x00D0,
+// PULLUP ON
+  PIN_PULLUP_ON      = 0x0100,
+  PIN_PULLUP         = 0x0100,
+  PIN_PULLUP_SET     = 0x0100,
+// PULLUP OFF
+  PIN_PULLUP_OFF     = 0x0200,
+  PIN_PULLUP_CLR     = 0x0200,
+// PULLUP TOGGLE
+  PIN_PULLUP_TGL     = 0x0300,
+  PIN_PULLUP_TOGGLE  = 0x0300,
+  PIN_NOPULLUP       = 0x0200,
+// Pin Input Level Control
+  PIN_INLVL_TTL      = 0x1000,
+  PIN_INLVL_ON       = 0x1000,
+  PIN_INLVL_SET      = 0x1000,
+  PIN_INLVL_SCHMITT  = 0x2000,
+  PIN_INLVL_OFF      = 0x2000,
+  PIN_INLVL_CLR      = 0x2000, // alias
+// PIN INVERT ON
+  PIN_INVERT_ON      = 0x4000,
+  PIN_INVERT_SET     = 0x4000,
+// PIN INVERT OFF
+  PIN_INVERT_OFF     = 0x8000,
+  PIN_INVERT_CLR     = 0x8000,
+// PIN_INVERT_TOGGLE
+  PIN_INVERT_TGL     = 0xC000,
+  PIN_INVERT_TOGGLE  = 0xC000
+} pin_configure_t;
+
+/**
+ * @brief Helper functions to catch the last argument in the pincfg recursion loop
+ *
+ * @param mode Mode parameter
+ * @return pin_configure_t
+ */
+
+
+inline pin_configure_t _pincfg(const pin_configure_t mode) {
+  return mode;
+}
+
+/**
+ * @brief Helper functions to catch the nth in the pincfg recursion loop
+ *
+ * @param digital_pin Arduino pin
+ * @param mode First "mode" parameter
+ * @param modes Nth "mode" parameter
+ * @return uint16_t pin configuration or'ed together
+ */
+template <typename... MODES>
+uint16_t _pincfg(const pin_configure_t mode, const MODES&... modes) {
+  return mode | _pincfg(modes...);
+}
+
+
+
+//void        pinConfigure(const uint8_t pinNumber, const uint16_t mode, const MODES&... modes);
+
+/**
+ * @brief Variadic template function for configuring a pin
+ *
+ * @param digital_pin Arduino pin number
+ * @param mode First "mode" parameter
+ * @param modes Nth "mode" parameter
+ */
+template <typename... MODES>
+void pinConfigure(const uint8_t digital_pin, const pin_configure_t mode, const MODES&... modes) {
+  // Or-ing together the arguments using recursion
+  uint16_t pin_config = _pincfg(mode, modes...);
+  _pinconfigure(digital_pin, pin_config);
+}
+
 
 
 #ifdef PIN_WIRE_SCL_PINSWAP_1
@@ -986,7 +1131,7 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 // try to spread around the ports we use for these defines - if we're
 // going to declare some other port to be the "main" serial port, with the monitor
 // on it and all, we should be consistent about that, right? *shrug*
-//#define SERIAL_PORT_HARDWARE      SERIAL_PORT_MONITOR
+#define SERIAL_PORT_HARDWARE      SERIAL_PORT_MONITOR
 
 // If we have USART2 (ie, we are not a DD-series) we will declare that to be
 // SERIAL_PORT_HARDWARE_OPEN, so that on a DB-series, libraries are less likely to
@@ -1004,9 +1149,9 @@ static const uint8_t SCK  = PIN_SPI_SCK;
     #endif
   #endif
 #endif
-#if !defined(SERIAL_PORT_MVIO) && defined(MVIO)
+#if !defined(SERIAL_PORT_MVIO) && defined(MVIO) // defined on DD snd DB.
 // DD-series parts with 20-or-fewer pins will not have a PC0 for the TX line of
-// Serial1, so it can't be their MVIO serial port (without involving the event
+// Serial1. that makes it difficult to , so it can't be their MVIO serial port (without involving the event
 // system, of course) - but they can get a serial port on MVIO pins with USART0
 // and an alternate mapping. So for those parts only, Serial is their MVIO port.
 // For everyone else it's Serial1, and for non-DD parts, that is the only serial port connected to thr mvio

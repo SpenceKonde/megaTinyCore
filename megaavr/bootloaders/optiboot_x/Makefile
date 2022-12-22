@@ -271,6 +271,10 @@ tinyx2zu1alt1sec:
 
 
 
+HELPTEXT += "target curiosity3217   - Microchip ATtiny3217 Curiosity Nano.\n"
+curiosity3217: TARGET = attiny3217
+curiosity3217:
+	$(MAKE) -f $(MF) optiboot_curiosity3217.hex UARTTX=B2 TIMEOUT=8 LED=B7 LED_INVERT=1
 
 
 HELPTEXT += "target curiosity1607 - Microchip ATtiny1607 Curiosity Nano.\n"
@@ -283,15 +287,25 @@ curiosity1627: TARGET = attiny1627
 curiosity1627:
 	$(MAKE) -f $(MF) optiboot_curiosity1627.hex UARTTX=B2 TIMEOUT=8 LED=B7 LED_INVERT=1
 
-HELPTEXT += "target xplained416   - Microchip ATtiny416 Xplained Nano.\n"
-xplained416: TARGET = attiny1607
-xplained416:
-	$(MAKE) -f $(MF) optiboot_xplained416.hex UARTTX=A1 TIMEOUT=8 LED=B5 LED_INVERT=1 BAUD_RATE=57600
+HELPTEXT += "target xplained3217pro   - Microchip ATtiny3217 Xplained Pro.\n"
+xplainedpro3217: TARGET = attiny3217
+xplainedpro3217:
+	$(MAKE) -f $(MF) optiboot_xplainedpro3217.hex UARTTX=A1 TIMEOUT=8 LED=B4 LED_INVERT=1
 
-HELPTEXT += "target xplained817   - Microchip ATtiny817 Xplained Mini.\n"
-xplained817: TARGET = attiny1607
-xplained817:
-	$(MAKE) -f $(MF) optiboot_xplained817.hex UARTTX=B2 TIMEOUT=8 LED=C0 BAUD_RATE=57600
+HELPTEXT += "target xplainedpro817   - Microchip ATtiny817 Xplained Pro.\n"
+xplainedpro: TARGET = attiny817
+xplainedpro817:
+	$(MAKE) -f $(MF) optiboot_xplainedpro817.hex UARTTX=B2 TIMEOUT=48 LED=B4 LED_INVERT=1
+
+HELPTEXT += "target xplainedmini817   - Microchip ATtiny817 Xplained Mini.\n"
+xplainedmini817: TARGET = attiny817
+xplainedmini817:
+	$(MAKE) -f $(MF) optiboot_xplainedmini817.hex UARTTX=B2 TIMEOUT=8 LED=C0 
+
+HELPTEXT += "target xplainednano416   - Microchip ATtiny416 Xplained Nano.\n"
+xplained416: TARGET = attiny416
+xplained416:
+	$(MAKE) -f $(MF) optiboot_xplainednano416.hex UARTTX=A1 TIMEOUT=8 LED=B5 LED_INVERT=1
 
 
 #---------------------------------------------------------------------------
