@@ -16,6 +16,13 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ## Unreleased changes
 
+### Planned 2.6.5
+* Correct issue with newly added bootloaders for Microchip official boards.
+* Correct issue with Sampled/Sampled and Sampled (125hz)/Disabled BOD options. (#874)
+* Port new version of pinConfigure (in progress)
+* Harmonize versions of Wire, USERSIG, Event.
+* Fix issue with reading with SerialUPDI (#871)
+* Fix several USART-related issues (USART0 not working in half duplex, usart1 not working for receive, .end() less efficient than it could be and potentially wrong.)
 
 ## Released versions
 

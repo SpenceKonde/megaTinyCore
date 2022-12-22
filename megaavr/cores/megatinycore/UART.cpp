@@ -142,7 +142,7 @@
             "andi     r24,     0xBF"  "\n\t"  // clear TXCIE
             "ori      r24,     0x80"  "\n\t"  // set RXCIE
             "std   Z +  5,      r24"  "\n\t"  // store CTRLA
-            "pop      r24"            "\n\t"  // pop r24, containing old sreg.
+            "pop      r24"            "\n\t"  // pop r24, xcontaining old sreg.
             "out     0x3f,      r24"  "\n\t"  // restore it
             "pop      r24"            "\n\t"  // pop r24 to get it's old value back
             "pop      r31"            "\n\t"  // and r31
@@ -676,14 +676,14 @@
       // Disable receiver and transmitter as well as the RX complete and the data register empty interrupts.
       // TXCIE only used in half duplex - we can just turn the damned thing off yo!
       volatile USART_t * temp = _hwserial_module; /* compiler does a slightly better job with this. */
-      temp -> CTRLB = 0b01011010; // clear all the flags that need a 1 written to clear
-      temp -> CTRLA &= 0; //~(USART_RXCIE_bm | USART_DREIE_bm | USART_TXCIE_bm);
-      temp -> STATUS =  USART_TXCIF_bm; // want to make sure no chanceofthat firing in error. TXCIE only used in half duplex
+      temp -> CTRLB = 0; //~(USART_RXEN_bm | USART_TXEN_bm);
+      temp -> CTRLA = 0; //~(USART_RXCIE_bm | USART_DREIE_bm | USART_TXCIE_bm);
+      temp -> STATUS =  USART_TXCIF_bm | USART_RXCIF_bm; // want to make sure no chance of that firing in error now that the USART is off. TXCIE only used in half duplex
       // clear any received data
       _rx_buffer_head = _rx_buffer_tail;
 
       // Note: Does not change output pins
-      // though the datasheetsays turning the TX module sets it to input.
+      // though the datasheetsays turning the TX module off sets it to input.
       _state = 0;
     }
 
@@ -780,6 +780,9 @@
            * *immediately* after we checked that the buffer was empty, before we made it not empty. And
            * in that case, without this line it would lose one of the characters... with that line, it could
            * stop servicing DRE until another serial write, AND lose a character. That's not better! -Spence 4/2021
+           * So this is to stop a race condition in which people are doing something that every guide everywhere says not to do
+           * (writing serial from within an ISR).
+           * I maintain that users SHOULD NOT WRITE TO SERIAL FROM AN ISR, and certainly not while the non-interrupt code is also writing!
            * Original comments:
            * // Make sure data register empty interrupt is disabled to avoid
            * // that the interrupt handler is called in this situation

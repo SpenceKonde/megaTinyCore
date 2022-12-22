@@ -41,7 +41,7 @@
     ISR(USART0_TXC_vect, ISR_NAKED) {
       __asm__ __volatile__(
             "push  r30"           "\n\t" // push the low byte of Z - we start out 5-6 clocks behind the ball, these three instructions take 4-5 -> 9 or 11 by th time we reach _do_txc
-            "ldi r30, 0x20"       "\n\t" // and put the low bit of this USART there - 0x20 * n
+            "ldi r30, 0x00"       "\n\t" // and put the low bit of this USART there - 0x20 * n
 #if PROGMEM_SIZE > 8192
             "jmp _do_txc"         "\n\t"
 #else

@@ -6,7 +6,7 @@
  * Copyright (c) 2006 Nicholas Zambetti, Modified by
  * 11/23/2006 David A. Mellis, 9/20/2010 Mark Sproul,
  * 8/24/2012 Alarus, 12/3/2013 Matthijs Kooijman
- * unknown others 2013-2020, 2020-2022 Spence Konde
+ * Others (unknown) 2013-2017, 2017-2021 Spence Konde
  */
 
 #include "Arduino.h"
@@ -57,7 +57,7 @@
 
   #if !(defined(USE_ASM_RXC) && (USE_ASM_RXC == 1 || USE_ASM_RXC == 2) && (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) /* && defined(USART1)*/)
     ISR(USART1_RXC_vect) {
-      HardwareSerial::_rx_complete_irq(Serial);
+      HardwareSerial::_rx_complete_irq(Serial1);
     }
   #else
       ISR(USART1_RXC_vect, ISR_NAKED) {
@@ -80,7 +80,7 @@
        (SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16) && \
        (SERIAL_TX_BUFFER_SIZE == 128 || SERIAL_TX_BUFFER_SIZE == 64 || SERIAL_TX_BUFFER_SIZE == 32 || SERIAL_TX_BUFFER_SIZE == 16))
     ISR(USART1_DRE_vect) {
-      HardwareSerial::_tx_data_empty_irq(Serial);
+      HardwareSerial::_tx_data_empty_irq(Serial1);
     }
   #else
     ISR(USART1_DRE_vect, ISR_NAKED) {
