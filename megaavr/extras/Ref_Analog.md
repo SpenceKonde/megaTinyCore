@@ -351,6 +351,44 @@ if (analogCheckError(adcreading2)) {
 
 ```
 
+### ADCPowerOptions(options) *2-series only prior to 2.5.12*
+*For compatibility, a much more limited version is provided for 0/1-series. See below*
+The PGA requires power when turned on. It is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that specifies valid gain > 0; if it is not already on, this will slow down the reading. By default we turn it off afterwards. There is also a "low latency" mode that, when enabled, keeps the ADC reference and related hardware running to prevent the delay (on order of tens of microseconds) before the next analog reading is taken. We use that by default, but it can be turned off with this function.
+Generate the argument for this by using one of the following constants, or bitwise-or'ing together a low latency option and a PGA option. If only one option is supplied, the other configuration will not be changed. Note that due to current errata, you **must** have LOW_LAT enabled
+* `LOW_LAT_OFF`     Turn off low latency mode. *2-series only*
+* `LOW_LAT_ON`      Turn on low latency mode. *2-series only*
+* `PGA_OFF_ONCE`    Turn off the PGA now. Don't change settings; if not set to turn off automatically, that doesn't change. *2-series only*
+* `PGA_KEEP_ON`     Enable PGA. Disable the automatic shutoff of the PGA. *2-series only*
+* `PGA_AUTO_OFF`    Disable PGA now, and in future turn if off after use. *2-series only*
+* `ADC_ENABLE`      Enable the ADC if it is currently disabled.     *new 2.5.12*
+* `ADC_DISABLE`     Disable the ADC to save power in sleep modes.   *new 2.5.12*
+* `ADC_STANDBY_ON`  Turn on ADC run standby mode                    *new 2.5.12*
+* `ADC_STANDBY_OFF` Turn off ADC run standby mode                   *new 2.5.12*
+
+Example:
+```c++
+ADCPowerOptions(LOW_LAT_ON  | PGA_KEEP_ON );            //  low latency on. Turn the PGA on, and do not automatically shut it off. Maximum power consumption, minimum ADC delays.
+ADCPowerOptions(LOW_LAT_OFF | PGA_AUTO_OFF);            //  low latency off. Turn off the PGA and enable automatic shut off. Minimum power consumption, maximum ADC delays. **ERRATA WARNING** turning off LOWLAT can cause problems on 2=series parts! See the errata for the specific part you are using.)
+ADCPowerOptions(ADC_DISABLE);                           //  turn off the ADC.
+ADCPowerOptions(ADC_ENABLE);                            //  Turn the ADC back on. If LOWLAT mode was on, when you turned off the ADC it will still be on,. Same with the other options.
+```
+
+As of 2.5.12 we will always disable and re-enable the ADC if touching LOWLAT, in the hopes that this will work around the lowlat errata consistently.
+**it is still recommended to call ADCPowerOptions(), if needed, before any other ADC-related functions** unless you fully understand the errata and the ramifications of your actions.
+**On most 2-series parts LOW_LAT mode is REQUIRED in order to use the PGA when not using an internal reference or measuring the DACREF!**
+**Disabling the ADC is REQUIRED for acceptable sleep power consumption on the 2-series!**
+
+Lowlat mode is enabled by default for this reason, as well as to generally improve performance. Disabling the ADC will end the power consumption associated with it.
+
+On 0/1-series parts, this function supports functions that are far more limited, since there are few power options.
+Only the following are supported
+* `ADC_ENABLE`      Enable the ADC if it is currently disabled.     *new 2.5.12*
+* `ADC_DISABLE`     Disable the ADC to save power in sleep modes.   *new 2.5.12*
+* `ADC_STANDBY_ON`  Turn on ADC run standby mode                    *new 2.5.12*
+* `ADC_STANDBY_OFF` Turn off ADC run standby mode                   *new 2.5.12*
+
+In all cases, if no command to turn on or off an option is passed the current setting will remain unchanged
+
 ### DAC Support
 The 1-series parts have an 8-bit DAC which can generate a real analog voltage. This generates voltages between 0 and the selected VREF (which cannot be VDD, unfortunately). Set the DAC reference voltage via the `DACReference()` function - pass it one of the `INTERNAL` reference options listed under the ADC section above. This voltage must be half a volt lower than Vcc for the voltage reference to be accurate. The DAC is exposed via the analogWrite() function: Call `analogWrite(PIN_PA6,value)` to set the voltage to be output by the DAC. To turn off the DAC output, call digitalWrite() on that pin; note that unlike most PWM pins served by TCA0, `analogWrite(PIN_PA6,0)` and `analogWrite(PIN_PA6,255)` do not act as if you called digitalWrite() on the pin; 0 or 255 written to the `DAC0.DATA` register. Thus when using a lower reference voltage, you do not have to worry about it applying the full supply voltage to the pin if you pass it 255. (which you may have connected to sensitive devices that would be harmed by such a voltage) if let the calculation return 255; that will just output 255/256ths of the reference voltage.
 
@@ -368,7 +406,6 @@ analogChannelToDigitalPin(p)    - converts an analog channel *number* to a digit
 analogInputToDigitalPin(p)      - converts an analog channel identifier to a digital pin number.
 digitalOrAnalogPinToDigital(p)  - converts an analog channel identifier or digital pin to a digital pin number
 ADC_CH(channel number)          - converts channel numbers to analog channel identifier
-
 ```
 
 Try not to use these unless you're getting really deep into library development and direct interaction with the ADC; we provide all the constants you will need. listed above.
@@ -378,24 +415,28 @@ Libraries exist that use trickery and the ADC to measure capacitance, hence dete
 
 
 ## **Dirty trick** ADC, resistor dividers, and the internal pullup
-Sometimes it is desirable to have a means of measuring the approximate resistance of something. The most obvious example is when you are trying to determine parameters of a device that doesn't have the means to actively communicate, but which you otherwise control. For example, you have 5 different gadgets you can connect to your gadget controller (maybe it can handle more than one maybe not, doesn't matter). The gadgets do not have an output built in - they just take power, ground, and a signal, and their output is the external behavior of the gadgets (which might be lights that glow based on the input, motors that spin at a speed controlled by the input, etc). Unfortunately your application requirements dictate that you must be able to connect any of the gadgets to the device. You are tightly constrained on available pins, and you don't want to have to add a controller just so the device can annouce which of a few possibilities it is.
+Sometimes it is desirable to have a means of measuring the approximate resistance of something. The most obvious example is when you are trying to determine parameters of a device that doesn't have the means to actively communicate, but which you otherwise control the design of. For example, you have 5 different gadgets you can connect to your gadget controller (maybe it can handle more than one maybe not, doesn't matter). The gadgets do not have an output built in - they just take power, ground, and a signal, and their output is the external behavior of the gadgets (which might be lights that glow based on the input, motors that spin at a speed controlled by the input, etc). Unfortunately your application requirements dictate that you must be able to connect any of the gadgets to the device. You are tightly constrained on available pins, and you don't want to have to add a controller just so the device can annouce which of a few possibilities it is.
 
-A classic way is to realize you don't need to sort it into that many buckers, five in this case. So you might add a resistor divider between power and ground on the gadget, and connect that to the ID pin. This uses 1 pin and 2 external components, but you can easily distinguish far more than 5 values. There are a couple of pitfalls here though - first, while the current lost to this divider would be trivial compared to a motor while running or a light while on, if you need low standby power consumption, you can't have a resistor divider sitting there draining power continuously. Also, the resistors should be close to the point where the connection to the microcontroller is made, so as to ensure that it's supply rail and ground are at the same voltage as those of the microcontroller. High currents and long wires would push values to the middle were the resistors located at the gadget end of the gadget<->MCU interconnect - which is okay, I guess, except that you need to add a pair of resistors to the end of a cable, and so there are going to be pieces of exposed conductor carrying the supply voltage right next to one tied to ground, requiring particular care in that end of the interconnect, which may not be practical (for example, if you're confined to using a common crimp type connector, those don't have a connector body that can shield your resistor pair, so you need to add not just insulation but armor around it to prevent a short during handling.
+A classic way is to realize you don't need to sort it into that many buckets, five in this case. So you might add a resistor divider between power and ground on the gadget, and connect that to the ID pin. This uses 1 pin and 2 external components, but you can easily distinguish far more than 5 values. There are a couple of pitfalls here though - first, while the current lost to this divider would be trivial compared to a motor while running or a light while on, if you need low standby power consumption, you can't have a resistor divider sitting there draining power continuously. Also, the resistors should be close to the point where the connection to the microcontroller is made, so as to ensure that it's supply rail and ground are at the same voltage as those of the microcontroller. High currents and long wires would push values to the middle were the resistors located at the gadget end of the gadget<->MCU interconnect - which is okay, I guess, except that you need to add a pair of resistors to the end of a cable, and so there are going to be pieces of exposed conductor carrying the supply voltage right next to one tied to ground, requiring particular care in that end of the interconnect, which may not be practical (for example, if you're confined to using a common crimp type connector, those don't have a connector body that can shield your resistor pair, so you need to add not just insulation but armor around it to prevent a short during handling.
 
 You could solve both problems at once and save a resistor - if only there was some sort of built in resistor that could be controlled ny the MCU. "Like an internal pullup?" Exactly! You can connect one resistor from ground to the added "identification" pin, at the MCU end of the interconnect. You still need to protect it from harm, but there's no exposed power rail on the other resistor for it to short to, so your countermeasures can go down a few tiers, and it won't drain power while off unless you leave the pullup on. Even in the case that the resistor were unprotected, the likely failure modes involve the resistor either coming disconnected entirely (infinite resistance, Vpin = Vdd), or shorting to it's other lead (approx. zero resistance, Vpin = Gnd). But those two conditions are both immediately apparent from the measurement - a value near the the upper limit means there's nothing connected, or if something is connected, it lacks a working resistor.
 
 So you turn on the internal pullup, wait a few moments for the voltage to stabilize, and then read it with the ADC, and based on that you can determine what "bucket" the value falls into and that tells you what the gadget's "identification" resistor is, and hence what is connected. And you could even do it using a pin you were already using to detect if anything was connected at all (ex, if it formerly grounded that pin, and now we adapt it to ) The internal pullup is... oh.... hmmm.... "between 30k and 50k" says the datasheet "around 30k" say forum-goers without being challenged. That's quite a range - wouldn't the bins need to be awfully large to catch all values with such large limits? And what if the voltage drop across the pullup is nonlinear with the current through it? And what about the supply voltage?
 
 ### So can I do that?
+
 Yeah - What's not entirely clear right now is exactly readily generalizable the measurements on any given part are, but signs are encouraging.
 
 Tests were conducted exactly as such a sketch would, except that to expedite things, I wired up 9 resistors from 22k to 470k that I planned to use, 1 per I/O pin not used by serial on an ATtiny1624, and 5V, 3.3V, and courtesy of a bad connection, 2.3v were tested.
 I found:
 Resistance decreases slightly as supply voltage increases; over the 2.7v interval tested, it was found to have an average (of the values of Rpullup calculated from the ADC measurements and known external resistance) of 33146 ohms on a particular specimen at 3.3v. ranging to 33862 at 2.3 and 32182 at 5 volts, that is around a 5% change over most of the operating voltage range. Not bad - and it's nearly linear with voltage.
-How about with current? Within that range, the measurements varied by half of the tolerance of the  +/- 5% resistors (which these days are usually better than 5%), 2.5% which is a lot better than 30-50k
-Scrambling the connections and remeasuring yielded results inconsistent with concern over differences between the pullups on the part. The estimated resistance was almost spot on. Hence some of the error we had previously interpreted as a consequence of differences between pins was actually due to differences between the resistors.
+How about with current? Within that range, the measurements varied by half of the tolerance of the  +/- 5% resistor.
 
-No temperature testing was done as I lack appropriate facilities. I'm not going to cook my board in a (somehow moisture sealed) double boiler to get 100C or run tests under boiling computer spray duster (using it as freeze spray, while effective, is highly environmentally irresponsible. Tetrafluoroethane is a much stronger greenhouse gas than CO2 - if you boil off a little over a pound of it, over the next 20 years, it's as if you'd burned an extra ton of coal just to test the ADC at -25C (that was the closest to the -40 spec I could come up with a way of reaching that's "hardware store", though one could then put a vacuum pump on it to lower it's boiling point further to keep it closer to -40. That sounds crude, but that's actually a very common way of generating ultra low temperatures for scientific experiments. When liquid helium at atmospheric pressure isn't cold enough but you're working with macroscopic items so you can't use laser cooling, you can pump down the pressure of the liquid helium, and it gets the temperature a bit lower). But what I just described with computer spray duster being used to chill a circuit board, yeah it's as crude as it sounds. But I'll take the datasheet's word, which is that the difference is typically around +/- 18% over the whole -40-125C range. The vast majority of applications are used when it's in a much narrower range than that. Microchip seems to be inconsistent with how conjservative their specs are. So some experimentation at the expected extremes would be wrothwhile.
+Scrambling the connections and remeasuring yielded results inconsistent with any differences between individual pullups on the part. The estimated resistance was almost spot on.
+
+All data was consistent with variation being caused by deviations of individual resistors from their nominal resistance.
+
+No temperature testing was done as I lack appropriate facilities. I'm not going to cook my board in a (somehow moisture sealed) double boiler to get 100C or run tests under boiling computer spray duster (using it as freeze spray, while effective, is highly environmentally irresponsible. Tetrafluoroethane is a much stronger greenhouse gas than CO2 - if you boil off a little over a pound of it, over the next 20 years, it's as if you'd burned an extra ton of coal just to test the ADC at -25C (that was the closest to the -40 spec I could come up with a way of reaching that's "hardware store", though one could then put a vacuum pump on it to lower it's boiling point further to keep it closer to -40. That sounds crude, but that's actually a very common way of generating ultra low temperatures for scientific experiments (though with different coolants): When liquid helium at atmospheric pressure isn't cold enough but a researcher is working with macroscopic items so laser cooling and the like are out of the question, you can pump down the pressure of the gaseous helium above the liquid helium, and it gets the temperature a bit lower. But what I just described with computer spray duster being used to chill a circuit board, yeah it's as crude as it sounds. I'll take the datasheet's word, which is that the difference is typically around +/- 18% over the whole -40-125C range. The vast majority of applications are used when it's in a much narrower range than that. Microchip seems to be inconsistent with how conservative their specs are. So some experimentation at the expected extremes would be worthwhile.
 
 ### So how to do it right?
 We know that Rpu is a function of T and V, the individual specimen.
@@ -448,8 +489,7 @@ Through these methods, it is possible to use the internal pullup as one side of 
 #### It may be even easier
 As long as the number of buckets you need to sort values into remains small, it runs on a regulated power supply, and the device will operate at comfortable human living temperatures, only a single point calibration should be needed. *It may in fact be found as a larger sample of chips are tested that even this is unnecessary; maybe Microchip has really good control over their process, and while their datasheets give them great leeway, they actually repeatedly hit the bullseye*. My initial testing seems to suggest that that may be the case, at least within part families - Every 2-series I tested has been within a kOhm or two! They are certainly considerablly closer than they promise on max clock speed, another property that varies with voltage and temperature, esp. on 2-series!
 
-I will soon find out, as I'm using this scheme and hoping to just have a table stored thats the same everywhere. They'll be 424-based nodes, regulated 5v and 15-35C worst case. I'm optimistic currently that the 10 buckets. will work.
-
+I will soon find out, as I'm using this scheme and hoping to just have a table stored thats the same everywhere. They'll be 424-based nodes, regulated 5v and 15-35C worst case. I'm optimistic currently that the 10 or so buckets I have will work.
 
 
 ## Microchip Documentation

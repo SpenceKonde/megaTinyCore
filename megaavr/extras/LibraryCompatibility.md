@@ -5,6 +5,7 @@ Please include information that uniquely identifies the library, as popular libr
 <!-- markdownlint-disable-file MD034 -->
 | Library      | Version | Library URL or reference                              | Status                               | Included w/ | Notes                                                     |
 |--------------|---------|-------------------------------------------------------|--------------------------------------|-------------|-----------------------------------------------------------|
+| ~FAST LED ~  | All     | https://github.com/FastLED/FastLED                    | Does not  compile, appears little if any work done to support modern AVRs| | This library is not being particuklarly well managed right now. The code incomprehensible,
 | tinyGPS++    |         | https://github.com/mikalhart/TinyGPSPlus              |                 Compiles and works   |             |                                                           |
 | ~NeoGPS~     |         |                                                       |  Architecture warning, doesn't work  |             | There are many other GPS libraries that do work.          |
 | VEML6070     |         | Adafruit                                              |                 Compiles and works   |             |                                                           |
