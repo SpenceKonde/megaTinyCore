@@ -69,17 +69,17 @@ These return pointers to the port output, input and direction registers (output 
 Returns the analog input number used internally. Only useful when fully taking over the ADC either directly or as part of a sketch.
 
 ### (mTC/DxC)`uint8_t analogChannelToDigitalPin(p)`
-Returns the pin number corresponding to an analog channel identifier. This is simply the analog input number with the high bit set via the ADC_CH() macro. Think long and hard if you find yourself needing this, it is rarely important on DxCore since you can always refer to pins with the digital pin number or even better, PxN notation.
+Returns the pin number corresponding to an analog channel identifier. This is simply the analog input number with the high bit set via the ADC_CH() macro. Think long and hard if you find yourself needing this, it is rarely important on megaTinyCore or DxCore since you can always refer to pins with the digital pin number or even better, PxN notation.
 
 ### (standard) `uint8_t analogInputToDigitalPin(p)`
-Returns the digital pin number associated with an analog input number. Only useful when fully taking over the ADC either directly or as part of a sketch.
+Returns the digital pin number associated with an analog input number. Only useful when fully taking over the ADC.
 
 ### (DxC only) `uint8_t digitalOrAnalogPinToDigital(p)`
 If `p < NUM_DIGITAL_PINS`, p is a digital pin, and is returned as is. If it is equal to `ADC_CH(n)` where n is a valid analog channel it is converted to the digital pin, and if anything else, it returns NOT_A_PIN.
 
-### `uint8_t portToPinZero(port)`
+### (DxC only) `uint8_t portToPinZero(port)`
 Returns `PIN_Px0` - eg `portToPinZero(PA)` is PIN_PA0. This will not work if there is no "hole" provided in the pin numbering.
-For example, AVR64DD14, the pins are PA0, PA1, PC1, PC2, PC3, PD4, PD5, PD6, PD7, PF6, PF7, with numbers 0, 1, 2, 3, 4, ~5 (PD0), 6, 7, 8~ 9, 10, 11, 12, 13, 14.  portToPinZero will work for PA and PD, but not PC or PF; this function is used internally in ways that don't matter for this case, and because it would otherwise involve the same pin number meaning different things, or much larger arrays (hence wasted space)
+For example, AVR64DD14, the pins are PA0, PA1, PC1, PC2, PC3, PD4, PD5, PD6, PD7, PF6, PF7, with numbers 0, 1, 9, 10, 11, ~12 (PD0)~, 16, 17, 18, 19.  portToPinZero will work for PA (0, PIN_PA0), PC (8, PIN_PC0, even though the pin isn't there), and PD (12, PIN_PD0), but not PF.  this function is used internally in ways that don't matter for this case, and because it would otherwise involve the same pin number meaning different things, or much larger arrays (hence wasted space)
 
 ### (DxC only) `volatile uint8_t* digitalPinHasPWMTCB(p)`
 Returns true if the pin has PWM available in the standard core configuration. This is a compile-time-known constant as long as the pin is, and does not account for the PORTMUX registers.
@@ -127,9 +127,9 @@ See [Analog Reference](https://github.com/SpenceKonde/DxCore/blob/master/megaavr
 int32_t analogReadEnh(       uint8_t pin,                    uint8_t res,    uint8_t gain)
 int32_t analogReadDiff(      uint8_t pos,       uint8_t neg, uint8_t res,    uint8_t gain)
 int16_t analogClockSpeed(    int16_t frequency,              uint8_t options             )
-bool    analogReadResolution(uint8_t res)
-bool    analogSampleDuration(uint8_t dur)
-void    DACReference(        uint8_t mode)
+bool    analogReadResolution(uint8_t res                                                 )
+bool    analogSampleDuration(uint8_t dur                                                 )
+void    DACReference(        uint8_t mode                                                )
 uint8_t getAnalogReference()
 uint8_t getDACReference()
 uint8_t getAnalogSampleDuration()
@@ -143,11 +143,11 @@ One difference from the stock implementation - `millis` is #defined as `millis`,
 These functions are not available if millis has been disabled from the tools menu. They are available if timekeeping is enabled in the tools menu, but has been prevented from operating in some other way, such as by overriding the timer initialization function or calling `stop_millis()` - in that case the number they return will not increase (if the timer isn't running) or will return nonsensical values (if it is). As long as interrupts are never disabled for more than 1ms at a time, they will not throw off the times returned. These functions will lose time and behave erratically beyond that. Time will be guaranteed to be lost when interrupts are disabled for more than 2ms
 
 ### (standard, with minor changes) `delay()`
-This works normally. If millis is disabled, the builtin avrlibc implementation is `_delay_ms()` is used; for constant arguments it is used directly and for variable ones it is called in a loop with 1ms delay. The catch with that is that if interrupts fire in the middle, time spent in those does not count towards the delay - unlike normal delay(). However, be warned that if millis is stopped in any way other than the tools menu, **delay will not know to use `_delay_ms()` and will likely wait forever (if the timer is stopped) or wait for unpredictable lengths of time (if it is running in some different configuration)**.
+This works normally. If millis is disabled, the builtin avrlibc implementation of `_delay_ms()` is used; for constant arguments it is used directly and for variable ones it is called in a loop with 1ms delay. The catch with that is that if interrupts fire in the middle, time spent in those does not count towards the delay - unlike normal delay(). However, be warned that if millis is stopped in any way other than the tools menu, **delay will not know to use `_delay_ms()` and will likely wait forever (if the timer is stopped) or wait for unpredictable lengths of time (if it is running in some different configuration)**.
 
 When delay is used with RTC as the millis timer, different implementations are used.
 
-**delay() must never be called when interrupts are disabled; it will delay forever.**
+**(standard) delay() must never be called when interrupts are disabled**
 
 ### (standard, with minor changes) `delayMicroseconds()`
 In order to achieve small code size and accurate timing at short delays, this function accepts an unsigned 16-bit number of microseconds, not an unsigned long like delay(). Like the official cores, delayMicroseconds() does NOT disable interrupts during the delay period - if it did, any interrupts that occurred during the delay would fire as it returned, causing your code to be delayed by them anyway. Instead, in the event that you are doing something where there are tight timing constraints, you need to have interrupts disabled before delayMicroseconds() is called, do your time-critical thing, and then re-enable it. Be aware that millis() can lose time if interrupts are disabled for more than 1ms (1000us).
@@ -186,9 +186,9 @@ delay():
   * Requires interrupts to be enabled.
   * Gives the requested delay regardless of interrupts occurring in the middle of it.
   * Works for delays of up to 4.2 billion milliseconds.
-* When it can't use the millis machinery, we fall back to avrlibc's implementation.]
+* When it can't use the millis machinery, we fall back to avrlibc's implementation.
   * Cycle counting delay, or cycle counting delay called in a loop. for non-constant delay.
-  * Will be lenthened by any interrupts occurring in the middle of it
+  * Will be lenthened by any interrupts occurring in the middle of it.
 
 
 delayMicroseconds():
@@ -201,7 +201,7 @@ delayMicroseconds():
 * Delays should be constants known at compile time (hence subject to constant folding) whenever possible.
 * Does not have the bug where certain very short, compile-time-known delays come out shorter than they should. This bug was introduced when LTO support was added and still impacts many cores - LTO would inline the function, but the function was accounting for the call overhead in it's calculated delay.
 
-###(undocumented standard)  `uint16_t clockCyclesPerMicrosecond()`
+### (undocumented standard)  `uint16_t clockCyclesPerMicrosecond()`
 Part of the standard API, but not documented. Does exactly what it says.
 ```c
 inline uint16_t clockCyclesPerMicrosecond() {
@@ -252,8 +252,7 @@ After having stopped millis either for sleep or to use timer for something else 
 
 ### (DxC/mTC) `void nudge_millis(uint16_t ms)`
 This is not yet implemented as we assess whether it is a useful or appropriate addition, and how it fits in with set millis().
-~Sets the millisecond timer forward by the specified number of milliseconds. Currently only implemented for TCB, TCA implementation will be added in a future release. This allows a clean way to advance the timer without needing to do the work of reading the current value, adding, and passing to `set_millis()`  It is intended for use before  (added becauise *I* needed it, but simple enough).
-The intended use case is when you know you're disabling interrupts for a long time (milliseconds), and know exactly how long that is (ex, to update neopixels), and want to nudge the timer
+~Sets the millisecond timer forward by the specified number of milliseconds. Currently only implemented for TCB, TCA implementation will be added in a future release. This allows a clean way to advance the timer without needing to do the work of reading the current value, adding, and passing to `set_millis()` The intended use case is when you know you're disabling interrupts for a long time (milliseconds), and know exactly how long that is (ex, to update neopixels), and want to nudge the timer
 forward by that much to compensate. That's what *I* wanted it for.~
 
 ### (DxC/mTC) `_switchInternalToF_CPU()`

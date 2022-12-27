@@ -300,7 +300,7 @@ xplainedpro817:
 HELPTEXT += "target xplainedmini817   - Microchip ATtiny817 Xplained Mini.\n"
 xplainedmini817: TARGET = attiny817
 xplainedmini817:
-	$(MAKE) -f $(MF) optiboot_xplainedmini817.hex UARTTX=B2 TIMEOUT=8 LED=C0 
+	$(MAKE) -f $(MF) optiboot_xplainedmini817.hex UARTTX=B2 TIMEOUT=8 LED=C0
 
 HELPTEXT += "target xplainednano416   - Microchip ATtiny416 Xplained Nano.\n"
 xplained416: TARGET = attiny416

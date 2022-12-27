@@ -63,7 +63,7 @@
   void badCall(const char*);
   void check_constant_pin(pin_size_t pin);
   #if defined(ARDUINO_MAIN) // We need to make sure these substitutes for the badArg and badCall functions are generated once and only once.
-    // They must not attempt to actully detect any error if LTO is disabled
+    // They must not attempt to actually detect any error if LTO is disabled
     void badArg(__attribute__((unused))const char* c) {
       return;
     }

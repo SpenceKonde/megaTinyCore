@@ -351,7 +351,7 @@ int main(void) {
   //  Previously we just made sure not to try to jump to the app in that case.
   //  Largely because in non-reset-pin configurations, after running the bootloader once,
   //  instead of continually running the bootloader until something was uploaded, it would do it
-  //  once, and then hit no entry conditions and jump to (the non-existant) app, run off the
+  //  once, and then hit no entry conditions and jump to (the non-existent) app, run off the
   //  end of the flash, and repeat (discovered 11/14/20)
   //
   //  Now, unless we are told that we should ASSUME_DIRECT_ENTRY_SAFE, when we detect something
