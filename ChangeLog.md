@@ -14,17 +14,15 @@ These items are in addition to what was listed under changes already in release.
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-## Unreleased changes
+## Released Versions
 
-### Planned 2.6.5
-* Correct issue with newly added bootloaders for Microchip official boards.
+### 2.6.5
+* Correct issues relating to optiboot board definitions for Microchip boards (missing board entries, missing bootloaders).
 * Correct issue with Sampled/Sampled and Sampled (125hz)/Disabled BOD options. (#874)
-* Port new version of pinConfigure (in progress)
+* Port new version of pinConfigure.
 * Harmonize versions of Wire, USERSIG, Event.
 * Fix issue with reading with SerialUPDI (#871)
 * Fix several USART-related issues (USART0 not working in half duplex, usart1 not working for receive, .end() less efficient than it could be and potentially wrong.)
-
-## Released versions
 
 ### 2.6.4 (2.6.3 respin due to critical compile error impacting all sketches)
 * Correct compile error encountered in all cases.

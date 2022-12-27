@@ -79,7 +79,7 @@
   #warning "This mode is ONLY for debugging LINK-TIME ERRORS that are reported by the linker as being located at .text+0, and you can't figure out where the bug is from other information it provides. As noted above, while this may make compilation succeed, it will only turn compile-time errors into incorrect runtime behavior, which is much harder to debug. As soon as the bug that forced this to be used is fixed, switch back to the standard platform.txt!"
   #warning "UART implementation is forcibly downgraded, Flash.h writes are replaced with NOPs, and pin interrupts are downgraded to the old (less efficient) implementation. All uploading is disabled, and behavior of exported binaries may vary from normal behavior arbitrarily."
 #endif
-         
+
 /* ADC-related stuff */
 /* With 2.3.0, we do the same thing as ATTinyCore and DxCore to specify
    that something is a channel number: set the high bit 1, since it is
@@ -630,7 +630,11 @@ unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
 #define TIMERB3         (0x23) // TCB3
 #define TIMERB4         (0x24) // TCB4
 #define TIMERD0         (0x40) // If any of these bits match it's potentially on TCD0
-#define DACOUT          (0x80)
+#define DACOUT          (0x80) /// If the high bit is set, it;s either the DAC oone of the new timers.
+#define TIMERE0         (0x90) //  Full dettails not known, the below constants are guesses
+#define TIMERF0         (0xC0)  // as abpve
+#define TIMERE1         (0xA0)
+#define TIMERF1         (0xD0)
 /* The above are all used in the digitalPinToTimer() macro and appear in the timer table, in addition to being how we identify millis timer.
  * For the millis timer, there's nothing weird here.
  * But the timer table constants contain more information than that for these. When user code interprets the timer table entries it is critical to do it right:
@@ -675,12 +679,12 @@ unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
 #define TIMERB4_ALT     (0x34) // TCB4 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
 
 
- // 0b01MC 0mmm - the 3 lowest bits refer to the PORTMUX.
+// 0b01MC 0mmm - the 3 lowest bits refer to the PORTMUX.
 //                            bit C specifies whether it's channel A (0) or B (1). If M is 1 it is WOC outputting chan A or WOB outputting D.
 //                            WOD outputting A or WOC outputting B is not supported by the core. WOB outputting A or WOA outputting B is not supported by the hardware.
 //                            Hence, PORTMUX.TCDROUTEA == (timer table entry) & (0x07)
 //                            and any table entry > 0x40 but less than 0x80 could be a TCD
-//
+/*
 #define TIMERD0_0WOA      (0x40) // PORTA
 #define TIMERD0_0WOB      (0x50)
 #define TIMERD0_0WOC      (0x60)
@@ -701,8 +705,10 @@ unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
 #define TIMERD0_4WOB      (0x54) // this is PA5, duplicates mux 0.
 #define TIMERD0_4WOC      (0x64) // second half is PORTD
 #define TIMERD0_4WOD      (0x74)
-/*
+
 // For future use
+// If timer D ever gets all 8 options, we'd need these
+
 #define TIMERD0_5WOA      (0x45) // hypothetical TCD0 WOA ALT5
 #define TIMERD0_5WOB      (0x55) // hypothetical TCD0 WOB ALT5
 #define TIMERD0_5WOC      (0x65) // hypothetical TCD0 WOC ALT5
@@ -715,7 +721,81 @@ unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
 #define TIMERD0_7WOB      (0x57) // hypothetical TCD0 WOB ALT7
 #define TIMERD0_7WOC      (0x67) // hypothetical TCD0 WOC ALT7
 #define TIMERD0_7WOD      (0x77) // hypothetical TCD0 WOD ALT7
+
+// Uhoh, EB has a new kind of timer, a TCE which looks a lot like a TCA-PWM-Powerhouse timer, only better.
+// We predict that PORTMUX.TCEROUTEA will not give individual pin control, but that it will be much like TCA.
+// and we will thus be able to quickly detect if the port it's poimted at is ours.
+
+#define TIMERE0_MUX0      (0x90) // HypotheticalTCE/WEX mux
+#define TIMERE0_MUX1      (0x91) // HypotheticalTCE/WEX mux
+#define TIMERE0_MUX2      (0x92) // HypotheticalTCE/WEX mux
+#define TIMERE0_MUX3      (0x93) // HypotheticalTCE/WEX mux
+#define TIMERE0_MUX4      (0x94) // HypotheticalTCE/WEX mux
+#define TIMERE0_MUX5      (0x95) // HypotheticalTCE/WEX mux
+#define TIMERE0_MUX6      (0x96) // HypotheticalTCE/WEX mux
+#define TIMERE0_MUX7      (0x97) // HypotheticalTCE/WEX mux
+
+// They might make a chip with 2 of them!
+#define TIMERE1_MUX0      (0xA0) // HypotheticalTCE/WEX mux
+#define TIMERE1_MUX1      (0xA1) // HypotheticalTCE/WEX mux
+#define TIMERE1_MUX2      (0xA2) // HypotheticalTCE/WEX mux
+#define TIMERE1_MUX3      (0xA3) // HypotheticalTCE/WEX mux
+#define TIMERE1_MUX4      (0xA4) // HypotheticalTCE/WEX mux
+#define TIMERE1_MUX5      (0xA5) // HypotheticalTCE/WEX mux
+#define TIMERE1_MUX6      (0xA6) // HypotheticalTCE/WEX mux
+#define TIMERE1_MUX7      (0xA7) // HypotheticalTCE/WEX mux
+
+
+// They might make a chip with 3 of them!
+#define TIMERE2_MUX0      (0xB0) // HypotheticalTCE/WEX mux
+#define TIMERE2_MUX1      (0xB1) // HypotheticalTCE/WEX mux
+#define TIMERE2_MUX2      (0xB2) // HypotheticalTCE/WEX mux
+#define TIMERE2_MUX3      (0xB3) // HypotheticalTCE/WEX mux
+#define TIMERE2_MUX4      (0xB4) // HypotheticalTCE/WEX mux
+#define TIMERE2_MUX5      (0xB5) // HypotheticalTCE/WEX mux
+#define TIMERE2_MUX6      (0xB6) // HypotheticalTCE/WEX mux
+#define TIMERE2_MUX7      (0xB7) // HypotheticalTCE/WEX mux
+
+// Plus this wacky TCF thing.
+// Premering on low pincount parts, it's hard to say what the full lineup of pin options will be likek
+// I predict... 3 bits for the mux position, and that a larger chip might have 2....
+
+#define TIMERF0_MUX0A      (0xC0) // Hypothetical TCF MUX
+#define TIMERF0_MUX0B      (0xC8) // Hypothetical TCF MUX
+#define TIMERF0_MUX1A      (0xC1) // Hypothetical TCF MUX
+#define TIMERF0_MUX1B      (0xC9) // Hypothetical TCF MUX
+#define TIMERF0_MUX2A      (0xC2) // Hypothetical TCF MUX
+#define TIMERF0_MUX2B      (0xCA) // Hypothetical TCF MUX
+#define TIMERF0_MUX3A      (0xC3) // Hypothetical TCF MUX
+#define TIMERF0_MUX3B      (0xCB) // Hypothetical TCF MUX
+#define TIMERF0_MUX4A      (0xC4) // Hypothetical TCF MUX
+#define TIMERF0_MUX4B      (0xCC) // Hypothetical TCF MUX
+#define TIMERF0_MUX5A      (0xC5) // Hypothetical TCF MUX
+#define TIMERF0_MUX5B      (0xCD) // Hypothetical TCF MUX
+#define TIMERF0_MUX6A      (0xC6) // Hypothetical TCF MUX
+#define TIMERF0_MUX6B      (0xCE) // Hypothetical TCF MUX
+#define TIMERF0_MUX7A      (0xC7) // Hypothetical TCF MUX
+#define TIMERF0_MUX7B      (0xCF) // Hypothetical TCF MUX
+
+// What if a chip has two of them? No problem!
+#define TIMERF1_MUX0A      (0xD0) // Hypothetical TCF MUX
+#define TIMERF1_MUX0B      (0xD8) // Hypothetical TCF MUX
+#define TIMERF1_MUX1A      (0xD1) // Hypothetical TCF MUX
+#define TIMERF1_MUX1B      (0xD9) // Hypothetical TCF MUX
+#define TIMERF1_MUX2A      (0xD2) // Hypothetical TCF MUX
+#define TIMERF1_MUX2B      (0xDA) // Hypothetical TCF MUX
+#define TIMERF1_MUX3A      (0xD3) // Hypothetical TCF MUX
+#define TIMERF1_MUX3B      (0xDB) // Hypothetical TCF MUX
+#define TIMERF1_MUX4A      (0xD4) // Hypothetical TCF MUX
+#define TIMERF1_MUX4B      (0xDC) // Hypothetical TCF MUX
+#define TIMERF1_MUX5A      (0xD5) // Hypothetical TCF MUX
+#define TIMERF1_MUX5B      (0xDD) // Hypothetical TCF MUX
+#define TIMERF1_MUX6A      (0xD6) // Hypothetical TCF MUX
+#define TIMERF1_MUX6B      (0xDE) // Hypothetical TCF MUX
+#define TIMERF1_MUX7A      (0xD7) // Hypothetical TCF MUX
+#define TIMERF1_MUX7B      (0xDF) // Hypothetical TCF MUX
 */
+
 
 __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us);
 
@@ -1050,7 +1130,7 @@ void pinConfigure(const uint8_t digital_pin, const pin_configure_t mode, const M
   uint16_t pin_config = _pincfg(mode, modes...);
   _pinconfigure(digital_pin, pin_config);
 }
-
+#endif // end
 
 
 #ifdef PIN_WIRE_SCL_PINSWAP_1
@@ -1131,7 +1211,9 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 // try to spread around the ports we use for these defines - if we're
 // going to declare some other port to be the "main" serial port, with the monitor
 // on it and all, we should be consistent about that, right? *shrug*
-#define SERIAL_PORT_HARDWARE      SERIAL_PORT_MONITOR
+#if !defined(SERIAL_PORT_HARDWARE)
+  #define SERIAL_PORT_HARDWARE      SERIAL_PORT_MONITOR
+#endif
 
 // If we have USART2 (ie, we are not a DD-series) we will declare that to be
 // SERIAL_PORT_HARDWARE_OPEN, so that on a DB-series, libraries are less likely to
@@ -1154,10 +1236,7 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 // Serial1. that makes it difficult to , so it can't be their MVIO serial port (without involving the event
 // system, of course) - but they can get a serial port on MVIO pins with USART0
 // and an alternate mapping. So for those parts only, Serial is their MVIO port.
-// For everyone else it's Serial1, and for non-DD parts, that is the only serial port connected to thr mvio
-// serial port.
-// that could be used with MVIO (again, short of rerouting signals with
-// the event system)
+// For everyone else it's Serial1, and for non-DD parts, that is the only serial port connected to the mvio pins.
 // Note that if MVIO is disabled, we cannot detect that.
   #if defined(DD_14_PINS) || defined(DD_20_PINS)
     #define SERIAL_PORT_MVIO Serial0
@@ -1171,9 +1250,7 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 // Spence Konde: This is a bit silly - but it does have some utility. I am of the
 // opinion that anything that needs to use a serial port or other peripheral of
 // which a chip may have several, and it needs to be sure to pick the "right" one
-// it should ASK THE USER - what good does it do that the GPS picked the first
-// open serial port, if the user tied it to a different port? Or thought they
-// were going to use software serial "like they always did" (*shudder*)
+// (that is, most of the time), it should be accepting an argument somewhere to set which serial port rather than assuming.
 
 
 

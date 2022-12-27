@@ -83,6 +83,7 @@
  * The sole exception? The ATmega2560/2561 has only 8k RAM, a 32:1 flash to ram ratio.
  * (to be fair, you are allowed to use external RAM - which was a very rare feature indeed,
  */
+#if !defined(LTODISABLED)
 #if !defined(USE_ASM_TXC)
   #define USE_ASM_TXC 2    // A bit slower than 1 in exchange for halfduplex.
 //#define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART and 44b for each additional one
@@ -95,6 +96,22 @@
 #if !defined(USE_ASM_DRE)
   #define USE_ASM_DRE 1      // This is the hard one...Depends on BOTH buffers, and has that other method of calling it. saves 34b for 1 USART and 68b for each additional one
 #endif
+#else
+  #warning "LTO has been disabled! ASM TXC/RXC/DRE not available. USART falling back to the old, flash-inefficient implementation with fewer features."
+  #if defined(USE_ASM_TXC)
+    #undef USE_ASM_TXC
+  #endif
+
+  #if defined(USE_ASM_RXC)
+    #undef USE_ASM_RXC
+  #endif
+
+  #if defined(USE_ASM_DRE)
+    #undef USE_ASM_DRE
+  #endif
+#endif
+
+
 // savings:
 // 44 total for 0/1,
 // 301 for 2-series, which may be nearly 9% of the total flash!

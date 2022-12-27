@@ -4831,6 +4831,7 @@ microchipo.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BU
 microchipo.menu.board_name.cn3217.bootloader.file=optiboot_curiosity3217.hex
 microchipo.menu.board_name.cn3217.build.attiny=3217
 microchipo.menu.board_name.cn3217.build.variant=txy7
+microchipo.menu.board_name.cn3217.build.millistimer=D0
 microchipo.menu.board_name.cn3217.upload.maximum_size=32256
 microchipo.menu.board_name.cn3217.upload.maximum_data_size=2048
 
@@ -4841,7 +4842,7 @@ microchipo.menu.board_name.cn1627.bootloader.file=optiboot_curiosity1627.hex
 microchipo.menu.board_name.cn1627.build.millistimer=B1
 microchipo.menu.board_name.cn1627.build.attiny=1627
 microchipo.menu.board_name.cn1627.build.variant=txy7
-microchipo.menu.board_name.cn1627.upload.maximum_size=15972
+microchipo.menu.board_name.cn1627.upload.maximum_size=15872
 microchipo.menu.board_name.cn1627.upload.maximum_data_size=2048
 microchipo.menu.board_name.cn1627.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}10
 microchipo.menu.board_name.cn1627.bootloader.TCD0CFG_avrdude=
@@ -5013,26 +5014,6 @@ microchipo.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
 microchipo.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 microchipo.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 microchipo.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
-
-#----------------------------------------#
-# MILLIS TIMER                           #
-#________________________________________#
-microchipo.menu.millis.enabled=Enabled (default timer)
-microchipo.menu.millis.disabled=Disabled (saves flash)
-microchipo.menu.millis.timera=TCA0 (default on 0-series)
-microchipo.menu.millis.timerd=TCD0 (1-series only, default there)
-microchipo.menu.millis.timerb0=TCB0 (breaks tone() and Servo except on 1627, 3217)
-microchipo.menu.millis.timerb1=TCB1 (3217 and 1627 only, default 2-series)
-microchipo.menu.millis.rtc=RTC (no micros)
-microchipo.menu.millis.rtcxtal=RTC w/w32.768 kHz ext. crystal (1/2-series only, no micros)
-microchipo.menu.millis.disabled.build.millistimer=NONE
-microchipo.menu.millis.timera.build.millistimer=A0
-microchipo.menu.millis.timerd.build.millistimer=D0
-microchipo.menu.millis.timerb0.build.millistimer=B0
-microchipo.menu.millis.timerb1.build.millistimer=B1
-microchipo.menu.millis.rtc.build.millistimer=RTC
-microchipo.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-microchipo.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
 #----------------------------------------#
 #  UPDI and RESET PIN configuration and  #

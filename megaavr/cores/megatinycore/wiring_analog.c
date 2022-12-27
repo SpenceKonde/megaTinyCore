@@ -32,16 +32,6 @@
  * error messages and codes at runtime, since we have no other way to report such.                                 */
 
 #define SINGLE_ENDED 254
-inline __attribute__((always_inline)) void check_valid_digital_pin(pin_size_t pin) {
-  if (__builtin_constant_p(pin)) {
-    if (pin >= NUM_TOTAL_PINS && pin != NOT_A_PIN)
-    // Exception made for NOT_A_PIN - code exists which relies on being able to pass this and have nothing happen.
-    // While IMO very poor coding practice, these checks aren't here to prevent lazy programmers from intentionally
-    // taking shortcuts we disapprove of, but to call out things that are virtually guaranteed to be a bug.
-    // Passing -1/255/NOT_A_PIN to the digital I/O functions is most likely intentional.
-    badArg("digital I/O function called  is constant, but not a valid pin");
-  }
-}
 
 inline __attribute__((always_inline)) void check_valid_analog_pin(pin_size_t pin) {
   if (__builtin_constant_p(pin)) {
@@ -113,8 +103,8 @@ inline __attribute__((always_inline)) void check_valid_dac_ref(uint8_t mode) {
 
 inline __attribute__((always_inline)) void check_valid_duty_cycle(int16_t val) {
   if (__builtin_constant_p(val)) {
-    if (val < 0 || val > 255)
-      badArg("analogWrite duty cycle called with a constant not between 0 and 255");
+    if (val < 0 || val >255)
+      badArg("analogWrite cannot produice duty cycle higher 100% or below 0%");
   }
 }
 
@@ -584,7 +574,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       for (uint8_t i =0; i < 16; i++) {
         int16_t clkadc = adc_prescale_to_clkadc[i];
         prescale = i;
-        if ((frequency >= clkadc) || /* i == 15 || */ (adc_prescale_to_clkadc[i+1] < ((options & 0x01) ? 2 : 300))) {
+        if ((frequency >= clkadc) || (adc_prescale_to_clkadc[i+1] < ((options & 0x01) ? 2 : 300))) {
           ADC0.CTRLB = prescale;
           break;
         }
@@ -592,6 +582,10 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     }
     if (frequency < 0) {
       return ADC_ERROR_INVALID_CLOCK;
+    }
+    int16_t ret = adc_prescale_to_clkadc[ADC0.CTRLB];
+    if (ret > 1500) {
+
     }
     return adc_prescale_to_clkadc[ADC0.CTRLB];
   }
@@ -804,19 +798,24 @@ Note: analogReference does NOT check this! So set the clock speed after referenc
 
 
 int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
+  uint8_t prescale = 0;
   if (frequency == -1) {
     frequency = 1450;
   }
   if (frequency > 0) {
     bool using_0v55 = !(VREF.CTRLA & VREF_ADC0REFSEL_gm || ADC0.CTRLC & ADC_REFSEL_gm);
     if ((options & 0x01) == 0) {
-      frequency = constrain(frequency, (using_0v55 ? 100: 200), (using_0v55 ? 260 : 1500));
+      int16_t maxadc = 1500;
+      if ((ADC0.CTRLA & ADC_RESSEL_bm)) {
+        maxadc = 2000;
+      }
+      frequency = constrain(frequency, (using_0v55 ? 100: 200), (using_0v55 ? 260 : maxadc));
     }
-    uint8_t prescale = 0;
     for (uint8_t i =0; i < 8; i++) {
       int16_t clkadc = adc_prescale_to_clkadc[i];
       prescale = i;
       if ((frequency >= clkadc) || (adc_prescale_to_clkadc[i + 1] < ((options & 0x01) ? 2 : (using_0v55 ? 100 : 200)))) {
+
         ADC0.CTRLC = (ADC0.CTRLC & ~ADC_PRESC_gm) | prescale;
         break;
       }
@@ -825,7 +824,13 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
   if (frequency < 0) {
     return ADC_ERROR_INVALID_CLOCK;
   }
-  return adc_prescale_to_clkadc[(ADC0.CTRLC & ADC_PRESC_gm)];
+  int16_t newadcclk = adc_prescale_to_clkadc[prescale]
+  if (newadcclk > 1500) {
+    ADC0.CALIB = 1;
+  } else {
+    ADC0.CALIB = 0;
+  }
+  return newadcclk;
 }
 
 #if defined(ADC1)
@@ -838,7 +843,7 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
         badArg("Only runstandby and enable/disable are supported - the hardware doesn't have LOWLAT nor the PGA");
       }
     }
-    // 0b SSE xxxx
+    // 0b SSEExxxx
     // SS = run standby
     // 00 = no change to run standby
     // 01 = no change to run standby
@@ -848,7 +853,12 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
     // 00 = Do not enable or disable ADC.
     // 01 = Do not enable or disable ADC.
     // 10 = Disable the ADC.
-    // 11 = Enable the ADC.
+    // 11 = Enable the ADC
+    //
+    // 0b10100000 = 0xA0 = stop and disable fully
+    // 0b00110000 - 0x30 = Enable ADC and don't change standby setting
+    // 0b11110000 - 0xF0 = Enable ADC and run in standby
+    //
 
     uint8_t temp = ADC1.CTRLA; //performance.
     if (options & 0x20) {
@@ -874,12 +884,12 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
         if (pin & 0x80) {
           if ((pin & 0x3F) >= NUM_ANALOG_INPUTS)
           {
-            badArg("analogRead called with constant channel that is neither valid analog channel nor valid pin");
+            badArg("analogRead1 called with constant channel that is neither valid analog channel nor valid pin");
           }
         } else {
           pin = digitalPinToAnalogInput(pin);
           if (pin == NOT_A_PIN) {
-            badArg("analogRead called with constant pin that is not a valid analog pin");
+            badArg("analogRead1 called with constant pin that is not a valid analog pin");
           }
         }
       }
@@ -894,20 +904,20 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
       #endif
       case VDD:
         VREF.CTRLB &= ~VREF_ADC1REFEN_bm; // Turn off force-adc-reference-enable
-        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
+        ADC1.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
         // VREF.CTRLA does not need to be reconfigured, as the voltage references only supply their specified voltage when requested to do so by the ADC.
         break;
       case INTERNAL0V55:
         VREF.CTRLC =  VREF.CTRLC & ~(VREF_ADC0REFSEL_gm); // These bits are all 0 for 0.55v reference, so no need to do the mode << VREF_ADC0REFSEL_gp here;
-        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; // per datasheet, recommended SAMPCAP=0 at ref < 1v
-        VREF.CTRLB |= VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
+        ADC1.CTRLC = (ADC1.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; // per datasheet, recommended SAMPCAP=0 at ref < 1v
+        VREF.CTRLB |= VREF_ADC1REFEN_bm; // Turn off force-adc-reference-enable
         break;
       case INTERNAL1V1:
       case INTERNAL2V5:
       case INTERNAL4V34:
       case INTERNAL1V5:
         VREF.CTRLC = (VREF.CTRLC & ~(VREF_ADC0REFSEL_gm)) | (mode << VREF_ADC0REFSEL_gp);
-        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v
+        ADC1.CTRLC = (ADC1.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v
         break;
     }
   }
@@ -916,19 +926,25 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
   // I wouldn't say the dual ADC thing was some of their best work.
 
   int16_t analogClockSpeed1(int16_t frequency, uint8_t options) {
+    uint8_t prescale = 0;
     if (frequency == -1) {
       frequency = 1450;
     }
     if (frequency > 0) {
-      bool using_0v55 = !(VREF.CTRLA & VREF_ADC0REFSEL_gm || ADC1.CTRLC & ADC_REFSEL_gm);
+      bool using_0v55 = !(VREF.CTRLA & VREF_ADC1REFSEL_gm || ADC0.CTRLC & ADC_REFSEL_gm);
       if ((options & 0x01) == 0) {
-        frequency = constrain(frequency, (using_0v55 ? 100: 200), (using_0v55 ? 260 : 1500));
+        int16_t maxadc = 1500;
+        if ((ADC1.CTRLA & ADC_RESSEL_bm)) {
+          maxadc = 2000;
+        }
+        frequency = constrain(frequency, (using_0v55 ? 100: 200), (using_0v55 ? 260 : maxadc));
+        // 'cause, ya see, if you only want 8-bit resolution, and aren't using the 11/20ths of a volt reference, you can run the ADC clock faster and hope to get meaningful numbers .
       }
-      uint8_t prescale = 0;
       for (uint8_t i =0; i < 8; i++) {
         int16_t clkadc = adc_prescale_to_clkadc[i];
         prescale = i;
         if ((frequency >= clkadc) || (adc_prescale_to_clkadc[i + 1] < ((options & 0x01) ? 2 : (using_0v55 ? 100 : 200)))) {
+
           ADC1.CTRLC = (ADC1.CTRLC & ~ADC_PRESC_gm) | prescale;
           break;
         }
@@ -937,8 +953,15 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
     if (frequency < 0) {
       return ADC_ERROR_INVALID_CLOCK;
     }
-    return adc_prescale_to_clkadc[(ADC1.CTRLC & ADC_PRESC_gm)];
+    int16_t newadcclk = adc_prescale_to_clkadc[prescale]
+    if (newadcclk > 1500) {
+      ADC1.CALIB = 1;
+    } else {
+      ADC1.CALIB = 0;
+    }
+    return newadcclk;
   }
+
 
   int16_t analogRead1(uint8_t pin) {
     check_valid_analog_pin1(pin);

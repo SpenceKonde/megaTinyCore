@@ -151,12 +151,43 @@ int main() {
       onPreMain();
     }
   #else
+  /*******************************************
+  * THIS FUNCTIONALITY IS ONLY EXPOSED ON    *
+  * DX-SERIES PARTS SO THIS CODE CANT-HAPPEN *
+  * megaTinyCore. You must write to flash    *
+  * using optiboot if required               *
+  *******************************************/
     // if we are, we also need to move the vectors. See longwinded deascription above.
     void _initThreeStuff() {
       init_reset_flags();
+      _PROTECTED_WRITE(CPUINT_CTRLA,CPUINT_IVSEL_bm);
       onPreMain();
     }
+    #if (SPM_FROM_APP == -1)
+      /* Declared as being located in .trampolines so it gets put way at the start of the binary. This guarantees that
+       * it will be in the first page of flash. Must be marked ((used)) or LinkTime Optimization (LTO) will see
+       * that nothing actually calls it and optimize it away. The trick of course is that it can be called if
+       * the user wants to - but it's designed to be called via hideous methods like
+       * __asm__ __volatile__ ("call EntryPointSPM" : "+z" (zaddress))
+       * see Flash.h */
+      /* It must be located *before everything* - including PROGMEM, which the compiler puts ahead of .init.
+       * .trampolines however comes before progmem. The function must be naked, it must be used, and you need to guard it
+       * with the rjmp that hops over the spm and ret instructions unless you jump directly to the entrypoint.    */
+      void __spm_entrypoint (void) __attribute__ ((naked)) __attribute__((used)) __attribute__ ((section (".trampolines")));
+      void __spm_entrypoint (void)
+      {
+        __asm__ __volatile__(
+                  "rjmp .+4"                "\n\t" // Jump over this if we got here the wrong way
+                 "EntryPointSPM:"           "\n\t" // this is the label we call
+                  "spm z+"                  "\n\t" // write r0, r1 to location pointed to by r30,r31 with posrincewmwr
+                  "ret"::);                        // by 2, and then return.
+      }
+    #endif
+  /* End if DXCore only spm from app stuff */
   #endif
+  // Finally, none of these three things need to be done if running optiboot!
+  // We want the vectors in the alt location, it checks, clears, and stashes the reset flags (in GPR0)
+  // and it providews the entrypoint we call to write to flash.
 #else
   void _initThreeStuff() __attribute__ ((naked)) __attribute__((used)) __attribute__ ((section (".init3")));
   void _initThreeStuff() {
