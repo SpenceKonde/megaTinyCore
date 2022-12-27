@@ -824,7 +824,7 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
   if (frequency < 0) {
     return ADC_ERROR_INVALID_CLOCK;
   }
-  int16_t newadcclk = adc_prescale_to_clkadc[prescale]
+  int16_t newadcclk = adc_prescale_to_clkadc[prescale];
   if (newadcclk > 1500) {
     ADC0.CALIB = 1;
   } else {
@@ -887,7 +887,7 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
             badArg("analogRead1 called with constant channel that is neither valid analog channel nor valid pin");
           }
         } else {
-          pin = digitalPinToAnalogInput(pin);
+          pin = digitalPinToAnalogInput_ADC1(pin);
           if (pin == NOT_A_PIN) {
             badArg("analogRead1 called with constant pin that is not a valid analog pin");
           }
@@ -953,7 +953,7 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
     if (frequency < 0) {
       return ADC_ERROR_INVALID_CLOCK;
     }
-    int16_t newadcclk = adc_prescale_to_clkadc[prescale]
+    int16_t newadcclk = adc_prescale_to_clkadc[prescale];
     if (newadcclk > 1500) {
       ADC1.CALIB = 1;
     } else {
