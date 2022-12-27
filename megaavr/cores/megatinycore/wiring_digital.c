@@ -45,7 +45,7 @@ void pinMode(uint8_t pin, uint8_t mode) {
   if ((bit_mask == NOT_A_PIN) || (mode > INPUT_PULLUP)) {
     return;                             /* ignore invalid pins passed at runtime */
   }
-  volatile uint8_t * port_base = (volatile uint8_t *) (PORTA + digitalPinToPort(pin)) ;
+  volatile uint8_t * port_base = (volatile uint8_t *) (uint16_t) ((&PORTA) + digitalPinToPort(pin));
   if (mode & 0x01) {
     // OUTPUT mode, so write DIRSET with the mask.
     *(port_base + 1) = bit_mask;
