@@ -343,115 +343,66 @@ int main(void) {
   // Optiboot C code makes the following assumptions:
   //  No interrupts will execute
   //  SP points to RAMEND
+  //  4/24/21 Spence Konde:
+  //  It *also* relies on the peripherals not being configured in an adverse way.
+  //  Everything is written with the assumption that we start out after a reset.
+  //  So what do we do when we can see that it isn't arriving from a reset, because RSTFR is 0?
+  //
+  //  Previously we just made sure not to try to jump to the app in that case.
+  //  Largely because in non-reset-pin configurations, after running the bootloader once,
+  //  instead of continually running the bootloader until something was uploaded, it would do it
+  //  once, and then hit no entry conditions and jump to (the non-existant) app, run off the
+  //  end of the flash, and repeat (discovered 11/14/20)
+  //
+  //  Now, unless we are told that we should ASSUME_DIRECT_ENTRY_SAFE, when we detect something
+  //  that could be either execution running past the end of an empty flash, a direct entry
+  //  attempt, or some dreadful error condition, that is, when we find no reset cause we do
+  //  what the app should have and fire a software reset. Net cost 10-12 bytes. We've still
+  //  got ~32 left, so I made the option for this is opt-out, not opt-in because I cannot
+  //  see any disadvantages, while `asm volatile("jmp 0");` is disturbingly common - often
+  //  with the only precautions taken being the reset of the most obvious registers, and
+  //  generally without understanding why they are doing what they are doing. With the
+  //  easy software reset, nobody should be using this method, but we all know they will.
+  //  This guarantees that execution reaching 0 without a reset will result in a reset
+  //  at the earliest opportunity followed by normal functioning.
 
   __asm__ __volatile__("clr __zero_reg__");  // known-zero required by avr-libc
-  #define RESET_EXTERNAL (RSTCTRL_EXTRF_bm|RSTCTRL_UPDIRF_bm|RSTCTRL_SWRF_bm)
-  #if !defined(FANCY_RESET_LOGIC)
-    ch = RSTCTRL.RSTFR;   // get reset cause
-    #if defined(START_APP_ON_POR)
-      // If WDRF is set  OR nothing except BORF and PORF are set, that's not bootloader entry condition
-      // so jump to app - this is for when UPDI pin is used as reset, so we go straight to app on start.
-      // 11/14: NASTY bug - we also need to check for no reset flags being set (ie, direct entry)
-      // and run bootloader in that case, otherwise bootloader won't run, among other things, after fresh
-      // bootloading!
-      if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~(RSTCTRL_BORF_bm | RSTCTRL_PORF_bm)))))) {
-    #elif defined(START_APP_UNLESS_SWR)
-      // Immediately runs application code unless a software reset was issued.
-      // in this case, the user application must use a software reset (or contain a bug that leads to a
-      // dirty reset, which in turn leads to this firing a software reset which would then trigger the bootloader)
-      // This option violates the Bootloader Prime Directive:
-      //   The operation of the bootloader and it's recognition of entry conditions valid or invalid shall not be
-      //   impacted in any way by the application, and even a maximally perverse application shalt not prevent the
-      //   bootloader from running when a valid entry condition occurs.
-      // Therefore, it is unfit for use by those without HV programmers unless PA0 is left in the default UPDI mode,
-      // and where reprogramming via UPDI is not unduely inconvenient. An application which never triggered a
-      // software reset (for example, blink or bare minimum) will leave the chip in a "bricked" state, requiring
-      // UPDI programming to unbrick and restore bootloader functionality.
-      // Added 10/26/22 Spence Konde
-      if (ch && !(ch & RSTCTRL_SWRF_bm)) {
+  ch = RSTCTRL.RSTFR;   // get reset cause
+  #ifndef ASSUME_DIRECT_ENTRY_SAFE
+  if (ch==0) {
+    _PROTECTED_WRITE(RSTCTRL_SWRR,0x01);
+  }
+  #endif
+  #ifdef START_APP_ON_POR
+    // If WDRF is set OR nothing except BORF and PORF are set, that's not bootloader entry condition
+    // so jump to app - this is for when UPDI pin is used as reset, so we go straight to app on start.
+    // 11/14: NASTY bug - we also need to check for no reset flags being set (ie, direct entry)
+    // and run bootloader in that case, otherwise bootloader won't run, among other things, after fresh
+    // bootloading!
+    #ifndef ASSUME_DIRECT_ENTRY_SAFE
+      if ((ch & RSTCTRL_WDRF_bm || (!(ch & (~(RSTCTRL_BORF_bm | RSTCTRL_PORF_bm)))))) {
     #else
-      // If WDRF is set  OR nothing except BORF is set, that's not bootloader entry condition
-      // so jump to app - let's see if this works okay or not...
+      if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~(RSTCTRL_BORF_bm | RSTCTRL_PORF_bm)))))) {
+    #endif
+  #else
+    // If WDRF is set  OR nothing except BORF is set, that's not bootloader entry condition so jump to app
+    #ifndef ASSUME_DIRECT_ENTRY_SAFE
+      if ((ch & RSTCTRL_WDRF_bm || (!(ch & (~RSTCTRL_BORF_bm))))) {
+    #else
       if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~RSTCTRL_BORF_bm))))) {
     #endif
-      // Start the app.
-      // Dont bother trying to stuff it in r2, which requires heroic effort to fish out
-      // we'll put it in GPIOR0 where it won't get stomped on.
-      //__asm__ __volatile__ ("mov r2, %0\n" :: "r" (ch));
-      RSTCTRL.RSTFR = ch; //clear the reset causes before jumping to app...
-      GPIOR0 = ch; // but, stash the reset cause in GPIOR0 for use by app...
-      watchdogConfig(WDT_PERIOD_OFF_gc);
-      __asm__ __volatile__(
-        "jmp app\n"
-      );
-    }
-  #else
-    /**************************************************************
-    | START BLOCK OF CODE THAT IS NOT USED - FANCY_RESET_LOGIC is
-    | kryptonite. We must assume that user code is not clearing the flags
-    | and in that case, it is impossible to differentiate a valid entry
-    | condition from a dirty reset or an invalid entry condition.
-    | This is a funcamental conceptual flaw in the ideal of the invisible
-    | bootloader - but even when not using the bootloader, megaTinyCore
-    | and DxCore will do the right thing (check reset flags, if zero, trigger
-    | SWR, otherwise clear and stash result in GPIOR0 for user retrieval if
-    | needed). It is critical that we never run the bootloader or application
-    | if no reset cause is reported, because both the cores and Optiboot assume
-    | that all peripherals are in their default configuration at startup, and
-    | if that assumption is violated, the behavior of both optiboot and the core
-    | are undefined, and will depend on the state the app left behind.
-    **************************************************************/
-    /*
-       Protect as much Reset Cause as possible for application
-       and still skip bootloader if not necessary
-    */
-    ch = RSTCTRL.RSTFR;
-    if (ch != 0) {
-      /*
-         We want to run the bootloader when an external reset has occurred.
-         On these mega0/XTiny chips, there are three types of ext reset:
-          reset pin (may not exist), UPDI reset, and SW-request reset.
-         One of these reset causes, together with watchdog reset, should
-          mean that Optiboot timed out, and it's time to run the app.
-         Other reset causes (notably poweron) should run the app directly.
-         If a user app wants to utilize and detect watchdog resets, it
-          must make sure that the other reset causes are cleared.
-      */
-      if (ch & RSTCTRL_WDRF_bm) {
-        if (ch & RESET_EXTERNAL) {
-          /*
-             Clear WDRF because it was most probably set by wdr in
-             bootloader.  It's also needed to avoid loop by broken
-             application which could prevent entering bootloader.
-
-             Note that the issue here with not clearing the WDRF would be that once one WDRF fired, for example after
-             optiboot ran and exited, it would never be run again unless user code cleared it which would be perverse.
-          */
-          RSTCTRL.RSTFR = RSTCTRL_WDRF_bm;
-        }
-      }
-      if (!((ch & RESET_EXTERNAL))) {
-      /*
-         save the reset flags in the designated register.
-         This can be saved in a main program by putting code in
-         .init0 (which executes before normal c init code) to save R2
-         to a global variable.
-      */
-      __asm__ __volatile__("mov r2, %0\n" :: "r"(ch));
-
-        // switch off watchdog
-        watchdogConfig(WDT_PERIOD_OFF_gc);
-        __asm__ __volatile__(
-          "jmp 512\n"
-        );
-      }
-    /**************************************************************
-    | END BLOCK OF CODE THAT IS NOT USED
-    | Comments are here to help readers not get thrown off by this
-    | Since *I* do and I wrote the damned code...........
-    **************************************************************/
-    }
-  #endif // Fancy reset cause stuff
+  #endif
+    // Start the app.
+    // Dont bother trying to stuff it in r2, which requires heroic effort to fish out
+    // we'll put it in GPIOR0 where it won't get stomped on.
+    //__asm__ __volatile__ ("mov r2, %0\n" :: "r" (ch));
+    RSTCTRL.RSTFR = ch; //clear the reset causes before jumping to app...
+    GPIOR0 = ch; // but, stash the reset cause in GPIOR0 for use by app...
+    watchdogConfig(WDT_PERIOD_OFF_gc);
+    __asm__ __volatile__(
+      "jmp app\n"
+    );
+  }
 
   watchdogReset();
   //    _PROTECTED_WRITE(CLKCTRL.MCLKCTRLB, 0);  // full speed clock

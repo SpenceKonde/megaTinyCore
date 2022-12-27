@@ -36,23 +36,23 @@ asm(".macro __wr_spmcsr p, v \n\t"
         "clr  r1\n\t"                            \
         :                                        \
         : "i" (_SFR_MEM_ADDR(__SPM_REG)),         \
-        "r" ((uint8_t)__BOOT_PAGE_FILL),       \
-        "z" ((uint16_t)address),               \
-        "r" ((uint16_t)data)                   \
+          "r" ((uint8_t)__BOOT_PAGE_FILL),       \
+          "z" ((uint16_t)address),               \
+          "r" ((uint16_t)data)                   \
         : "r0"                                   \
     );                                           \
   }))
 
 #define __boot_page_erase_short(address)         \
-  (__extension__({                                 \
+(__extension__({                                 \
     __asm__ __volatile__                         \
     (                                            \
         "__wr_spmcsr %0, %1\n\t"                 \
         "spm\n\t"                                \
         :                                        \
         : "i" (_SFR_MEM_ADDR(__SPM_REG)),         \
-        "r" ((uint8_t)__BOOT_PAGE_ERASE),      \
-        "z" ((uint16_t)address)                \
+          "r" ((uint8_t)__BOOT_PAGE_ERASE),      \
+          "z" ((uint16_t)address)                \
     );                                           \
   }))
 
@@ -64,8 +64,8 @@ asm(".macro __wr_spmcsr p, v \n\t"
         "spm\n\t"                                \
         :                                        \
         : "i" (_SFR_MEM_ADDR(__SPM_REG)),         \
-        "r" ((uint8_t)__BOOT_PAGE_WRITE),      \
-        "z" ((uint16_t)address)                \
+          "r" ((uint8_t)__BOOT_PAGE_WRITE),      \
+          "z" ((uint16_t)address)                \
     );                                           \
   }))
 
@@ -77,7 +77,7 @@ asm(".macro __wr_spmcsr p, v \n\t"
         "spm\n\t"                                \
         :                                        \
         : "i" (_SFR_MEM_ADDR(__SPM_REG)),         \
-        "r" ((uint8_t)__BOOT_RWW_ENABLE)       \
+          "r" ((uint8_t)__BOOT_RWW_ENABLE)       \
     );                                           \
   }))
 

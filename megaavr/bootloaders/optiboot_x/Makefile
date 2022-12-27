@@ -293,9 +293,9 @@ xplainedpro3217:
 	$(MAKE) -f $(MF) optiboot_xplainedpro3217.hex UARTTX=A1 TIMEOUT=8 LED=B4 LED_INVERT=1
 
 HELPTEXT += "target xplainedpro817   - Microchip ATtiny817 Xplained Pro.\n"
-xplainedpro: TARGET = attiny817
+xplainedpro817: TARGET = attiny817
 xplainedpro817:
-	$(MAKE) -f $(MF) optiboot_xplainedpro817.hex UARTTX=B2 TIMEOUT=48 LED=B4 LED_INVERT=1
+	$(MAKE) -f $(MF) optiboot_xplainedpro817.hex UARTTX=B2 TIMEOUT=8 LED=B4 LED_INVERT=1
 
 HELPTEXT += "target xplainedmini817   - Microchip ATtiny817 Xplained Mini.\n"
 xplainedmini817: TARGET = attiny817
