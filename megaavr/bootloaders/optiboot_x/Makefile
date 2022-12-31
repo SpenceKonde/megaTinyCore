@@ -75,8 +75,8 @@ endif
 # End of build environment code.
 
 
-CC         = $(GCCROOT)avr-gcc
-RCC        = $(abspath $(CC))
+CC	 = $(GCCROOT)avr-gcc
+RCC	= $(abspath $(CC))
 #$(info wildcard ("$(wildcard $(CC))",""))
 ifndef PRODUCTION
 $(info Using Compiler at: ${RCC})
@@ -99,9 +99,9 @@ OPTIMIZE = -Os -fno-split-wide-types -mrelax
 override CFLAGS  = -g -Wall $(OPTIMIZE)
 override LDFLAGS = $(LDSECTIONS) -Wl,--relax -nostartfiles -nostdlib
 
-OBJCOPY        = $(GCCROOT)avr-objcopy
-OBJDUMP        = "$(GCCROOT)avr-objdump"
-SIZE           = $(GCCROOT)avr-size
+OBJCOPY	= $(GCCROOT)avr-objcopy
+OBJDUMP	= "$(GCCROOT)avr-objdump"
+SIZE	   = $(GCCROOT)avr-size -A
 
 include parse_options.mk
 
@@ -139,7 +139,7 @@ optiboot_%.hex: optiboot_%.elf
 	$(OBJCOPY) -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex $< $@
 
 optiboot_%.elf:	optiboot_x.c FORCE
-	$(CC) $(CFLAGS) $(CPU_OPTIONS) $(LED_OPTIONS) $(UART_OPTIONS) $(POR_CMD) $(COMMON_OPTIONS) $(LDFLAGS) $(PACK_OPT) -mmcu=$(TARGET) -o $@ $<
+	$(CC) $(CFLAGS) $(CPU_OPTIONS) $(LED_OPTIONS) $(UART_OPTIONS) $(ENTRYCOND_CMD) $(COMMON_OPTIONS) $(LDFLAGS) $(PACK_OPT) -mmcu=$(TARGET) -o $@ $<
 	$(SIZE) $@
 	$(LISTING) $@ > optiboot_$*.lst
 
@@ -147,14 +147,11 @@ optiboot_%.elf:	optiboot_x.c FORCE
 #---------------------------------------------------------------------------
 # "Board-level Platform" targets.
 # A "Board-level Platform" implies a manufactured platform with a particular
-# AVR_FREQ, LED, and so on.  Parameters are not particularly changeable from
-# the "make" command line.
-# Most of the board-level platform builds should invoke make recursively
-#  appropriate specific options
+# serial port, LED, and so on.  Parameters are not particularly changeable from
+# the "make" command line. These "board level platforms" are for the Microchip official boards. 
 #---------------------------------------------------------------------------
-# This distinction isn't really well suited for the tinyAVR 0/1/2-series as
-# there aren't all that many plausible configurations. And in any event,
-# we build for all of them, and it's not clear how to use this otherwise.
+# The rest of these definitions are chip-level definitions, and while they assume an LED pin,
+# they make no assumptions about anything else other than that the baud rate will by 115200.
 # 0 and 1 series are entirely interchangible, nothing specific to one or the
 # other in Optiboot. We're assuming A7 as the LED pin except on 8-pin parts
 # when using the default serial pins, which include A7. A7 was picked, uh
@@ -166,148 +163,413 @@ optiboot_%.elf:	optiboot_x.c FORCE
 # datasheet had been available for months. Somehow that preliminary one was
 # very widely circulated, because I am not the only one who made that mistake.
 # Even in 2020, I've corrected someone who had been using the preliminary
-# datasheet!
-# Anyway, 2-series parts use the same binaries as each other. 3 serial options.
+# datasheet! 
+# After realizing my error, the 8-pin bootloaders were ammended to use PA3 as the LED. 
+# Anyway, 2-series parts use the same binaries as each other,and have 3 serial options.
 # 2 USARTs but USART0's alt pins are USART1's default ones.... (presumably
 # sharing some underlying hardware...)
 #---------------------------------------------------------------------------
 
-HELPTEXT += "Generic 14~24 pin dev board, default serial pins, 8 second timeout, LED on A7\n"
-tinyxyz: TARGET = attiny3217
-tinyxyz:
-	$(MAKE) -f $(MF) optiboot_txyz.hex UARTTX=B2 TIMEOUT=8 LED=A7
+HELPTEXT += "target txyz_all8sec Generic 14~24 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on PA7. Entry: Any reset except WDRF, 8 second timeout\n"
+txyz_all8sec: TARGET = attiny3217
+txyz_all8sec:
+	$(MAKE) -f $(MF) optiboot_txyz_all8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x35
 
-HELPTEXT += "Generic 8 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on A3\n"
-tinyxy2: TARGET = attiny412
-tinyxy2:
-	$(MAKE) -f $(MF) optiboot_txy2.hex UARTTX=A6 TIMEOUT=8 LED=A3
+HELPTEXT += "target txyz_poronly8sec Generic 14~24 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on PA7. Entry: only on POR, 8 second timeout\n"
+txyz_poronly8sec: TARGET = attiny3217
+txyz_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_txyz_poronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x21
 
-HELPTEXT += "Generic 0/1-series dev board, alternate serial pins, 8 second timeout, LED on A7\n"
-tinyxyzalt: TARGET = attiny3217
-tinyxyzalt:
-	$(MAKE) -f $(MF) optiboot_txyz_alt.hex UARTTX=A1 TIMEOUT=8 LED=A7
+HELPTEXT += "target txyz_swronly8sec Generic 14~24 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on PA7. Entry: Software reset only, 8 second timeout.\n"
+txyz_swronly8sec: TARGET = attiny3217
+txyz_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_txyz_swronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x30
+
+HELPTEXT += "target txyz_extronly Generic 14~24 pin 0/1-series dev board, default serial pins, 1 second timeout, LED on PA7. Entry: External reset, 1 second timeout\n"
+txyz_extronly: TARGET = attiny3217
+txyz_extronly:
+	$(MAKE) -f $(MF) optiboot_txyz_extronly.hex UARTTX=B2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target txyz_extr Generic 14~24 pin 0/1-series dev board, default serial pins, 1 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+txyz_extr: TARGET = attiny3217
+txyz_extr:
+	$(MAKE) -f $(MF) optiboot_txyz_extr.hex UARTTX=B2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target txyz_extr8sec Generic 14~24 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+txyz_extr8sec: TARGET = attiny3217
+txyz_extr8sec:
+	$(MAKE) -f $(MF) optiboot_txyz_extr8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target txyz_alt_all8sec Generic 14~24 pin 0/1-series dev board, alternate pins serial pins, 8 second timeout, LED on PA7. Entry: Any reset except WDRF, 8 second timeout\n"
+txyz_alt_all8sec: TARGET = attiny3217
+txyz_alt_all8sec:
+	$(MAKE) -f $(MF) optiboot_txyz_alt_all8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target txyz_alt_poronly8sec Generic 14~24 pin 0/1-series dev board, alternate pins serial pins, 8 second timeout, LED on PA7. Entry: only on POR, 8 second timeout\n"
+txyz_alt_poronly8sec: TARGET = attiny3217
+txyz_alt_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_txyz_alt_poronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target txyz_alt_swronly8sec Generic 14~24 pin 0/1-series dev board, alternate pins serial pins, 8 second timeout, LED on PA7. Entry: Software reset only, 8 second timeout.\n"
+txyz_alt_swronly8sec: TARGET = attiny3217
+txyz_alt_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_txyz_alt_swronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x30
+
+HELPTEXT += "target txyz_alt_extronly Generic 14~24 pin 0/1-series dev board, alternate pins serial pins, 1 second timeout, LED on PA7. Entry: External reset, 1 second timeout\n"
+txyz_alt_extronly: TARGET = attiny3217
+txyz_alt_extronly:
+	$(MAKE) -f $(MF) optiboot_txyz_alt_extronly.hex UARTTX=A1 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target txyz_alt_extr Generic 14~24 pin 0/1-series dev board, alternate pins serial pins, 1 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+txyz_alt_extr: TARGET = attiny3217
+txyz_alt_extr:
+	$(MAKE) -f $(MF) optiboot_txyz_alt_extr.hex UARTTX=A1 TIMEOUT=1 LED=A3 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target txyz_alt_extr8sec Generic 14~24 pin 0/1-series dev board, alternate pins serial pins, 8 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+txyz_alt_extr8sec: TARGET = attiny3217
+txyz_alt_extr8sec:
+	$(MAKE) -f $(MF) optiboot_txyz_alt_extr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target txy2_all8sec Generic 8 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on PA3. Entry: Any reset except WDRF, 8 second timeout\n"
+txy2_all8sec: TARGET = attiny412
+txy2_all8sec:
+	$(MAKE) -f $(MF) optiboot_txy2_all8sec.hex UARTTX=A6 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target txy2_poronly8sec Generic 8 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on PA3. Entry: only on POR, 8 second timeout\n"
+txy2_poronly8sec: TARGET = attiny412
+txy2_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_txy2_poronly8sec.hex UARTTX=A6 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target txy2_swronly8sec Generic 8 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on PA3. Entry: Software reset only, 8 second timeout.\n"
+txy2_swronly8sec: TARGET = attiny412
+txy2_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_txy2_swronly8sec.hex UARTTX=A6 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x30
+
+HELPTEXT += "target txy2_extronly Generic 8 pin 0/1-series dev board, default serial pins, 1 second timeout, LED on PA7. Entry: External reset, 1 second timeout\n"
+txy2_extronly: TARGET = attiny412
+txy2_extronly:
+	$(MAKE) -f $(MF) optiboot_txy2_extronly.hex UARTTX=A6 TIMEOUT=1 LED=A3 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target txy2_extr Generic 8 pin 0/1-series dev board, default serial pins, 1 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+txy2_extr: TARGET = attiny412
+txy2_extr:
+	$(MAKE) -f $(MF) optiboot_txy2_extr.hex UARTTX=A6 TIMEOUT=1 LED=A3 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target txy2_extr8sec Generic 8 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on PA3. Entry: External, software or UPDI reset\n"
+txy2_extr8sec: TARGET = attiny412
+txy2_extr8sec:
+	$(MAKE) -f $(MF) optiboot_txy2_extr8sec.hex UARTTX=A6 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target txy2_alt_all8sec Generic 8 pin 0/1-series dev board, alternate pins serial pins, 8 second timeout, LED on PA3. Entry: Any reset except WDRF, 8 second timeout\n"
+txy2_alt_all8sec: TARGET = attiny412
+txy2_alt_all8sec:
+	$(MAKE) -f $(MF) optiboot_txy2_alt_all8sec.hex UARTTX=A1 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target txy2_alt_poronly8sec Generic 8 pin 0/1-series dev board, alternate pins serial pins, 8 second timeout, LED on PA3. Entry: only on POR, 8 second timeout\n"
+txy2_alt_poronly8sec: TARGET = attiny412
+txy2_alt_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_txy2_alt_poronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target txy2_alt_swronly8sec Generic 8 pin 0/1-series dev board, alternate pins serial pins, 8 second timeout, LED on PA3. Entry: Software reset only, 8 second timeout.\n"
+txy2_alt_swronly8sec: TARGET = attiny412
+txy2_alt_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_txy2_alt_swronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x30
+
+HELPTEXT += "target txy2_alt_extronly Generic 8 pin 0/1-series dev board, alternate pins serial pins, 1 second timeout, LED on PA3. Entry: External reset, 1 second timeout\n"
+txy2_alt_extronly: TARGET = attiny412
+txy2_alt_extronly:
+	$(MAKE) -f $(MF) optiboot_txy2_alt_extronly.hex UARTTX=A1 TIMEOUT=1 LED=A3 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target txy2_alt_extr Generic 8 pin 0/1-series dev board, alternate pins serial pins, 1 second timeout, LED on PA3. Entry: External, software or UPDI reset\n"
+txy2_alt_extr: TARGET = attiny412
+txy2_alt_extr:
+	$(MAKE) -f $(MF) optiboot_txy2_alt_extr.hex UARTTX=A1 TIMEOUT=1 LED=A3 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target txy2_alt_extr8sec Generic 8 pin 0/1-series dev board, alternate pins serial pins, 8 second timeout, LED on PA3. Entry: External, software or UPDI reset\n"
+txy2_alt_extr8sec: TARGET = attiny412
+txy2_alt_extr8sec:
+	$(MAKE) -f $(MF) optiboot_txy2_alt_extr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target tx2z_all8sec Generic 14~24 pin 2-series dev board, default serial pins, 8 second timeout, LED on PA7. Entry: Any reset except WDRF, 8 second timeout\n"
+tx2z_all8sec: TARGET = attiny3227
+tx2z_all8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_all8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target tx2z_poronly8sec Generic 14~24 pin 2-series dev board, default serial pins, 8 second timeout, LED on PA7. Entry: only on POR, 8 second timeout\n"
+tx2z_poronly8sec: TARGET = attiny3227
+tx2z_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_poronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target tx2z_swronly8sec Generic 14~24 pin 2-series dev board, default serial pins, 8 second timeout, LED on PA7. Entry: Software reset only, 8 second timeout.\n"
+tx2z_swronly8sec: TARGET = attiny3227
+tx2z_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_swronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x30
+
+HELPTEXT += "target tx2z_extronly Generic 14~24 pin 2-series dev board, default serial pins, 1 second timeout, LED on PA7. Entry: External reset, 1 second timeout\n"
+tx2z_extronly: TARGET = attiny3227
+tx2z_extronly:
+	$(MAKE) -f $(MF) optiboot_tx2z_extronly.hex UARTTX=B2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target tx2z_extr Generic 14~24 pin 2-series dev board, default serial pins, 1 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+tx2z_extr: TARGET = attiny3227
+tx2z_extr:
+	$(MAKE) -f $(MF) optiboot_tx2z_extr.hex UARTTX=B2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target tx2z_extr8sec Generic 14~24 pin 2-series dev board, default serial pins, 8 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+tx2z_extr8sec: TARGET = attiny3227
+tx2z_extr8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_extr8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target tx2z_alt_all8sec Generic 14~24 pin 2-series dev board, alternate pins serial pins, 8 second timeout, LED on PA7. Entry: Any reset except WDRF, 8 second timeout\n"
+tx2z_alt_all8sec: TARGET = attiny3227
+tx2z_alt_all8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_alt_all8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target tx2z_alt_poronly8sec Generic 14~24 pin 2-series dev board, alternate pins serial pins, 8 second timeout, LED on PA7. Entry: only on POR, 8 second timeout\n"
+tx2z_alt_poronly8sec: TARGET = attiny3227
+tx2z_alt_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_alt_poronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target tx2z_alt_swronly8sec Generic 14~24 pin 2-series dev board, alternate pins serial pins, 8 second timeout, LED on PA7. Entry: Software reset only, 8 second timeout.\n"
+tx2z_alt_swronly8sec: TARGET = attiny3227
+tx2z_alt_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_alt_swronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x30
+
+HELPTEXT += "target tx2z_alt_extronly Generic 14~24 pin 2-series dev board, alternate pins serial pins, 1 second timeout, LED on PA7. Entry: External reset, 1 second timeout\n"
+tx2z_alt_extronly: TARGET = attiny3227
+tx2z_alt_extronly:
+	$(MAKE) -f $(MF) optiboot_tx2z_alt_extronly.hex UARTTX=A1 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target tx2z_alt_extr Generic 14~24 pin 2-series dev board, alternate pins serial pins, 1 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+tx2z_alt_extr: TARGET = attiny3227
+tx2z_alt_extr:
+	$(MAKE) -f $(MF) optiboot_tx2z_alt_extr.hex UARTTX=A1 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target tx2z_alt_extr8sec Generic 14~24 pin 2-series dev board, alternate pins serial pins, 8 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+tx2z_alt_extr8sec: TARGET = attiny3227
+tx2z_alt_extr8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_alt_extr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target tx2z_u1alt_all8sec Generic 14~24 pin 2-series dev board, USART1 alternate pins serial pins, 8 second timeout, LED on PA7. Entry: Any reset except WDRF, 8 second timeout\n"
+tx2z_u1alt_all8sec: TARGET = attiny3227
+tx2z_u1alt_all8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_u1alt_all8sec.hex UARTTX=C2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target tx2z_u1alt_poronly8sec Generic 14~24 pin 2-series dev board, USART1 alternate pins serial pins, 8 second timeout, LED on PA7. Entry: only on POR, 8 second timeout\n"
+tx2z_u1alt_poronly8sec: TARGET = attiny3227
+tx2z_u1alt_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_u1alt_poronly8sec.hex UARTTX=C2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target tx2z_u1alt_swronly8sec Generic 14~24 pin 2-series dev board, USART1 alternate pins serial pins, 8 second timeout, LED on PA7. Entry: Software reset only, 8 second timeout.\n"
+tx2z_u1alt_swronly8sec: TARGET = attiny3227
+tx2z_u1alt_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_u1alt_swronly8sec.hex UARTTX=C2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x30
+
+HELPTEXT += "target tx2z_u1alt_extronly Generic 14~24 pin 2-series dev board, USART1 alternate pins serial pins, 1 second timeout, LED on PA7. Entry: External reset, 1 second timeout\n"
+tx2z_u1alt_extronly: TARGET = attiny3227
+tx2z_u1alt_extronly:
+	$(MAKE) -f $(MF) optiboot_tx2z_u1alt_extronly.hex UARTTX=C2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target tx2z_u1alt_extr Generic 14~24 pin 2-series dev board, USART1 alternate pins serial pins, 1 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+tx2z_u1alt_extr: TARGET = attiny3227
+tx2z_u1alt_extr:
+	$(MAKE) -f $(MF) optiboot_tx2z_u1alt_extr.hex UARTTX=C2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target tx2z_u1alt_extr8sec Generic 14~24 pin 2-series dev board, USART1 alternate pins serial pins, 8 second timeout, LED on PA7. Entry: External, software or UPDI reset\n"
+tx2z_u1alt_extr8sec: TARGET = attiny3227
+tx2z_u1alt_extr8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_u1alt_extr8sec.hex UARTTX=C2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target curiosity3217_all8sec target curiosity3217 - Microchip ATtiny3217 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: Any reset except WDRF, 8 second timeout\n"
+curiosity3217_all8sec: TARGET = attiny3217
+curiosity3217_all8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity3217_all8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target curiosity3217_poronly8sec target curiosity3217 - Microchip ATtiny3217 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: only on POR, 8 second timeout\n"
+curiosity3217_poronly8sec: TARGET = attiny3217
+curiosity3217_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity3217_poronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target curiosity3217_swronly8sec target curiosity3217 - Microchip ATtiny3217 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: Software reset only, 8 second timeout.\n"
+curiosity3217_swronly8sec: TARGET = attiny3217
+curiosity3217_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity3217_swronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target curiosity1607_all8sec target curiosity1607 - Microchip ATtiny1607 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: Any reset except WDRF, 8 second timeout\n"
+curiosity1607_all8sec: TARGET = attiny1607
+curiosity1607_all8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity1607_all8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target curiosity1607_poronly8sec target curiosity1607 - Microchip ATtiny1607 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: only on POR, 8 second timeout\n"
+curiosity1607_poronly8sec: TARGET = attiny1607
+curiosity1607_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity1607_poronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target curiosity1607_swronly8sec target curiosity1607 - Microchip ATtiny1607 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: Software reset only, 8 second timeout.\n"
+curiosity1607_swronly8sec: TARGET = attiny1607
+curiosity1607_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity1607_swronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target curiosity1627_all8sec target curiosity1627 - Microchip ATtiny1627 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: Any reset except WDRF, 8 second timeout\n"
+curiosity1627_all8sec: TARGET = attiny1627
+curiosity1627_all8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity1627_all8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target curiosity1627_poronly8sec target curiosity1627 - Microchip ATtiny1627 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: only on POR, 8 second timeout\n"
+curiosity1627_poronly8sec: TARGET = attiny1627
+curiosity1627_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity1627_poronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target curiosity1627_swronly8sec target curiosity1627 - Microchip ATtiny1627 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: Software reset only, 8 second timeout.\n"
+curiosity1627_swronly8sec: TARGET = attiny1627
+curiosity1627_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity1627_swronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target curiosity1627_extronly target curiosity1627 - Microchip ATtiny1627 Curiosity Nano. default serial pins, 1 second timeout, LED on B7. Entry: External reset, 1 second timeout\n"
+curiosity1627_extronly: TARGET = attiny1627
+curiosity1627_extronly:
+	$(MAKE) -f $(MF) optiboot_curiosity1627_extronly.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=1 LED=B7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target curiosity1627_extr target curiosity1627 - Microchip ATtiny1627 Curiosity Nano. default serial pins, 1 second timeout, LED on B7. Entry: External, software or UPDI reset\n"
+curiosity1627_extr: TARGET = attiny1627
+curiosity1627_extr:
+	$(MAKE) -f $(MF) optiboot_curiosity1627_extr.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=1 LED=B7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target curiosity1627_extr8sec target curiosity1627 - Microchip ATtiny1627 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: External, software or UPDI reset\n"
+curiosity1627_extr8sec: TARGET = attiny1627
+curiosity1627_extr8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity1627_extr8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x34
+
+HELPTEXT += "target xplainedpro3217_all8sec target xplained3217pro - Microchip ATtiny3217 Xplained Pro. default serial pins, 8 second timeout, LED on B4. Entry: Any reset except WDRF, 8 second timeout\n"
+xplainedpro3217_all8sec: TARGET = attiny3217
+xplainedpro3217_all8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedpro3217_all8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target xplainedpro3217_poronly8sec target xplained3217pro - Microchip ATtiny3217 Xplained Pro. default serial pins, 8 second timeout, LED on B4. Entry: only on POR, 8 second timeout\n"
+xplainedpro3217_poronly8sec: TARGET = attiny3217
+xplainedpro3217_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedpro3217_poronly8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target xplainedpro3217_swronly8sec target xplained3217pro - Microchip ATtiny3217 Xplained Pro. default serial pins, 8 second timeout, LED on B4. Entry: Software reset only, 8 second timeout.\n"
+xplainedpro3217_swronly8sec: TARGET = attiny3217
+xplainedpro3217_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedpro3217_swronly8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target xplainedpro817_all8sec target xplainedpro817 - Microchip ATtiny817 Xplained Pro. default serial pins, 8 second timeout, LED on B4. Entry: Any reset except WDRF, 8 second timeout\n"
+xplainedpro817_all8sec: TARGET = attiny817
+xplainedpro817_all8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedpro817_all8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target xplainedpro817_poronly8sec target xplainedpro817 - Microchip ATtiny817 Xplained Pro. default serial pins, 8 second timeout, LED on B4. Entry: only on POR, 8 second timeout\n"
+xplainedpro817_poronly8sec: TARGET = attiny817
+xplainedpro817_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedpro817_poronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target xplainedpro817_swronly8sec target xplainedpro817 - Microchip ATtiny817 Xplained Pro. default serial pins, 8 second timeout, LED on B4. Entry: Software reset only, 8 second timeout.\n"
+xplainedpro817_swronly8sec: TARGET = attiny817
+xplainedpro817_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedpro817_swronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target xplainedmini817_all8sec target xplainedmini817 - Microchip ATtiny817 Xplained Mini. default serial pins, 8 second timeout, LED on C0. Entry: Any reset except WDRF, 8 second timeout\n"
+xplainedmini817_all8sec: TARGET = attiny817
+xplainedmini817_all8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedmini817_all8sec.hex UARTTX=B2 TIMEOUT=8 LED=C0 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target xplainedmini817_poronly8sec target xplainedmini817 - Microchip ATtiny817 Xplained Mini. default serial pins, 8 second timeout, LED on C0. Entry: only on POR, 8 second timeout\n"
+xplainedmini817_poronly8sec: TARGET = attiny817
+xplainedmini817_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedmini817_poronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=C0 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target xplainedmini817_swronly8sec target xplainedmini817 - Microchip ATtiny817 Xplained Mini. default serial pins, 8 second timeout, LED on C0. Entry: Software reset only, 8 second timeout.\n"
+xplainedmini817_swronly8sec: TARGET = attiny817
+xplainedmini817_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedmini817_swronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=C0 ENTRYCOND_REQUIRE=0x24
+
+HELPTEXT += "target xplainednano416_all8sec target xplainednano416 - Microchip ATtiny416 Xplained Nano. default serial pins, 8 second timeout, LED on B5. Entry: Any reset except WDRF, 8 second timeout\n"
+xplainednano416_all8sec: TARGET = attiny416
+xplainednano416_all8sec:
+	$(MAKE) -f $(MF) optiboot_xplainednano416_all8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B5 ENTRYCOND_REQUIRE=0x35
+
+HELPTEXT += "target xplainednano416_poronly8sec target xplainednano416 - Microchip ATtiny416 Xplained Nano. default serial pins, 8 second timeout, LED on B5. Entry: only on POR, 8 second timeout\n"
+xplainednano416_poronly8sec: TARGET = attiny416
+xplainednano416_poronly8sec:
+	$(MAKE) -f $(MF) optiboot_xplainednano416_poronly8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B5 ENTRYCOND_REQUIRE=0x21
+
+HELPTEXT += "target xplainednano416_swronly8sec target xplainednano416 - Microchip ATtiny416 Xplained Nano. default serial pins, 8 second timeout, LED on B5. Entry: Software reset only, 8 second timeout.\n"
+xplainednano416_swronly8sec: TARGET = attiny416
+xplainednano416_swronly8sec:
+	$(MAKE) -f $(MF) optiboot_xplainednano416_swronly8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B5 ENTRYCOND_REQUIRE=0x24
 
 
-HELPTEXT += "Generic 14~24 pin dev board, default serial pins, 1 second timeout, doesn't run on POR, LED on A7\n"
-tinyxyzrst: TARGET = attiny3217
-tinyxyzrst:
-	$(MAKE) -f $(MF) optiboot_txyz_rst.hex START_APP_ON_POR=1 UARTTX=B2 TIMEOUT=1 LED=A7
+HELPTEXT += "target txyz_porswr8sec Generic 14~24 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on PA7. Entry: Any reset except WDRF, 8 second timeout\n"
+txyz_porswr8sec: TARGET = attiny3217
+txyz_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_txyz_porswr8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x31
 
-HELPTEXT += "Generic 8 pin 0/1-series dev board, default serial pins, 1 second timeout, doesn't run on POR, LED on A3\n"
-tinyxy2rst: TARGET = attiny412
-tinyxy2rst:
-	$(MAKE) -f $(MF) optiboot_txy2_rst.hex START_APP_ON_POR=1 UARTTX=A6 TIMEOUT=1 LED=A3
+HELPTEXT += "target txyz_alt_porswr8sec Generic 14~24 pin 0/1-series dev board, alternate pins serial pins, 8 second timeout, LED on PA7. Entry: Any reset except WDRF, 8 second timeout\n"
+txyz_alt_porswr8sec: TARGET = attiny3217
+txyz_alt_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_txyz_alt_porswr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x31
 
-HELPTEXT += "Generic 0/1-series dev board, alternate serial pins, 1 second timeout, doesn't run on POR, LED on A7\n"
-tinyxyzaltrst: TARGET = attiny3217
-tinyxyzaltrst:
-	$(MAKE) -f $(MF) optiboot_txyz_alt_rst.hex START_APP_ON_POR=1 UARTTX=A1 TIMEOUT=1 LED=A7
+HELPTEXT += "target txy2_porswr8sec Generic 8 pin 0/1-series dev board, default serial pins, 8 second timeout, LED on PA3. Entry: Any reset except WDRF, 8 second timeout\n"
+txy2_porswr8sec: TARGET = attiny412
+txy2_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_txy2_porswr8sec.hex UARTTX=A6 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x31
 
+HELPTEXT += "target txy2_alt_porswr8sec Generic 8 pin 0/1-series dev board, alternate pins serial pins, 8 second timeout, LED on PA3. Entry: Any reset except WDRF, 8 second timeout\n"
+txy2_alt_porswr8sec: TARGET = attiny412
+txy2_alt_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_txy2_alt_porswr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x31
 
-HELPTEXT += "Generic 14~24 pin dev board, default serial pins, 1 second timeout, LED on A7\n"
-tinyxyz1sec: TARGET = attiny3217
-tinyxyz1sec:
-	$(MAKE) -f $(MF) optiboot_txyz_1sec.hex UARTTX=B2 TIMEOUT=1 LED=A7
+HELPTEXT += "target tx2z_porswr8sec Generic 14~24 pin 2-series dev board, default serial pins, 8 second timeout, LED on PA7. Entry: Any reset except WDRF, 8 second timeout\n"
+tx2z_porswr8sec: TARGET = attiny3227
+tx2z_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_porswr8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x31
 
-HELPTEXT += "Generic 8 pin 0/1-series dev board, default serial pins, 1 second timeout, LED on A3\n"
-tinyxy21sec: TARGET = attiny412
-tinyxy21sec:
-	$(MAKE) -f $(MF) optiboot_txy2_1sec.hex UARTTX=A6 TIMEOUT=1 LED=A3
+HELPTEXT += "target tx2z_alt_porswr8sec Generic 14~24 pin 2-series dev board, alternate pins serial pins, 8 second timeout, LED on PA7. Entry: Any reset except WDRF, 8 second timeout\n"
+tx2z_alt_porswr8sec: TARGET = attiny3227
+tx2z_alt_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_alt_porswr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x31
 
-HELPTEXT += "Generic 0/1-series dev board, alternate serial pins, 1 second timeout, LED on A7\n"
-tinyxyzalt1sec: TARGET = attiny3217
-tinyxyzalt1sec:
-	$(MAKE) -f $(MF) optiboot_txyz_alt_1sec.hex UARTTX=A1 TIMEOUT=1 LED=A7
+HELPTEXT += "target tx2z_u1alt_porswr8sec Generic 14~24 pin 2-series dev board, USART1 alternate pins serial pins, 8 second timeout, LED on PA7. Entry: Any reset except WDRF, 8 second timeout\n"
+tx2z_u1alt_porswr8sec: TARGET = attiny3227
+tx2z_u1alt_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_tx2z_u1alt_porswr8sec.hex UARTTX=C2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x31
 
+HELPTEXT += "target curiosity3217_porswr8sec target curiosity3217 - Microchip ATtiny3217 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: Any reset except WDRF, 8 second timeout\n"
+curiosity3217_porswr8sec: TARGET = attiny3217
+curiosity3217_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity3217_porswr8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x31
 
-## And now the 2-series....
+HELPTEXT += "target curiosity1607_porswr8sec target curiosity1607 - Microchip ATtiny1607 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: Any reset except WDRF, 8 second timeout\n"
+curiosity1607_porswr8sec: TARGET = attiny1607
+curiosity1607_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity1607_porswr8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x31
 
-HELPTEXT += "Generic 2-series board, USART0 default serial pins, 8 second timeout, LED on A7\n"
-tinyx2z: TARGET = attiny1627
-tinyx2z:
-	$(MAKE) -f $(MF) optiboot_tx2z.hex UARTTX=B2 TIMEOUT=8 LED=A7
+HELPTEXT += "target curiosity1627_porswr8sec target curiosity1627 - Microchip ATtiny1627 Curiosity Nano. default serial pins, 8 second timeout, LED on B7. Entry: Any reset except WDRF, 8 second timeout\n"
+curiosity1627_porswr8sec: TARGET = attiny1627
+curiosity1627_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_curiosity1627_porswr8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x31
 
-HELPTEXT += "Generic 2-series board, USART0 alternate serial pins, 8 second timeout, LED on A7\n"
-tinyx2zalt: TARGET = attiny1627
-tinyx2zalt:
-	$(MAKE) -f $(MF) optiboot_tx2z_alt.hex UARTTX=A1 TIMEOUT=8 LED=A7
+HELPTEXT += "target xplainedpro3217_porswr8sec target xplained3217pro - Microchip ATtiny3217 Xplained Pro. default serial pins, 8 second timeout, LED on B4. Entry: Any reset except WDRF, 8 second timeout\n"
+xplainedpro3217_porswr8sec: TARGET = attiny3217
+xplainedpro3217_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedpro3217_porswr8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x31
 
-HELPTEXT += "Generic 2-series board, USART1 alternate serial pins, 8 second timeout, LED on A7\n"
-tinyx2zu1alt: TARGET = attiny1627
-tinyx2zu1alt:
-	$(MAKE) -f $(MF) optiboot_tx2z_u1alt.hex UARTTX=C2 TIMEOUT=8 LED=A7
+HELPTEXT += "target xplainedpro817_porswr8sec target xplainedpro817 - Microchip ATtiny817 Xplained Pro. default serial pins, 8 second timeout, LED on B4. Entry: Any reset except WDRF, 8 second timeout\n"
+xplainedpro817_porswr8sec: TARGET = attiny817
+xplainedpro817_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedpro817_porswr8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x31
 
+HELPTEXT += "target xplainedmini817_porswr8sec target xplainedmini817 - Microchip ATtiny817 Xplained Mini. default serial pins, 8 second timeout, LED on C0. Entry: Any reset except WDRF, 8 second timeout\n"
+xplainedmini817_porswr8sec: TARGET = attiny817
+xplainedmini817_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_xplainedmini817_porswr8sec.hex UARTTX=B2 TIMEOUT=8 LED=C0 ENTRYCOND_REQUIRE=0x31
 
-HELPTEXT += "Generic 2-series board, USART0 default serial pins, 1 second timeout, doesn't run on POR, LED on A7\n"
-tinyx2zrst: TARGET = attiny1627
-tinyx2zrst:
-	$(MAKE) -f $(MF) optiboot_tx2z_rst.hex START_APP_ON_POR=1 UARTTX=B2 TIMEOUT=1 LED=A7
-
-HELPTEXT += "Generic 2-series board, USART0 alternate serial pins, 1 second timeout, doesn't run on POR, LED on A7\n"
-tinyx2zaltrst: TARGET = attiny1627
-tinyx2zaltrst:
-	$(MAKE) -f $(MF) optiboot_tx2z_alt_rst.hex START_APP_ON_POR=1 UARTTX=A1 TIMEOUT=1 LED=A7
-
-HELPTEXT += "Generic 2-series board, USART1 alternate serial pins, 1 second timeout, doesn't run on POR, LED on A7\n"
-tinyx2zu1altrst: TARGET = attiny1627
-tinyx2zu1altrst:
-	$(MAKE) -f $(MF) optiboot_tx2z_u1alt_rst.hex START_APP_ON_POR=1 UARTTX=C2 TIMEOUT=1 LED=A7
-
-
-HELPTEXT += "Generic 2-series board, USART0 default serial pins, 1 second timeout, LED on A7\n"
-tinyx2z1sec: TARGET = attiny1627
-tinyx2z1sec:
-	$(MAKE) -f $(MF) optiboot_tx2z_1sec.hex UARTTX=B2 TIMEOUT=1 LED=A7
-
-HELPTEXT += "Generic 2-series board, USART0 alternate serial pins, 1 second timeout, LED on A7\n"
-tinyx2zalt1sec: TARGET = attiny1627
-tinyx2zalt1sec:
-	$(MAKE) -f $(MF) optiboot_tx2z_alt_1sec.hex UARTTX=A1 TIMEOUT=1 LED=A7
-
-HELPTEXT += "Generic 2-series board with 20 or 24 pins, USART1 alternate serial pins, 1 second timeout, LED on A7\n"
-tinyx2zu1alt1sec: TARGET = attiny1627
-tinyx2zu1alt1sec:
-	$(MAKE) -f $(MF) optiboot_tx2z_u1alt_1sec.hex UARTTX=C2 TIMEOUT=1 LED=A7
-
-
-
-HELPTEXT += "target curiosity3217   - Microchip ATtiny3217 Curiosity Nano.\n"
-curiosity3217: TARGET = attiny3217
-curiosity3217:
-	$(MAKE) -f $(MF) optiboot_curiosity3217.hex UARTTX=B2 TIMEOUT=8 LED=B7 LED_INVERT=1
-
-
-HELPTEXT += "target curiosity1607 - Microchip ATtiny1607 Curiosity Nano.\n"
-curiosity1607: TARGET = attiny1607
-curiosity1607:
-	$(MAKE) -f $(MF) optiboot_curiosity1607.hex UARTTX=B2 TIMEOUT=8 LED=B7 LED_INVERT=1
-
-HELPTEXT += "target curiosity1627 - Microchip ATtiny1627 Curiosity Nano.\n"
-curiosity1627: TARGET = attiny1627
-curiosity1627:
-	$(MAKE) -f $(MF) optiboot_curiosity1627.hex UARTTX=B2 TIMEOUT=8 LED=B7 LED_INVERT=1
-
-HELPTEXT += "target xplained3217pro   - Microchip ATtiny3217 Xplained Pro.\n"
-xplainedpro3217: TARGET = attiny3217
-xplainedpro3217:
-	$(MAKE) -f $(MF) optiboot_xplainedpro3217.hex UARTTX=A1 TIMEOUT=8 LED=B4 LED_INVERT=1
-
-HELPTEXT += "target xplainedpro817   - Microchip ATtiny817 Xplained Pro.\n"
-xplainedpro817: TARGET = attiny817
-xplainedpro817:
-	$(MAKE) -f $(MF) optiboot_xplainedpro817.hex UARTTX=B2 TIMEOUT=8 LED=B4 LED_INVERT=1
-
-HELPTEXT += "target xplainedmini817   - Microchip ATtiny817 Xplained Mini.\n"
-xplainedmini817: TARGET = attiny817
-xplainedmini817:
-	$(MAKE) -f $(MF) optiboot_xplainedmini817.hex UARTTX=B2 TIMEOUT=8 LED=C0
-
-HELPTEXT += "target xplainednano416   - Microchip ATtiny416 Xplained Nano.\n"
-xplained416: TARGET = attiny416
-xplained416:
-	$(MAKE) -f $(MF) optiboot_xplainednano416.hex UARTTX=A1 TIMEOUT=8 LED=B5 LED_INVERT=1
-
-
+HELPTEXT += "target xplainednano416_porswr8sec target xplainednano416 - Microchip ATtiny416 Xplained Nano. default serial pins, 8 second timeout, LED on B5. Entry: Any reset except WDRF, 8 second timeout\n"
+xplainednano416_porswr8sec: TARGET = attiny416
+xplainednano416_porswr8sec:
+	$(MAKE) -f $(MF) optiboot_xplainednano416_porswr8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B5 ENTRYCOND_REQUIRE=0x31
 #---------------------------------------------------------------------------
 #
 # Generic build instructions
@@ -326,7 +588,7 @@ isp-stk500: $(PROGRAM)_$(TARGET).hex
 clean:
 	@touch  __temp_.o __temp_.elf __temp_.lst __temp_.map
 	@touch  __temp_.sym __temp_.lss __temp_.eep __temp_.srec
-	@touch __temp_.bin __temp_.hex __temp_.tmp.sh
+	@touch  __temp_.bin __temp_.hex __temp_.tmp.sh
 	rm -rf *.o *.elf *.lst *.map *.sym *.lss *.eep *.srec *.bin *.hex *.tmp.sh
 
 clean_asm:

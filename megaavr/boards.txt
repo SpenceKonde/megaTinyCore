@@ -57,11 +57,12 @@ menu.bootloaderuart=UART for Bootloader (burn bootloader req'd)
 menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
 menu.resetpinopti=UPDI/Reset Pin and Optiboot Entry (burn bootloader req'd)
 menu.resetpinopti_2=UPDI/alt-RST pins and Optiboot Entry (burn bootloader req'd)
+menu.entryconditition=Bootloader entry condition (burn bootloader req'd)
 menu.attach=attachInterrupt() Version
 menu.printf=printf()
 menu.wiremode=Wire (Wire.h/I2C) Library mode
-menu.WDTtimeout=WDT timeout (note that it cannot be disabled if set here!)
-menu.WDTwindow=WDT window (if desired)
+menu.WDTtimeout=WDT timeout (burn bootloader req'd. Note that it cannot be disabled if set here!)
+menu.WDTwindow=WDT window (if desired. burn bootloader req'd. Note that it cannot be disabled if set here!)
 
 ##########################################################################
 #                                                                        #
@@ -155,37 +156,6 @@ atxy7.upload.prog_interlock=
 #_____________________________________________#
 # CHIP                                   #
 #________________________________________#
-atxy7.menu.chip.3217=ATtiny3217
-atxy7.menu.chip.3217.build.board=AVR_ATtiny3217
-atxy7.menu.chip.3217.build.attiny=3217
-atxy7.menu.chip.3217.upload.maximum_size=32768
-atxy7.menu.chip.3217.upload.maximum_data_size=2048
-atxy7.menu.chip.3217.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy7.menu.chip.3217.bootloader.TCD0CFG_serialupdi=4:0x00
-atxy7.menu.chip.1617=ATtiny1617
-atxy7.menu.chip.1617.build.board=AVR_ATtiny1617
-atxy7.menu.chip.1617.build.attiny=1617
-atxy7.menu.chip.1617.upload.maximum_size=16384
-atxy7.menu.chip.1617.upload.maximum_data_size=2048
-atxy7.menu.chip.1617.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy7.menu.chip.1617.bootloader.TCD0CFG_serialupdi=4:0x00
-atxy7.menu.chip.817=ATtiny817
-atxy7.menu.chip.817.build.board=AVR_ATtiny817
-atxy7.menu.chip.817.build.attiny=817
-atxy7.menu.chip.817.upload.maximum_size=8192
-atxy7.menu.chip.817.build.mrelax=
-atxy7.menu.chip.817.build.mrelax=
-atxy7.menu.chip.817.upload.maximum_data_size=512
-atxy7.menu.chip.817.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy7.menu.chip.817.bootloader.TCD0CFG_serialupdi=4:0x00
-atxy7.menu.chip.417=ATtiny417
-atxy7.menu.chip.417.build.board=AVR_ATtiny417
-atxy7.menu.chip.417.build.attiny=417
-atxy7.menu.chip.417.upload.maximum_size=4096
-atxy7.menu.chip.417.build.mrelax=
-atxy7.menu.chip.417.upload.maximum_data_size=256
-atxy7.menu.chip.417.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy7.menu.chip.417.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy7.menu.chip.3227=ATtiny3227
 atxy7.menu.chip.3227.bootloader.altreset=11
 atxy7.menu.chip.3227.build.board=AVR_ATtiny3227
@@ -194,6 +164,13 @@ atxy7.menu.chip.3227.build.attiny=3227
 atxy7.menu.chip.3227.upload.maximum_size=32768
 atxy7.menu.chip.3227.upload.maximum_data_size=3072
 atxy7.menu.chip.3227.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
+atxy7.menu.chip.3217=ATtiny3217
+atxy7.menu.chip.3217.build.board=AVR_ATtiny3217
+atxy7.menu.chip.3217.build.attiny=3217
+atxy7.menu.chip.3217.upload.maximum_size=32768
+atxy7.menu.chip.3217.upload.maximum_data_size=2048
+atxy7.menu.chip.3217.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy7.menu.chip.3217.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy7.menu.chip.1627=ATtiny1627
 atxy7.menu.chip.1627.bootloader.altreset=11
 atxy7.menu.chip.1627.build.board=AVR_ATtiny1627
@@ -202,6 +179,19 @@ atxy7.menu.chip.1627.build.attiny=1627
 atxy7.menu.chip.1627.upload.maximum_size=16384
 atxy7.menu.chip.1627.upload.maximum_data_size=2048
 atxy7.menu.chip.1627.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
+atxy7.menu.chip.1617=ATtiny1617
+atxy7.menu.chip.1617.build.board=AVR_ATtiny1617
+atxy7.menu.chip.1617.build.attiny=1617
+atxy7.menu.chip.1617.upload.maximum_size=16384
+atxy7.menu.chip.1617.upload.maximum_data_size=2048
+atxy7.menu.chip.1617.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy7.menu.chip.1617.bootloader.TCD0CFG_serialupdi=4:0x00
+atxy7.menu.chip.1607=ATtiny1607
+atxy7.menu.chip.1607.build.board=AVR_ATtiny1607
+atxy7.menu.chip.1607.build.attiny=1607
+atxy7.menu.chip.1607.build.millistimer=A0
+atxy7.menu.chip.1607.upload.maximum_size=16384
+atxy7.menu.chip.1607.upload.maximum_data_size=1024
 atxy7.menu.chip.827=ATtiny827
 atxy7.menu.chip.827.bootloader.altreset=11
 atxy7.menu.chip.827.build.board=AVR_ATtiny827
@@ -211,6 +201,22 @@ atxy7.menu.chip.827.upload.maximum_size=8192
 atxy7.menu.chip.827.build.mrelax=
 atxy7.menu.chip.827.upload.maximum_data_size=1024
 atxy7.menu.chip.827.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
+atxy7.menu.chip.817=ATtiny817
+atxy7.menu.chip.817.build.board=AVR_ATtiny817
+atxy7.menu.chip.817.build.attiny=817
+atxy7.menu.chip.817.upload.maximum_size=8192
+atxy7.menu.chip.817.build.mrelax=
+atxy7.menu.chip.817.build.mrelax=
+atxy7.menu.chip.817.upload.maximum_data_size=512
+atxy7.menu.chip.817.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy7.menu.chip.817.bootloader.TCD0CFG_serialupdi=4:0x00
+atxy7.menu.chip.807=ATtiny807
+atxy7.menu.chip.807.build.board=AVR_ATtiny807
+atxy7.menu.chip.807.build.attiny=807
+atxy7.menu.chip.807.build.millistimer=A0
+atxy7.menu.chip.807.upload.maximum_size=8192
+atxy7.menu.chip.807.build.mrelax=
+atxy7.menu.chip.807.upload.maximum_data_size=512
 atxy7.menu.chip.427=ATtiny427
 atxy7.menu.chip.427.bootloader.altreset=11
 atxy7.menu.chip.427.build.board=AVR_ATtiny427
@@ -220,19 +226,14 @@ atxy7.menu.chip.427.upload.maximum_size=4096
 atxy7.menu.chip.427.build.mrelax=
 atxy7.menu.chip.427.upload.maximum_data_size=512
 atxy7.menu.chip.427.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
-atxy7.menu.chip.1607=ATtiny1607
-atxy7.menu.chip.1607.build.board=AVR_ATtiny1607
-atxy7.menu.chip.1607.build.attiny=1607
-atxy7.menu.chip.1607.build.millistimer=A0
-atxy7.menu.chip.1607.upload.maximum_size=16384
-atxy7.menu.chip.1607.upload.maximum_data_size=1024
-atxy7.menu.chip.807=ATtiny807
-atxy7.menu.chip.807.build.board=AVR_ATtiny807
-atxy7.menu.chip.807.build.attiny=807
-atxy7.menu.chip.807.build.millistimer=A0
-atxy7.menu.chip.807.upload.maximum_size=8192
-atxy7.menu.chip.807.build.mrelax=
-atxy7.menu.chip.807.upload.maximum_data_size=512
+atxy7.menu.chip.417=ATtiny417
+atxy7.menu.chip.417.build.board=AVR_ATtiny417
+atxy7.menu.chip.417.build.attiny=417
+atxy7.menu.chip.417.upload.maximum_size=4096
+atxy7.menu.chip.417.build.mrelax=
+atxy7.menu.chip.417.upload.maximum_data_size=256
+atxy7.menu.chip.417.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy7.menu.chip.417.bootloader.TCD0CFG_serialupdi=4:0x00
 
 #----------------------------------------#
 # CLOCK SOURCE                           #
@@ -597,36 +598,6 @@ atxy6.upload.prog_interlock=
 #_____________________________________________#
 # CHIP                                   #
 #________________________________________#
-atxy6.menu.chip.3216=ATtiny3216
-atxy6.menu.chip.3216.build.board=AVR_ATtiny3216
-atxy6.menu.chip.3216.build.attiny=3216
-atxy6.menu.chip.3216.upload.maximum_size=32768
-atxy6.menu.chip.3216.upload.maximum_data_size=2048
-atxy6.menu.chip.3216.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy6.menu.chip.3216.bootloader.TCD0CFG_serialupdi=4:0x00
-atxy6.menu.chip.1616=ATtiny1616
-atxy6.menu.chip.1616.build.board=AVR_ATtiny1616
-atxy6.menu.chip.1616.build.attiny=1616
-atxy6.menu.chip.1616.upload.maximum_size=16384
-atxy6.menu.chip.1616.upload.maximum_data_size=2048
-atxy6.menu.chip.1616.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy6.menu.chip.1616.bootloader.TCD0CFG_serialupdi=4:0x00
-atxy6.menu.chip.816=ATtiny816
-atxy6.menu.chip.816.build.board=AVR_ATtiny816
-atxy6.menu.chip.816.build.attiny=816
-atxy6.menu.chip.816.upload.maximum_size=8192
-atxy6.menu.chip.816.build.mrelax=
-atxy6.menu.chip.816.upload.maximum_data_size=512
-atxy6.menu.chip.816.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy6.menu.chip.816.bootloader.TCD0CFG_serialupdi=4:0x00
-atxy6.menu.chip.416=ATtiny416
-atxy6.menu.chip.416.build.board=AVR_ATtiny416
-atxy6.menu.chip.416.build.attiny=416
-atxy6.menu.chip.416.upload.maximum_size=4096
-atxy6.menu.chip.416.build.mrelax=
-atxy6.menu.chip.416.upload.maximum_data_size=256
-atxy6.menu.chip.416.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy6.menu.chip.416.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy6.menu.chip.3226=ATtiny3226
 atxy6.menu.chip.3226.bootloader.altreset=11
 atxy6.menu.chip.3226.build.board=AVR_ATtiny3226
@@ -635,6 +606,13 @@ atxy6.menu.chip.3226.build.attiny=3226
 atxy6.menu.chip.3226.upload.maximum_size=32768
 atxy6.menu.chip.3226.upload.maximum_data_size=3072
 atxy6.menu.chip.3226.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
+atxy6.menu.chip.3216=ATtiny3216
+atxy6.menu.chip.3216.build.board=AVR_ATtiny3216
+atxy6.menu.chip.3216.build.attiny=3216
+atxy6.menu.chip.3216.upload.maximum_size=32768
+atxy6.menu.chip.3216.upload.maximum_data_size=2048
+atxy6.menu.chip.3216.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy6.menu.chip.3216.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy6.menu.chip.1626=ATtiny1626
 atxy6.menu.chip.1626.bootloader.altreset=11
 atxy6.menu.chip.1626.build.board=AVR_ATtiny1626
@@ -643,6 +621,19 @@ atxy6.menu.chip.1626.build.attiny=1626
 atxy6.menu.chip.1626.upload.maximum_size=16384
 atxy6.menu.chip.1626.upload.maximum_data_size=2048
 atxy6.menu.chip.1626.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
+atxy6.menu.chip.1616=ATtiny1616
+atxy6.menu.chip.1616.build.board=AVR_ATtiny1616
+atxy6.menu.chip.1616.build.attiny=1616
+atxy6.menu.chip.1616.upload.maximum_size=16384
+atxy6.menu.chip.1616.upload.maximum_data_size=2048
+atxy6.menu.chip.1616.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy6.menu.chip.1616.bootloader.TCD0CFG_serialupdi=4:0x00
+atxy6.menu.chip.1606=ATtiny1606
+atxy6.menu.chip.1606.build.board=AVR_ATtiny1606
+atxy6.menu.chip.1606.build.attiny=1606
+atxy6.menu.chip.1606.build.millistimer=A0
+atxy6.menu.chip.1606.upload.maximum_size=16384
+atxy6.menu.chip.1606.upload.maximum_data_size=1024
 atxy6.menu.chip.826=ATtiny826
 atxy6.menu.chip.826.bootloader.altreset=11
 atxy6.menu.chip.826.build.board=AVR_ATtiny826
@@ -652,6 +643,21 @@ atxy6.menu.chip.826.upload.maximum_size=8192
 atxy6.menu.chip.826.build.mrelax=
 atxy6.menu.chip.826.upload.maximum_data_size=1024
 atxy6.menu.chip.826.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
+atxy6.menu.chip.816=ATtiny816
+atxy6.menu.chip.816.build.board=AVR_ATtiny816
+atxy6.menu.chip.816.build.attiny=816
+atxy6.menu.chip.816.upload.maximum_size=8192
+atxy6.menu.chip.816.build.mrelax=
+atxy6.menu.chip.816.upload.maximum_data_size=512
+atxy6.menu.chip.816.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy6.menu.chip.816.bootloader.TCD0CFG_serialupdi=4:0x00
+atxy6.menu.chip.806=ATtiny806
+atxy6.menu.chip.806.build.board=AVR_ATtiny806
+atxy6.menu.chip.806.build.attiny=806
+atxy6.menu.chip.806.build.millistimer=A0
+atxy6.menu.chip.806.upload.maximum_size=8192
+atxy6.menu.chip.806.build.mrelax=
+atxy6.menu.chip.806.upload.maximum_data_size=512
 atxy6.menu.chip.426=ATtiny426
 atxy6.menu.chip.426.bootloader.altreset=11
 atxy6.menu.chip.426.build.board=AVR_ATtiny426
@@ -661,19 +667,14 @@ atxy6.menu.chip.426.upload.maximum_size=4096
 atxy6.menu.chip.426.build.mrelax=
 atxy6.menu.chip.426.upload.maximum_data_size=512
 atxy6.menu.chip.426.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
-atxy6.menu.chip.1606=ATtiny1606
-atxy6.menu.chip.1606.build.board=AVR_ATtiny1606
-atxy6.menu.chip.1606.build.attiny=1606
-atxy6.menu.chip.1606.build.millistimer=A0
-atxy6.menu.chip.1606.upload.maximum_size=16384
-atxy6.menu.chip.1606.upload.maximum_data_size=1024
-atxy6.menu.chip.806=ATtiny806
-atxy6.menu.chip.806.build.board=AVR_ATtiny806
-atxy6.menu.chip.806.build.attiny=806
-atxy6.menu.chip.806.build.millistimer=A0
-atxy6.menu.chip.806.upload.maximum_size=8192
-atxy6.menu.chip.806.build.mrelax=
-atxy6.menu.chip.806.upload.maximum_data_size=512
+atxy6.menu.chip.416=ATtiny416
+atxy6.menu.chip.416.build.board=AVR_ATtiny416
+atxy6.menu.chip.416.build.attiny=416
+atxy6.menu.chip.416.upload.maximum_size=4096
+atxy6.menu.chip.416.build.mrelax=
+atxy6.menu.chip.416.upload.maximum_data_size=256
+atxy6.menu.chip.416.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy6.menu.chip.416.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy6.menu.chip.406=ATtiny406
 atxy6.menu.chip.406.build.board=AVR_ATtiny406
 atxy6.menu.chip.406.build.attiny=406
@@ -1041,37 +1042,6 @@ atxy4.upload.prog_interlock=
 #_____________________________________________#
 # CHIP                                   #
 #________________________________________#
-atxy4.menu.chip.1614=ATtiny1614
-atxy4.menu.chip.1614.build.board=AVR_ATtiny1614
-atxy4.menu.chip.1614.build.attiny=1614
-atxy4.menu.chip.1614.upload.maximum_size=16384
-atxy4.menu.chip.1614.upload.maximum_data_size=2048
-atxy4.menu.chip.1614.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy4.menu.chip.1614.bootloader.TCD0CFG_serialupdi=4:0x00
-atxy4.menu.chip.814=ATtiny814
-atxy4.menu.chip.814.build.board=AVR_ATtiny814
-atxy4.menu.chip.814.build.attiny=814
-atxy4.menu.chip.814.upload.maximum_size=8192
-atxy4.menu.chip.814.build.mrelax=
-atxy4.menu.chip.814.upload.maximum_data_size=512
-atxy4.menu.chip.814.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy4.menu.chip.814.bootloader.TCD0CFG_serialupdi=4:0x00
-atxy4.menu.chip.414=ATtiny414
-atxy4.menu.chip.414.build.board=AVR_ATtiny414
-atxy4.menu.chip.414.build.attiny=414
-atxy4.menu.chip.414.upload.maximum_size=4096
-atxy4.menu.chip.414.build.mrelax=
-atxy4.menu.chip.414.upload.maximum_data_size=256
-atxy4.menu.chip.414.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy4.menu.chip.414.bootloader.TCD0CFG_serialupdi=4:0x00
-atxy4.menu.chip.214=ATtiny214
-atxy4.menu.chip.214.build.board=AVR_ATtiny214
-atxy4.menu.chip.214.build.attiny=214
-atxy4.menu.chip.214.upload.maximum_size=2048
-atxy4.menu.chip.214.build.mrelax=
-atxy4.menu.chip.214.upload.maximum_data_size=128
-atxy4.menu.chip.214.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy4.menu.chip.214.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy4.menu.chip.3224=ATtiny3224
 atxy4.menu.chip.3224.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
 atxy4.menu.chip.3224.build.board=AVR_ATtiny3224
@@ -1086,6 +1056,19 @@ atxy4.menu.chip.1624.build.millistimer=B1
 atxy4.menu.chip.1624.build.attiny=1624
 atxy4.menu.chip.1624.upload.maximum_size=16384
 atxy4.menu.chip.1624.upload.maximum_data_size=2048
+atxy4.menu.chip.1614=ATtiny1614
+atxy4.menu.chip.1614.build.board=AVR_ATtiny1614
+atxy4.menu.chip.1614.build.attiny=1614
+atxy4.menu.chip.1614.upload.maximum_size=16384
+atxy4.menu.chip.1614.upload.maximum_data_size=2048
+atxy4.menu.chip.1614.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy4.menu.chip.1614.bootloader.TCD0CFG_serialupdi=4:0x00
+atxy4.menu.chip.1604=ATtiny1604
+atxy4.menu.chip.1604.build.board=AVR_ATtiny1604
+atxy4.menu.chip.1604.build.attiny=1604
+atxy4.menu.chip.1604.build.millistimer=A0
+atxy4.menu.chip.1604.upload.maximum_size=16384
+atxy4.menu.chip.1604.upload.maximum_data_size=1024
 atxy4.menu.chip.824=ATtiny824
 atxy4.menu.chip.824.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
 atxy4.menu.chip.824.build.board=AVR_ATtiny824
@@ -1094,6 +1077,21 @@ atxy4.menu.chip.824.build.attiny=824
 atxy4.menu.chip.824.upload.maximum_size=8192
 atxy4.menu.chip.824.build.mrelax=
 atxy4.menu.chip.824.upload.maximum_data_size=1024
+atxy4.menu.chip.814=ATtiny814
+atxy4.menu.chip.814.build.board=AVR_ATtiny814
+atxy4.menu.chip.814.build.attiny=814
+atxy4.menu.chip.814.upload.maximum_size=8192
+atxy4.menu.chip.814.build.mrelax=
+atxy4.menu.chip.814.upload.maximum_data_size=512
+atxy4.menu.chip.814.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy4.menu.chip.814.bootloader.TCD0CFG_serialupdi=4:0x00
+atxy4.menu.chip.804=ATtiny804
+atxy4.menu.chip.804.build.board=AVR_ATtiny804
+atxy4.menu.chip.804.build.attiny=804
+atxy4.menu.chip.804.build.millistimer=A0
+atxy4.menu.chip.804.upload.maximum_size=8192
+atxy4.menu.chip.804.build.mrelax=
+atxy4.menu.chip.804.upload.maximum_data_size=512
 atxy4.menu.chip.424=ATtiny424
 atxy4.menu.chip.424.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
 atxy4.menu.chip.424.build.board=AVR_ATtiny424
@@ -1102,19 +1100,14 @@ atxy4.menu.chip.424.build.attiny=424
 atxy4.menu.chip.424.upload.maximum_size=4096
 atxy4.menu.chip.424.build.mrelax=
 atxy4.menu.chip.424.upload.maximum_data_size=512
-atxy4.menu.chip.1604=ATtiny1604
-atxy4.menu.chip.1604.build.board=AVR_ATtiny1604
-atxy4.menu.chip.1604.build.attiny=1604
-atxy4.menu.chip.1604.build.millistimer=A0
-atxy4.menu.chip.1604.upload.maximum_size=16384
-atxy4.menu.chip.1604.upload.maximum_data_size=1024
-atxy4.menu.chip.804=ATtiny804
-atxy4.menu.chip.804.build.board=AVR_ATtiny804
-atxy4.menu.chip.804.build.attiny=804
-atxy4.menu.chip.804.build.millistimer=A0
-atxy4.menu.chip.804.upload.maximum_size=8192
-atxy4.menu.chip.804.build.mrelax=
-atxy4.menu.chip.804.upload.maximum_data_size=512
+atxy4.menu.chip.414=ATtiny414
+atxy4.menu.chip.414.build.board=AVR_ATtiny414
+atxy4.menu.chip.414.build.attiny=414
+atxy4.menu.chip.414.upload.maximum_size=4096
+atxy4.menu.chip.414.build.mrelax=
+atxy4.menu.chip.414.upload.maximum_data_size=256
+atxy4.menu.chip.414.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy4.menu.chip.414.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy4.menu.chip.404=ATtiny404
 atxy4.menu.chip.404.build.board=AVR_ATtiny404
 atxy4.menu.chip.404.build.attiny=404
@@ -1122,6 +1115,14 @@ atxy4.menu.chip.404.build.millistimer=A0
 atxy4.menu.chip.404.upload.maximum_size=4096
 atxy4.menu.chip.404.build.mrelax=
 atxy4.menu.chip.404.upload.maximum_data_size=256
+atxy4.menu.chip.214=ATtiny214
+atxy4.menu.chip.214.build.board=AVR_ATtiny214
+atxy4.menu.chip.214.build.attiny=214
+atxy4.menu.chip.214.upload.maximum_size=2048
+atxy4.menu.chip.214.build.mrelax=
+atxy4.menu.chip.214.upload.maximum_data_size=128
+atxy4.menu.chip.214.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy4.menu.chip.214.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy4.menu.chip.204=ATtiny204
 atxy4.menu.chip.204.build.board=AVR_ATtiny204
 atxy4.menu.chip.204.build.attiny=204
@@ -1494,13 +1495,6 @@ atxy2.menu.chip.412.upload.maximum_size=4096
 atxy2.menu.chip.412.upload.maximum_data_size=256
 atxy2.menu.chip.412.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
 atxy2.menu.chip.412.bootloader.TCD0CFG_serialupdi=4:0x00
-atxy2.menu.chip.212=ATtiny212
-atxy2.menu.chip.212.build.board=AVR_ATtiny212
-atxy2.menu.chip.212.build.attiny=212
-atxy2.menu.chip.212.upload.maximum_size=2048
-atxy2.menu.chip.212.upload.maximum_data_size=128
-atxy2.menu.chip.212.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
-atxy2.menu.chip.212.bootloader.TCD0CFG_serialupdi=4:0x00
 atxy2.menu.chip.402=ATtiny402
 atxy2.menu.chip.402.build.board=AVR_ATtiny402
 atxy2.menu.chip.402.build.attiny=402
@@ -1509,6 +1503,21 @@ atxy2.menu.chip.402.upload.maximum_size=4096
 atxy2.menu.chip.402.upload.maximum_data_size=256
 atxy2.menu.chip.402.bootloader.TCD0CFG_avrdude=
 atxy2.menu.chip.402.bootloader.TCD0CFG_serialupdi=
+atxy2.menu.chip.212=ATtiny212
+atxy2.menu.chip.212.build.board=AVR_ATtiny212
+atxy2.menu.chip.212.build.attiny=212
+atxy2.menu.chip.212.upload.maximum_size=2048
+atxy2.menu.chip.212.upload.maximum_data_size=128
+atxy2.menu.chip.212.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
+atxy2.menu.chip.212.bootloader.TCD0CFG_serialupdi=4:0x00
+atxy2.menu.chip.202=ATtiny202
+atxy2.menu.chip.202.build.board=AVR_ATtiny202
+atxy2.menu.chip.202.build.attiny=202
+atxy2.menu.chip.202.build.millistimer=A0
+atxy2.menu.chip.202.upload.maximum_size=2048
+atxy2.menu.chip.202.upload.maximum_data_size=128
+atxy2.menu.chip.202.bootloader.TCD0CFG_avrdude=
+atxy2.menu.chip.202.bootloader.TCD0CFG_serialupdi=
 atxy2.menu.chip.402w=ATtiny402 (bad signature)
 atxy2.menu.chip.402w.build.millistimer=A0
 atxy2.menu.chip.402w.build.board=AVR_ATtiny402
@@ -1518,14 +1527,6 @@ atxy2.menu.chip.402w.upload.maximum_data_size=256
 atxy2.menu.chip.402w.upload.workaround=w
 atxy2.menu.chip.402w.bootloader.TCD0CFG_avrdude=
 atxy2.menu.chip.402w.bootloader.TCD0CFG_serialupdi=
-atxy2.menu.chip.202=ATtiny202
-atxy2.menu.chip.202.build.board=AVR_ATtiny202
-atxy2.menu.chip.202.build.attiny=202
-atxy2.menu.chip.202.build.millistimer=A0
-atxy2.menu.chip.202.upload.maximum_size=2048
-atxy2.menu.chip.202.upload.maximum_data_size=128
-atxy2.menu.chip.202.bootloader.TCD0CFG_avrdude=
-atxy2.menu.chip.202.bootloader.TCD0CFG_serialupdi=
 
 #----------------------------------------#
 # CLOCK SOURCE                           #
@@ -1894,6 +1895,7 @@ microchip.menu.board_name.cn1627.upload.maximum_data_size=2048
 microchip.menu.board_name.cn1627.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}1{bootloader.eesavebit}
 microchip.menu.board_name.cn1627.bootloader.TCD0CFG_avrdude=
 microchip.menu.board_name.cn1627.bootloader.TCD0CFG_serialupdi=
+microchip.menu.board_name.cn1627.bootloader.altreset=11
 
 microchip.menu.board_name.cn1607=Curiosity Nano ATtiny1607
 microchip.menu.board_name.cn1607.build.board=AVR_CuriosityNano1607
@@ -2241,6 +2243,7 @@ atxy7o.bootloader.APPEND=0x00
 atxy7o.bootloader.BOOTEND=0x02
 atxy7o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atxy7o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy7o.bootloader.file=optiboot_txyz{bootloader.uartswap}{bootloader.entrycond}.hex
 atxy7o.bootloader.tool=avrdude
 
 #----------------------------------------#
@@ -2278,18 +2281,6 @@ atxy7o.menu.chip.1617.build.board=AVR_ATtiny1617
 atxy7o.menu.chip.1617.build.attiny=1617
 atxy7o.menu.chip.1617.upload.maximum_size=15872
 atxy7o.menu.chip.1617.upload.maximum_data_size=2048
-atxy7o.menu.chip.817=ATtiny817
-atxy7o.menu.chip.817.build.board=AVR_ATtiny817
-atxy7o.menu.chip.817.build.attiny=817
-atxy7o.menu.chip.817.upload.maximum_size=7680
-atxy7o.menu.chip.817.build.mrelax=
-atxy7o.menu.chip.817.upload.maximum_data_size=512
-atxy7o.menu.chip.417=ATtiny417
-atxy7o.menu.chip.417.build.board=AVR_ATtiny417
-atxy7o.menu.chip.417.build.attiny=417
-atxy7o.menu.chip.417.upload.maximum_size=3584
-atxy7o.menu.chip.417.build.mrelax=
-atxy7o.menu.chip.417.upload.maximum_data_size=256
 atxy7o.menu.chip.1607=ATtiny1607
 atxy7o.menu.chip.1607.build.board=AVR_ATtiny1607
 atxy7o.menu.chip.1607.build.attiny=1607
@@ -2298,6 +2289,12 @@ atxy7o.menu.chip.1607.upload.maximum_size=15872
 atxy7o.menu.chip.1607.upload.maximum_data_size=1024
 atxy7o.menu.chip.1607.bootloader.TCD0CFG_avrdude=
 atxy7o.menu.chip.1607.bootloader.TCD0CFG_serialupdi=
+atxy7o.menu.chip.817=ATtiny817
+atxy7o.menu.chip.817.build.board=AVR_ATtiny817
+atxy7o.menu.chip.817.build.attiny=817
+atxy7o.menu.chip.817.upload.maximum_size=7680
+atxy7o.menu.chip.817.build.mrelax=
+atxy7o.menu.chip.817.upload.maximum_data_size=512
 atxy7o.menu.chip.807=ATtiny807
 atxy7o.menu.chip.807.build.board=AVR_ATtiny807
 atxy7o.menu.chip.807.build.attiny=807
@@ -2306,6 +2303,12 @@ atxy7o.menu.chip.807.upload.maximum_size=7680
 atxy7o.menu.chip.807.build.mrelax=
 atxy7o.menu.chip.807.upload.maximum_data_size=512
 atxy7o.menu.chip.807.bootloader.TCD0CFG_avrdude=
+atxy7o.menu.chip.417=ATtiny417
+atxy7o.menu.chip.417.build.board=AVR_ATtiny417
+atxy7o.menu.chip.417.build.attiny=417
+atxy7o.menu.chip.417.upload.maximum_size=3584
+atxy7o.menu.chip.417.build.mrelax=
+atxy7o.menu.chip.417.upload.maximum_data_size=256
 atxy7o.menu.chip.807.bootloader.TCD0CFG_serialupdi=
 
 #----------------------------------------#
@@ -2494,21 +2497,56 @@ atxy7o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
 atxy7o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
 
 #----------------------------------------#
-#  UPDI and RESET PIN configuration and  #
-#       OPTIBOOT ENTRY conditions        #
+#  UPDI and RESET PIN configuration      #
 #----------------------------------------#
-atxy7o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
-atxy7o.menu.resetpinopti.UPDI.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
+atxy7o.menu.resetpinopti.UPDI=UPDI, (default optiboot for 8 sec. after all resets)
+atxy7o.menu.resetpinopti.UPDI.bootloader.defaultentrycond=_all8sec
 atxy7o.menu.resetpinopti.UPDI.bootloader.resetpinbits=01
-atxy7o.menu.resetpinopti.UPDIFastBoot=UPDI, Optiboot for 1 sec. after power-on & reset
-atxy7o.menu.resetpinopti.UPDIFastBoot.bootloader.file=optiboot_txyz{bootloader.uartswap}_1sec.hex
-atxy7o.menu.resetpinopti.UPDIFastBoot.bootloader.resetpinbits=01
-atxy7o.menu.resetpinopti.reset=Reset, Optiboot for 1 sec. after reset *DANGER* HV UPDI programmer req'd for reprogramming!
-atxy7o.menu.resetpinopti.reset.bootloader.file=optiboot_txyz{bootloader.uartswap}_rst.hex
+atxy7o.menu.resetpinopti.reset=Reset, (default ptiboot for 1 sec. after ext. reset) *DANGER* HV UPDI programmer req'd for reprogramming!
+atxy7o.menu.resetpinopti.reset.bootloader.defaultentrycond=_extr
 atxy7o.menu.resetpinopti.reset.bootloader.resetpinbits=10
-atxy7o.menu.resetpinopti.gpio=GPIO, Optiboot for 8 sec. after power-on & SW reset *DANGER* HV programmer req'd for reprogramming! (PCHV)
-atxy7o.menu.resetpinopti.gpio.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
+atxy7o.menu.resetpinopti.gpio=(weak) GPIO, (default optiboot for 8 sec. after all resets) *DANGER* HV programmer req'd for reprogramming! (PCHV)
+atxy7o.menu.resetpinopti.gpio.bootloader.defaultentrycond=_all8sec
 atxy7o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
+
+#----------------------------------------#
+# BOOTLOADER Entry Conditions            #
+#________________________________________#
+atxy7o.menu.entrycond.default=Default (Always enter bootloader 8 second delay - unless UPDI fused as reset, then extrf 1 second)
+atxy7o.menu.entrycond.all=Always: Every reset except a WDT reset or BOR w/out POR, 8 second timeout - easy to enter bootloader
+atxy7o.menu.entrycond.poronly= Power On Only: Only when chip is powercycled, 8 second timeout (assume manual unplug)
+atxy7o.menu.entrycond.swr=SW-only: 8 second timeout (Warning: bad app code won't run the bootloader)
+atxy7o.menu.entrycond.extr=External (reset pin): Reset pin and SW reset, 1 second timeout (assume autoreset, requires UPDI fused as reset).
+atxy7o.menu.entrycond.extronly=External reset only: 1 second timeout (assume autoreset, requires UPDI fused as reset)
+atxy7o.menu.entrycond.extr_slow=External (reset pin), slow: Reset pin and SW reset, 8 second timeout (assume manual reset, requires UPDI fused as reset)
+atxy7o.menu.entrycond.default.bootloader.entrycond={bootloader.defaultentrycond}
+atxy7o.menu.entrycond.extr.bootloader.entrycond=_extr
+atxy7o.menu.entrycond.extronly.bootloader.entrycond=_extronly
+atxy7o.menu.entrycond.poronly.bootloader.entrycond=_poronly8sec
+atxy7o.menu.entrycond.all.bootloader.entrycond=_all8sec
+atxy7o.menu.entrycond.swr.bootloader.entrycond=_swronly8sec
+atxy7o.menu.entrycond.extr_slow.bootloader.entrycond=_extr8sec
+atxy7o.menu.entrycond.porswr.bootloader.entrycond=_porswr8sec
+
+#----------------------------------------#
+# BOOTLOADER Entry Conditions            #
+#________________________________________#
+atxy7o.menu.entrycond.default=Default (Always enter bootloader 8 second delay - unless UPDI fused as reset, then extrf 1 second)
+atxy7o.menu.entrycond.all=Always: Every reset except a WDT reset or BOR w/out POR, 8 second timeout - easy to enter bootloader
+atxy7o.menu.entrycond.poronly= Power On Only: Only when chip is powercycled, 8 second timeout (assume manual unplug)
+atxy7o.menu.entrycond.swr=SW-only: 8 second timeout (Warning: bad app code won't run the bootloader)
+atxy7o.menu.entrycond.extr=External (reset pin): Reset pin and SW reset, 1 second timeout (assume autoreset, requires UPDI fused as reset).
+atxy7o.menu.entrycond.extronly=External reset only: 1 second timeout (assume autoreset, requires UPDI fused as reset)
+atxy7o.menu.entrycond.extr_slow=External (reset pin), slow: Reset pin and SW reset, 8 second timeout (assume manual reset, requires UPDI fused as reset)
+atxy7o.menu.entrycond.porswr=POR and SWR, but not external resets.
+atxy7o.menu.entrycond.default.bootloader.entrycond={bootloader.defaultentrycond}
+atxy7o.menu.entrycond.extr.bootloader.entrycond=_extr
+atxy7o.menu.entrycond.extronly.bootloader.entrycond=_extronly
+atxy7o.menu.entrycond.poronly.bootloader.entrycond=_poronly8sec
+atxy7o.menu.entrycond.all.bootloader.entrycond=_all8sec
+atxy7o.menu.entrycond.swr.bootloader.entrycond=_swronly8sec
+atxy7o.menu.entrycond.extr_slow.bootloader.entrycond=_extr8sec
+atxy7o.menu.entrycond.porswr.bootloader.entrycond=_porswr8sec
 
 #----------------------------------------#
 # STARTUP TIME (SUT)                     #
@@ -2611,6 +2649,7 @@ atx27o.bootloader.APPEND=0x00
 atx27o.bootloader.BOOTEND=0x02
 atx27o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atx27o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atx27o.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx27o.bootloader.tool=avrdude
 
 #----------------------------------------#
@@ -2845,24 +2884,44 @@ atx27o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atx27o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
 #----------------------------------------#
-#  UPDI and RESET PIN configuration and  #
-#       OPTIBOOT ENTRY conditions        #
+#  UPDI and RESET PIN configuration      #
 #----------------------------------------#
 atx27o.menu.resetpinopti_2.UPDIaltrst=UPDI on PA0, RST on PB4 (Optiboot for 1 sec after reset)
-atx27o.menu.resetpinopti_2.UPDIaltrst.bootloader.file=optiboot_tx2z{bootloader.uartswap}_rst.hex
+atx27o.menu.resetpinopti_2.UPDIaltrst.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx27o.menu.resetpinopti_2.UPDIaltrst.bootloader.resetpinbits=11
+atx27o.menu.resetpinopti_2.UPDIaltrst.bootloader.defaultentrycond=_extr
 atx27o.menu.resetpinopti_2.UPDI=No RST, UPDI enabled, 8 sec Optiboot after power on or SW reset
-atx27o.menu.resetpinopti_2.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
+atx27o.menu.resetpinopti_2.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx27o.menu.resetpinopti_2.UPDI.bootloader.resetpinbits=01
-atx27o.menu.resetpinopti_2.UPDIFastBoot=Optiboot for 1 sec. after power-on & SW reset, no RST pin
-atx27o.menu.resetpinopti_2.UPDIFastBoot.bootloader.file=optiboot_tx2z{bootloader.uartswap}_1sec.hex
-atx27o.menu.resetpinopti_2.UPDIFastBoot.bootloader.resetpinbits=01
+atx27o.menu.resetpinopti_2.UPDI.bootloader.defaultentrycond=_all8sec
 atx27o.menu.resetpinopti_2.reset=RST on PA0, Optiboot for 1 sec. after reset *DANGER* HV UPDI programmer req'd for reprogramming!
-atx27o.menu.resetpinopti_2.reset.bootloader.file=optiboot_tx2z{bootloader.uartswap}_rst.hex
+atx27o.menu.resetpinopti_2.reset.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx27o.menu.resetpinopti_2.reset.bootloader.resetpinbits=10
-atx27o.menu.resetpinopti_2.gpio=PA0 is GPIO, Optiboot for 8 sec. after power-on & SW reset, no RST pin *DANGER* HV programmer req'd for reprogramming! (PCHV)
-atx27o.menu.resetpinopti_2.gpio.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
+atx27o.menu.resetpinopti_2.reset.bootloader.defaultentrycond=_extr
+atx27o.menu.resetpinopti_2.gpio=PA0 is GPIO, (default always run optiboot for 8 sec), no RST, no UPDI - *DANGER* HV programmer req'd for reprogramming! (PCHV)
+atx27o.menu.resetpinopti_2.gpio.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx27o.menu.resetpinopti_2.gpio.bootloader.resetpinbits=00
+atx27o.menu.resetpinopti_2.gpio.bootloader.defaultentrycond=_all8sec
+
+#----------------------------------------#
+# BOOTLOADER Entry Conditions            #
+#________________________________________#
+atx27o.menu.entrycond.default=Default (extr 1 sec if either reset pin enabled, otherwise always, 8 seconds)
+atx27o.menu.entrycond.all=Always: Every reset except a WDT reset or BOR w/out POR, 8 second timeout - easy to enter bootloader
+atx27o.menu.entrycond.poronly= Power On Only: Only when chip is powercycled, 8 second timeout (assume manual unplug)
+atx27o.menu.entrycond.swr=SW-only: 8 second timeout (Warning: bad app code won't run the bootloader)
+atx27o.menu.entrycond.extr=External (reset pin): Reset pin and SW reset, 1 second timeout (assume autoreset, requires UPDI fused as reset).
+atx27o.menu.entrycond.extronly=External reset only: 1 second timeout (assume autoreset, requires UPDI fused as reset)
+atx27o.menu.entrycond.extr_slow=External (reset pin), slow: Reset pin and SW reset, 8 second timeout (assume manual reset, requires UPDI fused as reset)
+atx27o.menu.entrycond.porswr=POR and SWR, but not external resets.
+atx27o.menu.entrycond.default.bootloader.entrycond={bootloader.defaultentrycond}
+atx27o.menu.entrycond.extr.bootloader.entrycond=_extr
+atx27o.menu.entrycond.extronly.bootloader.entrycond=_extronly
+atx27o.menu.entrycond.poronly.bootloader.entrycond=_poronly8sec
+atx27o.menu.entrycond.all.bootloader.entrycond=_all8sec
+atx27o.menu.entrycond.swr.bootloader.entrycond=_swronly8sec
+atx27o.menu.entrycond.extr_slow.bootloader.entrycond=_extr8sec
+atx27o.menu.entrycond.porswr.bootloader.entrycond=_porswr8sec
 
 #----------------------------------------#
 # STARTUP TIME (SUT)                     #
@@ -2967,6 +3026,7 @@ atxy6o.bootloader.APPEND=0x00
 atxy6o.bootloader.BOOTEND=0x02
 atxy6o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atxy6o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy6o.bootloader.file=optiboot_txyz{bootloader.uartswap}{bootloader.entrycond}.hex
 atxy6o.bootloader.tool=avrdude
 
 #----------------------------------------#
@@ -3004,18 +3064,6 @@ atxy6o.menu.chip.1616.build.board=AVR_ATtiny1616
 atxy6o.menu.chip.1616.build.attiny=1616
 atxy6o.menu.chip.1616.upload.maximum_size=15872
 atxy6o.menu.chip.1616.upload.maximum_data_size=2048
-atxy6o.menu.chip.816=ATtiny816
-atxy6o.menu.chip.816.build.board=AVR_ATtiny816
-atxy6o.menu.chip.816.build.attiny=816
-atxy6o.menu.chip.816.upload.maximum_size=7680
-atxy6o.menu.chip.816.build.mrelax=
-atxy6o.menu.chip.816.upload.maximum_data_size=512
-atxy6o.menu.chip.416=ATtiny416
-atxy6o.menu.chip.416.build.board=AVR_ATtiny416
-atxy6o.menu.chip.416.build.attiny=416
-atxy6o.menu.chip.416.upload.maximum_size=3584
-atxy6o.menu.chip.416.build.mrelax=
-atxy6o.menu.chip.416.upload.maximum_data_size=256
 atxy6o.menu.chip.1606=ATtiny1606
 atxy6o.menu.chip.1606.build.board=AVR_ATtiny1606
 atxy6o.menu.chip.1606.build.attiny=1606
@@ -3024,6 +3072,12 @@ atxy6o.menu.chip.1606.upload.maximum_size=15872
 atxy6o.menu.chip.1606.upload.maximum_data_size=1024
 atxy6o.menu.chip.1606.bootloader.TCD0CFG_avrdude=
 atxy6o.menu.chip.1606.bootloader.TCD0CFG_serialupdi=
+atxy6o.menu.chip.816=ATtiny816
+atxy6o.menu.chip.816.build.board=AVR_ATtiny816
+atxy6o.menu.chip.816.build.attiny=816
+atxy6o.menu.chip.816.upload.maximum_size=7680
+atxy6o.menu.chip.816.build.mrelax=
+atxy6o.menu.chip.816.upload.maximum_data_size=512
 atxy6o.menu.chip.806=ATtiny806
 atxy6o.menu.chip.806.build.board=AVR_ATtiny806
 atxy6o.menu.chip.806.build.attiny=806
@@ -3033,6 +3087,12 @@ atxy6o.menu.chip.806.build.mrelax=
 atxy6o.menu.chip.806.upload.maximum_data_size=512
 atxy6o.menu.chip.806.bootloader.TCD0CFG_avrdude=
 atxy6o.menu.chip.806.bootloader.TCD0CFG_serialupdi=
+atxy6o.menu.chip.416=ATtiny416
+atxy6o.menu.chip.416.build.board=AVR_ATtiny416
+atxy6o.menu.chip.416.build.attiny=416
+atxy6o.menu.chip.416.upload.maximum_size=3584
+atxy6o.menu.chip.416.build.mrelax=
+atxy6o.menu.chip.416.upload.maximum_data_size=256
 atxy6o.menu.chip.406=ATtiny406
 atxy6o.menu.chip.406.build.board=AVR_ATtiny406
 atxy6o.menu.chip.406.build.attiny=406
@@ -3229,22 +3289,37 @@ atxy6o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy6o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
 #----------------------------------------#
-#  UPDI and RESET PIN configuration and  #
-#       OPTIBOOT ENTRY conditions        #
+#  UPDI and RESET PIN configuration      #
 #----------------------------------------#
-atxy6o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
-atxy6o.menu.resetpinopti.UPDI.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
+atxy6o.menu.resetpinopti.UPDI=UPDI, (default optiboot for 8 sec. after all resets)
+atxy6o.menu.resetpinopti.UPDI.bootloader.defaultentrycond=_all8sec
 atxy6o.menu.resetpinopti.UPDI.bootloader.resetpinbits=01
-atxy6o.menu.resetpinopti.UPDIFastBoot=UPDI, Optiboot for 1 sec. after power-on & reset
-atxy6o.menu.resetpinopti.UPDIFastBoot.bootloader.file=optiboot_txyz{bootloader.uartswap}_1sec.hex
-atxy6o.menu.resetpinopti.UPDIFastBoot.bootloader.resetpinbits=01
-atxy6o.menu.resetpinopti.reset=Reset, Optiboot for 1 sec. after reset *DANGER* HV UPDI programmer req'd for reprogramming!
-atxy6o.menu.resetpinopti.reset.bootloader.file=optiboot_txyz{bootloader.uartswap}_rst.hex
+atxy6o.menu.resetpinopti.reset=Reset, (default ptiboot for 1 sec. after ext. reset) *DANGER* HV UPDI programmer req'd for reprogramming!
+atxy6o.menu.resetpinopti.reset.bootloader.defaultentrycond=_extr
 atxy6o.menu.resetpinopti.reset.bootloader.resetpinbits=10
-atxy6o.menu.resetpinopti.gpio=GPIO, Optiboot for 8 sec. after power-on & SW reset *DANGER* HV programmer req'd for reprogramming! (PCHV)
-atxy6o.menu.resetpinopti.gpio.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
+atxy6o.menu.resetpinopti.gpio=(weak) GPIO, (default optiboot for 8 sec. after all resets) *DANGER* HV programmer req'd for reprogramming! (PCHV)
+atxy6o.menu.resetpinopti.gpio.bootloader.defaultentrycond=_all8sec
 atxy6o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
+#----------------------------------------#
+# BOOTLOADER Entry Conditions            #
+#________________________________________#
+atxy6o.menu.entrycond.default=Default (Always enter bootloader 8 second delay - unless UPDI fused as reset, then extrf 1 second)
+atxy6o.menu.entrycond.all=Always: Every reset except a WDT reset or BOR w/out POR, 8 second timeout - easy to enter bootloader
+atxy6o.menu.entrycond.poronly= Power On Only: Only when chip is powercycled, 8 second timeout (assume manual unplug)
+atxy6o.menu.entrycond.swr=SW-only: 8 second timeout (Warning: bad app code won't run the bootloader)
+atxy6o.menu.entrycond.extr=External (reset pin): Reset pin and SW reset, 1 second timeout (assume autoreset, requires UPDI fused as reset).
+atxy6o.menu.entrycond.extronly=External reset only: 1 second timeout (assume autoreset, requires UPDI fused as reset)
+atxy6o.menu.entrycond.extr_slow=External (reset pin), slow: Reset pin and SW reset, 8 second timeout (assume manual reset, requires UPDI fused as reset)
+atxy6o.menu.entrycond.porswr=POR and SWR, but not external resets.
+atxy6o.menu.entrycond.default.bootloader.entrycond={bootloader.defaultentrycond}
+atxy6o.menu.entrycond.extr.bootloader.entrycond=_extr
+atxy6o.menu.entrycond.extronly.bootloader.entrycond=_extronly
+atxy6o.menu.entrycond.poronly.bootloader.entrycond=_poronly8sec
+atxy6o.menu.entrycond.all.bootloader.entrycond=_all8sec
+atxy6o.menu.entrycond.swr.bootloader.entrycond=_swronly8sec
+atxy6o.menu.entrycond.extr_slow.bootloader.entrycond=_extr8sec
+atxy6o.menu.entrycond.porswr.bootloader.entrycond=_porswr8sec
 #----------------------------------------#
 # STARTUP TIME (SUT)                     #
 #________________________________________#
@@ -3346,6 +3421,7 @@ atx26o.bootloader.APPEND=0x00
 atx26o.bootloader.BOOTEND=0x02
 atx26o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atx26o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atx26o.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx26o.bootloader.tool=avrdude
 
 #----------------------------------------#
@@ -3580,24 +3656,44 @@ atx26o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atx26o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
 #----------------------------------------#
-#  UPDI and RESET PIN configuration and  #
-#       OPTIBOOT ENTRY conditions        #
+#  UPDI and RESET PIN configuration      #
 #----------------------------------------#
 atx26o.menu.resetpinopti_2.UPDIaltrst=UPDI on PA0, RST on PB4 (Optiboot for 1 sec after reset)
-atx26o.menu.resetpinopti_2.UPDIaltrst.bootloader.file=optiboot_tx2z{bootloader.uartswap}_rst.hex
+atx26o.menu.resetpinopti_2.UPDIaltrst.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx26o.menu.resetpinopti_2.UPDIaltrst.bootloader.resetpinbits=11
+atx26o.menu.resetpinopti_2.UPDIaltrst.bootloader.defaultentrycond=_extr
 atx26o.menu.resetpinopti_2.UPDI=No RST, UPDI enabled, 8 sec Optiboot after power on or SW reset
-atx26o.menu.resetpinopti_2.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
+atx26o.menu.resetpinopti_2.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx26o.menu.resetpinopti_2.UPDI.bootloader.resetpinbits=01
-atx26o.menu.resetpinopti_2.UPDIFastBoot=Optiboot for 1 sec. after power-on & SW reset, no RST pin
-atx26o.menu.resetpinopti_2.UPDIFastBoot.bootloader.file=optiboot_tx2z{bootloader.uartswap}_1sec.hex
-atx26o.menu.resetpinopti_2.UPDIFastBoot.bootloader.resetpinbits=01
+atx26o.menu.resetpinopti_2.UPDI.bootloader.defaultentrycond=_all8sec
 atx26o.menu.resetpinopti_2.reset=RST on PA0, Optiboot for 1 sec. after reset *DANGER* HV UPDI programmer req'd for reprogramming!
-atx26o.menu.resetpinopti_2.reset.bootloader.file=optiboot_tx2z{bootloader.uartswap}_rst.hex
+atx26o.menu.resetpinopti_2.reset.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx26o.menu.resetpinopti_2.reset.bootloader.resetpinbits=10
-atx26o.menu.resetpinopti_2.gpio=PA0 is GPIO, Optiboot for 8 sec, no RST, no UPDI - *DANGER* HV programmer req'd for reprogramming! (PCHV)
-atx26o.menu.resetpinopti_2.gpio.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
+atx26o.menu.resetpinopti_2.reset.bootloader.defaultentrycond=_extr
+atx26o.menu.resetpinopti_2.gpio=PA0 is GPIO, (default always run optiboot for 8 sec), no RST, no UPDI - *DANGER* HV programmer req'd for reprogramming! (PCHV)
+atx26o.menu.resetpinopti_2.gpio.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx26o.menu.resetpinopti_2.gpio.bootloader.resetpinbits=00
+atx26o.menu.resetpinopti_2.gpio.bootloader.defaultentrycond=_all8sec
+
+#----------------------------------------#
+# BOOTLOADER Entry Conditions            #
+#________________________________________#
+atx26o.menu.entrycond.default=Default (extr 1 sec if either reset pin enabled, otherwise always, 8 seconds)
+atx26o.menu.entrycond.all=Always: Every reset except a WDT reset or BOR w/out POR, 8 second timeout - easy to enter bootloader
+atx26o.menu.entrycond.poronly= Power On Only: Only when chip is powercycled, 8 second timeout (assume manual unplug)
+atx26o.menu.entrycond.swr=SW-only: 8 second timeout (Warning: bad app code won't run the bootloader)
+atx26o.menu.entrycond.extr=External (reset pin): Reset pin and SW reset, 1 second timeout (assume autoreset, requires UPDI fused as reset).
+atx26o.menu.entrycond.extronly=External reset only: 1 second timeout (assume autoreset, requires UPDI fused as reset)
+atx26o.menu.entrycond.extr_slow=External (reset pin), slow: Reset pin and SW reset, 8 second timeout (assume manual reset, requires UPDI fused as reset)
+atx26o.menu.entrycond.porswr=POR and SWR, but not external resets.
+atx26o.menu.entrycond.default.bootloader.entrycond={bootloader.defaultentrycond}
+atx26o.menu.entrycond.extr.bootloader.entrycond=_extr
+atx26o.menu.entrycond.extronly.bootloader.entrycond=_extronly
+atx26o.menu.entrycond.poronly.bootloader.entrycond=_poronly8sec
+atx26o.menu.entrycond.all.bootloader.entrycond=_all8sec
+atx26o.menu.entrycond.swr.bootloader.entrycond=_swronly8sec
+atx26o.menu.entrycond.extr_slow.bootloader.entrycond=_extr8sec
+atx26o.menu.entrycond.porswr.bootloader.entrycond=_porswr8sec
 
 #----------------------------------------#
 # STARTUP TIME (SUT)                     #
@@ -3702,6 +3798,7 @@ atxy4o.bootloader.APPEND=0x00
 atxy4o.bootloader.BOOTEND=0x02
 atxy4o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atxy4o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy4o.bootloader.file=optiboot_txyz{bootloader.uartswap}{bootloader.entrycond}.hex
 atxy4o.bootloader.tool=avrdude
 
 #----------------------------------------#
@@ -3982,21 +4079,37 @@ atxy4o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy4o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
 #----------------------------------------#
-#  UPDI and RESET PIN configuration and  #
-#       OPTIBOOT ENTRY conditions        #
+#  UPDI and RESET PIN configuration      #
 #----------------------------------------#
-atxy4o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
-atxy4o.menu.resetpinopti.UPDI.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
+atxy4o.menu.resetpinopti.UPDI=UPDI, (default optiboot for 8 sec. after all resets)
+atxy4o.menu.resetpinopti.UPDI.bootloader.defaultentrycond=_all8sec
 atxy4o.menu.resetpinopti.UPDI.bootloader.resetpinbits=01
-atxy4o.menu.resetpinopti.UPDIFastBoot=UPDI, Optiboot for 1 sec. after power-on & reset
-atxy4o.menu.resetpinopti.UPDIFastBoot.bootloader.file=optiboot_txyz{bootloader.uartswap}_1sec.hex
-atxy4o.menu.resetpinopti.UPDIFastBoot.bootloader.resetpinbits=01
-atxy4o.menu.resetpinopti.reset=Reset, Optiboot for 1 sec. after reset *DANGER* HV UPDI programmer req'd for reprogramming!
-atxy4o.menu.resetpinopti.reset.bootloader.file=optiboot_txyz{bootloader.uartswap}_rst.hex
+atxy4o.menu.resetpinopti.reset=Reset, (default ptiboot for 1 sec. after ext. reset) *DANGER* HV UPDI programmer req'd for reprogramming!
+atxy4o.menu.resetpinopti.reset.bootloader.defaultentrycond=_extr
 atxy4o.menu.resetpinopti.reset.bootloader.resetpinbits=10
-atxy4o.menu.resetpinopti.gpio=GPIO, Optiboot for 8 sec. after power-on & SW reset *DANGER* HV programmer req'd for reprogramming! (PCHV)
-atxy4o.menu.resetpinopti.gpio.bootloader.file=optiboot_txyz{bootloader.uartswap}.hex
+atxy4o.menu.resetpinopti.gpio=(weak) GPIO, (default optiboot for 8 sec. after all resets) *DANGER* HV programmer req'd for reprogramming! (PCHV)
+atxy4o.menu.resetpinopti.gpio.bootloader.defaultentrycond=_all8sec
 atxy4o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
+
+#----------------------------------------#
+# BOOTLOADER Entry Conditions            #
+#________________________________________#
+atxy4o.menu.entrycond.default=Default (Always enter bootloader 8 second delay - unless UPDI fused as reset, then extrf 1 second)
+atxy4o.menu.entrycond.all=Always: Every reset except a WDT reset or BOR w/out POR, 8 second timeout - easy to enter bootloader
+atxy4o.menu.entrycond.poronly= Power On Only: Only when chip is powercycled, 8 second timeout (assume manual unplug)
+atxy4o.menu.entrycond.swr=SW-only: 8 second timeout (Warning: bad app code won't run the bootloader)
+atxy4o.menu.entrycond.extr=External (reset pin): Reset pin and SW reset, 1 second timeout (assume autoreset, requires UPDI fused as reset).
+atxy4o.menu.entrycond.extronly=External reset only: 1 second timeout (assume autoreset, requires UPDI fused as reset)
+atxy4o.menu.entrycond.extr_slow=External (reset pin), slow: Reset pin and SW reset, 8 second timeout (assume manual reset, requires UPDI fused as reset)
+atxy4o.menu.entrycond.porswr=POR and SWR, but not external resets.
+atxy4o.menu.entrycond.default.bootloader.entrycond={bootloader.defaultentrycond}
+atxy4o.menu.entrycond.extr.bootloader.entrycond=_extr
+atxy4o.menu.entrycond.extronly.bootloader.entrycond=_extronly
+atxy4o.menu.entrycond.poronly.bootloader.entrycond=_poronly8sec
+atxy4o.menu.entrycond.all.bootloader.entrycond=_all8sec
+atxy4o.menu.entrycond.swr.bootloader.entrycond=_swronly8sec
+atxy4o.menu.entrycond.extr_slow.bootloader.entrycond=_extr8sec
+atxy4o.menu.entrycond.porswr.bootloader.entrycond=_porswr8sec
 
 #----------------------------------------#
 # STARTUP TIME (SUT)                     #
@@ -4091,6 +4204,7 @@ atx24o.bootloader.APPEND=0x00
 atx24o.bootloader.BOOTEND=0x02
 atx24o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atx24o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atx24o.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx24o.bootloader.tool=avrdude
 
 #----------------------------------------#
@@ -4325,20 +4439,16 @@ atx24o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atx24o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
 #----------------------------------------#
-#  UPDI and RESET PIN configuration and  #
-#       OPTIBOOT ENTRY conditions        #
+#  UPDI and RESET PIN configuration      #
 #----------------------------------------#
-atx24o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
-atx24o.menu.resetpinopti.UPDI.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
+atx24o.menu.resetpinopti.UPDI=UPDI, (default optiboot for 8 sec. after all resets)
+atx24o.menu.resetpinopti.UPDI.bootloader.defaultentrycond=_all8sec
 atx24o.menu.resetpinopti.UPDI.bootloader.resetpinbits=01
-atx24o.menu.resetpinopti.UPDIFastBoot=UPDI, Optiboot for 1 sec. after power-on & reset
-atx24o.menu.resetpinopti.UPDIFastBoot.bootloader.file=optiboot_tx2z{bootloader.uartswap}_1sec.hex
-atx24o.menu.resetpinopti.UPDIFastBoot.bootloader.resetpinbits=01
-atx24o.menu.resetpinopti.reset=Reset, Optiboot for 1 sec. after reset *DANGER* HV UPDI programmer req'd for reprogramming!
-atx24o.menu.resetpinopti.reset.bootloader.file=optiboot_tx2z{bootloader.uartswap}_rst.hex
+atx24o.menu.resetpinopti.reset=Reset, (default ptiboot for 1 sec. after ext. reset) *DANGER* HV UPDI programmer req'd for reprogramming!
+atx24o.menu.resetpinopti.reset.bootloader.defaultentrycond=_extr
 atx24o.menu.resetpinopti.reset.bootloader.resetpinbits=10
-atx24o.menu.resetpinopti.gpio=GPIO, Optiboot for 8 sec. after power-on & SW reset *DANGER* HV programmer req'd for reprogramming! (PCHV)
-atx24o.menu.resetpinopti.gpio.bootloader.file=optiboot_tx2z{bootloader.uartswap}.hex
+atx24o.menu.resetpinopti.gpio=(weak) GPIO, (default optiboot for 8 sec. after all resets) *DANGER* HV programmer req'd for reprogramming! (PCHV)
+atx24o.menu.resetpinopti.gpio.bootloader.defaultentrycond=_all8sec
 atx24o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
 
 #----------------------------------------#
@@ -4368,6 +4478,26 @@ atx24o.menu.bootloaderuart.default=TX:5 (PB2), RX:4 (PB3) (UART0 default pins)
 atx24o.menu.bootloaderuart.alternate=TX:8 (PA1), RX:9 (PA2) (UART0 alt/UART1 default pins)
 atx24o.menu.bootloaderuart.default.bootloader.uartswap=
 atx24o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
+
+#----------------------------------------#
+# BOOTLOADER Entry Conditions            #
+#________________________________________#
+atx24o.menu.entrycond.default=Default (Always enter bootloader 8 second delay - unless UPDI fused as reset, then extrf 1 second)
+atx24o.menu.entrycond.all=Always: Every reset except a WDT reset or BOR w/out POR, 8 second timeout - easy to enter bootloader
+atx24o.menu.entrycond.poronly= Power On Only: Only when chip is powercycled, 8 second timeout (assume manual unplug)
+atx24o.menu.entrycond.swr=SW-only: 8 second timeout (Warning: bad app code won't run the bootloader)
+atx24o.menu.entrycond.extr=External (reset pin): Reset pin and SW reset, 1 second timeout (assume autoreset, requires UPDI fused as reset).
+atx24o.menu.entrycond.extronly=External reset only: 1 second timeout (assume autoreset, requires UPDI fused as reset)
+atx24o.menu.entrycond.extr_slow=External (reset pin), slow: Reset pin and SW reset, 8 second timeout (assume manual reset, requires UPDI fused as reset)
+atx24o.menu.entrycond.porswr=POR and SWR, but not external resets.
+atx24o.menu.entrycond.default.bootloader.entrycond={bootloader.defaultentrycond}
+atx24o.menu.entrycond.extr.bootloader.entrycond=_extr
+atx24o.menu.entrycond.extronly.bootloader.entrycond=_extronly
+atx24o.menu.entrycond.poronly.bootloader.entrycond=_poronly8sec
+atx24o.menu.entrycond.all.bootloader.entrycond=_all8sec
+atx24o.menu.entrycond.swr.bootloader.entrycond=_swronly8sec
+atx24o.menu.entrycond.extr_slow.bootloader.entrycond=_extr8sec
+atx24o.menu.entrycond.porswr.bootloader.entrycond=_porswr8sec
 
 #----------------------------------------#
 # TWI OPTIONS                            #
@@ -4441,6 +4571,7 @@ atxy2o.bootloader.APPEND=0x00
 atxy2o.bootloader.BOOTEND=0x02
 atxy2o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 atxy2o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+atxy2o.bootloader.file=optiboot_txy2{bootloader.uartswap}{bootloader.entrycond}.hex
 atxy2o.bootloader.tool=avrdude
 
 #----------------------------------------#
@@ -4473,11 +4604,6 @@ atxy2o.menu.chip.412.build.board=AVR_ATtiny412
 atxy2o.menu.chip.412.build.attiny=412
 atxy2o.menu.chip.412.upload.maximum_size=3584
 atxy2o.menu.chip.412.upload.maximum_data_size=256
-atxy2o.menu.chip.212=ATtiny212
-atxy2o.menu.chip.212.build.board=AVR_ATtiny212
-atxy2o.menu.chip.212.build.attiny=212
-atxy2o.menu.chip.212.upload.maximum_size=1536
-atxy2o.menu.chip.212.upload.maximum_data_size=128
 atxy2o.menu.chip.402=ATtiny402
 atxy2o.menu.chip.402.build.board=AVR_ATtiny402
 atxy2o.menu.chip.402.build.attiny=402
@@ -4486,6 +4612,19 @@ atxy2o.menu.chip.402.upload.maximum_size=3584
 atxy2o.menu.chip.402.upload.maximum_data_size=256
 atxy2o.menu.chip.402.TCD0CFG_avrdude=
 atxy2o.menu.chip.402.TCD0CFG_serialupdi=
+atxy2o.menu.chip.212=ATtiny212
+atxy2o.menu.chip.212.build.board=AVR_ATtiny212
+atxy2o.menu.chip.212.build.attiny=212
+atxy2o.menu.chip.212.upload.maximum_size=1536
+atxy2o.menu.chip.212.upload.maximum_data_size=128
+atxy2o.menu.chip.202=ATtiny202
+atxy2o.menu.chip.202.build.board=AVR_ATtiny202
+atxy2o.menu.chip.202.build.attiny=202
+atxy2o.menu.chip.202.build.millistimer=A0
+atxy2o.menu.chip.202.upload.maximum_size=1536
+atxy2o.menu.chip.202.upload.maximum_data_size=128
+atxy2o.menu.chip.202.TCD0CFG_avrdude=
+atxy2o.menu.chip.202.TCD0CFG_serialupdi=
 atxy2o.menu.chip.402w=ATtiny402 (bad signature)
 atxy2o.menu.chip.402w.build.attiny=402
 atxy2o.menu.chip.402w.build.board=AVR_ATtiny402
@@ -4495,14 +4634,6 @@ atxy2o.menu.chip.402w.upload.maximum_data_size=256
 atxy2o.menu.chip.402w.TCD0CFG_avrdude=
 atxy2o.menu.chip.402w.TCD0CFG_serialupdi=
 atxy2o.menu.chip.402w.upload.workaround=w
-atxy2o.menu.chip.202=ATtiny202
-atxy2o.menu.chip.202.build.board=AVR_ATtiny202
-atxy2o.menu.chip.202.build.attiny=202
-atxy2o.menu.chip.202.build.millistimer=A0
-atxy2o.menu.chip.202.upload.maximum_size=1536
-atxy2o.menu.chip.202.upload.maximum_data_size=128
-atxy2o.menu.chip.202.TCD0CFG_avrdude=
-atxy2o.menu.chip.202.TCD0CFG_serialupdi=
 
 #----------------------------------------#
 # CLOCK SOURCE                           #
@@ -4694,21 +4825,37 @@ atxy2o.menu.bootloaderuart.default.bootloader.uartswap=2
 atxy2o.menu.bootloaderuart.alternate.bootloader.uartswap=z_alt
 
 #----------------------------------------#
-#  UPDI and RESET PIN configuration and  #
-#       OPTIBOOT ENTRY conditions        #
+#  UPDI and RESET PIN configuration      #
 #----------------------------------------#
-atxy2o.menu.resetpinopti.UPDI=UPDI, Optiboot for 8 sec. after power-on & reset
-atxy2o.menu.resetpinopti.UPDI.bootloader.file=optiboot_txy{bootloader.uartswap}.hex
+atxy2o.menu.resetpinopti.UPDI=UPDI, (default optiboot for 8 sec. after all resets)
+atxy2o.menu.resetpinopti.UPDI.bootloader.defaultentrycond=_all8sec
 atxy2o.menu.resetpinopti.UPDI.bootloader.resetpinbits=01
-atxy2o.menu.resetpinopti.UPDIFastBoot=UPDI, Optiboot for 1 sec. after power-on & reset
-atxy2o.menu.resetpinopti.UPDIFastBoot.bootloader.file=optiboot_txy{bootloader.uartswap}_1sec.hex
-atxy2o.menu.resetpinopti.UPDIFastBoot.bootloader.resetpinbits=01
-atxy2o.menu.resetpinopti.reset=Reset, Optiboot for 1 sec. after reset *DANGER* HV UPDI programmer req'd for reprogramming!
-atxy2o.menu.resetpinopti.reset.bootloader.file=optiboot_txy{bootloader.uartswap}_rst.hex
+atxy2o.menu.resetpinopti.reset=Reset, (default ptiboot for 1 sec. after ext. reset) *DANGER* HV UPDI programmer req'd for reprogramming!
+atxy2o.menu.resetpinopti.reset.bootloader.defaultentrycond=_extr
 atxy2o.menu.resetpinopti.reset.bootloader.resetpinbits=10
-atxy2o.menu.resetpinopti.gpio=GPIO, Optiboot for 8 sec. after power-on & SW reset *DANGER* HV programmer req'd for reprogramming! (PCHV)
-atxy2o.menu.resetpinopti.gpio.bootloader.file=optiboot_txy{bootloader.uartswap}.hex
+atxy2o.menu.resetpinopti.gpio=(weak) GPIO, (default optiboot for 8 sec. after all resets) *DANGER* HV programmer req'd for reprogramming! (PCHV)
+atxy2o.menu.resetpinopti.gpio.bootloader.defaultentrycond=_all8sec
 atxy2o.menu.resetpinopti.gpio.bootloader.resetpinbits=00
+
+#----------------------------------------#
+# BOOTLOADER Entry Conditions            #
+#________________________________________#
+atxy2o.menu.entrycond.default=Default (Always enter bootloader 8 second delay - unless UPDI fused as reset, then extrf 1 second)
+atxy2o.menu.entrycond.all=Always: Every reset except a WDT reset or BOR w/out POR, 8 second timeout - easy to enter bootloader
+atxy2o.menu.entrycond.poronly= Power On Only: Only when chip is powercycled, 8 second timeout (assume manual unplug)
+atxy2o.menu.entrycond.swr=SW-only: 8 second timeout (Warning: bad app code won't run the bootloader)
+atxy2o.menu.entrycond.extr=External (reset pin): Reset pin and SW reset, 1 second timeout (assume autoreset, requires UPDI fused as reset).
+atxy2o.menu.entrycond.extronly=External reset only: 1 second timeout (assume autoreset, requires UPDI fused as reset)
+atxy2o.menu.entrycond.extr_slow=External (reset pin), slow: Reset pin and SW reset, 8 second timeout (assume manual reset, requires UPDI fused as reset)
+atxy2o.menu.entrycond.porswr=POR and SWR, but not external resets.
+atxy2o.menu.entrycond.default.bootloader.entrycond={bootloader.defaultentrycond}
+atxy2o.menu.entrycond.extr.bootloader.entrycond=_extr
+atxy2o.menu.entrycond.extronly.bootloader.entrycond=_extronly
+atxy2o.menu.entrycond.poronly.bootloader.entrycond=_poronly8sec
+atxy2o.menu.entrycond.all.bootloader.entrycond=_all8sec
+atxy2o.menu.entrycond.swr.bootloader.entrycond=_swronly8sec
+atxy2o.menu.entrycond.extr_slow.bootloader.entrycond=_extr8sec
+atxy2o.menu.entrycond.porswr.bootloader.entrycond=_porswr8sec
 
 #----------------------------------------#
 # STARTUP TIME (SUT)                     #
@@ -4788,6 +4935,7 @@ microchipo.build.attachmode=-DCORE_ATTACH_ALL
 microchipo.build.export_merged_output=false
 microchipo.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 microchipo.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
+microchipo.bootloader.file={bootloader.basefilename}{bootloader.entrycond}.hex
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
@@ -4828,7 +4976,7 @@ microchipo.upload.speed=115200
 microchipo.menu.board_name.cn3217=Curiosity Nano ATtiny3217
 microchipo.menu.board_name.cn3217.build.board=AVR_CuriosityNano3217
 microchipo.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
-microchipo.menu.board_name.cn3217.bootloader.file=optiboot_curiosity3217.hex
+microchipo.menu.board_name.cn3217.bootloader.basefilename=optiboot_curiosity3217
 microchipo.menu.board_name.cn3217.build.attiny=3217
 microchipo.menu.board_name.cn3217.build.variant=txy7
 microchipo.menu.board_name.cn3217.build.millistimer=D0
@@ -4838,10 +4986,11 @@ microchipo.menu.board_name.cn3217.upload.maximum_data_size=2048
 microchipo.menu.board_name.cn1627=Curiosity Nano ATtiny1627
 microchipo.menu.board_name.cn1627.build.board=AVR_CuriosityNano1627
 microchipo.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
-microchipo.menu.board_name.cn1627.bootloader.file=optiboot_curiosity1627.hex
+microchipo.menu.board_name.cn1627.bootloader.basefilename=optiboot_curiosity1627
 microchipo.menu.board_name.cn1627.build.millistimer=B1
 microchipo.menu.board_name.cn1627.build.attiny=1627
 microchipo.menu.board_name.cn1627.build.variant=txy7
+microchipo.menu.board_name.cn1627.bootloader.altreset=11
 microchipo.menu.board_name.cn1627.upload.maximum_size=15872
 microchipo.menu.board_name.cn1627.upload.maximum_data_size=2048
 microchipo.menu.board_name.cn1627.bootloader.SYSCFG0=0b1111{bootloader.resetpinbits}10
@@ -4851,7 +5000,7 @@ microchipo.menu.board_name.cn1627.bootloader.TCD0CFG_serialupdi=
 microchipo.menu.board_name.cn1607=Curiosity Nano ATtiny1607
 microchipo.menu.board_name.cn1607.build.board=AVR_CuriosityNano1607
 microchipo.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
-microchipo.menu.board_name.cn1607.bootloader.file=optiboot_curiosity1607.hex
+microchipo.menu.board_name.cn1607.bootloader.basefilename=optiboot_curiosity1607
 microchipo.menu.board_name.cn1607.build.attiny=1607
 microchipo.menu.board_name.cn1607.build.variant=txy7
 microchipo.menu.board_name.cn1607.build.millistimer=A0
@@ -4863,7 +5012,7 @@ microchipo.menu.board_name.cn1607.bootloader.TCD0CFG_serialupdi=
 microchipo.menu.board_name.xp3217=Xplained Pro ATtiny3217
 microchipo.menu.board_name.xp3217.build.board=AVR_XplainedPro3217
 microchipo.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
-microchipo.menu.board_name.xp3217.bootloader.file=optiboot_xplainedpro3217.hex
+microchipo.menu.board_name.xp3217.bootloader.basefilename=optiboot_xplainedpro3217
 microchipo.menu.board_name.xp3217.build.attiny=3217
 microchipo.menu.board_name.xp3217.build.variant=txy7
 microchipo.menu.board_name.xp3217.build.millistimer=D0
@@ -4873,7 +5022,7 @@ microchipo.menu.board_name.xp3217.upload.maximum_data_size=2048
 microchipo.menu.board_name.xp817=Xplained Pro ATtiny817
 microchipo.menu.board_name.xp817.build.board=AVR_XplainedPro817
 microchipo.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
-microchipo.menu.board_name.xp817.bootloader.file=optiboot_xplainedpro817.hex
+microchipo.menu.board_name.xp817.bootloader.basefilename=optiboot_xplainedpro817
 microchipo.menu.board_name.xp817.build.attiny=817
 microchipo.menu.board_name.xp817.build.variant=txy7
 microchipo.menu.board_name.xp817.build.millistimer=D0
@@ -4884,7 +5033,7 @@ microchipo.menu.board_name.xp817.upload.maximum_data_size=512
 microchipo.menu.board_name.xm817=Xplained Mini ATtiny817
 microchipo.menu.board_name.xm817.build.board=AVR_XplainedMini817
 microchipo.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5 {build.tuned}
-microchipo.menu.board_name.xm817.bootloader.file=optiboot_xplainedmini817.hex
+microchipo.menu.board_name.xm817.bootloader.basefilename=optiboot_xplainedmini817
 microchipo.menu.board_name.xm817.build.attiny=817
 microchipo.menu.board_name.xm817.build.variant=txy7
 microchipo.menu.board_name.xm817.build.millistimer=D0
@@ -4895,7 +5044,7 @@ microchipo.menu.board_name.xm817.upload.maximum_data_size=512
 microchipo.menu.board_name.xn416=Xplained Nano ATtiny416
 microchipo.menu.board_name.xn416.build.board=AVR_XplainedNano416
 microchipo.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP {build.tuned}
-microchipo.menu.board_name.xn416.bootloader.file=optiboot_xplainednano416.hex
+microchipo.menu.board_name.xn416.bootloader.basefilename=optiboot_xplainednano416
 microchipo.menu.board_name.xn416.build.attiny=416
 microchipo.menu.board_name.xn416.build.variant=txy6
 microchipo.menu.board_name.xn416.build.millistimer=D0
@@ -4925,8 +5074,8 @@ microchipo.menu.clocko.4internaltuned=4 MHz internal - tuned
 microchipo.menu.clocko.1internaltuned=1 MHz internal - tuned
 microchipo.menu.clocko.24internaltuned=24 MHz internal - tuned, overclocked
 microchipo.menu.clocko.25internaltuned=25 MHz internal - tuned, overclocked
-microchipo.menu.clocko.30internaltuned=30 MHz internal - tuned, overclocked, may be unstable, req. 20 MHz fuse
-microchipo.menu.clocko.32internaltuned=32 MHz internal - tuned, 2-series, overclocked, may be unstable, req. 20 MHz fuse
+microchipo.menu.clocko.30internaltuned=30 MHz internal - tuned, very overclocked, may be unstable, req. 20 MHz fuse
+microchipo.menu.clocko.32internaltuned=32 MHz internal - tuned, c1627 only, very overclocked, may be unstable, req. 20 MHz fuse
 microchipo.menu.clocko.20internal.build.speed=20
 microchipo.menu.clocko.20internal.build.clocksource=0
 microchipo.menu.clocko.16internal.build.speed=16
@@ -5016,14 +5165,35 @@ microchipo.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 microchipo.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
 #----------------------------------------#
-#  UPDI and RESET PIN configuration and  #
-#       OPTIBOOT ENTRY conditions        #
+#  UPDI and RESET PIN configuration      #
 #----------------------------------------#
 microchipo.menu.resetpin.UPDI=UPDI (no reset pin)
 microchipo.menu.resetpin.UPDI.bootloader.resetpinbits=01
-microchipo.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (2-series only)
+microchipo.menu.resetpin.UPDI.bootloader.defaultentrycond=_all8sec
+microchipo.menu.resetpin.UPDIaltrst=UPDI w/reset on PB4 (Curiosity 1627 only)
 microchipo.menu.resetpin.UPDIaltrst.bootloader.resetpinbits={bootloader.altreset}
+microchipo.menu.resetpin.UPDIaltrst.bootloader.defaultentrycond=_extr
 # the microchip debuggers are not 12v tolerant so nothing that would need hv programming to reset is supported. And if you cut the straps to debugger, you shouldn't be using this board definition.
+
+#----------------------------------------#
+# BOOTLOADER Entry Conditions            #
+#________________________________________#
+microchipo.menu.entrycond.default=Default (external if reset is enabled on PB5 (Curiosity1627 only), otherwise always, 8 sec)
+microchipo.menu.entrycond.all=Always: Every reset except a WDT reset or BOR w/out POR, 8 second timeout - easy to enter bootloader
+microchipo.menu.entrycond.poronly= Power On Only: Only when chip is powercycled, 8 second timeout (assume manual unplug)
+microchipo.menu.entrycond.swr=SW-only: 8 second timeout (Warning: bad app code won't run the bootloader)
+microchipo.menu.entrycond.extr=External (reset pin): Reset pin and SW reset, 1 second timeout (Curiosity1627 only).
+microchipo.menu.entrycond.extronly=External reset only: 1 second timeout (Curiosity1627 only).
+microchipo.menu.entrycond.extr_slow=External (reset pin), slow: Reset pin and SW reset, 8 second timeout (Curiosity1627 only).
+microchipo.menu.entrycond.porswr=POR and SWR, but not external resets.
+microchipo.menu.entrycond.default.bootloader.entrycond={bootloader.defaultentrycond}
+microchipo.menu.entrycond.extr.bootloader.entrycond=_extr
+microchipo.menu.entrycond.extronly.bootloader.entrycond=_extronly
+microchipo.menu.entrycond.poronly.bootloader.entrycond=_poronly8sec
+microchipo.menu.entrycond.all.bootloader.entrycond=_all8sec
+microchipo.menu.entrycond.swr.bootloader.entrycond=_swronly8sec
+microchipo.menu.entrycond.extr_slow.bootloader.entrycond=_extr8sec
+microchipo.menu.entrycond.porswr.bootloader.entrycond=_porswr8sec
 
 #----------------------------------------#
 # STARTUP TIME (SUT)                     #

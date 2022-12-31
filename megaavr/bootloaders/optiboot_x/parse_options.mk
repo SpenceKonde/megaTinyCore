@@ -1,4 +1,4 @@
-# Make command-line Options for Optiboot, Optiboot-Mega0
+ # Make command-line Options for Optiboot, Optiboot-Mega0
 # Permit commands like "make atmega4809 LED_START_FLASHES=10" to pass the
 # appropriate parameters ("-DLED_START_FLASHES=10") to gcc
 #
@@ -56,8 +56,8 @@ LED_CMD = -DLED=$(LED)
 dummy = FORCE
 endif
 
-ifdef START_APP_ON_POR
-POR_CMD = -DSTART_APP_ON_POR
+ifdef ENTRYCOND_REQUIRE
+ENTRYCOND_CMD = -DENTRYCOND_REQUIRE=$(ENTRYCOND_REQUIRE)
 dummy = FORCE
 endif
 
