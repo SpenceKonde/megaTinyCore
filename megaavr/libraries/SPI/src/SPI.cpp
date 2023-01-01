@@ -69,7 +69,11 @@ bool SPIClass::pins(__attribute__((unused))uint8_t pinMOSI, __attribute__((unuse
       _uc_mux = 0;
       return true;
     } else {
-      _uc_mux = 0;
+      #if (SPI_MUX == NOT_A_MUX)
+        _uc_mux = 4;
+      #else
+        _uc_mux = 0;
+      #endif
       return false;
     }
   #endif
