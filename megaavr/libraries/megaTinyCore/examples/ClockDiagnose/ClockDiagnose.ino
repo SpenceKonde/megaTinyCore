@@ -1,6 +1,6 @@
 #ifndef MEGATINYCORE
 #error "This sketch ONLY supports megaTinyCore and the modern tinyAVR line");
-
+#endif
 #define FALLBACK20 (19200 * ((1.0 * F_CPU) / 3333333.0))
 #define FALLBACK16 (19200 * ((1.0 * F_CPU) / 2666666.7))
 

@@ -131,26 +131,27 @@ expected directory.
 
 
 ## Programming Chips Using the `_isp` Targets
-This does not work on modern AVRs, and there are no plans to change this.
+This does not work on modern AVRs, and there are no plans to change this. It *could* be changed, but it was never enough of a hassle to just manually bootload the parts to make that unwieldy - the bootloader is, let's face it, pretty bloody simple, since just about everything but the bare essentials has been ripped out.
 
 ## Standard Targets
-Being designed for megaTinyCore - there are 6 combinations of entry condition and timeout duration. There are additionally seven base configurations: txyz/txyzalt - tiny 0/1 on default or alt pins, txy2/txy2alt (8-pin 0/1-series), and tx2z/tx2zalt, tx2zu1alt
-parameter, while parenthesis indicates a mandatory one - one of the options must be used. This gives 42 combinations for the generic bootloaders.
-* `txyz[alt]_(one of: all_8sec, poronly_8sec, swronly_8sec (*), extronly (**), extr_8sec (**), extr (**))`
+Being designed for megaTinyCore - there are 7 combinations of entry condition and timeout duration. There are additionally seven base configurations: txyz/txyzalt - tiny 0/1 on default or alt pins, txy2/txy2alt (8-pin 0/1-series), and tx2z/tx2zalt, tx2zu1alt
+parameter, while parenthesis indicates a mandatory one - one of the options must be used. This gives 49 combinations for the generic bootloaders.
+* **14+ pin tinyAVR 0/1:** `txyz[alt]_(one of: all_8sec, poronly_8sec, swronly_8sec (*), extronly (**), extr_8sec (**), extr (**))`
   * Supports all 14-24 pin 0 and 1-series parts, with the LED pin set to PA7
   * `*` swronly_8sec relies on the software issuing a software reset.
   * `**` extr versions enter the bootloader when an external reset is received. However, the external reset signal only can be benerated if there is a reset pin. But the pin that's nominally reset can be fused as either UPDI (the usual) or GPIO. Unless it is fused as reset, there can be no external reset signal, and hence these bootloader entry options should NOT be used. If the UPDI pin is programmed to act as reset, then be aware that you must use a tinyAVR compatible HV programmer to reprogram via UPDI.
-* `txy2[alt]_(one of: all_8sec, poronly_8sec, swronly_8sec (*), extronly (**), extr_8sec (**), extr (**))`
+* **8-pin tinyAVR 0/1:**`txy2[alt]_(one of: all_8sec, poronly_8sec, swronly_8sec (*), extronly (**), extr_8sec (**), extr (**))`
   * Supports all 8 pin 0 and 1-series parts, with the LED pin set to PA3
   * All other caveats as above.
-  * Technically txyzalt and txy2alt are interchangible except for the different LED pin. The same is not true of txyz and txyz2
-* `tx2z[alt or u1alt]_(one of: all_8sec, poronly_8sec, swronly_8sec (*), extronly (**), extr_8sec (**), extr (**))`
+  * Technically `txyz_alt` and `txy2_alt` are interchangible except for the different LED pin. The same is not true of txyz and txyz2
+* **tinyAVR 2-series**`tx2z[alt or u1alt]_(one of: all_8sec, poronly_8sec, swronly_8sec (*), extronly (**), extr_8sec (**), extr (**))`
   * Supports all 2-series parts.
   * `*` as above.
   * `**` as above on 14-pin parts.
   * `**` On 20 and 24 pin parts, PB5 can be used as an alternate reset pin, making these entry modes far more useful. megaTinyCore defaults the alternate reset fuse setting for parts that have it, and our breakout boards provide a way to connect autoreset to this pin.
+  * `alt` indicates a build for use with the
 * For the Microchip boards
-  * These differ in the location of the LED pin, and the serial pins are fixed as the ones connected to debugger serial. There are 6 of these that can have 3 possible options, and 1 than can have 6 for 24 binaries
+  * These differ in the location of the LED pin, and the serial pins are fixed as the ones connected to debugger serial. There are 6 of these that can have 4 possible options, and 1 than can have 7 for 31 binaries
   * `curiosity3217 (one of: _all_8sec, _poronly_8sec, _swronly_8sec (*))`
   * `curiosity1607 (one of: _all_8sec, _poronly_8sec, _swronly_8sec (*))`
   * `curiosity1627 (one of: _all_8sec, _poronly_8sec, _swronly_8sec (*), extronly (**), extr_8sec (**), extr (**))`
@@ -159,7 +160,12 @@ parameter, while parenthesis indicates a mandatory one - one of the options must
   * `xplainedmini817 (one of: _all_8sec, _poronly_8sec, _swronly_8sec (*))`
   * `xplained416 (one of: _all_8sec, _poronly_8sec, _swronly_8sec (*))`
   * `**` external reset entry conditions only provided where the part can have an alternate reset (ie, on the curiosity 1627), because the debugger on these boards cannot generate the HV pulse to override a reprogrammed GPIO and would be harmed if an external HV programmer were used (and if if you've cut the strapping pins, you don't have one of these boards anymore and should use the generic )
-* There are hence a total of 66 binaries
+* There are hence a total of 80 binaries
+
+### The megaAVR 0-series is also supported by this codebase
+Running make_all_mega0.bat in a suitable build environment will build all 42 binaries - 7 entry condition/timeout combinations times 2 (default or alt pins) times 3 USARTs = 42.
+
+### All binaries are either 470 or 472 bytes in size, leaving 20 words free. There is at least one pathological pushpop.
 
 ## There are six entry condition options available
 These control when Optiboot will "run" and how long it will wait for a new sketch when it does. Note that a WDT reset will *never* run the bootloader (we use a WDT reset to exit the bootloader, and we can't tell whether that was our own WDT reset or something else's), nor will a BOD reset not accompanied by something else ("weak or malfunctioning power supply" is something other than the ideal time to try to upload new firmware)
@@ -192,7 +198,7 @@ DxCore ships with 315 binaries to support the same entry conditions. The reason 
   * That doesnt count the additional 288 micronucleus bootloaders - 144 normal and 144 update binaries, which support just 8 parts!
 
 ## Used and unused working registers
-The register pressure in Optiboot_x is markedly lower than the already low register pressure in optiboot_dx - less than half of the working registers are in use, though most of the unused registers are less useful lower registers. An upper register would allow you to save 1 word for every time you'd otherwise need to load a value into a register with LDI after the first (unless that register must be used because of the ABI), whereas a lower register can only start saving flash from every time you can replace an LDI with a register holding a constant value after the *second* occurance (because you need to ldi -> mov it, and that - that is assuming you don't need to use immediate values on itS)
+The register pressure in Optiboot_x is markedly lower than the already low register pressure in optiboot_dx - less than half of the working registers are in use, though most of the unused registers are less useful lower registers. An upper register would allow you to save 1 word for every time you'd otherwise need to load a value into a register with LDI after the first (unless that register must be used because of the ABI), whereas a lower register can only start saving flash from every time you can replace an LDI with a register holding a constant value after the *second* occurance (because you need to ldi -> mov it, and that - that is assuming you don't need to use immediate values on it).
 ```
   r0 - UNUSED
   r1
@@ -218,7 +224,7 @@ The register pressure in Optiboot_x is markedly lower than the already low regis
  ```
 
 ## Sorted assembly listing
-As with Optiboot_dx, this is a highly atypical instruction distribution.
+As with Optiboot_dx, this is a highly atypical instruction distribution. Because these devices have more slack in the flash, less attention was paid to the annotations compared to the DX-series
 ```text
    0: 01 c0         rjmp  .+2             ; 0x4 <main>
    c: 05 c0         rjmp  .+10            ; 0x18 <main+0x14>
@@ -301,13 +307,13 @@ As with Optiboot_dx, this is a highly atypical instruction distribution.
   6e: 87 e0         ldi   r24,    0x07    ; 7
   98: 80 e1         ldi   r24,    0x10    ; 16
   9e: 83 e7         ldi   r24,    0x73    ; 115
- 1c2: 8d e9         ldi   r24,    0x9D    ; 157
+ 1c2: 8d e9         ldi   r24,    0x9D    ; 157 <__PROTECTED_WRITE_SPM
   2c: 80 e0         ldi   r24,    0x00    ; 0
   46: 8c e5         ldi   r24,    0x5C    ; 92
   48: 90 e0         ldi   r25,    0x00    ; 0
- 196: 98 ed         ldi   r25,    0xD8    ; 216
+ 196: 98 ed         ldi   r25,    0xD8    ; 216 <__PROTECTED_WRITE
   a0: 90 e0         ldi   r25,    0x00    ; 0
-   e: 98 ed         ldi   r25,    0xD8    ; 216
+   e: 98 ed         ldi   r25,    0xD8    ; 216 <__PROTECTED_WRITE
   7a: d8 2e         mov   r13,    r24
  128: f8 2e         mov   r15,    r24
   84: 18 2f         mov   r17,    r24
