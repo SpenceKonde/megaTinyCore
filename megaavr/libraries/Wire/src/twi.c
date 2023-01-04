@@ -515,7 +515,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
   // Since the Y register is not call-clobbered, it can be considered persistent in this function and has not to
   // be restored after the icall to the user callbacks, unlike Z (which is used for _module and icall).
 
-  __asm__ __volatile__("\n\t": "=&y" (_data) : "0" (_data));  // force _data into Y and instruct to not change Y
+  FORCE_LOAD_POINTER_IN_Y(_data,_data);  // force _data into Y and instruct to not change Y
 
   uint8_t *address,  *txBuffer, *rxBuffer;
   twi_buffer_index_t *txHead, *txTail,  *rxHead, *rxTail;

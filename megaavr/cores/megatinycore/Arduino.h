@@ -564,6 +564,34 @@ Not enabled. Ugly ways to get delays at very small flash cost.
 #define        _CLRLOW(a) __asm__ __volatile__ ("eor %0A, %0A"  "\n\t" :"+r"((uint16_t)(a)))
 /* As above, except for low byte */
 
+
+/* GCC fails to optimize memory accesses on AVR.
+ * When accessing memory, GCC is using STS/LDS, using 2 words per instruction and 2/3 clocks respectively.
+ * In some cases, the programmer knows in advance that the function will access multiple peripheral registers or a bigger struct. (<= +63)
+ * To convince GCC that loading the pointer in advance will be more efficient, this defines are provided. The inline assembly forces GCC
+ * To use the instruction STD/LDD that are just one word big and need only 1/2 clocks respectively, allowing for smaller code and faster execution.
+ * It should be considered, that the address has to be loaded into the register first, thus adding 2 words and 2 clocks overhead. Not to mention the compiler
+ * might use the register for something else already. As GCC simulates Displacement on X with adiw/sbiw, it is not recommended to use "E" or "X" for
+ * optimizations. They were added for completion.
+ *
+ * How to use:
+ * declare local pointer variable with the same type as the original pointer, e.g. ADC_t* pADC;
+ * use one of the defines below. e.g. FORCE_LOAD_POINTER_IN_B(pADC, &ADC0)
+ * and voila! all memory accesses to ADC0 are, e.g. Y+xx or Z+xx
+ * it is also possible to use a function argument as __localVar__ and __pointer__ (see twi.c slave ISR)
+ *
+ * How do the instructions work?
+ * '=' is a modifier, that signals the compiler that whatever was in the register beforehand will be overwritten. The compiler should save the value, if it will be needed afterwards
+ * '&' is a modifier, that makes the compiler add a prequel to the assembly where the value (the one in brackets) is loaded in the specified register
+ * 'z' is a constraint that tells the compiler what register to load a value into, in this case, the Z register.
+ * '0' is a matching constraint. It tells the compiler that this input constraint is the same thing as the (number-) matching output operand. basically saying __localVar__ = __pointer__;
+ */
+#define FORCE_LOAD_POINTER_IN_Z(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&z" (__localVar__) : "0" (__pointer__));  // r30:r31
+#define FORCE_LOAD_POINTER_IN_Y(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&y" (__localVar__) : "0" (__pointer__));  // r28:r29
+#define FORCE_LOAD_POINTER_IN_X(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&x" (__localVar__) : "0" (__pointer__));  // r26:r27
+#define FORCE_LOAD_POINTER_IN_B(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&b" (__localVar__) : "0" (__pointer__));  // Y or Z
+#define FORCE_LOAD_POINTER_IN_E(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&e" (__localVar__) : "0" (__pointer__));  // X,Y or Z
+
 //
 uint16_t clockCyclesPerMicrosecond();
 uint32_t clockCyclesToMicroseconds(uint32_t cycles);
