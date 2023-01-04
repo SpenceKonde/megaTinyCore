@@ -1138,7 +1138,7 @@ void analogWrite(uint8_t pin, int val) {
     case DACOUT:
     {
       DAC0.DATA = val;
-      DAC0.CTRLA = 0x41; // OUTEN=1, ENABLE=1
+      DAC0.CTRLA |= 0x41; // OUTEN=1, ENABLE=1, and *don't* trash the RUNSTBY setting.
       break;
     }
   #endif
@@ -1190,10 +1190,10 @@ void analogWrite(uint8_t pin, int val) {
           while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until we can re-enable it
           TCD0.CTRLA |= TCD_ENABLE_bm; // re-enable it
         } else {
-          TCD0.CTRLE = TCD_SYNCEOC_bm; // Synchronize
+          TCD0.CTRLE = TCD_SYNCEOC_bm; // Synchronize at the end of the current cycle
         }
 
-        #if defined(NO_GLITCH_TIMERD0)
+        #if defined(NO_GLITCH_TIMERD0) // This mode is always used with the stock variant.
           // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts)
           // so if we're here, we're acting on either PC0 or PC1. And NO_GLITCH mode is enabled
           if (set_inven == 0) {
