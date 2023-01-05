@@ -5,12 +5,12 @@
 
 #include <tinyNeoPixel_Static.h>
 
-#define BUTTON_PIN   2    // Digital IO pin connected to the button.  This will be
+#define BUTTON_PIN   PIN_PA2    // Digital IO pin connected to the button.  This will be
 // driven with a pull-up resistor so the switch should
 // pull the pin to ground momentarily.  On a high -> low
 // transition the button press logic will execute.
 
-#define PIXEL_PIN    PIN_PA3    // Digital IO pin connected to the NeoPixels
+#define PIXEL_PIN    PIN_PA1    // Digital IO pin connected to the NeoPixels
 
 #define PIXEL_COUNT 16
 
