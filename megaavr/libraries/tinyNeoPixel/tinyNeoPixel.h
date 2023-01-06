@@ -24,7 +24,7 @@
 #include <Arduino.h>
 
 #if (__AVR_ARCH__ < 100)
-  #error "This version of the library only supports AVRxt parts (tinyAVR 0/1/2-series, megaAVR 0-series and the AVR DA/DB/DD parts. For tinyNeoPixel, for classic AVR, get from ATTinyCore package"
+  #error "This version of the library only supports AVRxt parts (tinyAVR 0/1/2-series, megaAVR 0-series and the AVR DA/DB/DD parts. For tinyNeoPixel for classic AVR, get from ATTinyCore package"
 #endif
 
 // The order of primary colors in the NeoPixel data stream can vary
@@ -50,11 +50,11 @@
 // 0bWWRRGGBB for RGBW devices
 // 0bRRRRGGBB for RGB
 
-// RGB NeoPixel permutations; white and red offsets are always same
+// RGB NeoPixel permutations:
 // Offset:         W          R          G          B
 #define NEO_RGB  ((0 << 6) | (0 << 4) | (1 << 2) | (2))
 #define NEO_RBG  ((0 << 6) | (0 << 4) | (2 << 2) | (1))
-#define NEO_GRB  ((1 << 6) | (1 << 4) | (0 << 2) | (2))
+#define NEO_GRB  ((1 << 6) | (1 << 4) | (0 << 2) | (2)) // GRB is very common
 #define NEO_GBR  ((2 << 6) | (2 << 4) | (0 << 2) | (1))
 #define NEO_BRG  ((1 << 6) | (1 << 4) | (2 << 2) | (0))
 #define NEO_BGR  ((2 << 6) | (2 << 4) | (1 << 2) | (0))

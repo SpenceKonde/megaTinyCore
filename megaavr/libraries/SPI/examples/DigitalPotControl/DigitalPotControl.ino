@@ -29,8 +29,8 @@
 // inslude the SPI library:
 #include <SPI.h>
 
-// Set PIN_PA3 as the slave select for the digital pot; any pin can be used, but we want it to compile even on 8-pin devices as it is used in automated testing.
-const int slaveSelectPin = PIN_PA4;
+// Set PIN_PA7 as the slave select for the digital pot; any pin can be used, but we want it to compile even on 8-pin devices as it is used in automated testing.
+const int slaveSelectPin = PIN_PA7;
 
 void setup() {
   // set the slaveSelectPin as an output:
