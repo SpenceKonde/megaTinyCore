@@ -1411,11 +1411,13 @@ void __attribute__((weak)) init_millis()
     #elif defined(MILLIS_USE_TIMERA1)
       TCA1.SPLIT.INTCTRL |= TCA_SPLIT_HUNF_bm;
     #elif defined(MILLIS_USE_TIMERD0)
-      TCD0.CMPBCLR        = TIME_TRACKING_TIMER_PERIOD; // essentially, this is TOP
-      TCD0.CTRLB          = 0x00; // oneramp mode
-      TCD0.CTRLC          = 0x80;
-      TCD0.INTCTRL        = 0x01; // enable interrupt
-      TCD0.CTRLA          = TIMERD0_PRESCALER | 0x01; // set clock source and enable!
+      TCD_t* pTCD;
+      FORCE_LOAD_POINTER_IN_B(pTCD, &TCD0);
+      pTCD->CMPBCLR        = TIME_TRACKING_TIMER_PERIOD; // essentially, this is TOP
+      pTCD->CTRLB          = 0x00; // oneramp mode
+      pTCD->CTRLC          = 0x80;
+      pTCD->INTCTRL        = 0x01; // enable interrupt
+      pTCD->CTRLA          = TIMERD0_PRESCALER | 0x01; // set clock source and enable!
     #elif defined(MILLIS_USE_TIMERRTC)
       while(RTC.STATUS); // if RTC is currently busy, spin until it's not.
       // to do: add support for RTC timer initialization
@@ -1633,6 +1635,8 @@ void __attribute__((weak)) init_clock() {
 
 /********************************* ADC ****************************************/
 void __attribute__((weak)) init_ADC0() {
+  ADC_t* pADC;
+  FORCE_LOAD_POINTER_IN_B(pADC, &ADC0);
   #if MEGATINYCORE_SERIES < 2
   /* ADC clock 1 MHz to 1.25 MHz at frequencies supported by megaTinyCore
    * Unlike the classic AVRs, which demand 50~200 kHz, for these, the datasheet
@@ -1651,54 +1655,54 @@ void __attribute__((weak)) init_ADC0() {
    **************************************************************************/
     //                              30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz.
     #if   F_CPU   > 24000000     // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
-      ADC0.CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      pADC->CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >= 12000000    // 16 MHz / 16 = 1.0 MHz,  20 MHz / 16 = 1.25 MHz
-      ADC0.CTRLC  = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      pADC->CTRLC  = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >=  6000000    //  8 MHz /  8 = 1.0 MHz,  10 MHz /  8 = 1.25 MHz
-      ADC0.CTRLC  =  ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      pADC->CTRLC  =  ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >=  3000000    //  4 MHz /  4 = 1.0 MHz,   5 MHz /  4 = 1.25 MHz
-      ADC0.CTRLC  =  ADC_PRESC_DIV4_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      pADC->CTRLC  =  ADC_PRESC_DIV4_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #else                       //  1 MHz /  2 = 500 kHz - the lowest setting
-      ADC0.CTRLC  =  ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      pADC->CTRLC  =  ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #endif
     #if   (F_CPU == 6000000 || F_CPU == 12000000 || F_CPU == 24000000 || F_CPU ==25000000)
-      ADC0.SAMPCTRL = (7); // 9 ADC clocks, 12 us
+      pADC->SAMPCTRL = (7); // 9 ADC clocks, 12 us
     #elif (F_CPU == 5000000 || F_CPU == 10000000 || F_CPU == 20000000)
-      ADC0.SAMPCTRL = (13);   // 15 ADC clock,s 12 us
+      pADC->SAMPCTRL = (13);   // 15 ADC clock,s 12 us
     #else
-      ADC0.SAMPCTRL = (10); // 12 ADC clocks, 12 us
+      pADC->SAMPCTRL = (10); // 12 ADC clocks, 12 us
     #endif
-    ADC0.CTRLD    = ADC_INITDLY_DLY16_gc;
-    ADC0.CTRLA    = ADC_ENABLE_bm;
+    pADC->CTRLD    = ADC_INITDLY_DLY16_gc;
+    pADC->CTRLA    = ADC_ENABLE_bm;
   #else
     /* On the 2-series maximum with internal reference is 3 MHz, so we will
      * target highest speed that doesn't exceed that and 16 ADC clocks sample
      * duration. */
     #if F_CPU     > 32000000            // 36 MHz /14 = 2.57 MHz
-      ADC0.CTRLB  = ADC_PRESC_DIV10_gc; // 33 MHz /14 = 2.35 MHz
+      pADC->CTRLB  = ADC_PRESC_DIV10_gc; // 33 MHz /14 = 2.35 MHz
     #elif F_CPU  >= 30000000            // 32 MHz /12 = 2.67 MHz
-      ADC0.CTRLB  = ADC_PRESC_DIV12_gc; // 30 MHz /12 = 2.50 MHz
+      pADC->CTRLB  = ADC_PRESC_DIV12_gc; // 30 MHz /12 = 2.50 MHz
     #elif F_CPU  >= 24000000            // 25 MHz /10 = 2.50 MHz
-      ADC0.CTRLB  = ADC_PRESC_DIV10_gc; // 24 MHz /10 = 2.40 MHz
+      pADC->CTRLB  = ADC_PRESC_DIV10_gc; // 24 MHz /10 = 2.40 MHz
     #elif F_CPU  >= 20000000
-      ADC0.CTRLB  = ADC_PRESC_DIV8_gc;  // 20 MHz / 8 = 2.50 MHz
+      pADC->CTRLB  = ADC_PRESC_DIV8_gc;  // 20 MHz / 8 = 2.50 MHz
     #elif F_CPU  >= 16000000
-      ADC0.CTRLB  = ADC_PRESC_DIV6_gc;  // 16 MHz / 6 = 2.67 MHz
+      pADC->CTRLB  = ADC_PRESC_DIV6_gc;  // 16 MHz / 6 = 2.67 MHz
     #elif F_CPU  >= 12000000
-      ADC0.CTRLB  = ADC_PRESC_DIV4_gc;  // 12 MHz / 4 = 3.00 MHz
+      pADC->CTRLB  = ADC_PRESC_DIV4_gc;  // 12 MHz / 4 = 3.00 MHz
     #elif F_CPU  >=  6000000            // 10 MHz / 4 = 2.50 MHz
-      ADC0.CTRLB  = ADC_PRESC_DIV4_gc;  //  8 MHz / 4 = 2.00 MHz
+      pADC->CTRLB  = ADC_PRESC_DIV4_gc;  //  8 MHz / 4 = 2.00 MHz
     #else                               //  5 MHz / 2 = 2.50 MHz
-      ADC0.CTRLB  = ADC_PRESC_DIV2_gc;  //  4 MHz / 2 = 2.00 MHz
+      pADC->CTRLB  = ADC_PRESC_DIV2_gc;  //  4 MHz / 2 = 2.00 MHz
     #endif                              //  1 MHz / 2 =  500 kHz
-    ADC0.CTRLE = 15; // 15.5 without PGA, 16 with PGA, corresponding to 7.75 or 8 us.
-    ADC0.CTRLA = ADC_ENABLE_bm | ADC_LOWLAT_bm;
+    pADC->CTRLE = 15; // 15.5 without PGA, 16 with PGA, corresponding to 7.75 or 8 us.
+    pADC->CTRLA = ADC_ENABLE_bm | ADC_LOWLAT_bm;
     /* Default low latency mode on
      * Users can turn it off if they care about power consumption while ADC is on
      * and chip is awake, since these parts don't have the perverse ADC-left-on
      * behavior of classic AVRs. */
-    ADC0.CTRLC = TIMEBASE_1US; // defined in Arduino.h.
-    ADC0.PGACTRL = ADC_PGABIASSEL_3_4X_gc | ADC_ADCPGASAMPDUR_15CLK_gc;
+    pADC->CTRLC = TIMEBASE_1US; // defined in Arduino.h.
+    pADC->PGACTRL = ADC_PGABIASSEL_3_4X_gc | ADC_ADCPGASAMPDUR_15CLK_gc;
     /* Note that we don't *enable* it automatically in init().
      * 3/4th bias is good up to 4 MHz CLK_ADC, 15 ADC Clocks to sample the PGA
      * up to 5 MHz, so within the regime of speeds that have to be compatible
@@ -1709,27 +1713,29 @@ void __attribute__((weak)) init_ADC0() {
 // Must be called manually.
 #ifdef ADC1
   __attribute__((weak)) void init_ADC1() {
+    ADC_t* pADC;
+    FORCE_LOAD_POINTER_IN_B(pADC, &ADC1);
     //                              30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz.
     #if   F_CPU   > 24000000     // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
-      ADC1.CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      pADC->CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >= 12000000    // 16 MHz / 16 = 1.0 MHz,  20 MHz / 16 = 1.25 MHz
-      ADC1.CTRLC  = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      pADC->CTRLC  = ADC_PRESC_DIV16_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >=  6000000    //  8 MHz /  8 = 1.0 MHz,  10 MHz /  8 = 1.25 MHz
-      ADC1.CTRLC  =  ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      pADC->CTRLC  =  ADC_PRESC_DIV8_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #elif F_CPU  >=  3000000    //  4 MHz /  4 = 1.0 MHz,   5 MHz /  4 = 1.25 MHz
-      ADC1.CTRLC  =  ADC_PRESC_DIV4_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      pADC->CTRLC  =  ADC_PRESC_DIV4_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #else                       //  1 MHz /  2 = 500 kHz - the lowest setting
-      ADC1.CTRLC  =  ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
+      pADC->CTRLC  =  ADC_PRESC_DIV2_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
     #endif
     #if   (F_CPU == 6000000 || F_CPU == 12000000 || F_CPU == 24000000 || F_CPU ==25000000)
-      ADC1.SAMPCTRL = (7); // 9 ADC clocks, 12 us
+      pADC->SAMPCTRL = (7); // 9 ADC clocks, 12 us
     #elif (F_CPU == 5000000 || F_CPU == 10000000 || F_CPU == 20000000)
-      ADC1.SAMPCTRL = (13);   // 15 ADC clock,s 12 us
+      pADC->SAMPCTRL = (13);   // 15 ADC clock,s 12 us
     #else
-      ADC1.SAMPCTRL = (10); // 12 ADC clocks, 12 us
+      pADC->SAMPCTRL = (10); // 12 ADC clocks, 12 us
     #endif
-    ADC1.CTRLD    = ADC_INITDLY_DLY16_gc;
-    ADC1.CTRLA    = ADC_ENABLE_bm;
+    pADC->CTRLD    = ADC_INITDLY_DLY16_gc;
+    pADC->CTRLA    = ADC_ENABLE_bm;
   }
 #endif
 
@@ -1743,11 +1749,13 @@ void init_timers()  {
 
 #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && !defined(MILLIS_USE_TIMERD0))
 void __attribute__((weak)) init_TCD0() {
-  TCD0.CMPBCLR  = 509; // 510 counts, starts at 0, not 1!
-  TCD0.CMPACLR  = 509;
-  TCD0.CTRLC    = 0x80; // WOD outputs PWM B, WOC outputs PWM A
-  TCD0.CTRLB    = TCD_WGMODE_ONERAMP_gc; // One Slope
-  TCD0.CTRLA    = TIMERD0_PRESCALER; // OSC20M prescaled by 32, gives ~1.2 khz PWM at 20MHz.
+  TCD_t* pTCD;
+  FORCE_LOAD_POINTER_IN_B(pTCD, &TCD0);
+  pTCD->CMPBCLR  = 509; // 510 counts, starts at 0, not 1!
+  pTCD->CMPACLR  = 509;
+  pTCD->CTRLC    = 0x80; // WOD outputs PWM B, WOC outputs PWM A
+  pTCD->CTRLB    = TCD_WGMODE_ONERAMP_gc; // One Slope
+  pTCD->CTRLA    = TIMERD0_PRESCALER; // OSC20M prescaled by 32, gives ~1.2 khz PWM at 20MHz.
 }
 #endif
 
