@@ -229,6 +229,7 @@ jobs:
             -
           verbose: false
           enable-deltas-report: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           enable-warnings-report: true
           sketches-report-path: sketches-reports
 
@@ -261,6 +262,7 @@ jobs:
             -
           verbose: false
           enable-deltas-report: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           enable-warnings-report: true
           sketches-report-path: sketches-reports
       - name: Compile examples (TCB0 millis)
@@ -291,6 +293,7 @@ jobs:
             -
           verbose: false
           enable-deltas-report: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           enable-warnings-report: true
           sketches-report-path: sketches-reports
       - name: Compile examples (RTC millis)
@@ -321,6 +324,7 @@ jobs:
             -
           verbose: false
           enable-deltas-report: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           enable-warnings-report: true
           sketches-report-path: sketches-reports
       - name: Compile examples (default millis, 8 MHz)
@@ -350,6 +354,7 @@ jobs:
             -
           verbose: false
           enable-deltas-report: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           enable-warnings-report: true
           sketches-report-path: sketches-reports
       - name: Compile examples (default millis, clock 25 MHz internal, tuned)
@@ -380,6 +385,7 @@ jobs:
             -
           verbose: false
           enable-deltas-report: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           enable-warnings-report: true
           sketches-report-path: sketches-reports
       - name: Compile examples (default millis, clock 24 MHz external)
@@ -410,6 +416,7 @@ jobs:
             -
           verbose: false
           enable-deltas-report: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           enable-warnings-report: true
           sketches-report-path: sketches-reports
       - name: Compile examples (default millis, clock 8 MHz internal, tuned)
@@ -440,6 +447,7 @@ jobs:
             -
           verbose: false
           enable-deltas-report: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           enable-warnings-report: true
           sketches-report-path: sketches-reports
       - name: Compile examples (default millis, clock 1 MHz internal, tuned)
@@ -470,5 +478,6 @@ jobs:
             -
           verbose: false
           enable-deltas-report: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           enable-warnings-report: true
           sketches-report-path: sketches-reports
