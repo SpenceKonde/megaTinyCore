@@ -31,8 +31,8 @@ Having two ready methods to reset from software has two benefits:
 
 The implementations are pulles straight from Ref_Reset, on account of a complaint from a user about there not being a wrapper around them and the difficulty of remembering how any SFR names are spelled on modern AVRs without both IO headers and datasheet open
 
-#### void ResetWithWDT()
-This will trigger a reset using the WDT, which will occur within around 10 ms, and will busy wait until then.
+#### void ResetViaWDT()
+This will trigger a reset using the WDT, which will occur within around 10 ms, and will busy wait until then. This will never run the bootloader.
 
-#### void SoftwareReset()
-This will trigger a reset using the RSTCTRL, which will occur instantly.
+#### void ResetViaSoftware()
+This will trigger a reset using the RSTCTRL, which will occur instantly. Depending on the bootloader entry conditions you selected when you burned bootloader this may enter the bootloader

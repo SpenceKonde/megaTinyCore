@@ -194,11 +194,11 @@ The logic is simple:
 DxCore ships with 315 binaries to support the same entry conditions. The reason for this nauseating preponderance of binaries is that the Dx-series parts have FAR more base configurations - for the simple reason that they have so many more serial options.
 * mTC supports 40 parts (4 8-pin parts, 12 14-pin parts, 12 20-pin parts and 12 24-pin parts) with 80 binaries.
 * DxC supports 36 parts, but needs 315 binaries to do it.
-* ATTc for classic AVRs supports a mere 14 parts with optiboot... but requires a mindblowing 586 bootloader binaries to do so, because of the dependance of the bootloader binary on the clock speed.
-  * That doesnt count the additional 288 micronucleus bootloaders - 144 normal and 144 update binaries, which support just 8 parts!
+* ATTc for classic AVRs supports a mere 14 parts with optiboot... but requires a mindblowing 586 bootloader binaries to do so, because of the dependence of the bootloader binary on the clock speed.
+  * That doesn't count the additional 288 micronucleus bootloaders - 144 normal and 144 update binaries, which support just 8 parts!
 
 ## Used and unused working registers
-The register pressure in Optiboot_x is markedly lower than the already low register pressure in optiboot_dx - less than half of the working registers are in use, though most of the unused registers are less useful lower registers. An upper register would allow you to save 1 word for every time you'd otherwise need to load a value into a register with LDI after the first (unless that register must be used because of the ABI), whereas a lower register can only start saving flash from every time you can replace an LDI with a register holding a constant value after the *second* occurance (because you need to ldi -> mov it, and that - that is assuming you don't need to use immediate values on it).
+The register pressure in Optiboot_x is markedly lower than the already low register pressure in optiboot_dx - less than half of the working registers are in use, though most of the unused registers are less useful lower registers. An upper register would allow you to save 1 word for every time you'd otherwise need to load a value into a register with LDI after the first (unless that register must be used because of the ABI), whereas a lower register can only start saving flash from every time you can replace an LDI with a register holding a constant value after the *second* occurrence (because you need to ldi -> mov it, and that - that is assuming you don't need to use immediate values on it).
 ```
   r0 - UNUSED
   r1

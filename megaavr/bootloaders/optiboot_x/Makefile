@@ -164,7 +164,7 @@ optiboot_%.elf:	optiboot_x.c FORCE
 # very widely circulated, because I am not the only one who made that mistake.
 # Even in 2020, I've corrected someone who had been using the preliminary
 # datasheet! 
-# After realizing my error, the 8-pin bootloaders were ammended to use PA3 as the LED. 
+# After realizing my error, the 8-pin bootloaders were amended to use PA3 as the LED. 
 # Anyway, 2-series parts use the same binaries as each other,and have 3 serial options.
 # 2 USARTs but USART0's alt pins are USART1's default ones.... (presumably
 # sharing some underlying hardware...)

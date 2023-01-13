@@ -75,7 +75,7 @@ bool printADCRuntimeError(int16_t error, HardwareSerial &__dbgser) {
       __dbgser.println("pin or channel does not exist on this part"); break;
     case 0xF9:
       __dbgser.println("The ADC has been disabled, re-enable it with ADCPowerOptions."); break;
-    default: {
+    default:
       __dbgser.println("Error code not recognized");
     }
     return false;

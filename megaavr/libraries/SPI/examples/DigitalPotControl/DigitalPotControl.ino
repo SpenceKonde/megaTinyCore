@@ -14,7 +14,8 @@
    * All A pins  of AD5206 connected to +5V
    * All B pins of AD5206 connected to ground
    * An LED and a 220-ohm resisor in series connected from each W pin to ground
-   * CS - Any pin. Here we use PA3 as described below
+   * CS - Any pin. Here we use use #ifdef's to pick the pin - you should replace that with the pin you actually plan to use.
+         We just do that because this is used for CI testing, so it needs to compile on **everything**.
    * SDI - MOSI (this can be used as the name of a pin)
    * CLK - SCK (This can be used as the name of a pin)
    * See https://github.com/SpenceKonde/DxCore/blob/master/megaavr/libraries/SPI/README.md for more information
@@ -26,11 +27,17 @@
  * modified 8/11/2022 to conform with Azduino conventions.
  */
 
+#if defined(megaTinyCore) && (_AVR_PINCOUNT >= 14 || CLOCK_SOURCE == 0)
+  #define SSPIN  PIN_PA3
+#elif defined(megaTinyCore) //then it's a stupid 8 pin tiny with an external clock. Okay, I guess we use PA6
+  #define SSPIN  PIN_PA6
+#endif
+
 // inslude the SPI library:
 #include <SPI.h>
 
-// Set PIN_PA7 as the slave select for the digital pot; any pin can be used, but we want it to compile even on 8-pin devices as it is used in automated testing.
-const int slaveSelectPin = PIN_PA7;
+// Set PIN_PA3 as the slave select for the digital pot; any pin can be used, but we want it to compile even on 8-pin devices as it is used in automated testing.
+const int slaveSelectPin = SSPIN;
 
 void setup() {
   // set the slaveSelectPin as an output:
