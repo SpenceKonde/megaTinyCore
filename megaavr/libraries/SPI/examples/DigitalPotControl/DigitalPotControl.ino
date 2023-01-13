@@ -26,22 +26,35 @@
  * Thanks to Heather Dewey-Hagborg for the original tutorial, 2005
  * modified 8/11/2022 to conform with Azduino conventions.
  */
-
-#if defined(megaTinyCore) && (_AVR_PINCOUNT >= 14 || CLOCK_SOURCE == 0)
+/* Replace this with a simple #define of SSPIN as whatever pin YOU have connected it to - you can use any pin that can be used as a digital output
+ * All the pin needs to be is capable of digital output, not used for something else, and present on the part. Since this sketch is used for compile-testing,
+ * we pick them so they're always there so that we don't get compile errors for writing to pins not present, not because they're what we'd necessarily use.
+ * the only real consideration in pin selection for SS is that you aren't using the pin somewhere else and won't need to use it.
+ * And then it's just wiring convienience - so you probably are going to want to use a pin adjacent to the SPI pins or nearby at least.
+ */
+#if defined(MEGATINYCORE) && (_AVR_PINCOUNT >= 14 || CLOCK_SOURCE == 0)
   #define SSPIN  PIN_PA3
-#elif defined(megaTinyCore) //then it's a stupid 8 pin tiny with an external clock. Okay, I guess we use PA6
+#elif defined(MEGATINYCORE) //with external clock or an 8-pin part we have no choice but to uise PIN_PA6 instead
   #define SSPIN  PIN_PA6
+#else // DxCore - Dx or Ex-series
+  #define SSPIN   PIN_PC3 //omnipresent on Dx and Ex parts - even the unknown-if-happening DU had that as it's only PORTC IO pin, So this seems a safe choice.
 #endif
 
 // inslude the SPI library:
 #include <SPI.h>
 
-// Set PIN_PA3 as the slave select for the digital pot; any pin can be used, but we want it to compile even on 8-pin devices as it is used in automated testing.
-const int slaveSelectPin = SSPIN;
-
 void setup() {
   // set the slaveSelectPin as an output:
-  pinMode(slaveSelectPin, OUTPUT);
+  // Previously this sketch declared a const int instead of using sspin directly. This also illustrates the common practice of using ALLCAPS for #defines
+  // (cammelCase for functions and methods, ProperCaps for global variables that are not constant, and lowercase_and_underscore for local variables is the
+  // convention used here). Finally, storing pins in an int  is not recommended. The official Arduino core uses ints for pin arguments. uint8_t (byte) is
+  // more than sufficient for representing pins on all current and plausible future AVR devices; The most they ever did was like 100 pins and 80-some I/O
+  // pins on the ATmega2560 and those of similar pincount and layout. There were a number of complications because of the number of pins, and some of the
+  // ports were "second class ports" and had no atomic bit-level operations.
+  // And that was still only 80 pins.
+  // A uint8_t is what megaTinyCore uses internally, so using that or a macro will maximize efficienct.
+
+  pinMode(SSPIN, OUTPUT);
   // initialize SPI:
   // SPI.swap(...) uncomment and fill in a number if you need to use alternate pins.
   SPI.begin();
@@ -68,12 +81,12 @@ void loop() {
 
 void digitalPotWrite(int address, int value) {
   // take the SS pin low to select the chip:
-  digitalWrite(slaveSelectPin, LOW);
+  digitalWrite(SSPIN, LOW);
   //  send in the address and value via SPI:
   SPI.transfer(address);
   SPI.transfer(value);
   // take the SS pin high to de-select the chip:
-  digitalWrite(slaveSelectPin, HIGH);
+  digitalWrite(SSPIN, HIGH);
   /* Best Practices note: If the pin is constant and known at compile
    * time, use digitalWriteFast and pinModeFast
    * These have the same syntax, but the pin (and ideally the value)
