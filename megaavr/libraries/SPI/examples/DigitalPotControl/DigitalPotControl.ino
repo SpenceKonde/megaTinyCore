@@ -32,7 +32,7 @@
  * the only real consideration in pin selection for SS is that you aren't using the pin somewhere else and won't need to use it.
  * And then it's just wiring convienience - so you probably are going to want to use a pin adjacent to the SPI pins or nearby at least.
  */
-#if defined(MEGATINYCORE) && (_AVR_PINCOUNT >= 14 || CLOCK_SOURCE == 0)
+#if defined(MEGATINYCORE) && CLOCK_SOURCE == 0)
   #define SSPIN  PIN_PA3
 #elif defined(MEGATINYCORE) //with external clock or an 8-pin part we have no choice but to uise PIN_PA6 instead
   #define SSPIN  PIN_PA6
