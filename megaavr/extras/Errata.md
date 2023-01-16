@@ -6,7 +6,7 @@ Well, for the tinyAVR 0/1-series, the list of issues is a tiny bit longer. By wh
 
 The lists of errata are ~hidden~ located in a separate document, the "Errata and datasheet clarification" sheet for the part now, instead of being in the datasheet proper like it was on classic AVRs. You know, just to make it easier for the users, so we don't have to skip over a few pages of highly relevant information on errata if we have one of the non-existent versions that doesn't have all these problems. Nope, they're *totally* not trying to hush up the bugs until you've made the buying decision and gotten too deep in the design process to switch MCUs to a competitors' one or anything, no siree - it's just to make things easier you you, the users! The specific errata relevant to a given part vary depending on the specific part and and silicon revision. The silicon revision can be read from the `SYSCFG.REVID` register (0 = A, 1 = B, etc). It is also marked on the chip - though my understanding is that us mere mortals are not trusted with the secret of how to do so, and must have Microchip folks help with that.
 
-Note that Rev. C of the 32k 1-series parts has been released and fixes a substantial amount of errata. It fixes some of the RTC stuff, it fixes the D-latch and the fact that you had to enable pin output to use the link output source on a downstream LUT as well as assorted other issues. Hopefully we will see these changes brought to other parts in the tinyAVR 0/1-series in the future. Two years after the preceeding sentence was written, there has been no such fix made available through a die rev on any other parts. The correlation in time of the Automotive version shipping, and this silicon revision being made, suggests that one or more major automotive customers refused to buy these parts until certain errata were corrected. One imagines a tense moment in the negotiations.
+Note that Rev. C of the 32k 1-series parts has been released and fixes a substantial amount of errata. It fixes some of the RTC stuff, it fixes the D-latch and the fact that you had to enable pin output to use the link output source on a downstream LUT as well as assorted other issues. Hopefully we will see these changes brought to other parts in the tinyAVR 0/1-series in the future. Two years after the preceding sentence was written, there has been no such fix made available through a die rev on any other parts. The correlation in time of the Automotive version shipping, and this silicon revision being made, suggests that one or more major automotive customers refused to buy these parts until certain errata were corrected. One imagines a tense moment in the negotiations.
 
 ```c
 Serial.print("Silicon revision is: ");
@@ -76,7 +76,7 @@ The CCL Must be Disabled to Change the Configuration of a Single LUT            
 Connecting LUTs in Linked Mode Requires OUTEN Set to ‘1’                                 | 4 |X|X|X|X| X |X|X|-
 D-latch is Not Functional                                                                | 3 |X|X|X|X| X |X|X|-
 **NVMCTRL**  | . | .  | . | .  | . | .  | . | . |.
-In some cases, the reset values of NVMCTRLA is not 0x00. Workaround: Ingore it.          | 1 |?|?|?|?| ? |?|X|X
+In some cases, the reset values of NVMCTRLA is not 0x00. Workaround: Ignore it.          | 1 |?|?|?|?| ? |?|X|X
 **PORTMUX**  | . | .  | . | .  | . | .  | . | . |.
 Selecting Alternative Output Pin for TCA0 WO 0-2 also Changes WO 3-5                     | 2 |-|-|X|X| - |-|-|-
 **RTC**  | . | .  | . | .  | . | .  | . | . |.
@@ -283,7 +283,7 @@ Standby sleep mode even if the Run in Standby bit (RUNSTDBY in ADCn.CTRLA) is '0
 will not trigger when the device enters Power-Down or Standby sleep mode.
 **Work Around:** None
 
-**megaTinyCore note:** We always set LOWLAT mode unless it is explicitly turned off. Therefor, **you must disable the ADC prior to entering sleep mode in order to get acceptable power consumption while sleeping**.
+**megaTinyCore note:** We always set LOWLAT mode unless it is explicitly turned off. Therefore, **you must disable the ADC prior to entering sleep mode in order to get acceptable power consumption while sleeping**.
 
 #### Low Latency Mode Must Be Set Before Changing ADC Configuration
 If using the low latency mode in the ADC, the initialization delay does not start for settings configured before the Low Latency (LOWLAT) bit in the Control A (ADCn.CTRLA) register. This may result in a conversion starting before the initialization time has ended and give a corrupt result.
@@ -439,7 +439,7 @@ Event detection will fail if TCBn receives an input event with a high/low period
 **Workaround:** Ensure that the high/low period of input events is equal to or longer than the period of the selected clock source
 (CLKSEL in `TCBn.CTRLA`).
 
-**megaTinyCore note:** Only impacts users who reconfigure a Type B timer for input capture, and hoped to measure events shorter than the system clock period. Such users shoould re-adjust their expectations.
+**megaTinyCore note:** Only impacts users who reconfigure a Type B timer for input capture, and hoped to measure events shorter than the system clock period. Such users should re-adjust their expectations.
 
 #### The TCB Interrupt Flag is Cleared When Reading CCMPH
 `TCBn.INTFLAGS.CAPT` is cleared when reading `TCBn.CCMPH` instead of CCMPL.
@@ -572,6 +572,6 @@ The Start-of-Frame Detector can unintentionally be enabled when the device is in
 #### Receiver non-functional after inconsistent start frame field
 After receiving an inconsistent sync frame in autobaud mode (that is, a condition that sets ISFIF), the receiver becomes non-functional.
 
-**Workaround:** Disable and reenable the receiver when this condition is encountered.
+**Workaround:** Disable and re-enable the receiver when this condition is encountered.
 
 **megaTinyCore note:** The core adopts this workaround on all parts. It is unclear how widely distributed this issue is, but as long as Serial is used, it should be automatically handled correctly.

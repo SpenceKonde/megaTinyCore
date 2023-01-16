@@ -30,11 +30,11 @@
  * All the pin needs to be is capable of digital output, not used for something else, and present on the part. Since this sketch is used for compile-testing,
  * we pick them so they're always there so that we don't get compile errors for writing to pins not present, not because they're what we'd necessarily use.
  * the only real consideration in pin selection for SS is that you aren't using the pin somewhere else and won't need to use it.
- * And then it's just wiring convienience - so you probably are going to want to use a pin adjacent to the SPI pins or nearby at least.
+ * And then it's just wiring convenience - so you probably are going to want to use a pin adjacent to the SPI pins or nearby at least.
  */
 #if defined(MEGATINYCORE) && CLOCK_SOURCE == 0)
   #define SSPIN  PIN_PA3
-#elif defined(MEGATINYCORE) //with external clock or an 8-pin part we have no choice but to uise PIN_PA6 instead
+#elif defined(MEGATINYCORE) //with external clock or an 8-pin part we have no choice but to use PIN_PA6 instead
   #define SSPIN  PIN_PA6
 #else // DxCore - Dx or Ex-series
   #define SSPIN   PIN_PC3 //omnipresent on Dx and Ex parts - even the unknown-if-happening DU had that as it's only PORTC IO pin, So this seems a safe choice.
