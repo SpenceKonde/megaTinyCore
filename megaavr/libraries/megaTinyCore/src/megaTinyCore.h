@@ -10,12 +10,12 @@
 // Reset immdiately using software reset. The bootloader, if present will run.
 
 inline void ResetViaWDT() {
-  _PROTECTED_WRITE(WDT.CTRLA,WDT_PERIOD_8CLK_gc); //enable the WDT, minimum timeout
+  _PROTECTED_WRITE(WDT.CTRLA, WDT_PERIOD_8CLK_gc); //enable the WDT, minimum timeout
   while (1); // spin until reset
 }
 
 inline void ResetViaSoftware() {
-  _PROTECTED_WRITE(RSTCTRL.SWRR,1);
+  _PROTECTED_WRITE(RSTCTRL.SWRR, 1);
 }
 
 
