@@ -7,9 +7,12 @@ These items are in addition to what was listed under changes already in release.
 ### Planned enhancements
 "Enhancements" are changes to the core which improve functionality and/or introduce new and exotic bugs. Sometimes called "Features", I prefer the term "enhancement". Calling it a feature, by my understanding of the semantics, means that it *does something new*. But many times changes are made that neither fix a bug or do something new, but rather just do something it already does faster, using less flash, or with better compile time error detection. All things that, as well as new features, would qualify as an enhancement.
 
-### Planned 2.6.x
+#### Enhancements which do not have a strict timeline or are ongoing
+* Finally implement that power save and sleep library I've been talking about for years.
 * Add tools submenu to select from a number of PWM pin layouts. This will impact flash use (to a degree that will be noticed on small parts) as well as the time it takes for turnOffPWM() (thus digitalWrite()) and analogWrite() to execute.
-* Under consideration: analogWriteFast(pin, duty); this will require that pin be constant, allowing the determination of the PWM compare value register to be determined at compile time, rather than runtime. It is not planned for this function to actually turn the PWM on or off, only adjust the duty cycle of a pin already outputting PWM.
+* Under consideration: analogWriteFast(pin, duty); this will require that pin be constant, allowing the determination of the PWM compare value register to be determined at compile time, rather than runtime, and if implemented, the user *must* have already called analogWrite() on the pin in question to kick off analog output - but this function would modify the duty cycle highly efficiently.
+* Port any applicable enhancements made to DxCore to megaTinyCore, should such happen be made.
+* If there are *other substantial changes that need to occur* within the core, I am unaware of the complaints and hence have no plans to address them before the heat death of the universe. If you desire changes on a more rapid timeline, please create an issue so that I am aware of the presence of said problem, deficiency, or imperfection. Those form the action item list for core development activity, so if something is not listed there, **it is unlikely to be implemented/fixed/etc** simply due to my being unaware of any concern.
 
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
@@ -17,24 +20,30 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ## Released Versions
 
 ### 2.6.5
-* Correct issues relating to optiboot board definitions for Microchip boards (missing board entries, missing bootloaders).
-* Correct issue with Sampled/Sampled and Sampled (125hz)/Disabled BOD options. (#874)
-* Port new version of pinConfigure.
-* Harmonize versions of Wire, USERSIG, Event.
-* Fix issue with reading with SerialUPDI (#871)
-* Fix several USART-related issues (USART0 not working in half duplex, usart1 not working for receive, .end() less efficient than it could be and potentially wrong.)
+* Bugfix: Correct issues relating to optiboot board definitions for Microchip boards (missing board entries, missing bootloaders).
+* Bugfix: Correct issue with Sampled/Sampled and Sampled (125hz)/Disabled BOD options. (#874)
+* Enhancement: Port new version of pinConfigure.
+* Significant Enhancement: Reimplement the whole entry condition logic for Optiboot. Increase numberr of potential entry conditions for 2 to 7. This is like what DxCore has, plus one which will be added there in the future.
+* New Feature: Ensure that without any code changes, just use of a different batch file, exactly analogous files can be generated for the megaAVR 0-series parts, with our behavior (entry conditions and reset cause flag treatment)
+  * Docs: Considerable improvements to documentation of Optiboot for developers.
+* Maintenance: Harmonize versions of Wire, USERSIG, Event to pull in improvements from DxCore.
+* Bugfix: Fix issue with reading with SerialUPDI (#871)
+* Bugfix: Fix several USART-related issues (USART0 not working in half duplex, usart1 not working for receive, .end() less efficient than it could be and potentially wrong.)
+* Performance enhancement: From @MX682X, the discovery that an appropriatly timed kick to the compiler's groin would cause it to place pointers into base registers when it otherwise would not. Doing this increases efficiency dramatically in some cases, , allowing the use of load and store with displacement in several places where it had previosly used a truckload of LDS and/or STS instructions. This resulted in smaller, faster binaries due to more efficient initialiaation code for a number of peripherals (which impacted even users who weren't doing anything special, since the biggest beneficiaries were the ADC and timer initialization code, which happen as long as main() is not overridden). This also includes the addition of a number of macros to implement such kicks to permit this method to be readily generalized if other areas of the core are found which could benefit from it.
+* Docs: General day-to-day maintenance
+* Add what little support was needed for analogWrite() to work if there were tools submenu to use differerent subsets of pins to wiring_analog.c. Varaiant files however still require significant work, however.
 
 ### 2.6.4 (2.6.3 respin due to critical compile error impacting all sketches)
-* Correct compile error encountered in all cases.
-* Correct compile error encountered in the SimpleEvent example.
-* Add support for configuring the WDT via fuses. These are set on all uploads, but ONLY for non-optiboot boards. To prevent difficulties that may be encountered when reprogramming. Because of the reliance of Optiboot on the WDT, the WDT must not be forced on when using Optiboot.
-* Correct problems with CI changes.
-* Correct issues relating to the fuse configuration set when uploading.
+* Critical Bugfix: Correct compile error encountered in all cases.
+* Bugfix: Correct compile error encountered in the SimpleEvent example.
+* New feature: Add support for configuring the WDT via fuses. These are set on all uploads, but ONLY for non-optiboot boards. To prevent difficulties that may be encountered when reprogramming. Because of the reliance of Optiboot on the WDT, the WDT must not be forced on when using Optiboot.
+* Bugfix: Correct problems with CI changes.
+* Bugfix: Correct issues relating to the fuse configuration set when uploading.
 
 ### 2.6.3 (2.6.2 respin due to json error)
-* Correct installation error from trying to install non-functional withdrawn version of toolchain.
-* Correct issues with compiling Comparator library.
-* Ensure that at least one test per library is in the CI list.
+* Bugfix: Correct installation error from trying to install non-functional withdrawn version of toolchain.
+* Bugfix: Correct issues with compiling Comparator library.
+* Bugfix: Ensure that at least one test per library is in the CI list.
 
 ### 2.6.2 (critical update)
 * Critical bugfix: Burn Bootloader corrected

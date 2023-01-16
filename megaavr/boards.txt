@@ -9,11 +9,11 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other         ##        ###         ##     #
-#  contributors 2018-2021                  #  #      #           #  #    #
-#  megaTinyCore is free software.    # #     #       ####          #     #
-#  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##    #      #
-#  License section of README.md       #    ####  ##   ###   ##   ####    #
+#  Copyright Spence Konde and other         ##        ###        ####    #
+#  contributors 2018-2021                  #  #      #           #       #
+#  megaTinyCore is free software.    # #     #       ####        ###     #
+#  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##      #    #
+#  License section of README.md       #    ####  ##   ###   ##   ###     #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
@@ -55,10 +55,9 @@ menu.bodmode=BOD Mode when Active/Sleeping (burn bootloader req'd)
 menu.eesave=Save EEPROM (burn bootloader req'd)
 menu.bootloaderuart=UART for Bootloader (burn bootloader req'd)
 menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
-menu.resetpinopti=UPDI/Reset Pin and Optiboot Entry (burn bootloader req'd)
-menu.resetpinopti_2=UPDI/alt-RST pins and Optiboot Entry (burn bootloader req'd)
-menu.entryconditition=Bootloader entry condition (burn bootloader req'd)
-menu.attach=attachInterrupt() Version
+menu.resetpinopti=UPDI/Reset Pin and
+menu.resetpinopti_2=UPDI/alt-RST pin
+menu.entryconditition=Bootloader entry sion
 menu.printf=printf()
 menu.wiremode=Wire (Wire.h/I2C) Library mode
 menu.WDTtimeout=WDT timeout (burn bootloader req'd. Note that it cannot be disabled if set here!)

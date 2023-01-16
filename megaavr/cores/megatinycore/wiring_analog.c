@@ -1104,8 +1104,6 @@ void analogWrite(uint8_t pin, int val) {
    */
   uint8_t digital_pin_timer =  digitalPinToTimer(pin) & __PeripheralControl;
   /* end megaTinyCore-specific section */
-
-  volatile uint8_t *timer_cmp_out; // must be volatile for this to be safe.
   /* Find out Port and Pin to correctly handle port mux, and timer. */
   switch (digital_pin_timer) {
     case TIMERA0:
@@ -1115,25 +1113,45 @@ void analogWrite(uint8_t pin, int val) {
         digitalWrite(pin, HIGH);
       } else {
         /* Calculate correct compare buffer register */
-        #ifdef __AVR_ATtinyxy2__
-        if (bit_mask == 0x80) {
-          bit_mask = 1;  // on the xy2, WO0 is on PA7
+        #if defined(_BUFFER_TCA)
+          //If we have buffered TCA0, then we write to different registers and calculate destinations differeetly.
+          volatile uint16_t *timer_cmp_out; // must be volatile for this to be safe.
+          uint8_t offset = 0;
+          if (bit@mask & 0x12) {
+            offset = 1;
+            bit_mask = 0x20;
+          }else if (bitmask & 0x24) {
+            offset = 2;
+            bit_mask = 0x40;
+          } else {
+            bit_mask = 0x10;
+          }
+          timer_cmp_out = (volatile uint16_t *)(&TCA0.SINGLE.CMP0BUF)
+          *(timer_cmp_out + offset) = (uint16_t) val;
+          TCA0.SINGLE.CTRLB = |= bitmask;
+          break;
+        #else
+          //Otherwise, we're in split mode and we use the classical method.
+          volatile uint8_t *timer_cmp_out; // must be volatile for this to be safe.
+          #ifdef __AVR_ATtinyxy2__
+            if (bit_mask == 0x80) {
+              bit_mask = 1;  // on the xy2, WO0 is on PA7
+            }
+          #endif
+          uint8_t offset = 0;
+          if (bit_mask > 0x04) { // HCMP
+            bit_mask <<= 1;      // mind the gap
+            offset = 1;          // if it's an hcmp, the offset of the compare register is 1 higher.
+          }
+          if      (bit_mask & 0x44) offset += 4;
+          else if (bit_mask & 0x22) offset += 2;
+          timer_cmp_out = ((volatile uint8_t *)(&TCA0.SPLIT.LCMP0)) + (offset); //finally at the very end we get the actual pointer (since volatile variables should be treated like nuclear waste due to performance impact)
+          (*timer_cmp_out) = (val); // write to it - and we're done with it.
+          TCA0.SPLIT.CTRLB |= bit_mask;
         }
-        #endif
-        uint8_t offset = 0;
-        if (bit_mask > 0x04) { // HCMP
-          bit_mask <<= 1;      // mind the gap
-          offset = 1;          // if it's an hcmp, the offset of the compare register is 1 higher.
-        }
-        if      (bit_mask & 0x44) offset += 4;
-        else if (bit_mask & 0x22) offset += 2;
-        timer_cmp_out = ((volatile uint8_t *)(&TCA0.SPLIT.LCMP0)) + (offset); //finally at the very end we get the actual pointer (since volatile variables should be treated like nuclear waste due to performance impact)
-        (*timer_cmp_out) = (val); // write to it - and we're done with it.
-        TCA0.SPLIT.CTRLB |= bit_mask;
-      }
-      break;
-      // End of TCA case
-
+        break;
+        // End of TCA case
+      #endif
   #if defined(DAC0)
     case DACOUT:
     {
@@ -1175,14 +1193,30 @@ void analogWrite(uint8_t pin, int val) {
         // with interrupts off. But an interrupt could trigger one of those bits becoming unset, so we must do it this way.
         // set new values
         uint8_t fc_mask;
-        if (bit_mask == 2) {  // PIN_PC1
-          TCD0.CMPBSET = ((255 - val) << 1) - 1;
-          fc_mask = 0x80;
-        } else {        // PIN_PC0
-          TCD0.CMPASET = ((255 - val) << 1) - 1;
-          fc_mask = 0x40;
-        }
-
+        #if defined(USE_TCD_WOAB) && _AVR_PINCOUNT != 8
+          // TCD is on PA4 or PA5 on 14+ pin parts
+          fc_mask = bit_mask;
+          if (bit_mask == 0x20) {  // PIN_PA5
+            TCD0.CMPBSET = ((255 - val) << 1) - 1;
+          } else {        // PIN_PA4
+            TCD0.CMPASET = ((255 - val) << 1) - 1;
+          }
+        #elif defined(USE_TCD_WOAB) && _AVR_PINCOUNT == 8 // 8 pin parts have it on PA6, PA7
+          if (bit_mask == 0x80) {  // PIN_PA7
+            TCD0.CMPBSET = ((255 - val) << 1) - 1;
+            fc_mask = 0x20;
+          } else {        // PIN_PA6
+            TCD0.CMPASET = ((255 - val) << 1) - 1;
+            fc_mask = 0x10;
+        #else //it's on PC0, PC1
+          if (bit_mask == 2) {  // PIN_PC1
+            TCD0.CMPBSET = ((255 - val) << 1) - 1;
+            fc_mask = 0x80;
+          } else {        // PIN_PC0
+            TCD0.CMPASET = ((255 - val) << 1) - 1;
+            fc_mask = 0x40;
+          }
+        #endif
         if (!(TCD0.FAULTCTRL & fc_mask)) {
           // if it's not active, we need to activate it... which produces a glitch in the PWM
           TCD0.CTRLA &= ~TCD_ENABLE_bm; // stop the timer
@@ -1194,24 +1228,61 @@ void analogWrite(uint8_t pin, int val) {
         }
 
         #if defined(NO_GLITCH_TIMERD0) // This mode is always used with the stock variant.
-          // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts)
-          // so if we're here, we're acting on either PC0 or PC1. And NO_GLITCH mode is enabled
-          if (set_inven == 0) {
-            // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR)
-            // or somewhere in between.
-            if (bit_mask == 1) {
-              PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
+         #if defined(USE_TCD_WOAB) && _AVR_PINCOUNT != 8
+            // TCD is on PA4 or PA5 on 14+ pin parts
+            if (set_inven == 0) {
+              // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR)
+              // or somewhere in between.
+              if (bit_mask == 0x10) {
+                PORTA.PIN4CTRL &= ~(PORT_INVEN_bm);
+              } else {
+                PORTA.PIN5CTRL &= ~(PORT_INVEN_bm);
+              }
             } else {
-              PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
+              // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
+              if (bit_mask == 0x10) {
+                PORTA.PIN4CTRL |= PORT_INVEN_bm;
+              } else {
+                PORTA.PIN5CTRL |= PORT_INVEN_bm;
+              }
             }
-          } else {
-            // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
-            if (bit_mask == 1) {
-              PORTC.PIN0CTRL |= PORT_INVEN_bm;
+          #elif defined(USE_TCD_WOAB) && _AVR_PINCOUNT == 8 // 8 pin parts have it on PA6, PA7
+            if (set_inven == 0) {
+              // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR)
+              // or somewhere in between.
+              if (bit_mask == 0x40) {
+                PORTA.PIN6CTRL &= ~(PORT_INVEN_bm);
+              } else {
+                PORTA.PIN7CTRL &= ~(PORT_INVEN_bm);
+              }
             } else {
-              PORTC.PIN1CTRL |= PORT_INVEN_bm;
+              // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
+              if (bit_mask == 0x40) {
+                PORTA.PIN6CTRL |= PORT_INVEN_bm;
+              } else {
+                PORTA.PIN7CTRL |= PORT_INVEN_bm;
+              }
             }
-          }
+          #else // TCD is on PC0 or PC1;
+            // so if we're here, we're acting on either PC0 or PC1. And NO_GLITCH mode is enabled
+            if (set_inven == 0) {
+              // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR)
+              // or somewhere in between.
+              if (bit_mask == 1) {
+                PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
+              } else {
+                PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
+              }
+            } else {
+              // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
+              if (bit_mask == 1) {
+                PORTC.PIN0CTRL |= PORT_INVEN_bm;
+              } else {
+                PORTC.PIN1CTRL |= PORT_INVEN_bm;
+              }
+            }
+          #endif
+        // End conditional to handle alternate set of TCD PWM pins.
         #endif
         SREG = oldSREG;
       }

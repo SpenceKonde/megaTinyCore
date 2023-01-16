@@ -8,15 +8,15 @@ name=megaTinyCore
 versionnum.major=2
 versionnum.minor=6
 versionnum.patch=5
-versionnum.postfix=-dev
-versionnum.released=0
+versionnum.postfix=
+versionnum.released=1
 
 version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}
 #####################
 # Stupid workaround #
 # for IDE bug       #
 #####################
-version=2.6.5-dev
+version=2.6.5
 
 build.versiondefines=-DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DMEGATINYCORE="{version}" -DMEGATINYCORE_MAJOR={versionnum.major}UL -DMEGATINYCORE_MINOR={versionnum.minor}UL -DMEGATINYCORE_PATCH={versionnum.patch}UL -DMEGATINYCORE_RELEASED={versionnum.released}
 
