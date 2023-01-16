@@ -13,6 +13,8 @@
      assembler.  We can even make it pretty with a macro.
    With this modification, the _short functions should work on cpus
      (like ATmega128) where STS is required.
+
+// *INDENT-OFF*  // turn of astyle format checking which dislikes inline assembly.
 */
 
 asm(".macro __wr_spmcsr p, v \n\t"
