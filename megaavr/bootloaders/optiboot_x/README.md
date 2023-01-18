@@ -165,7 +165,8 @@ parameter, while parenthesis indicates a mandatory one - one of the options must
 ### The megaAVR 0-series is also supported by this codebase
 Running make_all_mega0.bat in a suitable build environment will build all 42 binaries - 7 entry condition/timeout combinations times 2 (default or alt pins) times 3 USARTs = 42.
 
-### All binaries are either 470 or 472 bytes in size, leaving 20 words free. There is at least one pathological pushpop.
+### All binaries are either 470 or 472 bytes in size, leaving 20 words free
+* There is at least one pathological push-pop
 
 ## There are six entry condition options available
 These control when Optiboot will "run" and how long it will wait for a new sketch when it does. Note that a WDT reset will *never* run the bootloader (we use a WDT reset to exit the bootloader, and we can't tell whether that was our own WDT reset or something else's), nor will a BOD reset not accompanied by something else ("weak or malfunctioning power supply" is something other than the ideal time to try to upload new firmware)
