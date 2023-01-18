@@ -487,7 +487,7 @@ When the TCD is configured to use asynchronous input events (CFG in TCDn.EVCTRLx
 
 **megaTinyCore note:** Irrelevant unless taking a very deep dive into TCD0. This issue is almost universal on devices with a TCD.
 
-#### Halt and wait for SW restart does not work in dual slope mode or when CMPASET = 0.
+#### Halt and wait for SW restart does not work in dual slope mode or when CMPASET = 0
 Halting TCD and waiting for software restart (INPUTMODE in TCDn.INPUTCTRLA is ‘0x7’) does not work if compare value A is 0 (CMPASET in TCDn.CMPASET is ‘0x0’) or Dual Slope mode is used (WGMODE in TCDn.CTRLB is ‘0x3’).
 
 **Workaround:** Configure the compare value A (CMPASET in TCDn.CMPASET) to be different from ‘0’ and do not use Dual Slope mode (WGMODE in TCDn.CTRLB is not ‘0x3’) when using this feature

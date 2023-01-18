@@ -1,3 +1,4 @@
+// *INDENT-OFF*
 // Get all the "standard" definitions from the official boot.h
 #include <avr/boot.h>
 
@@ -14,6 +15,9 @@
    With this modification, the _short functions should work on cpus
      (like ATmega128) where STS is required.
 
+// Spence Konde: Do we even NEED this file on modern tinyAVRs? I don't think we do...
+// like, I don't think they even have SPM instructions!!!
+
 // *INDENT-OFF*  // turn of astyle format checking which dislikes inline assembly.
 */
 
@@ -29,7 +33,7 @@ asm(".macro __wr_spmcsr p, v \n\t"
 #if defined(__SPM_REG)
 
 #define __boot_page_fill_short(address, data)    \
-  (__extension__({                                 \
+  (__extension__({                               \
     __asm__ __volatile__                         \
     (                                            \
         "movw  r0, %3\n\t"                       \
@@ -37,7 +41,7 @@ asm(".macro __wr_spmcsr p, v \n\t"
         "spm\n\t"                                \
         "clr  r1\n\t"                            \
         :                                        \
-        : "i" (_SFR_MEM_ADDR(__SPM_REG)),         \
+        : "i" (_SFR_MEM_ADDR(__SPM_REG)),        \
           "r" ((uint8_t)__BOOT_PAGE_FILL),       \
           "z" ((uint16_t)address),               \
           "r" ((uint16_t)data)                   \
@@ -52,33 +56,33 @@ asm(".macro __wr_spmcsr p, v \n\t"
         "__wr_spmcsr %0, %1\n\t"                 \
         "spm\n\t"                                \
         :                                        \
-        : "i" (_SFR_MEM_ADDR(__SPM_REG)),         \
+        : "i" (_SFR_MEM_ADDR(__SPM_REG)),        \
           "r" ((uint8_t)__BOOT_PAGE_ERASE),      \
           "z" ((uint16_t)address)                \
     );                                           \
   }))
 
 #define __boot_page_write_short(address)         \
-  (__extension__({                                 \
+  (__extension__({                               \
     __asm__ __volatile__                         \
     (                                            \
         "__wr_spmcsr %0, %1\n\t"                 \
         "spm\n\t"                                \
         :                                        \
-        : "i" (_SFR_MEM_ADDR(__SPM_REG)),         \
+        : "i" (_SFR_MEM_ADDR(__SPM_REG)),        \
           "r" ((uint8_t)__BOOT_PAGE_WRITE),      \
           "z" ((uint16_t)address)                \
     );                                           \
   }))
 
 #define __boot_rww_enable_short()                \
-  (__extension__({                                 \
+  (__extension__({                               \
     __asm__ __volatile__                         \
     (                                            \
         "__wr_spmcsr %0, %1\n\t"                 \
         "spm\n\t"                                \
         :                                        \
-        : "i" (_SFR_MEM_ADDR(__SPM_REG)),         \
+        : "i" (_SFR_MEM_ADDR(__SPM_REG)),        \
           "r" ((uint8_t)__BOOT_RWW_ENABLE)       \
     );                                           \
   }))

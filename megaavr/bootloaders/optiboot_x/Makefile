@@ -148,7 +148,7 @@ optiboot_%.elf:	optiboot_x.c FORCE
 # "Board-level Platform" targets.
 # A "Board-level Platform" implies a manufactured platform with a particular
 # serial port, LED, and so on.  Parameters are not particularly changeable from
-# the "make" command line. These "board level platforms" are for the Microchip official boards. 
+# the "make" command line. These "board level platforms" are for the Microchip official boards.
 #---------------------------------------------------------------------------
 # The rest of these definitions are chip-level definitions, and while they assume an LED pin,
 # they make no assumptions about anything else other than that the baud rate will by 115200.
@@ -163,8 +163,8 @@ optiboot_%.elf:	optiboot_x.c FORCE
 # datasheet had been available for months. Somehow that preliminary one was
 # very widely circulated, because I am not the only one who made that mistake.
 # Even in 2020, I've corrected someone who had been using the preliminary
-# datasheet! 
-# After realizing my error, the 8-pin bootloaders were amended to use PA3 as the LED. 
+# datasheet!
+# After realizing my error, the 8-pin bootloaders were amended to use PA3 as the LED.
 # Anyway, 2-series parts use the same binaries as each other,and have 3 serial options.
 # 2 USARTs but USART0's alt pins are USART1's default ones.... (presumably
 # sharing some underlying hardware...)
@@ -679,7 +679,7 @@ HELPTEXT += "target mega0_ser1_extr8sec - megaAVR 0-series (m4809 et. al.) USART
 mega0_ser1_extr8sec: TARGET = atmega4809
 mega0_ser1_extr8sec:
 	$(MAKE) -f $(MF) optiboot_mega0_ser1_extr8sec.hex UARTTX=C0 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
-	
+
 HELPTEXT += "target mega0_ser1_alt_porswr8sec - megaAVR 0-series (m4809 et. al.) USART1, alternate serial pins, 8 second timeout, LED on A7. Entry: POR, software or UPDI reset\n"
 mega0_ser1_alt_porswr8sec: TARGET = atmega4809
 mega0_ser1_alt_porswr8sec:
@@ -749,7 +749,7 @@ HELPTEXT += "target mega0_ser2_extr8sec - megaAVR 0-series (m4809 et. al.) USART
 mega0_ser2_extr8sec: TARGET = atmega4809
 mega0_ser2_extr8sec:
 	$(MAKE) -f $(MF) optiboot_mega0_ser2_extr8sec.hex UARTTX=F0 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
-	
+
 HELPTEXT += "target mega0_ser2_alt_porswr8sec - megaAVR 0-series (m4809 et. al.) USART2, alternate serial pins, 8 second timeout, LED on A7. Entry: POR, software or UPDI reset\n"
 mega0_ser2_alt_porswr8sec: TARGET = atmega4809
 mega0_ser2_alt_porswr8sec:

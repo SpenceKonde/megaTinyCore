@@ -1,4 +1,3 @@
-
 // *INDENT-OFF*  // disable astyle code formatting tests.
 #include <megaTinyCore.h>
 #include <util/delay.h>
