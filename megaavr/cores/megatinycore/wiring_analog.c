@@ -1117,7 +1117,7 @@ void analogWrite(uint8_t pin, int val) {
           //If we have buffered TCA0, then we write to different registers and calculate destinations differeetly.
           volatile uint16_t *timer_cmp_out; // must be volatile for this to be safe.
           uint8_t offset = 0;
-          if (bit@mask & 0x12) {
+          if (bit_mask & 0x12) {
             offset = 1;
             bit_mask = 0x20;
           }else if (bitmask & 0x24) {
