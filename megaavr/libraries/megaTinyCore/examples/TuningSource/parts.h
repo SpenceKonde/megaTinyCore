@@ -11,6 +11,19 @@
   #elif  (defined(__AVR_ATmega641__) || defined(__AVR_ATmega1281__) || defined(__AVR_ATmega2561__) || \
           defined(__AVR_ATmega640__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__))
     #define __AVR_ATmega_Mega__
+  #elif (defined(__AVR_ATtiny167__) || defined(__AVR_ATtiny87__))
+    #define TINY_X7_TIMER
+    #if !(defined(TIMER0_TYPICAL))
+      #undef TIMER1_TYPICAL
+    #endif
+    #undef TIMER1_TYPICAL
+    #undef TIMER0_TYPICAL
+    #define TIMER0_TYPICAL (0)
+    #define TIMER1_TYPICAL (87)
+    #define PIN_TIMER_OC0A              (PIN_PA2)
+    #define PIN_IS_VALID_TIMER1(pin) (pin == PIN_PB1)
+    #define CONFIGURE_PWM() (TCCR1D = 0x1 << OC1BU;)
+
   #elif (defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328PB__) || \
          defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega168PB__) || defined(__AVR_ATmega168A__)  || defined(__AVR_ATmega168PA__) || \
          defined(__AVR_ATmega88__)  || defined(__AVR_ATmega88P__)  || defined(__AVR_ATmega88PB__)  || \
@@ -35,6 +48,7 @@
       #define PIN_TIMER_OC2A              (PIN_PD3)
       #define PIN_TIMER_OC2B              (PIN_PB3)
     #endif
+    }
     #define CONFIG_OK
   #endif
   // we can handle the others without mess like what is seen below.
