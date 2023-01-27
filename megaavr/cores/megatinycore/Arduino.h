@@ -174,8 +174,10 @@
   #define ADC_ACC512      0x89
   #define ADC_ACC1024     0x8A
 
-  #define LOW_LAT_ON      0x03
-  #define LOW_LAT_OFF     0x02
+  #define LOW_LAT_ON      0x03 // deprecated
+  #define LOW_LAT_OFF     0x02 // deprecated
+  #define ADC_LOWLAT_ON  0x03
+  #define ADC_LOWLAT_OFF 0x02
   #define PGA_KEEP_ON     0x08
   #define PGA_AUTO_OFF    0x0C
   #define PGA_OFF_ONCE    0x04
