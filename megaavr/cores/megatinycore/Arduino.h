@@ -176,8 +176,8 @@
 
   #define LOW_LAT_ON      0x03 // deprecated
   #define LOW_LAT_OFF     0x02 // deprecated
-  #define ADC_LOWLAT_ON  0x03
-  #define ADC_LOWLAT_OFF 0x02
+  #define ADC_LOWLAT_ON   0x03
+  #define ADC_LOWLAT_OFF  0x02
   #define PGA_KEEP_ON     0x08
   #define PGA_AUTO_OFF    0x0C
   #define PGA_OFF_ONCE    0x04
@@ -527,7 +527,7 @@ Not enabled. Ugly ways to get delays at very small flash cost.
  * and it would only take 1 clock.
  * This can be roughly translated to "whenever you are working with any peripheral by getting a pointer to it, but the offset you want
  * bounded but variable, For example, you get the port base register, amd now you need the PIMnCTRL register. n is 0-7, and the
- * PINnCTRL registers are located at +0x10 to +0x17, and ports are 32-bit aligned, so adding that to the register will never change the high
+ * PINnCTRL registers are located at +0x10 to +0x17, and ports are 32-byte aligned, so adding that to the register will never change the high
  * byte of the address. These are sometimes used when a somewhat time-sensitive function which is called very frequently has to performs
  * such manipulations. Don't use unless you ae damned certain that you meet the conditions, and the function is called constantly
  * Mostly intended for internal use
