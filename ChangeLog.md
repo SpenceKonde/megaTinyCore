@@ -17,9 +17,10 @@ These items are in addition to what was listed under changes already in release.
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-### Planned 2.6.5
-* Documentation: Document WDT menus even though they're self-explanatory.
-* Enhancement: Turn off GCSE optimization, which has been found to be a pessimization far more often that an optimization, because of the degree to which it ends up turning pointer accesses from a constant base with a constant offset into access to an arbitrary address. Access via pointer with displacement is 2 words 2 clocks to load the base pointer, plus 1 word 2 clocks per load and 1/1 per store with displacement, but access to absolute addresses is 2 words 3 clocks per access - so if you have 2 accesses to an offset from a base register, you're at parity, and above that, there is often significant savings. Test showed that the vast majority of sketches got smaller, not larger. (Thanks @MX682X)
+## Released Versions
+
+### 2.6.5
+* Enhancement: Add optimization level submenu. This allows switching to -O3 instead of -Os, and disabling or not disabling "GCSE". The latter has been found to change the size of compiled binaries by up to 5%.... in either direction, or sometimes barely change it at all, with no apparent pattern. When you get desperate for flash, you can turn it on and see if it helps your sketch, You have about a 60% chance to gain at least a tiny bit of flash, though your odds of a large improvement aren't as good.
 * Bugfix: Correct issues relating to optiboot board definitions for Microchip boards (missing board entries, missing bootloaders).
 * Bugfix: Correct issue with Sampled/Sampled and Sampled (125hz)/Disabled BOD options. (#874)
 * Enhancement: Port new version of pinConfigure.
@@ -29,11 +30,10 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Maintenance: Harmonize versions of Wire, USERSIG, Event to pull in improvements from DxCore.
 * Bugfix: Fix issue with reading with SerialUPDI (#871)
 * Bugfix: Fix several USART-related issues (USART0 not working in half duplex, usart1 not working for receive, .end() less efficient than it could be and potentially wrong.)
-* Performance enhancement: From @MX682X, the discovery that an appropriately timed kick to the compiler's groin would cause it to place pointers into base registers when it otherwise would not. Doing this increases efficiency dramatically in some cases, , allowing the use of load and store with displacement in several places where it had previously used a truckload of LDS and/or STS instructions. This resulted in smaller, faster binaries due to more efficient initialiaation code for a number of peripherals (which impacted even users who weren't doing anything special, since the biggest beneficiaries were the ADC and timer initialization code, which happen as long as main() is not overridden). This also includes the addition of a number of macros to implement such kicks to permit this method to be readily generalized if other areas of the core are found which could benefit from it.
+* Performance enhancement: From @MX682X, the discovery that an appropriately timed kick to the compiler's groin would cause it to place pointers into base registers when it otherwise would not. Doing this increases efficiency dramatically in some cases, allowing the use of load and store with displacement in several places where it had previously used a truckload of LDS and/or STS instructions. This resulted in smaller, faster binaries due to more efficient initialiaation code for a number of peripherals (which impacted even users who weren't doing anything special, since the biggest beneficiaries were the ADC and timer initialization code, which happen as long as main() is not overridden). This also includes the addition of a number of macros to implement such kicks to permit this method to be readily generalized if other areas of the core are found which could benefit from it.
+* Organizational enhancement: Move all of the dirty performance enhancement macros like the ones above from Arduino.h to newly added dirty_tricks.h. Change names of many macros to make them easier to type. Document these functions in [the dirty_tricks reference](megaavr/extras/Ref_dirty_tricks.md).
 * Docs: General day-to-day maintenance
-* Add what little support was needed for analogWrite() to work if there were tools submenu to use differerent subsets of pins to wiring_analog.c. Varaiant files however still require significant work, however.
-
-## Released Versions
+* Add what little support was needed for analogWrite() to work if there were tools submenu to use differerent subsets of pins to wiring_analog.c. Varaiant files however still require significant work, however!
 
 ### 2.6.4 (2.6.3 respin due to critical compile error impacting all sketches)
 * Critical Bugfix: Correct compile error encountered in all cases.

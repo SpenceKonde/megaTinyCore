@@ -20,7 +20,7 @@
       // Except under tight constraints of 14-pin non-tinies, we can always count on their being a PA2.
       #define TUNE_OUTPUT_PIN PIN_PA2
     #elif !(defined(__AVR_DU__)) /*AVR DD-series has no PC0, PA2-7, and the only pins nubered 2 or lower in any port
-     * are thus PA0, PA1, and PC1 and PC2. The pins on PORTA are needed fro the crystal if this is to be used
+     * are thus PA0, PA1, and PC1 and PC2. The pins on PORTA are needed for the crystal if this is to be used
      * and you actually want to tune to within an accuracy measured in  (tens of) "ppm" instead of  (several) "%" on datasheet specs.
      * (since any error in th tuning is reflected in the USART baud rate error and all timing accuracy).
      * You can use PIN_PC2 just as well.
@@ -33,13 +33,13 @@
       * millis in any way shape or form to get our timing (if we did it'[d be totally fucked_/
       *
       * This sketch does not support using the CCL to redirect these orphaned output channels to usable pins,
-      * and this is infact practically trivial to do without even using the libraries. Se my 8-channel
+      * and this is in fact practically trivial to do without even using the libraries. Se my 8-channel
       * "millis, never heard of her..." for the 2-series, I demonstrate this in order to force both of those
       * fancy 16-bit TCB's to be reduces to generating a single 8-pit PWM output redirected via the CCL.
       * The timers involved, in an interview after the testing, described the work as humuiliating, and
       * and de-humanizing [desiliconizing?]. They had objected at the time, they claimed, but said that
       * I had brandished a grill starter (the spark ones - to a semiconductor, this is like pointing a gun at them yasee)
-      * and ordered them to work as 8 bit timers, with my loyal logic blocks puting a friendly facade over the operation.
+      * and ordered them to work as 8 bit timers, with my loyal logic blocks putting a friendly facade over the operation.
       * These accusations are totally false, as are their claims that I wasn't even paying for that derading work.
       * They're supposed to receive a nominal portion of the package rate that I pay for the chips.
       * They're all under contract through Microchip, so if they're not happy with the working conditions, they need to

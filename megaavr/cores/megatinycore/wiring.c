@@ -1412,7 +1412,7 @@ void __attribute__((weak)) init_millis()
       TCA1.SPLIT.INTCTRL |= TCA_SPLIT_HUNF_bm;
     #elif defined(MILLIS_USE_TIMERD0)
       TCD_t* pTCD;
-      FORCE_LOAD_POINTER_IN_B(pTCD, &TCD0);
+      _fastPtr_d(pTCD, &TCD0);
       pTCD->CMPBCLR        = TIME_TRACKING_TIMER_PERIOD; // essentially, this is TOP
       pTCD->CTRLB          = 0x00; // oneramp mode
       pTCD->CTRLC          = 0x80;
@@ -1636,7 +1636,7 @@ void __attribute__((weak)) init_clock() {
 /********************************* ADC ****************************************/
 void __attribute__((weak)) init_ADC0() {
   ADC_t* pADC;
-  FORCE_LOAD_POINTER_IN_B(pADC, &ADC0);
+  _fastPtr_d(pADC, &ADC0);
   #if MEGATINYCORE_SERIES < 2
   /* ADC clock 1 MHz to 1.25 MHz at frequencies supported by megaTinyCore
    * Unlike the classic AVRs, which demand 50~200 kHz, for these, the datasheet
@@ -1714,7 +1714,7 @@ void __attribute__((weak)) init_ADC0() {
 #ifdef ADC1
   __attribute__((weak)) void init_ADC1() {
     ADC_t* pADC;
-    FORCE_LOAD_POINTER_IN_B(pADC, &ADC1);
+    _fastPtr_d(pADC, &ADC1);
     //                              30 MHz / 32 = 937 kHz,  32 MHz / 32 =  1 MHz.
     #if   F_CPU   > 24000000     // 24 MHz / 16 = 1.5 MHz,  25 MHz / 32 =  780 kHz
       pADC->CTRLC  = ADC_PRESC_DIV32_gc | ADC_REFSEL_VDDREF_gc | ADC_SAMPCAP_bm;
@@ -1750,7 +1750,7 @@ void init_timers()  {
 #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && !defined(MILLIS_USE_TIMERD0))
 void __attribute__((weak)) init_TCD0() {
   TCD_t* pTCD;
-  FORCE_LOAD_POINTER_IN_B(pTCD, &TCD0);
+  _fastPtr_d(pTCD, &TCD0);
   pTCD->CMPBCLR  = 509; // 510 counts, starts at 0, not 1!
   pTCD->CMPACLR  = 509;
   pTCD->CTRLC    = 0x80; // WOD outputs PWM B, WOC outputs PWM A

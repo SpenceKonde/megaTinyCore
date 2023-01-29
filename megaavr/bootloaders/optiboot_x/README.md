@@ -38,7 +38,7 @@ section          size      addr
 .debug_ranges     104         0
 ```
 into what we'd really like:
-```test
+```text
 .text             476         0
 .spmtarg            4       506
 .version            2       510
@@ -200,7 +200,7 @@ DxCore ships with 315 binaries to support the same entry conditions. The reason 
 
 ## Used and unused working registers
 The register pressure in Optiboot_x is markedly lower than the already low register pressure in optiboot_dx - less than half of the working registers are in use, though most of the unused registers are less useful lower registers. An upper register would allow you to save 1 word for every time you'd otherwise need to load a value into a register with LDI after the first (unless that register must be used because of the ABI), whereas a lower register can only start saving flash from every time you can replace an LDI with a register holding a constant value after the *second* occurrence (because you need to ldi -> mov it, and that - that is assuming you don't need to use immediate values on it).
-```
+```text
   r0 - UNUSED
   r1
  r2-r12 - UNUSED

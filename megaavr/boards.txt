@@ -57,11 +57,13 @@ menu.bootloaderuart=UART for Bootloader (burn bootloader req'd)
 menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
 menu.resetpinopti=UPDI/Reset Pin and
 menu.resetpinopti_2=UPDI/alt-RST pin
-menu.entryconditition=Bootloader entry sion
+menu.entryconditition=Bootloader entry on
+menu.optimizationlevel=Optimization level
 menu.printf=printf()
 menu.wiremode=Wire (Wire.h/I2C) Library mode
-menu.WDTtimeout=WDT timeout (burn bootloader req'd. Note that it cannot be disabled if set here!)
-menu.WDTwindow=WDT window (if desired. burn bootloader req'd. Note that it cannot be disabled if set here!)
+menu.WDTtimeout=WDT timeout (burn bootloader req'd. Cannot be disabled at runtime if set here)
+menu.WDTwindow=WDT window (if desired. burn bootloader req'd. Cannot be disabled at runtime if set here)
+menu.optimizationlevel=Optimization level (see documentation)
 
 ##########################################################################
 #                                                                        #
@@ -106,6 +108,8 @@ atxy7.build.clocksource=0
 atxy7.build.core=megatinycore
 atxy7.build.mrelax=-mrelax
 atxy7.build.variant=txy7
+atxy7.build.optimizationlevel=-Os
+atxy7.build.gcse=
 atxy7.build.tuned=
 atxy7.build.printf=
 atxy7.build.wire=MORS
@@ -142,6 +146,7 @@ atxy7.build.printfabr=
 atxy7.build.attachabr=
 atxy7.build.wireabr=
 atxy7.build.pwmabr=
+atxy7.build.optabr=.Os
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -462,6 +467,24 @@ atxy7.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy7.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atxy7.menu.optimization.size=-Os (size)
+atxy7.menu.optimization.sizegcse=-Os (size, no GCSE)
+atxy7.menu.optimization.o3=-O3 (speed)
+atxy7.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atxy7.menu.optimization.size.build.optimizationlevel=-Os
+atxy7.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atxy7.menu.optimization.o3.build.optimizationlevel=-O3
+atxy7.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atxy7.menu.optimization.size.build.optabr=.Os
+atxy7.menu.optimization.sizegcse.build.optabr=.Osng
+atxy7.menu.optimization.o3.build.optabr=.O3
+atxy7.menu.optimization.o3gcse.build.optabr=.O3ng
+atxy7.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atxy7.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atxy7.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -548,6 +571,8 @@ atxy6.build.clocksource=0
 atxy6.build.core=megatinycore
 atxy6.build.mrelax= -mrelax
 atxy6.build.variant=txy6
+atxy6.build.optimizationlevel=-Os
+atxy6.build.gcse=
 atxy6.build.tuned=
 atxy6.build.printf=
 atxy6.build.wire=MORS
@@ -584,6 +609,7 @@ atxy6.build.printfabr=
 atxy6.build.attachabr=
 atxy6.build.wireabr=
 atxy6.build.pwmabr=
+atxy6.build.optabr=.Os
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -907,6 +933,24 @@ atxy6.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy6.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atxy6.menu.optimization.size=-Os (size)
+atxy6.menu.optimization.sizegcse=-Os (size, no GCSE)
+atxy6.menu.optimization.o3=-O3 (speed)
+atxy6.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atxy6.menu.optimization.size.build.optimizationlevel=-Os
+atxy6.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atxy6.menu.optimization.o3.build.optimizationlevel=-O3
+atxy6.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atxy6.menu.optimization.size.build.optabr=.Os
+atxy6.menu.optimization.sizegcse.build.optabr=.Osng
+atxy6.menu.optimization.o3.build.optabr=.O3
+atxy6.menu.optimization.o3gcse.build.optabr=.O3ng
+atxy6.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atxy6.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atxy6.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -993,6 +1037,8 @@ atxy4.build.clocksource=0
 atxy4.build.core=megatinycore
 atxy4.build.mrelax= -mrelax
 atxy4.build.variant=txy4
+atxy4.build.optimizationlevel=-Os
+atxy4.build.gcse=
 atxy4.build.tuned=
 atxy4.build.printf=
 atxy4.build.wire=MORS
@@ -1028,6 +1074,7 @@ atxy4.build.printfabr=
 atxy4.build.attachabr=
 atxy4.build.wireabr=
 atxy4.build.pwmabr=
+atxy4.build.optabr=.Os
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -1353,6 +1400,24 @@ atxy4.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy4.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atxy4.menu.optimization.size=-Os (size)
+atxy4.menu.optimization.sizegcse=-Os (size, no GCSE)
+atxy4.menu.optimization.o3=-O3 (speed)
+atxy4.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atxy4.menu.optimization.size.build.optimizationlevel=-Os
+atxy4.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atxy4.menu.optimization.o3.build.optimizationlevel=-O3
+atxy4.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atxy4.menu.optimization.size.build.optabr=.Os
+atxy4.menu.optimization.sizegcse.build.optabr=.Osng
+atxy4.menu.optimization.o3.build.optabr=.O3
+atxy4.menu.optimization.o3gcse.build.optabr=.O3ng
+atxy4.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atxy4.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atxy4.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -1443,6 +1508,8 @@ atxy2.build.mcu=attiny{build.attiny}
 atxy2.build.f_cpu={build.speed}000000L
 atxy2.build.extra_flags=-DARDUINO_attinyxy2 {build.tuned}
 atxy2.build.export_merged_output=false
+atxy2.build.optimizationlevel=-Os
+atxy2.build.gcse=
 atxy2.build.tuned=
 atxy2.build.printf=
 atxy2.build.wire=MORS
@@ -1474,6 +1541,7 @@ atxy2.build.printfabr=
 atxy2.build.attachabr=
 atxy2.build.wireabr=
 atxy2.build.pwmabr=
+atxy2.build.optabr=.Os
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -1740,6 +1808,24 @@ atxy2.menu.startuptime.32.bootloader.SYSCFG1=0x06
 atxy2.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atxy2.menu.optimization.size=-Os (size)
+atxy2.menu.optimization.sizegcse=-Os (size, no GCSE)
+atxy2.menu.optimization.o3=-O3 (speed)
+atxy2.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atxy2.menu.optimization.size.build.optimizationlevel=-Os
+atxy2.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atxy2.menu.optimization.o3.build.optimizationlevel=-O3
+atxy2.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atxy2.menu.optimization.size.build.optabr=.Os
+atxy2.menu.optimization.sizegcse.build.optabr=.Osng
+atxy2.menu.optimization.o3.build.optabr=.O3
+atxy2.menu.optimization.o3gcse.build.optabr=.O3ng
+atxy2.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atxy2.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atxy2.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -1825,6 +1911,8 @@ microchip.build.clocksource=0
 microchip.build.core=megatinycore
 microchip.build.mrelax= -mrelax
 microchip.build.variant=txy7
+microchip.build.optimizationlevel=-Os
+microchip.build.gcse=
 microchip.build.tuned=
 microchip.build.board=If you see this, please report this bug promptly. It should never be shown.
 microchip.build.printf=
@@ -1860,6 +1948,7 @@ microchip.build.printfabr=
 microchip.build.wireabr=
 microchip.build.attachabr=
 microchip.build.pwmabr=
+microchip.build.optabr=.Os
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -2122,6 +2211,24 @@ microchip.menu.startuptime.32.bootloader.SYSCFG1=0x06
 microchip.menu.startuptime.64.bootloader.SYSCFG1=0x07
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+microchip.menu.optimization.size=-Os (size)
+microchip.menu.optimization.sizegcse=-Os (size, no GCSE)
+microchip.menu.optimization.o3=-O3 (speed)
+microchip.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+microchip.menu.optimization.size.build.optimizationlevel=-Os
+microchip.menu.optimization.sizegcse.build.optimizationlevel=-Os
+microchip.menu.optimization.o3.build.optimizationlevel=-O3
+microchip.menu.optimization.o3gcse.build.optimizationlevel=-O3
+microchip.menu.optimization.size.build.optabr=.Os
+microchip.menu.optimization.sizegcse.build.optabr=.Osng
+microchip.menu.optimization.o3.build.optabr=.O3
+microchip.menu.optimization.o3gcse.build.optabr=.O3ng
+microchip.menu.optimization.sizegcse.build.gcse=-fno-gcse
+microchip.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 microchip.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -2220,6 +2327,8 @@ atxy7o.build.core=megatinycore
 atxy7o.build.mrelax= -mrelax
 
 atxy7o.build.variant=txy7
+atxy7o.build.optimizationlevel=-Os
+atxy7o.build.gcse=
 atxy7o.build.tuned=
 atxy7o.build.printf=
 atxy7o.build.wire=MORS
@@ -2254,6 +2363,7 @@ atxy7o.build.printfabr=
 atxy7o.build.attachabr=
 atxy7o.build.wireabr=
 atxy7o.build.pwmabr=
+atxy7o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -2576,6 +2686,24 @@ atxy7o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy7o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atxy7o.menu.optimization.size=-Os (size)
+atxy7o.menu.optimization.sizegcse=-Os (size, no GCSE)
+atxy7o.menu.optimization.o3=-O3 (speed)
+atxy7o.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atxy7o.menu.optimization.size.build.optimizationlevel=-Os
+atxy7o.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atxy7o.menu.optimization.o3.build.optimizationlevel=-O3
+atxy7o.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atxy7o.menu.optimization.size.build.optabr=.Os
+atxy7o.menu.optimization.sizegcse.build.optabr=.Osng
+atxy7o.menu.optimization.o3.build.optabr=.O3
+atxy7o.menu.optimization.o3gcse.build.optabr=.O3ng
+atxy7o.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atxy7o.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atxy7o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -2626,6 +2754,8 @@ atx27o.build.clocksource=0
 atx27o.build.core=megatinycore
 atx27o.build.mrelax= -mrelax
 atx27o.build.variant=txy7
+atx27o.build.optimizationlevel=-Os
+atx27o.build.gcse=
 atx27o.build.tuned=
 atx27o.build.printf=
 atx27o.build.wire=MORS
@@ -2660,6 +2790,7 @@ atx27o.build.printfabr=
 atx27o.build.attachabr=
 atx27o.build.wireabr=
 atx27o.build.pwmabr=
+atx27o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -2953,6 +3084,24 @@ atx27o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 atx27o.menu.bootloaderuart.alternate1.bootloader.uartswap=_u1alt
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atx27o.menu.optimization.size=-Os (size)
+atx27o.menu.optimization.sizegcse=-Os (size, no GCSE)
+atx27o.menu.optimization.o3=-O3 (speed)
+atx27o.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atx27o.menu.optimization.size.build.optimizationlevel=-Os
+atx27o.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atx27o.menu.optimization.o3.build.optimizationlevel=-O3
+atx27o.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atx27o.menu.optimization.size.build.optabr=.Os
+atx27o.menu.optimization.sizegcse.build.optabr=.Osng
+atx27o.menu.optimization.o3.build.optabr=.O3
+atx27o.menu.optimization.o3gcse.build.optabr=.O3ng
+atx27o.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atx27o.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atx27o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -3003,6 +3152,8 @@ atxy6o.build.clocksource=0
 atxy6o.build.core=megatinycore
 atxy6o.build.mrelax= -mrelax
 atxy6o.build.variant=txy6
+atxy6o.build.optimizationlevel=-Os
+atxy6o.build.gcse=
 atxy6o.build.tuned=
 atxy6o.build.printf=
 atxy6o.build.wire=MORS
@@ -3037,6 +3188,7 @@ atxy6o.build.printfabr=
 atxy6o.build.attachabr=
 atxy6o.build.wireabr=
 atxy6o.build.pwmabr=
+atxy6o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3348,6 +3500,24 @@ atxy6o.menu.bootloaderuart.default.bootloader.uartswap=
 atxy6o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atxy6o.menu.optimization.size=-Os (size)
+atxy6o.menu.optimization.sizegcse=-Os (size, no GCSE)
+atxy6o.menu.optimization.o3=-O3 (speed)
+atxy6o.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atxy6o.menu.optimization.size.build.optimizationlevel=-Os
+atxy6o.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atxy6o.menu.optimization.o3.build.optimizationlevel=-O3
+atxy6o.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atxy6o.menu.optimization.size.build.optabr=.Os
+atxy6o.menu.optimization.sizegcse.build.optabr=.Osng
+atxy6o.menu.optimization.o3.build.optabr=.O3
+atxy6o.menu.optimization.o3gcse.build.optabr=.O3ng
+atxy6o.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atxy6o.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atxy6o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -3398,6 +3568,8 @@ atx26o.build.clocksource=0
 atx26o.build.core=megatinycore
 atx26o.build.mrelax= -mrelax
 atx26o.build.variant=txy6
+atx26o.build.optimizationlevel=-Os
+atx26o.build.gcse=
 atx26o.build.tuned=
 atx26o.build.printf=
 atx26o.build.wire=MORS
@@ -3432,6 +3604,7 @@ atx26o.build.printfabr=
 atx26o.build.attachabr=
 atx26o.build.wireabr=
 atx26o.build.pwmabr=
+atx26o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3725,6 +3898,24 @@ atx26o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 atx26o.menu.bootloaderuart.alternate1.bootloader.uartswap=_u1alt
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atx26o.menu.optimization.size=-Os (size)
+atx26o.menu.optimization.sizegcse=-Os (size, no GCSE)
+atx26o.menu.optimization.o3=-O3 (speed)
+atx26o.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atx26o.menu.optimization.size.build.optimizationlevel=-Os
+atx26o.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atx26o.menu.optimization.o3.build.optimizationlevel=-O3
+atx26o.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atx26o.menu.optimization.size.build.optabr=.Os
+atx26o.menu.optimization.sizegcse.build.optabr=.Osng
+atx26o.menu.optimization.o3.build.optabr=.O3
+atx26o.menu.optimization.o3gcse.build.optabr=.O3ng
+atx26o.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atx26o.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atx26o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -3775,6 +3966,8 @@ atxy4o.build.clocksource=0
 atxy4o.build.core=megatinycore
 atxy4o.build.mrelax= -mrelax
 atxy4o.build.variant=txy4
+atxy4o.build.optimizationlevel=-Os
+atxy4o.build.gcse=
 atxy4o.build.tuned=
 atxy4o.build.printf=
 atxy4o.build.wire=MORS
@@ -3809,6 +4002,7 @@ atxy4o.build.printfabr=
 atxy4o.build.attachabr=
 atxy4o.build.wireabr=
 atxy4o.build.pwmabr=
+atxy4o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -4131,6 +4325,24 @@ atxy4o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atxy4o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atxy4o.menu.optimization.size=-Os (size)
+atxy4o.menu.optimization.sizegcse=-Os (size, no GCSE)
+atxy4o.menu.optimization.o3=-O3 (speed)
+atxy4o.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atxy4o.menu.optimization.size.build.optimizationlevel=-Os
+atxy4o.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atxy4o.menu.optimization.o3.build.optimizationlevel=-O3
+atxy4o.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atxy4o.menu.optimization.size.build.optabr=.Os
+atxy4o.menu.optimization.sizegcse.build.optabr=.Osng
+atxy4o.menu.optimization.o3.build.optabr=.O3
+atxy4o.menu.optimization.o3gcse.build.optabr=.O3ng
+atxy4o.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atxy4o.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atxy4o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -4181,6 +4393,8 @@ atx24o.build.clocksource=0
 atx24o.build.core=megatinycore
 atx24o.build.mrelax= -mrelax
 atx24o.build.variant=txy4
+atx24o.build.optimizationlevel=-Os
+atx24o.build.gcse=
 atx24o.build.tuned=
 atx24o.build.printf=
 atx24o.build.wire=MORS
@@ -4215,6 +4429,7 @@ atx24o.build.printfabr=
 atx24o.build.attachabr=
 atx24o.build.wireabr=
 atx24o.build.pwmabr=
+atx24o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -4499,6 +4714,24 @@ atx24o.menu.entrycond.extr_slow.bootloader.entrycond=_extr8sec
 atx24o.menu.entrycond.porswr.bootloader.entrycond=_porswr8sec
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atx24o.menu.optimization.size=-Os (size)
+atx24o.menu.optimization.sizegcse=-Os (size, no GCSE)
+atx24o.menu.optimization.o3=-O3 (speed)
+atx24o.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atx24o.menu.optimization.size.build.optimizationlevel=-Os
+atx24o.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atx24o.menu.optimization.o3.build.optimizationlevel=-O3
+atx24o.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atx24o.menu.optimization.size.build.optabr=.Os
+atx24o.menu.optimization.sizegcse.build.optabr=.Osng
+atx24o.menu.optimization.o3.build.optabr=.O3
+atx24o.menu.optimization.o3gcse.build.optabr=.O3ng
+atx24o.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atx24o.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atx24o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -4548,6 +4781,8 @@ atxy2o.build.clocksource=0
 atxy2o.build.core=megatinycore
 atxy2o.build.mrelax=
 atxy2o.build.variant=txy2
+atxy2o.build.optimizationlevel=-Os
+atxy2o.build.gcse=
 atxy2o.build.tuned=
 atxy2o.build.printf=
 atxy2o.build.wire=MORS
@@ -4582,6 +4817,7 @@ atxy2o.build.printfabr=
 atxy2o.build.attachabr=
 atxy2o.build.wireabr=
 atxy2o.build.pwmabr=
+atxy2o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -4877,6 +5113,24 @@ atxy2o.menu.startuptimeopti.32.bootloader.SYSCFG1=0x06
 atxy2o.menu.startuptimeopti.64.bootloader.SYSCFG1=0x07
 
 #----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+atxy2o.menu.optimization.size=-Os (size)
+atxy2o.menu.optimization.sizegcse=-Os (size, no GCSE)
+atxy2o.menu.optimization.o3=-O3 (speed)
+atxy2o.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+atxy2o.menu.optimization.size.build.optimizationlevel=-Os
+atxy2o.menu.optimization.sizegcse.build.optimizationlevel=-Os
+atxy2o.menu.optimization.o3.build.optimizationlevel=-O3
+atxy2o.menu.optimization.o3gcse.build.optimizationlevel=-O3
+atxy2o.menu.optimization.size.build.optabr=.Os
+atxy2o.menu.optimization.sizegcse.build.optabr=.Osng
+atxy2o.menu.optimization.o3.build.optabr=.O3
+atxy2o.menu.optimization.o3gcse.build.optabr=.O3ng
+atxy2o.menu.optimization.sizegcse.build.gcse=-fno-gcse
+atxy2o.menu.optimization.o3gcse.build.gcse=-fno-gcse
+
+#----------------------------------------#
 # TWI OPTIONS                            #
 #________________________________________#
 atxy2o.menu.wiremode.mors=Master or Slave (saves flash and RAM)
@@ -4927,6 +5181,8 @@ microchipo.build.core=megatinycore
 microchipo.build.mrelax= -mrelax
 microchipo.build.mcu=attiny{build.attiny}
 microchipo.build.f_cpu={build.speed}000000L
+microchipo.build.optimizationlevel=-Os
+microchipo.build.gcse=
 microchipo.build.tuned=
 microchipo.build.printf=
 microchipo.build.wire=MORS
@@ -4958,6 +5214,7 @@ microchipo.build.printfabr=
 microchipo.build.wireabr=
 microchipo.build.attachabr=
 microchipo.build.pwmabr=
+microchipo.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -5213,6 +5470,24 @@ microchipo.menu.startuptime.8.bootloader.SYSCFG1=0x04
 microchipo.menu.startuptime.16.bootloader.SYSCFG1=0x05
 microchipo.menu.startuptime.32.bootloader.SYSCFG1=0x06
 microchipo.menu.startuptime.64.bootloader.SYSCFG1=0x07
+
+#----------------------------------------#
+# OPTIMIZATION OPTIONS                   #
+#________________________________________#
+microchipo.menu.optimization.size=-Os (size)
+microchipo.menu.optimization.sizegcse=-Os (size, no GCSE)
+microchipo.menu.optimization.o3=-O3 (speed)
+microchipo.menu.optimization.o3gcse=-O3 (speed, no GCSE)
+microchipo.menu.optimization.size.build.optimizationlevel=-Os
+microchipo.menu.optimization.sizegcse.build.optimizationlevel=-Os
+microchipo.menu.optimization.o3.build.optimizationlevel=-O3
+microchipo.menu.optimization.o3gcse.build.optimizationlevel=-O3
+microchipo.menu.optimization.size.build.optabr=.Os
+microchipo.menu.optimization.sizegcse.build.optabr=.Osng
+microchipo.menu.optimization.o3.build.optabr=.O3
+microchipo.menu.optimization.o3gcse.build.optabr=.O3ng
+microchipo.menu.optimization.sizegcse.build.gcse=-fno-gcse
+microchipo.menu.optimization.o3gcse.build.gcse=-fno-gcse
 
 #----------------------------------------#
 # TWI OPTIONS                            #

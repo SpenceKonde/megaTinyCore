@@ -1,0 +1,17 @@
+# A few important notes about the optimization menu
+3.6.5 adds a new Optimization Level menu which configures how the optimizer should weight speed, compile time, and binary size against each other.
+The optimization is made up of many passes, and these really have no idea what the other passes are doing.
+
+That means that optimizations are not always as optimal as you might hope.
+
+We use some [dirty tricks](Ref_dirty_tricks.md) to shove the optimizer to do better in the core libraries when it behaved particularly atrociously.
+
+But there's also the global optimization level. There are a number of options, but we offer only the subset of them most likely to be useful:
+* We allow optimizing for size (-Os) or speed (-O3). Compilation time for embedded C/C++ for small microcontrollers, when the compiler is running on powerful desktop computers, is rarely a problem. Thus, the lower optimization levels, which are designed to trade a larger binary size for reduced compilation time are not exactly useful.
+* We allow enabling or disabling of General Common Subexpression Elimination (gcse). What this does, exactly, is still a bit fuzzy to me (SK). However, surprising and alarming changes to the size of compiled binaries has been observed.
+  * The impact on compiled sketch size is +/-5%, though usually smaller in magnitude (that is to say, on some sketches, the magnitude of the change is nearly as large as LTO. LTO, Os vs non Os, and this are the optimization options known to the maintainer of this core as having potentially the largest impacts on flash usage). This varies depending on the sketch. There is little rhyme or reason apparent in the patterns.
+  * If a sketch is compiled with and without GCSE, the size delta recorded, then a tools submenu option is changed, and it is again compiled with and without GCSE and the size delta recorded the differences of over 100 bytes may be observed. There is little rhyme or reason to this, either.
+  * These are GIGANTIC CHANGES in sketch size for some sketches. The changes, however, are negligible for other sketches. Little pattern is seen in what benefits and what is made worse by these.
+  * Despite the change ranging from several hundred bytes larger to several hundred smaller, the average result was almost invisible. On one part that was investigated in great detail, they ranged from +56 to -122. However, the median was -3, and the average -8, indicating that barely more than 50% of sketches saw gains, and the rest got larger, and that the magnitude of the change for those that were improved was a bit larger than those that were degraded. About 10% of sketches saw binary size decrease by more than the worst impacted sketch's size increased.
+  * Hence, this option was added in order to provide a means of flipping this switch. If you imagine you were rolling a 10-sided die, you would see negligible improvement or significant degradation if you rolled a 1-5, while a 6-9 would lead to varying degrees of improvement, and the fortunate ones rolling a 10 would see around twice the benefit of those who rolled a 9. If you get into a pinch, you can see if this helps. It may very well not. Or maybe it will. At present we do not have any heuristic or means of determining which will benefit.
+* No combination of optimization flags will ever beat what a programmer fluent in assembly can achieve. However, it is slow and difficult to write, even harder to maintain, and so on.
