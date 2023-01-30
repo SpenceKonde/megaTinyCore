@@ -63,15 +63,16 @@ In lower case (but less compatible. Not dirty)
 These are the dirty tricks that we warned you about.
 
 ### High and Low math
-* `      _addLow(16_bit_t a, variable uint8_t b)`
-* `      _subLow(16_bit_t a, variable uint8_t b)`
-* `     _addHigh(16_bit_t a, variable uint8_t b)`
-* `     _subHigh(16_bit_t a, variable uint8_t b)`
-* ` _addLowConst(16_bit_t a, constant uint8_t b)`
-* ` _subLowConst(16_bit_t a, constant uint8_t b)`
-* `_addHighConst(16_bit_t a, constant uint8_t b)`
-* `_subHighConst(16_bit_t a, constant uint8_t b)`
-
+```c
+      _addLow(16_bit_t a, variable uint8_t b);
+      _subLow(16_bit_t a, variable uint8_t b);
+     _addHigh(16_bit_t a, variable uint8_t b);
+     _subHigh(16_bit_t a, variable uint8_t b);
+ _addLowConst(16_bit_t a, constant uint8_t b);
+ _subLowConst(16_bit_t a, constant uint8_t b);
+_addHighConst(16_bit_t a, constant uint8_t b);
+_subHighConst(16_bit_t a, constant uint8_t b);
+```
 These add or subtract the 8-bit value b from the high or low byte of a **without** taking any measures to handle carrying, borrowing, overflow, etc.
 These are best used when you have a base pointer that you need to take an offset from - likely the base pointer a is pointing to the start of a peripheral, and the offset is the location of a register within that peripheral. The peripherals are all aligned on 16, 32, 64, or 128 byte bounds and have at most that many registers. There may be times when you have 256-byte aligned pointers, too. When you want to offset them and either you need an offset of more than 63, or you know that you're already out of pointer pairs that can do displacement (and you're not working with a straight up constant. If the address can be constant-folded, and you are only using it once, this doesn't help and actually makes it worse). Typically you do this when you'd ideally like to use displacement - but you can't because you know both Y and Z are used, and the next pointer will be put into X.
 
@@ -97,12 +98,14 @@ This instead comes out to 6 clocks and 6 words.
 
 ### dirty tricks which can often but not always be replicated with clever use of C type unions
 These pertain to setting the high or low bit to a constant value, setting it to a value already in a variable
-* `      _setHigh(16_bit_t a, variable uint8_t b)`
-* ` _setHighConst(16_bit_t a, constant uint8_t b)`
-* `      _clrHigh(16_bit_t a)`
-* `       _setLow(16_bit_t a, variable uint8_t b)`
-* `  _setLowConst(16_bit_t a, constant uint8_t b)`
-* `       _clrLow(16_bit_t a)`
+```c
+      _setHigh(16_bit_t a, variable uint8_t b);
+ _setHighConst(16_bit_t a, constant uint8_t b);
+      _clrHigh(16_bit_t a);
+       _setLow(16_bit_t a, variable uint8_t b);
+  _setLowConst(16_bit_t a, constant uint8_t b);
+       _clrLow(16_bit_t a);
+```
 
 This sets the high or low byte (as requested) to a specified variable or constant. The change is made in place, and the other byte is unchanged.
 Most useful when working with pointers. "set" and "setconst" set the specified byte to a non-zero value, "clr" version sets the specified byte to 0.
@@ -110,12 +113,13 @@ Most useful when working with pointers. "set" and "setconst" set the specified b
 ### dirty tricks to force a variable into a pointer
 GCC fails to optimize memory accesses on AVR as well as it ought to.
 When accessing memory, GCC is using STS/LDS, using 2 words per instruction and 2/3 clocks respectively.In some cases, the programmer knows in advance that the function will access multiple peripheral registers or a bigger struct. (<= +63) To convince GCC that loading the pointer in advance will be more efficient, this defines are provided. The inline assembly forces GCC. To use the instruction STD/LDD that are just one word big and need only 1/2 clocks respectively, allowing for smaller code and faster execution. It should be considered, that the address has to be loaded into the register first, thus adding 2 words and 2 clocks overhead if it isn't already there. It is not required that the second argument be a variable rather than a constant.
-* `_fastPtr_z(16_bit_t __localVar__, 16_bit_t __pointer__)`
-* `_fastPtr_y(16_bit_t __localVar__, 16_bit_t __pointer__)`
-* `_fastPtr_x(16_bit_t __localVar__, 16_bit_t __pointer__)`
-* `_fastPtr_d(16_bit_t __localVar__, 16_bit_t __pointer__)` // Z or Y - the displacement capable ones
-* `_fastPtr(16_bit_t __localVar__, 16_bit_t __pointer__)` // any pointer register pair, so only direct access, access with postincrement or with predecrement will always work.
-
+```c
+_fastPtr_z(16_bit_t __localVar__, 16_bit_t __pointer__);
+_fastPtr_y(16_bit_t __localVar__, 16_bit_t __pointer__);
+_fastPtr_x(16_bit_t __localVar__, 16_bit_t __pointer__);
+_fastPtr_d(16_bit_t __localVar__, 16_bit_t __pointer__); // Z or Y - the displacement capable ones
+_fastPtr(16_bit_t __localVar__, 16_bit_t __pointer__); // any pointer register pair, so only direct access, access with postincrement or with predecrement will always work.
+```
 
 #### Using these
 * declare local pointer variable with the same type as the original pointer
@@ -129,8 +133,9 @@ pADC->CTRLB = 0x55;
 
 ### Building pointers from bytes
 These two macros give you a pointer (in either Z or Y, or in X, Y or Z).
-* `_makeFastPtr_d(uint8_t * newptt, const uint8_t highbyte, uint8_t lowbyte)` // Z or Y - the displacement capable ones
-* `  _makeFastPtr(uint8_t * newptt, const uint8_t highbyte, uint8_t lowbyte)` // any pointer register pair. Can almost always be done with a union.
-
+```c
+_makeFastPtr_d(uint8_t * newptt, const uint8_t highbyte, uint8_t lowbyte);// Z or Y - the displacement capable ones
+  _makeFastPtr(uint8_t * newptt, const uint8_t highbyte, uint8_t lowbyte);// any pointer register pair. Can almost always be done with a union.
+```
 These take three arguments: A local variable that must be a pointer, a constant value that is to be the high byte and a 8-bit variable which is to be the low byte.
 They  provide NO GUARANTEE that the compiler won't waste even more time shuffling them out of the register you forced them into, but the compiler is rarely that boneheaded. It does dumb stuff, yes, but if you've forced variables into certain registers, it's unlikely to move them unless it has to, in which case the compilers first attempt may not have been as bad as you thought.
