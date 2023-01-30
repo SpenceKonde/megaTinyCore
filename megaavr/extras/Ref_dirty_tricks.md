@@ -1,4 +1,4 @@
-# dirty_tricks.h - a package of macros that act as a forceful shove to the optimizer.
+# dirty_tricks.h - a package of macros that act as a forceful shove to the optimizer
 These are intended primarily for internal use.
 **For experienced users with at least basic AVR assembly knowledge only**
 
@@ -63,12 +63,12 @@ In lower case (but less compatible. Not dirty)
 These are the dirty tricks that we warned you about.
 
 ### High and Low math
-*       `_addLow(16_bit_t a, variable uint8_t b)`
-*       `_subLow(16_bit_t a, variable uint8_t b)`
-*      `_addHigh(16_bit_t a, variable uint8_t b)`
-*      `_subHigh(16_bit_t a, variable uint8_t b)`
-*  `_addLowConst(16_bit_t a, constant uint8_t b)`
-*  `_subLowConst(16_bit_t a, constant uint8_t b)`
+* `      _addLow(16_bit_t a, variable uint8_t b)`
+* `      _subLow(16_bit_t a, variable uint8_t b)`
+* `     _addHigh(16_bit_t a, variable uint8_t b)`
+* `     _subHigh(16_bit_t a, variable uint8_t b)`
+* ` _addLowConst(16_bit_t a, constant uint8_t b)`
+* ` _subLowConst(16_bit_t a, constant uint8_t b)`
 * `_addHighConst(16_bit_t a, constant uint8_t b)`
 * `_subHighConst(16_bit_t a, constant uint8_t b)`
 
@@ -97,12 +97,12 @@ This instead comes out to 6 clocks and 6 words.
 
 ### dirty tricks which can often but not always be replicated with clever use of C type unions
 These pertain to setting the high or low bit to a constant value, setting it to a value already in a variable
- *       `_setHigh(16_bit_t a, variable uint8_t b)`
- *  `_setHighConst(16_bit_t a, constant uint8_t b)`
- *       `_clrHigh(16_bit_t a)`
- *        `_setLow(16_bit_t a, variable uint8_t b)`
- *   `_setLowConst(16_bit_t a, constant uint8_t b)`
- *        `_clrLow(16_bit_t a)`
+* `      _setHigh(16_bit_t a, variable uint8_t b)`
+* ` _setHighConst(16_bit_t a, constant uint8_t b)`
+* `      _clrHigh(16_bit_t a)`
+* `       _setLow(16_bit_t a, variable uint8_t b)`
+* `  _setLowConst(16_bit_t a, constant uint8_t b)`
+* `       _clrLow(16_bit_t a)`
 
 This sets the high or low byte (as requested) to a specified variable or constant. The change is made in place, and the other byte is unchanged.
 Most useful when working with pointers. "set" and "setconst" set the specified byte to a non-zero value, "clr" version sets the specified byte to 0.
@@ -130,7 +130,7 @@ pADC->CTRLB = 0x55;
 ### Building pointers from bytes
 These two macros give you a pointer (in either Z or Y, or in X, Y or Z).
 * `_makeFastPtr_d(uint8_t * newptt, const uint8_t highbyte, uint8_t lowbyte)` // Z or Y - the displacement capable ones
-*   `_makeFastPtr(uint8_t * newptt, const uint8_t highbyte, uint8_t lowbyte)` // any pointer register pair. Can almost always be done with a union.
+* `  _makeFastPtr(uint8_t * newptt, const uint8_t highbyte, uint8_t lowbyte)` // any pointer register pair. Can almost always be done with a union.
 
 These take three arguments: A local variable that must be a pointer, a constant value that is to be the high byte and a 8-bit variable which is to be the low byte.
 They  provide NO GUARANTEE that the compiler won't waste even more time shuffling them out of the register you forced them into, but the compiler is rarely that boneheaded. It does dumb stuff, yes, but if you've forced variables into certain registers, it's unlikely to move them unless it has to, in which case the compilers first attempt may not have been as bad as you thought.
