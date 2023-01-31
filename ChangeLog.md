@@ -17,10 +17,13 @@ These items are in addition to what was listed under changes already in release.
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
+### 2.6.6
+* Enhancement/bugfix: 2.6.5 was intended to add an optimization level submenu. Due to a typographical error, the menu was not shown (though no harm was done). That menu is now actually available.
+
 ## Released Versions
 
 ### 2.6.5
-* Enhancement: Add optimization level submenu. This allows switching to -O3 instead of -Os, and disabling or not disabling "GCSE". The latter has been found to change the size of compiled binaries by up to 5%.... in either direction, or sometimes barely change it at all, with no apparent pattern. When you get desperate for flash, you can turn it on and see if it helps your sketch, You have about a 60% chance to gain at least a tiny bit of flash, though your odds of a large improvement aren't as good.
+* ~Enhancement: Add optimization level submenu. This allows switching to -O3 instead of -Os, and disabling or not disabling "GCSE". The latter has been found to change the size of compiled binaries by up to 5%.... in either direction, or sometimes barely change it at all, with no apparent pattern. When you get desperate for flash, you can turn it on and see if it helps your sketch, You have about a 60% chance to gain at least a tiny bit of flash, though your odds of a large improvement aren't as good.~
 * Bugfix: Correct issues relating to optiboot board definitions for Microchip boards (missing board entries, missing bootloaders).
 * Bugfix: Correct issue with Sampled/Sampled and Sampled (125hz)/Disabled BOD options. (#874)
 * Enhancement: Port new version of pinConfigure.
@@ -34,6 +37,10 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Organizational enhancement: Move all of the dirty performance enhancement macros like the ones above from Arduino.h to newly added dirty_tricks.h. Change names of many macros to make them easier to type. Document these functions in [the dirty_tricks reference](megaavr/extras/Ref_dirty_tricks.md).
 * Docs: General day-to-day maintenance
 * Add what little support was needed for analogWrite() to work if there were tools submenu to use differerent subsets of pins to wiring_analog.c. Varaiant files however still require significant work, however!
+
+#### Known issues
+* Optimization level menu is not displayed.
+* The version string may be incorrectly reported as 2.6.5-dev. The numeric version is correctly reported as 2.6.5.1. The workaround for the "Major version not found" bug in 1.8.14 and later Arduino IDE versions requires an easily forgotten double-entry bookkeeping step.
 
 ### 2.6.4 (2.6.3 respin due to critical compile error impacting all sketches)
 * Critical Bugfix: Correct compile error encountered in all cases.

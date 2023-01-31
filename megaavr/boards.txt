@@ -9,19 +9,24 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other         ##        ###        ####    #
+#  Copyright Spence Konde and other         ##        ###         ###    #
 #  contributors 2018-2021                  #  #      #           #       #
-#  megaTinyCore is free software.    # #     #       ####        ###     #
-#  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##      #    #
-#  License section of README.md       #    ####  ##   ###   ##   ###     #
+#  megaTinyCore is free software.    # #     #       ####        ####    #
+#  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##   #   #   #
+#  License section of README.md       #    ####  ##   ###   ##    ###    #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
 #  have the zoomed out "minimap" that you can scroll through.            #
 #                                                                        #
-#  megaTinyCore 2.6.0-2 is being developed simultaneously with DxCore    #
-#  1.5.0. As the hardware is very similar, much code is shared, and that #
-#  is the version of DxCore most similar to this version of megaTinyCore #
+#  megaTinyCore 2.6.6 is at approximate parity with DxCore 1.5.5         #
+#  These two cores share a large amount of code; most changes impact     #
+#  both cores, since the hardware is extremely similar, though it is     #
+#  expected that DxCore's minor version will advance faster since new    #
+#  part support is typically accompanied by a minor version bump, and    #
+#  there are two unreleased families with available product briefs that  #
+#  are headed for DxCore, but no unreleased tinyAVR parts that have      #
+#  been announced and all released tinyAVR parts are supported.          #
 #                                                                        #
 #  The board section headings have a triangle along the right edge       #
 #  if they are a non-bootloader definition. Optiboot sections have a     #
@@ -58,12 +63,11 @@ menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
 menu.resetpinopti=UPDI/Reset Pin and
 menu.resetpinopti_2=UPDI/alt-RST pin
 menu.entryconditition=Bootloader entry on
-menu.optimizationlevel=Optimization level
 menu.printf=printf()
 menu.wiremode=Wire (Wire.h/I2C) Library mode
 menu.WDTtimeout=WDT timeout (burn bootloader req'd. Cannot be disabled at runtime if set here)
 menu.WDTwindow=WDT window (if desired. burn bootloader req'd. Cannot be disabled at runtime if set here)
-menu.optimizationlevel=Optimization level (see documentation)
+menu.optimization=Optimization level (see documentation)
 
 ##########################################################################
 #                                                                        #
