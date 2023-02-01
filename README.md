@@ -161,6 +161,9 @@ All of a sudden, at 16k, the 1-series parts become far more interesting. Accompa
 ### tinyAVR 2-series
 As you can see from the table above, the 2-series is almost more of a sidegrade than an upgrade. They have a much better ADC, the event system and CCLs are "normal", and they have more RAM, the 14-pin part is available with 32k of flash (a 3214 was apparently planned, but then canceled; it got far enough to be in the ATPACK for a while before being removed)
 
+### Series Selection guide
+I've written [a brief summary of when you would want to use which series](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_PartSelection.md), if the right choice isn't obvious by now.
+
 ## A Word on Terminology ("megaAVR")
 In the official Arduino board definition for their "megaavr" hardware package, they imply that the new architecture on the megaAVR 0-Series parts (which is nearly the same as used on the tinyAVR 0-Series and 1-Series) is called "megaavr" - that is not an official term. Microchip uses the term "megaAVR" to refer to any "ATmega" part, whether it has the old style or modern peripherals. There are no official terms to refer to all AVR parts of one family or the other, and a Microchip employee even denied that there was such a term internally. I'm not sure how you can manufacture two sets of parts, with the parts in each set having so much in common with each other and so little in common with the other set, with nobody coining a phrase to refer to either of them.
 
