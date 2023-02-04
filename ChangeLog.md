@@ -19,6 +19,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### 2.6.6
 * Enhancement/bugfix: 2.6.5 was intended to add an optimization level submenu. Due to a typographical error, the menu was not shown (though no harm was done). That menu is now actually available.
+* Enhancement: Add a few more macros for getting information on peripherals and updated define reference.
 
 ## Released Versions
 

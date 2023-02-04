@@ -1,9 +1,9 @@
 /* core_devices  - a part of Arduino.h for megaTinyCore 2.3.0 and later and DxCore 1.4.0, but
- * which takes ion much greater importance (and girth) with the toolchain update in 2.6 and 1.6)
+ * which takes in much greater importance (and girth) with the toolchain update in 2.6 and 1.6)
  * This is directly included by Arduino.h and nothing else; it just moves
  * clutter out of that file. You should not directly include this file ever.
  *
- * Spence Konde 2021 -2022- megaTinyCore and DxCore are free software (LGPL 2.1)
+ * (C) Spence Konde 2021 - 2023. megaTinyCore and DxCore are free software (LGPL 2.1)
  * See LICENSE.txt for full legal boilerplate if you must */
 
 #ifndef Core_Devices_h
@@ -17,235 +17,235 @@
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx27__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 32
+  #define _AVR_FLASH 32
 #elif defined(__AVR_ATtiny1627__)
   #define MEGATINYCORE_MCU 1627
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx27__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 16
+  #define _AVR_FLASH 16
 #elif defined(__AVR_ATtiny827__)
   #define MEGATINYCORE_MCU 827
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx27__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 8
+  #define _AVR_FLASH 8
 #elif defined(__AVR_ATtiny427__)
   #define MEGATINYCORE_MCU 427
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx27__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 4
+  #define _AVR_FLASH 4
 #elif defined(__AVR_ATtiny3226__)
   #define MEGATINYCORE_MCU 3226
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx26__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 32
+  #define _AVR_FLASH 32
 #elif defined(__AVR_ATtiny1626__)
   #define MEGATINYCORE_MCU 1626
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx26__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 16
+  #define _AVR_FLASH 16
 #elif defined(__AVR_ATtiny826__)
   #define MEGATINYCORE_MCU 826
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx26__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 8
+  #define _AVR_FLASH 8
 #elif defined(__AVR_ATtiny426__)
   #define MEGATINYCORE_MCU 426
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx26__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 4
+  #define _AVR_FLASH 4
 #elif defined(__AVR_ATtiny3224__)
   #define MEGATINYCORE_MCU 3224
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx24__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 32
+  #define _AVR_FLASH 32
 #elif defined(__AVR_ATtiny1624__)
   #define MEGATINYCORE_MCU 1624
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx24__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 16
+  #define _AVR_FLASH 16
 #elif defined(__AVR_ATtiny824__)
   #define MEGATINYCORE_MCU 824
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx24__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 8
+  #define _AVR_FLASH 8
 #elif defined(__AVR_ATtiny424__)
   #define MEGATINYCORE_MCU 424
   #define MEGATINYCORE_SERIES 2
   #define __AVR_ATtinyx24__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 4
+  #define _AVR_FLASH 4
 #elif defined(__AVR_ATtiny3217__)
   #define MEGATINYCORE_MCU 3217
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx17__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 32
+  #define _AVR_FLASH 32
 #elif defined(__AVR_ATtiny1617__)
   #define MEGATINYCORE_MCU 1617
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx17__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 16
 #elif defined(__AVR_ATtiny817__)
   #define MEGATINYCORE_MCU 817
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx17__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 8
 #elif defined(__AVR_ATtiny417__)
   #define MEGATINYCORE_MCU 417
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx17__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 2
 #elif defined(__AVR_ATtiny3207__)
   #define MEGATINYCORE_MCU 3207
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx07__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 32
 #elif defined(__AVR_ATtiny1607__)
   #define MEGATINYCORE_MCU 1607
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx07__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 16
 #elif defined(__AVR_ATtiny807__)
   #define MEGATINYCORE_MCU 807
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx07__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 8
 #elif defined(__AVR_ATtiny407__)
   #define MEGATINYCORE_MCU 407
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx07__
   #define __AVR_ATtinyxy7__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 4
 #elif defined(__AVR_ATtiny3216__)
   #define MEGATINYCORE_MCU 3216
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 32
 #elif defined(__AVR_ATtiny1616__)
   #define MEGATINYCORE_MCU 1616
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 16
 #elif defined(__AVR_ATtiny816__)
   #define MEGATINYCORE_MCU 816
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 8
 #elif defined(__AVR_ATtiny416__)
   #define MEGATINYCORE_MCU 416
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx16__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 4
 #elif defined(__AVR_ATtiny1606__)
   #define MEGATINYCORE_MCU 1606
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 16
 #elif defined(__AVR_ATtiny806__)
   #define MEGATINYCORE_MCU 806
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 8
 #elif defined(__AVR_ATtiny406__)
   #define MEGATINYCORE_MCU 406
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx06__
   #define __AVR_ATtinyxy6__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 4
 #elif defined(__AVR_ATtiny214__)
   #define MEGATINYCORE_MCU 214
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx14__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 2
 #elif defined(__AVR_ATtiny1614__)
   #define MEGATINYCORE_MCU 1614
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx14__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 16
 #elif defined(__AVR_ATtiny814__)
   #define MEGATINYCORE_MCU 814
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx14__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 8
 #elif defined(__AVR_ATtiny414__)
   #define MEGATINYCORE_MCU 414
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx14__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 4
 #elif defined(__AVR_ATtiny204__)
   #define MEGATINYCORE_MCU 204
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx04__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 2
 #elif defined(__AVR_ATtiny804__)
   #define MEGATINYCORE_MCU 804
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx04__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 8
 #elif defined(__AVR_ATtiny404__)
   #define MEGATINYCORE_MCU 404
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx04__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 4
 #elif defined(__AVR_ATtiny1604__)
   #define MEGATINYCORE_MCU 1604
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx04__
   #define __AVR_ATtinyxy4__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 16
 #elif defined(__AVR_ATtiny212__)
   #define MEGATINYCORE_MCU 212
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx12__
   #define __AVR_ATtinyxy2__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 2
 #elif defined(__AVR_ATtiny412__)
   #define MEGATINYCORE_MCU 412
   #define MEGATINYCORE_SERIES 1
   #define __AVR_ATtinyx12__
   #define __AVR_ATtinyxy2__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 4
 #elif defined(__AVR_ATtiny202__)
   #define MEGATINYCORE_MCU 202
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx02__
   #define __AVR_ATtinyxy2__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 2
 #elif defined(__AVR_ATtiny402__)
   #define MEGATINYCORE_MCU 402
   #define MEGATINYCORE_SERIES 0
   #define __AVR_ATtinyx02__
   #define __AVR_ATtinyxy2__
-  #define _AVR_FLASH__ 2
+  #define _AVR_FLASH 4
 #else
   #error "Can't-happen: unknown chip somehow being used!"
 #endif
@@ -300,19 +300,103 @@
   #error "No ADC? No supported parts exist without one, something is wrong"
 #endif
 
+/* EVSYS:
+ * Count up the event channels.
+ * There are only 2 possibilities for tinyAVRs with the wacko channels.
+ * Since they're not making more of those, test for those two cases only, otherwise, might as well check every option.
+ */
+#if defined (EVSYS_ASYNCCH3) // tinyAVR 1
+  #define _AVR_EVSYS_COUNT  (6)
+  #define _AVR_EVSYS_ASYNC  (4)
+  #define _AVR_EVSYS_SYNC   (2)
+#elif defined (EVSYS_ASYNCCH1) // tinyAVR 0
+  #define _AVR_EVSYS_COUNT  (3)
+  #define _AVR_EVSYS_ASYNC  (2)
+  #define _AVR_EVSYS_SYNC   (1)
+#elif defined(EVSYS_CHANNEL15)
+  #define _AVR_EVSYS_COUNT  (16)
+#elif defined(EVSYS_CHANNEL14)
+  #define _AVR_EVSYS_COUNT  (15)
+#elif defined(EVSYS_CHANNEL13)
+  #define _AVR_EVSYS_COUNT  (14)
+#elif defined(EVSYS_CHANNEL12)
+  #define _AVR_EVSYS_COUNT  (13)
+#elif defined(EVSYS_CHANNEL11)
+  #define _AVR_EVSYS_COUNT  (12)
+#elif defined(EVSYS_CHANNEL10)
+  #define _AVR_EVSYS_COUNT  (11)
+#elif defined(EVSYS_CHANNEL9)
+  #define _AVR_EVSYS_COUNT  (10)
+#elif defined(EVSYS_CHANNEL8)
+  #define _AVR_EVSYS_COUNT  (9)
+#elif defined(EVSYS_CHANNEL7)
+  #define _AVR_EVSYS_COUNT  (8)
+#elif defined(EVSYS_CHANNEL6)
+  #define _AVR_EVSYS_COUNT  (7)
+#elif defined(EVSYS_CHANNEL5)
+  #define _AVR_EVSYS_COUNT  (6)
+#elif defined(EVSYS_CHANNEL4)
+  #define _AVR_EVSYS_COUNT  (5)
+#elif defined(EVSYS_CHANNEL3)
+  #define _AVR_EVSYS_COUNT  (4)
+#elif defined(EVSYS_CHANNEL2)
+  #define _AVR_EVSYS_COUNT  (3)
+#elif defined(EVSYS_CHANNEL1)
+  #define _AVR_EVSYS_COUNT  (2)
+#elif defined(EVSYS_CHANNEL0)
+  #define _AVR_EVSYS_COUNT  (1)
+#else
+  #error "No EVSYS detected? All supported parts have one, something is wrong"
+#endif
 
-#if defined(OPAMP2)
-  #define _AVR_OPAMP_COUNT   (3)
-#elif defined(OPAMP1)
-  #define _AVR_OPAMP_COUNT   (2)
-#elif defined(OPAMP0)
-  #define _AVR_OPAMP_COUNT   (1)
+/* We should also check what kind of evsys we have, as they are quite different from eachother.
+ * Provide a define indicating which revision of EVSYS this is. 1 and 2 differ only in naming of strobe register.
+ * 3 separates the decision of which pin(s) within a port will be used aas event input and which of those to use
+ * with the former being configured with PORTx.EVGENCTRL. This allows the number of generators to drop from 8/port to 2/port, and the number of RTC generators to likewise drop to 2 from 16 with 8 available per channel
+ * In exchange for this, we achieve our longtime dream: Equality between all generator channels, because the redused number of
+ * generators allows them to add both options for all ports and both RTC options to all generator channels
+ * Too bad they released so many parts with the other versions :-/ */
+
+#if defined(PORTA_EVGENCTRL) // Ex-series, with EVGENCTRL registers on RTC and PORT.
+  #define _AVR_EVSYS_VERSION   (3)
+#elif defined(EVSYS_STROBE) // mega0 - basically Dx, but different name for strobe.
+  #define _AVR_EVSYS_VERSION   (1)
+#elif !defined(EVSYS_ASYNCCH0) // AVR Dx, 2-series
+  #define _AVR_EVSYS_VERSION   (2)
+#else // tinyAVR 0/1-series with the two kinds of channels and boneheaded generator layout.
+  #define _AVR_EVSYS_VERSION   (0)
+#endif
+
+#if defined(OPAMP)
+  /* OPAMPS:
+   * Allow for future chip with more opamps. There's room for 6 in the struct
+   * which has 64 bytes - 8 per OPAMP, and 16 at the start used for global settings
+   * At time of writing, on the only parts with OPAMPs, only 4 of the global bytes are used
+   * 6 of the 8 bytes for each OPAMP are used, 2 are spares. */
+  #if defined(OPAMP_OP5CTRLA)
+    #define _AVR_OPAMP_COUNT   (6)
+  #elif defined(OPAMP_OP4CTRLA)
+    #define _AVR_OPAMP_COUNT   (5)
+  #elif defined(OPAMP_OP3CTRLA)
+    #define _AVR_OPAMP_COUNT   (4)
+  #elif defined(OPAMP_OP2CTRLA)
+    #define _AVR_OPAMP_COUNT   (3)
+  #elif defined(OPAMP_OP1CTRLA)
+    #define _AVR_OPAMP_COUNT   (2)
+  #elif defined(OPAMP_OP0CTRLA)
+    #define _AVR_OPAMP_COUNT   (1)
+  #else
+    #error "We have an OPAMP peripheral, but no opamps? Something is wrong"
+  #endif
 #else
   #define _AVR_OPAMP_COUNT   (0)
 #endif
 
 
-#if defined(CCL_TRUTH4)
+
+#if   defined(CCL_TRUTH6)
+  #define _AVR_LUT_COUNT     (8)
+#elif defined(CCL_TRUTH4)
   #define _AVR_LUT_COUNT     (6)
 #elif defined(CCL_TRUTH2)
   #define _AVR_LUT_COUNT     (4)
@@ -323,15 +407,19 @@
 #endif
 
 
-#if defined(TCA1)
+#if   defined(TCA1)
   #define _AVR_TCA_COUNT     (2)
 #elif defined(TCA0)
   #define _AVR_TCA_COUNT     (1)
 #else
-  #error "No TCA? No supported parts exist without one, something is wrong"
+  #define _AVR_TCA_COUNT     (0) // I fear something terrible happened to the TCA on the EB-series... and I think the TCE and that WEX Luther guy he's always with know something about it.
 #endif
 
-#if defined(TCB5)
+#if   defined(TCB7)
+  #define _AVR_TCB_COUNT     (8)
+#elif defined(TCB6)
+  #define _AVR_TCB_COUNT     (7)
+#elif defined(TCB5)
   #define _AVR_TCB_COUNT     (6)
 #elif defined(TCB4)
   #define _AVR_TCB_COUNT     (5)
@@ -348,13 +436,25 @@
 #endif
 
 
-#if defined(TCD1)
-  #define _AVR_TCD_COUNT     (1)
+#if   defined(TCD0)
+  #define _AVR_TCD_COUNT     (1) // Only on Dx-series and tinyAVR
 #else
   #define _AVR_TCD_COUNT     (0)
 #endif
 
-#if defined(TWI1)
+#if   defined(TCE0)
+  #define _AVR_TCE_COUNT     (1) // first appears on the EB-series, 16-bit. Some sort of 8-channeled monster who is always with the one they call WEX. I haven't heard from TCA0 after they showed up and started doing
+#else                            // PWM on the same pins. I have a bad feeling that TCA0 is either tied up in the basement, or dead in a wooded area. With the TCE's skill at motor control, they could easily have
+  #define _AVR_TCE_COUNT     (0) // used power-tools to dismember bury the body.... Anyway, whether these guys are as useful in the silicon as they look  on paper will depend a lot on the whether those
+#endif                           // 8-channels are independent, and whether they need to split like TCA did to handle 8 WO's if so. And, of course on how flexible their clocking options are.
+
+#if   defined(TCF0)
+  #define _AVR_TCF_COUNT     (1) // Even more enigmatic than the TCE. First appears on the EB-series, this previously unseen timer is said to be 24-bit! Curious how that will work and what clock sources it can use.
+#else                            // a 24-bit timer clocked from the CPU core, at only 20 MHz would need it's period choked way back, sacrificing all that resolution, in order to get PWM rather than a blinking light.
+  #define _AVR_TCF_COUNT     (0) // 2^24 is in the neighborhood of 17 million, so if CLK_PER was it's max, a lot of these frequencies it could generate would be a touch on the slow side. Even if we can get them up to
+#endif                           // 32 MHz like tiny-2's, we'd need to use only 1-2 bits of that last byte to avoid flicker if you wanted to use for PWM, which Arduino people will.
+
+#if   defined(TWI1)
   #define _AVR_TWI_COUNT     (2)
 #elif defined(TWI0)
   #define _AVR_TWI_COUNT     (1)
@@ -362,7 +462,7 @@
   #error "No TWI? No supported parts exist without one, something is wrong"
 #endif
 
-#if defined(SPI1)
+#if   defined(SPI1)
   #define _AVR_SPI_COUNT     (2)
 #elif defined(SPI0)
   #define _AVR_SPI_COUNT     (1)
@@ -371,7 +471,11 @@
 #endif
 
 
-#if defined(USART5)
+#if   defined(USART7)
+  #define _AVR_USART_COUNT     (8)
+#elif defined(USART6)
+  #define _AVR_USART_COUNT     (7)
+#elif defined(USART5)
   #define _AVR_USART_COUNT     (6)
 #elif defined(USART4)
   #define _AVR_USART_COUNT     (5)
@@ -387,7 +491,7 @@
   #error "No USARTs? No supported parts exist without one, something is wrong"
 #endif
 
-#if defined(ZCD3)
+#if   defined(ZCD3)
   #define _AVR_ZCD_COUNT     (1) /* Only the DD's have ZCD3, which is their ZCD0 by a different name, since it uses different pins */
 #elif defined(ZCD2)
   #define _AVR_ZCD_COUNT     (3)
@@ -396,10 +500,10 @@
 #elif defined(ZCD0)
   #define _AVR_ZCD_COUNT     (1)
 #else
-  #define _AVR_ZCD_COUNT     (0)
+  #define _AVR_ZCD_COUNT     (0) // And only Dx has ZCD's at all.
 #endif
 
-#if defined(DAC2)
+#if   defined(DAC2)
   #define _AVR_DAC_COUNT     (3)
 #elif defined(DAC1)
   #define _AVR_DAC_COUNT     (2)
@@ -407,6 +511,23 @@
   #define _AVR_DAC_COUNT     (1) /* Note that thus far, no DAC other than DAC0 has ever been able to output data. DAC1 and DAC2 are just the DACREFs for AC1 and AC2 on tinyAVR 1-series parts.*/
 #else
   #define _AVR_DAC_COUNT     (0)
+#endif
+
+#ifdef DAC0
+  #if   defined(DAC_OUTRANGE_gm) // Ex-series - 10-bit, and OUTRANGE, the strange option for selection the range of DATA values that can be output.
+    #define _AVR_DAC_VERSION            (2)
+  #elif defined(DAC0_DATAH) // Dx-series - 10-bit
+    #define _AVR_DAC_VERSION            (1)
+  #else // tinyAVR 1 - 8-bit
+    #define _AVR_DAC_VERSION            (0)
+  #endif
+  #ifndef PIN_DACOUT
+    #if _AVR_DAC_VERSION == 0
+      #define PIN_DACOUT PIN_PA6 // different on tinyAVR!
+    #else
+      #define PIN_DACOUT PIN_PD6
+    #endif
+  #endif
 #endif
 
 
