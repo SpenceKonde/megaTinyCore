@@ -8,12 +8,13 @@ Improved flash footprint of serial significantly while adding features, wire can
 
 ## IMPORTANT WARNINGS
 
+### ATTN: Linux Users
+**Only versions of the Arduino IDE downloaded from [arduino.cc](https://arduino.cc) should be used, NEVER from a linux package manager. The package managers often have the Arduino IDE - but have *modified it*. This is despite their knowing nothing about Arduino or embedded development in general, much less what they would need to know to modify it successfully** Those version are notorious for subtle but serious issues caused by these unwise modifications. This core should not be expected to work on such versions, and no modifications will be made for the sake of fixing versions of the IDE that come from package managers for this reason.
+
 ### IDE 2.0.x unsupported. If you use it, use the release not an old RC: all versions prior to 2.0.0-RC9.2 known to have critical regressions
 These bugs in the IDE prevent board settings from being correctly recognized. [This thread tracks known issues with 2.0 and workarounds](https://github.com/SpenceKonde/megaTinyCore/discussions/760). If you use unsupported software please reproduce all issues in 1.8.13 before reporting.
 
 ### IDE versions, and using the right one
-**Only versions of the Arduino IDE downloaded from [arduino.cc](https://arduino.cc) should be used. This is particularly relevant if you use Linux, as package managers often have the Arduino IDE - but have modified it, despite the fact that they don't know much of anything about Arduino.** Those version are notorious for subtle but serious issues caused by these unwise modifications. . This core should not be expected to work on such versions, and no modifications will be made for the sake of fixing versions of the IDE that come from package managers for this reason.
-
 V1.8.13 is the "golden version" and the only one I recommend. All the more recent ones gained bugs, and its the last version with a substantial improvement. Be aware it does have a vulnerable version of Log4J.
 
 Prior to megaTinyCore 2.6.0, manual installation of megaTinyCore would cause V1.8.14 of the IDE to crash due to [this bug](https://github.com/arduino/Arduino/issues/11813) when you install the core manually in your arduino folder. Users of 1.8.14 and later must use version 2.6.0 of megaTinyCore.
@@ -134,7 +135,7 @@ This is currently used only for the last few releases, and should fix the avrdud
 [**See this document covering all modern AVRs**](https://github.com/SpenceKonde/AVR-Guidance/blob/master/AVRFamilies_And_Compatibility/ModernAVRs.md)
 
 ## Background and specific hardware features
-| Feature | 0-series | 1-series | 1-series | 2-series |
+| Feature | 0-series | 1-series | 1+series | 2-series |
 |---------|----------|----------|----------|----------|
 | Flash   | 2k-16k   | 2k-8k    | 16k/32k  | 4k-32k   |
 | Pincount| 8-24     | 8-24     | 14-24    | 14-24    |
@@ -153,9 +154,9 @@ All parts have analog input available on most pins (all pins on PORTA and PORTB 
 These are the budget options. Though they are supported, they are not recommended. These never get the "boost" that the tinyAVR 1-series gets at 16k, have no second TCB in any configuration, no TCD, only 3 event channels, none of which can carry RTC event output. These parts have 2 CCL LUTs like the 1-series, and are available with up to 16k of flash in 14, 20, and 24-pin configurations (only 4k for 8-pin parts), and up to 1k SRAM.
 
 ### tinyAVR 1-series (small flash)
+These have 2k, 4k or 8k of flash and 128, 256, or 512b of ram, just like the 0-series. They do not have the second ADC, the triple AC configurationth or the second TCB, though they do have the TCD. 
 
-
-### tinyAVR 1-series (large flash)
+### tinyAVR 1+series (large flash)
 All of a sudden, at 16k, the 1-series parts become far more interesting. Accompanying the larger flash is an arsenal of peripherals that seems fit for a much larger chip, and whether 16k or 32k, they all get 2k of SRAM. The whole second ADC is unique among AVRs. It seems to have been the testing ground for many features that showed up in a refined form on the AVR Dx-series. The pricing does not appear to account for the vastly superior peripherals on the 16k 1-series,
 
 ### tinyAVR 2-series
