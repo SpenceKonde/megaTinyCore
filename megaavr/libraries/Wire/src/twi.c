@@ -294,8 +294,7 @@ uint8_t TWI_MasterCalcBaud(uint32_t frequency) {
  *@param      bool send_stop enables the STOP condition at the end of a write
  *
  *@return     uint8_t
- *@retval     amount of bytes that were written. If 0, no write took place, either due
- *            to an error or because of an empty txBuffer
+ *@retval     error code, if enabled. Not 0 means something went wrong
  */
 uint8_t TWI_MasterWrite(struct twiData *_data, bool send_stop) {
   uint8_t* txBuffer;
@@ -639,7 +638,7 @@ void TWI_HandleSlaveIRQ(struct twiData *_data) {
   }
   _data->_module->SCTRLB = action;  // using local variable (register) reduces the amount of loading _module
   #if defined(TWI_MANDS)
-    _data->_bools._toggleStreamFn = 0x01;
+    _data->_bools._toggleStreamFn = 0x00;
   #endif
 }
 
