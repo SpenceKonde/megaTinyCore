@@ -116,8 +116,10 @@
       "push  r0"         "\n\t" // so we start with a normal prologue
       "in    r0, 0x3f"   "\n\t" // The SREG
       "push  r0"         "\n\t" // on the stack
-      "in    r0, 0x3b"   "\n\t" // RAMPZ
-      "push  r0"         "\n\t" // on the stack.
+      #if PROGMEM_SIZE > 0x10000
+        "in    r0, 0x3b"   "\n\t" // RAMPZ
+        "push  r0"         "\n\t" // on the stack.
+      #endif
       "push  r1"         "\n\t" // We don't need r1 but the C code we call
       "eor   r1, r1"     "\n\t" // is going to want this to be zero....
       "push  r15"        "\n\t" // push r15 (we use it - it's call-saved)
@@ -183,8 +185,10 @@
       "pop   r17"         "\n\t" // skip 16 again - it's way down at the end, because it was pushed earlier
       "pop   r15"         "\n\t"
       "pop   r1"          "\n\t"
-      "pop   r0"          "\n\t"
-      "out   0x3b,  r0"   "\n\t"
+      #if PROGMEM_SIZE > 0x10000
+        "pop   r0"          "\n\t"
+        "out   0x3b,  r0"   "\n\t"
+      #endif
       "pop   r0"          "\n\t"
       "out   0x3f,  r0"   "\n\t" // between these is where there had been stuff added to the stack that we flushed.
       "pop   r0"          "\n\t"

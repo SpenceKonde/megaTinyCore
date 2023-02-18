@@ -127,14 +127,14 @@ void _pinconfigure(uint8_t pin, uint16_t pin_config) {
         }
       }
     } else {
-      if (__builtin_constant_p(pinconfig)) {
+      if (__builtin_constant_p(pin_config)) {
         if (pin_config & 0x01) {
           if (pin == HARDWIRE_INPUT_ONLY){
             pin_config = pin_config & 0xFFFC;
           }
         }
       } else {
-        if (pinconfig & 0x01 && pin == HARDWIRE_INPUT_ONLY) {
+        if (pin_config & 0x01 && pin == HARDWIRE_INPUT_ONLY) {
           pin_config = pin_config & 0xFFFC;
         }
       }
