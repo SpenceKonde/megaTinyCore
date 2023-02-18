@@ -25,6 +25,11 @@ SOFTWARE.
 #include "twi.h"
 #include "twi_pins.h"
 
+#if !defined(_fastPtr_y)
+  //Supplied by dirty_tricks.h normally, which gets included by Arduino.h - but this library may want to be ported say, to MegaCoreX.
+  #define _fastPtr_y(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&y" (__localVar__) : "0" (__pointer__));  // r28:r29
+#endif
+
 
 static uint8_t sleepStack = 0;
 
