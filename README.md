@@ -154,7 +154,7 @@ All parts have analog input available on most pins (all pins on PORTA and PORTB 
 These are the budget options. Though they are supported, they are not recommended. These never get the "boost" that the tinyAVR 1-series gets at 16k, have no second TCB in any configuration, no TCD, only 3 event channels, none of which can carry RTC event output. These parts have 2 CCL LUTs like the 1-series, and are available with up to 16k of flash in 14, 20, and 24-pin configurations (only 4k for 8-pin parts), and up to 1k SRAM.
 
 ### tinyAVR 1-series (small flash)
-These have 2k, 4k or 8k of flash and 128, 256, or 512b of ram, just like the 0-series. They do not have the second ADC, the triple AC configurationth or the second TCB, though they do have the TCD. 
+These have 2k, 4k or 8k of flash and 128, 256, or 512b of ram, just like the 0-series. They do not have the second ADC, the triple AC configurationth or the second TCB, though they do have the TCD.
 
 ### tinyAVR 1+series (large flash)
 All of a sudden, at 16k, the 1-series parts become far more interesting. Accompanying the larger flash is an arsenal of peripherals that seems fit for a much larger chip, and whether 16k or 32k, they all get 2k of SRAM. The whole second ADC is unique among AVRs. It seems to have been the testing ground for many features that showed up in a refined form on the AVR Dx-series. The pricing does not appear to account for the vastly superior peripherals on the 16k 1-series,

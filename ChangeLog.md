@@ -17,11 +17,15 @@ These items are in addition to what was listed under changes already in release.
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
+## Released Versions
+
 ### 2.6.6
 * Enhancement/bugfix: 2.6.5 was intended to add an optimization level submenu. Due to a typographical error, the menu was not shown (though no harm was done). That menu is now actually available.
 * Enhancement: Add a few more macros for getting information on peripherals and updated define reference.
-
-## Released Versions
+* **Critical Bugfix** Correct regression in Wire.h regarding master+slave mode
+* Bugfix: Attached pin interrupts on parts with less than 128k of flash were wasting 2 clocks before the user code was called and 3 clocks after, as well as 4 bytes. Small potatoes compared to the overall overhead of that abomination, but there's no need to push RAMPZ if there isn't a RAMPZ register (it reads as 0 and writes to it are ignored - so there was a donothing in/push and pop/out on parts without RAMPZ. And no tinyAVR parts have a RAMPZ.
+* Bugfix: pinConfigure would under some circumstances fail because of a misspelled variable
+* Bugfix: gcse was incorrectly left off at one step (whereit had little if any impact on flash use) regardless of the menu setting (which coulod not be changed anyway)
 
 ### 2.6.5
 * ~Enhancement: Add optimization level submenu. This allows switching to -O3 instead of -Os, and disabling or not disabling "GCSE". The latter has been found to change the size of compiled binaries by up to 5%.... in either direction, or sometimes barely change it at all, with no apparent pattern. When you get desperate for flash, you can turn it on and see if it helps your sketch, You have about a 60% chance to gain at least a tiny bit of flash, though your odds of a large improvement aren't as good.~
