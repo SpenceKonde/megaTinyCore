@@ -25,6 +25,7 @@
              so whenever UART.h has been loaded, those three macros are defined as either 1, or wharever
              value the user overode them with, likely 0. Also high byte of UART address always 0x08, so replace
              2-clock ldd with 1 clock ldi. - Spence
+ * 03/12/23: Correct bug in TxD1' and XCK1'
 */
 
 #pragma once
@@ -211,7 +212,7 @@ const uint8_t _usart_pins[][4] = {{PIN_PB2, PIN_PB3, PIN_PB1, PIN_PB0},{PIN_PA1,
 const uint8_t _usart_pins[][4] = {
   {PIN_PB2, PIN_PB3, PIN_PB1, PIN_PB0},
   {PIN_PA1, PIN_PA2, PIN_PA3, PIN_PA4},
-  {PIN_PC0, PIN_PC1, PIN_PC2, PIN_PC3}
+  {PIN_PC2, PIN_PC1, PIN_PC1, PIN_PC3}
 };
 #else
   #error "This can't happen - it doesn't have 8, 14, 20 or 24 pins, or it has 14 pins but no serial port - defines aren't being picked up correctly."
