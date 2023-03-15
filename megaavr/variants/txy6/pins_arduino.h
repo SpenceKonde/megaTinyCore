@@ -375,6 +375,7 @@ static const uint8_t    A11 = PIN_PB0;
   };
 
 
+//*INDENT-OFF*
   const uint8_t digital_pin_to_timer[] = {
     // Left side, top to bottom
     #if defined(USE_TIMERD0_PWM) && defined(USE_TCD_WOAB)
@@ -451,6 +452,7 @@ static const uint8_t    A11 = PIN_PB0;
     NOT_ON_TIMER        // 17 PA0
   };
 
+//*INDENT-ON*
 #endif
 
 // These serial port names are intended to allow libraries and architecture-neutral

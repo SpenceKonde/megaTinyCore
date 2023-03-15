@@ -118,7 +118,7 @@ void requestHandler() {
   // Wire.slaveTransactionOpen() ceased to be true, then check getBytesRead() to
   // see if the key register was read __HOWEVER__
   // While this is executing, you must bear in mind that the slave is "clock stretching"
-  // Hence avoiding an unduely long execution time should be one of your priorities.
+  // Hence avoiding an unduly long execution time should be one of your priorities.
   // Not only is the slave device wasting time, it's wasting the masters time, and that
   // of anything else waiting to use the bus. So like, if you're a sensor manager, you
   // should be storing the values in the "register" array as you take them; you shouldn't go

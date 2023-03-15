@@ -392,97 +392,99 @@ const uint8_t digital_pin_to_bit_mask[] = {
 };
 
 
-  const uint8_t digital_pin_to_timer[] = {
-    // Left side, top to bottom
-    #if defined(USE_TIMERD0_PWM) && defined(USE_TCD_WOAB)
-      TIMERD0,          // 0  PA4 *WOA* WO4
-      TIMERD0,          // 1  PA5 *WOB* WO5
-    #else
-      #if !defined(_TCA_ALT_WO4) && defined(_TCA_USE_WO4)
-        TIMERA0,        // 0  PA4 WOA *WO4*
-      #else
-        NOT_ON_TIMER,
-      #endif
-      #if !defined(_TCA_ALT_WO5) && defined(_TCA_USE_WO5)
-        TIMERA0,        // 1  PA5 WOB *WO5*
-      #else
-        NOT_ON_TIMER,
-      #endif
-    #endif
-  /////////////////////////////////////
-    #if defined(DAC0)
-      DACOUT,           // 2  PA6
-    #else
-      NOT_ON_TIMER,     // 2  PA6
-    #endif
-  /////////////////////////////////////
-    NOT_ON_TIMER,       // 3  PA7
-  //--port-break--
-    NOT_ON_TIMER,       // 4  PB7
-    NOT_ON_TIMER,       // 5  PB6
-    #if defined(_TCA_ALT_WO2)
-      TIMERA0,
-    #else
-      NOT_ON_TIMER,     // 6  PB5 WO2 Alt
-    #endif
-    #if defined(_TCA_ALT_WO1)
-      TIMERA0
-    #else
-      NOT_ON_TIMER,     // 7  PB4 WO1 Alt
-    #endif
-    #if defined(_TCA_ALT_WO0)
-      TIMERA0,
-    #else
-      NOT_ON_TIMER,     // 8  PB3 WO0 Alt
-    #endif
-    #if !defined(_TCA_ALT_WO2)
-      TIMERA0,
-    #else
-      NOT_ON_TIMER,     // 6  PB2 WO2
-    #endif
-    #if !defined(_TCA_ALT_WO1)
-      TIMERA0,
-    #else
-      NOT_ON_TIMER,     // 7  PB1 WO1
-    #endif
-    #if !defined(_TCA_ALT_WO0)
-      TIMERA0,
-    #else
-      NOT_ON_TIMER,     // 8  PB0 WO0
-    #endif
-  //--port-break--
-    #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && !defined(USE_TCD_WOAB))
-      TIMERD0,          // 12 PC0 *WOC*
-      TIMERD0,          // 13 PC1 *WOD*
-    #else
-      NOT_ON_TIMER,     // 12 PC0 WOC
-      NOT_ON_TIMER,     // 13 PC1 WOD
-    #endif
-    NOT_ON_TIMER,       // 14 PC2
-    #if defined(_TCA_ALT_WO3)
-      TIMERA0,          // 15 PC3 WO3 Alt
-    #else
-      NOT_ON_TIMER,     //
-    #endif
-    #if defined(_TCA_ALT_WO4)
-      TIMERA0,          // 16 PC4 WO4 Alt
-    #else
-      NOT_ON_TIMER,     //
-    #endif
-    #if defined(_TCA_ALT_WO5)
-      TIMERA0,          // 17 PC5 WO5 Alt
-    #else
-      NOT_ON_TIMER,     //
-    #endif
-    NOT_ON_TIMER,       // 18 PA1
-    NOT_ON_TIMER,       // 19 PA2
-    #if !defined(_TCA_ALT_WO3) && defined(_TCA_USE_WO3)
-      TIMERA0,          // 20 PA3 WO3
+//*INDENT-OFF*
+const uint8_t digital_pin_to_timer[] = {
+  // Left side, top to bottom
+  #if defined(USE_TIMERD0_PWM) && defined(USE_TCD_WOAB)
+    TIMERD0,          // 0  PA4 *WOA* WO4
+    TIMERD0,          // 1  PA5 *WOB* WO5
+  #else
+    #if !defined(_TCA_ALT_WO4) && defined(_TCA_USE_WO4)
+      TIMERA0,        // 0  PA4 WOA *WO4*
     #else
       NOT_ON_TIMER,
     #endif
-    NOT_ON_TIMER        // 21 PA0
-  };
+    #if !defined(_TCA_ALT_WO5) && defined(_TCA_USE_WO5)
+      TIMERA0,        // 1  PA5 WOB *WO5*
+    #else
+      NOT_ON_TIMER,
+    #endif
+  #endif
+/////////////////////////////////////
+  #if defined(DAC0)
+    DACOUT,           // 2  PA6
+  #else
+    NOT_ON_TIMER,     // 2  PA6
+  #endif
+/////////////////////////////////////
+  NOT_ON_TIMER,       // 3  PA7
+//--port-break--
+  NOT_ON_TIMER,       // 4  PB7
+  NOT_ON_TIMER,       // 5  PB6
+  #if defined(_TCA_ALT_WO2)
+    TIMERA0,
+  #else
+    NOT_ON_TIMER,     // 6  PB5 WO2 Alt
+  #endif
+  #if defined(_TCA_ALT_WO1)
+    TIMERA0
+  #else
+    NOT_ON_TIMER,     // 7  PB4 WO1 Alt
+  #endif
+  #if defined(_TCA_ALT_WO0)
+    TIMERA0,
+  #else
+    NOT_ON_TIMER,     // 8  PB3 WO0 Alt
+  #endif
+  #if !defined(_TCA_ALT_WO2)
+    TIMERA0,
+  #else
+    NOT_ON_TIMER,     // 6  PB2 WO2
+  #endif
+  #if !defined(_TCA_ALT_WO1)
+    TIMERA0,
+  #else
+    NOT_ON_TIMER,     // 7  PB1 WO1
+  #endif
+  #if !defined(_TCA_ALT_WO0)
+    TIMERA0,
+  #else
+    NOT_ON_TIMER,     // 8  PB0 WO0
+  #endif
+//--port-break--
+  #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && !defined(USE_TCD_WOAB))
+    TIMERD0,          // 12 PC0 *WOC*
+    TIMERD0,          // 13 PC1 *WOD*
+  #else
+    NOT_ON_TIMER,     // 12 PC0 WOC
+    NOT_ON_TIMER,     // 13 PC1 WOD
+  #endif
+  NOT_ON_TIMER,       // 14 PC2
+  #if defined(_TCA_ALT_WO3)
+    TIMERA0,          // 15 PC3 WO3 Alt
+  #else
+    NOT_ON_TIMER,     //
+  #endif
+  #if defined(_TCA_ALT_WO4)
+    TIMERA0,          // 16 PC4 WO4 Alt
+  #else
+    NOT_ON_TIMER,     //
+  #endif
+  #if defined(_TCA_ALT_WO5)
+    TIMERA0,          // 17 PC5 WO5 Alt
+  #else
+    NOT_ON_TIMER,     //
+  #endif
+  NOT_ON_TIMER,       // 18 PA1
+  NOT_ON_TIMER,       // 19 PA2
+  #if !defined(_TCA_ALT_WO3) && defined(_TCA_USE_WO3)
+    TIMERA0,          // 20 PA3 WO3
+  #else
+    NOT_ON_TIMER,
+  #endif
+  NOT_ON_TIMER        // 21 PA0
+};
+//*INDENT-ON*
 #endif
 
 // These serial port names are intended to allow libraries and architecture-neutral

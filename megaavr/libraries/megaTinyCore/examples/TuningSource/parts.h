@@ -1,5 +1,6 @@
 #ifndef  PARTS_H_
-// *INDENT-OFF* The indentation that it demands is stupid and wrong.
+// *INDENT-OFF*
+// The indentation that it demands is stupid and wrong.
   #define  PARTS_H_
   #include <avr/io.h>
   #if   (defined(__AVR_ATmega16__)    || defined(__AVR_ATmega32__)    || defined(__AVR_ATmega64__)    ||  defined(__AVR_ATmega128__)   || \

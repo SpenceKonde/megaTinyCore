@@ -1,5 +1,5 @@
 /* Wire Multi Address Write
- * by Spece Konde based on work by MX682X
+ * by Spence Konde based on work by MX682X
  *
  * Demonstrates use of the new Wire library for use with the secondary address
  * and masked address example sketches.

@@ -579,7 +579,7 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
        *
        * The series of shifts was determined numerically with a spreadsheet that calculated the results for
        * each value that could come from the initial round of rightshifts for any combination of
-       * bitshifts and provided a number of statistics to select based on. Bacwards time travel must
+       * bitshifts and provided a number of statistics to select based on. Backwards time travel must
        * never happenb, or if it does, it must be a shorter backward step than micros runtime - 1 us
        * otherwise delay() will break and timeouts can instantly expire when it is hit. Similarly,
        * one wants to avoid large jumps forward, and cases where more consecutive "actual" times

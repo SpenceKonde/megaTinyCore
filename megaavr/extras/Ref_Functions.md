@@ -245,7 +245,7 @@ Longer clock-counting delays aremore efficiently done with the 3 cycle loop (ldi
 Stop the timer being used for millis, and disable the interrupt. This does not change the current count. Intended for internal use in the future timing and sleep library, so you would stop it before sleeping and start the RTC before going into standby sleep, or powerdown with the PIT.
 
 ### (DxC/mTC) `void set_millis(uint32_t newmillis)`
-Sets the millisecond timer to the specified number of milliseconds. Be careful if you are setting to a number lower than the current millis count if you have any timeouts ongoing, since stanard best practice is to always subtract `(oldmillis - millis())` and these are unsigned. So setting it oldmillis-1 will make it look like 4.2xx billion ms have passed. and the timer will expire.
+Sets the millisecond timer to the specified number of milliseconds. Be careful if you are setting to a number lower than the current millis count if you have any timeouts ongoing, since standard best practice is to always subtract `(oldmillis - millis())` and these are unsigned. So setting it oldmillis-1 will make it look like 4.2xx billion ms have passed. and the timer will expire.
 
 ### (DxC/mTC) `void restart_millis()`
 After having stopped millis either for sleep or to use timer for something else and optionally have set it to correct for passage of time, call this to restart it.

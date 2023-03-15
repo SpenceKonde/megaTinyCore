@@ -511,7 +511,7 @@ atxy7.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy7.menu.PWMmux.6_A_defaultPB0-2, PA3-5, 1-series: PC0/1 (default)
+atxy7.menu.PWMmux.6_A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
 atxy7.menu.PWMmux.6_default=PB0-2, PA3-5 (0/2-series default)
 atxy7.menu.PWMmux.3_A_buffered=PB0-2 (buffered), 1-series: PC0/1
 atxy7.menu.PWMmux.3_D_buffered=PB0-2 (buffered), 1-series: PA4/5
@@ -1060,7 +1060,7 @@ atxy6.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy6.menu.PWMmux.6_A_defaultPB0-2, PA3-5, 1-series: PC0/1 (default)
+atxy6.menu.PWMmux.6_A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
 atxy6.menu.PWMmux.6_default=PB0-2, PA3-5 (0/2-series default)
 atxy6.menu.PWMmux.3_A_buffered=PB0-2 (buffered), 1-series: PC0/1
 atxy6.menu.PWMmux.3_D_buffered=PB0-2 (buffered), 1-series: PA4/5
@@ -2903,7 +2903,7 @@ atxy7o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy7o.menu.PWMmux.6_A_defaultPB0-2, PA3-5, 1-series: PC0/1 (default)
+atxy7o.menu.PWMmux.6_A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
 atxy7o.menu.PWMmux.6_default=PB0-2, PA3-5 (0/2-series default)
 atxy7o.menu.PWMmux.3_A_buffered=PB0-2 (buffered), 1-series: PC0/1
 atxy7o.menu.PWMmux.3_D_buffered=PB0-2 (buffered), 1-series: PA4/5
@@ -3833,7 +3833,7 @@ atxy6o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy6o.menu.PWMmux.6_A_defaultPB0-2, PA3-5, 1-series: PC0/1 (default)
+atxy6o.menu.PWMmux.6_A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
 atxy6o.menu.PWMmux.6_default=PB0-2, PA3-5 (0/2-series default)
 atxy6o.menu.PWMmux.3_A_buffered=PB0-2 (buffered), 1-series: PC0/1
 atxy6o.menu.PWMmux.3_D_buffered=PB0-2 (buffered), 1-series: PA4/5

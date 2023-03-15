@@ -271,6 +271,7 @@ const uint8_t digital_pin_to_bit_mask[] = {
   PIN0_bm  // 11 PA0
 };
 
+//*INDENT-OFF*
 const uint8_t digital_pin_to_timer[] = {
   // Left side, top to bottom
   #if defined(USE_TIMERD0_PWM) && defined(USE_TCD_WOAB)
@@ -316,8 +317,7 @@ const uint8_t digital_pin_to_timer[] = {
     NOT_ON_TIMER,
   #endif
   NOT_ON_TIMER        // 11 PA0
-
-
+//*INDENT-ON*
 };
 
 #endif

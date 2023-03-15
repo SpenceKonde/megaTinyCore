@@ -174,7 +174,7 @@ const uint8_t digital_pin_to_bit_mask[] = {
   PIN3_bm,      // 4  PA3
   PIN0_bm       // 5  PA0
 };
-
+//*INDENT-OFF*
 const uint8_t digital_pin_to_timer[] = {
   #if defined(DAC0) && !(defined(USE_TIMERD0_PWM) && defined(TCD0))
     DACOUT,       // 0  PA6
@@ -193,7 +193,7 @@ const uint8_t digital_pin_to_timer[] = {
   TIMERA0,      // 4  PA3
   NOT_ON_TIMER  // 5  PA0
 };
-
+//*INDENT-ON*
 
 
 #endif

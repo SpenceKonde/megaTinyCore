@@ -161,7 +161,7 @@ The best you can do is pipe the outputs to a pin and read the pin....
 
 
 ## The Event class
-Class for interfacing with the Event systemn (`EVSYS`). Each event channel has its own object.
+Class for interfacing with the Event system (`EVSYS`). Each event channel has its own object.
 Use the predefined objects `Event0`, `Event1`, `Event2`, `Event3`, `Event4`, `Event5`. These, alternately, are known as `EventSync0`, `EventSync1`, `EventAsync0`, `EventAsync1`, `EventAsync2`, `EventAsync3` on the tinyAVR 0-series and 1-series. Additionally, there is an `Event_empty` that is returned whenever you call a method that returns an Event reference, but it can't fulfil your request. Note that not all generators are available on all channels; see the tables above. On 2-series, it's fairly simple, and, all else being equal, the first channels are the most useful, so the standard rule of thumb of "whenever you use a generator that can go anywhere, use the highest number port" holds. With so many options for each pin, relative to the number of pins, that's unlikely to be a problem. The 0 and 1-series oparts are more complicated. Obviously,on 8 pin parts, the two channels that can do PORTA are the most valuable, and the 1 or 3 channels without them a better choice, when you have a choice. The sixth channel, present only on 1-series, has the RTC division options in place of pins. It is either critical to your application, or the least useful, with no middle ground.
 
 
