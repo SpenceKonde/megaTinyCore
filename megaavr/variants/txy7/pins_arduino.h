@@ -27,7 +27,7 @@
 #include "timers.h"
 
 #if defined(TCD0)
-//  #define USE_TIMERD0_PWM
+  //#define USE_TIMERD0_PWM
   #define NO_GLITCH_TIMERD0
 #endif
 

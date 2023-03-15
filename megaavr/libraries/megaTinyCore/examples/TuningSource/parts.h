@@ -87,6 +87,7 @@
     #define CONFIG_OK
   #endif
   // we can handle the others without mess like what is seen below.
+  // *INDENT-OFF*
   #elif (defined(__AVR_ATmega808__) || defined(__AVR_ATmega1608__) || defined(__AVR_ATmega3208__) || defined(__AVR_ATmega4808__) || \
          defined(__AVR_ATmega809__) || defined(__AVR_ATmega1609__) || defined(__AVR_ATmega3209__) || defined(__AVR_ATmega4809__) )
     #define __AVR_ATmega_Zero__

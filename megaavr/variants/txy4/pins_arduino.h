@@ -317,8 +317,9 @@ const uint8_t digital_pin_to_timer[] = {
     NOT_ON_TIMER,
   #endif
   NOT_ON_TIMER        // 11 PA0
-//*INDENT-ON*
 };
+//*INDENT-ON*
+
 
 #endif
 
