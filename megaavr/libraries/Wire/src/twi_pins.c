@@ -177,6 +177,34 @@ bool TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin) {
       #else // tinyAVR 0/1 without TWI multiplexer options
          return (sda_pin == PIN_WIRE_SDA);
       #endif
+// --- mega0 series ---
+    #elif defined(PORTMUX_TWISPIROUTEA)
+        uint8_t twimux = PORTMUX.TWISPIROUTEA & ~PORTMUX_TWI0_gc;
+        #if defined(PIN_WIRE_SDA_PINSWAP_2)
+          if (sda_pin == PIN_WIRE_SDA_PINSWAP_2 && scl_pin == PIN_WIRE_SCL_PINSWAP_2) {
+            twimux |= PORTMUX_TWI0_ALT2_gc;
+            PORTMUX.TWISPIROUTEA = twimux;
+            return true;
+          #endif
+          /* Can't happen */
+        #if defined(PIN_WIRE_SDA_PINSWAP_1)
+          if (sda_pin == PIN_WIRE_SDA_PINSWAP_1 && scl_pin == PIN_WIRE_SCL_PINSWAP_1) {
+            // Use pin swap
+            twimux |= PORTMUX_TWI0_ALT1_gc;
+            PORTMUX.TWISPIROUTEA = twimux;
+            return true;
+          }
+          /* end can'thappen */x
+        #endif
+        } else if (sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL) {
+          // Use default configuration
+          twimux &= ~PORTMUX_TWI0_gc;
+          return true;
+        } else {
+          // Assume default configuration
+          twimux &= ~PORTMUX_TWI0_g;
+          return false;
+        }
 // --- Dx series ---
     #elif defined(PORTMUX_TWIROUTEA)
       uint8_t portmux = (PORTMUX.TWIROUTEA & ~PORTMUX_TWI0_gm);

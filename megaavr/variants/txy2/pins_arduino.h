@@ -176,12 +176,18 @@ const uint8_t digital_pin_to_bit_mask[] = {
 };
 
 const uint8_t digital_pin_to_timer[] = {
-  #if defined(DAC0)
-  DACOUT,       // 0  PA6
+  #if defined(DAC0) && !(defined(USE_TIMERD0_PWM) && defined(TCD0))
+    DACOUT,       // 0  PA6
+  #elif defined(USE_TIMERD0_PWM) && defined(TCD0)
+    TIMERD0,
   #else
-  NOT_ON_TIMER, // 0  PA6
+    NOT_ON_TIMER, // 0  PA6
   #endif
-  TIMERA0,      // 1  PA7
+  #if defined(_TCA_ALT_WO0)
+    TIMERA0,    // 1  PA7
+  #elif defined(USE_TCD_PWM)
+    TIMERD0,
+  #endif
   TIMERA0,      // 2  PA1
   TIMERA0,      // 3  PA2
   TIMERA0,      // 4  PA3

@@ -133,8 +133,13 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
       #ifndef TCA0
         #error "Selected millis timer, TCA0 does not exist on this part."
       #endif
-      #define MILLIS_TIMER_VECTOR (TCA0_HUNF_vect)
-      const struct sTimer _timerS = {TCA_SPLIT_HUNF_bm,  &TCA0.SPLIT.INTFLAGS};
+      #if defined(TCA_BUFFERED_3PIN)
+        #define MILLIS_TIMER_VECTOR (TCA0_OVF_vect)
+        const struct sTimer _timerS = {TCA_SINGLE_OVF_bm,  &TCA0.SINGLE.INTFLAGS};
+      #else
+        #define MILLIS_TIMER_VECTOR (TCA0_HUNF_vect)
+        const struct sTimer _timerS = {TCA_SPLIT_HUNF_bm,  &TCA0.SPLIT.INTFLAGS};
+      #endif
 
     #elif defined (MILLIS_USE_TIMERA1)
       #ifndef TCA1
@@ -336,6 +341,8 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
       "pop        r30"            "\n\t"
       "reti"                      "\n\t" // total 77 - 79 clocks total, and 58 words, vs 104-112 clocks and 84 words
       :: "z" (&timingStruct),            // we are changing the value of this, so to be strictly correct, this must be declared input output - though in this case it doesn't matter
+                                         // Spence: Woah, uhh... No you aren't changing that. You're changing values in the struct it points to. That's very different. For that to be safely changed
+                                         // in ASM it needs to be volatile (which it already is, since this is also in interrupt context and it has to be)
         [LFRINC] "M" (((0x0000 - FRACT_INC)    & 0xFF)),
         [HFRINC] "M" (((0x0000 - FRACT_INC)>>8 & 0xFF)),
         [LFRMAX] "M" ((FRACT_MAX    & 0xFF)),
@@ -1407,7 +1414,11 @@ void __attribute__((weak)) init_millis()
     badCall("init_millis() is only valid with millis time keeping enabled.");
   #else
     #if defined(MILLIS_USE_TIMERA0)
-      TCA0.SPLIT.INTCTRL |= TCA_SPLIT_HUNF_bm;
+      #if !defined(TCA_BUFFERED_3PIN)
+        TCA0.SPLIT.INTCTRL = TCA_SPLIT_HUNF_bm;
+      #else
+        TCA0.SINGLE.INTCTRL = TCA_SINGLE_OVF_bm;
+      #endif
     #elif defined(MILLIS_USE_TIMERA1)
       TCA1.SPLIT.INTCTRL |= TCA_SPLIT_HUNF_bm;
     #elif defined(MILLIS_USE_TIMERD0)
@@ -1761,34 +1772,23 @@ void __attribute__((weak)) init_TCD0() {
 
 void __attribute__((weak)) init_TCA0() {
   /*  TYPE A TIMER   */
-
-  /* PORTMUX setting for TCA - don't need to set because using default
-     UNLESS it's an 8-pin part, in which case we do.*/
-  #ifdef __AVR_ATtinyxy2__
-    PORTMUX.CTRLC = 1; // move WO0 output to PA7 so PA3 can be used with WO3
+  #if !defined(TCA_BUFFERED_3PIN)
+    #if defined(TCA_PORTMUX)
+      PORTMUX.CTRLC = TCA_PORTMUX;
+    #endif
+    TCA0.SPLIT.CTRLD   = TCA_SPLIT_SPLITM_bm;
+    TCA0.SPLIT.LPER    = PWM_TIMER_PERIOD;
+    TCA0.SPLIT.HPER    = PWM_TIMER_PERIOD;
+    TCA0.SPLIT.CTRLA   = (TIMERA_PRESCALER_bm | TCA_SPLIT_ENABLE_bm);
+  #else
+    #if defined(TCA_PORTMUX)
+      PORTMUX.CTRLC = TCA_PORTMUX;
+    #endif
+    TCA0.SINGLE.PER    = PWM_TIMER_PERIOD;
+    TCA0.SINGLE.CTRLB  = (TCA_SINGLE_SINGLESLOPE_gc)
+    TCA0.SINGLE.CTRLA  = (TIMERA_PRESCALER_bm | TCA_SINGLE_ENABLE_bm);
   #endif
 
-  /* Enable Split Mode */
-  TCA0.SPLIT.CTRLD = TCA_SPLIT_SPLITM_bm;
-
-  // Only 1 WGM so no need to specifically set up.
-
-  /* Period setting, 8-bit register in SPLIT mode */
-  TCA0.SPLIT.LPER    = PWM_TIMER_PERIOD;
-  TCA0.SPLIT.HPER    = PWM_TIMER_PERIOD;
-
-  /* Default duty 0%, will re-assign in analogWrite() */
-  // 2/1/2021: Why the heck are we bothering to set these AT ALL?! The duty cycles for *non-active* type A timer channels? Which are already initialized to 0 automatically?
-  /*
-    TCA0.SPLIT.LCMP0 = 0;
-    TCA0.SPLIT.HCMP0 = 0;
-    TCA0.SPLIT.LCMP1 = 0;
-    TCA0.SPLIT.HCMP1 = 0;
-    TCA0.SPLIT.LCMP2 = 0;
-    TCA0.SPLIT.HCMP2 = 0;
-  */
-
-  TCA0.SPLIT.CTRLA = (TIMERA_PRESCALER_bm | TCA_SPLIT_ENABLE_bm);
 }
 
 

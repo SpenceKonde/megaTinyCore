@@ -16,7 +16,40 @@
 #if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_XOSC))
   #define MILLIS_USE_TIMERRTC
 #endif
-
+#if defined(TCA_PORTMUX)
+  #if TCA_PORTMUX & 0x01
+    #define _TCA_ALT_WO0
+  #endif
+  #if TCA_PORTMUX & 0x02
+    #define _TCA_ALT_WO1
+  #endif
+  #if TCA_PORTMUX & 0x04
+    #define _TCA_ALT_WO2
+  #endif
+  #if !defined(TCA_BUFFERED_3PIN)
+    #if TCA_PORTMUX & 0x08
+      #define _TCA_ALT_WO3
+    #else
+      #define _TCA_USE_WO3
+    #endif
+    #if TCA_PORTMUX & 0x10
+      #define _TCA_ALT_WO4
+    #else
+      #define _TCA_USE_WO4
+    #endif
+    #if TCA_PORTMUX & 0x20
+      #define _TCA_ALT_WO5
+    #else
+      #define _TCA_USE_WO5
+    #endif
+  #endif
+#endif
+#if defined(USE_TIMERD0_PWM)
+  #if !defined(TCD0)
+    #warning "You have selected an alternate PWM layout that uses TCD0, but this part doesnt have one. Those PWM pins will not be available."
+    #undef USE_TIMERD0_PWM
+  #endif
+#endif
 
 #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
   #if (F_CPU == 1000000UL)

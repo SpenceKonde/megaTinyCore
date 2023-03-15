@@ -20,14 +20,14 @@
   Boston, MA  02111-1307  USA
 */
 
-#ifndef Pins_Arduino_h
+#if !defined(Pins_Arduino_h)
 #define Pins_Arduino_h
 
 #include <avr/pgmspace.h>
 #include "timers.h"
 
 #if defined(TCD0)
-  #define USE_TIMERD0_PWM
+//  #define USE_TIMERD0_PWM
   #define NO_GLITCH_TIMERD0
 #endif
 
@@ -64,12 +64,16 @@
   #define digitalPinToAnalogInput(p)  (((p) < 4) ? ((p) + 4) : ((((p) > 17) && ((p) < 21)) ? ((p) - 17) : (((p) < 8) ? ((p) + 2) : (((p) < 16) ? (p):NOT_A_PIN))))
 #endif
 
-#ifdef DAC0 // 1-series only
+#if defined(DAC0) // 1-series only
   #define DAC_PIN      (PIN_PA6)
 #endif
 
-#ifndef LED_BUILTIN
+#if !defined(LED_BUILTIN)
   #define LED_BUILTIN  (PIN_PA7)
+#endif
+
+#if !defined(_TCA_STARTS_SPLIT)
+  #define _TCA_STARTS_SPLIT 1
 #endif
 
 /*
@@ -89,7 +93,7 @@
   #define PIN_SPI_MISO_PINSWAP_1      (PIN_PC1)
   #define PIN_SPI_MOSI_PINSWAP_1      (PIN_PC2)
   #define PIN_SPI_SS_PINSWAP_1        (PIN_PC3)
-  #ifdef PORTMUX_SPI0_bm
+  #if defined(PORTMUX_SPI0_bm)
     #define SPI_MUX_PINSWAP_1         (PORTMUX_SPI0_bm)
   #else
     #define SPI_MUX_PINSWAP_1         (PORTMUX_SPI0_ALT1_gc)
@@ -99,7 +103,7 @@
 #define SPI_INTERFACES_COUNT          (1)
 
 // Only 1-series parts have alternate pins for I2C...
-#ifdef PORTMUX_TWI0_bm
+#if defined(PORTMUX_TWI0_bm)
   #define PIN_WIRE_SDA_PINSWAP_1      (PIN_PA1)
   #define PIN_WIRE_SCL_PINSWAP_1      (PIN_PA2)
 #endif
@@ -226,10 +230,7 @@ static const uint8_t    A11 = PIN_PB0;
             #     ### #   #     #  # #  #  #  #  #  #   #    ###
 */
 
-#ifdef ARDUINO_MAIN
-
-// On the Arduino board, digital pins are also used for the analog output (PWM)
-// as well as analog input (ADC)
+#if defined(ARDUINO_MAIN)
 // ATtiny1617 / ARDUINO
 //                              (MOSI) (UPDI)
 //                              (AIN1) (AIN0)
@@ -285,8 +286,8 @@ static const uint8_t    A11 = PIN_PB0;
 
 
   2-series
-  PIN#   DESC         Pin Name  Other/Sp  ADC0      AC0       USART0    SPI0      TWI0      TCA(PWM)  TCBn      CCL
-  0                   PA4                 AIN4                XDIR      SS                   WO4                 LUT0-OUT
+  PIN#   DESC         Pin Name  Other/Sp  ADC0      AC0       USART     SPI0      TWI0      TCA(PWM)  TCBn      CCL
+  0      SS           PA4                 AIN4              *XDIR/XDIR1 SS                   WO4                 LUT0-OUT
   1                   PA5       VREFA     AIN5      OUT                                      WO5      TCB0 WO   *LUT3-OUT
   2                   PA6                 AIN6      AINN0
   3      LED          PA7      *EVOUTA    AIN7      AINP0                                                        LUT1-OUT
@@ -298,16 +299,16 @@ static const uint8_t    A11 = PIN_PB0;
   9      TX           PB2   TOSC2/EVOUTB                       TxD                           WO2                 LUT2-IN2
   10     SDA          PB1                 AIN10     AINP2      XCK                 SDA       WO1                 LUT2-IN1
   11     SCL          PB0                 AIN11     AINN2      XDIR                SCL       WO0                 LUT2-IN0
-  12                  PC0                                               *SCK                          *TCB0 WO   LUT3-IN0
-  13                  PC1                                               *MISO                                   *LUT1-OUT/LUT3-IN1
-  14                  PC2       EVOUTC                                  *MOSI                                    LUT3-IN2
-  15                  PC3                                               *SS                 *WO3                 LUT1-IN0
+  12                  PC0                                     *TxD1     *SCK                          *TCB0 WO   LUT3-IN0
+  13                  PC1                                     *RxD1     *MISO                                   *LUT1-OUT/LUT3-IN1
+  14                  PC2       EVOUTC                        *XCK1     *MOSI                                    LUT3-IN2
+  15                  PC3                                     *XDIR1    *SS                 *WO3                 LUT1-IN0
   16                  PC4                                                                   *WO4      *TCB1 WO   LUT1-IN1/LUT3-OUT
   17                  PC5                                                                   *WO5                 LUT1-IN2
   21     UPDI         PA0       RESET/UPDI                                                                       LUT0-IN0
-  18     MOSI         PA1                 AIN1                *TxD      MOSI      *SDA                           LUT0-IN1
-  19     MISO         PA2       EVOUTA    AIN2                *RxD      MISO      *SCL                           LUT0-IN2
-  20     SCK          PA3       EXTCLK    AIN3                *XCK      SCK                 WO3       TCB1 WO
+  18     MOSI         PA1                 AIN1                *TxD/TXD1 MOSI      *SDA                           LUT0-IN1
+  19     MISO         PA2       EVOUTA    AIN2                *RxD/RxD1 MISO      *SCL                           LUT0-IN2
+  20     SCK          PA3       EXTCLK    AIN3                *XCK/XCK1 SCK                 WO3       TCB1 WO
      * alternative pin locations
 */
 
@@ -330,8 +331,7 @@ const uint8_t digital_pin_to_port[] = {
   PC, // 14 PC2
   PC, // 15 PC3
   PC, // 16 PC4
-  PC, // 17 PC5
-  // skip PA0 until the end
+  PC, // 17 PC5 // skip PA0 until the end
   PA, // 18 PA1
   PA, // 19 PA2
   PA, // 20 PA3
@@ -357,8 +357,8 @@ const uint8_t digital_pin_to_bit_position[] = {
   PIN1_bp, // 13 PC1
   PIN2_bp, // 14 PC2
   PIN3_bp, // 15 PC3
-  PIN4_bp, // 16 PA4
-  PIN5_bp, // 17 PA5
+  PIN4_bp, // 16 PC4
+  PIN5_bp, // 17 PC5
   PIN1_bp, // 18 PA1
   PIN2_bp, // 19 PA2
   PIN3_bp, // 20 PA3
@@ -383,8 +383,8 @@ const uint8_t digital_pin_to_bit_mask[] = {
   PIN1_bm, // 13 PC1
   PIN2_bm, // 14 PC2
   PIN3_bm, // 15 PC3
-  PIN4_bm, // 16 PA4
-  PIN5_bm, // 17 PA5
+  PIN4_bm, // 16 PC4
+  PIN5_bm, // 17 PC5
   PIN1_bm, // 18 PA1
   PIN2_bm, // 19 PA2
   PIN3_bm, // 20 PA3
@@ -392,45 +392,97 @@ const uint8_t digital_pin_to_bit_mask[] = {
 };
 
 
-const uint8_t digital_pin_to_timer[] = {
-  // Left side, top to bottom
-  TIMERA0,         // 0  PA4 WO4 WOA
-  TIMERA0,         // 1  PA5 WO5 WOB
-  #if defined(DAC0)
-  DACOUT,           // 2  PA6
-  #else
-  NOT_ON_TIMER,     // 2  PA6
-  #endif
-  NOT_ON_TIMER,     // 3  PA7
-  NOT_ON_TIMER,     // 4  PB7
-  NOT_ON_TIMER,     // 5  PB6
-  NOT_ON_TIMER,     // 6  PB5 WO2 Alt
-  NOT_ON_TIMER,     // 7  PB4 WO1 Alt
-  NOT_ON_TIMER,     // 8  PB3 WO0 Alt
-  TIMERA0,          // 9  PB2 WO2
-  TIMERA0,          // 10 PB1 WO1
-  // Right side, bottom to top
-  TIMERA0,          // 11 PB0 WO0
-  #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
-  TIMERD0,          // 12 PC0 WOC
-  TIMERD0,          // 13 PC1 WOD
-  #else
-  NOT_ON_TIMER,     // 12 PC0
-  NOT_ON_TIMER,     // 13 PC1
-  #endif
-  NOT_ON_TIMER,     // 14 PC2
-  NOT_ON_TIMER,     // 15 PC3 WO3 Alt
-  NOT_ON_TIMER,     // 16 PC4 WO4 Alt
-  NOT_ON_TIMER,     // 17 PC5 WO5 Alt
-  NOT_ON_TIMER,     // 18 PA1
-  NOT_ON_TIMER,     // 19 PA2
-  TIMERA0,          // 20 PA3 WO3
-  NOT_ON_TIMER      // 21 PA0
-
-
-};
-
-
+  const uint8_t digital_pin_to_timer[] = {
+    // Left side, top to bottom
+    #if defined(USE_TIMERD0_PWM) && defined(USE_TCD_WOAB)
+      TIMERD0,          // 0  PA4 *WOA* WO4
+      TIMERD0,          // 1  PA5 *WOB* WO5
+    #else
+      #if !defined(_TCA_ALT_WO4) && defined(_TCA_USE_WO4)
+        TIMERA0,        // 0  PA4 WOA *WO4*
+      #else
+        NOT_ON_TIMER,
+      #endif
+      #if !defined(_TCA_ALT_WO5) && defined(_TCA_USE_WO5)
+        TIMERA0,        // 1  PA5 WOB *WO5*
+      #else
+        NOT_ON_TIMER,
+      #endif
+    #endif
+  /////////////////////////////////////
+    #if defined(DAC0)
+      DACOUT,           // 2  PA6
+    #else
+      NOT_ON_TIMER,     // 2  PA6
+    #endif
+  /////////////////////////////////////
+    NOT_ON_TIMER,       // 3  PA7
+  //--port-break--
+    NOT_ON_TIMER,       // 4  PB7
+    NOT_ON_TIMER,       // 5  PB6
+    #if defined(_TCA_ALT_WO2)
+      TIMERA0,
+    #else
+      NOT_ON_TIMER,     // 6  PB5 WO2 Alt
+    #endif
+    #if defined(_TCA_ALT_WO1)
+      TIMERA0
+    #else
+      NOT_ON_TIMER,     // 7  PB4 WO1 Alt
+    #endif
+    #if defined(_TCA_ALT_WO0)
+      TIMERA0,
+    #else
+      NOT_ON_TIMER,     // 8  PB3 WO0 Alt
+    #endif
+    #if !defined(_TCA_ALT_WO2)
+      TIMERA0,
+    #else
+      NOT_ON_TIMER,     // 6  PB2 WO2
+    #endif
+    #if !defined(_TCA_ALT_WO1)
+      TIMERA0,
+    #else
+      NOT_ON_TIMER,     // 7  PB1 WO1
+    #endif
+    #if !defined(_TCA_ALT_WO0)
+      TIMERA0,
+    #else
+      NOT_ON_TIMER,     // 8  PB0 WO0
+    #endif
+  //--port-break--
+    #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && !defined(USE_TCD_WOAB))
+      TIMERD0,          // 12 PC0 *WOC*
+      TIMERD0,          // 13 PC1 *WOD*
+    #else
+      NOT_ON_TIMER,     // 12 PC0 WOC
+      NOT_ON_TIMER,     // 13 PC1 WOD
+    #endif
+    NOT_ON_TIMER,       // 14 PC2
+    #if defined(_TCA_ALT_WO3)
+      TIMERA0,          // 15 PC3 WO3 Alt
+    #else
+      NOT_ON_TIMER,     //
+    #endif
+    #if defined(_TCA_ALT_WO4)
+      TIMERA0,          // 16 PC4 WO4 Alt
+    #else
+      NOT_ON_TIMER,     //
+    #endif
+    #if defined(_TCA_ALT_WO5)
+      TIMERA0,          // 17 PC5 WO5 Alt
+    #else
+      NOT_ON_TIMER,     //
+    #endif
+    NOT_ON_TIMER,       // 18 PA1
+    NOT_ON_TIMER,       // 19 PA2
+    #if !defined(_TCA_ALT_WO3) && defined(_TCA_USE_WO3)
+      TIMERA0,          // 20 PA3 WO3
+    #else
+      NOT_ON_TIMER,
+    #endif
+    NOT_ON_TIMER        // 21 PA0
+  };
 #endif
 
 // These serial port names are intended to allow libraries and architecture-neutral

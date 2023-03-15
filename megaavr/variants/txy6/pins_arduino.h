@@ -27,7 +27,7 @@
 #include "timers.h"
 
 #if defined(TCD0)
-  #define USE_TIMERD0_PWM
+//  #define USE_TIMERD0_PWM
   #define NO_GLITCH_TIMERD0
 #endif
 
@@ -302,112 +302,154 @@ static const uint8_t    A11 = PIN_PB0;
 */
 
 
-const uint8_t digital_pin_to_port[] = {
-  // Left side, top to bottom
-  PA, // 0  PA4
-  PA, // 1  PA5
-  PA, // 2  PA6
-  PA, // 3  PA7
-  PB, // 4  PB5
-  PB, // 5  PB4
-  PB, // 6  PB3
-  PB, // 7  PB2
-  PB, // 8  PB1
-  // Right side, bottom to top
-  PB, // 9  PB0
-  PC, // 10 PC0
-  PC, // 11 PC1
-  PC, // 12 PC2
-  PC, // 13 PC3
-  // skip PA0 until the end
-  PA, // 14 PA1
-  PA, // 15 PA2
-  PA, // 16 PA3
-  PA  // 17 PA0 UPDI/RST
-};
+  const uint8_t digital_pin_to_port[] = {
+    // Left side, top to bottom
+    PA, // 0  PA4
+    PA, // 1  PA5
+    PA, // 2  PA6
+    PA, // 3  PA7
+    PB, // 4  PB5
+    PB, // 5  PB4
+    PB, // 6  PB3
+    PB, // 7  PB2
+    PB, // 8  PB1
+    // Right side, bottom to top
+    PB, // 9  PB0
+    PC, // 10 PC0
+    PC, // 11 PC1
+    PC, // 12 PC2
+    PC, // 13 PC3
+    // skip PA0 until the end
+    PA, // 14 PA1
+    PA, // 15 PA2
+    PA, // 16 PA3
+    PA  // 17 PA0 UPDI/RST
+  };
 
-/* Use this for accessing PINnCTRL register */
-const uint8_t digital_pin_to_bit_position[] = {
-  // Left side, top to bottom
-  PIN4_bp, // 0  PA4
-  PIN5_bp, // 1  PA5
-  PIN6_bp, // 2  PA6
-  PIN7_bp, // 3  PA7
-  PIN5_bp, // 4  PB5
-  PIN4_bp, // 5  PB4
-  PIN3_bp, // 6  PB3
-  PIN2_bp, // 7  PB2
-  PIN1_bp, // 8  PB1
-  // Right side, bottom to top
-  PIN0_bp, // 9  PB0
-  PIN0_bp, // 10 PC0
-  PIN1_bp, // 11 PC1
-  PIN2_bp, // 12 PC2
-  PIN3_bp, // 13 PC3
-  PIN1_bp, // 14 PA1
-  PIN2_bp, // 15 PA2
-  PIN3_bp, // 16 PA3
-  PIN0_bp  // 17 PA0
-};
+  /* Use this for accessing PINnCTRL register */
+  const uint8_t digital_pin_to_bit_position[] = {
+    // Left side, top to bottom
+    PIN4_bp, // 0  PA4
+    PIN5_bp, // 1  PA5
+    PIN6_bp, // 2  PA6
+    PIN7_bp, // 3  PA7
+    PIN5_bp, // 4  PB5
+    PIN4_bp, // 5  PB4
+    PIN3_bp, // 6  PB3
+    PIN2_bp, // 7  PB2
+    PIN1_bp, // 8  PB1
+    // Right side, bottom to top
+    PIN0_bp, // 9  PB0
+    PIN0_bp, // 10 PC0
+    PIN1_bp, // 11 PC1
+    PIN2_bp, // 12 PC2
+    PIN3_bp, // 13 PC3
+    PIN1_bp, // 14 PA1
+    PIN2_bp, // 15 PA2
+    PIN3_bp, // 16 PA3
+    PIN0_bp  // 17 PA0
+  };
 
-/* Use this for accessing PINnCTRL register */
-const uint8_t digital_pin_to_bit_mask[] = {
-  // Left side, top to bottom
-  PIN4_bm, // 0  PA4
-  PIN5_bm, // 1  PA5
-  PIN6_bm, // 2  PA6
-  PIN7_bm, // 3  PA7
-  PIN5_bm, // 4  PB5
-  PIN4_bm, // 5  PB4
-  PIN3_bm, // 6  PB3
-  PIN2_bm, // 7  PB2
-  PIN1_bm, // 8  PB1
-  // Right side, bottom to top
-  PIN0_bm, // 9  PB0
-  PIN0_bm, // 10 PC0
-  PIN1_bm, // 11 PC1
-  PIN2_bm, // 12 PC2
-  PIN3_bm, // 13 PC3
-  PIN1_bm, // 14 PA1
-  PIN2_bm, // 15 PA2
-  PIN3_bm, // 16 PA3
-  PIN0_bm  // 17 PA0
-};
-
-
-const uint8_t digital_pin_to_timer[] = {
-  // Left side, top to bottom
-  TIMERA0,        // 0  PA4 WO4 WOA
-  TIMERA0,        // 1  PA5 WO5 WOB
-  #if defined(DAC0)
-  DACOUT,         // 2  PA6
-  #else
-  NOT_ON_TIMER,   // 2  PA6
-  #endif
-  NOT_ON_TIMER,   // 3  PA7
-  NOT_ON_TIMER,   // 4  PB5 WO2 Alt
-  NOT_ON_TIMER,   // 5  PB4 WO1 Alt
-  NOT_ON_TIMER,   // 6  PB3 WO0 Alt
-  TIMERA0,        // 7  PB2 WO2
-  TIMERA0,        // 8  PB1 WO1
-  // Right side, bottom to top
-  TIMERA0,        // 9  PB0 WO0
-  #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
-  TIMERD0,        // 10 PC0 WOC
-  TIMERD0,        // 11 PC1 WOD
-  #else
-  NOT_ON_TIMER,   // 10 PC0
-  NOT_ON_TIMER,   // 11 PC1
-  #endif
-  NOT_ON_TIMER,   // 12 PC2
-  NOT_ON_TIMER,   // 13 PC3 WO3 Alt
-  NOT_ON_TIMER,   // 14 PA1
-  NOT_ON_TIMER,   // 15 PA2
-  TIMERA0,        // 16 PA3 WO3
-  NOT_ON_TIMER    // 17 PA0
+  /* Use this for accessing PINnCTRL register */
+  const uint8_t digital_pin_to_bit_mask[] = {
+    // Left side, top to bottom
+    PIN4_bm, // 0  PA4
+    PIN5_bm, // 1  PA5
+    PIN6_bm, // 2  PA6
+    PIN7_bm, // 3  PA7
+    PIN5_bm, // 4  PB5
+    PIN4_bm, // 5  PB4
+    PIN3_bm, // 6  PB3
+    PIN2_bm, // 7  PB2
+    PIN1_bm, // 8  PB1
+    // Right side, bottom to top
+    PIN0_bm, // 9  PB0
+    PIN0_bm, // 10 PC0
+    PIN1_bm, // 11 PC1
+    PIN2_bm, // 12 PC2
+    PIN3_bm, // 13 PC3
+    PIN1_bm, // 14 PA1
+    PIN2_bm, // 15 PA2
+    PIN3_bm, // 16 PA3
+    PIN0_bm  // 17 PA0
+  };
 
 
-};
+  const uint8_t digital_pin_to_timer[] = {
+    // Left side, top to bottom
+    #if defined(USE_TIMERD0_PWM) && defined(USE_TCD_WOAB)
+      TIMERD0,          // 0  PA4 *WOA* WO4
+      TIMERD0,          // 1  PA5 *WOB* WO5
+    #else
+      #if !defined(_TCA_ALT_WO4) && defined(_TCA_USE_WO4)
+        TIMERA0,        // 0  PA4 WOA *WO4*
+      #else
+        NOT_ON_TIMER,
+      #endif
+      #if !defined(_TCA_ALT_WO5) && defined(_TCA_USE_WO5)
+        TIMERA0,        // 1  PA5 WOB *WO5*
+      #else
+        NOT_ON_TIMER,
+      #endif
+    #endif
+    #if defined(DAC0)
+      DACOUT,           // 2  PA6
+    #else
+      NOT_ON_TIMER,     // 2  PA6
+    #endif
+    NOT_ON_TIMER,       // 3  PA7
+    #if defined(_TCA_ALT_WO2)
+      TIMERA0,
+    #else
+      NOT_ON_TIMER,     // 4  PB5 WO2 Alt
+    #endif
+    #if defined(_TCA_ALT_WO1)
+      TIMERA0
+    #else
+      NOT_ON_TIMER,     // 5  PB4 WO1 Alt
+    #endif
+    #if defined(_TCA_ALT_WO0)
+      TIMERA0,
+    #else
+      NOT_ON_TIMER,     // 6  PB3 WO0 Alt
+    #endif
+    #if !defined(_TCA_ALT_WO2)
+      TIMERA0,
+    #else
+      NOT_ON_TIMER,     // 7  PB2 WO2
+    #endif
+    #if !defined(_TCA_ALT_WO1)
+      TIMERA0,
+    #else
+      NOT_ON_TIMER,     // 8  PB1 WO1
+    #endif
+    #if !defined(_TCA_ALT_WO0)
+      TIMERA0,
+    #else
+      NOT_ON_TIMER,     // 9  PB0 WO0
+    #endif
+    #if (defined(TCD0) && defined(USE_TIMERD0_PWM) && !defined(USE_TCD_WOAB))
+      TIMERD0,          // 10 PC0 *WOC*
+      TIMERD0,          // 11 PC1 *WOD*
+    #else
+      NOT_ON_TIMER,     // 10 PC0 WOC
+      NOT_ON_TIMER,     // 11 PC1 WOD
+    #endif
+    NOT_ON_TIMER,       // 12 PC2
+    #if defined(_TCA_ALT_WO3)
+      TIMERA0,          // 13 PC3 WO3 Alt
+    #else
+      NOT_ON_TIMER,     //
+    #endif
+    NOT_ON_TIMER,       // 14 PA1
+    NOT_ON_TIMER,       // 15 PA2
+    #if !defined(_TCA_ALT_WO3) && defined(_TCA_USE_WO3)
+      TIMERA0,          // 16 PA3 WO3
+    #else
+      NOT_ON_TIMER,
+    #endif
+    NOT_ON_TIMER        // 17 PA0
+  };
 
 #endif
 

@@ -193,34 +193,49 @@ The frequency of PWM output using the settings supplied by the core is shown in 
 
 This section is incomplete and will be expanded at a later date.
 
-### Planned new PWM options for 2.6.x versions
-Starting from 2.6.x, we are planning to add an additional tools submenu, PWM pin configuration. This functionality is not yet implemented
+### New in 3.6.7
+Unlike DxCore, where the overhead of identifying the timer and channel is low and flash abounds, the calculations are longer and the resources more limited here. Thus, we cannot offer runtime reconfiguration of the PWM pins. However, starting in 2.6.7, there is be a tools menu to select from a number of PWM options. On the 8-pin parts, this is a very small number - there are three theoretical possibilities, and all are on the menu. On the 24 pin parts, there are around 25 (!) options. These are only the most useful of the 168 (!!) possible logically coherant options (there are a total of 216 (!!!) possibilities in all, but only 168 of those are plausibly more useful than another), (Now do you see why we can't offer runtime reconfiguration?). On parts without a type D timer, there are "only" 72 distinct configurations.
 
-Unlike DxCore, where the overhead of identifying the timer and channel is low and flash abounds, the calculations are longer and the resources more limited here. Thus, we cannot offer automatic PWM moving by simply setting PORTMUX like we could there, however, starting in 2.6.0, there will be a tools menu to select from several PWM layouts.
+There are FAR fewer possibilities on the 14-pin parts: only 4 in total if there's no TCD, and the TCD only adds 2 more! 20-pin parts have 56 possible combinations. Those last 4 pins on the 24-pin 1-series parts include two PWM pins (and when n pins can be remapped, there are 2^n combinations, so that quadruples the number of 6-pin mappings) - PLUS they finally let you move the TCA pwm off of PA4/PA5, adding more options because 1/4th of all the 6-pin mappings get doubled again, because now you can finally have TCD on PA4/5.
 
-Note: This cannot be made changeable at runtime; it *must* be a tools menu option, because the number of conditionals involved would cause unacceptable code bloat.
 
 | Option description        | TCA0 PWM        | TCD0 PWM | 14pin | 20pin | 24pin | Notes |
 |---------------------------|-----------------|----------|-------|-------|-------|-------|
-| Default (6xTCA)           | PB0-2,PA3-5     | None     | Yes   | No    | No    | On 14-pin parts, this is default, Both of the TCD pins already have pwm from TCA which can't be remapped, TCD is not used for PWM on those   |
-| No TCD (6xTCA)            | PB0-2,PA3-5     | None     | No    | Yes   | Yes   | On 20/24-pin parts, this will save a non-negligible amount of flash, and improve performance of digitalWrite and analogWrite. No TCD PWM.  |
-| Default (6xTCA, 2xTCD)    | PB0-2,PA3-5     | PC0, PC1 | No    | Yes   | Yes   | On 14-pin 1-series, Both of the TCD pins already have pwm from TCA which can't be remapped, TCD is not used for PWM on those   |
-| Avoid UART (6xTCA, 2xTCD) | PB0,1,5 PA3-5   | PC0, PC1 | No    | Yes   | Yes   | On 20/24-pin parts we can avoid wasting any PWM channels on the USART pins |
-| Avoid Serial (6xTCA)      | PB1-3,PA3-5     | None     | Yes   | No    | No    | Minimizes conflict between PWM and SPI/I2C/USART as much as possible on 14-pin parts. No TCD0 PWM. |
-| Avoid Serial (6xTCA 2xTCD)| PB3-5,PC3-5     | PC0, PC1 | No    | No    | Yes   | Minimizes conflict between PWM and SPI/I2C/USART. TCD0 PWM on PA4, PA5. |
-| Avoid UART (3xbTCA, 2xTCD)| PB0-2           | PA4, PA5 | Yes   | No    | No    | Avoid UART pins when possible. 14-pin can't fully avoid USART pins. PWM output buffering enabled. TCD0 PWM on PA4, PA5. |
-| Avoid UART (3xbTCA, 2xTCD)| PB0,1,5         | PA4, PA5 | No    | Yes   | Yes   | Avoid UART pins completely. PWM output buffering enabled. TCD0 PWM on PA4, PA5. |
-| Avoid UART (3xbTCA, 2xTCD)| PB0,1,5         | PC0, PC1 | No    | Yes   | Yes   | Avoid UART pins completely. PWM output buffering enabled. TCD0 PWM on PC0, PC1 (note that these are also alternate pin mapping options USART1 on 2-series). |
+| Default (6xTCA)           | PB0-2, PA3-5    | None     | Yes   | No    | No    | On 14-pin parts, this is default, Both of the TCD pins already have pwm from TCA which can't be remapped, TCD is not used for PWM on those   |
+| No TCD (6xTCA)            | PB0-2, PA3-5    | None     | No    | Yes   | Yes   | On 20/24-pin parts, this will save a non-negligible amount of flash, and improve performance of digitalWrite and analogWrite. No TCD PWM.  |
+| Default (6xTCA, 2xTCD)    | PB0-2, PA3-5    | PC0, PC1 | No    | Yes   | Yes   | The 1-series default configuration   |
+| Buffered (3x TCA 2xTCD)   | PB0-2,          | PC0, PC1 | No    | Yes   | Yes   | Buffered TCA, TCD on PC0/1 |
+| Buffered (3x TCA 2xTCD)   | PB0-2,          | PA4, PA5 | Yes   | Yes   | Yes   | Buffered TCA, TCD on PA4/5 |
+| Buffered (3x TCA 2xTCD)   | PB0-2,          | None     | Yes   | Yes   | Yes   | Buffered TCA, No TCD (to save flash) |
+| PORTC PWM (6xTCA 2xTCD)   | PB0-2, PC3-5    | PC0, PC1 | No    | No    | Yes   | Shove PWM off to PORTC. TCD0 PWM on PC0, PC1. |
+| PORTC PWM (6xTCA 2xTCD)   | PB0-2, PC3-5    | PA4, PA5 | No    | No    | Yes   | Shove PWM off to PORTC. TCD0 PWM on PA4, PA5. |
+| PORTC PWM (6xTCA)         | PB0-2, PC3-5    | None     | No    | No    | Yes   | Shove PWM off to PORTC. No TCD0 PWM - saves flash. |
+| Avoid UART (6xTCA, 2xTCD) | PB0, 1, 5 PA3-5 | PC0, PC1 | No    | Yes   | Yes   | On 20/24-pin parts we can avoid wasting any PWM channels on the USART pins |
+| Avoid UART (6xTCA)        | PB0, 1, 5 PA3-5 | None     | No    | Yes   | Yes   | On 20/24-pin parts we can avoid wasting any PWM channels on the USART pins |
+| Avoid UART (6xTCA, 2xTCD) | PB0, 1, 5 PC3-5 | PA4, PA5 | No    | Yes   | Yes   | On 20/24-pin parts we can avoid wasting any PWM channels on the USART pins |
+| Avoid UART (6xTCA, 2xTCD) | PB0, 1, 5 PC3-5 | PC0, PC1 | No    | Yes   | Yes   | On 20/24-pin parts we can avoid wasting any PWM channels on the USART pins |
+| Avoid UART (6xTCA)        | PB0, 1, 5 PC3-5 | None     | No    | Yes   | Yes   | On 20/24-pin parts we can avoid wasting any PWM channels on the USART pins |
+| Avoid Serial (6xTCA 2xTCD)| PB3-5, PC3 PA4,5| PC0, PC1 | No    | Yes   | Yes   | Minimizes conflict between PWM and SPI/I2C/USART. TCD0 PWM on PC0, PC1. |
+| Avoid Serial (6xTCA)      | PB3-5, PC3 PA4,5| None     | No    | Yes   | Yes   | Minimizes conflict between PWM and SPI/I2C/USART. No TCD0 PWM - saves flash.  |
+| Avoid I2C (6xTCA 2xTCD)   | PB3-5, PC3-5    | PC0, PC1 | No    | No    | Yes   | Minimize conflict with I2C, and shove PWM off to PORTC. TCD0 PWM on PC0, PC1. |
+| Avoid I2C (6xTCA 2xTCD)   | PB3-5, PC3-5    | PA4, PA5 | No    | No    | Yes   | Minimize conflict with I2C, and shove PWM off to PORTC. TCD0 PWM on PA4, PA5. |
+| Avoid I2C (6xTCA)         | PB3-5, PC3-5    | None     | No    | No    | Yes   | Minimize conflict with I2C, and shove PWM off to PORTC. No TCD0 PWM - saves flash. |
+| Avoid I2C (6xTCA 2xTCD)   | PB3-5, PA3-5    | PC0, PC3 | No    | Yes   | Yes   | Minimize conflict with I2C, and shove PWM off to PORTC. TCD0 PWM on PA4, PA5. |
+| Avoid I2C (6xTCA)         | PB3-5, PA3-5    | None     | No    | Yes   | Yes   | Minimize conflict with I2C, and shove PWM off to PORTC. No TCD0 PWM - saves flash. |
+| Avoid UART (3xbTCA, 2xTCD)| PB0, 1, 5       | PA4, PA5 | No    | Yes   | Yes   | Avoid UART pins completely. Buffering enabled. TCD0 PWM on PA4, PA5. |
+| Avoid UART (3xbTCA, 2xTCD)| PB0, 1, 5       | PC0, PC1 | No    | Yes   | Yes   | Avoid UART pins completely. Buffering enabled. TCD0 PWM on PC0, PC1. |
+| Avoid UART (3xbTCA, 2xTCD)| PB0, 1, 5       | None     | No    | Yes   | Yes   | Avoid UART pins completely. Buffering enabled. No TCD PWM. |
 | Avoid UART (3xbTCA)       | PB0-2           | None     | Yes   | No    | No    | 14-pin can't fully avoid USART. PWM output buffering enabled. No TCD0 PWM - saves flash. |
-| Avoid UART (3xbTCA)       | PB3-5           | None     | No    | Yes   | Yes   | 14-pin can't fully avoid USART. PWM output buffering enabled. TCD0 PWM on PA4, PA5. |
-| Avoid I2C (3xbTCA, 2xTCD) | PB1-3           | PA4, PA5 | Yes   | No    | No    | 14-pin can't fully avoid I2C. You lose one of the PWM pins if you want I2C (though the 1-series - and only the 1-series - can move I2C to PA1 and PA2). PWM output buffering enabled. TCD0 PWM on PA4, PA5. |
-| Avoid I2C (3xbTCA, 2xTCD) | PB3-5           | PC0, PC1 | No    | Yes   | Yes   | Avoid I2C pins. PWM output buffering enabled. TCD0 PWM on PC0, PC1. |
-| Avoid I2C (3xbTCA, 2xTCD) | PB3-5           | PA4, PA5 | No    | Yes   | Yes   | Avoid I2C pins. PWM output buffering enabled. TCD0 PWM on PA4, PA5. |
-| Avoid I2C (3xbTCA)        | PB1-3           | None     | Yes   | No    | No    | Avoid I2C pins. PWM output buffering enabled. No TCD0 PWM - saves flash. |
-| Avoid I2C (3xbTCA)        | PB3-5           | None     | No    | Yes   | Yes   | Avoid I2C pins. PWM output buffering enabled. No TCD0 PWM - saves flash. |
-| Default 8-pin (4xTCA)     | PA1,2,3,7       | None     | No    | No    | No    | 8-pin parts only, the default
-| 3 pins (3xbTCA)           | PA1-3           | None     | No    | No    | No    | 8-pin parts only, trade 4th pwm pin for buffering and a bit more flash.
-| 5 pins (3xbTCA, 2xTCD)    | PA1-3           | PA6, PA7 | No    | No    | No    | 8-pin 1-series parts only. 5 PWM pins. A flash hog - these parts max out at just 4k of flash. The so-called "no glitch TCD" implementation is not used in order to save flash in this case.
+| Avoid UART (3xbTCA)       | PB3-5           | None     | No    | Yes   | Yes   | 14-pin can't fully avoid USART. PWM output buffering enabled. No TCD0 PWM - saves flash. |
+| Avoid I2C (3xbTCA, 2xTCD) | PB1-3           | PA4, PA5 | Yes   | No    | No    | 14-pin can't fully avoid I2C. You lose one of the PWM pins if you want I2C (though the 1-series - and only the 1-series - can move I2C to PA1 and PA2). Buffering enabled. TCD0 PWM on PA4, PA5. |
+| Avoid I2C (3xbTCA, 2xTCD) | PB3-5           | PC0, PC1 | No    | Yes   | Yes   | Avoid I2C pins. Buffering enabled. TCD0 PWM on PC0, PC1. |
+| Avoid I2C (3xbTCA, 2xTCD) | PB3-5           | PA4, PA5 | No    | Yes   | Yes   | Avoid I2C pins. Buffering enabled. TCD0 PWM on PA4, PA5. |
+| Avoid I2C (3xbTCA)        | PB1-3           | None     | Yes   | No    | No    | Avoid I2C pins. Buffering enabled. No TCD0 PWM - saves flash. |
+| Avoid I2C (3xbTCA)        | PB3-5           | None     | No    | Yes   | Yes   | Avoid I2C pins. Buffering enabled. No TCD0 PWM - saves flash. |
+| Default 8-pin (4xTCA)     | PA1, 2, 3, 7    | None     | No    | No    | No    | 8-pin parts only, the default |
+| 3 pins (3xbTCA)           | PA1-3           | None     | No    | No    | No    | 8-pin parts only, trade 4th pwm pin for buffering and a bit more flash. |
+| 5 pins (3xbTCA, 2xTCD)    | PA1-3           | PA6, PA7 | No    | No    | No    | 8-pin 1-series parts only. 5 PWM pins. A flash hog - these parts max out at just 4k of flash. The so-called "no glitch TCD" implementation is not used in order to save flash in this case. |
+
 
 #### TCD PWM pins
 On the 14-pin parts, when TCA is used in split mode, the only pins available for TCD PWM are PA4 and PA5 - which are already the only outputs WO4 and WO5 of TCA0 on those parts. Hence, TCD PWM is not used in that configuration as it would just waste flash without giving you more PWM pins. When TCA is not used in split mode, that opens the door to TCD-generated PWM on the 14-pin 1-series parts. Also, alternate mappings of the TCA PWM pins make TCD PWM on PA4, PA5 reasonable to use on 24-pin parts depending on what alternate functions you need from the pins not used for PWM.
@@ -236,6 +251,7 @@ This means the following things will be done differently in the TCA configuratio
 * Buffered mode uses slightly less flash.
   * If TCD is added as a result of changes to this menu option, that will increase the flash usage significantly.
 * The number of buffered channels is abbreviated bTCA in above table.
+* TCD PWM pins are always buffered; We always request SYNC_EOC (synchronize registers at end of PWM cycle) after setting a new duty cycle, rather than requesting an immediate sync. (If a sync is not requested at all, it will not be performed - the TCD will never see the new values and the duty cycle would never change.)
 
 ## Millis/Micros Timekeeping
 megaTinyCore allows any of the timers to be selected as the clock source for timekeeping via the standard millis timekeeping functions. ThThe timer used and system clock speed will effect the resolution of `millis()` and `micros()`, the time spent in the millis ISR, and the time it takes for `micros()`  to return a value. The `micros()` function will typically take several times it's resolution to return, and the times returned corresponds to the time `micros()` was called, regardless of how long it takes to return.
@@ -281,7 +297,7 @@ while (micros() - starttime < (100 - (6/2))); // this loop only samples micros e
 digitalWriteFast(pinb, LOW); // so now our pulse on average is 100usm but might be as low as 96 or as high and 103
 ```
 
-So - the message is you shouldn't busywait on micros(). micros is for time since something happened, it is not meant to be checked continually to see if a timeout is passed.  in the previous example, if linked by the event system to the pin, a TCB could be counting as soon as the new pin value was synchronized, giving a consistent length of 100us starting a fraction of a us after the pulse was seen. You can generate pulses up to (131070 / Clocks-per-us), about 6.5 seconds at 20 MHz, accurate to within 2 system clocks in that way. If you also wanted to delay the execution of later code, which you likely do if your first instinct was something like what is shown above, these can be done concurrently....
+So - the message is you shouldn't busywait on micros() if you need microsecond accuracy. micros is for time since something happened, it is not meant to be checked continually to see if a timeout is passed.  in the previous example, if linked by the event system to the pin, a TCB could be counting as soon as the new pin value was synchronized, giving a consistent length of 100us starting a fraction of a us after the pulse was seen. You can generate pulses up to (131070 / Clocks-per-us), about 6.5 seconds at 20 MHz, accurate to within 2 system clocks in that way. If you also wanted to delay the execution of later code, which you likely do if your first instinct was something like what is shown above, these can be done concurrently....
 
 ```c
 setupTCB(); // call your function to configure TCB in single shot mode, outputting a pulse 2000 clocks long triggered by a rising edge.
@@ -313,10 +329,10 @@ while (digitalReadFast(pina)); //wait for our input pulse to end;
 endtime = micros(); // highly accurate as long as pulse len longer than micros()
 while (digitalReadFast(pinb)); // make sure our pulse is over - can be omitted if we're not emitting a pulse plausibly longer by more than the micros execution time (in this example, if we were outputting a pulse that might be longer than 106 us, counting timer drift), though it only costs 4 bytes and 2 clocks to test for it.
 ```
+
 `*` internal oscillator is usually within a percent at room temperature, and within half a percent is common. We're assuming that at the moment millis started, an ideal stopwatch was started, and when it indicated 100us had gone by, drove the pin low effectively instantaneously.
 
 A table is presented for each type of timer comparing the percentage of CPU time spent in the ISR, the resolution of the timekeeping functions, and the execution time of micros. Typically `micros()`  can have one of three execution times, the shortest one being overwhelmingly more common, and the differences between them are small.
-
 
 ### TCAn for millis timekeeping
 When TCA0 is used as the millis timekeeping source, it is set to run at the system clock prescaled by 8 when system clock is 1MHz, 16 when system clock is <=5 MHz, and 64 for faster clock speeds, with a period of 255 (as with PWM). This provides a `millis()`  resolution of 1-2ms, and is effecively not higher than 1ms between 16 and 30 MHz, while `micros()` resolution remains at 4 us or less. At 32 MHz or higher, to continue generating PWM output within the target range, we are forced to switch to a larger prescaler (by a factor of 4), so the resolution figures fall by a similar amount, and the ISR is called that much less often.
@@ -338,11 +354,11 @@ In 2.6.2, the same techniques used for TCB were applied to TCA, improving the IS
 |    10 MHz |  1.63 ms |   6.4 us |   0.51 % |         14 us |
 |     8 MHz |  2.04 ms |   8.0 us |   0.51 % |         17 us |
 | !   7 MHz |  0.58 ms |   2.3 us |   2.13 % |   aprx  18 us |
-| !   6 MHz |  0.68 ms |   2.7 us |   2.13 % |   aprx  19 us |
+|     6 MHz |  0.68 ms |   2.7 us |   2.13 % |   aprx  19 us |
 |     5 MHz |  0.82 ms |   3.2 us |   2.13 % |         27 us |
 |     4 MHz |  1.02 ms |   4.0 us |   2.13 % |         33 us |
 | !   3 MHz |  0.68 ms |   2.7 us |   3.55 % |   aprx  45 us |
-| !   2 MHz |  1.02 ms |   4.0 us |   3.55 % |   aprx  60 us |
+|     2 MHz |  1.02 ms |   4.0 us |   3.55 % |   aprx  60 us |
 |     1 MHz |  2.04 ms |   8.0 us |   3.55 % |        112 us |
 
 `!` - Theoretical, these speeds are not supported and have not been tested
@@ -376,14 +392,14 @@ ISR execution time was decreased by 25% from 2.6.1 of megaTinyCore through reimp
 |     |  10 MHz |     1 ms |     1 us |   0.65 % |         10 us | 6 (2,4,6,8,10)         |
 |  †  |   8 MHz |     1 ms |     1 us |   0.80 % |         11 us | 1                      |
 | !   |   7 MHz |     1 ms |  1.14 us |   0.94 % | approx. 25 us | 5/7 (2,3,5,6 ~8,9~ )   |
-| ! * |   6 MHz |     1 ms |  1.33 us |   1.08 % |       > 20 us | 9 (0-7, 9)             |
+|   * |   6 MHz |     1 ms |  1.33 us |   1.08 % |       > 20 us | 9 (0-7, 9)             |
 |   * |   5 MHz |     1 ms |     1 us |   1.30 % |         23 us | 6 (2,4,6,8,10)         |
 |  †  |   4 MHz |     1 ms |     1 us |   1.18 % |         21 us | 1                      |
 | ! * |   3 MHz |     1 ms |  1.33 us |   1.61 % |       > 40 us | 9 (0-7, 9)             |
-| !†  |   2 MHz |     2 ms |     1 us |   1.18 % |         39 us | 1                      |
+|  †  |   2 MHz |     2 ms |     1 us |   1.18 % |         39 us | 1                      |
 |  †  |   1 MHz |     2 ms |     1 us |   2.36 % |         78 us | 1                      |
 
-`!` - Theoretical, these speeds are not supported and have not been tested. % time in ISR and micros return times, where given are theoretically calculated, not experimentally verified.
+`!` - Theoretical, these speeds are not supported and have not been tested (though 3 MHz is the same math as 6, 12, and 24 MHz). % time in ISR and micros return times, where given are theoretically calculated, not experimentally verified.
 `†` - Naturally ideal - no ersatz division is needed for powers of 2
 `*` - indicates that the shift & sum ersatz-division is done in hand-optimized assembly because I just couldn't stand how stupid and stubborn the compiler was, and by the time I was done analyzing it, implementing it was mostly done. These use every term that would improve the accuracy of the approximation, shown in the final column. The algorithm divides the timer ticks (which is between zero and F_CPU/2000) by a power if 2 (by right shifting) to get term 0; a number of terms (generated by further rightshifting) are then added and subtracted to get the time since the last millis was counted, and that total is added to 1000x the millisecond count. The ideal number of terms varies from 1 (for powers of 2 - only term 0) to 9 (for the terrible twelves (12, 24, 48, as well as 3 and 6). In optimized cases, that's how many are used. Otherwise, some may be dropped, or different combinations used (adding 1 term, then subtracting the next, would seem equivalent to just adding the next - but because of integer math, it's not, and in fact can lead to several us of backwards timetravel, so if you'd have to do the same operation twice in a row, you get more accurate numbers if you avoid that by adding another term). In optimized cases, as well as the powers of 2, the results are as good as possible in light of the specified resolution - where resolution is coarser than 1us, (1/resolution) of possible values for the three lowest digits (in normal base 10 number systems) is skipped and never shows up. These skipped values are distributed evenly between 1 and 999. For example, for 12/24/48, that means 250 values never show up. Of the remaining 750, 500 will show for only 1 "actual" microsecond value, and 250 for 2 consecutive "actual" microsecond values. See the table at the end of this document for the list of skipped least-significant-digit combinations. None of the optimized options will never go back in time, even by a single microsecond (as long as the chance of backward time travel is limited to less than the time it takes micros to execute, it can't break `delay()`, cause timeouts to instantly expire or cause other catastrophic consequences) nor are more than 2 values in a row ever skipped. Those criteria are not guaranteed to be met for other speeds, though we do guarantee that negative time travel will never occur that causes two consecutive calls to micros to return a smaller value for the second call which is what triggers misbehavior of timing code.
 
@@ -456,6 +472,7 @@ Whenever a function supplied by the core returns a representation of a timer, th
 `**` A hypothetical part with multiple DACs with output buffers will have extend up into 0x8x.
 
 All other unforeseen timer-like peripherals will be assigned to values above 0x9F
+
 ## Appendix II: TCB Micros Artifacts
 3, 6, 12, 24, and 48 MHz, with the new optimized micros code, running from a TCB, is known to skip these (and only these) 250 values when determining the least significant thousand micros. That is, if you repeatedly calculate `micros % 1000`, none of these will show up until it has been running long enough for micros to overflow.
 
@@ -483,6 +500,6 @@ Those 250 "missing" microseconds manifest as repeats. It is difficult to intuiti
 ```
 Similar lists can be generated for any other clock speed where resolution is coarser than 1us and a TCB is used.
 
-The number of values will, for ideal values, be `(1000) * (1 - (1 / resolution))` or something very close to that. Non-ideal series of terms or particularly adverse clock speeds may have more than that, as well as more cases of consecutive times that get the same micros value. If the terms were chosen poorly, it is possible for a time t give micros M where M(t-1) > M(t), violating the assumptions of the rest of the core and breaking EVERYTHING. 1.3.7 is believed to be free of them for all supported clock speeds. Likewise, it is possible for there to be larger skips or discontinuities, where M(t) - M(t-1) > 2, in contrast to skips listed above (where M(t) - M(t-1) = 2 ) or consecutive times return a repeated value (ie, M(t) = M(t-1))
+The number of values will, for ideal values, be `(1000) * (1 - (1 / resolution))` or something very close to that. Non-ideal series of terms or particularly adverse clock speeds may have more than that, as well as more cases of consecutive times that get the same micros value. If the terms were chosen poorly, it is possible for a time t give micros M where M(t-1) > M(t), violating the assumptions of the rest of the core and breaking EVERYTHING. The current version of the core is believed to be free of them for all supported clock speeds. Likewise, it is possible for there to be larger skips or discontinuities, where M(t) - M(t-1) > 2, in contrast to skips listed above (where M(t) - M(t-1) = 2 ), or the number of times that a value returned for a point in time 1 us in the future would be the same numeric value -  (ie, M(t) = M(t-1))
 
 Timer options which have resolution of 1us (internally, it is lower) may have repeats or skips if fewer than the optimal number of terms were used (as is the case with non optimized options) or where the clock speed is particularky hard to work with, like the 28 MHz one.

@@ -273,24 +273,49 @@ const uint8_t digital_pin_to_bit_mask[] = {
 
 const uint8_t digital_pin_to_timer[] = {
   // Left side, top to bottom
-  TIMERA0,        // 0  PA4
-  TIMERA0,        // 1  PA5
-  #if defined(DAC0)
-  DACOUT,         // 2  PA6
+  #if defined(USE_TIMERD0_PWM) && defined(USE_TCD_WOAB)
+    TIMERD0,          // 0  PA4 *WOA* WO4
+    TIMERD0,          // 1  PA5 *WOB* WO5
   #else
-  NOT_ON_TIMER,   // 2  PA6
+    #if defined(_TCA_USE_WO4)
+      TIMERA0,        // 0  PA4 WOA *WO4*
+    #else
+      NOT_ON_TIMER,
+    #endif
+    #if defined(_TCA_USE_WO5)
+      TIMERA0,        // 1  PA5 WOB *WO5*
+    #else
+      NOT_ON_TIMER,
+    #endif
   #endif
-  NOT_ON_TIMER,   // 3  PA7
-  NOT_ON_TIMER,   // 4  PB3
-  TIMERA0,        // 5  PB2
+  #if defined(DAC0)
+    DACOUT,           // 2  PA6
+  #else
+    NOT_ON_TIMER,     // 2  PA6
+  #endif
+  NOT_ON_TIMER,       // 3  PA7
+  #if defined(_TCA_ALT_WO0)
+    TIMERA0,          // 6  PB3 WO0 Alt
+  #else
+    NOT_ON_TIMER,     // 6  PB3 WO0 Alt
+  #endif
+  TIMERA0,            // 5  PB2
   // Right side, bottom to top
-  TIMERA0,        // 6  PB1
-  TIMERA0,        // 7  PB0
+  TIMERA0,            // 6  PB1
+  #if !defined(_TCA_ALT_WO0)
+    TIMERA0,          // 6  PB3 WO0 Alt
+  #else
+    NOT_ON_TIMER,     // 6  PB3 WO0 Alt
+  #endif
   //skip PA0 UPDI
-  NOT_ON_TIMER,   // 8  PA1
-  NOT_ON_TIMER,   // 9  PA2
-  TIMERA0,        // 10 PA3
-  NOT_ON_TIMER    // 11 PA0
+  NOT_ON_TIMER,       // 8  PA1
+  NOT_ON_TIMER,       // 9  PA2
+  #if defined(_TCA_USE_WO3)
+    TIMERA0,          // 10 PA3 WO3
+  #else
+    NOT_ON_TIMER,
+  #endif
+  NOT_ON_TIMER        // 11 PA0
 
 
 };

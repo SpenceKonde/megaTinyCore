@@ -38,13 +38,13 @@ These are the values that the MILLIS_TIMER may be defined as:
 | `TIMERA1`       |          0x08 | Millis is generated from TCA1
 | `TIMERB0`       |          0x20 | Millis is generated from TCB0
 | `TIMERB1`       |          0x21 | Millis is generated from TCB1
-| `TIMERB2`       |          0x23 | Millis is generated from TCB2
+| `TIMERB2`       |          0x22 | Millis is generated from TCB2
 | `TIMERB3`       |          0x23 | Millis is generated from TCB3
 | `TIMERB4`       |          0x24 | Millis is generated from TCB4
-| `TIMERD0`       |          0x40 | Not planned for implementation on DxCore.
-| `TIMERRTC`      |          0x80 | (not yet implemented on DxCore)
-| `TIMERRTC_XTAL` |          0x81 | (not yet implemented on DxCore)
-| `TIMERRTC_XOSC` |          0x82 | (not yet implemented on DxCore)
+| `TIMERD0`       |          0x40 | Millis is generated from TCD0 (megaTinyCore only)
+| `TIMERRTC`      |          0x80 | Millis is generated from the RTC from internal low frequency osc. (megaTinyCore only currently)
+| `TIMERRTC_XTAL` |          0x81 | Millis is generated from the RTC from external crystal oscillator. (megaTinyCore only currently)
+| `TIMERRTC_XOSC` |          0x82 | Millis is generated from the RTC from external active oscillator. (megaTinyCore only currently)
 
 To to find the millis timer:
 ```c
