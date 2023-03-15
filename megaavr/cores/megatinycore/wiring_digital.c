@@ -118,18 +118,35 @@ void turnOffPWM(uint8_t pin)
     /* TCA0 */
     case TIMERA0:
     {
-      // uint8_t *timer_cmp_out;
-      /* Bit position will give output channel */
-      #ifdef __AVR_ATtinyxy2__
-        if (bit_mask == 0x80) {
-          bit_mask = 1;  // on the xy2, WO0 is on PA7
+      uint8_t port=digitalPinToPort(pin);
+      #if !defined(TCA_BUFFERED_3PIN)
+        // uint8_t *timer_cmp_out;
+        /* Bit position will give output channel */
+        #ifdef __AVR_ATtinyxy2__
+          if (bit_mask == 0x80) {
+            bit_mask = 1;         // on the xy2, WO0 is on PA7
+          }
+          if (bit_mask > 0x04) {  // -> bit_pos > 2 -> output channel controlled by HCMP
+            bit_mask <<= 1;       // mind the gap (between LCMP and HCMP)
+          }
+        #else
+          if (port == PB) {        // WO0-WO2, Bitmask has one of these bits 1: 0b00hhhlll.
+            if (bit_mask > 0x04) { // Is it one of the three high ones? If so
+              bit_mask <<= 1;      // nudge it 1 place left swap nybbles since that's 1 clock faster than 3 rightshifts.
+              _SWAP(bit_mask);     // swap nybbles since that's 1 clock faster than 3 rightshifts.
+            }
+          } else {
+            // Otherwise, it's WO3-5. These will always be on 0b00hhh000,. Here since we ARE working with a high half timer, we need to just leftshift it once.
+            bit_mask <<= 1;
+          }
+        #endif
+        TCA0.SPLIT.CTRLB &= ~bit_mask;
+      #else // 3-pin mode. Means we know it's on PORTB}
+        if (bit_mask > 0x04) { // Is it one of the three high ones? If so
+          bit_mask <<= 1;      // nudge it 1 place left swap nybbles since that's 1 clock faster than 3 rightshifts.
+          _SWAP(bit_mask);     // swap nybbles since that's 1 clock faster than 3 rightshifts.
         }
       #endif
-      if (bit_mask > 0x04) { // -> bit_pos > 2 -> output channel controlled by HCMP
-        bit_mask <<= 1;      // mind the gap (between LCMP and HCMP)
-      }
-      // since we're turning it off, we don't need to change the CMP register
-      TCA0.SPLIT.CTRLB &= ~bit_mask;
       break;
     }
 
@@ -151,30 +168,53 @@ void turnOffPWM(uint8_t pin)
       case TIMERD0:
       {
         // rigmarole that produces a glitch in the PWM
-        uint8_t fc_mask = (bit_mask == 0x02?0x80:0x40);
-        if (TCD0.FAULTCTRL & fc_mask) {
-          uint8_t oldSREG = SREG;
-          cli();
-          // uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
-          //
-          TCD0.CTRLA &= ~TCD_ENABLE_bm;
-          _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~fc_mask));
-          while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it can be re-enabled
-          TCD0.CTRLA |= TCD_ENABLE_bm;           // re-enable it
-          #if defined(NO_GLITCH_TIMERD0) /* This is enabled in all cases where TCD0 is used for PWM */
-            // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
-            // So we need to make sure that's off - wouldn't that be fun to debug?
-            // We only support control of the TCD0 PWM functionality on PIN_PC0 and PIN_PC1 (on 20 and 24 pin parts)
-            // so if we're here, we're acting on either PC0 or PC1.
-            if (bit_mask == 0x01) {
-              PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
-            } else {
-              PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
-            }
-          #endif
+        #if defined(TCD_USE_WOAB)
+          uint8_t fc_mask = bit_mask;// Hey that works out well!
+          if (TCD0.FAULTCTRL & fc_mask) {
+            uint8_t oldSREG = SREG;
+            cli();
+            // uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
+            //
+            TCD0.CTRLA &= ~TCD_ENABLE_bm;
+            _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~fc_mask));
+            while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it can be re-enabled
+            TCD0.CTRLA |= TCD_ENABLE_bm;           // re-enable it
+            #if defined(NO_GLITCH_TIMERD0) /* This is enabled in all cases where TCD0 is used for PWM */
+              // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
+              // So we need to make sure that's off - wouldn't that be fun to debug?
+              if (bit_mask == 0x10) {
+                PORTA.PIN4CTRL &= ~(PORT_INVEN_bm);
+              } else {
+                PORTA.PIN5CTRL &= ~(PORT_INVEN_bm);
+              }
+            #endif
 
-          SREG = oldSREG;
-        }
+            SREG = oldSREG;
+          }
+        #else
+          uint8_t fc_mask = (bit_mask == 0x02 ? 0x80 : 0x40);
+          if (TCD0.FAULTCTRL & fc_mask) {
+            uint8_t oldSREG = SREG;
+            cli();
+            // uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
+            //
+            TCD0.CTRLA &= ~TCD_ENABLE_bm;
+            _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~fc_mask));
+            while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it can be re-enabled
+            TCD0.CTRLA |= TCD_ENABLE_bm;           // re-enable it
+            #if defined(NO_GLITCH_TIMERD0) /* This is enabled in all cases where TCD0 is used for PWM */
+              // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
+              // So we need to make sure that's off - wouldn't that be fun to debug?
+              if (bit_mask == 0x01) {
+                PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
+              } else {
+                PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
+              }
+            #endif
+
+            SREG = oldSREG;
+          }
+        #endif
         break;
       }
     #endif

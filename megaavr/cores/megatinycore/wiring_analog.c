@@ -1113,7 +1113,7 @@ void analogWrite(uint8_t pin, int val) {
         digitalWrite(pin, HIGH);
       } else {
         /* Calculate correct compare buffer register */
-        #if defined(_BUFFER_TCA)
+        #if defined(TCA_BUFFERED_3PIN)
           //If we have buffered TCA0, then we write to different registers and calculate destinations differeetly.
           volatile uint16_t *timer_cmp_out; // must be volatile for this to be safe.
           uint8_t offset = 0;
