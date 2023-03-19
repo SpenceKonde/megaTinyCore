@@ -193,7 +193,7 @@ The frequency of PWM output using the settings supplied by the core is shown in 
 
 This section is incomplete and will be expanded at a later date.
 
-### New in 3.6.7
+### New in 2.6.7
 Unlike DxCore, where the overhead of identifying the timer and channel is low and flash abounds, the calculations are longer and the resources more limited here. Thus, we cannot offer runtime reconfiguration of the PWM pins. However, starting in 2.6.7, there is be a tools menu to select from a number of PWM options. On the 8-pin parts, this is a very small number - there are three theoretical possibilities, and all are on the menu. On the 24 pin parts, there are around 25 (!) options. These are only the most useful of the 168 (!!) possible logically coherent options (there are a total of 216 (!!!) possibilities in all, but only 168 of those are plausibly more useful than another), (Now do you see why we can't offer runtime reconfiguration?). On parts without a type D timer, there are "only" 72 distinct configurations.
 
 There are FAR fewer possibilities on the 14-pin parts: only 4 in total if there's no TCD, and the TCD only adds 2 more! 20-pin parts have 56 possible combinations. Those last 4 pins on the 24-pin 1-series parts include two PWM pins (and when n pins can be remapped, there are 2^n combinations, so that quadruples the number of 6-pin mappings) - PLUS they finally let you move the TCA pwm off of PA4/PA5, adding more options because 1/4th of all the 6-pin mappings get doubled again, because now you can finally have TCD on PA4/5.
