@@ -88,13 +88,13 @@ class UpdiPhysical:
         # Wait for the double break end
         temporary_serial.read(1)
 
-        time.sleep(0.1)
+        #time.sleep(0.1)
 
         # Send two break characters, with 1 stop bit in between
-        temporary_serial.write([constants.UPDI_BREAK])
+        #temporary_serial.write([constants.UPDI_BREAK])
 
         # Wait for the double break end
-        temporary_serial.read(1)
+        #temporary_serial.read(1)
 
         # Re-init at the real baud
         temporary_serial.close()
@@ -119,7 +119,7 @@ class UpdiPhysical:
         :param size: bytes to receive
         """
         response = bytearray()
-        timeout = 1
+        timeout = 3
 
         # For each byte
         while size and timeout:

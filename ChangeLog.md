@@ -17,6 +17,15 @@ These items are in addition to what was listed under changes already in release.
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
+### Planned 2.6.7
+* Enhancement: finish implementing PWM pin set selection tools submenu. All reasonable pin mappings are available for 8-pin (3 combinations, 2 on 0/2-series), and 14-pin (6, 4 on 0/2-series) parts, and most plausibly useful ones on the larger parts (over a dozen on the 20-pin and 25 on the 24-pin parts), less than 20% of the absolute number of combinations. If 3-pin PWM mode is selected, it will still be 8 bit PWM - but you are guaranteed not to have a glitch when slowly raising the duty cycle because buffering is used.
+* Fix issue with the change to the comparator and logic libraries so it actually lets you make your own ISR.
+* Update to AVRdude 7.1 (pending)
+* Bugfix - pinModeFast will now turn off pullups if they're on when a pin is set to output. otherwise, the result was problemaic for - for example, a situation I ran into where the pullup was never turned off even after the pins were set back to output and driven low. Prior to going to deep sleep. You can imagine what my battery life was like.
+* Bugfix - Change clockCyclesToMicroseconds, microsecondsToClockCycles, and clockCyclesPerMicrosecond back into macros instead of inlinable functions, as some libraries depend on them being valid constexprs.
+* Bugfix - pinModeFast will now turn off pullups if they're on when a pin is set to output. otherwise, the result was problemaic for - for example, a situation I ran into where the pullup was never turned off even after the pins were set back to output and driven low. Prior to going to deep sleep. You can imagine what my battery life was like.
+
+
 ## Released Versions
 
 ### 2.6.6

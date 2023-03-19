@@ -50,21 +50,6 @@ uint8_t __PeripheralControl = 0xFF;
 // the prescaler is set so that timer ticks every 64 clock cycles, and the
 // the overflow handler is called every 256 ticks.
 
-
-inline uint16_t clockCyclesPerMicrosecond() {
-  return ((F_CPU) / 1000000L);
-}
-
-inline uint32_t clockCyclesToMicroseconds(const uint32_t cycles) {
-  return (cycles / clockCyclesPerMicrosecond());
-}
-
-inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
-  return (microseconds * clockCyclesPerMicrosecond());
-}
-
-
-
 /* Use prescale appropriate for system clock speed
  * Detect conflict between wiring.c and timers.h if we spot them, as that indicates
  * a defect in the core and would result in extremely bad behavior
@@ -107,26 +92,7 @@ inline uint32_t microsecondsToClockCycles(const uint32_t microseconds) {
     const struct sTimer _timerS = {RTC_OVF_bm, &RTC.INTCTRL};
   #else
     // when TCD0 is used as millis source, this will be different from above, but 99 times out of 10, when a piece of code asks for clockCyclesPerMicrosecond(), they're asking about CLK_PER/CLK_MAIN/etc, not the unprescaled TCD0!
-    inline uint16_t millisClockCyclesPerMicrosecond() {
-      #ifdef MILLIS_USE_TIMERD0
-        #if (F_CPU == 20000000UL || F_CPU == 10000000UL ||F_CPU == 5000000UL)
-          return (20);   // this always runs off the 20MHz oscillator
-        #else
-          return (16);
-        #endif
-      #else
-        return ((F_CPU) / 1000000L);
-      #endif
-    }
 
-
-    inline uint32_t millisClockCyclesToMicroseconds(const uint32_t cycles) {
-      return (cycles / millisClockCyclesPerMicrosecond());
-    }
-
-    inline uint32_t microsecondsToMillisClockCycles(const uint32_t microseconds) {
-      return (microseconds * millisClockCyclesPerMicrosecond());
-    }
 
 
     #if defined (MILLIS_USE_TIMERA0)

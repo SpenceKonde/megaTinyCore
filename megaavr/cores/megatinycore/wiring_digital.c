@@ -442,7 +442,7 @@ inline __attribute__((always_inline)) void pinModeFast(uint8_t pin, uint8_t mode
     // 1 clock to set direction
   if (mode == INPUT_PULLUP)
     *pin_ctrl |= PORT_PULLUPEN_bm;
-  else if (mode == INPUT)
+  else //SK 3/16/23 - we were doing something really dumb here. You need to turn off the pullup when set to output too!
     *pin_ctrl &= ~PORT_PULLUPEN_bm;
     // and 5 to switch the damned pullup.
 }

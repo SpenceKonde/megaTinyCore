@@ -408,11 +408,14 @@ void          turnOffPWM(uint8_t pinNumber               );
 uint8_t PWMoutputTopin(uint8_t timer, uint8_t channel);
 // Realized we're not going to be able to make generic code without this.
 
-
-//
-uint16_t clockCyclesPerMicrosecond();
-uint32_t clockCyclesToMicroseconds(uint32_t cycles);
-uint32_t microsecondsToClockCycles(uint32_t microseconds);
+/* Even when millis is off, we should still have access to the clock cycle counting macros.
+ * That's the only way we can get time estimates there!
+ * 3/19/23: These are supposed to be macros, not inline functions
+ * Users have reported problems resulting from their being functions, even inline ones
+ */
+#define clockCyclesPerMicrosecond() ((uint16_t)(F_CPU / 1000000L))
+#define clockCyclesToMicroseconds(a) ((uint32_t)((a) / clockCyclesPerMicrosecond()))
+#define microsecondsToClockCycles(a) ((uint32_t)((a) * clockCyclesPerMicrosecond()))
 
 // Currently DxCore has no cases where the millis timer isn't derived from system clock, but that will change
 /* This becomes important when we support other timers for timekeeping. The Type D timer can be faster, requiring:
@@ -432,9 +435,24 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
 
 
 // Copies of above for internal use, and for the really exotic use cases that want this instead of system clocks (basically never in user-land)
-uint16_t millisClockCyclesPerMicrosecond();
-unsigned long millisClockCyclesToMicroseconds(unsigned long cycles);
-unsigned long microsecondsToMillisClockCycles(unsigned long microseconds);
+
+/* Even when millis is off, we should still have access to the clock cycle counting macros.
+ * That's the only way we can get time estimates there!
+ * 3/19/23: These are supposed to be macros, not inline functions
+ * Users have reported problems resulting from their being functions, even inline ones
+ */
+#ifdef MILLIS_USE_TIMERD0
+  #if (F_CPU == 20000000UL || F_CPU == 10000000UL ||F_CPU == 5000000UL)
+    #define millisClockCyclesPerMicrosecond() ((uint16_t) (20));   // this always runs off the 20MHz oscillator
+  #else
+    #define millisClockCyclesPerMicrosecond() ((uint16_t) (16));
+  #endif
+#else
+  #define millisClockCyclesPerMicrosecond() ((uint16_t) ((F_CPU) / 1000000L));
+#endif
+#define millisClockCyclesToMicroseconds(a) ((uint32_t)((a) / millisClockCyclesPerMicrosecond()))
+#define microsecondsToMillisClockCycles(a) ((uint32_t)((a) * millisClockCyclesPerMicrosecond()))
+
 /* Timers and Timer-like-things
  * These are used for two things: Identifying the timer on a pin in
  * digitalPinToTimer(), and for the MILLIS_TIMER define that users can test to
