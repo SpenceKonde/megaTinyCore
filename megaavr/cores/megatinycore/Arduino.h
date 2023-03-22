@@ -443,12 +443,12 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
  */
 #ifdef MILLIS_USE_TIMERD0
   #if (F_CPU == 20000000UL || F_CPU == 10000000UL ||F_CPU == 5000000UL)
-    #define millisClockCyclesPerMicrosecond() ((uint16_t) (20));   // this always runs off the 20MHz oscillator
+    #define millisClockCyclesPerMicrosecond() ((uint16_t) (20))  // this always runs off the 20MHz oscillator
   #else
-    #define millisClockCyclesPerMicrosecond() ((uint16_t) (16));
+    #define millisClockCyclesPerMicrosecond() ((uint16_t) (16))
   #endif
 #else
-  #define millisClockCyclesPerMicrosecond() ((uint16_t) ((F_CPU) / 1000000L));
+  #define millisClockCyclesPerMicrosecond() ((uint16_t) ((F_CPU) / 1000000L))
 #endif
 #define millisClockCyclesToMicroseconds(a) ((uint32_t)((a) / millisClockCyclesPerMicrosecond()))
 #define microsecondsToMillisClockCycles(a) ((uint32_t)((a) * millisClockCyclesPerMicrosecond()))
