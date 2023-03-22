@@ -1,5 +1,5 @@
 # tinyNeoPixel documentation is elsewhere
-tinyNeoPixel is a tweaked version of adafruitNeoPixel, supporting more clock speeds, but should be code compatible excepting the change to the class name. This core also includes tinyNeoPixel_Static, which has been modified further to reduce the flash footprint. It is recommended to read the first one first, as it gives brief summaries of the API, before and discusses supported parts and particularly common issues relating to these parts.
+tinyNeoPixel is a tweaked version of adafruitNeoPixel, supporting more clock speeds and correcting some improperly specified constraints, but should be code compatible excepting the change to the class name. This core also includes tinyNeoPixel_Static, which has been modified further to reduce the flash footprint. It is recommended to read the first one first, as it gives brief summaries of the API, before and discusses supported parts and particularly common issues relating to addressable LEDs, both specific to these parts and in general (including specific hazards that they can expose the user to if used improperly)
 * [Summary and changes specific to tinyNeoPixel_Static](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/tinyNeoPixel.md)
 * [Full class reference from Adafruit](https://adafruit.github.io/Adafruit_NeoPixel/html/class_adafruit___neo_pixel.html)
 

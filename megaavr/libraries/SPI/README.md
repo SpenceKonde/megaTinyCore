@@ -1,15 +1,15 @@
 # SPI for megaTinyCore
-The SPI library implements all of the standard functionality described in the [Arduino SPI library reference](https://www.arduino.cc/en/reference/SPI) applies here. Also, like all of the "big three" third-party cores for post-2016 AVR devices, this version of SPI.h supports the `swap()` and `pins()` methods to make use of the PORTMUX feature of the chips.
+The SPI library implements all of the standard functionality described in the [Arduino SPI library reference](https://www.arduino.cc/en/reference/SPI) applies here. Also, like all of the "big three" third-party cores for post-2016 AVR devices, this version of SPI.h supports the `swap()` and `pins()` methods to make use of the PORTMUX feature of the chips. Aside from those extensions, and a few changes to rarelty used, ill-conceived methods relating to interrupts, and unimplemented methods (likely intended for slave mode which was never implemented, for reasons discussed below), it behaves in the same way as the official one.
 
 ## Pins
-| Pin Mapping   | Pins        | Parts           | Note                      |
-|---------------|-------------|-----------------|---------------------------|
-| 8-pin parts   | PA1-3, PA0  | 8-pin only      | Swap not supported on 8-pin parts* |
-| 0 (default)   | PA1-PA4     | 14+ pins        | Overlaps with very useful pins |
+| Pin Mapping   | Pins        | Parts           | Note                                                    |
+|---------------|-------------|-----------------|---------------------------------------------------------|
+| 8-pin parts   | PA1-3, PA0  | 8-pin only      | Swap not supported on 8-pin parts*                      |
+| 0 (default)   | PA1-PA4     | 14+ pins        | Overlaps with very useful pins                          |
 | 1 (alternate) | PC0-PC3     | 20+ pin         | Likely a better choice if using a part with this option |
 
 Notes:
-* The 8-pin parts, though they list an alternate pin mapping, it only appears to have MISO and MOSI - hence being somewhat less than useful. I'm not sure if the datasheet is just unclear and it does actually have an SCK output on another pin, whether it can be used by hacking things together with the event system (There is supposedly an SPI clock event generator). But the datasheet on the 0/1-series doesn't bother to include a table of the mux options in the PORTMUX chapter, so I couldn't really say. In any case, swapping the pins are not supported there.
+* The 8-pin parts, though they list an alternate pin mapping, it only appears to have MISO and MOSI - hence being somewhat less than useful. I'm not sure if the datasheet is just unclear and it does actually have an SCK output on another pin, whether it can be used by hacking things together with the event system or what the deal is (There is supposedly an SPI clock event generator). But the datasheet on the 0/1-series doesn't bother to include a table of the mux options in the PORTMUX chapter, so I couldn't really say. In any case, swapping the pins are not supported there.
 
 
 ## SPI pin swap methods
@@ -22,7 +22,7 @@ When `SPI.swap()` or `SPI.pins()` is called, assuming it was called with a valid
 ## Other differences between official cores and these
 
 ### Slave implementation
-As noted above, SPI.h does not support SPI slave mode, never has, and never will. While a library to implement this is conceivable (SPI is in fact FAR simpler than I2C/TWI or USART) - there are a grand total of 5 registers, including the data register; implementing an SPI slave device can be done comparatively easy by directly configuring the registers (except for one little detail), and there has been very little interest on forums in SPI slave devices, and a great deal of interest in I2C slaves.
+SPI.h does not support SPI slave mode, never has (on any Arduino platform to my knowledge), and never will. While a library to implement this is conceivable (SPI is in fact FAR simpler than I2C/TWI or USART) - there are a grand total of 5 registers, including the data register; implementing an SPI slave device can be done comparatively easy by directly configuring the registers - except for one little detail - and there has been very little interest on forums in SPI slave devices, and a great deal of interest in I2C slaves.
 
 I believe the reason is precisely that one little detail: speed, or rather the comparative lack of it on the AVRs. SPI is run as speeds much higher than I2C, and has no mechanism for the slave to say "wait up, let me get data ready to send!". Between these two factors, the slave faces timing constraints that are often difficult or impossible to meet, or must be run at a SCK speed much lower than other slave devices would be run at. Consider that in master/slave mode, between the time that SS goes low, and 1 SCK period later, the slave must have loaded the register. It takes 6 system clocks *just to reach the ISR*, then a minimum of 4 for the prologue - likely more like 10 depending on the simplicity of your code. You'll likely need to load a pointer to the buffer (2 clocks to load the address), load the address from a global variable (3 clocks) and add to address (2 clocks, then load the next byte (2 more clocks) from the buffer. This is looking like 19 clocks. At that point with a 5 MHz clock, the master has already clocked out four zeros (assuming you're running at 20 MHz ) and you then have an extremely narrow window during which you can write that byte if you want it to go out on the next byte (this is why so many SPI devices involve "dummy bytes" being sent by the slave). Well what about buffered mode? Well it helps, as you now have at least 9 SCK periods to write the new data - but that still is a very short time. In the above example we might think we were fine. But then there's the cleanup as the interrupt exits: 1 clock to increment the address, 2 to store it, then an epilogue of minimum 7 clocks, more likely 10-15, then 4 clocks for the reti. That's 14-22 clocks more. And that's neglecting the fact that data FROM the master also comes in, and assuming the simplest possible SPI ISR.
 
