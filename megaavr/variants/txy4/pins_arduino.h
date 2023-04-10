@@ -274,7 +274,7 @@ const uint8_t digital_pin_to_bit_mask[] = {
 //*INDENT-OFF*
 const uint8_t digital_pin_to_timer[] = {
   // Left side, top to bottom
-  #if defined(USE_TIMERD0_PWM) && defined(USE_TCD_WOAB)
+  #if defined(USE_TIMERD0_PWM) && defined(USE_TCD_WOAB) && defined(TCD0)
     TIMERD0,          // 0  PA4 *WOA* WO4
     TIMERD0,          // 1  PA5 *WOB* WO5
   #else
@@ -296,17 +296,25 @@ const uint8_t digital_pin_to_timer[] = {
   #endif
   NOT_ON_TIMER,       // 3  PA7
   #if defined(_TCA_ALT_WO0)
-    TIMERA0,          // 6  PB3 WO0 Alt
+    TIMERA0,          // 6  PB3 WO0
   #else
-    NOT_ON_TIMER,     // 6  PB3 WO0 Alt
+    NOT_ON_TIMER,     // 6  PB3 WO0
   #endif
-  TIMERA0,            // 5  PB2
-  // Right side, bottom to top
-  TIMERA0,            // 6  PB1
   #if !defined(_TCA_ALT_WO0)
-    TIMERA0,          // 6  PB3 WO0 Alt
+    TIMERA0,          // 6  PB3 WO0
   #else
-    NOT_ON_TIMER,     // 6  PB3 WO0 Alt
+    NOT_ON_TIMER,     // 6  PB3 WO0
+  #endif
+  // Right side, bottom to top
+  #if !defined(_TCA_ALT_WO0)
+    TIMERA0,          // 6  PB3 WO0
+  #else
+    NOT_ON_TIMER,     // 6  PB3 WO0
+  #endif
+  #if !defined(_TCA_ALT_WO0)
+    TIMERA0,          // 7  PB0 WO0 Alt
+  #else
+    NOT_ON_TIMER,     // 7  PB0 WO0 Alt
   #endif
   //skip PA0 UPDI
   NOT_ON_TIMER,       // 8  PA1

@@ -1,4 +1,15 @@
-# GNU LESSER GENERAL PUBLIC LICENSE
+# DxCore, megaTinyCore, and ATTinyCore are released under the LGPL version 2.1
+All files included with these package are covered by this unless
+otherwise noted. *Some included files and libraries are covered by other
+licenses.* Any file licensed under terms other than the LGPL 2.1 will have
+prominent notice of such at the top of the file, including the full text
+of the boilerplate, as well as applicable license files in the directory.
+
+Files licensed under the LGPL 2.1 may have that text abbreviated for
+readability. The LGPL 2.1 license text is reproduced below verbatim
+with no modifications beyond markdown formatting.
+
+## GNU LESSER GENERAL PUBLIC LICENSE
 
 Version 2.1, February 1999
 
@@ -452,6 +463,8 @@ RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
 FAILURE OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
 SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGES.
+
+## END OF TERMS AND CONDITIONS
 
 ## How to Apply These Terms to Your New Libraries
 

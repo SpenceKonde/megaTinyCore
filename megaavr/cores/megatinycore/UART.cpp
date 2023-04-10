@@ -87,7 +87,7 @@
     #if USE_ASM_TXC == 2
       void __attribute__((naked)) __attribute__((used)) __attribute__((noreturn)) _do_txc(void) {
         __asm__ __volatile__(
-        "_do_txc:"                      "\n\t" // We start out 11-13 clocks after the interrupt
+          "_do_txc:"                      "\n\t" // We start out 11-13 clocks after the interrupt
             "push       r24"              "\n\t" // r30 and r31 pushed before this.
             "in         r24,      0x3f"   "\n\t"  // Save SREG
             "push       r24"              "\n\t"  //

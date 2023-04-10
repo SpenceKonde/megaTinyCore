@@ -24,7 +24,7 @@
 #include <Arduino.h>
 
 #if (__AVR_ARCH__ < 100)
-  #error "This version of the library only supports AVRxt parts (tinyAVR 0/1/2-series, megaAVR 0-series and the AVR DA/DB/DD parts. For tinyNeoPixel for classic AVR, get from ATTinyCore package"
+  #error "This version of the library only supports AVRxt parts (tinyAVR 0/1/2-series, megaAVR 0-series and the AVR DA/DB/DD/EA parts. For tinyNeoPixel for classic AVR, get from ATTinyCore package"
 #endif
 
 // The order of primary colors in the NeoPixel data stream can vary

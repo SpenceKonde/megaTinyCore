@@ -1115,20 +1115,20 @@ void analogWrite(uint8_t pin, int val) {
         /* Calculate correct compare buffer register */
         #if defined(TCA_BUFFERED_3PIN)
           //If we have buffered TCA0, then we write to different registers and calculate destinations differeetly.
-          volatile uint16_t *timer_cmp_out; // must be volatile for this to be safe.
+          volatile uint16_t *timer_cmp16_out; // must be volatile for this to be safe.
           uint8_t offset = 0;
           if (bit_mask & 0x12) {
             offset = 1;
             bit_mask = 0x20;
-          }else if (bitmask & 0x24) {
+          } else if (bit_mask & 0x24) {
             offset = 2;
             bit_mask = 0x40;
           } else {
             bit_mask = 0x10;
           }
-          timer_cmp_out = (volatile uint16_t *)(&TCA0.SINGLE.CMP0BUF)
-          *(timer_cmp_out + offset) = (uint16_t) val;
-          TCA0.SINGLE.CTRLB = |= bitmask;
+          timer_cmp16_out = (volatile uint16_t *)(&TCA0_SINGLE_CMP0BUF)
+          *(timer_cmp16_out + offset) = (uint16_t) val;
+          TCA0.SINGLE.CTRLB |= bit_mask;
           break;
         #else
           //Otherwise, we're in split mode and we use the classical method.

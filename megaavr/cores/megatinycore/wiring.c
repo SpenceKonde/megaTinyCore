@@ -1739,19 +1739,23 @@ void __attribute__((weak)) init_TCD0() {
 void __attribute__((weak)) init_TCA0() {
   /*  TYPE A TIMER   */
   #if !defined(TCA_BUFFERED_3PIN)
-    #if defined(TCA_PORTMUX)
+    #if defined(PORTMUX_CTRLC)
       PORTMUX.CTRLC = TCA_PORTMUX;
+    #else
+      PORTMUX.TCAROUTEA = TCA_PORTMUX;
     #endif
     TCA0.SPLIT.CTRLD   = TCA_SPLIT_SPLITM_bm;
     TCA0.SPLIT.LPER    = PWM_TIMER_PERIOD;
     TCA0.SPLIT.HPER    = PWM_TIMER_PERIOD;
     TCA0.SPLIT.CTRLA   = (TIMERA_PRESCALER_bm | TCA_SPLIT_ENABLE_bm);
   #else
-    #if defined(TCA_PORTMUX)
+    #if defined(PORTMUX_CTRLC)
       PORTMUX.CTRLC = TCA_PORTMUX;
+    #else
+      PORTMUX.TCAROUTEA = TCA_PORTMUX;
     #endif
     TCA0.SINGLE.PER    = PWM_TIMER_PERIOD;
-    TCA0.SINGLE.CTRLB  = (TCA_SINGLE_SINGLESLOPE_gc)
+    TCA0.SINGLE.CTRLB  = (TCA_SINGLE_WGMODE_SINGLESLOPE_gc)
     TCA0.SINGLE.CTRLA  = (TIMERA_PRESCALER_bm | TCA_SINGLE_ENABLE_bm);
   #endif
 

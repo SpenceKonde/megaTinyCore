@@ -285,11 +285,9 @@ void set_millis(uint32_t newmillis);  // set current millis time.
  * user_code_that_messes with timer
  * set_millis(oldmillis+estimated_time_spent_above)
  * restart millis();
- *
- * Also, this might at times be appropriate
- * set_millis(millis() + known_offset);
- * after doing something that we know will block too long for millis to keep time
- * see also:
+ */
+void nudge_millis(__attribute__((unused)) uint16_t nudgesize);
+/* see also:
  */
 
 
