@@ -2541,7 +2541,7 @@ atxy7o.build.printfabr=
 atxy7o.build.attachabr=
 atxy7o.build.wireabr=
 atxy7o.build.pwmabr=
-atxy7o.build.optabr=.Os
+#atxy7o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3030,7 +3030,7 @@ atx27o.build.printfabr=
 atx27o.build.attachabr=
 atx27o.build.wireabr=
 atx27o.build.pwmabr=
-atx27o.build.optabr=.Os
+#atx27o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3462,7 +3462,7 @@ atxy6o.build.printfabr=
 atxy6o.build.attachabr=
 atxy6o.build.wireabr=
 atxy6o.build.pwmabr=
-atxy6o.build.optabr=.Os
+#atxy6o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -3933,7 +3933,7 @@ atx26o.build.printfabr=
 atx26o.build.attachabr=
 atx26o.build.wireabr=
 atx26o.build.pwmabr=
-atx26o.build.optabr=.Os
+#atx26o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
@@ -4356,7 +4356,7 @@ atxy4o.build.printfabr=
 atxy4o.build.attachabr=
 atxy4o.build.wireabr=
 atxy4o.build.pwmabr=
-atxy4o.build.optabr=.Os
+#atxy4o.build.optabr=.Os
 
 #----------------------------------------#
 # UPLOAD VIA OPTIBOOT                    #
