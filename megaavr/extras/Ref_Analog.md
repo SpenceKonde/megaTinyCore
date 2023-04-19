@@ -271,7 +271,7 @@ The busy and disabled errors are the only ones that we never know at compile tim
 Note that the numeric values, though not the names, of some of these were changed to make the error checking more efficient. As long as you used the named constants like you're supposed to you'll be fine. The values returned by checkAnalogError will not change in future releases, we make not guarantees about the values of the error constants themselves, though no changes are expected.
 
 | Error name                     |     Value   | analogCheckError val | Notes
-|--------------------------------|-------------|---------------------------------------------------------------------
+|--------------------------------|-------------|----------------------|----------------------------------------------
 |ADC_ERROR_BAD_PIN_OR_CHANNEL    |      -32001 |                   -1 | The specified pin or ADC channel does not exist or does not support analog reads.
 |ADC_ERROR_BUSY                  |      -32002 |                   -2 | The ADC is busy with another conversion.
 |ADC_ERROR_DISABLED              |      -32007 |                   -7 | The ADC is disabled at this time. Did you disable it before going to sleep and not re-enable it?
