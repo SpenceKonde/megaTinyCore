@@ -1133,9 +1133,13 @@ void analogWrite(uint8_t pin, int val) {
         #else
           //Otherwise, we're in split mode and we use the classical method.
           volatile uint8_t *timer_cmp_out; // must be volatile for this to be safe.
-          #ifdef __AVR_ATtinyxy2__
-            if (bit_mask == 0x80) {
-              bit_mask = 1;  // on the xy2, WO0 is on PA7
+          #if defined(_TCA_ALT_WO0)
+            if (bit_mask == PIN3_bm) {
+              bit_mask = PIN0_bm;
+            }
+          #elif defined(__AVR_ATtinyxy2__)
+            if (bit_mask == PIN7_bm) {
+              bit_mask = PIN0_bm;  // on the xy2, WO0 is on PA7
             }
           #endif
           uint8_t offset = 0;

@@ -122,9 +122,13 @@ void turnOffPWM(uint8_t pin)
       #if !defined(TCA_BUFFERED_3PIN)
         // uint8_t *timer_cmp_out;
         /* Bit position will give output channel */
-        #ifdef __AVR_ATtinyxy2__
-          if (bit_mask == 0x80) {
-            bit_mask = 1;         // on the xy2, WO0 is on PA7
+        #if defined(_TCA_ALT_WO0)
+          if (bit_mask == PIN3_bm) {
+            bit_mask = PIN0_bm;
+          }
+        #elif defined(__AVR_ATtinyxy2__)
+          if (bit_mask == PIN7_bm) {
+            bit_mask = PIN0_bm;         // on the xy2, WO0 is on PA7
           }
           if (bit_mask > 0x04) {  // -> bit_pos > 2 -> output channel controlled by HCMP
             bit_mask <<= 1;       // mind the gap (between LCMP and HCMP)

@@ -296,20 +296,20 @@ const uint8_t digital_pin_to_timer[] = {
   #endif
   NOT_ON_TIMER,       // 3  PA7
   #if defined(_TCA_ALT_WO0)
-    TIMERA0,          // 6  PB3 WO0
+    TIMERA0,          // 4  PB3 WO0
   #else
-    NOT_ON_TIMER,     // 6  PB3 WO0
+    NOT_ON_TIMER,     // 4  PB3 WO0
   #endif
-  #if !defined(_TCA_ALT_WO0)
-    TIMERA0,          // 6  PB3 WO0
+  #if !defined(_TCA_ALT_WO2)
+    TIMERA0,          // 5  PB2 WO2
   #else
-    NOT_ON_TIMER,     // 6  PB3 WO0
+    NOT_ON_TIMER,     // 5  PB2 WO2
   #endif
   // Right side, bottom to top
-  #if !defined(_TCA_ALT_WO0)
-    TIMERA0,          // 6  PB3 WO0
+  #if !defined(_TCA_ALT_WO1)
+    TIMERA0,          // 6  PB1 WO1
   #else
-    NOT_ON_TIMER,     // 6  PB3 WO0
+    NOT_ON_TIMER,     // 6  PB1 WO1
   #endif
   #if !defined(_TCA_ALT_WO0)
     TIMERA0,          // 7  PB0 WO0 Alt
