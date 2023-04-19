@@ -19,6 +19,9 @@
 #if !defined(TCA_PORTMUX)
   #define TCA_PORTMUX (0x00)
 #endif
+#define _TCA_USE_WO0
+#define _TCA_USE_WO1
+#define _TCA_USE_WO2
 #if TCA_PORTMUX & 0x01
   #define _TCA_ALT_WO0
 #endif

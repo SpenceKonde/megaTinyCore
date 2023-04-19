@@ -118,7 +118,6 @@ void turnOffPWM(uint8_t pin)
     /* TCA0 */
     case TIMERA0:
     {
-      uint8_t port=digitalPinToPort(pin);
       #if !defined(TCA_BUFFERED_3PIN)
         // uint8_t *timer_cmp_out;
         /* Bit position will give output channel */
@@ -130,7 +129,7 @@ void turnOffPWM(uint8_t pin)
             bit_mask <<= 1;       // mind the gap (between LCMP and HCMP)
           }
         #else
-          if (port == PB) {        // WO0-WO2, Bitmask has one of these bits 1: 0b00hhhlll.
+          if (digitalPinToPort(pin) == PB) {        // WO0-WO2, Bitmask has one of these bits 1: 0b00hhhlll.
             if (bit_mask > 0x04) { // Is it one of the three high ones? If so
               bit_mask <<= 1;      // nudge it 1 place left swap nybbles since that's 1 clock faster than 3 rightshifts.
               _SWAP(bit_mask);     // swap nybbles since that's 1 clock faster than 3 rightshifts.
@@ -205,13 +204,26 @@ void turnOffPWM(uint8_t pin)
             #if defined(NO_GLITCH_TIMERD0) /* This is enabled in all cases where TCD0 is used for PWM */
               // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
               // So we need to make sure that's off - wouldn't that be fun to debug?
-              if (bit_mask == 0x01) {
-                PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
-              } else {
-                PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
-              }
+              #if defined(USE_TCD_WOAB)
+                if (bit_mask == 0x01) {
+                  PORTA.PIN4CTRL &= ~(PORT_INVEN_bm);
+                } else {
+                  PORTA.PIN5CTRL &= ~(PORT_INVEN_bm);
+                }
+              #elif defined(__AVR_ATTinyxy2__)
+                if (bit_mask == 0x40) {
+                  PORTA.PIN6CTRL &= ~(PORT_INVEN_bm);
+                } else {
+                  PORTA.PIN7CTRL &= ~(PORT_INVEN_bm);
+                }
+              #else
+                if (bit_mask == 0x01) {
+                  PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
+                } else {
+                  PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
+                }
+              #endif
             #endif
-
             SREG = oldSREG;
           }
         #endif
