@@ -1077,11 +1077,6 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
   *****************************************************/
 #endif
 
-
-// PWM output only works on the pins with
-// hardware support.  These are defined in the variant
-// pins_arduino.h file.  For the rest of the pins, we default
-// to digital output.
 void analogWrite(uint8_t pin, int val) {
   check_valid_digital_pin(pin);
   check_valid_duty_cycle(val);
@@ -1134,7 +1129,6 @@ void analogWrite(uint8_t pin, int val) {
             timer_cmp16_out = (volatile uint16_t *)(&TCA0_SINGLE_CMP0BUF);
             *(timer_cmp16_out + offset) = (uint16_t) val;
             TCA0.SINGLE.CTRLB |= bit_mask;
-            break;
           #else
             //Otherwise, we're in split mode and we use the classical method.
             volatile uint8_t *timer_cmp_out; // must be volatile for this to be safe.
@@ -1156,9 +1150,9 @@ void analogWrite(uint8_t pin, int val) {
             timer_cmp_out = ((volatile uint8_t *)(&TCA0.SPLIT.LCMP0)) + (offset); //finally at the very end we get the actual pointer (since volatile variables should be treated like nuclear waste due to performance impact)
             (*timer_cmp_out) = (val); // write to it - and we're done with it.
             TCA0.SPLIT.CTRLB |= bit_mask;
-            break;
           #endif
           }
+        break;
         // End of TCA case
       }
     #endif
@@ -1169,11 +1163,6 @@ void analogWrite(uint8_t pin, int val) {
     #if defined(DAC0)
       case DACOUT:
       {
-        //Glitches permitted: 0 or 255 will generate a glitch on the other channels and lose a tiny amount of time if used as millis timer. If you're doing that often enough though it adds up.
-        // Now, if NO_GLITCH_TIMERD0 is defined, val can legally be 0 or 255, which is to be interpreted as an instruction to keep the output constant LOW or HIGH.
-        // 0 requires no special action - 255-0 = 255, we're counting to 254 and thus will never reach the compare matchvalue.
-        // 255 on the other hand, requires us to invert the pin and set val to 0 to get the constant output. Setting the CMPxSET register to 0 produces a sub-system-clock spike
-        //(maybe you don't care. but depending on the application, this could be catastrophic!)
         DAC0.DATA = val;
         DAC0.CTRLA |= 0x41; // OUTEN=1, ENABLE=1, and *don't* trash the RUNSTBY setting.
         break;
