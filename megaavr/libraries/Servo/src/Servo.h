@@ -79,7 +79,7 @@
 #if defined(ARDUINO_ARCH_MEGAAVR)
   #include "megaavr/ServoTimers.h"
   #if (F_CPU == 1000000)
-    #pragma message(Running at 1MHz results in unstable servo signal.")
+    #pragma message("Running at 1MHz results in unstable servo signal.")
   #endif
 #else
   #error "This is an architecture specific library for ARDUINO_ARCH_MEGAAVR, but this device is not of that architecture"
