@@ -6,7 +6,7 @@ Before deployment, be sure to run down this checklist for any circuit you design
 * As specified in the datasheet of the parts, be sure to include all required decoupling caps, located between power and ground of every other IC, as close to it as possible. Even if they don't order you to, I put minimum of 0.1uF decoupling on any IC, as close to it's power pins as possible. Regulators tend to need larger capacitors than any other parts, and are sometimes very picky about what *kind* of cap. Be sure to pick caps within their specifications
 * At least a few uF (I use 4.7) somewhere on the board for board level decoupling.
 * If a regulator is used, ensure that capacitors match what the datasheet specs (part of why I love the LDD1117 - not only do they have well under 1V dropout under normal conditions, they also can use nice cheap ceramic capcacitors (some regs demand tants!). The output cap of the regulator, if it's ceramic or tant, counts towards board level decoupling.
-* If using external clock, make sure it is located close to the chip. The same goes even moreso for a crystal and it's loading caps (though tinyAVR can't support crystals).
+* If using external clock, make sure it is located close to the chip. The same goes even more so for a crystal and it's loading caps (though tinyAVR can't support crystals).
 * Assuming this is a custom PCB, fill both layers with ground pours. Tie the two ground pours together with vias.
 * To avoid delays, make sure you can get all the parts you're using. Order the parts you need ASAP if they seem to be in short supply (almost everything is now)
 * Read the bloody errata, especially if on a DA, DB, or tiny 0/1. Those things have many relevant errata.
@@ -31,10 +31,11 @@ Before deployment, be sure to run down this checklist for any circuit you design
 There are a great many added complications to remember when you care about power consumption.
 * Be aware of applicable errata and make sure that you won't be caught by them  (the DB one is particularly nasty).
 * Floating pins, and pins that are in-between a high and a waste power. Supposedly this happened on classic AVRs too, and some people say it's not any worse now, but I am skeptical of that, as I've had projects that stayed alive in sleep mode for ages without taking such measures on classic AVRs, whereas a lot of the numbers that people complain about when they have floating pins on modern AVRs are considerably higher (I suspect that this may be related to the way that some pins Ensure that at least one of the following is true for every I/O pin:
-    * It is set output, hence not floating.
-    * It is set input_pullup, hence... not floating
-    * It is connected to a digital signal hence again, not floating.
-    * The port input buffer is disabled. This is the only correct configuration if the pin will have an external analog input on it.
+  1. It is set output, hence not floating.
+  2. It is set input_pullup, hence... not floating
+  3. It is connected to a digital signal hence again, not floating.
+  4. The port input buffer is disabled. This is the only correct configuration if the pin will have an external analog input on it.
+
   * I recommend doing this in a function called from Setup, so you can easily turn it off to keep from tripping over pins you forgot you were disabling and stuff like that during development, and then as you start turning to power consumption, then you can turn it on and. That way uncommenting a single function call is a small simple change. If it worked, other than power consumption, before making that change, and uncommenting the function call breaks something, you know that your unused + analog pin initialization routines is shitting on a pin you're actually using.
   * Only one of those things needs to be true.
   * **DO NOT set PIN_PA0 (the UPDI pin) to input disabled**! It is possible that the same issue applies to reset pins on parts with dedicated reset pins that can be used for I/O.
