@@ -67,7 +67,7 @@ menu.printf=printf()
 menu.wiremode=Wire (Wire.h/I2C) Library mode
 menu.WDTtimeout=WDT timeout (burn bootloader req'd. Cannot be disabled at runtime if set here)
 menu.WDTwindow=WDT window (if desired. burn bootloader req'd. Cannot be disabled at runtime if set here)
-menu.optimization=Optimization level (see documentation)
+#menu.optimization=Optimization level (see documentation)
 menu.PWMmux=PWM pins (advanced, see core documentation)
 
 ##########################################################################
@@ -511,11 +511,11 @@ atxy7.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy7.menu.PWMmux.6_A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
-atxy7.menu.PWMmux.6_default=PB0-2, PA3-5 (0/2-series default)
-atxy7.menu.PWMmux.3_A_buffered=PB0-2 (buffered), 1-series: PC0/1
-atxy7.menu.PWMmux.3_D_buffered=PB0-2 (buffered), 1-series: PA4/5
-atxy7.menu.PWMmux.3_buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
+atxy7.menu.PWMmux.A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
+atxy7.menu.PWMmux.default=PB0-2, PA3-5 (0/2-series default)
+atxy7.menu.PWMmux.A_buffered=PB0-2 (buffered), 1-series: PC0/1
+atxy7.menu.PWMmux.D_buffered=PB0-2 (buffered), 1-series: PA4/5
+atxy7.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
 atxy7.menu.PWMmux.U6_A=PB0,1,5, PA3-5, 1-series: PC0/1
 atxy7.menu.PWMmux.U6=PB0,1,5, PA3-5. No TCD PWM even on 1-series.
 atxy7.menu.PWMmux.C6_D=PB0-2, PC3-5 1-series: PA4/5
@@ -537,11 +537,11 @@ atxy7.menu.PWMmux.I3_A=PB3-5 (buffered), 1-series: PC0/1
 atxy7.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
 atxy7.menu.PWMmux.SC6_A=PB3-5, PC3, PA4/5, 1-series: PC0/1
 atxy7.menu.PWMmux.SC6=PB3-5, PC3, PA4/5. No TCD PWM even on 1-series.
-atxy7.menu.PWMmux.6_A_default.build.pwmflags=-DUSE_TIMERD0_PWM
-atxy7.menu.PWMmux.6_default.build.pwmflags=
-atxy7.menu.PWMmux.3_A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
-atxy7.menu.PWMmux.3_D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
-atxy7.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atxy7.menu.PWMmux.A_default.build.pwmflags=-DUSE_TIMERD0_PWM
+atxy7.menu.PWMmux.default.build.pwmflags=
+atxy7.menu.PWMmux.A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
+atxy7.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
+atxy7.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy7.menu.PWMmux.U6_A.build.pwmflags=-DTCA_PORTMUX=0x04 -DUSE_TIMERD0_PWM
 atxy7.menu.PWMmux.U6.build.pwmflags=-DTCA_PORTMUX=0x04
 atxy7.menu.PWMmux.C6_D.build.pwmflags=-DTCA_PORTMUX=0x38 -DUSE_TIMERD0_PWM -DTCD_USE_WOAB
@@ -563,11 +563,11 @@ atxy7.menu.PWMmux.I3_A.build.pwmflags=-DTCA_PORTMUX=0x07 -DUSE_TIMERD0_PWM -DTCA
 atxy7.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
 atxy7.menu.PWMmux.SC6_A.build.pwmflags=-DTCA_PORTMUX=0x0F -DUSE_TIMERD0_PWM
 atxy7.menu.PWMmux.SC6.build.pwmflags=-DTCA_PORTMUX=0x0F
-atxy7.menu.PWMmux.6_A_default.build.pwmabr=6A
-atxy7.menu.PWMmux.6_default.build.pwmabr=6
-atxy7.menu.PWMmux.3_A_buffered.build.pwmabr=3A
-atxy7.menu.PWMmux.3_D_buffered.build.pwmabr=3D
-atxy7.menu.PWMmux.3_buffered.build.pwmabr=3
+atxy7.menu.PWMmux.A_default.build.pwmabr=6A
+atxy7.menu.PWMmux.default.build.pwmabr=6
+atxy7.menu.PWMmux.A_buffered.build.pwmabr=3A
+atxy7.menu.PWMmux.D_buffered.build.pwmabr=3D
+atxy7.menu.PWMmux.buffered.build.pwmabr=3
 atxy7.menu.PWMmux.U6_A.build.pwmabr=U6A
 atxy7.menu.PWMmux.U6.build.pwmabr=U6
 atxy7.menu.PWMmux.C6_D.build.pwmabr=C6D
@@ -1060,11 +1060,11 @@ atxy6.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy6.menu.PWMmux.6_A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
-atxy6.menu.PWMmux.6_default=PB0-2, PA3-5 (0/2-series default)
-atxy6.menu.PWMmux.3_A_buffered=PB0-2 (buffered), 1-series: PC0/1
-atxy6.menu.PWMmux.3_D_buffered=PB0-2 (buffered), 1-series: PA4/5
-atxy6.menu.PWMmux.3_buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
+atxy6.menu.PWMmux.A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
+atxy6.menu.PWMmux.default=PB0-2, PA3-5 (0/2-series default)
+atxy6.menu.PWMmux.A_buffered=PB0-2 (buffered), 1-series: PC0/1
+atxy6.menu.PWMmux.D_buffered=PB0-2 (buffered), 1-series: PA4/5
+atxy6.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
 atxy6.menu.PWMmux.U6_A=PB0,1,5, PA3-5, 1-series: PC0/1
 atxy6.menu.PWMmux.U6=PB0,1,5, PA3-5. No TCD PWM even on 1-series.
 atxy6.menu.PWMmux.U3_D=PB0,1,5 (buffered), 1-series: PA4/5
@@ -1077,11 +1077,11 @@ atxy6.menu.PWMmux.I3_A=PB3-5 (buffered), 1-series: PC0/1
 atxy6.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
 atxy6.menu.PWMmux.SC6_A=PB3-5, PC3, PA4/5, 1-series: PC0/1
 atxy6.menu.PWMmux.SC6=PB3-5, PC3, PA4/5. No TCD PWM even on 1-series.
-atxy6.menu.PWMmux.6_A_default.build.pwmflags=-DUSE_TIMERD0_PWM
-atxy6.menu.PWMmux.6_default.build.pwmflags=
-atxy6.menu.PWMmux.3_A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
-atxy6.menu.PWMmux.3_D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
-atxy6.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atxy6.menu.PWMmux.A_default.build.pwmflags=-DUSE_TIMERD0_PWM
+atxy6.menu.PWMmux.default.build.pwmflags=
+atxy6.menu.PWMmux.A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
+atxy6.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
+atxy6.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy6.menu.PWMmux.U6_A.build.pwmflags=-DTCA_PORTMUX=0x04 -DUSE_TIMERD0_PWM
 atxy6.menu.PWMmux.U6.build.pwmflags=-DTCA_PORTMUX=0x04
 atxy6.menu.PWMmux.U3_D.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
@@ -1094,11 +1094,11 @@ atxy6.menu.PWMmux.I3_A.build.pwmflags=-DTCA_PORTMUX=0x07 -DUSE_TIMERD0_PWM -DTCA
 atxy6.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
 atxy6.menu.PWMmux.SC6_A.build.pwmflags=-DTCA_PORTMUX=0x0F -DUSE_TIMERD0_PWM
 atxy6.menu.PWMmux.SC6.build.pwmflags=-DTCA_PORTMUX=0x0F
-atxy6.menu.PWMmux.6_A_default.build.pwmabr=6A
-atxy6.menu.PWMmux.6_default.build.pwmabr=6
-atxy6.menu.PWMmux.3_A_buffered.build.pwmabr=3A
-atxy6.menu.PWMmux.3_D_buffered.build.pwmabr=3D
-atxy6.menu.PWMmux.3_buffered.build.pwmabr=3
+atxy6.menu.PWMmux.A_default.build.pwmabr=6A
+atxy6.menu.PWMmux.default.build.pwmabr=6
+atxy6.menu.PWMmux.A_buffered.build.pwmabr=3A
+atxy6.menu.PWMmux.D_buffered.build.pwmabr=3D
+atxy6.menu.PWMmux.buffered.build.pwmabr=3
 atxy6.menu.PWMmux.U6_A.build.pwmabr=U6A
 atxy6.menu.PWMmux.U6.build.pwmabr=U6
 atxy6.menu.PWMmux.U3_D.build.pwmabr=U3D
@@ -1582,21 +1582,21 @@ atxy4.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy4.menu.PWMmux.6_default=PB0-2, PA3-5 (default)
-atxy4.menu.PWMmux.3_D_buffered=PB0-2 (buffered), 1-series: PA4/5
-atxy4.menu.PWMmux.3_buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
+atxy4.menu.PWMmux.default=PB0-2, PA3-5 (default)
+atxy4.menu.PWMmux.D_buffered=PB0-2 (buffered), 1-series: PA4/5
+atxy4.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
 atxy4.menu.PWMmux.I6=PB3-5, PA3-5. No TCD PWM even on 1-series.
 atxy4.menu.PWMmux.I3_D=PB3-5 (buffered), 1-series: PA4/5
 atxy4.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
-atxy4.menu.PWMmux.6_default.build.pwmflags=
-atxy4.menu.PWMmux.3_D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
-atxy4.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atxy4.menu.PWMmux.default.build.pwmflags=
+atxy4.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
+atxy4.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy4.menu.PWMmux.I6.build.pwmflags=-DTCA_PORTMUX=0x07
 atxy4.menu.PWMmux.I3_D.build.pwmflags=-DTCA_PORTMUX=0x07 -DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
 atxy4.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
-atxy4.menu.PWMmux.6_default.build.pwmabr=6
-atxy4.menu.PWMmux.3_D_buffered.build.pwmabr=3D
-atxy4.menu.PWMmux.3_buffered.build.pwmabr=3
+atxy4.menu.PWMmux.default.build.pwmabr=6
+atxy4.menu.PWMmux.D_buffered.build.pwmabr=3D
+atxy4.menu.PWMmux.buffered.build.pwmabr=3
 atxy4.menu.PWMmux.I6.build.pwmabr=I6
 atxy4.menu.PWMmux.I3_D.build.pwmabr=I3D
 atxy4.menu.PWMmux.I3.build.pwmabr=I3
@@ -2012,15 +2012,15 @@ atxy2.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy2.menu.PWMmux.4_default=PA1-3,7 (default)
-atxy2.menu.PWMmux.3_buffered=PA1-3 (buffered)
-atxy2.menu.PWMmux.3_D_buffered=PA1-3, PA6/7 (buffered, 1-series only, flash hog)
-atxy2.menu.PWMmux.4_default.build.pwmflags=-DTCA_PORTMUX=0x01
-atxy2.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
-atxy2.menu.PWMmux.3_D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
-atxy2.menu.PWMmux.4_default.build.pwmabr=4
-atxy2.menu.PWMmux.3_buffered.build.pwmabr=3
-atxy2.menu.PWMmux.3_D_buffered.build.pwmabr=3D
+atxy2.menu.PWMmux.default=PA1-3,7 (default)
+atxy2.menu.PWMmux.buffered=PA1-3 (buffered)
+atxy2.menu.PWMmux.D_buffered=PA1-3, PA6/7 (buffered, 1-series only, flash hog)
+atxy2.menu.PWMmux.default.build.pwmflags=-DTCA_PORTMUX=0x01
+atxy2.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atxy2.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
+atxy2.menu.PWMmux.default.build.pwmabr=4
+atxy2.menu.PWMmux.buffered.build.pwmabr=3
+atxy2.menu.PWMmux.D_buffered.build.pwmabr=3D
 
 #----------------------------------------#
 # attachInterrupt Mode                   #
@@ -2883,11 +2883,11 @@ atxy7o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy7o.menu.PWMmux.6_A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
-atxy7o.menu.PWMmux.6_default=PB0-2, PA3-5 (0/2-series default)
-atxy7o.menu.PWMmux.3_A_buffered=PB0-2 (buffered), 1-series: PC0/1
-atxy7o.menu.PWMmux.3_D_buffered=PB0-2 (buffered), 1-series: PA4/5
-atxy7o.menu.PWMmux.3_buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
+atxy7o.menu.PWMmux.A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
+atxy7o.menu.PWMmux.default=PB0-2, PA3-5 (0/2-series default)
+atxy7o.menu.PWMmux.A_buffered=PB0-2 (buffered), 1-series: PC0/1
+atxy7o.menu.PWMmux.D_buffered=PB0-2 (buffered), 1-series: PA4/5
+atxy7o.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
 atxy7o.menu.PWMmux.U6_A=PB0,1,5, PA3-5, 1-series: PC0/1
 atxy7o.menu.PWMmux.U6=PB0,1,5, PA3-5. No TCD PWM even on 1-series.
 atxy7o.menu.PWMmux.C6_D=PB0-2, PC3-5 1-series: PA4/5
@@ -2909,11 +2909,11 @@ atxy7o.menu.PWMmux.I3_A=PB3-5 (buffered), 1-series: PC0/1
 atxy7o.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
 atxy7o.menu.PWMmux.SC6_A=PB3-5, PC3, PA4/5, 1-series: PC0/1
 atxy7o.menu.PWMmux.SC6=PB3-5, PC3, PA4/5. No TCD PWM even on 1-series.
-atxy7o.menu.PWMmux.6_A_default.build.pwmflags=-DUSE_TIMERD0_PWM
-atxy7o.menu.PWMmux.6_default.build.pwmflags=
-atxy7o.menu.PWMmux.3_A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
-atxy7o.menu.PWMmux.3_D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
-atxy7o.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atxy7o.menu.PWMmux.A_default.build.pwmflags=-DUSE_TIMERD0_PWM
+atxy7o.menu.PWMmux.default.build.pwmflags=
+atxy7o.menu.PWMmux.A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
+atxy7o.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
+atxy7o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy7o.menu.PWMmux.U6_A.build.pwmflags=-DTCA_PORTMUX=0x04 -DUSE_TIMERD0_PWM
 atxy7o.menu.PWMmux.U6.build.pwmflags=-DTCA_PORTMUX=0x04
 atxy7o.menu.PWMmux.C6_D.build.pwmflags=-DTCA_PORTMUX=0x38 -DUSE_TIMERD0_PWM -DTCD_USE_WOAB
@@ -2935,11 +2935,11 @@ atxy7o.menu.PWMmux.I3_A.build.pwmflags=-DTCA_PORTMUX=0x07 -DUSE_TIMERD0_PWM -DTC
 atxy7o.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
 atxy7o.menu.PWMmux.SC6_A.build.pwmflags=-DTCA_PORTMUX=0x0F -DUSE_TIMERD0_PWM
 atxy7o.menu.PWMmux.SC6.build.pwmflags=-DTCA_PORTMUX=0x0F
-atxy7o.menu.PWMmux.6_A_default.build.pwmabr=6A
-atxy7o.menu.PWMmux.6_default.build.pwmabr=6
-atxy7o.menu.PWMmux.3_A_buffered.build.pwmabr=3A
-atxy7o.menu.PWMmux.3_D_buffered.build.pwmabr=3D
-atxy7o.menu.PWMmux.3_buffered.build.pwmabr=3
+atxy7o.menu.PWMmux.A_default.build.pwmabr=6A
+atxy7o.menu.PWMmux.default.build.pwmabr=6
+atxy7o.menu.PWMmux.A_buffered.build.pwmabr=3A
+atxy7o.menu.PWMmux.D_buffered.build.pwmabr=3D
+atxy7o.menu.PWMmux.buffered.build.pwmabr=3
 atxy7o.menu.PWMmux.U6_A.build.pwmabr=U6A
 atxy7o.menu.PWMmux.U6.build.pwmabr=U6
 atxy7o.menu.PWMmux.C6_D.build.pwmabr=C6D
@@ -3363,8 +3363,8 @@ atx27o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atx27o.menu.PWMmux.6_default=PB0-2, PA3-5 (0/2-series default)
-atx27o.menu.PWMmux.3_buffered=PB0-2 (buffered).
+atx27o.menu.PWMmux.default=PB0-2, PA3-5 (0/2-series default)
+atx27o.menu.PWMmux.buffered=PB0-2 (buffered).
 atx27o.menu.PWMmux.U6=PB0,1,5, PA3-5.
 atx27o.menu.PWMmux.C6=PB0-2, PC3-5.
 atx27o.menu.PWMmux.UC6=PB0,1,5, PC3-5.
@@ -3373,8 +3373,8 @@ atx27o.menu.PWMmux.I6=PB3-5, PA3-5.
 atx27o.menu.PWMmux.IC6=PB3-5, PC3-5.
 atx27o.menu.PWMmux.I3=PB3-5 (buffered).
 atx27o.menu.PWMmux.SC6=PB3-5, PC3, PA4/5.
-atx27o.menu.PWMmux.6_default.build.pwmflags=
-atx27o.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atx27o.menu.PWMmux.default.build.pwmflags=
+atx27o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atx27o.menu.PWMmux.U6.build.pwmflags=-DTCA_PORTMUX=0x04
 atx27o.menu.PWMmux.C6.build.pwmflags=-DTCA_PORTMUX=0x38
 atx27o.menu.PWMmux.UC6.build.pwmflags=-DTCA_PORTMUX=0x3C
@@ -3383,8 +3383,8 @@ atx27o.menu.PWMmux.I6.build.pwmflags=-DTCA_PORTMUX=0x07
 atx27o.menu.PWMmux.IC6.build.pwmflags=-DTCA_PORTMUX=0x3F
 atx27o.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
 atx27o.menu.PWMmux.SC6.build.pwmflags=-DTCA_PORTMUX=0x0F
-atx27o.menu.PWMmux.6_default.build.pwmabr=6
-atx27o.menu.PWMmux.3_buffered.build.pwmabr=3
+atx27o.menu.PWMmux.default.build.pwmabr=6
+atx27o.menu.PWMmux.buffered.build.pwmabr=3
 atx27o.menu.PWMmux.U6.build.pwmabr=U6
 atx27o.menu.PWMmux.C6.build.pwmabr=C6
 atx27o.menu.PWMmux.UC6.build.pwmabr=UC6
@@ -3813,11 +3813,11 @@ atxy6o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy6o.menu.PWMmux.6_A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
-atxy6o.menu.PWMmux.6_default=PB0-2, PA3-5 (0/2-series default)
+atxy6o.menu.PWMmux.A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
+atxy6o.menu.PWMmux.default=PB0-2, PA3-5 (0/2-series default)
 atxy6o.menu.PWMmux.3_A_buffered=PB0-2 (buffered), 1-series: PC0/1
-atxy6o.menu.PWMmux.3_D_buffered=PB0-2 (buffered), 1-series: PA4/5
-atxy6o.menu.PWMmux.3_buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
+atxy6o.menu.PWMmux.D_buffered=PB0-2 (buffered), 1-series: PA4/5
+atxy6o.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
 atxy6o.menu.PWMmux.U6_A=PB0,1,5, PA3-5, 1-series: PC0/1
 atxy6o.menu.PWMmux.U6=PB0,1,5, PA3-5. No TCD PWM even on 1-series.
 atxy6o.menu.PWMmux.U3_D=PB0,1,5 (buffered), 1-series: PA4/5
@@ -3830,11 +3830,11 @@ atxy6o.menu.PWMmux.I3_A=PB3-5 (buffered), 1-series: PC0/1
 atxy6o.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
 atxy6o.menu.PWMmux.SC6_A=PB3-5, PC3, PA4/5, 1-series: PC0/1
 atxy6o.menu.PWMmux.SC6=PB3-5, PC3, PA4/5. No TCD PWM even on 1-series.
-atxy6o.menu.PWMmux.6_A_default.build.pwmflags=-DUSE_TIMERD0_PWM
-atxy6o.menu.PWMmux.6_default.build.pwmflags=
+atxy6o.menu.PWMmux.A_default.build.pwmflags=-DUSE_TIMERD0_PWM
+atxy6o.menu.PWMmux.default.build.pwmflags=
 atxy6o.menu.PWMmux.3_A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
-atxy6o.menu.PWMmux.3_D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
-atxy6o.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atxy6o.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
+atxy6o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy6o.menu.PWMmux.U6_A.build.pwmflags=-DTCA_PORTMUX=0x04 -DUSE_TIMERD0_PWM
 atxy6o.menu.PWMmux.U6.build.pwmflags=-DTCA_PORTMUX=0x04
 atxy6o.menu.PWMmux.U3_D.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
@@ -3847,11 +3847,11 @@ atxy6o.menu.PWMmux.I3_A.build.pwmflags=-DTCA_PORTMUX=0x07 -DUSE_TIMERD0_PWM -DTC
 atxy6o.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
 atxy6o.menu.PWMmux.SC6_A.build.pwmflags=-DTCA_PORTMUX=0x0F -DUSE_TIMERD0_PWM
 atxy6o.menu.PWMmux.SC6.build.pwmflags=-DTCA_PORTMUX=0x0F
-atxy6o.menu.PWMmux.6_A_default.build.pwmabr=6A
-atxy6o.menu.PWMmux.6_default.build.pwmabr=6
+atxy6o.menu.PWMmux.A_default.build.pwmabr=6A
+atxy6o.menu.PWMmux.default.build.pwmabr=6
 atxy6o.menu.PWMmux.3_A_buffered.build.pwmabr=3A
-atxy6o.menu.PWMmux.3_D_buffered.build.pwmabr=3D
-atxy6o.menu.PWMmux.3_buffered.build.pwmabr=3
+atxy6o.menu.PWMmux.D_buffered.build.pwmabr=3D
+atxy6o.menu.PWMmux.buffered.build.pwmabr=3
 atxy6o.menu.PWMmux.U6_A.build.pwmabr=U6A
 atxy6o.menu.PWMmux.U6.build.pwmabr=U6
 atxy6o.menu.PWMmux.U3_D.build.pwmabr=U3D
@@ -4266,22 +4266,22 @@ atx26o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atx26o.menu.PWMmux.6_default=PB0-2, PA3-5 (0/2-series default)
-atx26o.menu.PWMmux.3_buffered=PB0-2 (buffered).
+atx26o.menu.PWMmux.default=PB0-2, PA3-5 (0/2-series default)
+atx26o.menu.PWMmux.buffered=PB0-2 (buffered).
 atx26o.menu.PWMmux.U6=PB0,1,5, PA3-5.
 atx26o.menu.PWMmux.U3=PB0,1,5 (buffered).
 atx26o.menu.PWMmux.I6=PB3-5, PA3-5.
 atx26o.menu.PWMmux.I3=PB3-5 (buffered).
 atx26o.menu.PWMmux.SC6=PB3-5, PC3, PA4/5.
-atx26o.menu.PWMmux.6_default.build.pwmflags=
-atx26o.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atx26o.menu.PWMmux.default.build.pwmflags=
+atx26o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atx26o.menu.PWMmux.U6.build.pwmflags=-DTCA_PORTMUX=0x04
 atx26o.menu.PWMmux.U3.build.pwmflags=-DTCA_BUFFERED_3PIN
 atx26o.menu.PWMmux.I6.build.pwmflags=-DTCA_PORTMUX=0x07
 atx26o.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
 atx26o.menu.PWMmux.SC6.build.pwmflags=-DTCA_PORTMUX=0x0F
-atx26o.menu.PWMmux.6_default.build.pwmabr=6
-atx26o.menu.PWMmux.3_buffered.build.pwmabr=3
+atx26o.menu.PWMmux.default.build.pwmabr=6
+atx26o.menu.PWMmux.buffered.build.pwmabr=3
 atx26o.menu.PWMmux.U6.build.pwmabr=U6
 atx26o.menu.PWMmux.U3.build.pwmabr=U3
 atx26o.menu.PWMmux.I6.build.pwmabr=I6
@@ -4718,21 +4718,21 @@ atxy4o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy4o.menu.PWMmux.6_default=PB0-2, PA3-5 (default)
-atxy4o.menu.PWMmux.3_D_buffered=PB0-2 (buffered), 1-series: PA4/5
-atxy4o.menu.PWMmux.3_buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
+atxy4o.menu.PWMmux.default=PB0-2, PA3-5 (default)
+atxy4o.menu.PWMmux.D_buffered=PB0-2 (buffered), 1-series: PA4/5
+atxy4o.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
 atxy4o.menu.PWMmux.I6=PB3-5, PA3-5.
 atxy4o.menu.PWMmux.I3_D=PB3-5 (buffered), 1-series: PA4/5
 atxy4o.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
-atxy4o.menu.PWMmux.6_default.build.pwmflags=
-atxy4o.menu.PWMmux.3_D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
-atxy4o.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atxy4o.menu.PWMmux.default.build.pwmflags=
+atxy4o.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
+atxy4o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy4o.menu.PWMmux.I6.build.pwmflags=-DTCA_PORTMUX=0x07
 atxy4o.menu.PWMmux.I3_D.build.pwmflags=-DTCA_PORTMUX=0x07 -DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
 atxy4o.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
-atxy4o.menu.PWMmux.6_default.build.pwmabr=6
-atxy4o.menu.PWMmux.3_D_buffered.build.pwmabr=3D
-atxy4o.menu.PWMmux.3_buffered.build.pwmabr=3
+atxy4o.menu.PWMmux.default.build.pwmabr=6
+atxy4o.menu.PWMmux.D_buffered.build.pwmabr=3D
+atxy4o.menu.PWMmux.buffered.build.pwmabr=3
 atxy4o.menu.PWMmux.I6.build.pwmabr=I6
 atxy4o.menu.PWMmux.I3_D.build.pwmabr=I3D
 atxy4o.menu.PWMmux.I3.build.pwmabr=I3
@@ -5129,16 +5129,16 @@ atx24o.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atx24o.menu.PWMmux.6_default=PB0-2, PA3-5 (default)
-atx24o.menu.PWMmux.3_buffered=PB0-2 (buffered).
+atx24o.menu.PWMmux.default=PB0-2, PA3-5 (default)
+atx24o.menu.PWMmux.buffered=PB0-2 (buffered).
 atx24o.menu.PWMmux.I6=PB3-5, PA3-5.
 atx24o.menu.PWMmux.I3=PB3-5 (buffered).
-atx24o.menu.PWMmux.6_default.build.pwmflags=
-atx24o.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atx24o.menu.PWMmux.default.build.pwmflags=
+atx24o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atx24o.menu.PWMmux.I6.build.pwmflags=-DTCA_PORTMUX=0x07
 atx24o.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
-atx24o.menu.PWMmux.6_default.build.pwmabr=6
-atx24o.menu.PWMmux.3_buffered.build.pwmabr=3
+atx24o.menu.PWMmux.default.build.pwmabr=6
+atx24o.menu.PWMmux.buffered.build.pwmabr=3
 atx24o.menu.PWMmux.I6.build.pwmabr=I6
 atx24o.menu.PWMmux.I3.build.pwmabr=I3
 
@@ -5533,15 +5533,15 @@ atxy2o.menu.wiremode.mands.build.wire=MANDS
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
-atxy2o.menu.PWMmux.4_default=PA1-3,7 (default)
-atxy2o.menu.PWMmux.3_buffered=PA1-3 (buffered)
-atxy2o.menu.PWMmux.3_D_buffered=PA1-3, PA6/7 (buffered, 1-series only, flash hog)
-atxy2o.menu.PWMmux.4_default.build.pwmflags=-DTCA_PORTMUX=0x01
-atxy2o.menu.PWMmux.3_buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
-atxy2o.menu.PWMmux.3_D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
-atxy2o.menu.PWMmux.4_default.build.pwmabr=4
-atxy2o.menu.PWMmux.3_buffered.build.pwmabr=3
-atxy2o.menu.PWMmux.3_D_buffered.build.pwmabr=3D
+atxy2o.menu.PWMmux.default=PA1-3,7 (default)
+atxy2o.menu.PWMmux.buffered=PA1-3 (buffered)
+atxy2o.menu.PWMmux.D_buffered=PA1-3, PA6/7 (buffered, 1-series only, flash hog)
+atxy2o.menu.PWMmux.default.build.pwmflags=-DTCA_PORTMUX=0x01
+atxy2o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
+atxy2o.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
+atxy2o.menu.PWMmux.default.build.pwmabr=4
+atxy2o.menu.PWMmux.buffered.build.pwmabr=3
+atxy2o.menu.PWMmux.D_buffered.build.pwmabr=3D
 
 #----------------------------------------#
 # printf() version options               #
