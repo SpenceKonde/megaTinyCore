@@ -123,11 +123,11 @@
     #define USART_RS4851_bm USART_RS485_1_bm
   #endif
 #endif
-  #define SERIAL_RS485         (((uint16_t) USART_RS485_0_bm) << 8)// 0x0100
-  #if defined(USART_RS485_1_bm)
-    #define SERIAL_RS485_OTHER   (((uint16_t) USART_RS485_1_bm) << 9)// 0x0200 tinyAVR 0/1
-  #define SERIAL_RS485_OTHER   (((uint16_t) USART_RS485_1_bm)  << 9)// 0x0200
+#define SERIAL_RS485         (((uint16_t) USART_RS485_0_bm) << 8)// 0x0100
+#if defined(USART_RS485_1_bm)
+  #define SERIAL_RS485_OTHER   (((uint16_t) USART_RS485_1_bm) << 9)// 0x0200 tinyAVR 0/1
 #endif
+
 #define   SERIAL_OPENDRAIN      ((uint16_t)                 0x0400)// 0x0400
 #define   SERIAL_LOOPBACK      (((uint16_t) USART_LBME_bm)    << 8)// 0x0800
 #define   SERIAL_TX_ONLY       (((uint16_t) USART_RXEN_bm)    << 8)// 0x8000 The TXEN/RXEN bits are swapped - we invert the meaning of this bit.
