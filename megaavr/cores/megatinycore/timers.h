@@ -50,12 +50,12 @@
 #endif
 #if defined(USE_TIMERD0_PWM)
   #if !defined(TCD0)
-    #warning "You have selected an alternate PWM layout that uses TCD0, but this part doesn't have one. Those PWM pins will not be available."
+    #pragma message("You have selected an alternate PWM layout that uses TCD0, but this part doesn't have one. Those PWM pins will not be available.")
     #undef USE_TIMERD0_PWM
   #endif
 #endif
 
-#if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
+#if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)) || defined(MILLIS_USE_TIMERB5)) || defined(MILLIS_USE_TIMERB6)) || defined(MILLIS_USE_TIMERB7))
   #if (F_CPU == 1000000UL)
     #define TIME_TRACKING_TIMER_DIVIDER   (1)
     #define TIME_TRACKING_TIMER_PERIOD    ((F_CPU/500)-1)
@@ -129,6 +129,21 @@
     #error "TCB4, selected for millis, does not exist on this part"
   #endif
   #define MILLIS_TIMER TIMERB4
+#elif defined(MILLIS_USE_TIMERB5)
+  #ifndef TCB5
+    #error "TCB5, selected for millis, does not exist on this part"
+  #endif
+  #define MILLIS_TIMER TIMERB5
+#elif defined(MILLIS_USE_TIMERB6)
+  #ifndef TCB6
+    #error "TCB6, selected for millis, does not exist on this part"
+  #endif
+  #define MILLIS_TIMER TIMERB6
+#elif defined(MILLIS_USE_TIMERB7)
+  #ifndef TCB7
+    #error "TCB7, selected for millis, does not exist on this part"
+  #endif
+  #define MILLIS_TIMER TIMERB7
 #elif defined(MILLIS_USE_TIMERD0)
   #ifndef TCD0
     #error "TCD0, selected for millis, does not exist on this part"
@@ -183,7 +198,7 @@
   #define USE_TCB_PWM
   #if defined(SUPPORT_TCB_MUX)
     #undef SUPPORT_TCB_MUX
-    #warning "TCB autoMUXing is not yet supported"
+    #pragma message("TCB autoMUXing is not yet supported")
   #endif
   /* If this feature is ever implemented,  calling analogWrite() on a pin that has PWM controlled by a TCB
    * it will automatically also set or clear the PORTMUX bit to point the TCB at the right place.
