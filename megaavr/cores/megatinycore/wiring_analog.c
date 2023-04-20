@@ -1138,11 +1138,16 @@ void analogWrite(uint8_t pin, int val) {
               }
             #endif
             uint8_t offset = 0;
-            if (bit_mask > 0x04) { // HCMP
-              bit_mask <<= 1;      // mind the gap
-              offset = 1;          // if it's an hcmp, the offset of the compare register is 1 higher.
+              if (bit_mask > 0x04) { //if it's above pin 3 either it's on portb and should be lowered by 3, or it's not and needs to have an offset and be leftshifted
+                bit_mask <<= 1; // either wat leftshifting is thefirst step
+
+                if (digitalPinToPort(pin) == 1) {
+                  _SWAP(bit_mask);
+                } else {
+                  offset = 1;
+                }
             }
-            if      (bit_mask & 0x44) {
+            if        (bit_mask & 0x44) {
               offset += 4;
             } else if (bit_mask & 0x22) {
               offset += 2;
@@ -1150,6 +1155,10 @@ void analogWrite(uint8_t pin, int val) {
             timer_cmp_out = ((volatile uint8_t *)(&TCA0.SPLIT.LCMP0)) + (offset); //finally at the very end we get the actual pointer (since volatile variables should be treated like nuclear waste due to performance impact)
             (*timer_cmp_out) = (val); // write to it - and we're done with it.
             TCA0.SPLIT.CTRLB |= bit_mask;
+            if (pin == PIN_PB3) {
+              GPIOR0=bit_mask;
+              GPIOR1=offset;
+            }
           #endif
           }
         break;
