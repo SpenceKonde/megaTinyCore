@@ -1064,7 +1064,7 @@ void tinyNeoPixel::show(void) {
     endTime = micros();
     // Save EOD time for latch on next call
   #else
-    #warning "micros() is not available because millis is disabled from the tools subemnu. It is your responsibility to ensure a sufficient time has passed between calls to show(). See documentation."
+    #pragma message("micros() is not available because millis is disabled from the tools subemnu. It is your responsibility to ensure a sufficient time has passed between calls to show(). See documentation.")
   #endif
 }
 

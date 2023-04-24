@@ -220,7 +220,7 @@ SERIAL_HALF_DUPLEX	LITERAL1
 #printHex et al.
 #######################################
 printHex	KEYWORD2
-printHexLn	KEYWORD2
+printHexln	KEYWORD2
 autoBaudWFB	KEYWORD2
 waitForSync	KEYWORD2
 autobaudWFB_and_wait	KEYWORD2
@@ -406,6 +406,9 @@ sleep_mode	KEYWORD2
 sleep_bod_disable	KEYWORD2
 _SLEEP_CONTROL_REG	LITERAL2	RESERVED_WORD_2
 _SLEEP_ENABLE_MASK	LITERAL2	RESERVED_WORD_2
+SLEEP_MODE_PWR_DOWN	LITERAL2
+SLEEP_MODE_STANDBY	LITERAL2
+SLEEP_MODE_IDLE	LITERAL2
 #	<string.h>	-	http://www.nongnu.org/avr-libc/user-manual/group__avr__string.html
 _FFS	KEYWORD3	RESERVED_WORD
 ffs	KEYWORD2

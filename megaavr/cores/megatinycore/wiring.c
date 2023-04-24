@@ -1460,7 +1460,7 @@ void nudge_millis(__attribute__((unused)) uint16_t nudgesize) {
       timingStruct.timer_millis += nudgesize;
       SREG=oldSREG;
     #else
-      #warning "Timer correction not yet supported for this timer. The obvious way is obstructed by the RTC errata.");
+      #pragma message(""Timer correction not yet supported for this timer. The obvious way is obstructed by the RTC errata.");")
       (void)nudgesize; // unused parameter
     #endif
   #else
@@ -1755,7 +1755,7 @@ void __attribute__((weak)) init_TCA0() {
       PORTMUX.TCAROUTEA = TCA_PORTMUX;
     #endif
     TCA0.SINGLE.PER    = PWM_TIMER_PERIOD;
-    TCA0.SINGLE.CTRLB  = (TCA_SINGLE_WGMODE_SINGLESLOPE_gc)
+    TCA0.SINGLE.CTRLB  = TCA_SINGLE_WGMODE_SINGLESLOPE_gc;
     TCA0.SINGLE.CTRLA  = (TIMERA_PRESCALER_bm | TCA_SINGLE_ENABLE_bm);
   #endif
 

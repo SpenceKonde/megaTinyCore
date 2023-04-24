@@ -405,7 +405,7 @@ const uint8_t digital_pin_to_timer[] = {
     NOT_ON_TIMER,     // 4  PB5 WO2 Alt
   #endif
   #if defined(_TCA_ALT_WO1)
-    TIMERA0
+    TIMERA0,
   #else
     NOT_ON_TIMER,     // 5  PB4 WO1 Alt
   #endif

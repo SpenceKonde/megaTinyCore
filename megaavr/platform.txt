@@ -9,14 +9,14 @@ versionnum.major=2
 versionnum.minor=6
 versionnum.patch=7
 versionnum.postfix=
-versionnum.released=0
+versionnum.released=1
 
 version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}
 #####################
 # Stupid workaround #
 # for IDE bug       #
 #####################
-version=2.7.7
+version=2.6.7.1
 
 build.versiondefines=-DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DMEGATINYCORE="{version}" -DMEGATINYCORE_MAJOR={versionnum.major}UL -DMEGATINYCORE_MINOR={versionnum.minor}UL -DMEGATINYCORE_PATCH={versionnum.patch}UL -DMEGATINYCORE_RELEASED={versionnum.released}
 
@@ -234,7 +234,7 @@ tools.serialupdi.bootloader.pattern="{cmd}" -u "{runtime.platform.path}/tools/pr
 # Program will set fuses 2, 6 and 8 only. Fuses 0 and 4 are not written because the core never configures that.
 # If a user went and set that themselvesm we shouldn't undo it.
 # Fuse 1 is the BOD configuration, which could "brick" the chip if set for a higher voltage than the power rail.
-# Fuse 5 is SYSCFG0 which could disable UPDI and leave the board programmable without HV programming.
+# Fuse 5 is SYSCFG0 which could disable UPDI and leave the board unprogrammable without HV programming.
 # That leaves OSCCFG to choose 16 vs 20 MHz clock, and SYSCFG1 (for startup time and stuff) and BOOTEND,
 # ensuring that a part previously set to use a bootloader will be unbootloaded cleanly, instead of the
 # bootloader being erased but no sketches working)
