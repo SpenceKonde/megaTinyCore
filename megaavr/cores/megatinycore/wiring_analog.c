@@ -1084,7 +1084,7 @@ void analogWrite(uint8_t pin, int val) {
   if (bit_mask == NOT_A_PIN) {
     return;
   }
-  #if defined(TCD0) && defined(USE_TCD_PWM)
+  #if defined(TCD0) && defined(USE_TCD_PWM) && defined(NO_GLITCH_TIMERD0)
     uint8_t set_inven = 0;
   #endif
   // Set pin output because that's what Arduino does
