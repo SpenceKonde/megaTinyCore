@@ -3,7 +3,7 @@
 ## [Questions? Cases where you don't know whether the problem is in your code or the core? Things to show off?](https://github.com/SpenceKonde/megaTinyCore/discussions)
 We have a Github Discussions section now. When a problem is *definitely* a defect in the core, you will reduce the time taken to fix it if you create an issue, as I prioritize issues over catching up on discussions.
 
-### 2.6.1 is out - rejoice
+### 2.6.7 is out - rejoice
 Improved flash footprint of serial significantly while adding features, wire can wake slave from sleep without corrupting data, and much, much more, see [the Changelog](ChangeLog.md).
 
 ## IMPORTANT WARNINGS
