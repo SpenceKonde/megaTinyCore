@@ -1,10 +1,12 @@
 <!-- markdownlint-disable MD041 -->
-# megaTinyCore - Arduino support for all tinyAVR 0/1/2-Series
+# megaTinyCore (sometimes "mTC" informally) - Arduino support for all tinyAVR 0/1/2-Series
 ## [Questions? Cases where you don't know whether the problem is in your code or the core? Things to show off?](https://github.com/SpenceKonde/megaTinyCore/discussions)
 We have a Github Discussions section now. When a problem is *definitely* a defect in the core, you will reduce the time taken to fix it if you create an issue, as I prioritize issues over catching up on discussions.
 
 ### 2.6.7 is out - rejoice
-Improved flash footprint of serial significantly while adding features, wire can wake slave from sleep without corrupting data, and much, much more, see [the Changelog](ChangeLog.md).
+This corrects many of the bugs present in 2.6.x
+
+2.6.x introduces improved flash footprint of serial significantly while adding features, wire can wake slave from sleep without corrupting data, and much, much more, see [the Changelog](ChangeLog.md).
 
 ## IMPORTANT WARNINGS
 
