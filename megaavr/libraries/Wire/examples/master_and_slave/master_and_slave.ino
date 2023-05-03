@@ -68,6 +68,12 @@ void sendDataWire() {
 
 
 void receiveDataWire(int16_t numBytes) {
+  // Warning: This is terrible practice! Never print from within an ISR!
+  // It only works in very simple cases.
+  if (numBytes != 4) {
+    MySerial.print("Slave received only ");
+    MySerial.println(numBytes);
+  }
   MySerial.print("Slave Received: ");
   uint32_t temp = 0;
   temp |= (uint32_t)Wire.read();

@@ -1460,7 +1460,7 @@ void nudge_millis(__attribute__((unused)) uint16_t nudgesize) {
       timingStruct.timer_millis += nudgesize;
       SREG=oldSREG;
     #else
-      #pragma message(""Timer correction not yet supported for this timer. The obvious way is obstructed by the RTC errata.");")
+      #pragma message("Timer correction not yet supported for this timer. The obvious way is obstructed by the RTC errata.")
       (void)nudgesize; // unused parameter
     #endif
   #else
