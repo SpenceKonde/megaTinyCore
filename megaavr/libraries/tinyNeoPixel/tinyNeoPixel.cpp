@@ -219,67 +219,6 @@ void tinyNeoPixel::show(void) {
     // and if you were to crank it back to 4 MHz, well... it might actually still just barely work.
     // The ones would be way longser
 
-    // 7 instruction clocks per bit: HxxxxLL
-    // OUT instructions:             ^^   ^  (T=0,2,5)
-    // 200 ns zero bit - barely legal.
-    // 800 ns  highs    - legal.
-    // 400 ns lows minimum
-    //
-
-    hi   = *port |  pinMask;
-    lo   = *port & ~pinMask;
-    n1 = lo;
-    if (b & 0x80) n1 = hi;
-
-    // Dirty trick: RJMPs proceeding to the next instruction are used
-    // to delay two clock cycles in one instruction word (rather than
-    // using two NOPs).  This was necessary in order to squeeze the
-    // loop down to exactly 64 words -- the maximum possible for a
-    // relative branch.
-
-
-  noInterrupts(); // Need 100% focus on instruction timing
-
-
-  // AVRxt MCUs --  tinyAVR 0/1/2, megaAVR 0, AVR Dx ----------------------
-  // with extended maximum speeds to support vigorously overclocked
-  // Dx-series parts. This is by no means intended to imply that they will
-  // run at those speeds, only that - if they do - you can control WS2812s
-  // with them.
-
-  volatile uint16_t
-    i   = numBytes; // Loop counter
-  volatile uint8_t
-   *ptr = pixels,   // Pointer to next byte
-    b   = *ptr++,   // Current byte value
-    hi,             // PORT w/output bit set high
-    lo;             // PORT w/output bit set low
-
-  // Hand-tuned assembly code issues data to the LED drivers at a specific
-  // rate.  There's separate code for different CPU speeds (8, 12, 16 MHz)
-  // for both the WS2811 (400 KHz) and WS2812 (800 KHz) drivers.  The
-  // datastream timing for the LED drivers allows a little wiggle room each
-  // way (listed in the datasheets), so the conditions for compiling each
-  // case are set up for a range of frequencies rather than just the exact
-  // 8, 12 or 16 MHz values, permitting use with some close-but-not-spot-on
-  // devices (e.g. 16.5 MHz DigiSpark).  The ranges were arrived at based
-  // on the datasheet figures and have not been extensively tested outside
-  // the canonical 8/12/16 MHz speeds; there's no guarantee these will work
-  // close to the extremes (or possibly they could be pushed further).
-  // Keep in mind only one CPU speed case actually gets compiled; the
-  // resulting program isn't as massive as it might look from source here.
-
-  // 5ish MHz(ish) AVRxt
-  #if (F_CPU >= 400000UL) && (F_CPU <= 5600000UL)
-
-    volatile uint8_t n1, n2 = 0;  // First, next bits out
-
-    // At this dreadfully slow clock speed, we struggle to meet the constraints.
-    // The best I can come up with is this. At 5 MHz, the bits are 1.4 us lonng.
-    // The last two bits are 1.6 us long.
-    // and if you were to crank it back to 4 MHz, well... it might actually still just barely work.
-    // The ones would be way longser
-
     // 7 instruction clocks per bit: HxxxxLL       H:1 x:4 L:2
     // OUT instructions:             ^^   ^  (T=0,2,5)
     // 200 ns zero bit - barely legal.

@@ -185,7 +185,7 @@ const uint8_t digital_pin_to_timer[] = {
   #endif
   #if defined(_TCA_ALT_WO0)
     TIMERA0,    // 1  PA7
-  #elif defined(USE_TCD_PWM)
+  #elif defined(USE_TIMERD0_PWM)
     TIMERD0,
   #endif
   TIMERA0,      // 2  PA1

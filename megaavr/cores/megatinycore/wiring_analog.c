@@ -1084,7 +1084,8 @@ void analogWrite(uint8_t pin, int val) {
   if (bit_mask == NOT_A_PIN) {
     return;
   }
-  #if defined(TCD0) && defined(USE_TCD_PWM) && defined(NO_GLITCH_TIMERD0)
+  #if defined(TCD0) && defined(USE_TIMERD0_PWM) && defined(NO_GLITCH_TIMERD0)
+
     uint8_t set_inven = 0;
   #endif
   // Set pin output because that's what Arduino does
@@ -1181,139 +1182,132 @@ void analogWrite(uint8_t pin, int val) {
 * PART 1: TIMERD
 **********************************************************************/
     #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
-      case TIMERD0: {
-      #if !defined(NO_GLITCH_TIMERD0)
-        /* Glitches permitted: 0 or 255 will generate a glitch on the other channels and lose a tiny amount of time if used as millis timer. If you're doing that
-         * often enough though it adds up. */
-        if (val < 1) { /* if zero or negative drive digital low */
-          digitalWrite(pin, LOW);
-        } else if (val > 254) { /* if max or greater drive digital high */
-          digitalWrite(pin, HIGH);
-        } else {
-      #else
-       /* Now, if NO_GLITCH_TIMERD0 is defined, val can legally be 0 or 255, which is to be interpreted as an instruction to keep the output constant LOW or HIGH.
-        * 0 requires no special action - 255-0 = 255, we're counting to 254 and thus will never reach the compare matchvalue. 255 on the other hand, requires us to
-        * invert the pin and set val to 0 to get the constant output. Setting the CMPxSET register to 0 produces a sub-system-clock spike (maybe you don't care.
-        * But depending on the application, this could be catastrophic!)
-        * Values below 0 are easy just clip them to zero and we're done. Values of 255 though will produce duty cycles slightly below 100%! So in that case we change
-        * val to 0 (which would keep a constant low) but then invert the output pin.
-        */
-          if (val < 1) {
-            val = 0;
-          } else if (val > 254) {
-            val = 0;
-            set_inven = 1;
+      case TIMERD0:
+      {
+        #if !defined(NO_GLITCH_TIMERD0)
+          /* Glitches permitted: 0 or 255 will generate a glitch on the other channels and lose a tiny amount of time if used as millis timer. If you're doing that
+           * often enough though it adds up. */
+          if (val < 1) { /* if zero or negative drive digital low */
+            digitalWrite(pin, LOW);
+          } else if (val > 254) { /* if max or greater drive digital high */
+            digitalWrite(pin, HIGH);
+          } else {
+        #else
+         /* Now, if NO_GLITCH_TIMERD0 is defined, val can legally be 0 or 255, which is to be interpreted as an instruction to keep the output constant LOW or HIGH.
+          * 0 requires no special action - 255-0 = 255, we're counting to 254 and thus will never reach the compare matchvalue. 255 on the other hand, requires us to
+          * invert the pin and set val to 0 to get the constant output. Setting the CMPxSET register to 0 produces a sub-system-clock spike (maybe you don't care.
+          * But depending on the application, this could be catastrophic!)
+          * Values below 0 are easy just clip them to zero and we're done. Values of 255 though will produce duty cycles slightly below 100%! So in that case we change
+          * val to 0 (which would keep a constant low) but then invert the output pin.
+          */
+            if (val < 1) {
+              val = 0;
+            } else if (val > 254) {
+              val = 0;
+              set_inven = 1;
+            }
           }
+        #endif
+        // Calculation of values to write to CMPxSET
+        // val is 1~254, so 255-val is 1~254.
+        uint8_t oldSREG = SREG;
+
+        cli(); // interrupts off... wouldn't due to have this mess interrupted and messed with...
+
+        while ((TCD0.STATUS & (TCD_ENRDY_bm | TCD_CMDRDY_bm)) != (TCD_ENRDY_bm | TCD_CMDRDY_bm));
+        // if previous sync/enable in progress, wait for it to finish. This is dicey for sure, because we're waiting on a peripheral
+        // with interrupts off. But an interrupt could trigger one of those bits becoming unset, so we must do it this way.
+        // set new values
+        uint8_t fc_mask;
+        #if defined(USE_TCD_WOAB) && _AVR_PINCOUNT != 8 // TCD is available on PA4 or PA5 on 14+ pin parts
+          fc_mask = bit_mask;
+          if (bit_mask == 0x20) {  // PIN_PA5
+            TCD0.CMPBSET = ((255 - val) << 1) - 1;
+          } else {        // PIN_PA4
+            TCD0.CMPASET = ((255 - val) << 1) - 1;
+          }
+        #elif defined(USE_TCD_WOAB) && _AVR_PINCOUNT == 8 // 8 pin parts have it on PA6, PA7 only
+          if (bit_mask == 0x80) {  // PIN_PA7
+            TCD0.CMPBSET = ((255 - val) << 1) - 1;
+            fc_mask = 0x20;
+          } else {        // PIN_PA6
+            TCD0.CMPASET = ((255 - val) << 1) - 1;
+            fc_mask = 0x10;
+          }
+        #else // parts with more pins can have it on PC1 or PC0.
+          if (bit_mask == 2) {  // PIN_PC1
+            TCD0.CMPBSET = ((255 - val) << 1) - 1;
+            fc_mask = 0x80;
+          } else {        // PIN_PC0
+            TCD0.CMPASET = ((255 - val) << 1) - 1;
+            fc_mask = 0x40;
+          }
+        #endif
+        if (!(TCD0.FAULTCTRL & fc_mask)) {
+          // if it's not active, we need to activate it... which produces a glitch in the PWM
+          TCD0.CTRLA &= ~TCD_ENABLE_bm; // stop the timer
+          _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL | fc_mask);
+          while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until we can re-enable it
+          TCD0.CTRLA |= TCD_ENABLE_bm; // re-enable it
+        } else {
+          TCD0.CTRLE = TCD_SYNCEOC_bm; // Synchronize at the end of the current cycle
         }
-      #endif
-      // Calculation of values to write to CMPxSET
-      // val is 1~254, so 255-val is 1~254.
-      uint8_t oldSREG = SREG;
-      cli(); // interrupts off... wouldn't due to have this mess interrupted and messed with...
-      while ((TCD0.STATUS & (TCD_ENRDY_bm | TCD_CMDRDY_bm)) != (TCD_ENRDY_bm | TCD_CMDRDY_bm));
-      // if previous sync/enable in progress, wait for it to finish. This is dicey for sure, because we're waiting on a peripheral
-      // with interrupts off. But an interrupt could trigger one of those bits becoming unset, so we must do it this way.
-      // set new values
-      uint8_t fc_mask;
-      #if defined(USE_TCD_WOAB) && _AVR_PINCOUNT != 8 // TCD is available on PA4 or PA5 on 14+ pin parts
-        fc_mask = bit_mask;
-        if (bit_mask == 0x20) {  // PIN_PA5
-          TCD0.CMPBSET = ((255 - val) << 1) - 1;
-        } else {        // PIN_PA4
-          TCD0.CMPASET = ((255 - val) << 1) - 1;
-        }
-      #elif defined(USE_TCD_WOAB) && _AVR_PINCOUNT == 8 // 8 pin parts have it on PA6, PA7 only
-        if (bit_mask == 0x80) {  // PIN_PA7
-          TCD0.CMPBSET = ((255 - val) << 1) - 1;
-          fc_mask = 0x20;
-        } else {        // PIN_PA6
-          TCD0.CMPASET = ((255 - val) << 1) - 1;
-          fc_mask = 0x10;
-        }
-      #else // parts with more pins can have it on PC1 or PC0.
-        if (bit_mask == 2) {  // PIN_PC1
-          TCD0.CMPBSET = ((255 - val) << 1) - 1;
-          fc_mask = 0x80;
-        } else {        // PIN_PC0
-          TCD0.CMPASET = ((255 - val) << 1) - 1;
-          fc_mask = 0x40;
-        }
-      #endif
-      if (!(TCD0.FAULTCTRL & fc_mask)) {
-        // if it's not active, we need to activate it... which produces a glitch in the PWM
-        TCD0.CTRLA &= ~TCD_ENABLE_bm; // stop the timer
-        _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL | fc_mask);
-        while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until we can re-enable it
-        TCD0.CTRLA |= TCD_ENABLE_bm; // re-enable it
-      } else {
-        TCD0.CTRLE = TCD_SYNCEOC_bm; // Synchronize at the end of the current cycle
-      }
 
 
 /**********************************************************************
 * PART 3.5: TIMERD noglitch
 **********************************************************************/
-      #if defined(NO_GLITCH_TIMERD0) // This mode is always used with the stock variant.
-        #if defined(USE_TCD_WOAB) && _AVR_PINCOUNT != 8
-          // TCD is on PA4 or PA5 on 14+ pin parts
-          if (set_inven == 0) { // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR) or somewhere in between.
-            if (bit_mask == 0x10) {
-              PORTA.PIN4CTRL &= ~(PORT_INVEN_bm);
-            } else {
-              PORTA.PIN5CTRL &= ~(PORT_INVEN_bm);
+        #if defined(NO_GLITCH_TIMERD0) // This mode is always used with the stock variant.
+          #if defined(USE_TCD_WOAB) && _AVR_PINCOUNT != 8
+            // TCD is on PA4 or PA5 on 14+ pin parts
+            if (set_inven == 0) { // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR) or somewhere in between.
+              if (bit_mask == 0x10) {
+                PORTA.PIN4CTRL &= ~(PORT_INVEN_bm);
+              } else {
+                PORTA.PIN5CTRL &= ~(PORT_INVEN_bm);
+              }
+            } else { // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
+              if (bit_mask == 0x10) {
+                PORTA.PIN4CTRL |= PORT_INVEN_bm;
+              } else {
+                PORTA.PIN5CTRL |= PORT_INVEN_bm;
+              }
             }
-          } else { // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
-            if (bit_mask == 0x10) {
-              PORTA.PIN4CTRL |= PORT_INVEN_bm;
-            } else {
-              PORTA.PIN5CTRL |= PORT_INVEN_bm;
+          #elif defined(USE_TCD_WOAB) && _AVR_PINCOUNT == 8 // 8 pin parts have it on PA6, PA7
+            if (set_inven == 0) { // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR) or somewhere in between.
+              if (bit_mask == 0x40) {
+                PORTA.PIN6CTRL &= ~(PORT_INVEN_bm);
+              } else {
+                PORTA.PIN7CTRL &= ~(PORT_INVEN_bm);
+              }
+            } else { // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
+              if (bit_mask == 0x40) {
+                PORTA.PIN6CTRL |= PORT_INVEN_bm;
+              } else {
+                PORTA.PIN7CTRL |= PORT_INVEN_bm;
+              }
             }
-          }
-        #elif defined(USE_TCD_WOAB) && _AVR_PINCOUNT == 8 // 8 pin parts have it on PA6, PA7
-          if (set_inven == 0) { // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR) or somewhere in between.
-            if (bit_mask == 0x40) {
-              PORTA.PIN6CTRL &= ~(PORT_INVEN_bm);
-            } else {
-              PORTA.PIN7CTRL &= ~(PORT_INVEN_bm);
+          #else // TCD is on PC0 or PC1 so if we're here, we're acting on either PC0 or PC1. And NO_GLITCH mode is enabled
+            if (set_inven == 0) { // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR) or somewhere in between.
+              if (bit_mask == 1) {
+                PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
+              } else {
+                PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
+              }
+            } else { // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
+              if (bit_mask == 1) {
+                PORTC.PIN0CTRL |= PORT_INVEN_bm;
+              } else {
+                PORTC.PIN1CTRL |= PORT_INVEN_bm;
+              }
             }
-          } else { // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
-            if (bit_mask == 0x40) {
-              PORTA.PIN6CTRL |= PORT_INVEN_bm;
-            } else {
-              PORTA.PIN7CTRL |= PORT_INVEN_bm;
-            }
-          }
-        #else // TCD is on PC0 or PC1 so if we're here, we're acting on either PC0 or PC1. And NO_GLITCH mode is enabled
-          if (set_inven == 0) { // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR) or somewhere in between.
-            if (bit_mask == 1) {
-              PORTC.PIN0CTRL &= ~(PORT_INVEN_bm);
-            } else {
-              PORTC.PIN1CTRL &= ~(PORT_INVEN_bm);
-            }
-          } else { // we *are* turning off PWM while forcing pin high - analogwrite(pin, 255) was called on TCD0 PWM pin...
-            if (bit_mask == 1) {
-              PORTC.PIN0CTRL |= PORT_INVEN_bm;
-            } else {
-              PORTC.PIN1CTRL |= PORT_INVEN_bm;
-            }
-          }
-        #endif //End conditional for each set of pins
-      #endif // End conditional to handle no-glitch
-/**********************************************************************
-* End 3.5
-**********************************************************************/
-      SREG = oldSREG;
-    }
-    break;
+          #endif //End conditional for each set of pins
+        #endif // End conditional to handle no-glitch
+        SREG = oldSREG;
+        break;
+      }
     #endif
-    // end of TCD0 code
-
-/**********************************************************************
-* End 4: TIMERD
-**********************************************************************/
-
-    /* If non timer pin, or unknown timer definition.  */
-    /* do a digital write  */
+    // Now catch the cases where there's no pin.
     case NOT_ON_TIMER: /*falls through*/
     default:
     {
