@@ -15,7 +15,7 @@ extern const uint8_t bit_mask_to_position[];
 extern const uint8_t bit_mask_to_position_n[];
 
 inline uint8_t bitMaskToPosition_by_Math(uint8_t bitmask) {
-  if(__builtin_constant_p(bitmask)) {
+  if (__builtin_constant_p(bitmask)) {
     if (bitmask > 128) {
       badArg("bitMaskToPosition is being called a constant which is not a bitmask");
       return 255;
@@ -36,7 +36,7 @@ inline uint8_t bitMaskToPosition_by_Math(uint8_t bitmask) {
   return bitmask;
 }
 inline uint8_t bitMaskToPosition_by_LUT(uint8_t bitmask) {
-  if(__builtin_constant_p(bitmask)) {
+  if (__builtin_constant_p(bitmask)) {
     if (bitmask > 128) {
       badArg("bitMaskToPosition is being called a constant which is not a bitmask");
       return 255;
