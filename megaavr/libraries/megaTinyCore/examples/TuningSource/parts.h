@@ -93,7 +93,7 @@ defined(__AVR_ATmega809__) || defined(__AVR_ATmega1609__) || defined(__AVR_ATmeg
   #define __AVR_ATmega_Zero__
   #else
     #if (defined(MEGATINYCORE) || defined(DXCORE) || defined(ATTINYCORE))
-      // Well then what the heck is it?
+// Well then what the heck is it?
       #if   (defined(__AVR_ATtiny3217__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny1604__) || defined(__AVR_ATtiny1607__) || \
 defined(__AVR_ATtiny3216__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny1606__) || defined(__AVR_ATtiny1614__) || \
 defined(__AVR_ATtiny817__)  || defined(__AVR_ATtiny807__)  || defined(__AVR_ATtiny816__)  || defined(__AVR_ATtiny806__)  || \
@@ -133,7 +133,7 @@ defined(__AVR_AVR64EB20__) || defined(__AVR_AVR32EB20__) || defined(__AVR_AVR16E
 defined(__AVR_AVR64EB14__) || defined(__AVR_AVR32EB14__) || defined(__AVR_AVR16EB14__) || defined(__AVR_AVR8EB14__))
       #define __AVR_EB__
       #else
-        error "Unknown or unsupported part"
+        #error "Unknown or unsupported part"
       #endif
     #else // DXCore, megaTinyCore, ATTinyCore
       #if (CLOCK_SOURCE & 0x0F) != 1 && ((CLOCK_SOURCE & 0x0F) != 2)
