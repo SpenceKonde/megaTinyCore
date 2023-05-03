@@ -50,7 +50,7 @@
 #endif
 #if defined(USE_TIMERD0_PWM)
   #if !defined(TCD0)
-    #pragma message("You have selected an alternate PWM layout that uses TCD0, but this part doesn't have one. Those PWM pins will not be available.")
+    #pragma message("You have selected a PWM layout that uses TCD0, but this part doesn't have one. Those PWM pins will not be available.")
     #undef USE_TIMERD0_PWM
   #endif
 #endif
