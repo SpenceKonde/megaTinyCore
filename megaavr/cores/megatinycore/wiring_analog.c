@@ -1200,12 +1200,11 @@ void analogWrite(uint8_t pin, int val) {
           * Values below 0 are easy just clip them to zero and we're done. Values of 255 though will produce duty cycles slightly below 100%! So in that case we change
           * val to 0 (which would keep a constant low) but then invert the output pin.
           */
-            if (val < 1) {
-              val = 0;
-            } else if (val > 254) {
-              val = 0;
-              set_inven = 1;
-            }
+          if (val < 1) {
+            val = 0;
+          } else if (val > 254) {
+            val = 0;
+            set_inven = 1;
           }
         #endif
         // Calculation of values to write to CMPxSET
