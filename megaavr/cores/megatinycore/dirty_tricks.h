@@ -258,11 +258,12 @@ Not enabled. Ugly ways to get delays at very small flash cost.
 /************/
 /* _fastPtr */
 /************/
-#define _fastPtr_z(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&z" (__localVar__) : "0" (__pointer__));  // r30:r31
-#define _fastPtr_y(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&y" (__localVar__) : "0" (__pointer__));  // r28:r29
-#define _fastPtr_x(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&x" (__localVar__) : "0" (__pointer__));  // r26:r27
-#define _fastPtr_d(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&b" (__localVar__) : "0" (__pointer__));  // Y or Z
-#define   _fastPtr(__localVar__, __pointer__) __asm__ __volatile__("\n\t": "=&e" (__localVar__) : "0" (__pointer__));  // X,Y or Z
+#define _checkType(_varA_, _varB_) if (!__builtin_types_compatible_p(__typeof__(_varA_), __typeof__(_varB_))) { badArg("Non-compatible types"); }
+#define _fastPtr_z(_localVar_, _pointer_) _checkType(_localVar_, _pointer_); __asm__ __volatile__("\n\t": "=&z"(_localVar_) : "0"(_pointer_));  // r30:r31
+#define _fastPtr_y(_localVar_, _pointer_) _checkType(_localVar_, _pointer_); __asm__ __volatile__("\n\t": "=&y"(_localVar_) : "0"(_pointer_));  // r28:r29
+#define _fastPtr_x(_localVar_, _pointer_) _checkType(_localVar_, _pointer_); __asm__ __volatile__("\n\t": "=&x"(_localVar_) : "0"(_pointer_));  // r26:r27
+#define _fastPtr_d(_localVar_, _pointer_) _checkType(_localVar_, _pointer_); __asm__ __volatile__("\n\t": "=&b"(_localVar_) : "0"(_pointer_));  // Y or Z
+#define   _fastPtr(_localVar_, _pointer_) _checkType(_localVar_, _pointer_); __asm__ __volatile__("\n\t": "=&e"(_localVar_) : "0"(_pointer_));  // X,Y or Z
 /* _fastPtr_z(__localVar__, __pointer__)
  * _fastPtr_y(__localVar__, __pointer__)
  * _fastPtr_x(__localVar__, __pointer__)
