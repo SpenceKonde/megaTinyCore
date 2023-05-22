@@ -222,7 +222,7 @@ uint8_t __PeripheralControl = 0xFF;
       "ldd        r24,      Z+3"  "\n\t" //
       "sbci       r24,     0xFF"  "\n\t" //
       "std        Z+3,      r24"  "\n\t" // ... until all 4 bytes were handled, at 4 clocks and 3 words per byte -> 16 clocks
-      "ldi        r24, %[CLRFL]"  "\n\t" // This is the TCB interrupt clear bitmap
+      "ldi        r24, %[CLRFL]"  "\n\t" // This is the TCB interrupt clear bitmap !!
       "sts   %[PTCLR],      r24"  "\n\t" // write to Timer interrupt status register to clear flag. 2 clocks for sts
       "pop        r24"            "\n\t" // pop r24 to get the old SREG value - 2 clock
       "out       0x3F,      r24"  "\n\t" // restore SREG - 1 clock
@@ -230,10 +230,55 @@ uint8_t __PeripheralControl = 0xFF;
       "pop        r31"            "\n\t"
       "pop        r30"            "\n\t" // 6 more clocks popping registers in reverse order.
       "reti"                      "\n\t" // and 4 clocks for reti - total 12/13 + 16 + 2 + 1 + 6 + 4 = 41/42 clocks total, and 7+16+3+6 = 32 words, vs 60-61 clocks and 40 words
-      :: "z" (&timingStruct.timer_millis),          // we are changing the value of this, so to be strictly correct, this must be declared input output - though in this case it doesn't matter
+      :: "z" (&timingStruct.timer_millis),
          [CLRFL] "M" (_timerS.intClear),
          [PTCLR] "m" (*_timerS.intStatusReg)
       ); // grrr, sublime highlights this as invalid syntax because it gets confused by the ifdef's and odd syntax on inline asm
+
+      // !! Hey, isn't it strictly better to do this as soon as we've pushed r24 for the first time?, and push r24 before Z. That way if interrupts were turned off a while, and turned
+      // back on moments before we would have lost a millisecond... Right now we do this after the math at T = 28-29 through T=31-32. We could instead be doing it
+      // at T=6-7 through T=8-9! That would mean that the maximum delay without breaking millis would be 21 clock cycles longer! This fires every millisecond at most
+      // clock speeds, so of cases where millis may drift, it would prevent 1ms of time loss in 21 out of F_CPU/1000 instances. At 2 MHz this is a hair over 1% of
+      // instances of time loss. And time loss is bad, as it can cause micros to experience backwards timetravel. But if you are using micros timekeeping when
+      // you are experiencing instances of time loss, this is an issue you need to fix. (you are trying to time something with microsecond accuracy having disabled
+      // interrupts for a long period of time, micros is not expected to work). But that is an improvement, why shouldn't we take it?
+      // The argument against it would be potentially wrong values for micros - but that could only happen if a priority interrupt is called that interrupts the
+      // write of the millis total, and calls micros there. It would eroneously think that the timer had just overflowed, but that the ISR had run, and thus they
+      // would use the value in main memory which may have had 0-4 bytes updated. The 4 byte window would becorrect and is only 1 clock wide.
+      // | Cases | bytes updated | resulting error | Chance of error, per case |   Time |
+      // |-------|---------------|-----------------|---------------------------|--------|
+      // |     8 |             0 |           -1000 |                         1 |   -1ms |
+      // |     4 |             1 |         -256000 |                     1/256 | -256ms |
+      // |     4 |             2 |       -65536000 |                   1/65536 | -65.5s |
+      // |     4 |             3 |    -16777216000 |                1/16777216 | +6m42s |
+      // |     1 |             4 |               0 |                         0 |    0us |
+      //
+      // The effect is thus that when this manifets, 1 out of (1000-24000) times that micros() is called from a priority interrupt occurring at timing
+      // uncorrelated with millis interrupts, it will return a time that is either 1000, 256000, 65536000 or 1688821600 lower than the correct value.
+      // Unlike the case of being *in* a micros blackout long enough to cause time loss while relying upon timekeeping, it is *not* prohibited to
+      // call micros within an ISR provided the ISR is shorter than the millis period. In fact it could be used as a very crude form of input capture
+      // or if the key number happens to be time since startup, in microseconds. For these applications the "fix" would be catastrophic. Widening the permitted
+      // disabled interrupts time for a 0.42-20us period of time comes at the cost of the same period of time during which micros would get wrong answers under
+      // conditions that it currently does not, during that time 2/5ths of times would be 1000 us under, and 1/5th each a 1/256 chance of being 256000 us under,
+      // 1/65536 chance of being 65536000us under and 1/1677216 chance of it beiing slow by 3,892,314,112us which would likely be interpreted as being fast by
+      // 402,653,184 us (6m42s).
+      //
+      // | Error | Overall chance at 2 MHz | Overall chance at 48 MHz  |
+      // |-------|-------------------------|---------------------------|
+      // |   1ms | 0.1%              1 ppk | 0.002%             40 ppm |
+      // | 256ms | 0.0004%           4 ppm | 0.0000034%        160 ppb |
+      // |  65s  | 0.000001%        10 ppb | 0.0000000064%     625 ppt |
+      // | 6m42s | 0.000000003%     30 ppt | 0.000000000012%     3 ppt |
+      // Note: I suspect there are math errors above, but their magnitude within a power of 2, so the overall asseement is that 40-1000 out of 1m times micros
+      // was called in a priority interrupt it would be off by 1, less than 4 in 1 million times it would return values off by more than a minute, and that
+      // in extremely rare events, it could line up just wrong leading to errors of 6 minutes in the future.
+      //
+      // The errors would be hell to debug.
+      //
+      // Since this situation is supposed to be supported, and because the alternative is prolonging the window in which bad practice is permitted anyway,
+      // I am disinclined to make that change!
+
+
       /* ISR in C:
         ISR (TCBx_INT_vect) {       // x depends on user configuration
           #if (F_CPU > 2000000)
@@ -307,8 +352,10 @@ uint8_t __PeripheralControl = 0xFF;
       "pop        r30"            "\n\t"
       "reti"                      "\n\t" // total 77 - 79 clocks total, and 58 words, vs 104-112 clocks and 84 words
       :: "z" (&timingStruct),            // we are changing the value of this, so to be strictly correct, this must be declared input output - though in this case it doesn't matter
-                                         // Spence: Woah, uhh... No you aren't changing that. You're changing values in the struct it points to. That's very different. For that to be safely changed
-                                         // in ASM it needs to be volatile (which it already is, since this is also in interrupt context and it has to be)
+                                         // Spence: Woah, uhh... No you aren't changing that. You're changing values in the struct it points to. That's very different.
+                                         // For that to be safely changed in ASM it needs to be volatile (which it already is, since this is also in interrupt context
+                                         // and it has to be), but the pointer itself never gets changed (no use of ld/st Z+ or ld/st -Z, only ldd/std Z+q which leaves
+                                         // Z unchanged - had one of those been )
         [LFRINC] "M" (((0x0000 - FRACT_INC)    & 0xFF)),
         [HFRINC] "M" (((0x0000 - FRACT_INC)>>8 & 0xFF)),
         [LFRMAX] "M" ((FRACT_MAX    & 0xFF)),

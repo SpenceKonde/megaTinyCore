@@ -32,7 +32,16 @@ The takeaways from this should be that:
 
 megaTinyCore and DxCore, like all Arduino cores, provides implementations of the usual digital I/O functions. *These implementations are not guaranteed to have identical argument and return types, though we do guarantee that same will be implicitly convertible to the types used by the reference implementation*
 
-Below are listed *additional* functions provided by these cores for the purpose of providing greater functionality, improving the usability of the core, and the aesthetic beauty of not "hiding" the enhanced capabilities of modern AVR microcontrollers. Many of these functions are entirely appropriate for any microcontroller (though some are not; the capabilities), and I encourage others to use these implementations in the interest of making code which does require these more advanced I/O facilities to be portable across the widest variety of devices possible; beside that, I have a direct interest in that, because I may find myself using those devices in the future.
+
+pinConfigure called with second argument constrained to 0x00-0x0F (setting only direction and output value) (1), with it constrained to that plus configuring pullups (2), and without restrictions (3).
+
+About 200 bytes of that space is used for lookup tables, not instructions.
+
+This is why the fast digital I/O functions exist.
+
+This is why the fast digital I/O functions exist, and why there are people who habitually do `VPORTA.OUT |= 0x80;` instead of `digitalWrite(PIN_PA7,HIGH);`
+
+It's also why I am not comfortable automatically switching digital I/O to "fast" type when constant arguments are given. The normal functions are just SO SLOW that you're sure to break code that hadn't realized they were depending on the time it took for digital write, even if just for setup or hold time for the thing it's talking to.
 
 ## openDrain()
 It has always been possible to get the benefit of an open drain configuration - you set a pin's output value to 0 and toggle it between input and output. This core provides a slightly smoother (also faster) wrapper around this than using pinmode (since pinMode must also concern itself with configuring the pullup, whether it needs to be changed or not, every time - it's actually significantly slower setting things input vs output. The openDrain() function takes a pin and a value - `LOW`, `FLOATING` (or `HIGH`) or `CHANGE`. `openDrain()` always makes sure the output buffer is not set to drive the pin high; often the other end of a pin you're using in open drain mode may be connected to something running from a lower supply voltage, where setting it OUTPUT with the pin set high could damage the other device.
@@ -55,8 +64,7 @@ It also includes pinModeFast(). pinModeFast() requires a constant mode argument.
 digitalWriteFast(PIN_PD0, val); // This one takes 10 words of flash, and executes in around half 7-9 clocks.
 digitalWriteFast(PIN_PD0, val ? HIGH : LOW); // this one takes 6 words of flash and executes in 6 clocks
 digitalWriteFast(PIN_PD0, HIGH); // This is fastest of all, 1 word of flash, and 1 clock cycle to execute
-VPORTD.OUT |= 1 << 0; // digitalWriteFast(PIN_PD0,HIGH) is turned into this.
-                      // The previous line is syntactic sugar for this. Beyond being more readable
+VPORTD.OUT |= 1 << 0; // The previous line is syntactic sugar for this. Beyond being more readable
                       // it eliminates the temptation to try to write more than one bit which instead
                       // of an atomic SBI or CBI, is compiled to a read-modify-write cycle of three
                       // instructions which will cause unexpected results should an interrupt fire in the
@@ -86,8 +94,18 @@ Getting a 1 or 0 into a variable is slower and uses more flash; I can think of a
 
 **The fast digital I/O functions do not turn off PWM** as that is inevitably slower (far slower) than writing to pins and they would no longer be "fast" digital I/O.
 
+## turnOffPWM(uint8_t pin) is exposed
+This used to be a function only used within wiring_digital. It is now exposed to user code - as the name suggests it turns off PWM (only if analogWrite() could have put it there) for the given pin. It's performance is similar to analogWrite (nothing to get excited over), but sometimes an explicit function to turn off PWM and not change anything else is preferable: Recall that digitalWrite calls this (indeed, as shown in the above table, it's one of the main reasons digitalWrite is so damned bloated on the DX-series parts!), and that large code takes a long time to run. DigitalWrite thus does a terrible job of bitbanging. It would not be unreasonable to call this to turn off PWM, but avoid digitalWrite entirely. The pin will return to whatever state it was in before being told to generate PWM, unless digitalWriteFast() or direct writes to the port register have been used since. If the pin is set input,
+
+## Finding current PWM timer, if any
+On many cores, there is a `digitalPinToTimer(pin)` macro, mostly for internal use, which returns the timer associated with the pin. On DxCore there is the added complication that we account for the TCA portmux register, and digitalPinToTimer() only returns non-TCA timers. For the PORTMUX-aware test, call `digialPinToTimerNow(pin)` instead.
+
 ## pinConfigure()
-pinConfigure is a somewhat ugly function to expose all options that can be configured on a per-pin basis. It is called as shown here; you can bitwise-or any number of the constants shown in the table below. All of those pin options will be configured as specified. Pin functions that don't have a corresponding option OR'ed into the second argument will not be changed. There are very few guard rails here: This function will happily enable pin interrupts that you don't have a handler for (but when they fire it'll crash the sketch - however, note that if you've 'attached()' an interrupt, you can then enable and disable it with this. This is likely faster - and also likely more robust on principle (and defining the interrupt without attach better still) on the grounds that the less you play with function pointers, the lower the chance that there's a latent bug that can corrupt the value of that pointer, leading to unpredictable results when it is dereferenced), or waste power with pins driven low while connected to the pullup and so on.
+pinConfigure is a somewhat ugly function to expose all options that can be configured on a per-pin basis. It is called as shown here; you can bitwise-or any number of the constants shown in the table below. All of those pin options will be configured as specified. Pin functions that don't have a corresponding option OR'ed into the second argument will not be changed. There are very few guard rails here: This function will happily enable pin interrupts that you don't have a handler for (but when they fire it'll crash the sketch), or waste power with pins driven low while connected to the pullup and so on.
+
+Thanks to the work of @MCUdude 1.5.0, we can instead separate these constants with commas, like arguments. This is much, much more natural - the comma form should be preferred over the OR-ing form.
+
+The flash efficiency of the two methods should be very similar, (though small differences do exist, depending on the number of times pinConfigure is called and with what arguments. Commas are smaller for most cases, but between 3 and 8 calls, approximately, they're slightly bigger)
 
 ```c++
 pinConfigure(PIN_PA4,(PIN_DIR_INPUT | PIN_PULLUP_ON | PIN_OUT_LOW));
@@ -95,7 +113,10 @@ pinConfigure(PIN_PA4,(PIN_DIR_INPUT | PIN_PULLUP_ON | PIN_OUT_LOW));
 
 pinConfigure(PIN_PA2,(PIN_DIR_INPUT | PIN_OUT_LOW | PIN_PULLUP_OFF | PIN_INVERT_OFF | PIN_ISC_ENABLE));
 // Set PD2 input, with output register set low, pullup, invert off, and digital input enabled. Ie, the reset condition.
+// Equivalent:
+pinConfigure(PIN_PA2,(PIN_DIR_INPUT, PIN_OUT_LOW, PIN_PULLUP_OFF, PIN_INVERT_OFF, PIN_ISC_ENABLE));
 ```
+The second syntax is thanks to @MCUdude and his understanding of variadic macros
 
 
 | Functionality |   Enable  | Disable            | Toggle |
@@ -125,7 +146,7 @@ PORTA.PORTCTRL |= PORT_SRL_bm;
 // Disable slew rate limiting on PORTA
 PORTA.PORTCTRL &= ~PORT_SRL_bm;
 ```
-However, because there is only one bit in this register, you don't actually need to use the |= and &= operators, which do a read-modify-write operation, taking 10 bytes and 6 clocks each. Instead, you can use simple assignment. This saves 4 bytes (3 clocks) when enabling, and 6 bytes (4 clocks) on disabling. (going from `LDS, ORI/ANDI, STS` to `LDI, STS` and just `STS`, since avr-gcc always keeps a "known zero" in r1). Of course, if a future part with more port options comes out, porting to that part would require a code change if you also wanted to use one of those new bits. I suggest a reminder that it's a shortcut if you take it, like the comment below.
+However, because there is only one bit in this register, you don't actually need to use the |= and &= operators, which do a read-modify-write operation, taking 10 bytes and 6 clocks each. Instead, you can use simple assignment. This saves 4 bytes (3 clocks) when enabling, and 6 bytes (4 clocks) on disabling. (going from `LDS, ORI/ANDI, STS` to `LDI, STS` and just `STS` if you're clearing it, since avr-gcc always keeps a "known zero" in r1). Of course, if a future part with more options set by the PORTCTRL register comes out, porting to that part would require a code change if you also wanted to use one of those new features. I suggest a reminder that it's a shortcut if you take it, like the comments below. **It is recommended that libraries not take this shortcut - because you may not still be maintaining the library, and users across the world will have downloaded it and most will not be able to figure out why your library breaks their other code**.
 
 ```c
 // Enable slew rate limiting on PORTA more efficiently
@@ -134,7 +155,7 @@ PORTA.PORTCTRL = PORT_SRL_bm; // simple assignment is okay because on DA, DB, an
 PORTA.PORTCTRL = 0;           // simple assignment is okay because on DA, DB, and DD-series parts, no other bits of PORTCTRL are used, saves 3 words and 4 clocks
 ```
 
-These parts (like many electronics) are better at driving pins low than high (all values are from the typ. column - neither min nor max are specified; one gets the impression that this is not tightly controlled):
+These parts (like many electronics) are better at driving pins low than high. With slew rate limiting enabled, the pins take about twice as long to transition. (all values are from the typ. column - neither min nor max are specified; one gets the impression that this is not tightly controlled):
 
 | Direction   | Normal | Slew Rate Limited |
 |-------------|--------|-------------------|
@@ -148,6 +169,15 @@ The configurable input level option (`INLVL`) is only available on parts with MV
 
 Multi-pin configuration registers, which allow setting PINnCTRL en masse are only available on AVR Dx-series.
 
+### Basic pin information
+```c++
+uint8_t digitalPinToPort(uint8_t pin);
+uint8_t digitalPinToBitPosition(uint8_t pin);
+uint8_t digitalPinToBitMask(uint8_t pin);
+uint8_t analogPinToBitPosition(uint8_t pin);
+uint8_t analogPinToBitMask(uint8_t pin);
+```
+These take a pin number (which can be represented as a uint8_t - though it is unfortunately common practice to use 16-bit signed integers to store pin numbers in Arduino-land). If the pin passed is valid, these will return either the bit position (PIN_PA0 would return 0, PIN_PD4 will return 4 and so on), the bit mask (bit mask = 1 << (bit position), so PIN_PA0 would return 0x01, PIN_PD4 would return 0x10, etc) `*`, or the port number (PORTA = 0, PORTB = 1, etc).
 
 ## turnOffPWM(uint8_t pin) is exposed
 This used to be a function only used within wiring_digital. It is now exposed to user code - as the name suggests it turns off PWM (only if analogWrite() could have put it there) for the given pin. It's performance is similar to analogWrite (nothing to get excited over), but sometimes an explicit function to turn off PWM and not change anything else is preferable: Recall that digitalWrite calls this (indeed, as shown in the above table, it's one of the main reasons digitalWrite is so damned bloated on the DX-series parts!), and that large code takes a long time to run. DigitalWrite thus does a terrible job of bitbanging. It would not be unreasonable to call this to turn off PWM, but avoid digitalWrite entirely. The pin will return to whatever state it was in before being told to generate PWM, unless digitalWriteFast() or direct writes to the port register have been used since. If the pin is set input after PWM is enabled with analogWrite (or through other means - though in such cases, the behavior when turnOffPWM() is called on any pin which nominally outputs PWM controlled by the same timer *should be treated as undefined* - it is not possible to efficiently implement such a feature on AVRs nor most other microcontrollers while maintaining behavior consistent with the API - the core would (at least on an AVR) have to iterate through every possible source of PWM, testing each in turn to see if it might have PWM output enabled on this pin. In many cases, including this core, each timer would require checking a separate bit in one or more special function registers, as well as storing a database that associates each pin with one or more combinations of bits and the corresponding bit to clear to disable PWM through that pathway. Suffice to say, that is not practical within the resource constraints of embedded systems.
@@ -170,5 +200,12 @@ Furthermore, the following situations should not be expected to produce the desi
 ## Note on number of pins and future parts
 The most any announced AVR has had is 86 digital pins, the ATmega2560; In the modern AVR era, the digital pin maximum is 55, and the maximum possible without rearchitecting how pins are accessed is 56 (ie, if UPDI could be turned into I/O on DA/DB we are already there). There is no way for an AVR that allows the same bit-level access that we enjoy to have it on on all pins to have more than 56 pins within the AVR instructionset. Each port takes up 4 of the 32 addresses in the low I/O space for the VPORT registers, on which the single cycle bit-level access relies. Only time will tell how this is handled.
 * **No VPORTH or higher** - This is clean, simple, and limiting in some ways, but probably the best route. If you needed to use VPORT access, you'll just need to use the lower 7 ports for it. Surely you don't need 57+ pins all with VPORT atomic single cycle access! This is also, in my judgement, most likely based on the fact that on the ATmega2560, the only precedent we have for running out of low I/O registers for pins, they didn't even put ports H through L into the high I/O space.
-* **VPORTs in High I/O** - The only way that this really solves any problems is by if they were to extend SBI/CBI/SBIC/SBIS to another 16 registers, enough to bring it to the same approximate I/O pin count as the 2560. This would only take 16 x 8 x 4 = 512 opcodes (unlike other instruction set wishlist items, which would be theoretically impossible to add to AVR), and one might note that they seem to have left themselves room for this in the instruction set around the current SBI/CBI isns. But the need for updated toolchains would be painful indeed. This would generate the best product.
+* **VPORTs in High I/O** - There are many ways of dealing with it using a new set of differently behaving registers in the high I/O space. None of them retain the arbitrary compile-time-known-bit-write-is-one-clock of current VPORTs. At 8 registers per port, you could make a series of N operations on a bit or number of bits take N+1 clocks, and keep them atomic. This would mean a VPORT.DIR/DIRCLR/DIRSET, and VPORT.OUT/OUTSET/OUTCLR and VPORT.IN(writing to IN toggles, and there was never a single cycle DIR toggle). and VPORT.INTFLAGS. That's viable, though with the other registers in that, you could get at most only 3 more ports - which is only 24 pins: You couldn't quite do it for a 100 pin chip). Other solutions would lower capability and comprehensibility in exchange for squeezing in more pins. No matter how you do it, it doesn't really solve the problem.
 * **VPORTs that can be remapped at runtime** - The stuff of library author's nightmares. You'd have some subset of the VPORTs (or maybe all of them) could be remapped. If you put the register for that in the high I/O space it could be written quickly. But this will cause unaware old code to break by writing to the wrong pins if it didn't know to check for it, and any code that used them (ie, code that is supposed to be fast) might have to check the mapping first. This is most like what was done on the XMegas, but also serves as a shining example of the over-complexity that I think doomed those parts to poor uptake and slow death. The best of these bad approaches would probably be to have VPORTG changed into say VPORTX. Could configure it with a register in the high I/O space so it was 2 cycle overhead to write (1 for LDI port number, 1 to OUT to register). That way all code for other ports wouldn't worry, and port G is present on the fewest parts so the least code would be impacted if ported, and would be straightforward to document
+
+`*` - Note on conventions for specifying numbers: 0x## refers to a hexadecimal number, while ## refers to a decimal digit and 0b######## refers to a value given as binary. For hexadecimal values, if the size of the datatype is unambiguosly known, we will typically represent them with an appropriate number of leading 0's - so 1 in a 1-byte datatype is written as 0x01, while 1 in a 16-bit datatype is written as 0x0001. Any time a number is not prefixed by 0x or 0b, the decimal form should be assumed. Which representation of a given value is chosen is based on the context of that value. Values that simply represent numbers are generally given in decimal. Values that are being subjected to bitwise operators, or that are bit masks, group codes, and similar, will be shown in hexadecimal.
+
+
+## A few other macros you shouldn't need - meant for the CI testing; I need as many sketches as possible that run both here and megaTinyCor)'
+** `_VALID_DIGITAL_PIN(n)`** where N will include at least 4 supported values, depending on how much work I feel like putting into it. The pins returned will be the same on all DD-series and tinyAVR parts. These are not intended to be *good* pins, just *valid* pins. That is, they are to be used when automated test success or failure based on "does the sketch compile" not "is the behavior on the hardware what is expected?") We don't have capability to conduct such testing at this time
+** `_VALID_ANALOG_PIN(n)`** does the same thing for pins that can be used by analogRead(). PIN_PD0-PD7 for DA/DB series parts with at least 48 pins and all DA series parts. PD1-7 for 28 and 32-pin DD and DB-series. 20 pin parts get PD4-PD7, as do 14-pin ones.

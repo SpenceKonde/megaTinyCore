@@ -78,7 +78,7 @@ There are two general failure modes here. First, you may discover that it is ope
 If, instead, the speed is close to what you asked for, but off a few percent, I would suspect that the chip was not tuned properly and repeat the tuning process.
 
 The other failure mode is that it does seem to run at the requested speed, but you notice that sketches hang over time, or occasionally output nonsensical numbers (typically 1's turn into 0's). This means that that chip is being run faster than it's capable of under the voltage and temperature conditions. Do you have a stable 5V supply that is well-decoupled? That is essential.
-You may just have to use a different chip, as in the case above.
+You may just have to use a different chip, (keep trying and use F-spec (high temp) parts. , as in the case above.
 
 Considerations for Tuned oscillators are covered in greater depth in the [Tuning Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md).
 

@@ -109,7 +109,7 @@ These basic options all conveniently reside in a single register.
 
 #### Modifiers
 The modern tinyAVR and AVR Dx-series parts have a number of additional features. A few of these were available on classic AVRs (and just not exposed), but most of them are new.
-to use these, they should be coombined with one of the optionsfrom the table above using the bitwise or operator. More than one of these modifiers can be used, though many of them do not make sense in combination. When using the two argument form of Serial.begin(), remember to pass the constant (such as SERIAL_8N1) not just a modifier.
+To use these, they should be coombined with one of the options from the table above using the bitwise or operator. More than one of these modifiers can be used, though many of them do not make sense in combination. When using the two argument form of Serial.begin(), remember to pass the constant (such as SERIAL_8N1) not just a modifier.
 
 ```C
 Serial.begin(115200, (SERIAL_8N1 | SERIAL_TX_ONLY));
@@ -128,7 +128,7 @@ Serial1.begin(9600, (SERIAL_HALF_DUPLEX | SERIAL_RS485));
 
 Note:
 The "other" RS485 mode, according to the ATtiny3216/3217 datasheet:
-"Writing RS485[1] to ‘1’ enables the RS-485 mode which automatically sets the TXD pin to output one clock cycle
+"Writing RS485[1] to `1` enables the RS-485 mode which automatically sets the TXD pin to output one clock cycle
 before starting transmission and sets it back to input when the transmission is complete."
 
 Obviously this begs the question of how any of the devices involved are supposed to prevent collisions - I don't think there *is* a way. That would explain why this feature was removed from the Dx-series documentation (it was present in the initial DA-series IO headers, and is likely still in the hardware...).
@@ -168,7 +168,7 @@ uint8_t *  printHex(uint8_t * p, uint8_t len, char sep = 0);
 uint16_t * printHex(uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
 ```
 
-It will print `len` elements starting from the address the pointer is pointed at, if `sep` is non-zero, that character will be placed between each byte or word - these are **characters** not strings. A single character, enclosed between a pair of single quotes. ":" is a 2 character string - a colon followed by a null terminator, and is invalid. Anything between double quotes is invalid. Use single quotes as shown below. If `s` is true for a pointer to 16-bit values, the endianness will be swapped as well. There is a slightly different implementation for pointers to volatile variables to help prevent problems when using this to dump the contents of peripheral registers. Which is what printHex was made for.
+It will print `len` elements starting from the address the pointer is pointed at, if `sep` is non-zero, that character will be placed between each byte or word - these are **characters** not strings. A single character, enclosed between a pair of single quotes ":" is a 2 character string - a colon followed by a null terminator, and is invalid. Anything between double quotes is invalid. Use single quotes as shown below. If `s` is true for a pointer to 16-bit values, the endianness will be swapped as well. There is a slightly different implementation for pointers to volatile variables to help prevent problems when using this to dump the contents of peripheral registers. Which is what printHex was made for.
 ```c
   // dump every register associated with the CCL
   volatile uint8_t * cclconfig= (volatile uint8_t*)&CCL;
@@ -185,7 +185,7 @@ It will print `len` elements starting from the address the pointer is pointed at
 00:00:00:00
 */
 ```
-Many peripherals have a couple of 16-bit registers, amongst a sea of 16-bit ones. Say I'm trying to debug a problem involving the synchronous mode serial (because recently I was), it's got a baud register in the middle that I'd like to have formatted nicely. A union of a word and a byte pointer is just the thing here:
+Many peripherals have a couple of 16-bit registers, amongst a sea of 8-bit ones. Say I'm trying to debug a problem involving the synchronous mode serial (because recently I was), it's got a baud register in the middle that I'd like to have formatted nicely. A union of a word and a byte pointer is just the thing here:
 ```c
   union {
     volatile uint16_t *  intp;
@@ -208,7 +208,7 @@ This starts the serial port. Options should be made by combining the constant re
 
 #### Basic USART options
 
-| Data Size | Parity | 1 stop bit | 1 stop bit |
+| Data Size | Parity | 1 stop bit | 2 stop bit |
 |-----------|--------|------------|------------|
 | 5 bit     |  NONE  | SERIAL_5N1 | SERIAL_5N2 |
 | 6 bit     |  NONE  | SERIAL_6N1 | SERIAL_6N2 |
@@ -336,7 +336,7 @@ In this case, Any *write* will temporarily disable the RXC interrupt, and enable
 That configuration will result from calling the two argument version of begin() with SERIAL_OPEN_DRAIN and SERIAL_LOOPBACK, or equivalently, SERIAL_HALF_DUPLEX, and neither SERIAL_TX_ONLY nor SERIAL_RX_ONLY.
 
 ### Inverted Serial
-Rarely, one needs to have *inverted* serial, ie, idle line is low, the start bit is high, high bits are 0, low bits are 1 and the stop bit is low.) This can be achieved by by inverting the port (either manually, `PORTx.PINxCTRL |= PORT_INVEN_bm;` or via pinConfigure() - [see Digital I/O Reference](Ref_Digital.md) . Generally, when one of the pins is inverted, the other one is to, so you probably want to invert both TX and RX, and you probably don't want the pullup on either of them, since they lines are idle LOW when inverted.
+Rarely, one needs to have *inverted* serial, ie, idle line is low, the start bit is high, high bits are 0, low bits are 1 and the stop bit is low.) This can be achieved by inverting the port (either manually, `PORTx.PINxCTRL |= PORT_INVEN_bm;` or via pinConfigure() - [see Digital I/O Reference](Ref_Digital.md) . Generally, when one of the pins is inverted, the other one is to, so you probably want to invert both TX and RX, and you probably don't want the pullup on either of them, since they lines are idle LOW when inverted.
 
 ```c
 //after Serial.begin(), which would mess all this up.

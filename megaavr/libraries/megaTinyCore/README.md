@@ -4,6 +4,26 @@ This library, initially only to supply a keywords.txt, now supplies a few specia
 
 ## Function reference
 
+### Control clock output on PB5
+
+#### void turnOnClockout()
+On 20 and 24 pin parts, this will override the function of PIN_PB5 and output the system clock on it. This will generate a compile error on parts with fewer pins, as they do not have a PB5.
+
+#### void turnOffClockout()
+On 20 and 24 pin parts, this will return PB5 to whatever mode it was in before it was told to output the clock. This will generate a compile error on parts with fewer pins, as they do not have a PB5.
+
+### General purpose
+
+* inline uint8_t bitMaskToPosition_by_Math(uint8_t bitmask)
+* inline uint8_t bitMaskToPosition_by_LUT(uint8_t bitmask)
+
+These two functions return the bit position of a supplied bitmask, or 255 if it's not an 8-bit bitmask.
+The first one does it with a hand-optimized assembler routine, but it's still slower than using a lookup table - but doing that costs a bit more flash.
+
+* inline uint8_t bitMaskToHalfPosition(uint8_t bitmask, bool highnybble)
+
+This acts like the above with one key difference: it only acts on one nybble. Passing true as the second argument selects the high nybble. Number returned is always 0, 1, 2, 3, or 255 (error). This always uses the LUT because the lut is small
+
 ### Tuning related
 There are things here specific how megaTinyCore handless tuning and how to do it.
 

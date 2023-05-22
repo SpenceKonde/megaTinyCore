@@ -12,8 +12,7 @@ The exported files will be found in the sketch folder. The file names will look 
 6. Finally:
 * If the different printf implementation is chosen from the tools menu, .pfF or .pfM will be next, these are for the full and minimal implementations, and use different amounts of flash.
 * If you have chosen a non default option for attachInterrupt, `.aOld` or `.aMan` will indicate that.
-7. The optimization options come next, `Os`, `Osng`, `O3`, `O3ng` - self explanatory, other than that ng stands for "no GCSE"
-8. Ends with a '.' followed by a`v` followed by the current version of the core with no separators, then the file extension.
+7. Ends with a '.' followed by a`v` followed by the current version of the core with no separators, then the file extension.
 
 ## The memory map
 The map is a blunt instrument - and unfortunately doesn't have as much granularity as you'd like (it will often just show that main() is taking up most of the space. Okay, great, so init(), setup() and loop() and stuff called from them are taking up most of the flash. Tell me something I don't know - the reason all your functions end up being counted in main()) is that, because they're called in only one place, they get "inlined" to save space and improve execution time (calling a function has overhead - sometimes considerable overhead - it starts at 3-4 clocks (depending on the part) for the call, 4 for the return - but the "rules" for how different registers are treated mean that it can involve up to 36 clock cycles of shuffling registers around in the worst case, and 48 bytes of flash. Inlining is wonderful, but it makes the memory map less useful.
