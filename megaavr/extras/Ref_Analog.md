@@ -6,8 +6,8 @@ These parts all have a large number of analog inputs (11 pins on 20 and 24-pin 0
 ## Vital Statistics
 | Part family | Min. Res. | Max. Res. | CLK Max | CLK used | Max Ovrsamp Res. | Extras
 |-------------|-----------|-----------|---------|----------|------------------|---
-| tinyAVR 0/1 |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | Wierd ref voltages. Must slow way down for accurate readings w/lowest ref.
-| tinyAVR 1+  |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | Wierd ref voltages. Must slow way down for accurate readings w/lowest ref. Whole second copy of ADC.
+| tinyAVR 0/1 |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | Weird ref voltages. Must slow way down for accurate readings w/lowest ref.
+| tinyAVR 1+  |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | Weird ref voltages. Must slow way down for accurate readings w/lowest ref. Whole second copy of ADC.
 | AVR DA      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | Half-way differential mode.
 | AVR DB      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | Half-way differential mode.
 | AVR DD      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | Half-way differential mode, more pins can be ADC pins.

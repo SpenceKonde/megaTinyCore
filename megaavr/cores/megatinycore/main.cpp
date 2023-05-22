@@ -151,7 +151,7 @@ int main() {
       onPreMain();
     }
   #else /* Otherwise, SPM_FROM_APP is defined */
-    #if defined(__AVR_Dx__) /* So this beter be a Dx!!! */
+    #if defined(__AVR_Dx__) /* So this better be a Dx!!! */
   /*******************************************
   * THIS FUNCTIONALITY IS ONLY EXPOSED ON    *
   * DX-SERIES PARTS SO THIS CODE CANT-HAPPEN *
