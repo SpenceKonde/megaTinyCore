@@ -2100,6 +2100,8 @@ microchip.build.mcu=attiny{build.attiny}
 microchip.build.f_cpu={build.speed}000000L
 microchip.build.export_merged_output=false
 microchip.build.board=Microchip Placeholder
+microchip.build.pwmflags=
+microchip.default.build.pwmabr=_
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
@@ -5596,6 +5598,8 @@ microchipo.build.export_merged_output=false
 microchipo.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/hex/{bootloader.file}:i
 microchipo.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 microchipo.bootloader.file={bootloader.basefilename}{bootloader.entrycond}.hex
+microchipo.build.pwmflags=
+microchipo.build.pwmabr=_
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
