@@ -61,14 +61,7 @@ The "size" of the sketch as reported by avrdude during the upload process is 512
 ## Entry Conditions
 Depending on your needs, you may want or need different configurations for when the bootloader should run and when it should just jump straight to the application. It determines this with the reset flags, which it clears, and then stashes in GPIOR0 right before jumping to app (preserving them in place prevents detection of error conditions resulting from dirty resets, which can turn what would have been an unwanted reset into a straight-up hang, or an unclean reset into a broken state). We now supply 6 versions of the bootloader (except for Microchip official boards that are not based on tinyAVR 2-series parts: On those we supply only ones that do not rely on external resets, since only one pin, the UPDI pin, can be made into reset, but the microchip boards don't have 12v capable or tolerant debuggers on them (and if you're cutting the strapping pins, you should no longer be selecting the Microchip board definition!)
 
-
-
-
-
-
-
 I've been asked about supporting the no-verify option. Since there is literally no check on whether an upload succeeded other the presence or absence of gross protocol errors and the verification step (with either Optiboot or SerialUPDI, I don't think I can endorse this option. The same is true on all other AVRs, and *I think it is foolish and irresponsible that the Aruino team offers that option to users at all* - at least on AVR. Maybe other platforms with other upload protocols have CRC checks and othher such basic safeguards. But AVR provides no such assurance.
-
 
 ## Entry Conditions
 Depending on your needs, you may want or need different configurations for when the bootloader should run and when it should just jump straight to the application. It determines this with the reset flags, which it clears, and then stashes in GPR.GPR0 right before jumping to app. It doesn't clear them until it jumps to app, so you do get to see what kind of reset was involved.
@@ -110,7 +103,6 @@ Notes:
 | AVR64DD14    |  16dd14         | 0:0,3,4, 1:2          | PIN PD7 if serial0, <br/> PIN_PD5 if serial1 |
 
 **Notes** 14-pin parts had to depart from our tradition of PA7 LEDs. The LED is on PD7 on 14-pin parts, and PD5 if Serial1 is the serial port the bootloader uses (because that uses pins PD6 and PD7 - mux option 0 becomes available only when the TX pin, PC0, actually exists. This is only present on 28 and 32-pin parts).
-Because the 14-pin parts only have the first two pins of port
 
 ### Serial Ports, DA/DB
 
@@ -136,8 +128,17 @@ All ports and mux options subject to pin availability, as always:
 * USART0 alt 1 and 2 are unavailable on 14-pin parts.
 * USART1 default pins are unavailable on 14-pin and 2-pin parts
 
+### Serial Ports, EA
+| Serial port |Default| Alt 1 | Alt 2 | Alt 3 | Alt 4 |
+|-------------|-------|-------|-------|-------|-------|
+| USART0      | PA0-1 | PA4-5 | PA2-3 | PD4-5 | PC1-2 |
+| USART1      | PC0-1 | PC4-5 | PD6-7 | N/A   | N/A   |
+| USART2      | PF0-1 | PF4-5 | N/A   | N/A   | N/A   |
+
+At least they got the UART back.... Shame about all the NVM errata though
+
 ## Bootloader size
-There is a critical difference between the classic AVRs and the modern ones, and this one I think is one of the few places they may have made a questionable design decision (Obviously, their implementation left something to be desired in many areas, as described in the silicon errata, but that's not what we're talking about here). On classic AVRs, the bootloader section was at the very end of the flash. When it was enabled, the chip would jump to there on reset instead of starting at 0x0000, the bootloader would do it's thing, and then get to the application code by jumping to 0x0000. That way, there was no need to know whether it was a bootloader or non-bootloader configuration at compile time. Now, the bootloader is at the start of the flash, and jumps to the end of it's section. Hence, the compiler needs to know to offset everything by 512 bytes (or more for other theoretical bootloaders), and now you cannot use optiboot to upload a binary compiled for non-optiboot mode, nor the other way around. You cannot translate a hex file compiled for optiboot to non-optiboot or vise-versa.
+There are many a critical difference between the classic AVRs and the modern ones, and I usually think the design decisions made good sense. This one I think is questionable. (Obviously, their implementation left something to be desired in many areas, as described in the silicon errata, but that's not what we're talking about here - the design decisions underlying modern AVRs are generally solid). On classic AVRs, the bootloader section was at the very end of the flash. When it was enabled, the chip would jump to there on reset instead of starting at 0x0000, the bootloader would do it's thing, and then get to the application code by jumping to 0x0000. That way, there was no need to know whether it was a bootloader or non-bootloader configuration at compile time. Now, the bootloader is at the start of the flash, and jumps to the end of it's section. Hence, the compiler needs to know to offset everything by 512 bytes (or more for other theoretical bootloaders), and now you cannot use optiboot to upload a binary compiled for non-optiboot mode, nor the other way around. You cannot translate a hex file compiled for optiboot to non-optiboot or vise-versa (if there were no pointer registers, it would be tractable. Probably python regex replacements would do it. But every LD or ST to the memory mapped flash, but not the extended I/O space needs the source of it's address tracked down and changed. That is much harder).
 
 ## Writing to the flash from the app
 On tinyAVR and megAVR 0-series, This can be done on parts with Optiboot (and not without it), using the [Flash Library](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/libraries/Optiboot_flasher) by @MCUDude. (a comparable version is included with MegaCoreX
@@ -155,13 +156,13 @@ One's first thought on hearing about the binaries being different might be wheth
 There are also a couple of differences between what is generated for bootloader and non-bootloader boards. With a bootloader, we don't need to put in a guard function for handling of empty reset cause (see the [reset guide](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Reset.md), since Optiboot handles that. Writing to flash also has very different requirements depending on the presence or absence of a bootloader, and in the latter case, how much flash you want to be able to write. With Optiboot it is simple: The SPM instruction must be located in the boot section, that's the first page of flash. We put that in the two words immediately before the version number. Because only the actual spm instruction needs to run from bootloader section - you can stage everything else from the app - all that is needed is an a SPM Z+ (write word to flash and increment Z pointer) and RET (return). So in this case, you set up r0 and r1 with inline assembly, and then instead of calling SPM yourself (since you're in the application section), you can just call that address - it will be in the bootloader section, so it will be allowed to write to the application, and then it will immediately return. (The bootloader can be built without that feature - but that's not secure enough for a product where untrusted code could be involved, since if you can read from the bootloader section, you can find the SPM or an ST instruction with a clear path to a return after it, and call that instead. But don't worry - there's a bit you can set in the NVMCTRL registers that turns off the ability to read from or execute anything from the boot section; it can only be set from the bootloader, and only cleared by a total reset. So a bootloader that set that bit before jumping to the app could never be used to write to flash from the app - all it would see is NOOP instructions there if it tried). Making it work without a bootloader is trickier because the you still have to define a boot section (otherwise it treasts all of the flash as boot flash, which you can't write except over UPDI) - but you don't have a bootloader, you only have an app. If you're content to do it "the right way" and have part of the flash marked as "app data section" and the rest as "app code" this is as simple as setting the first page to be bootloader, and in early initialization, setting int interrupt vectors to be located in the bootloader section, which is what we do for "allow flash write from app" restricted to certain addresses. However, you can't write to EEPROM from appdata either, and if your code overflows into the app data section, depending on where the compiler happened to put it, you might end up failing to write to EEPROM. For unrestricted writes, we have to make something that looks like the case with the bootloader. We use the exact same structure, but it takes some trickery to make sure it goes into the correct section, since priority goes to several difficult to control sections before the .initn sections, so those won't work.
 
 ## Be sure you are using the latest bootloader version
-Within approximately every minor version, we have had a substantial improvement to the bootloaded. For tinyAVR, very little fat is left to trim. On Dx - if we actually honored the chip erase command (-e from avrdude) and did that at the start of any write, we could then just take data and store it directly to the flash as it came in. We could even double the baud and not miss anything! On Ex - well, that'll be an adventure 
+Within approximately every minor version, we have had a substantial improvement to the bootloaded. For tinyAVR, very little fat is left to trim. On Dx - if we actually honored the chip erase command (-e from avrdude) and did that at the start of any write, we could then just take data and store it directly to the flash as it came in. We could even double the baud and not miss anything! On Ex - well, that'll be an adventure
 
 There are also a couple of small differences between what is generated for bootloader and non-bootloader boards. With a bootloader, we don't need to put in a guard function for handling of empty reset cause (see the [reset guide](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md), since Optiboot handles that.
 
 ## Future for Optiboot_x: Likely basis for optiboot on Ex
 
 ## Future Devices
-* Optiboot_dx is expected to be the base for any future word-at-a-time NVMCTRL based AVR. This only such devices announced are the DA, DB, and DD and of course the long awaited DU. 
+* Optiboot_dx is expected to be the base for any future word-at-a-time NVMCTRL based AVR. This only such devices announced are the DA, DB, and DD and of course the long awaited DU.
 * Optiboot_x (for megaTinyCore and MegaCoreX) is likely to be the basis of page-buffer-using NVMCTRL AVRs.
-* The EA-series is page-based (unfortunately) Not only that, but it's got poor flash endurance and you can't execute any instructions during the write half of a page erasewrite, so you are basically going to be doing tinyAVR algorithm plus added complications to account for this mess. 
+* The EA-series is page-based (unfortunately) Not only that, but it's got poor flash endurance and you can't execute any instructions during the write half of a page erasewrite, so you are basically going to be doing tinyAVR algorithm plus added complications to account for this mess.

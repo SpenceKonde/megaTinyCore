@@ -161,7 +161,7 @@ At the other extreme you may want it to be impossible for code, even the clevere
 ```c++
 _PROTECTED_WRITE(WDT.STATUS, WDT_LOCK_bm); // call after setting WDT to desired configuration.
 ```
-For even more protection (and more nuisance in keeping the WDT from biting at all times). you can set the WDTCFG fuse via UPDI programming, using the included tools menu. 
+For even more protection (and more nuisance in keeping the WDT from biting at all times). you can set the WDTCFG fuse via UPDI programming, using the included tools menu.
 ### Summary and mini-example
 So overall, if you wanted your sketch to reset if you ever spent longer than 8 seconds between loop() iterations and also detect when a WDT reset just occurred and take special actions in setup you might do this
 ```c++

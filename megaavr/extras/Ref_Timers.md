@@ -22,8 +22,8 @@ The pins that the type A timer is directed to can be mapped to a variety of diff
   * On ATtiny parts with 8 pins, they are mapped to (in order) PA3-or-PA7, PA1, PA2, and PA3. Only the first 4 are available, and WO0 must be remapped in order to use WO3.
   * The desired pwm pin mapping must be chosen from the tools submenu at compile time
 * On non-TinyAVR parts, each TCA must be be pointed at one group of pins from a list of options. TCA0 can (on all parts thus far released) be directed to pins 0-5 of any port, while TCA1's WO0-5 channels are only available on PB0-5 or (on  - and not DA-series as of mid-2022 due to errata, 128DA64's) PG0-5, and TCA1's WO0-2 64-pin parts only can be output on pins PC4-6, or (on DB-series parts - DA's are again impacted by errata here) PE4-6. The Ex-series adds options for PD4-6 and PA4-6.
-  * This can be freely changed at runtime simply by writing to PORTMUX.TCAROUTEA. 
-  * On the AVR DD-series, where the TCD0 mux also works, the same functionality is applied there. 
+  * This can be freely changed at runtime simply by writing to PORTMUX.TCAROUTEA.
+  * On the AVR DD-series, where the TCD0 mux also works, the same functionality is applied there.
 #### Events and CCL channels
 On all parts, the TCA can be used to count events (counting either positive edges, or all edges), instead of system clocks (in this mode, the prescaler is ignored, and the events must be longer than 2 system clocks or generated synchronously to the system clock to guarantee the event input is seen) or to count only while the event channel is HIGH, or to reverse direction while the event input is high. On 2-series tinyAVR parts, AVR Dx and AVR Ex, there is a second event input dedicated to restarting the timer compare cycle on rising edge, any edge or have the timer only count or to reverse direction when an event is HIGH. **None of these event inputs are not available in SPLIT mode**. There is no restart-on-event input on the tinyAVR 0/1-series or megaAVR 0-series.
 
@@ -383,7 +383,7 @@ Except when the resolution is way down near the minimum, the device spends more 
 #### TCBn for millis timekeeping
 When a TCB is used for `millis()` timekeeping, it is set to run at the system clock prescaled by 2 (1 at 1 MHz system clock) and tick over every millisecond. This makes the millis ISR very fast, and provides 1ms resolution at all speeds for millis. The `micros()` function also has 1 us or almost-1 us resolution at all clock speeds (though there are small deterministic distortions due to the performance shortcuts used for the microsecond calculation - it never strays more than 1us or two, but there is a systematic effect there. The type B timer is an ideal timer for millis, however, they're also good for a lot of other things too. It is anticipated that as libraries for IR, 433MHz OOK'ed remote control, and similar add support for the modern AVR parts, that these timers will see even more use.
 
-TCB1 is the default millis timer on 2-series parts only. 
+TCB1 is the default millis timer on 2-series parts only.
 ISR execution time was decreased by 25% from 2.6.1 of megaTinyCore through reimplementation of the ISR is assembly, meaninmg less time spent incrementing millis and more on your code.
 
 |Note | CLK_PER | millis() | micros() | % in ISR | micros() time | Terms used             |
