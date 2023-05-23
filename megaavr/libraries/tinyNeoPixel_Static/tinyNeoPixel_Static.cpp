@@ -71,7 +71,7 @@ tinyNeoPixel::~tinyNeoPixel() {
 }
 void tinyNeoPixel::updateLatch(uint16_t us = 50) {
   /* New feature - to extend the latch interlock to all varieties of LEDs turns out to not be costly at all. */
-  latchTime=(us < 6 ? 6 : us); // there are no devices in production with a shorter latch waiting time, and thus is the shortest reasonable latch delay.
+  latchTime = (us < 6 ? 6 : us); // there are no devices in production with a shorter latch waiting time, and thus is the shortest reasonable latch delay.
 }
 // *INDENT-OFF*   astyle don't like assembly
 void tinyNeoPixel::show(void) {

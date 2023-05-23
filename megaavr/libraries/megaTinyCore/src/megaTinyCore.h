@@ -58,20 +58,20 @@ inline uint8_t bitMaskToHalfPosition(uint8_t bitmask, bool highnybble) {
 }
 inline void turnOnClockout() {
   #if !defined(PIN_PB5)
-    badCall("This part cannot generate clock output, because the clock output is only found on parts with a PB5 - this part does not have one!"
+  badCall("This part cannot generate clock output, because the clock output is only found on parts with a PB5 - this part does not have one!"
   #else
-    uint8_t temp = CLKCTRL_MCLKCTRLA;
-    temp |= 0x80;
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, temp);
+  uint8_t temp = CLKCTRL_MCLKCTRLA;
+  temp |= 0x80;
+  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, temp);
   #endif
 }
 inline void turnOffClockout() {
   #if !defined(PIN_PB5)
-    badCall("This part cannot generate clock output, because the clock output is only found on parts with a PB5 - this part does not have one!"
+  badCall("This part cannot generate clock output, because the clock output is only found on parts with a PB5 - this part does not have one!"
   #else
-    uint8_t temp = CLKCTRL_MCLKCTRLA;
-    temp &= 0x7F;
-    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, temp);
+  uint8_t temp = CLKCTRL_MCLKCTRLA;
+  temp &= 0x7F;
+  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, temp);
   #endif
 }
 

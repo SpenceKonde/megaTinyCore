@@ -242,9 +242,10 @@ uint8_t __PeripheralControl = 0xFF;
       // instances of time loss. And time loss is bad, as it can cause micros to experience backwards timetravel. But if you are using micros timekeeping when
       // you are experiencing instances of time loss, this is an issue you need to fix. (you are trying to time something with microsecond accuracy having disabled
       // interrupts for a long period of time, micros is not expected to work). But that is an improvement, why shouldn't we take it?
-      // The argument against it would be potentially wrong values for micros - but that could only happen if a priority interrupt is called that interrupts the
-      // write of the millis total, and calls micros there. It would eroneously think that the timer had just overflowed, but that the ISR had run, and thus they
-      // would use the value in main memory which may have had 0-4 bytes updated. The 4 byte window would becorrect and is only 1 clock wide.
+      // The argument against it would be potentially wrong values for micros - but **that could only happen if a **priority** interrupt is called** that interrupts the
+      // write of the millis total, **and calls micros there**. That specific case is not handled correctly. Users shouldn't do that.
+      // It would eroneously think that the timer had just overflowed, but that the ISR had run, and thus they would use the value in main
+      // memory which may have had 0-4 bytes updated. The 4 byte window would be correct and is only 1 clock wide.
       // | Cases | bytes updated | resulting error | Chance of error, per case |   Time |
       // |-------|---------------|-----------------|---------------------------|--------|
       // |     8 |             0 |           -1000 |                         1 |   -1ms |
