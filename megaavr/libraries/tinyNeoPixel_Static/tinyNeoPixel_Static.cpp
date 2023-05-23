@@ -50,7 +50,7 @@
 
 // Constructor when length, pin and type are known at compile-time:
 tinyNeoPixel::tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t, uint8_t *pxl) :
-  brightness(0), pixels(pxl), endTime(0) {
+  brightness(0), pixels(pxl), endTime(0), latchTime(50) {
   // boolean oldThreeBytesPerPixel = (wOffset == rOffset); // false if RGBW
   wOffset = (t >> 6) & 0b11; // See notes in header file
   rOffset = (t >> 4) & 0b11; // regarding R/G/B/W offsets

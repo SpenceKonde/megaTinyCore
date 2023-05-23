@@ -202,7 +202,7 @@ class tinyNeoPixel {
     fill(uint32_t c = 0, uint16_t first = 0, uint16_t count = 0),
     setBrightness(uint8_t b),
     clear(),
-    updateLatch(uint16_t = 50);
+    updateLatch(uint16_t latchtime = 50);
   uint8_t
    *getPixels(void) const,
     getBrightness(void) const;
@@ -307,6 +307,9 @@ class tinyNeoPixel {
   uint16_t
     numLEDs,       // Number of RGB LEDs in strip
     numBytes;      // Size of 'pixels' buffer below (3 or 4 bytes/pixel)
+    latchTime;     // Latch waiting period in us varies from 6 (contrary
+                   // to datasheet) for original 2812's, all the way to 250 us.
+                   // 50us is what the originals claim. Clones copied that, and some made it even longer.
   int8_t
     pin;           // Output pin number (-1 if not yet set)
   uint8_t
