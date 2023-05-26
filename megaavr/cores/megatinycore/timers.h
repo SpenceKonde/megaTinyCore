@@ -224,21 +224,13 @@
   // Pretty simple here!
 #elif defined(DXCORE)
   #if defined(TIMERD0_TOP_SETTING)
-   #if (TIMERD0_TOP_SETTING == 254 || TIMERD0_TOP_SETTING == 509 ||TIMERD0_TOP_SETTING == 1019 ||TIMERD0_TOP_SETTING == 2039 ||TIMERD0_TOP_SETTING == 4079 )
-      #if !defined(USE_TIMERD0_PWM)
-        #define USE_TIMERD0_PWM 1
-      #endif
-      #define TIMERD0_TOP_FIXED
-    #else // TOP setting defined, but not a supported value
-      #if defined(USE_TIMERD0_PWM)
-        // If they are also asking for PWM from TCD-, that's not a valid configuration.
-        #error "Unsupported TIMERD0_TOP_SETTING define, but USE_TIMERD0_PWM is also defined as 1"
+    #if (TIMERD0_TOP_SETTING == 254 || TIMERD0_TOP_SETTING == 509 ||TIMERD0_TOP_SETTING == 1019 ||TIMERD0_TOP_SETTING == 2039 ||TIMERD0_TOP_SETTING == 4079 )
+      #if defined(TCD0)
+        #define USE_TIMERD0_PWM
       #endif
     #endif
   #else
-    #if !defined(USE_TIMERD0_PWM)
-      #define USE_TIMERD0_PWM 1
-    #endif
+
   #endif
 
   /* On the DX-series parts, we can have a lot more fun with the Type D timer!
@@ -246,44 +238,60 @@
    * as a desperation move on the highly timer-constrained non-golden tinyAVR 1-series parts. The TCD0 on the
    * tinyAVRs is also far less interesting - it's virtually identical as far as the timer itself, but here
    * we have a much richer selection timing clock sources.
-              |   CLK_PER | Prescale A | Prescale D  | TOP D |
-              |-----------|------------|-------------|-------|
-              | ** 48 MHz |        256 |             |       |
-              | ** 44 MHz |        256 |             |       |
-              | ** 40 MHz |        256 |             |       |
-              | ** 36 MHz |        256 |             |       |
-              |  External |            | OSCHF@8  32 |   254 |
-              |  * 32 MHz |        256 |          32 |  1019 |
-              |  * 30 MHz |         64 | OSCHF@8  32 |   254 |
-              |  * 28 MHz |         64 |          32 |  1019 |
-              |  * 27 MHz |         64 | OSCHF@8  32 |   254 |
-              |    25 MHz |         64 |          32 |  1019 |
-              |    24 MHz |         64 |          32 |  1019 |
-              |    20 MHz |         64 |          32 |   509 |
-              |    16 MHz |         64 |          32 |   509 |
-              |    14 MHz |         64 | OSCHF@28 32 |  1019 |
-              |    12 MHz |         64 |          32 |   509 |
-              |    10 MHz |         64 | OSCHF@20 32 |   509 |
-              |     8 MHz |         64 |          32 |   254 |
-              |     7 MHz |         16 | OSCHF@28 32 |  1019 |
-              |     6 MHz |         16 | OSCHF@12 32 |   509 |
-              |     5 MHz |         16 | OSCHF@20 32 |   509 |
-              |     4 MHz |         16 |          32 |   254 |
-              |     3 MHz |          8 |           4 |   509 |
-              |     2 MHz |          8 |           4 |   509 |
-              |     1 MHz |          8 |           4 |   254 |
    */
   #if defined(USE_TIMERD0_PWM)
     #if !defined(TIMERD0_WGMODE_SETTING)
-      #define TIMERD0_WGMODE_SETTING (TCD_WGMODE_ONERAMP_gc)
+      #define TIMERD0_WGMODE_SETTING (TCD_WGMODE_ONERAMP_gc) // only WGMODE_ONERAMP and WGMODE_DUALSLOPE are supported by the core, as the other options
+      // cannot reproduce the behavior of analogWrite as they enforce PWM being non-overlapping. If you want those modes (I think 4 ramp mode has some
+      // relevant applications in combination with the TCD.CTRLD options, particularly in custom single wire protocols, particularly if you need to generate events
+      // at certain points in the cycle.
     #endif
     #if !defined(TIMERD0_CLOCK_SETTING)
       #if (CLOCK_SOURCE != 0)
         /*
-        This is ALSO almost indistinguishable! Same F_PWM, but lower internal frequency.
-        Sync is slower. but the bugs with TCD async events won't happen, and it's easier to do wacky stuff with the PROGEV.
+        Hey, we're not using the internal oscillator for the clock! We can totally run it at an ideal frequency from internal and use external for system clock!
+
+        There are at least five ways to slice this that look nearly identical. These are virtually indistinguishable from each other giving PWM at 980 Hz.
+        One runs the clock at 8 MHz with /32 division on the count prescaler and /1 on the synchronizer.
+        Another method drops the count prescaler back to /4, and compensates by increasing the sync prescaler to /8
+        A third way is to drop the count prescaler back to /4, sync prescale to /1, and set the FREQSEL to 1 MHz.
+        Sync prescale options of /2 and /4 can be paired with setting the osc to 2 or 4 MHz as well, with the same result
+        Lowering count prescale dodges some bugs, and there isn't exactly a wealth of options. (it goes /4 to /32, nothing in the middle,
+        and no undocumented fourth option (I checked :-P).
+        But /32 will get you right on target (that being ~1 kHz) if CLK_OSCHF / Sync prescale = 8 MHz
+        And /4 will get you right on target if CLK_OSCHF / Sync prescale = 1 MHz
+        There are still more equivalent settings if you consider that there are more than one way to get to 1 MHz from the internal HF oscillator.
+        Those settings are strictly worse if you aren't using the internal osc  for anything else.
+        On the one hand, running with clock set to 1 MHz is probably more power efficient, though nothing using a crystal is going to set any records
+        for power consumption - and using an external clock, well, you have the power consumption of the clock to worry about, which is often larger
+        than the chip itself...
+        On the other hand, using the /32 count prescaling exposes us to some silicon errata on the DA/DB - but in weirdo features nobody uses.
+        On the third hand, if the crystal or clock is defective, and you were relying on overriding clock failure callbacks with your own functions
+        that enable the internal oscillator at a known speed to communicate that to you (because you got a killer deal on crystals that have
+        astonishingly high DOA rate or something?) If clock failure is a normal occurrence, you're doing something wrong...
+
+        Anyway, regarding how we get the same frequency, well... very few Arduino folks care!
+
+
+        #define TIMERD0_CLOCK_SETTING (TCD_CNTPRES_DIV4_gc | TCD_SYNCPRES_DIV8_gc | TCD_CLKSEL_OSCHF_gc)
+        #define TIMERD0_SET_CLOCK     (CLKCTRL_FREQSEL_8M_gc)
+
+        #define TIMERD0_CLOCK_SETTING (TCD_CNTPRES_DIV4_gc | TCD_SYNCPRES_DIV4_gc | TCD_CLKSEL_OSCHF_gc)
+        #define TIMERD0_SET_CLOCK     (CLKCTRL_FREQSEL_4M_gc)
+
+        #define TIMERD0_CLOCK_SETTING (TCD_CNTPRES_DIV4_gc | TCD_SYNCPRES_DIV2_gc | TCD_CLKSEL_OSCHF_gc)
+        #define TIMERD0_SET_CLOCK     (CLKCTRL_FREQSEL_2M_gc)
+
         #define TIMERD0_CLOCK_SETTING (TCD_CNTPRES_DIV4_gc | TCD_SYNCPRES_DIV1_gc | TCD_CLKSEL_OSCHF_gc)
         #define TIMERD0_SET_CLOCK     (CLKCTRL_FREQSEL_1M_gc)
+
+        Hell... we could even set TOP to 2039 and do
+        #define TIMERD0_CLOCK_SETTING (TCD_CNTPRES_DIV4_gc | TCD_SYNCPRES_DIV1_gc | TCD_CLKSEL_OSCHF_gc)
+        #define TIMERD0_SET_CLOCK     (CLKCTRL_FREQSEL_1M_gc)
+        #define TIMERD0_TOP_SETTING   (2039)
+
+
+
         */
         #define TIMERD0_CLOCK_SETTING (TCD_CNTPRES_DIV32_gc | TCD_SYNCPRES_DIV1_gc | TCD_CLKSEL_OSCHF_gc)
         #define TIMERD0_SET_CLOCK     (CLKCTRL_FREQSEL_8M_gc)
@@ -324,21 +332,10 @@
           #endif
         #endif
       #endif // end of F_CPU tests
-    #else //CLOCK setting IS defined!!
+    #else //CLOCK setting IS defined!! That is unusual indeed!
       #if !defined(TIMERD0_TOP_SETTING)
         #define TIMERD0_TOP_SETTING (254)
       #endif
     #endif
-    // Okay, now that we've got the speed of the timer all sorted out, what's next?
-    //
-    // Right, does the PORTMUX work?
-    #if (defined(__AVR_DA__) || defined(__AVR_DB__))
-      #define TCD0_PWM_NO_MUX
-    #elif (defined(__AVR_DD__))
-      #define TCD0_PWM_WITH_MUX
-    #endif
-    // NO_MUX expects the TCD pins to be listed in the timer table as TIMERD0
-    // WITH_MUX expects TIMERD0_nWOx where N is 0-7 and x is A-D
-    // tinyAVR by contrast ONLY ever uses WOC and WOD.
   #endif // End of USE_TIMERD0_PWM
 #endif // end of DxCore TCD stuff - see why we don't support it for millis here?

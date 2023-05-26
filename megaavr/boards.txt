@@ -123,6 +123,7 @@ atxy7.build.mcu=attiny{build.attiny}
 atxy7.build.f_cpu={build.speed}000000L
 atxy7.build.extra_flags=-DARDUINO_attinyxy7 {build.tuned}
 atxy7.build.export_merged_output=false
+atxy7.build.pwmflags=-DUSE_TIMERD0_PWM
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
@@ -140,7 +141,6 @@ atxy7.bootloader.avrdudestring=
 atxy7.bootloader.serialupdistring=-aerase
 atxy7.bootloader.altreset=Alt reset pin not supported on 0/1-series.
 atxy7.bootloader.tool=avrdude
-
 #----------------------------------------#
 # Exported hex/lst/map names will        #
 # indicate selected options. These       #
@@ -150,7 +150,7 @@ atxy7.build.bootload=
 atxy7.build.printfabr=
 atxy7.build.attachabr=
 atxy7.build.wireabr=
-atxy7.build.pwmabr=
+atxy7.build.pwmabr=6A
 #atxy7.build.optabr=.Os
 
 #----------------------------------------#
@@ -512,7 +512,7 @@ atxy7.menu.printf.minimal.build.printfabr=.pfM
 # PWM Pinning options                    #
 #________________________________________#
 atxy7.menu.PWMmux.A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
-atxy7.menu.PWMmux.default=PB0-2, PA3-5 (0/2-series default)
+atxy7.menu.PWMmux.default=PB0-2, PA3-5. No TCD PWM even on 1-series.
 atxy7.menu.PWMmux.A_buffered=PB0-2 (buffered), 1-series: PC0/1
 atxy7.menu.PWMmux.D_buffered=PB0-2 (buffered), 1-series: PA4/5
 atxy7.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
@@ -669,6 +669,7 @@ atxy6.build.mcu=attiny{build.attiny}
 atxy6.build.f_cpu={build.speed}000000L
 atxy6.build.extra_flags=-DARDUINO_attinyxy6 {build.tuned}
 atxy6.build.export_merged_output=false
+atxy6.build.pwmflags=-DUSE_TIMERD0_PWM
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
@@ -1061,7 +1062,7 @@ atxy6.menu.printf.minimal.build.printfabr=.pfM
 # PWM Pinning options                    #
 #________________________________________#
 atxy6.menu.PWMmux.A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
-atxy6.menu.PWMmux.default=PB0-2, PA3-5 (0/2-series default)
+atxy6.menu.PWMmux.default=PB0-2, PA3-5. No TCD PWM even on 1-series.
 atxy6.menu.PWMmux.A_buffered=PB0-2 (buffered), 1-series: PC0/1
 atxy6.menu.PWMmux.D_buffered=PB0-2 (buffered), 1-series: PA4/5
 atxy6.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
@@ -1206,7 +1207,8 @@ atxy4.bootloader.resetpinbits=01
 atxy4.bootloader.avrdudestring=
 atxy4.bootloader.serialupdistring=-aerase
 atxy4.bootloader.tool=avrdude
-
+atxy4o.build.pwmflags=
+atxy4o.build.pwmabr=6
 #----------------------------------------#
 # Exported hex/lst/map names will        #
 # indicate selected options. These       #
@@ -1679,6 +1681,7 @@ atxy2.build.tuned=
 atxy2.build.printf=
 atxy2.build.wire=MORS
 atxy2.build.attachmode=-DCORE_ATTACH_ALL
+atxy2.build.pwmflags=
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
@@ -1705,7 +1708,7 @@ atxy2.build.bootload=
 atxy2.build.printfabr=
 atxy2.build.attachabr=
 atxy2.build.wireabr=
-atxy2.build.pwmabr=
+atxy2.build.pwmabr=4
 #atxy2.build.optabr=.Os
 
 #----------------------------------------#
@@ -2100,8 +2103,6 @@ microchip.build.mcu=attiny{build.attiny}
 microchip.build.f_cpu={build.speed}000000L
 microchip.build.export_merged_output=false
 microchip.build.board=Microchip Placeholder
-microchip.build.pwmflags=
-microchip.default.build.pwmabr=_
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
@@ -2148,6 +2149,7 @@ microchip.menu.board_name.cn3217=Curiosity Nano ATtiny3217
 microchip.menu.board_name.cn3217.build.board=AVR_CuriosityNano3217
 microchip.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchip.menu.board_name.cn3217.build.attiny=3217
+microchip.menu.board_name.cn3217.build.pwmflags=-DUSE_TIMERD0_PWM
 microchip.menu.board_name.cn3217.upload.protocol=curiosity_updi
 microchip.menu.board_name.cn3217.upload.maximum_size=32768
 microchip.menu.board_name.cn3217.upload.maximum_data_size=2048
@@ -2157,6 +2159,7 @@ microchip.menu.board_name.cn1627.build.board=AVR_CuriosityNano1627
 microchip.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7
 microchip.menu.board_name.cn1627.build.millistimer=B1
 microchip.menu.board_name.cn1627.build.attiny=1627
+microchip.menu.board_name.cn1627.build.pwmflags=
 microchip.menu.board_name.cn1627.upload.protocol=curiosity_updi
 microchip.menu.board_name.cn1627.upload.maximum_size=16384
 microchip.menu.board_name.cn1627.upload.maximum_data_size=2048
@@ -2182,6 +2185,7 @@ microchip.menu.board_name.xp3217.build.board=AVR_Xplained_Pro_3217
 microchip.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
 microchip.menu.board_name.xp3217.build.attiny=3217
 microchip.menu.board_name.xp3217.build.millistimer=D0
+microchip.menu.board_name.xp3217.build.pwmflags=-DUSE_TIMERD0_PWM
 microchip.menu.board_name.xp3217.upload.protocol=xplainedpro_updi
 microchip.menu.board_name.xp3217.build.variant=atxy7
 microchip.menu.board_name.xp3217.upload.maximum_size=32768
@@ -2192,6 +2196,7 @@ microchip.menu.board_name.xp817.build.board=AVR_Xplained_Pro_817
 microchip.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5
 microchip.menu.board_name.xp817.build.attiny=817
 microchip.menu.board_name.xp817.build.millistimer=D0
+microchip.menu.board_name.xp817.build.pwmflags=-DUSE_TIMERD0_PWM
 microchip.menu.board_name.xp817.upload.protocol=xplainedpro_updi
 microchip.menu.board_name.xp817.upload.maximum_size=8192
 microchip.menu.board_name.xp817.build.mrelax=
@@ -2202,6 +2207,7 @@ microchip.menu.board_name.xm817.build.board=AVR_XplainedMini817
 microchip.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5
 microchip.menu.board_name.xm817.build.attiny=817
 microchip.menu.board_name.xm817.build.millistimer=D0
+microchip.menu.board_name.xm817.build.pwmflags=-DUSE_TIMERD0_PWM
 microchip.menu.board_name.xm817.upload.protocol=xplainedmini_updi
 microchip.menu.board_name.xm817.upload.maximum_size=8192
 microchip.menu.board_name.xm817.build.mrelax=
@@ -2212,7 +2218,8 @@ microchip.menu.board_name.xn416.build.board=AVR_XplainedNano416
 microchip.menu.board_name.xn416.build.extra_flags=-DARDUINO_attinyxy6 -DLED_BUILTIN=PIN_PB5 -DPIN_BUTTON_BUILTIN=PIN_PB4 -DUART0_SWAP
 microchip.menu.board_name.xn416.build.attiny=416
 microchip.menu.board_name.xn416.build.variant=txy6
-microchip.menu.board_name.xn416.build.millistimer=A0
+microchip.menu.board_name.xn416.build.millistimer=D0
+microchip.menu.board_name.xn416.build.pwmflags=-DUSE_TIMERD0_PWM
 microchip.menu.board_name.xn416.upload.protocol=xplainedmini_updi
 microchip.menu.board_name.xn416.upload.maximum_size=4096
 microchip.menu.board_name.xn416.build.mrelax=
@@ -2517,6 +2524,7 @@ atxy7o.build.mcu=attiny{build.attiny}
 atxy7o.build.f_cpu={build.speed}000000L
 atxy7o.build.extra_flags=-DARDUINO_attinyxy7 -DUSING_OPTIBOOT {build.tuned}
 atxy7o.build.export_merged_output=true
+atxy7o.build.pwmflags=-DUSE_TIMERD0_PWM
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS                 #
@@ -2533,7 +2541,6 @@ atxy7o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/he
 atxy7o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 atxy7o.bootloader.file=optiboot_txyz{bootloader.uartswap}{bootloader.entrycond}.hex
 atxy7o.bootloader.tool=avrdude
-
 #----------------------------------------#
 # Exported hex/lst/map names will        #
 # indicate selected options. These       #
@@ -2542,7 +2549,7 @@ atxy7o.bootloader.tool=avrdude
 atxy7o.build.printfabr=
 atxy7o.build.attachabr=
 atxy7o.build.wireabr=
-atxy7o.build.pwmabr=
+atxy7o.build.pwmabr=6A
 #atxy7o.build.optabr=.Os
 
 #----------------------------------------#
@@ -2592,13 +2599,13 @@ atxy7o.menu.chip.807.upload.maximum_size=7680
 atxy7o.menu.chip.807.build.mrelax=
 atxy7o.menu.chip.807.upload.maximum_data_size=512
 atxy7o.menu.chip.807.bootloader.TCD0CFG_avrdude=
+atxy7o.menu.chip.807.bootloader.TCD0CFG_serialupdi=
 atxy7o.menu.chip.417=ATtiny417
 atxy7o.menu.chip.417.build.board=AVR_ATtiny417
 atxy7o.menu.chip.417.build.attiny=417
 atxy7o.menu.chip.417.upload.maximum_size=3584
 atxy7o.menu.chip.417.build.mrelax=
 atxy7o.menu.chip.417.upload.maximum_data_size=256
-atxy7o.menu.chip.807.bootloader.TCD0CFG_serialupdi=
 
 #----------------------------------------#
 # CLOCK SOURCE                           #
@@ -2886,7 +2893,7 @@ atxy7o.menu.printf.minimal.build.printfabr=.pfM
 # PWM Pinning options                    #
 #________________________________________#
 atxy7o.menu.PWMmux.A_default=PB0-2, PA3-5, 1-series: PC0/1 (default)
-atxy7o.menu.PWMmux.default=PB0-2, PA3-5 (0/2-series default)
+atxy7o.menu.PWMmux.default=PB0-2, PA3-5. No TCD PWM even on 1-series.
 atxy7o.menu.PWMmux.A_buffered=PB0-2 (buffered), 1-series: PC0/1
 atxy7o.menu.PWMmux.D_buffered=PB0-2 (buffered), 1-series: PA4/5
 atxy7o.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
@@ -3006,6 +3013,7 @@ atx27o.build.mcu=attiny{build.attiny}
 atx27o.build.f_cpu={build.speed}000000L
 atx27o.build.extra_flags=-DARDUINO_attinyx27 -DUSING_OPTIBOOT {build.tuned}
 atx27o.build.export_merged_output=true
+atx27o.build.pwmflags=
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS                 #
@@ -3031,7 +3039,7 @@ atx27o.bootloader.tool=avrdude
 atx27o.build.printfabr=
 atx27o.build.attachabr=
 atx27o.build.wireabr=
-atx27o.build.pwmabr=
+atx27o.build.pwmabr=6
 #atx27o.build.optabr=.Os
 
 #----------------------------------------#
@@ -3438,6 +3446,7 @@ atxy6o.build.mcu=attiny{build.attiny}
 atxy6o.build.f_cpu={build.speed}000000L
 atxy6o.build.extra_flags=-DARDUINO_attinyxy6 -DUSING_OPTIBOOT {build.tuned}
 atxy6o.build.export_merged_output=true
+atxy6o.build.pwmflags=-DUSE_TIMERD0_PWM
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS                 #
@@ -3463,7 +3472,7 @@ atxy6o.bootloader.tool=avrdude
 atxy6o.build.printfabr=
 atxy6o.build.attachabr=
 atxy6o.build.wireabr=
-atxy6o.build.pwmabr=
+atxy6o.build.pwmabr=6A
 #atxy6o.build.optabr=.Os
 
 #----------------------------------------#
@@ -3495,6 +3504,7 @@ atxy6o.menu.chip.1606=ATtiny1606
 atxy6o.menu.chip.1606.build.board=AVR_ATtiny1606
 atxy6o.menu.chip.1606.build.attiny=1606
 atxy6o.menu.chip.1606.build.millistimer=A0
+atxy6o.menu.chip.1606.build.pwmflags=
 atxy6o.menu.chip.1606.upload.maximum_size=15872
 atxy6o.menu.chip.1606.upload.maximum_data_size=1024
 atxy6o.menu.chip.1606.bootloader.TCD0CFG_avrdude=
@@ -3511,6 +3521,7 @@ atxy6o.menu.chip.806.build.attiny=806
 atxy6o.menu.chip.806.build.millistimer=A0
 atxy6o.menu.chip.806.upload.maximum_size=7680
 atxy6o.menu.chip.806.build.mrelax=
+atxy6o.menu.chip.806.build.pwmflags=
 atxy6o.menu.chip.806.upload.maximum_data_size=512
 atxy6o.menu.chip.806.bootloader.TCD0CFG_avrdude=
 atxy6o.menu.chip.806.bootloader.TCD0CFG_serialupdi=
@@ -3526,6 +3537,7 @@ atxy6o.menu.chip.406.build.attiny=406
 atxy6o.menu.chip.406.build.millistimer=A0
 atxy6o.menu.chip.406.upload.maximum_size=3584
 atxy6o.menu.chip.406.build.mrelax=
+atxy6o.menu.chip.406.build.pwmflags=
 atxy6o.menu.chip.406.upload.maximum_data_size=256
 atxy6o.menu.chip.406.bootloader.TCD0CFG_avrdude=
 atxy6o.menu.chip.406.bootloader.TCD0CFG_serialupdi=
@@ -3909,6 +3921,7 @@ atx26o.build.mcu=attiny{build.attiny}
 atx26o.build.f_cpu={build.speed}000000L
 atx26o.build.extra_flags=-DARDUINO_attinyx26 -DUSING_OPTIBOOT {build.tuned}
 atx26o.build.export_merged_output=true
+atx26o.build.pwmflags=
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS                 #
@@ -3925,7 +3938,6 @@ atx26o.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloaders/he
 atx26o.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 atx26o.bootloader.file=optiboot_tx2z{bootloader.uartswap}{bootloader.entrycond}.hex
 atx26o.bootloader.tool=avrdude
-
 #----------------------------------------#
 # Exported hex/lst/map names will        #
 # indicate selected options. These       #
@@ -3934,7 +3946,7 @@ atx26o.bootloader.tool=avrdude
 atx26o.build.printfabr=
 atx26o.build.attachabr=
 atx26o.build.wireabr=
-atx26o.build.pwmabr=
+atx26o.build.pwmabr=6
 #atx26o.build.optabr=.Os
 
 #----------------------------------------#
@@ -4332,6 +4344,7 @@ atxy4o.build.mcu=attiny{build.attiny}
 atxy4o.build.f_cpu={build.speed}000000L
 atxy4o.build.extra_flags=-DARDUINO_attinyxy4 -DUSING_OPTIBOOT {build.tuned}
 atxy4o.build.export_merged_output=true
+atxy4o.build.pwmflags=
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS                 #
@@ -4357,7 +4370,7 @@ atxy4o.bootloader.tool=avrdude
 atxy4o.build.printfabr=
 atxy4o.build.attachabr=
 atxy4o.build.wireabr=
-atxy4o.build.pwmabr=
+atxy4o.build.pwmabr=6
 #atxy4o.build.optabr=.Os
 
 #----------------------------------------#
@@ -4781,6 +4794,7 @@ atx24o.build.mcu=attiny{build.attiny}
 atx24o.build.f_cpu={build.speed}000000L
 atx24o.build.extra_flags=-DARDUINO_attinyx24 -DUSING_OPTIBOOT {build.tuned}
 atx24o.build.export_merged_output=true
+atx24o.build.pwmflags=
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS                 #
@@ -4806,7 +4820,7 @@ atx24o.bootloader.tool=avrdude
 atx24o.build.printfabr=
 atx24o.build.attachabr=
 atx24o.build.wireabr=
-atx24o.build.pwmabr=
+atx24o.build.pwmabr=6
 #atx24o.build.optabr=.Os
 
 #----------------------------------------#
@@ -5185,6 +5199,7 @@ atxy2o.build.mcu=attiny{build.attiny}
 atxy2o.build.f_cpu={build.speed}000000L
 atxy2o.build.extra_flags=-DARDUINO_attinyxy2 -DUSING_OPTIBOOT {build.tuned}
 atxy2o.build.export_merged_output=true
+atxy2o.build.pwmflags=
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS                 #
@@ -5210,7 +5225,7 @@ atxy2o.bootloader.tool=avrdude
 atxy2o.build.printfabr=
 atxy2o.build.attachabr=
 atxy2o.build.wireabr=
-atxy2o.build.pwmabr=
+atxy2o.build.pwmabr=4
 #atxy2o.build.optabr=.Os
 
 #----------------------------------------#
@@ -5599,7 +5614,6 @@ microchipo.bootloader.avrdudestring=-Uflash:w:{runtime.platform.path}/bootloader
 microchipo.bootloader.serialupdistring=-f{runtime.platform.path}/bootloaders/hex/{bootloader.file} -a write
 microchipo.bootloader.file={bootloader.basefilename}{bootloader.entrycond}.hex
 microchipo.build.pwmflags=
-microchipo.build.pwmabr=_
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
@@ -5622,7 +5636,7 @@ microchipo.bootloader.tool=avrdude
 microchipo.build.printfabr=
 microchipo.build.wireabr=
 microchipo.build.attachabr=
-microchipo.build.pwmabr=
+microchipo.build.pwmabr=6
 #microchipo.build.optabr=.Os
 
 #----------------------------------------#
@@ -5645,6 +5659,7 @@ microchipo.menu.board_name.cn3217.bootloader.basefilename=optiboot_curiosity3217
 microchipo.menu.board_name.cn3217.build.attiny=3217
 microchipo.menu.board_name.cn3217.build.variant=txy7
 microchipo.menu.board_name.cn3217.build.millistimer=D0
+microchipo.menu.board_name.cn3217.build.pwmflags=-DUSE_TIMERD0_PWM
 microchipo.menu.board_name.cn3217.upload.maximum_size=32256
 microchipo.menu.board_name.cn3217.upload.maximum_data_size=2048
 
@@ -5681,6 +5696,7 @@ microchipo.menu.board_name.xp3217.bootloader.basefilename=optiboot_xplainedpro32
 microchipo.menu.board_name.xp3217.build.attiny=3217
 microchipo.menu.board_name.xp3217.build.variant=txy7
 microchipo.menu.board_name.xp3217.build.millistimer=D0
+microchipo.menu.board_name.xp3217.build.pwmflags=-DUSE_TIMERD0_PWM
 microchipo.menu.board_name.xp3217.upload.maximum_size=32256
 microchipo.menu.board_name.xp3217.upload.maximum_data_size=2048
 
@@ -5691,6 +5707,7 @@ microchipo.menu.board_name.xp817.bootloader.basefilename=optiboot_xplainedpro817
 microchipo.menu.board_name.xp817.build.attiny=817
 microchipo.menu.board_name.xp817.build.variant=txy7
 microchipo.menu.board_name.xp817.build.millistimer=D0
+microchipo.menu.board_name.xp817.build.pwmflags=-DUSE_TIMERD0_PWM
 microchipo.menu.board_name.xp817.upload.maximum_size=7680
 microchipo.menu.board_name.xp817.build.mrelax=
 microchipo.menu.board_name.xp817.upload.maximum_data_size=512
@@ -5702,6 +5719,7 @@ microchipo.menu.board_name.xm817.bootloader.basefilename=optiboot_xplainedmini81
 microchipo.menu.board_name.xm817.build.attiny=817
 microchipo.menu.board_name.xm817.build.variant=txy7
 microchipo.menu.board_name.xm817.build.millistimer=D0
+microchipo.menu.board_name.xm817.build.pwmflags=-DUSE_TIMERD0_PWM
 microchipo.menu.board_name.xm817.upload.maximum_size=7680
 microchipo.menu.board_name.xm817.build.mrelax=
 microchipo.menu.board_name.xm817.upload.maximum_data_size=512
@@ -5713,6 +5731,7 @@ microchipo.menu.board_name.xn416.bootloader.basefilename=optiboot_xplainednano41
 microchipo.menu.board_name.xn416.build.attiny=416
 microchipo.menu.board_name.xn416.build.variant=txy6
 microchipo.menu.board_name.xn416.build.millistimer=D0
+microchipo.menu.board_name.xn416.build.pwmflags=-DUSE_TIMERD0_PWM
 microchipo.menu.board_name.xn416.upload.maximum_size=3584
 microchipo.menu.board_name.xn416.build.mrelax=
 microchipo.menu.board_name.xn416.upload.maximum_data_size=256

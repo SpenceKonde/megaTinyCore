@@ -306,7 +306,7 @@ class tinyNeoPixel {
 
   uint16_t
     numLEDs,       // Number of RGB LEDs in strip
-    numBytes;      // Size of 'pixels' buffer below (3 or 4 bytes/pixel)
+    numBytes,      // Size of 'pixels' buffer below (3 or 4 bytes/pixel)
     latchTime;     // Latch waiting period in us varies from 6 (contrary
                    // to datasheet) for original 2812's, all the way to 250 us.
                    // 50us is what the originals claim. Clones copied that, and some made it even longer.
