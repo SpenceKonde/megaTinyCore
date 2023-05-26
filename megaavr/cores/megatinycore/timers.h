@@ -50,7 +50,7 @@
 #endif
 #if defined(USE_TIMERD0_PWM)
   #if !defined(TCD0)
-    #pragma message("You have selected a PWM layout that uses TCD0, but this part doesn't have one. Those PWM pins will not be available.")
+    #pragma message("Note: This part does not have a TCD, hence there is no PWM from TCD available.")
     #undef USE_TIMERD0_PWM
   #endif
 #endif
@@ -230,7 +230,7 @@
       #endif
       #define TIMERD0_TOP_FIXED
     #else // TOP setting defined, but not a supported value
-      #if defined(USE_TIMERD0_PWM) && USE_TIMERD0_PWM == 1
+      #if defined(USE_TIMERD0_PWM)
         // If they are also asking for PWM from TCD-, that's not a valid configuration.
         #error "Unsupported TIMERD0_TOP_SETTING define, but USE_TIMERD0_PWM is also defined as 1"
       #endif
@@ -273,7 +273,7 @@
               |     2 MHz |          8 |           4 |   509 |
               |     1 MHz |          8 |           4 |   254 |
    */
-  #if USE_TIMERD0_PWM == 1
+  #if defined(USE_TIMERD0_PWM)
     #if !defined(TIMERD0_WGMODE_SETTING)
       #define TIMERD0_WGMODE_SETTING (TCD_WGMODE_ONERAMP_gc)
     #endif
