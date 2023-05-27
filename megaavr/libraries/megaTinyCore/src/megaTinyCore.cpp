@@ -34,7 +34,7 @@ uint16_t readTemp() {
     uint16_t adc_reading = analogRead(ADC_TEMPERATURE); // ADC conversion result with 1.1 V internal reference
     analogReference(VDD);
     ADC0.SAMPCTRL = sampctrl;
-    ADC0.CTRLD = ctrld
+    ADC0.CTRLD = ctrld;
     uint32_t temp = adc_reading - sigrow_offset;
     temp *= sigrow_gain; // Result might overflow 16 bit variable (10bit+8bit)
     temp += 0x80; // Add 1/2 to get correct rounding on division below
