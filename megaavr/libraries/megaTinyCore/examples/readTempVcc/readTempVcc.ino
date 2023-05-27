@@ -129,7 +129,7 @@ uint16_t readTempExplained() {
 
 
 void loop() {
-  int16_t reading = readSupplyVoltageExplain();
+  int16_t reading = readSupplyVoltageExplained();
   Serial.print("System voltage is: ");
   Serial.print(reading);
   Serial.println(" mV");
@@ -139,7 +139,7 @@ void loop() {
   Serial.println(" K");
   Serial.println("See notes in sketch on the accuracy (or rather the lack thereof) of the builtin temperature sensor");
   delay(1000);
-  Serial.println("Repeating above without the explanations")
+  Serial.println("Repeating above without the explanations");
   reading = readSupplyVoltage();
   Serial.print("System voltage is: ");
   Serial.print(reading);
