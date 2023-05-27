@@ -43,12 +43,12 @@ In some cases the voltage determines the maximum ADC clock speed. Call analogRef
 `INTERNAL` is not a supported reference, since there is no obvious reason that any of the four reference options should be used. These reference voltages are presented as they are in the datasheet, but do note that they are what the manufacturer targeted, not what the actual voltage is: The spec is +/- 4% over the temperature range of -40 to 85 C, when Vdd is at least the voltage specified above - though at typical conditions, every time I've checked, it was within 1%; The numbers they give for the voltages are specified to three decimal places (obviously that is convenient because then 1 mV = 1, 2, or 4 LSB), that should by no means be interpreted as a claim that they are *that* accurate. It is likely that the 1.024 V reference is usable below 2.5 V, but no guarantees are given. Reference voltages exceeding the supply voltage will produce meaningless results and should not be used.
 
 
-#### 2-series refs require slightly more headroom. From careful examination of the table above it can be seen that the minimum Vdd for a given reference voltage is slightly larger for the 2-series - You need slightly more headroom; about 0.5v, compared with around 0.4v for the 1-series. This could be a real effect (ie, increased sensitivity of the ADC to adverse operating conditions), or may simply reflect the more conservative approach that appears to have been taken to QA of 2-series parts in general (consider that 2-series parts have a total of 5 errata, with no new ones a year after release, and 4 of those impacted all modern AVRs released at the time. Compare to the 0 and 1-series each 0 and 1-series flash size has it's own grab-bag of a few dozen, most of which are on some but not all tinyAVR parts, nothing else, none of which were fixed on the last die rev for 16k 1-series, and some of which are really nasty.
+#### 2-series refs require slightly more headroom.
+From careful examination of the table above it can be seen that the minimum Vdd for a given reference voltage is slightly larger for the 2-series - You need slightly more headroom; about 0.5v, compared with around 0.4v for the 1-series. This could be a real effect (ie, increased sensitivity of the ADC to adverse operating conditions), or may simply reflect the more conservative approach that appears to have been taken to QA of 2-series parts in general (consider that 2-series parts have a total of 5 errata, with no new ones a year after release, and 4 of those impacted all modern AVRs released at the time. Compare to the 0 and 1-series each 0 and 1-series flash size has it's own grab-bag of a few dozen, most of which are on some but not all tinyAVR parts, nothing else, none of which were fixed on the last die rev for 16k 1-series, and some of which are really nasty.
 
-#### 0/1-series par reference voltages were awful
- Note the change from the heinous near random reference voltages used on the 0/1-series - which you often end up either checking against thresholds calculated at compile time or using floating point math in order to do anything useful with - to maximally convenient ones on everything released later than the 0/1-series. I say they are maximally convenient because with 12-bit resolution selected, 4.096V, 2.048V, and 1.024V references correspond to 1 mV/LSB, 0.5mv/LSB, and 0.25mv/LSB.
-
-4. On 0/1-series, you must be sure to slow down the ADC clock with analogClockSpeed when using the 0.55V reference, as it has a much more restricted operating clock speed range: 100 - 260 kHZ. The other references can be used at 200 - uh, well, 1500 kHz if you want accurate results according to the errata, at least on most aparts.
+#### 0/1-series-specific challenges
+The reference voltages on the 1-series were awful. 0.55, 1.1, 1.5, 2.5, 4.3? None of those are convenient to work with, not compared to the new standard: 1.024, 2.048, and 4.096. So you could use
+* On 0/1-series, you must be sure to slow down the ADC clock with analogClockSpeed when using the 0.55V reference, as it has a much more restricted operating clock speed range: 100 - 260 kHZ. The other references can be used at 200 - uh, well, 1500 kHz if you want accurate results according to the errata, at least on most aparts. Datasheet claim is 2 MHz but only in 8-bit res mode.
 
 5. The External Reference option **on the 16k and 32k 1-series parts** - like most of the other features specific to just those parts - was added is a somewhat slapdash manner. They say, and I quote:
 ```text
@@ -57,15 +57,15 @@ register to the value that is closest, but above the applied reference voltage. 
 4.3V, use ADCnREFSEL[0:2] = 0x3 [4.3V].
 ```
 And they also say that one must NOT have ADCnREFEN bit set when using an external reference, this warning was never present in the megaTinyCore docs until 1.5.12, and nobody complained. This suggests that it one of the following is true:
-  a. Configuring refsel per the datasheet isn't that important after all; alternately, it may just make the reference less accuratem, or otherwise throw off the accuracy enough to keep it from meeting spec, but not by enough that people who triggered it noticed.
+  a. Configuring refsel per the datasheet isn't that important after all; alternately, it may just make the reference less accurate, or otherwise throw off the accuracy enough to keep it from meeting spec, but not by enough that people who triggered it noticed.
   b. Failure to configure refsel per the datasheet causes only poor ADC accuracy, and the few individuals using an external reference either read the relevant paragraph in the datasheet and configured refsel or else thought "Damn the ADC on these parts sucks" but kept that observation to themselves.
   c. Configuring refsel per the datasheet is a *safeguard* against some undesirable outcome that could occur *if ADCnREFEN was also accidentally set* with an external reference enabled.
-  d. Configuring refsel per the datasheet is a safeguard against some undesirable outcome that could occur *whether or not ADCnREFEN is set*, but the undesirable outcome impacts the current internal reference only, and the few people who have encountered this have not realized, because they had the default 0.55V ref selected when they were using the external ref, and if they later used the internal reference, they didn't use the 0.55V one.
+  d. Configuring refsel per the datasheet is a *safeguard* against some undesirable outcome that could occur *whether or not ADCnREFEN is set*, but the undesirable outcome impacts the current internal reference only.
   e. Configuring refsel per the datasheet is a safeguard against some undesirable outcome that would cause visible consequences for the running sketch, regardless of whether ADCnREFEN is set, and this has only gone unnoticed because nobody who didn't read that section of the datasheet either have not tried to use an external voltage reference, or if they have, when whatever consequences occurred, they kept that information to themselves.
-  f. Everyone using extenrnal references has read that part of the datasheet, and thus nobody has encountered this condition. In this case, it could do anything from functioning normally to exploding, to raising the dead, and we wouldn't know.
+  f. Everyone using external references has read that part of the datasheet, and thus nobody has encountered this condition. In this case, it could do anything from functioning normally to exploding, to raising the dead, and we wouldn't know.
   g. Nobody has tried using the external reference, period.
 
-My guess (and it is ONLY A **GUESS**) is that b, c, or possibly d is the case, and that in the case of c and d, the undesired outcome takes the form of damage to the selected analog reference. Which will usually be 0.55V, since why would you change the internal reference if you had an external one connected unless you'd read that paragraph. That reference voltage is rarely used, so even if it was easy to destroy that reference, this could plausibly have gone unnoticed by megaTinyCore users.
+My guess (and it is ONLY A **GUESS**) is that b, c, or possibly d or a is the case, and that in the case of c and d, the undesired outcome takes the form of damage to the selected analog reference. Which will usually be 0.55V, since why would you change the internal reference if you had an external one connected unless you'd read that paragraph. The core starts with Vdd as the reference, but that option is located elsewhere (in the ADC itself we ask for Vdd as reference, but the VREF peripheral still thinks it's pointing at 0.55V). That reference voltage is rarely used, so even if it was easy to destroy that reference, this could plausibly have gone unnoticed by megaTinyCore users.
 
 I think possibility g is unlikely - someone probably tried it at some point. And f is only a theoretical possibility. We all know that most people haven't made a study of the datasheet and some haven't even taken a cursory look, especially for peripherals that normally handled by Arduino API functions.
 
@@ -88,13 +88,20 @@ In addition to reading from pins, you can read from a number of internal sources
 
 
 The Ground internal sources are presumably meant to help correct for offset error. On Classic AVRs they made a point of talking about offset cal for differential channels. They are thus far silent on this, despite a great number of tech briefs related to the new ADC has been coming out, greatly improving the quality of the available information
-DACREF0 is the the reference voltage for the analog comparator, AC0. On the 1-series, this is the same as the `DAC0` voltage (yup, the analog voltage is shared). Analog comparators AC1 and AC2 on 1-series parts with at least 16k of flash also have a DAC1 and DAC2 to generate a reference voltage for them (though it does not have an output buffer). On the 2-series, this is only used as the AC0 reference voltage; it cannot be output to a pin. Unlike the AVR DA-series parts, which have neither `VDDDIV10` nor `INTREF` as an option, hence reading the reference voltage through `DACREF0` was the only way to determine the operating voltage there's less of a clear use case on the tinyAVR 2-series, or the DB, DD, or EA-series parts. To what end are you measuring a voltage which you are in control of? To see how accurate the reference is?
+DACREF0 is the the reference voltage for the analog comparator, AC0. On the 1-series, this is the same as the `DAC0` voltage (yup, the analog voltage is shared). Analog comparators AC1 and AC2 on 1-series parts with at least 16k of flash also have a DAC1 and DAC2 to generate a reference voltage for them (though it does not have an output buffer). On the 2-series, this is only used as the AC0 reference voltage; it cannot be output to a pin.
+
+
+Unlike the AVR DA-series parts, which have neither `VDDDIV10` nor `INTREF` as an option - that meant if you wanted to know or the DB, DD, or EA-series parts. To what end are you measuring a voltage which you are in control of? To see how accurate the reference is?
 At least there's a plausible use of the DAC input: recognizing that the voltage is off. On all parts there's the possibility of a load on it that's too big dragging it downwards. The DA and DB parts also have a lifetime drift issue (per errata) when the DAC is used without the output buffer.
 
 `*` Note that the I/O headers omit several options listed in the datasheet; For Dx-series, DACREF options aren't listed in the I/O headers for MUXPOS or Ground, but we still provide the constants listed above, consistent with the datasheet.
 `?` The DD-series lists a "BGTEMPSENSE" option in preliminary material, but it was removed by launch. It is unclear if this was ever implemented or if it exists in the silicon.
 
-### Measuring VDD on 0/1-series
+### Measuring VDD and Temperature
+See [the example we give for very talkative implementation](../libraries/megaTinycore/examples/ReadTempVcc/ReadTempVcc.ino) and the [megaTinyCore.h library](../libraries/megaTinycore/README.md) which provides ready-to-use function calls for these measurements.
+
+
+#### Measuring VDD on 0/1-series
 So the only way to measure Vdd as you can see from the tables above is to measure the internal reference, with the reference set to VDD.
 
 But you probably want to use either the 1V1, 1V5, or 2V5 reference, not the default 0.55V one... But if you choose one of those, it switches the reference to internal! Don't worry - there's a very simple solution:
@@ -104,20 +111,7 @@ analogReference(VDD); // Set the ADC reference to VDD. Voltage selected previous
 analogRead(ADC_INT_REF); // proceed to measure the analog reference.
 ```
 
-On the 2-series, of course, there's no need for such silliness:
-```c++
-analogReference(INTERNAL1V024);
-analogRead(ADC_VDDDIV10); // Nothing weird on the 2-series.
-// 1V024 gives 1 mV per LSB. We're measuring VDD divided by 10, so VDD = 10mV * result.
-// If we switched to 12-bit resolution first, it would be 2.5 mV per LSB.
-// say we went further and did this:
-uint32_t raw = analogReadEnh(ADC_VDDDIV10,13); // automatically accumulate 4 samples and decimate to get 13 bits
-// that gives us 1.25 mV/LSB, or the raw reading is 0.8 times the voltage in mV.
-// This can be efficiently converted like so:
-uint16_t vdd = raw;
-vdd += vdd >> 2;  //equivalent to vdd = vdd + vdd/4, but faster and smaller than division, and much faster than using floating point values.
-// vdd now holds the voltage of VDD expressed in millivolts
-```
+On the 2-series, of course, there's no need for such silliness - you can just read ADC_VDDDIV10 with a convenient internal reference.
 
 
 ### Analog Resolution

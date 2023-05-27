@@ -18,10 +18,81 @@ const uint8_t bit_mask_to_position[] = {255,   0,   1, 255,   2, 255, 255, 255, 
 const uint8_t bit_mask_to_position_n[] = {255,  0,  1, 255,   2, 255, 255, 255,   3, 255, 255, 255, 255, 255, 255, 255}; //
 
 
-/* Now we get into the ugly clock stuff */
 
-// Display current tuning state in human readable form.
 // *INDENT-OFF*  display this code in human readable form instead of what astyle wants.
+uint16_t readTemp() {
+  #if MEGATINYCORE_SERIES!=2 /* 0 and 1-series both have the same ADC. */
+    // based on the datasheet, in section 30.3.2.5 Temperature Measurement, with added code to restore ADC config.
+    int8_t sigrow_offset = SIGROW.TEMPSENSE1; // Read signed value from signature row
+    uint8_t sigrow_gain = SIGROW.TEMPSENSE0; // Read unsigned value from signature row
+    analogReference(INTERNAL1V1);
+    uint8_t sampctrl = ADC0.SAMPCTRL;
+    uint8_t ctrld = ADC0.CTRLD;
+    ADC0.SAMPCTRL = 0x1F; // maximum length sampling
+    ADC0.CTRLD &= ~(ADC_INITDLY_gm);
+    ADC0.CTRLD |= ADC_INITDLY_DLY32_gc; // wait 32 ADC clocks before reading new reference
+    uint16_t adc_reading = analogRead(ADC_TEMPERATURE); // ADC conversion result with 1.1 V internal reference
+    analogReference(VDD);
+    ADC0.SAMPCTRL = sampctrl;
+    ADC0.CTRLD = ctrld
+    uint32_t temp = adc_reading - sigrow_offset;
+    temp *= sigrow_gain; // Result might overflow 16 bit variable (10bit+8bit)
+    temp += 0x80; // Add 1/2 to get correct rounding on division below
+    temp >>= 8; // Divide result to get Kelvin
+  return temp;
+  #else /* 2-series has a very different ADC */
+    int8_t  sigrowOffset  = SIGROW.TEMPSENSE1;
+    uint8_t sigrowGain    = SIGROW.TEMPSENSE0;
+    uint8_t analogref     = getAnalogReference();
+    uint8_t sampctrl      = ADC0.CTRLE;
+    analogSampleDuration(128); // must be >= 32µs * f_CLK_ADC per datasheet 30.3.3.7
+    analogReference(INTERNAL1V024);
+    uint32_t reading      = analogRead(ADC_TEMPERATURE);
+    analogReference(analogref);
+    ADC0.CTRLE            = sampctrl; //restore previous configuration.
+    reading              -= sigrowOffset;
+    reading              *= sigrowGain;
+    reading              += 0x80; // Add 1/2 to get correct rounding on division below
+    reading             >>= 8; // Divide result to get Kelvin
+    return reading;
+  #endif
+}
+
+uint16_t readSupplyVoltage() { // returns value in millivolts to avoid floating point
+  #if MEGATINYCORE_SERIES!=2
+    analogReference(VDD);
+    VREF.CTRLA = VREF_ADC0REFSEL_1V5_gc;
+    // there is a settling time between when reference is turned on, and when it becomes valid.
+    // since the reference is normally turned on only when it is requested, this virtually guarantees
+    // that the first reading will be garbage; subsequent readings taken immediately after will be fine.
+    // VREF.CTRLB|=VREF_ADC0REFEN_bm;
+    // delay(10);
+    uint16_t reading = analogRead(ADC_INTREF); // Crumple the reading up into a ball and toss in the general direction of the trash.
+    reading = analogRead(ADC_INTREF);          // Now we take the *real* reading.
+    uint32_t intermediate = 1023UL * 1500;     // This would overflow a 16-bit variable.
+    reading = intermediate / reading;          // Long division sucks! This single line takes about 600 clocks to execute!
+    return reading;
+  #else
+    int16_t returnval = 0;
+    analogReference(INTERNAL1V024);
+    analogReadEnh(ADC_VDDDIV10, 12); // take a reading, crumple, toss, take another reading and use that. Unlike the 0/1/classic parts, it is possible to get
+    int32_t vddmeasure = analogReadEnh(ADC_VDDDIV10, 12); // Take it at 12 bits
+    //vddmeasure *= 10; // since we measured 1/10th VDD, then divide by 4 to get into millivolts NO! Don't do that! This way takes 81 clocks for the multiply,
+    // then 8 more to shift it.
+    if (vddmeasure & 0x01) {
+      // if last digit was 1 we should round up
+      returnval++; // Let's do that here, that way the vddmeasure variable will be dead after the line after the end of this block.
+    }
+    returnval += (vddmeasure << 1) + (vddmeasure >> 1); // The net effect of *=10 followed by >> 2 is multiplication by 2.5.
+    // vddmeasure << 1 is 2*vddmeasure, and vddmeasure >> 1 is 0.5*vddmeasure, sum them to get 2.5 vddmeasure.
+    // This only takes 8 clocks to shift it, 8 for two addition operations, and probably 2 or 4 more spent `movw`ing registers around. This isn't time critical,
+    // but it's ~20 clocks vs 90 clocks via the naive method, and compared to over 600 on the 0/1-series. Division is the operator of the beast.
+    return returnval;
+  #endif
+}
+
+/* Now we get into the ugly clock stuff */
+// Display current tuning state in human readable form.
 int16_t getTunedOSCCAL(uint8_t osc, uint8_t target) {
   if (__builtin_constant_p(osc)) {
     if (osc != 20 && osc !=16) {

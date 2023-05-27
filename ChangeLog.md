@@ -18,9 +18,12 @@ These items are in addition to what was listed under changes already in release.
 * If there are *other substantial changes that need to occur* within the core, I am unaware of the complaints and hence have no plans to address them before the heat death of the universe. If you desire changes on a more rapid timeline, please create an issue so that I am aware of the presence of said problem, deficiency, or imperfection. Those form the action item list for core development activity, so if something is not listed there, **it is unlikely to be implemented/fixed/etc** simply due to my being unaware of any concern.
 
 ## Unreleased changes
+
+### Planned 2.6.8
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes
 * Fix issues introduced by pwm option menu. This prevented compilation on 1-series or Microchip boards.
 * Add turnOnClockout() and turnOffClockout() to megaTinyCore.h
+* Fix documentation and example issues relating to megaTinyCore.h
 * Fix issues with generating universally valid WS2812 signals with tinyNeoPixel when running at 20 MHz-30 MHz
 * Add UpdateLatch() method to tinyNeoPixel to adjust the latch timeout, because times as high as 250 us and as low as 6us have been encountered in the wild, and 50 us, the default, may or may not manifest in any real parts. If we're gonna have that check there, it should be meaningful, but to make it meaningful, we have to make it tunable. (even though it rarely, in practice, causes problems, because it usually takes longer than 250 us to generate a frame of pixels, and even when it doesn't we usually want a consistent frame rate and so slow it down a bit from sending the updates as fast as it possibly can)
 

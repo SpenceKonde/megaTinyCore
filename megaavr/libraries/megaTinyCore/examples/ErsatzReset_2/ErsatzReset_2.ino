@@ -1,4 +1,4 @@
-// Ersatz Reset Pin Demo 2, which is the same exceot that it resets using the functions provided by megaTinyCore.h, demonstrating both of them
+// Ersatz Reset Pin Demo 2, which is the same except that it resets using the functions provided by megaTinyCore.h.
 
 #include <megaTinyCore.h>
 
@@ -24,9 +24,14 @@ void setup() {
   while ((!(VPORTA.IN & RESET_MASK)) && millis() < 10); // wait up to 10 milliseconds for pin to go high...
   // MUCH longer than we need to wait...
   if (!(VPORTA.IN & RESET_MASK)) { // if still not high, reset...
-    resetWithWDT(); // here, reset pin is still held low at startup. If we are using optiboot we already ran the bootloader. Say we don't want to keep doing that. A reset via WDT will never run optiboot
+    ResetViaWDT(); // here, reset pin is still held low at startup. If we are using optiboot we already ran the bootloader.
+    // Say we don't want to keep doing that. A reset via WDT will never run optiboot
   } else {
+    // This works, but **only** because I had already set the same pin to enable the pullup and waited for it to go high (10 millis is ridiculously long.
+    // On an unloaded pin, it's under a microsecond)
+    // Otherwise, we would need to turn on the pullup, wait until the pin read high, and then write to set the pin to interrupt on low level.
     PINCTRL = PORT_PULLUPEN_bm | PORT_ISC_LEVEL_gc;
+    // This happens much more visibly on fully async pins than partially async pins.
   }
 }
 
@@ -41,6 +46,6 @@ ISR(PORTA_PORT_vect) {
   byte flags = PORTA.INTFLAGS;
   PORTA.INTFLAGS = flags; // clear flags
   if (flags & RESET_MASK) {
-    softwareReset()
+    ResetViaSoftware()
   }
 }

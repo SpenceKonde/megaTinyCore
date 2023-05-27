@@ -21,6 +21,10 @@
  * So as regards temp sensing on the 2-series, YMMV
  */
 
+// #include <megaTinyCore.h>
+//
+// Note - this uses very talkative "explained" versions of these functions. megaTinyCore.h has versions that don't
+// blab to whatever happens to be connected to the serial port
 
 #define RESULTCOUNT 4
 int16_t results[RESULTCOUNT];
@@ -36,7 +40,7 @@ void setup() {
   #endif
 }
 
-uint16_t readSupplyVoltage() { // returns value in millivolts to avoid floating point
+uint16_t readSupplyVoltageExplained() { // returns value in millivolts to avoid floating point
   #if MEGATINYCORE_SERIES!=2
   analogReference(VDD);
   VREF.CTRLA = VREF_ADC0REFSEL_1V5_gc;
@@ -80,7 +84,7 @@ void printRegisters() {
   #endif
 }
 
-uint16_t readTemp() {
+uint16_t readTempExplained() {
   #if MEGATINYCORE_SERIES!=2
   // based on the datasheet, in section 30.3.2.5 Temperature Measurement
   int8_t sigrow_offset = SIGROW.TEMPSENSE1; // Read signed value from signature row
