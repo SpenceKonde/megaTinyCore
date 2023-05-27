@@ -57,7 +57,7 @@ void setup() {
   Serial.println("SIGROW: ");
   mptr = SIGNATURES_START;
   Serial.printHex(*mptr++);
-    for (byte i = 0; i < (SIGNATURES_SIZE + PROD_SIGNATURES_SIZE - 1); i++) {
+  for (byte i = 0; i < (SIGNATURES_SIZE + PROD_SIGNATURES_SIZE - 1); i++) {
     Serial.print(':');
     Serial.printHex(*mptr++);
   }

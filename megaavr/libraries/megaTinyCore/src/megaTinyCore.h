@@ -47,14 +47,16 @@ inline uint8_t bitMaskToPosition(uint8_t bitmask) {
   uint8_t ret = 0;
   if (bitmask > 0x0F) {
     _SWAP(bitmask)
-    if (bitmask > 0x0F) return 255;
+    if (bitmask > 0x0F) {
+      return 255;
+    }
     ret += 4;
   }
-  uint8_t halfbp=bit_mask_to_position_n[bitmask & 0x0F];
+  uint8_t halfbp = bit_mask_to_position_n[bitmask & 0x0F];
   if (halfbp == 255) {
     return 255;
   }
-  return ret+halfbp;
+  return ret + halfbp;
 }
 inline uint8_t bitMaskToHalfPosition(uint8_t bitmask, bool highnybble) {
   if (highnybble) {

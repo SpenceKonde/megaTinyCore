@@ -2015,15 +2015,18 @@ atxy2.menu.printf.minimal.build.printfabr=.pfM
 #----------------------------------------#
 # PWM Pinning options                    #
 #________________________________________#
+# The name I3 is used simply to expand what I can test in CI
+# because I don't know how to do (IOClass > 2) ? "I3" : "default" in github yaml.
+#________________________________________|
 atxy2.menu.PWMmux.default=PA1-3,7 (default)
 atxy2.menu.PWMmux.buffered=PA1-3 (buffered)
-atxy2.menu.PWMmux.D_buffered=PA1-3, PA6/7 (buffered, 1-series only, flash hog)
+atxy2.menu.PWMmux.I3=PA1-3, PA6/7 (buffered, 1-series only, flash hog)
 atxy2.menu.PWMmux.default.build.pwmflags=-DTCA_PORTMUX=0x01
 atxy2.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
-atxy2.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
+atxy2.menu.PWMmux.I3.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
 atxy2.menu.PWMmux.default.build.pwmabr=4
 atxy2.menu.PWMmux.buffered.build.pwmabr=3
-atxy2.menu.PWMmux.D_buffered.build.pwmabr=3D
+atxy2.menu.PWMmux.I3.build.pwmabr=3D
 
 #----------------------------------------#
 # attachInterrupt Mode                   #

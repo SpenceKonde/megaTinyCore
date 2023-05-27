@@ -37,8 +37,8 @@ jobs:
         - megaavr/libraries/SoftwareSerial/examples/TwoPortReceive
         - megaavr/libraries/Wire/examples/SFRRanger_reader
         - megaavr/libraries/tinyNeoPixel/examples/RGBWstrandtest
-        - megaavr/libraries/megaTinyCore/examples/SelfTune
-        - megaavr/libraries/megaTinyCore/examples/MegaTinyTuner
+        - megaavr/libraries/megaTinyCore/examples/SelfTuning
+        - megaavr/libraries/megaTinyCore/examples/megaTinyTuner
         - megaavr/extras/CompileTestSketches/test_analog_read
         - megaavr/libraries/Wire/examples/slave_address_mask
         - megaavr/libraries/Wire/examples/master_multi_address_write
@@ -58,6 +58,8 @@ jobs:
         - megaavr/libraries/Wire/examples/slave_secondary_address
         - megaavr/libraries/megaTinyCore/examples/ModernRevSer
         - megaavr/libraries/megaTinyCore/examples/readTempVcc
+        - megaavr/libraries/megaTinyCore/examples/ErsatzReset
+        - megaavr/libraries/megaTinyCore/examples/ErsatzReset_2
         - megaavr/libraries/tinyNeoPixel/examples/buttoncycler
         - megaavr/libraries/tinyNeoPixel/examples/simple
         - megaavr/libraries/tinyNeoPixel/examples/strandtest

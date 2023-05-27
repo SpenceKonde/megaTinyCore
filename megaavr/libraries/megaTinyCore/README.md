@@ -82,7 +82,7 @@ Manual implementation of Ersatz Reset for tinyAVR 0/1-series and 14-pin 2-series
 Uses the included implementation of Ersatz Reset demonstrating both ways we can reset the chip from software.
 
 ### megaTinyTuner
-This is the sketch run on the device being tuned when you are tuning the part with a 1kHz reference clock. See the comments in the sketch itself for more info. Tuning rarely helps you get the clock speed more accurate, unless you are running far from room temperature (and tune at that temperature) - but it does let you get crazy speeds out of these parts. (see [the tuning reference](../../extras/REF_Tuning.md))
+This is the sketch run on the device being tuned when you are tuning the part with a 1kHz reference clock. See the comments in the sketch itself for more info. Tuning rarely helps you get the clock speed more accurate, unless you are running far from room temperature (and tune at that temperature) - but it does let you get crazy speeds out of these parts. (see [the tuning reference](../../extras/Ref_Tuning.md))
 
 ### ModernRevSer
 Prints out the die rev, serial number, and now the entire sigrow, for any modern AVR.
@@ -99,7 +99,7 @@ This sketch relies on a series of dubious assumptions, but it does do a pretty g
 5. We can now again time the PIT event output with TCB.
 6. With this information in hand, we are back at step 3, only the 32kHz ULP frequency is known, and the CPU frequency is not, and solving for the cpu frequency is trivial.
 
-But what can be achieved by making at least 3 dubious but close to true assumptions is miraculous; this sketch simply measures the ULP frequency, and then uses that to measure the clock speed at every value the tuning register can take, writing the closest values to USERROW (see [the tuning reference](../../extras/REF_Tuning.md)). Between timing runs, we enable the system clock prescaler to slow ourselves down so that if we find that we're starting to see instabilities, we have a greater chance of recognizing that, and informing the user. This, to my astonishment, does a good enough job of tuning that UART works, at a minimum.
+But what can be achieved by making at least 3 dubious but close to true assumptions is miraculous; this sketch simply measures the ULP frequency, and then uses that to measure the clock speed at every value the tuning register can take, writing the closest values to USERROW (see [the tuning reference](../../extras/Ref_Tuning.md)). Between timing runs, we enable the system clock prescaler to slow ourselves down so that if we find that we're starting to see instabilities, we have a greater chance of recognizing that, and informing the user. This, to my astonishment, does a good enough job of tuning that UART works, at a minimum.
 
 ### TCA0Demo, TCA0Demo2, TCA0Demo3, TCA0Demo4
 A series of demonstrations on advanced use of the type A timer. See [Taking over TCA0](../../extras/TakingOverTCA0.md). Much more explanation is found in that document.
