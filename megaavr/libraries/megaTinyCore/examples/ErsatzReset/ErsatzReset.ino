@@ -3,12 +3,12 @@
 
 #ifdef __AVR_ATtinyxy2__
   #define ERSATZ_RESET_PIN PIN_PA3
-  #define RESET_MASK 1<<3
+  #define RESET_MASK (1 << 3)
   #define PINCTRL PORTA.PIN3CTRL
 #else
   #define ERSATZ_RESET_PIN PIN_PA4
   // Always arduino pin 0
-  #define RESET_MASK 1<<4
+  #define RESET_MASK (1 << 4)
   #define PINCTRL PORTA.PIN4CTRL
 #endif
 
@@ -37,7 +37,7 @@ void loop() {
 }
 
 ISR(PORTA_PORT_vect) {
-  byte flags = PORTA.INTFLAGS;
+  uint8_t flags = PORTA.INTFLAGS;
   PORTA.INTFLAGS = flags; // clear flags
   if (flags & RESET_MASK) {
     _PROTECTED_WRITE(RSTCTRL.SWRR, 1);
