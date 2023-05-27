@@ -71,22 +71,24 @@ uint16_t readSupplyVoltage() { // returns value in millivolts to avoid floating 
     reading = analogRead(ADC_INTREF);          // Now we take the *real* reading.
     uint32_t intermediate = 1023UL * 1500;     // This would overflow a 16-bit variable.
     reading = intermediate / reading;          // Long division sucks! This single line takes about 600 clocks to execute!
+    // And **this** is why the reference voltages on the 0/1-series parts suck! The comparable math on the 2-series takes maybe
+    // 40 clocks, at most!
     return reading;
   #else
     int16_t returnval = 0;
     analogReference(INTERNAL1V024);
     analogReadEnh(ADC_VDDDIV10, 12); // take a reading, crumple, toss, take another reading and use that. Unlike the 0/1/classic parts, it is possible to get
     int32_t vddmeasure = analogReadEnh(ADC_VDDDIV10, 12); // Take it at 12 bits
+    uint16_t intermediate = (uint16_t) vddmeasure;
     //vddmeasure *= 10; // since we measured 1/10th VDD, then divide by 4 to get into millivolts NO! Don't do that! This way takes 81 clocks for the multiply,
     // then 8 more to shift it.
-    if (vddmeasure & 0x01) {
+    if (intermediate & 0x01) {
       // if last digit was 1 we should round up
       returnval++; // Let's do that here, that way the vddmeasure variable will be dead after the line after the end of this block.
     }
-    returnval += (vddmeasure << 1) + (vddmeasure >> 1); // The net effect of *=10 followed by >> 2 is multiplication by 2.5.
-    // vddmeasure << 1 is 2*vddmeasure, and vddmeasure >> 1 is 0.5*vddmeasure, sum them to get 2.5 vddmeasure.
-    // This only takes 8 clocks to shift it, 8 for two addition operations, and probably 2 or 4 more spent `movw`ing registers around. This isn't time critical,
-    // but it's ~20 clocks vs 90 clocks via the naive method, and compared to over 600 on the 0/1-series. Division is the operator of the beast.
+    returnval += (intermediate << 1) + (intermediate >> 1); // The net effect of *=10 followed by >> 2 is multiplication by 2.5.
+    // And why in the bloody hell were we doing the math in a 32 bit types anyway? I know this isn't time critical but that's no
+    // excuse for being a damned moron about how we go about this.
     return returnval;
   #endif
 }

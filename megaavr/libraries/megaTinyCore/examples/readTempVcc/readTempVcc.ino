@@ -21,10 +21,11 @@
  * So as regards temp sensing on the 2-series, YMMV
  */
 
-// #include <megaTinyCore.h>
-//
-// Note - this uses very talkative "explained" versions of these functions. megaTinyCore.h has versions that don't
-// blab to whatever happens to be connected to the serial port
+#include <megaTinyCore.h>
+/* This demonstrates both how the routines to measure temperature are implemented, with explanitary serial prints
+ * and then calls the library functions provided that do the same thing (just faster and with less flash usage,
+ * particularly on 2-series parts, where a shortcut was found in the mathematics
+ */
 
 #define RESULTCOUNT 4
 int16_t results[RESULTCOUNT];
@@ -65,6 +66,11 @@ uint16_t readSupplyVoltageExplained() { // returns value in millivolts to avoid 
   Serial.println(vddmeasure);
   vddmeasure *= 10; // since we measured 1/10th VDD
   int16_t returnval = vddmeasure >> 2; // divide by 4 to get into millivolts.
+  /* The above method of doing the math is bad, because multiplication of a 32-bit value takes
+   * 81 clocks. The smart way to multiply by 10 and then divide by four is to instead take the sum
+   * of the original value leftshifted one place, and the original value rightshifted one place.
+   * And here most of this can be donewith a 16-bit variable not a 32 bit one
+   */
   if (vddmeasure & 0x02) {
     // if last two digits were 0b11 or 0b10 we should round up
     returnval++;
@@ -123,7 +129,18 @@ uint16_t readTempExplained() {
 
 
 void loop() {
-  int16_t reading = readSupplyVoltage();
+  int16_t reading = readSupplyVoltageExplain();
+  Serial.print("System voltage is: ");
+  Serial.print(reading);
+  Serial.println(" mV");
+  reading = readTempExplained();
+  Serial.print("System temperature is: ");
+  Serial.print(reading);
+  Serial.println(" K");
+  Serial.println("See notes in sketch on the accuracy (or rather the lack thereof) of the builtin temperature sensor");
+  delay(1000);
+  Serial.println("Repeating above without the explanations")
+  reading = readSupplyVoltage();
   Serial.print("System voltage is: ");
   Serial.print(reading);
   Serial.println(" mV");
@@ -131,6 +148,4 @@ void loop() {
   Serial.print("System temperature is: ");
   Serial.print(reading);
   Serial.println(" K");
-  Serial.println("See notes in sketch on the accuracy (or rather the lack thereof) of the builtin temperature sensor");
-  delay(1000);
 }
