@@ -46,7 +46,7 @@ inline uint8_t bitMaskToPosition(uint8_t bitmask) {
   }
   uint8_t ret = 0;
   if (bitmask > 0x0F) {
-    _SWAP(bitmask)
+    _SWAP(bitmask);
     if (bitmask > 0x0F) {
       return 255;
     }
