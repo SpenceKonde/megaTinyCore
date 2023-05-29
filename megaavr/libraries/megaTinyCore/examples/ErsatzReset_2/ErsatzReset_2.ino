@@ -21,8 +21,15 @@
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(ERSATZ_RESET_PIN, INPUT_PULLUP); // on 8-pin parts, this overrides the previous line! No LED blink on these; not enough pins to demo everything here...
+  #if !defined(MILLIS_USE_TIMERNONE) // if we have millis, use that
   while ((!(VPORTA.IN & RESET_MASK)) && millis() < 10); // wait up to 10 milliseconds for pin to go high...
-  // MUCH longer than we need to wait...
+  #else // if millis is disabled, something like this achieves much the same thing, since delay() still does work with millis disabled.
+  uint8_t ms = 10;
+  while ((!(VPORTA.IN & RESET_MASK)) && ms) {
+    delay(1);
+    ms++;
+  }
+  #endif
   if (!(VPORTA.IN & RESET_MASK)) { // if still not high, reset...
     ResetViaWDT(); // here, reset pin is still held low at startup. If we are using optiboot we already ran the bootloader.
     // Say we don't want to keep doing that. A reset via WDT will never run optiboot

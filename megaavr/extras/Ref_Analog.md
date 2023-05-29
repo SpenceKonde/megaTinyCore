@@ -24,6 +24,31 @@ In some cases the voltage determines the maximum ADC clock speed. Call analogRef
 * You are using the half volt reference on the 0/1-series, or switching from that to another reference
 * You are on a Dx-series with an external reference of less than 1.8V
 
+
+ | tinyAVR (0/1)                           | Voltage | Minimum Vdd | Number | Notes |
+ |-----------------------------------------|---------|-------------|--------|
+ | `VDD` (default)                         | Vcc/Vdd |             |      5 |
+ | `INTERNAL0V55`                          | 1.024 V |      2.5* V |      0 |
+ | `INTERNAL1v1`                           | 2.048 V |      2.5  V |      1 |
+ | `INTERNAL2V5`                           | 4.096 V |      4.55 V |      2 |
+ | `INTERNAL4V3`                           | 2.500 V |      2.7  V |      3 |
+ | `INTERNAL1V5` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      2 |
+ | `EXTERNAL`                              | >=1.0 V |         Vdd |      6 | Dx: CLK_ADC =< 500 kHz
+ | `EXTERNAL`                              | >=1.8 V |         Vdd |      6 | Dx: No CLK_ADC restriction
+
+
+
+ | tinyAVR (0/1)                           | Voltage | Minimum Vdd | Number | Notes |
+ |-----------------------------------------|---------|-------------|--------|
+ | `VDD` (default)                         | Vcc/Vdd |             |      5 |
+ | `INTERNAL0V55`                          | 1.024 V |      2.5* V |      0 |
+ | `INTERNAL1v1`                           | 2.048 V |      2.5  V |      1 |
+ | `INTERNAL2V5`                           | 4.096 V |      4.55 V |      2 |
+ | `INTERNAL4V3`                           | 2.500 V |      2.7  V |      3 |
+ | `INTERNAL1V5` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      2 |
+ | `EXTERNAL`                              | >=1.0 V |         Vdd |      6 | Dx: CLK_ADC =< 500 kHz
+ | `EXTERNAL`                              | >=1.8 V |         Vdd |      6 | Dx: No CLK_ADC restriction
+
  | AVR Dx/Ex-series (all)                  | Voltage | Minimum Vdd | Number | Notes |
  |-----------------------------------------|---------|-------------|--------|
  | `VDD` (default)                         | Vcc/Vdd |             |      5 |

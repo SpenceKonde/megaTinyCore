@@ -310,7 +310,9 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     }
     // Uh? Is that it? That was, ah, a tiny bit simpler.
   }
-
+  uint8_t getAnalogReference() {
+    return ADC0.CTRLC & ADC_REFSEL_gm;
+  }
   int16_t analogRead(uint8_t pin) {
     check_valid_analog_pin(pin);
     if (pin < 0x80) {
@@ -605,6 +607,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
         badArg("Maximum SAMPLEN = 31 on these parts (33 ADC clocks)");
     }
   }
+
   bool analogSampleDuration(uint8_t dur) {
     check_valid_duration(dur);
     if (dur > 0x1F) {
@@ -615,66 +618,75 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       return true;
     }
   }
+
   void ADCPowerOptions(uint8_t options) {
-  if (__builtin_constant_p(options)) {
-    if (options & 0x0F) {
-      badArg("Only runstandby and enable/disable are supported - the hardware doesn't have LOWLAT nor the PGA");
-    }
-  }    // 0b SEE xxxx
-  // SS = run standby
-  // 00 = no change to run standby
-  // 01 = no change to run standby
-  // 10 = turn off run standby
-  // 11 = turn on run standby
-  // EE = ENABLE
-  // 00 = Do not enable or disable ADC.
-  // 01 = Do not enable or disable ADC.
-  // 10 = Disable the ADC.
-  // 11 = Enable the ADC.
+    if (__builtin_constant_p(options)) {
+      if (options & 0x0F) {
+        badArg("Only runstandby and enable/disable are supported - the hardware doesn't have LOWLAT nor the PGA");
+      }
+    }    // 0b SEE xxxx
+    // SS = run standby
+    // 00 = no change to run standby
+    // 01 = no change to run standby
+    // 10 = turn off run standby
+    // 11 = turn on run standby
+    // EE = ENABLE
+    // 00 = Do not enable or disable ADC.
+    // 01 = Do not enable or disable ADC.
+    // 10 = Disable the ADC.
+    // 11 = Enable the ADC.
 
-  uint8_t temp = ADC0.CTRLA; //performance.
-  if (options & 0x20) {
-    if (options & 0x10) {
-      temp |= 1; // ADC on
-    } else {
-      temp &= 0xFE; // ADC off
+    uint8_t temp = ADC0.CTRLA; //performance.
+    if (options & 0x20) {
+      if (options & 0x10) {
+        temp |= 1; // ADC on
+      } else {
+        temp &= 0xFE; // ADC off
+      }
+    }
+    if (options & 0x80) {
+      if (options & 0x40) {
+        temp |= 0x80; // run standby
+      } else {
+        temp &= 0x7F; // no run standby
+      }
+    }
+    ADC0.CTRLA = temp; //now we apply enable and standby,
+  }
+  void analogReference(uint8_t mode) {
+    check_valid_analog_ref(mode);
+    switch (mode) {
+      #if defined(EXTERNAL)
+        case EXTERNAL:
+      #endif
+      case VDD:
+        VREF.CTRLB &= ~VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
+        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
+        // VREF.CTRLA does not need to be reconfigured, as the voltage references only supply their specified voltage when requested to do so by the ADC.
+        break;
+      case INTERNAL0V55:
+        VREF.CTRLA =  VREF.CTRLA & ~(VREF_ADC0REFSEL_gm); // These bits are all 0 for 0.55v reference, so no need to do the mode << VREF_ADC0REFSEL_gp here;
+        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; // per datasheet, recommended SAMPCAP=0 at ref < 1v
+        VREF.CTRLB |= VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
+        break;
+      case INTERNAL1V1:
+      case INTERNAL2V5:
+      case INTERNAL4V34:
+      case INTERNAL1V5:
+        VREF.CTRLA = (VREF.CTRLA & ~(VREF_ADC0REFSEL_gm)) | (mode << VREF_ADC0REFSEL_gp);
+        ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v
+        break;
     }
   }
-  if (options & 0x80) {
-    if (options & 0x40) {
-      temp |= 0x80; // run standby
-    } else {
-      temp &= 0x7F; // no run standby
-    }
-  }
-  ADC0.CTRLA = temp; //now we apply enable and standby,
-}
-void analogReference(uint8_t mode) {
-  check_valid_analog_ref(mode);
-  switch (mode) {
-    #if defined(EXTERNAL)
-      case EXTERNAL:
-    #endif
-    case VDD:
-      VREF.CTRLB &= ~VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
-      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | mode | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v - we don't *KNOW* the external reference will be >1v, but it's probably more likely...
-      // VREF.CTRLA does not need to be reconfigured, as the voltage references only supply their specified voltage when requested to do so by the ADC.
-      break;
-    case INTERNAL0V55:
-      VREF.CTRLA =  VREF.CTRLA & ~(VREF_ADC0REFSEL_gm); // These bits are all 0 for 0.55v reference, so no need to do the mode << VREF_ADC0REFSEL_gp here;
-      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm | ADC_SAMPCAP_bm)) | INTERNAL; // per datasheet, recommended SAMPCAP=0 at ref < 1v
-      VREF.CTRLB |= VREF_ADC0REFEN_bm; // Turn off force-adc-reference-enable
-      break;
-    case INTERNAL1V1:
-    case INTERNAL2V5:
-    case INTERNAL4V34:
-    case INTERNAL1V5:
-      VREF.CTRLA = (VREF.CTRLA & ~(VREF_ADC0REFSEL_gm)) | (mode << VREF_ADC0REFSEL_gp);
-      ADC0.CTRLC = (ADC0.CTRLC & ~(ADC_REFSEL_gm)) | INTERNAL | ADC_SAMPCAP_bm; // per datasheet, recommended SAMPCAP=1 at ref > 1v
-      break;
-  }
-}
 
+  uint8_t getAnalogReference() {
+    uint8_t t = ADC0.CTRLC & ADC_REFSEL_gm;
+    if (t) {
+      return t;
+    } else {
+      return(VREF.CTRLA & (VREF_ADC0REFSEL_gm));
+    }
+  }
 
   int analogRead(uint8_t pin) {
     check_valid_analog_pin(pin);
@@ -923,8 +935,14 @@ int16_t analogClockSpeed(int16_t frequency, uint8_t options) {
   }
   // requires a bit of explanation - basically, the groupcodes are the same for ADC0 and ADC1, just different register.
   // VREF_ADC0REFSEL_gm == VREF_ADC1REFSEL_gm
-  // I wouldn't say the dual ADC thing was some of their best work.
-
+  uint8_t getAnalogReference1() {
+    uint8_t t = ADC1.CTRLC & ADC_REFSEL_gm;
+    if (t) {
+      return t;
+    } else {
+      return(VREF.CTRLC & (VREF_ADC0REFSEL_gm));
+    }
+  }
   int16_t analogClockSpeed1(int16_t frequency, uint8_t options) {
     uint8_t prescale = 0;
     if (frequency == -1) {
