@@ -24,6 +24,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Fix issues introduced by pwm option menu. This prevented compilation on 1-series or Microchip boards.
 * Add turnOnClockout() and turnOffClockout() to megaTinyCore.h
 * Fix documentation and example issues relating to megaTinyCore.h
+* Fix analog reference documentation. Add getAnalogReference, because we advertise having it.
 * Fix issues with generating universally valid WS2812 signals with tinyNeoPixel when running at 20 MHz-30 MHz
 * Add UpdateLatch() method to tinyNeoPixel to adjust the latch timeout, because times as high as 250 us and as low as 6us have been encountered in the wild, and 50 us, the default, may or may not manifest in any real parts. If we're gonna have that check there, it should be meaningful, but to make it meaningful, we have to make it tunable. (even though it rarely, in practice, causes problems, because it usually takes longer than 250 us to generate a frame of pixels, and even when it doesn't we usually want a consistent frame rate and so slow it down a bit from sending the updates as fast as it possibly can)
 

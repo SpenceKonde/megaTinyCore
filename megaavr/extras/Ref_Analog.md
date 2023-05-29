@@ -26,39 +26,35 @@ In some cases the voltage determines the maximum ADC clock speed. Call analogRef
 
 
  | tinyAVR (0/1)                           | Voltage | Minimum Vdd | Number | Notes |
+ |-----------------------------------------|---------|-------------|--------|-------|
+ | `VDD` (default)                         | Vcc/Vdd |           - |     16 | . |
+ | `INTERNAL0V55`                          |  0.55 V |           - |      0 | ADC clock needs to be 100kHz to 260 kHz to get accurate results |
+ | `INTERNAL1v1`                           |  1.10 V |           - |      1 | . |
+ | `INTERNAL2V5`                           |  2.50 V |           - |      2 | . |
+ | `INTERNAL4V3`                           |  4.30 V |           - |      3 | . |
+ | `INTERNAL1V5`                           |  1.50 V |           - |      4 | . |
+ | `EXTERNAL`                              |       - |           - |     32 | 1+series only |
+
+ | tinyAVR (2-series)                      | Voltage | Minimum Vdd | Number | Notes |
  |-----------------------------------------|---------|-------------|--------|
- | `VDD` (default)                         | Vcc/Vdd |             |      5 |
- | `INTERNAL0V55`                          | 1.024 V |      2.5* V |      0 |
- | `INTERNAL1v1`                           | 2.048 V |      2.5  V |      1 |
- | `INTERNAL2V5`                           | 4.096 V |      4.55 V |      2 |
- | `INTERNAL4V3`                           | 2.500 V |      2.7  V |      3 |
- | `INTERNAL1V5` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      2 |
- | `EXTERNAL`                              | >=1.0 V |         Vdd |      6 | Dx: CLK_ADC =< 500 kHz
- | `EXTERNAL`                              | >=1.8 V |         Vdd |      6 | Dx: No CLK_ADC restriction
-
-
-
- | tinyAVR (0/1)                           | Voltage | Minimum Vdd | Number | Notes |
- |-----------------------------------------|---------|-------------|--------|
- | `VDD` (default)                         | Vcc/Vdd |             |      5 |
- | `INTERNAL0V55`                          | 1.024 V |      2.5* V |      0 |
- | `INTERNAL1v1`                           | 2.048 V |      2.5  V |      1 |
- | `INTERNAL2V5`                           | 4.096 V |      4.55 V |      2 |
- | `INTERNAL4V3`                           | 2.500 V |      2.7  V |      3 |
- | `INTERNAL1V5` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      2 |
- | `EXTERNAL`                              | >=1.0 V |         Vdd |      6 | Dx: CLK_ADC =< 500 kHz
- | `EXTERNAL`                              | >=1.8 V |         Vdd |      6 | Dx: No CLK_ADC restriction
+ | `VDD` (default)                         | Vcc/Vdd |             |      0 | VDD Ref works at 6 MHz CLK ADC! |
+ | `INTERNAL1V024`                         | 1.024 V |      2.5* V |      4 | 10-bit reading with 1.025 ref gives apx.   1 mv/ADC count |
+ | `INTERNAL2V048`                         | 2.048 V |      2.5  V |      5 | 12-bit reading with 2.048 ref gives apx. 0.5 mv/ADC count |
+ | `INTERNAL4V096`                         | 4.096 V |      4.55 V |      7 | 12-bit reading with 4.096 ref gives apx.   1 mv/ADC count |
+ | `INTERNAL2V500`                         | 2.500 V |      2.7  V |      6 | . |
+ | `INTERNAL4V1` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      7 | . |
+ | `EXTERNAL`                              |       - |         Vdd |      2 | External ref works at 6 MHz CLK ADC! |
 
  | AVR Dx/Ex-series (all)                  | Voltage | Minimum Vdd | Number | Notes |
- |-----------------------------------------|---------|-------------|--------|
- | `VDD` (default)                         | Vcc/Vdd |             |      5 |
- | `INTERNAL1V024`                         | 1.024 V |      2.5* V |      0 |
- | `INTERNAL2V048`                         | 2.048 V |      2.5  V |      1 |
- | `INTERNAL4V096`                         | 4.096 V |      4.55 V |      2 |
- | `INTERNAL2V500`                         | 2.500 V |      2.7  V |      3 |
- | `INTERNAL4V1` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      2 |
- | `EXTERNAL`                              | >=1.0 V |         Vdd |      6 | Dx: CLK_ADC =< 500 kHz
- | `EXTERNAL`                              | >=1.8 V |         Vdd |      6 | Dx: No CLK_ADC restriction
+ |-----------------------------------------|---------|-------------|--------|---------|
+ | `VDD` (default)                         | Vcc/Vdd |             |      5 | . |
+ | `INTERNAL1V024`                         | 1.024 V |      2.5* V |      0 | 10-bit reading with 1.025 ref gives apx.   1 mv/ADC count |
+ | `INTERNAL2V048`                         | 2.048 V |      2.5  V |      1 | 12-bit reading with 2.048 ref gives apx. 0.5 mv/ADC count |
+ | `INTERNAL4V096`                         | 4.096 V |      4.55 V |      2 | 12-bit reading with 4.096 ref gives apx.   1 mv/ADC count |
+ | `INTERNAL2V500`                         | 2.500 V |      2.7  V |      3 | . |
+ | `INTERNAL4V1` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      2 | . |
+ | `EXTERNAL`                              | >=1.0 V |         Vdd |      6 | Dx: CLK_ADC =< 500 kHz |
+ | `EXTERNAL`                              | >=1.8 V |         Vdd |      6 | Dx: No CLK_ADC restriction |
 
  You can test like `if(getAnalogReference()==INTERNAL2V500)`, but if you try to say, print them, you just get a number. That's what is shown in the last column: contains the numerical value of the constants representing these references. Don't use those, then nobody will understand your code - including yourself in two weeks. However, if you are printing the results of `getAnalogReference()` or `getDACReference()`, these are the numbers you will see.
 

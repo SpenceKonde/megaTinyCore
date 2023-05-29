@@ -6,7 +6,6 @@ This library provides a grabbag of functions mostly related to debugging problem
 * This library does not make use of classes or objects - it just provides functions. I don't think a class would be at all appropriate here as this is a disparate grouping of libraries of widely different functionality.
 * Not all of the examples relate to this library at all - they are instead example code for doing other core or architecture specific things. They are listed in the example index below.
 
-
 ## Function reference
 
 ### Reset Related
@@ -23,7 +22,7 @@ This will trigger a reset using the WDT, which will occur within around 10 ms, a
 This will trigger a reset using the RSTCTRL, which will occur instantly. Depending on the bootloader entry conditions you selected when you burned bootloader this may enter the bootloader
 
 ### Control clock output on PB5
-These parts can output their system clock on PB5 (if they have a PB5). Parts without a PB5 cannot output the system clock on an I/O pin.
+These parts can output their system clock on PB5 (if they have a PB5). Parts without a PB5 (those with 14 pins or less) cannot output the system clock on an I/O pin.
 
 #### `void turnOnClockout()`
 On 20 and 24 pin parts, this will override the function of PIN_PB5 and output the system clock on it. This will generate a compile error on parts with fewer pins, as they do not have a PB5.
