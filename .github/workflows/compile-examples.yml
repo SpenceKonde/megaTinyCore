@@ -101,9 +101,9 @@ jobs:
         - megaavr/libraries/Logic/examples/Five_input_NOR
       IO-class-2-series-1-sketch-paths: |
         - megaavr/libraries/megaTinyCore/examples/TCA0Demo3
-      Series-1-sketch-paths: |
+      Series-1-available-flash-7_5kB-plus-true-1620only-sketch-paths: |
         - megaavr/libraries/megaTinyCore/examples/SelfTuning
-      Series-2-sketch-paths: |
+      Series-2-available-flash-7_5kB-plus-true-1620only-sketch-paths: |
         - megaavr/libraries/megaTinyCore/examples/SelfTuning
 
     strategy:
@@ -226,7 +226,7 @@ jobs:
             ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, (matrix.available-flash-kB >= 7.5))] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-            ${{ env[format('Series-{0}-sketch-paths', matrix.peripheral-class)] }}
+            ${{ env[format('Series-{0}-available-flash-7_5kB-plus-{1}-1620only-sketch-paths', matrix.peripheral-class)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json
@@ -261,7 +261,7 @@ jobs:
             ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-            ${{ env[format('Series-{0}-sketch-paths', matrix.peripheral-class)] }}
+            ${{ env[format('Series-{0}-available-flash-7_5kB-plus-{1}-1620only-sketch-paths', matrix.peripheral-class, matrix.available-flash-kB >= 7.5)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json
@@ -293,7 +293,7 @@ jobs:
             ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', (matrix.available-flash-kB >= 3.5 && (matrix.peripheral-class == 2 || (matrix.peripheral-class == 1 && matrix.available-flash-kB >= 15.5))))] }}
             ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
-            ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
+            ${{ env[format('Series-{0}-available-flash-7_5kB-plus-{1}-1620only-sketch-paths', matrix.peripheral-class, matrix.available-flash-kB >= 7.5)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json
@@ -326,7 +326,7 @@ jobs:
             ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-            ${{ env[format('Series-{0}-sketch-paths', matrix.peripheral-class)] }}
+            ${{ env[format('Series-{0}-available-flash-7_5kB-plus-{1}-1620only-sketch-paths', matrix.peripheral-class, matrix.available-flash-kB >= 7.5)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json
@@ -357,7 +357,6 @@ jobs:
             ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-            ${{ env[format('Series-{0}-sketch-paths', matrix.peripheral-class)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json
@@ -389,7 +388,7 @@ jobs:
             ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-            ${{ env[format('Series-{0}-sketch-paths', matrix.peripheral-class)] }}
+            ${{ env[format('Series-{0}-available-flash-7_5kB-plus-{1}-1620only-sketch-paths', matrix.peripheral-class, matrix.available-flash-kB >= 7.5)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json
@@ -421,7 +420,6 @@ jobs:
             ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-            ${{ env[format('Series-{0}-sketch-paths', matrix.peripheral-class)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json
@@ -453,7 +451,6 @@ jobs:
             ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-            ${{ env[format('Series-{0}-sketch-paths', matrix.peripheral-class)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json
@@ -485,7 +482,6 @@ jobs:
             ${{ env[format('bootloader-optiboot-{0}-flash-7_5kB-plus-{1}-sketch-paths', matrix.bootloader-code, matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
             ${{ env[format('IO-class-{0}-series-{1}-sketch-paths', matrix.IO-class, matrix.peripheral-class)] }}
-            ${{ env[format('Series-{0}-sketch-paths', matrix.peripheral-class)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
             - source-url: http://drazzy.com/package_drazzy.com_index.json
