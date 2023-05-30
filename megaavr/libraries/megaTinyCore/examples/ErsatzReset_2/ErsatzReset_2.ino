@@ -3,9 +3,9 @@
 #include <megaTinyCore.h>
 
 #ifdef __AVR_ATtinyxy2__
-  #define ERSATZ_RESET_PIN PIN_PA3
-  #define RESET_MASK (1 << 3)
-  #define PINCTRL PORTA.PIN3CTRL
+  #define ERSATZ_RESET_PIN PIN_PA7
+  #define RESET_MASK (1 << 7)
+  #define PINCTRL PORTA.PIN7CTRL
 #else
   #define ERSATZ_RESET_PIN PIN_PA4
   // Always arduino pin 0
