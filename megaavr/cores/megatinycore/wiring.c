@@ -204,13 +204,13 @@ uint8_t __PeripheralControl = 0xFF;
       // Clears the Timer Interrupt flag and pushes the CPU Registers
       // 7 words / 7 clocks
       __asm__ __volatile__(
-      "push       r30"            "\n\t" // First we make room for the pointer to timingStruct by pushing the Z registers
-      "push       r31"            "\n\t" //
       "push       r24"            "\n\t" // Free up one more register to load values into
       "ldi        r24, %[CLRFL]"  "\n\t" // This is the TCB interrupt clear bitmap
       "sts   %[PTCLR],      r24"  "\n\t" // write to Timer interrupt status register to clear flag. 2 clocks for sts
       "in         r24,     0x3F"  "\n\t" // Load SREG
       "push       r24"            "\n\t" // and push it on the Stack
+      "push       r30"            "\n\t" // First we make room for the pointer to timingStruct by pushing the Z registers
+      "push       r31"            "\n\t" //
       ::  [CLRFL] "M" (_timerS.intClear),
           [PTCLR] "m" (*_timerS.intStatusReg));
     #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
@@ -231,12 +231,6 @@ uint8_t __PeripheralControl = 0xFF;
       "ldd        r24,      Z+3"  "\n\t" //
       "sbci       r24,     0xFF"  "\n\t" //
       "std        Z+3,      r24"  "\n\t" // ... until all 4 bytes were handled, at 4 clocks and 3 words per byte -> 16 clocks
-      "pop        r24"            "\n\t" // pop r24 to get the old SREG value - 2 clock
-      "out       0x3F,      r24"  "\n\t" // restore SREG - 1 clock
-      "pop        r24"            "\n\t"
-      "pop        r31"            "\n\t"
-      "pop        r30"            "\n\t" // 6 more clocks popping registers in reverse order.
-      "reti"                      "\n\t" // and 4 clocks for reti - total 12/13 + 16 + 2 + 1 + 6 + 4 = 41/42 clocks total, and 7+16+3+6 = 32 words, vs 60-61 clocks and 40 words
       :: "z" (&timingStruct.timer_millis)
       ); // grrr, sublime highlights this as invalid syntax because it gets confused by the ifdef's and odd syntax on inline asm
 
@@ -255,7 +249,7 @@ uint8_t __PeripheralControl = 0xFF;
     
       __asm__ __volatile__(
       // ISR prologue (overall 10 words / 10 clocks (+ loading of Z)):
-      "push       r25"            "\n\t" // second byte
+      "push       r25"            "\n\t" // one extra Register needed
       // timer_fract handling (8 words / 10 clocks):
       "ldd        r24,      Z+8"  "\n\t" // lo8(timingStruct.timer_fract).
       "ldd        r25,      Z+9"  "\n\t" // hi8(timingStruct.timer_fract)
@@ -308,14 +302,8 @@ uint8_t __PeripheralControl = 0xFF;
       "sbci       r25,     0xFF"  "\n\t" //
       "std        Z+3,      r25"  "\n\t" //
       // ISR epilogue (7 words / 15/16 clocks):
-      "pop        r25"            "\n\t"
-      "pop        r24"            "\n\t" // pop r24 to get the old SREG value - 2 clock
-      "out       0x3F,      r24"  "\n\t" // restore SREG - 1 clock
-      "pop        r24"            "\n\t"
-      "pop        r31"            "\n\t"
-      "pop        r30"            "\n\t" // new: total 72 - 74 clocks, 55 words / 53 - 75 clocks and 53 words with MILLIS_INC == 0
-      "reti"                      "\n\t" // old: total 77 - 79 clocks total, and 58 words, vs 104-112 clocks and 84 words
-      :: "z" (&timingStruct),
+      "pop        r25"            "\n\t"  // new: total 72 - 74 clocks, 55 words / 53 - 75 clocks and 53 words with MILLIS_INC == 0
+      :: "z" (&timingStruct),             // old: total 77 - 79 clocks total, and 58 words, vs 104-112 clocks and 84 words
         [LFRINC] "M" (((0x0000 - FRACT_INC)    & 0xFF)),
         [HFRINC] "M" (((0x0000 - FRACT_INC)>>8 & 0xFF)),
         [LFRMAX] "M" ((FRACT_MAX    & 0xFF)),
@@ -376,12 +364,6 @@ uint8_t __PeripheralControl = 0xFF;
       "sub_end:"
       // ISR epilogue (7 words / 15/16 clocks):
       "pop        r25"            "\n\t"
-      "pop        r24"            "\n\t" // pop r24 to get the old SREG value - 2 clock
-      "out       0x3F,      r24"  "\n\t" // restore SREG - 1 clock
-      "pop        r24"            "\n\t"
-      "pop        r31"            "\n\t"
-      "pop        r30"            "\n\t" // new: total 79 - 81 clocks, 48 words with MILLIS_INC != 0
-      "reti"                      "\n\t" // old: total 77 - 79 clocks total, and 58 words, vs 104-112 clocks and 84 words
       :: "z" (&timingStruct),
         [LFRINC] "M" (((0x0000 - FRACT_INC)    & 0xFF)),
         [HFRINC] "M" (((0x0000 - FRACT_INC)>>8 & 0xFF)),
@@ -391,6 +373,19 @@ uint8_t __PeripheralControl = 0xFF;
         [MINCD]  "M" ((0xFFFF - MILLIS_INC) & 0xFF)
       );*/
     #endif /* (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)) */
+    // ISR Epilogue
+    // 6 words, 14 clocks
+    __asm__ __volatile__(
+      "pop        r31"            "\n\t"
+      "pop        r30"            "\n\t" // 6 more clocks popping registers in reverse order.
+      "pop        r24"            "\n\t" // pop r24 to get the old SREG value - 2 clock
+      "out       0x3F,      r24"  "\n\t" // restore SREG - 1 clock
+      "pop        r24"            "\n\t"
+      "reti"                      "\n\t" // and 4 clocks for reti
+      ::
+      );
+    
+    
     }
   #endif /* defined (MILLIS_USE_TIMERRTC)*/
 
