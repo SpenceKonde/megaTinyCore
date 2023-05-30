@@ -101,9 +101,9 @@ jobs:
         - megaavr/libraries/Logic/examples/Five_input_NOR
       IO-class-2-series-1-sketch-paths: |
         - megaavr/libraries/megaTinyCore/examples/TCA0Demo3
-      Series-1-available-flash-7_5kB-plus-true-1620only-sketch-paths: |
+      Series-1-available-flash-16kB-plus-true-1620only-sketch-paths: |
         - megaavr/libraries/megaTinyCore/examples/SelfTuning
-      Series-2-available-flash-7_5kB-plus-true-1620only-sketch-paths: |
+      Series-2-available-flash-16kB-plus-true-1620only-sketch-paths: |
         - megaavr/libraries/megaTinyCore/examples/SelfTuning
 
     strategy:
