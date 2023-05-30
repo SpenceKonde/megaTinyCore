@@ -62,13 +62,14 @@ menu.bootloaderuart=UART for Bootloader (burn bootloader req'd)
 menu.resetpin=UPDI/Reset Pin Function (burn bootloader req'd)
 menu.resetpinopti=UPDI/Reset Pin and
 menu.resetpinopti_2=UPDI/alt-RST pin
-menu.entrycond=Bootloader entry on
+menu.entrycond=Bootloader entry on...
 menu.printf=printf()
 menu.wiremode=Wire (Wire.h/I2C) Library mode
 menu.WDTtimeout=WDT timeout (burn bootloader req'd. Cannot be disabled at runtime if set here)
 menu.WDTwindow=WDT window (if desired. burn bootloader req'd. Cannot be disabled at runtime if set here)
 #menu.optimization=Optimization level (see documentation)
 menu.PWMmux=PWM pins (advanced, see core documentation)
+menu.attach=attachInterrupt Mode
 
 ##########################################################################
 #                                                                        #
