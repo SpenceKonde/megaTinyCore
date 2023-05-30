@@ -213,6 +213,7 @@ uint8_t __PeripheralControl = 0xFF;
       "push       r31"            "\n\t" //
       ::  [CLRFL] "M" (_timerS.intClear),
           [PTCLR] "m" (*_timerS.intStatusReg));
+
     #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
       __asm__ __volatile__(
       "ld         r24,        Z"  "\n\t" // Z points to LSB of timer_millis, load the LSB
@@ -246,7 +247,7 @@ uint8_t __PeripheralControl = 0xFF;
         }
       */
     #else // TCA0 or TCD0, also naked
-    
+    /*
       __asm__ __volatile__(
       // ISR prologue (overall 10 words / 10 clocks (+ loading of Z)):
       "push       r25"            "\n\t" // one extra Register needed
@@ -311,8 +312,8 @@ uint8_t __PeripheralControl = 0xFF;
         [MIINC]  "M" ((0x0000 - MILLIS_INC) & 0xFF),
         [MINCD]  "M" ((0xFFFF - MILLIS_INC) & 0xFF)
       );
-  
-  /*
+  */
+
       __asm__ __volatile__(
       // ISR prologue (overall 10 words / 10 clocks (+ loading of Z)):
       "push       r25"            "\n\t" // second byte
@@ -371,9 +372,9 @@ uint8_t __PeripheralControl = 0xFF;
         [HFRMAX] "M" ((FRACT_MAX>>8 & 0xFF)),
         [MIINC]  "M" ((0x0000 - MILLIS_INC) & 0xFF),
         [MINCD]  "M" ((0xFFFF - MILLIS_INC) & 0xFF)
-      );*/
+      );
     #endif /* (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)) */
-    // ISR Epilogue
+    // Common ISR Epilogue for TCA, TCB and TCD, popping register in reverse Order
     // 6 words, 14 clocks
     __asm__ __volatile__(
       "pop        r31"            "\n\t"
