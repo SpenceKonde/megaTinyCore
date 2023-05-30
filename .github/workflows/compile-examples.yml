@@ -291,7 +291,6 @@ jobs:
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
             ${{ env[format('available-flash-1_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 1.5)] }}
             ${{ env[format('free-TCB-flash-3.5kB-plus-{0}-sketch-paths', (matrix.available-flash-kB >= 3.5 && (matrix.peripheral-class == 2 || (matrix.peripheral-class == 1 && matrix.available-flash-kB >= 15.5))))] }}
-            ${{ env[format('Series-{0}-available-flash-16kB-plus-{1}-1620only-sketch-paths', matrix.peripheral-class, matrix.available-flash-kB >= 15.5)] }}
             ${{ env[format('IO-class-4-plus-{0}-sketch-paths', matrix.IO-class >= 4)] }}
           platforms: |
             # Install megaTinyCore via Boards Manager for the toolchain
