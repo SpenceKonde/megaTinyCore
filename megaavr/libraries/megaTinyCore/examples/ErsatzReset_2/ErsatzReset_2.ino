@@ -3,14 +3,13 @@
 #include <megaTinyCore.h>
 
 #ifdef __AVR_ATtinyxy2__
-  #define ERSATZ_RESET_PIN PIN_PA7
-  #define RESET_MASK (1 << 7)
-  #define PINCTRL PORTA.PIN7CTRL
+  #define ERSATZ_RESET_PIN    PIN_PA7
+  #define RESET_MASK          (1 << 7)
+  #define PINCTRL             (PORTA.PIN7CTRL)
 #else
-  #define ERSATZ_RESET_PIN PIN_PA4
-  // Always arduino pin 0
-  #define RESET_MASK (1 << 4)
-  #define PINCTRL PORTA.PIN4CTRL
+  #define ERSATZ_RESET_PIN    PIN_PA4
+  #define RESET_MASK          (1 << 4)
+  #define PINCTRL             (PORTA.PIN4CTRL)
 #endif
 
 // We will always use pin 0 as the ersatz reset pin, EXCEPT on the 8-pin parts.
@@ -29,7 +28,7 @@ void setup() {
   uint8_t ms = 10;
   while ((!(VPORTA.IN & RESET_MASK)) && ms) {
     delay(1);
-    ms++;
+    ms--;
   }
   #endif
   if (!(VPORTA.IN & RESET_MASK)) { // if still not high, reset...

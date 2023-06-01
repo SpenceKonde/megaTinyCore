@@ -19,7 +19,7 @@
 
 void setup() {
   #ifndef __AVR_ATtinyxy2__
-    pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   #endif
   pinMode(ERSATZ_RESET_PIN, INPUT_PULLUP); // on 8-pin parts, this overrides the previous line! No LED blink on these; not enough pins to demo everything here...
   #if !defined(MILLIS_USE_TIMERNONE) // if we have millis, use that
@@ -28,7 +28,7 @@ void setup() {
   uint8_t ms = 10;
   while ((!(VPORTA.IN & RESET_MASK)) && ms) {
     delay(1);
-    ms++;
+    ms--;
   }
   #endif
   // MUCH longer than we need to wait...

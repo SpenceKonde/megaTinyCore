@@ -19,16 +19,17 @@ These items are in addition to what was listed under changes already in release.
 
 ## Unreleased changes
 
-### Planned 2.6.8
-Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes
-* Fix issues introduced by pwm option menu. This prevented compilation on 1-series or Microchip boards.
-* Add turnOnClockout() and turnOffClockout() to megaTinyCore.h
-* Fix documentation and example issues relating to megaTinyCore.h
-* Fix analog reference documentation. Add getAnalogReference, because we advertise having it.
-* Fix issues with generating universally valid WS2812 signals with tinyNeoPixel when running at 20 MHz-30 MHz
-* Add UpdateLatch() method to tinyNeoPixel to adjust the latch timeout, because times as high as 250 us and as low as 6us have been encountered in the wild, and 50 us, the default, may or may not manifest in any real parts. If we're gonna have that check there, it should be meaningful, but to make it meaningful, we have to make it tunable. (even though it rarely, in practice, causes problems, because it usually takes longer than 250 us to generate a frame of pixels, and even when it doesn't we usually want a consistent frame rate and so slow it down a bit from sending the updates as fast as it possibly can)
-
 ## Released Versions
+### 2.6.8
+Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes
+* CRITICAL bugfix: Fix issues introduced by pwm option menu. This prevented compilation on 1-series or Microchip boards. There were at least *4 separate issues* feeding into this.
+* Enhancement: Add turnOnClockout() and turnOffClockout() to megaTinyCore.h
+* Bugfix: Documentation and examples for megaTinyCore.h did not match the code. Examples did not compile and documentation described functions with the wrong names. Stuff like that.
+* Bugfix: Fix analog reference documentation. Add getAnalogReference, because we advertise having it.
+* Bugfix: Fix issues with generating universally valid WS2812 signals with tinyNeoPixel when running at 20 MHz-30 MHz
+* Bugfix: Add UpdateLatch() method to tinyNeoPixel to adjust the latch timeout, because times as high as 250 us and as low as 6us have been encountered in the wild, and 50 us, the default, may or may not manifest in any real parts. If we're gonna have that check there, it should be meaningful, but to make it meaningful, we have to make it tunable. (even though it rarely, in practice, causes problems, because it usually takes longer than 250 us to generate a frame of pixels, and even when it doesn't we usually want a consistent frame rate and so slow it down a bit from sending the updates as fast as it possibly can). Marked bugfix because it is unarguable that a non-changable default value should not be set to a value that (as far as I am aware) does not match any hardware.
+* Enhancement: Improve testing coverage which would have prevented some of these bugs from making it through.
+
 ### 2.6.7
 * Enhancement: finish implementing PWM pin set selection tools submenu. All reasonable pin mappings are available for 8-pin (3 combinations, 2 on 0/2-series), and 14-pin (6, 4 on 0/2-series) parts, and most plausibly useful ones on the larger parts (over a dozen on the 20-pin and 25 on the 24-pin parts), less than 20% of the absolute number of combinations. If 3-pin PWM mode is selected, it will still be 8 bit PWM - but you are guaranteed not to have a glitch when slowly raising the duty cycle because buffering is used.
 * Fix issue with the change to the comparator and logic libraries so it actually lets you make your own ISR.
