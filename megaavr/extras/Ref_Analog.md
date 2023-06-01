@@ -36,7 +36,7 @@ In some cases the voltage determines the maximum ADC clock speed. Call analogRef
  | `EXTERNAL`                              |       - |           - |     32 | 1+series only |
 
  | tinyAVR (2-series)                      | Voltage | Minimum Vdd | Number | Notes |
- |-----------------------------------------|---------|-------------|--------|
+ |-----------------------------------------|---------|-------------|--------|-------|
  | `VDD` (default)                         | Vcc/Vdd |             |      0 | VDD Ref works at 6 MHz CLK ADC! |
  | `INTERNAL1V024`                         | 1.024 V |      2.5* V |      4 | 10-bit reading with 1.025 ref gives apx.   1 mv/ADC count |
  | `INTERNAL2V048`                         | 2.048 V |      2.5  V |      5 | 12-bit reading with 2.048 ref gives apx. 0.5 mv/ADC count |
@@ -119,7 +119,7 @@ At least there's a plausible use of the DAC input: recognizing that the voltage 
 `?` The DD-series lists a "BGTEMPSENSE" option in preliminary material, but it was removed by launch. It is unclear if this was ever implemented or if it exists in the silicon.
 
 ### Measuring VDD and Temperature
-See [the example we give for very talkative implementation](../libraries/megaTinycore/examples/ReadTempVcc/ReadTempVcc.ino) and the [megaTinyCore.h library](../libraries/megaTinycore/README.md) which provides ready-to-use function calls for these measurements.
+See [the example we give for very talkative implementation](../libraries/megaTinyCore/examples/ReadTempVcc/ReadTempVcc.ino) and the [megaTinyCore.h library](../libraries/megaTinycore/README.md) which provides ready-to-use function calls for these measurements.
 
 
 #### Measuring VDD on 0/1-series
