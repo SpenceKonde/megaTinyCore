@@ -178,9 +178,12 @@ uint8_t __PeripheralControl = 0xFF;
       volatile uint16_t timer_overflow_count;
 
     #else                               // TCAx or TCD0
-      volatile uint16_t timer_fract;
-      volatile uint32_t timer_millis;
+      //volatile uint16_t timer_fract;
+      //volatile uint32_t timer_millis;
+      //volatile uint32_t timer_overflow_count;
       volatile uint32_t timer_overflow_count;
+      volatile uint32_t timer_millis;
+      volatile uint16_t timer_fract;
 
     #endif
   } timingStruct;
@@ -197,15 +200,22 @@ uint8_t __PeripheralControl = 0xFF;
     }
   #else
     ISR(MILLIS_TIMER_VECTOR, ISR_NAKED) {
+      // Common Interrupt header for TCB, TCA and TCD;
+      // Clears the Timer Interrupt flag and pushes the CPU Registers
+      // 7 words / 7 clocks
       __asm__ __volatile__(
-      "push       r30"          "\n\t" // First we make room for the pointer to timingStruct by pushing the Z registers
-      "push       r31"          "\n\t" //
-      ::);
+      "push       r24"            "\n\t" // Free up one more register to load values into
+      "ldi        r24, %[CLRFL]"  "\n\t" // This is the TCB interrupt clear bitmap
+      "sts   %[PTCLR],      r24"  "\n\t" // write to Timer interrupt status register to clear flag. 2 clocks for sts
+      "in         r24,     0x3F"  "\n\t" // Load SREG
+      "push       r24"            "\n\t" // and push it on the Stack
+      "push       r30"            "\n\t" // First we make room for the pointer to timingStruct by pushing the Z registers
+      "push       r31"            "\n\t" //
+      ::  [CLRFL] "M" (_timerS.intClear),
+          [PTCLR] "m" (*_timerS.intStatusReg));
+
     #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))
       __asm__ __volatile__(
-      "push       r24"            "\n\t" // we only use two register other than the pointer
-      "in         r24,     0x3F"  "\n\t" // Need to save SREG too
-      "push       r24"            "\n\t" // and push the SREG value  - 7 clocks here + the 5-6 to enter the ISR depending on flash and sketch size, 12-13 total
       "ld         r24,        Z"  "\n\t" // Z points to LSB of timer_millis, load the LSB
       #if (F_CPU > 2000000)            // if it's 1 or 2 MHz, millis timer overflows every 2ms, intentionally sacrificing resolution for reduced time spent in ISR
       "subi       r24,     0xFF"  "\n\t" // sub immediate 0xFF is the same as to add 1. (There is no add immediate instruction, except add immediate to word)
@@ -222,62 +232,8 @@ uint8_t __PeripheralControl = 0xFF;
       "ldd        r24,      Z+3"  "\n\t" //
       "sbci       r24,     0xFF"  "\n\t" //
       "std        Z+3,      r24"  "\n\t" // ... until all 4 bytes were handled, at 4 clocks and 3 words per byte -> 16 clocks
-      "ldi        r24, %[CLRFL]"  "\n\t" // This is the TCB interrupt clear bitmap !!
-      "sts   %[PTCLR],      r24"  "\n\t" // write to Timer interrupt status register to clear flag. 2 clocks for sts
-      "pop        r24"            "\n\t" // pop r24 to get the old SREG value - 2 clock
-      "out       0x3F,      r24"  "\n\t" // restore SREG - 1 clock
-      "pop        r24"            "\n\t"
-      "pop        r31"            "\n\t"
-      "pop        r30"            "\n\t" // 6 more clocks popping registers in reverse order.
-      "reti"                      "\n\t" // and 4 clocks for reti - total 12/13 + 16 + 2 + 1 + 6 + 4 = 41/42 clocks total, and 7+16+3+6 = 32 words, vs 60-61 clocks and 40 words
-      :: "z" (&timingStruct.timer_millis),
-         [CLRFL] "M" (_timerS.intClear),
-         [PTCLR] "m" (*_timerS.intStatusReg)
+      :: "z" (&timingStruct.timer_millis)
       ); // grrr, sublime highlights this as invalid syntax because it gets confused by the ifdef's and odd syntax on inline asm
-
-      // !! Hey, isn't it strictly better to do this as soon as we've pushed r24 for the first time?, and push r24 before Z. That way if interrupts were turned off a while, and turned
-      // back on moments before we would have lost a millisecond... Right now we do this after the math at T = 28-29 through T=31-32. We could instead be doing it
-      // at T=6-7 through T=8-9! That would mean that the maximum delay without breaking millis would be 21 clock cycles longer! This fires every millisecond at most
-      // clock speeds, so of cases where millis may drift, it would prevent 1ms of time loss in 21 out of F_CPU/1000 instances. At 2 MHz this is a hair over 1% of
-      // instances of time loss. And time loss is bad, as it can cause micros to experience backwards timetravel. But if you are using micros timekeeping when
-      // you are experiencing instances of time loss, this is an issue you need to fix. (you are trying to time something with microsecond accuracy having disabled
-      // interrupts for a long period of time, micros is not expected to work). But that is an improvement, why shouldn't we take it?
-      // The argument against it would be potentially wrong values for micros - but **that could only happen if a **priority** interrupt is called** that interrupts the
-      // write of the millis total, **and calls micros there**. That specific case is not handled correctly. Users shouldn't do that.
-      // It would eroneously think that the timer had just overflowed, but that the ISR had run, and thus they would use the value in main
-      // memory which may have had 0-4 bytes updated. The 4 byte window would be correct and is only 1 clock wide.
-      // | Cases | bytes updated | resulting error | Chance of error, per case |   Time |
-      // |-------|---------------|-----------------|---------------------------|--------|
-      // |     8 |             0 |           -1000 |                         1 |   -1ms |
-      // |     4 |             1 |         -256000 |                     1/256 | -256ms |
-      // |     4 |             2 |       -65536000 |                   1/65536 | -65.5s |
-      // |     4 |             3 |    -16777216000 |                1/16777216 | +6m42s |
-      // |     1 |             4 |               0 |                         0 |    0us |
-      //
-      // The effect is thus that when this manifets, 1 out of (1000-24000) times that micros() is called from a priority interrupt occurring at timing
-      // uncorrelated with millis interrupts, it will return a time that is either 1000, 256000, 65536000 or 1688821600 lower than the correct value.
-      // Unlike the case of being *in* a micros blackout long enough to cause time loss while relying upon timekeeping, it is *not* prohibited to
-      // call micros within an ISR provided the ISR is shorter than the millis period. In fact it could be used as a very crude form of input capture
-      // or if the key number happens to be time since startup, in microseconds. For these applications the "fix" would be catastrophic. Widening the permitted
-      // disabled interrupts time for a 0.42-20us period of time comes at the cost of the same period of time during which micros would get wrong answers under
-      // conditions that it currently does not, during that time 2/5ths of times would be 1000 us under, and 1/5th each a 1/256 chance of being 256000 us under,
-      // 1/65536 chance of being 65536000us under and 1/1677216 chance of it beiing slow by 3,892,314,112us which would likely be interpreted as being fast by
-      // 402,653,184 us (6m42s).
-      //
-      // | Error | Overall chance at 2 MHz | Overall chance at 48 MHz  |
-      // |-------|-------------------------|---------------------------|
-      // |   1ms | 0.1%              1 ppk | 0.002%             40 ppm |
-      // | 256ms | 0.0004%           4 ppm | 0.0000034%        160 ppb |
-      // |  65s  | 0.000001%        10 ppb | 0.0000000064%     625 ppt |
-      // | 6m42s | 0.000000003%     30 ppt | 0.000000000012%     3 ppt |
-      // Note: I suspect there are math errors above, but their magnitude within a power of 2, so the overall asseement is that 40-1000 out of 1m times micros
-      // was called in a priority interrupt it would be off by 1, less than 4 in 1 million times it would return values off by more than a minute, and that
-      // in extremely rare events, it could line up just wrong leading to errors of 6 minutes in the future.
-      //
-      // The errors would be hell to debug.
-      //
-      // Since this situation is supposed to be supported, and because the alternative is prolonging the window in which bad practice is permitted anyway,
-      // I am disinclined to make that change!
 
 
       /* ISR in C:
@@ -291,115 +247,146 @@ uint8_t __PeripheralControl = 0xFF;
         }
       */
     #else // TCA0 or TCD0, also naked
+    /*
       __asm__ __volatile__(
-      // ISR prologue (overall 9 words / 9 clocks):
-      "push       r24"            "\n\t" // we use three more registers other than the pointer
-      "in         r24,     0x3F"  "\n\t" // Need to save SREG too
-      "push       r24"            "\n\t" // and push the SREG value
-      "push       r25"            "\n\t" // second byte
-      "push       r23"            "\n\t" // third byte
-      // timer_fract handling (13 words / 15/16 clocks):
-      "ldi        r23, %[MIINC]"  "\n\t" // load MILLIS_INC. (part of timer_millis handling)
-      "ld         r24,        Z"  "\n\t" // lo8(timingStruct.timer_fract).
-      "ldd        r25,      Z+1"  "\n\t" // hi8(timingStruct.timer_fract)
+      // ISR prologue (overall 10 words / 10 clocks (+ loading of Z)):
+      "push       r25"            "\n\t" // one extra Register needed
+      // timer_fract handling (8 words / 10 clocks):
+      "ldd        r24,      Z+8"  "\n\t" // lo8(timingStruct.timer_fract).
+      "ldd        r25,      Z+9"  "\n\t" // hi8(timingStruct.timer_fract)
       "subi       r24,%[LFRINC]"  "\n\t" // use (0xFFFF - FRACT_INC) and use the lower and higher byte to add by subtraction
       "sbci       r25,%[HFRINC]"  "\n\t" // can't use adiw since FRACT_INC might be >63
-      "st         Z,        r24"  "\n\t" // lo8(timingStruct.timer_fract)
-      "std        Z+1,      r25"  "\n\t" // hi8(timingStruct.timer_fract)
+      "std        Z+8,      r24"  "\n\t" // lo8(timingStruct.timer_fract)
+      "std        Z+9,      r25"  "\n\t" // hi8(timingStruct.timer_fract)
       "subi       r24,%[LFRMAX]"  "\n\t" // subtract FRACT_MAX and see if it is lower
       "sbci       r25,%[HFRMAX]"  "\n\t" //
-      "brlo               lower"  "\n\t" // skip next three instructions if it was lower
-      "st         Z,        r24"  "\n\t" // Overwrite the just stored value with the decremented value
-      "std        Z+1,      r25"  "\n\t" // seems counter-intuitive, but it requires less registers
-      "subi       r23,     0xFF"  "\n\t" // increment the MILLIS_INC by one, if FRACT_MAX was reached
-      "lower:"                    "\n\t" // land here if fract was lower then FRACT_MAX
-      // timer_millis handling (13 words / 17 clocks):
-      "ldd        r25,      Z+2"  "\n\t" // lo16.lo8(timingStruct.timer_millis)
-      "add        r25,      r23"  "\n\t" // add r23 to r25. r23 depends on MILLIS_INC and if FRACT_MAX was reached
-      "std        Z+2,      r25"  "\n\t" //
-      "ldi        r24,     0x00"  "\n\t" // get a 0x00 to adc with. Problem: can't subi 0x00 without losing the carry
-      "ldd        r25,      Z+3"  "\n\t" // lo16.hi8(timingStruct.timer_millis)
-      "adc        r25,      r24"  "\n\t" //
-      "std        Z+3,      r25"  "\n\t" //
-      "ldd        r25,      Z+4"  "\n\t" // hi16.lo8(timingStruct.timer_millis)
-      "adc        r25,      r24"  "\n\t" //
+      
+      #if MILLIS_INC != 0                // (6 words / 4 - 5 clocks, branches were optimize to create minimal diversion)
+      "brlo    higher"            "\n\t" // if FRAC_MAX was not reached,
+      "ldi        r24, %[MIINC]"  "\n\t" // load "normal" MILLIS_INC (0x00-MILLIS_INC)
+      "rjmp      sub4"            "\n\t" // avoid overwriting r24
+      "higher:"
+      #else                              // (4 words, 2 - 4 clocks)
+      "brlo   sub_end"            "\n\t" // if we know at compile time that MILLIS_INC is 0,
+      #endif                             // we don't have to check it at runtime, saving two insn (tst, branch)
+      
+      "std        Z+8,      r24"  "\n\t" // Overwrite the just stored value with the decremented value
+      "std        Z+9,      r25"  "\n\t" // seems counter-intuitive, but it requires less registers
+      "ldi        r24, %[MINCD]"  "\n\t" // load MILLIS_INC that was decreased by 1 (0xFF-MILLIS_INC)
+      
+      // timer_millis handling (12 words / 16 clocks):
+      "sub4:"
+      "ldd        r25,      Z+4"  "\n\t" // lo16.lo8(timingStruct.timer_millis)
+      "sub        r25,      r24"  "\n\t" //
       "std        Z+4,      r25"  "\n\t" //
-      "ldd        r25,      Z+5"  "\n\t" // hi16.hi8(timingStruct.timer_millis)
-      "adc        r25,      r24"  "\n\t" //
+      "ldd        r25,      Z+5"  "\n\t" // lo16.hi8(timingStruct.timer_millis)
+      "sbci       r25,     0xFF"  "\n\t" //
       "std        Z+5,      r25"  "\n\t" //
-      // timer_overflow_count handling (12 words / 16 clocks):
-      "ldd        r25,      Z+6"  "\n\t" // lo16.lo8(timingStruct.timer_overflow_count)
-      "subi       r25,     0xFF"  "\n\t" //
+      "ldd        r25,      Z+6"  "\n\t" // hi16.lo8(timingStruct.timer_millis)
+      "sbci       r25,     0xFF"  "\n\t" //
       "std        Z+6,      r25"  "\n\t" //
-      "ldd        r25,      Z+7"  "\n\t" // lo16.hi8(timingStruct.timer_overflow_count)
+      "ldd        r25,      Z+7"  "\n\t" // hi16.hi8(timingStruct.timer_millis)
       "sbci       r25,     0xFF"  "\n\t" //
       "std        Z+7,      r25"  "\n\t" //
-      "ldd        r25,      Z+8"  "\n\t" // hi16.lo8(timingStruct.timer_overflow_count)
+      "sub_end:"                         // only used if MILLIS_INC == 0
+      // timer_overflow_count handling (12 words / 16 clocks):
+      "ldd        r25,      Z+0"  "\n\t" // lo16.lo8(timingStruct.timer_overflow_count)
+      "subi       r25,     0xFF"  "\n\t" //
+      "std        Z+0,      r25"  "\n\t" //
+      "ldd        r25,      Z+1"  "\n\t" // lo16.hi8(timingStruct.timer_overflow_count)
       "sbci       r25,     0xFF"  "\n\t" //
-      "std        Z+8,      r25"  "\n\t" //
-      "ldd        r25,      Z+9"  "\n\t" // hi16.hi8(timingStruct.timer_overflow_count)
+      "std        Z+1,      r25"  "\n\t" //
+      "ldd        r25,      Z+2"  "\n\t" // hi16.lo8(timingStruct.timer_overflow_count)
       "sbci       r25,     0xFF"  "\n\t" //
-      "std        Z+9,      r25"  "\n\t" //
-      // timer interrupt flag reset handling (3 words / 3 clocks):
-      "ldi        r24, %[CLRFL]"  "\n\t" // This is the TCx interrupt clear bitmap
-      "sts   %[PTCLR],      r24"  "\n\t" // write to Timer interrupt status register to clear flag. 2 clocks for sts
-      // ISR epilogue (8 words / 17/18 clocks):
-      "pop        r23"            "\n\t"
-      "pop        r25"            "\n\t"
-      "pop        r24"            "\n\t" // pop r24 to get the old SREG value - 2 clock
-      "out       0x3F,      r24"  "\n\t" // restore SREG - 1 clock
-      "pop        r24"            "\n\t"
-      "pop        r31"            "\n\t"
-      "pop        r30"            "\n\t"
-      "reti"                      "\n\t" // total 77 - 79 clocks total, and 58 words, vs 104-112 clocks and 84 words
-      :: "z" (&timingStruct),            // we are changing the value of this, so to be strictly correct, this must be declared input output - though in this case it doesn't matter
-                                         // Spence: Woah, uhh... No you aren't changing that. You're changing values in the struct it points to. That's very different.
-                                         // For that to be safely changed in ASM it needs to be volatile (which it already is, since this is also in interrupt context
-                                         // and it has to be), but the pointer itself never gets changed (no use of ld/st Z+ or ld/st -Z, only ldd/std Z+q which leaves
-                                         // Z unchanged - had one of those been )
+      "std        Z+2,      r25"  "\n\t" //
+      "ldd        r25,      Z+3"  "\n\t" // hi16.hi8(timingStruct.timer_overflow_count)
+      "sbci       r25,     0xFF"  "\n\t" //
+      "std        Z+3,      r25"  "\n\t" //
+      // ISR epilogue (7 words / 15/16 clocks):
+      "pop        r25"            "\n\t"  // new: total 72 - 74 clocks, 55 words / 53 - 75 clocks and 53 words with MILLIS_INC == 0
+      :: "z" (&timingStruct),             // old: total 77 - 79 clocks total, and 58 words, vs 104-112 clocks and 84 words
         [LFRINC] "M" (((0x0000 - FRACT_INC)    & 0xFF)),
         [HFRINC] "M" (((0x0000 - FRACT_INC)>>8 & 0xFF)),
         [LFRMAX] "M" ((FRACT_MAX    & 0xFF)),
         [HFRMAX] "M" ((FRACT_MAX>>8 & 0xFF)),
-        [MIINC]  "M" (MILLIS_INC),
-        [CLRFL]  "M" (_timerS.intClear),
-        [PTCLR]  "m" (*_timerS.intStatusReg)
+        [MIINC]  "M" ((0x0000 - MILLIS_INC) & 0xFF),
+        [MINCD]  "M" ((0xFFFF - MILLIS_INC) & 0xFF)
       );
+  */
 
-      /* ISR ASM logic written out in C:
-        // timer_fract handling:
-        uint8_t temp = MILLIS_INC;
-        uint16_t f = timingStruct.timer_fract;
-        f -= 0xFFFF;
-        timingStruct.timer_fract = f;
-        f -= FRACT_MAX;
-        if (f > FRACT_MAX) {
-          timingStruct.timer_fract = f;
-          temp++;
-        }
-        // timer_millis handling:
-        timingStruct.timer_millis += temp;
-        // timer_overflow_count handling:
-        timingStruct.timer_overflow_count -= 0xFFFFFFFF;
-        // timer interrupt flag reset handling:
-        *_timerS.intStatusReg = _timerS.intClear;
-      */
-      /* old ISR C code:
-        uint32_t m = timingStruct.timer_millis;
-        uint16_t f = timingStruct.timer_fract;
-        m += MILLIS_INC;
-        f += FRACT_INC;
-        if (f >= FRACT_MAX) {
-
-          f -= FRACT_MAX;
-          m += 1;
-        }
-        timingStruct.timer_fract = f;
-        timingStruct.timer_millis = m;
-        timingStruct.timer_overflow_count++;
-        *_timerS.intStatusReg = _timerS.intClear;
-      */
+      __asm__ __volatile__(
+      // ISR prologue (overall 10 words / 10 clocks (+ loading of Z)):
+      "push       r25"            "\n\t" // second byte
+      // timer_overflow_count handling (4 words / 4 + (18) + 1 = 23 clocks):
+      "set"                       "\n\t" // remember to go back here
+      "ldi        r24,     0xFF"  "\n\t" // first byte to be subtracted of 4, rest will be 0xFF
+      "rjmp      sub4"            "\n\t" // jump down to sub/sbci
+      "ovf_end:"                  "\n\t" // jump back to here afterwards
+      "clt"                       "\n\t" // make sure to not jump back again
+      
+      // timer_fract handling (8 words / 10 clocks) (Z += 4):
+      "ldd        r24,      Z+4"  "\n\t" // lo8(timingStruct.timer_fract).
+      "ldd        r25,      Z+5"  "\n\t" // hi8(timingStruct.timer_fract)
+      "subi       r24,%[LFRINC]"  "\n\t" // use (0xFFFF - FRACT_INC) and use the lower and higher byte to add by subtraction
+      "sbci       r25,%[HFRINC]"  "\n\t" // can't use adiw since FRACT_INC might be >63
+      "std        Z+4,      r24"  "\n\t" // lo8(timingStruct.timer_fract)
+      "std        Z+5,      r25"  "\n\t" // hi8(timingStruct.timer_fract)
+      "subi       r24,%[LFRMAX]"  "\n\t" // subtract FRACT_MAX and see if it is lower
+      "sbci       r25,%[HFRMAX]"  "\n\t" //
+      
+      #if MILLIS_INC != 0                // (6 words / 4 - 5 clocks, branches were optimize to create minimal diversion)
+      "brlo    higher"            "\n\t" // if FRAC_MAX was not reached,
+      "ldi        r24, %[MIINC]"  "\n\t" // load "normal" MILLIS_INC (0x00-MILLIS_INC)
+      "rjmp      sub4"            "\n\t" // avoid overwriting r24
+      "higher:"
+      #else                              // (4 words, 2 - 4 clocks)
+      "brlo   sub_end"            "\n\t" // if we know at compile time that MILLIS_INC is 0,
+      #endif                             // we don't have to check it at runtime, saving two insn (tst, branch)
+      
+      "std        Z+4,      r24"  "\n\t" // Overwrite the just stored value with the decremented value
+      "std        Z+5,      r25"  "\n\t" // seems counter-intuitive, but it requires less registers
+      "ldi        r24, %[MINCD]"  "\n\t" // load MILLIS_INC that was decreased by 1 (0xFF-MILLIS_INC)
+    
+      // subtracting 4 bytes from a dword (13 words / 17 clocks)
+      "sub4:"
+      "ld         r25,        Z"  "\n\t" // lo16.lo8(timingStruct.timer_millis)
+      "sub        r25,      r24"  "\n\t" //
+      "st          Z+,      r25"  "\n\t" //
+      "ld         r25,        Z"  "\n\t" // lo16.hi8
+      "sbci       r25,     0xFF"  "\n\t" //
+      "st          Z+,      r25"  "\n\t" //
+      "ld         r25,        Z"  "\n\t" // hi16.lo8
+      "sbci       r25,     0xFF"  "\n\t" //
+      "st          Z+,      r25"  "\n\t" //
+      "ld         r25,        Z"  "\n\t" // hi16.hi8
+      "sbci       r25,     0xFF"  "\n\t" //
+      "st          Z+,      r25"  "\n\t" //
+      "brts   ovf_end"            "\n\t" // If T bit is set, we need to go back up
+      "sub_end:"
+      // ISR epilogue (7 words / 15/16 clocks):
+      "pop        r25"            "\n\t"
+      :: "z" (&timingStruct),
+        [LFRINC] "M" (((0x0000 - FRACT_INC)    & 0xFF)),
+        [HFRINC] "M" (((0x0000 - FRACT_INC)>>8 & 0xFF)),
+        [LFRMAX] "M" ((FRACT_MAX    & 0xFF)),
+        [HFRMAX] "M" ((FRACT_MAX>>8 & 0xFF)),
+        [MIINC]  "M" ((0x0000 - MILLIS_INC) & 0xFF),
+        [MINCD]  "M" ((0xFFFF - MILLIS_INC) & 0xFF)
+      );
     #endif /* (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)) */
+    // Common ISR Epilogue for TCA, TCB and TCD, popping register in reverse Order
+    // 6 words, 14 clocks
+    __asm__ __volatile__(
+      "pop        r31"            "\n\t"
+      "pop        r30"            "\n\t" // 6 more clocks popping registers in reverse order.
+      "pop        r24"            "\n\t" // pop r24 to get the old SREG value - 2 clock
+      "out       0x3F,      r24"  "\n\t" // restore SREG - 1 clock
+      "pop        r24"            "\n\t"
+      "reti"                      "\n\t" // and 4 clocks for reti
+      ::
+      );
+    
+    
     }
   #endif /* defined (MILLIS_USE_TIMERRTC)*/
 
