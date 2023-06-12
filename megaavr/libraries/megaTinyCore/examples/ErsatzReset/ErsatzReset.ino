@@ -13,9 +13,27 @@
 #endif
 
 // We will always use pin 0 as the ersatz reset pin, EXCEPT on the 8-pin parts.
-// We can't use PA4 since it doesn't exist there, and pin 0 is one of the serial pins
-// depending on the configuration of USART0, so that would be a bad choice. Instead we
-// will use PA3, arduino pin 4, the pin between UPDI and geound on the chip.
+// We can't use PA4 since it doesn't exist there. PA6, PA7, PA1 and PA2 are serial pins
+// so not ideal choices, and PA3 is right off the menu (for this code, but not for you)
+// because we use these sketches for CI testing, and one of the configurations that we use
+// for that testing is with an external clock - so we can't use the CLKI pin or the CI
+// will fail, and spurrious failures like that are treated as release blocking issues
+// because of their tendency to hide non-spurrious errors.
+// In realworld situations, on the 8-pin parts, the correct pin to use is "whatever pin you
+// can spare" (if any).
+
+// Pin Choice: There are two types of interrupt pins on the tinyAVR parts. Pins 2 and 6 on every
+// port are said to be "Fully Asynchronous". This allows them to react to events shorter than a
+// system clock cycle, and to wake the part from deep sleep modes on "rising" and "falling"
+// edges as well as "low" level and "change" (both edges). The other pins are termed "Partially
+// Asynchronous". While fully async pins have obvious advantages, they also have a non-obvious
+// disadvantage: In order to respond to such brief events, they necessarily are more sensitive
+// to transients; in the case of ErsatzReset (or really any interrupt that relies on a pin being
+// pulled up in the normal state), if you're forced to use a fully async pin, you may find that
+// you need an external, physical, pullup resistor instead of just the internal one.
+// Certainly, you can't use a single write to the PINnCTRL register to both enable the interrupt
+// and turn on the pullups (you shouldn't ever - *but you could sometimes do this on partially
+// async pins* Not reliably mind you. )
 
 void setup() {
   #ifndef __AVR_ATtinyxy2__

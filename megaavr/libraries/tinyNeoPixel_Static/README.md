@@ -12,4 +12,4 @@ See [LICENSE.md for the library](LICENSE.md)
 
 The rest of this core (except where noted) is LGPL 2.1.
 
-This distinction is rarely relevant to Arduino users, but consult with a legal professional if in doubt.
+This distinction is rarely relevant, but consult with a legal professional if in doubt.

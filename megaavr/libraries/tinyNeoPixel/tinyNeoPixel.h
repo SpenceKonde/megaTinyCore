@@ -127,6 +127,7 @@ For normal variable access the optimizer can use those if appropriate. However
 pgm_read_byte_near() and it's ilk are wrappers around macros written in ASM.
 They are hence optimization-proof.
 
+Finally, if neither of those are an option - it gets declared with PROGMEM
 
 
 To generate the sine table, execute in python:
