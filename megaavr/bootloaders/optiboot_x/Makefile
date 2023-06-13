@@ -22,7 +22,6 @@ export
 MCU_TARGET = atmega4809
 
 LDSECTIONS  = -Wl,-section-start=.text=0 \
-	      -Wl,--section-start=.application=0x200 \
 	      -Wl,--section-start=.version=0x1fe
 
 BAUD_RATE=115200
@@ -101,7 +100,7 @@ override LDFLAGS = $(LDSECTIONS) -Wl,--relax -nostartfiles -nostdlib
 
 OBJCOPY	= $(GCCROOT)avr-objcopy
 OBJDUMP	= "$(GCCROOT)avr-objdump"
-SIZE	   = $(GCCROOT)avr-size -A
+SIZE	   = $(GCCROOT)avr-size
 
 include parse_options.mk
 

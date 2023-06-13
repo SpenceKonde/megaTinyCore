@@ -73,11 +73,11 @@
 /*                                                        */
 /* TIMEOUT_MS:                                            */
 /* Bootloader timeout period, in milliseconds.            */
-/* 500,1000,2000,4000,8000 supported.                     */
+/* 500, 1000, 2000, 4000, 8000 supported.                 */
 /*                                                        */
 /* UART:                                                  */
 /* UART number (0..n) for devices with more than          */
-/* one hardware uart (644P, 1284P, etc)                   */
+/* one hardware uart (megaAVR 0 and tinyAVR 2-series)     */
 /*                                                        */
 /**********************************************************/
 
@@ -134,7 +134,6 @@
 unsigned const int __attribute__((section(".version"))) __attribute__((used))
 optiboot_version = 256 * (OPTIBOOT_MAJVER + OPTIBOOT_CUSTOMVER) + OPTIBOOT_MINVER;
 
-
 #include <inttypes.h>
 #include <avr/io.h>
 
@@ -145,42 +144,32 @@ optiboot_version = 256 * (OPTIBOOT_MAJVER + OPTIBOOT_CUSTOMVER) + OPTIBOOT_MINVE
 
 /*
    Fuses.
-   This is an example of what they'd be like, but some should not
-   necessarily be under control of the bootloader.  You'll need a
-   a programmer that processes the .fuses section to actually get
-   these programmed into the chip.
-   The fuses actually REQUIRED by Optiboot are:
-    BOOTEND=2, SYSCFG0=(CRC off, RSTPIN as appropriate)
-   On some chips, the "reset" pin can be either RESET or GPIO.
-    Other also have the UPDI option. If RESET is not enabled we won't be
-    able to auto-reset.  But if the UPDI pin is set to cause RESET, we
-    won't be able to reprogram the chip without HV UPDI (which is uncommon.)
-   The settings show will set chips (ie m4809) with RESET/GPIO to use RESET,
-    and chips with RESET/GPIO/UPDI to leave it in UPDI mode - the bootloader
-    can still be started by a power-on RESET.
+This block was a holdover and was not used in any way, because almost every fuses is controlled
+by a tools submenu, and hence must not be embedded in the binary.
+
 */
+/*
 FUSES = {
-  .WDTCFG = 0,  /* Watchdog Configuration */
-  .BODCFG = FUSE_BODCFG_DEFAULT,  /* BOD Configuration */
-  .OSCCFG = FREQSEL_20MHZ_gc, /* 20MHz */
+  .WDTCFG = 0,
+  .BODCFG = FUSE_BODCFG_DEFAULT,
+  .OSCCFG = FREQSEL_20MHZ_gc,
   #ifdef FUSE_TCD0CFG_DEFAULT
-  .TCD0CFG = FUSE_TCD0CFG_DEFAULT,  /* TCD0 Configuration */
+  .TCD0CFG = FUSE_TCD0CFG_DEFAULT,
   #endif
   #ifdef RSTPIN
-  .SYSCFG0 =  CRCSRC_NOCRC_gc | RSTPINCFG_RST_gc, /* RESET is enabled */
+  .SYSCFG0 =  CRCSRC_NOCRC_gc | RSTPINCFG_RST_gc,
   #else
   # ifdef FUSE_RSTPINCFG_gm  // group mask will be defined for triple-func pins
-  .SYSCFG0 =  CRCSRC_NOCRC_gc | RSTPINCFG_UPDI_gc, /* RESET is not yet */
+  .SYSCFG0 =  CRCSRC_NOCRC_gc | RSTPINCFG_UPDI_gc,
   # else
-  .SYSCFG0 =  CRCSRC_NOCRC_gc, /* RESET is not yet */
+  .SYSCFG0 =  CRCSRC_NOCRC_gc,
   # endif
   #endif
-  .SYSCFG1 = 0x06,  /* startup 32ms */
-  .APPEND = 0,  /* Application Code Section End */
-  .BOOTEND = 2 /* Boot Section End */
+  .SYSCFG1 = 0x06,
+  .APPEND = 0,
+  .BOOTEND = 2
 };
-
-
+*/
 /*
    optiboot uses several "address" variables that are sometimes byte pointers,
    sometimes word pointers. sometimes 16bit quantities, and sometimes built
@@ -354,44 +343,48 @@ int main(void) {
   //  once, and then hit no entry conditions and jump to (the non-existent) app, run off the
   //  end of the flash, and repeat (discovered 11/14/20)
   //
-  //  Now, unless we are told that we should ASSUME_DIRECT_ENTRY_SAFE, when we detect something
+  //  Now, ~unless we are told that we should ASSUME_DIRECT_ENTRY_SAFE~, when we detect something
   //  that could be either execution running past the end of an empty flash, a direct entry
   //  attempt, or some dreadful error condition, that is, when we find no reset cause we do
-  //  what the app should have and fire a software reset. Net cost 10-12 bytes. We've still
-  //  got ~32 left, so I made the option for this is opt-out, not opt-in because I cannot
-  //  see any disadvantages, while `asm volatile("jmp 0");` is disturbingly common - often
-  //  with the only precautions taken being the reset of the most obvious registers, and
-  //  generally without understanding why they are doing what they are doing. With the
-  //  easy software reset, nobody should be using this method, but we all know they will.
-  //  This guarantees that execution reaching 0 without a reset will result in a reset
-  //  at the earliest opportunity followed by normal functioning.
+  //  what the app should have and fire a software reset. Net cost 10-12 bytes, but we have 32 left
+  //  after that. As of 1/1/2023, I have removed ASSUME_DIRECT_ENTRY_SAFE, on the grounds that I don't
+  //  think that even a tenth of a percent of users have any idea what they would need to do to make
+  //  that be true. It's like an ASSUME_SKY_IS_GREEN option - yes it is theoretically possible -
+  //  for example, near the poles, at night, under a bright Aurora, the sky may indeed be green.
+  //  but it is an outlandish thing to assume. ASSUME_DIRECT_ENTRY_SAFE essentially translates as
+  //  ASSUME_DEVELOPER_KNOWS_EVERY_REGISTER_USED_BY_OPTIBOOT_AND_RESET_THEM_ALL - which is even
+  //  more outlandish than ASSUME_SKY_IS_GREEN, because the latter would be true without specific
+  //  effort from the app writer under some conditions which will occur in practice. In contrast,
+  //  the core guarantees that the former will never be true unless the developer has made a great
+  //  effort here.
+  //  This would take a considerably larger amount of flash relative to the small 8-10 byte footprint
+  //  of a software reset.
+  //
+  //  The clock speed must be set to the POR default (div/6) (10 bytes)
+  //  If the internal oscillator calibration was changed, that must be reset to the factory cal
+  //  (or something that is closer than the factory cal to the nominal osc speed). (12 bytes,
+  //  if this was ever changed)
+  //  If an external clock was used, we must switch back to internal (10 bytes)
+  //  The UART used by the bootloader must be made safe, meaning the following members for the UART
+  //  struct: CTRLB (this gets written, but we need to start with it disabled), EVCTRL, TXPLCTRL
+  //  RXPLCTRL should be zero'ed out, and STATUS should be read and written back. (16 bytes)
+  //  Interrupts must be disabled. (2 bytes)
+  //  PINnCTRL for the two pins must be zero'ed out if you had either pin inverted (2 bytes per)
+  //  The jump takes 4 bytes.
+  //  That means for overhead penalty of between 6 and 34 bytes added to app binary size, which is usable
+  //  for other code, you would be able to....  ... enter the bootloader less robustly, and save 10 bytes
+  //  in the bootloader, where you can't use it.
+  //  I do belive the phrase "strictly worse" describes this.
 
   __asm__ __volatile__("clr __zero_reg__");  // known-zero required by avr-libc
   ch = RSTCTRL.RSTFR;   // get reset cause
-  #ifndef ASSUME_DIRECT_ENTRY_SAFE
-  if (ch==0) {
-    _PROTECTED_WRITE(RSTCTRL_SWRR,0x01);
+  if (ch == 0) {
+    _PROTECTED_WRITE(RSTCTRL_SWRR, 0x01);
   }
+  #if !defined(ENTRYCOND_REQUIRE)
+    #define ENTRYCOND_REQUIRE 0x35
   #endif
-  #ifdef START_APP_ON_POR
-    // If WDRF is set OR nothing except BORF and PORF are set, that's not bootloader entry condition
-    // so jump to app - this is for when UPDI pin is used as reset, so we go straight to app on start.
-    // 11/14: NASTY bug - we also need to check for no reset flags being set (ie, direct entry)
-    // and run bootloader in that case, otherwise bootloader won't run, among other things, after fresh
-    // bootloading!
-    #ifndef ASSUME_DIRECT_ENTRY_SAFE
-      if ((ch & RSTCTRL_WDRF_bm || (!(ch & (~(RSTCTRL_BORF_bm | RSTCTRL_PORF_bm)))))) {
-    #else
-      if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~(RSTCTRL_BORF_bm | RSTCTRL_PORF_bm)))))) {
-    #endif
-  #else
-    // If WDRF is set  OR nothing except BORF is set, that's not bootloader entry condition so jump to app
-    #ifndef ASSUME_DIRECT_ENTRY_SAFE
-      if ((ch & RSTCTRL_WDRF_bm || (!(ch & (~RSTCTRL_BORF_bm))))) {
-    #else
-      if (ch && (ch & RSTCTRL_WDRF_bm || (!(ch & (~RSTCTRL_BORF_bm))))) {
-    #endif
-  #endif
+  if ((ch & 0x08) || !(ch & ENTRYCOND_REQUIRE)) {
     // Start the app.
     // Dont bother trying to stuff it in r2, which requires heroic effort to fish out
     // we'll put it in GPIOR0 where it won't get stomped on.
@@ -400,8 +393,7 @@ int main(void) {
     GPIOR0 = ch; // but, stash the reset cause in GPIOR0 for use by app...
     watchdogConfig(WDT_PERIOD_OFF_gc);
     __asm__ __volatile__(
-      "jmp app\n"
-    );
+      "jmp 0x0200\n\t");
   }
 
   watchdogReset();
@@ -745,19 +737,23 @@ void watchdogConfig(uint8_t x) {
   OPTFLASHSECT const char f_version[] = "Version=" xstr(OPTIBOOT_MAJVER) "." xstr(OPTIBOOT_MINVER);
 #endif
 
-// Dummy application that will loop back into the bootloader if not overwritten
-// This gives the bootloader somewhere to jump, and by referencing otherwise
+//  Dummy application that will loop back into the bootloader if not overwritten
+//  This gives the bootloader somewhere to jump, and by referencing otherwise
 //  unused variables/functions in the bootloader, it prevents them from being
 //  omitted by the linker, with fewer mysterious link options.
+//  Is there any way to get rid of this cursed thing?! It would let us go back to
+//  the output from avr-size that isn't insanely verbose!
+//  I would greatly prefer mysterious link options, and avr-size showing the
+//  size correctly without having to print over a dozen irrelevant values!
+/*
 void  __attribute__((section(".application")))
 __attribute__((naked)) app();
 void app() {
-  uint8_t ch;
-
-  ch = RSTCTRL.RSTFR;
-  RSTCTRL.RSTFR = ch; // reset causes
   *(volatile uint16_t *)(&optiboot_version);   // reference the version
   do_nvmctrl(0, NVMCTRL_CMD_PAGEBUFCLR_gc, 0); // reference this function!
-  __asm__ __volatile__("jmp 0");               // similar to running off end of memory - It's worth noting that this code is not included in the generated binaries!
-  //    _PROTECTED_WRITE(RSTCTRL.SWRR, 1); // cause new reset
+  __asm__ __volatile__("jmp 0");               // This is okay here ONLY because this compiled code *is never included in the .hex file!*
+  //                    ^^^^^^ NEVER EVER DO THIS IN YOUR CODE! It's done like that here because I want to make this application section (which is not emitted in
+  //  the binary, **but is counted in avr-size**) to be as small as possible. And I don't like the fact that is craps up the size like that.
+  //    _PROTECTED_WRITE(RSTCTRL.SWRR, 1); <---- This is how you should jump to the bootloader from the app - you don't need to do anything else to ensure safety.!
 }
+*/
