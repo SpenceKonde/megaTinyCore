@@ -731,6 +731,10 @@ void watchdogConfig(uint8_t x) {
   #ifdef UARTTX
     OPTFLASHSECT const char f_uart[] = "UARTTX=" UART_NAME;
   #endif
+  
+  #ifdef RS485
+    OPT2FLASH(RS485);
+  #endif
 
   OPTFLASHSECT const char f_date[] = "Built:" __DATE__ ":" __TIME__;
   #ifdef BIGBOOT
