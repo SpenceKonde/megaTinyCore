@@ -824,10 +824,10 @@
 
 #if defined(__AVR_ATtiny3227__) || defined(__AVR_ATtiny827__) || \
     defined(__AVR_ATtiny1627__) || defined(__AVR_ATtiny427__) || \
-    defined(__AVR_ATtiny3226__) || defined(__AVR_ATtiny827__) || \
-    defined(__AVR_ATtiny1626__) || defined(__AVR_ATtiny427__) || \
-    defined(__AVR_ATtiny3224__) || defined(__AVR_ATtiny827__) || \
-    defined(__AVR_ATtiny1624__) || defined(__AVR_ATtiny427__)
+    defined(__AVR_ATtiny3226__) || defined(__AVR_ATtiny826__) || \
+    defined(__AVR_ATtiny1626__) || defined(__AVR_ATtiny426__) || \
+    defined(__AVR_ATtiny3224__) || defined(__AVR_ATtiny824__) || \
+    defined(__AVR_ATtiny1624__) || defined(__AVR_ATtiny424__)
 #define MYPMUX_REG PORTMUX.USARTROUTEA
 # if (UARTTX == B2)
 #  define UART_NAME "B2"
