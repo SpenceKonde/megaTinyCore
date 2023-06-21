@@ -146,7 +146,7 @@
             "out     0x3f,      r24"  "\n\t"  // restore it
             "pop      r24"            "\n\t"  // pop r24 to get it's old value back
             "pop      r31"            "\n\t"  // and r31
-            "pop      r30"            "\n\t"  // Pop the register the ISR did
+            "pop      r30"            "\n\t"  // Pop the register the ISR pushed
             "reti"                    "\n"    // return from the interrupt.
             ::);
         __builtin_unreachable();

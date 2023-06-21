@@ -374,7 +374,7 @@ int main(void) {
   //  That means for overhead penalty of between 6 and 34 bytes added to app binary size, which is usable
   //  for other code, you would be able to....  ... enter the bootloader less robustly, and save 10 bytes
   //  in the bootloader, where you can't use it.
-  //  I do belive the phrase "strictly worse" describes this.
+  //  I do believe the phrase "strictly worse" describes this.
 
   __asm__ __volatile__("clr __zero_reg__");  // known-zero required by avr-libc
   ch = RSTCTRL.RSTFR;   // get reset cause

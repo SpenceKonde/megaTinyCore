@@ -17,8 +17,16 @@ These items are in addition to what was listed under changes already in release.
 * Port any applicable enhancements made to DxCore to megaTinyCore, should such happen be made.
 * If there are *other substantial changes that need to occur* within the core, I am unaware of the complaints and hence have no plans to address them before the heat death of the universe. If you desire changes on a more rapid timeline, please create an issue so that I am aware of the presence of said problem, deficiency, or imperfection. Those form the action item list for core development activity, so if something is not listed there, **it is unlikely to be implemented/fixed/etc** simply due to my being unaware of any concern.
 
+
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes
+
+### Planned 2.6.9 or 2.7.0
+* Bugfix: optiboot_x.c that has been in use since newyears day 2023 was never committed.
+* Bugfix: Remove boot_opt.h which is not applicable to modern AVRs.
+* Bugfix: Remove the useless dummy app that forced us to use avr-size -A to see the size of the bootloader separated from the app, and switch avr-size -A to normal avr-size to take advantage of this.
+* Rebuild all bootloader hex files Size appears unchanged. We need to get some eyes on this prior to release to make sure it works. This is simple stuff to do -it doesn't need to be done by me, so if some others could test the ones now checked into github that would be awesome
+
 
 ## Released Versions
 ### 2.6.8

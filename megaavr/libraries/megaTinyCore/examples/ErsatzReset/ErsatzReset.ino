@@ -17,7 +17,7 @@
 // so not ideal choices, and PA3 is right off the menu (for this code, but not for you)
 // because we use these sketches for CI testing, and one of the configurations that we use
 // for that testing is with an external clock - so we can't use the CLKI pin or the CI
-// will fail, and spurrious failures like that are treated as release blocking issues
+// will fail, and spurious failures like that are treated as release blocking issues
 // because of their tendency to hide non-spurrious errors.
 // In realworld situations, on the 8-pin parts, the correct pin to use is "whatever pin you
 // can spare" (if any).

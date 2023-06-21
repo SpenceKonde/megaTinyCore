@@ -68,55 +68,38 @@
  * Since the USE_ASM_* = 1 option is apparently working, we do not recommend disabling it, as it will waste flash and hurt performance.
  *
  * Flash versus RAM table
- * |       |  modern tinyAVR series parts   | Other modern parts   |
- * | Flash | 0-series | 1-series | 2-series | mega | All Dx |  EA  |
- * |-------|----------|----------|----------|------|--------|------|
- * |  2048 |      128 |      128 |       -  |   -  |     -  |   -  |
- * |  4096 |      256 |      256 |      512 |   -  |     -  |   -  |
- * |  8192 |      512 |      512 |     1024 | 1024 |     -  | 1024 |
- * | 16384 |     1024 |     2048 |     2048 | 2048 |   2048 | 2048 |
- * | 32768 |       -  |     2048 |     3072 | 4096 |   4096 | 4096 |
- * | 49152 |       -  |       -  |       -  | 6120 |     -  |   -  |
- * | 65536 |       -  |       -  |       -  |   -  |   8192 | 6120 |
- * |  128k |       -  |       -  |       -  |   -  |  16384 |   -  |
- * This ratio is remarkably consistent. No AVR part was ever made with
- * less than 8:1 flash:ram, nor more than 16:1, since first ATmegas!
- * The sole exception? The ATmega2560/2561 has only 8k RAM, a 32:1 flash to ram ratio.
- * (to be fair, you are allowed to use external RAM - which was a very rare feature indeed,
+ * |       |  modern tinyAVR series parts   | Other modern parts          |
+ * | Flash | 0-series | 1-series | 2-series | mega | All Dx |  EA  |  EB  |
+ * |-------|----------|----------|----------|------|--------|------|------|
+ * |  2048 |      128 |      128 |       -  |   -  |     -  |   -  |   -  |
+ * |  4096 |      256 |      256 |      512 |   -  |     -  |   -  |   -  |
+ * |  8192 |      512 |      512 |     1024 | 1024 |     -  | 1024 | 1024 |
+ * | 16384 |     1024 |     2048 |     2048 | 2048 |   2048 | 2048 | 2048 |
+ * | 32768 |       -  |     2048 |     3072 | 4096 |   4096 | 4096 | 3072 |
+ * | 49152 |       -  |       -  |       -  | 6120 |     -  |   -  |   -  |
+ * | 65536 |       -  |       -  |       -  |   -  |   8192 | 6120 |   -  |
+ * |  128k |       -  |       -  |       -  |   -  |  16384 |   -  |   -  |
+ * This ratio is remarkably consistent. No AVR part was ever made with less than 8:1 flash:ram,
+ * nor more than 16:1, since the earliest recognizable AVRs. I am only aware of one exception. Was it some bizarro part
+ * from the dark ages? Nope - it's the surprisingly popular ATmega2560!
+ * The ATmega2560/2561 has only 8k RAM, a 32:1 flash to ram ratio. (to be fair, you are allowed to use external RAM
+ * on those, which was a very rare feature indeed, and that is by far the most widespread part with such a feature - though if you're using the
+ * XMEM interface, you've burned 19 GPIO lines right there.... The ATmega2560 is kind of the "I have a job too big for an AVR.
+ * But I don't know how to program anything else!" part. That is not a compliment.
+ *
+ * |  RAM  | TX | RX | Amount of RAM implied | Total ram used |
+ * |-------|----|----|-----------------------|----------------|
+ * | < 512 | 16 | 16 | 256b (0/1 w/2k or 4k) | 32b, all 1 port|
+ * | <1024 | 16 | 32 | 512b                  | 48b or 96b     |
+ * | <2048 | 32 | 64 | 1024b                 | 96b or 192b    |
+ * | More  | 64 | 64 | 2048b or 3072b        | 128b or 256b   |
+ *
+ * (the two numbers in final column are given because 0/1-serieas has 1 port, but tiny2 has 2, though if you only use one, you only
+ * get one set of buffers)
  */
-#if !defined(LTODISABLED)
-#if !defined(USE_ASM_TXC)
-  #define USE_ASM_TXC 2    // A bit slower than 1 in exchange for halfduplex.
-//#define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART and 44b for each additional one
-#endif
 
-#if !defined(USE_ASM_RXC)
-  #define USE_ASM_RXC 1    // This now works. Saves only 4b for 1 usart but 98 for each additional one
-#endif
+/* Buffer Sizing */
 
-#if !defined(USE_ASM_DRE)
-  #define USE_ASM_DRE 1      // This is the hard one...Depends on BOTH buffers, and has that other method of calling it. saves 34b for 1 USART and 68b for each additional one
-#endif
-#else
-  #warning "LTO has been disabled! ASM TXC/RXC/DRE not available. USART falling back to the old, flash-inefficient implementation with fewer features."
-  #if defined(USE_ASM_TXC)
-    #undef USE_ASM_TXC
-  #endif
-
-  #if defined(USE_ASM_RXC)
-    #undef USE_ASM_RXC
-  #endif
-
-  #if defined(USE_ASM_DRE)
-    #undef USE_ASM_DRE
-  #endif
-#endif
-
-
-// savings:
-// 44 total for 0/1,
-// 301 for 2-series, which may be nearly 9% of the total flash!
-// The USE_ASM_* options can be disabled by defining them as 0 (in the same way that buffer sizes can be overridden)
 // The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file (as defines in pins_arduino.h) or boards.txt (By passing them as extra flags).
 // note that buffer sizes must be powers of 2 only.
 
@@ -168,6 +151,45 @@
 #if (SERIAL_RX_BUFFER_SIZE & (SERIAL_RX_BUFFER_SIZE - 1))
   #error "ERROR: RX buffer size must be a power of two."
 #endif
+
+/* Buffer sizing done */
+
+
+#if !defined(LTODISABLED)
+#if !defined(USE_ASM_TXC)
+  #define USE_ASM_TXC 2    // A bit slower than 1 in exchange for halfduplex.
+//#define USE_ASM_TXC 1    // This *appears* to work? It's the easy one. saves 6b for 1 USART and 44b for each additional one
+#endif
+
+#if !defined(USE_ASM_RXC)
+  #define USE_ASM_RXC 1    // This now works. Saves only 4b for 1 usart but 98 for each additional one
+#endif
+
+#if !defined(USE_ASM_DRE)
+  #define USE_ASM_DRE 1    // This is the hard one...Depends on BOTH buffers, and has that other method of calling it. saves 34b for 1 USART and 68b for each additional one
+#endif
+#else
+  #warning "LTO has been disabled! ASM TXC/RXC/DRE not available. USART falling back to the old, flash-inefficient implementation with fewer features."
+  #if defined(USE_ASM_TXC)
+    #undef USE_ASM_TXC
+  #endif
+
+  #if defined(USE_ASM_RXC)
+    #undef USE_ASM_RXC
+  #endif
+
+  #if defined(USE_ASM_DRE)
+    #undef USE_ASM_DRE
+  #endif
+#endif
+
+
+// savings:
+// 44 total for 0/1,
+// 301 for 2-series, which may be nearly 9% of the total flash!
+// The USE_ASM_* options can be disabled by defining them as 0 (in the same way that buffer sizes can be overridden)
+// The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file (as defines in pins_arduino.h) or boards.txt (By passing them as extra flags).
+// note that buffer sizes must be powers of 2 only.
 
 #if USE_ASM_RXC == 1 && !(SERIAL_RX_BUFFER_SIZE == 256 || SERIAL_RX_BUFFER_SIZE == 128 || SERIAL_RX_BUFFER_SIZE == 64 || SERIAL_RX_BUFFER_SIZE == 32 || SERIAL_RX_BUFFER_SIZE == 16)
   #error "Assembly RX Complete (RXC) ISR is only supported when RX buffer size are 256, 128, 64, 32 or 16 bytes"
