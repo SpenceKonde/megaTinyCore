@@ -26,7 +26,7 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Bugfix: Remove boot_opt.h which is not applicable to modern AVRs.
 * Bugfix: Remove the useless dummy app that forced us to use avr-size -A to see the size of the bootloader separated from the app, and switch avr-size -A to normal avr-size to take advantage of this.
 * Rebuild all bootloader hex files Size appears unchanged. We need to get some eyes on this prior to release to make sure it works. This is simple stuff to do -it doesn't need to be done by me, so if some others could test the ones now checked into github that would be awesome
-
+* Merge in support for usng XDIR and RS485 (custom optiboot build only).
 
 ## Released Versions
 ### 2.6.8
