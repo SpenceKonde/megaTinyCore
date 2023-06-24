@@ -678,6 +678,7 @@
 
 /*
  * Handle devices with up to 4 uarts.  Rather inelegantly.
+ *  There is no alternative XDIR pin for USART2 and USART3.
  */
 #define USART_ALTPMUX 1
 
@@ -694,6 +695,8 @@
 #  define MYUART USART0
 #  define MYUART_TXPORT VPORTA
 #  define MYUART_TXPIN (1<<PORT0)
+#  define MYUART_XDIRPORT VPORTA
+#  define MYUART_XDIRPIN (1<<PORT3)
 #  define MYUART_PMUX_VAL (PORTMUX_USART0_DEFAULT_gc)
 # elif (UARTTX == A4)
 #  define UART_NAME "A4"
@@ -703,6 +706,8 @@
 #  define MYUART USART0
 #  define MYUART_TXPORT VPORTA
 #  define MYUART_TXPIN (1<<PORT4)
+#  define MYUART_XDIRPORT VPORTA
+#  define MYUART_XDIRPIN (1<<PORT7)
 #  define MYUART_PMUX_VAL (PORTMUX_USART0_ALT1_gc)
 # elif (UARTTX == B0)
 #  define UART_NAME "B0"
@@ -712,6 +717,8 @@
 #  define MYUART USART3
 #  define MYUART_TXPORT VPORTB
 #  define MYUART_TXPIN (1<<PORT0)
+#  define MYUART_XDIRPORT VPORTB
+#  define MYUART_XDIRPIN (1<<PORT3)
 #  define MYUART_PMUX_VAL (PORTMUX_USART3_DEFAULT_gc)
 # elif (UARTTX == B4)
 #  define UART_NAME "B4"
@@ -721,6 +728,8 @@
 #  define MYUART USART3
 #  define MYUART_TXPORT VPORTB
 #  define MYUART_TXPIN (1<<PORT4)
+#  define MYUART_XDIRPORT VPORTB
+#  define MYUART_XDIRPIN (1<<PORT3)
 #  define MYUART_PMUX_VAL (PORTMUX_USART3_ALT1_gc)
 # elif (UARTTX == C0)
 #  define UART_NAME "C0"
@@ -730,6 +739,8 @@
 #  define MYUART USART1
 #  define MYUART_TXPORT VPORTC
 #  define MYUART_TXPIN (1<<PORT0)
+#  define MYUART_XDIRPORT VPORTC
+#  define MYUART_XDIRPIN (1<<PORT3)
 #  define MYUART_PMUX_VAL (PORTMUX_USART1_DEFAULT_gc)
 # elif (UARTTX == C4)
 #  define UART_NAME "C4"
@@ -739,6 +750,8 @@
 #  define MYUART USART1
 #  define MYUART_TXPORT VPORTC
 #  define MYUART_TXPIN (1<<PORT4)
+#  define MYUART_XDIRPORT VPORTC
+#  define MYUART_XDIRPIN (1<<PORT7)
 #  define MYUART_PMUX_VAL (PORTMUX_USART1_ALT1_gc)
 # elif (UARTTX == F0)
 #  define UART_NAME "F0"
@@ -748,6 +761,8 @@
 #  define MYUART USART2
 #  define MYUART_TXPORT VPORTF
 #  define MYUART_TXPIN (1<<PORT0)
+#  define MYUART_XDIRPORT VPORTF
+#  define MYUART_XDIRPIN (1<<PORT3)
 #  define MYUART_PMUX_VAL (PORTMUX_USART2_DEFAULT_gc)
 # elif (UARTTX == F4)
 #  define UART_NAME "F4"
@@ -757,12 +772,16 @@
 #  define MYUART USART2
 #  define MYUART_TXPORT VPORTF
 #  define MYUART_TXPIN (1<<PORT4)
+#  define MYUART_XDIRPORT VPORTF
+#  define MYUART_XDIRPIN (1<<PORT3)
 #  define MYUART_PMUX_VAL (PORTMUX_USART2_ALT1_gc)
 # endif
 #endif  // ATmega4809
 
 /*
  * 8pin Tiny0 and Tiny1
+ *  There is no alternative XDIR pin. On the 412/212, there is no
+ *  XDIR pin at all!
  */
 #if defined(__AVR_ATtiny402__) || defined(__AVR_ATtiny202__) || \
     defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny212__)
@@ -775,6 +794,11 @@
 #  define MYUART USART0
 #  define MYUART_TXPORT VPORTA
 #  define MYUART_TXPIN (1<<PORT6)
+#  if (RS485 > 0) && (defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny212__))
+#   error XDIR pin not available on ATtiny412 and ATtiny212
+#  endif
+#  define MYUART_XDIRPORT VPORTA
+#  define MYUART_XDIRPIN (1<<PORT0)
 #  define MYUART_PMUX_VAL 0
 # elif (UARTTX == A1)
 #  define UART_NAME "A1"
@@ -784,6 +808,11 @@
 #  define MYUART USART0
 #  define MYUART_TXPORT VPORTA
 #  define MYUART_TXPIN (1<<PORT1)
+#  if (RS485 > 0) && (defined(__AVR_ATtiny412__) || defined(__AVR_ATtiny212__))
+#   error XDIR pin not available on ATtiny412 and ATtiny212
+#  endif
+#  define MYUART_XDIRPORT VPORTA
+#  define MYUART_XDIRPIN (1<<PORT0)
 #  define MYUART_PMUX_VAL (USART_ALTPMUX)
 # endif
 #endif // Tiny402/etc
@@ -809,6 +838,8 @@
 #  define MYUART USART0
 #  define MYUART_TXPORT VPORTB
 #  define MYUART_TXPIN (1<<PORT2)
+#  define MYUART_XDIRPORT VPORTB
+#  define MYUART_XDIRPIN (1<<PORT0)
 #  define MYUART_PMUX_VAL 0
 # elif (UARTTX == A1)
 #  define UART_NAME "A1"
@@ -818,16 +849,18 @@
 #  define MYUART USART0
 #  define MYUART_TXPORT VPORTA
 #  define MYUART_TXPIN (1<<PORT1)
+#  define MYUART_XDIRPORT VPORTA
+#  define MYUART_XDIRPIN (1<<PORT4)
 #  define MYUART_PMUX_VAL (USART_ALTPMUX)
 # endif
 #endif
 
 #if defined(__AVR_ATtiny3227__) || defined(__AVR_ATtiny827__) || \
     defined(__AVR_ATtiny1627__) || defined(__AVR_ATtiny427__) || \
-    defined(__AVR_ATtiny3226__) || defined(__AVR_ATtiny827__) || \
-    defined(__AVR_ATtiny1626__) || defined(__AVR_ATtiny427__) || \
-    defined(__AVR_ATtiny3224__) || defined(__AVR_ATtiny827__) || \
-    defined(__AVR_ATtiny1624__) || defined(__AVR_ATtiny427__)
+    defined(__AVR_ATtiny3226__) || defined(__AVR_ATtiny826__) || \
+    defined(__AVR_ATtiny1626__) || defined(__AVR_ATtiny426__) || \
+    defined(__AVR_ATtiny3224__) || defined(__AVR_ATtiny824__) || \
+    defined(__AVR_ATtiny1624__) || defined(__AVR_ATtiny424__)
 #define MYPMUX_REG PORTMUX.USARTROUTEA
 # if (UARTTX == B2)
 #  define UART_NAME "B2"
@@ -837,6 +870,8 @@
 #  define MYUART USART0
 #  define MYUART_TXPORT VPORTB
 #  define MYUART_TXPIN (1 << PORT2)
+#  define MYUART_XDIRPORT VPORTB
+#  define MYUART_XDIRPIN (1<<PORT0)
 #  define MYUART_PMUX_VAL 0
 # elif (UARTTX == A1)
 #  define UART_NAME "A1"
@@ -846,6 +881,8 @@
 #  define MYUART USART0
 #  define MYUART_TXPORT VPORTA
 #  define MYUART_TXPIN (1 << PORT1)
+#  define MYUART_XDIRPORT VPORTA
+#  define MYUART_XDIRPIN (1<<PORT4)
 #  define MYUART_PMUX_VAL (USART_ALTPMUX)
 # elif (UARTTX == C2)
 #  define UART_NAME "C2"
@@ -855,6 +892,8 @@
 #  define MYUART USART1
 #  define MYUART_TXPORT VPORTC
 #  define MYUART_TXPIN (1 << PORT2)
+#  define MYUART_XDIRPORT VPORTC
+#  define MYUART_XDIRPIN (1<<PORT3)
 #  define MYUART_PMUX_VAL (USART_ALTPMUX << 2)
 # endif
 #endif

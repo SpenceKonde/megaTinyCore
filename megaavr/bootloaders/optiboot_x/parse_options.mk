@@ -119,6 +119,12 @@ SS_CMD = -DSINGLESPEED=1
 endif
 endif
 
+HELPTEXT += "Option RS485=1               - use RS485 mode for UART, controlled by XDIR pin\n"
+ifdef RS485
+ifneq ($(RS485), 0)
+RS485_CMD = -DRS485=1
+endif
+endif
 
 #CPU Options
 
@@ -157,4 +163,4 @@ ifdef UARTTX
 UART_CMD = -DUARTTX=$(UARTTX)
 endif
 
-UART_OPTIONS = $(UART_CMD) $(BAUD_RATE_CMD) $(SOFT_UART_CMD) $(SS_CMD)
+UART_OPTIONS = $(UART_CMD) $(BAUD_RATE_CMD) $(SOFT_UART_CMD) $(SS_CMD) $(RS485_CMD)

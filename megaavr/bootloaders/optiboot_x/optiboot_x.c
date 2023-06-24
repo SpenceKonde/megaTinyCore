@@ -401,6 +401,9 @@ int main(void) {
 
   MYUART_TXPORT.DIR |= MYUART_TXPIN; // set TX pin to output
   MYUART_TXPORT.OUT |= MYUART_TXPIN;  // and "1" as per datasheet
+  #if RS485 > 0
+    MYUART_XDIRPORT.DIR |= MYUART_XDIRPIN; // set XDIR pin to output
+  #endif
   #if defined (MYUART_PMUX_VAL)
     MYPMUX_REG = MYUART_PMUX_VAL;  // alternate pinout to use
   #endif
@@ -411,7 +414,12 @@ int main(void) {
   }
   MYUART.DBGCTRL = 1;  // run during debug
   MYUART.CTRLC = (USART_CHSIZE_gm & USART_CHSIZE_8BIT_gc);  // Async, Parity Disabled, 1 StopBit
-  MYUART.CTRLA = 0;  // Interrupts: all off
+  #if RS485 > 0
+    /* Enable RS485 mode using XDIR pin */
+    MYUART.CTRLA = 1;  // Interrupts: all off, RS485 mode 1
+  #else
+    MYUART.CTRLA = 0;  // Interrupts: all off, RS485 off
+  #endif
   MYUART.CTRLB = USART_RXEN_bm | USART_TXEN_bm;
 
   // Set up watchdog to trigger after a bit
@@ -722,6 +730,9 @@ void watchdogConfig(uint8_t x) {
   #endif
   #ifdef UARTTX
     OPTFLASHSECT const char f_uart[] = "UARTTX=" UART_NAME;
+  #endif
+  #ifdef RS485
+    OPT2FLASH(RS485);
   #endif
 
   OPTFLASHSECT const char f_date[] = "Built:" __DATE__ ":" __TIME__;
