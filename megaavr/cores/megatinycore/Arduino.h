@@ -713,6 +713,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
 #endif
 /********************************************************************************
  * CORE AND HARDWARE FEATURE SUPPORT  *
+ * CORE_HAS_ERRORFUNS is defined and 1 if there is a badArg() and badCall() function supplied by the core
  * CORE_HAS_FASTIO is 1 when digitalReadFast and digitalWriteFast are supplied, and 2 when openDrainFast and pinModeFast are as well.
  * CORE_HAS_OPENDRAIN
  * CORE_HAS_PINCONFIG is 1 if pinConfig is supplied. The allows full configuration of any pin. It is 2 if it accepts commas instead of bitwise or between configuration parameters (NYI)
@@ -727,6 +728,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
  * the hardware worked, and not defined at all if the hardware doesn't have such a feature even in theory
  * CORE_SUPPORT_LONG_TONES is 1 if the core supports the three argument tone for unreasonably long tones.
  ********************************************************************************/
+#define CORE_HAS_ERRORFUNS              (1) /* megaTinyCore implements badArg and badCall */
 #define CORE_HAS_FASTIO                 (2)
 #define CORE_HAS_OPENDRAIN              (1)
 #define CORE_HAS_PINCONFIG              (1)
