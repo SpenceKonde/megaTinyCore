@@ -59,12 +59,13 @@ We have a largely self-consistent code style used throughout the core and associ
   a. astyle is only run in libraries and variants, not the core itself because it would need to be disabled on all files anyway.
 2. Always use the integer types that explicitly specify the datatype size. That means, avoid 'int' 'byte' 'char' 'long' etc. Types should be things like:
 
-| size   | signed  | unsigned | grudging | avoid | avoid | avoid        |
-|--------|---------|----------|----------|-------|-------|--------------|
-| 8-bit  |  int8_t |  uint8_t |        . | short |  byte |            . |
-| 16-bit | int16_t | uint16_t |   size_t |   int |  word | unsigned int |
-| 32-bit | int32_t | uint32_t |        . |  long |unsigned long | .     |
-| 64-bit | int64_t | uint64_t |        . |  long long | unsigned<br/>long long | . |
+| size   | signed  | unsigned | grudging | avoid | avoid | avoid        | Notes |
+|--------|---------|----------|----------|-------|-------|--------------|-------|
+| 8-bit  |  int8_t |  uint8_t |        . | short |  byte |            . | Use uint8_t's whenever possible |
+| 16-bit | int16_t | uint16_t |   size_t |   int |  word | unsigned int | C likes to default things to int16_t - this is often undesirable. |
+| 32-bit | int32_t | uint32_t |        . |  long |unsigned long         | Use 32-bit datatypes only when needed |
+| 32-bit |   float |      n/a |        . | double|     . |            . | Avoid 'bloating' point values unless absolutely necessary. |
+| 64-bit | int64_t | uint64_t |        . |  long long | unsigned<br/>long long | . | 64 bit datatypes are not used by the core in any way shape or form |
 
   a. Always use the smallest datatype appropriate for the data.
   b. If either a signed or unsigned value will work, use the unsigned one unless there is a reason not to.
@@ -79,7 +80,7 @@ We have a largely self-consistent code style used throughout the core and associ
 5. "hidden" things, like a special functions and methods not meant for use by end users should be start with a _
 6. For readability, please observe these style patterns. See comments below.
 ```c
-uint8_t foo() { // space after the close paren, open bracket on same line
+uint8_t foo() { // space after the close paren, open bracket on same line. Space betweenn { and //, and between // and the comment.
   uint8_t temp = getValue();  // space before and after =.
   if (temp == 0) {  // again, space before and after operators, except as noted below
     bar();
@@ -94,10 +95,13 @@ uint8_t foo() { // space after the close paren, open bracket on same line
 ```c
   if (temp == 255) return FOO_CANNOT_BE_BARRED;
   // or
-  if (digitalReadFast(mypin)==HIGH) return -1;
+  if (digitalReadFast(mypin) == HIGH) return -1;
 ```
-  This sort of construction is acceptable in the core only (not libraries, examples, or variants), and even then it is acceptable **if and only if** the added line, braces, and indentations actually would make it it less readable instead of more. Typically *this is only the case when the conditionally executed code is a **single trivial** statement* - a return statement, incrementing a variable, that sort of thing.
+  This sort of construction is acceptable in the core only (not libraries, examples, or variants), and even then it is deprecated and allowed **if and only if** the added line, braces, and indentations actually would make it it less readable instead of more. Typically *this is only the case when the conditionally executed code is a **single trivial** statement* - a return statement, incrementing a variable, that sort of thing.
 
+8. Braces do not get their own lines
+
+This construction is **not** acceptable. It needlessly inflates the visual size of the code so you can't see as much on the screen and does not benefit readability in any other way. Since readability is better when you can see more of the code, all else being equal, this fails the readability requirement.
 ```c
   if (condition)
   {
@@ -108,7 +112,8 @@ uint8_t foo() { // space after the close paren, open bracket on same line
     ... // code
   }
 ```
-This construction is **not** acceptable. It needlessly inflates the visual size of the code so you can't see as much on the screen and does not benefit readability in any other way. Since readability is better when you can see more of the code, all else being equal, this fails the readability requirement. The above code can be written in 37.5
+
+Look how much less visual space is taken up when the coding conventions are followed:
 
 ```c
   if (condition) {
@@ -118,19 +123,20 @@ This construction is **not** acceptable. It needlessly inflates the visual size 
   }
 ```
 
-
-```
-Note that the bit about spaces between operators and operands does not apply to the unary `*` and `&` operators!
+**Note that the bit about spaces between operators and operands does not apply to the unary `*` and `&` operators!**
 ```c
 PORT_t *portptr = &PORTA; // good
-PORT_t * portptr = & PORTA; // no. These look too much like multiplication and a bitwise and that's missing the first argument. My reasoning is that when the second argument is a
+PORT_t * portptr = & PORTA; // no. These look too much like multiplication and a bitwise and that's missing the first argument.
 ```
+This is down to personal taste, and is the sort of thing crusades are waged over. In my mind the * is not acting as an operator but rather part of the symbol (if var is a variable, &var is the address it is located at) as opposed to the "correct" interpretation (the & operator takes a variable as argument and returns it's address).
 
-7. 2 spaces per indentation level. All conditionally executed code MUST be indented.
-  a. Spaces, not tabs. There are to be no tabs in any file other than keywords.txt (which requires them).
-  b. Exception to 2 spaces on all indentation: no extra level of indentation for the contents of a header guarded by an includeguard.
-  c. When there's a large block of conditionally compiled code or a large block in an if/etc (ie, if you can't see the whole thing on the screen at once, the end should get a comment indicating which block it's the end of. This is optional but encouraged elsewhere
-  d. In headers and other places where there is a list of function prototypes or a run of similar bits of code, it is encouraged to pad the space between extra spaces to line them up and improve readability. Like thisd:
+
+7. **INDENTATION**
+  a. 2 spaces per indentation level. All conditionally executed or compiled code MUST be indented.
+  b. Spaces, not tabs. There are to be no tabs in any file other than keywords.txt (which requires them).
+  c. Exception to 2 spaces on all indentation: no extra level of indentation for the contents of a header guarded by an includeguard.
+  d. When there's a large block of conditionally compiled code or a large block in an if/etc (ie, if you can't see the whole thing on the screen at once, the end should get a comment indicating which block it's the end of. This is optional but encouraged elsewhere
+  e. In headers and other places where there is a list of function prototypes or a run of similar bits of code, it is encouraged to pad the space between extra spaces to line them up and improve readability. Like thisd:
 
 ```c
 uint8_t  foobar = 1
@@ -162,11 +168,12 @@ Notice how in this case, we noticed that we had an unusual structure for the tab
   f. Line up all the "\n\t" sequences.
   g. unless your asm takes only a small number of output or input operands, put input and output on separate lines. If you think it makes it clearer to put each opperand on it'd own line, do that.
   h. You can't rjmp to a label in another function. You can jmp to it (though this only works because of LTO and technically is not above board), but not rjmp. Just because you have an rjmp doesn't mean the linker will decide to place the routine you want to jump to within range of an rjmp!
-  i. A pointer to a volatile variable, which you use to change that variable using st X/Y/Z or std Y+q/Z+q only is an input operand. You haven't changed it! You've changed what it's pointing to, but you haven't changed the pointer. You must never use a pointer to a non-volatile variable to write to that variable from within asm.
+  i. Your code must be correct and valid: A pointer to a volatile variable, which you use to change that variable using st X/Y/Z or std Y+q/Z+q only is an input operand. You haven't changed it! You've changed what it's pointing to, but you haven't changed the pointer. Similarly, you must never use a pointer to a non-volatile variable to write to that variable from within asm. The only variables you are can change are volatile variables accessed via pointers, and opperands declared with the read-write or write only constraint.
   j. A pointer to a variable, even if you only use it to read the variable, if you use ld X+/Y+/Z+ or ld -X/-Y/-Z must be marked as a read-write operand - the operand is the pointer, and you're changing it!
-  k. Triple check your constraints. The problem with wrong constraints is that they sometimes compile... only to not compile under other circumstances. If you use SBIW/ADIW on something, it must have the w, e, x, y, or z constraint. This will often go unnoticed until it gets inlined into someplace where there is high register pressure, at which point it will no longer compile. If you use any of the 'immediate' instructions, the register being operated on MUST be specified with the +d or =d constraint (to get an upper register which you're allowed to write to). Again, this will not cause an error until the compiler happens to assign a register that is not an upper register, and which point everything promptly stops compiling with a very confusing error message. Wrong constraints are insidious for this reason
-  l. Inline assembly is hard to read, and hard to maintain. Don't use it gratuitously or where the benefits are negligible. Use it only where execution speed really really matters - that's why for instance, in these cores, you will find it in timekeeping functions, in ISRs, and not really elsewhere.
-  m. If it is outside of the core, you *will* need turn off astyle indentation checking or it will fail style checks.
+  k. If you specify a write only constraint it may contain anything until you write it. Specify a read-write opperand if you need to, for example, add to an existing value.
+  l. Triple check your constraints. The problem with wrong constraints is that they sometimes compile... only to not compile under other circumstances. If you use SBIW/ADIW on something, it must have the w, e, x, y, or z constraint. This will often go unnoticed until it gets inlined into someplace where there is high register pressure, at which point it will no longer compile. If you use any of the 'immediate' instructions, the register being operated on MUST be specified with the +d or =d constraint (to get an upper register which you're allowed to write to). Again, this will not cause an error until the compiler happens to assign a register that is not an upper register, and which point everything promptly stops compiling with a very confusing error message. Wrong constraints are insidious for this reason
+  m. Inline assembly is hard to read, and hard to maintain. Don't use it gratuitously or where the benefits are negligible. Use it only where execution speed really really matters - that's why for instance, in these cores, you will find it in timekeeping functions, in ISRs, and not really elsewhere.
+  n. If it is outside of the core, you *will* need turn off astyle indentation checking or it will fail style checks.
 
 This is an example of how it should look
 ```c
@@ -183,10 +190,11 @@ uint8_t myfunc(uint8_t a, uint8_t b) {
       "add    %0, %1"                   "\n\t" // And every line (almost) should have a comment
       "brcs   _myfuncend"               "\n\t" // Notice how the labels contain the name of the function to prevent name conflicts.
       "dec    %1"                       "\n\t" // decrement a.
-      "brneq  _myfuncloopstart"         "\n\t" // if we haven't hit zero yet, return to start of loop.
+      "brneq  _myfuncloopstart"         "\n\t" // if we haven't hit zero yet, return to start of loop. Notice also that as an internal function, labels are prefixed with _.
       "rjmp   .+2"                      "\n\t" // skip next instruction
     "_myfuncend:"                       "\n\t" // here's where we jump at the end if we overflowed in the loop...
-      "ldi    %0, 255"                  "\n\t" // This is the instruction that we are rjmp'ing over if a reached 0 without an overflow.
+      "ldi    %0, 255"                  "\n\t" // This is the instruction that we are rjmp'ing over if a reached 0 without an overflow. Otherwise we jumped to _mufuncend and
+                                               // perform the ldi
     :"=d" ((uint8_t) retval),                  // Output operands and input operands should go on different lines, if both kinds are present
      "+r" ((uint8_t) a)                        // and it is acceptable and often desirable to put each operand on it's own line entirely.
     :"r" ((uint8_t) b)                         // I have no position on named variables vs not naming them - both are acceptable.
@@ -197,18 +205,20 @@ uint8_t myfunc(uint8_t a, uint8_t b) {
 
 9. Really really ugly #ifdef hell is undesirable. yet often we have no choice; Alternate indentation schemes may be appropriate for this. See event.h for one such example.
 
-
-
 ## Things to be aware of when writing PR's
-Help us prevent bad code from getting merged by making sure to include only good code with your PR.
+
+### Help us prevent bad code from getting merged
+Do not submit pull requests containing bad code.
+
 ### Avoid common mistakes
 * macro definitions must have parentheses around the value they will take.
-* Be sure to consider what happens when millis is disabled. This is the second most commonly chosen option for millis timekeeping!
-  * delay() and delayMicroseconds() both work with millis disabled.
+* Be sure to consider what happens when millis is disabled. **This is the second most commonly chosen option for millis timekeeping after the default!**
+  * delay() and delayMicroseconds() both work with millis disabled (in the case of delay, only if millis is actually disabled from the menu, not enabled and subsequently broken by user code).
 * macros DO NOT CHECK TYPES; your macros that are exposed to user code library code must be hardened to take stupid types passed to them. Remember that while the core uses uint8_t's for all pin identifiers, code in the wild frequently follows the boneheaded lead of the Arduino IDE and uses signed 16-bit integers. A bug discovered in early 2023 involved the fact that if certain pin information macros were called with a signed value, the math where we checked if it was a valid pin could fuck up; we were checking if pin >= NUM_DIGITAL_PINS. When the values are unsigned, this works because -1 = 255 > pin whenever pin is valid - a single test can be used to catch both known NOT_A_PIN and other invalid pins not yet identified as much. But if a signed integer was passed to the macro, the default signed integer type would remain in use for the comparison with 0. So any negative number would pass through the test, and down the line would cause us to read from a memory location that was not part of the table we were looking values up in. If there is anything type sensitive, explicitly cast it.
-* Because of this, in macros, always use 255 if for some reason you have to write out the value of the NOT_A_whateveritis error values, not -1, even though you know it will end up in a uint8_t. There's no advantage to -1, and the potential disadvantage that if it doesn't go directly to something that turns it into a uint8_t, but passes through an int16_t, and math is done on it at that time, the results will be wrong.
+* Because of this, in macros, always use 255 if for some reason you have to write out the value of the NOT_A_whateveritis error values, not -1, even though you know it will end up in a uint8_t. There's no advantage to -1, but though you may know what type it will eventually have, you do not know the path it will take to get there, which may involve multiple data types.
+
 ### Performance and binary size matter.
-Particularly within the core API, performance matters. That means that things like division and modulo are bad, especially on large datatypes. Division and modulo both run the same routines. Approx time cost of math (how the variables are initialized may have an impact of +/- 2*(size of datatype), so this is not gospel, and the time required for division shown below is an average, since that routine does not execute in a fixed period of time. Large numerators and small denominators make it worse). Notice that switching to 64-bit types from 32-bit ones more than doubles the execution time - this is due to register pressure. It is likely to actually have an even larger effect in practice if there are other variables that need to be swapped out of working registers and reloaded.*
+Particularly within the core API, performance matters. That means that things like division and modulo are bad, especially on large datatypes. Division and modulo both run the same routines. Approx time cost of math (how the variables are initialized may have an impact of +/- 2 x (size of datatype), so this is not gospel. The time required for division shown below is an average, since that routine does not execute in a fixed period of time. Large numerators and small denominators make it worse - as you would expect, computing x / y where x < y is highly favorable. Notice that switching to 64-bit types from 32-bit ones more than doubles the execution time - this is due to register pressure. It is likely to actually have an even larger effect in practice if there are other variables that need to be swapped out of working registers and reloaded.*
 
 | Math Operation | uint8_t | uint16_t | uint32_t | uint64_t | float |
 |----------------|---------|----------|----------|----------|-------|
