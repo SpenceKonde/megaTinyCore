@@ -130,6 +130,7 @@ class NvmAccessProviderSerial(NvmAccessProvider):
                 write_chunk_size = len(data_aligned)
             chunk = data_aligned[0:write_chunk_size]
             self.logger.debug("Writing %d bytes to address 0x%06X", write_chunk_size, offset_aligned)
+            self.logger.debug(memtype_string);
             if memtype_string == MemoryNames.FUSES:
                 self.avr.nvm.write_fuse(offset_aligned, chunk)
             elif memtype_string == MemoryNames.EEPROM:
@@ -187,7 +188,7 @@ class NvmAccessProviderSerial(NvmAccessProvider):
         :param memory_info: dictionary for the memory as provided by the DeviceMemoryInfo class
         :param offset: relative offset in the memory type
         :param numbytes: number of bytes to read
-        :param max_read_chunk: memory is read im chunks of up to 512b at a time. The -rc parameter can shrink this if needed for compatibility with certain hardware. 
+        :param max_read_chunk: memory is read im chunks of up to 512b at a time. The -rc parameter can shrink this if needed for compatibility with certain hardware.
         :return: array of bytes read
         """
         offset += memory_info[DeviceMemoryInfoKeys.ADDRESS]

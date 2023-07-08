@@ -63,7 +63,7 @@ def determine_write_size(memory_name, page_size, device_name):
     write_size = 1
     device_name = device_name.lower()
     if memory_name is 'flash':
-        if (device_name.find('avr') != -1 and ((device_name.find('da') != -1) or (device_name.find('db') != -1))):
+        if (device_name.find('avr') != -1 and ((device_name.find('da') != -1) or (device_name.find('db') != -1) or (device_name.find('dd') != -1))):
             write_size = 2
         else:
             write_size = page_size

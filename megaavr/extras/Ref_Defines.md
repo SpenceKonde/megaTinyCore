@@ -102,14 +102,15 @@ The below parameter defines should be used in preference to the above.
 * `_AVR_FAMILY` - String - "DA", "DB", "DD, "DU", "EA", "EB" or "T0", "T1", "T2" depending on what kind of part it is.
 * `_AVR_PINCOUNT` - The number of physical pins
 * `_AVR_FLASH` - Flash size, in KB
-* `__AVR_DA__`
-* `__AVR_DB__`
-* `__AVR_DD__`
-* `__AVR_EA__` (unreleased, but official, will be DxCore)
-* `__AVR_EB__` (unreleased, but official, will be DxCore)
-* `__AVR_TINY_0__`
-* `__AVR_TINY_1__`
-* `__AVR_TINY_2__`
+* `__AVR_DA__` (official, defined by avrlibc))
+* `__AVR_DB__` (official, defined by avrlibc))
+* `__AVR_DD__` (official, defined by avrlibc))
+* `__AVR_DU__` (unreleased - official, defined by avrlibc)
+* `__AVR_EA__` (official, defined by avrlibc)
+* `__AVR_EB__` (unreleased - official, defined by avrlibc)
+* `__AVR_TINY_0__` (unofficial - defined by the core)
+* `__AVR_TINY_1__` (unofficial - defined by the core)
+* `__AVR_TINY_2__` (unofficial - defined by the core)
 * `MEGATINYCORE_MCU` - The number after "ATtiny" in the part name.
 * `MEGATINYCORE_SERIES` - the part series, 0, 1, or 2.
 
@@ -185,17 +186,18 @@ This can be set to 102, 103, or 104 depending on flash size - the compiler sets 
 ## Core feature detection
 * `DEVICE_PORTMUX_TCA = 1` 1 = each wave output channel can be moved individually, like tinyAVRs. 2 = Whole thing moved at once
 There are a number of macros for determining what (if any) features the core supports (these are shared with megaTinyCore and ATTinyCore (2.0.0+)
-* `CORE_HAS_FASTIO = 2` - If defined as 1 or higher. indicates that `digitalWriteFast()` and `digitalReadFast()` is available. If undefined or defined as 0, these are not available. If 2 or higher, s it is for all parts on megaTinyCore, `pinModeFast()` is also available. If defined as -1, there are no `digital____Fast()` functions, but with constant pins, these functions are optimized aggressively for speed and flash usage (though not all the way down to 1 instruction).
+* `CORE_HAS_FASTIO = 2` - If defined as 1 or higher. indicates that `digitalWriteFast()` and `digitalReadFast()` is available. If undefined or defined as 0, these are not available. If 2 or higher, as it is for all parts on megaTinyCore, `pinModeFast()` is also available. If defined as -1, there are no `digital____Fast()` functions, but with constant pins, these functions are optimized aggressively for speed and flash usage (though not all the way down to 1 instruction). If not defined at all, the core may not be aggressively optimized.
 * `CORE_HAS_OPENDRAIN = 1` - If defined as 1, indicates that `openDrain()` and (assuming `CORE_HAS_FASTIO` is >= 1) `openDrainFast()` are available. If undefined or 0, these are not available.
 * `CORE_HAS_PINCONFIG = 1` - If defined as Indicates that `pinConfigure()` is available. If not defined or defined as 0, it is not available.
-* `CORE_HAS_TIMER_TAKEOVER = 1` - if defined as 1, `takeOverTCxn()` functions are available to let user code take full control of TCA0, TCA1 and/or TCD0.
-* `CORE_HAS_TIMER_RESUME = 0`- if defined as 1, the corresponding `resumeTCxn()` functions, which reinitialize them and return them to their normal core-integrated functions, are available. Not available on megaTinyCore.
+* `CORE_HAS_TIMER_TAKEOVER = 1` - if defined as 1 or more, `takeOverTCxn()` functions are available to let user code take full control of TCA0, TCA1 and/or TCD0. If a part, for which support has been provided by one of my cores, in a release, without a takeOverTCxn() function for a timer it has, and later gets a takeOverTCxn function for that timer, there would need to be a CORE_HAS_TIMER_TAKEOVER = 2 for versions of the core that have that new function. I hope, however, to give all new timers a takeOver function if one is appropriate with the first release of support for parts having those timers.
+* `CORE_HAS_TIMER_RESUME = 0`- if defined as 1, the corresponding `resumeTCAn()` functions, which reinitialize them and return them to their normal core-integrated functions, are available. Different values in the future might be used to indicate that resume timers other than TCAn, or which might have an option to resume TCD0. Not available on megaTinyCore.
 * `ADC_NATIVE_RESOLUTION = 10 or 12`- This is the maximum resolution, in bits, of the ADC without using oversampling.
 * `ADC_NATIVE_RESOLUTION_LOW = 8` - The ADC has a resolution setting that chooses between ADC_NATIVE_RESOLUTION, and a lower resolution.
-* `ADC_DIFFERENTIAL = 0, 1, or 2` - This is defined as 1 if the part has a basic differential ADC (no gain, and V<sub>analog_in</sub> constrained to between Gnd and V<sub>Ref</sub>, as on the Dx-series), and 2 if it has a full-featured one. It does not indicate whether said differential capability is exposed by the core. This is 0 for 0/1-series and 2 for 2-series. Classic AVRs on ATTinyCore 2.0.0+ will define this as -1 if they have a differential ADC, as their ADC takes differential channels in a totally different way. See also `CORE_HAS_ANALOG_DIFF`
+* `ADC_DIFFERENTIAL = 0, 1, or 2` - This is defined as 1 if the part has a basic differential ADC (no gain, and V<sub>analog_in</sub> constrained to between Gnd and V<sub>Ref</sub>, as on the Dx-series), and 2 if it has a full-featured one. It does not indicate whether said differential capability is exposed by the core. This is 0 for 0/1-series and 2 for 2-series. Classic AVRs on ATTinyCore 2.0.0+ will define this as -1 if they have a differential ADC, as their ADC takes differential channels in a totally different way, and will not define it at all if they do not. See also `CORE_HAS_ANALOG_DIFF`
 * `SUPPORT_LONG_TONES = 0 or 1` - On some modern AVR cores, an intermediate value in the tone duration calculation can overflow (which is timed by counting times the pin is flipped) leading to a maximum duration of 4.294 million millisecond. This is worst at high frequencies, and can manifest at durations as short as 65 seconds worst case. Working around this, however, costs some flash, so megaTinyCore only supports long tones on parts with more than 8k of flash. If `SUPPORT_LONG_TONES` is defined as 1, as long as (duration * frequency)/500 < 4.294 billion, the duration will not be truncated. If it is defined as 0, the bug was known to the core maintainer and they chose not to fully correct it (eg, to save flash) but took the obvious step to reduce the impact, it will be truncated if (duration * frequency) exceeds 4.294 billion. If `SUPPORT_LONG_TONES` is not defined at all, the bug may be present in its original form, in which case the duration will be truncated if (duration * frequency) exceeds 2.14 billion.
 * `CORE_HAS_ANALOG_ENH = 1` - If defined as 1, `analogReadEnh()` (enhanced analogRead) is available. Otherwise, it is not; it is 1 for all parts on recent versions of megaTinyCore.
-* `CORE_HAS_ANALOG_DIFF = 0 or 1` - If defined as 1, `analogReadDiff()` (differential enhanced analogRead) is available. Otherwise, it is not. 1 for 2-series, 0 for others. It has same features as enhanced, except that it takes a differential measurement. If this is -128, (128 unsigned), it is a classic AVR, not a modern one with a differential ADC, and the core's analogRead implementation accepts the constants listed in the core documentation to make an analogRead of a differential pair.
+* `CORE_HAS_ANALOG_DIFF = 0 or 1` - If defined as 1, `analogReadDiff()` (differential enhanced analogRead) is available. Otherwise, it is not. 1 for 2-series (which has a differential ADC) and for the Ex/Dx-series, which have at least a mediocre , 0 for others (as they do not). It has same features as enhanced, except that it takes a differential measurement. If this is -128, (128 unsigned), it is a classic AVR, not a modern one with a differential ADC, and the core's analogRead implementation accepts the constants listed in the core documentation to make an analogRead of a differential pair.
+* `CORE_HAS_ERRORFUNS = 1` - Newly added define - it's become apparent that reliance on the core's badArg and badCall functions was impacting portability of library code; this can be tested for by libraries which use badArg() and badCall() so that if it's not present, the library can include a copy of the definitions. Mostly meant for internal use, though some other people *might* be using badArg() or badCall() in their libraries?
 
 ## Hardware feature detection
 * `ADC_MAX_OVERSAMPLED_RESOLUTION` = 13 (tinyAVR0/1), 15 (Dx-series) or 17 (tinyAVR 2 or Ex-series) - If either `CORE_HAS_ANALOG_ENH` or `CORE_HAS_ANALOG_DIFF` is 1, this will be defined as the maximum resolution obtainable automatically via oversampling and decimation using those functions.
@@ -204,55 +206,60 @@ There are a number of macros for determining what (if any) features the core sup
 
 ## Compatibility macros
 Occasionally Microchip has not kept the names of registers or bitfields consistent between families of parts, even when the function was not changed. In some cases these have even been changed between versions of the ATpack! The places where we've papered over identical register functionality with different names are:
-* The `GPIO`/`GPIOR`/`GPR` registers - they are now `GPR.GPRn`. The old names will work too, `GPIORn` is recommended for maximum compatibility.
-* The `TCA_SINGLE_EVACTA` bitfield - formerly known as `TCA_SINGLE_EVACT` and it's group codes. The old names will work too, permitting code portability from tinyAVR to Dx.
-* The `RTC_CLKSEL` group codes that were renamed on non-tiny parts. The old names will work too, permitting code portability from tinyAVR to Dx.
-* The `CLKCTRL_SELHF_CRYSTAL_gc` option on DB-series parts which was renamed to `CLKCTRL_SELHF_XTAL_gc`. This goes both ways, as different ATpacks name them differently.
-* All things `CLKCTRL_FREQSEL` related, which had the E dropped in some ATPACK versions. This goes both ways, as different ATpacks name them differently.
+* The `GPIO`/`GPIOR`/`GPR` registers - on the most recent parts, these are officially `GPR.GPRn`. We provide whichever of the following are not present: GPIOn, GPIORn, and GPR_GPRn. `GPIORn` is recommended for maximum compatibility. (GPIOR compatibility note: If writing code that may be ported to classic AVRs, GPIOR3 does not exist at all, and only GPIOR0 is guaranteed to be in the low I/O space - check the register map.
+* The `TCA_SINGLE_EVACTA` bitfield - formerly known as `TCA_SINGLE_EVACT` and it's group codes - the old names will work too, permitting code portability from tinyAVR to Dx.
+* The `RTC_CLKSEL` group codes have different spellings of some abbreviations on tinyAVR vs Dx/Ex.  The old names will work too, permitting code portability from tinyAVR to Dx.
+* The `CLKCTRL_SELHF_CRYSTAL_gc` option on DB-series parts which was renamed to `CLKCTRL_SELHF_XTAL_gc`. Both names work.
+* All things `CLKCTRL_FREQSEL` related, which had the E dropped in some ATPACK versions. Both FRQSEL and the old FREQSEL spellings work. I dunno, there must be a shortage of capital E's at Microchip. Maybe it's the new EA and upcoming EB parts hogging all the E's?
 * All multi-bit bitfields - the `_bp` and `_bm` defines now have an underscore before the bit number. There are about a thousand impacted defines. At least they had the decency to bump the major version.
 
 ## Errata
 There are ah, a lot of errata on these parts, sad to say. See the [errata summary](./Errata.md) for details on them.
 These constants are defined as either:
-* `ERRATA_IRREL` (-127) - This errata does not apply to a part family because the conditions that would make it manifest can never exist there (ex: ERRATA_PORT_PD0 is irrelevant to the DA, because there are no DA parts that don't have a PD0, only smaller DBs have that (where they put the VDDIO2 pin instead).
-* `-1` - This applies to all parts in this family.
+* `ERRATA_IRREL` (-128) - This errata does not apply to a part family because the conditions that would make it manifest can never exist there (ex: ERRATA_PORT_PD0 is irrelevant to the DA, because there are no DA parts that don't have a PD0, only smaller DBs have that issue (the nominal PD0 pin is where they put the VDDIO2 pin instead, but the input buffer for PD0 was still present, and with no pin, would always be floating, and needs to have it's input buffer turned off to avoid wasting power).
+* `-1` - This applies to all specimens of this part.
 * `0` - This does not apply to any parts in this family
-* Any other value - This is the die REVID that corrected this problem.
+* Any other value - This is the REVID that corrected this problem.
+* use checkErrata() for best results, ex, if (checkErrata)
 
-`checkErrata(errata name)` will return `ERRATA_APPLIES` (1/true) if the errata applies to this part, or `ERRATA_DOES_NOT_APPLY` (0/false) if the errata does not apply or is irrelevant.
+`checkErrata(errata name)` will return 1/true if the errata applies to this part, or 0/false if the errata does not apply or is irrelevant.
 
-Note that checkErrata does not get compiled to a known constant unless either all specimens of the part in question or none of them have the issue. Right now, only the A4 AVR DB-series parts have bugs that were fixed by a subsequent die rev - but very few of them made it out of Microchip - at least to the general public. I ordered them basically as soon as they were for sale, and received them before they even posted the datasheet; they were all A5s. Therefore, to maximize performance, **the problems corrected by A5 in the DB128 and DB64 are are reported by the core to not impact those devices**, that is, on a DB-series, `ERRATA_PLL_RUNSTBY` will be defined as 0, not 0xA5. A similar thing happened on the DD-series, except that the DD-series didn't have any particularly bad errata. The 64k parts with 28+ pins and the smaller parts with less have two minor issues related to HV override of UPDI pin function (no define is provided for them; I couldn't think of a plausible use case where you would want different software options compiled in based on that - it impacts the upload process, not the code itself.
+Note that checkErrata does not get compiled to a known constant - it has to read the SYSCFG.REVID - if there are circulating revisions that do and don't have the bug. But if all specimens either do or do not have the bug, they will.
 
 When future die revs fix some of these problems, checkErrata() will no longer compile to a known constant. Thus, do not use it in #if statements. Do not use it in functions that your application relies upon the compiler constant-folding and optimizing away.
 
 
-| Errata name               |  DA  |  DB  |  DD  | Quick description
+| Errata name               |   0  |   1  |   2  | Quick description
 |---------------------------|------|------|------|---------------------------------------
-| Many severe ADC bugs      | No   | A5   | No   | The ADC on the A4 DB parts (of which a vanishingly small number are in circulation) had tons of very serious ADC and OPAMP bugs. Hence the urgent die rev.
-| ERRATA_ADC_PIN_DISABLE    | All  | All  | No   | Pin pointed to by MUXPOS and MUXNEG are disabled, even when no conversion is ongoing.
-| ERRATA_CCL_PROTECTION     | All  | All  | No   | The whole CCL peripheral must be disabled in order to disable any one LUT to reconfigure it.
-| ERRATA_CCL_LINK           | All  | A5   | No   | On 28/32 pin parts, LINK input on LUT3 non-functional (it's trying to take input from non-existent LUT4)
-| ERRATA_DAC_DRIFT          | All  | All  | No   | If DAC used as internal source (OUTEN = 0), accuracy drifts over time.
-| ERRATA_EVSYS_PORT_B_E     | 128k | No   | No   | PE and PB pins not present on 48-pin parts not connected to EVSYS on 64 pin parts.
-| ERRATA_NVM_MULTIPAGE      | All  | All  | All  | A multipage erase can ignore the write protection, if it could write to the first page in that section.<br/>This requires a terribly contrived scenario to manifest.
-| ERRATA_NVM_ST_BUG         | 128k | No   | No   | ST incorrectly applies section protections, use SPM to write flash instead. It's twice as fast anyway.
-| ERRATA_PLL_RUNSTBY        | All  | A5   | No   | Runstby does not work for the PLL. It will never run during standby.<br/>Not only that, the PLLS status bit won't be set either.
-| ERRATA_PLL_XTAL           |  -   | All  | No   | PLL cannot use external crystal as source.
-| ERRATA_PORT_PD0           |  -   | All  | No   | On 28/32 pin DB-series, PD0 is not connected to a pin, but it is still set as an input. The core implements the recommended fix of disabling input.
-| ERRATA_TCA_RESTART        | All  | All  | No   | TCA restart resets direction, like DA/DB datasheet says. Both datasheet and silicon were "wrong".
-| ERRATA_TCA1_PORTMUX       | 128k | No   | No   | TCA1 mux options 2 and 3 don't work.
-| ERRATA_TCB_CCMP           | All  | All  | All  | In 8-bit PWM, CCMP treated as a 16-bit register not 2 8-bit ones, so both must be written, never just 1. Universal on modern AVRs.
-| ERRATA_TCD_ASYNC_COUNTPSC | All  | All  | No   | Async event's are missed when TCD tries to use them if count prescaler is engaged.
-| ERRATA_TCD_PORTMUX        | All  | All  | No   | TCD PORTMUX unusable. Only default portmux pins work.
-| ERRATA_TCD_HALTANDRESTART | All  | All  | All  | Halt and Wait for SW restart fault mode does not work in dual slope more, or if CMPASET = 0
-| ERRATA_TWI_PINS           | All  | All  | No   | The OUT register for SCL and SDA must be low, otherwise TWI will try to drive the pins high! (Wire.h makes sure this is done correctly)
-| ERRATA_TWI_FLUSH          | All  | All  | All  | TWI_FLUSH command leaves the bus in unknown state. That is exactly what it was supposed to fix.
-| ERRATA_USART_ISFIF        | All  | All  | All  | After an inconsistent sync field (ISFIF), you must turn off RXC and turn it back on
+| `ERRATA_CCL_PROTECTION`   | All  | All  | All  | The whole CCL peripheral must be disabled in order to disable any one LUT to reconfigure it.
+| `ERRATA_CCL_OUTEN`        | Some | Some | No   | Some 0 and 1-series parts can't use the LINK input if the other LUT doesn't have OUTEN set.
+| `ERRATA_CCL_DLATCH`       | All  | Most | No   | Except on Rev. C 3216 and 3217, the D-type Latch sequencer option is broken.
+| `ERRATA_TCA_RESTART`      | All  | All  | All  | TCA restart resets direction, like DA/DB datasheet says. Both datasheet and silicon were "wrong".
+| `ERRATA_TCB_CCMP`         | All  | All  | All  | In 8-bit PWM, CCMP treated as a 16-bit register not 2 8-bit ones, so both must be written, never just 1. Universal on modern AVRs.
+|`ERRATA_TCD_ASYNC_COUNTPSC`|  -   | All  |  -   | Async event's are missed when TCD tries to use them if count prescaler is engaged.
+| `ERRATA_TCD_AUTOUPDATE`   |  -   | Some |  -   | One of the three errata fixed in rev B of the 16k parts, out of the 34 errata present.
+| `ERRATA_TCD_PORTMUX`      |  -   | All  |  -   | TCD PORTMUX unusable. Only default portmux pins work.
+|`ERRATA_TCD_HALTANDRESTART`|  -   | All  |  -   | Halt and Wait for SW restart fault mode does not work in dual slope more or if CMPASET = 0
+| `ERRATA_TWI_PINS`         | All  | All  | No   | The OUT register for SCL and SDA must be low, otherwise TWI will try to drive the pins high! (Wire.h makes sure this is done correctly)
+| `ERRATA_TWI_FLUSH`        | All  | All  | All  | TWI_FLUSH command leaves the bus in unknown state. That is exactly what it was supposed to fix.
+| `ERRATA_USART_ISFIF`      | All  | All  | All  | After an inconsistent sync field (ISFIF), you must turn off RXC and turn it back on
 | ERRATA_USART_ONEWIRE_PINS | All  | All  | No   | The DIR register for TX must be set INPUT when ODME bit is set, or it can drive pin high. This is handled internally by the core, and you likely don't need to know.
-| ERRATA_USART_WAKE         | All  | All  | No   | You must clear SFDEN when waking on start of frame detection before you clear the RXCIF. This is handled internally by the core, and you likely don't need to know.
-| ERRATA_ZCD_PORTMUX        | All  | A5   | No   | All ZCD output pins controlled by ZCD0 bit of PORTMUX
+| `ERRATA_USART_FRAMING`    | All  | Most | No   | Framing errors would corrupt future received bytes. The fix for this, present on Rev. C of the tiny 3216/3217, introduced the USART SFDEN wake bug below, and the ISFIF bug.
+| `ERRATA_USART_WAKE`       |  No  | Few  | All  | You must clear SFDEN when waking on start of frame detection before you clear the RXCIF. This is handled internally by the core, and you likely don't need to know. Present on any parts that don't have the framing error bug.
+| `ERRATA_USART_ISFIF`      |  No  | Few  | All  | Likely a consequence of the revised USART silicon's fix for "Full range duty cycle not supported when validating LIN sync" issue. That issue does not have a define, as it is related to one of the very few serial features we don't support
+| `ERRATA_RTC_PITANDRTC`    | All  | Most | No   | One of the nastiest modern AVR errata. The PIT and RTC are inappropriately entangled, and neither will work correctly if the other is not enabled, and the ways in which they don't-work are perverse. Additionally, writing RTC.CTRLA resets the PIT interval timer on impacted parts. Both of these were fixed in 3216/3217 Rev C, but nowhere else.
+| `ERRATA_TCB_SYNCUPD`      | All  | All  | No   | SYNCUPD mode does not restart the TCB from a TCA restart command.
+| `ERRATA_TCB_PULSELEN`     | All  | All  | No   | The pulse length must be longer than the selected TCB clock period to be detected when in Time-Out Check and Input Capture Frequency and Pulse-Width Measurement.
+| `ERRATA_TCB_ICFPWM`       | Some | Some | No   | Unevenly scattered across the 0/1-series. Input Capture Frequency and Pulse-Width Measurement on impacted parts only works when using CLKSEL = 0.
+| `ERRATA_AC_FALSETRIGGER`  | Some | Some | No   | The analog comparators on some tiny 0/1-series parts can give false triggers, see the errata for details.
+| `ERRATA_AC_INTFLAG`       | Most?| Most?| No   | ACs didn't raise the INTFLAG unless the interrupt is enabled.
+| `ERRATA_FUSE_OSCLOCK`     | Most?| Most?| No   | OSCLOCK from fuses was applied before the factory cal was loaded, preventing factory cal from being loaded.
+| `ERRATA_ADC_FLAGSRESH`    | Some | Some | No   | Only an issue in 8-bit mode - the interrupt flags are only cleared automatically by reading the high byte of the result.
+| `ERRATA_ADC_FREERUN`      | Some | Some | No   | Certain control registers don't properly get applied if changed while freerunning mode in use, and an extra sample is taken after it is disabled.
+| `ERRATA_ADC_ASDVSAMPLEN`  | Some | Some | No   | SAMPLEN and INITDLY/ADSV do not play well together
+| `ERRATA_ADC_WCMP`         | Some | Some | No   | WCMP needs another INITDLY after waking the part from standby sleep mode.
 
-Note: Some problems only appeared on the 128k version of the AVR DA-series
+
 
 ## Identifying Timers
 Each timer has a number associated with it, as shown below. This may be used by preprocessor macros (`#if` et. al.) or `if()` statements to check what `MILLIS_TIMER` is, or to identify which timer (if any) is associated with a pin using the `digitalPinToTimer(pin)` macro. Defines are available on all parts that the core supports, whether or not the timer in question is present on the part (ie, it is safe to use them in tests/code without making sure that the part has that timer). There are two very closely related macros for determining pin timers:

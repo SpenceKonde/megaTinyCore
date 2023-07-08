@@ -115,6 +115,15 @@ class NvmUpdiTinyMega(NvmUpdi):
         :param address: address to write to
         :param data: data to write
         """
+        if len(data) == 1:
+            if (address >= 0x1280) and (address <= 0x128A):
+                self.logger.info("Write to address 0x%06x (which is either the lockbyte or a fuse)")
+                return write_fuse(address, data, write_delay = 2)
+        if (len(data) % 2 == 1) and (len(data) <= 256): # The second condition should never be false. No part with NVMv0 has been released or
+            # announced with a page size larger than 128b, and the current logic works up to twice that voltage. The situation that triggers this
+            # codepath can (will) happen at the very end of an upload if you trick the compiler into generating a binary with an odd length
+            # This is quite uncommon, but (because it happens only at the end of a write) the use of a b
+            return self.write_nvm(address, data, use_word_access=False, blocksize=blocksize, bulkwrite = 0, pagewrite_delay=pagewrite_delay)
         return self.write_nvm(address, data, use_word_access=True, blocksize=blocksize,  bulkwrite=bulkwrite, pagewrite_delay=pagewrite_delay)
 
     def write_eeprom(self, address, data):
@@ -123,8 +132,7 @@ class NvmUpdiTinyMega(NvmUpdi):
         :param address: address to write to
         :param data: data to write
         """
-        return self.write_nvm(address, data, use_word_access=False,
-                              nvmcommand=constants.UPDI_V0_NVMCTRL_CTRLA_ERASE_WRITE_PAGE)
+        return self.write_nvm(address, data, use_word_access=False, nvmcommand=constants.UPDI_V0_NVMCTRL_CTRLA_ERASE_WRITE_PAGE)
 
     def write_fuse(self, address, data, write_delay=1):
         """
@@ -156,8 +164,7 @@ class NvmUpdiTinyMega(NvmUpdi):
         if not self.wait_flash_ready():
             raise PymcuprogError("Timeout waiting for flash ready before page buffer clear ")
 
-    def write_nvm(self, address, data, use_word_access, nvmcommand=constants.UPDI_V0_NVMCTRL_CTRLA_WRITE_PAGE,
-                  blocksize=2,  bulkwrite=0, pagewrite_delay=0):
+    def write_nvm(self, address, data, use_word_access, nvmcommand=constants.UPDI_V0_NVMCTRL_CTRLA_WRITE_PAGE, blocksize=2,  bulkwrite=0, pagewrite_delay=0):
         """
         Writes a page of data to NVM (v0)
 

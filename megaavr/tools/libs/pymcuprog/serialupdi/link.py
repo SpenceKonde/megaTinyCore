@@ -192,7 +192,10 @@ class UpdiDatalink:
                     But this should pose no problems for compatibility, because your serial adapter can't deal with 6b chunks,
                     none of pymcuprog would work!
         """
-        self.logger.debug("ST16 to *ptr++ with RSD, data length: 0x%03X in blocks of:  %d", len(data), blocksize)
+        if blocksize == None:
+            self.logger.debug("ST16 to *ptr++ with RSD, data length: 0x%03X in a single great big chunk", len(data))
+        else:
+            self.logger.debug("ST16 to *ptr++ with RSD, data length: 0x%03X in blocks of:  %d", len(data), blocksize)
 
         #for performance we glob everything together into one USB transfer....
         repnumber= ((len(data) >> 1) -1)
@@ -297,6 +300,7 @@ class UpdiDatalink:
         response = self.updi_phy.receive(1)
         if len(response) != 1 or response[0] != constants.UPDI_PHY_ACK:
             if len(response) >= 0:
+                self.logger.error(str(response));
                 self.logger.error("expecting ACK after ST, but got: %02x", response[0])
             else:
                 self.logger.error("expecting ACK after ST, got nothing.")

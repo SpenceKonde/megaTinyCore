@@ -31,6 +31,15 @@
 
 #include "avr/io.h"
 
+//If a core provides badArg() and badCall(), it should define CORE_HAS_ERRORFUNS to = 1.
+//otherwise we need to add them in here - this is for ease of using with MegaCoreX
+#if !defined(CORE_HAS_ERRORFUNS)
+  void badArg(const char*)    __attribute__((error(""))); //used when an argument is known at compile time to be an invalid value
+  // but the function being called is valid to call at this time.
+  void badCall(const char*)   __attribute__((error(""))); //used when it is known at compile time that a whole function cannot be called,
+  // regardless of what arguments it is passed! Typically this is things like timekeeping when millis is disabled, and functions that
+  // only work on some parts - things like TWI1_swap() which has only 1 option on some parts.
+#endif
 
 void    TWI0_ClearPins();
 bool    TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin);
