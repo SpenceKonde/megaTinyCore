@@ -148,6 +148,8 @@ A very brief summary of the API functions present in and essentially unmodified 
 
 `show()` Output the contents of the pixel buffer to the LEDs
 
+`show(uint16_t n)` **New Feature 2.0.6+, > 4k of flash only** Output the contents of the first n pixels in the buffer to the LEDs. This doesn't add much overhead, but it does add a little bit - so to avoid causing problems for those on very low flash tinyAVRs, who have a hard enough time already we won't build this weird feature there.
+
 `setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b)` set the color of pixel `n` to the color `r,g,b` (for RGB LEDs)
 
 `setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t w)` set the color of pixel `n` to the color `r,g,b,w` (for RGBW LEDs)

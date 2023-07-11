@@ -138,8 +138,8 @@ int8_t  getAnalogReadResolution()
 
 ## Timekeeping
 
-### (standard) `millis()` and `micros()`
-One difference from the stock implementation - `millis` is #defined as `millis`, and `micros` is #defined as `micros`. Macros do not expand themselves, but this allows you to test #if defined(millis) to determine if millis is available.
+### `millis()` and `micros()`
+(standard) One difference from the stock implementation - `millis` is #defined as `millis`, and `micros` is #defined as `micros`. Macros do not expand themselves, but this allows you to test #if defined(millis) to determine if millis is available.
 These functions are not available if millis has been disabled from the tools menu. They are available if timekeeping is enabled in the tools menu, but has been prevented from operating in some other way, such as by overriding the timer initialization function or calling `stop_millis()` - in that case the number they return will not increase (if the timer isn't running) or will return nonsensical values (if it is). As long as interrupts are never disabled for more than 1ms at a time, they will not throw off the times returned. These functions will lose time and behave erratically beyond that. Time will be guaranteed to be lost when interrupts are disabled for more than 2ms
 
 ### (standard, with minor changes) `delay()`
@@ -201,32 +201,25 @@ delayMicroseconds():
 * Delays should be constants known at compile time (hence subject to constant folding) whenever possible.
 * Does not have the bug where certain very short, compile-time-known delays come out shorter than they should. This bug was introduced when LTO support was added and still impacts many cores - LTO would inline the function, but the function was accounting for the call overhead in it's calculated delay.
 
-### (undocumented standard)  `uint16_t clockCyclesPerMicrosecond()`
+### (undocumented standard) clockCyclesPerMicrosecond()`
 Part of the standard API, but not documented. Does exactly what it says.
 ```c
-inline uint16_t clockCyclesPerMicrosecond() {
-  return ((F_CPU) / 1000000L);
-}
+#define clockCyclesPerMicrosecond() {(F_CPU) / 1000000L);
 ```
 
-### (undocumented standard) `uint32_t clockCyclesToMicroseconds(uint32_t cycles)`
+### (undocumented standard) `clockCyclesToMicroseconds(cycles)`
 Part of the standard API, but not documented. Does exactly what the name implies. Note that it always rounds down, like everything in C.
 ```c
-inline unsigned long clockCyclesToMicroseconds(unsigned long cycles) {
-  return (cycles / clockCyclesPerMicrosecond());
-}
+#define clockCyclesToMicroseconds() (cycles / clockCyclesPerMicrosecond());
 ```
 
-### (undocumented standard) `uint32_t microsecondsToClockCycles(uint32_t microseconds)`
+### (undocumented standard) `microsecondsToClockCycles(uint32_t microseconds)`
 Part of the standard API, but not documented. Does exactly what the name implies. Note that it always rounds down, like everything in C.
 ```c
-inline unsigned long microsecondsToClockCycles(unsigned long microseconds) {
-  return (microseconds * clockCyclesPerMicrosecond());
-}
+#define microsecondsToClockCycles  icroseconds * clockCyclesPerMicrosecond());
 ```
 
-### (standard) `_NOP()`
-Execute a single cycle NOP (no operation) instruction which takes up 1 word of flash.
+### (standard) `_NOP()Execute a single cycle NOP (no operation) instruction which takes up 1 word of flash.
 
 ### (DxC/mTC) `_NOPNOP()` or `_NOP2()`
 Execute a 2 cycle NOP (no operation) instruction (`rjmp .+0`)which takes up 1 word of flash. (Added 1.3.9)
@@ -241,10 +234,10 @@ Longer clock-counting delays aremore efficiently done with the 3 cycle loop (ldi
 
 ## Time Manipulation
 
-### (DxC/mTC) `void stop_millis()`
+### `void stop_millis()`
 Stop the timer being used for millis, and disable the interrupt. This does not change the current count. Intended for internal use in the future timing and sleep library, so you would stop it before sleeping and start the RTC before going into standby sleep, or powerdown with the PIT.
 
-### (DxC/mTC) `void set_millis(uint32_t newmillis)`
+### `void set_millis(uint32_t newmillis)`
 Sets the millisecond timer to the specified number of milliseconds. Be careful if you are setting to a number lower than the current millis count if you have any timeouts ongoing, since standard best practice is to always subtract `(oldmillis - millis())` and these are unsigned. So setting it oldmillis-1 will make it look like 4.2xx billion ms have passed. and the timer will expire.
 
 ### (DxC/mTC) `void restart_millis()`
@@ -252,11 +245,12 @@ After having stopped millis either for sleep or to use timer for something else 
 
 ### (DxC/mTC) `void nudge_millis(uint16_t ms)`
 This is not yet implemented as we assess whether it is a useful or appropriate addition, and how it fits in with set millis().
-~Sets the millisecond timer forward by the specified number of milliseconds. Currently only implemented for TCB, TCA implementation will be added in a future release. This allows a clean way to advance the timer without needing to do the work of reading the current value, adding, and passing to `set_millis()` The intended use case is when you know you're disabling interrupts for a long time (milliseconds), and know exactly how long that is (ex, to update neopixels), and want to nudge the timer
+~Sets the millisecond timer forward by the specified number of milliseconds. Currently only implemented for TCB, TCA implementation will be added in a future release. This allows a clean way to advance the timer without needing to do the work of reading the current value, adding, and passing to `set_millis()`  It is intended for use before  (added becauise *I* needed it, but simple enough).
+The intended use case is when you know you're disabling interrupts for a long time (milliseconds), and know exactly how long that is (ex, to update neopixels), and want to nudge the timer
 forward by that much to compensate. That's what *I* wanted it for.~
 
-### (DxC/mTC) `_switchInternalToF_CPU()`
-Call this if you are running from the internal clock, but it is not at F_CPU - likely when overriding `onClockTimeout()`.
+### `_switchInternalToF_CPU()`
+Call this if you are running from the internal clock, but it is not at F_CPU - likely when overriding `onClockTimeout()`  `onClockFailure()` is generally useless.
 
 ## PWM control
 See [Timer Reference](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Timers.md)
@@ -264,4 +258,7 @@ See [Timer Reference](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/
   void takeOverTCA0()
   void takeOverTCD0()
   void resumeTCA0()
+  void resumeTCA1()
+  bool digitalPinHasPWMNow(uint8_t p)
+  uint8_t digitalPinToTimerNow(uint8_t p)
 ```

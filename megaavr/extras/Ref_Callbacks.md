@@ -30,13 +30,13 @@ S .init9: Jumps to main()
 #   init_ADC0() - This is called to initialize the ADC
 #   //init_ADC1() - on the 1-series w/16 or 32k flash, aka "Golden 1-series" series parts with a second ADC, this function exists but it NOT called. See Ref_Analog.md.
     init_timers() - This function calls the timer initialization functions
--    init_TCA0() - Initialized TCA0 in split mode for PWM output. If you don't want PWM or need to use PWM in 16-bit mode or need buffering, AND are truly desperate for more flash, you can override with an empty function.
-                    Don't do that if you are using TCA0 for millis, though.
--     init_TCD0() - If present and not used for millis (1-series)
-X   init_millis() - This is called to kick off millis() timekeeping. This will configure TCD0 or any TCB if it is used for millis as well.
-                    TCD0 require a nontrivial amount of additional code here and elsewhere when used for millis().
-X initVariant() - A rare few libraries define this for stuff they need to run before setup.
-+ onAfterInit() - returns a uint8_t, normally 0. If it returns anything else, we will not enable interrupts, with all the hazards that entails (see below for some specifics)
+      init_TCA0()
+      init_TCA1() - If present.
+      init_TCBs()
+      init_TCD0() - If present.
+    init_millis() - This is called to kick off millis() timekeeping. This will configure TCD0 or any TCB if it is used for millis as well.
+  initVariant() - A rare few libraries define this for stuff they need to run before setup.
+  onAfterInit() - Default simply returns 0. Can be overridden. If 0 is returned, enable interrupts.
   setup() - Finally the normal setup() is called
   loop() - and the normal loop(), called continually.
 ```
@@ -122,10 +122,12 @@ Overriding these is not recommended. They're most likely to become relevant if y
 void init()             __attribute__((weak)); // This calls all of the others.
 void init_clock()       __attribute__((weak)); // this is called first, to initialize the system clock.
 void init_ADC0()        __attribute__((weak)); // this is called to initialize ADC0.
-//void init_ADC1()      __attribute__((weak)); // this is not called automatically, but can be called manually on parts with an ADC1 to initialize that just as we do ADC0.
+void init_ADC1()      __attribute__((weak)); // this is not called automatically, but can be  called manually on parts with an ADC1 (ie, 1-series with 16k flash+) to initialize that just as we do ADC0. *Only present where that perripheral exists*
 void init_timers();                            // this function calls the timer initialization functions. Overriding is not permitted.
 void init_TCA0()        __attribute__((weak)); // called by init_timers() - Don't override this if using TCA0 for millis.
-void init_TCD0()        __attribute__((weak)); // called by init_timers() - Does nothing if TCD0 is used as millis timer.
+void init_TCA1()        __attribute__((weak)); // called by init_timers() - Don't override this if using TCA1 for millis. *Only present where that perripheral exists*
+void init_TCBs()        __attribute__((weak)); // called by init_timers() - Does not break millis if overridden, even if using the same timer, because it is either skipped or overwritten by the millis confige in init_millis();
+void init_TCD0()        __attribute__((weak)); // called by init_timers() - Does nothing if TCD0 is used as millis timer but that is not currently supported on DxCore. *Only present where that perripheral exists*
 void init_millis()      __attribute__((weak)); // called by init() after everything else and just before enabling interrupts and calling setup() - sets up and enables millis timekeeping.
 ```
 They are called in the order shown above.
@@ -153,6 +155,10 @@ Calls initTCA0(), and then initTCD0() (if the part has one). There is no general
 #### init_TCA0
 Initialize the type A timer for PWM. The one for a timer used as millis must not be overridden. It is not recommended to override these at all except with an empty function in order to leave the peripheral in reset state (but takeOverTCA0() will also put it back in it's reset state - and if you don't `takeOverTCA0` then it will try to turn off PWM when you call digitalWrite() - and not necessarily on the pin you called it on! That is *why* there is a `takeOverTCA0()` function; If you don't want to use analogWrite() through the timer, instead call takeOverTCA0() - which you need to do even if these are overridden if you don't want analogWrite() and digitalWrite() to manipulate the timer. As the tinyAVRs only have one TCA, there's no `init_TCA1()` and the PORTMUX configuration is handled in this function. If not using PWM, overriding this saves 22 bytes of flash. The only case when you can safely override this with an empty function without calling takeOkverTCA0() is if neither your code nor any library makes any call to digitalWrite() or analogWrite(). The case of disabling all PWM functionality on one or both types of timer to save flash will be addressed in 2.6.x.
 
+#### init_TCA0 and init_TCA1
+Initialize the type A timers for PWM. The one for a timer used as millis must not be overridden. It is not recommended to override these at all except with an empty function in order to leave the peripheral in reset state (but takeOverTCAn() will also put it back in it's reset state. If you don't want to use analogWrite() through the timer, instead call takeOverTCAn() - which you need to do even if these are overridden if you don't want analogWrite() and digitalWrite() to manipulate the timer. This is solely a space saving method, and will most likely have little place except on things like the AVR8EA-series.
+#### init_TCBs on DxCore
+Initializes the type B timers (the one used for millis is skipped if it's the highest numbered timer). It is not recommended to override this except with an empty function in order to leave the type B timers that are not used for millis in reset state.
 #### init_TCBs does not exist in megaTinyCore
 On DxCore, this function provides support for using Type B timers as really lame PWM timers (see [Timer Reference](Ref_Timers.md)), although we do not recommend using those timers for that purpose.
 

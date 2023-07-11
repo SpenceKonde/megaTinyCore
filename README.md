@@ -250,40 +250,41 @@ These parts (well, the 1/2-Series at least - the 0-Series is more of a budget op
 * 8  MHz Internal (2.7v-5.5v - typical for 3.3v systems)
 * 5  MHz Internal (1.8v-5.5v)
 * 4  MHz Internal (1.8v-5.5v)
-* 2  MHz Internal (1.8v-5.5v)
-* 1  MHz Internal (1.8v-5.5v)
-* 20 MHz External Clock (4.5v-5.5v)
-* 16 MHz External Clock (4.5v-5.5v)
-* 12 MHz External Clock (2.7v-5.5v)
-* 10 MHz External Clock (2.7v-5.5v)
-* 8  MHz External Clock (2.7v-5.5v)
-* 6  MHz Internal (tuned)
-* 5  MHz Internal (tuned)
-* 4  MHz Internal (tuned)
-* 2  MHz Internal (tuned)
-* 1  MHz Internal (tuned)
-* 7  MHz Internal (tuned, for masochists)
-* 8  MHz Internal (tuned)
-* 10 MHz Internal (tuned)
-* 12 MHz Internal (tuned)
+* 2  MHz Internal (1.8v-5.5v, poorly tested)
+* 1  MHz Internal (1.8v-5.5v, poorly tested)
+* 20 MHz External Clock (4.5v-5.5v, poorly tested)
+* 16 MHz External Clock (4.5v-5.5v, poorly tested)
+* 12 MHz External Clock (2.7v-5.5v, poorly tested)
+* 10 MHz External Clock (2.7v-5.5v, poorly tested)
+* 8  MHz External Clock (2.7v-5.5v, poorly tested)
+* 6  MHz Internal (tuned, untested)
+* 5  MHz Internal (tuned, poorly tested)
+* 4  MHz Internal (tuned, poorly tested)
+* 2  MHz Internal (tuned, poorly tested)
+* 1  MHz Internal (tuned, poorly tested))
+* 7  MHz Internal (tuned, for masochists, untested)
+* 8  MHz Internal (tuned, poorly tested)
+* 10 MHz Internal (tuned, poorly tested)
+* 12 MHz Internal (tuned, untested)
+* 14 MHz Internal (tuned, for masochists, untested)
 * 16 MHz Internal (tuned)
 * 20 MHz Internal (tuned)
-* 24 MHz Internal (tuned, overclocked)
-* 25 MHz Internal (tuned, overclocked)
-* 30 MHz Internal (tuned, overclocked) - 0/1-Series require "20MHz" OSCCFG fuse setting; 2-Series parts may or may not be able to reach 30 with "16 MHz" selected.
-* 32 MHz Internal (tuned, overclocked) - 2-Series only, very optimistic overclocking, may be unstable.
-* 24 MHz External clock (Overclocked)
-* 25 MHz External clock (Overclocked)
-* 30 MHz External clock (Overclocked aggressively)
-* 32 MHz External clock (Overclocked aggressively)
+* 24 MHz Internal (tuned, overclocked, poorly tested)
+* 25 MHz Internal (tuned, overclocked, poorly tested)
+* 30 MHz Internal (tuned, overclocked, poorly tested) - 0/1-Series require "20MHz" OSCCFG fuse setting; 2-Series parts may or may not be able to reach 30 with "16 MHz" selected.
+* 32 MHz Internal (tuned, overclocked, poorly tested) - 2-Series only, very optimistic overclocking, may be unstable.
+* 24 MHz External clock (Overclocked, poorly tested)
+* 25 MHz External clock (Overclocked, poorly tested)
+* 30 MHz External clock (Overclocked, poorly tested)
+* 32 MHz External clock (Overclocked, poorly tested)
 
-**We make no claims about voltage or temperature ranges for overclocked parts - all we claim is that at least one of chips we have worked at that speed** at room temperature and 5v.
+**We make no claims about voltage or temperature ranges for overclocked parts - all we claim is that at least one of chips we have worked at that speed** at room temperature, running a specific sketch, at 5v. Your milage is expected to vary, but to be generally better with an F spec versus an N or U spec part.
 
 **Important - Read about [Tuning](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md) before selecting any tuned option!**
 
 More information on these clock speeds can be found in the [**Clock Reference**](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Clocks.md)
 
-Voltages shown are those guaranteed to work by manufacturer specifications. Unless pushing the bounds of the operating temperature range, these parts will typically do far better (2-Series generally work at 32 MHz and 5v @ room temperature even from internal oscillator; the 0/1-Series will likewise usually work at 32 MHz with external clock provided the power supply is a stable 5.0-5.5V).
+Voltages shown are those guaranteed to work by manufacturer specifications (. Unless pushing the bounds of the operating temperature range, these parts will typically do far better (2-Series generally work at 32 MHz and 5v @ room temperature even from internal oscillator; the 0/1-Series will likewise usually work at 32 MHz with external clock provided the power supply is a stable 5.0-5.5V).
 
 No action is required to set the `OSCCFG` fuse when the sketch is uploaded via UPDI. When uploaded through Optiboot, the fuse cannot be changed, so whatever was chosen when the bootloader was burned is what is used, and only "burn bootloader" or uploading a sketch via UPDI will change that.
 

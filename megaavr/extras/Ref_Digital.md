@@ -4,7 +4,7 @@ This core includes a number of features to provide more control or performance w
 ## But first, about the hardware
 As there is a good chance you;ve noticed, a lot of hardware is better at driving pins low than high (sinking vs sourcing). Classic AVRs had symmetric drive - they were very similar in their ability to source and sink current. Though the modern AVRs do not spec a different maximum source and sink current, how well the chip is able to deliver that current is not equal (and likely the ultimate maximum current at which damage occurs in practice is similarly unequal). It has always been easier to pull low that to pull high
 
-The modern AVR's aren't quite as symmetric. *this may impede techniques like the R-C filter on a pin to generate analog voltages if R is low and C large)* (as long as the current through the pin is low you don't notice). Let's compare the modern AVRs real quick here; the values from the table are not shown as they are not directly comparable - different parts spec them at different voltages, or only specify values for a single operating voltage, and that value has to be true across the -40-125 temp range. :
+So did the modern tinyAVR parts (not exactly, but very close to it.
 
 | Part Family      | tiny0/1 | tiny2 | Dx | Ex | tiny reset pin when used for UPDI or GPIO |
 |------------------|---------|-------|----|----|-------------------------------------------|
@@ -46,7 +46,8 @@ These figures compare the size of a while loop that continually writes to a pin 
 
 The takeaways from this should be that:
 * digitalWrite() can easily take 35-75 or more clock cycle with turnOffPWM and then over 50 itself. So digitalWrite can take up to 7 us per call (at 20 MHz; digitalWriteFast takes 0.05 us), and it is by far the worst offender. A small consolation is that turnOffPWM does not execute the entire block of code for all parts. It checks which timer is used, and uses that block, which very roughly gives 70 clocks on a TCA pin, around 150 on a TCD pin, and considerably fewer on a pin with no PWM, though it still has to determine that the pin doesn't have pwm.
-* If you know you won't have PWM coming out of a pin, pinConfigure is a faster way to write to an LED especially if only setting up the more common properties.
+* If you know you won't have PWM coming out of a pin, pinConfigure is faster than pinMode() and digitalWrite(), especially if only setting up the more common properties. pinConfigure 1 above has the effect of a combined pinMode and digitalWrite, and it's faster than either of them.
+* With great power comes greater overhead. With only 1 timer doing PWM, the 3224 only needs 72 words to handle turning off that timer. The 3216 with 2 TCD pins has to pay around 150 words of flash in turnOffPWM, and a similar amount in analogWrite. And on Dx, it's even worse (though you only traverse a small portion of it on any given call. But we gotta handle 3 kinds of timers, some with errata to work around)
 * pinConfigure is optimized differently when called with the second argument constrained to 0x00-0x0F (setting only direction and output value) (1), with it constrained to that plus configuring pullups (2), and without restrictions (3).
 * Up to 4 bytes times the highest numbered digital pin are in the form of lookup tables. Which tables the compiler needs to include depends on which functions are used.
   * digital_pin_to_port[] is used by all of them.
@@ -70,7 +71,7 @@ This is why the fast digital I/O functions exist, and why there are people who h
 It's also why I am not comfortable automatically switching digital I/O to "fast" type when constant arguments are given. The normal functions are just SO SLOW that you're sure to break code that hadn't realized they were depending on the time it took for digital write, even if just for setup or hold time for the thing it's talking to.
 
 ## openDrain()
-It has always been possible to get the benefit of an open drain configuration - you set a pin's output value to 0 and toggle it between input and output. This core provides a slightly smoother (also faster) wrapper around this than using pinmode (since pinMode must also concern itself with configuring the pullup, whether it needs to be changed or not, every time - it's actually significantly slower setting things input vs output. The openDrain() function takes a pin and a value - `LOW`, `FLOATING` (or `HIGH`), or `CHANGE`. `openDrain()` always makes sure the output buffer is not set to drive the pin high; often the other end of a pin you're using in open drain mode may be connected to something running from a lower supply voltage, where setting it OUTPUT with the pin set high could damage the other device.
+It has always been possible to get the benefit of an open drain configuration - you set a pin's output value to 0 and toggle it between input and output. This core provides a slightly smoother (also faster) wrapper around this than using pinmode (since pinMode must also concern itself with configuring the pullup, whether it needs to be changed or not, every time - it's actually significantly slower setting things input vs output. The openDrain() function takes a pin and a value - `LOW`, `FLOATING` (or `HIGH`) or `CHANGE`. `openDrain()` always makes sure the output buffer is not set to drive the pin high; often the other end of a pin you're using in open drain mode may be connected to something running from a lower supply voltage, where setting it OUTPUT with the pin set high could damage the other device.
 
 Use pinMode() to set the pin `INPUT_PULLUP` before you start using `openDrain()`, or use `pinConfigure()` if you need the pullup enabled too; this doesn't change it. Note that there is nothing to stop you from doing `pinMode(pin,INPUT_PULLUP); openDrain(pin, LOW);` That is non-destructive (no ratings are exceeded), and would be a good place to start for a bitbanged open drain protocol, should you ever create one - but it doesn't exactly help with power consumption if you leave it like that! If running on batteries, be sure to turn off one of the two, either by using openDrain to release it to to pullups, or digitalWrite'ing it `HIGH`, or any other method of configuring pins that gets you a pin held in a defined state where it isn't working against it's own pullup.
 
@@ -145,23 +146,107 @@ pinConfigure(PIN_PA2,(PIN_DIR_INPUT, PIN_OUT_LOW, PIN_PULLUP_OFF, PIN_INVERT_OFF
 The second syntax is thanks to @MCUdude and his understanding of variadic macros
 
 
-| Functionality |   Enable  | Disable            | Toggle |
-|---------------|-------|---------------------|--------------------|
-| Direction, pinMode() | `PIN_DIR_OUTPUT`<br/>`PIN_DIR_OUT`<br/>`PIN_DIRSET` | `PIN_DIR_INPUT`<br/>`PIN_DIR_IN`<br/>`PIN_DIRCLR`       | `PIN_DIR_TOGGLE`<br/>`PIN_DIRTGL` |
-| Pin output, `HIGH` or LOW | `PIN_OUT_HIGH`<br/>`PIN_OUTSET`         | `PIN_OUT_LOW`<br/>`PIN_OUTCLR`          | `PIN_OUT_TOGGLE`<br/>`PIN_OUTTGL`       |
-| Internal Pullup  | `PIN_PULLUP_ON`<br/>`PIN_PULLUP`        | `PIN_PULLUP_OFF`<br/>`PIN_NOPULLUP`       | `PIN_PULLUP_TGL`       |
-| Invert `HIGH` and LOW |`PIN_INVERT_ON`        | `PIN_INVERT_OFF`       | `PIN_INVERT_TGL`       |
-| Digital input buffer | `PIN_INPUT_ENABLE`or<br/> `PIN_ISC_ENABLE`    | `PIN_ISC_DISABLE` or<br/>`PIN_INPUT_DISABLE`    | Not supported<br/>No plausible use case |
-| Interrupt on change | `PIN_ISC_ENABLE` or<br/> `PIN_INPUT_ENABLE`       | `PIN_ISC_ENABLE` or<br/>oth     | Not applicable |
-| Interrupt on Rise  | `PIN_ISC_RISE` or<br/> `PIN_INT_RISE`         | `PIN_ISC_ENABLE` or<br/>`PIN_ISC_DISABLE`     | Not applicable |
-| Interrupt on Fall  | `PIN_ISC_FALL` or<br/> `PIN_INT_FALL` | `PIN_ISC_ENABLE` or<br/>`PIN_ISC_DISABLE`      | Not applicable |
-| Interrupt on LOW  | `PIN_ISC_LEVEL`  or<br/> `PIN_INT_LEVEL` | `PIN_ISC_ENABLE` or<br/>`PIN_ISC_DISABLE`      | Not applicable |
+| Functionality |   Enable    | Disable            | Toggle |
+|---------------|-------------|---------------------|--------------------|
+| Direction, pinMode()        | `PIN_DIR_OUTPUT`<br/>`PIN_DIR_OUT`<br/>`PIN_DIRSET` | `PIN_DIR_INPUT`<br/>`PIN_DIR_IN`<br/>`PIN_DIRCLR`       | `PIN_DIR_TOGGLE`<br/>`PIN_DIRTGL` |
+| Pin output, `HIGH` or LOW   | `PIN_OUT_HIGH`<br/>`PIN_OUTSET`          | `PIN_OUT_LOW`<br/>`PIN_OUTCLR`                 | `PIN_OUT_TOGGLE`<br/>`PIN_OUTTGL`       |
+| Internal Pullup             | `PIN_PULLUP_ON`<br/>`PIN_PULLUP`         | `PIN_PULLUP_OFF`<br/>`PIN_NOPULLUP`            | `PIN_PULLUP_TGL`       |
+| Invert `HIGH` and LOW       |v`PIN_INVERT_ON`                          | `PIN_INVERT_OFF`                               | `PIN_INVERT_TGL`       |
+| Use TTL levels (DB/DD only) | `PIN_INLVL_TTL`<br/>`PIN_INLVL_ON`       | `PIN_INLVL_SCHMITT`<br/>`PIN_INLVL_OFF`        | Not supported<br/>No plausible use case      |
+| Digital input buffer        |`PIN_INPUT_ENABLE`or<br/>`PIN_ISC_ENABLE` | `PIN_ISC_DISABLE` or<br/>`PIN_INPUT_DISABLE`   | Not supported<br/>No plausible use case |
+| Interrupt on change         |`PIN_ISC_ENABLE` or<br/>`PIN_INPUT_ENABLE`| `PIN_ISC_ENABLE`                               | Not applicable |
+| Interrupt on Rise           | `PIN_ISC_RISE` or<br/> `PIN_INT_RISE`    | `PIN_ISC_ENABLE` or<br/>`PIN_ISC_DISABLE`      | Not applicable |
+| Interrupt on Fall           | `PIN_ISC_FALL` or<br/> `PIN_INT_FALL`    | `PIN_ISC_ENABLE` or<br/>`PIN_ISC_DISABLE`      | Not applicable |
+| Interrupt on LOW            | `PIN_ISC_LEVEL`  or<br/> `PIN_INT_LEVEL` | `PIN_ISC_ENABLE` or<br/>`PIN_ISC_DISABLE`      | Not applicable |
 
 For every constant with TGL or TOGGLE at the end, we provide the other spelling as well. For every binary option, in addition to the above, there is a `PIN_(option)_SET` and `PIN_(option)_CLR` for turning it on and off. The goal was to make it hard to not get the constants right.
 
 While pinConfigure is not as fast as the fast digital I/O functions above, it's still faster than pinMode().
 
-Again, note that unlike digitalWrite() this does not turn off PWM.
+### INLVL - input logic levels
+On some parts (DB, DD, EA - likely all the "good" parts. The EB-series is going to be their newer, better, less wacky t861. Considering how badly they've cut features from it, I'll be disappointed if they're not cheap. , pins can be configured to use one of two sets of input voltages: either the normal schmitt triggert input, which has thresholds as a fraction of Vdd, or the TTL mode which has fixed thresholds independent of operating voltage. On MVIO pins, using the schmitt trigger Vddio2 takes the place of VDDIO. Note that this is overridden when pins are used for the TWI - that defaults to I2C voltage levels, but supports an optional SMBus 3.0 mode.
+
+| Voltage             |  Schmitt  |     I2C   |  TTL   | SMBus 3.0 |
+|---------------------|-----------|-----------|--------|-----------|
+| Low input (Max)     | 0.2 x Vdd | 0.3 x Vdd | 0.80 V |    0.80 V |
+| High Input (Min)    | 0.8 x Vdd | 0.7 x Vdd | 1.60 V |    1.35 V |
+
+These are the maximum voltage guaranteed to qualify as LOW and the minimum guaranteed to qualify as `HIGH`. Although the I2C levels are described as being different, it is worth noting that 1) if the schmitt trigger input on a recognized a 0.3 x Vdd voltage as LOW, it would surely do the same for a 0.2 x Vdd one, likewise at the high end. And typical characteristics graphs, when available, for modern AVRs with the same thresholds and I2C levels, show typical I/O pin thresholds as easily meeting the specs given for the I2C levels. The two options for I2C levels are not new for the DB either - they are widespread. What appears to be new is a less tightly specified but conceptually similar input circuit on all pins, selectable by a bit in PINnCTRL, instead of just I2C pins. It's important to keep in mind how this divides up possible input voltages (note: this is just based on room temp typical characteristics)
+* With Schmitt trigger inputs, highest and lowest 1/5th of the voltage-space each go to a definite value, while the voltages between allow the hysteresis that the schmitt triggers are known for. The graphs in the DA-series datasheet (DB typical charachteristics are not yet available) show that in practice, the hysteresis occurs over a much narrower voltage range than the same graph for the 4809 (which depicted three regions of similar size).
+  * Typical falling threshold ranged from 0.8 up to 2.05, and rising thresholds from 1.05 V to 2.75 V. Thus, the hysteresis region ranged in size from 0.2 to 0.7 volts, but reached a nadir just around 2-2.25 V where it could be as small as 0.15 V, since the lower threshold increases faster than the upper one at the bottom of the range.
+  * When Vdd = 5.0 V - 3.3 V is not guaranteed to be `HIGH`, though the typical characteristic graphs suggest that it will be, as has always been the case on AVRs.
+* With TTL input levels, behavior relative to the operating voltage varies greatly.
+  * With Vdd = 1.8 V (the minimum), below about half the operating voltage, it's going to read low, while it may need to be very close to the power rail to read `HIGH`.
+  * With Vdd = 5.0 V (maximum typically used intentionally) anything over about 1/3rd if the supply voltage is guaranteed to be `HIGH`, and you need to get down to 1/6th of the supply voltage for a guaranteed `LOW`.
+  * The actual lower threshold is likely to be higher, and the upper threshold lower. For example, on DA-series SMBus pins, those voltages are 1.09 V and 1.24 V over most of the operating voltage range. This leave you with very little hysteresis, if that happens to be problematic.
+  * If interacting with an output that for whatever reason struggles to pull the pin as close to ground as an ideal output should, or if you're counting on the transition being somewhere near the middle of the range, definitley don't use this option.
+
+Particularly in the context of these MVIO-equipped parts, however, the TTL input level option has an obvious major advatage: It makes communication with parts that run at lower voltages easier, and reduces competition for the limited number of MVIO pins. If we allow the low part to control it push-pull (aka totam-pole and other names), and treat it as an `INPUT`, we will always read what they intend. The fact that you can switch a pin between input and output, while pulling it up externally was noted above, and the voltage it was pulled up to could be the lower operating vboltage. That can be done on any AVR. But with INLVL, this scheme is viable for a bidirectional line: the The line between devices could either be pulled up to the lowest operating voltage externally, with the DB or DD series part manipulating the pin as an open drain output (see above). One need not stop with just two devices - multiple DB/DD-series parts with `INVLV = TTL` set could communicate with multiple devices operating at the low voltage, as long as none of them ever drove it `HIGH` (though, if it was low, they would not know which device was doing that. The designer would have to make sure this approach made sense in that regard, and that everything was smart enough to not hold onto the line or anything.
+
+## PINCONFIG and associated registers
+The hardware has a series of registers - one shared across all ports, `PORTx.PINCONFIG` with bitfields matching the ones in the the PINnCTRL registers, and three which always read zero, `PORTx.PINCTRLUPD`,  `PORTx.PINCTRLSET` and  `PORTx.PINCTRLCLR`. These allow mass updating of the PINnCTRL registers: Every pin corresponding to a 1 on the port will have the contents of their PINnCTRL register either set to (`PINCTRLUPD`), bitwise-OR'ed with (`PINCTRLSET`) or bitwise-AND'ed with the inverse (`PORTx.PINCTRLCLR`) of the  `PINCONFIG` register. Noting keeps you from setting ISC bitfield that way, you shouldn't do that, unless you really know what you're doing,
+
+
+So:
+```c
+PORTA.PINCONFIG = PORT_PULLUPEN_bm;
+PORTA.PINCTRLSET = 0b11110000; // Turns on the pullup on PA4~7
+PORTB.PINCTRLUPD = 0b10000001; // Sets PINnCTRL to only have pullup enabled on PB0 and PB7. If one of those pins was inverted or using TTL levels or had an interrupt on it, it doesn't anymore.
+PORTC.PINCTRLCLR = 0b11111111; // Turns off the pullup on every pin on PORTC
+PORTA.PINCONFIG = PORT_PULLUPEN_bm | PORT_INVEN_bm; //invert and turn on pullup
+PORTG.PINCTRLUPD = 0b00001111; // inverts and turns on pullups on PG0~3
+PORTF.PINCTRLUPD = 0b01010101; // inverts and turns on pullups on PF 0, 2, 4, and 6.
+
+/* executes faster and looks less hideous than: */
+PORTA.PIN4CTRL |=  PORT_PULLUPEN_bm; //Read-modify-write takes 6 clocks and 5 words of flash! - lds, ori, sts
+PORTA.PIN5CTRL |=  PORT_PULLUPEN_bm;
+PORTA.PIN6CTRL |=  PORT_PULLUPEN_bm;
+PORTA.PIN7CTRL |=  PORT_PULLUPEN_bm;
+PORTB.PIN0CTRL  =  PORT_PULLUPEN_bm; // Simple write 2 clocks 2 words to write, plus a single 1 for the whole group to load the value to a working register.
+PORTB.PIN7CTRL  =  PORT_PULLUPEN_bm;
+PORTC.PIN0CTRL &= ~PORT_PULLUPEN_bm; // 6 clocks again!
+PORTC.PIN1CTRL &= ~PORT_PULLUPEN_bm;
+PORTC.PIN2CTRL &= ~PORT_PULLUPEN_bm;
+PORTC.PIN3CTRL &= ~PORT_PULLUPEN_bm;
+PORTC.PIN4CTRL &= ~PORT_PULLUPEN_bm;
+PORTC.PIN5CTRL &= ~PORT_PULLUPEN_bm;
+PORTC.PIN6CTRL &= ~PORT_PULLUPEN_bm;
+PORTC.PIN7CTRL &= ~PORT_PULLUPEN_bm;
+PORTF.PIN4CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
+PORTF.PIN5CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
+PORTF.PIN6CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
+PORTF.PIN7CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
+PORTG.PIN0CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
+PORTG.PIN1CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
+PORTG.PIN2CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
+PORTG.PIN3CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
+
+/* The above contrived examples are 7 x 3 - 21 clocks and 21 words for the multipin-configuration method.
+ * versus 4*6 + 2*2+1 + 8*6 + 2*8+1 = 94 clocks and 82 words of flash for the alternative.
+ * The contrast is even more stark for somee realistic scenarios on high pincount devices.
+ */
+
+```
+PORTA.PINCONFIG =
+All bits make sense with PINCTRLUPD - some more than others - as long as you don't forget that it will replace whatever is there currently.
+The lower three bits, controlling whether the pin is acting as an interrupt, will have surprising and likely unwelcome effects with  `PORTx.PINCTRLSET` and  `PORTx.PINCTRLCLR`. For PINCTRLSET they should never be 1 (any of them). For PINCTRLCLR, all should be 0 or all should be 1 ( 0b00000111 would turn off pin interrupts on the pins it's applied to without otherwise changing PINnCTRL register contents). Otherwise, the concept of flipping individual bits makes little sense for that last bitfield - the bits individually do not have a separate function, there is just the function of those three bits as a group. When changing the input sense configuration on large numbers of pins, use PINCTRLUPD instead.
+
+This system is most useful at startup for devices running on battery to meet the datasheet requirement that the pins not be allowed to float if their digital input buffers are enabled.
+
+```c++
+// Practical example
+/* Say we are using a Dx48, but only have any digital I/O on PORTA (maybe we are only using the DB48 because we need the three configurable opamps, and nothing else on other ports
+ * but we need to be able to go into power down sleep mode to minimize power consumption, meaning unused pins must have pin buffer disabled */
+
+PORTB.PINCONFIG = PORT_ISC_DISABLED_gc; //doesn't matter which port, shared between all ports.
+PORTB.PINCTRLUPD = 0x3F; //disable input buffer on all pins of portB
+PORTF.PINCTRLUPD = 0x3F; // disable input buffer on all pins of PORTF
+PORTD.PINCTRLUPD = 0xFF; // disable input buffer on all pins of PORTD
+PORTC.PINCTRLUPD = 0xFF; // disable input buffer on all pins of PORTC
+PORTE.PINCTRLUPD = 0x0F; // disable input buffer on all pins of PORTE
+// this is 1+2, 1+2+2, 1+2+2, 1+2 = 16 words, and executes in that many clocks. Imagine how much longer it would take to loop over 32 pins setting PINnCTRL for each (minimum words and more than that many clocks) plus the machinery for picking the port, likely hundreds of bytes total.
+
+```
 
 ## Slew Rate Limiting (Dx-series and 2-series only)
 All of the Dx-series parts have the option to limit the [slew rate](https://en.wikipedia.org/wiki/Slew_rate) for the OUTPUT pins on a on a per-port basis. This is typically done because fast-switching digital pins contain high-frequency components (in this sense, high frequency doesn't necessarily mean that it repeats, only that if it continued, it would be high frequency; this way of thinking is useful in electrical engineering), which can contribute to EMI, as well as ringing (if you're ever looked on a scope and noticed that after a transition, the voltage briefly oscillates around the final voltage - that's ringing) which may confuse downstream devices (not usually, at least in arduino land, though). Often, you will not know exactly *why* it's an issue or what goes wrong, you just see a maximum slew rate spec. If you're productizing something and it has to pass FCC`**` testing sometimes limiting the slew rate can reduce EMI.
@@ -232,7 +317,7 @@ The most any announced AVR has had is 86 digital pins, the ATmega2560; In the mo
 
 `*` - Note on conventions for specifying numbers: 0x## refers to a hexadecimal number; this will always be written with a power of 2 number of hex digits, padded with a leading zero nybble if needed. A number written without a 0x prefix, ie, `12` refers to a decimal value. 0b######## refers to a value given as binary. For hexadecimal values, if the size of the datatype is unambiguosly known, we will typically represent them with an appropriate number of leading 0's - so 1 in a 1-byte datatype is written as 0x01, while 1 in a 16-bit datatype is written as 0x0001. Any time a number is not prefixed by 0x or 0b, the decimal form should be assumed. Which representation of a given value is chosen is based on the context of that value. Values that simply represent numbers are generally given in decimal. Values that are being subjected to bitwise operators, or that are bit masks, group codes, and similar, will be shown in hexadecimal, or when the bit math is particularly obtuse but the significance of the data is by bitfield, binary. In C, prefixing a number with 0 in an integer literal - to the surprise of many - will result in it being treated as octal (base 8), which probably made sense at the time for some wierd reason
 
-`**` As far as the FCC testing goes, the net effect (a $5k+ barrier to entry applied only to domestic manufacturers) means that "FCC" might as well stand for Fail to Compete with China - Do you think any of the electronics we get from China passed FCC testing?! A good portion of them don't look to have been tested for basic functionality, let alone compliance. Since we;ve had a couple of decades of near unregulated electronic crap being imported, and there aren't computers failing, data infrastructure exploding, and airplanes crashing because of lost navigation (batteries catching fire? Well, I don't think any crashes? But definitely some emergecny landings)... maybe we don't need such strict rules (on radio emissions, at least) and we could do without requiring such vigorous and expensive testing?
+`*` - Note on conventions for specifying numbers: 0x## refers to a hexadecimal number, while ## refers to a decimal digit and 0b######## refers to a value given as binary. For hexadecimal values, if the size of the datatype is unambiguosly known, we will typically represent them with an appropriate number of leading 0's - so 1 in a 1-byte datatype is written as 0x01, while 1 in a 16-bit datatype is written as 0x0001. Any time a number is not prefixed by 0x or 0b, the decimal form should be assumed. Which representation of a given value is chosen is based on the context of that value. Values that simply represent numbers are generally given in decimal. Values that are being subjected to bitwise operators, or that are bit masks, group codes, and similar, will be shown in hexadecimal.
 
 All of the cases I'm aware of where interference from a device that wouldn't pass FCC testing actually caused concern were from devices intentionally designed do disrupt other devices (usually "GPS jammers" being used by truck drivers to cheat their employer or skirt safety rules - usually both). That is, they are devices that not only would fail testing, but which are explicitly illegal to an extent that they're not sold openly: Marketplace sites will take down listings for them. They are illegal devices being used to abet criminal acts which expose others risk of financial loss, injury, or death (from a car crash caused by avoiding safety regulations) whether or not a GPS jammer is used. The GPS jammers tend to have the opposite effect of what the criminals desire - rather than letting their truck go unnoticed, the GPS disruptions impact something critical, attracting attention as well as acting as a literal radio beacon that the authorities charged with maintaining the integrity of GPS can use to easily track, identify, and apprehend the user. These don't seem to be much of a problem either (except for their operator), since they aren't sold in huge volumes, and they make it easy to their operator to get busted.
 

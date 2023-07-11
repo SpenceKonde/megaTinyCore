@@ -130,6 +130,12 @@
   #define ADC_ACC16       0x84
   #define ADC_ACC32       0x85
   #define ADC_ACC64       0x86
+  #define ADC_ACC2S       badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC4S       badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC8S       badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC16S      badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC32S      badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC64S      badArg("Sign chopping is only supported on Ex-series")
 #else
   /* ADC constants for 2-series */
   #define VDD             (0) /* ADC_REFSEL_VDD_gc    */
@@ -173,6 +179,16 @@
   #define ADC_ACC256      0x88
   #define ADC_ACC512      0x89
   #define ADC_ACC1024     0x8A
+  #define ADC_ACC2S       badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC4S       badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC8S       badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC16S      badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC32S      badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC64S      badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC128S     badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC256S     badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC512S     badArg("Sign chopping is only supported on Ex-series")
+  #define ADC_ACC1024S    badArg("Sign chopping is only supported on Ex-series")
 
   #define LOW_LAT_ON      0x03 // deprecated
   #define LOW_LAT_OFF     0x02 // deprecated

@@ -1,20 +1,34 @@
-# ADC/DAC Reference for megaTinyCore
-These parts all have a large number of analog inputs (11 pins on 20 and 24-pin 0/1-series, 15 on 2-series, 9 on 14-pin parts and 5 on 8-pin parts.) - plus the one on the UPDI pin which is not totally usable because the UPDI functionality). They can be read with analogRead() like on a normal AVR. While the `An` constants (ex, `A3`) are supported, and will read from the ADC channel of that number, they are in fact defined as then digital pin shared with that channel. Using the `An` constants is deprecated - the recommended practice is to just use the digital pin number, or better yet, use `PIN_Pxn` notation when calling analogRead(). Particularly with the release of 2.3.0 and tinyAVR 2-series support, a number of enhanced ADC features have been added to expose more of the power of the sophisticated ADC in these parts.
+# ADC/DAC Reference for DxCore and megaTinyCore
+These parts all have a large number of analog inputs,  - plus the one on the UPDI pin which is not totally usable because the UPDI functionality). They can be read with analogRead() like on a normal AVR. While the `An` constants (ex, `A3`) are supported, and will read from the ADC channel of that number, they are in fact defined as then digital pin shared with that channel. Using the `An` constants is deprecated - the recommended practice is to just use the digital pin number, or better yet, use `PIN_Pxn` notation when calling analogRead(). Particularly with the release of 2.3.0 and tinyAVR 2-series support, a number of enhanced ADC features have been added to expose more of the power of the sophisticated ADC in these parts.
+
+The tinyAVR 2-series is the first post-revolutionary AVR to feature a real differential ADC. *Hey! We've got differential ADC in the Dx!* No, for the last time, that is not a real differential ADC. You might as well have two single ended ADC channels tied to the same trigger and that's it. Like what was demo'ed on the 1-series tinyAVRs in fact, only on the Dx-series it's packaged more neatly and with all the auxilliary uses stomped out. A normal differential ADC channel lets you set the reference to 1v, turn the gain up to the max, and listen to the difference betweeen the Vdd power rail and the ever so slightly higher voltage before the current sense resistor! The Dx's one is capped to V<sub>Ain</sub> <=
+
+The ADC on the the Ex-series is even better - it is nearly the same ADC that the tinyAVR 2-series got, though it's specs have gotten a small across the board improvement, and there's a new feature that can only be used when accumulated mode is in use: Sign Chopping. Sign Chopping alternates between positive and negative inputs during an accumulated measurement as well as the sign of the value added to the total. This can greatly reduce offset error (which, particularly with gain cranked up and the reference cranked down, trying to get the most possible out of the ADC, could get surprisingly high).
 
 **Be sure to disable to the ADC prior to putting the part to sleep if low power consumption is required!**
 
 ## Vital Statistics
 | Part family | Min. Res. | Max. Res. | CLK Max | CLK used | Max Ovrsamp Res. | Extras
 |-------------|-----------|-----------|---------|----------|------------------|---
-| tinyAVR 0/1 |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | Weird ref voltages. Must slow way down for accurate readings w/lowest ref.
-| tinyAVR 1+  |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | Weird ref voltages. Must slow way down for accurate readings w/lowest ref. Whole second copy of ADC.
-| AVR DA      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | Half-way differential mode.
-| AVR DB      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | Half-way differential mode.
-| AVR DD      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | Half-way differential mode, more pins can be ADC pins.
-| tinyAVR 2   |     8-bit |    12-bit |   3/6 * | 2-2.5MHz |           17-bit | True differential, 1-16x PGA
-| AVR EA      |     8-bit |    12-bit |   3/6 * | 2-2.5MHz |           17-bit | True differential, 1-16x PGA, sign chopping.
+| tinyAVR 0/1 |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | (1), (2), (3)
+| tinyAVR 1+  |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | (1), (2), (3), (4), Whole second copy of ADC.
+| AVR DA      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | (5) "Differential" ADC
+| AVR DB      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | (5) "Differential" ADC
+| AVR DD      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | (5) "Differential" ADC more pins can be ADC pins.
+| tinyAVR 2   |     8-bit |    12-bit |   3/6 * | 2-2.5MHz |           17-bit | (6) True differential, 1-16x PGA
+| AVR EA      |     8-bit |    12-bit |   3/6 * | 2-2.5MHz |           17-bit | (6) True differential, 1-16x PGA, sign chopping.
 
 `*` 6 MHz with external or Vdd reference, 3 MHz with internal.
+
+Notes:
+1. This part initially had aspired to function at F_ADC = 2.00 MHz, RES = 8-bits. This didn't work so well. See the errata for the marginally successful workarounds.
+2. This part has a dumbass set of reference voltages (4.3, 2.5, 1.1, 1.5, 0.55). For the ultra low reference voltage, use analogSetClock() to ensure that the clock speed is within the much lower sped'ed range of 65-200 kHz. You may also want to lower sample duration since that's what it's denominated in. All other parts have 1.024/2.048/4.096/2.5
+3. No external reference on 0-series and 1-series below 16k.
+4. 16k (1+series) parts are blessed with a number a boons. One of them is a second ADC. I think the intent was to provide a way to approximate having a differential ADC by triggering both at once (well, one of the intents, another one was because the ADC0 is taken over by the PTC if that is in use.
+5. The Dx-series differential ADC is a bad joke. First: The maximum absolute value both voltages is V<sub>ref</sub>, above that, wrong results are returned. And there's no amplification other than what you can press the opamps into service as.
+  **Unsubstantiated and slanderous speculation** My theory is this: The dual ADC on the 1+ series was to get dual ADC field tested because even then they could see that the new ADC was going to be an ordeal. They figured they can get away with 1 generation of chips without explicit differential ADC, but they still needed a way to get the same effect for some major customer application
+6. This is a REAL differential ADC. Max V<sub>Ain</sub> = Vdd + .1 or .2V and for useful readings their difference must be smaller than VREF. The tiny2 has some mysterious tunables, proper tuning of which is unclear. Offset error is disappointingly high, which Microchip noticed and introduced sign chopping (and removed a mysterious tunable or two) in the EA series, which should help significantly.
+
 The differential ADC on the Dx-series is disappointing.
 
 ## Reference Voltages
@@ -35,7 +49,7 @@ In some cases the voltage determines the maximum ADC clock speed. Call analogRef
  | `INTERNAL1V5`                           |  1.50 V |           - |      4 | . |
  | `EXTERNAL`                              |       - |           - |     32 | 1+series only |
 
- | tinyAVR (2-series)                      | Voltage | Minimum Vdd | Number | Notes |
+ | tinyAVR (2-series)  or Ex-series        | Voltage | Minimum Vdd | Number | Notes |
  |-----------------------------------------|---------|-------------|--------|-------|
  | `VDD` (default)                         | Vcc/Vdd |             |      0 | VDD Ref works at 6 MHz CLK ADC! |
  | `INTERNAL1V024`                         | 1.024 V |      2.5* V |      4 | 10-bit reading with 1.025 ref gives apx.   1 mv/ADC count |
@@ -63,7 +77,10 @@ In some cases the voltage determines the maximum ADC clock speed. Call analogRef
 #### There is no INTERNAL
 `INTERNAL` is not a supported reference, since there is no obvious reason that any of the four reference options should be used. These reference voltages are presented as they are in the datasheet, but do note that they are what the manufacturer targeted, not what the actual voltage is: The spec is +/- 4% over the temperature range of -40 to 85 C, when Vdd is at least the voltage specified above - though at typical conditions, every time I've checked, it was within 1%; The numbers they give for the voltages are specified to three decimal places (obviously that is convenient because then 1 mV = 1, 2, or 4 LSB), that should by no means be interpreted as a claim that they are *that* accurate. It is likely that the 1.024 V reference is usable below 2.5 V, but no guarantees are given. Reference voltages exceeding the supply voltage will produce meaningless results and should not be used.
 
+#### Limits of external refeences
+External reference voltage should be between 1.8v and Vdd if CLK_ADC is higher than 500kHz (by default, it is), however if you slow the ADC clock down, external references as low as 1.0V (they gave 1.024V as the lower limit. It is unclear if the slower clock speed must also be used for the internal 1.024V reference.
 
+This is not all bad news though on the 2-series and Ex, instead of having to slow down for some reference voltages, we get higher max CLK_ADC with external references!
 #### 2-series refs require slightly more headroom
 From careful examination of the table above it can be seen that the minimum Vdd for a given reference voltage is slightly larger for the 2-series - You need slightly more headroom; about 0.5v, compared with around 0.4v for the 1-series. This could be a real effect (ie, increased sensitivity of the ADC to adverse operating conditions), or may simply reflect the more conservative approach that appears to have been taken to QA of 2-series parts in general (consider that 2-series parts have a total of 5 errata, with no new ones a year after release, and 4 of those impacted all modern AVRs released at the time. Compare to the 0 and 1-series each 0 and 1-series flash size has it's own grab-bag of a few dozen, most of which are on some but not all tinyAVR parts, nothing else, none of which were fixed on the last die rev for 16k 1-series, and some of which are really nasty.
 
@@ -94,23 +111,34 @@ analogReference() as you know takes only a single argument, and the overhead of 
 
 
 ## Internal Sources
-In addition to reading from pins, you can read from a number of internal sources - this is done just like reading a pin, except the constant listed in the table below is used instead of the pin name or pin number:
+In addition to reading from pins, you can read from a number of internal sources - this is done just like reading a pin, except the constant listed in the table below is used instead of the pin number:
 
-| tinyAVR 0/1-series                     | tinyAVR 2-series                    | AVRDA            | AVRDB             | AVRDD             | AVR EA           |
-|----------------------------------------|-------------------------------------|------------------|-------------------|-------------------|------------------|
-| `ADC_INTREF`                           | `ADC_VDDDIV10`                      | `ADC_TEMPERATURE`| `ADC_VDDDIV10`    | `ADC_VDDDIV10`    | `ADC_VDDDIV10`   |
-| `ADC_TEMPERATURE`                      | `ADC_TEMPERATURE`                   | `ADC_GROUND` *   | `ADC_TEMPERATURE` | `ADC_TEMPERATURE` | `ADC_TEMPERATURE`|
-| `ADC_DAC0` (1-series only)             | `ADC_GROUND` (offset calibration?)  | `ADC_DACREF0` *  | `ADC_GROUND` *    | `ADC_GROUND`      | `ADC_GROUND`     |
-| `ADC_GROUND` (offset calibration?)     | `ADC_DACREF0`                       | `ADC_DACREF1` *  | `ADC_DACREF0` *   | `ADC_DACREF0`     | `ADC_DACREF0`    |
-| `ADC_DACREF0` (alias of ADC_DAC0)      | `ADC_DAC0` (alias of `ADC_DACREF0`) | `ADC_DACREF2` *  | `ADC_DACREF1` *   | `ADC_DAC0`        | `ADC_DACREF1`    |
-| `ADC_PTC` (not particularly useful)    | *see note*                          | `ADC_DAC0`       | `ADC_DACREF2` *   | `ADC_VDDIO2DIV10` | `ADC_DAC0`       |
-| `ADC1_DACREF1` (16/32k 1-series only)† |                                     |                  | `ADC_DAC0` *      |                   |                  |
-| `ADC1_DACREF2` (16/32k 1-series only)† |                                     |                  | `ADC_VDDIO2DIV10` |                   |                  |
 
+| AVR DA           | AVR DB            | AVR DD            | AVR EA           |
+|------------------|-------------------|-------------------|------------------|
+| `ADC_TEMPERATURE`| `ADC_VDDDIV10`    | `ADC_VDDDIV10`    | `ADC_VDDDIV10`   |
+| `ADC_GROUND` *   | `ADC_TEMPERATURE` | `ADC_TEMPERATURE` | `ADC_TEMPERATURE`|
+| `ADC_DACREF0` *  | `ADC_GROUND` *    | `ADC_GROUND`      | `ADC_GROUND`     |
+| `ADC_DACREF1` *  | `ADC_DACREF0` *   | `ADC_DACREF0`     | `ADC_DACREF0`    |
+| `ADC_DACREF2` *  | `ADC_DACREF1` *   | `ADC_DAC0`        | `ADC_DACREF1`    |
+| `ADC_DAC0`       | `ADC_DACREF2` *   | `ADC_VDDIO2DIV10` | `ADC_DAC0`       |
+|                  | `ADC_DAC0` *      |                   |                  |
+|                  | `ADC_VDDIO2DIV10` |                   |                  |
+
+| tinyAVR 0/1-series                     | tinyAVR 2-series                    |
+|----------------------------------------|-------------------------------------|
+| `ADC_INTREF`                           | `ADC_VDDDIV10`                      |
+| `ADC_TEMPERATURE`                      | `ADC_TEMPERATURE`                   |
+| `ADC_DAC0` (1-series only)             | `ADC_GROUND` (offset calibration?)  |
+| `ADC_GROUND` (offset calibration?)     | `ADC_DACREF0`                       |
+| `ADC_DACREF0` (alias of ADC_DAC0)      | `ADC_DAC0` (alias of `ADC_DACREF0`) |
+| `ADC_PTC` (not particularly useful)    | *see note*                          |
+| `ADC1_DACREF1` (16/32k 1-series only)† |                                     |
 
 The Ground internal sources are presumably meant to help correct for offset error. On Classic AVRs they made a point of talking about offset cal for differential channels. They are thus far silent on this, despite a great number of tech briefs related to the new ADC has been coming out, greatly improving the quality of the available information
 DACREF0 is the the reference voltage for the analog comparator, AC0. On the 1-series, this is the same as the `DAC0` voltage (yup, the analog voltage is shared). Analog comparators AC1 and AC2 on 1-series parts with at least 16k of flash also have a DAC1 and DAC2 to generate a reference voltage for them (though it does not have an output buffer). On the 2-series, this is only used as the AC0 reference voltage; it cannot be output to a pin.
 
+DACREF0-2 are the the reference voltages for the analog comparators. On the DA-series, there is no way to measure the supply voltage other than using DAC or DACREF source: you can neither directly measure a reference voltage like some parts, nor is there any way to get a fraction of the supply voltage like the DB and DD-series support.  Note also that on the DB series, you can't measure the outputs of the OPAMPs directly - you must output to the pin and measure that, however much the high-level descriptions sound like there is a way to route the opamp signals internally.
 
 Unlike the AVR DA-series parts, which have neither `VDDDIV10` nor `INTREF` as an option - that meant if you wanted to know or the DB, DD, or EA-series parts. To what end are you measuring a voltage which you are in control of? To see how accurate the reference is?
 At least there's a plausible use of the DAC input: recognizing that the voltage is off. On all parts there's the possibility of a load on it that's too big dragging it downwards. The DA and DB parts also have a lifetime drift issue (per errata) when the DAC is used without the output buffer.
@@ -213,6 +241,10 @@ Enhanced `analogRead()` - Perform a single-ended read on the specified pin. `res
   // tinyAVR 0/1-series, this will be sampled 64 times, as we need 3 more bits, hence we need to take 2^(3*2) = 64 samples then rightshift them 3 times.,
   int32_t adc_reading2 = analogReadEnh(PIN_PD2, ADC_ACC128);
   // Take 128 samples and accumulate them. This value, k, is 19 bits wide; on the Dx-series parts, this is truncated to 16 bits - the hardware does not expose the three LSBs.
+  int32_t adc_reading3 = analogReadEnh(PIN_PD2, ADC_CHOP(14));
+  // oversa,[;e amd decimate to try for 14-bits of accuracy use sign chopping to redue offset error (Ex-only)
+  int32_t adc_reading3 = analogReadEnh(PIN_PD2, ADC_ACC64S);
+  // Similar to the raw accumulation above, this does the same thing, only with sign chopping turned on (Ex-only)
 ```
 
 Negative values from ADC_ENH always indicate a runtime error; these values are easily recognized, as they are huge negative numbers
@@ -256,11 +288,7 @@ If a 1 is passed as the second argument, the validity check will be bypassed; th
 
 The 0/1-series has prescalers in every power of two from 2 to 256, and at the extreme ends, typical operating frequencies will result in an ADC clock that is not in spec. Hence the second argument, Currently there is only one option: If a 1 or anything with the 1's bit set is passed, that tells the core to disregard the spec'ed minimum and maximum, and get as close to the value you asked for as possible, however accuracy may suffer and/or functionality may be impaired
 
-On the 0/1-series, it is noted that if analog resolution is set to 8 instead of 10 (can be done with analogReadResolution), up to 2000 MHz is supported. In this case, however, 50% duty cycle must be enabled, otherwise (when F_ACD <= 15000) 50% duty cycle must not be used. .
-
-The 2-series has a much richer selection of prescalers: Every even number up to 16, then 20, 24, 28, 32, 40, 48, 56, and 64, giving considerably more precision in this adjustment.
-
-In either case you don't need to know the range of prescalers, just ask for a frequency and we'll get as close as possible without exceeding it, and tell you what was picked
+In either case you don't need to know the range of prescalers - just ask for the desired frequency. We'll get as close as possible to that number without exceeding it or going outside the chip specifications, and tell you what that number we picked was. If options & 0x01 is non-zero, we will skip checking whether the frequency in question is within spec, just in case you for some reason want inaccurate results from the ADC, or the chip's clock speed has been changed (which of course breaks timekeeping too - but you may not care, or may also be compensating for that.
 
 ```c++
 // ******* for both *******
@@ -399,6 +427,8 @@ if (analogCheckError(adcreading)) {
 }
 ```
 
+#### int16_t millivoltsToADCVals(int16_t mv, const int16_t ref, const uint8_t bits) *Not yet implemented*
+Converts a voltage in millivolts into the approximate expected ADC counts (no accounting for error is made). See the [documentation for the DxCore Library](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/libraries/DxCore)
 ### ADCPowerOptions(options)
 The PGA requires power when turned on. It is enabled by any call to `analogReadEnh()` or `analogReadDiff()` that specifies valid gain > 0; if it is not already on, this will slow down the reading. By default we turn it off afterwards. There is also a "low latency" mode that, when enabled, keeps the ADC reference and related hardware running to prevent the delay (on order of tens of microseconds) before the next analog reading is taken. We use that by default, but it can be turned off with this function.
 Generate the argument for this by using one of the following constants, or bitwise-or'ing together a low latency option and a PGA option. If only one option is supplied, the other configuration will not be changed. Note that due to current errata, you **must** have LOW_LAT enabled
