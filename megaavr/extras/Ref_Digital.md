@@ -20,6 +20,7 @@ You might be scurrying to your datasheets thinking "I swear they were symmetric 
 
 What tinyAVR calls current injection, Dx/Ex-series call "Clamp current" - it's current through the protection diodes. Oddly It wasn't spec'ed on classic AVRs (but was well known as the usual cause of "blown" pins). Atmel employees are rumored to have said +/- 1mA maximum. Certainly we have made some progress on that front.
 
+It remains to be seen what the pin drive strength will be like on the Ex-series or any other future part, and until the IO pin output current is added to the characteristics graphs section of the datasheet, you don't really have much information; preliminary datasheets typically omit this sort of data, because these properties have not yet been characterized (I'm not sure how they manage that. Automating that testing, while not trivial, shouldn't be a challenge to microcontroller experts. I'm pretty sure there are a considerable number of such persons employed by Microchip.
 
 ## Ballpark overhead figures
 The digital I/O functions are astonishingly inefficient. This isn't my fault (not on mTC - on DxC I have definitely not helped...) - it's the Arduino API's fault
@@ -28,19 +29,20 @@ These figures are the difference between a sketch containing a single call to th
 The comparison to the fast I/O functions is grossly unfair, because the fast I/O functions have constant arguments - but this gives an idea of the scale.
 Remember also that executing 1 word of code (2 bytes) takes 1 clock cycle, though not all of the code paths are traversed for all pins (indeed, we know that large portions will be skipped for all pins, because each pin can have only one PWM timer, but on the other hand, there are a few small loops in there). Gives an idea of the scale.
 
-| Function           | t3224 | t3216 | Notes
-|--------------------|-------|-------|-------------------------
-| pinMode()          |  +112 |  +130 | Does NOT call turnOffPWM().
-| digitalWrite()     |  +216 |  +340 | Calls turnOffPWM(), included in figures.
-| both of above      |  +300 |  +358 | Calls turnOffPWM()
-| openDrain()        |  +136 |  +272 | Calls turnOffPWM()
-| turnOffPWM()       |  +100 |  +266 | 3216 has the complicated type D timer, so this is huge.
-| digitalRead()      |   +60 |   +72 | Official core calls turnOffPWM (we don't)
-| pinConfigure() 1   |  +104 |  +116 | Only direction/output level.
-| pinConfigure() 2   |  +202 |  +220 | Only pullup, input sense, and direction/outlevel
-| pinConfigure() 3   |  +232 |  +252 | Unconstrained.
-| digitalWriteFast() |    +2 |    +2 | With constant arguments.
-| pinModeFast()      |   +12 |   +12 | With constant arguments.
+| Function           | DB64 | t3224 | t3216 | Notes
+|--------------------|------|-------|-------|-------------------------
+| pinMode()          | +306 |  +112 |  +130 | Does NOT call turnOffPWM().
+| digitalWrite()     | +656 |  +216 |  +340 | Calls turnOffPWM(), included in figures.
+| both of above      | +784 |  +300 |  +358 | Calls turnOffPWM()
+| openDrain()        | +584 |  +136 |  +272 | calls turnOffPWM()
+| turnOffPWM()       | +572 |  +100 |  +266 | Dx pays dearly for the pwm remapping. 3216 is paying for the TCD PWM.
+| digitalRead()      |  +76 |   +60 |   +72 | Official core calls turnOffPWM (we don't)
+| pinConfigure() 1   | +216 |  +104 |  +116 | Only direction/output level
+| pinConfigure() 2   | +362 |  +202 |  +220 | Only pullup, input sense, and direction/outlevel
+| pinConfigure() 3   | +414 |  +232 |  +252 | Unconstrained
+| digitalWriteFast() |   +2 |    +2 |    +2 | With constant arguments.
+| pinModeFast()      |  +12 |   +12 |   +12 | With constant arguments.
+| dW-turnOffPWM()    |  +84 |  +126 |  +112 | Digital write times above less the turnOffPWM()
 
 These figures compare the size of a while loop that continually writes to a pin number that it loads from an I/O register. This is compared with an assignment of a value to one of those registers in an otherwise empty sketch. That is to say, a sketch for a 3224 that uses pinMode, digitalWrite, openDrain, and digitalRead will use less than 300 + 136 + 60 = 496 more than a sketch with just the dummy loop (ie, `while (1) {GPIOR1 = GPIOR0};`). This comparison thus includes the digital_pin_to_* tables, with one entry per pin each. There are 4 such tables (bit_mask, bit_position , port, and timer). *Thus this table does not include call overhead, because the function, called from a single place, gets inlined*. The overhead of such a call is at least 2 bytes per place that it is called from, but that neglects additional overhead required by making callable functions. Once the processor has loaded the values of the arguments into a working register (how long this takes depends on your code), it may need to move them around to put them in the registers according to the avr-gcc ABI, and then the function may have to then move them again to get them into the register it needs them in.
 
@@ -164,7 +166,7 @@ For every constant with TGL or TOGGLE at the end, we provide the other spelling 
 While pinConfigure is not as fast as the fast digital I/O functions above, it's still faster than pinMode().
 
 ### INLVL - input logic levels
-On some parts (DB, DD, EA - likely all the "good" parts. The EB-series is going to be their newer, better, less wacky t861. Considering how badly they've cut features from it, I'll be disappointed if they're not cheap. , pins can be configured to use one of two sets of input voltages: either the normal schmitt triggert input, which has thresholds as a fraction of Vdd, or the TTL mode which has fixed thresholds independent of operating voltage. On MVIO pins, using the schmitt trigger Vddio2 takes the place of VDDIO. Note that this is overridden when pins are used for the TWI - that defaults to I2C voltage levels, but supports an optional SMBus 3.0 mode.
+On some parts (DB, DD, EA - likely all the new "good" parts (but not tinyAVRs. The EB-series is going to be their newer, better, less wacky t861. Considering how badly they've cut features from it, I'll be disappointed if they're not cheap. , pins can be configured to use one of two sets of input voltages: either the normal schmitt triggert input, which has thresholds as a fraction of Vdd, or the TTL mode which has fixed thresholds independent of operating voltage. On MVIO pins, using the schmitt trigger Vddio2 takes the place of VDDIO. Note that this is overridden when pins are used for the TWI - that defaults to I2C voltage levels, but supports an optional SMBus 3.0 mode.
 
 | Voltage             |  Schmitt  |     I2C   |  TTL   | SMBus 3.0 |
 |---------------------|-----------|-----------|--------|-----------|
@@ -183,7 +185,7 @@ These are the maximum voltage guaranteed to qualify as LOW and the minimum guara
 
 Particularly in the context of these MVIO-equipped parts, however, the TTL input level option has an obvious major advatage: It makes communication with parts that run at lower voltages easier, and reduces competition for the limited number of MVIO pins. If we allow the low part to control it push-pull (aka totam-pole and other names), and treat it as an `INPUT`, we will always read what they intend. The fact that you can switch a pin between input and output, while pulling it up externally was noted above, and the voltage it was pulled up to could be the lower operating vboltage. That can be done on any AVR. But with INLVL, this scheme is viable for a bidirectional line: the The line between devices could either be pulled up to the lowest operating voltage externally, with the DB or DD series part manipulating the pin as an open drain output (see above). One need not stop with just two devices - multiple DB/DD-series parts with `INVLV = TTL` set could communicate with multiple devices operating at the low voltage, as long as none of them ever drove it `HIGH` (though, if it was low, they would not know which device was doing that. The designer would have to make sure this approach made sense in that regard, and that everything was smart enough to not hold onto the line or anything.
 
-## PINCONFIG and associated registers
+## PINCONFIG and associated registers (Dx, Ex only)
 The hardware has a series of registers - one shared across all ports, `PORTx.PINCONFIG` with bitfields matching the ones in the the PINnCTRL registers, and three which always read zero, `PORTx.PINCTRLUPD`,  `PORTx.PINCTRLSET` and  `PORTx.PINCTRLCLR`. These allow mass updating of the PINnCTRL registers: Every pin corresponding to a 1 on the port will have the contents of their PINnCTRL register either set to (`PINCTRLUPD`), bitwise-OR'ed with (`PINCTRLSET`) or bitwise-AND'ed with the inverse (`PORTx.PINCTRLCLR`) of the  `PINCONFIG` register. Noting keeps you from setting ISC bitfield that way, you shouldn't do that, unless you really know what you're doing,
 
 
@@ -248,6 +250,8 @@ PORTE.PINCTRLUPD = 0x0F; // disable input buffer on all pins of PORTE
 
 ```
 
+This core *currently* does not make use of this feature - However in the future, sleepTime will have a function that will turn pins to their most power efficient settings en masse. On parts with PINCONFIG, that will be used.
+
 ## Slew Rate Limiting (Dx-series and 2-series only)
 All of the Dx-series parts have the option to limit the [slew rate](https://en.wikipedia.org/wiki/Slew_rate) for the OUTPUT pins on a on a per-port basis. This is typically done because fast-switching digital pins contain high-frequency components (in this sense, high frequency doesn't necessarily mean that it repeats, only that if it continued, it would be high frequency; this way of thinking is useful in electrical engineering), which can contribute to EMI, as well as ringing (if you're ever looked on a scope and noticed that after a transition, the voltage briefly oscillates around the final voltage - that's ringing) which may confuse downstream devices (not usually, at least in arduino land, though). Often, you will not know exactly *why* it's an issue or what goes wrong, you just see a maximum slew rate spec. If you're productizing something and it has to pass FCC`**` testing sometimes limiting the slew rate can reduce EMI.
 ```c
@@ -278,7 +282,10 @@ With a 24 MHz system clock, that means "normal" would be just over half a clock 
 ## There is no INLVL or PINCONFIG on tinyAVR devices
 The configurable input level option (`INLVL`) is only available on parts with MVIO (AVR DB and DD-series).
 
-Multi-pin configuration registers, which allow setting PINnCTRL en masse are only available on AVR Dx-series.
+## Standard and semi-standard API functions
+There are a number of macros defined (as is the case with most cores) which provide a certain set of basic functions that sketches - or more importantly, library code - can use to get information on a pin number. Though these look like functions, they are preprocessor macros. This distinction only occcasionally becomes important.
+
+The return type (since it's a macro) is undefined; what is presented below is intended to give an indication of what the type it would return, and what argument types it would expect, if it were a function rather than a macro.
 
 ### Basic pin information
 ```c++
@@ -290,17 +297,40 @@ uint8_t analogPinToBitMask(uint8_t pin);
 ```
 These take a pin number (which can be represented as a uint8_t - though it is unfortunately common practice to use 16-bit signed integers to store pin numbers in Arduino-land). If the pin passed is valid, these will return either the bit position (PIN_PA0 would return 0, PIN_PD4 will return 4 and so on), the bit mask (bit mask = 1 << (bit position), so PIN_PA0 would return 0x01, PIN_PD4 would return 0x10, etc) `*`, or the port number (PORTA = 0, PORTB = 1, etc).
 
+In the event that the pin passed to it does NOT correspond to a valid pin, the following behavior should be expected:
+
+* If the pin does not exist, with the exception of digitalPinToPort(), these will all always return NOT_A_PIN, a numeric constant with a value of 255 (or -1; 255 and -1 are equivalent when assigned to an 8-bit type).
+* digitalPinToPort has special behavior for one specific sort of situation: If the pin would have bit position 0, and that pin's number was skipped in the Arduino pin numbering, and other pins (which are neither RESET nor the UPDI pin) on that port do exist on this part (this is the case with PD0 on 28 and 32-pin DB-series and all DD-series parts, as well as PIN_PC0 for 14 and 20-pin DD-series), digitalPinToPort() will return the port number. Otherwise, digitalPinToPort() will return NOT_A_PORT if the pin is invalid. (also has a value of 255/-1 - the two are used just to make intent clearer and improve code readability).
+  * This is done because there are sometimes cases, particularly for TCA-driven PWM, where you need to know what the first pin number is, so that you can count up from that to find the pins on that port that can output TCA PWM (the first 6 pins on every port can output TCA0 PWM, and the same pins on PORTB and PORTG can output TCA1 PWM, if both those pins and TCA1 are present).
+  * This is only possible on DxCore because all ports are always numbered in the same order that they appear on the chip. It does NOT work on megaTinyCore (the pins aren't in order on those chips, and the TCA outputs are not as trivially ordered anyway and besides, flash is often tight enough that we can't be wasting even a small amount of flash).
+  * Any pin number corresponding to a skipped number in the pinout chart, and which would not be pin 0 within that port, will return NOT_A_PORT.
+  * Therefore, in order to test whether a pin exists or not, don't use `digitalPinToPort()`.
+
+The analog pin versions will additionally return NOT_A_PIN in the event that the pin does not have analog input capability, even if it exists. Note that analog and digital pin numbers are the same on DxCore. There is no concept of a separate numbering system for analog pins.
+
+
+### Things that return pointers
+```c++
+volatile uint8_t* getPINnCTRLregister(uint8_t port, uint8_t bit_pos);
+PORT_t* digitalPinToPortStruct(uint8_t pin);
+PORT_t* portToPortStruct(uint8_t port);
+volatile uint8_t* portOutputRegister(uint8_t port)
+volatile uint8_t* portInputRegister(uint8_t port)
+volatile uint8_t* portModeRegister(uint8_t port)
+```
+`getPINnCTRLregister` returns a pointer to the pin's PINnCTRL register, which is used to configure things like pin interrupts, invert the pin, and control the pullup - all things that pinConfigure() above can also do. This is a *pointer* to an 8-bit register.
+
+Two of them return a pointer to the PORT struct (having type PORT_t) for the port that this pin is part of (or for the port of that number, in the case of portToPortStruct).
+
+Finally, the last three take a port number (from digitalPinToPort) and return a pointer to the PORTx.OUT, PORTx.IN, or PORTx.DIR register. These are pointers. In the case of OUT and DIR, you can use pointer arithmetic to reach three highly useful registers from there: Add one to get OUTSET/DIRSET, add 2 to get OUTCLR/DIRCLR, and add 3 to get OUTTGL/DIRTGL.
+
+When working with the SET/CLR/TGL registers, remember that you must never use operators like |= or &= - you write a 1 to the bits you want to set, clear or toggle: These registers *read* as the value of the corresponding register, so `*(portOutputRegister(0) + 2) |= 1<<4;` clears the output bit of EVERY pin in PORTA that is set, not just PA4! (it reads the current value, which mirrors PORTA.OUT. It then sets bit 4 of that value, and writes the modified value to PORTA.OUTCLR, resulting in bit 4 being cleared, along with any other bit that was 1). To add insult to injury, it uses 2-3 more words of flash and 3-4 more clock cycles to do an inappropriate read-modify-write cycle than it would to do the correct thing, and simply write the value, eg (`*(portOutputRegister(0) + 2) = 1<<4;`which is equivalent to `PORTA.OUTCLR = 1<<4;`)
+
 ## turnOffPWM(uint8_t pin) is exposed
 This used to be a function only used within wiring_digital. It is now exposed to user code - as the name suggests it turns off PWM (only if analogWrite() could have put it there) for the given pin. It's performance is similar to analogWrite (nothing to get excited over), but sometimes an explicit function to turn off PWM and not change anything else is preferable: Recall that digitalWrite calls this (indeed, as shown in the above table, it's one of the main reasons digitalWrite is so damned bloated on the DX-series parts!), and that large code takes a long time to run. DigitalWrite thus does a terrible job of bitbanging. It would not be unreasonable to call this to turn off PWM, but avoid digitalWrite entirely. The pin will return to whatever state it was in before being told to generate PWM, unless digitalWriteFast() or direct writes to the port register have been used since. If the pin is set input after PWM is enabled with analogWrite (or through other means - though in such cases, the behavior when turnOffPWM() is called on any pin which nominally outputs PWM controlled by the same timer *should be treated as undefined* - it is not possible to efficiently implement such a feature on AVRs nor most other microcontrollers while maintaining behavior consistent with the API - the core would (at least on an AVR) have to iterate through every possible source of PWM, testing each in turn to see if it might have PWM output enabled on this pin. In many cases, including this core, each timer would require checking a separate bit in one or more special function registers, as well as storing a database that associates each pin with one or more combinations of bits and the corresponding bit to clear to disable PWM through that pathway. Suffice to say, that is not practical within the resource constraints of embedded systems.
 
 ## Finding current PWM timer, if any: digitalPinToTimerNow() (DxCore only)
 On many cores, there is a `digitalPinToTimer(pin)` macro, mostly for internal use, which returns the timer associated with the pin. The Arduino API implicitly assumes that this is constant, and both core libraries and code in the wild often assume that it is. The digitalPinToTimer() implementation is as a macro, which frequently is optimized to a constant (provided the argument is constant, of course). The assumption that there exists not-more-than-1-to-1 timer:pin mapping was never universally valid even among AVRs (there are examples of classic AVRs that have multiple timers usable on some pins, and some even permit that to be remapped easily at runtime (the classic ATtiny841 being a notable example). All modern AVRs have at least two pins available to each timer output compare channel; and while the tinyAVRs never have more than two timers potentially usable with a given pin, the Dx-series allows one of up to 7 pins to be associated with a given timer (in groups), with some pins having as many as 4 options.
-
-For the modern tinyAVRs, during development of megaTinyCore the design decision was made to not support PWM output via analogWrite() for any timer *type* if that *type* would add not more than 1 additional PWM pin when the type A timer was used in split mode (which has up to 6 channels) in order to make efficient use of limited flash. This leaves out the type D timer on 8-pin and 14-pin 1-series parts, and the type B timer(s) on all parts. Either of these would nearly double the flash required for PWM - however, as of recent versions you can choose between a number of PWM pin layounts. In any event, on megaTinyCore, `digitalPinToTimerNow()` is simply an alias of `digitalPinToTimer()` and this will remain the case, nor are there plans to add support for TCB PWM.
-
-On the Dx-series parts, timers, pins, multiplexing options, and clock cycles are all more abundant, as are other peripherals competing for any given pin meanwhile, counterintuitively, the multiplexing scheme is actually simpler, and that inflexibility was not appropriate. As of 1.3.x, `analogWrite()` works for either type A timer **even if you change where that timer is pointed** *provided* that the appropriate `PORTMUX` register is set first. As of 1.5.x this is extended to the type D timer where hardware allows (at time of writing, only the AVR DD-series; there is a silicon bug impacting all production DA/DB-series parts. It is expected that future silicon revisions will correct this on those parts, if those are ever made available; having waited more than 2 years hoping for such fixes, and 5 years for other corrections for the tinyAVRs, I am not optimistic). On DxCore there is both `digitalPinToTimer()` and `digitalPinToTimerNow()`. The former never returns TIMERAn, but will return a constant referring to a type D timer *channel* or a type B *timer*. The latter tests the relevant `PORTMUX` register if that pin can use a type A timer; If it cannot, it then checks the standard `digitalPinToTimer()`. If that indicates that a type D timer channel can be used with the pin, it then performs a bitwise AND with the type D timer mux register, which will be true if the TCD is pointed at that pin. If that gives us a type B timer, that timer is returned as the result (notice that pins that can use either the type D timer or a type B timer will never return the type B timer, even if the type D timer is pointed elsewhere - this was a necessary compromise for flash and code complexity considerations.
-
-**In no case will either of these macros ever return a timer which the core does not permit use of analogWrite() with.**
 
 Furthermore, the following situations should not be expected to produce the desired result:
 * Calling turnOffPWM, digitalPinToTimer, digitalPinToTimerNow or analogWrite on a pin nominally driven by a timer which the core has been instructed not to reconfigure using the takeOverTCxn() function. The core will treat the pin as an ordinary digital pin - by calling that, you assume full responsibility for all management of that timer. That function must be called if any manual configuration of a PWM timer will be or has been performed, except as specifically noted in in the timer and PWM reference or type D timer reference.

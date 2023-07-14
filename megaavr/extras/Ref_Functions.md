@@ -22,7 +22,7 @@ This function is what we call when user code passed an argument to a function th
 This function is what we call when user code a function that doesn't make sense to call with the current configuration, regardless of what values one passes. For example, calling `stop_millis()` when millis is disabled. The message will indicate why that call is invalid.
 
 ## Digital Functions
-See [Digital Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Digital.md)
+See [Digital Reference](Ref_Digital.md)
 ```c
 int8_t  digitalReadFast( uint8_t pin)
 void    digitalWriteFast(uint8_t pin, uint8_t val)
@@ -33,7 +33,7 @@ void    turnOffPWM(      uint8_t pin)
 ```
 ## Pin information
 These are almost all preprocessor macros, not functions, but what they expand to is appropriate for the stated datatypes/
-These are in many cases part of the standard API, but not all are. The concept of analog channel identifiers (this is the analog channel number with the high bit set, eg, ADC_CH(0) = 0x80) is new in my cores, and gives an unambiguous way to represent an input by either pin or channel. Historically, this has been a mess on non-328p parts. Note that *digital I/O functions do not accept channel identifiers at this time on megaTinyCore* - I am trying to train people away from that practice.
+These are in many cases part of the standard API, but not all are. The concept of analog channel identifiers (eg, ADC_CH(0) = 0x80) is new in my cores, and gives an unambiguous way to represent an input by either pin or channel. Historically, this has been a mess on non-328p parts. Note that *digital I/O functions do not accept channel identifiers at this time on DxCore* or megaTinyCore - I am trying to train people away from that practice.
 
 As a reminder, we recommend getting in the habit of using PIN_Pxn notation rather than raw numbers - it makes your code more portable between modern AVR parts, makes it easier to refer to manufacturer documentation, and promotes the habit of using those names, which eliminate all ambiguity when referring to pins, for example in forum discussions, where people on
 

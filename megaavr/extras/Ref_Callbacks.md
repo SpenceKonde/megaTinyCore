@@ -3,8 +3,8 @@ These are not callbacks. Callbacks are not efficient in this context. However, w
 
 A callback would be where you supply a function pointer which we then call (which would end up as an icall instruction). Doing such a thing is much more costly, because the compiler can't assume it is constant. Hence call-used registers (even if the function doesn't use them) get saved and restored, function call overhead cannot be avoided, and the compiler can't optimize them. We try to avoid these. They're only used when the function to be called can actually change at runtime, mainly when "attaching" interrupts.
 
-**This document reflects the 2.5.12 release of megaTinyCore**
-Some of these were added in 2.4.x (actually, quite a few of them were, which was the impetus for writing this)
+**This document reflects the 1.6.9 release of DxCore**
+Some of these were added in 2.6.9 (actually, quite a few of them were, which was the impetus for writing this)
 
 ## Startup Sequence
 When execution reaches the application after reset or bootloader, it hits the reset vector first, and then jumps where ver that is pointing and begins execution with the .init sections

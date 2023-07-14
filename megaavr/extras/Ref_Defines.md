@@ -114,17 +114,49 @@ The below parameter defines should be used in preference to the above.
 * `MEGATINYCORE_MCU` - The number after "ATtiny" in the part name.
 * `MEGATINYCORE_SERIES` - the part series, 0, 1, or 2.
 
+### Additional, deprecated, macros
+This core provides an additional set of defines depending on the number of pins on the part and it's family. These are deprecated; the above definitions are preferred. The `__AVR_xx__` and `_AVR_PINCOUNT` macros give the same information, are less ugly, and work equally well on megaTinyCore and DxCore.
+
+* `DA_28_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DA_32_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DA_48_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DA_64_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DB_28_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DB_32_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DB_48_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DB_64_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DD_14_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DD_20_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DD_28_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DD_32_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DX_14_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DX_20_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DX_28_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DX_32_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DX_48_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `DX_64_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `EA_28_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `EA_32_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `EA_48_PINS` (Deprecated - use `_AVR_FAMILY` and `_AVR_PINCOUNT`)
+* `HAS_64_PINS` (Deprecated - use `_AVR_PINCOUNT`)
+* `HAS_32_PINS` (Deprecated - use `_AVR_PINCOUNT`)
+* `HAS_28_PINS` (Deprecated - use `_AVR_PINCOUNT`)
+* `HAS_24_PINS` (Deprecated - use `_AVR_PINCOUNT`)
+* `HAS_20_PINS` (Deprecated - use `_AVR_PINCOUNT`)
+* `HAS_14_PINS` (Deprecated - use `_AVR_PINCOUNT`)
+* `HAS_8_PINS`  (Deprecated - use `_AVR_PINCOUNT`)
+
 ## Peripheral detection
-Most of these need no explanation - they just tell you how many peripherals of each type you have. Those that don't need an explanation don't have one.
+Most of these need no explanation - they usually just give you the number of instances of a peripheral. Those that don't need an explanation don't have one.
 * `_AVR_AC_COUNT`
 * `_AVR_ADC_COUNT` - 1, or 2 on the tinyAVR 1+series.
 * `_AVR_DAC_COUNT`
-* `_AVR_DAC_VERSION` - 0, 1, or 2. 0 is 8-bit (tinyAVR), 1 is 10-bit (Dx-series), 2 is 10-bit with OUTRANGE (Ex-series)
+* `_AVR_DAC_VERSION` - 0, 1, or 2. 0 is 8-bit (tinyAVR), 1 is 10-bit (Dx-series), 2 is 10-bit with OUTRANGE (Ex-series), 1.5.5+/2.6.6+ only.
 * `_AVR_OPAMP_COUNT`
-* `_AVR_EVSYS_COUNT` - The number of total EVSYS channels.
-* `_AVR_EVSYS_SYNC` - The number of synchronous EVSYS channels. 1 or 2. Only defined on tinyAVR 0/1.
-* `_AVR_EVSYS_ASYNC` - the number of async EVSYS channels. 2 or 4. Only defined for the tinyAVR 0/1.
-* `_AVR_EVSYS_VERSION` - 0, 1, 2, or 3 - 0 is the tinyAVR 0/1 shitshow, 1 is mega0, nearly identical to version 2, the Dx-series version, except that megaAVR calls the strobe register STROBE instead of SWEVENTx. 3 is the AVR Ex-series version, with EVGENCTRL registers for ports and RTC, and with all generator channels being created equal.
+* `_AVR_EVSYS_COUNT` - The number of total EVSYS channels. 1.5.5+/2.6.6+. 3 on 0-series, 8 on high pincount Dx, 6 everywhere else
+* `_AVR_EVSYS_SYNC` - The number of synchronous EVSYS channels. 1 or 2. Only defined on tinyAVR 0/1. 2.6.6+ only
+* `_AVR_EVSYS_ASYNC` - the number of async EVSYS channels. 2 or 4. Only defined on tinyAVR 0/1. 2.6.6+ only
+* `_AVR_EVSYS_VERSION` - 0, 1, 2, or 3 - 0 is the tinyAVR 0/1 shitshow, 1 is mega0, 2 is Dx-series 3 is the AVR Ex-series. Version 0 has two kinds of generator channels. Version 3 eliminates all differences between channels. Version 1 and 2 give different RTC channels to odd and even generator channels and limit access to pin events to to 2 or 4 channels per port.  1.5.5+/2.6.6+ only
 * `_AVR_LUT_COUNT`
 * `_AVR_TCA_COUNT`
 * `_AVR_TCB_COUNT`
@@ -133,6 +165,26 @@ Most of these need no explanation - they just tell you how many peripherals of e
 * `_AVR_USART_COUNT`
 
 The EVSYS defines are very useful if you are using EVSYS without event, but even if you are using event, you want to, for example, select channels to minimize the functionality you're blocking off with your configuration, unless you're using an Ex-series, where all channels are created equal.
+
+## Identifying other attributes (added 1.5.8)
+`_AVR_FLASHMODE` describes which method of writing to the NVM is used.
+* There are three basic modes, described here as 0, 1 and 2.
+  * 0 is the traditional paged mode where you fill a page buffer then do an erase+write typically.
+  * 1 is much like 0, except it has RWW support. Unfortunately, the current EA implementation is a disaster.
+  * 2 is the AVR DA/DB/DD method of writing flash. Pages are much larger, but only used for erase.
+  * The high bit is special - if set, it indicates that severe errata impacts the chip compromising the breadth of the applications to which it is applicable
+    * 0x81 is mode 1 as it first shipped (on 64EA) - erase-write broken, no multipage erase over UPDI, etc.
+    * 0x82 is the AVR128DA family where the byte write mode improperly applies protection. Only word writes should be used on those parts.
+
+`_AVR_CLOCKMODE` is a 1-byte descriptor of the clocking options.
+* The pattern is 0bTTTAUESW
+  * TTT indicates the number of tuning "notches", 0 = 32, 1 = 64, 2 = 128, 3 = 256 (not seen on modern AVR).
+  * A, if set, indicates that en external watch crystal can be used to autotune.
+  * U indicates auto-tuning from USB frames is supported (native USB parts only).
+  * E indicates that external HF crystals can be used.
+  * S indicates that the speed is selected at runtime, not by fuses.
+  * W watch crystal for RTC supported. For example an AVR-DB would be 0x17, while a tiny 2-series would be 0x41
+* This is meant to be tested by libraries and similar.
 
 ## Identifying core version
 These define the version of the core:
@@ -150,6 +202,7 @@ These define the version of the core:
   * `DXCORE_PATCH` - DxCore patch version
   * `DXCORE_RELEASED` - 1 if a released version, 0 if unreleased (ie, installed from github between releases).
   * `DXCORE_NUM` - DxCore version, as unsigned long.
+### megaTinyCore
 ```c++
 Serial.println(MEGATINYCORE);
 Serial.print(MEGATINYCORE_MAJOR);
@@ -197,12 +250,30 @@ There are a number of macros for determining what (if any) features the core sup
 * `SUPPORT_LONG_TONES = 0 or 1` - On some modern AVR cores, an intermediate value in the tone duration calculation can overflow (which is timed by counting times the pin is flipped) leading to a maximum duration of 4.294 million millisecond. This is worst at high frequencies, and can manifest at durations as short as 65 seconds worst case. Working around this, however, costs some flash, so megaTinyCore only supports long tones on parts with more than 8k of flash. If `SUPPORT_LONG_TONES` is defined as 1, as long as (duration * frequency)/500 < 4.294 billion, the duration will not be truncated. If it is defined as 0, the bug was known to the core maintainer and they chose not to fully correct it (eg, to save flash) but took the obvious step to reduce the impact, it will be truncated if (duration * frequency) exceeds 4.294 billion. If `SUPPORT_LONG_TONES` is not defined at all, the bug may be present in its original form, in which case the duration will be truncated if (duration * frequency) exceeds 2.14 billion.
 * `CORE_HAS_ANALOG_ENH = 1` - If defined as 1, `analogReadEnh()` (enhanced analogRead) is available. Otherwise, it is not; it is 1 for all parts on recent versions of megaTinyCore.
 * `CORE_HAS_ANALOG_DIFF = 0 or 1` - If defined as 1, `analogReadDiff()` (differential enhanced analogRead) is available. Otherwise, it is not. 1 for 2-series (which has a differential ADC) and for the Ex/Dx-series, which have at least a mediocre , 0 for others (as they do not). It has same features as enhanced, except that it takes a differential measurement. If this is -128, (128 unsigned), it is a classic AVR, not a modern one with a differential ADC, and the core's analogRead implementation accepts the constants listed in the core documentation to make an analogRead of a differential pair.
+
+* `CORE_HAS_ENH_SERIAL = 1` - if defined as 1 the core has the new implementation of Serial. See [the serial reference](Ref_Serial.md)
+
 * `CORE_HAS_ERRORFUNS = 1` - Newly added define - it's become apparent that reliance on the core's badArg and badCall functions was impacting portability of library code; this can be tested for by libraries which use badArg() and badCall() so that if it's not present, the library can include a copy of the definitions. Mostly meant for internal use, though some other people *might* be using badArg() or badCall() in their libraries?
 
 ## Hardware feature detection
 * `ADC_MAX_OVERSAMPLED_RESOLUTION` = 13 (tinyAVR0/1), 15 (Dx-series) or 17 (tinyAVR 2 or Ex-series) - If either `CORE_HAS_ANALOG_ENH` or `CORE_HAS_ANALOG_DIFF` is 1, this will be defined as the maximum resolution obtainable automatically via oversampling and decimation using those functions.
 * `ADC_MAXIMUM_GAIN` is 0 (DA, DD, DU, tinyAVR0/1), -1 (DB), or 16 (EA, EB, tinyAVR 2) - Some parts' ADC is blessed with a Programmable Gain Amplifier (PGA) amplifier, often used for differential readings (though modern AVRs can use it for single-ended readings, if they have it - not that it's terribly useful).  The Dx-series are not among them, though the EA will have it. If this is defined as a positive number, it is the maximum gain available (16 on the EA). If this is defined as 0 that means there is no way to amplify an analog signal we might want to measure (if this is a problem you need external opamps). If this is defined as -1 (or 255 if stuffed into a uint8), there are one or more `OPAMP` peripherals available which could be directed towards the same purpose, though more deliberation and part specific work would be needed; they may be more flexible in some ways, but they are very rigid in others (for example, in that there is only one pin option for them. If it is defined as -128 (128 in a uint8) there is a gain stage on the differential ADC, but it is specified along with the pair of pins, not with separate configuration options. This also means that it's *NOT* a modern AVR! This is generally what is done on all classic AVRs with a differential ADC) so the available gain options depend on which pins are being measured, and there is a different procedure to use it, as detailed in the core documentation (ex, ATTinyCore 2.0.0 and later). If it is undefined, there is definitley no support exposed through the core, and it may not be a feature of the hardware at all.
 * `_AVR_PORT_INLVL` is 1 if the INLVL bit is present. If undefined or 0, that feature is not available.
+
+## Hardware pin determination
+
+### Timers (DxCore only)
+For type A and type D timers, defines are provided for each pin included by a `PORTMUX` option for a type A or type D timer. This is `NOT_A_PIN` if the pin in question is not available on the device. This includes PA0/PA1 when they are used for the clock source or PD0 when that pin was replaced by the `VDDIO2` pin. The type B timers are not yet covered.
+* `PIN_TCA1_WO0_DEFAULT`
+* `PIN_TCA1_WO5_ALT1`
+* `PIN_TCD0_WOA_DEFAULT`
+While Microchip has thus far been quite kind to us regarding keeping mappings consistent between part families, we can't count on that to always be the case. While these values can be deduced from datasheets, the point is to make it more straightforward to detect whether the pin is present and usable.
+
+### Other peripherals (DxCore only)
+If present, any OPAMP peripherals have each of their pins defined as shown (where n is 0, 1, or 2) pins are defined as:
+* `PIN_OPAMPn_INP` - Positive Input to OPAMPn
+* `PIN_OPAMPn_OUT` - Output of OPAMPn
+* `PIN_OPAMPn_INN` - Negative Input of OPAMPn
 
 ## Compatibility macros
 Occasionally Microchip has not kept the names of registers or bitfields consistent between families of parts, even when the function was not changed. In some cases these have even been changed between versions of the ATpack! The places where we've papered over identical register functionality with different names are:
@@ -224,7 +295,7 @@ These constants are defined as either:
 
 `checkErrata(errata name)` will return 1/true if the errata applies to this part, or 0/false if the errata does not apply or is irrelevant.
 
-Note that checkErrata does not get compiled to a known constant - it has to read the SYSCFG.REVID - if there are circulating revisions that do and don't have the bug. But if all specimens either do or do not have the bug, they will.
+Note that checkErrata does not get compiled to a known constant unless either all specimens of the part in question or none of them have the issue. Right now, only the A4 AVR DB-series parts have bugs that were fixed by a subsequent die rev - but very few of them made it out of Microchip - at least to the general public. I ordered them basically as soon as they were for sale, and received them before they even posted the datasheet; they were all A5s. Therefore, to maximize performance, **the problems corrected by A5 in the DB128 and DB64 are are reported by the core to not impact those devices**, that is, on a DB-series, `ERRATA_PLL_RUNSTBY` will be defined as 0, not 0xA5. A similar thing happened on the DD-series, except that the DD-series didn't have any particularly bad errata. The 64k parts with 28+ pins and the smaller parts with less have two minor issues related to HV override of UPDI pin function (no define is provided for them; I couldn't think of a plausible use case where you would want different software options compiled in based on that - it impacts the upload process, not the code itself.
 
 When future die revs fix some of these problems, checkErrata() will no longer compile to a known constant. Thus, do not use it in #if statements. Do not use it in functions that your application relies upon the compiler constant-folding and optimizing away.
 
@@ -266,18 +337,180 @@ Each timer has a number associated with it, as shown below. This may be used by 
 * `digitalPinToTimer()` tells you what timer (if any) the pin is associated with by default. This is a constant, when the argument is constant, the optimizer will optimize it away.
 * `digitalPinToTimerNow()` tells you what timer (if any) the pin is associated with currently. On megaTinyCore, this is either the result of `digitalPinToTimer()` unless that timer has been "taken over" by user code with `takeOverTCA0()` or `takeOverTCD0()`. On modern AVR cores like Dx-core which support use of `analogWrite()` even when the `PORTMUX.TCxROUTEA` register (where `x` is `A` or `D`) has been changed, this will return the timer currently associated with that pin. megaTinyCore does NOT support non-default timer pin mappings with `analogWrite()`- so if `PORTMUX.TCAROUTEA` (2-series) or `PORTMUX.CTRLC` (0/1-series) has been altered, this will not not reflect that.
 
-```c
-#define NOT_ON_TIMER 0x00   // if MILLIS_TIMER set to this, millis is disabled. If digitalPinToTimer() gives this, it is not a PWM pin
-#define TIMERA0 0x10        // Present on all modern AVRs
-#define TIMERA1 0x08        // Not present on any tinyAVR; only on AVR DA and DB-series parts with at least 48 pins and AVR EA-series parts
-#define TIMERB0 0x20        // Present on all modern AVRs
-#define TIMERB1 0x21        // Not present on any tinyAVR 0-series or tinyAVR 1-series parts with 2, 4, or 8k of flash
-#define TIMERB2 0x22        // Not present on any tinyAVR, only 28+ pin Dx-series
-#define TIMERB3 0x23        // Not present on any tinyAVR, only 48/64-pin Dx-series
-#define TIMERB4 0x24        // Not present on any tinyAVR, only 64-pin Dx-series
-#define TIMERD0 0x40        // Present only on tinyAVR 1-series and AVR Dx-series parts.
-#define DACOUT 0x80         // Not a timer, obviously - but used like one by analogWrite()
-#define TIMERRTC 0x90       // Usable for millis only, not PWM
-#define TIMERRTC_XTAL 0x91  // Usable for millis only, not PWM
-#define TIMERRTC_XOSC 0x92  // Usable for millis only, not PWM
+These are the "timers" that can be associated with a pin:
+```text
+NOT_ON_TIMER      0x00
+TIMERA0           0x10
+TIMERA1           0x08
+TIMERB0           0x20
+TIMERB1           0x21
+TIMERB2           0x22
+TIMERB3           0x23
+TIMERB4           0x24
+TIMERD0           0x40 (see notes)
+DACOUT            0x80 (not a timer - but treated like it was for purposes of pin-info.)
+```
+
+TCD0 will be 0x40 when it's being used as the millis timer (not supported on DxCore), but when a pin is interrogated and reveals that it can be used by TCD0, the value it returns will be of the form 0b01cc_0mmm. Here cc is the channel (0 = WOA, 1 = WOB, 2 = WOC, 3 = WOD), and mmm is the value of `PORTMUX.TCDROUTEA | PORTMUX_TCD0_gm`. In the event that a future part is released with a second type D timer, there are two bits that could be used to signify that, leaving a second bit available if they added a WOE and WOF (to replicate the functionality of the venerable ATtiny861, which is still the only game in town if you want to control a three-phase BLDC motor), without having to change the numbering system otherwise. Regardless, unless madness breaks out at Microchip and they release a part with 3 or more type D timers and a third comparison channel, or a part with 5 or more type D timers, you can count on `timer & 0x40 == 0x40` for a type D timer. We'll burn that bridge when we come to it.
+
+This is a stark contrast to classic AVRs the timers were just numbered sequentially - here we can still uniquely specify any combination of timer and mux setting
+
+Additionally, other contexts involving timers may return these values (obviously the RTC won't generate PWM for you).
+```text
+TIMERRTC          0x90
+TIMERRTC_XTAL     0x91
+TIMERRTC_CLK      0x92
+```
+
+When digitalPinToTimer is used to get the timer associated with a pin, and that timer is a TCD the following constants may be returned.
+
+```text
+TIMERD0_0WOA      0x40
+TIMERD0_0WOB      0x50
+TIMERD0_0WOC      0x60
+TIMERD0_0WOD      0x70
+TIMERD0_1WOA      0x41
+TIMERD0_1WOB      0x51
+TIMERD0_1WOC      0x61
+TIMERD0_1WOD      0x71
+TIMERD0_2WOA      0x42
+TIMERD0_2WOB      0x52
+TIMERD0_2WOC      0x62
+TIMERD0_2WOD      0x72
+TIMERD0_3WOA      0x43
+TIMERD0_3WOB      0x53
+TIMERD0_3WOC      0x63
+TIMERD0_3WOD      0x73
+TIMERD0_4WOA      0x44
+TIMERD0_4WOB      0x54
+TIMERD0_4WOC      0x64
+TIMERD0_4WOD      0x74
+```
+Similarly, future parts with more TCD0 mux options may use:
+```text
+TIMERD0_5WOA      0x45
+TIMERD0_5WOB      0x55
+TIMERD0_5WOC      0x65
+TIMERD0_5WOD      0x75
+TIMERD0_6WOA      0x46
+TIMERD0_6WOB      0x56
+TIMERD0_6WOC      0x66
+TIMERD0_6WOD      0x76
+TIMERD0_7WOA      0x47
+TIMERD0_7WOB      0x57
+TIMERD0_7WOC      0x67
+TIMERD0_7WOD      0x77
+```
+Hence, if a pin returns a value with bit 6 set, and `(PORTMUX.TCDROUTEA & PORTMUX_TCD0_gm)` is equal to the value of the three low bits, then the pin is on TCD, and TCD is pointed at that set of pins, and you could proceed to get PWM out of it from TCD0.
+
+
+A future version of the core may use these constants to specify that a pin has access to TCA0 or TCA1.
+```text
+TIMERA0_MUX0      0x10
+TIMERA0_MUX1      0x11
+TIMERA0_MUX2      0x12
+TIMERA0_MUX3      0x13
+TIMERA0_MUX4      0x14
+TIMERA0_MUX5      0x15
+TIMERA0_MUX6      0x16
+TIMERA0_MUX7      0x17
+TIMERA1_MUX0      0x08
+TIMERA1_MUX1      0x09
+TIMERA1_MUX2      0x0A
+TIMERA1_MUX3      0x0B
+TIMERA1_MUX4      0x0C
+TIMERA1_MUX5      0x0D
+```
+Similar to above, the mux value is stored in the 3 low bits. Bit 4 signifies TCA0, and bit 3 TCA1 (TCA2 would get both, in the event that we get a part with a third TCA).
+
+And finally there are these. These are **currently not used in any way by the core** but may be used in a future version.
+```text
+TIMERB0_ALT       0x30
+TIMERB1_ALT       0x31
+TIMERB2_ALT       0x32
+TIMERB3_ALT       0x33
+TIMERB4_ALT       0x34
+```
+
+### Timer Redux
+This means a specific order must be used when testing an 8-bit timer identifier (the format that the core uses internally refers to timers) to avoid incorrect results; assuming we take it as a given that we are using hardware that has been announced or released as of late 2022:
+1. If the high bit is set, it's the DAC or RTC, not a PWM timer.
+2. If 0x40 is set, TCD0. If any other bits are set, it's specifically a reference to a pin - bits 4 and 5 give the channel (A-D), and the low 3 bits are the mux.
+3. If 0x20 is set, it's a TCB, and the number is in the low nybble. If it's a pin reference, 0x10 indicates that it's on the alternate pin.
+4. If 0x10 is set, it's TCA0, if 0x08 is set it's TCA1, the mux option is in the low 7 bits, and if neither 0x10 or 0x08 are set, but it's not zero, you're trying to look up something that does not indicate any timer at all.
+
+### Timer identification examples
+Two strange examples cam be found below
+
+```c++
+if (timer & TIMERD0 == TIMERD0) {
+  // it's a TCD.
+  // if it's a pin, the mux option that points to it is:
+  uint8_t pinmux = timer & 0x07;
+  // and we find the WO channel in bits 4 and 5:
+  uint8_t wochan = (timer & 0x30) >> 4; // compiler ought to render this as mov andi swap
+  TCD_t* tcd = &TCD0;
+  // to get the bit corresponding to this pin in TCD0.FAULTCTRL
+  // 0x40 << wochan;
+  // looking up port and bit would take a lookup table of 1 byte per mux option, containing the port number and a number indicating pin layout.
+  // 0b00000000, 0b00000001, 0b00001101, 0b00000110, 0b101100000
+  // 0 = 4567
+  // 1 = 0123
+  uint pin = wochan;
+  uint8_t tcdport = pgm_read_byte_near(&tcdtable[pinmux]
+  if !(tcdport & 0x08) {
+    pin += 4;
+  }
+  if (tcdport & 0x80) {
+    if(wochan & 0x02) {
+      _SWAP(tcdport);
+      pin -= 2;
+      // this is the pin within the port;
+    }
+    PORT_t *port = &PORTA + (tcdport & 0x07);
+    // and now we have the port!
+  } else if (!(timer & 0x80)) {
+  if ((timer & (TIMERB0) == TIMERB0) {
+    // TCB
+    uint8_t timernbr = timer & 7;
+    TCB_t* tcb=&TCB0;
+    tcb += timernbr;
+    // tcb now points to the TCB identified.
+    bool altpins = timer & 0x10
+    // This section left an an exercise for the reader.
+    /* looking up pins would take a lookup table of 2 bytes per timer
+     * hint: store each as 0bppp00bbb where ppp is the port number and bbb is the bit position
+     * then it's easy to fish out the PORT and pin. But there's a trick to that format -
+     * tcb_tbl & 0xE0 is the low byte of the address of the PORTx register! just 'or' with 0x0400
+     */
+  }
+  uint8_t timernbr
+  if(timer &(TIMERA0 | TIMERA1)) {
+    uint8_t timernbr
+    timernbr = (timer & TIMERA1 ? 1 : 0);
+    if(timer & TIMERA0){
+      timernbr + timernbr; // 0 -> 0,  1 -> 2
+    }
+    TCA_t *tca = &TCA0 + timernbr;
+    if (timernbr == 0) {
+      port = &PORTA + (PORTMUX.TCAROUTEA & PORTMUX_TCD0_gm);
+    }
+    // pin can't be worked back from the identity of the TCA.
+    // and doing this for TCA1 is much messier because most of it's mappings are only 3 pin ones, and the mux to port mapping is completely random, but some aren't. Takes another lookup table.
+  }
+```
+
+```c++
+void setup() {
+  Serial.begin(115200);
+  if (checkErrata(ERRATA_TCA1_PORTMUX)) {
+    Serial.println("ERROR: This chip cannot direct output from TCA1 to PG0:5 or PE4:7 due to silicon errata");
+    while (1) {
+      runInCirclesScreamAndShout();
+    }
+  } else {
+    doSomethingWithTCA1PinMapping();
+    partyDown();  // defined elsewhere.
+  }
+}
 ```

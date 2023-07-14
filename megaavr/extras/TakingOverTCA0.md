@@ -7,9 +7,9 @@ Microchip has made available a Technical Brief describing the capabilities of th
 
 [Technical Brief 3217: Getting started with TCA](https://www.microchip.com/en-us/application-notes/tb3217)
 
-## Reconfiguring TCA0 while using megaTinyCore
-The most common point of confusion is the fact that megaTinyCore, out of the box, configures TCA0 for use in "Split Mode" - this allows it to generate 6 8-bit PWM signals. This provides 2 additional PWM pins (3 if TCB0 is needed for other purposes) - and since analogWrite() only supports 8-bit PWM anyway, when using the Arduino API functions, there is no loss of functionality imposed by this.
-However, for users wishing to take over the timer, it has caused confusion, because it changes the behavior of the compare and period registers significantly (they are treated as 8-bit values instead of 16-bit ones), and TCA0.CTRLD which controls split mode is enable-locked. In order to help resolve this issue and make it easier to make use of the advanced functionality of the timer, we provide the `takeOverTCA0()` function. That will disable all of the core-mediated API functionality that interacts with the timer, so that digitalWrite (and analogWrite) will not reconfigure the timer, which could result in PWM on a different pin being turned off (in the vase of digitalWrite - you should not call analogWrite() on a pin that is controlled by TCA0 anyway after taking over TCA0. Simply calling `takeOverTCA0()` will perform a hard reset of the timer in addition to instructing analogWrite() and digitalWrite() not to configure that timer (digitalPinToTimerNow() will return NOT_ON_TIMER for TCA0 pins).
+## Reconfiguring TCA0 while using DxCore and megaTinyCore
+The most common point of confusion is the fact that DxCore and megaTinyCore, out of the box, configures TCA0 (and TCA1 if present) for use in "Split Mode" - this allows them to generate 6 8-bit PWM signals eacg. Since analogWrite() only supports 8-bit PWM anyway, when using the Arduino API functions, there is no loss of functionality imposed by this.
+However, for users wishing to take over the timer, it has caused confusion, because it changes the behavior of the compare and period registers significantly (they are treated as 8-bit values instead of 16-bit ones), and TCA0.CTRLD which controls split mode is enable-locked. In order to help resolve this issue and make it easier to make use of the advanced functionality of the timer, we provide the `takeOverTCA0()` function. That will disable all of the core-mediated API functionality that interacts with the timer, so that digitalWrite (and analogWrite) will not reconfigure the timer, which could result in PWM on an unexpected pin being turned off(in the vase of digitalWrite - you should not call analogWrite() on a pin that is controlled by TCA0 anyway after taking over TCA0. Simply calling `takeOverTCA0()` will perform a hard reset of the timer in addition to instructing analogWrite() and digitalWrite() not to configure that timer (digitalPinToTimerNow() will return NOT_ON_TIMER for TCA0 pins).
 
 ### Fully manual reconfiguration
 You must disable the timer when switching split mode and non-split mode, and Microchip recommends that you issue a reset command. That's what we do here. This will reset timer registers to their default (not our default) values. Note that in split mode, the two low bits must be 1, or the command is ignored. Only 00 (none) and 11 (both) are listed as valid; it sounds like there had originally been a plan to allow the RESTART command to be issued independently to the two halves (and possibly a third command) but that it either was never implemented, or never worked correctly and was discovered early enough and dropped instead of adding another issue that would go unfixed for 5+ years to the errata.
@@ -31,8 +31,8 @@ Reconfiguring TCA0 when it is used as the millis timer source will result in los
 
 Better yet, you can verify that you chose the intended millis timer, rather than that you didn't pick the most unsuitable one:
 ```c++
-#ifndef MILLIS_USE_TIMERB0
-  #error "This sketch is written for use with TCB0 as the millis timing source"
+#ifndef MILLIS_USE_TIMERB2
+  #error "This sketch is written for use with TCB2 as the millis timing source"
 #endif
 ```
 
@@ -60,16 +60,24 @@ A note about the pin numbers - we use the PORT_Pxn notation to refer to pins; wh
   #error "This sketch takes over TCA0, don't use for millis here.  Pin mappings on 8-pin parts are different"
 #endif
 
-unsigned int DutyCycle = 0;
+uint8_t DutyCycle = 0;
+// picked more or less randomly, other than the fact that everything has it, so it makes a good example :-)
+#if defined(MEGATINYVCORE)
+  uint8_t OutputPin = PIN_PB1;
+#else
+  uint8_t OutputPin = PIN_PC1;
+#endif
 
 void setup() {
-  // We will be outputting PWM on PB0
-  pinMode(PIN_PB0, OUTPUT); //PB0 - TCA0 WO0, pin7 on 14-pin parts
+
+  // We will be outputting PWM on PB1 or PC1
+
+  pinMode(PIN_PB0, OUTPUT); //PB0 - TCA0 WO1, pin7 on 14-pin parts
   takeOverTCA0();                           // This replaces disabling and resettng the timer, required previously.
-  TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_DSBOTTOM_gc); //Dual slope PWM mode OVF interrupt at BOTTOM, PWM on WO0
+  TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_DSBOTTOM_gc); //Dual slope PWM mode OVF interrupt at BOTTOM, PWM on WO1
   TCA0.SINGLE.PER = 0xFFFF; // Count all the way up to 0xFFFF
   // At 20MHz, this gives ~152Hz PWM
-  TCA0.SINGLE.CMP0 = DutyCycle;
+  TCA0.SINGLE.CMP1 = DutyCycle;
   TCA0.SINGLE.INTCTRL = TCA_SINGLE_OVF_bm; //enable overflow interrupt
   TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm; //enable the timer with no prescaler
 }
@@ -77,9 +85,9 @@ void setup() {
 void loop() { // Not even going to do anything in here
 }
 
-ISR(TCA0_OVF_vect) { //on overflow, we will increment TCA0.CMP0, this will happen after every full cycle - a little over 7 minutes.
-  TCA0.SINGLE.CMP0 = DutyCycle++; // Because we are in Dual Slope Bottom mode, OVF fires at BOTTOM, at end, not TOP, in middle of the pulse.
-  TCA0.SINGLE.INTFLAGS = TCA_SINGLE_OVF_bm; //Always remember to clear the interrupt flags, otherwise the interrupt will fire continually!
+ISR(TCA0_OVF_vect) {    // on overflow, we will increment TCA0.CMP0, this will happen after every full cycle - a little over 7 minutes.
+  TCA0.SINGLE.CMP1      = DutyCycle++; // Because we are in Dual Slope Bottom mode, OVF fires at BOTTOM, at end, not TOP, in middle of the pulse.
+  TCA0.SINGLE.INTFLAGS  = TCA_SINGLE_OVF_bm; // Always remember to clear the interrupt flags, otherwise the interrupt will fire continually!
 }
 ```
 
@@ -92,13 +100,23 @@ This generates PWM similar to the first example (though without the silly interr
 #error "This sketch takes over TCA0, don't use for millis here."
 #endif
 
-uint8_t OutputPin     = PIN_PB0;
-
+// picked more or less randomly, other than the fact that everything has it, so it makes a good example :-)
+#if defined(MEGATINYVCORE)
+  uint8_t OutputPin = PIN_PB1;
+#else
+  uint8_t OutputPin = PIN_PC1;
+#endif
 unsigned int Period   = 0xFFFF;
 
 void setup() {
+  
   pinMode(OutputPin, OUTPUT);
-  PORTMUX.TCAROUTEA   = (PORTMUX.TCAROUTEA & ~(PORTMUX_TCA0_gm)) | PORTMUX_TCA0_PORTC_gc;
+  #if defined MEGATINYCORE
+    #define NEW_PORTMUX_OUTPUT = 1 << 1;
+    PORTMUX.TCAROUTEA   = NEW_PORTMUX_OUTPUT;
+  #else 
+    PORTMUX.TCAROUTEA   = (PORTMUX.TCAROUTEA & ~(PORTMUX_TCA0_gm)) | PORTMUX_TCA0_PORTC_gc;
+  #endif
   takeOverTCA0();                             // This replaces disabling and resettng the timer, required previously.
   TCA0.SINGLE.CTRLB   = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc);
                                               // Single slope PWM mode, PWM on WO0
@@ -128,7 +146,7 @@ void PWMDemo(unsigned long frequency){
 }
 
 void setDutyCycle(byte duty) {
-  TCA0.SINGLE.CMP0 = map(duty, 0, 255, 0, Period);
+  TCA0.SINGLE.CMP1 = map(duty, 0, 255, 0, Period);
 }
 
 void setFrequency(unsigned long freqInHz) {
@@ -154,6 +172,11 @@ Do note that if pushing the PWM frequency is your aim, you can go considerably h
 #error "This sketch takes over TCA0, don't use for millis here."
 #endif
 
+#if defined(MEGATINYCORE)
+#define PWM_PIN PIN_PB1
+#else
+#define PWM_PIN PIN_PC1
+#endif
 
 void setup() {
   // We will be outputting PWM on PA3 on an 8-pin part
@@ -177,11 +200,11 @@ void loop() { // Lets generate some output just to prove it works
       pass = 1;
       duty = 199;
       TCA0.SINGLE.PER = 199;
-    } else if (pass == 1) {   // and now the requested 62 kHz (actually 62.11kHz)
+    } else if (pass == 1) { // and now the requested 62 kHz (actually 62.11kHz)
       pass = 2;
       duty = 322;
       TCA0.SINGLE.PER = 322;
-    } else {                  // and back to the beginning.
+    } else {                // and back to the beginning.
       pass = 0;
       duty = 255;
       TCA0.SINGLE.PER = 255;
@@ -322,5 +345,8 @@ void analogWriteWO5(uint8_t duty) {
     TCA0.SPLIT.HCMP2  =  duty;                 // Turn set the duty cycle for WO5
     TCA0.SPLIT.CTRLB |=  TCA_SPLIT_HCMP2EN_bm; // Turn on PWM
   }
+}
+```
+
 }
 ```

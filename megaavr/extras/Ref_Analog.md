@@ -450,10 +450,15 @@ ADCPowerOptions(ADC_DISABLE);                           //  turn off the ADC.
 ADCPowerOptions(ADC_ENABLE);                            //  Turn the ADC back on. If LOWLAT mode was on, when you turned off the ADC it will still be on,. Same with the other options.
 ```
 
-As of 2.5.12 we will always disable and re-enable the ADC if touching LOWLAT, in the hopes that this will work around the lowlat errata consistently.
+As of 2.5.12 (1.6.8) we will always disable and re-enable the ADC if touching LOWLAT, in the hopes that this will work around the lowlat errata consistently.
+
 **it is still recommended to call ADCPowerOptions(), if needed, before any other ADC-related functions** unless you fully understand the errata and the ramifications of your actions.
+
 **On most 2-series parts LOW_LAT mode is REQUIRED in order to use the PGA when not using an internal reference or measuring the DACREF!**
+
 **Disabling the ADC is REQUIRED for acceptable sleep power consumption on the 2-series!**
+
+**No word either way on the EA-series!**
 
 Lowlat mode is enabled by default for this reason, as well as to generally improve performance. Disabling the ADC will end the power consumption associated with it.
 
@@ -491,7 +496,7 @@ Try not to use these unless you're getting really deep into library development 
 Libraries exist that use trickery and the ADC to measure capacitance, hence detect touch/proximity. Most of these libraries (since Atmel always locked up QTouch) relied on the leftover charge in the ADC S&H cap. The magnitude of this source of error is much larger on classic AVRs. It is considered undesirable (this is why when changing ADC channels in the past, you were advised to throw out the first couple of readings!) and with each generation, this has been reduced. There are still ways to do this effectively on the 2series, but require very different approaches. Thankfully for parts that do have a PTC, great strides are being made. the tiny1-series has an active developer working on it, while Microchip itself will release a library based on qtouch for the DA.
 
 ## Microchip Documentation
-Has been much expanded and I'm very happy to see this sort of document produced before the EA release. Wondering about the numbering? Well, TB stands for Technical Brief, which is different in some way from an Application Note (AN), and obviously a whitepaper or "Datasheet" (DS) is something else altogether. Even when they're about the same length and contain similar types of content. S
+Has been much expanded and I'm very happy to see this sort of document produced before the EA release. Wondering about the numbering? Well, TB stands for Technical Brief, which is what Microchip refers to the sort of documents everyone else calls an Application Note. I belive the AN lettering denotes pre-revolutionary literature (ie, Atmel naming) - but it means the same thing as a technical brief, and covers the same spread of quality. Some are like a brilliant lighthouse, illuminating the way for miles around. Others could have been written by a highschool kid paraphrasing the datasheet. is is somewhat different from a whitepaper, which is meant to be a bit more formal. Depending on
 * [DS00003197A - Differential and Single-Ended ADC](https://ww1.microchip.com/downloads/en/DeviceDoc/Differential-and-Single-Ended-ADC-WhitePaper-DS00003197A.pdf)
 * [TB3256 - How to Use the 12-Bit Differential ADC with PGA in Single Mode](https://www.microchip.com/content/dam/mchp/documents/MCU08/ApplicationNotes/ApplicationNotes/TB3256-How-to-Use-the-12-Bit-Differential-ADC-with-PGA-in-Single-Mode-DS90003256A.pdf)
 * [AN4225 - Maximizing the Signal: Tips and Tricks to Properly Acquiring Analog Signals](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ApplicationNotes/ApplicationNotes/Max-Signal-Properly-TipsTrick-Acq-Analog-Signals-DS00004225.pdf)

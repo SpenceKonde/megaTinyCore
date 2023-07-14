@@ -9,17 +9,17 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other         ##        ###        #####   #
-#  contributors 2018-2021                  #  #      #               #   #
-#  megaTinyCore is free software.    # #     #       ####           #    #
-#  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##     #     #
-#  License section of README.md       #    ####  ##   ###   ##    #      #
+#  Copyright Spence Konde and other         ##        ###        ###     #
+#  contributors 2018-2021                  #  #      #          #   #    #
+#  megaTinyCore is free software.    # #     #       ####        ####    #
+#  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##      #    #
+#  License section of README.md       #    ####  ##   ###   ##   ###     #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
 #  have the zoomed out "minimap" that you can scroll through.            #
 #                                                                        #
-#  megaTinyCore 2.6.6 is at approximate parity with DxCore 1.5.5         #
+#  megaTinyCore 2.6.8 is at approximate parity with DxCore 1.5.5         #
 #  These two cores share a large amount of code; most changes impact     #
 #  both cores, since the hardware is extremely similar, though it is     #
 #  expected that DxCore's minor version will advance faster since new    #
@@ -5469,8 +5469,8 @@ atxy2o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 # But when altgernate pins are used, it can use the same binary as all other 0/1-series!
 atxy2o.menu.bootloaderuart.default=TX:0 (PA6), RX:1 (PA7)
 atxy2o.menu.bootloaderuart.alternate=TX:2 (PA1), RX:3 (PA2)
-atxy2o.menu.bootloaderuart.default.bootloader.uartswap=2
-atxy2o.menu.bootloaderuart.alternate.bootloader.uartswap=z_alt
+atxy2o.menu.bootloaderuart.default.bootloader.uartswap=
+atxy2o.menu.bootloaderuart.alternate.bootloader.uartswap=_alt
 
 #----------------------------------------#
 #  UPDI and RESET PIN configuration      #
