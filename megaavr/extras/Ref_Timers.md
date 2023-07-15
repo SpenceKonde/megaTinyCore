@@ -511,21 +511,21 @@ When TCA0 is used as the millis timekeeping source, it is set to run at the syst
 |    40 MHz |  1.63 ms |   6.4 us |   0.19 % |        3.5 us |
 |    36 MHz |  1.81 ms |   7.1 us |   0.19 % |   aprx   4 us |
 |    32 MHz |  2.04 ms |   8.0 us |   0.19 % |          4 us |
-|    30 MHz |  0.54 ms |   2.1 us |   0.51 % |   aprx   4 us |
-|    28 MHz |  0.58 ms |   2.3 us |   0.51 % |          4 us |
-|    25 MHz |  0.65 ms |   2.6 us |   0.51 % |   aprx   4 us |
-|    24 MHz |  0.68 ms |   2.7 us |   0.51 % |          5 us |
-|    20 MHz |  0.82 ms |   3.2 us |   0.51 % |          7 us |
+|    30 MHz  | 0.54 ms |   2.1 us |   0.51 % |   aprx   4 us |
+|    28 MHz  | 0.58 ms |   2.3 us |   0.51 % |          4 us |
+|    25 MHz  | 0.65 ms |   2.6 us |   0.51 % |   aprx   4 us |
+|    24 MHz  | 0.68 ms |   2.7 us |   0.51 % |          5 us |
+|    20 MHz  | 0.82 ms |   3.2 us |   0.51 % |          7 us |
 |    16 MHz |  1.02 ms |   4.0 us |   0.51 % |          9 us |
 | !  14 MHz |  1.14 ms |   4.6 us |   0.51 % |   aprx  10 us |
 |    12 MHz |  1.36 ms |   5.3 us |   0.51 % |         10 us |
 |    10 MHz |  1.63 ms |   6.4 us |   0.51 % |         14 us |
 |     8 MHz |  2.04 ms |   8.0 us |   0.51 % |         17 us |
-| !   7 MHz |  0.58 ms |   2.3 us |   2.13 % |   aprx  18 us |
-| !   6 MHz |  0.68 ms |   2.7 us |   2.13 % |   aprx  19 us |
-|     5 MHz |  0.82 ms |   3.2 us |   2.13 % |         27 us |
+| !   7 MHz  | 0.58 ms |   2.3 us |   2.13 % |   aprx  18 us |
+| !   6 MHz  | 0.68 ms |   2.7 us |   2.13 % |   aprx  19 us |
+|     5 MHz  | 0.82 ms |   3.2 us |   2.13 % |         27 us |
 |     4 MHz |  1.02 ms |   4.0 us |   2.13 % |         33 us |
-| !   3 MHz |  0.68 ms |   2.7 us |   3.55 % |   aprx  45 us |
+| !   3 MHz  | 0.68 ms |   2.7 us |   3.55 % |   aprx  45 us |
 | !   2 MHz |  1.02 ms |   4.0 us |   3.55 % |   aprx  60 us |
 |     1 MHz |  2.04 ms |   8.0 us |   3.55 % |        112 us |
 
@@ -663,33 +663,33 @@ Whenever a function supplied by the core returns a representation of a timer, th
 ### For DxCore
 | Timer Name   | Value | Peripheral |          Used for |
 |--------------|-------|------------|-------------------|
-| NOT_ON_TIMER |  0x00 |      None  | millis (disabled) or when asked what timer outputs on a pin available for PWM.  |
-| TIMERA0 *    |  0x10 |     `TCA0` | millis and/or PWM |
-| TIMERA1 *    |  0x08 |     `TCA1` | millis and/or PWM |
-| TIMERA2 *    |  0x18 |     `TCA2` | Nothing. No such part exists |
-| TIMERB0      |  0x20 |     `TCB0` | millis     or PWM |
-| TIMERB1      |  0x21 |     `TCB1` | millis     or PWM |
-| TIMERB2      |  0x22 |     `TCB2` | millis     or PWM |
-| TIMERB3      |  0x23 |     `TCB3` | millis     or PWM |
-| TIMERB4      |  0x24 |     `TCB4` | millis     or PWM |
-| TIMERB0_ALT  |  0x30 |     `TCB0` | Reserved, not used|
-| TIMERB1_ALT  |  0x31 |     `TCB1` | Reserved, not used|
-| TIMERB2_ALT  |  0x32 |     `TCB2` | Reserved, not used|
-| TIMERB3_ALT  |  0x33 |     `TCB3` | Reserved, not used|
-| TIMERB4_ALT  |  0x34 |     `TCB4` | Reserved, not used|
-| TIMERD0      |  0x40 |     `TCD0` | PWM or on mTC only, millis |
+| NOT_ON_TIMER    | 0x00 |      None  | millis (disabled) or when asked what timer outputs on a pin available for PWM.  |
+| TIMERA0 *       | 0x10 |     `TCA0` | millis and/or PWM |
+| TIMERA1 *       | 0x08 |     `TCA1` | millis and/or PWM |
+| TIMERA2 *       | 0x18 |     `TCA2` | Nothing. No such part exists |
+| TIMERB0         | 0x20 |     `TCB0` | millis     or PWM |
+| TIMERB1         | 0x21 |     `TCB1` | millis     or PWM |
+| TIMERB2         | 0x22 |     `TCB2` | millis     or PWM |
+| TIMERB3         | 0x23 |     `TCB3` | millis     or PWM |
+| TIMERB4         | 0x24 |     `TCB4` | millis     or PWM |
+| TIMERB0_ALT     | 0x30 |     `TCB0` | Reserved, not used|
+| TIMERB1_ALT     | 0x31 |     `TCB1` | Reserved, not used|
+| TIMERB2_ALT     | 0x32 |     `TCB2` | Reserved, not used|
+| TIMERB3_ALT     | 0x33 |     `TCB3` | Reserved, not used|
+| TIMERB4_ALT     | 0x34 |     `TCB4` | Reserved, not used|
+| TIMERD0         | 0x40 |     `TCD0` | PWM or on mTC only, millis |
 | TIMERD0_0WOA ** | 0x40 |   `TCD0` |           PWM WOA |
 | TIMERD0_0WOB ** | 0x50 |   `TCD0` |           PWM WOB |
 | TIMERD0_0WOC ** | 0x60 |   `TCD0` |           PWM WOC |
 | TIMERD0_0WOD ** | 0x70 |   `TCD0` |           PWM WOD |
 | TIMERD0_1WOA ** | 0x41 |   `TCD0` | with mux in 3 LSBs|
 | TIMERD0_4WOD ** | 0x74 |   `TCD0` | and so on to here |
-| TIMERE0      |  TBD  |     `TCE0` | TBD               |
-| TIMERF0      |  TBD  |     `TCF0` | TBD               |
-| DACOUT ***   |  0x80 |     `DAC0` | DAC output        |
-| TIMERRTC     |  0x90 |      `RTC` | @ sleepTime.h     |
-| TIMERPIT     |  0x98 | `RTC PIT`  | @ PD sleepTime.h  |
-| NOT_A_TIMER  |  0xFF |      None  | Reserved @@       |
+| TIMERE0        |  TBD  |     `TCE0` | TBD               |
+| TIMERF0        |  TBD  |     `TCF0` | TBD               |
+| DACOUT ***      | 0x80 |     `DAC0` | DAC output        |
+| TIMERRTC        | 0x90 |      `RTC` | @ sleepTime.h     |
+| TIMERPIT        | 0x98 | `RTC PIT`  | @ PD sleepTime.h  |
+| NOT_A_TIMER     | 0xFF |      None  | Reserved @@       |
 
 0 (`NOT_ON_TIMER`) will be returned by digitalPinToTimer() or digitalPinToTimerNow() (herafter: dPTT and dPTTN) if the specified pin has no timer.
 
@@ -707,21 +707,21 @@ There were some key and non-obvious hazards:
 ### For megaTinyCore
 | Timer Name   | Value | Peripheral |          Used for |
 |--------------|-------|------------|-------------------|
-| NOT_ON_TIMER |  0x00 |      None  | millis (disabled) or when asked what timer outputs on a pin available for PWM.  |
-| TIMERA0 *    |  0x10 |     `TCA0` | millis and/or PWM |
-| TIMERA1 *    |  0x08 |     `TCA1` | millis and/or PWM |
-| TIMERA2 *    |  0x18 |     `TCA2` | Nothing. No such part exists |
-| TIMERB0      |  0x20 |     `TCB0` | millis     or PWM |
-| TIMERB1      |  0x21 |     `TCB1` | millis     or PWM |
-| TIMERB2      |  0x22 |     `TCB2` | millis     or PWM |
-| TIMERB3      |  0x23 |     `TCB3` | millis     or PWM |
-| TIMERB4      |  0x24 |     `TCB4` | millis     or PWM |
-| TIMERB0_ALT  |  0x30 |     `TCB0` | Reserved, not used|
-| TIMERB1_ALT  |  0x31 |     `TCB1` | Reserved, not used|
-| TIMERB2_ALT  |  0x32 |     `TCB2` | Reserved, not used|
-| TIMERB3_ALT  |  0x33 |     `TCB3` | Reserved, not used|
-| TIMERB4_ALT  |  0x34 |     `TCB4` | Reserved, not used|
-| TIMERD0      |  0x40 |     `TCD0` | PWM or on mTC only, millis |
+| NOT_ON_TIMER  | 0x00 |      None  | millis (disabled) or when asked what timer outputs on a pin available for PWM.  |
+| TIMERA0 *     | 0x10 |     `TCA0` | millis and/or PWM |
+| TIMERA1 *     | 0x08 |     `TCA1` | millis and/or PWM |
+| TIMERA2 *     | 0x18 |     `TCA2` | Nothing. No such part exists |
+| TIMERB0       | 0x20 |     `TCB0` | millis     or PWM |
+| TIMERB1       | 0x21 |     `TCB1` | millis     or PWM |
+| TIMERB2       | 0x22 |     `TCB2` | millis     or PWM |
+| TIMERB3       | 0x23 |     `TCB3` | millis     or PWM |
+| TIMERB4       | 0x24 |     `TCB4` | millis     or PWM |
+| TIMERB0_ALT   | 0x30 |     `TCB0` | Reserved, not used|
+| TIMERB1_ALT   | 0x31 |     `TCB1` | Reserved, not used|
+| TIMERB2_ALT   | 0x32 |     `TCB2` | Reserved, not used|
+| TIMERB3_ALT   | 0x33 |     `TCB3` | Reserved, not used|
+| TIMERB4_ALT   | 0x34 |     `TCB4` | Reserved, not used|
+| TIMERD0       | 0x40 |     `TCD0` | PWM or on mTC only, millis |
 | TIMERD0_0WOA ** | 0x40 |   `TCD0` |           PWM WOA |
 | TIMERD0_0WOB ** | 0x50 |   `TCD0` |           PWM WOB |
 | TIMERD0_0WOC ** | 0x60 |   `TCD0` |           PWM WOC |
@@ -730,13 +730,13 @@ There were some key and non-obvious hazards:
 | TIMERD0_4WOD ** | 0x74 |   `TCD0` | and so on to here |
 | TIMERE0      |  TBD  |     `TCE0` | TBD               |
 | TIMERF0      |  TBD  |     `TCF0` | TBD               |
-| DACOUT ***   |  0x80 |     `DAC0` | DAC output        |
-| TIMERRTC     |  0x90 |      `RTC` | millis            |
-| TIMERRTC_INT |  0x91 | `RTC, int. 32k`| mTC only, deprecated in light of upcoming sleepTime |
-| TIMERRTC_XTAL|  0x92 | `RTC, 32k Xtal`| mTC only, deprecated in light of upcoming sleepTime |
-| TIMERRTC_EXT |  0x93 | `RTC, ext clk`| mTC only, deprecated in light of upcoming sleepTime |
-| TIMERPIT     |  0x98 | `RTC PIT`  | @ PD sleep time   |
-| NOT_A_TIMER  |  0xFF |      None  | Reserved @@       |
+| DACOUT ***    | 0x80 |     `DAC0` | DAC output        |
+| TIMERRTC      | 0x90 |      `RTC` | millis            |
+| TIMERRTC_INT  | 0x91 | `RTC, int. 32k`| mTC only, deprecated in light of upcoming sleepTime |
+| TIMERRTC_XTAL | 0x92 | `RTC, 32k Xtal`| mTC only, deprecated in light of upcoming sleepTime |
+| TIMERRTC_EXT  | 0x93 | `RTC, ext clk`| mTC only, deprecated in light of upcoming sleepTime |
+| TIMERPIT      | 0x98 | `RTC PIT`  | @ PD sleep time   |
+| NOT_A_TIMER   | 0xFF |      None  | Reserved @@       |
 
 
 0 (`NOT_ON_TIMER`) will be returned by digitalPinToTimer() or digitalPinToTimerNow() (herafter: dPTT and dPTTN) if the specified pin has no timer.
@@ -784,24 +784,24 @@ Calls to `_gCMT` should be conditionally compiled based on CORE_HAS_CURRENTTIMER
 
 | Timer Name   | Value | Peripheral |Notes:
 |--------------|-------|------------|-------
-| NOT_ON_TIMER |  0x00 |      None  | Means millis is *paused* or *stopped* but can be restarted.
-| TIMERA0      |  0x10 |     `TCA0` |
-| TIMERA1      |  0x08 |     `TCA1` |
-| TIMERA2      |  0x18 |     `TCA2` | Theoretical
-| TIMERB0      |  0x20 |     `TCB0` |
-| TIMERB1      |  0x21 |     `TCB1` |
-| TIMERB2      |  0x22 |     `TCB2` |
-| TIMERB3      |  0x23 |     `TCB3` |
-| TIMERB4      |  0x24 |     `TCB4` |
-| TIMERD0      |  0x40 |     `TCD0` | mTC only
+| NOT_ON_TIMER  | 0x00 |      None  | Means millis is *paused* or *stopped* but can be restarted.
+| TIMERA0       | 0x10 |     `TCA0` |
+| TIMERA1       | 0x08 |     `TCA1` |
+| TIMERA2       | 0x18 |     `TCA2` | Theoretical
+| TIMERB0       | 0x20 |     `TCB0` |
+| TIMERB1       | 0x21 |     `TCB1` |
+| TIMERB2       | 0x22 |     `TCB2` |
+| TIMERB3       | 0x23 |     `TCB3` |
+| TIMERB4       | 0x24 |     `TCB4` |
+| TIMERD0       | 0x40 |     `TCD0` | mTC only
 | TIMERE0      |  TBD  |     `TCE0` | TBD
 | TIMERF0      |  TBD  |     `TCF0` | TBD
-| TIMERRTC     |  0x90 |      `RTC` | Never the value of TIMER_MILLIS. only returned by _gCMT(). Indicates that the RTC is being used for timekeeping temporarily.
-| TIMERRTC_INT |  0x91 | `RTC, int. 32k`| mTC only
-| TIMERRTC_XTAL|  0x92 | `RTC, 32k Xtal`| mTC only
-| TIMERRTC_EXT |  0x93 | `RTC, ext clk`| mTC only
-| TIMERPIT     |  0x98 | `RTC PIT`  | Never given by TIMER_MILLIS  only returned by _gCMT(), and only if temporarily using the PIT for timekeeping, presumably in power down sleep.
-| NOT_A_TIMER  |  0xFF |      None  | Means millis is *stopped but could be restarted.*
+| TIMERRTC      | 0x90 |      `RTC` | Never the value of TIMER_MILLIS. only returned by _gCMT(). Indicates that the RTC is being used for timekeeping temporarily.
+| TIMERRTC_INT  | 0x91 | `RTC, int. 32k`| mTC only
+| TIMERRTC_XTAL | 0x92 | `RTC, 32k Xtal`| mTC only
+| TIMERRTC_EXT  | 0x93 | `RTC, ext clk`| mTC only
+| TIMERPIT      | 0x98 | `RTC PIT`  | Never given by TIMER_MILLIS  only returned by _gCMT(), and only if temporarily using the PIT for timekeeping, presumably in power down sleep.
+| NOT_A_TIMER   | 0xFF |      None  | Means millis is *stopped but could be restarted.*
 
 All other unforeseen timer-like peripherals will be assigned to values above 0x9F
 
