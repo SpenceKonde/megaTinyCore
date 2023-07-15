@@ -27,7 +27,7 @@ Not the feature I'm most impressed with. A+ on concept, C on execution.
 Tuning to achieve non-standard speeds is not supported on the AVR Ex-series parts under DxCore.
 
 ## Supported Clock Speeds
-Like classic AVRs, tinyAVRs have a "speed grades" depending on the voltage and operating conditions that they are rated for operation within. The spec is 5 MHz @ 1.8V , 10 MHz @ 2.7V (3.3V nominal) and 20 @ 4.5V (5.0V nominal) (2.7 or 4.5 for 8MHz and 16 MHz at >105C . See the Speed Grade reference for more information on this. Note that the speed grades are extrememly conservative for room temperature operation\
+Like classic AVRs, tinyAVRs have a "speed grades" depending on the voltage and operating conditions that they are rated for operation within. The spec is 5 MHz @ 1.8V , 10 MHz @ 2.7V (3.3V nominal) and 20 @ 4.5V (5.0V nominal) (2.7 or 4.5 for 8MHz and 16 MHz at >105C . See the Speed Grade reference for more information on this. Note that the speed grades are extremely conservative for room temperature operation\
 
 Some of the listed speeds, while supported by the hardware are not supported by the
 For unsupported speeds, the micros and delay-us columns indicate what internal plumbing has been implemented. micros is implemented for almost all speeds, delayMicroseconds with non-compile-time-known delays for most, even some unsupported ones. delayMicroseconds() is supported and accurate at all speeds when the argument is a compile-time-known constant, as we use the avr-libc implementation.

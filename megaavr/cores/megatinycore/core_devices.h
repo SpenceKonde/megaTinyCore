@@ -587,7 +587,7 @@
 
 // Notice NUM_TOTAL_PORTS should always be 1, 2, 3, 6 or 7 - it is the number of the highest port plus 1.
 // The tinyAVRs have either just PORTA, PORTA and PORTB, or ports A, B, and C - 1, 2, or 3 ports.
-// The Dx and Ex parts,however, even onthe 14-pin version, have representatives from ports A, C, D, and F.
+// The Dx and Ex parts,however, even on the 14-pin version, have representatives from ports A, C, D, and F.
 // F is the 6th port, so NUM_TOTAL_PORTS is 6, even though at least half of the pins on the represented
 // ports aren't there!
 
