@@ -62,7 +62,7 @@ A note about the pin numbers - we use the PORT_Pxn notation to refer to pins; wh
 
 uint8_t DutyCycle = 0;
 // picked more or less randomly, other than the fact that everything has it, so it makes a good example :-)
-#if defined(MEGATINYVCORE)
+#if defined(MEGATINYCORE)
   uint8_t OutputPin = PIN_PB1;
 #else
   uint8_t OutputPin = PIN_PC1;
@@ -72,9 +72,9 @@ void setup() {
 
   // We will be outputting PWM on PB1 or PC1
 
-  pinMode(PIN_PB0, OUTPUT); //PB0 - TCA0 WO1, pin7 on 14-pin parts
+  pinMode(OutputPin, OUTPUT); //PB0 - TCA0 WO1, pin7 on 14-pin parts
   takeOverTCA0();                           // This replaces disabling and resettng the timer, required previously.
-  TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_DSBOTTOM_gc); //Dual slope PWM mode OVF interrupt at BOTTOM, PWM on WO1
+  TCA0.SINGLE.CTRLB = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_DSBOTTOM_gc); //Dual slope PWM mode OVF interrupt at BOTTOM, PWM on WO1
   TCA0.SINGLE.PER = 0xFFFF; // Count all the way up to 0xFFFF
   // At 20MHz, this gives ~152Hz PWM
   TCA0.SINGLE.CMP1 = DutyCycle;
@@ -96,12 +96,12 @@ ISR(TCA0_OVF_vect) {    // on overflow, we will increment TCA0.CMP0, this will h
 This generates PWM similar to the first example (though without the silly interrupt to change the duty cycle), but takes it a step further and into more practical territory with two functions to set the duty cycle and frequency. Calling those instead of this PWMDemo() function is all you'd need to make use of this. Somewhere I think I have the same functionality implemented for the classic AVR "Timer1" style 16-bit timers.
 
 ```c++
-#if defined(MILLIS_USE_TIMERA0)
-#error "This sketch takes over TCA0, don't use for millis here."
+#if defined(MILLIS_USE_TIMERA0) || defined(__AVR_ATtinyxy2__)
+  #error "This sketch takes over TCA0, don't use for millis here.  Pin mappings on 8-pin parts are different"
 #endif
 
 // picked more or less randomly, other than the fact that everything has it, so it makes a good example :-)
-#if defined(MEGATINYVCORE)
+#if defined(MEGATINYCORE)
   uint8_t OutputPin = PIN_PB1;
 #else
   uint8_t OutputPin = PIN_PC1;
@@ -109,13 +109,16 @@ This generates PWM similar to the first example (though without the silly interr
 unsigned int Period   = 0xFFFF;
 
 void setup() {
-  
+
   pinMode(OutputPin, OUTPUT);
   #if defined MEGATINYCORE
-    #define NEW_PORTMUX_OUTPUT = 1 << 1;
-    PORTMUX.TCAROUTEA   = NEW_PORTMUX_OUTPUT;
-  #else 
-    PORTMUX.TCAROUTEA   = (PORTMUX.TCAROUTEA & ~(PORTMUX_TCA0_gm)) | PORTMUX_TCA0_PORTC_gc;
+  #if defined PORTMUX_TCAROUTEA
+  PORTMUX.TCAROUTEA   &= 1 << 1;
+  #elif defined PORTMUX_CTRLC
+  PORTMUX.CTRLC   &= 1 << 1;
+  #endif
+  #else
+  PORTMUX.TCAROUTEA = (PORTMUX.TCAROUTEA & ~(PORTMUX_TCA0_gm)) | PORTMUX_TCA0_PORTC_gc;
   #endif
   takeOverTCA0();                             // This replaces disabling and resettng the timer, required previously.
   TCA0.SINGLE.CTRLB   = (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_SINGLESLOPE_gc);
@@ -168,16 +171,9 @@ A megaTinyCore user requested (#152) high speed PWM. They wanted split mode disa
 Do note that if pushing the PWM frequency is your aim, you can go considerably higher by using the Type D timer - it is rated for a TCD clock of up to 48 MHz.... (and I was able to generate PWM from it without anomalies with it clocked at 128 MHz (32 MHz system clock multiplied by 4) - these parts have a ton of headroom on frequency at room temp and under non-adverse conditions)
 
 ```c++
-#if defined(MILLIS_USE_TIMERA0)
-#error "This sketch takes over TCA0, don't use for millis here."
+#if defined(MILLIS_USE_TIMERA0) || !defined(__AVR_ATtinyxy2__)
+  #error "This sketch takes over TCA0, don't use for millis here. Pin mapping is specific to 8-pin"
 #endif
-
-#if defined(MEGATINYCORE)
-#define PWM_PIN PIN_PB1
-#else
-#define PWM_PIN PIN_PC1
-#endif
-
 void setup() {
   // We will be outputting PWM on PA3 on an 8-pin part
   pinMode(PIN_PA3, OUTPUT);                     // PA3 - TCA0 WO0, pin 4 on 8-pin parts
@@ -219,21 +215,41 @@ A quick example of how cool split mode can be - You can get two different PWM fr
 Here, we've made it even more interesting by using two frequencies almost identical to each other.... they will "beat" against each other weith a frequency of 1.43 Hz (366 Hz / 256). You should be able to observe that with a bicolor LED (and appropriate resistor) between the two pins. These have two LEDs with opposite polarity, typically a red and a green, connected between two pins... the question is - what will it look like? How will it be different from a single color LED? Make predictions and then test them. When I (Spence) did this, my prediction was wrong.
 
 ```c++
-#if defined(MILLIS_USE_TIMERA0)
-#error "This sketch takes over TCA0, don't use for millis here."
+#if defined(MILLIS_USE_TIMERA0) || defined(__AVR_ATtinyxy2__)
+  #error "This sketch takes over TCA0, don't use for millis here.  Pin mappings on 8-pin parts are different"
 #endif
 
+#if defined(MEGATINYCORE)
+  uint8_t OutputPin1 = PIN_PB1; // WO1
+  uint8_t OutputPin2 = PIN_PA3; // WO3
+  #define CTRLBSETTING (TCA_SPLIT_LCMP0EN_bm|TCA_SPLIT_HCMP2EN_bm)
+#else
+  uint8_t OutputPin1 = PIN_PA2; //WO2
+  uint8_t OutputPin2 = PIN_PA3; //WO3
+#endif
 
 void setup() {
-  // We will be outputting PWM on PD2 amd PD3
   // No need to enable split mode - core has already done that for us.
-  pinMode(PIN_PB0, OUTPUT); // PB0 - TCA0 WO0, pin7 on 14-pin parts
-  pinMode(PIN_PA5, OUTPUT); // PA5 - TCA0 WO5, pin1 on 14-pin parts
-  TCA0.SPLIT.CTRLB  = TCA_SPLIT_LCMP0EN_bm|TCA_SPLIT_HCMP2EN_bm; // PWM on WO5, WO0
+  pinMode(OutputPin1, OUTPUT);
+  pinMode(OutputPin2, OUTPUT);
+  #if defined MEGATINYCORE
+  #if defined PORTMUX_TCAROUTEA
+  PORTMUX.TCAROUTEA &= ~0x09;
+  #elif defined PORTMUX_CTRLC
+  PORTMUX.CTRLC     &= ~0x09;
+  #endif
+  #else
+  PORTMUX.TCAROUTEA = (PORTMUX.TCAROUTEA & ~(PORTMUX_TCA0_gm)) | PORTMUX_TCA0_PORTA_gc;
+  #endif
+  TCA0.SPLIT.CTRLB  = CTRLBSETTING;
   TCA0.SPLIT.LPER   = 0xFF; // Count all the way down from 255 on WO0/WO1/WO2
   TCA0.SPLIT.HPER   = 200;  // Count down from only 200 on WO3/WO4/WO5
-  TCA0.SPLIT.LCMP0  = 0x7F; // 50% duty cycle
-  TCA0.SPLIT.HCMP2  = 150;  // 75% duty cycle
+  #if defined(MEGATINYCORE)
+  TCA0.SPLIT.LCMP1  = 0x7F; // 50% duty cycle
+  #else
+  TCA0.SPLIT.LCMP2  = 0c7F;
+  #endif
+  TCA0.SPLIT.HCMP0  = 150;  // 75% duty cycle
   TCA0.SPLIT.CTRLA  = TCA_SPLIT_CLKSEL_DIV16_gc | TCA_SPLIT_ENABLE_bm; // enable the timer with prescaler of 16
 }
 void loop() { //nothing to do here but enjoy your PWM.
@@ -345,8 +361,5 @@ void analogWriteWO5(uint8_t duty) {
     TCA0.SPLIT.HCMP2  =  duty;                 // Turn set the duty cycle for WO5
     TCA0.SPLIT.CTRLB |=  TCA_SPLIT_HCMP2EN_bm; // Turn on PWM
   }
-}
-```
-
 }
 ```

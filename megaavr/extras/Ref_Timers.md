@@ -2,8 +2,8 @@
 This document is divided into two sections. The first one simply describes the available timers, and what they are capable of (by "simply describes" I don't claim to have made a simple description, only that the purpose is simple. and that is to describe the timers). The second section describes how they are used by this core in particular. The first section is shared by DxCore and megaTinyCore. The second contains many sections specific to one core or another, however the same document is used for both for the sake of th4e maintainers' sanity. Because this is a very long document, a table of contents is included!
 * [Quick answer: Which PWM pins should I use?](Ref_Timers.md#quick-answer-which-pwm-pins-should-i-use?)
   * [Why TCB2 as default millis timer?](Ref_Timers.md#why-tcb2-as-default-millis-timer?)
-* [Section One: Background: Timers on modern AVRs](Ref_Timers.md#section-one:-background-timers-on-modern-avrs)
-* [Background: The Timers on the AVR Dx-series and Ex-series parts](Ref_Timers.md#background:-the-timers-on-the-avr-dx-series-and-ex-series-parts)
+* [Section One: Background: Timers on modern AVRs](Ref_Timers.md#section-one-background-timers-on-modern-avrs)
+* [Background: The Timers on the AVR Dx-series and Ex-series parts](Ref_Timers.md#background-the-timers-on-the-avr-dx-series-and-ex-series-parts)
   * [TCA0 - Type A 16-bit Timer with 3/6 PWM channels](Ref_Timers.md#tca0---type-a-16-bit-timer-with-36-pwm-channels)
     * [Events and CCL channels](Ref_Timers.md#events-and-ccl-channels)
     * [Interrupt note](Ref_Timers.md#interrupt-note)
@@ -27,7 +27,7 @@ This document is divided into two sections. The first one simply describes the a
     * [RTC/PIT errata on 0/1-series](Ref_Timers.md#rtcpit-errata-on-01-series)
 * [Timer Prescaler Availability](Ref_Timers.md#timer-prescaler-availability)
 * [Resolution, Frequency and Period](Ref_Timers.md#resolution-frequency-and-period)
-  * [[In Google Sheets](https://docs.google.com/spreadsheets/d/10Id8DYLRtlp01KA7vvslC3cHaR4S2a1TrH7u6pHXMNY/edit?usp=sharing)]
+  * [In Google Sheets](https://docs.google.com/spreadsheets/d/10Id8DYLRtlp01KA7vvslC3cHaR4S2a1TrH7u6pHXMNY/edit?usp=sharing)
 * [Section Two: How the core uses these timers](Ref_Timers.md#section-two-how-the-core-uses-these-timers)
   * [Initialization](Ref_Timers.md#initialization)
   * [Justification for TOP = 254, not 255](Ref_Timers.md#justification-for-top--254-not-255)
@@ -50,8 +50,8 @@ This document is divided into two sections. The first one simply describes the a
       * [There is no takeover or resume of TCBs](Ref_Timers.md#there-is-no-takeover-or-resume-of-tcbs)
   * [PWM Frequencies](Ref_Timers.md#pwm-frequencies)
     * [Summary Table](Ref_Timers.md#summary-table)
-      * [DxCore]
-      * [megaTinyCore]
+      * [DxCore](Ref_Timers.md#for-dxcore)
+      * [megaTinyCore](Ref_Timers.md#for-megatinycore)
 * [Millis/Micros Timekeeping](Ref_Timers.md#millis/micros-timekeeping)
   * [Why this longass section matters](Ref_Timers.md#why-this-longass-section-matters)
   * [TCAn for millis timekeeping](Ref_Timers.md#tcan-for-millis-timekeeping)
