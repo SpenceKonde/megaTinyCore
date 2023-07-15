@@ -1,5 +1,76 @@
 # PWM and Timers on modern AVRs and their usage in this core
-This document is divided into two sections. The first one simply describes the available timers, and what they are capable of (by "simply describes" I don't claim to have made a simple description, only that the purpose is simple. and that is to describe the timers). The second section describes how they are used by this core in particular. The first section is shared by DxCore and megaTinyCore. The second contains many sections specific to one core or another.
+This document is divided into two sections. The first one simply describes the available timers, and what they are capable of (by "simply describes" I don't claim to have made a simple description, only that the purpose is simple. and that is to describe the timers). The second section describes how they are used by this core in particular. The first section is shared by DxCore and megaTinyCore. The second contains many sections specific to one core or another, however the same document is used for both for the sake of th4e maintainers' sanity. Because this is a very long document, a table of contents is included!
+* [Quick answer: Which PWM pins should I use?](Ref_Timers.md#quick-answer-which-pwm-pins-should-i-use?)
+  * [Why TCB2 as default millis timer?](Ref_Timers.md#why-tcb2-as-default-millis-timer?)
+* [Section One: Background: Timers on modern AVRs](Ref_Timers.md#section-one:-background-timers-on-modern-avrs)
+* [Background: The Timers on the AVR Dx-series and Ex-series parts](Ref_Timers.md#background:-the-timers-on-the-avr-dx-series-and-ex-series-parts)
+  * [TCA0 - Type A 16-bit Timer with 3/6 PWM channels](Ref_Timers.md#tca0---type-a-16-bit-timer-with-36-pwm-channels)
+    * [Events and CCL channels](Ref_Timers.md#events-and-ccl-channels)
+    * [Interrupt note](Ref_Timers.md#interrupt-note)
+    * [Future part note](Ref_Timers.md#future-part-note)
+  * [TCBn - Type B 16-bit Timer](Ref_Timers.md#tcbn---type-b-16-bit-timer)
+    * [Periodic interrupt](Ref_Timers.md#periodic-interrupt)
+    * [Input Capture on Event](Ref_Timers.md#input-capture-on-event)
+    * [Input Capture Frequency Measurement](Ref_Timers.md#input-capture-frequency-measurement)
+    * [Input Capture Pulse Width Measurement](Ref_Timers.md#input-capture-pulse-width-measurement)
+    * [Input Capture Frequecy And Pulse Width Measurement](Ref_Timers.md#input-capture-frequecy-and-pulse-width-measurement)
+    * [Single-shot](Ref_Timers.md#single-shot)
+    * [Timeout Check](Ref_Timers.md#timeout-check)
+    * [8-bit PWM mode](Ref_Timers.md#8-bit-pwm-mode)
+    * [Extra features on 2-series and Dx/Ex-series](Ref_Timers.md#extra-features-on-2-series-and-dxex-series)
+    * [Intflag summary](Ref_Timers.md#intflag-summary)
+  * [TCD0 - Type D 12-bit Async Timer](Ref_Timers.md#tcd0---type-d-12-bit-async-timer)
+    * [For more information on what you can do to TCD0 and still use analogWrite()](Ref_TCD.md)
+  * [TCE - Lurking in the distance with WEX](Ref_Timers.md#tce---lurking-in-the-distance-with-wex)
+  * [TCF - Another new timer](Ref_Timers.md#tcf---another-new-timer)
+  * [RTC - 16-bit Real Time Clock and Programmable Interrupt Timer](Ref_Timers.md#rtc---16-bit-real-time-clock-and-programmable-interrupt-timer)
+    * [RTC/PIT errata on 0/1-series](Ref_Timers.md#rtcpit-errata-on-01-series)
+* [Timer Prescaler Availability](Ref_Timers.md#timer-prescaler-availability)
+* [Resolution, Frequency and Period](Ref_Timers.md#resolution-frequency-and-period)
+  * [[In Google Sheets](https://docs.google.com/spreadsheets/d/10Id8DYLRtlp01KA7vvslC3cHaR4S2a1TrH7u6pHXMNY/edit?usp=sharing)]
+* [Section Two: How the core uses these timers](Ref_Timers.md#section-two-how-the-core-uses-these-timers)
+  * [Initialization](Ref_Timers.md#initialization)
+  * [Justification for TOP = 254, not 255](Ref_Timers.md#justification-for-top--254-not-255)
+  * [PWM via analogWrite](Ref_Timers.md#pwm-via-analogwrite)
+    * [Priority](Ref_Timers.md#priority)
+    * [Channels without pins](Ref_Timers.md#channels-without-pins)
+    * [TCAn](Ref_Timers.md#tcan)
+  * [TCD0](Ref_Timers.md#tcd0)
+    * [TCD0 on DxCore](Ref_Timers.md#tcd0-on-dxcore)
+    * [TCD0 on megaTinyCore](Ref_Timers.md#tcd0-on-megatinycore)
+  * [TCBn](Ref_Timers.md#tcbn)
+    * [API Extensions](Ref_Timers.md#api-exstensions)
+      * [bool digitalPinHasPWMNow()](Ref_Timers.md#uint8_t-digitalpinhaspwmnow)
+      * [uint8_t digitalPinToTimerNow()](Ref_Timers.md#uint8_t-digitalpintotimernow)
+      * [takeOverTCA0()](Ref_Timers.md#takeovertca0)
+      * [takeOverTCA1()](Ref_Timers.md#takeovertca1)
+      * [takeOverTCD0()](Ref_Timers.md#takeovertcd0)
+      * [resumeTCA0()](Ref_Timers.md#resumetca0)
+      * [resumeTCA1()](Ref_Timers.md#resumetca1)
+      * [There is no takeover or resume of TCBs](Ref_Timers.md#there-is-no-takeover-or-resume-of-tcbs)
+  * [PWM Frequencies](Ref_Timers.md#pwm-frequencies)
+    * [Summary Table](Ref_Timers.md#summary-table)
+      * [DxCore]
+      * [megaTinyCore]
+* [Millis/Micros Timekeeping](Ref_Timers.md#millis/micros-timekeeping)
+  * [Why this longass section matters](Ref_Timers.md#why-this-longass-section-matters)
+  * [TCAn for millis timekeeping](Ref_Timers.md#tcan-for-millis-timekeeping)
+    * [TCA timekeeping resolution](Ref_Timers.md#tca-timekeeping-resolution)
+    * [TCBn for millis timekeeping](Ref_Timers.md#tcbn-for-millis-timekeeping)
+  * [TCD0 for millis timekeeping](Ref_Timers.md#tcd0-for-millis-timekeeping)
+  * [Manipulating millis timekeeping](Ref_Timers.md#manipulating-millis-timekeeping)
+* [Tone](Ref_Timers.md#tone)
+  * [Long tones which specify a duration](Ref_Timers.md#long-tones-which-specify-a-duration)
+* [Servo Library](Ref_Timers.md#servo-library)
+* [Additional functions for advanced timer control](Ref_Timers.md#additional-functions-for-advanced-timer-control)
+* [Appendix I: Names of timers](Ref_Timers.md#appendix-i-names-of-timers)
+  * [For DxCore](Ref_Timers.md#for-dxcore)
+  * [For megaTinyCore](Ref_Timers.md#for-megatinycore)
+  * [Approximate algorithm for interpreting these](Ref_Timers.md#approximate-algorithm-for-interpreting-these)
+  * [`_GCMT` return values](Ref_Timers.md#_gcmt-return-values)
+* [Appendix II: TCB Micros Artifacts](Ref_Timers.md#appendix-ii-tcb-micros-artifacts)
+
+
 
 ## Quick answer: Which PWM pins should I use?
 TCA or TCD pins; these timers are much better for generation of PWM. Only use TCB pins if desperate. See the part-specific docs for your part and pincount to see where the timers are pointed by the core on startup. You can set which pins the TCAs (and the TCD on the DD-series) use *at runtime* by simply writing to `PORTMUX.TCAROUTEA`. See the part-specific docs (the ones with the pinout charts, linked to from top of main README and from the column headings in [About the Dx-Series](AboutDxSeries.md)). These contain a table for each timer, listing what we set the portmux for the timer to on initialization, and what options are available and note which options are precluded by errata.
@@ -62,7 +133,7 @@ Remember that the pin invert (INVEN) effects event inputs and outputs. So if you
 When firing interrupts from a TCA, you must *ALWAYS* manually clear the intflags. It is not done for you by the hardware.
 
 #### Future part note
-There will be parts that have a TCE instead of a TCA. As nothing is known about the TCE, we can't say what this will look like.
+There will be parts that have a TCE instead of a TCA. As nothing is known about the TCE, we don't know the form TCE will take - but an educated guess would be something like "A TC[A|D] on steroids", likely the first of the two. We'll have to wait any see.
 
 ### TCBn - Type B 16-bit Timer
 The type B timer is what I would describe as a "utility timer" - It is a very good utility timer. In this role, it can take one of no less than 7 modes, most of which require using the event system. They can also be used as a single channel 8-bit PWM timer. Unfortunately, they have limited selection of clock prescalers: only the system clock, the system clock divided by 2, or a clock that is already being generated for TCA0 or TCA1, making these very unappealing PWM timers. 2-series, Dx, and Ex-parts can also count rising event edges using the second event input, which is not available on the tinyAVR 0/1-series or megaAVR 0-series. In terms of input capture, the TCBs are able to do everything a classic AVR timer1 could do, plus multiple things that the classic AVR's timers couldn't even dream of doing. On the other hand, the classic Timer1 was an excellent PWM timer - while these are terrible ones.
@@ -124,7 +195,7 @@ It also has a 'dither' option to allow PWM at a frequency in between frequencies
 
 The asynchronous nature of this timer, however, comes at a great cost: It is much harder to use than the other timers. Most changes to settings require it to be disabled as noted above - and you need to wait for that operation to complete (check for the `ENABLERDY` bit in `TCD0.STATUS`). Similarly, to tell it to apply changes made to the `CMPxSET` and `CMPxCLR` registers, you must use the `TCD.CTRLE` (the "command" register) to instruct it to synchronize the registers. Similarly, to capture the current count, you need to issue a SCAPTUREx command (x is A or B - there are two capture channels) - and then wait for the corresponding bit to be set in the `TCD0.STATUS` register. In the case of turning PWM channels on and off, not only must the timer be stopped, but a timed write sequence is needed ie, `_PROTECTED_WRITE(TCD0.FAULTCTRL,value)` to write to the register that controls whether PWM is enabled; this is apparenmtly because, in the intended use-cases of motor and switching power supply control, changing this accidentally (due to a wild pointer or other software bug) could have catastrophic consequences (these are, remember, certified for use in safety critical applications). Writes to any register when it is not "legal" to write to it will be ignored. Thus, making use of the type D timer for even simple tasks requires careful study of the datasheet - which is a frustratingly terse chapter at key points, yet is STILL the longest chapter at 50 pages (counting only chapters that are mostly text (so the electrical/typical charachteristics section doesn't count).
 
-So if you're doing something where misbehavior of the PWM timer could lead serious hardware damage (eg, via shootthrough on an H-bridge or the nearly identical situation on a synchronously rectifying DC-DC converter), this is the timer to use if you want the best protection against that, and more flexibility in generating the waveforms that would be needed in such applications. Note that I don't recommend building your own DC-DC converter, owing to the low price of assembled modules, especially ones prone to potentially destructive shoot-through because that shouldn't even be a problem with off the shelf solutions in this day and age....
+So if you're doing something where misbehavior of the PWM timer could lead serious hardware damage (eg, via shootthrough on an H-bridge or the nearly identical situation on a synchronously rectifying DC-DC converter), this is the timer to use if you want the best protection against that, and more flexibility in generating the waveforms that would be needed in such applications. Note that I don't recommend building your own DC-DC converter, owing to the low price of assembled modules, especially ones prone to potentially destructive shoot-through because that shouldn't even be a problem with off the shelf solutions in this day and age, and I certainly don't recommend building anything where a malfunction could result in serious damage.
 
 Remember this part of the license.
 ```
@@ -281,29 +352,29 @@ You can get a lot of control over the frequency without having to take over full
 ### TCBn
 The type B timers, while not particularly good for PWM, can be used for PWM on DxCore (on mTC they always overap with other timers, making them even less useful; they are not supported there.) They are clocked from the highest number TCA available, though this can be changed freely.)
 
-#### API exstens
+#### API Extensions
 ##### bool digitalPinHasPWMNow(uint8_t p)
 This function returns 1 if the pin currently has PWM available accounting for PORTMUX and `takeOverTCxn`. The dynamic analog of `digitalPinHasPWM()` - obviously, not compile-time constant.
 
 ##### uint8_t digitalPinToTimerNow(uint8_t p)
 This function returns the timer the pin will be controlled by accounting for PORTMUX and `takeOverTCxn`. The dynamic analog of `digitalPinToTimer()` - obviously, not compile-time constant.
 
-### takeOverTCA0()
+##### takeOverTCA0()
 After this is called, `analogWrite()` will no longer control PWM on any pins attached to timer TCA0 (though it will attempt to use other timers that the pin may be controllable with to, if any), nor will `digitalWrite()` turn it off. TCA0 will be disabled and returned to it's power on reset state. All TCBs that are used for PWM on parts with only TCA0 use that as their prescaled clock source buy default. These will not function until TCA1 is re-enabled or they are set to use a different clock source. Available only on parts with TCA1 where a different timer is used for millis timekeeping.
 
-### takeOverTCA1()
+##### takeOverTCA1()
 After this is called, `analogWrite()` will no longer control PWM on any pins attached to timer TCA1 (though it will attempt to use other timers that the pin may be controllable with to, if any), nor will `digitalWrite()` turn it off. TCA1 will be disabled and returned to it's power on reset state. All TCBs that are used for PWM on parts with TCA1 use that as their prescaled clock source buy default. These will not function until TCA1 is re-enabled or they are set to use a different clock source. Available only on parts with TCA1, and only when a different timer is used for millis timekeeping.
 
-### takeOverTCD0()
+##### takeOverTCD0()
 After this is called, `analogWrite()` will no longer control PWM on any pins attached to timer TCD0 (though it will attempt to use other timers, if any), nor will `digitalWrite()` turn it off. There is no way to reset type D timers like Type A ones. Instead, if you are doing this at the start of your sketch, override init_TCD0. If TCD is ever supported as millis timing source, this will not be available.
 
-### resumeTCA0()
+##### resumeTCA0()
 This can be called after takeOverTimerTCA0(). It resets TCA0 and sets it up the way the core normally does and re-enables TCA0 PWM via analogWrite.
 
-### resumeTCA1()
+##### resumeTCA1()
 This can be called after takeOverTimerTCA1(). It resets TCA1 and sets it up the way the core normally does and re-enables TCA1 PWM via analogWrite.
 
-### There is no takeover or resume of TCBs
+##### There is no takeover or resume of TCBs
 TCBs are handled differently since each one has only a single PWM channel - we will treat it as available (and hence use it as a timer of last resort if analogWrite() or turnOffPWM() is called on that timer's output pin) if and only if that timer is currently set to PWM mode, which we set during initialization for all timers not being used for millis timekeeping.  it is currently set to PWM mode. Which pin is fixed by the variant file and shown in the core documentation for that part family - they've been chosen differently on different parts to maximize the number of usable pins).
 
 
