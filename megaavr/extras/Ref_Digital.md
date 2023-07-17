@@ -1,6 +1,24 @@
 # Improved Digital I/O Functionality
 This core includes a number of features to provide more control or performance when doing digital I/O. This page describes how to use them. All of the options that can be configured for a pin are exposed. The only things that aren't exposed are the slew rate limiting feature, and the multi-pin configuration facilities. The slew rate limiting is can only be configured on a per port basis; turning it on and off is so simple (see below) that it needs no wrapper. The multi-pin configuration system does not have an obvious "right way" to expose it and should be handled directly by the sketch - it is very flexible and no wrapper around it would be able to preserve it's virtues while being much of a wrapper.
 
+## Table of Contents
+* [But first, about the hardware](Ref_Digital.md#but-first-about-the-hardware)
+* [Ballpark overhead figures](Ref_Digital.md#ballpark-overhead-figures)
+* [openDrain()](Ref_Digital.md#opendrain)
+* [Fast Digital I/O](Ref_Digital.md#fast-digital-io)
+  * [Flash use of fast digital output functions](Ref_Digital.md#flash-use-of-fast-digital-output-functions)
+* [pinConfigure()](Ref_Digital.md#pinconfigure)
+  * [INLVL - input logic levels](Ref_Digital.md#inlvl---input-logic-levels)
+* [PINCONFIG and associated registers](Ref_Digital.md#pinconfig-and-associated-registers) (Dx, Ex only)
+* [Slew Rate Limiting](Ref_Digital.md#slew-rate-limiting)(Dx-series and 2-series only)
+* [There is no INLVL or PINCONFIG on tinyAVR devices](Ref_Digital.md#there-is-no-inlvl-or-pinconfig-on-tinyavr-devices)
+* [Standard and semi-standard API functions](Ref_Digital.md#standard-and-semi-standard-api-functions)
+  * [Basic pin information](Ref_Digital.md#basic-pin-information)
+  * [Things that return pointers](Ref_Digital.md#things-that-return-pointers)
+* [Finding current PWM timer, if any: digitalPinToTimerNow()](Ref_Digital.md#finding-current-pwm-timer-if-any-digitalpintotimernow)  (DxCore only)
+* [Note on number of pins and future parts](Ref_Digital.md#note-on-number-of-pins-and-future-parts)
+
+
 ## But first, about the hardware
 As there is a good chance you;ve noticed, a lot of hardware is better at driving pins low than high (sinking vs sourcing). Classic AVRs had symmetric drive - they were very similar in their ability to source and sink current. Though the modern AVRs do not spec a different maximum source and sink current, how well the chip is able to deliver that current is not equal (and likely the ultimate maximum current at which damage occurs in practice is similarly unequal). It has always been easier to pull low that to pull high
 
@@ -347,7 +365,6 @@ The most any announced AVR has had is 86 digital pins, the ATmega2560; In the mo
 
 `*` - Note on conventions for specifying numbers: 0x## refers to a hexadecimal number; this will always be written with a power of 2 number of hex digits, padded with a leading zero nybble if needed. A number written without a 0x prefix, ie, `12` refers to a decimal value. 0b######## refers to a value given as binary. For hexadecimal values, if the size of the datatype is unambiguosly known, we will typically represent them with an appropriate number of leading 0's - so 1 in a 1-byte datatype is written as 0x01, while 1 in a 16-bit datatype is written as 0x0001. Any time a number is not prefixed by 0x or 0b, the decimal form should be assumed. Which representation of a given value is chosen is based on the context of that value. Values that simply represent numbers are generally given in decimal. Values that are being subjected to bitwise operators, or that are bit masks, group codes, and similar, will be shown in hexadecimal, or when the bit math is particularly obtuse but the significance of the data is by bitfield, binary. In C, prefixing a number with 0 in an integer literal - to the surprise of many - will result in it being treated as octal (base 8), which probably made sense at the time for some weird reason
 
-`*` - Note on conventions for specifying numbers: 0x## refers to a hexadecimal number, while ## refers to a decimal digit and 0b######## refers to a value given as binary. For hexadecimal values, if the size of the datatype is unambiguosly known, we will typically represent them with an appropriate number of leading 0's - so 1 in a 1-byte datatype is written as 0x01, while 1 in a 16-bit datatype is written as 0x0001. Any time a number is not prefixed by 0x or 0b, the decimal form should be assumed. Which representation of a given value is chosen is based on the context of that value. Values that simply represent numbers are generally given in decimal. Values that are being subjected to bitwise operators, or that are bit masks, group codes, and similar, will be shown in hexadecimal.
 
 All of the cases I'm aware of where interference from a device that wouldn't pass FCC testing actually caused concern were from devices intentionally designed do disrupt other devices (usually "GPS jammers" being used by truck drivers to cheat their employer or skirt safety rules - usually both). That is, they are devices that not only would fail testing, but which are explicitly illegal to an extent that they're not sold openly: Marketplace sites will take down listings for them. They are illegal devices being used to abet criminal acts which expose others risk of financial loss, injury, or death (from a car crash caused by avoiding safety regulations) whether or not a GPS jammer is used. The GPS jammers tend to have the opposite effect of what the criminals desire - rather than letting their truck go unnoticed, the GPS disruptions impact something critical, attracting attention as well as acting as a literal radio beacon that the authorities charged with maintaining the integrity of GPS can use to easily track, identify, and apprehend the user. These don't seem to be much of a problem either (except for their operator), since they aren't sold in huge volumes, and they make it easy to their operator to get busted.
 

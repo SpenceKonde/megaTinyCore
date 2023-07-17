@@ -30,18 +30,19 @@ It is often more convenient to use these newer macros, which identify instead te
 #### Millis timer codes
 These are the values that the MILLIS_TIMER may be defined as:
 
-| Name            | Numeric value | Meaning                             |
+| Name            | Numeric value | Meaning
 |-----------------|---------------|----------------------------------------------------------
 | `NOT_ON_TIMER`  |          0x00 | Millis is disabled
-| `NONE`          |          0x00 | Millia ia disabled
-| `TIMERA0`       |          0x10 | Millis is generated from TCA0
-| `TIMERA1`       |          0x08 | Millis is generated from TCA1
-| `TIMERB0`       |          0x20 | Millis is generated from TCB0
-| `TIMERB1`       |          0x21 | Millis is generated from TCB1
-| `TIMERB2`       |          0x22 | Millis is generated from TCB2
-| `TIMERB3`       |          0x23 | Millis is generated from TCB3
-| `TIMERB4`       |          0x24 | Millis is generated from TCB4
+| `TIMERA0`       |          0x10 | Millis is generated from TCA0 (All non-EB-series)
+| `TIMERA1`       |          0x08 | Millis is generated from TCA1 (DA`*`, DB`*`, EA only)
+| `TIMERB0`       |          0x20 | Millis is generated from TCB0 (all parts)
+| `TIMERB1`       |          0x21 | Millis is generated from TCB1 (No tinyAVR 0-series or 1-series with 4k or 8k of flash)
+| `TIMERB2`       |          0x22 | Millis is generated from TCB2 (DA, DB, DD`*`, EA only)
+| `TIMERB3`       |          0x23 | Millis is generated from TCB3 (DA`*`, DB`*`, EA only)
+| `TIMERB4`       |          0x24 | Millis is generated from TCB4 (DA`*`, DB`*`, only)
 | `TIMERD0`       |          0x40 | Millis is generated from TCD0 (megaTinyCore only)
+| `TIMERE0`       | TBD - undefined | Millis is generated from TCE0 (EB-series only).
+| `TIMERF0`       | TBD - undefined | Millis is generated from TCF0 (EB-series only).
 | `TIMERRTC`      |          0x80 | Millis is generated from the RTC from internal low frequency osc. (megaTinyCore only currently)
 | `TIMERRTC_XTAL` |          0x81 | Millis is generated from the RTC from external crystal oscillator. (megaTinyCore only currently)
 | `TIMERRTC_XOSC` |          0x82 | Millis is generated from the RTC from external active oscillator. (megaTinyCore only currently)
@@ -202,6 +203,32 @@ These define the version of the core:
   * `DXCORE_PATCH` - DxCore patch version
   * `DXCORE_RELEASED` - 1 if a released version, 0 if unreleased (ie, installed from github between releases).
   * `DXCORE_NUM` - DxCore version, as unsigned long.
+
+### DxCore
+```c++
+Serial.println(DXCORE);
+Serial.print(DXCORE_MAJOR);
+Serial.print(' '); // using ' ' instead of " " saves a tiny amount of flash!
+Serial.print(DXCORE_MINOR);
+Serial.print(' ');
+Serial.print(DXCORE_PATCH);
+Serial.print(' ');
+Serial.println(DXCORE_RELEASED);
+Serial.println(DXCORE_NUM,HEX);
+
+```
+Will produce output like:
+```text
+1.3.7
+1 3 7 1
+01030401
+```
+or - if your non-Arduino IDE is not able to handle the escaping and you happened to be using a 1.3.8 github build:
+```text
+Unknown 1.3.7+
+1 3 8 0
+01030800
+```
 ### megaTinyCore
 ```c++
 Serial.println(MEGATINYCORE);
@@ -244,8 +271,8 @@ There are a number of macros for determining what (if any) features the core sup
 * `CORE_HAS_PINCONFIG = 1` - If defined as Indicates that `pinConfigure()` is available. If not defined or defined as 0, it is not available.
 * `CORE_HAS_TIMER_TAKEOVER = 1` - if defined as 1 or more, `takeOverTCxn()` functions are available to let user code take full control of TCA0, TCA1 and/or TCD0. If a part, for which support has been provided by one of my cores, in a release, without a takeOverTCxn() function for a timer it has, and later gets a takeOverTCxn function for that timer, there would need to be a CORE_HAS_TIMER_TAKEOVER = 2 for versions of the core that have that new function. I hope, however, to give all new timers a takeOver function if one is appropriate with the first release of support for parts having those timers.
 * `CORE_HAS_TIMER_RESUME = 0`- if defined as 1, the corresponding `resumeTCAn()` functions, which reinitialize them and return them to their normal core-integrated functions, are available. Different values in the future might be used to indicate that resume timers other than TCAn, or which might have an option to resume TCD0. Not available on megaTinyCore.
-* `ADC_NATIVE_RESOLUTION = 10 or 12`- This is the maximum resolution, in bits, of the ADC without using oversampling.
-* `ADC_NATIVE_RESOLUTION_LOW = 8` - The ADC has a resolution setting that chooses between ADC_NATIVE_RESOLUTION, and a lower resolution.
+* `ADC_NATIVE_RESOLUTION = 10 or 12`- This is the maximum resolution, in bits, of the ADC without using oversampling. 2-series get 12-bits, other tinies get 10, and all Dx/Ex get 12, though the Ex has a much nicer ADC.
+* `ADC_NATIVE_RESOLUTION_LOW = 8 or 10` - All the ADCs, in addition to converting at ADC_NATIVE_RESOLUTION, have a lower resolution, slightly faster option. On the tinyAVRs this is 8-bit for all parts, while for Dx, it's 10 bits. 
 * `ADC_DIFFERENTIAL = 0, 1, or 2` - This is defined as 1 if the part has a basic differential ADC (no gain, and V<sub>analog_in</sub> constrained to between Gnd and V<sub>Ref</sub>, as on the Dx-series), and 2 if it has a full-featured one. It does not indicate whether said differential capability is exposed by the core. This is 0 for 0/1-series and 2 for 2-series. Classic AVRs on ATTinyCore 2.0.0+ will define this as -1 if they have a differential ADC, as their ADC takes differential channels in a totally different way, and will not define it at all if they do not. See also `CORE_HAS_ANALOG_DIFF`
 * `SUPPORT_LONG_TONES = 0 or 1` - On some modern AVR cores, an intermediate value in the tone duration calculation can overflow (which is timed by counting times the pin is flipped) leading to a maximum duration of 4.294 million millisecond. This is worst at high frequencies, and can manifest at durations as short as 65 seconds worst case. Working around this, however, costs some flash, so megaTinyCore only supports long tones on parts with more than 8k of flash. If `SUPPORT_LONG_TONES` is defined as 1, as long as (duration * frequency)/500 < 4.294 billion, the duration will not be truncated. If it is defined as 0, the bug was known to the core maintainer and they chose not to fully correct it (eg, to save flash) but took the obvious step to reduce the impact, it will be truncated if (duration * frequency) exceeds 4.294 billion. If `SUPPORT_LONG_TONES` is not defined at all, the bug may be present in its original form, in which case the duration will be truncated if (duration * frequency) exceeds 2.14 billion.
 * `CORE_HAS_ANALOG_ENH = 1` - If defined as 1, `analogReadEnh()` (enhanced analogRead) is available. Otherwise, it is not; it is 1 for all parts on recent versions of megaTinyCore.

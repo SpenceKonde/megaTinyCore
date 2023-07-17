@@ -128,7 +128,7 @@
 */
 
 #if !defined(OPTIBOOT_CUSTOMVER)
-  #define OPTIBOOT_CUSTOMVER 0
+  #define OPTIBOOT_CUSTOMVER 0x10
 #endif
 
 unsigned const int __attribute__((section(".version"))) __attribute__((used))
@@ -215,13 +215,13 @@ typedef union {
   #define BAUD_RATE   115200L // Highest rate Avrdude win32 will support
 #endif
 #ifdef F_CPU
-  # warning F_CPU is ignored for this chip (run from internal osc.)
+  #warning F_CPU is ignored for this chip (run from internal osc.)
 #endif
 #ifdef SINGLESPEED
-  # warning SINGLESPEED ignored for this chip.
+  #warning SINGLESPEED ignored for this chip.
 #endif
 #ifdef UART
-  # warning UART is ignored for this chip (use UARTTX=PortPin instead)
+  #warning UART is ignored for this chip (use UARTTX=PortPin instead)
 #endif
 
 #define BAUD_SETTING_16 (((16000000/6)*64) / (16L*BAUD_RATE))
@@ -230,11 +230,11 @@ typedef union {
 #define BAUD_ACTUAL_20 ((64L*(20000000/6)) / (16L*BAUD_SETTING))
 
 #if BAUD_SETTING_16 < 64   // divisor must be > 1.  Low bits are fraction.
-  # error Unachievable baud rate (too fast) BAUD_RATE
+  #error Unachievable baud rate (too fast) BAUD_RATE
 #endif
 
 #if BAUD_SETTING > 65635
-  # error Unachievable baud rate (too slow) BAUD_RATE
+  #error Unachievable baud rate (too slow) BAUD_RATE
 #endif // baud rate slow check
 
 /*
@@ -305,11 +305,11 @@ void pre_main(void) {
   //    of compilation, features, etc
   __asm__ __volatile__(
     "       rjmp    1f\n"
-    #ifndef APP_NOSPM
+#ifndef APP_NOSPM
     "       rjmp    do_nvmctrl\n"
-    #else
+#else
     "   ret\n"   // if do_spm isn't include, return without doing anything
-    #endif
+#endif
     "1:\n"
   );
 }
@@ -374,7 +374,7 @@ int main(void) {
   //  That means for overhead penalty of between 6 and 34 bytes added to app binary size, which is usable
   //  for other code, you would be able to....  ... enter the bootloader less robustly, and save 10 bytes
   //  in the bootloader, where you can't use it.
-  //  I do believe the phrase "strictly worse" describes this.
+  //  I do belive the phrase "strictly worse" describes this.
 
   __asm__ __volatile__("clr __zero_reg__");  // known-zero required by avr-libc
   ch = RSTCTRL.RSTFR;   // get reset cause
@@ -414,7 +414,7 @@ int main(void) {
   }
   MYUART.DBGCTRL = 1;  // run during debug
   MYUART.CTRLC = (USART_CHSIZE_gm & USART_CHSIZE_8BIT_gc);  // Async, Parity Disabled, 1 StopBit
-  #if RS485 > 0
+  #if defined(RS485) && RS485 > 0
     /* Enable RS485 mode using XDIR pin */
     MYUART.CTRLA = 1;  // Interrupts: all off, RS485 mode 1
   #else

@@ -260,7 +260,7 @@ uint8_t __PeripheralControl = 0xFF;
       "std        Z+9,      r25"  "\n\t" // hi8(timingStruct.timer_fract)
       "subi       r24,%[LFRMAX]"  "\n\t" // subtract FRACT_MAX and see if it is lower
       "sbci       r25,%[HFRMAX]"  "\n\t" //
-      
+
       #if MILLIS_INC != 0                // (6 words / 4 - 5 clocks, branches were optimize to create minimal diversion)
       "brlo    higher"            "\n\t" // if FRAC_MAX was not reached,
       "ldi        r24, %[MIINC]"  "\n\t" // load "normal" MILLIS_INC (0x00-MILLIS_INC)
@@ -269,11 +269,11 @@ uint8_t __PeripheralControl = 0xFF;
       #else                              // (4 words, 2 - 4 clocks)
       "brlo   sub_end"            "\n\t" // if we know at compile time that MILLIS_INC is 0,
       #endif                             // we don't have to check it at runtime, saving two insn (tst, branch)
-      
+
       "std        Z+8,      r24"  "\n\t" // Overwrite the just stored value with the decremented value
       "std        Z+9,      r25"  "\n\t" // seems counter-intuitive, but it requires less registers
       "ldi        r24, %[MINCD]"  "\n\t" // load MILLIS_INC that was decreased by 1 (0xFF-MILLIS_INC)
-      
+
       // timer_millis handling (12 words / 16 clocks):
       "sub4:"
       "ldd        r25,      Z+4"  "\n\t" // lo16.lo8(timingStruct.timer_millis)
@@ -323,7 +323,7 @@ uint8_t __PeripheralControl = 0xFF;
       "rjmp      sub4"            "\n\t" // jump down to sub/sbci
       "ovf_end:"                  "\n\t" // jump back to here afterwards
       "clt"                       "\n\t" // make sure to not jump back again
-      
+
       // timer_fract handling (8 words / 10 clocks) (Z += 4):
       "ldd        r24,      Z+4"  "\n\t" // lo8(timingStruct.timer_fract).
       "ldd        r25,      Z+5"  "\n\t" // hi8(timingStruct.timer_fract)
@@ -333,7 +333,7 @@ uint8_t __PeripheralControl = 0xFF;
       "std        Z+5,      r25"  "\n\t" // hi8(timingStruct.timer_fract)
       "subi       r24,%[LFRMAX]"  "\n\t" // subtract FRACT_MAX and see if it is lower
       "sbci       r25,%[HFRMAX]"  "\n\t" //
-      
+
       #if MILLIS_INC != 0                // (6 words / 4 - 5 clocks, branches were optimize to create minimal diversion)
       "brlo    higher"            "\n\t" // if FRAC_MAX was not reached,
       "ldi        r24, %[MIINC]"  "\n\t" // load "normal" MILLIS_INC (0x00-MILLIS_INC)
@@ -342,11 +342,11 @@ uint8_t __PeripheralControl = 0xFF;
       #else                              // (4 words, 2 - 4 clocks)
       "brlo   sub_end"            "\n\t" // if we know at compile time that MILLIS_INC is 0,
       #endif                             // we don't have to check it at runtime, saving two insn (tst, branch)
-      
+
       "std        Z+4,      r24"  "\n\t" // Overwrite the just stored value with the decremented value
       "std        Z+5,      r25"  "\n\t" // seems counter-intuitive, but it requires less registers
       "ldi        r24, %[MINCD]"  "\n\t" // load MILLIS_INC that was decreased by 1 (0xFF-MILLIS_INC)
-    
+
       // subtracting 4 bytes from a dword (13 words / 17 clocks)
       "sub4:"
       "ld         r25,        Z"  "\n\t" // lo16.lo8(timingStruct.timer_millis)
@@ -385,8 +385,8 @@ uint8_t __PeripheralControl = 0xFF;
       "reti"                      "\n\t" // and 4 clocks for reti
       ::
       );
-    
-    
+
+
     }
   #endif /* defined (MILLIS_USE_TIMERRTC)*/
 

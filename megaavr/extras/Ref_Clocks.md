@@ -4,7 +4,13 @@ Be aware that this is very different from the equivalent document for the Dx and
 
 **Crystal** is not supported as a clock source on the DA-series, or EB-series, but is on the DB, DD, and DU-series.
 
-## How the internal oscillator works, briefly
+## Background - how the timers work.
+see also [the timer reference](Ref_Timer.md)
+
+### On tinyAVR
+The OSCCFG fuse selects whether the speed is derived from a 20 MHz or 16 MHz oscillator. At power-on, these are always set to a prescaler of /6 hence 2.66 or 3.33 MHz. The core, prior to calling setup, will reconfigure the prescaler to match the requested speed. The OSCCFG fuse is always set when a sketch is uploaded via a UPDI programmer.
+They additionally have the equivalent of the classic AVR's OSCCAL calibration register, and like those parts, the compliance is many times what the datasheet claims, and you can get a very wide range of speeds from them. 0/1-series has 64 settings for each nominal clock frequency, and 2-series parts have 128. Determining the value to set it to in order to obtain a desired clock speed is called "Tuning", even though you're not doing it for accuracy (it's generally already at the best setting from factory cal if you want the nominal clock speed.)
+
 ### On Dx-series
 The OSCCTRL.OSCHFCTRLA register's *middle* 4 bits control the frequency of the internal oscillator. This field divides neatly into two sections. 0x0, 0x1, 0x2 and 0x3 are 1, 2, 3, and 4 MHz. The next one is reserved (I'd wager it would give 4 MHz). That's followed by the next section, 8, and every subsequent multiple of 4 up to 24 are listed in the datasheet, and at least at room temperature, extending the pattern 2 more rungs is consistent, and leads to speeds of 28 and 32 MHz, generally work at room temperature. (beyond that, the last 4 are repeated).
 
@@ -12,7 +18,7 @@ Additionally, there is a tuning register, CLKCTRL.OSCHFTUNE. Unfortunately, it i
 If an external 32.768 MHz crystal has been connected, you can, for improved temperature stability, autotune the internal oscillator from this. I had to direct a torch at the chip (from a distance) to heat it up enough to see the speed autotune....
 Not the feature I'm most impressed with. A+ on concept, C on execution.
 
-Tuning to achieve non-standard speeds is not supported on the AVR Dx-series parts under DxCore.
+Tuning to achieve non-standard speeds is not supported on the AVR Dx-series parts under DxCore. 
 
 ### On tinyAVR
 The OSCCFG fuse selects whether the speed is derived from a 20 MHz or 16 MHz oscillator. At power-on, these are always set to a prescaler of /6 hence 2.66 or 3.33 MHz. The core, prior to calling setup, will reconfigure the prescaler to match the requested speed. The OSCCFG fuse is always set when a sketch is uploaded via a UPDI programmer.
@@ -27,24 +33,27 @@ Not the feature I'm most impressed with. A+ on concept, C on execution.
 Tuning to achieve non-standard speeds is not supported on the AVR Ex-series parts under DxCore.
 
 ## Supported Clock Speeds
-Like classic AVRs, tinyAVRs have a "speed grades" depending on the voltage and operating conditions that they are rated for operation within. The spec is 5 MHz @ 1.8V , 10 MHz @ 2.7V (3.3V nominal) and 20 @ 4.5V (5.0V nominal) (2.7 or 4.5 for 8MHz and 16 MHz at >105C . See the Speed Grade reference for more information on this. Note that the speed grades are extremely conservative for room temperature operation\
+Like classic AVRs, tinyAVRs have a "speed grades" depending on the voltage and operating conditions that they are rated for operation within. The spec is 5 MHz @ 1.8V , 10 MHz @ 2.7V (3.3V nominal) and 20 @ 4.5V (5.0V nominal) (2.7 or 4.5 for 8MHz and 16 MHz at >105C . See the Speed Grade reference for more information on this. Note that the speed grades are extrememly conservative for room temperature operation, and unreal overclocking is easily achievable at room temperaturee, particularly with high temp. rated parts. 
 
-Some of the listed speeds, while supported by the hardware are not supported by the
+The AVR Dx-series come in I (105C) and E (125C) spec parts. Since the DA-series was released, Microchip has STOPPED MARKING THE SPEED GRADE ON THE CHIPS. Be sure that if you have both speed grades, you mark the chips somehow (0 and 1-series parts do still have the temperature rating marked (N = 105, F = 125). 
+
+
+Some of the listed speeds, while supported by the hardware are not supported by the core - typically wierd, slow clocks, particularly from a crystal
 For unsupported speeds, the micros and delay-us columns indicate what internal plumbing has been implemented. micros is implemented for almost all speeds, delayMicroseconds with non-compile-time-known delays for most, even some unsupported ones. delayMicroseconds() is supported and accurate at all speeds when the argument is a compile-time-known constant, as we use the avr-libc implementation.
 
 | Clock Speed | Within Spec |      Internal |  Ext. Crystal |    Ext. Clock | micros | delay-us | Notes
 |-------------|-------------|---------------|---------------|---------------|--------|----------|-------
 |       1 MHz |         Yes |           Yes | Not by DxCore | Not by DxCore |    Yes |      Yes | 1
-|       2 MHz |         Yes | Not by DxCore | Not by DxCore | Not by DxCore |    Yes |      Yes | 2
-|       3 MHz |         Yes | Not by DxCore | Not by DxCore | Not by DxCore |    Yes |       No | 2
+| *     2 MHz |         Yes | Not by DxCore | Not by DxCore | Not by DxCore |    Yes |      Yes | 2
+| *     3 MHz |         Yes | Not by DxCore | Not by DxCore | Not by DxCore |    Yes |       No | 2
 |       4 MHz |         Yes | Not by DxCore | Not by DxCore | Not by DxCore |    Yes |      Yes | 3
-|       5 MHz |         Yes |     Prescaled | Not by DxCore | Not by DxCore |    Yes |      Yes |
-|       6 MHz |         Yes | Not by DxCore | Not by DxCore | Not by DxCore |    Yes |       No | 2, 4
-|       7 MHz |         Yes | Not by DxCore | Not by DxCore | Not by DxCore |     No |       No | 2, 4
+| *     5 MHz |         Yes |     Prescaled | Not by DxCore | Not by DxCore |    Yes |      Yes |
+| *     6 MHz |         Yes | Not by DxCore | Not by DxCore | Not by DxCore |    Yes |       No | 2, 4
+| *     7 MHz |         Yes | Not by DxCore | Not by DxCore | Not by DxCore |     No |       No | 2, 4
 |       8 MHz |         Yes |           Yes |           Yes |           Yes |    Yes |      Yes |
 |      10 MHz |         Yes |     Prescaled |           Yes |           Yes |    Yes |      Yes |
 |      12 MHz |         Yes |           Yes |           Yes |           Yes |    Yes |      Yes |
-|      14 MHz |       Kinda | Not by DxCore | Not by DxCore | Not by DxCore |     No |       No | 2, 4
+| *    14 MHz |       Kinda | Not by DxCore | Not by DxCore | Not by DxCore |     No |       No | 2, 4
 |      16 MHz |         Yes |           Yes |           Yes |           Yes |    Yes |      Yes |
 |      20 MHz |         Yes |           Yes |           Yes |           Yes |    Yes |      Yes |
 |      24 MHz |         Yes |           Yes |           Yes |           Yes |    Yes |      Yes |
@@ -54,11 +63,12 @@ For unsupported speeds, the micros and delay-us columns indicate what internal p
 |      32 MHz |          No |           Yes |           Yes |           Yes |    Yes |      Yes | 5
 |      36 MHz |          No |            No |    Most chips |    Most chips |    Yes |      Yes | 8
 |      40 MHz |          No |            No |    Most chips |    Most chips |    Yes |      Yes | 8
-|      44 MHz |          No |            No | Not by DxCore | Not by DxCore |    Yes |      Yes | 2, 8
-|      48 MHz |          No |            No |  Rarely works |    Some chips |    Yes |      Yes | 8
+| *    44 MHz |          No |            No | Not by DxCore | Not by DxCore |    Yes |      Yes | 2, 8
+|      48 MHz |          No |            No |   Most E-spec |   Most E-spec |    Yes |      Yes | 8
 
 Notes:
-1. 1 MHz is often used for low power applications, and so is supported with the internal oscillator only. It is not supported with other clock sources. Crystal uses more power, and so doesn't make sense, and external clocks seem to be power hogs.
+* This speed is not exposed and is unsupported, but the mechanics to make it work are belived to be there
+1. 1 MHz is often used for low power applications, and so is supported with the internal oscillator only. It is not supported with other clock sources. Crystal uses more power, and so doesn't make sense, and external clocks seem to be power hogs. Also refer to the Idd vs Vdd characteristics graphs: If you are CPU-bound, since a first order approximation of power vs frequency is a * F_CPU + b, where b is larger than sleeping power consumption
 2. Unsupported because of low demand, not technical obstacle.
 3. 4 MHz from internal is always the clock source at startup. Optiboot always runs at this speed.
 4. This is not natively supported by the internal oscillator but could be generated by prescaling the internal oscillator at 12 or 28 MHz. Other possible frequencies that can be created through prescaling are not shown, only integer number of MHz is included in table.
@@ -92,15 +102,16 @@ void setup() {
 ## Overclocking
 The capacity of these parts to run at speeds in excess of their rated maximum boggles the mind. To my knowledge, the maximum is around 48 MHz with an external clock. It didn't work on an I-spec part, but seems to work with E-spec parts (most of them anyway). E-spec always overclocks better than I-spec. There is no known voltage dependence related to overclocking - the DB-series power consumption errata implies that if there is, it only manifests low voltages, namely below 2.1 volts, when that power consumption errata manifests (likely a result of the regulator getting into a bad state = these parts have an internal regulator to generate a core voltage in the neighborhood of 1.8v)
 
-I have some 48 MHz crystals on the way to test with, as well. Generally things on crystals work better than internal clocks (assuming the crystal layout is good), but external clocks are almost universally superior for overclocking.
-
 Running at 48 MHz is an ambitious overclock and is totally unnecessary - so obviously this is a very exciting chance to do something for that fundamental instintive reason: "Because I can"! And you can to!  So far, I had success at room temperature with external clocks, but not external crystals, and only when using the E-spec (extended temperature range) parts (which makes sense). I am surprised how they will "just work" at 40 from a crystal though, even I-spec parts usually do However, not all parts are capable of this. Out of around a dozen parts, I've so far found 1 that doesn't work at 40. As usual with AVRs, it's the ALU that starts failing first. I have an I-spec that, at 48 external clock will run a program that does a 1 second delay between calling micros (so lots of math is being done, then prints it). Like with over-overclocked tinies, if it's not so high that they crash immediately, they start getting math wrong, which shows up as 0's being printed for micros/millis(). This is unstable, as eventually a return address will get broken, it will return to that, and everything will fail (this may now turn into a reset if you're properly handling reset flags)
 
 These can be returned to normal operation by uploading code that doesn't try to use an excessively fast clock - since the heat generated by the CPU core is negligible even at double it's rated clock speed, the damage that a desktop computer CPU might incur when overclocked too hard is not an issue.
 
 
+## megaTinyCore
+
 ## Strange possibilities for divided clocks
 There are a *lot* of strange clock speeds possible through combinations of prescalers and the internal oscillator - ever wanted to run an MCU at 7 MHz? *Me neither*, but you totally can, even without a crystal... These exotic speeds are not currently supported by DxCore. The switching logic to get that clock speed from the internal oscillator is implemented for the integer MHz speeds that can be achieved in that way. Fractional speeds are not implemented at all and total timekeeping failure should be expected. I'd be lying if I said I missed the struggle to make millis and micros accurate with weirdo clock speeds back on ATTinyCore (which in turn was done to support UART crystals, because some people are very picky about baud rate accuracy. You may laugh at their posts about making sure the clock is perfect for serial - but if you're not careful, on classic AVRs, the granularity of USART baud rates was horrendous near the higher speeds!) See also the [serial reference](Ref_Serial.md)
+Like classic AVRs, tinyAVRs have a "speed grades" depending on the voltage and operating conditions that they are rated for operation within. The spec is 5 MHz @ 1.8V , 10 MHz @ 2.7V (3.3V nominal) and 20 @ 4.5V (5.0V nominal) (2.7 or 4.5
 
 | Clock Speed | Within Spec | Internal | Ext.Clk |Tuned| 0/1 |Tuned|  2  | Notes |
 |-------------|-------------|----------|---------|-----|-----|-----|-----|-------|
@@ -140,7 +151,7 @@ megaTinyCore has no plans to add support for clock speeds that do not approximat
 The tinyAVR product line does not support use of an external high frequency crystal, only external clock or the internal oscillator can be used. The internal oscillator is pretty accurate, so internal clock will work fine for UART communication()they're within a fraction of a percent at room temp) with very little voltage dependence.
 
 ## Tuning
-The compliance of the tinyAVR 0/1/2-series oscillator blows the datasheet specifications out of the water and into low earth orbit. The difference between the speed with the oscillator frequency cal at it's minimum and at it's maximum values is about the magnitude of it's nominal frequency! 0/1-series parts usually go from a little under 5/8ths of their nominal frequency with tuning at 0 up to 1-5/8ths with tuning at the maximum! 2-series parts have a slightly wider range, centered a couple of MHz higher; a typical 2-series, at a nominal frequency of 20 MHz could be tuned from as low as 12 MHz up to around 36 or so, if you were to extrapolate the speed speed trend (they generally don't make it all the way to 0x7F tuning).
+The compliance of the tinyAVR 0/1/2-series oscillator blows the datasheet specifications out of the water and into low earth orbit. The difference between the speed with the oscillator frequency cal at it's minimum and at it's maximum values is about the magnitude of it's nominal frequency! 0/1-series parts usually go from a little under 5/8ths of their nominal frequency with tuning at 0 up to 1-5/8ths with tuning at the maximum! 2-series parts have a slightly wider range, centered a couple of MHz higher; a typical 2-series, at a nominal frequency of 20 MHz could be tuned from as low as 12 MHz up to around 36 or so, if you were to extrapolate the speed speed (they generally don't make it to the mid 30's).
 
 A tuning sketch must be used to experimentally determine the values to use. See the [Tuning Reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Tuning.md). Tuning is a LOT more fun here than on the DX-series!
 

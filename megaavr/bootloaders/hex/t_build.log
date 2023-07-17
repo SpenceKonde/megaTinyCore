@@ -1,0 +1,1200 @@
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_all8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txyz_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_all8sec.elf > optiboot_txyz_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_all8sec.elf optiboot_txyz_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_poronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txyz_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_poronly8sec.elf > optiboot_txyz_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_poronly8sec.elf optiboot_txyz_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_swronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txyz_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_swronly8sec.elf > optiboot_txyz_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_swronly8sec.elf optiboot_txyz_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_extronly 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_extronly 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_extronly.hex UARTTX=B2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_extronly.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_extronly.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txyz_extronly.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_extronly.elf > optiboot_txyz_extronly.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_extronly.elf optiboot_txyz_extronly.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_extr 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_extr 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_extr.hex UARTTX=B2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_extr.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_extr.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txyz_extr.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_extr.elf > optiboot_txyz_extr.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_extr.elf optiboot_txyz_extr.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_extr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_extr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_extr8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_extr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_extr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txyz_extr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_extr8sec.elf > optiboot_txyz_extr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_extr8sec.elf optiboot_txyz_extr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_alt_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_alt_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_alt_all8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_alt_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_alt_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txyz_alt_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_alt_all8sec.elf > optiboot_txyz_alt_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_alt_all8sec.elf optiboot_txyz_alt_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_alt_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_alt_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_alt_poronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_alt_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_alt_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txyz_alt_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_alt_poronly8sec.elf > optiboot_txyz_alt_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_alt_poronly8sec.elf optiboot_txyz_alt_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_alt_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_alt_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_alt_swronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_alt_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_alt_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txyz_alt_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_alt_swronly8sec.elf > optiboot_txyz_alt_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_alt_swronly8sec.elf optiboot_txyz_alt_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_alt_extronly 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_alt_extronly 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_alt_extronly.hex UARTTX=A1 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_alt_extronly.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_alt_extronly.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txyz_alt_extronly.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_alt_extronly.elf > optiboot_txyz_alt_extronly.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_alt_extronly.elf optiboot_txyz_alt_extronly.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_alt_extr 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_alt_extr 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_alt_extr.hex UARTTX=A1 TIMEOUT=1 LED=A3 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_alt_extr.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_alt_extr.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txyz_alt_extr.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_alt_extr.elf > optiboot_txyz_alt_extr.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_alt_extr.elf optiboot_txyz_alt_extr.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_alt_extr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_alt_extr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_alt_extr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_alt_extr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_alt_extr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txyz_alt_extr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_alt_extr8sec.elf > optiboot_txyz_alt_extr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_alt_extr8sec.elf optiboot_txyz_alt_extr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_all8sec.hex UARTTX=A6 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A6 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txy2_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_all8sec.elf > optiboot_txy2_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_all8sec.elf optiboot_txy2_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_poronly8sec.hex UARTTX=A6 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A6 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txy2_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_poronly8sec.elf > optiboot_txy2_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_poronly8sec.elf optiboot_txy2_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_swronly8sec.hex UARTTX=A6 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A6 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txy2_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_swronly8sec.elf > optiboot_txy2_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_swronly8sec.elf optiboot_txy2_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_extronly 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_extronly 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_extronly.hex UARTTX=A6 TIMEOUT=1 LED=A3 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A6 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_extronly.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_extronly.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txy2_extronly.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_extronly.elf > optiboot_txy2_extronly.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_extronly.elf optiboot_txy2_extronly.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_extr 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_extr 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_extr.hex UARTTX=A6 TIMEOUT=1 LED=A3 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A6 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_extr.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_extr.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txy2_extr.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_extr.elf > optiboot_txy2_extr.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_extr.elf optiboot_txy2_extr.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_extr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_extr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_extr8sec.hex UARTTX=A6 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A6 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_extr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_extr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txy2_extr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_extr8sec.elf > optiboot_txy2_extr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_extr8sec.elf optiboot_txy2_extr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_alt_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_alt_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_alt_all8sec.hex UARTTX=A1 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_alt_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_alt_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txy2_alt_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_alt_all8sec.elf > optiboot_txy2_alt_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_alt_all8sec.elf optiboot_txy2_alt_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_alt_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_alt_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_alt_poronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_alt_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_alt_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txy2_alt_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_alt_poronly8sec.elf > optiboot_txy2_alt_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_alt_poronly8sec.elf optiboot_txy2_alt_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_alt_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_alt_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_alt_swronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_alt_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_alt_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txy2_alt_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_alt_swronly8sec.elf > optiboot_txy2_alt_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_alt_swronly8sec.elf optiboot_txy2_alt_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_alt_extronly 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_alt_extronly 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_alt_extronly.hex UARTTX=A1 TIMEOUT=1 LED=A3 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_alt_extronly.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_alt_extronly.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txy2_alt_extronly.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_alt_extronly.elf > optiboot_txy2_alt_extronly.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_alt_extronly.elf optiboot_txy2_alt_extronly.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_alt_extr 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_alt_extr 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_alt_extr.hex UARTTX=A1 TIMEOUT=1 LED=A3 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_alt_extr.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_alt_extr.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txy2_alt_extr.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_alt_extr.elf > optiboot_txy2_alt_extr.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_alt_extr.elf optiboot_txy2_alt_extr.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_alt_extr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_alt_extr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_alt_extr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_alt_extr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_alt_extr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txy2_alt_extr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_alt_extr8sec.elf > optiboot_txy2_alt_extr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_alt_extr8sec.elf optiboot_txy2_alt_extr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_all8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_tx2z_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_all8sec.elf > optiboot_tx2z_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_all8sec.elf optiboot_tx2z_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_poronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_tx2z_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_poronly8sec.elf > optiboot_tx2z_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_poronly8sec.elf optiboot_tx2z_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_swronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_tx2z_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_swronly8sec.elf > optiboot_tx2z_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_swronly8sec.elf optiboot_tx2z_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_extronly 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_extronly 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_extronly.hex UARTTX=B2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_extronly.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_extronly.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_tx2z_extronly.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_extronly.elf > optiboot_tx2z_extronly.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_extronly.elf optiboot_tx2z_extronly.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_extr 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_extr 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_extr.hex UARTTX=B2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_extr.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_extr.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_tx2z_extr.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_extr.elf > optiboot_tx2z_extr.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_extr.elf optiboot_tx2z_extr.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_extr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_extr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_extr8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_extr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_extr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_tx2z_extr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_extr8sec.elf > optiboot_tx2z_extr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_extr8sec.elf optiboot_tx2z_extr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_alt_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_alt_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_alt_all8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_alt_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_alt_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_alt_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_alt_all8sec.elf > optiboot_tx2z_alt_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_alt_all8sec.elf optiboot_tx2z_alt_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_alt_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_alt_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_alt_poronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_alt_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_alt_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_alt_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_alt_poronly8sec.elf > optiboot_tx2z_alt_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_alt_poronly8sec.elf optiboot_tx2z_alt_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_alt_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_alt_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_alt_swronly8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_alt_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_alt_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_alt_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_alt_swronly8sec.elf > optiboot_tx2z_alt_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_alt_swronly8sec.elf optiboot_tx2z_alt_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_alt_extronly 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_alt_extronly 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_alt_extronly.hex UARTTX=A1 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_alt_extronly.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_alt_extronly.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_alt_extronly.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_alt_extronly.elf > optiboot_tx2z_alt_extronly.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_alt_extronly.elf optiboot_tx2z_alt_extronly.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_alt_extr 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_alt_extr 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_alt_extr.hex UARTTX=A1 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_alt_extr.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_alt_extr.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_alt_extr.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_alt_extr.elf > optiboot_tx2z_alt_extr.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_alt_extr.elf optiboot_tx2z_alt_extr.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_alt_extr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_alt_extr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_alt_extr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_alt_extr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_alt_extr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_alt_extr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_alt_extr8sec.elf > optiboot_tx2z_alt_extr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_alt_extr8sec.elf optiboot_tx2z_alt_extr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_u1alt_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_u1alt_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_u1alt_all8sec.hex UARTTX=C2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=C2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_u1alt_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_u1alt_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_u1alt_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_u1alt_all8sec.elf > optiboot_tx2z_u1alt_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_u1alt_all8sec.elf optiboot_tx2z_u1alt_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_u1alt_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_u1alt_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_u1alt_poronly8sec.hex UARTTX=C2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=C2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_u1alt_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_u1alt_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_u1alt_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_u1alt_poronly8sec.elf > optiboot_tx2z_u1alt_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_u1alt_poronly8sec.elf optiboot_tx2z_u1alt_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_u1alt_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_u1alt_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_u1alt_swronly8sec.hex UARTTX=C2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=C2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_u1alt_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_u1alt_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_u1alt_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_u1alt_swronly8sec.elf > optiboot_tx2z_u1alt_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_u1alt_swronly8sec.elf optiboot_tx2z_u1alt_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_u1alt_extronly 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_u1alt_extronly 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_u1alt_extronly.hex UARTTX=C2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=C2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_u1alt_extronly.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_u1alt_extronly.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_u1alt_extronly.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_u1alt_extronly.elf > optiboot_tx2z_u1alt_extronly.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_u1alt_extronly.elf optiboot_tx2z_u1alt_extronly.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_u1alt_extr 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_u1alt_extr 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_u1alt_extr.hex UARTTX=C2 TIMEOUT=1 LED=A7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=C2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_u1alt_extr.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_u1alt_extr.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_u1alt_extr.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_u1alt_extr.elf > optiboot_tx2z_u1alt_extr.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_u1alt_extr.elf optiboot_tx2z_u1alt_extr.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_u1alt_extr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_u1alt_extr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_u1alt_extr8sec.hex UARTTX=C2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=C2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_u1alt_extr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_u1alt_extr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_u1alt_extr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_u1alt_extr8sec.elf > optiboot_tx2z_u1alt_extr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_u1alt_extr8sec.elf optiboot_tx2z_u1alt_extr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity3217_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity3217_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity3217_all8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_curiosity3217_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity3217_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity3217_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity3217_all8sec.elf > optiboot_curiosity3217_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity3217_all8sec.elf optiboot_curiosity3217_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity3217_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity3217_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity3217_poronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_curiosity3217_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity3217_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity3217_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity3217_poronly8sec.elf > optiboot_curiosity3217_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity3217_poronly8sec.elf optiboot_curiosity3217_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity3217_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity3217_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity3217_swronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_curiosity3217_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity3217_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity3217_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity3217_swronly8sec.elf > optiboot_curiosity3217_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity3217_swronly8sec.elf optiboot_curiosity3217_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1607_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1607_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1607_all8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1607 -o optiboot_curiosity1607_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1607_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1607_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1607_all8sec.elf > optiboot_curiosity1607_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1607_all8sec.elf optiboot_curiosity1607_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1607_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1607_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1607_poronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1607 -o optiboot_curiosity1607_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1607_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1607_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1607_poronly8sec.elf > optiboot_curiosity1607_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1607_poronly8sec.elf optiboot_curiosity1607_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1607_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1607_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1607_swronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1607 -o optiboot_curiosity1607_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1607_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1607_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1607_swronly8sec.elf > optiboot_curiosity1607_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1607_swronly8sec.elf optiboot_curiosity1607_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1627_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1627_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1627_all8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1627 -o optiboot_curiosity1627_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1627_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1627_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1627_all8sec.elf > optiboot_curiosity1627_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1627_all8sec.elf optiboot_curiosity1627_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1627_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1627_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1627_poronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1627 -o optiboot_curiosity1627_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1627_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1627_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1627_poronly8sec.elf > optiboot_curiosity1627_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1627_poronly8sec.elf optiboot_curiosity1627_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1627_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1627_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1627_swronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1627 -o optiboot_curiosity1627_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1627_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1627_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1627_swronly8sec.elf > optiboot_curiosity1627_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1627_swronly8sec.elf optiboot_curiosity1627_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1627_extronly 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1627_extronly 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1627_extronly.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=1 LED=B7 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1627 -o optiboot_curiosity1627_extronly.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1627_extronly.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1627_extronly.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1627_extronly.elf > optiboot_curiosity1627_extronly.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1627_extronly.elf optiboot_curiosity1627_extronly.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1627_extr 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1627_extr 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1627_extr.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=1 LED=B7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=1  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1627 -o optiboot_curiosity1627_extr.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1627_extr.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1627_extr.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1627_extr.elf > optiboot_curiosity1627_extr.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1627_extr.elf optiboot_curiosity1627_extr.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1627_extr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1627_extr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1627_extr8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x34
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x34 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x34     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1627 -o optiboot_curiosity1627_extr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1627_extr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1627_extr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1627_extr8sec.elf > optiboot_curiosity1627_extr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1627_extr8sec.elf optiboot_curiosity1627_extr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedpro3217_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedpro3217_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedpro3217_all8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=B4  -DLED_INVERT=1 -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_xplainedpro3217_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedpro3217_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_xplainedpro3217_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedpro3217_all8sec.elf > optiboot_xplainedpro3217_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedpro3217_all8sec.elf optiboot_xplainedpro3217_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedpro3217_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedpro3217_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedpro3217_poronly8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=B4  -DLED_INVERT=1 -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_xplainedpro3217_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedpro3217_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_xplainedpro3217_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedpro3217_poronly8sec.elf > optiboot_xplainedpro3217_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedpro3217_poronly8sec.elf optiboot_xplainedpro3217_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedpro3217_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedpro3217_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedpro3217_swronly8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=B4  -DLED_INVERT=1 -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_xplainedpro3217_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedpro3217_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_xplainedpro3217_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedpro3217_swronly8sec.elf > optiboot_xplainedpro3217_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedpro3217_swronly8sec.elf optiboot_xplainedpro3217_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedpro817_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedpro817_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedpro817_all8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=B4  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny817 -o optiboot_xplainedpro817_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedpro817_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_xplainedpro817_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedpro817_all8sec.elf > optiboot_xplainedpro817_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedpro817_all8sec.elf optiboot_xplainedpro817_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedpro817_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedpro817_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedpro817_poronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=B4  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny817 -o optiboot_xplainedpro817_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedpro817_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_xplainedpro817_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedpro817_poronly8sec.elf > optiboot_xplainedpro817_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedpro817_poronly8sec.elf optiboot_xplainedpro817_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedpro817_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedpro817_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedpro817_swronly8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=B4  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny817 -o optiboot_xplainedpro817_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedpro817_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_xplainedpro817_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedpro817_swronly8sec.elf > optiboot_xplainedpro817_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedpro817_swronly8sec.elf optiboot_xplainedpro817_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedmini817_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedmini817_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedmini817_all8sec.hex UARTTX=B2 TIMEOUT=8 LED=C0 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=C0   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny817 -o optiboot_xplainedmini817_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedmini817_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_xplainedmini817_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedmini817_all8sec.elf > optiboot_xplainedmini817_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedmini817_all8sec.elf optiboot_xplainedmini817_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedmini817_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedmini817_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedmini817_poronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=C0 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=C0   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny817 -o optiboot_xplainedmini817_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedmini817_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_xplainedmini817_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedmini817_poronly8sec.elf > optiboot_xplainedmini817_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedmini817_poronly8sec.elf optiboot_xplainedmini817_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedmini817_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedmini817_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedmini817_swronly8sec.hex UARTTX=B2 TIMEOUT=8 LED=C0 ENTRYCOND_REQUIRE=0x24
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x24 -DLED_START_FLASHES=3  -DLED=C0   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x24     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny817 -o optiboot_xplainedmini817_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedmini817_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_xplainedmini817_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedmini817_swronly8sec.elf > optiboot_xplainedmini817_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedmini817_swronly8sec.elf optiboot_xplainedmini817_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainednano416_all8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainednano416_all8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainednano416_all8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B5 ENTRYCOND_REQUIRE=0x35
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x35 -DLED_START_FLASHES=3  -DLED=B5  -DLED_INVERT=1 -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x35     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny416 -o optiboot_xplainednano416_all8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainednano416_all8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_xplainednano416_all8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainednano416_all8sec.elf > optiboot_xplainednano416_all8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainednano416_all8sec.elf optiboot_xplainednano416_all8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainednano416_poronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainednano416_poronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainednano416_poronly8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B5 ENTRYCOND_REQUIRE=0x21
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x21 -DLED_START_FLASHES=3  -DLED=B5  -DLED_INVERT=1 -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x21     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny416 -o optiboot_xplainednano416_poronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainednano416_poronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_xplainednano416_poronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainednano416_poronly8sec.elf > optiboot_xplainednano416_poronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainednano416_poronly8sec.elf optiboot_xplainednano416_poronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainednano416_swronly8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainednano416_swronly8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainednano416_swronly8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B5 ENTRYCOND_REQUIRE=0x30
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x30 -DLED_START_FLASHES=3  -DLED=B5  -DLED_INVERT=1 -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x30     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny416 -o optiboot_xplainednano416_swronly8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainednano416_swronly8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_xplainednano416_swronly8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainednano416_swronly8sec.elf > optiboot_xplainednano416_swronly8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainednano416_swronly8sec.elf optiboot_xplainednano416_swronly8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_porswr8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txyz_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_porswr8sec.elf > optiboot_txyz_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_porswr8sec.elf optiboot_txyz_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txyz_alt_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txyz_alt_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txyz_alt_porswr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_txyz_alt_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txyz_alt_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txyz_alt_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txyz_alt_porswr8sec.elf > optiboot_txyz_alt_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txyz_alt_porswr8sec.elf optiboot_txyz_alt_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_porswr8sec.hex UARTTX=A6 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A6 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_txy2_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_porswr8sec.elf > optiboot_txy2_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_porswr8sec.elf optiboot_txy2_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake txy2_alt_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino txy2_alt_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_txy2_alt_porswr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A3 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=A3   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny412 -o optiboot_txy2_alt_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_txy2_alt_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_txy2_alt_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_txy2_alt_porswr8sec.elf > optiboot_txy2_alt_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_txy2_alt_porswr8sec.elf optiboot_txy2_alt_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_porswr8sec.hex UARTTX=B2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_tx2z_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_porswr8sec.elf > optiboot_tx2z_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_porswr8sec.elf optiboot_tx2z_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_alt_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_alt_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_alt_porswr8sec.hex UARTTX=A1 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_alt_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_alt_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_alt_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_alt_porswr8sec.elf > optiboot_tx2z_alt_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_alt_porswr8sec.elf optiboot_tx2z_alt_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake tx2z_u1alt_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino tx2z_u1alt_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_tx2z_u1alt_porswr8sec.hex UARTTX=C2 TIMEOUT=8 LED=A7 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=A7   -DUARTTX=C2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3227 -o optiboot_tx2z_u1alt_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_tx2z_u1alt_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_tx2z_u1alt_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_tx2z_u1alt_porswr8sec.elf > optiboot_tx2z_u1alt_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_tx2z_u1alt_porswr8sec.elf optiboot_tx2z_u1alt_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity3217_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity3217_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity3217_porswr8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_curiosity3217_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity3217_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity3217_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity3217_porswr8sec.elf > optiboot_curiosity3217_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity3217_porswr8sec.elf optiboot_curiosity3217_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1607_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1607_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1607_porswr8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1607 -o optiboot_curiosity1607_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1607_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1607_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1607_porswr8sec.elf > optiboot_curiosity1607_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1607_porswr8sec.elf optiboot_curiosity1607_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake curiosity1627_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino curiosity1627_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_curiosity1627_porswr8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B7 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=B7  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny1627 -o optiboot_curiosity1627_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_curiosity1627_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_curiosity1627_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_curiosity1627_porswr8sec.elf > optiboot_curiosity1627_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_curiosity1627_porswr8sec.elf optiboot_curiosity1627_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedpro3217_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedpro3217_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedpro3217_porswr8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=B4  -DLED_INVERT=1 -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny3217 -o optiboot_xplainedpro3217_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedpro3217_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_xplainedpro3217_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedpro3217_porswr8sec.elf > optiboot_xplainedpro3217_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedpro3217_porswr8sec.elf optiboot_xplainedpro3217_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedpro817_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedpro817_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedpro817_porswr8sec.hex UARTTX=B2 LED_INVERT=1 TIMEOUT=8 LED=B4 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=B4  -DLED_INVERT=1 -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny817 -o optiboot_xplainedpro817_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedpro817_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_xplainedpro817_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedpro817_porswr8sec.elf > optiboot_xplainedpro817_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedpro817_porswr8sec.elf optiboot_xplainedpro817_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainedmini817_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainedmini817_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainedmini817_porswr8sec.hex UARTTX=B2 TIMEOUT=8 LED=C0 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=C0   -DUARTTX=B2 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny817 -o optiboot_xplainedmini817_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainedmini817_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    474	      0	      0	    474	    1da	optiboot_xplainedmini817_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainedmini817_porswr8sec.elf > optiboot_xplainedmini817_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainedmini817_porswr8sec.elf optiboot_xplainedmini817_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>call omake xplainednano416_porswr8sec 
+
+C:\arduino-1.0.6-7.3.0compiler\hardware\arduino\bootloaders\optiboot_x>..\..\..\tools\avr\utils\bin\make OS=windows ENV=arduino xplainednano416_porswr8sec 
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/utils/bin/make -f  makefile optiboot_xplainednano416_porswr8sec.hex UARTTX=A1 LED_INVERT=1 TIMEOUT=8 LED=B5 ENTRYCOND_REQUIRE=0x31
+Using Compiler at: C:/arduino-1.0.6-7.3.0compiler/hardware/tools/avr/bin/avr-gcc
+make[1]: Entering directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'
+../../../tools/avr/bin/avr-gcc -g -Wall -Os -fno-split-wide-types -mrelax  -DWDTTIME=8  -DENTRYCOND_REQUIRE=0x31 -DLED_START_FLASHES=3  -DLED=B5  -DLED_INVERT=1 -DUARTTX=A1 -DBAUD_RATE=115200    -DENTRYCOND_REQUIRE=0x31     -Wl,-section-start=.text=0 -Wl,--section-start=.version=0x1fe -Wl,--relax -nostartfiles -nostdlib  -mmcu=attiny416 -o optiboot_xplainednano416_porswr8sec.elf optiboot_x.c
+../../../tools/avr/bin/avr-size optiboot_xplainednano416_porswr8sec.elf
+   text	   data	    bss	    dec	    hex	filename
+    476	      0	      0	    476	    1dc	optiboot_xplainednano416_porswr8sec.elf
+"../../../tools/avr/bin/avr-objdump" -S optiboot_xplainednano416_porswr8sec.elf > optiboot_xplainednano416_porswr8sec.lst
+../../../tools/avr/bin/avr-objcopy -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex optiboot_xplainednano416_porswr8sec.elf optiboot_xplainednano416_porswr8sec.hex
+make[1]: Leaving directory `C:/arduino-1.0.6-7.3.0compiler/hardware/arduino/bootloaders/optiboot_x'

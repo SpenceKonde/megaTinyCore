@@ -61,8 +61,9 @@ If working with assembly you should make a rigorous study of the insruction set 
 * [tinyAVR402/202](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny202-402-AVR-MCU-with-Core-Independent-Peripherals_and-picoPower-40001969A.pdf)
 
 ### And the errata taketh away
-Notice that while datasheets generalize across a series for all flash sizes (on the Dx-series, I've gone as far as ripping pdf's to text and comparing it. No differences. No, I do not know why there are so many datasheets for parts with the same functionality differing only in flash), but the errata does NOT, because (particularly on the 1-series) between part releases in different flash sizes, bugs are fixed and occasionally introduced. Errata do generalize over a flash size for all pincounts though (except for the 417 which shares errata with 8k 1-series parts).
-* Not very much on the 2-series
+Notice that while datasheet information can be generalized across the whole family of parts The datasheets typically differ only in the header and footer (excepting the 1-series, which is effectively two part families, the 16k+ and the 2-8k parts). But because they use different dies, and dies are designed at discrete points in time, flash sizes released later have fewer bugs, because they've been spending the intervening months stomping out errata. On the 0 and 1 series tinyAVRs, there is a mindboggling amount of errata and a terrible shortage of die revisions. The 2-series tinyAVR by contrast has very little and the DD even less, though the EA's new RWW flash system is pretty janky.
+
+See also [Errata.md](Errata.md).
   * [tinyAVR 2-series 32k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny3224-3226-3227-SilConErrataClarif-DS40002342A.pdf)
   * [tinyAVR 2-series 16k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny1624-26-27-SilConErrataClarif-DS80000902D.pdf)
   * [tinyAVR 2-series 4/8k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny424-426-427-824-826-827-SilConErrataClarif-DS80000955B.pdf)

@@ -31,6 +31,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Bugfix: Remove boot_opt.h which is not applicable to modern AVRs.
 * Bugfix: Remove the useless dummy app that forced us to use avr-size -A to see the size of the bootloader separated from the app, and switch avr-size -A to normal avr-size to take advantage of this.
 * Maintenance: Rebuild all bootloader files.
+* Bugfix: The recently introduced entry condition functionality of Optiboot was busted.
+* Maintenance: Rebuild all bootloader files again.
 * Enhancement (contributed): Merge in support for using XDIR and RS485 (custom optiboot build only).
 * Enhancement: Add a test to the start of twi_pins.h that will allows it to be carried to another modern AVR core that doesn't provide badArg and badCall. Add CORE_HAS_ERRORFUNS #define.
 

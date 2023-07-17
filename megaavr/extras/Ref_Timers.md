@@ -198,7 +198,7 @@ The asynchronous nature of this timer, however, comes at a great cost: It is muc
 So if you're doing something where misbehavior of the PWM timer could lead serious hardware damage (eg, via shootthrough on an H-bridge or the nearly identical situation on a synchronously rectifying DC-DC converter), this is the timer to use if you want the best protection against that, and more flexibility in generating the waveforms that would be needed in such applications. Note that I don't recommend building your own DC-DC converter, owing to the low price of assembled modules, especially ones prone to potentially destructive shoot-through because that shouldn't even be a problem with off the shelf solutions in this day and age, and I certainly don't recommend building anything where a malfunction could result in serious damage.
 
 Remember this part of the license.
-```
+```text
 This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
@@ -230,7 +230,7 @@ One very important thing to be aware of on the tinyAVR 0/1-series only (and not 
 
 ## Timer Prescaler Availability
 Prescaler    | TCAn  | TCBn  | TCD0  | TCD0 sync | TD0 counter |
------------- | ------|-------|-------|-----------|-------------|
+-------------|-------|-------|-------|-----------|-------------|
 CLK          |  YES  |  YES  |  YES  |  YES      |  YES        |
 CLK2         |  YES  |  YES  |  YES* |  YES      |  NO         |
 CLK/4        |  YES  |  TCA  |  YES  |  YES      |  YES        |
@@ -582,21 +582,21 @@ When TCA0 is used as the millis timekeeping source, it is set to run at the syst
 |    40 MHz |  1.63 ms |   6.4 us |   0.19 % |        3.5 us |
 |    36 MHz |  1.81 ms |   7.1 us |   0.19 % |   aprx   4 us |
 |    32 MHz |  2.04 ms |   8.0 us |   0.19 % |          4 us |
-|    30 MHz  | 0.54 ms |   2.1 us |   0.51 % |   aprx   4 us |
-|    28 MHz  | 0.58 ms |   2.3 us |   0.51 % |          4 us |
-|    25 MHz  | 0.65 ms |   2.6 us |   0.51 % |   aprx   4 us |
-|    24 MHz  | 0.68 ms |   2.7 us |   0.51 % |          5 us |
-|    20 MHz  | 0.82 ms |   3.2 us |   0.51 % |          7 us |
+|    30 MHz |  0.54 ms |   2.1 us |   0.51 % |   aprx   4 us |
+|    28 MHz |  0.58 ms |   2.3 us |   0.51 % |          4 us |
+|    25 MHz |  0.65 ms |   2.6 us |   0.51 % |   aprx   4 us |
+|    24 MHz |  0.68 ms |   2.7 us |   0.51 % |          5 us |
+|    20 MHz |  0.82 ms |   3.2 us |   0.51 % |          7 us |
 |    16 MHz |  1.02 ms |   4.0 us |   0.51 % |          9 us |
 | !  14 MHz |  1.14 ms |   4.6 us |   0.51 % |   aprx  10 us |
 |    12 MHz |  1.36 ms |   5.3 us |   0.51 % |         10 us |
 |    10 MHz |  1.63 ms |   6.4 us |   0.51 % |         14 us |
 |     8 MHz |  2.04 ms |   8.0 us |   0.51 % |         17 us |
-| !   7 MHz  | 0.58 ms |   2.3 us |   2.13 % |   aprx  18 us |
-| !   6 MHz  | 0.68 ms |   2.7 us |   2.13 % |   aprx  19 us |
-|     5 MHz  | 0.82 ms |   3.2 us |   2.13 % |         27 us |
+| !   7 MHz |  0.58 ms |   2.3 us |   2.13 % |   aprx  18 us |
+| !   6 MHz |  0.68 ms |   2.7 us |   2.13 % |   aprx  19 us |
+|     5 MHz |  0.82 ms |   3.2 us |   2.13 % |         27 us |
 |     4 MHz |  1.02 ms |   4.0 us |   2.13 % |         33 us |
-| !   3 MHz  | 0.68 ms |   2.7 us |   3.55 % |   aprx  45 us |
+| !   3 MHz |  0.68 ms |   2.7 us |   3.55 % |   aprx  45 us |
 | !   2 MHz |  1.02 ms |   4.0 us |   3.55 % |   aprx  60 us |
 |     1 MHz |  2.04 ms |   8.0 us |   3.55 % |        112 us |
 
@@ -733,34 +733,34 @@ Whenever a function supplied by the core returns a representation of a timer, th
 
 ### For DxCore
 | Timer Name   | Value | Peripheral |          Used for |
-|--------------|-------|------------|-------------------|
+|-----------------|------|------------|-------------------|
 | NOT_ON_TIMER    | 0x00 |      None  | millis (disabled) or when asked what timer outputs on a pin available for PWM.  |
-| TIMERA0 *       | 0x10 |     `TCA0` | millis and/or PWM |
-| TIMERA1 *       | 0x08 |     `TCA1` | millis and/or PWM |
-| TIMERA2 *       | 0x18 |     `TCA2` | Nothing. No such part exists |
-| TIMERB0         | 0x20 |     `TCB0` | millis     or PWM |
-| TIMERB1         | 0x21 |     `TCB1` | millis     or PWM |
-| TIMERB2         | 0x22 |     `TCB2` | millis     or PWM |
-| TIMERB3         | 0x23 |     `TCB3` | millis     or PWM |
-| TIMERB4         | 0x24 |     `TCB4` | millis     or PWM |
-| TIMERB0_ALT     | 0x30 |     `TCB0` | Reserved, not used|
-| TIMERB1_ALT     | 0x31 |     `TCB1` | Reserved, not used|
-| TIMERB2_ALT     | 0x32 |     `TCB2` | Reserved, not used|
-| TIMERB3_ALT     | 0x33 |     `TCB3` | Reserved, not used|
-| TIMERB4_ALT     | 0x34 |     `TCB4` | Reserved, not used|
-| TIMERD0         | 0x40 |     `TCD0` | PWM or on mTC only, millis |
+| TIMERA0 *       | 0x10 |   `TCA0` | millis and/or PWM |
+| TIMERA1 *       | 0x08 |   `TCA1` | millis and/or PWM |
+| TIMERA2 *       | 0x18 |   `TCA2` | Nothing. No such part exists |
+| TIMERB0         | 0x20 |   `TCB0` | millis     or PWM |
+| TIMERB1         | 0x21 |   `TCB1` | millis     or PWM |
+| TIMERB2         | 0x22 |   `TCB2` | millis     or PWM |
+| TIMERB3         | 0x23 |   `TCB3` | millis     or PWM |
+| TIMERB4         | 0x24 |   `TCB4` | millis     or PWM |
+| TIMERB0_ALT     | 0x30 |   `TCB0` | Reserved, not used|
+| TIMERB1_ALT     | 0x31 |   `TCB1` | Reserved, not used|
+| TIMERB2_ALT     | 0x32 |   `TCB2` | Reserved, not used|
+| TIMERB3_ALT     | 0x33 |   `TCB3` | Reserved, not used|
+| TIMERB4_ALT     | 0x34 |   `TCB4` | Reserved, not used|
+| TIMERD0         | 0x40 |   `TCD0` | PWM or on mTC only, millis |
 | TIMERD0_0WOA ** | 0x40 |   `TCD0` |           PWM WOA |
 | TIMERD0_0WOB ** | 0x50 |   `TCD0` |           PWM WOB |
 | TIMERD0_0WOC ** | 0x60 |   `TCD0` |           PWM WOC |
 | TIMERD0_0WOD ** | 0x70 |   `TCD0` |           PWM WOD |
 | TIMERD0_1WOA ** | 0x41 |   `TCD0` | with mux in 3 LSBs|
 | TIMERD0_4WOD ** | 0x74 |   `TCD0` | and so on to here |
-| TIMERE0        |  TBD  |     `TCE0` | TBD               |
-| TIMERF0        |  TBD  |     `TCF0` | TBD               |
-| DACOUT ***      | 0x80 |     `DAC0` | DAC output        |
-| TIMERRTC        | 0x90 |      `RTC` | @ sleepTime.h     |
-| TIMERPIT        | 0x98 | `RTC PIT`  | @ PD sleepTime.h  |
-| NOT_A_TIMER     | 0xFF |      None  | Reserved @@       |
+| TIMERE0         | TBD  |   `TCE0` | TBD               |
+| TIMERF0         | TBD  |   `TCF0` | TBD               |
+| DACOUT ***      | 0x80 |   `DAC0` | DAC output        |
+| TIMERRTC        | 0x90 |    `RTC` | @ sleepTime.h     |
+| TIMERPIT        | 0x98 | `RTC PIT`| @ PD sleepTime.h  |
+| NOT_A_TIMER     | 0xFF |    None  | Reserved @@       |
 
 0 (`NOT_ON_TIMER`) will be returned by digitalPinToTimer() or digitalPinToTimerNow() (herafter: dPTT and dPTTN) if the specified pin has no timer.
 
@@ -837,7 +837,7 @@ Calls to `_gCMT` should be conditionally compiled based on CORE_HAS_CURRENTTIMER
   } else { //can't happen.
     runInCirclesScreamAndShout();
   }
-  ```
+```
 2. Make a copy of the value, bitwise and with 0xF8.
 3. If the copy is less than 0x20, -> it's TCAn
   a. Specifically,  n(copyval >> 3) = (n/a, 1, 0, 2)
@@ -908,7 +908,7 @@ The number of values will, for ideal values, be `(1000) * (1 - (1 / resolution))
 Timer options which have resolution of 1us (internally, it is lower) may have repeats or skips if fewer than the optimal number of terms were used (as is the case with non optimized options) or where the clock speed is particularky hard to work with, like the 28 MHz one.
 
 
-## Appendix III: Quiz answer! Yes, you made it through all the intervening 400ish lines of textm, just to be told...
+## Appendix III: Quiz answer! Yes, you made it through all the intervening 400ish lines of text, just to be told
 > *It's a trick question!*
 
 Yes, every single one of those, or something close enough for our team of expert(s) to deem them equivalent. These have all actually existed in some form or another, at one time or another - right here on Earth, the works of mankind. A *teenager* really did make a nuclear reactor at home (people had tracked radioactive dust all over the neighborhood by the time someone realized what was going on). Asbestos cloth was widely used to make flexible fireproof objects, including clothing. Wooden knickknacks are in fact made through a traditional artform in asian countries where the lacquer plant grows natively; the sap - rich in the same compounds as poison ivy (the same "active" ones, to be clear); they used it to make things like bowls and dishes, because it hardened into a durable plastic-like material long before plastics existed. Though it doesn't pose the persistent toxicity of some modern plastics, I wouldn't be the one to volunteer to make it... And indeed, some emperor's tomb, I believe in China, contained, or had contained at one point, a pond and possibly a fountain of mercury. And as most fans of danger already knew, around the turn of the century radioactive material (usually radium) was just one of the many poisons sold as medicine. They put it in all kinds of things, including water (which you were supposed to *drink*) soaps, and similar, so it's inconceivable that shampoo wasn't one of those. Obviously none of them any any benefit to speak of, and unlike older patent medicines, which were typically heroin, cocaine, and organochlorine drug
