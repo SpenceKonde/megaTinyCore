@@ -247,7 +247,7 @@ After having stopped millis either for sleep or to use timer for something else 
 Sets the millisecond timer forward by the specified number of milliseconds. Currently only implemented for TCB, TCA implementation will be added in a future release. This allows a clean way to advance the timer without needing to do the work of reading the current value, adding, and passing to `set_millis()`  It is intended for use before  (added becauise *I* needed it, but simple enough). The intended use case is when you know you're disabling interrupts for a long time (milliseconds), and know exactly how long that is (ex, to update neopixels), and want to nudge the timerforward by that much to compensate. That's what *I* wanted it for.
 
 ### `_switchInternalToF_CPU()`
-Call this if you are running from the internal clock, but it is not at F_CPU - likely when overriding `onClockTimeout()` as  `onClockFailure()` is not very useful, since it doesn't catch limping crystals, only ones that have just stopped oscillating alltogether.
+Call this if you are running from the internal clock, but it is not at F_CPU - likely when overriding `onClockTimeout()` as  `onClockFailure()` is not very useful, since it doesn't catch limping crystals, only ones that have just stopped oscillating altogether.
 
 ## PWM control
 See [Timer Reference](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Timers.md)

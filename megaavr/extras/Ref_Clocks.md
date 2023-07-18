@@ -33,12 +33,12 @@ Not the feature I'm most impressed with. A+ on concept, C on execution.
 Tuning to achieve non-standard speeds is not supported on the AVR Ex-series parts under DxCore.
 
 ## Supported Clock Speeds
-Like classic AVRs, tinyAVRs have a "speed grades" depending on the voltage and operating conditions that they are rated for operation within. The spec is 5 MHz @ 1.8V , 10 MHz @ 2.7V (3.3V nominal) and 20 @ 4.5V (5.0V nominal) (2.7 or 4.5 for 8MHz and 16 MHz at >105C . See the Speed Grade reference for more information on this. Note that the speed grades are extrememly conservative for room temperature operation, and unreal overclocking is easily achievable at room temperaturee, particularly with high temp. rated parts. 
+Like classic AVRs, tinyAVRs have a "speed grades" depending on the voltage and operating conditions that they are rated for operation within. The spec is 5 MHz @ 1.8V , 10 MHz @ 2.7V (3.3V nominal) and 20 @ 4.5V (5.0V nominal) (2.7 or 4.5 for 8MHz and 16 MHz at >105C . See the Speed Grade reference for more information on this. Note that the speed grades are extremely conservative for room temperature operation, and unreal overclocking is easily achievable at room temperaturee, particularly with high temp. rated parts. 
 
 The AVR Dx-series come in I (105C) and E (125C) spec parts. Since the DA-series was released, Microchip has STOPPED MARKING THE SPEED GRADE ON THE CHIPS. Be sure that if you have both speed grades, you mark the chips somehow (0 and 1-series parts do still have the temperature rating marked (N = 105, F = 125). 
 
 
-Some of the listed speeds, while supported by the hardware are not supported by the core - typically wierd, slow clocks, particularly from a crystal
+Some of the listed speeds, while supported by the hardware are not supported by the core - typically weird, slow clocks, particularly from a crystal
 For unsupported speeds, the micros and delay-us columns indicate what internal plumbing has been implemented. micros is implemented for almost all speeds, delayMicroseconds with non-compile-time-known delays for most, even some unsupported ones. delayMicroseconds() is supported and accurate at all speeds when the argument is a compile-time-known constant, as we use the avr-libc implementation.
 
 | Clock Speed | Within Spec |      Internal |  Ext. Crystal |    Ext. Clock | micros | delay-us | Notes
@@ -67,7 +67,7 @@ For unsupported speeds, the micros and delay-us columns indicate what internal p
 |      48 MHz |          No |            No |   Most E-spec |   Most E-spec |    Yes |      Yes | 8
 
 Notes:
-* This speed is not exposed and is unsupported, but the mechanics to make it work are belived to be there
+* This speed is not exposed and is unsupported, but the mechanics to make it work are believed to be there
 1. 1 MHz is often used for low power applications, and so is supported with the internal oscillator only. It is not supported with other clock sources. Crystal uses more power, and so doesn't make sense, and external clocks seem to be power hogs. Also refer to the Idd vs Vdd characteristics graphs: If you are CPU-bound, since a first order approximation of power vs frequency is a * F_CPU + b, where b is larger than sleeping power consumption
 2. Unsupported because of low demand, not technical obstacle.
 3. 4 MHz from internal is always the clock source at startup. Optiboot always runs at this speed.
