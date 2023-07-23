@@ -28,7 +28,7 @@ This table lists some of the most significant differences between the tinyAVR 0,
 | TCD0      | No       | Yes      | Yes      | No       |          Yes |           No |
 | Max pract. internal<br/>overclock | 25 MHz | 25 MHz   |       32 MHz | 40-48 w/xtal | Basically none.  |
 | Max pract.<br/>overclock| 30 MHz | 30 MHz  | 32 MHz   | 40-48 w/xtal |    40-48 MHz |      TBD         |
-| Errata    | A lot    | Tons     | A lot    | Not much | Hardly any?  | We shall see |
+| Errata    | A lot    | Tons     | A lot    | Not much | Hardly any?  | none except for nvmctrl, which is fucked. |
 | Price/pc  |    $1.08 |      n/a |$1.16     |    $1.18 |        $1.10 |          TBA |
 
 Qty 1 price from Microchip Direct for 16k flash version of 24 pin tiny, normal temp range, or 28-pin DD or EA in QFN (since it is not being made in low pincounts). Put simply, the price difference is minuscule (except maybe for the EA).
