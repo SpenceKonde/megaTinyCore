@@ -1,4 +1,12 @@
-# Direct Port Manipulation
+, but they also rely on it not being this stupid slow. . That is the only kind of pin interrupt. You get 6 choices of input sense configuration: a. no interrupts, or interrupts on b. 1 The interrupts can only be disabled by disabling the interrupt in PINnCTRL (which will not stop an interrupt from occcurring if you have not cleared th I think you can get into bad places too if you 
+
+But these parts also have 4 additional "VPORT" registers for each port. These are located in the coveted low I/O space, and offer single cycle bit access.
+
+VPORTx.DIR
+VPORTx.OUT
+
+
+## Background for modern AVRs
 When multiple i/o pins should be controlled simultaneously by the microcontroller, or when using Arduino functions, like digitalWrite and digitalRead, are too slow, port manipulation can be used to write directly to the registers.
 Port registers allow for lower-level and faster manipulation of the i/o pins of the ATtiny. At least 1 port, and up to 3 ports are used in the ATtiny, where each port is indicated by a letter:
 * PORTA
@@ -183,7 +191,7 @@ It also **only works on the above listed registers** plus the four special `GPIO
 
 On ALL other registers, |= and &= will ALWAYS produce a read-modify-write, and the load will take 2 or 3 clock cycles, and the store 1 or 2.
 
-A more flexible, and consistent method for controlling the port registers can be achieved with the PORTx registers, however, when you have the information to use the VPORT method, the PORT registers are slower than the VPORT registers (it takes 2 clock cycles, plus 1 or more to prepare the value to write).
+A more flexible, and consistent method for controlling the port registers can be achieved with the PORTx registers, however, when you have the information to use the VPORT method and it's compile time known, the PORT registers are slower than the VPORT registers (it takes 2 clock cycles, plus 1 or more to prepare the value to write), though unlike most peripheral registers the SET/CLR/TGL registers give you atomic access. 
 
 These registers are:
 ```c
@@ -221,13 +229,23 @@ These are the **most misunderstood registers** on the modern AVR parts, and it i
 
 Using `___SET` in this way does nothing untoward, though it is slower and not atomic.
 
-Not so DIRCLR - If you do `PORTx.DIRCLR |= (1 << 2) | (1 << 3)`. The compiler will then do a read modify write cycle. It will read the DIRCLR register, the current value of PORTx.DIR. Then that will bitwise OR'ed with the values you passed. It now has a temporary value in a register with each bit that is set in PORTx.DIR as well as bits 2 and 3 set. And then it will write that to PORTx.DIRCLR. This will result in EVERY BIT CURRENTLY SET BEING CLEARED!!
+Not so DIRCLR - If you do `PORTx.DIRCLR |= (1 << 2) | (1 << 3)`. The compiler will then do a read modify write cycle. It will read the DIRCLR register, the current value of PORTx.DIR. Then that will bitwise OR'ed with the values you passed. It now has a temporary value in a register with each bit that is set in PORTx.DIR as well as bits 2 and 3 set. And then it will write that to PORTx.DIRCLR. This will result in EVERY BIT CURRENTLY SET BEING CLEARED! The same thing happens with tgl registers too - they toggle every pin set 1, clearing them and bam, there you go. 
 
-The behavior of the TGL registers is even stranger: if used with |= they'll turn clear all bits set (by toggling them) and toggle the requested bit. And if you foolishly use ^= with TGL, it will set the specified bit and clear all other set bits.
+None of that behavior is useful. Only use simple assignment with the SET/CLR/TGL registers, or regret it. 
 
-None of that behavior is useful. Only use simple assignment with the SET/CLR/TGL registers.
+### Don't use a bloody pointer or reference to a vport register. 
+* You don't get CBI/SBI speed.
+* It hides the true power of That prevents the whole benefit of vport registers from being seen.
+* There is evidence that an errata impacting all modern AVRs exists under certain highly unlikely write patterns.a common bug to trigger, but it's nasty when triggered. 
+
+
+### PINnCTRL
+PORTx registers all contain PIN0CTRL through PIN7CTRL. this is where you: 
+* set pin mode between normal, totally disabled, and interrupt on change/rising/falling/lowlevel,
+* Enable or disable the pullup
+* Enable features like INVEN and (on DB, DD, and EA) INLVL. (Invert-Enable and Parts that have Input Levels  it can put the thresholds into a non-VDD-dependant logic level mode. 0.8 ot lower is a guaranteed a low and 1.8+ a high. Very useful for interfacing in open drain mode with low voltage devices.  
 
 ### A sidenote: INTFLAGS
-While writing this, I realized that essentially, INTFLAGS is like a `___CLR` register for a hidden register that you can't otherwise interact with.
+While writing this, I realized that essentially, INTFLAGS is like a `___CLR` register for a hidden register that you can't otherwise interact with.I suspect that someone fuzzing these parts would find all sorts of crazy registers scattered through the extended I/O space.
 
 Elsewhere on these parts, aside from the INTFLAGS registers that most peripherals have, and the reset flag register, there are very few registers like this. TCA's have CTRLESET/CTRLECLR (and CTRLFSET/CTRLFCLR) (and no corresponding base register - all access is by reading the SET or CLR registers), and the Dx-series parts have the multi-pin config registers which are similar to but distinct from this type of register.
