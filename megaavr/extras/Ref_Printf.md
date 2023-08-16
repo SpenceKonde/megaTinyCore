@@ -1,13 +1,27 @@
-Unlike the official board packages, but like many third party board packages, megaTinyCore includes the `printf()` method for the printable class (used for UART serial ports and most everything else with `print()` methods); this works like `sprintf()`, except that it outputs to the device in question; for example:
+# printf() method, and "printf() in general" - considerations for correct use
+There are a whole bunch of standard c functions with names that are some variantion on "printf()" (fprintf, sprintf, snprintf, vprintf, etc). If you have desktop C experience, you've likely used them there, and you may have played with it on Arduino too. However, "stuff involving format strings" is also a notorious source of strange bugs in software, including no small number that were exploitable to great impact - and that's on desktop PC's, where the type weirdness doesn't become quite so visible, as you'll see below.
+
+## We have the printf() method
+Unlike the official board packages, but like many third party board packages, megaTinyCore includes the `printf()` method for the Print class. Print is the parent class of Stream, and either Print or Stream is the parent class of - uh - just about every class you see with a print() method, including HardwareSerial and TwoWire.
+
 ```cpp
 Serial.printf("Milliseconds since start: %ld\n", millis());
 ```
-Note that using this method will pull in just as much bloat as `sprintf()` and is subject to the same limitations as printf - by default, floating point values aren't printed. You can use this with all serial ports
-You can choose to have a full `printf()` implementation from a Tools submenu if you want to print floating point numbers, at a cost of some additional flash.
 
-#### **WARNING** `printf()` and Variants Thereof Have Many Pitfalls
-There are a considerable number of ways to screw up with `printf()`. Some of the recent issues that have come up:
-* Formatting specifiers have modifiers that they must be paired with depending on the datatype being printed, for all except one type. See the table of ones that I expect will work below (it was cribbed from [cplusplus.com/reference/cstdio/printf/](https://www.cplusplus.com/reference/cstdio/printf/), and then I chopped off all the rows that aren't applicable, which is most of them). Apparently many people are not fully aware (or at all aware) of how important this is - even when they think they know how to use printf(), and may have done so on previously (on a desktop OS, with 32-bit ints and no reason to use smaller datatypes for simple stuff).
+Pretty straightforward if you know how to use printf() - see the below cplusplus.com link for a decent review of it. I managed to write a printf that didn't crash the sketch and printed what it was supposed to (I don't particularly care for format strings in any language. I find the syntax ugly, obtuse, and that I write a lot more bugs when I try to use them).
+
+## The hazards of printf() and it's gang of ne'er-do-wells
+There a variety of pitfalls when using printf. You *must* be sure to avoid them - they're deep pits too, some with spikes at the bottom. Security vulnerabilities caused by format-string bugs on desktop PCs and servers are one of the most common causes of security vulnerabilities. Most of us are less concerned about security, since our devices are typically not on a public facing network. When they are, hopefully they are behind a firewall.
+
+### First - simple thing: printing to strings (sprintf/snprintf)
+When you use sprintf(), there is no checking of any sort to prevent it from running off the end of the buffer, and causing undefined but almost always catastrophic behavior. snprintf() also allows you to specify the maximum size of the result that it writes to the buffer. Use snprintf() in preference to sprintf(), and make sure you don't specify too large of an n for the buffer.
+
+### Formatting specifiers have modifiers, and you probably need to use them
+Specifically, there is a length modifier that specifies the size of the data being formatted. They must match the actual data passed ***and this is not checked*** reliably, and when it is checked, it is only a warning).
+
+The consequences of forgetting the format specifiers are severe: Not only is the output corrupted, the state of printf() internally is broken, and subsequent calls may also malfunction. It can also corrupt memory and cause undefined behavior through other means.
+
+See the table of ones that I expect will work below (it was cribbed from [cplusplus.com/reference/cstdio/printf/](https://www.cplusplus.com/reference/cstdio/printf/), and then I chopped off all the rows that aren't applicable, which is most of them). Apparently many people are not fully aware (or at all aware) of how important this is - even when they think they know how to use printf(), and may have done so on previously (on a desktop OS, with 32-bit ints and no reason to use smaller datatypes for simple stuff).
 * There are (as of 1.4.0) warnings enabled for format specifiers that don't match the the arguments, but you should not rely on them. Double check what you pass to `printf()` - `printf()` bugs are a common cause of software bugs in the real world. Be aware that *while you can use F() on the format string, there are no warnings for invalid format strings in that case*; a conservative programmer would first make the app work without F() around the format string, and only switch to F() once the format string was known working.
 
 From cplusplus.com:
@@ -24,7 +38,14 @@ The table below comprises the relevant lines from that table - many standard typ
 
 Notice that there is no line for 64 bit types in the table above; these are not supported (support for 64-bit types is pretty spotty, which is not surprising. Variables of that size are hard to work with on an 8-bit microcontroller with just 32 working registers). This applies to all versions of `printf()` - the capability is not supplied by avr-libc.
 
-There are reports of memory corruption with printf, I suspect it is misunderstandign of above that is actually at hand here.
+There are reports of memory corruption with printf suspect it is misunderstandign of above that is actually at hand here.
+
+### General notes about DxC/mTC and printf()'y things.
+* No matter how you come to printing with a format string, it's gonna end up pulling in all the same bloat. Most of the `[1-2 letters]printf()` functions are little more than wrappers around various ways of supplying input to using the output from master algorithm.
+Note that using this method will pull in just as much bloat as `sprintf()` and is subject to the same limitations as printf - by default, floating point values aren't printed. You can use this with all serial ports
+You can choose to have a full `printf()` implementation from a Tools submenu if you want to print floating point numbers, at a cost of some additional flash.
+-lprintf_min
+
 
 #### Selectable `printf()` Implementation
 A Tools submenu lets you choose from three levels of `printf()`: full `printf()` with all features, the default one that drops float support to save 1k of flash, and the minimal one drops almost everything and for another 450 bytes flash saving (will be a big deal on the 16k and 8k parts. Less so on 128k ones). Note that selecting any non-default option here *will cause it to be included in the binary even if it's never called* - and if it's never called, it normally wouldn't be included. So an empty sketch will take more space with minimal `printf()` selected than with the default, while a sketch that uses `printf()` will take less space with minimal `printf()` vs default.
