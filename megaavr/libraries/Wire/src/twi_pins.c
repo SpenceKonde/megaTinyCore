@@ -179,7 +179,7 @@ bool TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin) {
       #endif
 // --- mega0 series ---
     #elif defined(PORTMUX_TWISPIROUTEA)
-        uint8_t twimux = PORTMUX.TWISPIROUTEA & ~PORTMUX_TWI0_gc;
+        uint8_t twimux = PORTMUX.TWISPIROUTEA & ~PORTMUX_TWI0_gm;
         #if defined(PIN_WIRE_SDA_PINSWAP_2)
           if (sda_pin == PIN_WIRE_SDA_PINSWAP_2 && scl_pin == PIN_WIRE_SCL_PINSWAP_2) {
             twimux |= PORTMUX_TWI0_ALT2_gc;
@@ -193,16 +193,15 @@ bool TWI0_Pins(uint8_t sda_pin, uint8_t scl_pin) {
             twimux |= PORTMUX_TWI0_ALT1_gc;
             PORTMUX.TWISPIROUTEA = twimux;
             return true;
-          }
-          /* end can'thappen */x
+          /* end can'thappen */
         #endif
         } else if (sda_pin == PIN_WIRE_SDA && scl_pin == PIN_WIRE_SCL) {
           // Use default configuration
-          twimux &= ~PORTMUX_TWI0_gc;
+          twimux &= ~PORTMUX_TWI0_gm;
           return true;
         } else {
           // Assume default configuration
-          twimux &= ~PORTMUX_TWI0_g;
+          twimux &= ~PORTMUX_TWI0_gm;
           return false;
         }
 // --- Dx series ---
