@@ -35,10 +35,11 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Maintenance: Rebuild all bootloader files.
 * Bugfix: The recently introduced entry condition functionality of Optiboot was busted.
 * Maintenance: Rebuild all bootloader files again.
-* Enhancement (contributed): Merge in support for using XDIR and RS485 (custom optiboot build only).
-* Enhancement: Add a test to the start of twi_pins.h that will allows it to be carried to another modern AVR core that doesn't provide badArg and badCall. Add CORE_HAS_ERRORFUNS #define.
 * Bugfix: Correct issue with missing getAnalogReadResolution function body.
 * Maintenance: Work around CLI regression by specifying cli 0.33.0 for the CI.
+* Enhancement (contributed): Merge in support for using XDIR and RS485 (custom optiboot build only).
+* Enhancement: Add a test to the start of twi_pins.h that will allows it to be carried to another modern AVR core that doesn't provide badArg and badCall. Add CORE_HAS_ERRORFUNS #define.
+* Enhancement: Add `_digitalPinToCanon()` to convert pin numbers to `(port * 8) + bit_position`, will be needed to address recently reported shortcomings of the SPI library surrounding interrupts.
 
 ### 2.6.8
 * CRITICAL bugfix: Fix issues introduced by pwm option menu. This prevented compilation on 1-series or Microchip boards. There were at least *4 separate issues* feeding into this.

@@ -724,6 +724,31 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
   uint8_t _getRTCEventConfig(); //simply returns the RTC channel configuration. Will likely return 255 if called on non Ex
   uint8_t _RTCPrescaleToVal(uint16_t prescale)
 #endif
+  /* The Variant file must do one of the following */
+/* 1. Use the same pin order as this core's default pin mapping (recommended)
+ * 2. Number each pin (port * 8) + bit_position, and define HYPERRATIONAL_PIN_NUMBERS (also recommended)
+ * 3. Number each pin (port * 8) + bit_position + 1, with PA0 wrapping around to the highest number and define RATIONALPLUS_PIN_NUMBERS
+ * 4. Define SPECIAL_PIN_NUMBERS, and use any pin numbering. (recommended if you must use a layout that departs significantly from the above)
+ */
+
+#if defined(HYPERRATIONAL_PIN_NUMBERS) /* Pins numbered starting from PA0, and PB6 and PB7 (14, 15) skipped on 20-pin */
+  #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? (pin) : NOT_A_PIN)
+#elif defined(RATIONALPLUS_PIN_NUMBERS) /* Pins numbered starting from PA1 = 0, so pin + 1 = cannonical pin number */
+  #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? (((pin) == NUM_TOTAL_PINS - 1) ? 0 :((pin) + 1 ))  : NOT_A_PIN)
+#elif defined(SPECIAL_PIN_NUMBERS)
+  #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? ((digital_pin_to_port[pin] << 3) + digital_pin_to_bit_position[pin] ) : NOT_A_PIN)
+#else
+  #if _AVR_PINCOUNT == 8
+    const uint8_t _dptc[] = {6,7,1,2,3,0};
+    #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? (_dptc[(pin)]) : NOT_A_PIN)
+  #elif _AVR_PINCOUNT == 14
+    #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? (((pin) < PIN_PA1) ? ((((pin) > PIN_PA7 && (pin) < PIN_PC0) ? 15 - (pin) : (pin) + 4)) : (((pin) == 11) ? 0 : (pin) - 7)) : NOT_A_PIN)
+  #elif _AVR_PINCOUNT == 20
+    #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? (((pin) < PIN_PA1) ? ((((pin) > PIN_PA7 && (pin) < PIN_PC0) ? 17 - (pin) : (pin) + 4)) : (((pin) == 17) ? 0 : (pin) - 13)) : NOT_A_PIN)
+  #else /* 24 pins */
+    #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? (((pin) < PIN_PA1) ? ((((pin) > PIN_PA7 && (pin) < PIN_PC0) ? 19 - (pin) : (pin) + 4)) : (((pin) == 21) ? 0 : (pin) - 17)) : NOT_A_PIN)
+  #endif
+#endif
 #ifdef __cplusplus
 } // extern "C"
 #endif

@@ -82,6 +82,5 @@
 #if defined(UARTBAUD5V) || defined(UARTBAUD3V)
   #warning "The UARTBAUDxV baud rate correction was removed in 2.3.0 because it had excessive overhead and negligible benefit. The define you specified does nothing."
 #endif
-#endif
 
 #endif
