@@ -143,6 +143,7 @@ inline bool analogReadResolution(uint8_t res) {
   #endif
 }
 
+
 #ifdef DAC0
 void DACReference(uint8_t mode) {
   check_valid_dac_ref(mode);
@@ -312,6 +313,9 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   }
   uint8_t getAnalogReference() {
     return ADC0.CTRLC & ADC_REFSEL_gm;
+  }
+  int8_t getAnalogReadResolution() {
+    return _analog_options & 0x0F;
   }
   int16_t analogRead(uint8_t pin) {
     check_valid_analog_pin(pin);
@@ -688,6 +692,9 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     }
   }
 
+  int8_t getAnalogReadResolution() {
+    return ((ADC0.CTRLA & (ADC_RESSEL_gm)) == ADC_RESSEL_12BIT_gc) ? 12 : 10;
+  }
   int analogRead(uint8_t pin) {
     check_valid_analog_pin(pin);
 

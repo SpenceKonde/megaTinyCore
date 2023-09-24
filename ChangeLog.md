@@ -26,7 +26,9 @@ These items are in addition to what was listed under changes already in release.
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes
 
 
-### Planned 2.6.9 or 2.7.0
+## Released Versions
+
+### 2.6.9
 * Bugfix: optiboot_x.c that has been in use since newyears day 2023 was never committed.
 * Bugfix: Remove boot_opt.h which is not applicable to modern AVRs.
 * Bugfix: Remove the useless dummy app that forced us to use avr-size -A to see the size of the bootloader separated from the app, and switch avr-size -A to normal avr-size to take advantage of this.
@@ -35,8 +37,9 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Maintenance: Rebuild all bootloader files again.
 * Enhancement (contributed): Merge in support for using XDIR and RS485 (custom optiboot build only).
 * Enhancement: Add a test to the start of twi_pins.h that will allows it to be carried to another modern AVR core that doesn't provide badArg and badCall. Add CORE_HAS_ERRORFUNS #define.
+* Bugfix: Correct issue with missing getAnalogReadResolution function body.
+* Maintenance: Work around CLI regression by specifying cli 0.33.0 for the CI.
 
-## Released Versions
 ### 2.6.8
 * CRITICAL bugfix: Fix issues introduced by pwm option menu. This prevented compilation on 1-series or Microchip boards. There were at least *4 separate issues* feeding into this.
 * Enhancement: Add turnOnClockout() and turnOffClockout() to megaTinyCore.h
