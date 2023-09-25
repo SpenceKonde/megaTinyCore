@@ -36,6 +36,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Bugfix: The recently introduced entry condition functionality of Optiboot was busted.
 * Maintenance: Rebuild all bootloader files again.
 * Bugfix: Correct issue with missing getAnalogReadResolution function body.
+* Bugfix: Ensure that the default parameters in boards.txt for 8-pin parts are defined boardwide, rather than for the default option, because people on PIO don't know when new options are added, or that all options are expected to be included. This was done for most - but not all - parts.
+* Enhancement: Improve error messages when third party IDEs like PIO allow people to specify more than one millis timer, which would then fail to compile (#1002).
 * Maintenance: Work around CLI regression by specifying cli 0.33.0 for the CI.
 * Enhancement (contributed): Merge in support for using XDIR and RS485 (custom optiboot build only).
 * Enhancement: Add a test to the start of twi_pins.h that will allows it to be carried to another modern AVR core that doesn't provide badArg and badCall. Add CORE_HAS_ERRORFUNS #define.

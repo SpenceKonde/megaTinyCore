@@ -539,7 +539,6 @@ atxy7.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
 atxy7.menu.PWMmux.SC6_A=PB3-5, PC3, PA4/5, 1-series: PC0/1
 atxy7.menu.PWMmux.SC6=PB3-5, PC3, PA4/5. No TCD PWM even on 1-series.
 atxy7.menu.PWMmux.A_default.build.pwmflags=-DUSE_TIMERD0_PWM
-atxy7.menu.PWMmux.default.build.pwmflags=
 atxy7.menu.PWMmux.A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
 atxy7.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
 atxy7.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
@@ -698,7 +697,7 @@ atxy6.build.bootload=
 atxy6.build.printfabr=
 atxy6.build.attachabr=
 atxy6.build.wireabr=
-atxy6.build.pwmabr=
+atxy6.build.pwmabr=6
 #atxy6.build.optabr=.Os
 
 #----------------------------------------#
@@ -1080,7 +1079,6 @@ atxy6.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
 atxy6.menu.PWMmux.SC6_A=PB3-5, PC3, PA4/5, 1-series: PC0/1
 atxy6.menu.PWMmux.SC6=PB3-5, PC3, PA4/5. No TCD PWM even on 1-series.
 atxy6.menu.PWMmux.A_default.build.pwmflags=-DUSE_TIMERD0_PWM
-atxy6.menu.PWMmux.default.build.pwmflags=
 atxy6.menu.PWMmux.A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
 atxy6.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
 atxy6.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
@@ -1097,7 +1095,6 @@ atxy6.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
 atxy6.menu.PWMmux.SC6_A.build.pwmflags=-DTCA_PORTMUX=0x0F -DUSE_TIMERD0_PWM
 atxy6.menu.PWMmux.SC6.build.pwmflags=-DTCA_PORTMUX=0x0F
 atxy6.menu.PWMmux.A_default.build.pwmabr=6A
-atxy6.menu.PWMmux.default.build.pwmabr=6
 atxy6.menu.PWMmux.A_buffered.build.pwmabr=3A
 atxy6.menu.PWMmux.D_buffered.build.pwmabr=3D
 atxy6.menu.PWMmux.buffered.build.pwmabr=3
@@ -1192,6 +1189,7 @@ atxy4.build.mcu=attiny{build.attiny}
 atxy4.build.f_cpu={build.speed}000000L
 atxy4.build.extra_flags=-DARDUINO_attinyxy4 {build.tuned}
 atxy4.build.export_merged_output=false
+atxy4.build.pwmflags=
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
@@ -1208,8 +1206,6 @@ atxy4.bootloader.resetpinbits=01
 atxy4.bootloader.avrdudestring=
 atxy4.bootloader.serialupdistring=-aerase
 atxy4.bootloader.tool=avrdude
-atxy4o.build.pwmflags=
-atxy4o.build.pwmabr=6
 #----------------------------------------#
 # Exported hex/lst/map names will        #
 # indicate selected options. These       #
@@ -1219,7 +1215,7 @@ atxy4.build.bootload=
 atxy4.build.printfabr=
 atxy4.build.attachabr=
 atxy4.build.wireabr=
-atxy4.build.pwmabr=
+atxy4.build.pwmabr=6
 #atxy4.build.optabr=.Os
 
 #----------------------------------------#
@@ -1591,7 +1587,6 @@ atxy4.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
 atxy4.menu.PWMmux.I6=PB3-5, PA3-5. No TCD PWM even on 1-series.
 atxy4.menu.PWMmux.I3_D=PB3-5 (buffered), 1-series: PA4/5
 atxy4.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
-atxy4.menu.PWMmux.default.build.pwmflags=
 atxy4.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
 atxy4.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy4.menu.PWMmux.I6.build.pwmflags=-DTCA_PORTMUX=0x07
@@ -1711,6 +1706,7 @@ atxy2.build.attachabr=
 atxy2.build.wireabr=
 atxy2.build.pwmabr=4
 #atxy2.build.optabr=.Os
+atxy2.build.pwmflags=-DTCA_PORTMUX=0x01
 
 #----------------------------------------#
 # ALL UPLOADING VIA UPDI                 #
@@ -2022,10 +2018,8 @@ atxy2.menu.printf.minimal.build.printfabr=.pfM
 atxy2.menu.PWMmux.default=PA1-3,7 (default)
 atxy2.menu.PWMmux.buffered=PA1-3 (buffered)
 atxy2.menu.PWMmux.I3=PA1-3, PA6/7 (buffered, 1-series only, flash hog)
-atxy2.menu.PWMmux.default.build.pwmflags=-DTCA_PORTMUX=0x01
 atxy2.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy2.menu.PWMmux.I3.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
-atxy2.menu.PWMmux.default.build.pwmabr=4
 atxy2.menu.PWMmux.buffered.build.pwmabr=3
 atxy2.menu.PWMmux.I3.build.pwmabr=3D
 
@@ -2923,7 +2917,6 @@ atxy7o.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
 atxy7o.menu.PWMmux.SC6_A=PB3-5, PC3, PA4/5, 1-series: PC0/1
 atxy7o.menu.PWMmux.SC6=PB3-5, PC3, PA4/5. No TCD PWM even on 1-series.
 atxy7o.menu.PWMmux.A_default.build.pwmflags=-DUSE_TIMERD0_PWM
-atxy7o.menu.PWMmux.default.build.pwmflags=
 atxy7o.menu.PWMmux.A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
 atxy7o.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
 atxy7o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
@@ -3387,7 +3380,6 @@ atx27o.menu.PWMmux.I6=PB3-5, PA3-5.
 atx27o.menu.PWMmux.IC6=PB3-5, PC3-5.
 atx27o.menu.PWMmux.I3=PB3-5 (buffered).
 atx27o.menu.PWMmux.SC6=PB3-5, PC3, PA4/5.
-atx27o.menu.PWMmux.default.build.pwmflags=
 atx27o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atx27o.menu.PWMmux.U6.build.pwmflags=-DTCA_PORTMUX=0x04
 atx27o.menu.PWMmux.C6.build.pwmflags=-DTCA_PORTMUX=0x38
@@ -3849,7 +3841,6 @@ atxy6o.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
 atxy6o.menu.PWMmux.SC6_A=PB3-5, PC3, PA4/5, 1-series: PC0/1
 atxy6o.menu.PWMmux.SC6=PB3-5, PC3, PA4/5. No TCD PWM even on 1-series.
 atxy6o.menu.PWMmux.A_default.build.pwmflags=-DUSE_TIMERD0_PWM
-atxy6o.menu.PWMmux.default.build.pwmflags=
 atxy6o.menu.PWMmux.3_A_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCA_BUFFERED_3PIN
 atxy6o.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
 atxy6o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
@@ -4291,7 +4282,6 @@ atx26o.menu.PWMmux.U3=PB0,1,5 (buffered).
 atx26o.menu.PWMmux.I6=PB3-5, PA3-5.
 atx26o.menu.PWMmux.I3=PB3-5 (buffered).
 atx26o.menu.PWMmux.SC6=PB3-5, PC3, PA4/5.
-atx26o.menu.PWMmux.default.build.pwmflags=
 atx26o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atx26o.menu.PWMmux.U6.build.pwmflags=-DTCA_PORTMUX=0x04
 atx26o.menu.PWMmux.U3.build.pwmflags=-DTCA_BUFFERED_3PIN
@@ -4743,7 +4733,6 @@ atxy4o.menu.PWMmux.buffered=PB0-2 (buffered). No TCD PWM even on 1-series.
 atxy4o.menu.PWMmux.I6=PB3-5, PA3-5.
 atxy4o.menu.PWMmux.I3_D=PB3-5 (buffered), 1-series: PA4/5
 atxy4o.menu.PWMmux.I3=PB3-5 (buffered). No TCD PWM even on 1-series.
-atxy4o.menu.PWMmux.default.build.pwmflags=
 atxy4o.menu.PWMmux.D_buffered.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
 atxy4o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy4o.menu.PWMmux.I6.build.pwmflags=-DTCA_PORTMUX=0x07
@@ -5153,7 +5142,6 @@ atx24o.menu.PWMmux.default=PB0-2, PA3-5 (default)
 atx24o.menu.PWMmux.buffered=PB0-2 (buffered).
 atx24o.menu.PWMmux.I6=PB3-5, PA3-5.
 atx24o.menu.PWMmux.I3=PB3-5 (buffered).
-atx24o.menu.PWMmux.default.build.pwmflags=
 atx24o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atx24o.menu.PWMmux.I6.build.pwmflags=-DTCA_PORTMUX=0x07
 atx24o.menu.PWMmux.I3.build.pwmflags=-DTCA_PORTMUX=0x07 -DTCA_BUFFERED_3PIN
@@ -5203,7 +5191,7 @@ atxy2o.build.mcu=attiny{build.attiny}
 atxy2o.build.f_cpu={build.speed}000000L
 atxy2o.build.extra_flags=-DARDUINO_attinyxy2 -DUSING_OPTIBOOT {build.tuned}
 atxy2o.build.export_merged_output=true
-atxy2o.build.pwmflags=
+atxy2o.build.pwmflags=-DTCA_PORTMUX=0x01
 
 #----------------------------------------#
 # BOOTLOADING PARAMETERS                 #
@@ -5560,10 +5548,8 @@ atxy2o.menu.wiremode.mands.build.wire=MANDS
 atxy2o.menu.PWMmux.default=PA1-3,7 (default)
 atxy2o.menu.PWMmux.buffered=PA1-3 (buffered)
 atxy2o.menu.PWMmux.I3=PA1-3, PA6/7 (buffered, 1-series only, flash hog)
-atxy2o.menu.PWMmux.default.build.pwmflags=-DTCA_PORTMUX=0x01
 atxy2o.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy2o.menu.PWMmux.I3.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
-atxy2o.menu.PWMmux.default.build.pwmabr=4
 atxy2o.menu.PWMmux.buffered.build.pwmabr=3
 atxy2o.menu.PWMmux.I3.build.pwmabr=3D
 

@@ -739,8 +739,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
   #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? ((digital_pin_to_port[pin] << 3) + digital_pin_to_bit_position[pin] ) : NOT_A_PIN)
 #else
   #if _AVR_PINCOUNT == 8
-    const uint8_t _dptc[] = {6,7,1,2,3,0};
-    #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? (_dptc[(pin)]) : NOT_A_PIN)
+    #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? digital_pin_to_bit_position[pin] : NOT_A_PIN)
   #elif _AVR_PINCOUNT == 14
     #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? (((pin) < PIN_PA1) ? ((((pin) > PIN_PA7 && (pin) < PIN_PC0) ? 15 - (pin) : (pin) + 4)) : (((pin) == 11) ? 0 : (pin) - 7)) : NOT_A_PIN)
   #elif _AVR_PINCOUNT == 20
