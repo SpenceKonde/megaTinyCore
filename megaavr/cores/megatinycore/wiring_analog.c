@@ -693,7 +693,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
   }
 
   int8_t getAnalogReadResolution() {
-    return ((ADC0.CTRLA & (ADC_RESSEL_gm)) == ADC_RESSEL_12BIT_gc) ? 12 : 10;
+    return ((ADC0.CTRLA & (ADC_RESSEL_bm)) == 1) ? 8 : 10;
   }
   int analogRead(uint8_t pin) {
     check_valid_analog_pin(pin);
