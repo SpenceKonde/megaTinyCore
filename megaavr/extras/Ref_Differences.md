@@ -1,7 +1,7 @@
 # Differences between megaTinyCore and stock core
 We generally try to honor the Arduino API. Occasionally that is impractical. In some cases we are just explicitly stating what was true of the Arduino stock cores, but never acknowledged.
 
-## Intended cases where behavior differes from official cores:
+## Intended cases where behavior differs from official cores:
 While we generally make an effort to emulate the official Arduino core, there are a few cases where the decision was made to have different behavior to avoid compromising the overall functionality; the official core is disappointing on many levels. The following is a (hopefully nearly complete) list of these cases.
 
 ### I2C **Requires** External Pullup Resistors

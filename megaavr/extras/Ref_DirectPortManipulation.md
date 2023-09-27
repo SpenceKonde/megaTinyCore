@@ -1,10 +1,47 @@
-, but they also rely on it not being this stupid slow. . That is the only kind of pin interrupt. You get 6 choices of input sense configuration: a. no interrupts, or interrupts on b. 1 The interrupts can only be disabled by disabling the interrupt in PINnCTRL (which will not stop an interrupt from occcurring if you have not cleared th I think you can get into bad places too if you 
+# Direct Port Manipulation
+When using Arduino functions, like digitalWrite and digitalRead, is too slow, there are two ways to get much faster access to I/O pins.
 
-But these parts also have 4 additional "VPORT" registers for each port. These are located in the coveted low I/O space, and offer single cycle bit access.
+The first (and more traditional, but more complicated) method is to directly access the registers that control the pins; that is the option that most of this document is concerned with. Within this way, there are two sets of registers, the full service PORTx registers which get accessed with LDS/STS (if you're just accessing one member of the PORTx struct) or LD/LDD, ST/STD if you're using a pointer to the port, which can set all of the options that are "owned" by that port, So read, and/or with constant, write is either 3, 1, 2 clocks or 2, 1, 1 clocks. The other set of registers are the high performance VPORTx registers. They get 4 1-byte registers per port - the direction, output value, input value, and interrupt flags - but these are located in the most favorable part of memory; they work best when you are writing or testing a single bit, known at compile time, within a VPORT register known at compile time.
 
-VPORTx.DIR
-VPORTx.OUT
+The second - equally performant when an apple-to-apple comparison is possible - method is the digitalWriteFast()/digitalReadFast()/etc functions provided by the core. These functions are detailed in [the digital I/O reference](Ref_Digital.md). This method is recommended when both are viable as code tends to be more readable and less likely to contain bugs. Fast Digital I/O requires the pin to be compile time known and constant, and prefers if the second argument is as well.
 
+Both of these methods compile to the same machine code:
+```c
+digitalWriteFast(PIN_PA4,HIGH); /* 1 clock: sbi 1, 4 */
+
+VPORTA.OUT |= 1 << 4; /* Same as above */
+
+/* Similarly */
+if (digitalReadFast(PIN_PA4) == HIGH) { /* rendered as sbis 2, 4; rjmp afterfunctionbody; typically. Overhead is just 2 clocks plus the function body itself if it runs, 3 otherwise, and 4 bytes of flash. */
+    //...
+}
+
+if (VPORTA.IN & (1 << 4)) { /* Same as above */
+    //...
+}
+```
+
+Each port contains up to 8 pins, numbered 0 through 7 (see the pinout charts). For example, on the ATtiny1616 pin 0 is located on PORTA, bit 4, commonly written as PA4. On the AVR Dx-series parts, the numbering is even simpler than the tinyAVR ones, since the numbering *always* starts from PA0, and no pins are ever out of order (though there are often pins missing in the middle - for example, the 32-pin parts start with PA0-PA7, and end with PF0-PF5 plus the reset pin on PF6 - but they have no `PORTB` or `PORTE`, and only half of a `PORTC`). You can always get the Arduino pin number from the port/pin through the pre-defined constant, for example `PIN_PA4` - not to be confused with `PIN_A4` (which is defined to something else) or `PA4` (which is ALSO defined as something else by the io headers on some parts)
+
+## Why one might need direct port manipulation
+The main reason is that the Arduino API functions, digitalWrite, digitalRead, and pinMode are mindbogglingly slow. On smaller flash devices, the bulk of the full implementations may also motivate use of direct port manipulation.
+
+In most situations, however the same performance enhancement can be achieved with Fast Digital I/O. The times when it cannot be used include:
+* When the port is known only from a pointer or otherwise determined at runtime, you need to use the PORTx registers.
+* When you need to switch multiple pins at once.
+* When writing pin ISRs without attachInterrupt (since you need to clear the intflags before returning from the interrupt - if you only have an interrupt on one pin, that interrupt can blindly write a 1 to that bit of the intflags to clear it).
+* The mass-PINnCTRL-setting feature of the Dx and Ex series has a very similar feel to it.
+
+I have never manually calculated the speed of digitalWrite, but I've benchmarked it, and and it's disgusting. The reason is that the Arduino API functions need to do a lot more that toggle or read the pin. They are given arbitrary pin number, usually at runtime, which they have to look up in a table to find the port, look up in another table to find the bit mask. Then if it's digitalWrite they have to check whether the pin can have any PWM outputs directed to it, and while that's a major feature, and it's not as expensive as it looks the PORTMUX aware PWM does not help the performance of digitalWrite (via turnOffPWM) and analogWrite, which involves checking if it's pin 0-5 on it's port, and if so, whether the port matches the one that TCA0 or TCA1 is pointed at, if not, it looks up in a third table to see if it has a TCD or TCB pointed at it. If it has any timer pointed at it, it needs to determine the appropriate register to write in order to turn that off. Finally, once it's done that, it can finally write the pin. It also has to maintain compatibility with old code that assumes you can digitalWrite(pin,HIGH) when a pin is set INPUT to turn on the pullups, so it also has to get the pin control register, save the status register and disable interrupts, read the pin control register, set or clear that bit, write it back, and restore the status register.
+
+pinMode and digitalRead don't need to clear the PWM, and in the case of pinMode, the pin control and interrupt shuffle, but breaking this down, the steps are something like:
+1. Look up internal representations of the pins.
+2. Turn off PWM, if any.
+3. Get the port struct.
+4. Write the new pin state within it or read current pin state.
+5. Save and restore SREG around the the write the pin control register to configure pullups.
+
+Most of the time, when using these functions, you know that many of these steps are unnecessary - but the compiler doesn't. Just because you've never made a call to analogWrite() doesn't free it from having to check for PWM. It can also take only limited measures to optimize away the looking up of values for constant pins or values. And while you may know that you don't have any interrupts that write to the same port, the code is written to support that. The end result is that the digital I/O functions, which were always slow, are slower still here, and an operation like writing PIN_PA2 to HIGH could take hundreds of clock cycles. On the other hand, a direct port write to achieve the same thing takes... could be done in a single clock cycle.
 
 ## Background for modern AVRs
 When multiple i/o pins should be controlled simultaneously by the microcontroller, or when using Arduino functions, like digitalWrite and digitalRead, are too slow, port manipulation can be used to write directly to the registers.
@@ -22,50 +59,69 @@ You will very often see constant names from the io headers used. Unlike the clas
 
 PORTx.DIR is the register which determines if the pin is an input or an output (like DDRx registers in classic AVR). After reset, all pins are set to input (0 in the register). In order to use the pin as an output the bit in the register must be set to 1, which can be done as follows:
 
-    PORTA.DIR = PIN4_bm
+```
+PORTA.DIR = PIN4_bm
+```
 
 This will set bit 4 on PORTA - if using an ATtiny1616, for example, that would correspond to Arduino pin 0.
 Multiple pins on the same port can be configured by writing each bit, or by setting multiple bitmasks
 
-    PORTA.DIR = 0b01001000;         // sets PA3 and PA6 as an output
-    PORTA.DIR = PIN3_bm | PIN6_bm;  // sets PA3 and PA6 as an output
+```
+PORTA.DIR = 0b01001000;         // sets PA3 and PA6 as an output
+PORTA.DIR = PIN3_bm | PIN6_bm;  // sets PA3 and PA6 as an output
+```
 
 Besides setting the pins to an input (0) or output (1) in the DIR register, you can also use the DIRSET and DIRCLR registers to set (set as output) or clear (set as input) a specific pin:
 
-    PORTA.DIRSET = PIN4_bm; // use PA4 as an output
-    PORTA.DIRCLR = PIN4_bm; // use PA4 as an input
+```
+PORTA.DIRSET = PIN4_bm; // use PA4 as an output
+PORTA.DIRCLR = PIN4_bm; // use PA4 as an input
+```
 
 You can even toggle between an input or output by writing to the DIRTGL register.
 
 Turning the pin on and off is done with the PORTx.OUT register (this works like the PORTx register of classic AVR). Writing a 1 to the corresponding pin will set an output pin HIGH while a 0 will set it LOW:
 
-    PORTA.OUT |=  PIN4_bm; // write PB4 high - Don't do it like this in real life!
-    PORTA.OUT &= ~PIN4_bm; // write PB4 low - Don't do it like this in real life!
+```
+PORTA.OUT |=  PIN4_bm; // write PB4 high - Don't do it like this in real life!
+PORTA.OUT &= ~PIN4_bm; // write PB4 low - Don't do it like this in real life!
+```
 
 Note that the two examples above for flipping a single bit are not atomic - it's a read-modify-write operation, and will take between 4 and 8 clocks and between 3 and 7 words of flash. If an interrupt fires between the read and the write, the change that the ISR made will be reverted - if you have ISRs that are flipping pins (Servo.h does this), lines like those shown above would have to be be performed with interrupts disabled (just like classic AVR). Fortunately, the modern AVR architecture provides a better solution - the OUTSET and OUTCLR registers, just like the DIRSET and DIRCLR registers described above - this is atomic - as well as being faster and smaller
 
-    PORTA.OUTSET = PIN4_bm; // turn PA4 output on - Atomic operation taking 2-3 words, 2-3 clocks
-    PORTA.OUTCLR = PIN4_bm; // turn PA4 output off
+```
+PORTA.OUTSET = PIN4_bm; // turn PA4 output on - Atomic operation taking 2-3 words, 2-3 clocks
+PORTA.OUTCLR = PIN4_bm; // turn PA4 output off
+```
 
 Or when you just want to toggle the output you can use:
 
-    PORTA.OUTTGL = PIN4_bm; // toggle PA4 output
+```
+PORTA.OUTTGL = PIN4_bm; // toggle PA4 output
+```
 
 **WARNING** These registers, when read, return the value of PORTx.OUT or PORTx.DIR! Using the |= and &= operators on them will NOT do what you expect. While the SET version is mostly harmless (just 3 clock cycles slower and 4 bytes larger), `PORTA.DIRCLR |= 1<<3;` will not set PA3 to an input... it will set ALL pins in PORTx to inputs! Depending on the surrounding code and hardware involved, the resultant behavior can be incredibly difficult to debug (See #227 for an example). Don't do that!
 
 You can read the state of a pin by using the IN register (this is like the PINx register of classic AVR):
 
-    bool status = PORTA.IN & PIN5_bm;
+```
+bool status = PORTA.IN & PIN5_bm;
+```
+
 
 Unlike the classic AVRs, setting a pin HIGH with the OUT register while it is set as an input will not turn on the internal pullup. If you want to use the internal pullup resistor, you can set this in the PINnCTRL register as follows:
 
-    PORTA.PIN6CTRL |= PORT_PULLUPEN_bm; // use the internal pullup resistor on PA6
-    PORTA.PIN6CTRL &= ~PORT_PULLUPEN_bm; // don't use the internal pullup resistor on PA6
+```
+PORTA.PIN6CTRL |= PORT_PULLUPEN_bm; // use the internal pullup resistor on PA6
+PORTA.PIN6CTRL &= ~PORT_PULLUPEN_bm; // don't use the internal pullup resistor on PA6
+```
 
 Note that this does mean that each pin has its own PINnCTRL register - unlike the classic AVRs where there was one register to control pullup for each port, with one bit per pin. The rest of the PINnCTRL register configures the "Input Sense Configuration", otherwise known as pin interrupts, as well as providing an way to disable the pin input buffer entirely to save power, and an option to invert the pin (some other parts may have additional advanced features here). Assuming you aren't using those, these are valid.
 
-    PORTA.PIN6CTRL = PORT_PULLUPEN_bm; // use the internal pullup resistor on PA6
-    PORTA.PIN6CTRL = 0; // don't use the internal pullup resistor on PA6
+```
+PORTA.PIN6CTRL = PORT_PULLUPEN_bm; // use the internal pullup resistor on PA6
+PORTA.PIN6CTRL = 0; // don't use the internal pullup resistor on PA6
+```
 
 
 
@@ -76,7 +132,7 @@ On the modern AVR parts the registers are normally accessed as members of a stru
 
 ## VPORTx registers
 
-The normal port registers are at addresses starting at 0x400. This means they are outside the range of the `sbi`, `cbi`, and `out` instructions. This can be an issue when porting code, or when writing assembler for these parts. Fortunately, to address this, each port has 4 VPORT registers - VPORTx.OUT, VPORTx.IN, VPORTx.DIR, and VPORTx.INTFLAGS - these are aliases of the corresponding PORTx registers, and can be used with `sbi`, `cbi`, and `out`. Writing 1 to a bit in VPORTx.IN will toggle the pin state if the pin is an output.
+The normal port registers are at addresses starting at 0x400. This means they are outside the range of the `sbi`, `cbi`, and `out` instructions. This can be an issue when porting code, or when writing assembler for these parts. Fortunately, to address this, each port has 4 VPORT registers - VPORTx.OUT, VPORTx.IN, VPORTx.DIR, and VPORTx.INTFLAGS - these are aliases of the corresponding PORTx registers, and can be used with `sbi`, `cbi`, `in` and `out`. Writing 1 to a bit in VPORTx.IN will toggle the pin state if the pin is an output.
 
 ## |= vs =
 The |= and &= assignment operators (assigning the bitwise OR or bitwise AND of the current value to a register (or variable, but that's not the issue here)) have a very notable significance in the land of AVRs, and behave dramatically differently when used on the 32 registers at address 0 through 0x1F. Used on any other variable or register, they perform a read-modify-write cycle (ie, they are not atomic, if any interrupt modifies the same registers, you need to wrap them in MAKE_ATOMIC or cli/sei (or save SREG, cli, restore SREG if the function doing it might be called with interrupts disabled), and they are slower than simple assignment.
@@ -93,11 +149,11 @@ So, knowing all this, when is it more efficient to use `VPORTx.OUT |= PIN3_bm` a
 
 
 ## Equivalents to classic AVR registers
-Classic AVR |  modern AVR |  VPORT
------------- | ------------- | -------------
-PORTx | PORTx.OUT | VPORTx.OUT
-PINx  | PORTx.IN | VPORTx.IN
-DDRx  | PORTx.DIR | VPORTx.DIR
+Classic AVR  |  modern AVR   |  VPORT
+-------------|---------------|--------------
+       PORTx | PORTx.OUT     | VPORTx.OUT
+       PINx  | PORTx.IN      | VPORTx.IN
+       DDRx  | PORTx.DIR     | VPORTx.DIR
 
 **NOTE** Unlike classic AVRs, setting the bit in PORTx.OUT while pin is set as an INPUT will *NOT* enable the pullups. Only the PORTx.PINnCTRL registers can do that. There is no VPORT register that allows changing pullup status. Writing to PORTx.IN does *NOT* toggle the output of the bit, but writing to VPORTx.IN *DOES*.
 
@@ -191,7 +247,7 @@ It also **only works on the above listed registers** plus the four special `GPIO
 
 On ALL other registers, |= and &= will ALWAYS produce a read-modify-write, and the load will take 2 or 3 clock cycles, and the store 1 or 2.
 
-A more flexible, and consistent method for controlling the port registers can be achieved with the PORTx registers, however, when you have the information to use the VPORT method and it's compile time known, the PORT registers are slower than the VPORT registers (it takes 2 clock cycles, plus 1 or more to prepare the value to write), though unlike most peripheral registers the SET/CLR/TGL registers give you atomic access. 
+A more flexible, and consistent method for controlling the port registers can be achieved with the PORTx registers, however, when you have the information to use the VPORT method and it's compile time known, the PORT registers are slower than the VPORT registers (it takes 2 clock cycles, plus 1 or more to prepare the value to write), though unlike most peripheral registers the SET/CLR/TGL registers give you atomic access.
 
 These registers are:
 ```c
@@ -229,21 +285,22 @@ These are the **most misunderstood registers** on the modern AVR parts, and it i
 
 Using `___SET` in this way does nothing untoward, though it is slower and not atomic.
 
-Not so DIRCLR - If you do `PORTx.DIRCLR |= (1 << 2) | (1 << 3)`. The compiler will then do a read modify write cycle. It will read the DIRCLR register, the current value of PORTx.DIR. Then that will bitwise OR'ed with the values you passed. It now has a temporary value in a register with each bit that is set in PORTx.DIR as well as bits 2 and 3 set. And then it will write that to PORTx.DIRCLR. This will result in EVERY BIT CURRENTLY SET BEING CLEARED! The same thing happens with tgl registers too - they toggle every pin set 1, clearing them and bam, there you go. 
+Not so DIRCLR - If you do `PORTx.DIRCLR |= (1 << 2) | (1 << 3)`. The compiler will then do a read modify write cycle. It will read the DIRCLR register, the current value of PORTx.DIR. Then that will bitwise OR'ed with the values you passed. It now has a temporary value in a register with each bit that is set in PORTx.DIR as well as bits 2 and 3 set. And then it will write that to PORTx.DIRCLR. This will result in EVERY BIT CURRENTLY SET BEING CLEARED! The same thing happens with tgl registers too - they toggle every pin set 1, clearing them and bam, there you go.
 
-None of that behavior is useful. Only use simple assignment with the SET/CLR/TGL registers, or regret it. 
+None of that behavior is useful. Only use simple assignment with the SET/CLR/TGL registers, or regret it.
 
-### Don't use a bloody pointer or reference to a vport register. 
+### Don't use a bloody pointer or reference to a vport register.
 * You don't get CBI/SBI speed.
-* It hides the true power of That prevents the whole benefit of vport registers from being seen.
-* There is evidence that an errata impacting all modern AVRs exists under certain highly unlikely write patterns.a common bug to trigger, but it's nasty when triggered. 
+* If you know you can't get the benefits of VPORT registers (likely, because you don't know which port at compile time and are using a pointer or something), you can do things equally well or better using the PORTx registers.
+* Really, VPORTs should only be used if the port, and preferably the bit, are known at compile time, and you are either using simple assignment, flipping a single bit, or testing a single bit - that is required to get the performance benefit. And that's what makes them better than the PORTx registers - otherwise, they're just PORTx registers with fewer features that can only atomically set or clear one bit at a time.
+* There is evidence that an errata impacting all modern AVRs (and if not, many of them) exists under certain highly unlikely write patterns - and one of the main reasons they are unlikely is that they involve writing to the I/O space through a pointer register (specifically, doing so on the first clock after writing to somewhere else). This bug is ghastly when it manifests - the second write is silently lost - but that is uncommon enough that it took until now to be noticed - it is present on the 412 and the EA, and likely everything between them.
 
 
 ### PINnCTRL
-PORTx registers all contain PIN0CTRL through PIN7CTRL. this is where you: 
+PORTx registers all contain PIN0CTRL through PIN7CTRL. this is where you:
 * set pin mode between normal, totally disabled, and interrupt on change/rising/falling/lowlevel,
 * Enable or disable the pullup
-* Enable features like INVEN and (on DB, DD, and EA) INLVL. (Invert-Enable and Parts that have Input Levels  it can put the thresholds into a non-VDD-dependant logic level mode. 0.8 ot lower is a guaranteed a low and 1.8+ a high. Very useful for interfacing in open drain mode with low voltage devices.  
+* Enable features like INVEN and (on DB, DD, and EA) INLVL. (Invert-Enable, and Input Level for parts that support it. It can put the thresholds into a non-VDD-dependant "TTL" mode. 0.8 or lower is a guaranteed LOW and 1.8+ guaranteed HIGH. Very useful for interfacing in open drain mode with low voltage devices.
 
 ### A sidenote: INTFLAGS
 While writing this, I realized that essentially, INTFLAGS is like a `___CLR` register for a hidden register that you can't otherwise interact with.I suspect that someone fuzzing these parts would find all sorts of crazy registers scattered through the extended I/O space.

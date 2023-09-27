@@ -733,7 +733,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
 
 #if defined(HYPERRATIONAL_PIN_NUMBERS) /* Pins numbered starting from PA0, and PB6 and PB7 (14, 15) skipped on 20-pin */
   #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? (pin) : NOT_A_PIN)
-#elif defined(RATIONALPLUS_PIN_NUMBERS) /* Pins numbered starting from PA1 = 0, so pin + 1 = cannonical pin number */
+#elif defined(RATIONALPLUS_PIN_NUMBERS) /* Pins numbered starting from PA1 = 0, so pin + 1 = canonical pin number */
   #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? (((pin) == NUM_TOTAL_PINS - 1) ? 0 :((pin) + 1 ))  : NOT_A_PIN)
 #elif defined(SPECIAL_PIN_NUMBERS)
   #define _digitalPinToCanon(pin) (((pin) < NUM_TOTAL_PINS) ? ((digital_pin_to_port[pin] << 3) + digital_pin_to_bit_position[pin] ) : NOT_A_PIN)
