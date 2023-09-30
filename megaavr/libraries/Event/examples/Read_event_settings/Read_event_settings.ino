@@ -18,45 +18,45 @@
 |***********************************************************************/
 
 #include <Event.h>
-
+#define MYSERIAL Serial
 // Function to print information about the passed event
 void print_event_info(Event &my_event) {
-  Serial.printf("This is event channel no. %d\n", my_event.get_channel_number());
-  Serial.printf("This channel uses generator no. 0x%02x, which you can find in Event.h\n", my_event.get_generator());
+  MYSERIAL.printf("This is event channel no. %d\n", my_event.get_channel_number());
+  MYSERIAL.printf("This channel uses generator no. 0x%02x, which you can find in Event.h\n", my_event.get_generator());
 }
 
 void print_user_info(user::user_t my_user) {
   // Event::get_user_channel() returns -1 if the user isn't connected to any event generator
-  Serial.printf("User 0x%02x is connected to event channel no. %d\n\n", my_user, Event::get_user_channel(my_user));
+  MYSERIAL.printf("User 0x%02x is connected to event channel no. %d\n\n", my_user, Event::get_user_channel_number(my_user));
 }
 
 void setup() {
-  Serial.begin(115200); // Initialize hardware serial port
+  MYSERIAL.begin(115200); // Initialize hardware serial port
 
-  Event2.set_generator(gen2::pin_pa1); // Set pin PA1 as event generator
-  #if defined(MEGATINYCORE)
-  #if MEGATINYCORE_SERIES == 2
-  Event3.set_generator(gen3::pin_pa6); // Set pin PA6 as event generator
-  #else
-  Event3.set_generator(gen4::pin_pb1); // PB1 as the generator for this channel
-  #endif
+  Event0.set_generator(gen0::pin_pa6); // Set pin PA6 as event generator
+
   // For more information about EVOUT, see the PORTMUX section in the datasheet
-  Event2.set_user(user::evouta_pin_pa2); // Set EVOUTE as event user
-  Event3.set_user(user::evoutb_pin_pb2); // Set EVOUTF as event user
+  Event0.set_user(user::evouta_pin_pa2); // Set EVOUTA as event user
 
   // Start event channels
+  Event0.start();
+  #if !defined(MEGATINYCORE) || _AVR_PINCOUNT > 8
+  // again for the second channel, if we have 
+  Event2.set_generator(gen1::pin_pa4); // Set pin PA4 as event generator
+  Event2.set_user(user::evoutb_pin_pb2); // Set EVOUTB as event user
   Event2.start();
-  Event3.start();
+  #endif
 }
 
 void loop() {
-  // Print info about Event4 and its event user
+  // Print info about Event0 and its event user
+  print_event_info(Event0);
+  print_user_info(user::evoutb_pin_pa2);
+
+  #if !defined(MEGATINYCORE) || MEGATINYCORE_SERIES == 2
+  // Print info about Event2 and its event user
   print_event_info(Event2);
-  print_user_info(user::evouta_pin_pa2);
-
-  // Print info about Event3 and its event user
-  print_event_info(Event3);
   print_user_info(user::evoutb_pin_pb2);
-
+  #endif
   delay(5000);
 }

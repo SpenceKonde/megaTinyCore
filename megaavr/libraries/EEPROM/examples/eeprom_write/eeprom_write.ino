@@ -6,12 +6,18 @@
  */
 
 #include <EEPROM.h>
+#if defined(megaTinyCore)
+  #define ANALOG_PIN PIN_PA7
+#else
+  #define ANALOG_PIN PIN_PD4
+#endif
+
 
 /* the current address in the EEPROM (i.e. which byte we're going to write to next) */
 int addr = 0;
 
 void setup() {
-  // initialize the LED pin as an output - skip if LED_BUILTIN is defined as PIN_PA3 and using external clock source (an invalid configuration in practice!). We test for this to ensure that the sketch will compile successfully and can be used for CI testing
+  // initialize the LED pin as an output - skip if LED_BUILTIN is defined as the CLKIN pin and using external clock source (an invalid configuration in practice!). We test for this to ensure that the sketch will compile successfully and can be used for CI testing
   #if CLOCK_SOURCE != 2 ||  LED_BUILTIN != PIN_PA3
   pinMode(LED_BUILTIN, OUTPUT);
   #endif
@@ -23,7 +29,7 @@ void loop() {
    * value from 0 to 255.
    */
 
-  int val = analogRead(A7) / 4; // Use A7 for example because all supported parts have it: tinyAVR, Dx, and Ex.
+  int val = analogRead(ANALOG_PIN) / 4;
 
   /* Write the value to the appropriate byte of the EEPROM.
     these values will remain there when the board is

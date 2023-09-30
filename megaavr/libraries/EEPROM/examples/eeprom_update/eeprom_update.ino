@@ -11,6 +11,11 @@
  */
 
 #include <EEPROM.h>
+#if defined(megaTinyCore)
+  #define ANALOG_PIN PIN_PA7
+#else
+  #define ANALOG_PIN PIN_PD4
+#endif
 
 /* the current address in the EEPROM (i.e. which byte we're going to write to next) */
 int address = 0;
@@ -25,7 +30,7 @@ void loop() {
    * 0 to 1023 and each byte of the EEPROM can only hold a
    * value from 0 to 255.
    */
-  int val = analogRead(A7) / 4; // Use A7 for example because all supported parts have it: tinyAVR, Dx, and Ex.
+  int val = analogRead(ANALOG_PIN) / 4; // Use A7 for example because all tinyAVRs have it
 
   /*
    * Update the particular EEPROM cell.

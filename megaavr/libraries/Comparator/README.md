@@ -1,6 +1,6 @@
 # Comparator
 A library for interfacing with the analog comparator peripheral in the modern AVR parts - tinyAVR 0/1/2-series, megaAVR 0-series, and the latest iterations, the DA, DB, DD, and EA-series.
-Developed by [MCUdude](https://github.com/MCUdude/) with some porting effort by [Spence Konde](https://github.com/SpenceKonde/). This is the readme distributed with megaTinyCore.
+Developed by [MCUdude](https://github.com/MCUdude/) with some porting effort by [Spence Konde](https://github.com/SpenceKonde/). This is the readme distributed with DxCore.
 
 The tinyAVR 0-series, 2-series, and 1-series parts with less than 16k of flash have a single analog comparator, with either 1 or 2 options each for the positive and negative input pins. The "golden" 1-series parts, those with 16k or 32k flash (and other goodies) instead have three comparators, which have up to 4 options for the positive input, and 2 for the negative. The internal voltage reference can also be used as the negative side; on the 1-series and 2-series parts, that reference can be scaled by an internal 8-bit DAC, and on 0-series and 1-series parts, the reference itself can be used directly. This library provides a wrapper class, `Comparator` that exposes the full functionality of these peripherals without having to manually manipulate registers.
 
@@ -41,14 +41,14 @@ Like the other basic wrappers around modern avr peripherals (logic, ZCD, event),
 ### The POWER and LPMODE options are not supported currently
 On Dx-series parts, each analog comparator can be configured for one of three power profiles. The higher the number, the lower the power consumption and the slower the response. Currently the Comparator library always uses the highest power, fastest response option. This may be changed in a future release if there is call for such a feature.
 
-Early versions of the header specified a fourth value, but this was removed from both the datasheet and the io header before release. It may or may not secretly still be present (my guess would be that it is, just like the 4x PLL multiplier), but there was likely a reason that it was struck from the documentation (likely, that it didn't work, was inaccurate, or didn't save power).
+Early versions of the header specified a fourth value, but this was removed from both the datasheet and the io header before release. It may or may not secretly still be present (my guess would be that it is, just like the 4x PLL multiplier), but there was likely a reason that it was struck from the documentation (likely, that it didn't work, was inaccurate, or didn't save power). It would appear that by the time the DD was released, they'd gotten the issue sorted out, because power profile 3 is present there.
 
 On the tinyAVR and megaAVR parts, there is instead an LPMODE (Low Power Mode) which can be either on or off. Comparator always sets it to 0. An option to configure this may be made available in the future if there is user demand.
 
 ### Window Mode is not supported
 Thus far all modern AVR parts with more than 1 comparator have had a "windowed mode" that can be selected to group 2 comparators into a single "windowed" comparator, where both comparators must use the same positive input, while the negative inputs define the upper and lower bounds of the "window", and interrupts can be generated when the state rises above, or falls below the input, or when it enters or leaves the window.
 
-The Comparator library does not support this odd option. There are no plans to add support for this odd feature. Note also that this is entirely separate from the ADC "window comparator" mode, where a similar effect is achieved with the ADC set in free-running mode.
+The Comparator library does not support this odd option. There are no plans to add support for this feature - it's an awkward amount of synchronization for this library to provide. Note also that this is entirely separate from the ADC "window comparator" mode, where a similar effect is achieved with the ADC set in free-running mode!
 
 ## Properties of the Comparator class
 
@@ -92,7 +92,9 @@ Comparator.input_n = comparator::in_n::vref;  // Connect voltage reference to th
 
 
 ### reference
-On the 0-series and 1-series, this sets the voltage reference that will be used if VREF is selected as the negative input. On 1-series and 2-series, this also sets the voltage that DACREF is derived from. On 1-series parts with multiple comparators, these reference voltages can be set independently (unlike on the Dx-series). On the tinyAVR 1-series, AC0 and the DAC that can be output on PA6 share the same reference. The 0/1-series uses a rather strange set of voltages, while the 2-series uses the same voltages that most modern AVRs do
+On the 0-series and 1-series, this sets the voltage reference that will be used if VREF is selected as the negative input. On non-0-series, this also sets the voltage that DACREF is derived from. 
+
+On 1-series parts with multiple comparators, these reference voltages can be set independently for each comparator. On the Dx and Ex parts, parts with multiple comparators  have to share just one reference voltage.. On the tinyAVR 1-series, AC0 and the DAC that can be output on PA6 share the same reference. The 0/1-series uses a rather strange set of voltages, while the 2-series uses the same voltages that most modern AVRs do.
 
 Accepted values (0/1-series):
 ``` c++
@@ -105,7 +107,7 @@ comparator::ref::vref_4v34;   // 4.34V internal reference
 comparator::ref::vref_2v500;  // 2.5V internal reference (compatibility)
 ```
 
-Accepted values (2-series):
+Accepted values (Everything else):
 ``` c++
 comparator::ref::disable;    // Do not use any reference
 comparator::ref::vref_1v024; // 1.02V internal reference

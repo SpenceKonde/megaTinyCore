@@ -53,7 +53,7 @@
   #else
     #define USE_TIMERB2
   #endif
-  // ah, finally cases that might be relevant to tinyAVR
+
 #elif (defined(TCB1) && defined(SERVO_USE_TIMERB1))
   #if defined(MILLIS_USE_TIMERB1)
     #error "SERVO_USE_TIMERB1 is defined, but so is MILLIS_USE_TIMERB1 - TCB1 can only be used for one of these."
@@ -66,7 +66,7 @@
   #else
     #define USE_TIMERB0
   #endif
-  // No defines try to force a specific timer, use TCB1 if it exists unless it's being used for millis.
+  // No defines try to force using a specific timer, use TCB1 if it exists unless it's being used for millis.
 #elif (defined(TCB1) && !defined(MILLIS_USE_TIMERB1))
   #define USE_TIMERB1
 #elif !defined(MILLIS_USE_TIMERB0)

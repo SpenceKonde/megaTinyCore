@@ -11,7 +11,7 @@
 #endif
 
 void AnalogComparator::attachInterrupt(void (*userFunc)(void), uint8_t mode) {
-  #if !defined(DXCORE)
+  #if defined(__AVR_DD__) || !defined(DXCORE)
   AC_INTMODE_t intmode;
   switch (mode) {
     // Set RISING, FALLING or CHANGE interrupt trigger for the comparator output

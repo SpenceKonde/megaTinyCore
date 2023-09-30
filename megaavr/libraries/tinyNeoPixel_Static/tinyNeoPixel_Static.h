@@ -195,6 +195,9 @@ class tinyNeoPixel {
 
  void
     show(void),
+    #if (PROGMEM_SIZE > 4096UL)
+    show(uint16_t leds),
+    #endif
     setPin(uint8_t p),
     setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b),
     setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t w),

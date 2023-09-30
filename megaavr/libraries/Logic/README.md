@@ -111,11 +111,35 @@ The correct order for for initialization is:
 2. Attach any interrupts if using attachInterrupt. Note that interrupts may also be defined manually - if this is done, you must avoid calling LogicN.attachInterrupt and LogicN.detachInterrupt on any logic block, and write to the appropriate registers to enable them. Interrupts defined this way, particularly if short and simple, will execute much faster. Refer to the datasheet for more information.
 2. call `LogicN.init()` to write those properties to the CCL registers.
 
-The correct procedure for modifying the configuration of one or more logic blocks:
+The correct procedure for modifying the configuration of one or more logic blocks is impacted by a significant erratum on most extant silicon. Currently, only the AVR DD-series is spared.
+
+**When ERRATA_CCL_PROTECTION is undefined, or defined and -1 or a number higher than SYSCFG.REVID:**
 1. Set the properties as required for all logic blocks being changed.
 2. Call `Logic::stop()`.
 3. Call `LogicN.init()` on all logic blocks that have been changed.
 4. Call `Logic::start()` to restart the CCL as a whole.
+
+**When ERRATA_CCL_PROTECTION is defined, and is 0 or a number lower than SYSCFG.REVID** this behavior has been fixed, and you do not need to shut down the CCL entirely
+1. Set the properties as required for logic block being changed.
+2. Call `LogicN.init()` on all that logic block. This will briefly shut down only that particular logic block, just long enough to reconfigure it. Other logic blocks will continue to function.
+3. Repeat if configuring more than one. You may set all the properties of multiple blocks and then call init in succession, or not, as you please.
+
+NOTE: You may wish to follow the first process even on parts without this erratum - if all of your LUTs are interdependent, you probably want them to come back on simultaneously.
+
+You may test for this as shown below:
+```c++
+// assumes you've already set the properties
+if (checkErrata(ERRATA_CCL_PROTECTION)) {
+  Logic::stop(); //All other logic blocks briefly disabled!
+  Logic1.init();
+  Logic2.init();
+  Logic::start(); // all logic blocks re-enabled.
+} else {
+  Logic1.init(); // Only logic block 1 disabled while this runs.
+  Logic2.init(); // Only logic block 2 disabled while this runs.
+}
+```
+
 
 ## Properties
 
@@ -219,13 +243,16 @@ Notes specific to ATtiny 0/1-series:
 * If you need feedback input from an odd-numbered logic block, use the event system for that.
 * Not all pin inputs are available on all parts (see table above). The event system can be used to bring in input from other pins.
 * CCL0's IN0 pin is on PA0, which is nominally the UPDI pin. This may limit the usefulness of CCL0 on the ATtiny parts (though it may work as long as the input cannot be mistaken for a UPDI activation command); configuring UPDI as GPIO prevents further programming via UPDI except via HV programming. One can always use the event system to substitute another input for IN0; This is demonstrated in the three input example.
-* Only the ATtiny1614, 1616, 1617, 3216, and 3217 have TCB1, AC1, and AC2.
-* **Errata warning** Many parts in circulation are impacted by an errata (though not all - some never had it, while the 32k parts have gotten a die rev that fixes it. On effected parts, the link input does not work unless pin output of the other logic block is enabled. Check the applicable errata and datasheet clarification document from Microchip to see if your part is impacted.
-* **Compatibility warning** These were the first AVRs with CCL. They made some decisions that they realized weren't such a good idea after all and changed for parts released more recently. Most importantly, for TCBs and ACs, as well as USARTs, the peripheral number used is the input number. SPI on these parts makes MISO available supposedly. Later parts do not. Later parts also only make USART TXD available - though you can get XCK from the event system.
+* Among tinyAVR 1-series Only the ATtiny1614, 1616, 1617, 3216, and 3217 have TCB1, AC1, and AC2. All tiny 2-series have TCB1, but they never have more than one AC.
+* DA/DB have 3 AC's, EA 2, and the DD, DU and EB have one.
+The two final limits add further chaos to the distributions of numeric values for users and generators - the two seem to have had separate algorithms for determining when to leave holes for absent peripherals, and when to fill them in. They *really* seem to like filling in the holes in the generator lists, leaving me wondering what it is abouut the length of the list with such a high cost...
+
+* **Errata warning** Many parts in circulation are impacted by an errata (though not all - some never had it, while the 32k parts have gotten a die rev that fixes it. On effected parts, the link input does not work unless pin output of the other logic block is enabled. Check the applicable errata and datasheet clarification document from Microchip to see if your part is impacted. Other parts have a 
+* **Compatibility warning** The tinyAVR 0/1's were the first AVRs with CCL. They made some decisions that they realized weren't such a good idea after all and changed for parts released more recently. Most importantly, for TCBs and ACs, as well as USARTs, the peripheral number used is the input number. SPI on these parts makes MISO available supposedly. Later parts do not. Later parts also only make USART TXD available - though you can get XCK from the event system.
 * USART option will use XCK on input 0, TXD on input 1, and is not valid for input 2.
   * MISO is (supposedly) available as an input when SPI is used as the input.
   * Parts with two TCBs or three ACs give them their own channel on 0/1-series. Obviously there wouldn't be enough channels for this if it were done on a Dx with 5 TCBs, and 3 ACs. The other parts that have multiples of these (2-series and Dx) have one channel for this, and the input number selects which one is used, but only the first two can be used.
-* The tinyAVR 0/1-series datasheets refer to the event channels as 0 and 1. On all subsequent parts, they are referred to as A and B. The Logic library always accepts both, though we recommend using event_a/event_b everywhere, as it is clear that that is the convention that Microchip chose to settle on.
+* The tinyAVR 0/1-series datasheets refer to the event channels as 0 and 1. On all subsequent parts, they are referred to as A and B. The Logic library always accepts both, though we recommend using `event_a`/`event_b`everywhere, as it is clear that that is the convention that Microchip chose to settle on.
 
 #### Accepted values for tinyAVR 2-series
 ``` c++
@@ -337,9 +364,9 @@ Accepted values:
 ```c++
 logic::clocksource::clk_per;      // Clock from the peripheral clock (ie, system clock)
 logic::clocksource::in2;          // Clock from the selected input2; it is treated as a 0 in the truth table.
-logic::clocksource::oschf;        // Clock from the **unprescaled** internal HF oscillator. Same as clk_per if system clock not prescaled. tinyAVR 2-series (and Dx-series)
-logic::clocksource::osc32k;       // Clock from the internal 32.768 kHz oscillator - tinyAVR 2-series only (and Dx-series)
-logic::clocksource::osc1k;        // Clock from the internal 32.768 kHz oscillator prescaled by 32 - tinyAVR 2-series only (and Dx-series)
+logic::clocksource::oschf;        // Clock from the **unprescaled** internal HF oscillator. Same as clk_per if system clock not prescaled, unless using external clock or crystal
+logic::clocksource::osc32k;       // Clock from the internal 32.768 kHz oscillator - tinyAVR 2-series and Dx-series only
+logic::clocksource::osc1k;        // Clock from the internal 32.768 kHz oscillator prescaled by 32 - tinyAVR 2-series and Dx-series only
 ```
 
 
@@ -362,14 +389,14 @@ logic::edgedetect::enable;       // Edge detection used
 ```
 
 ### sequencer
-Property controlling the "sequencer" for this pair of logic blocks - these are latches or flip-flops which will remember their state. There is 1 sequencer per 2 logic blocks; each logic block controls one of the two inputs to a flip flop or latch; *this property is ignored for the odd-numbered logic blocks*. Flip-flops are clocked from the same clock source as the even logic block. Latches are asynchronous. **The output of the sequencer will for all purposes replace the output of the even logic block**
+Property controlling the "sequencer" for this pair of logic blocks - these are latches or flip-flops which will remember their state. There is 1 sequencer per 2 logic blocks; each logic block controls one of the two inputs to a flip flop or latch; **this property is ignored for the odd-numbered logic blocks**. Flip-flops are clocked from the same clock source as the even logic block. Latches are asynchronous. **The output of the sequencer will for all purposes, including link, feedback, pin and event outputs, replace the output of the even logic block**
 
 Accepted values:
 ```c++
 logic::sequencer::disable;      // No sequencer connected
 logic::sequencer::d_flip_flop;  // D flip flop sequencer connected
 logic::sequencer::jk_flip_flop; // JK flip flop sequencer connected
-logic::sequencer::d_latch;      // Gated D latch sequencer connected - note that on most tinyAVR 0/1-series parts, this straight up doesn't work. (though recently produced 32k 1-series parts have it fixed). See the relevant errata.
+logic::sequencer::d_latch;      // Gated D latch sequencer connected (broken on many early modern AVRs, see the errata)
 logic::sequencer::rs_latch;     // RS latch sequencer connected
 ```
 
@@ -390,19 +417,19 @@ Below is shown in the 4 left columns an RS latch, and in the right 4, a D latch 
 Hence truth tables are 0xB2 and 0xB8, and both of these leave the odd LUT available. Of course, if you need a logic block to come up with the inputs to set and reset, this is less useful.
 
 #### D Flip-flop
-The D-type fiip-flow outputs a 0 or a 1, and retains it's value unless told otherwise. The inputs consist of G (maybe for gate?) and D (data?) input. As long as G is low, nothing will change, When G is high, each rising edge will latch the value on the D line to the output.
+The D-type fiip-flow outputs a 0 or a 1, and retains it's value unless told otherwise. The inputs consist of G and D input. As long as G is low, nothing will change, When G is high, each rising edge will latch the value on the D line to the output. As I understand, D is derived from "Data" and G from "Gate", in the sense that it opens the gate and allows new data in.
 
 The even LUT drives the D input, and the odd LUT drives the G input.
 
 
 #### JK Flip-flop
-The JK-type fiip-flow outputs a 0 or a 1, and retains it's value unless told otherwise. The inputs consist of J (set) and K (clear). On the rising edge of the clock, if J is high and K is not, the output will be set to 1. If K is high and J is low, the output will be set to 0, and if both are high, it will toggle the output. In all cases, the value will be retained until the next rising edge of the lock occurs while J and K are set to values that instruct it to change.
+The JK-type fiip-flow outputs a 0 or a 1, and retains it's value unless told otherwise. The inputs consist of J (set) and K (clear). On the rising edge of the clock, if J is high and K is not, the output will be set to 1. If K is high and J is low, the output will be set to 0, and if both are high, it will toggle the output. In all cases, the value will be retained until the next rising edge of the lock occurs while J and K are set to values that instruct it to change. The names of the lines are as universal on flipflops are they are nonsensical - J and K? Your guess is as good as mine where they came from
 
 #### D Latch
 This is the unclocked equivalent of D flip-flop - again, there is a D and a G input. However, here, there is no clock. Asynchronously, whenever G is high, the output is set to D, and whenever G is low, the output doesn't change.
 
 #### RS Latch
-This, again, is the unclocked version of the JK flip-flop. This one more sensibly names the inputs S and R for Set and Reset. Because there is no clock, the behavior when both R and R are high is not defined (this behavior is part of deal when you use an RS latch, integrated into a CCL like this or as a discrete component). Otherwise, if the S line is high, it is set to 1, and if the R line is high, it is set to 0
+This, again, is the unclocked version of the JK flip-flop. This one more sensibly names the inputs S and R for Set and Reset. Because there is no clock, the behavior when both R and S are high is not defined (this behavior is part of deal when you use an RS latch, integrated into a CCL like this or as a discrete component). Otherwise, if the S line is high, it is set to 1, and if the R line is high, it is set to 0
 
 | LUT  | D | G | J | K | R | S |
 |------|---|---|---|---|---|---|
@@ -452,7 +479,7 @@ Logic0.truth = 0xF0;
 ## Logic Methods
 
 ### init()
-Method for initializing a logic block; the settings you have previously configured will be applied and pins configured as requested at this time only.
+Method for initializing a logic block; the settings you have previously configured will be applied and pins configured as requested *only* when init() is called. See the section below on reconfiguring.
 
 #### Usage
 ```c++
@@ -481,16 +508,24 @@ Logic::stop(); // Stop CCL
 Method for enabling interrupts for a specific block.
 Valid arguments for the third parameters are `RISING`, `FALLING` and `CHANGE`.
 This method isn't available on tinyAVR 0/1-series as these parts cannot generate an interrupt from the CCL blocks.
-All forms of attachInterrupt, everywhere, are fundamentally evil, because they add a several microsecond overhead to the ISR simply because there is a call to a non-inlinable function;
+
+All forms of attachInterrupt, everywhere, are fundamentally evil, because they add a several microsecond overhead to the ISR simply because there is a call to a non-inlinable function, but the attach method is more familiar to most Arduino users.
 
 #### Usage
 ```c++
-Logic0.attachInterrupt(blinkLED, RISING); // Runthe blinkLED function when the putput goes high
+Logic0.attachInterrupt(blinkLED, RISING); // Runthe blinkLED function when the output goes high
 
 void blinkLED()
 {
   digitalWrite(myLedPin, CHANGE);
 }
+
+void setup() {
+  // other configuration and initialization of Logic0 needed
+  Logic0.attachInterrupt(blinkLED, RISING); // Runthe blinkLED function when the putput goes high
+  // and you'll need to do logic::start when you're ready for it to be enabled.
+}
+
 ```
 
 
@@ -502,39 +537,212 @@ This method isn't available on tinyAVR 0/1-series.
 ```c++
 Logic0.detachInterrupt(); // Disable interrupts for block 0
 ```
+### Advanced interrupts
+New in 1.5.0, it is possible to use interrupts "manually" while still using the Logic library. This results in smaller, faster executing interrupts.
+
+You must declare a function using the ISR macro, like so:
+```c++
+ISR(CCL_CCL_vect) {
+  // It's best if interrupts run quickly and are simple (don't involve accessing scores of variables).
+  // Everyday things like making a function call can dramatically slow an ISR. Ideally, you should not
+  // call any function here that can't be inlined. Functions that are only called once will be inlined,
+  // as will certain "always_inline" functions, which include the digitalWriteFast() and similar.
+  // digitalWrite 1) won't be inlined since it's almost certainly used elsewhere, and 2) is unbelivably slow.
+  // But before we get to that, you may have noticed that CCL_INT_vect doesn't have the number of the LUT in it.
+  // If you've worked with manual pin interrupts you know what that means. There's one interrupt, and if there's
+  // more than one CCL interrupt enabled, you have to read the flags and see which interrupt it is.
+  // Note that any typo or mistake of any sort in the vector name - amazingly - will not be treated as a compile error.
+  // Just a warning. When the interrupt fires the application will uncerimoniously reset.
+  uint8_t flags=CCL.INTFLAGS;
+  // bits 0 - 5 correspond to LUT0 - LUT5, as you could have guessed.
+  // eg, 0bRR543210 - where R is a reserved bit, and the numbers are the number of the LUT corresponding to that bit.
+  // You also need to clear the intflags - that isn't done automatically
+  // If interrupts may fire in very rapid succession the timing of when you clear the flags could matter.
+  // You should always read the flags first thing. Writing them immediately minimizes the possibility
+  // of an repeated interrupt condition being missed because you hadn't cleared the flag yet, but it also increases
+  // the potential for something like switch bounce to land you in the interrupt multiple times, and in extreme
+  // situation, can result in the code being locked in the interrupt, because it will re-trigger immediately after
+  // returning, It's probably smarter to only clear the intflags at the very end. This is done by writing a 1 to each
+  // flag you are clearing, which typically means all the ones you saw were set at the start of the ISR.
+  // DO NOT read the flags a second time - use the value you read earlier. That way if another logic block's interrupt
+  // triggered, it would naturally be triggered as soon as you left this interrupt. The interrupt would run twice, though
+  // all interrupt conditions that occurred would be handled.
+  // Anyway, back to the body of the ISR
+  // Assuming that your LED pin is a constant, this is the preferred way to toggle a pin:
+  digitalWriteFast(myLedPin, CHANGE);
+  // And now we clear the intflags...
+  CCL.INTFLAGS = flags;
+  // If you forget to do this, the interrupt will run continually. After each interrupt returns, a single instruction will be run before the interrupt runs again, generating the appearance of the sketch running very slowly.
+}
+```
+
+Assuming you have a CCL interrupt defined, you can enable it by using the `CCL.INTCTRL0` (LUT0-LUT3) and `CCL.INTCTRL1` (LUT4, LUT5) registers.
+These registers are structured like:
+
+```text
+INTCTRL0:
+0b44332211
+INTCTRL1 (48/64 pin DA/DB only):
+0bRRRR5544
+
+Where R indicates a reserved bit.
+
+The two bits per LUT allow the interrupt to be triggered on
+00 - neither/disable interrupt
+01 - rising
+10 - falling
+11 - rising or falling
+
+```
+
+## Latch-without-sequencer
+The available sequencer options, unfortunately, are capable of only slightly more than what can be done with just the even block alone, using feedback. An example of this (2 on DxCore) shows a different input ordering. The comments in the LatchNoSeq example provide a bit more information. You can do many tasks that would at first blush look like a job for the latches by simply setting one input as feedback, and the other two to your latch inputs.
+
+##### RS-latch w/out sequencer
+Input0 is Set
+Input1 is Reset
+Input2 is Feedback
+
+| 2 | 1 | 0 | Out |
+|---|---|---|-----|
+| 0 | 0 | 0 |  0  |
+| 0 | 0 | 1 |  1  |
+| 0 | 1 | 0 |  0  |
+| 0 | 1 | 1 |  0  |
+| 1 | 0 | 0 |  1  |
+| 1 | 0 | 1 |  1  |
+| 1 | 1 | 0 |  0  |
+| 1 | 1 | 1 |  1  |
+
+Truth = 0b10110010 = 0xB2;
+
+Note that here you have the power to decide what happens in the event that the illegal state where R and S are both high occurs. Here I have it maintain the current state.
+It's also fine to have it go high or low on the "S & R = 1" state, with truthtables of 0b10111010 = 0xBA, or 0b00110010 = 0x32 respectively. But make it toggle, ie, truth table of 0b00111010 = 0x3A and it will instead oscillate extremely rapidly (though it could be slowed down with the synchronizer or filter, that still isn't particularly useful  )
+
+##### D-type latch w/out sequencer
+Input0 is D
+Input1 is G
+Input2 is Feedback
+
+| 2 | 1 | 0 | Out |
+|---|---|---|-----|
+| 0 | 0 | 0 |  0  |
+| 0 | 0 | 1 |  0  |
+| 0 | 1 | 0 |  0  |
+| 0 | 1 | 1 |  1  |
+| 1 | 0 | 0 |  1  |
+| 1 | 0 | 1 |  1  |
+| 1 | 1 | 0 |  0  |
+| 1 | 1 | 1 |  1  |
+
+Hence truth tables are 0xB2 and 0xB8, and both of these leave the odd LUT available. Of course, if you need a logic block to come up with the inputs to set and reset, this is less useful.
+
+
 
 ## Reconfiguring
-There are TWO levels of "enable protection" on the CCL hardware. According to the Silicon Errata, only one of these is intended. As always, it's anyone's guess when or if this issue will be corrected in a future silicon rev, and if so, on which parts (it would appear that Microchip only became aware of the issue after the Dx-series parts were released - although it impacts all presently available parts, it is only listed in errata updated since mid-2020). Users are advised to proceed with use of workarounds, rather than delay work in the hopes of corrected silicon. The intended enable-protection is that a given logic block cannot be reconfigured while enabled. This is handled by `init()` - you can write your new setting to a logic block, call `LogicN.init()` and it will briefly disable the logic block, make the changes, and re-enable it.
+There are TWO levels of "enable protection" on the CCL hardware except on the newest parts . According to the Silicon Errata, only one of these is intended. As always, it's anyone's guess when or if this issue will be corrected in a future silicon rev. That it is likely to be fixed on any part that gets a die rev is not in doubt; when (and indeed whether) they will rev the die to fix all the nasty bugs that they've now corrected in their peripheral designs. (It would appear that Microchip only became aware of the issue after the Dx-series parts were released; it's the kind of thing where you could believe that it was intended if annoying behavior, which is probably why it wasn't noticed sooner (It came at the same time as the "TCA does what the datasheet says on RESTART command" (paraphrased, ofc), another bug like that; both may indeed have been intended at the time, and only later classified as bugs, perhaps by a newly installed product manager or QA czar who thought the original intent was folly (I do suspect that there was a changing of the guard around that time. That and/or an influx of testing manpower and resources. How else do you introduce a new ADC while reducing the number of errata from the previous generation from around 20, several serious, to like 5, of which this is the only one without a workaround); I happen to agree on this count and think it's a big deal (the other feature that got this treatment I agree with as well, but why did they ever let the timers have a port direction override? . Since there is no indication that there are die revs coming out any time soon, users are advised to proceed with use of workarounds, rather than delay work in the hopes of corrected silicon.
 
-The unintended layer is that no logic block can be reconfigured without also disabling the whole CCL system. Changes can be freely made to the `Logic` classes, however, only the `init()` method will apply those changes, and you must call `Logic::stop()` before calling `init()`, and `Logic::start()` afterwards. If/when parts become available where this is not necessary, this step may be omitted, and this library may be amended to provide a way to check.
+The intended enable-protection is that a given logic block cannot be reconfigured while enabled. *This is handled by `init()` - you can write your new setting to a logic block, call `LogicN.init()` and it will briefly disable the logic block, make the changes, and re-enable it.*
 
+The unintended layer is that no logic block can be enabled or disabled (such as to be reconfigured) without also **disabling the whole CCL system** instead of just the one LUT.
+
+Changes can always be freely made to the `Logic` classes - changes aren't written to the hardware until you call `init()`, so that's the only thing the CCL must be disabled for. On parts which are impacted by this (All tinyAVRs, the mega 0s and the DA and DB), you must call `Logic::stop()` before calling `init()`, and `Logic::start()` afterwards. On other parts, and the above listed parts if/when they get a silicon rev, you need not call `Logic::stop()/start()` - init() handles the per-LUT disable/enable correctly.
+
+### Testing if the enable-lock erratum is present
+At present, there is never a need to test this, because you know from the part family whether or not it has this erratum - nothing that shipped with this broken has gotten a die rev that fixed it, so it impacts all tinyAVR, mega0, DA, and DB. However DxCore provides #defines for all Arduino-relevant errata, and this errata can be tested like this; note that **this is not a macro and cannot be made a macro. The die rev is not compile time known!** How could it be? The compiler doesn't know what you're going to do with the hex file.
+```c
+if (checkErrata(ERRATA_CCL_PROTECTION)) { /*true if errata presnt */
+  Logic::stop();
+  Logic1.init();
+  Logic::start();
+} else { // No erratum, hence no problem
+  Logic1.init();
+}
+```
 ### Example
 ```c++
 
 // Imagine there's some code above this that configured and enabled Logic0.
 
 Logic1.truth=0x55;      // new truth table
-Logic1.input2=tca0;     // and different input 2
+Logic1.input2=logic::in::tca0;     // and different input 2
 Logic3.enabled=true;    // enable another LUT
-Logic3.input0=in::link; // Use link from LUT0
-Logic3.input1=in::ac;   // and the analog comparator
-Logic3.input2=in::pin;  // and the LUT3 IN2 pin
+Logic3.input0=logic::in::link; // Use link from LUT0
+Logic3.input1=logic::in::ac;   // and the analog comparator
+Logic3.input2=logic::in::pin;  // and the LUT3 IN2 pin
 Logic3.truth=0x79;      // truth table for LUT3
 
 Logic3.attachInterrupt(RISING,interruptFunction);
 
 // Interrupt now attached - but - Logic3 not enabled, and logic1 is using old settings
 
+// If we don't care that Logic0 will be briefly delayed, the cautious approach is fully portable.
 Logic::stop();  // have to turn off Logic0 too, even though I might not want to
 Logic1.init();  // apply changes to logic block 1
 Logic3.init();  // apply settings to logic block 3 for the first time
 Logic::start(); // re-enable
+```
 
+Or, to "do the best it can" with the hardware, but use the more compact implementations without the runtime test if it's using parts the either always or never will have the bug:
+```c++
 
+// Imagine there's some code above this that configured and enabled Logic0.
+/* So the past is approximately:
+ * ConfigureLogic0();
+ * ConfigureLogic1();
+ * Logic0.init();
+ * Logic1.init();
+ * Logic::start();
+ * And now you want to enable Logic3 and change Logic1 settings, if possible without disturbing Logic0.
+ */
+
+void someFunction() {
+  Logic1.truth=0x55;      // new truth table
+  Logic1.input2=logic::in::tca0;     // and different input 2
+  Logic3.enabled=true;    // enable another LUT
+  Logic3.input0=logic::in::link; // Use link from LUT0
+  Logic3.input1=logic::in::ac;   // and the analog comparator
+  Logic3.input2=logic::in::pin;  // and the LUT3 IN2 pin
+  Logic3.truth=0x79;      // truth table for LUT3
+
+  Logic3.attachInterrupt(RISING,interruptFunction);
+
+  // Interrupt now attached - but - Logic3 not enabled, and logic1 is using old settings
+
+  applyCCLChanges();
+  // you'll probably want to call this more than once - maybe with an argumnent that specifies which blocks to reinit,
+  // depending on your application, other logic might be able to be aggregated there to save flash.
+
+void applyCCLChanges() {
+  // Adjust to suit the logic blocks you need
+  // As noted at the start we wanted to avoid disturbing the Logic0 channel if possible, so we want to avoid the stop-start.
+  #if defined(ERRATA_CCL_PROTECTION) && ERRATA_CCL_PROTECTION == 1
+    /* Some parts have not received a die rev and hence all extant specimens exhibit this erratum */
+    Logic::stop();  // have to turn off Logic0 too, even though I might not want to
+    Logic1.init();  // apply changes to logic block 1
+    Logic3.init();  // apply settings to logic block 3 for the first time
+    Logic::start(); // re-enable
+  #elif defined(ERRATA_CCL_PROTECTION) && ERRATA_CCL_PROTECTION == 0
+    /* No version of the part has ever had this erratum, so there is no chance of encountering it */
+    Logic1.init();  // apply changes to logic block 1
+    Logic3.init();  // apply settings to logic block 3 for the first time
+  #else
+    /* Awesome! We got a die rev finally. Wait, crap, now I have to support both? */
+    if checkErrata(ERRATA_CCL_PROTECTION) {
+      Logic::stop();  // have to turn off Logic0 too, even though I might not want to
+      Logic1.init();  // apply changes to logic block 1
+      Logic3.init();  // apply settings to logic block 3 for the first time
+      Logic::start(); // re-enable
+    } else {
+      Logic1.init();  // apply changes to logic block 1
+      Logic3.init();
+    }
+  #endif
+}
 ```
 
 ## Think outside the box
-To consider the CCL system as simply a built-in multifunction gate IC is to greatly undersell it. The true power of the CCL is in it's ability to use events directly, and to take inputs from almost everything. Even doing neat stuff like the above 0xD4 truth table on an even-numbered logic block with input 2 set to feedback to make an R/S latch without using the second logic block is only scratching the surface of what these can do! Taking that a step farther... you could then use the odd-numbered logic block with that same feedback to, say, switch between two waveforms being output by one of the PWM timers... see the [Tricks and Tips page](Tricks_and_Tips.md)
+To consider the CCL system as simply a built-in multifunction gate IC is to greatly undersell it. The true power of the CCL is in it's ability to use events directly, and to take inputs from almost everything. Even doing neat stuff like the above mentioned "latch with no sequencer" is only scratching the surface of what these can do! Taking that a step farther... you could then use the odd-numbered logic block with that same feedback to, say, switch between two waveforms being output by one of the PWM timers, depending on what the latch is set to. See the [Tricks and Tips page](Tricks_and_Tips.md)
 
 ## Note on terminology
 Yes, technically, C++ doesn't have "properties" or "methods" - these are "member variables" and "member functions" in C++ parlance. They mean the same thing. I've chosen to use the more familiar, preseent day terminology.

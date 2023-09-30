@@ -75,6 +75,7 @@ namespace logic {
       tca1            = 0x0B,
       tcb             = 0x0C,
       tcd             = 0x0D,
+      tcd0            = 0x0D,
       input_pullup    = 0x15,
       input           = 0x25,
       input_no_pullup = 0x25,
@@ -104,6 +105,7 @@ namespace logic {
       tca             = 0x0A,
       tcb             = 0x0C,
       tcd             = 0x0D,
+      tcd0            = 0x0D,
       input_pullup    = 0x15,
       input           = 0x25,
       input_no_pullup = 0x25,
@@ -134,7 +136,29 @@ namespace logic {
       input_pullup    = 0x15,
       input           = 0x25,
       input_no_pullup = 0x25,
-
+      #elif defined(__AVR_AVR8EB28__)   || defined(__AVR_AVR8EB32__)   ||  \
+      defined(__AVR_AVR16EB32__)  || defined(__AVR_AVR32EA32__)  ||  \
+      defined(__AVR_AVR16EB20__)  || defined(__AVR_AVR16EB32__)  ||  \
+      defined(__AVR_AVR16EB28__)  || defined(__AVR_AVR16EB32__)  ||  \
+      defined(__AVR_AVR32EB20__)  || defined(__AVR_AVR32EB14__)  ||  \
+      defined(__AVR_AVR32EB28__)  || defined(__AVR_AVR32EA32__)
+      masked          = 0x00,
+      unused          = 0x00,
+      disable         = 0x00,
+      feedback        = 0x01,
+      link            = 0x02,
+      event_0         = 0x03,
+      event_a         = 0x03,
+      event_1         = 0x04,
+      event_b         = 0x04,
+      pin             = 0x05,
+      ac              = 0x06,
+      usart           = 0x08,
+      spi             = 0x09,
+      tcb             = 0x0C,
+      input_pullup    = 0x15,
+      input           = 0x25,
+      input_no_pullup = 0x25,
       #else //tinyAVR 0/1-series
       masked          = 0x00,
       unused          = 0x00,
@@ -153,6 +177,7 @@ namespace logic {
       tca             = 0x08,
       tca0            = 0x08,
       tcd0            = 0x09,
+      tcd             = 0x09,
       usart           = 0x0A,
       usart0          = 0x0A,
       spi             = 0x0B,

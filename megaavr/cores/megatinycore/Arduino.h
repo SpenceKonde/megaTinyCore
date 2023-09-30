@@ -6,17 +6,17 @@
  * ATtiny 0/1/2-series microcontrollers from Microchip.
  * megaTinyCore is free software (LGPL 2.1)
  * See LICENSE.txt for full legal boilerplate if you must */
+
 /*************************************************************
  * This file contains the stuff I think people are most likely
  * to need to refer to. The minutia has all been pushed into
  * core_devices.h if it's independent of pins_arduino.h or into
  * pinswap.h if it relates to PORTMUX, which is a great volume
- * of stuff nobody should have to read.=
- */
- /*
+ * of stuff nobody should have to read.
+ *
  * That means functions and macros that may be used by user code
- * (except for part-feature ones - those are clearly documented
- * in the readme if they are ready for users).
+ * (except for some part info macros, which are described in
+ * Ref_Defines.md in the documentation.
  * I also try to put detailed comments in where appropriate.
  *************************************************************/
 
@@ -45,9 +45,15 @@
  * analogWrite() on a constant pin that will never support PWM, or digitalWrite() on
  * a pin number that is neither a pin nor NOT_A_PIN (which silently does nothing for
  * compatibility).
+ *
  * badCall() on the other hand is called if we know that regardless of what arguments
  * are passed, that function is nonsensical with current settings, for example, millis()
- * when millis timekeeping has been disabled */
+ * when millis timekeeping has been disabled.
+ * Closely related in check_constant_pin, which calls badArg to stop compilation if
+ * the pin number it was passed isn't a foldably constant value known at compile time,
+ * which is used by the fast digital I/O functions and other things that require than
+ * you pass them a *constant* pin.
+ */
 
 #if !defined(LTODISABLED)
   void badArg(const char*)    __attribute__((error("")));

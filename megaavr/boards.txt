@@ -216,7 +216,6 @@ atxy7.menu.chip.817.build.board=AVR_ATtiny817
 atxy7.menu.chip.817.build.attiny=817
 atxy7.menu.chip.817.upload.maximum_size=8192
 atxy7.menu.chip.817.build.mrelax=
-atxy7.menu.chip.817.build.mrelax=
 atxy7.menu.chip.817.upload.maximum_data_size=512
 atxy7.menu.chip.817.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
 atxy7.menu.chip.817.bootloader.TCD0CFG_serialupdi=4:0x00

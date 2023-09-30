@@ -7,24 +7,29 @@
 | Developed in 2019-2022 by MCUdude                                     |
 | https://github.com/MCUdude/                                           |
 |                                                                       |
-| Ported to tinyAVR 2020-2021 by Spence Konde.                          |
+| Ported 2021-2022 to DxCore, megaTinyCore by Spence Konde.             |                                                                      |
 |                                                                       |
 | In this example we use the negative and positive input 0 of the       |
 | comparator. The output goes high if the positive input is higher than |
 | the negative input, and low otherwise.                                |
+| This is much like tranplanting an 'lm339" only with better specs into |
+| your AVR. Pin used are:                                               |
+|       | Dx/Ex/Mega0 | TinyAVR  |  DD14      |                         |
+| In_p  | PD2         |      PA7 | AINP3 PB                     |
+| in_N  | PD3         |      PA6 |            |                         |
+| Out   | PA7         |      PA5 | Todo: evsys|           |             |
+|                                                                       |
+|Note that the evetn library can by used to redirect the outputt        |
 |
-| In effect this turns the three pins into the inputs and outputs of a  |
-| LM339-like chip, except that these are rail to rail
 |***********************************************************************/
 
 #include <Comparator.h>
 
 void setup() {
   // Configure relevant comparator parameters
-  Comparator.input_p = comparator::in_p::in0;      // Use positive input 0 (PA7)
-  Comparator.input_n = comparator::in_n::in0;      // Use negative input 0 (PA6)
-  Comparator.output = comparator::out::enable;     // Enable output on PIN_PA5 (digital pin 1)
-  //                                   // or PIN_PA3 (digital pin 4) on ATtiny402/202)
+  Comparator.input_p = comparator::in_p::in0;      // Use positive input 0 (PD2/PA7)
+  Comparator.input_n = comparator::in_n::in0;      // Use negative input 0 (PD3/PA6)
+  Comparator.output = comparator::out::enable;     // Enable output - (PA7/PA5)
 
   // Initialize comparator
   Comparator.init();

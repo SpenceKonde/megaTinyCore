@@ -2,8 +2,10 @@
 | Modern AVR Comparator library for tinyAVR 0/1/2, megaAVR0, Dx, and  Ex|
 |                                                                       |
 | Developed in 2019 by MCUdude    https://github.com/MCUdude/           |
-| Ported to tinyAVR & Dx-series by Spence Konde for megaTinyCore and    |
-| DxCore 2021-2022: https://github.com/SpenceKonde/                     |
+| Ported to tinyAVR 2021 by Spence Konde for megaTinyCore               |
+| https://github.com/SpenceKonde/megaTinyCore                           |
+| Ported to tinyAVR 2022 by Spence Konde for DxCore                     |
+| https://github.com/SpenceKonde/DxCore                                 |
 |                                                                       |
 | In this example we use an internal reference voltage instead of an    |
 | external one on the negative pin. This makes it possible to give a    |
@@ -49,7 +51,7 @@ void setup() {
 
   // Configure relevant comparator parameters
   Comparator.input_p = comparator::in_p::in0;       // Use positive input 0 (PA7)
-  #if MEGATINYCORE_SERIES == 0
+  #if (defined(MEGATINYCORE) && MEGATINYCORE_SERIES == 0)
   Comparator.input_n = comparator::in_n::vref;      // 0-series has no DACREF, so use vref directly.
   #else
   Comparator.input_n = comparator::in_n::dacref;    // Connect the negative pin to the DACREF voltage

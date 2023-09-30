@@ -16,7 +16,7 @@
 // Features present on all generator channels
 
 namespace event {
-#if !(defined(MEGATINYCORE) || defined(PORT_EVGEN0SEL)) //if neither tiny nor EA or beyond, here's the list
+#if !defined(MEGATINYCORE) && !defined(PORT_EVGEN0SEL_gm) //if neither tiny nor EA or beyond, here's the list
   namespace gen {
     enum generator_t : uint8_t {
       disable       = 0x00,
@@ -663,54 +663,54 @@ namespace event {
       ccl2_event_b   = 0x05,
       ccl3_event_a   = 0x06,
       ccl3_event_b   = 0x07,
-      adc0_start     = 0x0C,
+      adc0_start     = 0x08,
 #if defined(PIN_PA2) // not on 14-pin ones.
-      evouta_pin_pa2 = 0x0D,
+      evouta_pin_pa2 = 0x09,
 #endif
-      evoutc_pin_pc2 = 0x0F,
+      evoutc_pin_pc2 = 0x0A,
 #if defined(PIN_PD2) // only on 28 or 32 pin ones.
-      evoutd_pin_pd2 = 0x10,
+      evoutd_pin_pd2 = 0x0B,
 #endif
 #if defined(PIN_PF2) // only on 32-pin ones.
-      evoutf_pin_pf2 = 0x12,
+      evoutf_pin_pf2 = 0x0C,
 #endif
-      usart0_irda    = 0x14,
-      usart1_irda    = 0x15,
-      tca0           = 0x1A,
-      tca0_cnt_a     = 0x1A,
-      tca0_cnt_b     = 0x1B,
-      tcb0           = 0x1E,
-      tcb0_capt      = 0x1E,
-      tcb0_cnt       = 0x1F,
-      tcb1           = 0x20,
-      tcb1_capt      = 0x20,
-      tcb1_cnt       = 0x21,
+      usart0_irda    = 0x0D,
+      usart1_irda    = 0x0E,
+      tca0           = 0x0F,
+      tca0_cnt_a     = 0x0F,
+      tca0_cnt_b     = 0x10,
+      tcb0           = 0x11,
+      tcb0_capt      = 0x11,
+      tcb0_cnt       = 0x12,
+      tcb1           = 0x13,
+      tcb1_capt      = 0x13,
+      tcb1_cnt       = 0x14,
 #if defined(TCB2)
-      tcb2           = 0x22,
-      tcb2_capt      = 0x22,
-      tcb2_cnt       = 0x23,
+      tcb2           = 0x15,
+      tcb2_capt      = 0x15,
+      tcb2_cnt       = 0x16,
 #endif
-      tcd0_in_a      = 0x28,
-      tcd0_in_b      = 0x29,
+      tcd0_in_a      = 0x17,
+      tcd0_in_b      = 0x18,
 #if defined(PIN_PA7) // not on 14-pin ones.
-      evouta_pin_pa7 = 0x8D,
+      evouta_pin_pa7 = 0x89,
 #endif
-      evoutd_pin_pd7 = 0x90,
-#if defined(PIN_PF7) // only on 32-pin ones.
-      evoutf_pin_pf7 = 0x92,
+      evoutd_pin_pd7 = 0x8B,
+#if defined(PIN_PF7)
+      evoutf_pin_pf7 = 0x8C,
 #endif
 #endif
     };
   };
-  // END NON-TINY ENUMS //
-  #elif defined(PORT_EV0GENSEL_gm)
+  // End of Dx series - start of Ex-series //
+  #elif defined(PORT_EVGEN0SEL_gm) // Start EVGEN block
     // Parts with uniform event channels, eg, the future EA-series parts. We may be able to use this code for every Ex-series part, or will need only trivial changes.
     namespace gen {
       enum generator_t : uint8_t {
       disable           = 0x00,
       off               = 0x00,
       updi_synch        = 0x01,
-#ifdef(MVIO)
+#if defined(MVIO)
         mvio_ok         = 0x05,
 #endif
       rtc_ovf           = 0x06,
@@ -721,27 +721,27 @@ namespace event {
       ccl1_out          = 0x11,
       ccl2_out          = 0x12,
       ccl3_out          = 0x13,
-#ifdef (CCL_LUT4CTRLA) // I fully expect a 6-LUT, 64 pin Ex-series part
+#if defined(CCL_LUT4CTRLA) // I fully expect a 6-LUT, 64 pin Ex-series part
       ccl4_out          = 0x14,
       ccl5_out          = 0x15,
 #endif
-#ifdef (CCL_LUT6CTRLA) // Any ATmega2560 replacement would probably have at least 8 LUTs
+#if defined(CCL_LUT6CTRLA) // Any ATmega2560 replacement would probably have at least 8 LUTs
       ccl6_out          = 0x16,
       ccl7_out          = 0x17,
 #endif
-#ifdef (CCL_LUT8CTRLA) // Maybe even more
+#if defined(CCL_LUT8CTRLA) // Maybe even more
       ccl8_out          = 0x18,
       ccl9_out          = 0x19,
 #endif
-#ifdef (CCL_LUT10CTRLA)
+#if defined(CCL_LUT10CTRLA)
       ccl10_out         = 0x1A,
       ccl11_out         = 0x1B,
 #endif
-#ifdef (CCL_LUT12CTRLA)
+#if defined(CCL_LUT12CTRLA)
       ccl2_out          = 0x1C,
       cc13_out          = 0x1D,
 #endif
-#ifdef (CCL_LUT14CTRLA)
+#if defined(CCL_LUT14CTRLA)
       ccl14_out         = 0x1E,
       ccl15_out         = 0x1F,
       // Hey, I can dream can't I? Can you imagine what you could do with 4 TCA's 16 event channels, 16 LUTs and a 3-phase TCD?
@@ -753,10 +753,10 @@ namespace event {
       ac1_out           = 0x21,
 #endif
 #if defined(ac2) // An Ex with three AC would not surprise me
-      ac2_out           = 0x22,
+        ac2_out           = 0x21,
 #endif
 #if defined(ac3) // An Ex with fourAC would not surprise me
-      ac3_out           = 0x23,
+        ac3_out           = 0x21,
 #endif
       adc0_ready        = 0x24,
       adc0_sample       = 0x25,
@@ -765,7 +765,7 @@ namespace event {
       zcd1_out          = 0x32,
 #endif
 #if defined(ZCD1)
-      zcd1_out          = 0x33,
+        zcd1_out          = 0x32,
 #endif
 #if defined(ZCD2)
       zcd2_out          = 0x32,
@@ -804,26 +804,24 @@ namespace event {
                     // Becayse the uniform EVSYS channels introduced with the EA leave plenty of holes, it's likely that that part would have it's channels nubered similarly,
                     // with it's extra ports
       porth_evgen0      = 0x4E,
-      porth_evgen1      = 0x4E,
+        porth_evgen1      = 0x4F,
 #endif
-#if defined(PORTI)  // not clear how the remaining ports would be handled, but that's probably what the 0x5_ range is earmarked for.
-      porth_evgen0      = 0x50,
-      porth_evgen1      = 0x51,
-#endif
-#if defined(PORTJ)
-      porti_evgen0      = 0x52,
-      porti_evgen1      = 0x53,
+#if defined(PORTJ)  // not clear how the remaining ports would be handled, but that's probably what the 0x5_ range is earmarked for.
+        portj_evgen0      = 0x50,
+        portj_evgen1      = 0x51,
 #endif
 #if defined(PORTK)
-      portk_evgen0      = 0x54,
-      portk_evgen1      = 0x55,
+        portk_evgen0      = 0x52,
+        portk_evgen1      = 0x53,
 #endif
-#if defined(PORTL)  // or ar least up to 0x08. I havent'y seen anything beyond PORTL on an AVR.
-      portl_evgen0      = 0x56,
-      portl_evgen1      = 0x57,
+#if defined(PORTL)
+        portl_evgen0      = 0x54,
+        portl_evgen1      = 0x55,
 #endif
       usart0_xck        = 0x60,
+#if defined(USART1)
       usart1_xck        = 0x61,
+#endif
 #if defined(USART2)
       usart2_xck        = 0x62,
 #endif
@@ -839,23 +837,28 @@ namespace event {
 #if defined(USART6)
       usart6_xck        = 0x66,
 #endif
-#if defined(USART7) // The highest number of USARTs that naturally fit this numbering coincides with somewhere around what we'd expect on a 100 pin part.
-      usart7_xck        = 0x67, //which would have... maybe 86 I/O pins if we allow for ample power and ground pins., meaning 4 new ports, adding at most 32 new pins.
-                                // If they were willing to go as far as extending the architecture, there is still room enough for just over 1500 instructions. 512 of them could - with compiler support - provide 4 more first class ports!
+#if defined(USART7) // The highest number of USARTs that naturally fit this numbering coincides with the maximum plausible number on a 100 pin chip
+        usart7_xck        = 0x67,
 #endif
       spi0_sck          = 0x68,
 #if defined(SPI1)   // I fully expect to see Ex-series parts with more SPI ports and higher pincounts.
       spi1_sck          = 0x69,
 #endif
-#if defined(TCA1)
+#if defined(TCA0)
       tca0_ovf_lunf     = 0x80,
       tca0_hunf         = 0x81,
       tca0_cmp0         = 0x84,
       tca0_cmp1         = 0x85,
       tca0_cmp2         = 0x86,
 #endif
-#if defined(TCA1)  // EA-series parts have 2 TCA's, but if they go to very low pincounts with an "ED-series" which will probably not be called that
-                   // these would probably lose the second timer.
+#if defined(TCE0)
+        tce0_ovf          = 0x80,  /* Timer/Counter E0 overflow */
+        tce0_cmp0         = 0x84,  /* Timer/Counter E0 compare 0 */
+        tce0_cmp1         = 0x85,  /* Timer/Counter E0 compare 1 */
+        tce0_cmp2         = 0x86,  /* Timer/Counter E0 compare 2 */
+        tce0_cmp3         = 0x87,  /* Timer/Counter E0 compare 3 */
+#endif
+#if defined(TCA1)  // I fully expect to see Ex-series parts with only 1 TCA, in low pincounts.
       tca1_ovf_lunf     = 0x88,
       tca1_hunf         = 0x89,
       tca1_cmp0         = 0x8C,
@@ -904,8 +907,16 @@ namespace event {
       tcd0_cmpbset      = 0xB2,
       tcd0_progev       = 0xB3,
 #endif
+// Saving room for TCD1?
+#if defined(TCF0)
+        tcf0_ovf          = 0xB8,  /* Timer/Counter F0 Overflow */
+        tcf0_cmp0         = 0xB9,  /* Timer/Counter F0 compare 0 */
+        tcf0_cmp1         = 0xBA  /* Timer/Counter F0 compare 1 */
+#endif
     };
   };
+  /* Done with plausible generators */
+
   #if defined(__AVR_EA__) //these are specific to the family,
   namespace user{
     enum user_t : uint8_t {
@@ -927,31 +938,47 @@ namespace event {
 #if defined(PIN_PE2)
       evoute_pin_pe2 = 0x0D,
 #endif
+#if defined(PIN_PF2)
       evoutf_pin_pf2 = 0x0E,
+#endif
       usart0_irda    = 0x0F,
+#if defined(USART2)
       usart1_irda    = 0x10,
+#endif
+#if defined(USART2)
       usart2_irda    = 0x11,
-      tca0           = 0x11,
-      tca0_cnt_a     = 0x11,
+#endif
+#if defined(TCA0)
+        tca0              = 0x12,
+        tca0_cnt_a        = 0x12,
       tca0_cnt_b     = 0x13,
+#endif
+#if defined(TCA1)
       tca1           = 0x14,
       tca1_cnt_a     = 0x14,
       tca1_cnt_b     = 0x15,
+#endif
+#if defined(TCB0)
       tcb0           = 0x16,
       tcb0_capt      = 0x16,
-      tcb0_ovf       = 0x17,
+        tcb0_cnt          = 0x17,
+#endif
+#if defined(TCB1)
       tcb1           = 0x18,
       tcb1_capt      = 0x18,
-      tcb1_ovf       = 0x19,
+        tcb1_cnt          = 0x19,
+#endif
+#if defined(TCB2)
       tcb2           = 0x1A,
       tcb2_capt      = 0x1A,
-      tcb2_ovf       = 0x1B,
+        tcb2_cnt          = 0x1B,
+#endif
 #if defined(TCB3)
       tcb3           = 0x1C,
       tcb3_capt      = 0x1C,
-      tcb3_ovf       = 0x1D,
+        tcb3_cnt          = 0x1D,
 #endif
-      // "Unofficial" user generators. Uses EVOUT, but swaps the output pin using PORTMUX
+        // "Unofficial" users. Uses EVOUT, but swaps the output pin using PORTMUX
       evouta_pin_pa7 = 0x89,
 #if defined(PIN_PB7)
       evoutb_pin_pb7 = 0x8A,
@@ -963,19 +990,68 @@ namespace event {
 #if defined(PIN_PE7)
       evoute_pin_pe7 = 0x8D,
 #endif
-#if defined(PIN_PE7)
-      evoutf_pin_pf7 = 0x8E,
+        evoutf_pin_pf7    = 0x8E
+      };
+    };
+  #elif defined(__AVR_EB__)
+    namespace user{
+      enum user_t : uint8_t {
+        ccl0_event_a      = 0x00,
+        ccl0_event_b      = 0x01,
+        ccl1_event_a      = 0x02,
+        ccl1_event_b      = 0x03,
+        ccl2_event_a      = 0x04,
+        ccl2_event_b      = 0x05,
+        ccl3_event_a      = 0x06,
+        ccl3_event_b      = 0x07,
+        adc0_start        = 0x08,
+#if defined(PIN_PA2)
+        evouta_pin_pa2    = 0x09,
 #endif
+#if defined(PIN_PC2)
+        evoutc_pin_pc2    = 0x0A,
+#endif
+#if defined(PIN_PD2)
+        evoutd_pin_pd2    = 0x0B,
+#endif
+#if defined(PIN_PF2)
+        evoutf_pin_pf2    = 0x0C,
+#endif
+        usart0_irda       = 0x0D,
+        tcae              = 0x0E,
+        tce0_cnt_a        = 0x0F,
+        tce0_cnt_b        = 0x10,
+#if defined(TCB0)
+        tcb0              = 0x11,
+        tcb0_capt         = 0x11,
+        tcb0_cnt          = 0x12,
+#endif
+#if defined(TCB1)
+        tcb1              = 0x13,
+        tcb1_capt         = 0x13,
+        tcb1_cnt          = 0x14,
+#endif
+        tcf0_cnt          = 0x15,  /* TCF0 Clock Event */
+        tcf0_act          = 0x16,  /* TCF0 Action Event */
+        wexa              = 0x17,  /* WEX Event A */
+        wexb              = 0x18,  /* WEX Event B */
+        wexc              = 0x19,  /* WEX Event C */
+#if defined(PIN_PA7)
+        // "Unofficial" users. Uses EVOUT, but swaps the output pin using PORTMUX
+        evouta_pin_pa7    = 0x89,
+#endif
+        evoutd_pin_pd7    = 0x8C,
+        evoutf_pin_pf7    = 0x8E
     };
   };
-  #endif // defined (__AVR_EA__)
+    #endif // defined (__AVR_EB__)
   #elif MEGATINYCORE_SERIES == 2
     namespace gen {
       enum generator_t : uint8_t {
         disable         = 0x00,
-        updi_synch      = 0x1,
-        rtc_ovf         = 0x6,
-        rtc_cmp         = 0x7,
+        updi_synch        = 0x01,
+        rtc_ovf           = 0x06,
+        rtc_cmp           = 0x07,
         ccl0_out        = 0x10,
         ccl1_out        = 0x11,
         ccl2_out        = 0x12,

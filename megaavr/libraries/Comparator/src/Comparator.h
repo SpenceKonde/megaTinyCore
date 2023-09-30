@@ -18,6 +18,7 @@
   #elif defined(__AVR_DD__)
     /* DD:1 AC:  P0, P3, P4, N0, N2, N3 */
     #define ANALOG_COMP_PINS_DD
+    #define AC_NULL_REG _SFR_MEM8(0x04B0)
     #define ANALOG_COMP_NO_N1
   #elif defined(__AVR_EA__)
     /* EA:2 ACs: P0, P1, P2, P3, P4, N0, N1, N2, N3 */
@@ -91,17 +92,17 @@ namespace comparator {
     namespace in_p {
       enum inputP_t : uint8_t {
         in0    = 0x00,
+      pd2    = 0x00,
     #ifndef __AVR_DD__
         in1    = 0x01,
         in2    = 0x02,
     #endif
         in3    = 0x03,
-    #ifdef __AVR_DD__
+      pd6    = 0x03,
+      #if defined(__AVR_DD__) || defined(__AVR_EA__)
         in4    = 0x04,
         pc3    = 0x04,
     #endif
-        pd2    = 0x00,
-        pd6    = 0x03
       };
     };
 
@@ -113,16 +114,16 @@ namespace comparator {
         pd0    = 0x01,
     #endif
         in2    = 0x02,
-    #if defined(__AVR_DD__) || defined(__AVR_EA__)
-        in3    = 0x00, /* TBD - Will dacref change number, or will it's number be skipped? */
-    #endif
-        dacref = 0x03,
         pd7    = 0x02,
+        #if defined(__AVR_DD__) || defined(__AVR_EA__) || defined(__AVR_EB__)
+          in3    = 0x03,
+          pc3    = 0x03,
+          dacref = 0x04
+        #else
+          dacref = 0x03
+        #endif
       };
     };
-    // Unknown how these will be numbered on DD-series, which has an AINN3 and DACREF - initial header release is copied verbatim from DA/DB
-    // and the EA-series doesn't even have that available, and I'm not privy to the pre-release preliminary datasheets that I'm sure important
-    // customers are poring over now.
   #elif defined(MEGATINYCORE)
     namespace in_p {
       enum inputP_t : uint8_t {
@@ -228,7 +229,7 @@ class AnalogComparator {
                        register8_t& in1_n,
                        register8_t& in2_n);
 
-    #elif defined(ANALOG_COMP_PINS_DD) /*6 inputs: P0, P3, P4, N0, N2, N3 */
+    #elif defined(ANALOG_COMP_PINS_DD) /*6 inputs - P1, P2, and N1 are gone, but newly added P4 and N3 are available P0, P3, P4, N0, N2, N3 */
       AnalogComparator(const uint8_t comparator_number,
                        AC_t& ac,
                        register8_t& in0_p,
@@ -237,7 +238,7 @@ class AnalogComparator {
                        register8_t& in0_n,
                        register8_t& in2_n,
                        register8_t& in3_n);
-    #elif defined(ANALOG_COMP_PINS_EA) /*9 inputs P0, P1, P2, P3, P4, N0, N1, N2, N3 */
+    #elif defined(ANALOG_COMP_PINS_EA) /*9 inputs - with 48 pins EA gets all inputs for at least one comparator. P0, P1, P2, P3, P4, N0, N1, N2, N3 */
       AnalogComparator(const uint8_t comparator_number,
                        AC_t& ac,
                        register8_t& in0_p,
