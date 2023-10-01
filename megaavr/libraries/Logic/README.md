@@ -247,7 +247,7 @@ Notes specific to ATtiny 0/1-series:
 * DA/DB have 3 AC's, EA 2, and the DD, DU and EB have one.
 The two final limits add further chaos to the distributions of numeric values for users and generators - the two seem to have had separate algorithms for determining when to leave holes for absent peripherals, and when to fill them in. They *really* seem to like filling in the holes in the generator lists, leaving me wondering what it is abouut the length of the list with such a high cost...
 
-* **Errata warning** Many parts in circulation are impacted by an errata (though not all - some never had it, while the 32k parts have gotten a die rev that fixes it. On effected parts, the link input does not work unless pin output of the other logic block is enabled. Check the applicable errata and datasheet clarification document from Microchip to see if your part is impacted. Other parts have a 
+* **Errata warning** Many parts in circulation are impacted by an errata (though not all - some never had it, while the 32k parts have gotten a die rev that fixes it. On effected parts, the link input does not work unless pin output of the other logic block is enabled. Check the applicable errata and datasheet clarification document from Microchip to see if your part is impacted. Other parts have a
 * **Compatibility warning** The tinyAVR 0/1's were the first AVRs with CCL. They made some decisions that they realized weren't such a good idea after all and changed for parts released more recently. Most importantly, for TCBs and ACs, as well as USARTs, the peripheral number used is the input number. SPI on these parts makes MISO available supposedly. Later parts do not. Later parts also only make USART TXD available - though you can get XCK from the event system.
 * USART option will use XCK on input 0, TXD on input 1, and is not valid for input 2.
   * MISO is (supposedly) available as an input when SPI is used as the input.
@@ -594,50 +594,6 @@ The two bits per LUT allow the interrupt to be triggered on
 11 - rising or falling
 
 ```
-
-## Latch-without-sequencer
-The available sequencer options, unfortunately, are capable of only slightly more than what can be done with just the even block alone, using feedback. An example of this (2 on DxCore) shows a different input ordering. The comments in the LatchNoSeq example provide a bit more information. You can do many tasks that would at first blush look like a job for the latches by simply setting one input as feedback, and the other two to your latch inputs.
-
-##### RS-latch w/out sequencer
-Input0 is Set
-Input1 is Reset
-Input2 is Feedback
-
-| 2 | 1 | 0 | Out |
-|---|---|---|-----|
-| 0 | 0 | 0 |  0  |
-| 0 | 0 | 1 |  1  |
-| 0 | 1 | 0 |  0  |
-| 0 | 1 | 1 |  0  |
-| 1 | 0 | 0 |  1  |
-| 1 | 0 | 1 |  1  |
-| 1 | 1 | 0 |  0  |
-| 1 | 1 | 1 |  1  |
-
-Truth = 0b10110010 = 0xB2;
-
-Note that here you have the power to decide what happens in the event that the illegal state where R and S are both high occurs. Here I have it maintain the current state.
-It's also fine to have it go high or low on the "S & R = 1" state, with truthtables of 0b10111010 = 0xBA, or 0b00110010 = 0x32 respectively. But make it toggle, ie, truth table of 0b00111010 = 0x3A and it will instead oscillate extremely rapidly (though it could be slowed down with the synchronizer or filter, that still isn't particularly useful  )
-
-##### D-type latch w/out sequencer
-Input0 is D
-Input1 is G
-Input2 is Feedback
-
-| 2 | 1 | 0 | Out |
-|---|---|---|-----|
-| 0 | 0 | 0 |  0  |
-| 0 | 0 | 1 |  0  |
-| 0 | 1 | 0 |  0  |
-| 0 | 1 | 1 |  1  |
-| 1 | 0 | 0 |  1  |
-| 1 | 0 | 1 |  1  |
-| 1 | 1 | 0 |  0  |
-| 1 | 1 | 1 |  1  |
-
-Hence truth tables are 0xB2 and 0xB8, and both of these leave the odd LUT available. Of course, if you need a logic block to come up with the inputs to set and reset, this is less useful.
-
-
 
 ## Reconfiguring
 There are TWO levels of "enable protection" on the CCL hardware except on the newest parts . According to the Silicon Errata, only one of these is intended. As always, it's anyone's guess when or if this issue will be corrected in a future silicon rev. That it is likely to be fixed on any part that gets a die rev is not in doubt; when (and indeed whether) they will rev the die to fix all the nasty bugs that they've now corrected in their peripheral designs. (It would appear that Microchip only became aware of the issue after the Dx-series parts were released; it's the kind of thing where you could believe that it was intended if annoying behavior, which is probably why it wasn't noticed sooner (It came at the same time as the "TCA does what the datasheet says on RESTART command" (paraphrased, ofc), another bug like that; both may indeed have been intended at the time, and only later classified as bugs, perhaps by a newly installed product manager or QA czar who thought the original intent was folly (I do suspect that there was a changing of the guard around that time. That and/or an influx of testing manpower and resources. How else do you introduce a new ADC while reducing the number of errata from the previous generation from around 20, several serious, to like 5, of which this is the only one without a workaround); I happen to agree on this count and think it's a big deal (the other feature that got this treatment I agree with as well, but why did they ever let the timers have a port direction override? . Since there is no indication that there are die revs coming out any time soon, users are advised to proceed with use of workarounds, rather than delay work in the hopes of corrected silicon.

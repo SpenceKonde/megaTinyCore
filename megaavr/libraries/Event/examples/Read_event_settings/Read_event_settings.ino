@@ -41,7 +41,7 @@ void setup() {
   // Start event channels
   Event0.start();
   #if !defined(MEGATINYCORE) || _AVR_PINCOUNT > 8
-  // again for the second channel, if we have 
+  // again for the second channel, if we have
   Event2.set_generator(gen1::pin_pa4); // Set pin PA4 as event generator
   Event2.set_user(user::evoutb_pin_pb2); // Set EVOUTB as event user
   Event2.start();

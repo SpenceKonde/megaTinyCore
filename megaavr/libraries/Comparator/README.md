@@ -92,7 +92,7 @@ Comparator.input_n = comparator::in_n::vref;  // Connect voltage reference to th
 
 
 ### reference
-On the 0-series and 1-series, this sets the voltage reference that will be used if VREF is selected as the negative input. On non-0-series, this also sets the voltage that DACREF is derived from. 
+On the 0-series and 1-series, this sets the voltage reference that will be used if VREF is selected as the negative input. On non-0-series, this also sets the voltage that DACREF is derived from.
 
 On 1-series parts with multiple comparators, these reference voltages can be set independently for each comparator. On the Dx and Ex parts, parts with multiple comparators  have to share just one reference voltage.. On the tinyAVR 1-series, AC0 and the DAC that can be output on PA6 share the same reference. The 0/1-series uses a rather strange set of voltages, while the 2-series uses the same voltages that most modern AVRs do.
 

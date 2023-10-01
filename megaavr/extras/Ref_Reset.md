@@ -39,7 +39,7 @@ The two high bits of GPIOR0 may be written by the init_clock() function (which r
 //   }
 ```
 
-3. When the bootloader entry conditions are not met, the reset flags are read. If they are 0, indicating no reset has occurred, we immediately fire a software reset. If the entry conditions are not met, but the reset flags are non-zero, or if the entry conditions are met and the bootloader runs (and either times out or receives a new application), before jumping to the app the flags are cleared, and stashed someplace where a user of average skill can retrieve them (ie, NOT r2). A do-nothing register like GPIOR0 is well suited to this, and this is what we use the lower 6 bits of that register for (the remaining two are used to report issues with the tuned clock settings)
+3. When the bootloader entry conditions are not met, the reset flags are read. If they are 0, indicating no reset has occurred, we immediately fire a software reset. If the entry conditions are not met, but the reset flags are non-zero, or if the entry conditions are met and the bootloader runs (and either times out or receives a new application), before jumping to the app the flags are cleared, and stashed someplace where a user of average skill can retrieve them (ie, NOT r2). A do-nothing register like GPIOR0 is well suited to this, and this is what we use the lower 6 bits of that register for (the remaining two are used to report issues with the tuned clock settings).
 
 ## Reset Sources
 
@@ -145,7 +145,7 @@ void resetViaSWR() {
 }
 ```
 
-The two recommended methods, resetViaWDT() and resetViaSWR() are provided by DxCore.h or megaTinycore.h as appropriate. 
+The two recommended methods, resetViaWDT() and resetViaSWR() are provided by DxCore.h or megaTinycore.h as appropriate.
 
 ## Using watchdog to reset when hung
 If you only worked with the watchdog timer as an Arduino user - you might not even know why it's called that, or what the original concept was, and just know it as that trick to do a software reset on classic AVRs, and as a way to generate periodic interrupts (which it can't do on a modern AVR - though the much more powerful and full features RTC can be used instead). The "purpose" of a watchdog timer is to detect when the part has become hung - either because it's wound up in an infinite loop due to a bug, or because it wound up in a bad state due to a glitch on the power supply or other adverse hardware event, has been left without a clock by an external clock source failing, went to sleep waiting for some event which doesn't end up happening (or without correctly enabling whatever is supposed to wake it up) - and issue a reset. It is often anthropomorphized as a dog, who needs to be "fed" or "pet" periodically, or else he will "bite" (commonly seen in comments - the latter generally only when we are expecting it, as in `while (1); //wait for the watchdog to bite`).

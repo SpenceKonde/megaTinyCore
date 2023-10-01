@@ -122,8 +122,6 @@ Clock: N/A
 
 Sync/Filter: Off
 
-###
-
 ## Sequential logic with just one LUT
 You can simulate some sequential logic units with just one LUT!
 
@@ -196,6 +194,7 @@ LUT:
 Ergo: TRUTH = 0xE4
 
 ### Gated Buffer
+Let a signal through or output a constant signal depending on the second signal.
 INSEL:
 * X: D - When G is high, D is output
 * Y: G - When G is low, the output is low.
@@ -213,7 +212,7 @@ Clock: N/A
 Sync/Filter: Off
 
 ### Double-gated Buffer
-There are many variants on this where different combinations of logic are used. The point is to get an "If A and B, output C, else output (whatever level it is"
+There are many variants on this where different combinations of logic are used. The point is to get an "If A and B, output C, else output (whatever level you want it to default to)"
 
 INSEL:
 * X: D - When G is high, D is output
