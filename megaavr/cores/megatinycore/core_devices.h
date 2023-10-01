@@ -353,7 +353,7 @@
 
 /* We should also check what kind of evsys we have, as they are quite different from each other.
  * Provide a define indicating which revision of EVSYS this is. 1 and 2 differ only in naming of strobe register.
- * 3 separates the decision of which pin(s) within a port will be used aas event input and which of those to use
+ * 3 separates the decision of which pin(s) within a port will be used as event input and which of those to use
  * with the former being configured with PORTx.EVGENCTRL. This allows the number of generators to drop from 8/port to 2/port, and the number of RTC generators to likewise drop to 2 from 16 with 8 available per channel
  * In exchange for this, we achieve our longtime dream: Equality between all generator channels, because the redused number of
  * generators allows them to add both options for all ports and both RTC options to all generator channels
