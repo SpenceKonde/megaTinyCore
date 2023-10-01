@@ -11,7 +11,7 @@
  */
 
 #include <EEPROM.h>
-#if defined(megaTinyCore)
+#if defined(MEGATINYCORE)
   #define ANALOG_PIN PIN_PA7
 #else
   #define ANALOG_PIN PIN_PD4
