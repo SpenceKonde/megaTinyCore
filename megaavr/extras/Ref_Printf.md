@@ -40,10 +40,12 @@ Notice that there is no line for 64 bit types in the table above; these are not 
 
 There are reports of memory corruption with printf suspect it is misunderstandign of above that is actually at hand here.
 
-### General notes about DxC/mTC and printf()'y things.
-No matter how you come to printing with a format string, it's gonna end up pulling in all the same bloat. Most of the `[1-2 letters]printf()` functions are little more than wrappers around various ways of supplying input to using the output from master algorithm.
+### General notes about DxC/mTC and printf()'y things
+No matter how you come to printing with a format string, it's gonna end up pulling in all the same bloat. Most of the `[1-2 letters]printf()` functions are little more than wrappers around various ways of supplying input to using the output from one master function.
 
-You can choose to have a full `printf()` implementation from a Tools submenu if you want to print floating point numbers, at a cost of some additional flash.
 
-#### Selectable `printf()` Implementation
-A Tools submenu lets you choose from three levels of `printf()`: full `printf()` with all features, the default one that drops float support to save 1k of flash, and the minimal one drops almost everything and for another 450 bytes flash saving (will be a big deal on the 16k and 8k parts. Less so on 128k ones). Note that selecting any non-default option here *will cause it to be included in the binary even if it's never called* - and if it's never called, it normally wouldn't be included. So an empty sketch will take more space with minimal `printf()` selected than with the default, while a sketch that uses `printf()` will take less space with minimal `printf()` vs default.
+#### There are several levels of printf support available
+Which one is right for you depends on the needs of your applications and your available flash. A Tools submenu lets you choose from three levels of `printf()`. **Warning:** Enabling either of the non-default modes will force the compiler to include the other version of printf *even if it is not used*. If left at the default, and none of the printf's are used, printf is not included. Hence, you should be sure to leave this at the default if not using printf.
+
+The options are:
+Full `printf()`: This handles  the default one that drops float support to save 1k of flash, and the minimal one drops almost everything and for another 450 bytes flash saving (will be a big deal on the 16k and 8k parts. Less so on 128k ones). Note that selecting any non-default option here *will cause it to be included in the binary even if it's never called* - and if it's never called, it normally wouldn't be included. So an empty sketch will take more space with minimal `printf()` selected than with the default, while a sketch that uses `printf()` will take less space with minimal `printf()` vs default.
