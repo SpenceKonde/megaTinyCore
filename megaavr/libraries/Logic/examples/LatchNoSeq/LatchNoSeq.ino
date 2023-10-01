@@ -66,7 +66,7 @@ void setup() {
 
   Logic0.enable = true;               // Enable logic block 0
 
-  #if defined(MEGATINYCORE) || defined(MEGATINYCORE_SERIES) != 2
+  #if defined(EVSYS_CHANNEL0)
   EVSYS.CHANNEL0 = EVSYS_CHANNEL0_CCL_LUT0_gc;
   EVSYS.USERCCLLUT1A = EVSYS_USER_CHANNEL0_gc;
   #else // it's a tinyAVR 0/1
