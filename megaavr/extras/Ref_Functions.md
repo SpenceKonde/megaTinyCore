@@ -219,7 +219,7 @@ Part of the standard API, but not documented. Does exactly what the name implies
 #define microsecondsToClockCycles  icroseconds * clockCyclesPerMicrosecond();
 ```
 
-### (standard) `_NOP()` Execute a single cycle NOP (no operation) instruction which takes up 1 word of flash.
+### (standard) `_NOP()` Execute a single cycle NOP (no operation) instruction which takes up 1 word of flash
 
 ### (DxC/mTC) `_NOPNOP()` or `_NOP2()`
 Execute a 2 cycle NOP (no operation) instruction (`rjmp .+0`)which takes up 1 word of flash. (Added 1.3.9)

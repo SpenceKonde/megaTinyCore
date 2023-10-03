@@ -381,7 +381,7 @@ Logic2.clocksource = logic::clocksource::oschf; // Set block 2 to use unprescale
 
 
 ### edgedetect
-Property to enable the edge detector. The edge detector can be used to generate a pulse when detecting a rising edge on its input. To detect a falling edge, the TRUTH table should be programmed to provide inverted output. "In order to avoid unpredictable behavior, a valid filter option must be enabled" (note: that's what the datasheet says; it's not clear whether you can get the unpredictable behavior, or if the edge detecter won't be connected unless a filter or synchronizer is enabled). Note that the edge detector is likely only of use when the output is being used for sequential logic or as the input to another logic block; it looks particularly useful on the odd LUT input to a J-K flip-flop sequential logic unit.
+Property to enable the edge detector. The edge detector can be used to generate a pulse when detecting a rising edge on its input. To detect a falling edge, the TRUTH table should be programmed to provide inverted output. "In order to avoid unpredictable behavior, a valid filter option must be enabled" (note: that's what the datasheet says; it's not clear whether you can get the unpredictable behavior, or if the edge detector won't be connected unless a filter or synchronizer is enabled). Note that the edge detector is likely only of use when the output is being used for sequential logic or as the input to another logic block; it looks particularly useful on the odd LUT input to a J-K flip-flop sequential logic unit.
 
 ```c++
 logic::edgedetect::disable;      // No edge detection used
@@ -607,7 +607,7 @@ Changes can always be freely made to the `Logic` classes - changes aren't writte
 ### Testing if the enable-lock erratum is present
 At present, there is never a need to test this, because you know from the part family whether or not it has this erratum - nothing that shipped with this broken has gotten a die rev that fixed it, so it impacts all tinyAVR, mega0, DA, and DB. However DxCore provides #defines for all Arduino-relevant errata, and this errata can be tested like this; note that **this is not a macro and cannot be made a macro. The die rev is not compile time known!** How could it be? The compiler doesn't know what you're going to do with the hex file.
 ```c
-if (checkErrata(ERRATA_CCL_PROTECTION)) { /*true if errata presnt */
+if (checkErrata(ERRATA_CCL_PROTECTION)) { /*true if errata present */
   Logic::stop();
   Logic1.init();
   Logic::start();

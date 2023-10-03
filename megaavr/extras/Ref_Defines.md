@@ -86,7 +86,7 @@ If your sketch requires a certain timer NOT be used for millis, or that a certai
 ```
 
 ### Testing if millis enabled
-The names of these two functions are #defined as themselves if the function can be used. On DxCore, `millis` is never defined if `micros` is not, since there are no timekeeping options which suppory millis but not micros. On megaTinyCore, if the RTC is used, millis, but not micros, will be available, so `defined(micros)` is false but `defined(millis)` is true.
+The names of these two functions are #defined as themselves if the function can be used. On DxCore, `millis` is never defined if `micros` is not, since there are no timekeeping options which support millis but not micros. On megaTinyCore, if the RTC is used, millis, but not micros, will be available, so `defined(micros)` is false but `defined(millis)` is true.
 
 ## Identifying part family within sketch
 When writing code that may be compiled for a variety of target chips, it is often useful to detect which chip it is running on.Defines of the form `__AVR_partname__` are provided by the toolchain. However, it is often MORE useful to not have to have a giant block of #ifdefs, and have the part numbers distilled down to something more that can be checked more intuitively, since what you care about is the family, number of pins, or occasionally size of the flash.

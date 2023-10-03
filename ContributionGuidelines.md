@@ -55,7 +55,7 @@ Some general themes of these decisions others may disagree with:
 ## Azduino Code Style
 We have a largely self-consistent code style used throughout the core and associated files based on a number of principles.
 
-1. Readbility is paramount, and if adhering to particular code styling guidelines would result in hideous looking unreadable code, don't do it.
+1. Readability is paramount, and if adhering to particular code styling guidelines would result in hideous looking unreadable code, don't do it.
   a. astyle is only run in libraries and variants, not the core itself because it would need to be disabled on all files anyway.
 2. Always use the integer types that explicitly specify the datatype size. That means, avoid 'int' 'byte' 'char' 'long' etc. Types should be things like:
 

@@ -402,7 +402,7 @@ uint8_t TwoWire::specialConfig( __attribute__ ((unused)) bool smbuslvl, __attrib
     else { //not compile time constant so have to check at runtime
       if (sda_hold_dual) { // only have to do SDA hold 0 - already caught bad input levels.
         ret |= 2; //error code.
-        //sda_hold_dual= 0; not needed to zero out if no dual mode, we don't use this value anmore.
+        //sda_hold_dual= 0; not needed to zero out if no dual mode, we don't use this value anymore.
       }
     }
   #else

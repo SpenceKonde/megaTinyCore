@@ -64,6 +64,7 @@ If working with assembly you should make a rigorous study of the insruction set 
 Notice that while datasheet information can be generalized across the whole family of parts The datasheets typically differ only in the header and footer (excepting the 1-series, which is effectively two part families, the 16k+ and the 2-8k parts). But because they use different dies, and dies are designed at discrete points in time, flash sizes released later have fewer bugs, because they've been spending the intervening months stomping out errata. On the 0 and 1 series tinyAVRs, there is a mindboggling amount of errata and a terrible shortage of die revisions. The 2-series tinyAVR by contrast has very little and the DD even less, though the EA's new RWW flash system is pretty janky.
 
 See also [Errata.md](Errata.md).
+* Short and sweet for the 2-series.
   * [tinyAVR 2-series 32k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny3224-3226-3227-SilConErrataClarif-DS40002342A.pdf)
   * [tinyAVR 2-series 16k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny1624-26-27-SilConErrataClarif-DS80000902D.pdf)
   * [tinyAVR 2-series 4/8k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny424-426-427-824-826-827-SilConErrataClarif-DS80000955B.pdf)
@@ -71,8 +72,8 @@ See also [Errata.md](Errata.md).
   * [tinyAVR 1+series 32k parts - does NOT apply to smaller parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny3216-17-SilConErrataClarif-DS80000887B.pdf)
   * [tinyAVR 1+series 16k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny1614-16-17-SilConErrataClarif-DS80000886C.pdf) - yeah, the 32k ones are at Rev. C of the die, and had no Rev B, and most of the bugs are fixed, but down on 16k, we did get a Rev. B which fixed almost nothing.
   * [tinyAVR 1-series 8k parts + 417](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny417-814-816-817-SilConErrataClarif-DS80000934A.pdf) - Based on the early revision of this document, I am skeptical of it's completeness
-  * [tinyAVR 1-series 2-4k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny212-214-412-414-416-SilConErrataClarif-DS80000933.pdf) - Based on the early revision of this document, I am skeptical of it's completeness
-* Less than the 1-series, but that's unsurprising since these cut so many features (and for so little cost savings), so there's just less for there to be errata in.
+  * [tinyAVR 1-series 2-4k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny212-214-412-414-416-SilConErrataClarif-DS80000933.pdf) (note: this is now the latest version)
+* Down a bit on the 0-series. This is unsurprising; based on device ID's, they look to have been registered in the database later (and things do get registered some time before release, because parts that were never released leave "holes" ))
   * [tinyAVR 0-series 8-16k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny804-06-07-1604-06-07-SilConErrataClarif-DS80000951A.pdf) - Based on the early revision of this document, I am skeptical of it's completeness
   * [tinyAVR 0-series 2-4k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny202-204-402-404-406-SilConErrataClarif-DS80000956A.pdf)
 

@@ -56,7 +56,7 @@
  * is atomic, but significantly hurts performance. (theoretical worst case
  * is 94 clocks, real-world is usually far less, but I'll only say "less"
  * The functions in question have considerable register pressure). But,
- * it unquestionably would impact USART performance at high speeeds.
+ * it unquestionably would impact USART performance at high speeds.
  *
  * * The USE_ASM_* options can be disabled by defining them as 0 either in variant pins_arduino.h
  * The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file (

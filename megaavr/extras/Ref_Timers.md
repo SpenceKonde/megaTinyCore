@@ -167,7 +167,7 @@ They can be pressed into service as a rather poor PWM timer. TCB in PWM mode is 
 **Errata Alert** - `TCBn.CCMP` is effected by silicon errata on all available silicon save the DD and EA-series: It still acts like a 16-bit register. That means that it uses the TCB.TEMP register for access, and that you must read and write both bytes together, starting with the low byte, then high byte: Writes to the low byte are redirected to the temp register, reading the low byte copies the high byte of the CCMP register to TEMP, and writing to the high byte is what copies the low byte from the TEMP register to the actual CCMP register low byte. However, if you only write the high byte, and write the low byte only once, writes to the high byte alone do work. Until you do something like reading the CNT register, at which point everything will fall over.
 
 #### Extra features on 2-series and Dx/Ex-series
-The tinyAVR 2-series and Dx parts add three upgrades, two useful, and the other less-so. The less useful one is a separate OVF event/interrupt source. I find this to be of dubious untility - likely the best use of the separate OVF bit is as a 17th bit in input capture mode, but this can generally be done without using it as an interrupt.
+The tinyAVR 2-series and Dx parts add three upgrades, two useful, and the other less-so. The less useful one is a separate OVF event/interrupt source. I find this to be of dubious utility - likely the best use of the separate OVF bit is as a 17th bit in input capture mode, but this can generally be done without using it as an interrupt.
 
 A much more interesting option is the clock-on-event option: The TCBs now have a second event user, which can be selected as the clock source! Combined with the CCL, this can, for example, be used to get a prescaled system clock into the TCB different from that of a TCA (see the Logic library documentation and examples for discussion of how the CCL filter and synchronizer can be used to generate s prescaled clock).
 
@@ -693,7 +693,7 @@ uint8_t _getCurrentMillisTimer();
  * sleepTime library two additional options will be possible: TIMERRTC and TIMERPIT. These are
  * returned in the unlikely event that this is called when sleeptime has been sleeping with RTC
  * timekeeping and hasn't switched back yet.
- * See Apppendix I. */
+ * See Appendix I. */
 (macro) MILLIS_TIMER
 
 /* This is the value (from appendix I - anything that _gCMT() can return except TIMERRTC and TIMERPIT, but including TIMERRTC_INT, TIMERRTC_XTAL, and TIMERRTC_EXT. These indicate that the RTC is *permanently* the millis source (mTC only).

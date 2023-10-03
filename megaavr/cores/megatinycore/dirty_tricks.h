@@ -58,7 +58,7 @@
  *
  * Many of these hinge upon bullying the compiler into assigning registers less stupidly. These do not at all prevent the register allocator from
  * smacking down the whole thing with a gigantic wad of fail if it thinks it has to (ie, when you're out of pointer registers). These should be used only with one eye
- * on the compiler listings to spot this, because at that point they are usually causeing harm instead of good.
+ * on the compiler listings to spot this, because at that point they are usually causing harm instead of good.
  *
  * List of dirty trick macros
  * Not dirty - cycle counting macros:
@@ -306,7 +306,7 @@ Not enabled. Ugly ways to get delays at very small flash cost.
  *
  * Very similar to the above. Passed a pointer as two bytes, the high byte constant and the low byte not, this finds use in the same sort
  * of situatios as high/low math. See the I/O headers: each class of peripherals often has the same high byte for all addresses. Ports (0x0400, 0x0420, 0x0440
- * and so on. The most freqently used functions get special attention paid to this as a small gain adds up for the most commonly called functions
+ * and so on. The most frequently used functions get special attention paid to this as a small gain adds up for the most commonly called functions
  * usage is typically sdmething like
  *    lowbyte = (_SWAP(usartnbr)); // passed from,elsewhere io the code, which must be free of bugs!
  *    lowbyte <<= 1;

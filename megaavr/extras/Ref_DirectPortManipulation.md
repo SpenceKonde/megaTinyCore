@@ -59,21 +59,21 @@ You will very often see constant names from the io headers used. Unlike the clas
 
 PORTx.DIR is the register which determines if the pin is an input or an output (like DDRx registers in classic AVR). After reset, all pins are set to input (0 in the register). In order to use the pin as an output the bit in the register must be set to 1, which can be done as follows:
 
-```
+```c
 PORTA.DIR = PIN4_bm
 ```
 
 This will set bit 4 on PORTA - if using an ATtiny1616, for example, that would correspond to Arduino pin 0.
 Multiple pins on the same port can be configured by writing each bit, or by setting multiple bitmasks
 
-```
+```c
 PORTA.DIR = 0b01001000;         // sets PA3 and PA6 as an output
 PORTA.DIR = PIN3_bm | PIN6_bm;  // sets PA3 and PA6 as an output
 ```
 
 Besides setting the pins to an input (0) or output (1) in the DIR register, you can also use the DIRSET and DIRCLR registers to set (set as output) or clear (set as input) a specific pin:
 
-```
+```c
 PORTA.DIRSET = PIN4_bm; // use PA4 as an output
 PORTA.DIRCLR = PIN4_bm; // use PA4 as an input
 ```
@@ -82,21 +82,21 @@ You can even toggle between an input or output by writing to the DIRTGL register
 
 Turning the pin on and off is done with the PORTx.OUT register (this works like the PORTx register of classic AVR). Writing a 1 to the corresponding pin will set an output pin HIGH while a 0 will set it LOW:
 
-```
+```c
 PORTA.OUT |=  PIN4_bm; // write PB4 high - Don't do it like this in real life!
 PORTA.OUT &= ~PIN4_bm; // write PB4 low - Don't do it like this in real life!
 ```
 
 Note that the two examples above for flipping a single bit are not atomic - it's a read-modify-write operation, and will take between 4 and 8 clocks and between 3 and 7 words of flash. If an interrupt fires between the read and the write, the change that the ISR made will be reverted - if you have ISRs that are flipping pins (Servo.h does this), lines like those shown above would have to be be performed with interrupts disabled (just like classic AVR). Fortunately, the modern AVR architecture provides a better solution - the OUTSET and OUTCLR registers, just like the DIRSET and DIRCLR registers described above - this is atomic - as well as being faster and smaller
 
-```
+```c
 PORTA.OUTSET = PIN4_bm; // turn PA4 output on - Atomic operation taking 2-3 words, 2-3 clocks
 PORTA.OUTCLR = PIN4_bm; // turn PA4 output off
 ```
 
 Or when you just want to toggle the output you can use:
 
-```
+```c
 PORTA.OUTTGL = PIN4_bm; // toggle PA4 output
 ```
 
@@ -104,21 +104,21 @@ PORTA.OUTTGL = PIN4_bm; // toggle PA4 output
 
 You can read the state of a pin by using the IN register (this is like the PINx register of classic AVR):
 
-```
+```c
 bool status = PORTA.IN & PIN5_bm;
 ```
 
 
 Unlike the classic AVRs, setting a pin HIGH with the OUT register while it is set as an input will not turn on the internal pullup. If you want to use the internal pullup resistor, you can set this in the PINnCTRL register as follows:
 
-```
+```c
 PORTA.PIN6CTRL |= PORT_PULLUPEN_bm; // use the internal pullup resistor on PA6
 PORTA.PIN6CTRL &= ~PORT_PULLUPEN_bm; // don't use the internal pullup resistor on PA6
 ```
 
 Note that this does mean that each pin has its own PINnCTRL register - unlike the classic AVRs where there was one register to control pullup for each port, with one bit per pin. The rest of the PINnCTRL register configures the "Input Sense Configuration", otherwise known as pin interrupts, as well as providing an way to disable the pin input buffer entirely to save power, and an option to invert the pin (some other parts may have additional advanced features here). Assuming you aren't using those, these are valid.
 
-```
+```c
 PORTA.PIN6CTRL = PORT_PULLUPEN_bm; // use the internal pullup resistor on PA6
 PORTA.PIN6CTRL = 0; // don't use the internal pullup resistor on PA6
 ```
@@ -139,7 +139,7 @@ The |= and &= assignment operators (assigning the bitwise OR or bitwise AND of t
 
 HOWEVER, on those magic 32 registers in the "low I/O space", provided you are setting or clearing a single bit, AND that bit is compile time known, they optimize to a single instruction: sbi or cbi (set or clear bit index), which is not only atomic, but runs in a single clock cycle (unlike the 2 on classic AVRs). That makes it faster than simple assignment, which requires two instructions (potentially 3 in unusual circumstances) - an LDI (load immediate) to put the value into a CPU register, and an OUT instruction to write it out (the single cycle IN and OUT instructions only work up to address 0x3F, above that the only available options are slower. So which are these magic registers? Unlike classic AVR devices, where a near-random assortment of registers, in addition to the pin manipulation ones, were placed in the low I/O space, on modern AVR devices, it is very simple: Only the VPORT registers and the four GPIO registers (which do nothing, they're for general application use). Similarly, there's also a single instruction branch for testing a single, compile time known bit in these registers.
 
-So, while many examples of direct port writes for classic AVRs will use |= and &= for single bit flips, when using VPORT registers (Or when using the GPIO registers, but if you're using those, you're using them exclusively because of this, and know what you're doing). **There is never a right time to write to use |= or &= with any register in PORTx except for PINnCTRL** registers. It is always slower, and it is never interrupt safe. So don't do that. Specifically, as warned about above, you should NEVER use |= or &= with the PORTx.DIRCLR, PORTx.DIRSET, PORTx.OUTSET or PORTx.OUTCLR; the SETs are simply inefficient, while the CLRs produce unexpected behavior. The same hazard that applies to the DIRCLR and OUTCLR regisers also applies to INTFLAGS - it's a register where writing 1's clears bits instead of setting them, and the compiler does not know anything about them other than that the're 'volatile' and it is required to do exactly what you say.
+So, while many examples of direct port writes for classic AVRs will use |= and &= for single bit flips, when using VPORT registers (Or when using the GPIO registers, but if you're using those, you're using them exclusively because of this, and know what you're doing). **There is never a right time to write to use |= or &= with any register in PORTx except for PINnCTRL** registers. It is always slower, and it is never interrupt safe. So don't do that. Specifically, as warned about above, you should NEVER use |= or &= with the PORTx.DIRCLR, PORTx.DIRSET, PORTx.OUTSET or PORTx.OUTCLR; the SETs are simply inefficient, while the CLRs produce unexpected behavior. The same hazard that applies to the DIRCLR and OUTCLR registers also applies to INTFLAGS - it's a register where writing 1's clears bits instead of setting them, and the compiler does not know anything about them other than that the're 'volatile' and it is required to do exactly what you say.
 
 ## VPORTx.OUT vs PORTx.OUTSET/PORTx.OUTCLR
 So, knowing all this, when is it more efficient to use `VPORTx.OUT |= PIN3_bm` and when is it more efficient to use `PORTx.OUTSET=PIN3_bm`?
@@ -149,11 +149,11 @@ So, knowing all this, when is it more efficient to use `VPORTx.OUT |= PIN3_bm` a
 
 
 ## Equivalents to classic AVR registers
-Classic AVR  |  modern AVR   |  VPORT
--------------|---------------|--------------
-       PORTx | PORTx.OUT     | VPORTx.OUT
-       PINx  | PORTx.IN      | VPORTx.IN
-       DDRx  | PORTx.DIR     | VPORTx.DIR
+| Classic AVR |  modern AVR   |  VPORT       |
+|-------------|---------------|--------------|
+|       PORTx | PORTx.OUT     | VPORTx.OUT   |
+|       PINx  | PORTx.IN      | VPORTx.IN    |
+|       DDRx  | PORTx.DIR     | VPORTx.DIR   |
 
 **NOTE** Unlike classic AVRs, setting the bit in PORTx.OUT while pin is set as an INPUT will *NOT* enable the pullups. Only the PORTx.PINnCTRL registers can do that. There is no VPORT register that allows changing pullup status. Writing to PORTx.IN does *NOT* toggle the output of the bit, but writing to VPORTx.IN *DOES*.
 
@@ -289,7 +289,7 @@ Not so DIRCLR - If you do `PORTx.DIRCLR |= (1 << 2) | (1 << 3)`. The compiler wi
 
 None of that behavior is useful. Only use simple assignment with the SET/CLR/TGL registers, or regret it.
 
-### Don't use a bloody pointer or reference to a vport register.
+### Don't use a bloody pointer or reference to a vport register
 * You don't get CBI/SBI speed.
 * If you know you can't get the benefits of VPORT registers (likely, because you don't know which port at compile time and are using a pointer or something), you can do things equally well or better using the PORTx registers.
 * Really, VPORTs should only be used if the port, and preferably the bit, are known at compile time, and you are either using simple assignment, flipping a single bit, or testing a single bit - that is required to get the performance benefit. And that's what makes them better than the PORTx registers - otherwise, they're just PORTx registers with fewer features that can only atomically set or clear one bit at a time.

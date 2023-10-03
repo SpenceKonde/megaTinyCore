@@ -320,7 +320,7 @@
  * For each of the ones that we do have a flag for, we load that pointer into Z with postincrement, subtract 0 from it and look at zero flag to make sure it's not null.
  * assuming it's not, we fire icall to call the user function. Either way we then repeat the loop until out of flags.
  * which at latest will happen when we're also at end of the ports intfunc array....
- * Then, with the initial flags still in 15 and the the VPORT adderess in r16 copy that once more to a pointer register, 0 the high byte, and store the flags value we read to clear it.
+ * Then, with the initial flags still in 15 and the the VPORT address in r16 copy that once more to a pointer register, 0 the high byte, and store the flags value we read to clear it.
  * then it's just a matter of making sure we pop everything we pushed onto the stack in the reverse order, including r16 followed by the reti to exit the interrupt..
 */
 

@@ -1,7 +1,7 @@
 # Differences between megaTinyCore and stock core
 We generally try to honor the Arduino API. Occasionally that is impractical. In some cases we are just explicitly stating what was true of the Arduino stock cores, but never acknowledged.
 
-## Intended cases where behavior differs from official cores:
+## Intended cases where behavior differs from official cores
 While we generally make an effort to emulate the official Arduino core, there are a few cases where the decision was made to have different behavior to avoid compromising the overall functionality; the official core is disappointing on many levels. The following is a (hopefully nearly complete) list of these cases.
 
 ### I2C **Requires** External Pullup Resistors
@@ -18,12 +18,21 @@ Later efforts to improve serial further increased it's performance and reduced t
 ### Serial supports like, everything
 Almost every weirdo hardware feature that the USART has, we expose. It is also able to receive up to 1 rx buffer full of data at the maximum baud rate, with the transmitting device sending continuously. Official megaAVR core can crash if you try to redline it, and classic AVRs can't get the baud rate on target even way way below the maximum, so there's really no comparison there.
 
+### Serial options have different numeric values
+The stock megaavr core used 12 bits across two bytes to store the configuration written to CTRLC... *to the 1 byte register, CTRLC*... Say you have a register, and 6 bits in it might be configured. Your users generate the value by ORing together constants you supply.
+
+Do you:
+1. Use the locations of the bits that get controlled, so the value passed to begin is the same as the value you have to write to ctrlc?
+2. Make your own representation of it, which takes twice as many bits to represent, and is full of "reserved" positions for options that exist on parts that are not this AVR.
+
+Hopefully I don't need to tell you which way they did it.
+
 ### The core *requires* compiling with -Os and LTO
 LTO (link time optimization - it gets you about 15-20% smaller binaries that perform comparably to or better than normal ones) is required. This is set up automatically and is not a concern unless you are building in a very-not-arduino-like context - but if you try to disable it, everything will fall down around your ears. We make *very* heavy use of builtin functions like `__builtin_constant_p()` and similar in order to maximize the potential optimization, and some expanded API functions (most notably fast digital I/O) **require** LTO in order to work (in the fast digital I/O case, we need to be able to see that the thing that the user passed as a pin is constant. If we can't peer into other files to figure out if it's a constant, we can't do fast digital I/O.
 
 Furthermore, -Os is required - we looked into offering -O3 - but we found that this caused a meticulously hand-implemented wall of intricate assembly that was implemented to eliminate duplication of code *to itself be duplicated* which in turn caused a compilation failure because it includes a named label.
 
-The optimizer frankly isn't very good at doing either -Os or -O3, so you're missing less than you think. The compiler is very clever in some ways, but it's also very stupid in others. It's been too long since all the optimization passes were properly tuned and the avr-portion was up to date with the rest of it for the optimizer to really do a great job.
+The optimizer frankly isn't very good at doing either -Os or -O3, so you're missing less than you think. The compiler is very clever in some ways, but it's also very stupid in others. It's been too long since all the optimization passes were properly tuned and the avr-portion was up to date with the rest of it for the optimizer to really do a great job. The compiler appears to have peaked at version 4.3. 5.4 was worse (enough so that it broke pulsein, which is why it's supplied as asm). 6.x had some bad bug that we couldn't abide by - but it added support for LTO, which was a total gamechanger; They quickly went to 7.3, and that's still where we are. It's established wisdom that you want to use the oldest version of GCC that will do what you need, not the newest.
 
 ### SerialEvent Support is Dropped
 This is deprecated on the official core and is, and always has been, a dreadful misfeature. Dropped as of 2.3.0.
@@ -89,9 +98,9 @@ No more.
 The working registers are not mapped to the data space. Mapping the working registers to the dataspace is madness. WTF good was it? If you're writing C, then you don't know what working register a variable is in, and if you're writing assembly you just look at the register; if that feature was useful to you you were doing something wrong. Now the I/O space 0x00 to 0x3F is mapped to data space 0x0000 to 0x003F.
 
 
-## Direct Register Manipulation
-If you are manually manipulating registers controlling a peripheral, except as specifically noted in relevant reference pages, the stated behavior of API functions can no longer be assured. It may work like you hope, it may not, and it is not a bug if it does not, and you should not assume that calling said API functions will not adversely impact the rest of your application. For example, if you "take over" TCA0, you should not expect that using `analogWrite()` - except on the two pins on the 20/24-pin parts controlled by TCD0 - will work for generating PWM. If you reconfigure TCA0 except as noted in Ref_Timers, without calling `takeOverTCA0`, both `analogWrite()` and `digitalWrite()` on a PWM pin may disrupt your changed configuration.
+## Direct Register Manipulation warning
+If you are manually manipulating registers controlling a peripheral (except as specifically noted in relevant reference pages - some portions of the API are designed specifically permit this, particularly the PWM timers), *the stated behavior of API functions related to that by means obvious or obscure, can no longer be expected*. It may work like you hope, it may not - but it is not a bug if it doesn't work. (When you start poking at registers, you should usually be taking full control of that peripheral, and not using related api functions or libraries). Thus you should not assume that calling said API functions will not adversely impact the rest of your application. For example, if you "take over" TCA0, you should not expect that using `analogWrite()` - except on the two pins on the 20/24-pin parts controlled by TCD0 - will work for generating PWM. If you reconfigure TCA0 except as noted in Ref_Timers, without calling `takeOverTCA0`, both `analogWrite()` and `digitalWrite()` on a PWM pin may disrupt your changed configuration, or interfere with normal port operation.
 
 This, strictly speaking, is not a difference from the stock core. It will also melt down if you fiddle with hardware registers arbitrarily. There are two big differences:
-1. The stock core is not explicit about this fact, despite the fact that it will always happen.
+1. The stock core is not explicit about this fact, despite the fact that it's at least as bad.
 2. The stock core exerts slightly more effort to picking up after other code defensively, but only slightly, and often at surprisingly high overhead.

@@ -21,7 +21,7 @@
       #if (_AVR_PINCOUNT > 14)
         // Except under tight constraints of 14-pin non-tinies, we can always count on their being a PA2.
         #define TUNE_OUTPUT_PIN PIN_PA2
-      #elif defined(PIN_PC2) /*AVR DD-series has no PC0, PA2-7, and the only pins nubered 2 or lower in any port
+      #elif defined(PIN_PC2) /*AVR DD-series has no PC0, PA2-7, and the only pins numbered 2 or lower in any port
         * are thus PA0, PA1, and PC1 and PC2. The pins on PORTA are needed for the crystal if this is to be used
         * and you actually want to tune to within an accuracy measured in  (tens of) "ppm" instead of  (several) "%" on datasheet specs.
         * So we're using either PC1 or PC2!

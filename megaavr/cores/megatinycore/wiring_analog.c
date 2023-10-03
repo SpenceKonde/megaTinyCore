@@ -213,7 +213,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
  *                                                          uint8_t gain=0)
  *     Enhanced analogRead(). Still single-ended, res is resolution in bits,
  *     which range from 8 to the largest value that can be obtained from using
- *     the accumlation feature and a single "start" command to oversample x4
+ *     the accumulation feature and a single "start" command to oversample x4
  *     per extra bit, followed by decimation/2 per extra bit (the math is
  *     described in Microchip/Atmel app notes). This maximum is 13 bits for
  *     0/1-series parts, and 17 bits for 2-series parts.

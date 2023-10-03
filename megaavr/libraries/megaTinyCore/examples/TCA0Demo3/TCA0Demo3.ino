@@ -4,7 +4,7 @@
  * disabled, and PWM frequency higher than 62KHz. This is indeed possible - though do note
  * that the maximum frequency of PWM possible with a full 8 bits of resolution and 20MHz
  * system clock is 78.125 kHz (20000000/256) - and the next higher frequency for which
- * perfect 8-bit resolution is possible is half that, 39.061 kHz. Higher fequencies require
+ * perfect 8-bit resolution is possible is half that, 39.061 kHz. Higher frequencies require
  * lower resolution (see above example for one approach, which can also be used for
  * intermediate frequencies) though if the frequency is constant, varying your input between
  * 0 and the period instead of using map() is desirable, as map may not be smooth. As a further

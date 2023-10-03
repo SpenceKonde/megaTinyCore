@@ -129,7 +129,7 @@ void setup() {
       Serial.println("The OSCCFG fuse is set to 16 MHz however a tuned speed has been requested that can only be reached with the 20 MHz oscillator.");
     }
     if (errortype & 8) {
-      Serial.println("Core configured to use the internal oscillator. But somehow we got here with an external clock selected.\r\nI have not the faintest idea how you mananged that unless you modified the core (this sketch does not support modified versions of the core)");
+      Serial.println("Core configured to use the internal oscillator. But somehow we got here with an external clock selected.\r\nI have not the faintest idea how you managed that unless you modified the core (this sketch does not support modified versions of the core)");
     }
     if (errortype & 64) {
       Serial.println("Tuned internal selected, but tuning sketch has not run successfully.If you can read this, but got a wad of gibberish before, ");

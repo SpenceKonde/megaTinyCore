@@ -801,7 +801,7 @@ namespace event {
       portg_evgen1      = 0x4D,
 #endif
 #if defined(PORTH)  // At some point they will need to either surrender a non-trivial amount of market share, or offer a migration path from the m2560.
-                    // Becayse the uniform EVSYS channels introduced with the EA leave plenty of holes, it's likely that that part would have it's channels nubered similarly,
+                    // Becayse the uniform EVSYS channels introduced with the EA leave plenty of holes, it's likely that that part would have it's channels numbered similarly,
                     // with it's extra ports
       porth_evgen0      = 0x4E,
         porth_evgen1      = 0x4F,
