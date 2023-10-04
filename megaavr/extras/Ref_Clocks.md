@@ -4,7 +4,7 @@ Be aware that this is very different from the equivalent document for the Dx and
 
 **Crystal** is not supported as a clock source on the DA-series, or EB-series, but is on the DB, DD, and DU-series.
 
-## Background - how the timers work.
+## Background - how the timers work
 see also [the timer reference](Ref_Timer.md)
 
 ### On tinyAVR

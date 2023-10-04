@@ -167,7 +167,7 @@ They can be pressed into service as a rather poor PWM timer. TCB in PWM mode is 
 **Errata Alert** - `TCBn.CCMP` is effected by silicon errata on all available silicon save the DD and EA-series: It still acts like a 16-bit register. That means that it uses the TCB.TEMP register for access, and that you must read and write both bytes together, starting with the low byte, then high byte: Writes to the low byte are redirected to the temp register, reading the low byte copies the high byte of the CCMP register to TEMP, and writing to the high byte is what copies the low byte from the TEMP register to the actual CCMP register low byte. However, if you only write the high byte, and write the low byte only once, writes to the high byte alone do work. Until you do something like reading the CNT register, at which point everything will fall over.
 
 #### Extra features on 2-series and Dx/Ex-series
-The tinyAVR 2-series and Dx parts add three upgrades, two useful, and the other less-so. The less useful one is a separate OVF event/interrupt source. I find this to be of dubious utility - likely the best use of the separate OVF bit is as a 17th bit in input capture mode, but this can generally be done without using it as an interrupt.
+The tinyAVR 2-series and Dx parts add three upgrades, two useful, and the other less-so. The less useful one is a separate OVF event/interrupt source. I find this to be of dubious untility - likely the best use of the separate OVF bit is as a 17th bit in input capture mode, but this can generally be done without using it as an interrupt.
 
 A much more interesting option is the clock-on-event option: The TCBs now have a second event user, which can be selected as the clock source! Combined with the CCL, this can, for example, be used to get a prescaled system clock into the TCB different from that of a TCA (see the Logic library documentation and examples for discussion of how the CCL filter and synchronizer can be used to generate s prescaled clock).
 
@@ -693,7 +693,7 @@ uint8_t _getCurrentMillisTimer();
  * sleepTime library two additional options will be possible: TIMERRTC and TIMERPIT. These are
  * returned in the unlikely event that this is called when sleeptime has been sleeping with RTC
  * timekeeping and hasn't switched back yet.
- * See Appendix I. */
+ * See Apppendix I. */
 (macro) MILLIS_TIMER
 
 /* This is the value (from appendix I - anything that _gCMT() can return except TIMERRTC and TIMERPIT, but including TIMERRTC_INT, TIMERRTC_XTAL, and TIMERRTC_EXT. These indicate that the RTC is *permanently* the millis source (mTC only).
@@ -764,7 +764,7 @@ Whenever a function supplied by the core returns a representation of a timer, th
 
 0 (`NOT_ON_TIMER`) will be returned by digitalPinToTimer() or digitalPinToTimerNow() (herafter: dPTT and dPTTN) if the specified pin has no timer.
 
-`*` Currently, the 3 low bits are never set to 1. However, this may change in the future. There are unfortunately two three-bit pieces of information vying for the same three data bits, and which piece of information you want depends on what you're doing, and is only trivial to determine for TCA0: the waveform output channel (0-2 or 0-5) or the mux option (0-6) that points to that pin, . No other timer will ever be numbered 0x10-0x17, nor 0x08-0x0F. 0x18-0x1F is reserved for hypothetical future parts with a third TCA. Hence to test for TCA type: `(timerType = MILLIS_TIMER & 0xF8; if (timerType || timerType < 0x20) {timerType = 0}` will give either `NOT_ON_TIMER`, `TIMERA0`, `TIMERA1`, or in the future, potentially `TIMERA2`. Note that dPTT does not report on the TCAs at all on DxCore (unlike megaTinyCore) - only dPTTN does, because since we
+`*` Currently, the 3 low bits are never set to 1. However, this may change in the future. There are unfortunately two three-bit pieces of information vying for the same three data bits, and which piece of information you want depends on what you're doing, and is only trivial to determine for TCA0: the waveform output channel (0-2 or 0-5) or the mux option (0-6) that points to that pin, . No other timer will ever be numbered 0x10-0x17, nor 0x08-0x0F. 0x18-0x1F is reserved for hypothetical future parts with a third TCA. Hence to test for TCA type: `(timerType = MILLIS_TIMER & 0xF8; if (timerType || timerType < 0x20) {timerType = 0}` will give either `NOT_ON_TIMER`, `TIMERA0`, `TIMERA1`, or in the future, potentially `TIMERA2`. Note that dPTT does not report on the TCAs at all on DxCore (unlike megaTinyCore) - only dPTTN does, because dPTT needs to be a macro (or at least constant/compiletime known and foldable) otherwise it causes problems with other code that relies upon it being a macro (often without realizing it), or which produce really bad output from that. But at compiletime, you have no idea which timer the TCAs are on - you don't know that until you call analogWrite, which calls the function dPTTN()
 `**` What was described above regarding including the TCA mux option would look much like this. Notice how we split the byte up into, effectively,
 `***` A hypothetical part with multiple DACs with output buffers will extend this by increasing the count.  into 0x8x.
 `@` Planned for future use. All 0x9x values are reserved for future applications of the RTC and/or PIT and not other new kinds of timers to be determined at a future date.
@@ -773,7 +773,7 @@ Up to four mux options per TCB and up to 8 TCBs on a future part could be accomm
 
 
 There were some key and non-obvious hazards:
-  * For dPTT[N] especially. It is convenient to make a copy
+* Unfortunately I never actually wrote down the list, just the heading, and forgot what they were, then came back days or weeks later and saw the cut-off sentence. Sorry. And it's a shame, I think these were important.
 
 ### For megaTinyCore
 | Timer Name   | Value | Peripheral |          Used for |
@@ -847,7 +847,7 @@ Calls to `_gCMT` should be conditionally compiled based on CORE_HAS_CURRENTTIMER
   In the future, there may be additioal timers supported above 0x80.
 5. Otherwise, check bit 6 (0x40). If it is a 1, you have a type D timer on this pin. Bits 4 and 5 indicate which waveform output channel, and bits 0-2 indicate the mux option. Bit 3 is reserved for any future TCD1.
   Having both those pieces of information in the table improves performance.
-6.  Finally, check bit 5 (0x20). Which If set, means a type B timer pin
+6. Finally, check bit 5 (0x20). If set, means a type B timer pin
   a. 3 LSBs contain the timer number. If bit 4 is set, it's the alternate pin. If a second or third is ever available, we'll use bit 3 just like TCA.
 
 

@@ -10,7 +10,7 @@ These items are in addition to what was listed under changes already in release.
 #### Planned 2.7.0
 * Migrate to avrdude 7.2
 
-#### Planned 2.6.9/x
+#### Planned 2.6.10/x
 * Add support `_getCurrentMillisTimer()` and `getCurrentMillisMode()`, required for sleepTime.
 
 
