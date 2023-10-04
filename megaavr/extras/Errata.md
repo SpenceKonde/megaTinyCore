@@ -31,7 +31,7 @@ Issue is mitigated in relevant API functions, but the workaround is distasteful 
 * 4 - *Serious Impact*
 These issues are those that impact most or all users of the relevant peripheral, and for which no complete workaround will provide the functionality the datasheet described, and Microchip has confirmed by including it on errata or directly that they do consider it to be a bug, and this isn't just a really bad feature working as intended. Issues of 4 and 5 severity have a significant adverse impact on users.
 * 5 - *Critical Impact*
-This bug is impossible to avoid or nearly impossible to avoid if you are using the peripheral. We cannot work around it for the general case, if it can be worked around at all; any workaround is likely to have sideffects or have other limitations. If it's covered by the API, we don't handle it. These level of issue threaten to render parts unsuitable for impacted use cases. These may also be 4's with aggrevating factors like poor description in the errata, and/or particularly perverse and/or surprising  behavior (I'm looking at the RTC)
+This bug is impossible to avoid or nearly impossible to avoid if you are using the peripheral. We cannot work around it for the general case, if it can be worked around at all; any workaround is likely to have sideffects or have other limitations. If it's covered by the API, we don't handle it. These level of issue threaten to render parts unsuitable for impacted use cases. These may also be 4's with aggravating factors like poor description in the errata, and/or particularly perverse and/or surprising  behavior (I'm looking at the RTC)
 
 
 ## Errata Groups
@@ -51,7 +51,7 @@ Errata apply to a specific die. But the same die may be used on multiple parts, 
   * all 32k
 
 ## The grand combined table, now readable
-[**The table is now in Google Sheets and publically viewable - color coded too!**](https://docs.google.com/spreadsheets/d/1N-dDZ3WogEXRYcOip5kOREj_ExPQQRD1OrgMuywjXzw/edit?usp=sharing)
+[**The table is now in Google Sheets and publicly viewable - color coded too!**](https://docs.google.com/spreadsheets/d/1N-dDZ3WogEXRYcOip5kOREj_ExPQQRD1OrgMuywjXzw/edit?usp=sharing)
 
 
 
