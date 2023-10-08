@@ -37,11 +37,15 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 * Maintenance: Rebuild all bootloader files again.
 * Bugfix: Correct issue with missing getAnalogReadResolution function body.
 * Bugfix: Ensure that the default parameters in boards.txt for 8-pin parts are defined boardwide, rather than for the default option, because people on PIO don't know when new options are added, or that all options are expected to be included. This was done for most - but not all - parts.
+* Bugfix: Azduino7 toolchain for windows had excessive bloat (duplicated files - which raises some questions about the BZIP2 algorithm. (note that if arduino knew how to deal with .tar.xz (LZMA), the toolchain download would be 1/3rd the size!, and all platforms had bad copies of eeprom.h and power.h.
 * Enhancement: Improve error messages when third party IDEs like PIO allow people to specify more than one millis timer, which would then fail to compile (#1002).
 * Maintenance: Work around CLI regression by specifying cli 0.33.0 for the CI.
 * Enhancement (contributed): Merge in support for using XDIR and RS485 (custom optiboot build only).
 * Enhancement: Add a test to the start of twi_pins.h that will allows it to be carried to another modern AVR core that doesn't provide badArg and badCall. Add CORE_HAS_ERRORFUNS #define.
 * Enhancement: Add `_digitalPinToCanon()` to convert pin numbers to `(port * 8) + bit_position`, will be needed to address recently reported shortcomings of the SPI library surrounding interrupts.
+* Documentation: Many, many improvements to reference docs.
+* Documentation: Move the errata tables to a google sheets spreadsheet. The table was beyond markdown
+* Packaging: Do not delete the entire extras folder, only .png/gif/jpg/jpeg files and the subfolders, when making the board manage versions.
 
 ### 2.6.8
 * CRITICAL bugfix: Fix issues introduced by pwm option menu. This prevented compilation on 1-series or Microchip boards. There were at least *4 separate issues* feeding into this.

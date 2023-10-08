@@ -96,6 +96,17 @@
 
 #if MEGATINYCORE_SERIES < 2
   /* ADC constants for 0/1-series */
+  #define LOW_LAT_ON      badArg("This option is on 2-series tiny and AVR Ex-series only")
+  #define LOW_LAT_OFF     badArg("This option is on 2-series tiny and AVR Ex-series only")
+  #define ADC_LOWLAT_ON   badArg("This option is on 2-series tiny and AVR Ex-series only")
+  #define ADC_LOWLAT_OFF  badArg("This option is on 2-series tiny and AVR Ex-series only")
+  #define PGA_KEEP_ON     badArg("This option is on 2-series tiny and AVR Ex-series only")
+  #define PGA_AUTO_OFF    badArg("This option is on 2-series tiny and AVR Ex-series only")
+  #define PGA_OFF_ONCE    badArg("This option is on 2-series tiny and AVR Ex-series only")
+  #define ADC_ENABLE      0x20
+  #define ADC_DISABLE     0x30
+  #define ADC_STANDBY_ON  0xC0
+  #define ADC_STANDBY_OFF 0x80
   #define INTERNAL0V55    (VREF_ADC0REFSEL_0V55_gc >> VREF_ADC0REFSEL_gp)
   #define INTERNAL1V1     (VREF_ADC0REFSEL_1V1_gc >> VREF_ADC0REFSEL_gp)
   #define INTERNAL2V5     (VREF_ADC0REFSEL_2V5_gc >> VREF_ADC0REFSEL_gp)
