@@ -5,7 +5,7 @@
  * PTC_CB_EVENT_TOUCH_DETECT and PTC_CB_EVENT_TOUCH_RELEASE can
  * be used for quick actions, like switching a pin or variable,
  * but it is recommended to use PTC_CB_EVENT_CONV_SELF_CMPL, as
- * otherwise the handling of the successing nodes would be delayed.
+ * otherwise the handling of the successive nodes would be delayed.
  * This example demonstrates how to use the other sensor nodes
  * as shield. This improves the signal-to-noise ratio.
  */
@@ -17,7 +17,7 @@ void setup() {
   MySerial.begin(115200);
 
   // this puts the node on the list and initializes to default values
-  ptc_add_selfcap_node(&nodes[0], PIN_TO_PTC(PIN_PA4), PIN_TO_PTC(PIN_PA5) | PIN_TO_PTC(PIN_PA6));    
+  ptc_add_selfcap_node(&nodes[0], PIN_TO_PTC(PIN_PA4), PIN_TO_PTC(PIN_PA5) | PIN_TO_PTC(PIN_PA6));
   ptc_add_selfcap_node(&nodes[1], PIN_TO_PTC(PIN_PA5), PIN_TO_PTC(PIN_PA4) | PIN_TO_PTC(PIN_PA6));
   ptc_add_selfcap_node(&nodes[2], PIN_TO_PTC(PIN_PA6), PIN_TO_PTC(PIN_PA4) | PIN_TO_PTC(PIN_PA5));
 

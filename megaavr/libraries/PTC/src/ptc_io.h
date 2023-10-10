@@ -1,5 +1,5 @@
-/* 
- * Refer to ptc.h file for copyright, changelog, usage and license information  
+/*
+ * Refer to ptc.h file for copyright, changelog, usage and license information
  */
 
 #pragma once
@@ -367,7 +367,7 @@ const ptc_ch_bm_t digital_pin_to_ptc_bm [] = {
 // lookup-table to quickly disable input and pull-up
 const uint8_t ptc_ch_to_pin [] = {
 #if (__PTC_Pincount__ <= 14)
-  PORTA_ISC(4), 
+  PORTA_ISC(4),
   PORTA_ISC(5),
   PORTA_ISC(6),
   PORTA_ISC(7),
@@ -392,7 +392,7 @@ const uint8_t ptc_ch_to_pin [] = {
   PORTA_ISC(5),
   PORTA_ISC(6),
   PORTA_ISC(7),   // X7
-  
+
   PORTB_ISC(0),
   PORTB_ISC(1),
   PORTB_ISC(2),
@@ -401,7 +401,7 @@ const uint8_t ptc_ch_to_pin [] = {
   PORTB_ISC(5),
   PORTB_ISC(6),
   PORTB_ISC(7),   // X15
-  
+
   PORTD_ISC(0),
   PORTD_ISC(1),
   PORTD_ISC(2),
@@ -410,7 +410,7 @@ const uint8_t ptc_ch_to_pin [] = {
   PORTD_ISC(5),
   PORTD_ISC(6),
   PORTD_ISC(7),   // X23
-  
+
   PORTE_ISC(0),
   PORTE_ISC(1),
   PORTE_ISC(2),
@@ -419,7 +419,7 @@ const uint8_t ptc_ch_to_pin [] = {
   PORTE_ISC(5),
   PORTE_ISC(6),
   PORTE_ISC(7),   // X31
-  
+
   PORTF_ISC(0),
   PORTF_ISC(1),
   PORTF_ISC(2),
@@ -428,7 +428,7 @@ const uint8_t ptc_ch_to_pin [] = {
   PORTF_ISC(5),   // X37
   0x00,
   0x00,
-  
+
   PORTG_ISC(0),
   PORTG_ISC(1),
   PORTG_ISC(2),

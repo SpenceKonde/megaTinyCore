@@ -5,7 +5,7 @@
  * PTC_CB_EVENT_TOUCH_DETECT and PTC_CB_EVENT_TOUCH_RELEASE can
  * be used for quick actions, like switching a pin or variable,
  * but it is recommended to use PTC_CB_EVENT_CONV_MUTUAL_CMPL, as
- * otherwise the handling of the successing nodes would be delayed.
+ * otherwise the handling of the successive nodes would be delayed.
  */
 #define MySerial Serial
 
@@ -15,7 +15,7 @@ void setup() {
   MySerial.begin(115200);
 
   // this puts the node on the list and initializes to default values
-  ptc_add_mutualcap_node(&nodes[0], PIN_TO_PTC(PIN_PA4), PIN_TO_PTC(PIN_PA7));    
+  ptc_add_mutualcap_node(&nodes[0], PIN_TO_PTC(PIN_PA4), PIN_TO_PTC(PIN_PA7));
   ptc_add_mutualcap_node(&nodes[1], PIN_TO_PTC(PIN_PA5), PIN_TO_PTC(PIN_PA7));
 
 

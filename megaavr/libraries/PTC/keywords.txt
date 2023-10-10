@@ -6,14 +6,14 @@
 # Datatypes (KEYWORD1)
 #######################################
 ptc_ch_bm_t	KEYWORD1
-ptc_node_state_t KEYWORD1
-ptc_sm_t KEYWORD1
+ptc_node_state_t	KEYWORD1
+ptc_sm_t	KEYWORD1
 ptc_ret_t	KEYWORD1
 ptc_lib_t	KEYWORD1
-cap_sensor_t KEYWORD1
-ptc_lib_sm_set_t KEYWORD1
-ptc_cb_event_t KEYWORD1
-PTC_t KEYWORD1
+cap_sensor_t	KEYWORD1
+ptc_lib_sm_set_t	KEYWORD1
+ptc_cb_event_t	KEYWORD1
+PTC_t	KEYWORD1
 
 
 
@@ -21,42 +21,42 @@ PTC_t KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 ptc_process	KEYWORD2
-ptc_event_callback KEYWORD2
-ptc_event_cb_touch KEYWORD2
-ptc_event_cb_conversion KEYWORD2
-ptc_event_cb_calibration KEYWORD2
-ptc_event_cb_wake KEYWORD2
-ptc_event_cb_error KEYWORD2
-ptc_enable_node KEYWORD2
-ptc_disable_node KEYWORD2
-ptc_set_next_conversion_type KEYWORD2
-ptc_node_set_thresholds KEYWORD2
-ptc_node_set_resistor KEYWORD2
-ptc_node_set_prescaler KEYWORD2
-ptc_node_set_gain KEYWORD2
-ptc_add_selfcap_node KEYWORD2
-ptc_add_mutualcap_node KEYWORD2
-ptc_suspend KEYWORD2
-ptc_resume KEYWORD2
-ptc_get_node_cc_fempto KEYWORD2
-ptc_get_node_xCh_bm KEYWORD2
-ptc_get_node_yCh_bm KEYWORD2
-ptc_get_node_sensor_value KEYWORD2
-ptc_get_node_touched KEYWORD2
+ptc_event_callback	KEYWORD2
+ptc_event_cb_touch	KEYWORD2
+ptc_event_cb_conversion	KEYWORD2
+ptc_event_cb_calibration	KEYWORD2
+ptc_event_cb_wake	KEYWORD2
+ptc_event_cb_error	KEYWORD2
+ptc_enable_node	KEYWORD2
+ptc_disable_node	KEYWORD2
+ptc_set_next_conversion_type	KEYWORD2
+ptc_node_set_thresholds	KEYWORD2
+ptc_node_set_resistor	KEYWORD2
+ptc_node_set_prescaler	KEYWORD2
+ptc_node_set_gain	KEYWORD2
+ptc_add_selfcap_node	KEYWORD2
+ptc_add_mutualcap_node	KEYWORD2
+ptc_suspend	KEYWORD2
+ptc_resume	KEYWORD2
+ptc_get_node_cc_fempto	KEYWORD2
+ptc_get_node_xCh_bm	KEYWORD2
+ptc_get_node_yCh_bm	KEYWORD2
+ptc_get_node_sensor_value	KEYWORD2
+ptc_get_node_touched	KEYWORD2
 ptc_get_node_sm	KEYWORD2
-ptc_get_node_delta KEYWORD2
-ptc_get_node_state KEYWORD2
-ptc_node_request_recal KEYWORD2
+ptc_get_node_delta	KEYWORD2
+ptc_get_node_state	KEYWORD2
+ptc_node_request_recal	KEYWORD2
 ptc_init_ADC0	KEYWORD2
 ptc_lp_init	KEYWORD2
-ptc_lp_disable KEYWORD2
-ptc_lp_was_waken KEYWORD2
+ptc_lp_disable	KEYWORD2
+ptc_lp_was_waken	KEYWORD2
 ptc_get_sm_settings	KEYWORD2
-ptc_event_cb_touch KEYWORD2
-ptc_event_cb_wake KEYWORD2
-ptc_event_cb_conversion KEYWORD2
-ptc_event_cb_calibration KEYWORD2
-ptc_event_cb_error KEYWORD2
+ptc_event_cb_touch	KEYWORD2
+ptc_event_cb_wake	KEYWORD2
+ptc_event_cb_conversion	KEYWORD2
+ptc_event_cb_calibration	KEYWORD2
+ptc_event_cb_error	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
@@ -66,26 +66,25 @@ ptc_event_cb_error KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
-PTC_CB_EVENT_TOUCH LITERAL1
-PTC_CB_EVENT_TOUCH_DETECT LITERAL1
-PTC_CB_EVENT_TOUCH_RELEASE LITERAL1
-PTC_CB_EVENT_TOUCH_WAKE LITERAL1
-PTC_CB_EVENT_WAKE_TOUCH LITERAL1
-PTC_CB_EVENT_WAKE_NO_TOUCH LITERAL1
-PTC_CB_EVENT_CONV_CMPL LITERAL1
-PTC_CB_EVENT_CONV_MUTUAL_CMPL LITERAL1
-PTC_CB_EVENT_CONV_SELF_CMPL LITERAL1
-PTC_CB_EVENT_CONV_SHIELD_CMPL LITERAL1
-PTC_CB_EVENT_CONV_TYPE_CMPL_MSK LITERAL1
-PTC_CB_EVENT_CONV_CALIB LITERAL1
-PTC_CB_EVENT_ERR_CALIB_LOW LITERAL1
-PTC_CB_EVENT_ERR_CALIB_HIGH LITERAL1
-PTC_CB_EVENT_ERR_CALIB_TO LITERAL1
-PTC_CB_EVENT_ERR_CALIB_MSK LITERAL1
+PTC_CB_EVENT_TOUCH	LITERAL1
+PTC_CB_EVENT_TOUCH_DETECT	LITERAL1
+PTC_CB_EVENT_TOUCH_RELEASE	LITERAL1
+PTC_CB_EVENT_TOUCH_WAKE	LITERAL1
+PTC_CB_EVENT_WAKE_TOUCH	LITERAL1
+PTC_CB_EVENT_WAKE_NO_TOUCH	LITERAL1
+PTC_CB_EVENT_CONV_CMPL	LITERAL1
+PTC_CB_EVENT_CONV_MUTUAL_CMPL	LITERAL1
+PTC_CB_EVENT_CONV_SELF_CMPL	LITERAL1
+PTC_CB_EVENT_CONV_SHIELD_CMPL	LITERAL1
+PTC_CB_EVENT_CONV_TYPE_CMPL_MSK	LITERAL1
+PTC_CB_EVENT_CONV_CALIB	LITERAL1
+PTC_CB_EVENT_ERR_CALIB_LOW	LITERAL1
+PTC_CB_EVENT_ERR_CALIB_HIGH	LITERAL1
+PTC_CB_EVENT_ERR_CALIB_TO	LITERAL1
+PTC_CB_EVENT_ERR_CALIB_MSK	LITERAL1
 NODE_TYPE_NOCONV_bm	LITERAL1
-NODE_MUTUAL_bm LITERAL1
+NODE_MUTUAL_bm	LITERAL1
 NODE_SELFCAP_bm	LITERAL1
-NODE_SHIELD_bm LITERAL1
-NODE_SELFCAP_SHIELD_bm LITERAL1
-NODE_TYPE_bm LITERAL1
-
+NODE_SHIELD_bm	LITERAL1
+NODE_SELFCAP_SHIELD_bm	LITERAL1
+NODE_TYPE_bm	LITERAL1

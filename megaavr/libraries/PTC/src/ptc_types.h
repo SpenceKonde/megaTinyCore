@@ -200,7 +200,7 @@ typedef struct cap_sensor_type {
   struct cap_sensor_type* nextNode;
   ptc_node_type_t   type;
   ptc_id_t  id;             // number for easier identification in the callback
- 
+
   ptc_ch_bm_t hw_xCh_bm;
   ptc_ch_bm_t hw_yCh_bm;
   uint16_t hw_compCaps;      // [13:12] rough; [11:8] course; [7:4] fine; [3:0] accurate

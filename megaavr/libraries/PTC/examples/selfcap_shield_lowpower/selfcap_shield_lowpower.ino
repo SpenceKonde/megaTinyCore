@@ -12,7 +12,7 @@
  * As millis() is not incremented while the CPU is asleep, it will
  * take the Chip 10 seconds after a wake event before it goes back
  * to sleep.
- * ptc_process will also fire either PTC_CB_EVENT_WAKE_TOUCH or 
+ * ptc_process will also fire either PTC_CB_EVENT_WAKE_TOUCH or
  * PTC_CB_EVENT_WAKE_NO_TOUCH after a conversion on the lp-node
  * has been finished.
  */
@@ -25,7 +25,7 @@ void setup() {
   MySerial.begin(115200);
 
   // this puts the node on the list and initializes to default values
-  ptc_add_selfcap_node(&nodes[0], PIN_TO_PTC(PIN_PA4), PIN_TO_PTC(PIN_PA5));    
+  ptc_add_selfcap_node(&nodes[0], PIN_TO_PTC(PIN_PA4), PIN_TO_PTC(PIN_PA5));
   ptc_add_selfcap_node(&nodes[1], PIN_TO_PTC(PIN_PA6), PIN_TO_PTC(PIN_PA5));
 
   // as each node requires some calibration and drift, it is recommended
@@ -52,7 +52,7 @@ void setup() {
   //EVSYS.ASYNCUSER8 = EVSYS_ASYNCUSER8_ASYNCCH3_gc;
   //PORTMUX.CTRLA = PORTMUX_EVOUT0_bm;
   //pinMode(PIN_PA2, OUTPUT);
-  
+
 
   // Stand-by sleep
   SLPCTRL.CTRLA = SLEEP_MODE_STANDBY | SLPCTRL_SEN_bm;
@@ -72,7 +72,7 @@ void loop() {
     MySerial.flush(); // empty the Serial TX buffer
 
     ptc_lp_init(&lp_node);  // Will set STARTEI bit to start conversions
-    while (ptc_lp_was_waken() != PTC_LIB_WAS_WAKEN) { 
+    while (ptc_lp_was_waken() != PTC_LIB_WAS_WAKEN) {
       sleep_cpu();  // Make sure the ADC has woken the CPU, otherwise, go back to sleep
     }               // The library does not filter the wake-up events. The user must make sure
                     // there are no detected touches before going back to sleep.
@@ -114,9 +114,9 @@ void ptc_event_cb_calibration(const ptc_cb_event_t eventType, cap_sensor_t* node
 
 void ptc_event_cb_wake(const ptc_cb_event_t eventType, cap_sensor_t* node) {
    if (PTC_CB_EVENT_WAKE_TOUCH == eventType) {
-      // True if the node was touched when a wakeup occured
+      // True if the node was touched when a wakeup occurred
   } else if (PTC_CB_EVENT_WAKE_NO_TOUCH == eventType) {
-    // True if the node was no touch when a wakeup occured
+    // True if the node was no touch when a wakeup occurred
   }
   (void)node;   // remove unused warning
 }

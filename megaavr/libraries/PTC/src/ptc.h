@@ -150,7 +150,7 @@ uint8_t ptc_suspend(void);
 void ptc_resume(void);
 
 // If you want to know the compensation capacitance in fempto Farrad
-uint16_t ptc_get_node_cc_fempto(cap_sensor_t* node);
+uint16_t ptc_get_node_cc_femto(cap_sensor_t* node);
 
 ptc_lib_sm_set_t* ptc_get_sm_settings();
 
@@ -171,12 +171,12 @@ inline uint16_t ptc_get_node_sensor_value(cap_sensor_t* node) {
   return node->sensorData;
 }
 
-// returns true, if node is a valid pointer and node is touched, otherwise false. 
+// returns true, if node is a valid pointer and node is touched, otherwise false.
 // No other return value so there can be easy checks - not null or null
 inline uint8_t ptc_get_node_touched(cap_sensor_t* node) {
   if (node == NULL) return 0x00;
 
-  if (node->stateMachine & (PTC_SM_TOUCH_DETECT | PTC_SM_TOUCH_OUT_FLT)) 
+  if (node->stateMachine & (PTC_SM_TOUCH_DETECT | PTC_SM_TOUCH_OUT_FLT))
     return 0x01;
   return 0x00;
 }
@@ -205,7 +205,7 @@ inline uint8_t ptc_get_node_state(cap_sensor_t* node) {
 inline ptc_id_t ptc_get_node_id(cap_sensor_t* node) {
   if (node == NULL)
     return 0xFF;
-  
+
   return (node->id);
 }
 

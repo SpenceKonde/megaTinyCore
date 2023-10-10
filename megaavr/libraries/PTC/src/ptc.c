@@ -1,5 +1,5 @@
-/* 
- * Refer to ptc_touch.h file for copyright, changelog, usage and license information  
+/*
+ * Refer to ptc_touch.h file for copyright, changelog, usage and license information
  */
 
 
@@ -8,7 +8,7 @@
 
 
 // The following functions are used internally only.
-// get the pointer of the last valid node struct can be "firstNode" 
+// get the pointer of the last valid node struct can be "firstNode"
 cap_sensor_t* ptc_get_last_node(void);
 
 
@@ -54,7 +54,7 @@ volatile ptc_lib_t ptc_lib_state = PTC_LIB_IDLE;
 /*
  * Global settings for the state-machine applied on every node.
  * Pointer to this struct can be retrieved by ptc_get_sm_settings()
- * 
+ *
  */
 ptc_lib_sm_set_t ptc_sm_settings = {
   .force_recal_delta = 150,
@@ -72,7 +72,7 @@ ptc_lib_sm_set_t* ptc_get_sm_settings() {
 // Analog gain Values, extracted with a debugger
 
 const uint8_t ptc_a_gain_lut[] = {
-  0x3F, 0x1C, 0x0B, 
+  0x3F, 0x1C, 0x0B,
   0x05, 0x03, 0x01,
 };
 
@@ -89,7 +89,7 @@ const uint8_t ptc_a_gain_lut[] = {
 // Workarounds to make the code work with DAs... Argh.
 #if defined (__PTC_DA__)
   #ifndef ADC_SAMPNUM_ACC1_gc
-    #define ADC_SAMPNUM_ACC1_gc ADC_SAMPNUM_NONE_gc 
+    #define ADC_SAMPNUM_ACC1_gc ADC_SAMPNUM_NONE_gc
   #endif
   #ifndef ADC_REFSEL_VDDREF_gc
     #define ADC_REFSEL_VDDREF_gc 0x00
@@ -121,7 +121,7 @@ __attribute__ ((weak, alias("ptc_event_callback"))) void ptc_event_cb_error(cons
 
 // Set the threshold for touch detection and away from touch for a node
 uint8_t ptc_node_set_thresholds (cap_sensor_t* node, int16_t th_in, int16_t th_out) {
-  if (NULL == node) 
+  if (NULL == node)
     return PTC_LIB_BAD_POINTER;
 
   node->touch_in_th = th_in;
@@ -133,7 +133,7 @@ uint8_t ptc_node_set_thresholds (cap_sensor_t* node, int16_t th_in, int16_t th_o
 // Change Resistor Setting. Note: Only has an effect on mutual sensors
 uint8_t ptc_node_set_resistor(cap_sensor_t* node, uint8_t res) {
   PTC_CHECK_FOR_BAD_POINTER(node);
-    
+
   if (res > RSEL_MAX)
     return PTC_LIB_BAD_ARGUMENT;
 
@@ -169,10 +169,10 @@ uint8_t ptc_node_set_gain(cap_sensor_t* node, uint8_t aGain, uint8_t dGain) {
     if (__builtin_constant_p(aGain))
       badArg("Analog Gain too high. Max Analog Gain Value is 0x05 (equals 32x)");
     return PTC_LIB_BAD_ARGUMENT;
-  } 
-  
+  }
+
   if (dGain > 0x06) {
-    if (__builtin_constant_p(dGain)) 
+    if (__builtin_constant_p(dGain))
       badArg("Digital Gain too high. Max Digital Gain Value is 0x06 (equals 64x)");
     return PTC_LIB_BAD_ARGUMENT;
   }
@@ -238,7 +238,7 @@ void ptc_init_ADC0(void) {
     pPTC->CTRLB    = ADC_SAMPNUM_ACC1_gc;
     pPTC->CTRLA    = ADC_ENABLE_bm;
   #elif defined (__PTC_DA__)
-  
+
   #endif
 }
 
@@ -249,10 +249,10 @@ void ptc_add_node_common(cap_sensor_t* node, ptc_ch_bm_t yCh, ptc_ch_bm_t xCh);
 // if xCh > 0, with shield, otherwise usual selfcap
 uint8_t ptc_add_selfcap_node_asserted(cap_sensor_t* node, const ptc_ch_bm_t yCh, const ptc_ch_bm_t xCh) {
   PTC_CHECK_POINTER(node, PTC_LIB_BAD_POINTER); // check not in h file as gcc doesn't know about the memory address
-  
+
   if (ptc_append_node(node) != PTC_LIB_SUCCESS)
     return PTC_LIB_BAD_POINTER;
-  
+
   ptc_add_node_common(node, yCh, xCh);
 
   if (xCh > 0)  node->type = NODE_SELFCAP_SHIELD_bm;
@@ -281,8 +281,8 @@ uint8_t ptc_add_mutualcap_node_asserted(cap_sensor_t* node, ptc_ch_bm_t yCh, ptc
   node->touch_in_th = 10;
   node->touch_out_th = 5;
   node->hw_compCaps = PTC_DEFAULT_MC_CC;  /* value from official library */
-  node->hw_rsel_presc = NODE_RSEL_PRSC(RSEL_VAL_100, PTC_PRESC_DEFAULT); 
-  
+  node->hw_rsel_presc = NODE_RSEL_PRSC(RSEL_VAL_100, PTC_PRESC_DEFAULT);
+
   return PTC_LIB_SUCCESS;
 }
 
@@ -411,14 +411,14 @@ uint8_t ptc_lp_was_waken(void) {
 
 
 /* not recommended to use, as the calculation is bloated */
-uint16_t ptc_get_node_cc_fempto (cap_sensor_t* node) {
+uint16_t ptc_get_node_cc_femto (cap_sensor_t* node) {
   if (NULL == node)
     return 0;
 
   uint16_t retVal = 0;
   uint16_t comp = node->hw_compCaps;
   for (uint8_t i = 0; i < 3; i++) {
-    retVal /= 10; /* "skips" last addition */ 
+    retVal /= 10; /* "skips" last addition */
     uint8_t temp = comp & 0x0F;
     retVal += (temp * 675);
     comp >>= 4;   /* select next field */
@@ -612,7 +612,7 @@ void ptc_process_node_sm (cap_sensor_t* node) {
 
   }
 
-  
+
   if (node->stateMachine != nodeSM) {
     node->lastStateChange = 0;
     node->stateMachine = nodeSM;
@@ -624,7 +624,7 @@ void ptc_process_node_sm (cap_sensor_t* node) {
 
 uint8_t ptc_process_calibrate (cap_sensor_t* node) {
   uint16_t rawData = node->sensorData;
-  
+
   #if defined(__PTC_Tiny__)
     uint16_t compensation = node->hw_compCaps;
     uint8_t cc_accurate =             compensation        & 0x0F;
@@ -723,7 +723,7 @@ uint8_t ptc_process_calibrate (cap_sensor_t* node) {
             cc_fine -= dir;
             if (dir < 0)
               return PTC_LIB_CALIB_TOO_LOW;
-            else 
+            else
               return PTC_LIB_CALIB_TOO_HIGH;
           } else {
             cc_coarse -= dirOvf;
@@ -836,8 +836,8 @@ void ptc_init_conversion(uint8_t nodeType) {
   } else {
     return;
   }
-  
-  
+
+
   uint8_t freq = freq_select;
   if (nodeType == NODE_MUTUAL_bm) {
     pPTC->SAMPDLY = 0x00;
@@ -852,7 +852,7 @@ void ptc_init_conversion(uint8_t nodeType) {
       freq = 0x0F;
     pPTC->SAMPDLY = freq;
   }
-  
+
   pPTC->INTFLAGS = ADC_RESRDY_bm | ADC_WCMP_bm; // clear ISR flags, if there were unhandled
 
   currConvType = nodeType;
@@ -897,7 +897,7 @@ void ptc_set_registers(cap_sensor_t* node) {
 
   if (NULL == node)
     return;
-  
+
   uint8_t analogGain = 0x3F;
   if ((node->state.disabled == 0) && (node->stateMachine != PTC_SM_NOINIT_CAL)) {
     uint8_t lut_index = node->hw_a_d_gain / 16;  // A little workaround as >> 4 is kinda broken sometimes.
@@ -923,9 +923,9 @@ void ptc_set_registers(cap_sensor_t* node) {
     pPTC->CTRLP |= 0x03;
     pPTC->CTRLA = ADC_RUNSTBY_bm | ADC_ENABLE_bm; /* 0x81 */
 
-    if (0 == node->state.low_power) 
+    if (0 == node->state.low_power)
       pPTC->COMMAND = 0x01; // Normal opertion: Manual Start
-    else 
+    else
       pPTC->EVCTRL = 0x01;  // Low Power: Start by positive Flank on Event
   #elif defined (__PTC_DA__)
 
@@ -952,7 +952,7 @@ void ptc_eoc(void) {
 
   if (pCurrentNode->state.low_power) {
     if (flags & ADC_WCMP_bm) {
-      pCurrentNode->state.win_comp = 1; 
+      pCurrentNode->state.win_comp = 1;
       ptc_lib_state = PTC_LIB_CONV_WCMP;
     } else {
       pCurrentNode->state.win_comp = 0;
@@ -976,7 +976,7 @@ cap_sensor_t* ptc_get_last_node (void) {
     cap_sensor_t *nextNode = node->nextNode;
     if (nextNode == NULL)
       return node;
-    else 
+    else
       node = nextNode;
   }
 }
