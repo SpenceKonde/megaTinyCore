@@ -170,7 +170,7 @@ Sync/Filter: Off for latch, on for flip-flop.
 ### Pulse-stretcher
 You often need pulses output on pins or to direct internal peripherals via the event system. Maybe you have an input that generates fast pulses, but you need a long enough pulse for a synchronous peripheral to react to, or maybe you'd like to generate a pulse from software, and then immediately write to another pin *during* the pulse, because that would make some bigbanged mess cleaner (I doubt it will, but feel free to try).
 
-#### Even LUT:
+#### Even LUT
 Start with the even LUT set to act as an S/R latch as described above.
 
 INSEL:
@@ -180,7 +180,7 @@ INSEL:
 
 LUT per above.
 
-#### Odd LUT:
+#### Odd LUT
 The odd lut is a simple delay.
 
 INSEL:
@@ -219,7 +219,7 @@ This combination does the following:
 ### Pulse Stretcher 2
 This uses the sequencer. It doesn't get you the delayed pulse. However, it is largely free of complications.
 
-#### Even LUT:
+#### Even LUT
 Even LUT drives set.
 
 INSEL:
@@ -229,7 +229,7 @@ INSEL:
 
 LUT 0x02
 
-#### Odd LUT:
+#### Odd LUT
 The odd lut drives reset, much like the one above did.
 
 INSEL:
@@ -347,7 +347,7 @@ This generates a pulse two or four clocks long on either a rising *or* falling e
 
 We need 2 LUTs, n, and n+1, where n is an even number.
 
-#### LUTn+1: Configure for 2 or 4 clock delay as above.
+#### LUTn+1: Configure for 2 or 4 clock delay as above
 See also variant below. The first stage is just generating a delayed version of the input waveform.
 
 #### LUTn
