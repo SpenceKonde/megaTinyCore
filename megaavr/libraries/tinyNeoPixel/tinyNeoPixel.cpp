@@ -50,7 +50,7 @@
 
 // Constructor when length, pin and type are known at compile-time:
 tinyNeoPixel::tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t) :
-  begun(false), latchTime(50), brightness(0), pixels(NULL), endTime(0) {
+  begun(false), brightness(0), pixels(NULL), latchTime(50), endTime(0) {
   updateType(t);
   updateLength(n);
   setPin(p);
@@ -62,7 +62,8 @@ tinyNeoPixel::tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t) :
 // command.  If using this constructor, MUST follow up with updateType(),
 // updateLength(), etc. to establish the strand type, length and pin number!
 tinyNeoPixel::tinyNeoPixel() :
-  begun(false), numLEDs(0), numBytes(0), latchTime(50), pin(NOT_A_PIN), brightness(0), pixels(NULL), rOffset(1), gOffset(0), bOffset(2), wOffset(1), endTime(0)  {
+  begun(false), numLEDs(0), numBytes(0), pin(NOT_A_PIN), brightness(0), pixels(NULL),
+  rOffset(1), gOffset(0), bOffset(2), wOffset(1), latchTime(50), endTime(0)  {
 }
 
 tinyNeoPixel::~tinyNeoPixel() {

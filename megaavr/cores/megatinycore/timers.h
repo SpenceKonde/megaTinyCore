@@ -50,7 +50,9 @@
 #endif
 #if defined(USE_TIMERD0_PWM)
   #if !defined(TCD0)
-    #pragma message("Note: This part does not have a TCD, hence there is no PWM from TCD available.")
+    #if defined(ARDUINO_MAIN)
+      #pragma message("Note: This part does not have a TCD, hence there is no PWM from TCD available.")
+    #endif
     #undef USE_TIMERD0_PWM
   #endif
 #endif
