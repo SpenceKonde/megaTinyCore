@@ -25,12 +25,10 @@ These items are in addition to what was listed under changes already in release.
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes
 
 
-
-
 ## Released Versions
 
 ### 2.6.10 - Critical fix
-* Critical bugfix: Have to reroll release and change to versiuon azduinio7b. It is *binary identical* to azduino7, but I pushed out the wrong CRC in the json file
+* Critical bugfix: Switch to using Azduino7c, which is the same as the Azduino7b binary, but with the correct CRC attached.
 * Bugfix: #1014, named constants for ADCPowerOptions() did not work on 0/1-series parts. The 4 valid options are now given named defines, and the rest are #defined as `badArg("This option is on 2-series tiny and AVR Ex-series only")`
 
 ### ~2.6.9~
