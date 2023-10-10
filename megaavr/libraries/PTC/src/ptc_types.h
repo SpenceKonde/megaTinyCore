@@ -1,5 +1,5 @@
-/* 
- * Refer to ptc_touch.h file for copyright, changelog, usage and license information  
+/*
+ * Refer to ptc_touch.h file for copyright, changelog, usage and license information
  */
 
 
@@ -55,7 +55,7 @@ extern "C" {
 /**
  * PTC series resistor setting. For Mutual cap mode, this series
  * resistor is switched internally on the Y-pin. For Self cap mode,
- * thes series resistor is switched internally on the Sensor pin.
+ * the series resistor is switched internally on the Sensor pin.
  *
  * Example:
  * RSEL_VAL_0 sets internal series resistor to 0ohms.
@@ -221,10 +221,10 @@ typedef struct cap_sensor_type {
 
 // Abbreviation: NoM: Number of Measurements
 typedef struct ptc_lib_sm_settings_type {
-  uint16_t force_recal_delta;     // if the threshold value exceeds this compared to optimal (512), force recalibration.  Defualt: 150
+  uint16_t force_recal_delta;     // if the threshold value exceeds this compared to optimal (512), force recalibration.  Default: 150
   uint8_t  touched_detect_nom;    // NoM above node threshold for the node to become touched.         Default: 3
   uint8_t  untouched_detect_nom;  // NoM below node threshold for the node to become untouched.       Default: 3
-  uint8_t  touched_max_nom;       // NoM a touch was detected until a recal if forced.                Value +1. Disabled with 0xFF. Default: 200
+  uint8_t  touched_max_nom;       // NoM a touch was detected until a recalibration is forced.        Value +1. Disabled with 0xFF. Default: 200
   uint8_t  drift_up_nom;          // NoM when no touch is detected, until the threshold is increased. Value +1. Disabled with 0xFF. Default: 20
   uint8_t  drift_down_nom;        // NoM when no touch is detected, until the threshold is decreased. Value +1. Disabled with 0xFF. Default: 20
 } ptc_lib_sm_set_t;

@@ -1,4 +1,4 @@
-# ptc_touch
+# PTC Library
 An Arduino compatible C library to support the PTC in the AtTiny 1-Series
 
 ## Features
@@ -89,7 +89,7 @@ The ptc_ch_bm_t is a typedef that depends on the pincount of the device and rang
 
 ### PTC Operation
 ![PTC_InnerWorkings](https://github.com/MX682X/ptc_touch/assets/58419867/823c487c-0633-4031-b381-45e7a32867fb)
-(Source: [Microchip's PTC Subsystem Firmware User's Guide](https://web.archive.org/web/20221225142000/https://www.mouser.com/pdfdocs/SAMA5D2_PTC_Firmware_UG.pdf))
+(Source: [Microchip's PTC Subsystem Firmware User's Guide](<https://web.archive.org/web/20221225142000/https://www.mouser.com/pdfdocs/SAMA5D2_PTC_Firmware_UG.pdf>))
 This schematic was made for a different chip, but it is likely to look similar on the AVRs.
 
 Most of the following is a hypothesis based on the publicly available documentation and observation.
@@ -127,9 +127,9 @@ If a node is not sensitive enough, you can increase the Analog Gain (if it becom
 
 ### Global settings of the State-maschine
 The state-machine, which changes the node's state between Calibration, touch, no touch, etc. uses some variables that are valid for all nodes, those are:
- - `uint16_t force_recal_delta`. Each node has a threshold value that is used to calculate the delta. This Threshold value is drifting over time to adjust for environmental changes. If the threshold value drifts 512 +/- this value, a recalibration of CC is performed. Default: 150
- - `uint8_t  touched_detect_nom`. Number of consecutive Measurements (Conversions) that are above the touch threshold until the node becomes "touched". Default: 3
- - `uint8_t  untouched_detect_nom`. Number of consecutive measurements that are below the no-touch threshold until the node is fully untouched. Default: 3
- - `uint8_t  touched_max_nom`. Number of consecutive measurements plus one in the touched state until a recalibration is forced. Can be disabled by writing 255 to it. Default: 200
- - `uint8_t  drift_up_nom`. If the delta is higher then the reference, but lower then the threshold, the amount of consecutive measurements plus one, until the reference is incremented. Can be disabled with 255. Default: 20.
- - `uint8_t  drift_down_nom`. If the delta is below the reference, the amount of consecutive measurements plus one until the reference is decremented. Can be disabled with 255. Default: 20.
+- `uint16_t force_recal_delta`. Each node has a threshold value that is used to calculate the delta. This Threshold value is drifting over time to adjust for environmental changes. If the threshold value drifts 512 +/- this value, a recalibration of CC is performed. Default: 150
+- `uint8_t  touched_detect_nom`. Number of consecutive Measurements (Conversions) that are above the touch threshold until the node becomes "touched". Default: 3
+- `uint8_t  untouched_detect_nom`. Number of consecutive measurements that are below the no-touch threshold until the node is fully untouched. Default: 3
+- `uint8_t  touched_max_nom`. Number of consecutive measurements plus one in the touched state until a recalibration is forced. Can be disabled by writing 255 to it. Default: 200
+- `uint8_t  drift_up_nom`. If the delta is higher then the reference, but lower then the threshold, the amount of consecutive measurements plus one, until the reference is incremented. Can be disabled with 255. Default: 20.
+- `uint8_t  drift_down_nom`. If the delta is below the reference, the amount of consecutive measurements plus one until the reference is decremented. Can be disabled with 255. Default: 20.

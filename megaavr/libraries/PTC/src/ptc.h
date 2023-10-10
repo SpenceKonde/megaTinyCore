@@ -62,7 +62,7 @@ extern "C" {
 // if it's Flash, it will be 0x80, as signed it means negative.
 // if it's anything else (I/O, EEPROM, etc.), p will be <= 14
 // thus making a signed check will make pretty sure the pointer points to a RAM address
-// Disadvantage: GCC can not validate this at compiletime as it does not know the variable's
+// Disadvantage: GCC can not validate this at compile time as it does not know the variable's
 // address at compile-time.
 #define PTC_CHECK_POINTER(__p__, __ret__)         \
   if (((int8_t)((uint16_t)__p__ >> 8)) < 0x38) {  \
@@ -100,7 +100,7 @@ uint8_t ptc_enable_node(cap_sensor_t* node);
 // Disables a node. If the conversion is started, it will be finished
 uint8_t ptc_disable_node(cap_sensor_t* node);
 
-// Can be used outside an acqusition process to select ADC/SELFCAP/MUTUAL/SHIELD
+// Can be used outside an acquisition process to select ADC/SELFCAP/MUTUAL/SHIELD
 void ptc_set_next_conversion_type(ptc_node_type_t type);
 
 // Main task handle for PTC. Handles State-Machine, drift, and calibration
@@ -149,7 +149,7 @@ inline uint8_t ptc_add_mutualcap_node(cap_sensor_t* node, const ptc_ch_bm_t yCh,
 uint8_t ptc_suspend(void);
 void ptc_resume(void);
 
-// If you want to know the compensation capacitance in fempto Farrad
+// If you want to know the compensation capacitance in femto Farrad
 uint16_t ptc_get_node_cc_femto(cap_sensor_t* node);
 
 ptc_lib_sm_set_t* ptc_get_sm_settings();

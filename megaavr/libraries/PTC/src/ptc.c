@@ -43,8 +43,8 @@ volatile cap_sensor_t *currConvNode = NULL;
 ptc_node_type_t currConvType = 0;   // does not "remember" if type was low-power
 ptc_node_type_t nextConvType = 0;
 
-uint16_t acqPeriod = 20;    // Period in ms until a new acquision is started
-uint16_t lastAcqTime = 0;   // millis value of last Acqusition (16-bit)
+uint16_t acqPeriod = 20;    // Period in ms until a new acquisition is started
+uint16_t lastAcqTime = 0;   // millis value of last acquisition (16-bit)
 
 ptc_freq_t freq_select = 0;  /* FREQ_SEL_0 to FREQ_SEL_15, FREQ_SEL_SPREAD -> CTRLD */
 
@@ -149,7 +149,7 @@ uint8_t ptc_node_set_resistor(cap_sensor_t* node, uint8_t res) {
 }
 
 
-// Change preschaler. Recomended ADC frequency: < 1.5MHz, but max 3 factors below
+// Change pre-scaler. Recommended ADC frequency: < 1.5MHz, but max 3 factors below
 uint8_t ptc_node_set_prescaler(cap_sensor_t* node, uint8_t presc) {
   PTC_CHECK_FOR_BAD_POINTER(node);
 
@@ -184,7 +184,7 @@ uint8_t ptc_node_set_gain(cap_sensor_t* node, uint8_t aGain, uint8_t dGain) {
 
 /*
  *  Two functions to suspend and resume of the normal PTC operation, however,
- *  this functions will only work when no acqusition is in progress. Neither
+ *  this functions will only work when no acquisition is in progress. Neither
  *  when the library is in low-power mode. This is due to the fact that the
  *  low-power mode relies on the registers being set once, at the low-power
  *  initialization. Thus, the user has to disable LP mode, then suspend, resume
@@ -539,8 +539,8 @@ void ptc_process_node_sm (cap_sensor_t* node) {
     }
 
 
-  } else if (nodeSM & PTC_SM_NO_TOUCH) {   /* default State, no touch */
-    if (nodeDelta < -150) {                 /* if the touch value is way too small, something chnaged with the lines, recal */
+  } else if (nodeSM & PTC_SM_NO_TOUCH) {  /* default State, no touch */
+    if (nodeDelta < -150) {               /* if the touch value is way too small, something changed with the lines, recalibrate */
       nodeSM = PTC_SM_RECAL_FLT;
     } else if (nodeDelta >= node->touch_in_th) {
       nodeSM = PTC_SM_TOUCH_IN_FLT;
@@ -924,7 +924,7 @@ void ptc_set_registers(cap_sensor_t* node) {
     pPTC->CTRLA = ADC_RUNSTBY_bm | ADC_ENABLE_bm; /* 0x81 */
 
     if (0 == node->state.low_power)
-      pPTC->COMMAND = 0x01; // Normal opertion: Manual Start
+      pPTC->COMMAND = 0x01; // Normal operation: Manual Start
     else
       pPTC->EVCTRL = 0x01;  // Low Power: Start by positive Flank on Event
   #elif defined (__PTC_DA__)
@@ -934,7 +934,7 @@ void ptc_set_registers(cap_sensor_t* node) {
 
 void ptc_eoc(void) {
   PTC_t *pPTC;
-  volatile cap_sensor_t *pCurrentNode;  // volatile nedded to pass type check
+  volatile cap_sensor_t *pCurrentNode;  // volatile needed to pass type check
   _fastPtr_d(pPTC,&PTC);
   _fastPtr_d(pCurrentNode,currConvNode);
 
