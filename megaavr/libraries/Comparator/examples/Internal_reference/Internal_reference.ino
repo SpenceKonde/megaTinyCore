@@ -1,4 +1,4 @@
- /***********************************************************************|
+/***********************************************************************|
 | Modern AVR Comparator library for tinyAVR 0/1/2, megaAVR0, Dx, and  Ex|
 |                                                                       |
 | Developed in 2019 by MCUdude    https://github.com/MCUdude/           |
