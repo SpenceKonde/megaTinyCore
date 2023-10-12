@@ -16,7 +16,7 @@ These items are in addition to what was listed under changes already in release.
 
 #### Enhancements which do not have a strict timeline or are ongoing
 * Finally implement that power save and sleep library I've been talking about for years.
-*
+* Add in the obnoxious interrupt features of SPI. I changed that over a year ago and this is the first complaint (about that, obviously), this needs to be implemented significantly better than the garbage stock implementation, which was a hellspawned abomination (the worst kind!)
 * Under consideration: analogWriteFast(pin, duty); this will require that pin be constant, allowing the determination of the PWM compare value register to be determined at compile time, rather than runtime, and if implemented, the user *must* have already called analogWrite() on the pin in question to kick off analog output - but this function would modify the duty cycle highly efficiently.
 * Port any applicable enhancements made to DxCore to megaTinyCore, should such happen be made.
 * If there are *other substantial changes that need to occur* within the core, I am unaware of the complaints and hence have no plans to address them before the heat death of the universe. If you desire changes on a more rapid timeline, please create an issue so that I am aware of the presence of said problem, deficiency, or imperfection. Those form the action item list for core development activity, so if something is not listed there, **it is unlikely to be implemented/fixed/etc** simply due to my being unaware of any concern.
@@ -24,6 +24,8 @@ These items are in addition to what was listed under changes already in release.
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes
 
+### Planned 2.6.11
+* Correct numerous issues with the microchip board defs. Clearly nobody is using them - since 2 of them didn't compile, and none of the optiboot ones would ever be able to successfully be programmed over the bootloader because selfprogramming wasn't enabled (BOOTEND = 0).
 
 ## Released Versions
 

@@ -9,34 +9,39 @@ This table lists some of the most significant differences between the tinyAVR 0,
 1+series denotes the 5 16k or 32k parts in the 1-series. These have significantly enhanced features, without an accompanying jump in price. Two recent non-tinyAVR are shown for compariso. The DD-series is price-competitive with the non-tinies. The EA-series looks like its going to be a bit pricier. The AVR DA/DB are not included in this chart - these parts are aiming for lower cost and the right size and selection of peripherals for typical applications. The DA/DB series was "Okay, we scuttled our old flagship, what's next?" "Now we get aboard our new one" .... "Well, you heard the man! Climb aboard and start bailing!" "Maybe we should have made sure it was seaworthy first?" "As if we had time for that! "
 
 
-| Parameter | 0-series | 1-series | 1+series | 2-series |   DD-series  |    EA-series |
-|-----------|----------|----------|----------|----------|--------------|--------------|
-| Flash sizes|   2-16k |     2-8k |   16-32k |    4-32k |       16-64k |        8-64k |
-| Pincounts |     8-24 |     8-24 |    14-24 |    14-24 |        14-28 |        28-48 |
-| CCL LUTs  |        2 |        2 |        2 |        4 |            4 |            4 |                0 |
-| EVSYS chan| 1syn/2asyn|2syc/4asy| 2sy/4asy |        6 |            6 |       6 v1.2 |
-| ADC type  | Normal   | Normal   | 2xNormal | Differential<br/> w/ 1/2/4/8/16x gain | Semidifferential | Differential <br/> w 1/2/4/8/16x gain, ADC specs better. |
-| ADC res   | 10-bit   | 10-bit   | 10-bit   | 12-bit   |       12-bit |       12-bit |
-| ADC speed | 4-6x <br/> classic | 4-6x <br/> classic | 4-6x <br/> classic | 10x <br/> classic | 4-6x classic |
-| VREF opts | Dumb     | Dumb     | Dumb+ext | Good     |         Good |         Good |
-| DACs      | 0        | 1x8b v0.9| 1x8b v0.9| 0        |   1x10b v1.0 |   1x10b v1.1 |
-| AC's      | 1        | 1        | 3        | 1        |            2 |            2 |
-| AC DACREF | No       | Yes*     | Yes*     | Yes      |          Yes |          Yes |
-| USARTs    | 1        | 1        | 1        | 2        |            2 |          2-3 |
-| Alt Reset | No       | No       | No       | 20/24-pin|    In effect |    In effect |
-| TCBs      | 1x v1.0  | 1x v1.0  | 2x v1.0  | 2x v1.1  |          2/3 |          2-4 |
-| TCD0      | No       | Yes      | Yes      | No       |          Yes |           No |
-| Max pract. internal<br/>overclock | 25 MHz | 25 MHz   |       32 MHz | 40-48 w/xtal | Basically none.  |
-| Max pract.<br/>overclock| 30 MHz | 30 MHz  | 32 MHz   | 40-48 w/xtal |    40-48 MHz |      TBD         |
-| Errata    | A lot    | Tons     | A lot    | Not much | Hardly any?  | none except for nvmctrl, which is fucked. |
-| Price/pc  |    $1.08 |      n/a |$1.16     |    $1.18 |        $1.10 |          TBA |
+| Parameter | 0-series | 1-series | 1+series | 2-series |   DD-series  |    EA-series |    EB-series |
+|-----------|----------|----------|----------|----------|--------------|--------------|--------------|
+| Flash sizes|   2-16k |     2-8k |   16-32k |    4-32k |       16-64k |       16-64k |       16-32k |
+| RAM       | 128b-1k  |  128b-1k |       2k |  256b-3k |        2k-8k |        2k-6k |        2k-3k
+| Pincounts |     8-24 |     8-24 |    14-24 |    14-24 |        14-32 |        28-48 |        14-32 |
+| CCL LUTs  |        2 |        2 |        2 |        4 |            4 |            4 |            4 |
+| EVSYS chan| 1syn/2asyn|2syc/4asy| 2sy/4asy |        6 |            6 |       6 v1.2 |       6 v1.2 |
+| ADC type  | Normal   | Normal   | 2xNormal | Differential<br/> w/ 1/2/4/8/16x gain | Semidifferential | Differential <br/> w 1/2/4/8/16x gain, ADC specs better. | <-- same as EA |
+| ADC res   | 10-bit   | 10-bit   | 10-bit   | 12-bit   |       12-bit |       12-bit |       12-bit |
+| ADC speed | 4-6x <br/> classic | 4-6x <br/> classic | 4-6x <br/> classic | 14x <br/> classic | 5-8x classic | 14x classic | 14x classic |
+| VREF opts | Dumb     | Dumb     | Dumb+ext | Good     |         Good |         Good |         Good |
+| DACs      | 0        | 1x8b v0.9| 1x8b v0.9| 0        |   1x10b v1.0 |   1x10b v1.1 |         None |
+| AC's      | 1        | 1        | 3        | 1        |            2 |            2 |            2 |
+| AC DACREF | No       | Yes*     | Yes*     | Yes      |          Yes |          Yes |          Yes |
+| USARTs    | 1        | 1        | 1        | 2        |            2 |          2-3 |            1 |
+| Alt Reset | No       | No       | No       | 20/24-pin|       Irrel. |       Irrel. |       Irrel. |
+| TCAs      | 1        | 1        | 1        | 1        |            1 |            2 |           No |
+| TCBs      | 1x v1.0  | 1x v1.0  | 2x v1.0  | 2x v1.1  |          2/3 |          2-4 |            2 |
+| TCD0      | No       | Yes      | Yes      | No       |          Yes |           No |           No |
+| TCE0      | No       | No       | No       | No       |          No  |           No |    Yes + WEX |
+| TCFs      | No       | No       | No       | No       |          No  |           No |            1 |
+| Max pract. internal<br/>overclock|25 MHz | 25 MHz   |       32 MHz | 40-48 w/xtal | Basically none.  | TBD - potentially a lot |
+| Max pract.<br/>overclock| 30 MHz|30 MHz|30 MHz|32 MHz | 40-48 w/xtal | Expect 32-40 | TBD, but no xtal |
+| Errata    | A lot    | Tons     | Tons     | Not much | Hardly any?  | Virtually none, Except for nvmctrl, that one's amess | We'll see... |
+| Price/pc  |    $1.08 |      n/a |$1.16     |    $1.18 |        $1.10 | expect $1.20 | Expect, uh between $1.00 and $1.30? |
 
 Qty 1 price from Microchip Direct for 16k flash version of 24 pin tiny, normal temp range, or 28-pin DD or EA in QFN (since it is not being made in low pincounts). Put simply, the price difference is minuscule (except maybe for the EA).
 
-2-series TCBs are the only ones that can do cascade mode (not very important) and count on event (if you need it, you *really* need it). The Dx and Ex-series also got the new version. The TCA is also improved on the 2-series with an extra event input.
+2-series TCBs are the only ones that can do cascade mode (not very important) and count on event (if you need it, you *really* need it). The Dx and Ex-series and EB also got the new version. The TCA is also improved on the 2-series with an extra event input.
 
 `*` - AC0 DACREF on 1-series is DAC0, the same one that can be output to a pin. This is occasionally inconvenient.
 
+## The ADC Reference Voltages
 There are two sets of VREF options, one of which is good, and one of which is dumb.
 Reference voltage | Dumb system | Smart System | notes |
 Lowest            |       0.55V | 1.024V | ADC clock may need to be made much slower. |
@@ -51,8 +56,8 @@ External vref supported on the 1+series and 2-series. I don't know what numbnuts
 
 1V024. 2V048. 2V5. 4V096, VDD, external.
 
-What's special about these? Mainly the fact that we have an ADC with a native resolution of 12 bits. That's 0-4095.
-4V096 reference used for a 12-bit measurement with no gain will return a numeric voltage that is simply equal to the voltage, in millivolts. Hence you can read a pin, say you get back 2360. You want to make that into a human readable voltage? Easy, just print "2360 mV" to the console or display! Other combinations of those three power-of-2 divided by 1000 references can also be super-convenient in various circumstances, because you always end up with the numeric units of your analog reading as being a power of two (positive or negative power, if you say, oversample and decimate to get 16-bits using the 4V096. you end up with a number from 0-65535, in units of 1/16th of a millivolt. That means you can separate the fractional portion with this kind of thing:
+What's special about these? Mainly the fact that we have an ADC with a native resolution of 12 bits. That's 0-4095 or on Dx-series, 10 bits (1024).
+So 4V096 reference used for a 12-bit measurement with no gain will return a numeric voltage that is simply equal to the voltage, in millivolts. With a 10-bit ADC, either multiply by 4 for millivolts or do a 12-bit oversampled reading) Hence you can read a pin, say you get back 2360. You want to make that into a human readable voltage? Easy, just print it, followed " mV" to the console or display, and save the grindingly slow division. Other combinations of those three power-of-2 divided by 1000 references can also be super-convenient in various circumstances, because you always end up with the numeric units of your analog reading as being a power of two (positive or negative power, if you say, oversample and decimate to get 16-bits using the 4V096. you end up with a number from 0-65535, in units of 1/16th of a millivolt. That means you can separate the fractional portion with this kind of thing:
 ```c
 /* global scope */
 const uint8_t sixteenths[]={0, 6, 13, 19, 25, 31, 38, 44, 50, 56, 63, 69, 75, 81, 88, 94};
@@ -77,12 +82,11 @@ The errata on the 0/1-series is a totally different matter. The table of content
 
 Plus, the PORTMUX and EVSYS look like a beta-test version. EVSYS channels are divided into two types, the headers didn't give you names for the event users (though I think I papered over this, because it was just so fucking ugly), and the layout of generators across the channels is weird and inconsistent. The Event library makes this a little easier to deal with, but there's no way around the fact that the event system is fiddlier and less powerful. PORTMUX works, it's just unpleasant, because they hadn't thought of naming the registers after what peripherals they controlled the route for yet, so they're CTRLA, CTRLB, CTRLC, CTRLD, instead of TCAROUTEA, USARTROUTEA etc.
 
-On the other hand, the 1+series parts are the only AVR family to feature TWO ADCs. I suspect this was intended to be an escape hatch to be able to simulate a differential ADC - but it is much more than that Almost makes me sad to see that they're using a better ADC on new oparts now. Almost. You can:
+## The tiny1+ (16k and 32k parts) have a second fully user accessible ADC
+On the other hand, the 1+series parts are the only AVR family to feature TWO ADCs *and expose both of them as a normal ADC* (the Dx has A has a second, but it's only used for PTC). I suspect this was intended to be an escape hatch to be able to simulate a differential ADC (and they already had the second ADC there for the PTC) - but it is much more than that. Almost makes me sad to see that they're using a better ADC on new parts now. Almost. You can:
 * Have the two ADCs each monitoring a different channel. I was able to get these parts to continually read two channels with an ADC, alternating between them, and between ADC reads, use a lookup table to convert the ADC reading to a value to send over SPI to a DAC... Both ADCs were free-running, and I'd poll them until the result was ready, lookup, send, then poll other adc, and when i was done optimizing, it was running at the speed of the ADCs - I was not missing a single reading from either ADC. That was a fun project. Only time I think I've ever had fun with an analog input. The overall goal was a 2-channel device to take 2 input voltages, and for each ADC reading, look up an arbitrary voltage to set the DAC to, in order to transform the voltage curve from analog input sources which had one characteristic voltage vs sensor value into the voltage curve that the other device was expecting. Client had no control over the programming on either side (and the "correct" part was already unavailable , and needed a thing to go in the middle to act as a translator.
 * Use one ADC normally. Leave the other one sitting in free-running mode with the Window Comparator configured to generate an interrupt in the event of a voltage excursion on a specific pin - without having to take your other ADC's attention away from what it's measuring (remember that the sampling capacitor holds a small but non-zero amount of charge, which is why one usually throws away the first reading when changing channels)
 * But you probably don't want to do the simulated differential ADC thing, because you could get a 2-series with a real ADC.
-
-The 1-series also has the type D timer and all it's crazy features; there are some things that you just can't do with TCA's and TCBs.
 
 And it has three analog comparators (what?! three?!), complete with the windowed mode like you can do on the AVR DA and DB parts (so these have two completely different ways of window analog comparating **both with windowed mode**, and with the dual ADC, if you for some reason wanted to, you could compare three voltages against a window **entirely in the background, with no CPU involvement other than responding to the interrupt when your specified conditions occurred**)
 
@@ -153,8 +157,10 @@ Use a DD series if:
 
 ### DA/DB series
 Use the DA or DB series if:
-* Do you really need to ask this?
-* You need more pins, flash, or instances of peripherals. Only the DB's have OPAMPs, or you just need more flash
+* Do you really need to ask this? The reasons are pretty obvious: They've got more pins, ram, flash and peripherals than other options (and they're more expensive), but they have more errata than DD or tiny2, or EA.
+* You need more pins, flash, ram, or instances of peripherals.
+* ADC is 12-bit,
+* If you need or want onchip opamps. Only the DB's have OPAMPs.
 
 ### The EA-series
 The EA series boasts a new and improved ADC, some nice improvements that are hidden from the user but will make Event work better. Oh, and RWW flash. They should have made the event system changes long ago, this is the bloody obvious solution... and the clock system has regressed back to tinyAVR, EXCEPT IT KEPT THE AWFUL CAL REGISTER OF DX! Reading that register description felt like a kick to the groin the first time I saw it. I figured that "okay, if we're not getting 24 MHz rated with insane overclockability, we'll at least get the tinyAVR calbyte" - the tinyAVR 2 series could output timing data that would not vary from a quadratic best fit line enough to be seen, and the magnitude of the difference between min and max speed... was about the nominal speed. 0/1-series could be adjusted to 32 MHz but weren't stable unless extenrnal clock and particularly good decoupling was used running from solid 5v supply. The 2-series was generally *stable* at internal 32 MHz and the tuning ran all the way up to 36ish on the high oscillator.
@@ -163,13 +169,13 @@ But nope. No fun for us here. Only way to overclock is with a crystal. And you c
 
 But anyway - Use them if you need the new ADC, which is what the 2-series got with fewer rough edges and much larger selection of connections for it to stretch it's muxes to, basically. Don't use them if you don't need that. Dx's are better parts in general.
 
+### The EB-series
+A mysterious part, this doubles down on swing towards the lower end of the market, after the high end got the DA/DB. It's not as large as a DD (fewer features, slower processor). It has two interesting things - it's the low pincount Ex with the good ADC. That can't be bad! It replaces the TCA with a more complicated and powerful 4-channel 16-bit one - but this one doesn't have split mode :-(. TCF normally is for pulse and frequency ("frequency" = 50% duty cycle) with great precision using it's PLL-clocked (up to 80 MHz rated) TCF for very accurate periodic pulses or frequencies. But who wants to do THAT?! We want PWM! The TCF has a TCB-style "lobotomized mode" in which it generates 2 PWM channels
+
 ### The DU-series
 Hasn't been seen much in marketing material, but it is believed that it is still in development and that the old brief gave generally correct information, hence we have 20/14 pin packages up to 32k, with 64k sizes only on the 32 and 28 pin parts, and yes on the 28-pin qfn (product designers and accountants cheer, everyone else glances around confused), Yes on 14-pin SSOP, and yes on 20-pin 3mmx3mm. Use these parts if you need native usb for something. USB is a demanding master and he requires great sacrifices to be made to secure his blessing. The TCD, MVIO and the exrta TCB some parts went were all thrown before the almighty USB. The entire point of these parts is the native USB. They should not be used if the native USB is not being used.
 
 So I'm going to say you should use the DU-series after it's been released, **IFF you are using native USB** as in symbolic logic, if and only if)
-
-### The EB-series
-A mysterious part, this doubles down on swing towards the lower end of the market, after the high end got the DA/DB. It's not as large as a DD (fewer features, slower processor). It has two interesting things - it's the low pincount Ex with the good ADC. That can't be bad! But it drops the TCA for a TCE + WEX, which could be either horrible or wonderful, and adds a new TCF, about which nothing is known. We already j
 
 ## One notices a pattern with their recent releases
 Count how many parts were released in each family since 2020. The AVR DA and DB got 11 parts each (4 pincounts 3 memory sizes, minus the 32k/64-pin). The tinyAVR 2-series got 12 parts (3 pincounts, 4 memory sizes). DD got 12 parts (4 pincounts, 3 memory sizes) The EA-series gets 12 parts (3 pincounts 4 memory sizes) and the EB will be 12 (4 pincounts 3 memory sizes). Even the DU, whose product brief appeared only for a few hours (it was a very brief) listed 11 parts (4 pincounts and 3 memory sizes, and no 14 pin/64k version). It would appear that Microchip Doctrine is to release parts in squads of a dozen, or whatever the opposite of a baker's dozen is (bakers dozen is 13, 1 more than a dozen. I guess a chip baker's dozen is 11.).
