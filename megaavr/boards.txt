@@ -5653,7 +5653,6 @@ microchipo.menu.board_name.cn3217.build.board=AVR_CuriosityNano3217
 microchipo.menu.board_name.cn3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PA3 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchipo.menu.board_name.cn3217.bootloader.basefilename=optiboot_curiosity3217
 microchipo.menu.board_name.cn3217.build.attiny=3217
-microchipo.menu.board_name.cn3217.build.variant=txy7
 microchipo.menu.board_name.cn3217.build.millistimer=D0
 microchipo.menu.board_name.cn3217.build.pwmflags=-DUSE_TIMERD0_PWM
 microchipo.menu.board_name.cn3217.upload.maximum_size=32256
@@ -5663,7 +5662,6 @@ microchipo.menu.board_name.cn1627=Curiosity Nano ATtiny1627
 microchipo.menu.board_name.cn1627.build.board=AVR_CuriosityNano1627
 microchipo.menu.board_name.cn1627.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchipo.menu.board_name.cn1627.build.attiny=1627
-microchipo.menu.board_name.cn1627.build.variant=txy7
 microchipo.menu.board_name.cn1627.build.millistimer=B1
 microchipo.menu.board_name.cn1627.bootloader.basefilename=optiboot_curiosity1627
 microchipo.menu.board_name.cn1627.bootloader.altreset=11
@@ -5677,7 +5675,6 @@ microchipo.menu.board_name.cn1607=Curiosity Nano ATtiny1607
 microchipo.menu.board_name.cn1607.build.board=AVR_CuriosityNano1607
 microchipo.menu.board_name.cn1607.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PC4 -DPIN_BUTTON_BUILTIN=PIN_PB7 {build.tuned}
 microchipo.menu.board_name.cn1607.build.attiny=1607
-microchipo.menu.board_name.cn1607.build.variant=txy7
 microchipo.menu.board_name.cn1607.build.millistimer=A0
 microchipo.menu.board_name.cn1607.bootloader.basefilename=optiboot_curiosity1607
 microchipo.menu.board_name.cn1607.bootloader.TCD0CFG_avrdude=
@@ -5689,7 +5686,6 @@ microchipo.menu.board_name.xp3217=Xplained Pro ATtiny3217
 microchipo.menu.board_name.xp3217.build.board=AVR_XplainedPro3217
 microchipo.menu.board_name.xp3217.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
 microchipo.menu.board_name.xp3217.build.attiny=3217
-microchipo.menu.board_name.xp3217.build.variant=txy7
 microchipo.menu.board_name.xp3217.build.millistimer=D0
 microchipo.menu.board_name.xp3217.build.pwmflags=-DUSE_TIMERD0_PWM
 microchipo.menu.board_name.xp3217.bootloader.basefilename=optiboot_xplainedpro3217
@@ -5701,7 +5697,6 @@ microchipo.menu.board_name.xp817.build.board=AVR_XplainedPro817
 microchipo.menu.board_name.xp817.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PB4 -DPIN_BUTTON_BUILTIN=PIN_PB5 {build.tuned}
 microchipo.menu.board_name.xp817.build.attiny=817
 microchipo.menu.board_name.xp817.build.mrelax=
-microchipo.menu.board_name.xp817.build.variant=txy7
 microchipo.menu.board_name.xp817.build.millistimer=D0
 microchipo.menu.board_name.xp817.build.pwmflags=-DUSE_TIMERD0_PWM
 microchipo.menu.board_name.xp817.bootloader.basefilename=optiboot_xplainedpro817
@@ -5713,7 +5708,6 @@ microchipo.menu.board_name.xm817.build.board=AVR_XplainedMini817
 microchipo.menu.board_name.xm817.build.extra_flags=-DARDUINO_attinyxy7 -DLED_BUILTIN=PIN_PC0 -DPIN_BUTTON_BUILTIN=PIN_PC5 {build.tuned}
 microchipo.menu.board_name.xm817.build.attiny=817
 microchipo.menu.board_name.xm817.build.mrelax=
-microchipo.menu.board_name.xm817.build.variant=txy7
 microchipo.menu.board_name.xm817.build.millistimer=D0
 microchipo.menu.board_name.xm817.build.pwmflags=-DUSE_TIMERD0_PWM
 microchipo.menu.board_name.xm817.bootloader.basefilename=optiboot_xplainedmini817
