@@ -47,10 +47,6 @@ For example: FQBN for `ATtint1607` without optiboot is `megaTinyCore:megaavr:atx
 You can find the Chip and other fuse details, like from Arduino IDE's _board dropboard_, in the **_boards.txt_**. On my mac the file path is: `/Users/<user>/Library/Arduino15/packages/megaTinyCore/hardware/megaavr/<version>/boards.txt`
 
 From there, you can see All the details as per specific chips and pin numbers etc.
-So let's say, for our example's sake, I want to use a:
-3.1. 24 pin ATTINY1607 without optiboot
-3.2. After testing from Arduino IDE, the fuse settings, the options I'm happy with, are as below:
-![Screenshot 2021-07-21 at 12 04 24 AM](https://user-images.githubusercontent.com/4619862/126485512-83e0ff2a-48d6-4c63-86a7-12910361e4ef.png)
 
 You can also look from terminal the available menu options as list by using the command against your specific FQBN:
 `arduino-cli board details -b <YOUR FQBN>`
@@ -61,14 +57,17 @@ After going through the output list and picking on the fuses options, below chip
 Options:
   chip=1607
   clock=5internal
+  millis=enabled
+  startuptime=0
   bodvoltage=1v8
   bodmode=disabled
   eesave=enable
-  millis=enabled
   resetpin=UPDI
-  startuptime=0
-  wiremode=mors
   printf=minimal
+  wiremode=mors
+  WDTtimeout=disabled
+  WDTwindow=disabled
+  PWMmux=A_default
   attach=allenabled
 ```
 Now we have to basically chain these key value pairs, comma separating each key value pair, staring with a ":" after the supplied FQBN.
@@ -77,8 +76,10 @@ Now we have to basically chain these key value pairs, comma separating each key 
 
 3.3. So expanding on the example further, the options that I listed above, if I had to chain the specific fuse detail), following will be the command to compile the sketch in the sketch directory:
 
-```sh
-arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,wiremode=mors,printf=minimal,attach=allenabled --output-dir ./build/
+```bash
+rm -rf build
+mkdir build
+arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,millis=enabled,startuptime=0,bodvoltage=1v8,bodmode=disabled,eesave=enable,resetpin=UPDI,printf=minimal,wiremode=mors,WDTtimeout=disabled,WDTwindow=disabled,PWMmux=A_default,attach=allenabled --build-path $(pwd)/build
 ```
 Here I chose the build directory to be inside my sketch directory, where all the hex files etc will be exported.
 
@@ -96,16 +97,18 @@ From the sketch directory that has `build/` from previous step (if you have comp
 
 For our example:
 
-```sh
-arduino-cli upload -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,wiremode=mors,printf=minimal,attach=allenabled -p /dev/tty.usbserial-A10KHTR4 -P serialupdi -t
+```bash
+arduino-cli upload -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,millis=enabled,startuptime=0,bodvoltage=1v8,bodmode=disabled,eesave=enable,resetpin=UPDI,printf=minimal,wiremode=mors,WDTtimeout=disabled,WDTwindow=disabled,PWMmux=A_default,attach=allenabled -p /dev/tty.usbserial-A10KHTR4 -P serialupdi921k -t
 ```
 
 ## If you want to compile and then upload right after compilation
 Do the following. From your sketch directory:
-```sh
+```bash
 arduino-cli compile -b FQBN:fuseKey=fuseValue,fuseKey=fuseValue,.. --output-dir ./build/ -u -p <Serial UPDI uploader PORT> -P <PROGRAMMER> -t
 ```
 For our example that would be:
-```sh
-arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,wiremode=mors,printf=minimal,attach=allenabled --output-dir ./build/ -u -p /dev/tty.usbserial-A10KHTR4 -P serialupdi -t
+```bash
+rm -rf build
+mkdir build
+arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,millis=enabled,startuptime=0,bodvoltage=1v8,bodmode=disabled,eesave=enable,resetpin=UPDI,printf=minimal,wiremode=mors,WDTtimeout=disabled,WDTwindow=disabled,PWMmux=A_default,attach=allenabled --build-path $(pwd)/build -u -p /dev/tty.usbserial-A10KHTR4 -P serialupdi921k -t
 ```
