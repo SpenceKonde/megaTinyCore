@@ -1,13 +1,16 @@
 # [Arduino CLI] Installation & Management through CLI
+
 If you are using the Arduino-cli, megaTinyCore can be used without much difficulty. The only complication is that you need to select values from all the tools menus... from the command line. This is done using the FQBN. It is not recommended to omit menus from that list. The rest of the core is written under the assumption that all are specified. Some have implicit default. Others do not. Any implicit default may not match normal menu default or your expectations. Future versions of the core may explicitly prevent compilation when menus are omitted in this way, as it suggests an invalid core configuration.
 Credit for the following guide goes to @dattasaurabh82 - THANKS!
 
 ## 1. Install latest Arduino-cli
+
 [Install latest Arduino-cli](https://arduino.github.io/arduino-cli/latest/installation/)
 Or
 [upgrade to latest](https://arduino.github.io/arduino-cli/latest/UPGRADING/) (on Mac you can use `brew upgrade …`)
 
 ## 2. Install megaTinyCore
+
 Setting an additional Boards Manager URL:
 
 `arduino-cli core update-index --additional-urls http://drazzy.com/package_drazzy.com_index.json`
@@ -18,23 +21,29 @@ First get the PATH:
 `arduino-cli config dump --verbose`
 
 If there is no config file, create one first:
-```sh
+
+```bash
 arduino-cli config init
 arduino-cli config dump --verbose
 ```
+
 Then edit/add:
+
 ```text
 aboard_manager:
   additional_urls:
   - http://drazzy.com/package_drazzy.com_index.json
 ```
+
 Search and install core:
+
 ```sh
 arduino-cli core search megaTinyCore
 arduino-cli core install megaTinyCore:megaavr
 ```
 
 ## 3. Compile using `arduino-cli` for a `megaTinyCore` based chip
+
 Migrate to your sketch folder.
 
 You can find `FQBN`(necessary for compiling) for your speecific ATtiny using:
@@ -57,6 +66,7 @@ You can also look from terminal the available menu options as list by using the 
 
 For my example of ATTINY1607 without optiboot: `arduino-cli board details -b megaTinyCore:megaavr:atxy7`
 After going through the output list and picking on the fuses options, below chip and fuse options are the ones I want to use:
+
 ```text
 Options:
   chip=1607
@@ -71,6 +81,7 @@ Options:
   printf=minimal
   attach=allenabled
 ```
+
 Now we have to basically chain these key value pairs, comma separating each key value pair, staring with a ":" after the supplied FQBN.
 
 `...FQBN:<fuse_uption1>=<fuse_uotion1_value>,<fuse_uption2>=<fuse_uotion2_value>,..`
@@ -80,8 +91,8 @@ Now we have to basically chain these key value pairs, comma separating each key 
 ```sh
 arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,wiremode=mors,printf=minimal,attach=allenabled --output-dir ./build/
 ```
-Here I chose the build directory to be inside my sketch directory, where all the hex files etc will be exported.
 
+Here I chose the build directory to be inside my sketch directory, where all the hex files etc will be exported.
 
 ## 4. Upload using `arduino-cli`
 
@@ -96,16 +107,20 @@ From the sketch directory that has `build/` from previous step (if you have comp
 
 For our example:
 
-```sh
+```bash
 arduino-cli upload -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,wiremode=mors,printf=minimal,attach=allenabled -p /dev/tty.usbserial-A10KHTR4 -P serialupdi -t
 ```
 
 ## If you want to compile and then upload right after compilation
+
 Do the following. From your sketch directory:
-```sh
+
+```bash
 arduino-cli compile -b FQBN:fuseKey=fuseValue,fuseKey=fuseValue,.. --output-dir ./build/ -u -p <Serial UPDI uploader PORT> -P <PROGRAMMER> -t
 ```
+
 For our example that would be:
-```sh
+
+```bash
 arduino-cli compile -b megaTinyCore:megaavr:atxy7:chip=1607,clock=5internal,bodvoltage=1v8,bodmode=disabled,eesave=enable,millis=enabled,resetpin=UPDI,startuptime=0,wiremode=mors,printf=minimal,attach=allenabled --output-dir ./build/ -u -p /dev/tty.usbserial-A10KHTR4 -P serialupdi -t
 ```
