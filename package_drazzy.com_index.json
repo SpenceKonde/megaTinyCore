@@ -1,0 +1,784 @@
+{
+  "packages": [
+    {
+      "maintainer": "Magicbit", 
+      "help": {
+        "online": "http://www.magicbit.cc"
+      }, 
+      "websiteURL": "https://github.com/magicbitlk/arduino-esp32", 
+      "platforms": [
+	  {
+          "category": "Magicbit", 
+          "name": "magicbit", 
+          "url": "https://github.com/magicbitlk/arduino-esp32/releases/download/V2.0.0/magicbit-2.0.0.zip", 
+          "checksum": "SHA-256:cf625b4bf0473126f2909c83c484a929080878dcb813f493376dbadfe87d6bc2", 
+          "help": {
+            "online": ""
+          }, 
+          "version": "2.0.0", 
+          "architecture": "esp32", 
+          "archiveFileName": "magicbit-2.0.0.zip", 
+          "boards": [
+            {
+              "name": "Magicbit"
+            }, 
+            {
+              "name": "ESP32 Dev Module"
+            }
+          ], 
+          "toolsDependencies": [
+           
+            {
+              "packager": "magicbit",
+              "name": "xtensa-esp32-elf-gcc",
+              "version": "gcc8_4_0-esp-2021r1"
+            },
+            {
+              "packager": "magicbit",
+              "name": "esptool_py",
+              "version": "3.1.0"
+            },
+            {
+              "packager": "magicbit",
+              "name": "mkspiffs",
+              "version": "0.2.3"
+            },
+            {
+              "packager": "magicbit",
+              "name": "mklittlefs",
+              "version": "3.0.0-gnu12-dc7f933"
+            }
+          ], 
+          "size": "101765903"
+        },
+        {
+          "category": "Magicbit", 
+          "name": "magicbit", 
+          "url": "https://github.com/magicbitlk/arduino-esp32/releases/download/V1.0.1/magicbit-1.0.1.zip", 
+          "checksum": "SHA-256:808a99e43c63d05ccb99f8321962bc79ac7deeabed8dab7162bed2d5014e3e02", 
+          "help": {
+            "online": ""
+          }, 
+          "version": "1.0.1", 
+          "architecture": "esp32", 
+          "archiveFileName": "magicbit-1.0.1.zip", 
+          "boards": [
+            {
+              "name": "Magicbit"
+            }, 
+            {
+              "name": "ESP32 Dev Module"
+            }
+          ], 
+          "toolsDependencies": [
+            {
+              "packager": "magicbit", 
+              "version": "1.22.0-80-g6c4433a-5.2.0", 
+              "name": "xtensa-esp32-elf-gcc"
+            }, 
+            {
+              "packager": "magicbit", 
+              "version": "2.6.1", 
+              "name": "esptool_py"
+            }, 
+            {
+              "packager": "magicbit", 
+              "version": "0.2.3", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "size": "36861652"
+        },
+		{
+          "category": "Magicbit", 
+          "name": "magicbit", 
+          "url": "https://github.com/magicbitlk/arduino-esp32/releases/download/V1.0.0/magicbit-1.0.0.zip", 
+          "checksum": "SHA-256:ee64c7b683dbf17b19ee929b626bc3cf3f7d011f2d8381a9137bb0b00b61a26e", 
+          "help": {
+            "online": ""
+          }, 
+          "version": "1.0.0", 
+          "architecture": "esp32", 
+          "archiveFileName": "magicbit-1.0.0.zip", 
+          "boards": [
+            {
+              "name": "Magicbit"
+            }, 
+            {
+              "name": "ESP32 Dev Module"
+            }
+          ], 
+          "toolsDependencies": [
+            {
+              "packager": "magicbit", 
+              "version": "1.22.0-80-g6c4433a-5.2.0", 
+              "name": "xtensa-esp32-elf-gcc"
+            }, 
+            {
+              "packager": "magicbit", 
+              "version": "2.6.1", 
+              "name": "esptool_py"
+            }, 
+            {
+              "packager": "magicbit", 
+              "version": "0.2.3", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "size": "37020651 "
+        }
+      ], 
+       "tools": [
+        {
+          "name": "riscv32-esp-elf-gcc",
+          "version": "gcc8_4_0-esp-2021r1",
+          "systems": [
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/riscv32-esp-elf-gcc8_4_0-esp-2021r1-linux-amd64.tar.gz",
+              "archiveFileName": "riscv32-esp-elf-gcc8_4_0-esp-2021r1-linux-amd64.tar.gz",
+              "checksum": "SHA-256:3459618f33bbd5f54d7d7783e807cb6eef6472a220f2f1eb3faced735b9d13bb",
+              "size": "152812483"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/riscv32-esp-elf-gcc8_4_0-esp-2021r1-linux-armel.tar.gz",
+              "archiveFileName": "riscv32-esp-elf-gcc8_4_0-esp-2021r1-linux-armel.tar.gz",
+              "checksum": "SHA-256:24b9e54b348bbd5fb816fc4c52abb47337c702beecdbba840750b7cfb9d38069",
+              "size": "151726623"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/riscv32-esp-elf-gcc8_4_0-esp-2021r1-linux-i686.tar.gz",
+              "archiveFileName": "riscv32-esp-elf-gcc8_4_0-esp-2021r1-linux-i686.tar.gz",
+              "checksum": "SHA-256:954d340ebffef12a2ce9be1ea004e6f45a8863f1e6f41f46fd3f04f58499627c",
+              "size": "155430963"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/riscv32-esp-elf-gcc8_4_0-esp-2021r1-macos.tar.gz",
+              "archiveFileName": "riscv32-esp-elf-gcc8_4_0-esp-2021r1-macos.tar.gz",
+              "checksum": "SHA-256:612fb3a3f84f703222327bd16581df8f80fda8cdf137637fe5d611587d1b664e",
+              "size": "159836199"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/riscv32-esp-elf-gcc8_4_0-esp-2021r1-win32.zip",
+              "archiveFileName": "riscv32-esp-elf-gcc8_4_0-esp-2021r1-win32.zip",
+              "checksum": "SHA-256:5711eb407ffe44adddbd1281b6b575a5645e7193ca78faefa27dc5bc5b662bec",
+              "size": "191266312"
+            }
+          ]
+        },
+        {
+          "name": "xtensa-esp32-elf-gcc",
+          "version": "gcc8_4_0-esp-2021r1",
+          "systems": [
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/xtensa-esp32-elf-gcc8_4_0-esp-2021r1-linux-amd64.tar.gz",
+              "archiveFileName": "xtensa-esp32-elf-gcc8_4_0-esp-2021r1-linux-amd64.tar.gz",
+              "checksum": "SHA-256:44a0b467b9d2b759ab48b2f27aed684581f33c96e2842992781c4e045992c5b0",
+              "size": "86361217"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/xtensa-esp32-elf-gcc8_4_0-esp-2021r1-linux-armel.tar.gz",
+              "archiveFileName": "xtensa-esp32-elf-gcc8_4_0-esp-2021r1-linux-armel.tar.gz",
+              "checksum": "SHA-256:fdacdb2a7bbf6293bcafda9b52463a4da8a2f3b7e1df9f83d35ff9d1efa22012",
+              "size": "84520407"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/xtensa-esp32-elf-gcc8_4_0-esp-2021r1-linux-i686.tar.gz",
+              "archiveFileName": "xtensa-esp32-elf-gcc8_4_0-esp-2021r1-linux-i686.tar.gz",
+              "checksum": "SHA-256:e2024096492dfaa50fc6ac336cd8faa2e395e8cebb617753eab0b5f16d3dd0dc",
+              "size": "88375391"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/xtensa-esp32-elf-gcc8_4_0-esp-2021r1-macos.tar.gz",
+              "archiveFileName": "xtensa-esp32-elf-gcc8_4_0-esp-2021r1-macos.tar.gz",
+              "checksum": "SHA-256:7bbc6a2b94f009cd8a3351b9c7acf7a5caa1c4d3700500ead60f84965386a61b",
+              "size": "93357296"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/xtensa-esp32-elf-gcc8_4_0-esp-2021r1-win32.zip",
+              "archiveFileName": "xtensa-esp32-elf-gcc8_4_0-esp-2021r1-win32.zip",
+              "checksum": "SHA-256:e4f9fdda192abfc9807e3e7fcd6e9fea30c1a0cf3f3c5a5c961b5114fc8c9b7e",
+              "size": "105603626"
+            }
+          ]
+        },
+        {
+          "name": "xtensa-esp32-elf-gcc",
+          "version": "1.22.0-97-gc752ad5-5.2.0",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/xtensa-esp32-elf-win32-1.22.0-97-gc752ad5-5.2.0.zip",
+              "archiveFileName": "xtensa-esp32-elf-win32-1.22.0-97-gc752ad5-5.2.0.zip",
+              "checksum": "SHA-256:80571e5d5a63494f4fa758bb9d8fb882ba4059853a8c412a84d232dc1c1400e6",
+              "size": "125747216"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/xtensa-esp32-elf-macos-1.22.0-97-gc752ad5-5.2.0.tar.gz",
+              "archiveFileName": "xtensa-esp32-elf-macos-1.22.0-97-gc752ad5-5.2.0.tar.gz",
+              "checksum": "SHA-256:b1ce39a563ae359cf363fb7d8ee80cb1e5226fda83188203cff60f16f55e33ef",
+              "size": "50525386"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/xtensa-esp32-elf-linux64-1.22.0-97-gc752ad5-5.2.0.tar.gz",
+              "archiveFileName": "xtensa-esp32-elf-linux64-1.22.0-97-gc752ad5-5.2.0.tar.gz",
+              "checksum": "SHA-256:96f5f6e7611a0ed1dc47048c54c3113fc5cebffbf0ba90d8bfcd497afc7ef9f3",
+              "size": "44225380"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/xtensa-esp32-elf-linux32-1.22.0-97-gc752ad5-5.2.0.tar.gz",
+              "archiveFileName": "xtensa-esp32-elf-linux32-1.22.0-97-gc752ad5-5.2.0.tar.gz",
+              "checksum": "SHA-256:8094a2c30b474e99ce64dd0ba8f310c4614eb3b3cac884a3aea0fd5f565af119",
+              "size": "45575521"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/xtensa-esp32-elf-linux-armel-1.22.0-97-gc752ad5-5.2.0.tar.gz",
+              "archiveFileName": "xtensa-esp32-elf-linux-armel-1.22.0-97-gc752ad5-5.2.0.tar.gz",
+              "checksum": "SHA-256:d70d550f88448fa476b29fa50ef5502ab497a16ac7fa9ca24c6d0a39bb1e681e",
+              "size": "50657803"
+            },
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/xtensa-esp32-elf-linux-armel-1.22.0-97-gc752ad5-5.2.0.tar.gz",
+              "archiveFileName": "xtensa-esp32-elf-linux-armel-1.22.0-97-gc752ad5-5.2.0.tar.gz",
+              "checksum": "SHA-256:d70d550f88448fa476b29fa50ef5502ab497a16ac7fa9ca24c6d0a39bb1e681e",
+              "size": "50657803"
+            }
+          ]
+        },
+        {
+          "version": "1.22.0-80-g6c4433a-5.2.0",
+          "name": "xtensa-esp32-elf-gcc",
+          "systems": [
+            {
+              "url": "https://dl.espressif.com/dl/xtensa-esp32-elf-win32-1.22.0-80-g6c4433a-5.2.0.zip",
+              "checksum": "SHA-256:f217fccbeaaa8c92db239036e0d6202458de4488b954a3a38f35ac2ec48058a4",
+              "host": "i686-mingw32",
+              "archiveFileName": "xtensa-esp32-elf-win32-1.22.0-80-g6c4433a-5.2.0.zip",
+              "size": "125719261"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/xtensa-esp32-elf-osx-1.22.0-80-g6c4433a-5.2.0.tar.gz",
+              "checksum": "SHA-256:a4307a97945d2f2f2745f415fbe80d727750e19f91f9a1e7e2f8a6065652f9da",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "xtensa-esp32-elf-osx-1.22.0-80-g6c4433a-5.2.0.tar.gz",
+              "size": "46517409"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz",
+              "checksum": "SHA-256:3fe96c151d46c1d4e5edc6ed690851b8e53634041114bad04729bc16b0445156",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz",
+              "size": "44219107"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/xtensa-esp32-elf-linux32-1.22.0-80-g6c4433a-5.2.0.tar.gz",
+              "checksum": "SHA-256:b4055695ffc2dfc0bcb6dafdc2572a6e01151c4179ef5fa972b3fcb2183eb155",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "xtensa-esp32-elf-linux32-1.22.0-80-g6c4433a-5.2.0.tar.gz",
+              "size": "45566336"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/xtensa-esp32-elf-linux-armel-1.22.0-87-gb57bad3-5.2.0.tar.gz",
+              "checksum": "SHA-256:9c68c87bb23b1256dc0a1859b515946763e5292dcab4a4159a52fae5618ce861",
+              "host": "arm-linux-gnueabihf",
+              "archiveFileName": "xtensa-esp32-elf-linux-armel-1.22.0-87-gb57bad3-5.2.0.tar.gz",
+              "size": "50655584"
+            }
+          ]
+        },
+        {
+          "name": "xtensa-esp32s2-elf-gcc",
+          "version": "gcc8_4_0-esp-2021r1",
+          "systems": [
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/xtensa-esp32s2-elf-gcc8_4_0-esp-2021r1-linux-amd64.tar.gz",
+              "archiveFileName": "xtensa-esp32s2-elf-gcc8_4_0-esp-2021r1-linux-amd64.tar.gz",
+              "checksum": "SHA-256:b127baccfe6949ee7eaf3d0782ea772750a9b8e2732b16ce6bcc9dcd91f7209a",
+              "size": "86687290"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/xtensa-esp32s2-elf-gcc8_4_0-esp-2021r1-linux-armel.tar.gz",
+              "archiveFileName": "xtensa-esp32s2-elf-gcc8_4_0-esp-2021r1-linux-armel.tar.gz",
+              "checksum": "SHA-256:7ca0d240f11e1c53c01a56257b0c968f876ab405142d1068d8c9b456d939554c",
+              "size": "84916701"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/xtensa-esp32s2-elf-gcc8_4_0-esp-2021r1-linux-i686.tar.gz",
+              "archiveFileName": "xtensa-esp32s2-elf-gcc8_4_0-esp-2021r1-linux-i686.tar.gz",
+              "checksum": "SHA-256:9941f993ff84d1c606b45ffbeeb7bcdc5a72cf24e787bb9230390510fe3511c6",
+              "size": "88699953"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/xtensa-esp32s2-elf-gcc8_4_0-esp-2021r1-macos.tar.gz",
+              "archiveFileName": "xtensa-esp32s2-elf-gcc8_4_0-esp-2021r1-macos.tar.gz",
+              "checksum": "SHA-256:4b55b1a9ca7fc945be6fc3513802b6cece9264bee4cbca76013569cec2695973",
+              "size": "93757895"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/espressif/crosstool-NG/releases/download/esp-2021r1/xtensa-esp32s2-elf-gcc8_4_0-esp-2021r1-win32.zip",
+              "archiveFileName": "xtensa-esp32s2-elf-gcc8_4_0-esp-2021r1-win32.zip",
+              "checksum": "SHA-256:c94ec1e45c81b7e4944d216bab4aa41d46849768d7761fd691661dab1a3df828",
+              "size": "106013515"
+            }
+          ]
+        },
+        {
+          "name": "esptool_py",
+          "version": "3.1.0",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/2.0.0-alpha1/esptool-3.1.0-windows.zip",
+              "archiveFileName": "esptool-3.1.0-windows.zip",
+              "checksum": "SHA-256:c9b4f9bc6e94db136c2545c87c00c7ab1441644ca0bac50811bc3c014e22514b",
+              "size": "7411889"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/2.0.0-alpha1/esptool-3.1.0-macos.tar.gz",
+              "archiveFileName": "esptool-3.1.0-macos.tar.gz",
+              "checksum": "SHA-256:1dffcb884665fb616779aea62a68f517aac251ea6dfe95560906c364d6ef3065",
+              "size": "6776909"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/2.0.0-alpha1/esptool-3.1.0-linux.tar.gz",
+              "archiveFileName": "esptool-3.1.0-linux.tar.gz",
+              "checksum": "SHA-256:15eca9896a30e804aa24be6f7a06e39397541b8b09a7a4c48deb65f826e7baad",
+              "size": "80550"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/2.0.0-alpha1/esptool-3.1.0-linux.tar.gz",
+              "archiveFileName": "esptool-3.1.0-linux.tar.gz",
+              "checksum": "SHA-256:15eca9896a30e804aa24be6f7a06e39397541b8b09a7a4c48deb65f826e7baad",
+              "size": "80550"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/2.0.0-alpha1/esptool-3.1.0-linux.tar.gz",
+              "archiveFileName": "esptool-3.1.0-linux.tar.gz",
+              "checksum": "SHA-256:15eca9896a30e804aa24be6f7a06e39397541b8b09a7a4c48deb65f826e7baad",
+              "size": "80550"
+            },
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/2.0.0-alpha1/esptool-3.1.0-linux.tar.gz",
+              "archiveFileName": "esptool-3.1.0-linux.tar.gz",
+              "checksum": "SHA-256:15eca9896a30e804aa24be6f7a06e39397541b8b09a7a4c48deb65f826e7baad",
+              "size": "80550"
+            }
+          ]
+        },
+        {
+          "name": "esptool_py",
+          "version": "3.0.0",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/esptool-3.0.0.2-windows.zip",
+              "archiveFileName": "esptool-3.0.0.2-windows.zip",
+              "checksum": "SHA-256:b192bfc1545a3c92658ce586b4edcc2aca3f0ad4b3fa8417d658bc8a48f1387e",
+              "size": "3434736"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/esptool-3.0.0.2-macos.tar.gz",
+              "archiveFileName": "esptool-3.0.0.2-macos.tar.gz",
+              "checksum": "SHA-256:2cafab7f1ebce89475b84c115548eaace40b6366d7b3f9862cdb2fc64f806643",
+              "size": "3859642"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/esptool-3.0.0.2-linux.tar.gz",
+              "archiveFileName": "esptool-3.0.0.2-linux.tar.gz",
+              "checksum": "SHA-256:d5cb51da1c74ff69f81b820470d2ecccb5c7c3a2dec7776483d4c89588b00020",
+              "size": "57526"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/esptool-3.0.0.2-linux.tar.gz",
+              "archiveFileName": "esptool-3.0.0.2-linux.tar.gz",
+              "checksum": "SHA-256:d5cb51da1c74ff69f81b820470d2ecccb5c7c3a2dec7776483d4c89588b00020",
+              "size": "57526"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/esptool-3.0.0.2-linux.tar.gz",
+              "archiveFileName": "esptool-3.0.0.2-linux.tar.gz",
+              "checksum": "SHA-256:d5cb51da1c74ff69f81b820470d2ecccb5c7c3a2dec7776483d4c89588b00020",
+              "size": "57526"
+            },
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://github.com/espressif/arduino-esp32/releases/download/1.0.5-rc5/esptool-3.0.0.2-linux.tar.gz",
+              "archiveFileName": "esptool-3.0.0.2-linux.tar.gz",
+              "checksum": "SHA-256:d5cb51da1c74ff69f81b820470d2ecccb5c7c3a2dec7776483d4c89588b00020",
+              "size": "57526"
+            }
+          ]
+        },
+        {
+          "version": "2.6.1",
+          "name": "esptool_py",
+          "systems": [
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.6.1-windows.zip",
+              "checksum": "SHA-256:84cf0b369a7707fe566434faba148852fc464992111d5baa95b658b374802f96",
+              "host": "i686-mingw32",
+              "archiveFileName": "esptool-2.6.1-windows.zip",
+              "size": "3422445"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.6.1-macos.tar.gz",
+              "checksum": "SHA-256:f4eb758a301d6902cc9dfcd49d36345d2f075ad123da7cf8132d15cfb7533457",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "esptool-2.6.1-macos.tar.gz",
+              "size": "3837085"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.6.1-linux.tar.gz",
+              "checksum": "SHA-256:eaf82ff4070d9792f6a42ae1e485375de5a87bec59ef01dfb95de901519ec7fb",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "esptool-2.6.1-linux.tar.gz",
+              "size": "44762"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.6.1-linux.tar.gz",
+              "checksum": "SHA-256:eaf82ff4070d9792f6a42ae1e485375de5a87bec59ef01dfb95de901519ec7fb",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "esptool-2.6.1-linux.tar.gz",
+              "size": "44762"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.6.1-linux.tar.gz",
+              "checksum": "SHA-256:eaf82ff4070d9792f6a42ae1e485375de5a87bec59ef01dfb95de901519ec7fb",
+              "host": "arm-linux-gnueabihf",
+              "archiveFileName": "esptool-2.6.1-linux.tar.gz",
+              "size": "44762"
+            }
+          ]
+        },
+        {
+          "version": "2.6.0",
+          "name": "esptool_py",
+          "systems": [
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.6.0-windows.zip",
+              "checksum": "SHA-256:a73f4cf68db240d7f1d250c5c7f2dfcb53c17a37483729f1bf71f8f43d79a799",
+              "host": "i686-mingw32",
+              "archiveFileName": "esptool-2.6.0-windows.zip",
+              "size": "3421208"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.6.0-macos.tar.gz",
+              "checksum": "SHA-256:0a881b91547c840fab8c72ae3d031069384278b8c2e5241647e8c8292c5e4a4b",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "esptool-2.6.0-macos.tar.gz",
+              "size": "3835660"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.6.0-linux.tar.gz",
+              "checksum": "SHA-256:6d162f70f395ca31f5008829dd7e833e729f044a9c7355d5be8ce333a054e110",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "esptool-2.6.0-linux.tar.gz",
+              "size": "43535"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.6.0-linux.tar.gz",
+              "checksum": "SHA-256:6d162f70f395ca31f5008829dd7e833e729f044a9c7355d5be8ce333a054e110",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "esptool-2.6.0-linux.tar.gz",
+              "size": "43535"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.6.0-linux.tar.gz",
+              "checksum": "SHA-256:6d162f70f395ca31f5008829dd7e833e729f044a9c7355d5be8ce333a054e110",
+              "host": "arm-linux-gnueabihf",
+              "archiveFileName": "esptool-2.6.0-linux.tar.gz",
+              "size": "43535"
+            }
+          ]
+        },
+        {
+          "version": "3.0.0-gnu12-dc7f933",
+          "name": "mklittlefs",
+          "systems": [
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu12/aarch64-linux-gnu.mklittlefs-c41e51a.200706.tar.gz",
+              "archiveFileName": "aarch64-linux-gnu.mklittlefs-c41e51a.200706.tar.gz",
+              "checksum": "SHA-256:fc56e389383749e4cf4fab0fcf75cc0ebc41e59383caf6c2eff1c3d9794af200",
+              "size": "44651"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu12/arm-linux-gnueabihf.mklittlefs-c41e51a.200706.tar.gz",
+              "archiveFileName": "arm-linux-gnueabihf.mklittlefs-c41e51a.200706.tar.gz",
+              "checksum": "SHA-256:52b642dd0545eb3bd8dfb75dde6601df21700e4867763fd2696274be279294c5",
+              "size": "37211"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu12/i686-linux-gnu.mklittlefs-c41e51a.200706.tar.gz",
+              "archiveFileName": "i686-linux-gnu.mklittlefs-c41e51a.200706.tar.gz",
+              "checksum": "SHA-256:7886051d8ccc54aed0af2e7cdf6ff992bb51638df86f3b545955697720b6d062",
+              "size": "48033"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu12/i686-w64-mingw32.mklittlefs-c41e51a.200706.zip",
+              "archiveFileName": "i686-w64-mingw32.mklittlefs-c41e51a.200706.zip",
+              "checksum": "SHA-256:43740db30ce451454f2337331f10ab4ed41bd83dbf0fa0cb4387107388b59f42",
+              "size": "332655"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu12/x86_64-apple-darwin14.mklittlefs-c41e51a.200706.tar.gz",
+              "archiveFileName": "x86_64-apple-darwin14.mklittlefs-c41e51a.200706.tar.gz",
+              "checksum": "SHA-256:e3edd5e05b70db3c7df6b9d626558348ad04804022fe955c799aeb51808c7dc3",
+              "size": "362608"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu12/x86_64-linux-gnu.mklittlefs-c41e51a.200706.tar.gz",
+              "archiveFileName": "x86_64-linux-gnu.mklittlefs-c41e51a.200706.tar.gz",
+              "checksum": "SHA-256:66e84dda0aad747517da3785125e05738a540948aab2b7eaa02855167a1eea53",
+              "size": "46778"
+            },
+            {
+              "host": "x86_64-mingw32",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu12/x86_64-w64-mingw32.mklittlefs-c41e51a.200706.zip",
+              "archiveFileName": "x86_64-w64-mingw32.mklittlefs-c41e51a.200706.zip",
+              "checksum": "SHA-256:2e319077491f8e832e96eb4f2f7a70dd919333cee4b388c394e0e848d031d542",
+              "size": "345132"
+            }
+          ]
+        },
+        {
+          "name": "mkspiffs",
+          "version": "0.2.3",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.3/mkspiffs-0.2.3-arduino-esp32-win32.zip",
+              "archiveFileName": "mkspiffs-0.2.3-arduino-esp32-win32.zip",
+              "checksum": "SHA-256:b647f2c2efe6949819c85ea9404271b55c7c9c25bcb98d3b98a1d0ba771adf56",
+              "size": "249809"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.3/mkspiffs-0.2.3-arduino-esp32-osx.tar.gz",
+              "archiveFileName": "mkspiffs-0.2.3-arduino-esp32-osx.tar.gz",
+              "checksum": "SHA-256:9f43fc74a858cf564966b5035322c3e5e61c31a647c5a1d71b388ed6efc48423",
+              "size": "130270"
+            },
+            {
+              "host": "i386-apple-darwin",
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.3/mkspiffs-0.2.3-arduino-esp32-osx.tar.gz",
+              "archiveFileName": "mkspiffs-0.2.3-arduino-esp32-osx.tar.gz",
+              "checksum": "SHA-256:9f43fc74a858cf564966b5035322c3e5e61c31a647c5a1d71b388ed6efc48423",
+              "size": "130270"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.3/mkspiffs-0.2.3-arduino-esp32-linux64.tar.gz",
+              "archiveFileName": "mkspiffs-0.2.3-arduino-esp32-linux64.tar.gz",
+              "checksum": "SHA-256:5e1a4ff41385e842f389f6b5254102a547e566a06b49babeffa93ef37115cb5d",
+              "size": "50646"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.3/mkspiffs-0.2.3-arduino-esp32-linux32.tar.gz",
+              "archiveFileName": "mkspiffs-0.2.3-arduino-esp32-linux32.tar.gz",
+              "checksum": "SHA-256:464463a93e8833209cdc29ba65e1a12fec31718dc10075c195a2445b2c3f6cb0",
+              "size": "48751"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.3/mkspiffs-0.2.3-arduino-esp32-linux-armhf.tar.gz",
+              "archiveFileName": "mkspiffs-0.2.3-arduino-esp32-linux-armhf.tar.gz",
+              "checksum": "SHA-256:ade3dc00117912ac08a1bdbfbfe76b12d21a34bc5fa1de0cfc45fe7a8d0a0185",
+              "size": "40665"
+            },
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.3/mkspiffs-0.2.3-arduino-esp32-linux-armhf.tar.gz",
+              "archiveFileName": "mkspiffs-0.2.3-arduino-esp32-linux-armhf.tar.gz",
+              "checksum": "SHA-256:ade3dc00117912ac08a1bdbfbfe76b12d21a34bc5fa1de0cfc45fe7a8d0a0185",
+              "size": "40665"
+            }
+          ]
+        },
+        {
+          "version": "2.3.1",
+          "name": "esptool",
+          "systems": [
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.3.1-windows.zip",
+              "checksum": "SHA-256:c187763d0faac7da7c30a292a23c759bbc256fcd084dc8846ed284000cb0fe29",
+              "host": "i686-mingw32",
+              "archiveFileName": "esptool-2.3.1-windows.zip",
+              "size": "3396085"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.3.1-macos.tar.gz",
+              "checksum": "SHA-256:cd922418f02e0ca11dc066b36a22646a1b441da00d762b4464ca598c902c5ecb",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "esptool-2.3.1-macos.tar.gz",
+              "size": "3810932"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.3.1-linux.tar.gz",
+              "checksum": "SHA-256:cff30841dad80ed5d7d2d58a31843b63afa57528979a9c839806568167691d8e",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "esptool-2.3.1-linux.tar.gz",
+              "size": "39563"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.3.1-linux.tar.gz",
+              "checksum": "SHA-256:cff30841dad80ed5d7d2d58a31843b63afa57528979a9c839806568167691d8e",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "esptool-2.3.1-linux.tar.gz",
+              "size": "39563"
+            },
+            {
+              "url": "https://dl.espressif.com/dl/esptool-2.3.1-linux.tar.gz",
+              "checksum": "SHA-256:cff30841dad80ed5d7d2d58a31843b63afa57528979a9c839806568167691d8e",
+              "host": "arm-linux-gnueabihf",
+              "archiveFileName": "esptool-2.3.1-linux.tar.gz",
+              "size": "39563"
+            }
+          ]
+        }
+      ], 
+      "email": "info@magicbit.cc", 
+      "name": "magicbit"
+    },
+	{
+      "name": "MagicbitTiny",
+      "maintainer": "Magicbit",
+      "websiteURL": "https://magicbit.cc/magicbittiny",
+      "email": "",
+      "help": {
+        "online": ""
+      },
+      "platforms": [
+    
+        {
+          "name": "MagicbitTiny",
+          "architecture": "megaavr",
+          "version": "2.6.10",
+          "category": "Contributed",
+          "url": "https://SpenceKonde.github.io/megaTinyCore/megaTinyCore-2.6.10.tar.bz2",
+          "archiveFileName": "megaTinyCore-2.6.10.tar.bz2",
+          "checksum": "SHA-256:62703a44f94a8033faac2f5283e3fe708d65a7cd5e1db8dd17edfaddee96f5da",
+          "size": "993438",
+          "boards": [
+            {
+              "name": "Full Arduino support for the tinyAVR 0-series, 1-series, and the new 2-series!<br/> 24-pin parts: ATtiny3227/3217/1627/1617/1607/827/817/807/427<br/> 20-pin parts: ATtiny3226/3216/1626/1616/1606/826/816/806/426/416/406<br/> 14-pin parts: ATtiny3224/1624/1614/1604/824/814/804/424/414/404/214/204<br/> 8-pin parts: ATtiny412/402/212/202<br/> Microchip Boards: Curiosity Nano 3217/1627/1607 and Xplained Pro (3217/817), Mini (817) Nano (416). Direct USB uploads may not work on linux, but you can export hex and <br/> upload through the mass storage projection."
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "DxCore",
+              "name": "avr-gcc",
+              "version": "7.3.0-atmel3.6.1-azduino7b1"
+            },
+            {
+              "packager": "DxCore",
+              "name": "avrdude",
+              "version": "6.3.0-arduino17or18"
+            },
+            {
+              "packager": "arduino",
+              "name": "arduinoOTA",
+              "version": "1.3.0"
+            },
+            {
+              "packager": "megaTinyCore",
+              "version": "3.7.2-post1",
+              "name": "python3"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        {
+          "version": "3.7.2-post1",
+          "name": "python3",
+          "systems": [
+            {
+              "host": "x86_64-mingw32",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-3.7.2.post1-embed-win32v2a.zip",
+              "archiveFileName": "python3-3.7.2.post1-embed-win32v2a.zip",
+              "checksum": "SHA-256:f57cb2daf86176d2929e7c58990c2ac32554e3219d454dcac10e464ddda35bf2",
+              "size": "6428926"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-3.7.2.post1-embed-win32v2a.zip",
+              "archiveFileName": "python3-3.7.2.post1-embed-win32va2.zip",
+              "checksum": "SHA-256:f57cb2daf86176d2929e7c58990c2ac32554e3219d454dcac10e464ddda35bf2",
+              "size": "6428926"
+            },
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz",
+              "archiveFileName": "python3-via-env.tar.gz",
+              "checksum": "SHA-256:c9237bfe0f62842d7187a39495baa4a7e3ab8b87c0b433614294b023cf0bc0f3",
+              "size": "292"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz",
+              "archiveFileName": "python3-via-env.tar.gz",
+              "checksum": "SHA-256:c9237bfe0f62842d7187a39495baa4a7e3ab8b87c0b433614294b023cf0bc0f3",
+              "size": "292"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz",
+              "archiveFileName": "python3-via-env.tar.gz",
+              "checksum": "SHA-256:c9237bfe0f62842d7187a39495baa4a7e3ab8b87c0b433614294b023cf0bc0f3",
+              "size": "292"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-macosx-portable.tar.gz",
+              "archiveFileName": "python3-macosx-portable.tar.gz",
+              "checksum": "SHA-256:01a5bf1fa264c6f04cfaadf4c6e9f6caaacb6833ef40104dfbe953fcdb9bca1c",
+              "size": "25494144"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz",
+              "archiveFileName": "python3-via-env.tar.gz",
+              "checksum": "SHA-256:c9237bfe0f62842d7187a39495baa4a7e3ab8b87c0b433614294b023cf0bc0f3",
+              "size": "292"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
