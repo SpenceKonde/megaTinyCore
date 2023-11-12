@@ -29,9 +29,6 @@
 #include <Arduino.h>
 
 
-extern "C" {
-#include "twi.h"
-}
 /* The Wire library unfortunately needs TWO buffers, one for TX, and one for RX. That means, multiply these
  * values by 2 to get the actual amount of RAM they take. You can see that on the smallest ram sizes, all but
  * the minuscule buffer we provide becomes prohibitive. 32b is a magic number because it's used on the stock
@@ -46,6 +43,42 @@ extern "C" {
  * and while the enhanced wire library *will* fit on 2k parts, you have very little flash left for anything else.
  * and the practicality of using it there is limited.
  */
+ 
+ 
+ #ifndef ADD_READ_BIT
+  #define ADD_READ_BIT(address)    (address | 0x01)
+#endif
+#ifndef ADD_WRITE_BIT
+  #define ADD_WRITE_BIT(address)   (address & ~0x01)
+#endif
+
+#ifndef DEFAULT_FREQUENCY
+  #define DEFAULT_FREQUENCY 100000
+#endif
+
+
+#if (!defined(TWI1) && defined(TWI_USING_WIRE1))
+  // If pins for Wire1 are not defined, but TWI_USING_WIRE1 was defined in the boards.txt menu, throw an error. Used for 28-pin DA/DB parts
+  #error "This part only provides a single Wire interface."
+#endif
+
+#if ((defined(TWI0_DUALCTRL) && !defined(TWI_USING_WIRE1)) || (defined(TWI1_DUALCTRL) && defined(TWI_USING_WIRE1)))
+  /* Instead of requiring changes to the library to switch between DxCore and megaTinyCore, we can check
+   * if the part supports dual mode. Goal is that the identical library can be used on both, so updates
+   * in one can be propagated to the other by just copying files. */
+  #define TWI_DUALCTRL   // This identifies if the device supports dual mode, where slave pins are different from the master pins
+#endif
+
+
+#if defined(__AVR_ATtiny202__) || defined(__AVR_ATtiny202__)
+  #if defined(TWI_MANDS)  // 202 and 402 do not support independent master and slave.
+    // #undef TWI_MANDS
+    #error "Master + Slave mode is not supported on the 202 or 402."
+    // If a user enables master + slave mode on a part where we know it won't we should error
+    // so that they know what's wrong instead of silently disobeying
+  #endif
+#endif
+
 
 // WIRE_HAS_END means Wire has end(), which almost all implementations do.
 #ifndef WIRE_HAS_END
@@ -69,9 +102,137 @@ extern "C" {
 #define WIRE_I2C_LEVELS  0
 #define WIRE_SMBUS_LEVELS  1
 
+
+
+#if !defined(TWI_BUFFER_LENGTH)       // we need a Buffer size
+  #if defined(BUFFER_LENGTH) && (BUFFER_LENGTH != 32)   // Backwards Compatibility: someone needs a non-default size
+    #define TWI_BUFFER_LENGTH BUFFER_LENGTH             // Apply it.
+    #warning "It seems like BUFFER_LENGTH was used to change the default Wire Buffer Size."
+    #warning "The define was renamed to TWI_BUFFER_LENGTH to reduce ambiguity."
+    #warning "TWI_BUFFER_LENGTH was set to BUFFER_LENGTH." // defining TWI_BUFFER_LENGTH= will remove the warnings
+
+  #else                               // BUFFER_LENGTH was not messed with, go with our defaults
+    #if (RAMSIZE < 256)
+      #define TWI_BUFFER_LENGTH 16
+    #elif (RAMSIZE < 4096)
+      #define TWI_BUFFER_LENGTH 32
+    #else
+      #define TWI_BUFFER_LENGTH 130
+    #endif
+  #endif
+#endif
+
+// In the case someone wants to use custom 255+ buffer sizes, define TWI_16BIT_BUFFER
+#if (TWI_BUFFER_LENGTH > 255) || defined(TWI_16BIT_BUFFER)
+  typedef uint16_t twi_buf_index_t;
+#else
+  typedef uint8_t  twi_buf_index_t;
+#endif
+
+
+#define  TWI_TIMEOUT_ENABLE       // Enabled by default, might be disabled for debugging or other reasons
+#define  TWI_ERROR_ENABLED        // Enabled by default, TWI Master Write error functionality
+//#define TWI_READ_ERROR_ENABLED  // Enabled on Master Read too
+//#define DISABLE_NEW_ERRORS      // Disables the new error codes and returns TWI_ERR_UNDEFINED instead.
+
+// Errors from Arduino documentation:
+#define  TWI_ERR_SUCCESS         0x00  // Default
+#define  TWI_ERR_DATA_TOO_LONG   0x01  // Not used here; data too long to fit in TX buffer
+#define  TWI_ERR_ACK_ADR         0x02  // Address was NACKed on Master write
+#define  TWI_ERR_ACK_DAT         0x03  // Data was NACKed on Master write
+#define  TWI_ERR_UNDEFINED       0x04  // Software can't tell error source
+#define  TWI_ERR_TIMEOUT         0x05  // TWI Timed out on data rx/tx
+
+// Errors that are made to help finding errors on TWI lines. Only here to give a suggestion of where to look - these may not always be reported accurately.
+#if !defined(DISABLE_NEW_ERRORS)
+  #define  TWI_ERR_UNINIT        0x10  // TWI was in bad state when function was called.
+  #define  TWI_ERR_PULLUP        0x11  // Likely problem with pull-ups
+  #define  TWI_ERR_BUS_ARB       0x12  // Bus error and/or Arbitration lost
+  #define  TWI_ERR_BUF_OVERFLOW  0x13  // Buffer overflow on master read
+  #define  TWI_ERR_CLKHLD        0x14  // Something's holding the clock
+#else
+  // DISABLE_NEW_ERRORS can be used to more completely emulate the old error reporting behavior; this should rarely be needed.
+  #define  TWI_ERR_UNINIT        TWI_ERR_UNDEFINED  // TWI was in bad state when method was called.
+  #define  TWI_ERR_PULLUP        TWI_ERR_UNDEFINED  // Likely problem with pull-ups
+  #define  TWI_ERR_BUS_ARB       TWI_ERR_UNDEFINED  // Bus error and/or Arbitration lost
+  #define  TWI_ERR_BUF_OVERFLOW  TWI_ERR_UNDEFINED  // Buffer overflow on master read
+  #define  TWI_ERR_CLKHLD        TWI_ERR_UNDEFINED  // Something's holding the clock
+#endif
+
+#if defined(TWI_ERROR_ENABLED)
+  #define TWI_ERROR_VAR    twi_error
+  #define TWI_INIT_ERROR   uint8_t TWI_ERROR_VAR = TWI_ERR_SUCCESS
+  #define TWI_GET_ERROR    TWI_ERROR_VAR
+  #define TWI_CHK_ERROR(x) TWI_ERROR_VAR == x
+  #define TWI_SET_ERROR(x) TWI_ERROR_VAR = x
+#else
+  #define TWI_ERROR_VAR     {}
+  #define TWI_INIT_ERROR    {}
+  #define TWI_GET_ERROR     {0}
+  #define TWI_CHK_ERROR(x)  (true)
+  #define TWI_SET_ERROR(x)  {}
+#endif
+
+#if defined(TWI_READ_ERROR_ENABLED) && defined(TWI_ERROR_ENABLED)
+  #define TWIR_ERROR_VAR        twiR_error
+  #define TWIR_INIT_ERROR       uint8_t TWIR_ERROR_VAR = TWI_ERR_SUCCESS
+  #define TWIR_GET_ERROR        TWIR_ERROR_VAR
+  #define TWIR_CHK_ERROR(x)     TWIR_ERROR_VAR == x
+  #define TWIR_SET_ERROR(x)     TWIR_ERROR_VAR = x
+
+  // #define TWI_SET_EXT_ERROR(x)  TWI_ERROR_VAR = x
+#else
+  #define TWIR_ERROR_VAR        {}
+  #define TWIR_INIT_ERROR       {}
+  #define TWIR_GET_ERROR        {0}
+  #define TWIR_CHK_ERROR(x)     (true)
+  #define TWIR_SET_ERROR(x)     {}
+
+  // #define TWI_SET_EXT_ERROR(x)  {}
+#endif
+
+
+struct twiDataBools {         // using a struct so the compiler can use skip if bit is set/cleared
+  bool _toggleStreamFn:   1;  // used to toggle between Slave and Master elements when TWI_MANDS defined
+  bool _hostEnabled:      1;
+  bool _clientEnabled:    1;
+  uint8_t _reserved:      5;
+};
+
+
+
+
+
 class TwoWire: public Stream {
   private:
-    twiData vars;   // We're using a struct to reduce the amount of parameters that have to be passed.
+    TWI_t *_module;
+    uint8_t MasterCalcBaud(uint32_t frequency);
+    
+    uint8_t client_irq_mask;
+    struct twiDataBools _bools;      // the structure to hold the bools for the class
+    #if defined(TWI_READ_ERROR_ENABLED)
+    uint8_t _errors;
+    #endif
+    
+    void (*user_onRequest)(void);
+    void (*user_onReceive)(int);
+    
+    uint8_t _clientAddress;
+    twi_buf_index_t _bytesToReadWrite;
+    twi_buf_index_t _bytesReadWritten;
+    twi_buf_index_t _bytesTransmittedS;
+
+    #if defined(TWI_MANDS)
+      uint8_t _incomingAddress;
+      twi_buf_index_t _bytesToReadWriteS;
+      twi_buf_index_t _bytesReadWrittenS;
+    #endif
+    
+    uint8_t _hostBuffer[TWI_BUFFER_LENGTH];
+    #if defined(TWI_MANDS)
+      uint8_t _clientBuffer[TWI_BUFFER_LENGTH];
+    #endif
+
   public:
     explicit TwoWire(TWI_t *twi_module);
     bool pins(uint8_t sda_pin, uint8_t scl_pin);
@@ -96,7 +257,10 @@ class TwoWire: public Stream {
       return endTransmission(true);
     }
 
-    twi_buffer_index_t requestFrom(uint8_t address, twi_buffer_index_t quantity, uint8_t sendStop = 1);
+    twi_buf_index_t requestFrom(uint8_t address, twi_buf_index_t quantity, uint8_t sendStop = 1);
+    
+    uint8_t masterTransmit(auto length, uint8_t addr, uint8_t* buffer, uint8_t sendStop);
+    auto masterReceive(auto length, uint8_t addr, uint8_t* buffer, uint8_t sendStop);
 
     virtual size_t write(uint8_t);
     virtual size_t write(const uint8_t *, size_t);
@@ -106,7 +270,7 @@ class TwoWire: public Stream {
     void flush(void);
     uint8_t specialConfig(bool smbuslvl = 0, bool longsetup = 0, uint8_t sda_hold = 0, bool smbuslvl_dual = 0, uint8_t sda_hold_dual = 0);
     uint8_t getIncomingAddress(void);
-    twi_buffer_index_t getBytesRead(void);
+    twi_buf_index_t getBytesRead(void);
     uint8_t slaveTransactionOpen(void);
     uint8_t checkPinLevels(void);             // Can be used to make sure after boot that SDA/SCL are high
     void    enableDualMode(bool fmp_enable);  // Moves the Slave to dedicated pins
@@ -141,8 +305,9 @@ class TwoWire: public Stream {
     uint8_t returnError();
     #endif
 
-    static void onSlaveIRQ(TWI_t *module);    // is called by the TWI interrupt routines
+    static void HandleSlaveIRQ(TwoWire* wire_s);
 };
+
 
 #if defined(TWI0)
   extern TwoWire Wire;

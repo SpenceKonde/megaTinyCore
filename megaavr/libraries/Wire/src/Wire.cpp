@@ -37,9 +37,17 @@ extern "C" {
 
 
 extern "C" {    // compiler was complaining when I put twi.h into the upper C include part
-  #include "twi.h"
   #include "twi_pins.h"
 }
+
+static uint8_t sleepStack = 0;
+
+void pushSleep(void);
+void popSleep(void);
+
+TwoWire* twi0_wire;
+TwoWire* twi1_wire;
+
 
 
 /**
@@ -49,8 +57,20 @@ extern "C" {    // compiler was complaining when I put twi.h into the upper C in
  *
  *@return     constructor can't return anything
  */
+
 TwoWire::TwoWire(TWI_t *twi_module) {
-  vars._module = twi_module;
+  if (&TWI0 == twi_module) {
+    twi0_wire = this;
+  }
+  #if defined(TWI1)
+    else if (&TWI1 == twi_module) {
+      twi1_wire = this;
+    }
+  #endif
+  else {    // ignore NULLs
+    return;
+  }
+  _module = twi_module;
 }
 
 /**
@@ -103,9 +123,9 @@ bool TwoWire::pins(uint8_t sda_pin, uint8_t scl_pin) {
    * I don't see a way around that, though... but this will at least catch the majority of cases. -SK 10/5/22.
    */
   #if defined(TWI1)
-    if (&TWI0 == vars._module)  {
+    if (&TWI0 == _module)  {
       return TWI0_Pins(sda_pin, scl_pin);
-    } else if (&TWI1 == vars._module)  {
+    } else if (&TWI1 == _module)  {
       return TWI1_Pins(sda_pin, scl_pin);
     } else {
       return false;
@@ -177,9 +197,9 @@ bool TwoWire::swap(uint8_t state) {
     #endif
   }
   #if defined(TWI1)
-    if (&TWI0 == vars._module) {
+    if (&TWI0 == _module) {
       return TWI0_swap(state);
-    } else if (&TWI1 == vars._module) {
+    } else if (&TWI1 == _module) {
       return TWI1_swap(state);
     } else {
       return false;
@@ -201,9 +221,9 @@ bool TwoWire::swap(uint8_t state) {
  */
 void TwoWire::usePullups(void) {
   #if defined(TWI1)
-    if (&TWI0 == vars._module) {
+    if (&TWI0 == _module) {
       TWI0_usePullups();
-    } else if (&TWI1 == vars._module) {
+    } else if (&TWI1 == _module) {
       TWI1_usePullups();
     }
   #else
@@ -224,19 +244,32 @@ void TwoWire::usePullups(void) {
  *@retval     true if change was successful
  */
 bool TwoWire::swapModule(TWI_t *twi_module) {
+  if (__builtin_constant_p(twi_module)) {
+    if (twi_module == NULL) {
+      badArg("Null Pointer passed");
+      return false;
+    }
+  }
   #if defined(TWI1)
     #if defined(TWI_USING_WIRE1)
       badCall("swapModule() can only be used if Wire1 is not used");
     #else
-      if (vars._module->MCTRLA == 0) {    // client and host initialisations enable MCTRLA, so just check for that
-        vars._module = twi_module;
-        return true;                      // Success
+      if ((_bools._hostEnabled | _bools._clientEnabled) == 0) { // make sure nothing's enabled
+        if (&TWI0 == twi_module) {
+          twi0_wire = this;
+          _module = twi_module;
+          return true;
+        }
+        else if (&TWI1 == twi_module) {
+          twi1_wire = this;
+          _module = twi_module;
+          return true;
+        }
       }
     #endif
   #else
     badCall("Only one TWI module available, nothing to switch with");
   #endif
-  (void)twi_module;   // Remove warning unused variable
   return false;
 }
 
@@ -249,7 +282,33 @@ bool TwoWire::swapModule(TWI_t *twi_module) {
  *@return     void
  */
 void TwoWire::begin(void) {
-  TWI_MasterInit(&vars);
+  #if defined(TWI_MANDS)                            // Check if the user wants to use Master AND Slave
+    if (_bools._hostEnabled == 1) {          // Slave is allowed to be enabled, don't re-enable the host though
+      return;
+    }
+  #else                                             // Master OR Slave
+    if ((_bools._hostEnabled | _bools._clientEnabled) == 1) {  //If either are enabled
+      return;                                       // return and do nothing
+    }
+  #endif
+
+
+  #if defined(TWI1)                                 // More then one TWI used
+    if        (&TWI0 == _module) {           // check which one this function is working with
+      TWI0_ClearPins();
+    } else if (&TWI1 == _module) {
+      TWI1_ClearPins();
+    }
+  #else                                             // Only one TWI is used
+    TWI0_ClearPins();                               // Only one option is possible
+  #endif
+
+  _bools._hostEnabled    = 1;
+  TWI_t* module = _module;
+  module->MCTRLA        = TWI_ENABLE_bm;  // Master Interrupt flags stay disabled
+  module->MSTATUS       = TWI_BUSSTATE_IDLE_gc;
+
+  setClock(DEFAULT_FREQUENCY);
 }
 
 
@@ -274,7 +333,34 @@ void TwoWire::begin(uint8_t address, bool receive_broadcast, uint8_t second_addr
       return;
     }
   }
-  TWI_SlaveInit(&vars, address, receive_broadcast, second_address);
+  
+  
+  #if defined(TWI_MANDS)                    // Check if the user wants to use Master AND Slave
+    if (_bools._clientEnabled  == 1) {      // Master is allowed to be enabled, don't re-enable the client though
+      return;
+    }
+  #else                                         // Master or Slave
+    if ((_bools._hostEnabled | _bools._clientEnabled) == 1) {  //If either are enabled
+      return;                                     // return and do nothing
+    }
+  #endif
+
+  #if defined(TWI1)
+    if        (&TWI0 == _module) {
+      TWI0_ClearPins();
+    } else if (&TWI1 == _module) {
+      TWI1_ClearPins();
+    }
+  #else
+    TWI0_ClearPins();
+  #endif
+
+  _bools._clientEnabled = 1;
+  client_irq_mask = TWI_COLL_bm;
+  TWI_t* module = _module;
+  module->SADDR        = (address << 1) | receive_broadcast;
+  module->SADDRMASK    = second_address;
+  module->SCTRLA       = TWI_DIEN_bm | TWI_APIEN_bm | TWI_PIEN_bm  | TWI_ENABLE_bm;
 }
 
 
@@ -290,7 +376,85 @@ void TwoWire::begin(uint8_t address, bool receive_broadcast, uint8_t second_addr
  *@retval       1 if a problem occurred
  */
 uint8_t TwoWire::setClock(uint32_t clock) {
-  return TWI_MasterSetBaud(&vars, clock);
+  TWI_t* module = _module;
+  if (__builtin_constant_p(clock)) {
+    if ((clock < 1000) || (clock > 15000000)) {
+      badArg("Invalid frequency was passed for SCL clock!");
+      return 1;
+    }
+  } else {
+    if (clock < 1000) {
+      return 1;
+    }
+  }
+  if (_bools._hostEnabled == 1) {              // Do something only if the host is enabled.
+    uint8_t newBaud = MasterCalcBaud(clock);        // get the new Baud value
+    uint8_t oldBaud = module->MBAUD;                // load the old Baud value
+    if (newBaud != oldBaud) {                       // compare both, in case the code is issuing this before every transmission.
+      uint8_t restore = module->MCTRLA;             // Save the old Master state
+      module->MCTRLA    = 0;                        // Disable Master
+      module->MBAUD     = newBaud;                  // update Baud register
+      if (clock > 400000) {
+        module->CTRLA  |=  TWI_FMPEN_bm;            // Enable FastMode+
+      } else {
+        module->CTRLA  &= ~TWI_FMPEN_bm;            // Disable FastMode+
+      }
+      module->MCTRLA    = restore;                  // restore the old register, thus enabling it again
+      if (restore & TWI_ENABLE_bm) {                // If the TWI was enabled,
+        module->MSTATUS   = TWI_BUSSTATE_IDLE_gc;   // Force the state machine into IDLE according to the data sheet
+      }
+    }
+    return 0;
+  }
+  return 1;
+}
+
+
+/**
+ *@brief              TWI_MasterCalcBaud calculates the baud for the desired frequency
+ *
+ *@param              uint32_t frequency is the desired frequency
+ *
+ *@return             uint8_t value for the MBAUD register
+ *@retval             the desired baud value
+ */
+#define TWI_BAUD(freq, t_rise) ((F_CPU / freq) / 2) - (5 + (((F_CPU / 1000000) * t_rise) / 2000))
+uint8_t TwoWire::MasterCalcBaud(uint32_t frequency) {
+  int16_t baud;
+
+  #if (F_CPU == 20000000) || (F_CPU == 10000000)
+    if (frequency >= 600000) {          // assuming 1.5kOhm
+      baud = TWI_BAUD(frequency, 250);
+    } else if (frequency >= 400000) {   // assuming 2.2kOhm
+      baud = TWI_BAUD(frequency, 350);
+    } else {                            // assuming 4.7kOhm
+      baud = TWI_BAUD(frequency, 600);  // 300kHz will be off at 10MHz. Trade-off between size and accuracy
+    }
+  #else
+    if (frequency >= 600000) {          // assuming 1.5kOhm
+      baud = TWI_BAUD(frequency, 250);
+    } else if (frequency >= 400000) {   // assuming 2.2kOhm
+      baud = TWI_BAUD(frequency, 400);
+    } else {                            // assuming 4.7kOhm
+      baud = TWI_BAUD(frequency, 600);
+    }
+  #endif
+
+  #if (F_CPU >= 20000000)
+    const uint8_t baudlimit = 2;
+  #elif (F_CPU == 16000000) || (F_CPU == 8000000) || (F_CPU == 4000000)
+    const uint8_t baudlimit = 1;
+  #else
+    const uint8_t baudlimit = 0;
+  #endif
+
+  if (baud < baudlimit) {
+    return baudlimit;
+  } else if (baud > 255) {
+    return 255;
+  }
+
+  return (uint8_t)baud;
 }
 
 
@@ -302,7 +466,8 @@ uint8_t TwoWire::setClock(uint32_t clock) {
  *@return     void
  */
 void TwoWire::end(void) {
-  TWI_Disable(&vars);
+  endMaster();
+  endSlave();
 }
 
 
@@ -313,11 +478,14 @@ void TwoWire::end(void) {
  *
  *@return     void
  */
-#if defined(TWI_MANDS)
 void TwoWire::endMaster(void) {
-  TWI_DisableMaster(&vars);
+  if (true == _bools._hostEnabled) {
+    _module->MCTRLA = 0x00;
+    _module->MBAUD  = 0x00;
+    _bools._hostEnabled  = 0x00;
+  }
 }
-#endif
+
 
 
 /**
@@ -327,17 +495,28 @@ void TwoWire::endMaster(void) {
  *
  *@return     void
  */
-#if defined(TWI_MANDS)
 void TwoWire::endSlave(void) {
-  TWI_DisableSlave(&vars);
+  if (true == _bools._clientEnabled) {
+    _module->SADDR       = 0x00;
+    _module->SCTRLA      = 0x00;
+    _module->SADDRMASK   = 0x00;
+    _bools._clientEnabled     = 0x00;
+    #if defined(TWI_DUALCTRL)
+      _module->DUALCTRL  = 0x00;    // Disable pin splitting when available
+    #endif
+  }
 }
-#endif
+
+
+
 /**
  *@brief      specialConfig allows configuring of wacky features.
- *            smbus evel: Vihmin and Vilmax are normally 0.7*Vdd (or VDDIO on MVIO pins) and 0.3*Vdd respectively. This option sets them to the SMBus 3.0 levels:
- *            In this mode, any voltage below 0.8V is guaranteed to be a LOW, and anything above 1.35 or 1.45 (see electrical characteristics in datasheet)
- *            This is of great utility for communication with lower voltage devices, especially where you don't have MVIO. Can also be set independently if dual mode used.
- *            loongsetup: The setup times are normally 4 system clocks, however this can be doubled for disagreeable devices and/or adverse bus conditions
+ *            smbus evel: Vihmin and Vilmax are normally 0.7*Vdd (or VDDIO on MVIO pins) and 0.3*Vdd respectively.
+ *            This option sets them to the SMBus 3.0 levels: In this mode, any voltage below 0.8V is guaranteed to be a LOW,
+ *            and anything above 1.35 or 1.45 (see electrical characteristics in datasheet)
+ *            This is of great utility for communication with lower voltage devices, especially where you don't have MVIO.
+ *            Can also be set independently if dual mode used.
+ *            longsetup: The setup times are normally 4 system clocks, however this can be doubled for disagreeable devices and/or adverse bus conditions
  *            Four options are available for the SDA hold times. sda_hold_dual handles the dual pins. This is used for SMBus 2.0 compatibility.
  *              WIRE_SDA_HOLD_OFF 0 - hold time off (default)
  *              WIRE_SDA_HOLD_50  1 - short hold time
@@ -418,9 +597,9 @@ uint8_t TwoWire::specialConfig( __attribute__ ((unused)) bool smbuslvl, __attrib
   // Now we actually call the function in twi_pins.
   // Notice how the non-dualctrl parts also don't have smbus levels!
   #if defined(TWI1) // TWI_DUALCTRL is also defined here - everything with TWI1 has dual mode
-    if (&TWI0 == vars._module) {
+    if (&TWI0 == _module) {
       ret |= TWI0_setConfig(smbuslvl, longsetup, sda_hold, smbuslvl_dual, sda_hold_dual);
-    } else if (&TWI1 == vars._module) {
+    } else if (&TWI1 == _module) {
       ret |= TWI1_setConfig(smbuslvl, longsetup, sda_hold, smbuslvl_dual, sda_hold_dual);
     }
   #else
@@ -434,11 +613,114 @@ uint8_t TwoWire::specialConfig( __attribute__ ((unused)) bool smbuslvl, __attrib
 }
 
 
+
+
+
 /**
- *@brief      requestFrom sends a host READ with the specified client address
+ *@brief      masterReceive sends a host READ with the specified client address
  *
- *            When a greater quantity then the BUFFER_LENGTH is passed, the quantity gets
- *            limited to the BUFFER_LENGTH.
+ *            This function will read an arbitrary number of bytes from the TWI module
+ *            and store them into the specified buffer. This allows the user to use 
+ *            custom sized buffers and avoids extra copy operations through read.
+ *
+ *@param      auto length - amount of bytes to be read (first arg so it is placed in r24:r25)
+ *@param      uint8_t addr - the address of the client (7-bit)
+ *@param      uint8_t* buffer - pointer to the memory area to be written upon.
+ *@param      uint8_t/bool sendStop - if the transaction should be terminated with a STOP condition
+ *
+ *@return     auto (uint8_t/uint16_t) - depends on the usage
+ *@retval     amount of bytes that were actually read. If 0, no read took place due to a bus error.
+ */
+
+
+auto TwoWire::masterReceive(auto length, uint8_t addr, uint8_t* buffer, uint8_t sendStop) {
+  TWI_t *module = _module;
+
+  TWIR_INIT_ERROR;             // local variable for errors
+  auto dataRead = 0;
+
+  uint8_t currentSM;
+  uint8_t currentStatus;
+  uint8_t state = 0;
+  #if defined (TWI_TIMEOUT_ENABLE)
+    uint16_t timeout = (F_CPU/1000);
+  #endif
+  
+  while (true) {
+    currentStatus = module->MSTATUS;
+    currentSM = currentStatus & TWI_BUSSTATE_gm;  // get the current mode of the state machine
+    
+    if (currentSM == TWI_BUSSTATE_UNKNOWN_gc) {
+      TWIR_SET_ERROR(TWI_ERR_UNINITIALIZED);
+      return dataRead;
+    }
+
+    #if defined(TWI_TIMEOUT_ENABLE)
+      if (--timeout == 0) {
+        if      (currentSM == TWI_BUSSTATE_OWNER_gc) {
+          TWIR_SET_ERROR(TWI_ERR_TIMEOUT);
+        } else if (currentSM == TWI_BUSSTATE_IDLE_gc) {
+          TWIR_SET_ERROR(TWI_ERR_PULLUP);
+        } else {
+          TWIR_SET_ERROR(TWI_ERR_UNDEFINED);
+        }
+        break;
+      }
+    #endif
+    
+    if (currentStatus & TWI_ARBLOST_bm) {   // Check for Bus error
+      TWIR_SET_ERROR(TWI_ERR_BUS_ARB);      // set error flag
+      break;                                // leave RX loop
+    }
+
+    
+    if (currentSM != TWI_BUSSTATE_BUSY_gc) {
+      if (state == 0x00) {
+        module->MADDR = ADD_READ_BIT(addr);     // Send Address with read bit
+        state |= 0x01;
+        #if defined (TWI_TIMEOUT_ENABLE)
+          timeout = (F_CPU/1000);               // reset timeout
+        #endif
+      } else {
+        if (currentStatus & TWI_WIF_bm) {
+          TWIR_SET_ERROR(TWI_ERR_RXACK);          // set error flag
+          module->MCTRLB = TWI_MCMD_STOP_gc;      // free the bus
+          break;
+        } else if (currentStatus & TWI_RIF_bm) {
+          *buffer = module->MDATA;
+          buffer++;
+          dataRead++;
+          #if defined (TWI_TIMEOUT_ENABLE)
+            timeout = (F_CPU/1000);                // reset timeout
+          #endif
+          if (dataRead < length) {
+            module->MCTRLB = TWI_MCMD_RECVTRANS_gc;  // send an ACK so the Slave so it can send the next byte
+          } else {
+            if (sendStop != 0) {
+              module->MCTRLB = TWI_ACKACT_bm | TWI_MCMD_STOP_gc;   // send STOP + NACK
+            } else {
+              module->MCTRLB = TWI_ACKACT_bm;   // Send NACK, but no STOP
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
+  #if defined(TWI_READ_ERROR_ENABLED) && defined(TWI_ERROR_ENABLED)
+    _errors = TWIR_GET_ERROR;                // save error flags
+  #endif
+  return dataRead;
+}
+
+
+
+
+/**
+ *@brief      requestFrom is a wrapper for masterReceive providing the expected interface
+ *
+ *            When a greater quantity then the TWI_BUFFER_LENGTH is passed, the quantity gets
+ *            limited to the TWI_BUFFER_LENGTH.
  *            Received Bytes must be read with read().
  *
  *@param      int/uint8_t address - the address of the client
@@ -448,13 +730,24 @@ uint8_t TwoWire::specialConfig( __attribute__ ((unused)) bool smbuslvl, __attrib
  *@return     uint8_t/uint16_t
  *@retval     amount of bytes that were actually read. If 0, no read took place due to a bus error.
  */
-twi_buffer_index_t TwoWire::requestFrom(uint8_t  address,  twi_buffer_index_t quantity,  uint8_t sendStop) {
-  if (quantity >= BUFFER_LENGTH) {
-    quantity = BUFFER_LENGTH;
+twi_buf_index_t TwoWire::requestFrom(uint8_t  address,  twi_buf_index_t quantity,  uint8_t sendStop) {
+  if (__builtin_constant_p(quantity)) {
+    if (quantity > TWI_BUFFER_LENGTH) {
+      badArg("requestFrom requests more bytes then there is Buffer space");
+    }
   }
-  vars._clientAddress = address << 1;
-  return TWI_MasterRead(&vars, quantity, sendStop);
+  if (quantity >= TWI_BUFFER_LENGTH) {
+    quantity = TWI_BUFFER_LENGTH;
+  }
+
+  _clientAddress = address << 1;
+  
+  twi_buf_index_t count = masterReceive(quantity, _clientAddress, _hostBuffer, sendStop);
+  _bytesToReadWrite = count;  // for available/read/peek
+  _bytesReadWritten = 0;
+  return count;
 }
+
 
 
 /**
@@ -470,24 +763,21 @@ twi_buffer_index_t TwoWire::requestFrom(uint8_t  address,  twi_buffer_index_t qu
  *@return     void
  */
 void TwoWire::beginTransmission(uint8_t address) {
-  twi_buffer_index_t *txHead;
-  #if defined(TWI_MERGE_BUFFERS)                  // Same Buffers for tx/rx
-    txHead  = &(vars._bytesToReadWrite);
-  #else                                           // Separate tx/rx Buffers
-    txHead  = &(vars._bytesToWrite);
-  #endif
   if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
     badArg("Supplied address seems to be 8 bit. Only 7-bit-addresses are supported");
     return;
   }
-  // set address of targeted client
-  vars._clientAddress = address << 1;
-  (*txHead) = 0;  // fill buffer from 0
+  if (_bools._hostEnabled) {
+    // set address of targeted client
+    _clientAddress = address << 1;
+    _bytesToReadWrite = 0;  // fill buffer from 0
+    _bytesReadWritten = 0;
+  }
 }
 
 
 /**
- *@brief      endTransmission is the function that actually performs the (blocking) host WRITE
+ *@brief      endTransmission is the wrapper function for masterTransmit and offers the API compatibility
  *
  *            Originally, 'endTransmission' was an f(void) function. It has been modified to take
  *            one parameter indicating whether or not a STOP should be performed on the bus.
@@ -515,10 +805,110 @@ void TwoWire::beginTransmission(uint8_t address) {
  */
 uint8_t TwoWire::endTransmission(bool sendStop) {
   // transmit (blocking)
-  return TWI_MasterWrite(&vars, sendStop);
+
+  return masterTransmit(_bytesToReadWrite, _clientAddress, _hostBuffer, sendStop);
 }
 
 
+
+/**
+ *@brief      masterTransmit sends a host WRITE with the specified client address
+ *
+ *            This function will write an arbitrary number of bytes to the TWI module
+ *            and read the data from the specified buffer. This allows the user to use 
+ *            custom sized buffers and avoids extra copy operations through write.
+ *
+ *@param      auto length - amount of bytes to be read (first arg so it is placed in r24:r25)
+ *@param      uint8_t addr - the address of the client (7-bit)
+ *@param      uint8_t* buffer - pointer to the memory area to be read from.
+ *@param      uint8_t/bool sendStop - if the transaction should be terminated with a STOP condition
+ *
+ *@return     uint8_t
+ *@retval     errors (see endTransmission)
+ */
+uint8_t TwoWire::masterTransmit(auto length, uint8_t addr, uint8_t* buffer, uint8_t sendStop) {
+  TWI_t* module = _module;
+  __asm__ __volatile__("\n\t" : "+z"(module));
+  
+  TWI_INIT_ERROR;
+  uint8_t currentSM;
+  uint8_t currentStatus;
+  uint8_t stat = 0;
+  #if defined (TWI_TIMEOUT_ENABLE)
+    uint16_t timeout = (F_CPU/1000);
+  #endif
+  
+  if ((module->MCTRLA & TWI_ENABLE_bm) == 0x00) {  // If the module is disabled, abort
+    return TWI_ERR_UNINIT;
+  }
+
+  while (true) {
+    currentStatus = module->MSTATUS;
+    currentSM = currentStatus & TWI_BUSSTATE_gm;  // get the current mode of the state machine
+    
+    if (currentSM == TWI_BUSSTATE_UNKNOWN_gc) { // If the bus was not initialized
+      return TWI_ERR_UNINIT;                    // abort
+    }
+
+    #if defined(TWI_TIMEOUT_ENABLE)
+      if (--timeout == 0) {
+        if        (currentSM == TWI_BUSSTATE_OWNER_gc) {
+          TWI_SET_ERROR(TWI_ERR_TIMEOUT);
+        } else if (currentSM == TWI_BUSSTATE_IDLE_gc) {
+          TWI_SET_ERROR(TWI_ERR_PULLUP);
+        } else {
+          TWI_SET_ERROR(TWI_ERR_UNDEFINED);
+        }
+        break;
+      }
+    #endif
+
+    if (currentStatus & TWI_ARBLOST_bm) {     // Check for Bus error
+      TWI_SET_ERROR(TWI_ERR_BUS_ARB);       // set error flag
+      break;                                // leave TX loop
+    }
+    
+    if (currentSM != TWI_BUSSTATE_BUSY_gc) {  // Undefined was excluded, so make sure it's IDLE or OWNER
+      if (stat == 0x00) {                     // At the start, we send the ADDR
+        module->MADDR = ADD_WRITE_BIT(addr);      // clear bit 0
+        stat |= 0x01;                             // skip this if we're done
+        #if defined (TWI_TIMEOUT_ENABLE)
+          timeout = (F_CPU/1000);                 // reset timeout
+        #endif
+      } else {
+        if (currentStatus & TWI_WIF_bm) {     // ADDR was sent, check for completed write
+          if (currentStatus & TWI_RXACK_bm) {   // got a NACK, see how much was written
+            if (stat & 0x02) {                  // bit 1 set, data was already sent
+              if (length != 0)                    // the client may send an ACK at the end. If we
+                TWI_SET_ERROR(TWI_ERR_ACK_DAT);   // transferred everything, we can ignore the NACK
+            } else {                              // otherwise, no data sent, ADDR NACK
+              TWI_SET_ERROR(TWI_ERR_ACK_ADR);
+            }
+            break;
+          } else {                              // No NACK on write
+            if (length != 0) {                  // check if there is data to be written
+              module->MDATA = *buffer;          // Writing to the register to send data
+              buffer++;
+              length--;
+              stat |= 0x02;                     // remember that we've sent data
+              #if defined (TWI_TIMEOUT_ENABLE)
+                timeout = (F_CPU/1000);                   // reset timeout
+              #endif
+            } else {                                      // else there is no data to be written
+              break;                                      // TX finished, leave loop, error is still TWI_NO_ERR
+            }
+          }
+        }
+      } /* dataWritten == 0 */
+    } /* currentSM != TWI_BUSSTATE_BUSY_gc */
+  } /* while */
+
+
+  if ((sendStop != 0) || (TWI_ERR_SUCCESS != TWI_GET_ERROR)) {
+    module->MCTRLB = TWI_MCMD_STOP_gc;                        // Send STOP
+  }
+  return TWI_GET_ERROR;
+}
 
 /**
  *@brief      write fills the transmit buffers, master or slave, depending on when it is called
@@ -535,26 +925,21 @@ uint8_t TwoWire::endTransmission(bool sendStop) {
  */
 size_t TwoWire::write(uint8_t data) {
   uint8_t* txBuffer;
-  twi_buffer_index_t *txHead;
+  twi_buf_index_t *txHead;
   #if defined(TWI_MANDS)                   // Add following if host and client are split
-    if (vars._bools._toggleStreamFn == 0x01) {
-      txHead   = &(vars._bytesToReadWriteS);
-      txBuffer =   vars._trBufferS;
+    if (_bools._toggleStreamFn == 0x01) {
+      txHead   = &(_bytesToReadWriteS);
+      txBuffer =   _clientBuffer;
     } else
   #endif
   {
-    #if defined(TWI_MERGE_BUFFERS)         // Same Buffers for tx/rx
-      txHead   = &(vars._bytesToReadWrite);
-      txBuffer =   vars._trBuffer;
-    #else                                  // Separate tx/rx Buffers
-      txHead   = &(vars._bytesToWrite);
-      txBuffer =   vars._txBuffer;
-    #endif
+    txHead   = &(_bytesToReadWrite);
+    txBuffer =   _hostBuffer;
   }
 
   /* Put byte in txBuffer */
 
-  if ((*txHead) < BUFFER_LENGTH) {      // while buffer not full, write to it
+  if ((*txHead) < TWI_BUFFER_LENGTH) {    // while buffer not full, write to it
     txBuffer[(*txHead)] = data;             // Load data into the buffer
     (*txHead)++;                            // advancing the head
     return 1;
@@ -577,7 +962,7 @@ size_t TwoWire::write(uint8_t data) {
  *@retval     amount of bytes copied
  */
 size_t TwoWire::write(const uint8_t *data, size_t quantity) {
-  twi_buffer_index_t i = 0;
+  twi_buf_index_t i = 0;
   for (; i < quantity; i++) {
     if (TwoWire::write(*(data++)) == 0)
       break;   // break if buffer full
@@ -601,20 +986,13 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity) {
  *@retval     amount of bytes available to read from the host buffer
  */
 int TwoWire::available(void) {
-  int rxHead;
   #if defined(TWI_MANDS)                          // Add following if host and client are split
-    if (vars._bools._toggleStreamFn == 0x01) {
-      rxHead  = vars._bytesToReadWriteS - vars._bytesReadWrittenS;
-    } else
+    if (_bools._toggleStreamFn == 0x01) {
+      return (_bytesToReadWriteS - _bytesReadWrittenS);
+    }
   #endif
-  {
-    #if defined(TWI_MERGE_BUFFERS)                // Same Buffers for tx/rx
-      rxHead  = vars._bytesToReadWrite - vars._bytesReadWritten;
-    #else                                         // Separate tx/rx Buffers
-      rxHead  = vars._bytesToRead - vars._bytesRead;
-    #endif
-  }
-  return rxHead;
+
+  return (_bytesToReadWrite - _bytesReadWritten);
 }
 
 
@@ -634,24 +1012,18 @@ int TwoWire::available(void) {
  */
 int TwoWire::read(void) {
   uint8_t *rxBuffer;
-  twi_buffer_index_t *rxHead, *rxTail;
+  twi_buf_index_t *rxHead, *rxTail;
   #if defined(TWI_MANDS)                         // Add following if host and client are split
-    if (vars._bools._toggleStreamFn == 0x01) {
-      rxHead   = &(vars._bytesToReadWriteS);
-      rxTail   = &(vars._bytesReadWrittenS);
-      rxBuffer =   vars._trBufferS;
+    if (_bools._toggleStreamFn == 0x01) {
+      rxHead   = &(_bytesToReadWriteS);
+      rxTail   = &(_bytesReadWrittenS);
+      rxBuffer =   _clientBuffer;
     } else
   #endif
   {
-    #if defined(TWI_MERGE_BUFFERS)               // Same Buffers for tx/rx
-      rxHead   = &(vars._bytesToReadWrite);
-      rxTail   = &(vars._bytesReadWritten);
-      rxBuffer =   vars._trBuffer;
-    #else                                        // Separate tx/rx Buffers
-      rxHead   = &(vars._bytesToRead);
-      rxTail   = &(vars._bytesRead);
-      rxBuffer =   vars._rxBuffer;
-    #endif
+    rxHead   = &(_bytesToReadWrite);
+    rxTail   = &(_bytesReadWritten);
+    rxBuffer =   _hostBuffer;
   }
 
 
@@ -682,7 +1054,7 @@ int TwoWire::read(void) {
  *@retval     actually read bytes.
  */
 size_t TwoWire::readBytes(char* data, size_t quantity) {
-  twi_buffer_index_t i = 0;
+  twi_buf_index_t i = 0;
   for (; i < quantity; i++) {
     int16_t c = read();
     if (c < 0) break;   // break if buffer empty
@@ -707,24 +1079,18 @@ size_t TwoWire::readBytes(char* data, size_t quantity) {
  */
 int TwoWire::peek(void) {
   uint8_t *rxBuffer;
-  twi_buffer_index_t *rxHead, *rxTail;
+  twi_buf_index_t *rxHead, *rxTail;
   #if defined(TWI_MANDS)                         // Add following if host and client are split
-    if (vars._bools._toggleStreamFn == 0x01) {
-      rxHead   = &(vars._bytesToReadWriteS);
-      rxTail   = &(vars._bytesReadWrittenS);
-      rxBuffer =   vars._trBufferS;
+    if (_bools._toggleStreamFn == 0x01) {
+      rxHead   = &(_bytesToReadWriteS);
+      rxTail   = &(_bytesReadWrittenS);
+      rxBuffer =   _clientBuffer;
     } else
   #endif
   {
-    #if defined(TWI_MERGE_BUFFERS)               // Same Buffers for tx/rx
-      rxHead   = &(vars._bytesToReadWrite);
-      rxTail   = &(vars._bytesReadWritten);
-      rxBuffer =   vars._trBuffer;
-    #else                                        // Separate tx/rx Buffers
-      rxHead   = &(vars._bytesToRead);
-      rxTail   = &(vars._bytesRead);
-      rxBuffer =   vars._rxBuffer;
-    #endif
+    rxHead   = &(_bytesToReadWrite);
+    rxTail   = &(_bytesReadWritten);
+    rxBuffer =   _hostBuffer;
   }
 
   if ((*rxTail) < (*rxHead)) {   // if there are bytes to read
@@ -744,7 +1110,20 @@ int TwoWire::peek(void) {
  */
 void TwoWire::flush(void) {
   /* Turn off and on TWI module */
-  TWI_Flush(&vars);
+  TWI_t* module = _module;
+  #if defined(ERRATA_TWI_FLUSH)
+    // badCall("The AVR DA-series parts are impacted by an errata that leaves the TWI peripheral in a non-functioning state when using flush.");
+    // restarting TWI hardware by hand. Extra size shouldn't matter on DA series
+    uint8_t temp_MCTRLA     = module->MCTRLA;
+    uint8_t temp_SCTRLA     = module->SCTRLA;
+    module->MCTRLA  = 0x00;
+    module->SCTRLA  = 0x00;
+    module->MCTRLA  = temp_MCTRLA;
+    module->MSTATUS = 0x01;  // force TWI state machine into idle state
+    module->SCTRLA  = temp_SCTRLA;
+  #else
+    module->MCTRLB |= TWI_FLUSH_bm;
+  #endif
 }
 
 /**
@@ -760,9 +1139,9 @@ void TwoWire::flush(void) {
  */
 uint8_t TwoWire::getIncomingAddress(void) {
   #if defined(TWI_MANDS)                         // Alias handler
-    return vars._incomingAddress;
+    return _incomingAddress;
   #else
-    return vars._clientAddress;
+    return _clientAddress;
   #endif
 }
 
@@ -780,9 +1159,9 @@ uint8_t TwoWire::getIncomingAddress(void) {
  *              the last time this was called.
  */
 
-twi_buffer_index_t TwoWire::getBytesRead() {
-  twi_buffer_index_t num = vars._bytesTransmittedS;
-  vars._bytesTransmittedS = 0;
+twi_buf_index_t TwoWire::getBytesRead() {
+  twi_buf_index_t num = _bytesTransmittedS;
+  _bytesTransmittedS = 0;
   return num;
 }
 
@@ -803,7 +1182,7 @@ twi_buffer_index_t TwoWire::getBytesRead() {
  */
 
 uint8_t TwoWire::slaveTransactionOpen() {
-  uint8_t status = vars._module->SSTATUS;
+  uint8_t status = _module->SSTATUS;
   if (!(status & TWI_AP_bm)) return 0;  // If AP bit is cleared, last match was a stop condition -> not in transaction.
   if (status & TWI_DIR_bm) return 2;    // DIR bit will be 1 if last address match was for read
   return 1;                             // Otherwise it was a write.
@@ -824,7 +1203,7 @@ uint8_t TwoWire::slaveTransactionOpen() {
  */
 void TwoWire::enableDualMode(bool fmp_enable) {
   #if defined(TWI_DUALCTRL)
-    vars._module->DUALCTRL = ((fmp_enable << TWI_FMPEN_bp) | TWI_ENABLE_bm);
+    _module->DUALCTRL = ((fmp_enable << TWI_FMPEN_bp) | TWI_ENABLE_bm);
   #else
     badCall("enableDualMode was called, but device does not support it");
     (void) fmp_enable;    // Disable unused variable warning
@@ -846,9 +1225,9 @@ void TwoWire::enableDualMode(bool fmp_enable) {
  */
 uint8_t TwoWire::checkPinLevels(void) {
   #if defined(TWI1)
-    if (&TWI0 == vars._module)  {
+    if (&TWI0 == _module)  {
       return TWI0_checkPinLevel();
-    } else if (&TWI1 == vars._module)  {
+    } else if (&TWI1 == _module)  {
       return TWI1_checkPinLevel();
     } else {
       return false;
@@ -874,7 +1253,7 @@ uint8_t TwoWire::checkPinLevels(void) {
  */
 void TwoWire::selectSlaveBuffer(void) {
   #if defined(TWI_MANDS)
-    vars._bools._toggleStreamFn = 0x01;
+    _bools._toggleStreamFn = 0x01;
   #else
     badCall("selectSlaveBuffer() was called, but simultaneous mode is not selected");
   #endif
@@ -896,7 +1275,7 @@ void TwoWire::selectSlaveBuffer(void) {
  */
 void TwoWire::deselectSlaveBuffer(void) {
   #if defined(TWI_MANDS)
-    vars._bools._toggleStreamFn = 0x00;
+    _bools._toggleStreamFn = 0x00;
   #else
     badCall("deselectSlaveBuffer() was called, but simultaneous mode is not selected");
   #endif
@@ -905,32 +1284,105 @@ void TwoWire::deselectSlaveBuffer(void) {
 
 
 
-/**
- *@brief      onSlaveIRQ is called by the interrupts and calls the interrupt handler
- *
- *            Another little hack I had to do: This function is static, thus there is no extra copy
- *            when a new Wire object, like Wire1 is initialized. When I first wrote this function
- *            I was using Wire.vars.module and Wire1.vars.module to figure out which pointer to pass,
- *            but this made the compiler create a Wire1 object in some cases, where Wire1 was never used
- *            by the user. So I rewrote this function with the thought that if the module can be different,
- *            there is just one Wire object, so the code doesn't have to check if Wire is using TWI0 or TWI1
- *
- *
- *@param      TWI_t *module - the pointer to the TWI module
- *
- *@return     void
- */
-void TwoWire::onSlaveIRQ(TWI_t *module) {          // This function is static and is, thus, the only one for both
-                                                    // Wire interfaces. Here is decoded which interrupt was fired.
-  #if defined(TWI1) &&  defined(TWI_USING_WIRE1)   // Two TWIs available and TWI1 is used. Need to check the module
-    if (module == &TWI0) {
-      TWI_HandleSlaveIRQ(&(Wire.vars));
-    } else if (module == &TWI1) {
-      TWI_HandleSlaveIRQ(&(Wire1.vars));
+
+void TwoWire::HandleSlaveIRQ(TwoWire* wire_s) {
+  if (wire_s == NULL) {
+    return;
+  }
+
+
+  uint8_t *address,  *buffer;
+  twi_buf_index_t *head, *tail;
+  #if defined(TWI_MANDS)
+    address = &(wire_s->_incomingAddress);
+    head    = &(wire_s->_bytesToReadWriteS);
+    tail    = &(wire_s->_bytesReadWrittenS);
+    buffer  =   wire_s->_clientBuffer;
+  #else
+    address = &(wire_s->_clientAddress);
+    head    = &(wire_s->_bytesToReadWrite);
+    tail    = &(wire_s->_bytesReadWritten);
+    buffer  =   wire_s->_hostBuffer;
+  #endif
+
+  #if defined(TWI_MANDS)
+    wire_s->_bools._toggleStreamFn = 0x01;
+  #endif
+
+  uint8_t action = 0;
+  uint8_t clientStatus = wire_s->_module->SSTATUS;
+
+
+  if (clientStatus & TWI_APIF_bm) {   // Address/Stop Bit set
+  
+    if ((*head) > 0) {                     // At this point, we have either a START, REPSTART or a STOP
+      if (wire_s->user_onReceive != NULL) {  // at START, head should be 0, as it was set so on the last STOP
+        wire_s->user_onReceive((*head));     // otherwise, we notify the use sketch, as we have an REPSTART/STOP
+      }
     }
-  #else                                 // Otherwise, only one Wire object is being used anyway, no need to check
-    (void)module;
-    TWI_HandleSlaveIRQ(&(Wire.vars));
+
+    if (clientStatus & TWI_AP_bm) {     // Address bit set
+      if ((*head) == 0) {                 // only if there was no data (START)
+        pushSleep();                      // push the sleep
+      }
+      (*address) = wire_s->_module->SDATA;  // read address from data register
+      if (clientStatus & TWI_DIR_bm) {      // Master is reading
+        (*head) = 0;                          // reset buffer positions for user sketch
+        (*tail) = 0;
+
+        if (wire_s->user_onRequest != NULL) {
+          wire_s->user_onRequest();
+        }
+        if ((*head) == 0) {                     // If no data to transmit, send NACK
+          action = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc;  // NACK + "Wait for any Start (S/Sr) condition"
+        } else {
+          action = TWI_SCMD_RESPONSE_gc;        // "Execute Acknowledge Action succeeded by reception of next byte"
+        }
+      } else {                          // Master is writing
+        (*head) = 0;                    // reset buffer positions
+        (*tail) = 0;
+        action = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by reception of next byte"
+      }
+    } else {                          // Stop bit set
+      popSleep();
+      
+      (*head) = 0;                    // clear whatever might be left due errors
+      (*tail) = 0;
+      action = TWI_SCMD_COMPTRANS_gc;  // "Wait for any Start (S/Sr) condition"
+    }
+  } else if (clientStatus & TWI_DIF_bm) { // Data bit set
+    if (clientStatus & TWI_DIR_bm) {        // Master is reading
+      if (clientStatus & wire_s->client_irq_mask) {   // If a collision was detected, or RXACK bit is set (when it matters)
+        (*head) = 0;                            // Abort further data writes
+        wire_s->client_irq_mask = TWI_COLL_bm;  // stop checking for NACK
+        action = TWI_SCMD_COMPTRANS_gc;         // "Wait for any Start (S/Sr) condition"
+      } else {                                // RXACK bit not set, no COLL
+        wire_s->_bytesTransmittedS++;            // increment bytes transmitted counter (for register model)
+        wire_s->client_irq_mask = TWI_COLL_bm | TWI_RXACK_bm;  // start checking for NACK
+        if ((*tail) < (*head)) {                // Data is available
+          wire_s->_module->SDATA = buffer[(*tail)];  // Writing to the register to send data
+          (*tail)++;                              // Increment counter for sent bytes
+          action = TWI_SCMD_RESPONSE_gc;          // "Execute a byte read operation followed by Acknowledge Action"
+        } else {                                  // No more data available
+          action = TWI_SCMD_COMPTRANS_gc;         // "Wait for any Start (S/Sr) condition"
+        }
+      }
+    } else {                                  // Master is writing
+      uint8_t payload = wire_s->_module->SDATA;     // reading SDATA will clear the DATA IRQ flag
+      if ((*head) < TWI_BUFFER_LENGTH) {            // make sure that we don't have a buffer overflow in case Master ignores NACK
+        buffer[(*head)] = payload;                  // save data
+        (*head)++;                                  // Advance Head
+        if ((*head) == TWI_BUFFER_LENGTH) {         // if buffer is not yet full
+          action = TWI_ACKACT_bm | TWI_SCMD_COMPTRANS_gc;  // "Execute ACK Action succeeded by waiting for any Start (S/Sr) condition"
+        } else {                                    // else buffer would overflow with next byte
+          action = TWI_SCMD_RESPONSE_gc;            // "Execute Acknowledge Action succeeded by reception of next byte"
+        }
+      }
+    }
+  }
+  wire_s->_module->SCTRLB = action;  // using local variable (register) reduces the amount of loading _module
+  #if defined(TWI_MANDS)
+    wire_s->_bools._toggleStreamFn = 0x00;
   #endif
 }
 
@@ -946,7 +1398,7 @@ void TwoWire::onSlaveIRQ(TWI_t *module) {          // This function is static an
  *@return     void
  */
 void TwoWire::onReceive(void (*function)(int)) {
-  vars.user_onReceive = function;
+  user_onReceive = function;
 }
 
 
@@ -960,7 +1412,7 @@ void TwoWire::onReceive(void (*function)(int)) {
  *@return     void
  */
 void TwoWire::onRequest(void (*function)(void)) {
-  vars.user_onRequest = function;
+  user_onRequest = function;
 }
 
 
@@ -975,7 +1427,7 @@ uint8_t TwoWire::returnError() {
  *@brief      TWI0 Slave Interrupt vector
  */
 ISR(TWI0_TWIS_vect) {
-  TwoWire::onSlaveIRQ(&TWI0);
+  TwoWire::HandleSlaveIRQ(twi0_wire);
 }
 
 
@@ -984,9 +1436,59 @@ ISR(TWI0_TWIS_vect) {
  */
 #if defined(TWI1)
   ISR(TWI1_TWIS_vect) {
-    TwoWire::onSlaveIRQ(&TWI1);
+    TwoWire::HandleSlaveIRQ(twi1_wire);
   }
 #endif
+
+
+/**
+ *@brief      pushSleep and popSleep handle the sleep guard
+ *
+ *            When used only by one peripheral, just saving the sleep register is plenty,
+ *              But when used by more then one, special care must be taken to restore the
+ *              sleep settings only at the end.
+ *              e.g. when TWI0 - START, TWI1 - START, TWI0 - STOP, TWI1 - STOP
+ *              so, there is a counter that counts up to 15 when pushing and down to 0 when
+ *              popping. Only at 0, the actual push and pop happen. An overflow will lead to
+ *              unpredictable results.
+ *
+ *@param      none
+ *
+ *@return     void
+ */
+void pushSleep() {
+  #if defined(TWI_USING_WIRE1)
+    uint8_t sleepStackLoc = sleepStack;
+    if (sleepStackLoc > 0) {                // Increment only if sleep was enabled
+      sleepStackLoc = (sleepStackLoc + 0x10); // use upper nibble to count - max 15 pushes
+    } else {
+      sleepStackLoc = SLPCTRL.CTRLA;        // save sleep settings to sleepStack
+      SLPCTRL.CTRLA = sleepStackLoc & 0x01; // Set to IDLE if sleep was enabled
+    }
+    sleepStack = sleepStackLoc;
+  #else
+    sleepStack = SLPCTRL.CTRLA;           // save old sleep State
+    SLPCTRL.CTRLA = sleepStack & 0x01;    // only leave the SEN bit, if it was set
+  #endif
+}
+
+void popSleep() {
+  #if defined(TWI_USING_WIRE1)
+    uint8_t sleepStackLoc = sleepStack;
+    if (sleepStackLoc > 0) {      // only do something if sleep was enabled
+      if (sleepStackLoc > 0x10) {   // only decrement if pushed once before
+        sleepStackLoc = (sleepStackLoc - 0x10);   // upper nibble
+      } else {                    // at 0 we are about to put sleep back
+        SLPCTRL.CTRLA = sleepStackLoc;  // restore sleep
+        sleepStackLoc = 0;              // reset everything
+      }
+      sleepStack = sleepStackLoc;
+    }
+  #else
+    SLPCTRL.CTRLA = sleepStack;
+  #endif
+}
+
 
 
 /**
