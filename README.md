@@ -26,9 +26,6 @@ I buy a lot of electronics stuff on AliExpress. It's a great marketplace for thi
 
 Buy them from reputable distributors like Digikey or Mouser (if in a hurry, and they're on backorder - which is the case for almost everything during the Great Chip Shortage of 2021-2023 - buy from a reputable USA/EU-based scalper, to the extent that a reputable scalper isn't an oxymoron. I know a guy who might be able to help out with small quantities of parts, but his prices are... high.
 
-## Using This Document
-This document is best viewed online - [https://github.com/SpenceKonde/megaTinyCore](https://github.com/SpenceKonde/megaTinyCore)
-
 ## Getting Started
 ### [Wiring](Wiring.md)
 ### [Installation](Installation.md)
