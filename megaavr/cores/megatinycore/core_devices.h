@@ -777,7 +777,87 @@ int8_t _setPrescale(int8_t prescale) {
    * I'm sure everyone is grateful for the fact that the folks designing the Dx-series have their
    * heads screwed on properly and realized that 4 GPIOR-- excuse me, GPRs, 4 awkward VPORTs and
    * 12 unused addresses in the low I/O space was maybe not the best design decision made in the
-   * xmega line, and decided that wasn't a winning formula */
+   * xmega line. With any parts that would have more than 64 physical pins (56 I/O pins, 7 ports)
+   * far in the future, and no clear need for more than 4 GPRs, this was the obvious choice.
+   * When they do eventually release a modern successor to the 2560, they'll need to decide how
+   * to deal with this, or do what they did on the 2560 itself, which was nothing: They ran out
+   * of low I/O there, and don't even remark on it in the datasheet, that some of the ports are
+   * in low I/O and fast, and others are in extended I/O and slow.
+   *
+   * It's worth thinking about an odd anticoincidence here: On the classic AVRs, address 0x0000
+   * in the dataspace (ie, where a null pointer points) was R0. That's harmless to smash with an
+   * 8-bit value, but if you write a word there, the second write would shit on zero_reg and then
+   * adding 1 and 1 could yield numbers other than 2. 0x0001 + 0x01 could be as high as 65282 if
+   * you've trashed the zero_reg (to add a byte to a word, the compiler uses add on the low bytes
+   * then needs to use adc (add with carry) to get the carry bit into the high byte, so it does
+   * adc %B0, r1
+   * assuming that r1 is 0, as it is required to be. (under the hood, though there are times that
+   * r1 has a special meaning to the hardware, the only times these are manifest is when executing
+   * inline asm; the compiler will never generate the sequences of instructions that do this on
+   * it's own - once you dig enough, you find that somewhere in the dark recesses of avr-libc is
+   * an asm macro that actually executes the instructions that explicitly use r1 (multiplication
+   * is the big one, the high byte of the product always goes in r1. I think the only other is
+   * SPM on some hardware, and again, in those cases either there's no hw support (modern) or it's
+   * asm macros in boot.h). In all cases, if r1 is changed, it must be rezeroed before returning to
+   * c. Otherwise, it'll break everything. Thus, on classic AVRs you could write a null pointer and
+   * probably not see any sign of that if you wrote one byte, if you wrote a 2 byte one, the worls
+   * would crash down around you.
+   * On the modern AVRs, address 0x0000 is VPORTA.OUT, so the first thing you'd trash if you wrote
+   * to a null pointer is the PORTA configuration. BUT had they put the GPIOR's first - like xmega
+   * then writing the null pointer would have first trashed a byte or bytes that most applications
+   * don't even use - but which would also naturally be a perfect probe of whether the bizzare bug
+   * you're trying to sort out is caused by following a null pointer somewhere or by something else.
+   * Not that that's a super-common bug. 99 times out of 10 those sorts of "everything is totally
+   * confused" bugs happen when you return from a function that has overflowed the bounds of a
+   * local array. The array, probably the only thing on the stack associated with this call other
+   * than the return address, is going to end up right next to the array. Thus, the first thing you
+   * trash when you overflow the array in that direction (which one that is depends on details - it
+   * could end up between two return addresses, too, so overflowing it one way makes it blow up at
+   * the return from this function, and overflowing the other way it causes it to blow up when the
+   * calling function returns. Either way, it returns to someplace totally different than where it
+   * was called from, and then trundles along the code, executing code that thinks registers have
+   * different data in them than they do and jumping off into some other remote corner of the
+   * program every time they hit a 'ret'. 0xFFFF (empty flash) is treated as 'sbrs r31, 7', 0xFFF7
+   * Usually it will pretty quickly end up at a point where it's either returning to 0 or has run
+   * off the end of the flash, which wraps around. If the sbrs skips 0x0000, it will land on the
+   * next vector, but since we don't use the NMI vector ever (cause it can't do anything useful),
+   * that is just a jump to badisr, which jumps to 0, so unless execution stumbles upon a stable
+   * loop and hangs while misbehaving, it's likely to end up at the reset vector, without a reset.
+   * That starts the chip up in guaranteed-not-to-work mode, which we detect and software-reset
+   * in response to.
+   * Calling a null pointer or a bogus function pointer has the same effect, as does enabling and
+   * triggering an ISR that isn't defined. On classic AVR, these dirty resets would instead reset
+   * into more of a "not-*guaranteed*-not-to-work-but-highly-unlikely-to" mode. Both would often
+   * show the pattern of working -aack-> executes zero or more sections of incorrect code -> "dirty"
+   * reset -> hang or abnormal very tight loop shortly after startup.
+   *
+   * Those three ways of getting a dirty reset are more common (each one is, on it's own, more
+   * common) than instances of null pointers being written to. I don't fault them on the design
+   * and it actually is much easier that VPORTA = *0x0000 than *0x0004, for sure. This does however
+   * demonstrate how the architecture of the ISA controls how readily various flavors of undefined-
+   * -but-unquestionably-broken behavior manifest; the dirty reset may actually work on classic AVR
+   * for your program, as a normal reset, whereas it will never work correctly after a dirty reset
+   * on modern AVR, except that the core traps it. I think it would be nice if this were documented
+   * explicitly, rather than relying on the reader to combine AVR CPU, CPUINT and RSTCTRL chapters
+   * (and less-than-well documented avr-libc behaviors) to conclude that they should always check the
+   * reset cause flags, and if they do that, they must clear them or they won't know which source, if
+   * any caused the reset if one occurs, and that ending up restarting the code without a hardware
+   * reset occurring is a "can't happen" that can happen if your c code is bad enough. From there,
+   * having read the chapters on the other peripherals you are using you'd no doubt have found some
+   * reason your initialization couldn't be done over again exactly the same way without a reset.
+   * Hence in your init code you need to check and clear reset flags if you find them, or software
+   * reset if you find nothing. I think that's asking a lot of the developer, even outside arduino
+   * land.
+   *
+   * Losing the memory mapping of working registers is a Good Thing; they never should have been
+   * made accessible like that. You don't know what's in which registers, and all you're going to
+   * get trying is undefined behavior. If you need to specify registers by number, you should be
+   * writing inline asm, not fucking with the registers from C. The only *capability* they got from
+   * the mess that couldn't be done normally is indirect access via pointer registers, which is
+   * an almos if
+   *
+   */
+
   #if !defined(GPIOR0)
     #define GPIOR0                            (_SFR_MEM8(0x001C))
     #define GPIOR1                            (_SFR_MEM8(0x001D))

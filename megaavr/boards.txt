@@ -9,11 +9,11 @@
 #  #   # ####  ###  #  #   ##   ### #   #   #    #####  ###  #  #  ####  #
 #________________________________________________________________________#
 #                                                                        #
-#  Copyright Spence Konde and other         ##        ###        ###     #
-#  contributors 2018-2021                  #  #      #          #   #    #
-#  megaTinyCore is free software.    # #     #       ####        ####    #
-#  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##      #    #
-#  License section of README.md       #    ####  ##   ###   ##   ###     #
+#  Copyright Spence Konde and other         ##        ###       #   ###  #
+#  contributors 2018-2021                  #  #      #         ##  #   # #
+#  megaTinyCore is free software.    # #     #       ####       #  #   # #
+#  (LGPL v2.1) see LICENSE.md and    # #    #    ##  #   #  ##  #  #   # #
+#  License section of README.md       #    ####  ##   ###   ## ###  ###  #
 #________________________________________________________________________#
 #                                                                        #
 #  Now reformatted for easy navigation with text editing tools which     #
@@ -595,7 +595,26 @@ atxy7.menu.PWMmux.SC6.build.pwmabr=SC6
 #________________________________________#
 atxy7.menu.attach.allenabled=On all pins, new implementation.
 atxy7.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
-atxy7.menu.attach.manual=Only enabled ports
+atxy7.menu.attach.portaonly=New impl, Port A only - Ports B and C can have manually defined ints
+atxy7.menu.attach.portbonly=New impl, Port B only - Ports A and C can have manually defined ints
+atxy7.menu.attach.portconly=New impl, Port C only - Ports A and B can have manually defined ints
+atxy7.menu.attach.portabonly=New impl, Port A, B only - Port C can have manually defined ints
+atxy7.menu.attach.portbconly=New impl, Port B, C only - Port A can have manually defined ints
+atxy7.menu.attach.portcaonly=New impl, Port A, C only - Port B can have manually defined ints atxy7.menu.attach.portaonly.build.attachmode=-DCORE_ATTACH_SOME=0x01
+atxy7.menu.attach.portbonly.build.attachmode=-DCORE_ATTACH_SOME=0x02
+atxy7.menu.attach.portconly.build.attachmode=-DCORE_ATTACH_SOME=0x04
+atxy7.menu.attach.portabonly.build.attachmode=-DCORE_ATTACH_SOME=0x03
+atxy7.menu.attach.portbconly.build.attachmode=-DCORE_ATTACH_SOME=0x06
+atxy7.menu.attach.portcaonly.build.attachmode=-DCORE_ATTACH_SOME=0x05
+atxy7.menu.attach.portaonly.build.attachabr=.aA
+atxy7.menu.attach.portbonly.build.attachabr=.aB
+atxy7.menu.attach.portconly.build.attachabr=.aC
+atxy7.menu.attach.portabonly.build.attachabr=.aAB
+atxy7.menu.attach.portbconly.build.attachabr=.aBC
+atxy7.menu.attach.portcaonly.build.attachabr=.aAC
+atxy7.menu.attach.manual.build.attachabr=.aMan
+atxy7.menu.attach.oldversion.build.attachabr=.aOld
+atxy7.menu.attach.manual=I will enable them manually per docs
 atxy7.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy7.menu.attach.oldversion=Old version, may fix bugs.
 atxy7.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
@@ -952,7 +971,7 @@ atxy6.menu.bodmode.enabled.bootloader.bodmodebits=00101
 atxy6.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 atxy6.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 atxy6.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-atxy6.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+atxy6.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 atxy6.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy6.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy6.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -1115,6 +1134,23 @@ atxy6.menu.PWMmux.SC6.build.pwmabr=SC6
 #________________________________________#
 atxy6.menu.attach.allenabled=On all pins, with new implementation.
 atxy6.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy6.menu.attach.portaonly=New impl, Port A only - Ports B and C can have manually defined ints
+atxy6.menu.attach.portbonly=New impl, Port B only - Ports A and C can have manually defined ints
+atxy6.menu.attach.portconly=New impl, Port C only - Ports A and B can have manually defined ints
+atxy6.menu.attach.portabonly=New impl, Port A, B only - Port C can have manually defined ints
+atxy6.menu.attach.portbconly=New impl, Port B, C only - Port A can have manually defined ints
+atxy6.menu.attach.portcaonly=New impl, Port A, C only - Port B can have manually defined ints atxy6.menu.attach.portaonly.build.attachmode=-DCORE_ATTACH_SOME=0x01
+atxy6.menu.attach.portbonly.build.attachmode=-DCORE_ATTACH_SOME=0x02
+atxy6.menu.attach.portconly.build.attachmode=-DCORE_ATTACH_SOME=0x04
+atxy6.menu.attach.portabonly.build.attachmode=-DCORE_ATTACH_SOME=0x03
+atxy6.menu.attach.portbconly.build.attachmode=-DCORE_ATTACH_SOME=0x06
+atxy6.menu.attach.portcaonly.build.attachmode=-DCORE_ATTACH_SOME=0x05
+atxy6.menu.attach.portaonly.build.attachabr=.aA
+atxy6.menu.attach.portbonly.build.attachabr=.aB
+atxy6.menu.attach.portconly.build.attachabr=.aC
+atxy6.menu.attach.portabonly.build.attachabr=.aAB
+atxy6.menu.attach.portbconly.build.attachabr=.aBC
+atxy6.menu.attach.portcaonly.build.attachabr=.aAC
 atxy6.menu.attach.manual=Only enabled ports
 atxy6.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy6.menu.attach.oldversion=Old version, (may fix bugs)
@@ -1474,7 +1510,7 @@ atxy4.menu.bodmode.enabled.bootloader.bodmodebits=00101
 atxy4.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 atxy4.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 atxy4.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-atxy4.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+atxy4.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 atxy4.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy4.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy4.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -1603,6 +1639,11 @@ atxy4.menu.PWMmux.I3.build.pwmabr=I3
 #________________________________________#
 atxy4.menu.attach.allenabled=On all pins, with new implementation.
 atxy4.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy4.menu.attach.portaonly=New impl, Port A only - Port B can have manually defined ints
+atxy4.menu.attach.portbonly=New impl, Port B only - Port A can have manually defined ints atxy4.menu.attach.portaonly.build.attachmode=-DCORE_ATTACH_SOME=0x01
+atxy4.menu.attach.portbonly.build.attachmode=-DCORE_ATTACH_SOME=0x02
+atxy4.menu.attach.portaonly.build.attachabr=.aA
+atxy4.menu.attach.portbonly.build.attachabr=.aB
 atxy4.menu.attach.manual=Only enabled ports
 atxy4.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy4.menu.attach.oldversion=Old version, (may fix bugs)
@@ -1911,7 +1952,7 @@ atxy2.menu.bodmode.enabled.bootloader.bodmodebits=00101
 atxy2.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 atxy2.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 atxy2.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-atxy2.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+atxy2.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 atxy2.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy2.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy2.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -2335,7 +2376,7 @@ microchip.menu.bodmode.enabled.bootloader.bodmodebits=00101
 microchip.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 microchip.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 microchip.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-microchip.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+microchip.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 microchip.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 microchip.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 microchip.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -2767,7 +2808,7 @@ atxy7o.menu.bodmode.enabled.bootloader.bodmodebits=00101
 atxy7o.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 atxy7o.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 atxy7o.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-atxy7o.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+atxy7o.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 atxy7o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy7o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy7o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -2976,6 +3017,23 @@ atxy7o.menu.PWMmux.SC6.build.pwmabr=SC6
 #________________________________________#
 atxy7o.menu.attach.allenabled=On all pins, with new implementation.
 atxy7o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy7o.menu.attach.portaonly=New impl, Port A only - Ports B and C can have manually defined ints
+atxy7o.menu.attach.portbonly=New impl, Port B only - Ports A and C can have manually defined ints
+atxy7o.menu.attach.portconly=New impl, Port C only - Ports A and B can have manually defined ints
+atxy7o.menu.attach.portabonly=New impl, Port A, B only - Port C can have manually defined ints
+atxy7o.menu.attach.portbconly=New impl, Port B, C only - Port A can have manually defined ints
+atxy7o.menu.attach.portcaonly=New impl, Port A, C only - Port B can have manually defined ints atxy7o.menu.attach.portaonly.build.attachmode=-DCORE_ATTACH_SOME=0x01
+atxy7o.menu.attach.portbonly.build.attachmode=-DCORE_ATTACH_SOME=0x02
+atxy7o.menu.attach.portconly.build.attachmode=-DCORE_ATTACH_SOME=0x04
+atxy7o.menu.attach.portabonly.build.attachmode=-DCORE_ATTACH_SOME=0x03
+atxy7o.menu.attach.portbconly.build.attachmode=-DCORE_ATTACH_SOME=0x06
+atxy7o.menu.attach.portcaonly.build.attachmode=-DCORE_ATTACH_SOME=0x05
+atxy7o.menu.attach.portaonly.build.attachabr=.aA
+atxy7o.menu.attach.portbonly.build.attachabr=.aB
+atxy7o.menu.attach.portconly.build.attachabr=.aC
+atxy7o.menu.attach.portabonly.build.attachabr=.aAB
+atxy7o.menu.attach.portbconly.build.attachabr=.aBC
+atxy7o.menu.attach.portcaonly.build.attachabr=.aAC
 atxy7o.menu.attach.manual=Only enabled ports
 atxy7o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy7o.menu.attach.oldversion=Old version, (may fix bugs)
@@ -3258,7 +3316,7 @@ atx27o.menu.bodmode.enabled.bootloader.bodmodebits=00101
 atx27o.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 atx27o.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 atx27o.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-atx27o.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+atx27o.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 atx27o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atx27o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atx27o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -3408,6 +3466,23 @@ atx27o.menu.PWMmux.SC6.build.pwmabr=SC6
 #________________________________________#
 atx27o.menu.attach.allenabled=On all pins, with new implementation.
 atx27o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atx27o.menu.attach.portaonly=New impl, Port A only - Ports B and C can have manually defined ints
+atx27o.menu.attach.portbonly=New impl, Port B only - Ports A and C can have manually defined ints
+atx27o.menu.attach.portconly=New impl, Port C only - Ports A and B can have manually defined ints
+atx27o.menu.attach.portabonly=New impl, Port A, B only - Port C can have manually defined ints
+atx27o.menu.attach.portbconly=New impl, Port B, C only - Port A can have manually defined ints
+atx27o.menu.attach.portcaonly=New impl, Port A, C only - Port B can have manually defined ints atx27o.menu.attach.portaonly.build.attachmode=-DCORE_ATTACH_SOME=0x01
+atx27o.menu.attach.portbonly.build.attachmode=-DCORE_ATTACH_SOME=0x02
+atx27o.menu.attach.portconly.build.attachmode=-DCORE_ATTACH_SOME=0x04
+atx27o.menu.attach.portabonly.build.attachmode=-DCORE_ATTACH_SOME=0x03
+atx27o.menu.attach.portbconly.build.attachmode=-DCORE_ATTACH_SOME=0x06
+atx27o.menu.attach.portcaonly.build.attachmode=-DCORE_ATTACH_SOME=0x05
+atx27o.menu.attach.portaonly.build.attachabr=.aA
+atx27o.menu.attach.portbonly.build.attachabr=.aB
+atx27o.menu.attach.portconly.build.attachabr=.aC
+atx27o.menu.attach.portabonly.build.attachabr=.aAB
+atx27o.menu.attach.portbconly.build.attachabr=.aBC
+atx27o.menu.attach.portcaonly.build.attachabr=.aAC
 atx27o.menu.attach.manual=Only enabled ports
 atx27o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atx27o.menu.attach.oldversion=Old version, (may fix bugs)
@@ -3721,7 +3796,7 @@ atxy6o.menu.bodmode.enabled.bootloader.bodmodebits=00101
 atxy6o.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 atxy6o.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 atxy6o.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-atxy6o.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+atxy6o.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 atxy6o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy6o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy6o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -3882,6 +3957,23 @@ atxy6o.menu.PWMmux.SC6.build.pwmabr=SC6
 #________________________________________#
 atxy6o.menu.attach.allenabled=On all pins, with new implementation.
 atxy6o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy6o.menu.attach.portaonly=New impl, Port A only - Ports B and C can have manually defined ints
+atxy6o.menu.attach.portbonly=New impl, Port B only - Ports A and C can have manually defined ints
+atxy6o.menu.attach.portconly=New impl, Port C only - Ports A and B can have manually defined ints
+atxy6o.menu.attach.portabonly=New impl, Port A, B only - Port C can have manually defined ints
+atxy6o.menu.attach.portbconly=New impl, Port B, C only - Port A can have manually defined ints
+atxy6o.menu.attach.portcaonly=New impl, Port A, C only - Port B can have manually defined ints atxy6o.menu.attach.portaonly.build.attachmode=-DCORE_ATTACH_SOME=0x01
+atxy6o.menu.attach.portbonly.build.attachmode=-DCORE_ATTACH_SOME=0x02
+atxy6o.menu.attach.portconly.build.attachmode=-DCORE_ATTACH_SOME=0x04
+atxy6o.menu.attach.portabonly.build.attachmode=-DCORE_ATTACH_SOME=0x03
+atxy6o.menu.attach.portbconly.build.attachmode=-DCORE_ATTACH_SOME=0x06
+atxy6o.menu.attach.portcaonly.build.attachmode=-DCORE_ATTACH_SOME=0x05
+atxy6o.menu.attach.portaonly.build.attachabr=.aA
+atxy6o.menu.attach.portbonly.build.attachabr=.aB
+atxy6o.menu.attach.portconly.build.attachabr=.aC
+atxy6o.menu.attach.portabonly.build.attachabr=.aAB
+atxy6o.menu.attach.portbconly.build.attachabr=.aBC
+atxy6o.menu.attach.portcaonly.build.attachabr=.aAC
 atxy6o.menu.attach.manual=Only enabled ports
 atxy6o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy6o.menu.attach.oldversion=Old version, (may fix bugs)
@@ -4163,7 +4255,7 @@ atx26o.menu.bodmode.enabled.bootloader.bodmodebits=00101
 atx26o.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 atx26o.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 atx26o.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-atx26o.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+atx26o.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 atx26o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atx26o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atx26o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -4304,6 +4396,23 @@ atx26o.menu.PWMmux.SC6.build.pwmabr=SC6
 #________________________________________#
 atx26o.menu.attach.allenabled=On all pins, with new implementation.
 atx26o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atx26o.menu.attach.portaonly=New impl, Port A only - Ports B and C can have manually defined ints
+atx26o.menu.attach.portbonly=New impl, Port B only - Ports A and C can have manually defined ints
+atx26o.menu.attach.portconly=New impl, Port C only - Ports A and B can have manually defined ints
+atx26o.menu.attach.portabonly=New impl, Port A, B only - Port C can have manually defined ints
+atx26o.menu.attach.portbconly=New impl, Port B, C only - Port A can have manually defined ints
+atx26o.menu.attach.portcaonly=New impl, Port A, C only - Port B can have manually defined ints atx26o.menu.attach.portaonly.build.attachmode=-DCORE_ATTACH_SOME=0x01
+atx26o.menu.attach.portbonly.build.attachmode=-DCORE_ATTACH_SOME=0x02
+atx26o.menu.attach.portconly.build.attachmode=-DCORE_ATTACH_SOME=0x04
+atx26o.menu.attach.portabonly.build.attachmode=-DCORE_ATTACH_SOME=0x03
+atx26o.menu.attach.portbconly.build.attachmode=-DCORE_ATTACH_SOME=0x06
+atx26o.menu.attach.portcaonly.build.attachmode=-DCORE_ATTACH_SOME=0x05
+atx26o.menu.attach.portaonly.build.attachabr=.aA
+atx26o.menu.attach.portbonly.build.attachabr=.aB
+atx26o.menu.attach.portconly.build.attachabr=.aC
+atx26o.menu.attach.portabonly.build.attachabr=.aAB
+atx26o.menu.attach.portbconly.build.attachabr=.aBC
+atx26o.menu.attach.portcaonly.build.attachabr=.aAC
 atx26o.menu.attach.manual=Only enabled ports
 atx26o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atx26o.menu.attach.oldversion=Old version, (may fix bugs)
@@ -4624,7 +4733,7 @@ atxy4o.menu.bodmode.enabled.bootloader.bodmodebits=00101
 atxy4o.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 atxy4o.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 atxy4o.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-atxy4o.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+atxy4o.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 atxy4o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy4o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy4o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -4753,6 +4862,11 @@ atxy4o.menu.PWMmux.I3.build.pwmabr=I3
 #________________________________________#
 atxy4o.menu.attach.allenabled=On all pins, with new implementation.
 atxy4o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atxy4o.menu.attach.portaonly=New impl, Port A only - Port B can have manually defined ints
+atxy4o.menu.attach.portbonly=New impl, Port B only - Port A can have manually defined ints atxy4o.menu.attach.portaonly.build.attachmode=-DCORE_ATTACH_SOME=0x01
+atxy4o.menu.attach.portbonly.build.attachmode=-DCORE_ATTACH_SOME=0x02
+atxy4o.menu.attach.portaonly.build.attachabr=.aA
+atxy4o.menu.attach.portbonly.build.attachabr=.aB
 atxy4o.menu.attach.manual=Only enabled ports
 atxy4o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atxy4o.menu.attach.oldversion=Old version, (may fix bugs)
@@ -5035,7 +5149,7 @@ atx24o.menu.bodmode.enabled.bootloader.bodmodebits=00101
 atx24o.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 atx24o.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 atx24o.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-atx24o.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+atx24o.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 atx24o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atx24o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atx24o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -5158,6 +5272,11 @@ atx24o.menu.PWMmux.I3.build.pwmabr=I3
 #________________________________________#
 atx24o.menu.attach.allenabled=On all pins, with new implementation.
 atx24o.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+atx24o.menu.attach.portaonly=New impl, Port A only - Port B can have manually defined ints
+atx24o.menu.attach.portbonly=New impl, Port B only - Port A can have manually defined ints atx24o.menu.attach.portaonly.build.attachmode=-DCORE_ATTACH_SOME=0x01
+atx24o.menu.attach.portbonly.build.attachmode=-DCORE_ATTACH_SOME=0x02
+atx24o.menu.attach.portaonly.build.attachabr=.aA
+atx24o.menu.attach.portbonly.build.attachabr=.aB
 atx24o.menu.attach.manual=Only enabled ports
 atx24o.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 atx24o.menu.attach.oldversion=Old version, (may fix bugs)
@@ -5448,7 +5567,7 @@ atxy2o.menu.bodmode.enabled.bootloader.bodmodebits=00101
 atxy2o.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 atxy2o.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 atxy2o.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-atxy2o.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+atxy2o.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 atxy2o.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 atxy2o.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 atxy2o.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -5833,7 +5952,7 @@ microchipo.menu.bodmode.enabled.bootloader.bodmodebits=00101
 microchipo.menu.bodmode.ensampfast.bootloader.bodmodebits=00110
 microchipo.menu.bodmode.ensampslow.bootloader.bodmodebits=10110
 microchipo.menu.bodmode.sampledfast.bootloader.bodmodebits=01010
-microchipo.menu.bodmode.sampledlow.bootloader.bodmodebits=11010
+microchipo.menu.bodmode.sampledslow.bootloader.bodmodebits=11010
 microchipo.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 microchipo.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 microchipo.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
@@ -5931,6 +6050,23 @@ microchipo.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________#
 microchipo.menu.attach.allenabled=On all pins, with new implementation.
 microchipo.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
+microchipo.menu.attach.portaonly=New impl, Port A only - Ports B and C can have manually defined ints
+microchipo.menu.attach.portbonly=New impl, Port B only - Ports A and C can have manually defined ints
+microchipo.menu.attach.portconly=New impl, Port C only - Ports A and B can have manually defined ints
+microchipo.menu.attach.portabonly=New impl, Port A, B only - Port C can have manually defined ints
+microchipo.menu.attach.portbconly=New impl, Port B, C only - Port A can have manually defined ints
+microchipo.menu.attach.portcaonly=New impl, Port A, C only - Port B can have manually defined ints microchipo.menu.attach.portaonly.build.attachmode=-DCORE_ATTACH_SOME=0x01
+microchipo.menu.attach.portbonly.build.attachmode=-DCORE_ATTACH_SOME=0x02
+microchipo.menu.attach.portconly.build.attachmode=-DCORE_ATTACH_SOME=0x04
+microchipo.menu.attach.portabonly.build.attachmode=-DCORE_ATTACH_SOME=0x03
+microchipo.menu.attach.portbconly.build.attachmode=-DCORE_ATTACH_SOME=0x06
+microchipo.menu.attach.portcaonly.build.attachmode=-DCORE_ATTACH_SOME=0x05
+microchipo.menu.attach.portaonly.build.attachabr=.aA
+microchipo.menu.attach.portbonly.build.attachabr=.aB
+microchipo.menu.attach.portconly.build.attachabr=.aC
+microchipo.menu.attach.portabonly.build.attachabr=.aAB
+microchipo.menu.attach.portbconly.build.attachabr=.aBC
+microchipo.menu.attach.portcaonly.build.attachabr=.aAC
 microchipo.menu.attach.manual=Only enabled ports
 microchipo.menu.attach.manual.build.attachmode=-DCORE_ATTACH_NONE
 microchipo.menu.attach.oldversion=Old version, (may fix bugs)
