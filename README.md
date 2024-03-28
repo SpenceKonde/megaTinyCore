@@ -13,21 +13,18 @@ This corrects many of the bugs present in 2.6.x
 ### ATTN: Linux Users
 **Only versions of the Arduino IDE downloaded from [arduino.cc](https://arduino.cc) should be used, NEVER from a linux package manager. The package managers often have the Arduino IDE - but have *modified it*. This is despite their knowing nothing about Arduino or embedded development in general, much less what they would need to know to modify it successfully** Those version are notorious for subtle but serious issues caused by these unwise modifications. This core should not be expected to work on such versions, and no modifications will be made for the sake of fixing versions of the IDE that come from package managers for this reason.
 
-### IDE 2.0.x unsupported. If you use it, use the release not an old RC: all versions prior to 2.0.0-RC9.2 known to have critical regressions
-These bugs in the IDE prevent board settings from being correctly recognized. [This thread tracks known issues with 2.0 and workarounds](https://github.com/SpenceKonde/megaTinyCore/discussions/760). If you use unsupported software please reproduce all issues in 1.8.13 before reporting.
+### IDE Versions 2.0.x and some 2.1 do not work correctly.
+This is a bug in the Arduino client.
 
-### IDE versions, and using the right one
-V1.8.13 is the "golden version" and the only one I recommend. All the more recent ones gained bugs, and its the last version with a substantial improvement. Be aware it does have a vulnerable version of Log4J.
+IDE versions between 1.8.13 and 2.x developed significant novel defects. IDE versions 1.8.2 and earlier , however, possess crippling unfixed defects. I belive that they finally have a working version of the IDE out, and I belive that latest is able to install my core correctly.
 
 Prior to megaTinyCore 2.6.0, manual installation of megaTinyCore would cause V1.8.14 of the IDE to crash due to [this bug](https://github.com/arduino/Arduino/issues/11813) when you install the core manually in your arduino folder. Users of 1.8.14 and later must use version 2.6.0 of megaTinyCore.
 
 ### **Don't Buy Modern AVRs (Anything this core supports) on AliExpress or From eBay International Sellers**
 I buy a lot of electronics stuff on AliExpress. It's a great marketplace for things that are made by Chinese companies and are mostly generic, including loads of components unavailable to individuals in the global West any other way (ex, min order is a reel or something like that - if you can even find a component vendor that works with the no-name chinese chip maker). It is not a great place for the latest semiconductor product lines from major Western manufacturers, especially in the midst of a historic shortage of said chips. The modern AVR devices, when they are available through those channels at all, are **frequently reported to be fake or defective** (like ATtiny412s that think they're 416s and may not correctly execute power on reset). For that matter, **you probably don't want to buy any AVR microcontrollers on AliExpress**... Assembled boards, like Arduino Nano clones, generally work if you avoid the ones with the third party LGT8 chips and watch out for the ones with the ATmega168p instead of the '328p - but there are a lot of reports of bogus microcontrollers when they're sold as bare chips (I have heard of fake ATtiny85s that were actually remarked ATtiny13s; it's not just modern AVRs that get faked). There are a lot of interesting theories for where those bogus chips came from, and Microchip has remained totally silent on the issue.
 
-Buy them from reputable distributors like Digikey or Mouser (if in a hurry, and they're on backorder - which is the case for almost everything during the Great Chip Shortage of 2021-2023 - buy from a reputable USA/EU-based scalper, to the extent that a reputable scalper isn't an oxymoron. I know a guy who might be able to help out with small quantities of parts, but his prices are... high.
-
 ## Using This Document
-This document is best viewed online - [https://github.com/SpenceKonde/megaTinyCore](https://github.com/SpenceKonde/megaTinyCore)
+This document is best viewed online (as opposed to opening the markdown file in your favorite text editor), so that links are clickable and inline images are shown, and probably most importantly, to make tables render correctly sometimes. Again, this [document can be found on github](https://github.com/SpenceKonde/megaTinyCore](https://github.com/SpenceKonde/megaTinyCore)
 
 ## Getting Started
 ### [Wiring](Wiring.md)
