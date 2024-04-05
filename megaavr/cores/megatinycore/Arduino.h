@@ -207,19 +207,24 @@
   #define ADC_ACC512S     badArg("Sign chopping is only supported on Ex-series")
   #define ADC_ACC1024S    badArg("Sign chopping is only supported on Ex-series")
 
-  #define LOW_LAT_ON      0x03 // deprecated
-  #define LOW_LAT_OFF     0x02 // deprecated
-  #define ADC_LOWLAT_ON   0x03
-  #define ADC_LOWLAT_OFF  0x02
-  #define PGA_KEEP_ON     0x08
-  #define PGA_AUTO_OFF    0x0C
-  #define PGA_OFF_ONCE    0x04
-  #define ADC_ENABLE      0x20
-  #define ADC_DISABLE     0x30
-  #define ADC_STANDBY_ON  0xC0
-  #define ADC_STANDBY_OFF 0x80
-
-
+  #define _PGA_CFG_MASK     0x03
+  #define _ADC_LOWLAT_CTRL  0x08
+  #define _ADC_LOWLAT_VAL   0x04
+  #define _ADC_ENABLE_VAl   0x10
+  #define _ADC_ENABLE_CTRL  0x20
+  #define _ADC_STANDBY_VAl  0X40
+  #define _ADC_STANDBY_CTRL 0x80
+  #define PGA_OFF_ONCE      0x01
+  #define PGA_KEEP_ON       0x02
+  #define PGA_AUTO_OFF      0x03
+  #define LOW_LAT_ON        0x0C // deprecated
+  #define LOW_LAT_OFF       0x08 // deprecated
+  #define ADC_LOWLAT_ON     0x0C
+  #define ADC_LOWLAT_OFF    0x08
+  #define ADC_ENABLE        0x20
+  #define ADC_DISABLE       0x30
+  #define ADC_STANDBY_ON    0xC0
+  #define ADC_STANDBY_OFF   0x80
 #endif
 
 /* Errors in analogReadEnh and analogReadDiff are large negative numbers,
