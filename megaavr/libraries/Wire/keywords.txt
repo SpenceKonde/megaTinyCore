@@ -5,6 +5,8 @@
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
+twi_buf_index_t	KEYWORD1
+TWI_t	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -18,6 +20,8 @@ setClock	KEYWORD2
 beginTransmission	KEYWORD2
 endTransmission	KEYWORD2
 requestFrom	KEYWORD2
+masterTransmit	KEYWORD2
+masterReceive	KEYWORD2
 onReceive	KEYWORD2
 onRequest	KEYWORD2
 getIncomingAddress	KEYWORD2
@@ -25,6 +29,8 @@ getBytesRead	KEYWORD2
 slaveTransactionOpen	KEYWORD2
 checkPinLevels	KEYWORD2
 specialConfig	KEYWORD2
+enableDualMode	KEYWORD2
+returnError	KEYWORD2
 WIRE_SDA_HOLD_OFF	KEYWORD2
 WIRE_SDA_HOLD_50	KEYWORD2
 WIRE_SDA_HOLD_300	KEYWORD2

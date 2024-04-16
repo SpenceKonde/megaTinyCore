@@ -18,7 +18,7 @@
 
   Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
 
-  Modified 2021-2022 by MX682X for megaTinyCore and DxCore.
+  Modified 2021-2023 by MX682X for megaTinyCore and DxCore.
   Added Support for Simultaneous master/slave, dual mode and Wire1.
 */
 
@@ -43,9 +43,9 @@
  * and while the enhanced wire library *will* fit on 2k parts, you have very little flash left for anything else.
  * and the practicality of using it there is limited.
  */
- 
- 
- #ifndef ADD_READ_BIT
+
+
+#ifndef ADD_READ_BIT
   #define ADD_READ_BIT(address)    (address | 0x01)
 #endif
 #ifndef ADD_WRITE_BIT
@@ -62,10 +62,11 @@
   #error "This part only provides a single Wire interface."
 #endif
 
+/* Instead of requiring changes to the library to switch between DxCore and megaTinyCore, we can check
+ * if the part supports dual mode. Goal is that the identical library can be used on both, so updates
+ * in one can be propagated to the other by just copying files.
+ */
 #if ((defined(TWI0_DUALCTRL) && !defined(TWI_USING_WIRE1)) || (defined(TWI1_DUALCTRL) && defined(TWI_USING_WIRE1)))
-  /* Instead of requiring changes to the library to switch between DxCore and megaTinyCore, we can check
-   * if the part supports dual mode. Goal is that the identical library can be used on both, so updates
-   * in one can be propagated to the other by just copying files. */
   #define TWI_DUALCTRL   // This identifies if the device supports dual mode, where slave pins are different from the master pins
 #endif
 
@@ -132,7 +133,7 @@
 
 #define  TWI_TIMEOUT_ENABLE       // Enabled by default, might be disabled for debugging or other reasons
 #define  TWI_ERROR_ENABLED        // Enabled by default, TWI Master Write error functionality
-//#define TWI_READ_ERROR_ENABLED  // Enabled on Master Read too
+#define  TWI_READ_ERROR_ENABLED   // Enabled on Master Read too
 //#define DISABLE_NEW_ERRORS      // Disables the new error codes and returns TWI_ERR_UNDEFINED instead.
 
 // Errors from Arduino documentation:
@@ -207,30 +208,30 @@ class TwoWire: public Stream {
   private:
     TWI_t *_module;
     uint8_t MasterCalcBaud(uint32_t frequency);
-    
+
     uint8_t client_irq_mask;
     struct twiDataBools _bools;      // the structure to hold the bools for the class
     #if defined(TWI_READ_ERROR_ENABLED)
     uint8_t _errors;
     #endif
-    
+
     void (*user_onRequest)(void);
     void (*user_onReceive)(int);
-    
+
     uint8_t _clientAddress;
     twi_buf_index_t _bytesToReadWrite;
     twi_buf_index_t _bytesReadWritten;
     twi_buf_index_t _bytesTransmittedS;
 
     #if defined(TWI_MANDS)
-      uint8_t _incomingAddress;
-      twi_buf_index_t _bytesToReadWriteS;
-      twi_buf_index_t _bytesReadWrittenS;
+    uint8_t _incomingAddress;
+    twi_buf_index_t _bytesToReadWriteS;
+    twi_buf_index_t _bytesReadWrittenS;
     #endif
-    
+
     uint8_t _hostBuffer[TWI_BUFFER_LENGTH];
     #if defined(TWI_MANDS)
-      uint8_t _clientBuffer[TWI_BUFFER_LENGTH];
+    uint8_t _clientBuffer[TWI_BUFFER_LENGTH];
     #endif
 
   public:
@@ -258,9 +259,9 @@ class TwoWire: public Stream {
     }
 
     twi_buf_index_t requestFrom(uint8_t address, twi_buf_index_t quantity, uint8_t sendStop = 1);
-    
-    uint8_t masterTransmit(auto length, uint8_t addr, uint8_t* buffer, uint8_t sendStop);
-    auto masterReceive(auto length, uint8_t addr, uint8_t* buffer, uint8_t sendStop);
+
+    uint8_t masterTransmit(auto *length, uint8_t *buffer, uint8_t addr, uint8_t sendStop);
+    uint8_t masterReceive(auto *length, uint8_t *buffer, uint8_t addr, uint8_t sendStop);
 
     virtual size_t write(uint8_t);
     virtual size_t write(const uint8_t *, size_t);
@@ -301,11 +302,7 @@ class TwoWire: public Stream {
     }
     size_t readBytes(char *data, size_t quantity);
 
-    #if defined(TWI_READ_ERROR_ENABLED) && defined(TWI_ERROR_ENABLED)
-    uint8_t returnError();
-    #endif
-
-    static void HandleSlaveIRQ(TwoWire* wire_s);
+    static void HandleSlaveIRQ(TwoWire *wire_s);
 };
 
 

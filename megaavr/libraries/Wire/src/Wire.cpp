@@ -21,7 +21,7 @@
   Modified 2019-2021 by Spence Konde for megaTinyCore and DxCore.
   This version is part of megaTinyCore and DxCore; it is not expected
   to work with other hardware or cores without modifications.
-  Modified extensively 2021-22 by MX682X for megaTinyCore and DxCore.
+  Modified extensively 2021-23 by MX682X for megaTinyCore and DxCore.
   Added Support for Simultaneous host/client, dual mode and Wire1.
 */
 // *INDENT-OFF*   astyle wants this file to be completely unreadable with no indentation for the many preprocessor conditionals!
@@ -333,8 +333,8 @@ void TwoWire::begin(uint8_t address, bool receive_broadcast, uint8_t second_addr
       return;
     }
   }
-  
-  
+
+
   #if defined(TWI_MANDS)                    // Check if the user wants to use Master AND Slave
     if (_bools._clientEnabled  == 1) {      // Master is allowed to be enabled, don't re-enable the client though
       return;
@@ -620,24 +620,25 @@ uint8_t TwoWire::specialConfig( __attribute__ ((unused)) bool smbuslvl, __attrib
  *@brief      masterReceive sends a host READ with the specified client address
  *
  *            This function will read an arbitrary number of bytes from the TWI module
- *            and store them into the specified buffer. This allows the user to use 
+ *            and store them into the specified buffer. This allows the user to use
  *            custom sized buffers and avoids extra copy operations through read.
  *
- *@param      auto length - amount of bytes to be read (first arg so it is placed in r24:r25)
- *@param      uint8_t addr - the address of the client (7-bit)
+ *@param      auto* length - pointer to a 8/16 bit variable containing the length. Will be overwritten with the amount of received bytes
  *@param      uint8_t* buffer - pointer to the memory area to be written upon.
+ *@param      uint8_t addr - the address of the client (7-bit)
  *@param      uint8_t/bool sendStop - if the transaction should be terminated with a STOP condition
  *
- *@return     auto (uint8_t/uint16_t) - depends on the usage
- *@retval     amount of bytes that were actually read. If 0, no read took place due to a bus error.
+ *@return     uint8_t
+ *@retval     error code, see masterTrasnmit
  */
 
 
-auto TwoWire::masterReceive(auto length, uint8_t addr, uint8_t* buffer, uint8_t sendStop) {
+uint8_t TwoWire::masterReceive(auto *length, uint8_t *buffer, uint8_t addr, uint8_t sendStop) {
   TWI_t *module = _module;
+  __asm__ __volatile__("\n\t" : "+z"(module));
 
   TWIR_INIT_ERROR;             // local variable for errors
-  auto dataRead = 0;
+  auto dataToRead = *length;
 
   uint8_t currentSM;
   uint8_t currentStatus;
@@ -645,14 +646,14 @@ auto TwoWire::masterReceive(auto length, uint8_t addr, uint8_t* buffer, uint8_t 
   #if defined (TWI_TIMEOUT_ENABLE)
     uint16_t timeout = (F_CPU/1000);
   #endif
-  
+
   while (true) {
     currentStatus = module->MSTATUS;
     currentSM = currentStatus & TWI_BUSSTATE_gm;  // get the current mode of the state machine
-    
+
     if (currentSM == TWI_BUSSTATE_UNKNOWN_gc) {
-      TWIR_SET_ERROR(TWI_ERR_UNINITIALIZED);
-      return dataRead;
+      TWIR_SET_ERROR(TWI_ERR_UNINIT);
+      break;
     }
 
     #if defined(TWI_TIMEOUT_ENABLE)
@@ -667,13 +668,12 @@ auto TwoWire::masterReceive(auto length, uint8_t addr, uint8_t* buffer, uint8_t 
         break;
       }
     #endif
-    
+
     if (currentStatus & TWI_ARBLOST_bm) {   // Check for Bus error
       TWIR_SET_ERROR(TWI_ERR_BUS_ARB);      // set error flag
       break;                                // leave RX loop
     }
 
-    
     if (currentSM != TWI_BUSSTATE_BUSY_gc) {
       if (state == 0x00) {
         module->MADDR = ADD_READ_BIT(addr);     // Send Address with read bit
@@ -683,17 +683,16 @@ auto TwoWire::masterReceive(auto length, uint8_t addr, uint8_t* buffer, uint8_t 
         #endif
       } else {
         if (currentStatus & TWI_WIF_bm) {
-          TWIR_SET_ERROR(TWI_ERR_RXACK);          // set error flag
+          TWIR_SET_ERROR(TWI_ERR_ACK_ADR);        // set error flag
           module->MCTRLB = TWI_MCMD_STOP_gc;      // free the bus
           break;
         } else if (currentStatus & TWI_RIF_bm) {
           *buffer = module->MDATA;
           buffer++;
-          dataRead++;
           #if defined (TWI_TIMEOUT_ENABLE)
             timeout = (F_CPU/1000);                // reset timeout
           #endif
-          if (dataRead < length) {
+          if (--dataToRead != 0) {
             module->MCTRLB = TWI_MCMD_RECVTRANS_gc;  // send an ACK so the Slave so it can send the next byte
           } else {
             if (sendStop != 0) {
@@ -707,10 +706,8 @@ auto TwoWire::masterReceive(auto length, uint8_t addr, uint8_t* buffer, uint8_t 
       }
     }
   }
-  #if defined(TWI_READ_ERROR_ENABLED) && defined(TWI_ERROR_ENABLED)
-    _errors = TWIR_GET_ERROR;                // save error flags
-  #endif
-  return dataRead;
+  *length -= dataToRead;
+  return TWIR_GET_ERROR;
 }
 
 
@@ -741,11 +738,12 @@ twi_buf_index_t TwoWire::requestFrom(uint8_t  address,  twi_buf_index_t quantity
   }
 
   _clientAddress = address << 1;
-  
-  twi_buf_index_t count = masterReceive(quantity, _clientAddress, _hostBuffer, sendStop);
-  _bytesToReadWrite = count;  // for available/read/peek
+  _bytesToReadWrite = quantity;  // for available/read/peek
   _bytesReadWritten = 0;
-  return count;
+
+  masterReceive(&_bytesToReadWrite, _hostBuffer, _clientAddress, sendStop);  // We ignore the error that gets returned
+
+  return _bytesToReadWrite;
 }
 
 
@@ -805,8 +803,7 @@ void TwoWire::beginTransmission(uint8_t address) {
  */
 uint8_t TwoWire::endTransmission(bool sendStop) {
   // transmit (blocking)
-
-  return masterTransmit(_bytesToReadWrite, _clientAddress, _hostBuffer, sendStop);
+  return masterTransmit(&_bytesToReadWrite, _hostBuffer, _clientAddress, sendStop);
 }
 
 
@@ -815,29 +812,30 @@ uint8_t TwoWire::endTransmission(bool sendStop) {
  *@brief      masterTransmit sends a host WRITE with the specified client address
  *
  *            This function will write an arbitrary number of bytes to the TWI module
- *            and read the data from the specified buffer. This allows the user to use 
+ *            and read the data from the specified buffer. This allows the user to use
  *            custom sized buffers and avoids extra copy operations through write.
  *
- *@param      auto length - amount of bytes to be read (first arg so it is placed in r24:r25)
- *@param      uint8_t addr - the address of the client (7-bit)
+ *@param      auto* length - pointer to a 8/16 bit variable containing the length. Will be overwritten with the amount of written bytes
  *@param      uint8_t* buffer - pointer to the memory area to be read from.
+ *@param      uint8_t addr - the address of the client (7-bit)
  *@param      uint8_t/bool sendStop - if the transaction should be terminated with a STOP condition
  *
  *@return     uint8_t
  *@retval     errors (see endTransmission)
  */
-uint8_t TwoWire::masterTransmit(auto length, uint8_t addr, uint8_t* buffer, uint8_t sendStop) {
+uint8_t TwoWire::masterTransmit(auto *length, uint8_t *buffer, uint8_t addr, uint8_t sendStop) {
   TWI_t* module = _module;
   __asm__ __volatile__("\n\t" : "+z"(module));
-  
+
   TWI_INIT_ERROR;
   uint8_t currentSM;
   uint8_t currentStatus;
   uint8_t stat = 0;
+  auto dataToWrite = *length;
   #if defined (TWI_TIMEOUT_ENABLE)
     uint16_t timeout = (F_CPU/1000);
   #endif
-  
+
   if ((module->MCTRLA & TWI_ENABLE_bm) == 0x00) {  // If the module is disabled, abort
     return TWI_ERR_UNINIT;
   }
@@ -845,7 +843,7 @@ uint8_t TwoWire::masterTransmit(auto length, uint8_t addr, uint8_t* buffer, uint
   while (true) {
     currentStatus = module->MSTATUS;
     currentSM = currentStatus & TWI_BUSSTATE_gm;  // get the current mode of the state machine
-    
+
     if (currentSM == TWI_BUSSTATE_UNKNOWN_gc) { // If the bus was not initialized
       return TWI_ERR_UNINIT;                    // abort
     }
@@ -867,7 +865,7 @@ uint8_t TwoWire::masterTransmit(auto length, uint8_t addr, uint8_t* buffer, uint
       TWI_SET_ERROR(TWI_ERR_BUS_ARB);       // set error flag
       break;                                // leave TX loop
     }
-    
+
     if (currentSM != TWI_BUSSTATE_BUSY_gc) {  // Undefined was excluded, so make sure it's IDLE or OWNER
       if (stat == 0x00) {                     // At the start, we send the ADDR
         module->MADDR = ADD_WRITE_BIT(addr);      // clear bit 0
@@ -879,17 +877,17 @@ uint8_t TwoWire::masterTransmit(auto length, uint8_t addr, uint8_t* buffer, uint
         if (currentStatus & TWI_WIF_bm) {     // ADDR was sent, check for completed write
           if (currentStatus & TWI_RXACK_bm) {   // got a NACK, see how much was written
             if (stat & 0x02) {                  // bit 1 set, data was already sent
-              if (length != 0)                    // the client may send an ACK at the end. If we
+              if (dataToWrite != 0)               // the client may send an ACK at the end. If we
                 TWI_SET_ERROR(TWI_ERR_ACK_DAT);   // transferred everything, we can ignore the NACK
             } else {                              // otherwise, no data sent, ADDR NACK
               TWI_SET_ERROR(TWI_ERR_ACK_ADR);
             }
             break;
           } else {                              // No NACK on write
-            if (length != 0) {                  // check if there is data to be written
+            if (dataToWrite != 0) {             // check if there is data to be written
               module->MDATA = *buffer;          // Writing to the register to send data
               buffer++;
-              length--;
+              dataToWrite--;
               stat |= 0x02;                     // remember that we've sent data
               #if defined (TWI_TIMEOUT_ENABLE)
                 timeout = (F_CPU/1000);                   // reset timeout
@@ -903,7 +901,7 @@ uint8_t TwoWire::masterTransmit(auto length, uint8_t addr, uint8_t* buffer, uint
     } /* currentSM != TWI_BUSSTATE_BUSY_gc */
   } /* while */
 
-
+  *length -= dataToWrite;
   if ((sendStop != 0) || (TWI_ERR_SUCCESS != TWI_GET_ERROR)) {
     module->MCTRLB = TWI_MCMD_STOP_gc;                        // Send STOP
   }
@@ -1285,7 +1283,7 @@ void TwoWire::deselectSlaveBuffer(void) {
 
 
 
-void TwoWire::HandleSlaveIRQ(TwoWire* wire_s) {
+void TwoWire::HandleSlaveIRQ(TwoWire *wire_s) {
   if (wire_s == NULL) {
     return;
   }
@@ -1314,7 +1312,7 @@ void TwoWire::HandleSlaveIRQ(TwoWire* wire_s) {
 
 
   if (clientStatus & TWI_APIF_bm) {   // Address/Stop Bit set
-  
+
     if ((*head) > 0) {                     // At this point, we have either a START, REPSTART or a STOP
       if (wire_s->user_onReceive != NULL) {  // at START, head should be 0, as it was set so on the last STOP
         wire_s->user_onReceive((*head));     // otherwise, we notify the use sketch, as we have an REPSTART/STOP
@@ -1345,7 +1343,7 @@ void TwoWire::HandleSlaveIRQ(TwoWire* wire_s) {
       }
     } else {                          // Stop bit set
       popSleep();
-      
+
       (*head) = 0;                    // clear whatever might be left due errors
       (*tail) = 0;
       action = TWI_SCMD_COMPTRANS_gc;  // "Wait for any Start (S/Sr) condition"
@@ -1414,13 +1412,6 @@ void TwoWire::onReceive(void (*function)(int)) {
 void TwoWire::onRequest(void (*function)(void)) {
   user_onRequest = function;
 }
-
-
-#if defined(TWI_READ_ERROR_ENABLED) && defined(TWI_ERROR_ENABLED)
-uint8_t TwoWire::returnError() {
-  return vars._errors;
-}
-#endif
 
 
 /**
