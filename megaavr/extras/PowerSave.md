@@ -37,7 +37,7 @@ The ADC can be a source of power drain.
 // Before sleeping
   ADC0.CTRLA &= ~ADC_ENABLE_bm; //Very important on the tinyAVR 2-series
 // upon waking if ou plan to use the ADC
-  ADC0.CTRLA |= ~ADC_ENABLE_bm;
+  ADC0.CTRLA |= ADC_ENABLE_bm;
 ```
 may reduce draw by hundreds of ua. You should also be sure to set all unused pins to either INPUT_PULLUP, OUTPUT, or disable their input (see [the Digital Pin Function referernce](Ref_Digital.md))
 

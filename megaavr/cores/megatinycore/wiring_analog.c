@@ -400,11 +400,15 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
     // 01 = Turn off PGA, settings unchanged. It will be enabled next time is requested, but will not automatically turn off.
     // 10 = Turn on PGA, and don't turn it off automatically.
     // 11 = turn off PGA now and automatically after each use
+    //
+    // (set rstby)(to this value)(set enable)(to this value),
+
+
     uint8_t temp = ADC0.CTRLA; //performance.
-    if (options & 0x02) {
+    if (options & _ADC_LOWLAT_CTRL) {
       ADC0.CTRLA = 0; // hopwfully workaround lowlat errata by ensuring that everything is turned off.
       // and configuring lowlat mode.
-      if (options & 0x01) {
+      if (options & _ADC_LOWLAT_VAL) {
         ADC0.CTRLA |=  ADC_LOWLAT_bm;
         temp |= ADC_LOWLAT_bm;
       } else {
@@ -412,24 +416,25 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
         temp &= ~ADC_LOWLAT_bm;
       }
     }
-    if (options & 0x20) {
-      if (options & 0x10) {
+    if (options & _ADC_ENABLE_CTRL) {
+      if (options & _ADC_ENABLE_VAL) {
         temp |= 1; // ADC on
       } else {
         temp &= 0xFE; // ADC off
       }
     }
-    if (options & 0x80) {
-      if (options & 0x40) {
+    if (options & _ADC_STANDBY_CTRL) {
+      if (options & _ADC_STANDBY_VAL) {
         temp |= 0x80; // run standby
       } else {
         temp &= 0x7F; // no run standby
       }
     }
     ADC0.CTRLA = temp; //now we apply enable and standby, and lowlat has been turned on, hopefully that's good enough for the errata.
-    if (options & 0x04) { // turn off PGA.
+    options &= _PGA_CFG_MASK;
+    if (options & 0x01) { // turn off PGA.
       ADC0.PGACTRL &= ~ADC_PGAEN_bm;
-      if (options & 0x08)  {
+      if (options & 0x02)  {
         _analog_options &= 0x7F;
       } else {
         _analog_options |= 0x80;
