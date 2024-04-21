@@ -294,7 +294,7 @@ See [**Speed Grade reference**](https://github.com/SpenceKonde/megaTinyCore/blob
 
 **It has been established that the extended temperature parts overclock better** which makes sense. A part that is spec'ed to run at 20 MHz at 125C would be expected to have a better chance of running at 32 MHz at room temperature than one spec'ed only to run at 20 MHz only at 105C
 
-## Support for Official Microchip Developmenmt Boards
+## Support for Official Microchip Development Boards
 As of version 2.4.0, we now provide an "Official Microchip Board" option. This doesn't do anything special other than defining `LED_BUILTIN` to be the pin that has the LED on that board, instead of A7, and defining a macro `PIN_BUTTON_BUILTIN` defined as the pin with the user button on it and making "upload" with the non-optiboot version always use the onboard programmer/debugger; tools -> programmer will be used only for "burn bootloader" and "upload using programmer". In the case of the ATtiny416 XPlained Nano, it also selects the version of the bootloader that uses the alternate pins for the serial port - it does not automatically use the alternate pins for USART0 as if you'd done Serial.swap(1) yet - functionality to support default swapping of serial pins will come in a future update, alongside some other changes in the machinery underlying the pinswap mechanism which will hopefully also reduce flash usage.
 
 As noted above, these may not work correctly on 32-bit Linux platforms. This is beyond my control; I don't build avrdude binaries amd I am *not* taking on that task too. I have too many already.
