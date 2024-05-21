@@ -287,7 +287,7 @@ My tentative ruling is that:
 #endif
 
 #ifndef TONE_UNAVAILABLE
-  // helper functiodn for ending tone.
+  // helper function for ending tone.
   /* Works for all timers -- the timer being disabled will go back to the
       configuration it had on startup */
   static void disableTimer() {
