@@ -40,10 +40,10 @@ extern "C" {    // compiler was complaining when I put twi.h into the upper C in
   #include "twi_pins.h"
 }
 
-static uint8_t sleepStack = 0;
+volatile uint8_t sleepStack = 0;
 
-void pushSleep(void);
-void popSleep(void);
+void pauseDeepSleep(uint8_t moduelAddr);
+void restoreSleep(uint8_t moduelAddr);
 
 TwoWire* twi0_wire;
 TwoWire* twi1_wire;
@@ -1288,7 +1288,6 @@ void TwoWire::HandleSlaveIRQ(TwoWire *wire_s) {
     return;
   }
 
-
   uint8_t *address,  *buffer;
   twi_buf_index_t *head, *tail;
   #if defined(TWI_MANDS)
@@ -1312,22 +1311,21 @@ void TwoWire::HandleSlaveIRQ(TwoWire *wire_s) {
 
 
   if (clientStatus & TWI_APIF_bm) {   // Address/Stop Bit set
-
-    if ((*head) > 0) {                     // At this point, we have either a START, REPSTART or a STOP
-      if (wire_s->user_onReceive != NULL) {  // at START, head should be 0, as it was set so on the last STOP
-        wire_s->user_onReceive((*head));     // otherwise, we notify the use sketch, as we have an REPSTART/STOP
+    if (wire_s->_bools._hostDataSent != 0) { // At this point, we have either a START, REPSTART or a STOP
+      wire_s->_bools._hostDataSent = 0x00;
+      if (wire_s->user_onReceive != NULL) {   // only if the last APIF was a Master Write,
+        wire_s->user_onReceive((*head));      // we notify the sketch about new Data
       }
     }
 
     if (clientStatus & TWI_AP_bm) {     // Address bit set
       if ((*head) == 0) {                 // only if there was no data (START)
-        pushSleep();                      // push the sleep
+        pauseDeepSleep((uint8_t)((uint16_t)wire_s->_module));  // Only START can wake from deep sleep, change to IDLE
       }
+      (*head) = 0;
+      (*tail) = 0;
       (*address) = wire_s->_module->SDATA;  // read address from data register
       if (clientStatus & TWI_DIR_bm) {      // Master is reading
-        (*head) = 0;                          // reset buffer positions for user sketch
-        (*tail) = 0;
-
         if (wire_s->user_onRequest != NULL) {
           wire_s->user_onRequest();
         }
@@ -1337,31 +1335,30 @@ void TwoWire::HandleSlaveIRQ(TwoWire *wire_s) {
           action = TWI_SCMD_RESPONSE_gc;        // "Execute Acknowledge Action succeeded by reception of next byte"
         }
       } else {                          // Master is writing
-        (*head) = 0;                    // reset buffer positions
-        (*tail) = 0;
-        action = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by reception of next byte"
+        wire_s->_bools._hostDataSent = 0x01;
+        action = TWI_SCMD_RESPONSE_gc;  // "Execute Acknowledge Action succeeded by slave data interrupt"
       }
     } else {                          // Stop bit set
-      popSleep();
-
-      (*head) = 0;                    // clear whatever might be left due errors
+      restoreSleep((uint8_t)((uint16_t)wire_s->_module));
+      (*head) = 0;
       (*tail) = 0;
       action = TWI_SCMD_COMPTRANS_gc;  // "Wait for any Start (S/Sr) condition"
     }
   } else if (clientStatus & TWI_DIF_bm) { // Data bit set
     if (clientStatus & TWI_DIR_bm) {        // Master is reading
       if (clientStatus & wire_s->client_irq_mask) {   // If a collision was detected, or RXACK bit is set (when it matters)
-        (*head) = 0;                            // Abort further data writes
         wire_s->client_irq_mask = TWI_COLL_bm;  // stop checking for NACK
+        (*head) = 0;                            // Abort further data writes
         action = TWI_SCMD_COMPTRANS_gc;         // "Wait for any Start (S/Sr) condition"
       } else {                                // RXACK bit not set, no COLL
-        wire_s->_bytesTransmittedS++;            // increment bytes transmitted counter (for register model)
+        wire_s->_bytesTransmittedS++;           // increment bytes transmitted counter (for register model)
         wire_s->client_irq_mask = TWI_COLL_bm | TWI_RXACK_bm;  // start checking for NACK
         if ((*tail) < (*head)) {                // Data is available
           wire_s->_module->SDATA = buffer[(*tail)];  // Writing to the register to send data
           (*tail)++;                              // Increment counter for sent bytes
-          action = TWI_SCMD_RESPONSE_gc;          // "Execute a byte read operation followed by Acknowledge Action"
+          action = TWI_SCMD_RESPONSE_gc;          // "Execute Acknowledge Action succeeded by reception of next byte"
         } else {                                  // No more data available
+          (*head) = 0;                            // Avoid triggering REPSTART handler
           action = TWI_SCMD_COMPTRANS_gc;         // "Wait for any Start (S/Sr) condition"
         }
       }
@@ -1433,50 +1430,61 @@ ISR(TWI0_TWIS_vect) {
 
 
 /**
- *@brief      pushSleep and popSleep handle the sleep guard
+ *@brief      pauseDeepSleep and restoreSleep handle the sleep guard
  *
  *            When used only by one peripheral, just saving the sleep register is plenty,
  *              But when used by more then one, special care must be taken to restore the
- *              sleep settings only at the end.
+ *              sleep settings only at the end by using a bitmask on the upper nibble.
  *              e.g. when TWI0 - START, TWI1 - START, TWI0 - STOP, TWI1 - STOP
- *              so, there is a counter that counts up to 15 when pushing and down to 0 when
- *              popping. Only at 0, the actual push and pop happen. An overflow will lead to
- *              unpredictable results.
  *
- *@param      none
+ *@param      uint8_t module_lower_Addr - lower byte of the TWI Module address
+                    (used only with two Wire objects)
  *
  *@return     void
  */
-void pushSleep() {
+void pauseDeepSleep(uint8_t module_lower_Addr) {
   #if defined(TWI_USING_WIRE1)
-    uint8_t sleepStackLoc = sleepStack;
-    if (sleepStackLoc > 0) {                // Increment only if sleep was enabled
-      sleepStackLoc = (sleepStackLoc + 0x10); // use upper nibble to count - max 15 pushes
-    } else {
-      sleepStackLoc = SLPCTRL.CTRLA;        // save sleep settings to sleepStack
-      SLPCTRL.CTRLA = sleepStackLoc & 0x01; // Set to IDLE if sleep was enabled
+    uint8_t bit_mask = 0x10;
+    if (module_lower_Addr == (uint8_t)((uint16_t)&TWI1)){
+      bit_mask = 0x20;
     }
+    uint8_t sleepStackLoc = sleepStack;
+    if (sleepStackLoc == 0) {        // Save sleep state only if stack empty
+      sleepStackLoc = SLPCTRL.CTRLA;        // save sleep settings to sleepStack
+      SLPCTRL.CTRLA = sleepStackLoc & 0x01; // only leave the SEN bit, if it was set
+    }
+    sleepStackLoc |= bit_mask;      // Remember which module is busy
     sleepStack = sleepStackLoc;
   #else
-    sleepStack = SLPCTRL.CTRLA;           // save old sleep State
-    SLPCTRL.CTRLA = sleepStack & 0x01;    // only leave the SEN bit, if it was set
+    (void) module_lower_Addr;
+    
+    if (sleepStack == 0x00) {
+      uint8_t slp = SLPCTRL.CTRLA;    // save current sleep State
+      sleepStack = slp;               // using local variable for less store/load
+      SLPCTRL.CTRLA = slp & 0x01;     // only leave the SEN bit, if it was set
+    }
   #endif
 }
 
-void popSleep() {
+void restoreSleep(uint8_t module_lower_Addr) {
   #if defined(TWI_USING_WIRE1)
+    uint8_t bit_mask = ~0x10;
+    if (module_lower_Addr == (uint8_t)((uint16_t)&TWI1)){
+      bit_mask = ~0x20;
+    }
     uint8_t sleepStackLoc = sleepStack;
+    sleepStackLoc &= bit_mask;
     if (sleepStackLoc > 0) {      // only do something if sleep was enabled
-      if (sleepStackLoc > 0x10) {   // only decrement if pushed once before
-        sleepStackLoc = (sleepStackLoc - 0x10);   // upper nibble
-      } else {                    // at 0 we are about to put sleep back
+      if (sleepStackLoc < 0x10) {   // if upper nibble is clear
         SLPCTRL.CTRLA = sleepStackLoc;  // restore sleep
         sleepStackLoc = 0;              // reset everything
       }
-      sleepStack = sleepStackLoc;
     }
+    sleepStack = sleepStackLoc;
   #else
+    (void) module_lower_Addr;
     SLPCTRL.CTRLA = sleepStack;
+    sleepStack = 0;
   #endif
 }
 
