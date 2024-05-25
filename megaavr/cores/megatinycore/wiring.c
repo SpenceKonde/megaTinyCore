@@ -166,9 +166,10 @@ uint8_t __PeripheralControl = 0xFF;
     #endif  /* defined(MILLIS_USE_TIMER__) */
   #endif  /* defined(MILLIS_USE_TIMERRTC) */
 
+  #define ClockCyclesToMicroseconds(__a__) ((__a__) / (F_CPU / 1000000L))
   #define FRACT_MAX (1000)
-  #define FRACT_INC (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)%1000)
-  #define MILLIS_INC (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/1000)
+  #define FRACT_INC (ClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)%1000)
+  #define MILLIS_INC (ClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/1000)
 
   struct sTimeMillis {
     #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))     // Now TCB as millis source does not need fraction
@@ -334,7 +335,7 @@ uint8_t __PeripheralControl = 0xFF;
       "subi       r24,%[LFRMAX]"  "\n\t" // subtract FRACT_MAX and see if it is lower
       "sbci       r25,%[HFRMAX]"  "\n\t" //
 
-      #if MILLIS_INC != 0                // (6 words / 4 - 5 clocks, branches were optimize to create minimal diversion)
+      #if MILLIS_INC > 0                 // (6 words / 4 - 5 clocks, branches were optimize to create minimal diversion)
       "brlo    higher"            "\n\t" // if FRAC_MAX was not reached,
       "ldi        r24, %[MIINC]"  "\n\t" // load "normal" MILLIS_INC (0x00-MILLIS_INC)
       "rjmp      sub4"            "\n\t" // avoid overwriting r24
