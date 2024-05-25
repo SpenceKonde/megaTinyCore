@@ -1457,7 +1457,7 @@ void pauseDeepSleep(uint8_t module_lower_Addr) {
     sleepStack = sleepStackLoc;
   #else
     (void) module_lower_Addr;
-    
+
     if (sleepStack == 0x00) {
       uint8_t slp = SLPCTRL.CTRLA;    // save current sleep State
       sleepStack = slp;               // using local variable for less store/load
