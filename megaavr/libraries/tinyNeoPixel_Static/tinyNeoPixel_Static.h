@@ -305,7 +305,7 @@ class tinyNeoPixel {
   #endif
 
 
- private:
+ protected:
 
   uint16_t
     numLEDs,       // Number of RGB LEDs in strip
