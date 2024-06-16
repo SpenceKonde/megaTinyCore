@@ -321,7 +321,7 @@ class tinyNeoPixel {
   #endif
 
 
- private:
+ protected:
 
   boolean
     begun;         // true if begin() previously called
