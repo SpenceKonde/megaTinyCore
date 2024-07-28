@@ -208,6 +208,18 @@ uint8_t checkPinLevels();
 ```
 This function returns the level of the master TWI pins, depending on the used TWI module and port multiplexer settings. Bit 0 represents SDA line and bit 1 represents SCL line. This is useful on initialisation, where you want to make sure that all devices have their pins ready in open-drain mode. A value of 0x03 indicates that both lines have a HIGH level and the bus is ready.
 
+#### `uint8_t masterTransmit()`
+```c++
+uint8_t masterTransmit(auto *length, uint8_t *buffer, uint8_t addr, uint8_t sendStop);
+```
+This functions allows to transmit a buffer of data without having to copy the data to the internal buffer of the library. This allows transmission lengths as long as the RAM size without having to define the TWI_BUFFER_SIZE in the platform.txt. The return value is the same as endTransmission(). length will be overwritten with the actual amount of written bytes.
+
+#### `uint8_t masterReceive()`
+```c++
+uint8_t masterReceive(auto *length, uint8_t *buffer, uint8_t addr, uint8_t sendStop);
+```
+This functions allows to receive a buffer of data without having to copy the data from the internal buffer of the library. This allows transmission lengths as long as the RAM size without having to define the TWI_BUFFER_SIZE in the platform.txt. The return value is the same as endTransmission(). length will be overwritten with the actual amount of received bytes.
+
 ### Additional New Methods not available on all parts
 These new methods are available exclusively for parts with certain specialized hardware; Most full-size parts support enableDualMode (but tinyAVR does not), while only the DA and DB-series parts have the second TWI interface that swapModule requires.
 #### `void swapModule()`
@@ -323,6 +335,8 @@ When the second or third argument was used, `Wire.getIncomingAddress()` should b
 
 If (and only if) the Master and Slave option is selected in the Tools -> Wire mode, the Wire interface can be enabled for both master and slave. Even when Dual Mode is used, the correct option must still be selected to enable acting as both master and slave.
 
+The Arduino library defines the array lengths as `BUFFER_LENGTH`, however, this define name might create conflicts, as the name is quite arbitrary. The newest library version uses the name `TWI_BUFFER_LENGTH` instead. However, it is still backwards compatible, as the `BUFFER_LENGTH` is still applied, but a compiler warning is generated to notify about the change.
+
 #### `void setClock()`
 ```c++
 void setClock(uint32_t);
@@ -419,7 +433,7 @@ The implementation isn't identical, but the behaviour is unchanged, or is differ
 
 #### Write Sequence
 1. Master generates start condition.
-2. Master clocks out the slave address with out read-bit set..
+2. Master clocks out the slave address without read-bit set..
 3. Slave detects and ACKs.
 4. Master clocks out 1 or more data bytes as slave ACKs them.
 5. Master generates a Stop Condition.

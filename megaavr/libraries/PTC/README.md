@@ -125,7 +125,7 @@ In order to ease the use of the PTC module, the ptc_add_* functions will initial
 
 If a node is not sensitive enough, you can increase the Analog Gain (if it becomes too sensitive, an increase of the thresholds might be needed). However it is better to have a bigger node to begin with because the bigger the area, the higher is the capacitance delta.
 
-### Global settings of the State-maschine
+### Global settings of the State-machine
 The state-machine, which changes the node's state between Calibration, touch, no touch, etc. uses some variables that are valid for all nodes, those are:
 - `uint16_t force_recal_delta`. Each node has a threshold value that is used to calculate the delta. This Threshold value is drifting over time to adjust for environmental changes. If the threshold value drifts 512 +/- this value, a recalibration of CC is performed. Default: 150
 - `uint8_t  touched_detect_nom`. Number of consecutive Measurements (Conversions) that are above the touch threshold until the node becomes "touched". Default: 3

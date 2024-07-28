@@ -453,9 +453,9 @@ uint8_t PWMoutputTopin(uint8_t timer, uint8_t channel);
  * 3/19/23: These are supposed to be macros, not inline functions
  * Users have reported problems resulting from their being functions, even inline ones
  */
-#define clockCyclesPerMicrosecond()       ((F_CPU / 1000000UL))
-#define clockCyclesToMicroseconds(__a__)  (__a__ / clockCyclesPerMicrosecond())
-#define microsecondsToClockCycles(__a__)  (__a__ * clockCyclesPerMicrosecond())
+#define clockCyclesPerMicrosecond()      ((uint16_t)(F_CPU / 1000000UL))
+#define clockCyclesToMicroseconds(__a__) ((uint32_t)((__a__) / clockCyclesPerMicrosecond()))
+#define microsecondsToClockCycles(__a__) ((uint32_t)((__a__) * clockCyclesPerMicrosecond()))
 
 // Currently DxCore has no cases where the millis timer isn't derived from system clock, but that will change
 /* This becomes important when we support other timers for timekeeping. The Type D timer can be faster, requiring:
@@ -483,15 +483,15 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
  */
 #ifdef MILLIS_USE_TIMERD0
   #if (F_CPU == 20000000UL || F_CPU == 10000000UL ||F_CPU == 5000000UL)
-    #define millisClockCyclesPerMicrosecond() (20)  // this always runs off the 20MHz oscillator
+    #define millisClockCyclesPerMicrosecond() ((uint16_t)(20)) // this always runs off the 20MHz oscillator
   #else
-    #define millisClockCyclesPerMicrosecond() (16)
+    #define millisClockCyclesPerMicrosecond() ((uint16_t)(16))
   #endif
 #else
-  #define millisClockCyclesPerMicrosecond() (F_CPU / 1000000UL)
+  #define millisClockCyclesPerMicrosecond() ((uint16_t)((F_CPU / 1000000UL)))
 #endif
-#define millisClockCyclesToMicroseconds(__a__) (__a__ / millisClockCyclesPerMicrosecond())
-#define microsecondsToMillisClockCycles(__a__) (__a__ * millisClockCyclesPerMicrosecond())
+#define millisClockCyclesToMicroseconds(__a__) ((uint32_t)(__a__ / millisClockCyclesPerMicrosecond()))
+#define microsecondsToMillisClockCycles(__a__) ((uint32_t)(__a__ * millisClockCyclesPerMicrosecond()))
 
 /* Timers and Timer-like-things
  * These are used for two things: Identifying the timer on a pin in
