@@ -225,7 +225,10 @@ Programmer used for uploading.
 | `atmelice_updi`                       | Atmel ICE programmer in UPDI mode                                                                                |
 | `xplainedpro_updi`                    | Xplained Pro in UPDI mode                                                                                        |
 | `powerdebugger_updi`                  | Power Debugger in UPDI mode                                                                                      |
+| `serialupdi`                          | Serial UPDI based on pymcuprog, includes improvements taken from the DxCore implementation                       |
 
+**Note that this is not an exhaustive list**. 
+The full list of supported programmers is accessible via the `avrdude -c ?` command.
 
 ### `upload_flags`
 Used to pass extra flags to Avrdude when uploading using a programmer.
@@ -236,15 +239,34 @@ upload_flags =
   -PUSB
   -v
 ```
+
 ### Using SerialUPDI from platformIO
-It has been reported that, added to platformio.ini, the following works for making platformIO use SerialUPDI, assuming this core is present and installed via board manager on the Arduino IDE. Replace the megaTinyCore version with the installed version. This can probably be generalized better, but I (Spence Konde) don't use platformIO and so don't know how to do that. This is also a very aggressive configuration, and you may have better luck if you back off the speed to 115200 baud. UPDI does autobaud - you just want to make sure you pick a speed that the hardware will handle. 115200 works almost always, higher speeds are more demanding of how the UPDI circuit is wired up to meet required rise and fall times.
+It has been reported that, added to platformio.ini, the following works for making platformIO use SerialUPDI, but requires `python3` in the path. This is also a very aggressive configuration, and you may have better luck if you back off the speed to 115200 baud. UPDI does autobaud - you just want to make sure you pick a speed that the hardware will handle. 115200 works almost always, higher speeds are more demanding of how the UPDI circuit is wired up to meet required rise and fall times.
+
+However, note that this is probably obsolete and in most cases the same functionality can be achieved simply by setting `upload_protocol = serialupdi`, unless you have a specific reason to use this core's implementation. 
 ```ini
 [env:ATtiny1614]
 platform = atmelmegaavr
 board = ATtiny1614
 framework = arduino
+platform_packages = platformio/framework-arduino-megaavr-megatinycore@https://github.com/SpenceKonde/megaTinyCore
+
+; Fill in the following as per your hardware setup
+upload_port = 
+upload_speed = 230400
+
+upload_flags = 
+	--tool
+	uart
+	--device
+	$BOARD
+	--uart
+	$UPLOAD_PORT
+	-b
+	$UPLOAD_SPEED
+
 upload_protocol = custom
-upload_command = C:\Users\(your username)\AppData\Local\Arduino15\packages\megaTinyCore\tools\python3\3.7.2-post1/python3 -u C:\Users\(your username)AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.4.2/tools/prog.py -t uart -u COM18 -b 460800 -d attiny1614 --fuses 2:0x01 6:0x04 8:0x00 -f$SOURCE -a write
+upload_command = python3 ${platformio.packages_dir}/framework-arduino-megaavr-megatinycore/tools/prog.py $UPLOAD_FLAGS -f$SOURCE -a write
 ```
 
 
