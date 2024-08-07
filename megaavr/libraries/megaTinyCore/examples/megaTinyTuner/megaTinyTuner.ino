@@ -217,7 +217,7 @@ void loop() {
           while (i < 8)
         #endif
         {
-          uint16_t temp = pulseIn(PIN_PA5, LOW, (uint32_t) 100000UL);
+          uint16_t temp = pulseIn(TUNING_PIN, LOW, (uint32_t) 100000UL);
           #if defined(ONEKHZMODE)
             if (temp < 200 || temp > 1000)
           #else
