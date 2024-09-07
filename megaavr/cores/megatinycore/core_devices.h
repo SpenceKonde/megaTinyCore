@@ -805,7 +805,7 @@ int8_t _setPrescale(int8_t prescale) {
    * On the modern AVRs, address 0x0000 is VPORTA.OUT, so the first thing you'd trash if you wrote
    * to a null pointer is the PORTA configuration. BUT had they put the GPIOR's first - like xmega
    * then writing the null pointer would have first trashed a byte or bytes that most applications
-   * don't even use - but which would also naturally be a perfect probe of whether the bizzare bug
+   * don't even use - but which would also naturally be a perfect probe of whether the bizarre bug
    * you're trying to sort out is caused by following a null pointer somewhere or by something else.
    * Not that that's a super-common bug. 99 times out of 10 those sorts of "everything is totally
    * confused" bugs happen when you return from a function that has overflowed the bounds of a

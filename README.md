@@ -16,7 +16,7 @@ This corrects many of the bugs present in 2.6.x
 ### IDE Versions 2.0.x and some 2.1 do not work correctly.
 This is a bug in the Arduino client.
 
-IDE versions between 1.8.13 and 2.x developed significant novel defects. IDE versions 1.8.2 and earlier , however, possess crippling unfixed defects. I belive that they finally have a working version of the IDE out, and I belive that latest is able to install my core correctly.
+IDE versions between 1.8.13 and 2.x developed significant novel defects. IDE versions 1.8.2 and earlier , however, possess crippling unfixed defects. I believe that they finally have a working version of the IDE out, and I believe that latest is able to install my core correctly.
 
 Prior to megaTinyCore 2.6.0, manual installation of megaTinyCore would cause V1.8.14 of the IDE to crash due to [this bug](https://github.com/arduino/Arduino/issues/11813) when you install the core manually in your arduino folder. Users of 1.8.14 and later must use version 2.6.0 of megaTinyCore.
 

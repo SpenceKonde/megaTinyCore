@@ -50,7 +50,7 @@ arduino-cli core upgrade
 arduino-cli core update-index
 ```
 
-__Note:__ Sometimes in environments like Github Actions, arduino-cli is not able to find the megaTinyCore with the above comamnd.
+__Note:__ Sometimes in environments like Github Actions, arduino-cli is not able to find the megaTinyCore with the above command.
 The reason could be many folds. In runners like Github Actions, if the arduino-cli is not able to fetch the JSON file automatically, we can manually download the necessary JSON file and place it in the expected directory before running the core search or install command.
 
 example:

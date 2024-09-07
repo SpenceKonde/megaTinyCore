@@ -252,7 +252,7 @@
       "icall"             "\n\t" // call their function, which is allowed to shit on any upper registers other than 28, 29, 16, and 17.
       "rjmp AIntLoop"     "\n\t" // Restart loop after.
     "AIntEnd:"            "\n\t" // sooner or later r17 will be 0 and we'll branch here.
-      // with EARLYCLEAR variant, we don't need to do anythin other than cleaning up working registers - flags already cleared.
+      // with EARLYCLEAR variant, we don't need to do anything other than cleaning up working registers - flags already cleared.
       "pop   r31"         "\n\t" // clean up a million registers
       "pop   r30"         "\n\t"
       "pop   r29"         "\n\t"

@@ -142,7 +142,7 @@ void tinyNeoPixel::show(uint16_t leds) {
   //
   //   Finally, some of the constraints were incorrect, and this only ever
   //   worked because classes are kryptonite to the optimizer.
-  //   * [ptr] was decleared read only. No, it is not. The register is
+  //   * [ptr] was declared read only. No, it is not. The register is
   //     register contaains the address being pointed to. We read with
   //     postincrement, so this is read-write.
   //   * Conversely, [port], another pointer, is never written. The thing that

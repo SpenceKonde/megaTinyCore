@@ -65,7 +65,7 @@
 /* Set bootloader baud rate.                              */
 /*                                                        */
 /* LED_START_FLASHES:                                     */
-/* Number of LED flashes on bootup.                       */
+/* Number of LED flashes on boot-up.                       */
 /*                                                        */
 /* LED_DATA_FLASH:                                        */
 /* Flash LED when transferring data. For boards without   */

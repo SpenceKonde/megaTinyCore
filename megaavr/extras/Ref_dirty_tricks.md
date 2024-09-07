@@ -10,7 +10,7 @@ There are a few of us who work on the core (me, and 1, maybe two others) who kno
 
 The ramifications of C type promotion and integer literals defaulting to 16-bit signed ints come together to cause math to be done with larger datatypes than you intend, and frequently it is nearly impossible to talk it out of this.
 
-There is no C syntax that is consistently optimized intelligently for << 8 operations and larger shifts, and frequntly, the optimization choices made with -Os result in not *no* consideration being given to performance.
+There is no C syntax that is consistently optimized intelligently for << 8 operations and larger shifts, and frequently, the optimization choices made with -Os result in not *no* consideration being given to performance.
 
 So this is a combination of simply pathological code where the n'th instruction negates the n-1-th instruction, poor renditions of the C type promotion rules that make things really inefficient, and -Os is too willing to pick incredibly slow implementations
 

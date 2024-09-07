@@ -104,7 +104,7 @@ Sync/Filter: Off
 Yes, we could have done the third one with another CCL lut too - but why when there's a trick to do it without wasting a second LUT? Maybe we need the other LUTs.
 
 ### Modulated PWM
-Like classic AVRs had on larger pincount devices. One PWM frequency should be significantly higher than the other if you're trying to modulate it, rather than measure the beat frequency or something, and they definitley should be at different frequencies, otherwise see the previous pattern.
+Like classic AVRs had on larger pincount devices. One PWM frequency should be significantly higher than the other if you're trying to modulate it, rather than measure the beat frequency or something, and they definitely should be at different frequencies, otherwise see the previous pattern.
 
 INSEL:
 * X: Timer PWM channel.
