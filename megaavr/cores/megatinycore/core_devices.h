@@ -731,7 +731,7 @@ int8_t _setPrescale(int8_t prescale) {
  */
 
 // #define BACKWARD_COMBATIBILITY_MODE
-
+/* Outside of Backwards COMBATability mode - where our normal measures to paper over microchip's frequent renamings, 
 #if !defined(BACKWARD_COMBATIBILITY_MODE)
   // We default to seeking compatibility. for COMBATability you would uncomment that #define, and that turns all these off.
 
@@ -800,7 +800,7 @@ int8_t _setPrescale(int8_t prescale) {
    * SPM on some hardware, and again, in those cases either there's no hw support (modern) or it's
    * asm macros in boot.h). In all cases, if r1 is changed, it must be rezeroed before returning to
    * c. Otherwise, it'll break everything. Thus, on classic AVRs you could write a null pointer and
-   * probably not see any sign of that if you wrote one byte, if you wrote a 2 byte one, the worls
+   * probably not see any sign of that if you wrote one byte, if you wrote a 2 byte one, the world
    * would crash down around you.
    * On the modern AVRs, address 0x0000 is VPORTA.OUT, so the first thing you'd trash if you wrote
    * to a null pointer is the PORTA configuration. BUT had they put the GPIOR's first - like xmega
