@@ -35,7 +35,7 @@ arduino-cli config dump --verbose
 Then edit/add:
 
 ```yaml
-aboard_manager:
+board_manager:
   additional_urls:
   - http://drazzy.com/package_drazzy.com_index.json
 ```
