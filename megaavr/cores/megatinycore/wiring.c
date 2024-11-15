@@ -171,12 +171,8 @@ uint8_t __PeripheralControl = 0xFF;
   #define MILLIS_INC (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)/1000)
 
   struct sTimeMillis {
-    #if (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))     // Now TCB as millis source does not need fraction
+    #if (defined(MILLIS_USE_TIMERRTC) || defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4))     // Now TCB as millis source does not need fraction
       volatile uint32_t timer_millis;   // That's all we need to track here
-
-    #elif defined(MILLIS_USE_TIMERRTC)  // RTC
-      volatile uint16_t timer_overflow_count;
-
     #else                               // TCAx or TCD0
       //volatile uint16_t timer_fract;
       //volatile uint32_t timer_millis;
@@ -191,10 +187,8 @@ uint8_t __PeripheralControl = 0xFF;
   // Now for the ISRs. This gets a little bit more interesting now...
   #if defined (MILLIS_USE_TIMERRTC)
     ISR(MILLIS_TIMER_VECTOR) {
-      // if RTC is used as timer, we only increment the overflow count
-      // Overflow count isn't used for TCB's
       if (RTC.INTFLAGS & RTC_OVF_bm) {
-        timingStruct.timer_overflow_count++;
+        timingStruct.timer_millis += 64000;
       }
       RTC.INTFLAGS = RTC_OVF_bm | RTC_CMP_bm; // clear flag
     }
@@ -442,53 +436,16 @@ uint8_t __PeripheralControl = 0xFF;
     cli();
     #if defined(MILLIS_USE_TIMERRTC)
       uint16_t rtccount = RTC.CNT;
-      m = timingStruct.timer_overflow_count;
+      m = timingStruct.timer_millis;
       if (RTC.INTFLAGS & RTC_OVF_bm) {
         /* There has just been an overflow that hasn't been accounted for by the interrupt. Check if the high bit of counter is set.
          * We just basically need to make sure that it didn't JUST roll over at the last couple of clocks. But this merthod is
          * implemented very efficiently (just an sbrs) so it is more efficient than other approaches. If user code is leaving
          * interrupts off nearly 30 seconds, they shouldn't be surprised. */
-        if (!(rtccount & 0x8000)) m++;
+        if (!(rtccount & 0x8000)) m += 64000;
       }
       SREG = oldSREG;
-      m = (m << 16);
-      m += rtccount;
-      m = m - (m >> 5) + (m >> 7);
-      /* the compiler is incorrigible - it cannot be convinced not to copy m twice, shifting one 7 times and the other 5 times
-       * and wasting 35 clock cycles and several precious instruction words.
-       * What you want is for it to make one copy of m, shift it right 5 places, subtract, then rightshift it 2 more.
-       */
-      /* Would this work?
-      uint32_t temp;
-      uint8_t cnt;
-      __asm__ __volatile__ (
-        "movw %A1, %A0     \n\t"
-        "movw %C1, %C0     \n\t" //make our copy
-        "ldi %2, 5"       "\n\t"
-        "lsr %D1"         "\n\t"
-        "ror %C1"         "\n\t"
-        "ror %B1"         "\n\t"
-        "ror %A1"         "\n\t"
-        "dec %2"          "\n\t"
-        "brne .-12"       "\n\t"
-        "sub %A0, %A1"    "\n\t"
-        "subc %B0, %B1"   "\n\t"
-        "subc %C0, %C1"   "\n\t"
-        "subc %D0, %D1"   "\n\t"
-        "ldi %2, 2"       "\n\t"
-        "lsr %D1"         "\n\t"
-        "ror %C1"         "\n\t"
-        "ror %B1"         "\n\t"
-        "ror %A1"         "\n\t"
-        "dec %2"          "\n\t"
-        "brne .-12"       "\n\t"
-        "add %A0, %A1"    "\n\t"
-        "adc %B0, %B1"    "\n\t"
-        "adc %C0, %C1"    "\n\t"
-        "adc %D0, %D1"    "\n\t"
-        : "+r" (m), "+r" (temp), "+d" (cnt)
-        );
-      */
+      m += rtccount - (rtccount >> 5) + (rtccount >> 7);
     #else
       m = timingStruct.timer_millis;
       SREG = oldSREG;
@@ -1462,17 +1419,11 @@ void set_millis(__attribute__((unused))uint32_t newmillis)
     (void)newmillis; // unused parameter
   #else
     #if defined(MILLIS_USE_TIMERRTC)
-      // timer_overflow_count = newmillis >> 16;
-      // millis = 61/64(timer_overflow_count << 16 + RTC.CNT)
       uint8_t oldSREG = SREG; // save SREG
       cli();                // interrupts off
-      uint16_t temp = (newmillis % 61) << 6;
-      newmillis = (newmillis / 61) << 6;
-      temp = temp / 61;
-      newmillis += temp;
-      timingStruct.timer_overflow_count = newmillis >> 16;
+      timingStruct.timer_millis = newmillis;
       while(RTC.STATUS&RTC_CNTBUSY_bm); // wait if RTC busy
-      RTC.CNT = newmillis & 0xFFFF;
+      RTC.CNT = 0;
       SREG = oldSREG; // re-enable interrupts if we killed them,
     #else
       /* farting around with micros via overflow count was ugly and buggy.
@@ -1489,15 +1440,10 @@ void set_millis(__attribute__((unused))uint32_t newmillis)
 
 void nudge_millis(__attribute__((unused)) uint16_t nudgesize) {
   #if !defined(MILLIS_USE_TIMERNONE)
-    #if (!(MILLIS_TIMER & 0x80 || MILLIS_TIMER == NOT_ON_TIMER)) /* if not disabled or RTC-bbased  */
-      uint8_t oldSREG=SREG;
-      cli();
-      timingStruct.timer_millis += nudgesize;
-      SREG=oldSREG;
-    #else
-      #pragma message("Timer correction not yet supported for this timer. The obvious way is obstructed by the RTC errata.")
-      (void)nudgesize; // unused parameter
-    #endif
+    uint8_t oldSREG=SREG;
+    cli();
+    timingStruct.timer_millis += nudgesize;
+    SREG=oldSREG;
   #else
     (void)nudgesize; // unused parameter
   #endif
