@@ -731,7 +731,9 @@ int8_t _setPrescale(int8_t prescale) {
  */
 
 // #define BACKWARD_COMBATIBILITY_MODE
-/* Outside of Backwards COMBATability mode - where our normal measures to paper over microchip's frequent renamings, 
+/* Outside of Backwards COMBATability mode - where our normal measures to paper over microchip's frequent renamings and some of the in-name-only
+differences between part families are disabled (so as to force you to comply strictly with their headers, whereas we try to support every name that
+has once worked for the same thing as meaning that thing */
 #if !defined(BACKWARD_COMBATIBILITY_MODE)
   // We default to seeking compatibility. for COMBATability you would uncomment that #define, and that turns all these off.
 
