@@ -32,7 +32,7 @@
     #define ERRATA_USART_WAKE          (-1)
   #endif
   #define ERRATA_USART_FRAMING          (0)
-  #define ERRATA_TCD_ASYNC_COUNTPSC  (-128)
+  #define ERRATA_TCD_ASYNC_COUNTPSC  (-128) // Tiny 0 has no TCD
   #define ERRATA_TCD_HALTANDRESTART  (-128)
   #define ERRATA_TCD_AUTOUPDATE      (-128)
   #define ERRATA_TWI_ASSORTED           (0)
@@ -44,7 +44,7 @@
   #define ERRATA_ADC_FLAGSRESH          (0)
   #define ERRATA_TWI_PINS               (0) /* Not in any errata? Huh? */
   #define ERRATA_TWI_FLUSH              (0) /* Flush bug hasn't showed up on any 1-series errata */
-  #define ERRATA_ADC_LOWLAT          (-128) /* There's no LOWLAT here */
+  #define ERRATA_ADC_LOWLAT          (-128) /* There's no LOWLAT here cause the ADC doesn't have it*/
 #elif defined(__AVR_Tiny_1__)
   #if _AVR_FLASH == 32 /* 3216 and 3217
   * Them lucky 32k parts, they get all the breaks! Not only did they start with a less buggy design overall,
