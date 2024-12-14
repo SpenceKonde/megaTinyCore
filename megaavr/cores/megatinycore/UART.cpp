@@ -728,7 +728,7 @@
         // If we have never written a byte, no need to flush. This special
         // case is needed since there is no way to force the TXCIF (transmit
         // complete) bit to 1 during initialization
-        if (!_state & 1) {
+        if (!(_state & 1)) {
           return;
         }
 
