@@ -135,19 +135,19 @@
 #elif defined(__AVR_ATtiny3216__)
   #define MEGATINYCORE_MCU 3216
   #define MEGATINYCORE_SERIES 1
-  #define __AVR_ATtinyx06__
+  #define __AVR_ATtinyx16__
   #define __AVR_ATtinyxy6__
   #define _AVR_FLASH 32
 #elif defined(__AVR_ATtiny1616__)
   #define MEGATINYCORE_MCU 1616
   #define MEGATINYCORE_SERIES 1
-  #define __AVR_ATtinyx06__
+  #define __AVR_ATtinyx16__
   #define __AVR_ATtinyxy6__
   #define _AVR_FLASH 16
 #elif defined(__AVR_ATtiny816__)
   #define MEGATINYCORE_MCU 816
   #define MEGATINYCORE_SERIES 1
-  #define __AVR_ATtinyx06__
+  #define __AVR_ATtinyx16__
   #define __AVR_ATtinyxy6__
   #define _AVR_FLASH 8
 #elif defined(__AVR_ATtiny416__)
