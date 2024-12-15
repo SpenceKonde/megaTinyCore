@@ -256,14 +256,14 @@ upload_port =
 upload_speed = 230400
 
 upload_flags =
-	--tool
-	uart
-	--device
-	$BOARD
-	--uart
-	$UPLOAD_PORT
-	-b
-	$UPLOAD_SPEED
+    --tool
+    uart
+    --device
+    $BOARD
+    --uart
+    $UPLOAD_PORT
+    -b
+    $UPLOAD_SPEED
 
 upload_protocol = custom
 upload_command = python3 ${platformio.packages_dir}/framework-arduino-megaavr-megatinycore/tools/prog.py $UPLOAD_FLAGS -f$SOURCE -a write
