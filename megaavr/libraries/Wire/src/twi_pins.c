@@ -440,7 +440,7 @@ void TWI0_usePullups() {
     #endif
   #elif defined(MEGATINYCORE)     /* tinyAVR 0/1-series */
     #if defined(PORTMUX_TWI0_bm) // 1-series with remappable TWI
-      if (true == (PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
+      if (PORTMUX.CTRLB & PORTMUX_TWI0_bm) {
         PORTA.OUTCLR    = 0x06;
         PORTA.PIN2CTRL |= PORT_PULLUPEN_bm;
         PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
@@ -491,7 +491,7 @@ uint8_t TWI0_checkPinLevel(void) {
     return ((vport->IN & 0x0C) >> 2);
   #elif defined(MEGATINYCORE)  /* tinyAVR 0/1-series */
     #if defined(PORTMUX_TWI0_bm)  // Has a pin multiplexer
-      if (true == (PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
+      if (PORTMUX.CTRLB & PORTMUX_TWI0_bm) {
         return ((VPORTA.IN & 0x06) >> 1);
       } else {
         return (VPORTB.IN & 0x03);
