@@ -365,4 +365,157 @@ bool TWI0_swap(uint8_t state) {
     }
   #endif
   return false;
-#endif
+}
+
+
+void TWI0_usePullups() {
+  // make sure we don't get errata'ed: Clear the pins
+  // and then turn on the pullups.
+  #if defined(PORTMUX_TWIROUTEA) // Dx or Ex-series
+    uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm;
+    PORT_t *port;
+    // PORTA and PORTC are present on all parts with a TWIROUTEA register
+    if(portmux == PORTMUX_TWI0_ALT2_gc) {
+      port = &PORTC;
+    } else {
+      port = &PORTA;
+    }
+    #if !defined(__AVR_DA__) && !defined(__AVR_DB__) //DD and EA, and presumably later parts, have an extra mux option.
+      if (portmux == 3) {
+        port->OUTCLR    = 0x03;  // bits 0 and 1
+        port->PIN0CTRL |= PORT_PULLUPEN_bm;
+        port->PIN1CTRL |= PORT_PULLUPEN_bm;
+      } else
+    #endif
+    {
+      port->OUTCLR    = 0x0C;  // bits 2 and 3
+      port->PIN2CTRL |= PORT_PULLUPEN_bm;
+      port->PIN3CTRL |= PORT_PULLUPEN_bm;
+    }
+    #if defined(TWI0_DUALCTRL)   //Also handle slave pins, if enabled
+      if (TWI0.DUALCTRL & TWI_ENABLE_bm) {
+        #if !(defined(__AVR_DA__) || defined(__AVR_DB__))
+          if (portmux == PORTMUX_TWI0_DEFAULT_gc ||
+              portmux == PORTMUX_TWI0_ALT3_gc) {
+            PORTC.OUTCLR    = 0x0C;
+            PORTC.PIN2CTRL |= PORT_PULLUPEN_bm;
+            PORTC.PIN3CTRL |= PORT_PULLUPEN_bm;
+          }
+        #else
+          if (portmux == PORTMUX_TWI0_DEFAULT_gc) {
+            PORTC.OUTCLR    = 0x0C;  // bits 2 and 3
+            PORTC.PIN2CTRL |= PORT_PULLUPEN_bm;
+            PORTC.PIN3CTRL |= PORT_PULLUPEN_bm;
+          } else {
+            PORTC.OUTCLR    = 0xC0;  // bits 6 and 7
+            PORTC.PIN6CTRL |= PORT_PULLUPEN_bm;
+            PORTC.PIN7CTRL |= PORT_PULLUPEN_bm;
+          }
+        #endif
+      }
+    #endif
+  #elif defined(PORTMUX_TWISPIROUTEA) // megaAVR 0-series
+    uint8_t portmux = PORTMUX.TWISPIROUTEA & PORTMUX_TWI0_gm;
+    PORT_t *port;
+    // Note that all megaAVR 0-series parts have a PORTA, PORTC and PORTF!
+    if(portmux == PORTMUX_TWI0_ALT2_gc) {
+      port = &PORTC;
+    } else {
+      port = &PORTA;
+    }
+    port->OUTCLR    = 0x0C;  // bits 2 and 3
+    port->PIN2CTRL |= PORT_PULLUPEN_bm;
+    port->PIN3CTRL |= PORT_PULLUPEN_bm;
+    #if defined(TWI0_DUALCTRL)   //Also handle slave pins, if enabled
+      if (TWI0.DUALCTRL & TWI_ENABLE_bm) {
+        if (portmux == PORTMUX_TWI0_DEFAULT_gc) {
+          port = &PORTC;
+        } else {
+          port = &PORTF;
+        }
+        port->OUTCLR    = 0x0C;  // bits 2 and 3
+        port->PIN2CTRL |= PORT_PULLUPEN_bm;
+        port->PIN3CTRL |= PORT_PULLUPEN_bm;
+      }
+    #endif
+  #elif defined(MEGATINYCORE) && MEGATINYCORE_SERIES != 2  /* tinyAVR 0/1-series */
+    #if defined(PORTMUX_TWI0_bm) // 1-series with remappable TWI
+      if (true == (PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
+        PORTA.OUTCLR    = 0x06;
+        PORTA.PIN2CTRL |= PORT_PULLUPEN_bm;
+        PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
+      } else {
+        PORTB.OUTCLR    = 0x03;  // bits 1 and 0.
+        PORTB.PIN1CTRL |= PORT_PULLUPEN_bm;
+        PORTB.PIN0CTRL |= PORT_PULLUPEN_bm;
+      }
+    #elif defined(__AVR_ATtinyxy2__) // 8-pin 0/1-series part
+      PORTA.OUTCLR    = 0x06;  // bits 2 and 1.
+      PORTA.PIN2CTRL |= PORT_PULLUPEN_bm;
+      PORTA.PIN1CTRL |= PORT_PULLUPEN_bm;
+    #else // 0-series or 2-series part with no remapping options
+      PORTB.OUTCLR    = 0x03;  // bits 1 and 0.
+      PORTB.PIN1CTRL |= PORT_PULLUPEN_bm;
+      PORTB.PIN0CTRL |= PORT_PULLUPEN_bm;
+    #endif
+  #endif
+}
+
+//Check if TWI0 Master pins have a HIGH level: Bit0 = SDA, Bit 1 = SCL
+uint8_t TWI0_checkPinLevel(void) {
+  #if defined(PORTMUX_TWIROUTEA)     /* Dx-series */
+    uint8_t portmux = (PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm);
+    VPORT_t *vport;
+    if (portmux == PORTMUX_TWI0_ALT2_gc) {
+      vport = &VPORTC;
+    } else {
+      vport = &VPORTA;
+    }
+
+    #if !defined(__AVR_DA__) && !defined(__AVR_DB__) //DD and EA, and presumably later parts, have an extra mux option.
+      if (portmux == 3) {
+        return (vport->IN & 0x03);
+      } else
+    #endif
+    {
+      return ((vport->IN & 0x0C) >> 2);
+    }
+  #elif defined(PORTMUX_TWISPIROUTEA)
+    uint8_t portmux = (PORTMUX.TWISPIROUTEA & PORTMUX_TWI0_gm);
+    VPORT_t *vport;
+    if (portmux == PORTMUX_TWI0_ALT2_gc) {
+      vport = &VPORTC;
+    } else {
+      vport = &VPORTA;
+    }
+    return ((vport->IN & 0x0C) >> 2);
+  #elif defined(MEGATINYCORE)  /* tinyAVR 0/1-series */
+    #if defined(PORTMUX_TWI0_bm)  // Has a pin multiplexer
+      if (true == (PORTMUX.CTRLB & PORTMUX_TWI0_bm)) {
+        return ((VPORTA.IN & 0x06) >> 1);
+      } else {
+        return (VPORTB.IN & 0x03);
+      }
+    #elif defined(__AVR_ATtinyxy2__)  // No PORTMUX for 8-pin parts, they always use PA1/2
+      return ((VPORTA.IN & 0x06) >> 1);
+    #else //it uses PB0/1
+      return (VPORTB.IN & 0x03);
+    #endif
+  #else
+    #error "Only modern AVR parts are supported by this version of Wire: tinyAVR 0/1/2-series, megaAVR 0-series, AVR Dx-series or AVR Ex-series."
+    return 0;
+  #endif
+}
+
+
+uint8_t TWI0_setConfig(bool longsetup, uint8_t sda_hold) {
+  uint8_t cfg = TWI0.CTRLA & 0x03;
+  if (longsetup) {
+    cfg |= 0x10;
+  }
+  cfg |= sda_hold;
+  TWI0.CTRLA = cfg;
+  return 0; // return success - all other errors are checked for before this is called.
+}
+
+#endif /* TWI_PINS_H */
