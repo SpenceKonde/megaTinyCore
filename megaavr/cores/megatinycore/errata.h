@@ -174,9 +174,9 @@
   #define ERRATA_TCB_ICFPWM             (0)
   #define ERRATA_TCA_RESTART            (0)
   #define ERRATA_TCB_SYNCUPD            (0)
-  #define ERRATA_TCB_PULSELEN           (0)
-  #define ERRATA_TCD_ASYNC_COUNTPSC     (0)
-  #define ERRATA_TCD_HALTANDRESTART     (0)
+  #define ERRATA_TCB_PULSELEN           (0) /* No TCD */
+  #define ERRATA_TCD_ASYNC_COUNTPSC     (0) /* No TCD */
+  #define ERRATA_TCD_HALTANDRESTART     (0) /* No TCD */
   #define ERRATA_TWI_PINS               (0) /* Not in any errata? Huh? */
   #define ERRATA_TWI_FLUSH              (0) /* Flush bug hasn't showed up on any 2-series errata */
   #if _AVR_FLASH == 32
@@ -208,6 +208,13 @@
 #endif
 
 inline bool __attribute__((always_inline)) checkErrata(int8_t errata) {
+/* We want
+  errata = 0, return 0/false.
+  errata = -1, return 1/true.
+  errata =
+
+*/
+
   if (!(errata & 0x7F)) { // 0 or(-128)
     return 0;
   }

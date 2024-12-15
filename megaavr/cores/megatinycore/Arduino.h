@@ -25,6 +25,9 @@
 #include "dirty_tricks.h"
 #include "api/ArduinoAPI.h"
 #include "UART_constants.h"
+
+#define CLOCK_TUNE_START (USER_SIGNATURES_SIZE - 12)
+
 #include "core_devices.h"
 /* Gives names to all the timer pins - relies on core_devices.h being included first.*/
 /* These names look like:
@@ -317,20 +320,7 @@ void initVariant();
 void takeOverTCA0();
 void takeOverTCD0();
 
-// millis() timer control
-void stop_millis();                   // Disable the interrupt and stop counting millis.
-void restart_millis();                // Reinitialize the timer and start counting millis again
-void set_millis(uint32_t newmillis);  // set current millis time.
-/* Expected usage:
- * uint32_t oldmillis=millis();
- * stop_millis();
- * user_code_that_messes with timer
- * set_millis(oldmillis+estimated_time_spent_above)
- * restart millis();
- */
-void nudge_millis(__attribute__((unused)) uint16_t nudgesize);
-/* see also:
- */
+
 
 
 /* inlining of a call to delayMicroseconds() would throw it off */
@@ -351,11 +341,6 @@ void stop_millis();                          // stop the timer being used for mi
 void restart_millis();                       // After having stopped millis either for sleep or to use timer for something else and optionally have set it to correct for passage of time, call this to restart it.
 void set_millis(uint32_t newmillis);         // Sets the millisecond timer to the specified number of milliseconds. DO NOT CALL with a number lower than the current millis count if you have any timeouts ongoing.
                                              // they may expire instantly.
-// void nudge_millis(uint16_t nudgemillis);  // Sets the millisecond timer forward by the specified number of milliseconds. Currently only implemented for TCB, TCA implementation will be added. This allows a clean
-// Not yet implemented, debating if          // way to advance the timer without needing to read the current millis yourself, and without a few other risks. (added becauise *I* needed it, but simple enough).
-// this is the right thing to implement      // The intended use case is when you know you're disabling millis for a long time, and know exactly how long that is (ex, to update neopixels), and want to nudge the timer
-                                             // forward by a given amount; I added this when in a pinch because *I* needed that functionality.
-
 // Allows for user to mark a timer "do not touch" for purposes of analogWrite and the like, so you can take over a timer and reconfigure it, and not worry about digitalWrite() flipping a CMPEN bit.
 // On megaTinyCore this also prevents the situation where PWM is remapped, but then when the user is digitalWrite'ing pins that default to having PWM, it would turn off the PWM now coming from another pin
 // This is not an issue because we fully support portmux (can't spare the flash overhead on the tinies, people already complain that the core uses too much flash)
@@ -851,7 +836,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
   #define ADC_MAXIMUM_GAIN             (16)
 #endif
 
-/* Oh and DB/DD can use inlvl to adjust trigger points. */
+/* Oh and DB and later can use inlvl to adjust trigger points. But not the tinAVRs */
 #define PORT_HAS_INLVL 0
 
 #ifdef __cplusplus

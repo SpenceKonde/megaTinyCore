@@ -365,3 +365,4 @@ bool TWI0_swap(uint8_t state) {
     }
   #endif
   return false;
+#endif
