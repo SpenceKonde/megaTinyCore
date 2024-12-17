@@ -5,11 +5,15 @@
  * See LICENSE.txt for full legal boilerplate if you must
  */
 
-/* Okay... This was getting fucking absurd.
+/* Okay... This was getting absurd. We had too many piecemeal hacks to work around shit compiler output, the poor quality of which is was apparent immediately upon
+ * examination of the assembler listings early on, in code that was everywhere, and hence which I had to stare at any time I debugged anything.
  * We (well, me and the one, maybe two other people here who speak fluent avr asm) all knew we needed unholy tricks like this.
- * We wish we didn't. But while the GCC part of avr-gcc does a pretty thorough and consistent job optimizing...
+ * We wish we didn't. But while the GCC part of avr-gcc does a pretty thorough and consistent job optimizing..
  * The AVR part is piss-poor. It's fucking awful. As I understand it, GCC from a big picture, first transforms the code into an idealized
- * version that has standins for registers, but "almost" maps to machine instructions, but is universal and this is where the bulk of the optimization happens
+ * version that has standins for registers and is architecture agnostic, but tends to correspond very very nearly with  machine instructions. Because there is
+ * a massive amount of stuff compiled with GCC and other tools built on the same foundations (they're the only game in town if aren't willing to use a proprietary
+ * one. I don't really understand the appeal of those... ) considerable effort has been directed towards improvement, in
+ * order to improve efficiency of high profile computing applications
  * This happens in many passes to perform optimization that isn't machine specific (and hence have gotten resources lavished on them by everyone).
  * Then, it has to go from that ideal world to reality, and start naming instructions and assigning registers. This is machine specific.
  * And it is here that AVR hasn't gotten much love. The result is sometimes what might be termed pathological assembly (as in, it is indicative disease).
@@ -44,15 +48,16 @@
  *
  * With this update, we are centralizing and documenting all the dirty assembler tricks.
  *
- * I know that lowercase names and macros are sinful. Yes these are macros. Except for the classics (and we have appropriate duplicated of those), they are now lowercase.
+ * I know that mixing lowercase names and macros is sinful. Yes these are macros. Except for the classics (and we have appropriate duplicated of those), they are now lowercase.
  * I know macros are supposed to be all uppercase. But we're prefixing them with an underscore, so you still know there's spooky shit involved, it's just
  * too unpleasant to type and too ugly to read to have all these longass macro names, making a mess of all our core "speed matters" code - and besides that,
- * while macros generally don't care what types they get passed, these totally will cast the arguments to specific types like functions do. Except more permissively -
- * that's an explicit cast, which will eat things that functions won't implicitly cast), but without actually changing the type of anything :-P
+ * while macros generally don't care what types they get passed, these totally will cast the arguments to specific types like functions do (actually, significantly more vigorously)
  *
  * General Advice:
  * Don't use any of the wacky ones unless you know what the fuck you're doing. This is largely for internal use within the core, because we do, and we know that
- * lots of people who dont and couldn't reproduce this performance enhancement themself if they needed it use the core. So where there's a high impact
+ * lots of people don't know nor want to know asm (even normal, polite asm, which this often isn't), and thus couldn't reproduce this performance enhancement
+ * if they needed or wanted it, and that describes most people who use the core. Essentially, I feel that when I see a way to silently make the core perform better, even if it looks
+ * heinous, do it, because if you don't, nobody else will, and surely someomne out there needs a bit more performance right?
  * bit of code - either repeated a lot, and/or in a time-critical section of code that benefits from doing unholy things like this, we're going to do it to make
  * the core better.
  *
@@ -80,6 +85,7 @@
  *
  * And now all the hideously dirty ones:
  * In all cases, pointer-like 16-bit values should be a local variable, either a pointer or uint16_t.
+ *   These "tricks" allow us to
  *        _addLow(uint16_t a,       uint8_t b)
  *        _subLow(uint16_t a,       uint8_t b)
  *       _addHigh(uint16_t a,       uint8_t b)
@@ -137,12 +143,7 @@ Not enabled. Ugly ways to get delays at very small flash cost.
   // Really, these are things you shoudnt do unless you have your back against the flash/RAM limits and a gun to your head.
   #endif
 */
-#ifndef _NOP14
-  #define _NOP14()  __asm__ __volatile__ ("rjmp .+2"  "\n\t"   /* same idea as above. */ \
-                                          "ret"       "\n\t"   /* Except now it's no longer able to beat the loop if it has a free register. */ \
-                                          "rcall .-4" "\n\t"   /* so this is unlikely to be better, ever. */ \
-                                          "rcall .-6" "\n\t" )
-#endif
+
 
 /* Beyond this, just use a loop.
  * If you don't need submicrosecond accuracy, just use delayMicroseconds(), which uses very similar methods. See Ref_Timers
@@ -190,6 +191,20 @@ Not enabled. Ugly ways to get delays at very small flash cost.
 /*********************/
 /* Low and high Math */
 /*********************/
+/* These are dirty, ugly hacky things. What is the point of them? They save a single clock each when used at a point where they are relevant and correct.
+   By prohibiting the crossing of a 256b barier (the high versions are less useful I daresay...), you save a clock cycle. Note that wraparound behavior is predictable
+
+   A big part of this was just how often the stock code was doing this, over and over and over:
+   adiw r26, 10
+   ld X, rwhatever
+   sbiw r26, 10
+   adiw r26, 12
+   ld X, rsomeother
+   sbit r26, 12
+   ADIW and SBIW are both 2 clock instructions, and a load is 2, so that's 6 clocks; you can do it in 3n+1 instead of 6n clocks as long as they're in the same block of 256 addresses, which is often guaranteed.
+   Other times you may be subtracting values that are mathematically certain to never result in an over or underflow
+*/
+
 #define       _addLow(a,b) __asm__ __volatile__ ("add  %0A, %1"  "\n\t" :"+r"((uint16_t)(a)):"r"((uint8_t) b))
 #define       _subLow(a,b) __asm__ __volatile__ ("sub  %0A, %1"  "\n\t" :"+r"((uint16_t)(a)):"r"((uint8_t) b))
 #define      _addHigh(a,b) __asm__ __volatile__ ("add  %0B, %1"  "\n\t" :"+r"((uint16_t)(a)):"r"((uint8_t) b))
@@ -320,7 +335,8 @@ Not enabled. Ugly ways to get delays at very small flash cost.
  * SK: I've totally been desperate enough on a 16k part that I was replacing double-quoted strings 1 character long with single quoted characters
  * in order to get rid of the space the null took up and pulling strings from progmem to RAM because that saved a word vs printing it with F() macro
  * (it was a classic AVR, no memory mapped flash). I was told 500 of them were getting programmed the next day and we needed a feature added. One that I suspected
- * weeks ago would be needed, but they'd finally realized it the evening before D-day at around 9pm with a few hundred byes of flash left. Good times!
+ * weeks ago would be needed, but they'd finally realized it the evening before D-day at around 9pm with a few hundred byes of flash left. Good times! Would have been cake if I knew ASM then
+ * since then I could optimize the code.
  *
  * _makeFastPtr() should be used when you are only reading from that one address, or consecutive addresses starting there (eg, *ptr++ or *--ptr),
  *  so it can use the X, Y or Z register.
