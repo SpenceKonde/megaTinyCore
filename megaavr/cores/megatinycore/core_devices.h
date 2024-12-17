@@ -282,6 +282,7 @@
   #define __AVR_TINY_2__
 #endif
 
+/* FOLLOWING THIS, SHARED WITH DxCoRE DIRECTLY */
 #if defined(AC2)
   #define _AVR_AC_COUNT      (3)
 #elif defined(AC1)
@@ -585,6 +586,10 @@
   #endif
 #endif
 
+
+/* End block shared with DxCore */
+
+
 // Notice NUM_TOTAL_PORTS should always be 1, 2, 3, 6 or 7 - it is the number of the highest port plus 1.
 // The tinyAVRs have either just PORTA, PORTA and PORTB, or ports A, B, and C - 1, 2, or 3 ports.
 // The Dx and Ex parts,however, even on the 14-pin version, have representatives from ports A, C, D, and F.
@@ -600,32 +605,27 @@
  */
 // bits are 0bRRRPPPPE - Reserved x3, prescale x4, prescale enable - nothing we need to preserve!
 
-#define  _setPrescale1x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (0)))
-#define  _setPrescale2x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_2X_gc | CLKCTRL_PEN_bm))) /* 0x01 */
-#define  _setPrescale4x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_4X_gc | CLKCTRL_PEN_bm))) /* 0x03 */
-#define  _setPrescale8x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_8X_gc | CLKCTRL_PEN_bm))) /* 0x05 */
-#define _setPrescale16x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_16X_gc | CLKCTRL_PEN_bm))) /* 0x07 */
-#define _setPrescale32x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_32X_gc | CLKCTRL_PEN_bm))) /* 0x09 */
-#define _setPrescale64x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_64X_gc | CLKCTRL_PEN_bm))) /* 0x0B */
-#define  _setPrescale6x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_6X_gc | CLKCTRL_PEN_bm))) /* 0x11 */
-#define _setPrescale10x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_10X_gc | CLKCTRL_PEN_bm))) /* 0x13 */
-#define _setPrescale12x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_12X_gc | CLKCTRL_PEN_bm))) /* 0x15 */
-#define _setPrescale24x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_24X_gc | CLKCTRL_PEN_bm))) /* 0x17 */
-#define _setPrescale48x()         (_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_48X_gc | CLKCTRL_PEN_bm))) /* 0x19 */
-
-/*
-uint8_t _clockprescalers[] =       {1,  2,  4,  8, 16, 32, 64,  6, 10, 12, 24, 48};
-uint8_t _clockprescalesettings[] = {0,  1,  3,  5,  7,  9,  B, 17, 19, 21, 23, 25};
-
-int8_t _setPrescale(int8_t prescale) {
-  for (x = 0x00; x < 11; x++) {
-    if (_clockprescalers[x] == prescale) {
-      _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, _clockprescalesettings[prescale]);
-      return prescale;
-    }
-  }
-  return -1; // invalid prescaler passed
-}
+#define  _setPrescale1x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (0))
+#define  _setPrescale2x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_2X_gc | CLKCTRL_PEN_bm)) /* 0x01 */
+#define  _setPrescale4x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_4X_gc | CLKCTRL_PEN_bm)) /* 0x03 */
+#define  _setPrescale8x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_8X_gc | CLKCTRL_PEN_bm)) /* 0x05 */
+#define _setPrescale16x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_16X_gc | CLKCTRL_PEN_bm)) /* 0x07 */
+#define _setPrescale32x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_32X_gc | CLKCTRL_PEN_bm)) /* 0x09 */
+#define _setPrescale64x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_64X_gc | CLKCTRL_PEN_bm)) /* 0x0B */
+#define  _setPrescale6x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, ( CLKCTRL_PDIV_6X_gc | CLKCTRL_PEN_bm)) /* 0x11 */
+#define _setPrescale10x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_10X_gc | CLKCTRL_PEN_bm)) /* 0x13 */
+#define _setPrescale12x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_12X_gc | CLKCTRL_PEN_bm)) /* 0x15 */
+#define _setPrescale24x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_24X_gc | CLKCTRL_PEN_bm)) /* 0x17 */
+#define _setPrescale48x()         _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, (CLKCTRL_PDIV_48X_gc | CLKCTRL_PEN_bm)) /* 0x19 */
+/* DANGER DANGER - NOT MEANT FOR ENDUSER APPLICATIONS. GI - GO  */
+#define     _getPrescale()        (CLKCTRL_MCLKCTRLB)
+#define _setPrescaleValue(val)    _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, val)
+/* This is Yucky. These are macros.
+Intended usage scenario:
+uint8_t oldpsc=_getPrescale();
+setPrescaler10x();
+//dostuff
+setPrescalerValue(oldpsc);
 */
 
 #if MEGATINYCORE_SERIES <= 2
@@ -717,8 +717,6 @@ int8_t _setPrescale(int8_t prescale) {
   #endif
 
 #endif
-
-#define CLOCK_TUNE_START (USER_SIGNATURES_SIZE - 12)
 
 /* Microchip has shown a tendency to rename registers bitfields and similar between product lines, even when the behavior is identical.
  * This is a major hindrance to writing highly portable code which I assume is what most people wish to do. It certainly beats having
