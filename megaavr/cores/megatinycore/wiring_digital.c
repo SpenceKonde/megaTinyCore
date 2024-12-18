@@ -121,14 +121,14 @@ void turnOffPWM(uint8_t pin)
       #if !defined(TCA_BUFFERED_3PIN)
         // uint8_t *timer_cmp_out;
         /* Bit position will give output channel */
-        #ifdef __AVR_ATtinyxy2__
+        #ifdef __AVR_ATtinyxy2__ //8 pin parts
           if (bit_mask == 0x80) {
             bit_mask = 1;         // on the xy2, WO0 is on PA7
           }
           if (bit_mask > 0x04) {  // -> bit_pos > 2 -> output channel controlled by HCMP
             bit_mask <<= 1;       // mind the gap (between LCMP and HCMP)
           }
-        #else
+        #else // Normal parts
           if (digitalPinToPort(pin) == PB) {        // WO0-WO2, Bitmask has one of these bits 1: 0b00hhhlll.
             if (bit_mask > 0x04) { // Is it one of the three high ones? If so
               bit_mask <<= 1;      // nudge it 1 place left swap nybbles since that's 1 clock faster than 3 rightshifts.
@@ -138,13 +138,17 @@ void turnOffPWM(uint8_t pin)
             // Otherwise, it's WO3-5. These will always be on 0b00hhh000,. Here since we ARE working with a high half timer, we need to just leftshift it once.
             bit_mask <<= 1;
           }
-        #endif
+        #endif // End if 8 vs normal parts
         TCA0.SPLIT.CTRLB &= ~bit_mask;
-      #else // 3-pin mode. Means we know it's on PORTB}
-        if (bit_mask > 0x04) { // Is it one of the three high ones? If so
-          bit_mask <<= 1;      // nudge it 1 place left swap nybbles since that's 1 clock faster than 3 rightshifts.
-          _SWAP(bit_mask);     // swap nybbles since that's 1 clock faster than 3 rightshifts.
+      #else // 3-pin mode. Means we know it's either in set A or B: 0b0AAAxBBB We get 0x00ABC
+        if(bit_mask & 0b00111000) {
+          bit_mask <<= 1; // 0b01110000
+        } else {
+          //bit_maslk <<= 3;  same result, but in 3 clocks 3 words instead of 1 and 1!
+
+          _SWAP(bit_mask); // 0b0111000
         }
+        TCA0.SINGLE.CTRLB &= ~bit_mask;
       #endif
       break;
     }

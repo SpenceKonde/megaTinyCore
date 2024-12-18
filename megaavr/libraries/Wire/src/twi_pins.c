@@ -508,14 +508,241 @@ uint8_t TWI0_checkPinLevel(void) {
 }
 
 
-uint8_t TWI0_setConfig(bool longsetup, uint8_t sda_hold) {
-  uint8_t cfg = TWI0.CTRLA & 0x03;
+#if defined(TWI0_DUALCTRL) // full version for parts with dual mode and likely input level too
+  uint8_t TWI0_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smbuslvl_dual, uint8_t sda_hold_dual) {
+    uint8_t cfg = TWI0.CTRLA & 0x03;
+    sda_hold <<= 2; // get these into the right place in the byte
+
+    if (smbuslvl) {
+      cfg |= 0x40;
+    }
+    if (longsetup) {
+      cfg |= 0x10;
+    }
+    cfg |= sda_hold;
+    TWI0.CTRLA = cfg;
+    #if defined(TWI0_DUALCTRL)
+      sda_hold_dual <<= 2;
+      uint8_t cfg_dual = TWI0.DUALCTRL & 0x03;
+      if (cfg_dual & 1) {
+        cfg_dual |= sda_hold_dual;
+        if (smbuslvl_dual) {
+          cfg_dual |= 0x40;
+        }
+        TWI0.DUALCTRL = cfg_dual;
+      } else if (sda_hold_dual || smbuslvl_dual) {
+        return 0x04; // dual mode exists on this part, but is not enabled. This signifies a failure to follow documented startup order
+      }
+     #endif
+     return 0; // return success - all other errors are checked for before this is called.
+  }
+#else // very little to do here on tiny, do save flash with a smaller implementation.
+  uint8_t TWI0_setConfig(bool longsetup, uint8_t sda_hold) {
+    uint8_t cfg = TWI0.CTRLA & 0x03;
+    if (longsetup) {
+      cfg |= 0x10;
+    }
+    cfg |= sda_hold;
+    TWI0.CTRLA = cfg;
+    return 0; // return success - all other errors are checked for before this is called.
+  }
+#endif
+
+
+#if defined(TWI1)
+void TWI1_ClearPins() {
+  #if defined(PIN_WIRE1_SDA_PINSWAP_2) || defined(TWI1_DUALCTRL)
+    uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm;
+  #endif
+  #if defined(PIN_WIRE1_SDA_PINSWAP_2)
+    if (portmux == PORTMUX_TWI1_ALT2_gc) {  // make sure we don't get errata'ed
+      #if defined(PORTB)
+        PORTB.OUTCLR = 0x0C;  // bits 2 and 3
+      #endif
+    } else
+  #endif
+  {
+    PORTF.OUTCLR = 0x0C;  // bits 2 and 3
+  }
+  #if defined(TWI1_DUALCTRL)
+    #if defined(PORTB)
+      if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
+        if (portmux == PORTMUX_TWI1_DEFAULT_gc) {
+          PORTB.OUTCLR = 0x0C;  // bits 2 and 3
+        } else {
+          PORTB.OUTCLR = 0xC0;  // bits 6 and 7
+        }
+      }
+    #endif
+  #endif
+  (void) portmux; //this is grabbed early, but depending on which part and hence what is conditionally compiled, may not go into the code. It will produce spurious warnings without this line
+}
+
+
+bool TWI1_Pins(uint8_t sda_pin, uint8_t scl_pin) {
+  #if (defined(PIN_WIRE1_SDA_PINSWAP_1) || defined(PIN_WIRE1_SDA_PINSWAP_2))
+    // Danger: 'portmux' in this context means all the other settings in portmux, since we're replacing the PORTMUX setting for TWI1, and will bitwise-or with the _gc constants.
+    // Elsewhere, 'portmux' refers to the setting for this peripheral only, and we compare it to PORTMUX_TWI1_xxx_gc
+    uint8_t portmux = PORTMUX.TWIROUTEA & ~PORTMUX_TWI1_gm;
+    #if defined(PIN_WIRE1_SDA_PINSWAP_2)
+      if (sda_pin == PIN_WIRE1_SDA_PINSWAP_2 && scl_pin == PIN_WIRE1_SCL_PINSWAP_2) {
+        // Use pin swap
+        PORTMUX.TWIROUTEA = portmux | PORTMUX_TWI1_ALT2_gc;
+        return true;
+      } else
+    #endif
+    #if defined(PIN_WIRE1_SDA_PINSWAP_1)
+      if (sda_pin == PIN_WIRE1_SDA_PINSWAP_1 && scl_pin == PIN_WIRE1_SCL_PINSWAP_1) {
+        PORTMUX.TWIROUTEA = portmux | PORTMUX_TWI1_ALT1_gc;
+        return true;
+      } else
+    #endif
+    #if defined(PIN_WIRE1_SDA)
+      if (sda_pin == PIN_WIRE1_SDA && scl_pin == PIN_WIRE1_SCL) {
+        // Use default configuration
+        PORTMUX.TWIROUTEA = portmux;
+        return true;
+      } else {
+        // Assume default configuration
+        PORTMUX.TWIROUTEA = portmux;
+        return false;
+      }
+    #endif
+  #else  // No TWI1 pin options - why call this?
+    if (__builtin_constant_p(sda_pin) && __builtin_constant_p(scl_pin)) {
+      /* constant case - error if there's no swap and the swap attempt is known at compile time */
+      if (sda_pin != PIN_WIRE1_SDA || scl_pin != PIN_WIRE1_SCL) {
+        badCall("This part does not support alternate Wire1 pins, if Wire1.pins() is called, it must be passed the default pins");
+        return false;
+      } else {
+        return true;
+      }
+    } else { /* Non-constant case */
+      return (sda_pin == PIN_WIRE1_SDA && scl_pin == PIN_WIRE1_SCL);
+    }
+  #endif
+  return false;
+}
+
+
+
+bool TWI1_swap(uint8_t state) {
+  // Danger: 'portmux' in this context means all the other settings in portmux, since we're replacing the PORTMUX setting for TWI1, and will bitwise-or with the _gc constants.
+  // Elsewhere, 'portmux' refers to the setting for this peripheral only, and we compare it to PORTMUX_TWI1_xxx_gc
+  uint8_t portmux = PORTMUX.TWIROUTEA & (~PORTMUX_TWI1_gm);
+  #if defined(PIN_WIRE1_SDA_PINSWAP_2)
+    if (state == 2) {
+      // Use pin swap
+      PORTMUX.TWIROUTEA = portmux | PORTMUX_TWI1_ALT2_gc;
+      return true;
+    } else
+  #endif
+  #if defined(PIN_WIRE1_SDA_PINSWAP_1)
+    if (state == 1) {
+      // Use pin swap
+      PORTMUX.TWIROUTEA = portmux | PORTMUX_TWI1_ALT1_gc;
+      return true;
+    } else
+  #endif
+  #if defined(PIN_WIRE1_SDA)
+    if (state == 0) {
+      // Use default configuration
+      PORTMUX.TWIROUTEA = portmux;
+      return true;
+    } else {
+      // Assume default configuration
+      PORTMUX.TWIROUTEA = portmux;
+      return false;
+    }
+  #else
+    {
+      // Assume default configuration
+      PORTMUX.TWIROUTEA = portmux | PORTMUX_TWI1_ALT2_gc;
+      return false;
+    }
+  #endif
+  return false;
+}
+
+
+void TWI1_usePullups() {
+  #if defined(PIN_WIRE1_SDA_PINSWAP_2) || defined(TWI1_DUALCTRL)
+    uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm;
+  #endif
+  PORT_t *port;
+  #if defined(PORTB) //All parts with a TWI1 have a PORTF
+    if (portmux == PORTMUX_TWI1_ALT2_gc) {
+      port = &PORTB;
+    } else {
+      port = &PORTF;
+    }
+  #else
+    port = &PORTF;
+  #endif
+
+  port->OUTCLR = 0x0C;  // bits 2 and 3
+  port->PIN2CTRL |= PORT_PULLUPEN_bm;
+  port->PIN3CTRL |= PORT_PULLUPEN_bm;
+
+  #if defined(TWI0_DUALCTRL) && defined(PORTB)
+    if (TWI1.DUALCTRL & TWI_ENABLE_bm) {
+      if (portmux == PORTMUX_TWI1_DEFAULT_gc) {
+        PORTB.OUTCLR = 0x0C;  // bits 2 and 3
+        PORTB.PIN2CTRL |= PORT_PULLUPEN_bm;
+        PORTB.PIN3CTRL |= PORT_PULLUPEN_bm;
+      } else {
+        PORTB.OUTCLR = 0xC0;  // bits 6 and 7
+        PORTB.PIN6CTRL |= PORT_PULLUPEN_bm;
+        PORTB.PIN7CTRL |= PORT_PULLUPEN_bm;
+      }
+    }
+  #endif
+  (void) portmux; //this is grabbed early, but depending on which part and hence what is conditionally compiled, may not go into the code. It will produce spurious warnings without this line
+}
+
+//Check if TWI1 Master pins have a HIGH level: Bit0 = SDA, Bit 1 = SCL
+uint8_t TWI1_checkPinLevel(void) {
+  // we do it this way because when accessed using a pointer, it's no longer any faster to use VPORTx
+  #if defined(PORTB) //All parts with a TWI1 have a PORTF
+    uint8_t portmux = PORTMUX.TWIROUTEA & PORTMUX_TWI1_gm;
+    if (portmux == PORTMUX_TWI1_ALT2_gc) {
+      return ((VPORTB.IN & 0x0C) >> 2);
+    } else {
+      return ((VPORTF.IN & 0x0C) >> 2);
+    }
+  #else
+    return ((VPORTF.IN & 0x0C) >> 2);
+  #endif
+}
+
+// All devices with TWI1 have dual mode and the most have the smbus levels; the exceptions are caught before this is called
+uint8_t TWI1_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smbuslvl_dual, uint8_t sda_hold_dual) {
+  uint8_t cfg = TWI1.CTRLA & 0x03;
+  if (smbuslvl) {
+    cfg |= 0x40;
+  }
   if (longsetup) {
     cfg |= 0x10;
   }
   cfg |= sda_hold;
-  TWI0.CTRLA = cfg;
-  return 0; // return success - all other errors are checked for before this is called.
+  TWI1.CTRLA = cfg;
+  #if defined(TWI1_DUALCTRL)
+    uint8_t cfg_dual = TWI1.DUALCTRL & 0x03;
+    if (cfg_dual & 1) {
+      cfg_dual |= sda_hold_dual;
+      if (smbuslvl_dual) {
+        cfg_dual = 0x40;
+      }
+      TWI1.DUALCTRL = cfg_dual;
+    } else if (sda_hold_dual || smbuslvl_dual) {
+      return 0x04;
+    }
+  #endif
+  return 0;
 }
 
-#endif /* TWI_PINS_H */
+
+
+#endif  /* defined(TWI1) */
+
+#endif /* TWI_PINS_H *
