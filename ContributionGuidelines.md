@@ -205,10 +205,26 @@ uint8_t myfunc(uint8_t a, uint8_t b) {
 
 9. Really really ugly #ifdef hell is undesirable. yet often we have no choice; Alternate indentation schemes may be appropriate for this. See event.h for one such example.
 
+
 ## Things to be aware of when writing PR's
 
 ### Help us prevent bad code from getting merged
 Do not submit pull requests containing bad code.
+
+
+### Do not introduce abominations to the codebase!
+There exist abominations spawned in the very depths of Hell! Surprising nobody whose been in the technology field, many of these hellspawned abomainations are - in fact - digital (this makes them much easier to spawn, ya see, so there are way more). They often take the form of severely pathological code which taints all that it touches, turning honorable men into lechers, good parents into deadbeats and drunks. It causes toxic mold to grow in vents, and man-eating tigers to emerge from closets. These abombinations are not under any circumstance be introduced into the codebase. This list will be added to as more tiger attacks upon deadbeat, drunken parents with toxic mold in their HVAC systems are reported. 
+
+#### `if(true == (SOME_REG & SOME_FEATURE_bm)`
+**THIS ONLY WORKS IF SOME_FEATURE_bm = 0x01**
+
+Imagine if register holds 0x10, and SOME_FEATURE_bm is 0x10. So that becomes
+
+`if (true == 0x10)`
+
+Obviously the author was imagining the comparioson happening as a boolean - 0x10 evaluates to true when we need a boolean, so true == true great right? Except that C has type *promotion*, not *demotion*. The bool gets promoted to the same size data type (here a byte), takes the value 1. 0x01 != 0x10, so the if statement will never run
+
+But it looks like it works as long as the bitwise and is non-zero. There's no reason to do this, it's harder to read and it's usually a bug.
 
 ### Avoid common mistakes
 * macro definitions must have parentheses around the value they will take.
@@ -224,13 +240,18 @@ Particularly within the core API, performance matters. That means that things li
 |----------------|---------|----------|----------|----------|-------|
 | Addition       |       5 |       14 |       20 |       54 |   116 |
 | Multiplication |       8 |       22 |       81 |      371 |   141 |
-| Division       |     233 |      235 |      604 |     1734 |   479 |
+| Division (avg) |     233 |      235 |      604 |     1734 |   479 |
+
+Seriously, those are not typos or mistakes on the division line (and the time is non-constant). Addition of two 8-bit values takes 5 clocks, their multiplication 8, and their division, on average, 233. Clearly somethings being promoted to 16-bity, but even there the numbers are 14, 22, and 235. Large binary size and slow execution are closely correllated, so avoiding doing bad kinds of math will help both.
 
 The obscenely slow division of 32-bit datatypes is why micros has all that ugly assembly in it - division was way too slow. So we used a combination of bitshifts and addition, and used tricks to minimize the size of the operands at all times. But the compiler rendered it as an incredibly inefficient mess. (a + (a >> 1) + (a >> 2)) was rendered as (copy a to a temp register. Then copy it again, rightshift that once, add to temp register. Copy the original, replacing that singly rightshifted version. Rightshift twice, and add). Instead of simply rightshifting the intermediate value another place and repeating the addition.
 
 If you have to use this "ersatz division", there are two things to remember. First, a - (a >> 2) - (a >> 3) is almost the same as a - (a >> 1) + (a >> 2) - (a >> 3). Except that integer math and rounding can bite us in the arse here. For maximum accuracy, organize the terms so that when the terms are in order from largest to smallest, the sign alternates. In the above example the second case is more accurate, assuming the theoretical goal is to find `0.625*a`, though it is slower. But wait - you can then perform the same substitution in reverse on the second version, yielding a better one: a - (a >> 1) + (a >> 3), however trying to improve the performance of that by turning it into (a >> 1) + (a >> 3) will lower accuracy, because you have two positive terms in succession (if you imagine an implicit `0 +` in front of those, this may make more sense)  You will of course want to balance the cost of adding more terms against the required accuracy.
 
 Sometimes codesize and performance are in opposition. How do you know which is more important? A good rule of thumb is that if the overhead is introduced only when people use the specific feature, which is not a feature that is so widely used in libraries and sketches in the wild that it will impact most code anyway, sacrificing size for speed is relatively more acceptable. The only people who will get the overhead are those using the feature that you've added or made better in some other way. If the overhead is imposed on everyone (because it's located in initialization code, or in something so widely used that it might as well be) code size becomes much more important. Seriously, people have made angry issues over 20 bytes, and others have complained about the overhead of the core itself, citing how large bare minimum was, comparing it to an empty C program compiled with microchip studio and declaring that the whole core was garbage because look how much flash it throws away to do nothing. Of course it doesn't do nothing - even bare minimum is doing a bunch of stuff - setting up the ADC so analogRead works setting up the timers so analogWrite works, initializing tables so that pin numbers can be used `*`, catching dirty resets to prevent erratic and unpredictable misbehavior if you smash the stack or trigger an ISR that doesn't exist, and making the CPU run at the speed you asked for, and (if not disabled), setting up millis timekeeping). My point is that people, particularly on the 8-pin tinyAVRs which come only in 2 and 4k versions, will scream bloody murder about small increases in globally applicable overhead, so that must be avoided
+
+#### Floating and Sinking
+Floats should be used when necessary and appropriate. Under no othercircumstances is their use to be even considererd. **right now none of the float-bloat gets carried in unless people use functions that pull in the float bloat. Float bloat should not be forced on users**
 
 ### Constants in PROGMEM and different cores
 Code is constantly ported between DxCore and megaTinyCore. You need to be aware of one particularly important difference between parts with 32k of flash or less and those with more. With 32k of flash or less, all flash is mapped, and you do not have to (and should not) use the PROGMEM keyword for a table of constants which you want to stay in flash - the compiler will automatically know to leave the table in flash, and it can be accessed normally. But when the flash is larger, the compiler cannot do that, because only one section of the flash (defaulting to the highest one) is mapped at any given time, and that can be changed (though it rarely is). There are three ways to deal with this:
