@@ -1,11 +1,11 @@
 /*
- * Refer to ptc_touch.h file for copyright, changelog, usage and license information
+ * Refer to ptc.h file for copyright, changelog, usage and license information
  */
 
 
 #pragma once
-#ifndef PTC_TOUCH_TYPES_H
-#define PTC_TOUCH_TYPES_H
+#ifndef PTC_TYPES_H
+#define PTC_TYPES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,65 +14,51 @@ extern "C" {
 #include <avr/io.h>
 
 #if (defined(__AVR_ATtiny814__) || defined(__AVR_ATtiny1614__) || defined(__AVR_ATtiny3214__))
-  typedef uint8_t  ptc_id_t;
-  typedef uint8_t ptc_ch_bm_t;
-  #define __PTC_Tiny__
-  #define __PTC_Pincount__ 6
+typedef uint8_t  ptc_id_t;
+typedef uint8_t  ptc_ch_bm_t;
+typedef uint8_t  ptc_ch_arr_t[1];
+#define __PTC_Tiny__
+#define __PTC_Pincount__ 6
 #elif (defined(__AVR_ATtiny816__) || defined(__AVR_ATtiny1616__) || defined(__AVR_ATtiny3216__))
-  typedef uint8_t  ptc_id_t;
-  typedef uint16_t ptc_ch_bm_t;
-  #define __PTC_Tiny__
-  #define __PTC_Pincount__ 12
+typedef uint8_t  ptc_id_t;
+typedef uint16_t ptc_ch_bm_t;
+typedef uint16_t ptc_ch_arr_t[1];
+#define __PTC_Tiny__
+#define __PTC_Pincount__ 12
 #elif (defined(__AVR_ATtiny817__) || defined(__AVR_ATtiny1617__) || defined(__AVR_ATtiny3217__))
-  typedef uint8_t  ptc_id_t;
-  typedef uint16_t ptc_ch_bm_t;
-  #define __PTC_Tiny__
-  #define __PTC_Pincount__ 14
+typedef uint8_t  ptc_id_t;
+typedef uint16_t ptc_ch_bm_t;
+typedef uint16_t ptc_ch_arr_t[1];
+#define __PTC_Tiny__
+#define __PTC_Pincount__ 14
 #elif (defined(__AVR_AVR32DA28__) || defined(__AVR_AVR64DA28__) || defined(__AVR_AVR128DA28__))
-  typedef uint16_t  ptc_id_t;
-  typedef uint64_t  ptc_ch_bm_t;
-  #define __PTC_DA__
-  #define __PTC_Pincount__ 17
+typedef uint16_t ptc_id_t;
+typedef uint64_t ptc_ch_bm_t;
+typedef uint8_t  ptc_ch_arr_t[5];
+#define __PTC_DA__
+#define __PTC_Pincount__ 18
 #elif (defined(__AVR_AVR32DA32__) || defined(__AVR_AVR64DA32__) || defined(__AVR_AVR128DA32__))
-  typedef uint16_t  ptc_id_t;
-  typedef uint64_t  ptc_ch_bm_t;
-  #define __PTC_DA__
-  #define __PTC_Pincount__ 21
+typedef uint16_t ptc_id_t;
+typedef uint64_t ptc_ch_bm_t;
+typedef uint8_t  ptc_ch_arr_t[5];
+#define __PTC_DA__
+#define __PTC_Pincount__ 22
 #elif (defined(__AVR_AVR32DA48__) || defined(__AVR_AVR64DA48__) || defined(__AVR_AVR128DA48__))
-  typedef uint16_t  ptc_id_t;
-  typedef uint64_t  ptc_ch_bm_t;
-  #define __PTC_DA__
-  #define __PTC_Pincount__ 31
+typedef uint16_t ptc_id_t;
+typedef uint64_t ptc_ch_bm_t;
+typedef uint8_t  ptc_ch_arr_t[5];
+#define __PTC_DA__
+#define __PTC_Pincount__ 32
 #elif (defined(__AVR_AVR32DA64__) || defined(__AVR_AVR64DA64__) || defined(__AVR_AVR128DA64__))
-  typedef uint16_t  ptc_id_t;
-  typedef uint64_t  ptc_ch_bm_t;
-  #define __PTC_DA__
-  #define __PTC_Pincount__ 47
+typedef uint16_t ptc_id_t;
+typedef uint64_t ptc_ch_bm_t;
+typedef uint8_t  ptc_ch_arr_t[6];
+#define __PTC_DA__
+#define __PTC_Pincount__ 46
 #else
-  #error "PTC not supported by this chip"
+#error "PTC not supported by this chip"
 #endif
 
-/**
- * PTC series resistor setting. For Mutual cap mode, this series
- * resistor is switched internally on the Y-pin. For Self cap mode,
- * the series resistor is switched internally on the Sensor pin.
- *
- * Example:
- * RSEL_VAL_0 sets internal series resistor to 0ohms.
- * RSEL_VAL_20 sets internal series resistor to 20Kohms.
- * RSEL_VAL_50 sets internal series resistor to 50Kohms.
- * RSEL_VAL_70 sets internal series resistor to 70Kohms.
- * RSEL_VAL_100 sets internal series resistor to 100Kohms.
- * RSEL_VAL_200 sets internal series resistor to 200Kohms.
- */
-typedef enum PTC_RSEL_enum {
-  RSEL_VAL_0,
-  RSEL_VAL_20,
-  RSEL_VAL_50,
-  RSEL_VAL_70,
-  RSEL_VAL_100,
-  RSEL_VAL_200
-} PTC_RSEL_t;
 
 typedef enum ptc_freq_enum {
   FREQ_SEL_0,
@@ -95,27 +81,76 @@ typedef enum ptc_freq_enum {
 } ptc_freq_t;
 
 
+#if defined (__PTC_Tiny__)
+typedef enum PTC_PRESC_enum {
+  PTC_PRESC_DIV2_gc   = (0x00 << 0), /* CLK_PER divided by 2 */
+  PTC_PRESC_DIV4_gc   = (0x01 << 0), /* CLK_PER divided by 4 */
+  PTC_PRESC_DIV8_gc   = (0x02 << 0), /* CLK_PER divided by 8 */
+  PTC_PRESC_DIV16_gc  = (0x03 << 0), /* CLK_PER divided by 16 */
+  PTC_PRESC_DIV32_gc  = (0x04 << 0), /* CLK_PER divided by 32 */
+  PTC_PRESC_DIV64_gc  = (0x05 << 0), /* CLK_PER divided by 64 */
+  PTC_PRESC_DIV128_gc = (0x06 << 0), /* CLK_PER divided by 128 */
+  PTC_PRESC_DIV256_gc = (0x07 << 0), /* CLK_PER divided by 256 */
+} ptc_presc_t;
 
-typedef enum PTC_PRESC_enum
-{
-  PTC_PRESC_DIV2_gc   = (0x00<<0),  /* CLK_PER divided by 2 */
-  PTC_PRESC_DIV4_gc   = (0x01<<0),  /* CLK_PER divided by 4 */
-  PTC_PRESC_DIV8_gc   = (0x02<<0),  /* CLK_PER divided by 8 */
-  PTC_PRESC_DIV16_gc  = (0x03<<0),  /* CLK_PER divided by 16 */
-  PTC_PRESC_DIV32_gc  = (0x04<<0),  /* CLK_PER divided by 32 */
-  PTC_PRESC_DIV64_gc  = (0x05<<0),  /* CLK_PER divided by 64 */
-  PTC_PRESC_DIV128_gc = (0x06<<0),  /* CLK_PER divided by 128 */
-  PTC_PRESC_DIV256_gc = (0x07<<0)  /* CLK_PER divided by 256 */
-} PTC_PRESC_t;
+typedef enum PTC_RSEL_enum {
+  RSEL_VAL_0,
+  RSEL_VAL_20,
+  RSEL_VAL_50,
+  RSEL_VAL_70,
+  RSEL_VAL_100,
+  RSEL_VAL_200
+} ptc_rsel_t;
 
+typedef enum ptc_gain_enum {
+  PTC_GAIN_1            = 0x00,
+  PTC_GAIN_2            = 0x23,
+  PTC_GAIN_4            = 0x34,
+  PTC_GAIN_8            = 0x3A,
+  PTC_GAIN_16           = 0x3C,
+  PTC_GAIN_32           = 0x3E,
+  PTC_GAIN_MAX          = 0x3F,
+} ptc_gain_t;
 
+#elif defined (__PTC_DA__)
+typedef enum PTC_PRESC_enum {
+  PTC_PRESC_DIV2_gc   = (0x00 << 0), /* CLK_PER divided by 2 */
+  PTC_PRESC_DIV4_gc   = (0x01 << 0), /* CLK_PER divided by 4 */
+  PTC_PRESC_DIV6_gc   = (0x02 << 0), /* CLK_PER divided by 2 */
+  PTC_PRESC_DIV8_gc   = (0x03 << 0), /* CLK_PER divided by 8 */
+  PTC_PRESC_DIV10_gc  = (0x04 << 0), /* CLK_PER divided by 8 */
+  PTC_PRESC_DIV12_gc  = (0x05 << 0), /* CLK_PER divided by 8 */
+  PTC_PRESC_DIV14_gc  = (0x06 << 0), /* CLK_PER divided by 8 */
+  PTC_PRESC_DIV16_gc  = (0x07 << 0), /* CLK_PER divided by 16 */
+} ptc_presc_t;
+
+typedef enum tag_rsel_val_t {
+  RSEL_VAL_0,
+  RSEL_VAL_20,
+  RSEL_VAL_50,
+  RSEL_VAL_70,
+  RSEL_VAL_80,
+  RSEL_VAL_100,
+  RSEL_VAL_120,
+  RSEL_VAL_200
+} ptc_rsel_t;
+
+typedef enum ptc_gain_enum {
+  PTC_GAIN_1            = 0x00,
+  PTC_GAIN_2            = 0x10,
+  PTC_GAIN_4            = 0x18,
+  PTC_GAIN_8            = 0x1C,
+  PTC_GAIN_16           = 0x1E,
+  PTC_GAIN_MAX          = 0x1F,
+} ptc_gain_t;
+#endif
 
 typedef struct ptc_node_state_type {
-  uint8_t error:1;
-  uint8_t win_comp:1;
-  uint8_t low_power:1;
-  uint8_t data_ready:1;
-  uint8_t disabled:1;
+  uint8_t error: 1;
+  uint8_t win_comp: 1;
+  uint8_t low_power: 1;
+  uint8_t data_ready: 1;
+  uint8_t disabled: 1;
 } ptc_node_state_t;
 
 
@@ -197,15 +232,15 @@ typedef enum ptc_lib_enum {
 } ptc_lib_t;
 
 typedef struct cap_sensor_type {
-  struct cap_sensor_type* nextNode;
+  struct cap_sensor_type *nextNode;
   ptc_node_type_t   type;
   ptc_id_t  id;             // number for easier identification in the callback
 
-  ptc_ch_bm_t hw_xCh_bm;
-  ptc_ch_bm_t hw_yCh_bm;
-  uint16_t hw_compCaps;      // [13:12] rough; [11:8] course; [7:4] fine; [3:0] accurate
+  ptc_ch_arr_t hw_xCh_bm;   // the code relies on this bitmaps to be together,
+  ptc_ch_arr_t hw_yCh_bm;   // do not separate them or change order.
+  uint16_t hw_compCaps;      // [13:12] rough; [11:8] course; [7:4] fine; [3:0] accurate (on Tinies only)
   uint8_t  hw_rsel_presc;    // [7:4] RSEL, [3:0] PRESC
-  uint8_t  hw_a_d_gain;      // [7:4] Analog Gain, [3:0] Digital Gain  /* PTC_AGAIN / CTRLB.SAMPNUM */
+  uint8_t  hw_gain_ovs;      // [7:4] Analog Gain, [3:0] Oversampling  /* PTC_AGAIN / CTRLB.SAMPNUM */
   uint8_t  hw_csd;           // [4:0] Charge Share Delay /* SAMPLEN in SAMPCTRL */
 
   ptc_node_state_t state;
