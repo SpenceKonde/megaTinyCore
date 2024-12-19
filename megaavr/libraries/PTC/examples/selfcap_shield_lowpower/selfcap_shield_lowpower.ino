@@ -74,8 +74,9 @@ void loop() {
     ptc_lp_init(&lp_node);  // Will set STARTEI bit to start conversions
     while (ptc_lp_was_waken() != PTC_LIB_WAS_WAKEN) {
       sleep_cpu();  // Make sure the ADC has woken the CPU, otherwise, go back to sleep
-    }               // The library does not filter the wake-up events. The user must make sure
-                    // there are no detected touches before going back to sleep.
+    }
+    // The library does not filter the wake-up events. The user must make sure
+    // there are no detected touches before going back to sleep.
     MySerial.println("I'm Awake!");
     ptc_lp_disable();
   }
@@ -113,8 +114,8 @@ void ptc_event_cb_calibration(const ptc_cb_event_t eventType, cap_sensor_t* node
 }
 
 void ptc_event_cb_wake(const ptc_cb_event_t eventType, cap_sensor_t* node) {
-   if (PTC_CB_EVENT_WAKE_TOUCH == eventType) {
-      // True if the node was touched when a wakeup occurred
+  if (PTC_CB_EVENT_WAKE_TOUCH == eventType) {
+    // True if the node was touched when a wakeup occurred
   } else if (PTC_CB_EVENT_WAKE_NO_TOUCH == eventType) {
     // True if the node was no touch when a wakeup occurred
   }
