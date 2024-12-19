@@ -479,7 +479,7 @@ void TwoWire::end(void) {
  *@return     void
  */
 void TwoWire::endMaster(void) {
-  if (true == _bools._hostEnabled) {
+  if (_bools._hostEnabled) {
     _module->MCTRLA = 0x00;
     _module->MBAUD  = 0x00;
     _bools._hostEnabled  = 0x00;
@@ -496,7 +496,7 @@ void TwoWire::endMaster(void) {
  *@return     void
  */
 void TwoWire::endSlave(void) {
-  if (true == _bools._clientEnabled) {
+  if (_bools._clientEnabled) {
     _module->SADDR       = 0x00;
     _module->SCTRLA      = 0x00;
     _module->SADDRMASK   = 0x00;

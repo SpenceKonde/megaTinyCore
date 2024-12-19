@@ -112,9 +112,9 @@
 
 
 
-#ifndef dirty_tricks_h
-#define dirty_tricks_h
-
+#ifndef DIRTY_TRICKS_H
+#define DIRTY_TRICKS_H
+;
 #ifndef _NOP
   #define _NOP()    __asm__ __volatile__ ("nop")
 #endif
