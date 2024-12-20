@@ -438,7 +438,7 @@ void TWI0_usePullups() {
         port->PIN3CTRL |= PORT_PULLUPEN_bm;
       }
     #endif
-  #elif defined(MEGATINYCORE)     /* tinyAVR 0/1-series */
+  #elif defined(MEGATINYCORE)  /* tinyAVR 0/1-series */
     #if defined(PORTMUX_TWI0_bm) // 1-series with remappable TWI
       if (PORTMUX.CTRLB & PORTMUX_TWI0_bm) {
         PORTA.OUTCLR    = 0x06;
@@ -506,7 +506,6 @@ uint8_t TWI0_checkPinLevel(void) {
     return 0;
   #endif
 }
-
 
 #if defined(TWI0_DUALCTRL) // full version for parts with dual mode and likely input level too
   uint8_t TWI0_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smbuslvl_dual, uint8_t sda_hold_dual) {
@@ -745,4 +744,4 @@ uint8_t TWI1_setConfig(bool smbuslvl, bool longsetup, uint8_t sda_hold, bool smb
 
 #endif  /* defined(TWI1) */
 
-#endif /* TWI_PINS_H *
+#endif /* TWI_PINS_H */
