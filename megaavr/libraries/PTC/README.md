@@ -1,73 +1,78 @@
-# PTC Library
-An Arduino compatible C library to support the PTC in the AtTiny 1-Series
+# ptc_touch
+An Arduino compatible C library to support the PTC in the ATtiny 1-family as well as the DA family.
 
 ## Features
-As this is library can be considered an Alpha version, things might change in the future, so nothing is set in stone yet.
 * Ready to use with minimal knowledge of the peripheral, but can still be well configured (options are similar to the "official" library)
 * Supports Mutual-cap and Self-cap (+Shield) sensing technology
-* Supports event-based triggering of conversions, as well as window-compared wake-up from Stand-by sleep
-* Can be suspended to allow the polled use of ADC0 (ADC0 ISRs are used by the library)
-* Reduced memory footprint due to CPU specific optimizations compared to the "official" implementation (needs about 3.5k Flash)
+* Supports event-based triggering of conversions, as well as window-compared wake-up from stand-by sleep
+* On ATtiny: Can be suspended to allow the polled use of ADC0's internal channels (ADC0 ISRs are used by the library)
+* Reduced memory footprint due to CPU specific optimizations compared to the "official" implementation
 
 
 ## Installation
+For the non-Arduino people: all required files are inside the src folder (No Arduino exclusive functions are used in this library).
 
-Not needed, comes with the core.
 
-For the non-Arduino people: all you need is inside the src folder.
+### How to use this library
 
-## How to use this library
-
-### Overview
 
 #### Step 1: Memory Initialization
 Allocate memory for every single sensing node. The easiest way is to have an array with `cap_sensor_t` elements, e.g. `cap_sensor_t nodes[3];`. Even though it allows you to access the data stored in this structures directly, it is not allowed to change the contents directly. Always use the provided setter functions for this.
 
 #### Step 2: Node registration
-Initialize the node to be either a mutual-cap node with `uint8_t ptc_add_mutualcap_node(cap_sensor_t* node, ptc_ch_bm_t yCh, ptc_ch_bm_t xCh);` or to a self-cap node with `uint8_t ptc_add_selfcap_node(cap_sensor_t* node, ptc_ch_bm_t yCh, ptc_ch_bm_t xCh);`. When everything went without problems, the functions will return the enum `PTC_LIB_SUCCESS`. While mutual-cap requires yCh and xCh not to be 0 (otherwise `PTC_LIB_BAD_ARGUMENT` will be returned), the self-cap requires only the yCh not to be 0. If the xCh is zero, the node will be a normal self-cap node, otherwise it will be of the self-cap with shield type. This becomes relevant when you change between the types, but that will be explained later. This function will also disable the pullup and digital input function of the specified pins. The order, in which this function is called determines the conversion order. The nodes will be also numbered for easier identification. Up to 255 nodes are supported for devices with 16 or less PTC pins. 65k for bigger devices. The nodes are enabled by default, so, in case an added node should be disabled, you can call `uint8_t ptc_disable_node(cap_sensor_t* node);`, and for `re-enabling uint8_t ptc_enable_node(cap_sensor_t* node);`.
+Initialize the node to be either a mutual-cap node with `uint8_t ptc_add_mutualcap_node(cap_sensor_t* node, ptc_ch_bm_t xCh, ptc_ch_bm_t yCh);` or to a self-cap node with `uint8_t ptc_add_selfcap_node(cap_sensor_t* node, ptc_ch_bm_t xCh, ptc_ch_bm_t yCh);`. When everything went without problems, the functions will return the enum `PTC_LIB_SUCCESS`. While mutual-cap requires yCh and xCh not to be 0 (otherwise `PTC_LIB_BAD_ARGUMENT` will be returned), the self-cap requires only the yCh not to be 0. If the xCh is zero, the node will be a normal self-cap node, otherwise it will be of the self-cap with shield type. This becomes relevant when you change between the types, but that will be explained later. This function will also disable the pullup and digital input function of the specified pins. The order, in which this function is called determines the conversion order. The nodes will be also numbered for easier identification. Up to 255 nodes are supported for devices with 16 or less PTC pins. 65k for bigger devices. The nodes are enabled by default, so, in case an added node should be disabled, you can call `uint8_t ptc_disable_node(cap_sensor_t* node);`, and for re-enabling `uint8_t ptc_enable_node(cap_sensor_t* node);`.
 Here are some examples:
-- `ptc_add_mutualcap_node(&nodes[0], PIN_TO_PTC(PIN_PA4), PIN_TO_PTC(PIN_PA7));`
+- `ptc_add_mutualcap_node(&nodes[0], PIN_TO_PTC(PIN_PA7), PIN_TO_PTC(PIN_PA4));`
   - PA4 will be sensing, PA7 will be driving
-- `ptc_add_selfcap_node(&nodes[1], PIN_TO_PTC(PIN_PA4), 0);`
+- `ptc_add_selfcap_node(&nodes[1], 0, PIN_TO_PTC(PIN_PA4));`
   - No Driving pin, only sensing on PA4
-- `ptc_add_selfcap_node(&nodes[2], (PIN_TO_PTC(PIN_PA4) | PIN_TO_PTC(PIN_PA5)), PIN_TO_PTC(PIN_PA7));`
+- `ptc_add_selfcap_node(&nodes[2], PIN_TO_PTC(PIN_PA7), (PIN_TO_PTC(PIN_PA4) | PIN_TO_PTC(PIN_PA5)));`
   - useful for wakeups, all "buttons" work as one, no matter on which you press, plus driven shield pin.
 
 
 #### Step 3: Acquisition and Processing
-This library requires a regular call to the function `void ptc_process(uint16_t currTime)`. This function handles all background functionality of the library and calls the callback `extern void ptc_event_callback(const uint8_t eventType, cap_sensor_t* node)` when appropriate. First, the function checks if an acquisition was completed (all nodes of the selected type converted). If that's the case, it proceeds to handle the gathered data to handle the respective state machine of each node whose conversion was completed. The more nodes you have, the more time it might take.
+This library requires a regular call to the function `void ptc_process(uint16_t currTime)`. This function handles all background functionality of the library and calls the callback `extern void ptc_event_callback(const uint8_t eventType, cap_sensor_t* node)`, or one of the few sub-callbacks below, when appropriate. First, the function checks if an acquisition was completed (all nodes of the selected type converted). If that's the case, it proceeds to handle the gathered data to handle the respective state machine of each node whose conversion was completed. The more nodes you have, the more time it might take.
 The exact workings of this function will exceed the scope of this document.
+
 This function takes an argument, `uint16_t currTime`, to decide when to start the next acquisition. This, compared to having a, as an example, `millis()` inside the library, offers the user significant flexibility on choosing the time source (e.g. TCB.CNT). The Period can be set by `void ptc_set_acqusition_period(uint16_t period)`. Whenever the currTime minus the currTime when the last acquisition trigger happened is greater or equal the period, a new acquisition is started.
 However, if there was a successful call to `uint8_t ptc_suspend(void)`, only the timestamp is updated, but no acquisition is started. This also applies when the library was put into low-power mode, except that conversions can still be triggered by events.
 Even though this library can handle three different node types, only one type can be acquired at a time. By default, the type of the first node in the list is used. But the user can use the function `ptc_set_next_conversion_type(uint8_t type)` to change this behavior.
 
 #### Step 4: Callback
-In order to provide an efficient way of notification, the library provides a couple of extern callbacks, listed below with the type of events that are passed to those functions. In a previous version, all callback-events would have called `void ptc_event_callback(const ptc_cb_event_t eventType, cap_sensor_t* node) {`, however, I realized that a single function would end up too complex.
-All (sub-)callbacks are provided with the `weak` and `alias(ptc_event_callback)` attributes, meaning that if you do not provide a definition in your files, the callbacks will be redirected to the standard callback function, but never to both. The standard callback has also a default version that literally does nothing, meaning that your sketch will compile, even if you don't define any of the callbacks (not recommended though).
+In order to understand what happens, there is an extern callback function defined in the h-file. This means that you are required to have a function in your sketch-file that look like this: `void ptc_event_callback(const uint8_t eventType, cap_sensor_t* node) {`. The reason why I used an extern function and not a pointer to a callback is that this allows the compiler to inline optimizations, like optimizing away calls with eventTypes that don't need handling.
+There are following events:
+- `PTC_CB_EVENT_WAKE_TOUCH` (node: lowPower):
+  - This event happens in LP mode only when the Window-Comparator was triggered.
+- `PTC_CB_EVENT_WAKE_NO_TOUCH` (node: lowPower):
+  - This event happens in LP mode only when the Window-Comparator was not triggered.
+- `PTC_CB_EVENT_CONV_CMPL` (node: current node):
+  - This event happens whenever ptc_process finished handling said node
+- `PTC_CB_EVENT_CONV_MUTUAL_CMPL`,
+- `PTC_CB_EVENT_CONV_SELF_CMPL`,
+- `PTC_CB_EVENT_CONV_SHIELD_CMPL` (node: last converted node):
+  - This events happen whenever ptc_process has handled all nodes of said type.
+- `PTC_CB_EVENT_CONV_CALIB` (node: current node):
+  - This event happens, whenever the calibration was successful.
+- `PTC_CB_EVENT_ERR_CALIB` (node: current node):
+  - This event happens, whenever the calibration failed on said node.
+- `PTC_CB_EVENT_TOUCH_DETECT`(node: current node):
+  - This event triggers shortly before the state-machine is updated to the "touched" state.
+- `PTC_CB_EVENT_TOUCH_RELEASE`(node: current node):
+  - This event triggers shortly before the state-machine is updated to the "not-touched" state.
 
+You can use a simple switch-case to check for the events in the callback.
+Another option is to use following "sub-callbacks". As they are weak and aliased with `ptc_event_callback` it is possible to choose between one function to collect all events, or have dedicated function for each event type.
+- `void ptc_event_cb_wake(const ptc_cb_event_t eventType, cap_sensor_t* node);`
+  - called on `PTC_CB_EVENT_WAKE_*` events
+- `void ptc_event_cb_conversion(const ptc_cb_event_t eventType, cap_sensor_t* node);`
+  - called on `PTC_CB_EVENT_CONV_*_CMPL` events
+- `void ptc_event_cb_error(const ptc_cb_event_t eventType, cap_sensor_t* node);`
+  - called on `PTC_CB_EVENT_CONV_CALIB` events
+- `void ptc_event_cb_calibration(const ptc_cb_event_t eventType, cap_sensor_t* node);`
+  - called on `PTC_CB_EVENT_ERR_CALIB` events
+- `void ptc_event_cb_touch(const ptc_cb_event_t eventType, cap_sensor_t* node);`
+  - called on `PTC_CB_EVENT_TOUCH_*` events
 
-There are following callbacks:
-- `ptc_event_cb_touch` With following Events:
-  - `PTC_CB_EVENT_TOUCH_DETECT`     (0x11): Whenever a node changes to the pressed state
-  - `PTC_CB_EVENT_TOUCH_RELEASE`    (0x12): Whenever a node changes to the un-pressed state
-- `ptc_event_cb_wake` Only when low-power is enabled, called from ptc_process:
-  - `PTC_CB_EVENT_WAKE_TOUCH`       (0x15): When the Window-Comparator detected a touch
-  - `PTC_CB_EVENT_WAKE_NO_TOUCH`    (0x16): opposite of above
-- `ptc_event_cb_conversion`:
-  - `PTC_CB_EVENT_CONV_CMPL`        (0x20): Anytime a node has finished it's conversion and the state-machine was updated
-  - `PTC_CB_EVENT_CONV_MUTUAL_CMPL` (0x21). Useful to select the next type of conversions, if you have a mix of types
-  - `PTC_CB_EVENT_CONV_SELF_CMPL`   (0x24). You can AND the values with NODE_MUTUAL_bm, NODE_SELFCAP_bm,
-  - `PTC_CB_EVENT_CONV_SHIELD_CMPL` (0x28). NODE_SELFCAP_SHIELD_bm.
-  - `PTC_CB_EVENT_CONV_TYPE_CMPL_MSK`(0x0D): Can be used with bitwise AND to differentiate between node and type conversions.
-- `ptc_event_cb_calibration`:
-  - `PTC_CB_EVENT_CONV_CALIB`       (0x40): When ever a calibration was finished.
-  - `PTC_CB_EVENT_ERR_CALIB_MSK`    (0x07): Can be used with bitwise AND to to differentiate between success and Error.
-  - `PTC_CB_EVENT_ERR_CALIB_LOW`    (0x41): If the Capacitor compensation ended up too low.
-  - `PTC_CB_EVENT_ERR_CALIB_HIGH`   (0x42): As above, but too high.
-  - `PTC_CB_EVENT_ERR_CALIB_TO`     (0x44): If the calibration timed out.
-- `ptc_event_cb_error':
-  - Currently unused, but might be in the future.
-The hexa-decimal values are there for orientation and might change in the future.
 
 
 ### Low Power operation
@@ -75,13 +80,13 @@ This library also provides a so-called low power mode. This mode changes the ope
 
 In order to initialize the low-power mode, just call `uint8_t ptc_lp_init(cap_sensor_t* node)` (to disable: `uint8_t ptc_lp_disable(void)`) with the node you want to have automatically converted. The node must be enabled and must have been calibrated beforehand to work correctly, meaning it had to have a couple finished conversions.
 
-To check, if the window-comparator was triggered outside of the WAKE events, you can use the function `uint8_t ptc_lp_was_waken(void)` that returns either `PTC_LIB_WAS_WAKEN` or `PTC_LIB_ASLEEP`, at least while the low-power mode is active or use the callback.
+To check, if the window-comparator was triggered outside of the WAKE events, you can use the function `uint8_t ptc_lp_was_waken(void)` that returns either `PTC_LIB_WAS_WAKEN` or `PTC_LIB_ASLEEP`, at least while the low-power mode is active.
 
 ### Pins and how to use the ptc_add_* functions
 
-The ptc_add_* functions require a bitmap (ptc_ch_bm_t yCh; ptc_ch_bm_t xCh) of pins, that will be connected to the PTC internals upon the beginning of a conversion. The bitposition equals to the PTC pin numbering, that you can find in the PTC column in the datasheet. It is different from the usual numbering, for example PA4 on the 1614 is X0/Y0, resulting in a bitmap of 0x01.
+The ptc_add_* functions require a bitmap (ptc_ch_bm_t yCh; ptc_ch_bm_t xCh) of pins, that will be connected to the PTC internals upon the beginning of a conversion. The bit position equals to the PTC pin numbering, that you can find in the PTC column in the datasheet. On Tinies, it is different from the usual numbering, for example PA4 on the 1614 is X0/Y0, resulting in a bitmap of 0x01. On DAs it is more straightforward, PA0 is bitmap 1<<0, PB0 is 1<<8. PORTC is skipped, so PD0 is 1<<16.
 
-However, to make it easier, a compile-time look-up-table with a macro to access it is provided, `PIN_TO_PTC(PIN_Pnx)`. If the pin is valid, the corresponding bit-map is returned, otherwise null. But this requires the megaTinyCore from Spence Konde, as the PIN_Pnx naming is defined there.
+However, to make it easier, a compile-time look-up-table with a macro to access it is provided, PIN_TO_PTC(PIN_Pnx). If the pin is valid, the corresponding bit-map is returned, otherwise null. But this requires the megatiny/Dx core from Spence Konde, as the PIN_Pnx naming is defined there.
 
 The reason, why a bit-map is used, is to provide a way to connect the electrodes of multiple pins to act as one big electrode. In order to create a node with multiple pins connected, a simple OR operation is enough.
 
@@ -110,20 +115,24 @@ If you have trouble understanding: Imagine two equally sized volumes connected t
 
 Based on the documentation found online, the PTC has an internal, tunable capacitor connected after the series resistance to ground that is used to compensate the parasitic capacitance of the electrodes. Every node starts with a default compensation value. As soon as the node is enabled, the library attempts to find a compensation setting that will result in an ADC value of about 512 counts (1/2 of ADC resolution). Based on oscilloscope readings, it can also be said that the PTC tries to have a charge of 50% VCC on the electrode when being acquired. This is the also the reason, why the digital input function of the pins is disabled.
 
-The maximum compensation is about 30pF for Mutual-cap and about 50pF for Self-cap. It is possible to get the compensation capacitance with uint16_t ptc_get_node_cc_femto(cap_sensor_t* node); - however this function has to do a lot of calculations and is thus a bit bloat-y. It will also return the value in femto farrads, to avoid floats. Read more here: https://www.microchipdeveloper.com/touch:guide-to-interpret-cc-calibration-value
+The maximum compensation is about 30pF for Mutual-cap and about 50pF for Self-cap. It is possible to get the compensation capacitance with uint16_t ptc_get_node_cc_femto(cap_sensor_t* node); - however this function has to do a lot of calculations and is thus a bit bloat-y. It will also return the value in femto farrads, to avoid floats. Read more here: <https://www.microchipdeveloper.com/touch:guide-to-interpret-cc-calibration-value>
 
 Different pins have a different parasitic capacitance. I suspect this is depends on the internal circuitry and alternative functions, so it's normal to see some difference with pins next to each other.
 
 ### Tuning of nodes
 
 In order to ease the use of the PTC module, the ptc_add_* functions will initialize the cap_sensor_t struct with some default values, like the CC value mentioned above. That values can be easily changed and will be applied the next time a conversion of said node starts. Here is a list:
-- Analog Gain. Increases the sensitivity of the electrode by adjusting a capacitor on a integrator (I think) (1x Gain)
-- Digital Gain. Defines the amount of ADC Oversampling. Will not affect the count value, as it is internally right-shifted. (16x Oversampled)
-- Charge Share Delay. Affects the Sample length of the ADC. (0 extra clocks)
-- Prescaler. It is possible to slow down the ADC clock by adjusting the Prescaler. (Depends on CPU clock, targeted: 1MHz +/- 25%)
-- Serial Resistor. Allows to change the serial resistor between the Cc and the node. Fixed at 100k for Self-Cap. Creates RC-low-pass filter.
+- `uint8_t ptc_node_set_gain(cap_sensor_t *node, ptc_gain_t gain)`. Increases the sensitivity of the electrode by adjusting a capacitor on the integrator (I think). Defaults to 1x Gain.
+  - Valid values are: `PTC_GAIN_1`, `PTC_GAIN_2`, `PTC_GAIN_4`, `PTC_GAIN_8`, `PTC_GAIN_16`, `PTC_GAIN_32` (Tiny only).
+- `uint8_t ptc_node_set_oversamples(cap_sensor_t *node, uint8_t ovs)`. Defines the amount of ADC Oversampling. Will not affect the count value, as it is internally right-shifted. Valid values are in the range from 0 to 6 resulting in 1x, 2x, 4x, 8x, 16x, 32x, 64x oversampling. Defaults to 16x.
+- `uint8_t ptc_node_set_charge_share_delay(cap_sensor_t *node, uint8_t csd)`. Affects the Sample length of the ADC. This does pretty much the same thing as ADC.SAMPCTRL register. Valid range is from 0 to 31. Defaults to 0 extra clocks.
+- `uint8_t ptc_node_set_prescaler(cap_sensor_t *node, ptc_presc_t presc)`. It is possible to slow down the ADC/PTC clock by adjusting the Prescaler. The ADC/PTC Clock should be between 1 and 2 MHz. The library calculates the default based on F_CPU.
+  - Valid values for Tiny are: `PTC_PRESC_DIV2_gc`, `PTC_PRESC_DIV4_gc`, `PTC_PRESC_DIV8_gc`, `PTC_PRESC_DIV16_gc`, `PTC_PRESC_DIV32_gc`, `PTC_PRESC_DIV64_gc`, `PTC_PRESC_DIV128_gc`, `PTC_PRESC_DIV256_gc`.
+  - Valid values for DA are: `PTC_PRESC_DIV2_gc`, `PTC_PRESC_DIV4_gc`, `PTC_PRESC_DIV6_gc`, `PTC_PRESC_DIV8_gc`, `PTC_PRESC_DIV10_gc`, `PTC_PRESC_DIV12_gc`, `PTC_PRESC_DIV14_gc`,  `PTC_PRESC_DIV16_gc`.
+- `uint8_t ptc_node_set_resistor(cap_sensor_t *node, ptc_rsel_t res)`. Allows to change the serial resistor between the Cc and the node. Fixed at 100k for Self-Cap. Defaults to 50k for Mutual-Cap.
+  - Valid Values are: `RSEL_VAL_0`, `RSEL_VAL_20`, `RSEL_VAL_50`, `RSEL_VAL_70`, `RSEL_VAL_80` (DA only), `RSEL_VAL_100`, `RSEL_VAL_120` (DA only), `RSEL_VAL_200`.
 
-If a node is not sensitive enough, you can increase the Analog Gain (if it becomes too sensitive, an increase of the thresholds might be needed). However it is better to have a bigger node to begin with because the bigger the area, the higher is the capacitance delta.
+If a node is not sensitive enough, you can increase the Analog Gain (if it becomes too sensitive, an increase of the thresholds might be needed). However it is better to have a bigger electrode to begin with because the bigger the area, the higher is the capacitance delta.
 
 ### Global settings of the State-machine
 The state-machine, which changes the node's state between Calibration, touch, no touch, etc. uses some variables that are valid for all nodes, those are:

@@ -52,8 +52,8 @@ The reset sources are listed below. Note that for brevity and familiarity to tho
 | UPDI Reset           | RSTCTRL_UPDIRF_bm |  1 << 5  | 0x20 | UPDI programming  | POR, BOR (by hw), manually |
 | Software Reset (SWR) | RSTCTRL_SWRF_bm   |  1 << 4  | 0x10 | When SWR used     | ..                         |
 | Watchdog Reset (WDR) | RSTCTRL_WDRF_bm   |  1 << 3  | 0x08 | When WDT expires w/out wdr instruction<br/>wdr executed before window in windowed mode| POR, BOR (by hw), manually |
-| External Reset       | RSTCTRL_EXTRF_bm  |  1 << 2  | 0x04 | When reset pin is brought LOW | POR, BOR, Manually | 
-| Brownout Reset (BOR) | RSTCTRL_BORF_bm   |  1 << 1  | 0x02 | When Vdd lower than BOD threshold and BOD enabled. | POR, manually. resers all flags except POR. 
+| External Reset       | RSTCTRL_EXTRF_bm  |  1 << 2  | 0x04 | When reset pin is brought LOW | POR, BOR, Manually |
+| Brownout Reset (BOR) | RSTCTRL_BORF_bm   |  1 << 1  | 0x02 | When Vdd lower than BOD threshold and BOD enabled. | POR, manually. resers all flags except POR.
 | Power on reset (POR) | RSTCTRL_PORF_bm   |       1  | 0x01 | On power on (Vdd goes above V<sub>POR</sub> from below V<sub>PORR</sub>) | Manually. Resets all other reset flags
 
 * All of these resets restore the peripheral registers [(SFRs)](https://github.com/SpenceKonde/AVR-Guidance/blob/master/Glossary.md#sfr) to their power on state - with the exception of the reset flag register, amd a small number of things that ONLY POR resets:
@@ -69,42 +69,42 @@ The reset sources are listed below. Note that for brevity and familiarity to tho
 | WDRF | UPDIRF| SWRF | EXTRF | PORF | BORF | Meaning, Suggested response
 |------|-------|------|-------|------|------|-------------
 |    0 |     0 |   0  |    0  |    0 |    0 | (Unless you are reinventing this wheel) You are reading RSTFR, but the core already read that and cleared it; we leave the value in the 6 LSB of GPIOR0.
-|    0 |     0 |   0  |    0  |    0 |    0 | (No wheel reinvention, GPIOR0 & 0x3F == 0 at start of setup()) - Should be impossible without disabling reset cause clearing (see "Note"), otherwise create a new issue showing code that reproduces this issue; this should not occur and constitutes a serious bug. 
-|    0 |     0 |   0  |    0  |    0 |    0 | (Reinventing the reset cause clearing wheel, and found RSTFR = 0 after apparent reset). Reset is dirty, hardware in unknown state, "guaranteed not to work". Fire software reset immediately. 
+|    0 |     0 |   0  |    0  |    0 |    0 | (No wheel reinvention, GPIOR0 & 0x3F == 0 at start of setup()) - Should be impossible without disabling reset cause clearing (see "Note"), otherwise create a new issue showing code that reproduces this issue; this should not occur and constitutes a serious bug.
+|    0 |     0 |   0  |    0  |    0 |    0 | (Reinventing the reset cause clearing wheel, and found RSTFR = 0 after apparent reset). Reset is dirty, hardware in unknown state, "guaranteed not to work". Fire software reset immediately.
 |    X |     1 |   X  |    X  |    X |    X | The most recent reset was caused by exiting UPDI programming mode. All other reset flags should probably be ignored. Start per application requirements as a "hot start"
-|    1 |     0 |   0  |    0  |    0 |    0 | Code was previously executing. WDT was enabled, and the timeout expired without wdr being executed (or executed wdr too soon in windowed mode). React per application requirements as a "hot start". 
-|    0 |     0 |   1  |    0  |    0 |    0 | Code was previously executing, until a software reset was issued. If not expected, likely resulted from dirty reset; investigate as such. If expected, react per application requirements as a "hot start". 
+|    1 |     0 |   0  |    0  |    0 |    0 | Code was previously executing. WDT was enabled, and the timeout expired without wdr being executed (or executed wdr too soon in windowed mode). React per application requirements as a "hot start".
+|    0 |     0 |   1  |    0  |    0 |    0 | Code was previously executing, until a software reset was issued. If not expected, likely resulted from dirty reset; investigate as such. If expected, react per application requirements as a "hot start".
 |    1 |     0 |   0  |    1  |    0 |    0 | As above. While WDR triggered, reset pin asserted and released. Likely WDR is retriggering repeatedly, and the reset button fixed nothing. If powercycling then fixed, suspect "hot start" issue.
 |    X |     0 |   1  |    X  |    1 |    X | Can't happen unless reset cause clearing has definitely been disabled. See "Note"
 |    X |     0 |   1  |    X  |    0 |    1 | Can't happen unless reset cause clearing is broken badly. See "Note"
 |    1 |     0 |   X  |    X  |    1 |    X | Can't happen unless reset cause clearing has definitely been disabled. See "Note"
 |    1 |     0 |   X  |    X  |    0 |    1 | Can't happen unless reset cause clearing is broken badly. See "Note"
-|    1 |     0 |   1  |    X  |    0 |    0 | Implausible but possible with precise timeing - but more likely reset cause clearing is broken badly. See "Note" 
-|    0 |     0 |   1  |    1  |    0 |    0 | Implausible but possible with precise timeing - but more likely reset cause clearing is broken badly. See "Note" 
-|    0 |     0 |   0  |    X  |    X |    X | power on, reset pin, or brown out reset. If more than one is set, see the smaller table below. 
-|    X |     X |   X  |    X  |    1 |    X | If POR fired, Vdd must have been below V<sub>POR, fall</sub> or V<sub>PORR</sub> since the last time POR was triggered, then Vdd exceeded V<sub>POR, rise</sub> or V<sub>POR</sub>). 
+|    1 |     0 |   1  |    X  |    0 |    0 | Implausible but possible with precise timing - but more likely reset cause clearing is broken badly. See "Note"
+|    0 |     0 |   1  |    1  |    0 |    0 | Implausible but possible with precise timing - but more likely reset cause clearing is broken badly. See "Note"
+|    0 |     0 |   0  |    X  |    X |    X | power on, reset pin, or brown out reset. If more than one is set, see the smaller table below.
+|    X |     X |   X  |    X  |    1 |    X | If POR fired, Vdd must have been below V<sub>POR, fall</sub> or V<sub>PORR</sub> since the last time POR was triggered, then Vdd exceeded V<sub>POR, rise</sub> or V<sub>POR</sub>).
 
 | PORF | EXTRF | BORF | Meaning, Suggested Response
 |------|-------|------|----------
 |    1 |     0 |    0 | Vdd ramped quickly, and BOD did not have a chance to engage and react (fast rising power) or BOR not enabled. This is a typical successful startup (or if problems at startup, perhapse you should be using BOD or longer SUT)
-|    0 |     0 |    1 | Code was executing, Vdd fell below V<sub>BOR</sub>, triggering BOR. Vdd stayed above V<sub>POR, fall</sub> or V<sub>PORR</sub>, and later increased to exceed V<sub>BOR</sub>, and appropriate brownout recovery steps taken, if needed, 
-|    1 |     0 |    1 | Vdd ramp was slow. Likely while still in SUT, the BOD awoke, saw the still insufficeint voltage (Vdd < V<sub>BOR</sub> , and asserted a BOR, from which it revived when Vdd exceeded V<sub>BOR</sub> 
+|    0 |     0 |    1 | Code was executing, Vdd fell below V<sub>BOR</sub>, triggering BOR. Vdd stayed above V<sub>POR, fall</sub> or V<sub>PORR</sub>, and later increased to exceed V<sub>BOR</sub>, and appropriate brownout recovery steps taken, if needed,
+|    1 |     0 |    1 | Vdd ramp was slow. Likely while still in SUT, the BOD awoke, saw the still insufficeint voltage (Vdd < V<sub>BOR</sub> , and asserted a BOR, from which it revived when Vdd exceeded V<sub>BOR</sub>
 |    1 |     1 |    X | The reset pin voltage rose significantly more slowly than VDD, and hence upon release of POR. EXTR remained engaged for some time longer. Excessive capacitive loading on reset? Insufficient pullup?
-Note: These states indicate that you've done something to defang the reset cause detection and dirty reset detection. That is something one does not do by accident, so presumably you have something in mind. Uh, well, whatever it is, if it's supposed to be working, it's not, cause here we are with reset flags that cannot occur unless you're failing to reset the reset flags on startup. Anyway, until you fix that, neither bootloader nor application will be able to accurately determine reset cause and dirty resets will usually hang. 
+Note: These states indicate that you've done something to defang the reset cause detection and dirty reset detection. That is something one does not do by accident, so presumably you have something in mind. Uh, well, whatever it is, if it's supposed to be working, it's not, cause here we are with reset flags that cannot occur unless you're failing to reset the reset flags on startup. Anyway, until you fix that, neither bootloader nor application will be able to accurately determine reset cause and dirty resets will usually hang.
 Suggested responses (pick one):
-a. Run in circles, scream, and shout. 
+a. Run in circles, scream, and shout.
 b. (not recommended) Correct your code to check and clear the reset cause at the earliest point in the boot process, and if none is reported handle the fact that you are in an unknown state, likely by firing a software reset.
-c. Come to your senses, accept that the wheel was invented long, with little fundamental improvement, and stick to current version ofDo not override the included reset cause handling. Retrive the reset cause from the 6 LSB of GPIOR0 as documented after which it may be set to 0 if used elsewhere. None of the lines on the table which refer to this note should occur. 
+c. Come to your senses, accept that the wheel was invented long, with little fundamental improvement, and stick to current version ofDo not override the included reset cause handling. Retrieve the reset cause from the 6 LSB of GPIOR0 as documented after which it may be set to 0 if used elsewhere. None of the lines on the table which refer to this note should occur.
 
-Where I say reset cause detection is "disabled", notice that PORF is set, implyingthat the reset flags were never cleared. 
+Where I say reset cause detection is "disabled", notice that PORF is set, implyingthat the reset flags were never cleared.
 
-When the combination of reset cause flags is inconsistent with both making no attempt to clear flags - PORF was set at poweron, and is no longer set - but has somehow failed to clear other flags. 
+When the combination of reset cause flags is inconsistent with both making no attempt to clear flags - PORF was set at poweron, and is no longer set - but has somehow failed to clear other flags.
 
 In some cases, with unusually good timing, it is likely possible to trigger two reset causes close enough together that you end up with two flags (for example, code is spamming SWR repeatedly, you could hit reset at the right moment )
 
 
 
-`**` - Few plausible routes to this state exist except for a) wiring fault, intermittent power connection. b) power supply circuit defect or unforseen behavior. c) Power supply circuit expected behavior due to, for example, a device with a battery being used until it stopped working due to the battery voltage sinking below V<sub>BOR</sub>; depending on the design, it is entirely plausible that the battery voltage will continue to be seen by the microcontroller - so then when it is plugged into a USB power cable to recharge, and the voltage rises above V<sub>BOR</sub>. This results in it starting up with BORF alone set. (This is a useful thing to check when the system gets into bad states, particularly ones not solved by a reset button press but solved by a power cycle - typically the result of an external device with different reset thresholds, which has not reset, or reset uncleanly (some devices, due to hysteresis in the reset mechanism, have a range of voltages in which they are above the nominal POR/BOR mechanism threshold, but not above the device's power on reset voltage.  The AVR's have a V<sub>PORR</sub>, the voltage t
+`**` - Few plausible routes to this state exist except for a) wiring fault, intermittent power connection. b) power supply circuit defect or unforeseen behavior. c) Power supply circuit expected behavior due to, for example, a device with a battery being used until it stopped working due to the battery voltage sinking below V<sub>BOR</sub>; depending on the design, it is entirely plausible that the battery voltage will continue to be seen by the microcontroller - so then when it is plugged into a USB power cable to recharge, and the voltage rises above V<sub>BOR</sub>. This results in it starting up with BORF alone set. (This is a useful thing to check when the system gets into bad states, particularly ones not solved by a reset button press but solved by a power cycle - typically the result of an external device with different reset thresholds, which has not reset, or reset uncleanly (some devices, due to hysteresis in the reset mechanism, have a range of voltages in which they are above the nominal POR/BOR mechanism threshold, but not above the device's power on reset voltage.  The AVR's have a V<sub>PORR</sub>, the voltage t
 
 `*` Possibly due to loading and insufficient pullup strength on the reset pin (You should immediately suspect that there is an issue with autoreset if you are using that - Perhaps a different (larger) value capacitor was used? Could the pullup be disconnected?). This has the visible consequence that the bootloader runs on startup. Even when a sketch is present and the reset button was never pressed.  While ideally it should not occur, it is also not indicative of the sort of "drop everything and find this bug" situation, whereas a starting with no flags set indicates a critical failure occurring, and ought never be tolerated, but rather investigated promptly.
 
