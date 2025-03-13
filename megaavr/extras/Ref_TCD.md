@@ -11,7 +11,7 @@ In addition to the synchronization, some of the intentional features make it cha
 ```c++
 analogWrite(PIN_PA4,128); // 50% PA4. - like usual
 analogWrite(PIN_PA7,192); // 50% PA4, 75% PA7 - like usual
-analogWrite(PIN_PA6, 64); // 25% PA5, 25% PA6, 75% PA7 - PA4 and PA6 are both channel A
+analogWrite(PIN_PA6, 64); // 25% PA4, 25% PA6, 75% PA7 - PA4 and PA6 are both channel A
 //use digitalWrite to turn off the PWM on a pin
 // or call turnOffPwm(pin);
 ```
