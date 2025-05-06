@@ -2057,7 +2057,7 @@ atxy2.menu.printf.minimal.build.printfabr=.pfM
 #________________________________________|
 atxy2.menu.PWMmux.default=PA1-3,7 (default)
 atxy2.menu.PWMmux.buffered=PA1-3 (buffered)
-atxy2.menu.PWMmux.I3=PA1-3, PA6/7 (buffered, 1-series only, flash hog)
+atxy2.menu.PWMmux.I3=PWM on all pins: TCA @ PA1-3, TCD @ PA6/7 both buffered. 1-series only, flash hog, NO DACOUT)
 atxy2.menu.PWMmux.buffered.build.pwmflags=-DTCA_BUFFERED_3PIN
 atxy2.menu.PWMmux.I3.build.pwmflags=-DUSE_TIMERD0_PWM -DTCD_USE_WOAB -DTCA_BUFFERED_3PIN
 atxy2.menu.PWMmux.buffered.build.pwmabr=3

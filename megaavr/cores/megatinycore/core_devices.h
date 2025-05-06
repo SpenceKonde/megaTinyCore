@@ -282,6 +282,59 @@
   #define __AVR_TINY_2__
 #endif
 
+
+/* These are constant for all tinies, and make the variant stuff look a lot nicer */
+#if defined(TCA0) && defined(PORTMUX_TCA00_bm)
+  #if defined(_TCA_ALT_WO0)
+    #define _TCA_WO0 PIN_PB0
+  #else
+    #define _TCA_WO0 PIN_PB3
+  #endif
+  #if defined(_TCA_ALT_WO1)
+    #define _TCA_WO1 PIN_PB1
+  #else
+    #define _TCA_WO1 PIN_PB4
+  #endif
+
+  #if defined(_TCA_ALT_WO2)
+    #define _TCA_WO2 PIN_PB2
+  #else
+    #define _TCA_WO2 PIN_PB5
+  #endif
+  #if defined(_TCA_USE_WO3)
+    #if defined(_TCA_ALT_WO3)
+      #define _TCA_WO3 PIN_PA3
+    #else
+      #define _TCA_WO3 PIN_PC3
+    #endif
+  #endif
+  #if defined(_TCA_USE_WO4)
+    #if defined(_TCA_ALT_WO4)
+      #define _TCA_WO4 PIN_PC4
+    #else
+      #define _TCA_WO4 PIN_PA4
+    #endif
+  #endif
+  #if defined(_TCA_USE_WO5)
+    #if defined(_TCA_ALT_WO5)
+      #define _TCA_WO5 PIN_PA5
+    #else
+      #define _TCA_WO5 PIN_PC5
+    #endif
+  #endif
+#endif
+#if defined(USE_TIMERD_PWM)
+  #if defined(USE_TCD_WOAB)
+    #define _TCD_WOAC PIN_PA4
+    #define _TCD_WOBD PIN_PA5
+  #else
+    #define _TCD_WOAC PIN_PC0
+    #define _TCD_WOBD PIN_PC1
+  #endif
+#endif
+
+
+
 /* FOLLOWING THIS, SHARED WITH DxCoRE DIRECTLY */
 #if defined(AC2)
   #define _AVR_AC_COUNT      (3)
@@ -316,6 +369,7 @@
   #define _AVR_EVSYS_COUNT  (3)
   #define _AVR_EVSYS_ASYNC  (2)
   #define _AVR_EVSYS_SYNC   (1)
+/* Otherwise, we just count down till we find one, since there's no plausible reason for them to number the channels any other way. */
 #elif defined(EVSYS_CHANNEL15)
   #define _AVR_EVSYS_COUNT  (16)
 #elif defined(EVSYS_CHANNEL14)
@@ -360,7 +414,8 @@
  * generators allows them to add both options for all ports and both RTC options to all generator channels
  * Too bad they released so many parts with the other versions :-/ */
 
-#if defined(PORTA_EVGENCTRL) // Ex-series, with EVGENCTRL registers on RTC and PORT.
+#if defined(PORTA_EVGENCTRL)||defined(PORTA_EVGENCTRLA) // Starting with EA, they have EVGENCTRL registers onthe PORTS and RTC, so all channels are equal.
+                                                        // Starting with EB, and retroactively changing EA, they renamed them to EVGENCTRLA. Elsewhere we define the other if either one of the two is defined, as we always do when they change spellings.
   #define _AVR_EVSYS_VERSION   (3)
 #elif defined(EVSYS_STROBE) // mega0 - basically Dx, but different name for strobe.
   #define _AVR_EVSYS_VERSION   (1)
@@ -446,7 +501,7 @@
 #endif
 
 #if   defined(TCE0)
-  #define _AVR_TCE_COUNT     (1) // first appears on the EB-series, 16-bit. Some sort of 8-channeled monster who is always with the one they call WEX. I haven't heard from TCA0 after they showed up and started doing
+  #define _AVR_TCE_COUNT     (1) // first appears on the EB-series, 16-bit.
 #else                            // PWM on the same pins. I have a bad feeling that TCA0 is either tied up in the basement, or dead in a wooded area. With the TCE's skill at motor control, they could easily have
   #define _AVR_TCE_COUNT     (0) // used power-tools to dismember bury the body.... Anyway, whether these guys are as useful in the silicon as they look  on paper will depend a lot on the whether those
 #endif                           // 8-channels are independent, and whether they need to split like TCA did to handle 8 WO's if so. And, of course on how flexible their clocking options are.
@@ -718,6 +773,10 @@ setPrescalerValue(oldpsc);
 
 #endif
 
+
+
+
+
 /* Microchip has shown a tendency to rename registers bitfields and similar between product lines, even when the behavior is identical.
  * This is a major hindrance to writing highly portable code which I assume is what most people wish to do. It certainly beats having
  * to run code through find replace making trivial changes, forcing a fork where you would rather not have one.
@@ -753,6 +812,8 @@ has once worked for the same thing as meaning that thing */
       #define RTC_CLKSEL_XTAL32K_gc           RTC_CLKSEL_XOSC32K_gc
     #endif
   #endif
+
+
   /* General Purpose Register names, GPR.GPRn, vs GPIORn vs GPIOn
    * They now appear to have decided they don't like either of the previous conventions, one just a few years old. Now they are grouping
    * them under a "General Purpose Register". "peripheral". I cannot argue that GPR doesn't make more sense, as there's not really any
@@ -940,7 +1001,7 @@ has once worked for the same thing as meaning that thing */
     #define TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc
     #define TCA_SINGLE_EVACTA_UPDOWN_gc TCA_SINGLE_EVACTA_UPDOWN_gc
   #endif
-  // TCA V1.1 - DA, DB, tinyAVR 2?
+  // TCA V1.1 - DA/2-series and everthing since
   //  with two inputs changes the names the existing ones to specify channel A
   // We add in the non-postfixed ana
   #if !defined(TCA_SINGLE_CNTEI_bm)
@@ -951,6 +1012,43 @@ has once worked for the same thing as meaning that thing */
     #define TCA_SINGLE_EVACT_CNT_HIGHLVL_gc TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc
     #define TCA_SINGLE_EVACT_UPDOWN_gc TCA_SINGLE_EVACTA_UPDOWN_gc
   #endif
+  // Some versions of the EA headers have it as PORTx_EVGENCTRL, retroactively changed to PORTx_EVGENCTRLA, implying plans for more.
+  #if defined(PORTA_EVGENCTRL)
+    #define PORTA_EVGENCTRLA PORTA_EVGENCTRL
+  #else
+    #define PORTA_EVGENCTRL PORTA_EVGENCTRLA
+  #endif
+  #if defined(PORTB_EVGENCTRL)
+    #define PORTB_EVGENCTRLA PORTB_EVGENCTRL
+  #else
+    #define PORTB_EVGENCTRL PORTB_EVGENCTRLA
+  #endif
+  #if defined(PORTC_EVGENCTRL)
+    #define PORTC_EVGENCTRLA PORTC_EVGENCTRL
+  #else
+    #define PORTC_EVGENCTRL PORTC_EVGENCTRLA
+  #endif
+  #if defined(PORTD_EVGENCTRL)
+    #define PORTD_EVGENCTRLA PORTD_EVGENCTRL
+  #else
+    #define PORTD_EVGENCTRL PORTD_EVGENCTRLA
+  #endif
+  #if defined(PORTE_EVGENCTRL)
+    #define PORTE_EVGENCTRLA PORTE_EVGENCTRL
+  #else
+    #define PORTE_EVGENCTRL PORTE_EVGENCTRLA
+  #endif
+  #if defined(PORTF_EVGENCTRL)
+    #define PORTF_EVGENCTRLA PORTF_EVGENCTRL
+  #else
+    #define PORTF_EVGENCTRL PORTF_EVGENCTRLA
+  #endif
+  #if defined(PORTG_EVGENCTRL)
+    #define PORTG_EVGENCTRLA PORTG_EVGENCTRL
+  #else
+    #define PORTG_EVGENCTRL PORTG_EVGENCTRLA
+  #endif
+
 
   #if (!defined(MEGATINYCORE) || MEGATINYCORE_SERIES >= 2)
     #define TCB_CLKSEL_CLKDIV1_gc TCB_CLKSEL_DIV1_gc

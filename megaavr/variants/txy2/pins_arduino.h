@@ -42,10 +42,21 @@
 #define PIN_PA3   (4)
 #define PIN_PA0   (5)
 
-#define digitalPinHasPWM(p)               ((p) != 0 && (p) != 5)
+#if !defined(USE_TIMERD0_PWM) && !defined(TCA_BUFFERED_3PIN)
+  #define digitalPinHasPWM(p)            (((uint8_t)((p) - 1) < (uint8_t) 4 ) //PA7, PA1. PA2. PA3.
+#elif !defined(USE_TIMERD0_PWM) && defined(TCA_BUFFERED_3PIN)
+  #define digitalPinHasPWM(p)            (((uint8_t)((p) - 2) < (uint8_t) 3 ) //PA1. PA2. PA3.
+#elif defined(USE_TIMERD0_PWM)
+  #define digitalPinHasPWM(p)            (((uint8_t)(p)) < (uint8_t) 5) /* every pin except the reset pin, whichmakes since, seeing as it barely has output drivers... */
+#endif
 
-#ifdef DAC0
-  #define DAC_PIN                         (PIN_PA6)
+#if defined(DAC0)
+  #if !defined(USE_TIMERD0_PWM)
+    #define DAC_PIN                         (PIN_PA6)
+  #else
+    #pragma message("TCD is enabled for PWM output; DAC output via analogWrite() is disabled in favor of TCD PWM")
+    /* If you got a problem with that, do it manually! The DAC is about as easy to confgiure as it gets!*/
+  #endif
 #endif
 
 #ifndef LED_BUILTIN
@@ -190,7 +201,11 @@ const uint8_t digital_pin_to_timer[] = {
   #endif
   TIMERA0,      // 2  PA1
   TIMERA0,      // 3  PA2
-  TIMERA0,      // 4  PA3
+  #if !defined(TCA_BUFFERED_3PIN)
+    TIMERA0,      // 4  PA3
+  #else
+    NOT_ON_TIMER, // 4  PA3
+  #endif
   NOT_ON_TIMER  // 5  PA0
 };
 //*INDENT-ON*

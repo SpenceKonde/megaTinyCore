@@ -46,10 +46,45 @@
 
 #define EXTERNAL_NUM_INTERRUPTS       (20)
 
+/* Ugh! What a mess! */
 #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
-  #define digitalPinHasPWM(p)         ((p) == PIN_PA4 || (p) == PIN_PA5 || (p) == PIN_PB2 || (p) == PIN_PB1 || (p) == PIN_PB0 || (p) == PIN_PC0 || (p) == PIN_PC1 || (p) == PIN_PA3)
+  #if defined(_TCA_USE_WO3) && defined(_TCA_USE_WO4) && defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO3 || (p) == _TCA0_WO4 || (p) == _TCA0_WO5 || (p) == _TCD_WOAC || (p) == _TCD_WOBD)
+  #elif defined(_TCA_USE_WO3) && defined(_TCA_USE_WO4) && !defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO3 || (p) == _TCA0_WO4 || (p) == _TCD_WOAC || (p) == _TCD_WOBD)
+  #elif defined(_TCA_USE_WO3) && !defined(_TCA_USE_WO4) && defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO3 || (p) == _TCA0_WO5 || (p) == _TCD_WOAC || (p) == _TCD_WOBD)
+  #elif defined(_TCA_USE_WO3) && !defined(_TCA_USE_WO4) && !defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO3 || (p) == _TCD_WOAC || (p) == _TCD_WOBD)
+  #elif !defined(_TCA_USE_WO3) && defined(_TCA_USE_WO4) && defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO4 || (p) == _TCA0_WO5 || (p) == _TCD_WOAC || (p) == _TCD_WOBD)
+  #elif !defined(_TCA_USE_WO3) && defined(_TCA_USE_WO4) && !defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO4 || (p) == _TCA0_WO5 || (p) == _TCD_WOAC || (p) == _TCD_WOBD)
+  #elif !defined(_TCA_USE_WO3) && !defined(_TCA_USE_WO4) && defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO5 || (p) == _TCD_WOAC || (p) == _TCD_WOBD)
+  #elif !defined(_TCA_USE_WO3) && !defined(_TCA_USE_WO4) && defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCD_WOAC || (p) == _TCD_WOBD)
+  #else
+    #error "Error determining PWM pins."
+  #endif
 #else
-  #define digitalPinHasPWM(p)         ((p) == PIN_PA4 || (p) == PIN_PA5 || (p) == PIN_PB2 || (p) == PIN_PB1 || (p) == PIN_PB0                                     || (p) == PIN_PA3)
+  #if defined(_TCA_USE_WO3) && defined(_TCA_USE_WO4) && defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO3 || (p) == _TCA0_WO4 || (p) == _TCA0_WO5 )
+  #elif defined(_TCA_USE_WO3) && defined(_TCA_USE_WO4) && !defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO3 || (p) == _TCA0_WO4 )
+  #elif defined(_TCA_USE_WO3) && !defined(_TCA_USE_WO4) && defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO3 || (p) == _TCA0_WO5 )
+  #elif defined(_TCA_USE_WO3) && !defined(_TCA_USE_WO4) && !defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO3 )
+  #elif !defined(_TCA_USE_WO3) && defined(_TCA_USE_WO4) && defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO4 || (p) == _TCA0_WO5 )
+  #elif !defined(_TCA_USE_WO3) && defined(_TCA_USE_WO4) && !defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO4 || (p) == _TCA0_WO5 )
+  #elif !defined(_TCA_USE_WO3) && !defined(_TCA_USE_WO4) && defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 || (p) == _TCA0_WO5 )
+  #elif !defined(_TCA_USE_WO3) && !defined(_TCA_USE_WO4) && defined(_TCA_USE_WO5)
+    #define digitalPinHasPWM(p)         ((p) == _TCA0_WO0 || (p) == _TCA0_WO1 || (p) == _TCA0_WO2 )
+  #endif
 #endif
 
 
@@ -67,7 +102,6 @@
   #if defined(ADC1) // 3216 and 1616 only have second ADC.
     #define digitalPinToAnalogInput_ADC1(p) ((p) < 6 ? (p) : ((p) < PINS_COUNT && ((p) >= PIN_PC0) ? (6 + (p) - PIN_PC0) : NOT_A_PIN))
   #endif
-
 #else
   /* 2-series MUX table says ADC channel 0 is tied to ground, not PA0, PC0 through PC3 are a A12-15 */
   #define digitalPinToAnalogInput(p)  (((p) < 6) ? ((p) + 4) : (((p) > 13 && (p) < 17) ? ((p) - 13) : ((((p) >= 8) && ((p) < 14)) ? ((p) + 2) :  NOT_A_PIN)))
@@ -472,5 +506,9 @@ const uint8_t digital_pin_to_timer[] = {
 //                            pins are NOT connected to anything by default.
 #define SERIAL_PORT_MONITOR     Serial
 #define SERIAL_PORT_HARDWARE    Serial
+
+#if defined (USART1)
+  #define SERIAL_PORT_HARDWARE_OPEN Serial1
+#endif
 
 #endif

@@ -9,8 +9,6 @@ These items are in addition to what was listed under changes already in release.
 
 #### Planned 2.7.0
 * Migrate to avrdude 7.2
-
-#### Planned 2.6.10/x
 * Add support `_getCurrentMillisTimer()` and `getCurrentMillisMode()`, required for sleepTime.
 
 
@@ -26,6 +24,9 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### Planned 2.6.11
 * Correct numerous issues with the microchip board defs. Clearly nobody is using them - since 2 of them didn't compile, and none of the optiboot ones would ever be able to successfully be programmed over the bootloader because selfprogramming wasn't enabled (BOOTEND = 0).
+* Major Bugfix: Correct issue #1164 thanks to John Vasileff. This would cause Serial.flush to hang in one-wire mode.
+* Major Bugfix: Correct buffered PWM on all parts. 
+* 
 
 ## Released Versions
 

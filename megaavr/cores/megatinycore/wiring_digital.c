@@ -20,7 +20,7 @@
   Boston, MA  02111-1307  USA
 
   Modified 28 September 2010 by Mark Sproul
-  Modified extensively 2018~2021 by Spence Konde for
+  Modified extensively 2018~2025 by Spence Konde for
   megaTinyCore and DxCore.
 */
 
@@ -144,7 +144,7 @@ void turnOffPWM(uint8_t pin)
         if(bit_mask & 0b00111000) {
           bit_mask <<= 1; // 0b01110000
         } else {
-          //bit_maslk <<= 3;  same result, but in 3 clocks 3 words instead of 1 and 1!
+          //bit_mask <<= 4;  same result, but in 3 clocks 3 words instead of 1 and 1!
 
           _SWAP(bit_mask); // 0b0111000
         }

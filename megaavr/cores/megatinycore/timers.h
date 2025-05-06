@@ -32,20 +32,17 @@
   #define _TCA_ALT_WO2
 #endif
 #if !defined(TCA_BUFFERED_3PIN)
+  #define _TCA_USE_WO4
+  #define _TCA_USE_WO5
+  #define _TCA_USE_WO3
   #if TCA_PORTMUX & 0x08
     #define _TCA_ALT_WO3
-  #else
-    #define _TCA_USE_WO3
   #endif
   #if TCA_PORTMUX & 0x10
     #define _TCA_ALT_WO4
-  #else
-    #define _TCA_USE_WO4
   #endif
   #if TCA_PORTMUX & 0x20
     #define _TCA_ALT_WO5
-  #else
-    #define _TCA_USE_WO5
   #endif
 #endif
 #if defined(USE_TIMERD0_PWM)
