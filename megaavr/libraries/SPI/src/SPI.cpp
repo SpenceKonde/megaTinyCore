@@ -125,26 +125,26 @@ void SPIClass::begin() {
   #endif
 
   #if ((defined(PIN_SPI_MOSI_PINSWAP_1) && defined(PIN_SPI_MISO_PINSWAP_1) && defined(PIN_SPI_SCK_PINSWAP_1)) || (defined(PIN_SPI_MOSI_PINSWAP_2) && defined(PIN_SPI_MISO_PINSWAP_2) && defined(PIN_SPI_SCK_PINSWAP_2)))
-  if (_uc_mux == 0) {
-    pinMode(PIN_SPI_MOSI, OUTPUT);
-    pinMode(PIN_SPI_SCK, OUTPUT);
-  }
-  #if (defined(PIN_SPI_MOSI_PINSWAP_1) && defined(PIN_SPI_MISO_PINSWAP_1) && defined(PIN_SPI_SCK_PINSWAP_1))
-  #ifdef PORTMUX_CTRLB
-  else if (_uc_mux == PORTMUX_SPI0_bm)
-  #else
-  else if (_uc_mux == 1)
-  #endif
-  {
-    pinMode(PIN_SPI_MOSI_PINSWAP_1, OUTPUT);
-    pinMode(PIN_SPI_SCK_PINSWAP_1, OUTPUT);
-  }
+    if (_uc_mux == 0) {
+      pinMode(PIN_SPI_MOSI, OUTPUT);
+      pinMode(PIN_SPI_SCK, OUTPUT);
+    }
+    #if (defined(PIN_SPI_MOSI_PINSWAP_1) && defined(PIN_SPI_MISO_PINSWAP_1) && defined(PIN_SPI_SCK_PINSWAP_1))
+    #ifdef PORTMUX_CTRLB
+      else if (_uc_mux == PORTMUX_SPI0_bm)
+    #else
+      else if (_uc_mux == 1)
+    #endif
+    {
+      pinMode(PIN_SPI_MOSI_PINSWAP_1, OUTPUT);
+      pinMode(PIN_SPI_SCK_PINSWAP_1, OUTPUT);
+    }
   #endif
   #if (defined(PIN_SPI_MOSI_PINSWAP_2) && defined(PIN_SPI_MISO_PINSWAP_2) && defined(PIN_SPI_SCK_PINSWAP_2))
-  else if (_uc_mux == 2) {
-    pinMode(PIN_SPI_MOSI_PINSWAP_2, OUTPUT);
-    pinMode(PIN_SPI_SCK_PINSWAP_2, OUTPUT);
-  }
+    else if (_uc_mux == 2) {
+      pinMode(PIN_SPI_MOSI_PINSWAP_2, OUTPUT);
+      pinMode(PIN_SPI_SCK_PINSWAP_2, OUTPUT);
+    }
   #endif
   #else
   // MISO is set to input by the controller
