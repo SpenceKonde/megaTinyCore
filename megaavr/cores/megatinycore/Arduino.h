@@ -568,7 +568,7 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
 
 
 // 0b01MC 0mmm - the 3 lowest bits refer to the PORTMUX.
-//                            bit C specifies whether it's channel A (0) or B (1). If M is 1 it is WOC outputting chan A or WOB outputting D.
+//                            bit C specifies whether it's channel A (0) or B (1). If M is 1 it is WOC outputting chan A or WOD outputting B.
 //                            WOD outputting A or WOC outputting B is not supported by the core. WOB outputting A or WOA outputting B is not supported by the hardware.
 //                            Hence, PORTMUX.TCDROUTEA == (timer table entry) & (0x07)
 //                            and any table entry > 0x40 but less than 0x80 could be a TCD

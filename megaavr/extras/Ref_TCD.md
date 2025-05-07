@@ -11,10 +11,14 @@ In addition to the synchronization, some of the intentional features make it cha
 ```c++
 analogWrite(PIN_PA4,128); // 50% PA4. - like usual
 analogWrite(PIN_PA7,192); // 50% PA4, 75% PA7 - like usual
-analogWrite(PIN_PA6, 64); // 25% PA5, 25% PA6, 75% PA7 - PA4 and PA6 are both channel A
+analogWrite(PIN_PA6, 64); // 25% PA4, 25% PA6, 75% PA7 - PA4 and PA6 are both channel A
 //use digitalWrite to turn off the PWM on a pin
 // or call turnOffPwm(pin);
 ```
+
+## WOC and WOD (PC0 and PC1)
+
+On 20/24 pin 1-Series parts, `TCD0` can also drive the `WOC` and `WOD` pins (PC0 and PC1 respectively). `WOC` and `WOD` can each be connected to either `WOA` or `WOB`, but the core only supports connecting `WOC` to `WOA` and `WOD` to `WOB`.
 
 ## Permitted settings
 You can do the following things and continue using analogWrite() and expect it to keep behaving normally. Do not expect anything else to work - if you need to do more, you need to take it over entirely.
