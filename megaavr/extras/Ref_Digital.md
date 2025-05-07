@@ -77,16 +77,17 @@ Anyway, the takeaways I intended from this are:
 * The section of the datasheet where they are talking abou 
 
 
-## Now we can talk about the digital I/O features supplied by the core
+## Now we can talk about the digital I/O features supplied by the core 
 (murmurs of annoyance from the audience 'about damn time!')
 
 * We supply the classics, which work as you know them to:
   * pinMode(uint8_t pin, uint8_t mode)
+  * digitalWrite(uint8_t pin, uint8_t state)- state should be LOW, HIGH, or CHANGE. *All other values are invalid* and hve *undefined behavior*  LOW, HIGH and CHANGE have numeric values of 0, 1, and 2, though using the numbers is deprecated. What digitalWrite() does not do is evaluate the state argument as a boolean and branch based on that.
   * digitalRead(uint8_t pin) - returns a uint8_t, not an int. **Does not turn off PWM when used on a pin currently outputting PWM, unlike the default core. Do you really want all the turnOffPWM overhead? Does it even make sense that reading will cancel an effect you enabled with a function ending in "Write"?**
   * analogWrite(uint8_t pin, uint8_t duty) - *That's not digital* "Well I can't very well talk about the ovewrhead without bringing up PWM, as you'll see."
 * There has always been an internal function by this name, which does exactly what it sounds like. For reasons unclear to me, it was hidden.
+  * turnOffPWM(uint8_t pin) - turns off PWM on the pin passed to it, if it's a PWM pin. Otherwise does nothing but burn a lot of clock cycles, especially on Dx-series. Mostly used internally, and you just digitalWrite() the pin for the same effect. 
 * And we have added a bunch of new API extensions...
-  * openDrain(uint8_t pin, uint8_t state) - State = LOW or FLOATING (HIGH will work, but is not recommended). Leaves the port output value at 0 (and sets it to that if it isn't there already), and just changes the direction.
   * digitalWriteFast(uint8_t pin, uint8_t state) - arguments must be compile-time known foldable constants (compile errors saying as much if you try), but if they are, these are extremely fast and lightweight. And let's face it, this covers a lot of real situations.
   * digitalReadFast(uint8_t pin) - As above; in a construction like `if(digitalReadFast(PINNUMBER)){...}` may use only a single clock cycle on the test.
   * pinModeFast(uint8_t pin, uint8_t mode) - as above. Performance and overhead suffer significantly if mode not constant.
@@ -97,7 +98,6 @@ Anyway, the takeaways I intended from this are:
   * All things that take a pin number as an argument, if that argument is compile time known constant, and is invalid (eg, pin doesn't exist), you'll be told as much through a compile error
     * This is consistent with my philosophy that "There is no way this line could ever not be a bug" - such as telling a pin to do something that didn't correspond to anything a pin could do is a valid and appropriate reason to generate a compile error.
   * There are many ways to outfox these "badArg" errors, since they only work on foldable compile-time-known constants. But they help to quickly catch the stupid bugs - bad tab completions, constant pin assignments copy/pasted from code for other modern AVRs, etc
-* We discourage referrign to pins by numbers. PIN_PA1, PIN_PB3 is preferred. If they're not defined at compile time, you're compiling for the wrong part or are trying to use ports you don't have.
 * We discourage referrign to pins by numbers. PIN_PA1, PIN_PB3 is preferred. If they're not defined at compile time, you're compiling for the wrong part or are trying to use ports you don't have. 
   * It's also a great help when porting between modern AVRs, as the same peripherals are found on the same port pins* 
 
@@ -366,6 +366,7 @@ With a 24 MHz system clock, that means "normal" would be just over half a clock 
 
 ## There is no INLVL or PINCONFIG on tinyAVR devices
 The configurable input level option (`INLVL`) is only available on the AVR Dx and Ex series (and likely and future series).
+The configurable input level option (`INLVL`) is only available on the AVR Dx and Ex series (and likely any future series).
 
 
 ## Standard and semi-standard API functions
