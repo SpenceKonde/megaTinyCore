@@ -10,7 +10,7 @@
 // I mean, I do too, but I hated all the alternatives we tried even more.
 // Readable code always takes priority over formatting dogma. -Spence
 
-#ifndef LOGIC_EMUMS_H
+#ifndef LOGIC_PARTS_H
 #define LOGIC_PARTS_H
 
 struct Logic::CCLBlock {
