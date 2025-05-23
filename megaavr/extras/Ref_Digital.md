@@ -81,21 +81,22 @@ Anyway, the takeaways I intended from this are:
 (murmurs of annoyance from the audience 'about damn time!')
 
 * We supply the classics, which work as you know them to:
-  * pinMode(uint8_t pin, uint8_t mode)
-  * digitalWrite(uint8_t pin, uint8_t state)- state should be LOW, HIGH, or CHANGE. *All other values are invalid* and hve *undefined behavior*  LOW, HIGH and CHANGE have numeric values of 0, 1, and 2, though using the numbers is deprecated. What digitalWrite() does not do is evaluate the state argument as a boolean and branch based on that.
+  * pinMode(uint8_t pin, uint8_t mode) `i'ts slow as shit! `
+  * digitalWrite(uint8_t pin, uint8_t state)- state should be `LOW`, `HIGH`, or `CHANGE`. *All other values are invalid* and hve *undefined behavior*  `LOW`, `HIGH` and `CHANGE` have numeric values of 0, 1, and 2, though using the numbers is deprecated. What digitalWrite() does not do is evaluate the state argument as a boolean and branch based on that.
   * digitalRead(uint8_t pin) - returns a uint8_t, not an int. **Does not turn off PWM when used on a pin currently outputting PWM, unlike the default core. Do you really want all the turnOffPWM overhead? Does it even make sense that reading will cancel an effect you enabled with a function ending in "Write"?**
   * analogWrite(uint8_t pin, uint8_t duty) - *That's not digital* "Well I can't very well talk about the ovewrhead without bringing up PWM, as you'll see."
 * There has always been an internal function by this name, which does exactly what it sounds like. For reasons unclear to me, it was hidden.
   * turnOffPWM(uint8_t pin) - turns off PWM on the pin passed to it, if it's a PWM pin. Otherwise does nothing but burn a lot of clock cycles, especially on Dx-series. Mostly used internally, and you just digitalWrite() the pin for the same effect. 
 * And we have added a bunch of new API extensions...
-  * digitalWriteFast(uint8_t pin, uint8_t state) - arguments must be compile-time known foldable constants (compile errors saying as much if you try), but if they are, these are extremely fast and lightweight. And let's face it, this covers a lot of real situations.
-  * digitalReadFast(uint8_t pin) - As above; in a construction like `if(digitalReadFast(PINNUMBER)){...}` may use only a single clock cycle on the test.
-  * pinModeFast(uint8_t pin, uint8_t mode) - as above. Performance and overhead suffer significantly if mode not constant.
-  * openDrainFast(uint8_t pin, uint8_t state) - as above.
-  * pinConfigure(uint8_t pin, uint16_t pin_config) - wrapper around all things pin maniupulation related, allowing direction and output value to be set along with all the options in the PINnCFG register.
-* We have applied some policies to all of these functions
-  * Things like digitalWrite() or pinMode() that get an argument where only a small number of options are valid, if you pass a compile time known constant that isn't valid, you'll get a compile error telling you as much.
-  * All things that take a pin number as an argument, if that argument is compile time known constant, and is invalid (eg, pin doesn't exist), you'll be told as much through a compile error
+  * openDrain(uint8_t pin, uint8_t state) - State = `LOW` or `FLOATING` (HIGH will work, but is not recommended). Leaves the port output value at 0 (and sets it to that if it isn't there already), and just changes the direction. 
+  * digitalWriteFast(uint8_t pin, uint8_t state) - arguments must be compile-time known foldable constants (compile errors saying as much if you try), but if they are, these are extremely fast and lightweight. And let's face it, this covers a lot of real situations. 
+  * digitalReadFast(uint8_t pin) - As above; in a construction like `if(digitalReadFast(PINNUMBER)){...}` may use only a single clock cycle on the test. 
+  * pinModeFast(uint8_t pin, uint8_t mode) - as above. Performance and overhead suffer significantly if mode not constant. 
+  * openDrainFast(uint8_t pin, uint8_t state) - as above. 
+  *] pinConfigure(uint8_t pin, uint16_t pin_config) - wrapper around all things pin maniupulation related, allowing direction and output value to be set along with all the options in the PINnCFG register.
+* We have applied some policies to all of these fnctions
+  * Things like digitalWrite() or pinMode() that get an argument where only a small number of options are valid, if you pass a compiletime known constant that isn't valid, you'll get a compile error telling you as much. 
+  * All things that take a pin number as an argument, if that argument is compiletime known constant, and is invalid (eg, pin doesn't exist), you'll be told as much through a compile error 
     * This is consistent with my philosophy that "There is no way this line could ever not be a bug" - such as telling a pin to do something that didn't correspond to anything a pin could do is a valid and appropriate reason to generate a compile error.
   * There are many ways to outfox these "badArg" errors, since they only work on foldable compile-time-known constants. But they help to quickly catch the stupid bugs - bad tab completions, constant pin assignments copy/pasted from code for other modern AVRs, etc
 * We discourage referrign to pins by numbers. PIN_PA1, PIN_PB3 is preferred. If they're not defined at compile time, you're compiling for the wrong part or are trying to use ports you don't have. 
@@ -165,33 +166,38 @@ openDrain(PIN_PA1, FLOATING); // sets pin INPUT. It will either float, or (if pu
 ## Fast Digital I/O
 This core includes the Fast Digital I/O functions, digitalReadFast(), digitalWriteFast() and openDrainFast(). These are take up less flash than the normal version, and can execute in as little as 1 clock cycle. The catch is that the pin MUST be a known constant at compile time. For the fastest, least flash-hungry results, you should use a compile-time known constant for the pin value as well. Remember than there are three options here, not just two. If you only want two of the options, you will get smaller binaries that run faster by using the ternary operator to explicitly tell the compiler that the value is only ever going to be those two values, and then it can optimize away the third case.
 
-An openDrainFast() is also provided. openDrainFast() also writes the pin LOW prior to setting it output or toggling it with change, in case it was set `INPUT` and `HIGH`. `CHANGE` is slightly slower and takes an extra 2 words of flash because the `VPORT` registers only work their magic when the sbi and cbi (set and clear bit index) instructions will get you what you want. For the output value, writing a 1 to the bit in `VPORT.IN` will toggle it, and that's what we do, but there is no analogous way to change the pin direction, so we have to use a full STS instruction (2 words) to write to the `PORT.DIRTGL` register after spending another word on LDI to load the bit we want to toggle into a working register.
+An openDrainFast() is also provided. openDrainFast() also writes the pin `LOW` prior to setting it output or toggling it with change, in case it was set `INPUT` and `HIGH`. `CHANGE` is slightly slower and takes an extra 2 words of flash because the `VPORT` registers only work their magic when the sbi and cbi (set and clear bit index) instructions will get you what you want. For the output value, writing a 1 to the bit in `VPORT.IN` will toggle it, and that's what we do, but there is no analogous way to change the pin direction, so we have to use a full STS instruction (2 words) to write to the `PORT.DIRTGL` register after spending another word on LDI to load the bit we want to toggle into a working register.
 
 It also includes pinModeFast(). pinModeFast() requires a constant mode argument. INPUT and INPUT_PULLUP as constant arguments are still as large and take as long to execute as digitalWriteFast with either-high-or-low-state - they turn the pullups on and off (use openDrainFast(pin,FLOATING) to execute faster and leave the pullups as is).
 
 ```c++
-digitalWriteFast(PIN_PD0, val); // This one takes 10 words of flash, and executes in around half 7-9 clocks.
-digitalWriteFast(PIN_PD0, val ? HIGH : LOW); // this one takes 6 words of flash and executes in 6 clocks
-digitalWriteFast(PIN_PD0, HIGH); // This is fastest of all, 1 word of flash, and 1 clock cycle to execute
-VPORTD.OUT |= 1 << 0; // The previous line is syntactic sugar for this. Beyond being more readable
+digitalWriteFast(PIN_PA3, val); // This one takes 10 words of flash, and executes in around 7-9 clocks (assuming the compiler can't deduce val).
+digitalWriteFast(PIN_PA3, val ? HIGH : LOW); // this one takes 6 words of flash and and runs in 6 clocks (you've given it extra information and relaxed it's assignment: you've told it that all it needs to be capable of handling is a HIGH or LOW, not CHANGE. 
+                                             //
+digitalWriteFast(PIN_PA3, HIGH); // This is fastest of all, 1 word of flash, and 1 clock cycle to execute.
+
+VPORTA.OUT |= 1 << 3; // The previous line is syntactic sugar for this. Beyond being more readable
                       // it eliminates the temptation to try to write more than one bit which instead
                       // of an atomic SBI or CBI, is compiled to a read-modify-write cycle of three
                       // instructions which will cause unexpected results should an interrupt fire in the
                       // middle and write the same register.
 ```
 
-### Flash use of fast digital output functions
+### Flash use and speed of (fast) digital output functions
+All of the "fast" digital I/O functions are set ((always_inline)). This results in each "call" having the size listed below. In fact, no call or subroutine is involved - always_inline tells it to replace the call with the body of the function, even when it's normal optimization (-Os) would favor putting it in a call 
 
-| function            | Any value | HIGH/LOW | Constant        |
+| function            | Any value | HIGH/LOW | Constant Val    |
 |---------------------|-----------|----------|-----------------|
 | openDrainFast()     | 14 words  | 7 words  | 2 words if LOW<br/>1 if FLOATING |
 | digitalWriteFast()  | 10 words  | 6 words  | 1 words         |
-| pinModeFast()       |      N/A  |     N/A  | 6 words - too easy to accidentally leave pullups on and drive pin low.  |
+| pinModeFast()       |      N/A  |     N/A  | 6 words         |
+
+
 
 Execution time is 1 or sometimes 2 clocks per word that is actually executed (not all of them are in the multiple possibility options. in the case of the "any option" digitalWrite, it's 5-7
 Note that the HIGH/LOW numbers include the overhead of a `(val ? HIGH : LOW)` which is required in order to get that result. That is how the numbers were generated - you can use a variable of volatile uint8_t and that will prevent the compiler from assuming anything about it's value. It is worth noting that when both pin and value are constant, this is 2-3 times faster and uses less flash than *even the call to the normal digital IO function*, much less the time it takes for the function itself (which is many times that. The worst offender is the normal digitalWrite(), because it also has to check for PWM functionality and then turn it off if enabled (and the compiler isn't allowed to skip this if you never use PWM).
 
-1 word is 2 bytes; when openDrainFast is not setting the pin FLOATING, it needs an extra word to set the output to low level as well (just in case). This was something I debated, but decided that since it could be connected to a lower voltage part and damage caused if a HIGH was output, ensuring that that wasn't what it would do seemed justified; if CHANGE is an option, it also uses an extra 2 words because instead of a single instruction against VPORT.IN, it needs to load the pin bit mask into a register (1 word) and use STS to write it (2 words) - and it also does the clearing of the output value - hence how we end up with the penalty of 4 for the unrestricted case vs digitalWriteFast.
+1 word is 2 bytes; when openDrainFast is not setting the pin `FLOATING`, it needs an extra word to set the output to low level as well (just in case). This was something I debated, but decided that since it could be connected to a lower voltage part and damage caused if a `HIGH` was output, ensuring that that wasn't what it would do seemed justified; if `CHANGE` is an option, it also uses an extra 2 words because instead of a single instruction against VPORT.IN, it needs to load the pin bit mask into a register (1 word) and use STS to write it (2 words) - and it also does the clearing of the output value - hence how we end up with the penalty of 4 for the unrestricted case vs digitalWriteFast.
 
 The size and speed of digitalReadFast is harder to calculate since it also matters what you do with the result. It is far faster than digitalRead() no matter what. The largest impact is seen if you plan to use it as a test in an if/while/etc statement; there are single-clock instructions to skip the next instruction if a specific bit in a "low I/O" register like the ones involved is set or cleared. Thus, it is most efficient to do so directly:
 ```c
@@ -220,26 +226,28 @@ The flash efficiency of the two methods should be very similar, (though small di
 pinConfigure(PIN_PA4,PIN_DIR_INPUT,PIN_PULLUP_ON,PIN_OUT_LOW);
 // Set PIN_PA4 to input, with pullup enabled and output value of LOW without changing whether the pin is inverted or triggers an interrupt.
 
-pinConfigure(PIN_PA2, PIN_DIR_INPUT, PIN_OUT_LOW, PIN_PULLUP_OFF, PIN_INVERT_OFF, PIN_ISC_ENABLE);
-// Set PD2 input, with output register set low, pullup, invert off, and digital input enabled. Ie, the reset condition.
+pinConfigure(PIN_PA4, PIN_DIR_INPUT, PIN_OUT_LOW, PIN_PULLUP_OFF, PIN_INVERT_OFF, PIN_ISC_ENABLE);
+// Set PA4 input, with output register set low, pullup turned off, invert turned off, and digital input enabled. Ie, the reset condition.
+
 // Equivalent:
-pinConfigure(PIN_PA2,(PIN_DIR_INPUT | PIN_OUT_LOW | PIN_PULLUP_OFF | PIN_INVERT_OFF | PIN_ISC_ENABLE));
+pinConfigure(PIN_PA4,(PIN_DIR_INPUT | PIN_OUT_LOW | PIN_PULLUP_OFF | PIN_INVERT_OFF | PIN_ISC_ENABLE));
 ```
 The second syntax is thanks to @MCUdude and his understanding of variadic macros
 
 
-| Functionality |   Enable    | Disable            | Toggle |
+| Functionality |   Enable    | Disable            | Toggle | Notes
 |---------------|-------------|---------------------|--------------------|
 | Direction, pinMode()        | `PIN_DIR_OUTPUT`<br/>`PIN_DIR_OUT`<br/>`PIN_DIRSET` | `PIN_DIR_INPUT`<br/>`PIN_DIR_IN`<br/>`PIN_DIRCLR`       | `PIN_DIR_TOGGLE`<br/>`PIN_DIRTGL` |
-| Pin output, `HIGH` or LOW   | `PIN_OUT_HIGH`<br/>`PIN_OUTSET`          | `PIN_OUT_LOW`<br/>`PIN_OUTCLR`                 | `PIN_OUT_TOGGLE`<br/>`PIN_OUTTGL`       |
-| Internal Pullup             | `PIN_PULLUP_ON`<br/>`PIN_PULLUP`         | `PIN_PULLUP_OFF`<br/>`PIN_NOPULLUP`            | `PIN_PULLUP_TGL`       |
-| Invert `HIGH` and LOW       | `PIN_INVERT_ON`                          | `PIN_INVERT_OFF`                               | `PIN_INVERT_TGL`       |
-| Use TTL levels (DB/DD only) | `PIN_INLVL_TTL`<br/>`PIN_INLVL_ON`       | `PIN_INLVL_SCHMITT`<br/>`PIN_INLVL_OFF`        | Not supported<br/>No plausible use case      |
-| Digital input buffer        |`PIN_INPUT_ENABLE`or<br/>`PIN_ISC_ENABLE` | `PIN_ISC_DISABLE` or<br/>`PIN_INPUT_DISABLE`   | Not supported<br/>No plausible use case |
-| Interrupt on change         |`PIN_ISC_CHANGE` or<br/>`PIN_INT_CHANGE`  | `PIN_ISC_ENABLE` or<br/>`PIN_ISC_DISABLE`      | Not applicable |
-| Interrupt on Rise           | `PIN_ISC_RISE` or<br/> `PIN_INT_RISE`    | `PIN_ISC_ENABLE` or<br/>`PIN_ISC_DISABLE`      | Not applicable |
-| Interrupt on Fall           | `PIN_ISC_FALL` or<br/> `PIN_INT_FALL`    | `PIN_ISC_ENABLE` or<br/>`PIN_ISC_DISABLE`      | Not applicable |
-| Interrupt on LOW            | `PIN_ISC_LEVEL`  or<br/> `PIN_INT_LEVEL` | `PIN_ISC_ENABLE` or<br/>`PIN_ISC_DISABLE`      | Not applicable |
+| Pin output, `HIGH` or `LOW` | `PIN_OUT_HIGH`<br/>`PIN_OUTSET`           | `PIN_OUT_LOW`<br/>`PIN_OUTCLR`                 | `PIN_OUT_TOGGLE`<br/>`PIN_OUTTGL`       |
+| Internal Pullup             | `PIN_PULLUP_ON`<br/>`PIN_PULLUP`          | `PIN_PULLUP_OFF`<br/>`PIN_NOPULLUP`            | `PIN_PULLUP_TGL`       |
+| Invert `HIGH` and `LOW`     | `PIN_INVERT_ON`                           | `PIN_INVERT_OFF`                               | `PIN_INVERT_TGL`       |
+| Use TTL levels (where avail)| `PIN_INLVL_TTL`<br/>`PIN_INLVL_ON`        | `PIN_INLVL_SCHMITT`<br/>`PIN_INLVL_OFF`        | Not supported<br/>No plausible use case      |
+| Enable Digital Input        | `PIN_INPUT_ENABLE`or<br/>`PIN_ISC_ENABLE` | Any of the other ISC/INT options               | Not applicable | *See note below*
+| Disable Digital Input       | `PIN_ISC_DISABLE` or<br/>`PIN_INPUT_DISABLE`| Any of the other ISC/INT options             | Not applicable | *See note below*
+| Interrupt on change         | `PIN_ISC_CHANGE` or<br/>`PIN_INT_CHANGE`  | Any of the other ISC/INT options               | Not applicable | *See note below*
+| Interrupt on Rise           | `PIN_ISC_RISE` or<br/> `PIN_INT_RISE`     | Any of the other ISC/INT options               | Not applicable | *See note below*
+| Interrupt on Fall           | `PIN_ISC_FALL` or<br/> `PIN_INT_FALL`     | Any of the other ISC/INT options               | Not applicable | *See note below*
+| Interrupt on `LOW`          | `PIN_ISC_LEVEL`  or<br/> `PIN_INT_LEVEL`  | Any of the other ISC/INT options               | Not applicable | *See note below*
 
 For every constant with TGL or TOGGLE at the end, we provide the other spelling as well. For every binary option, in addition to the above, there is a `PIN_(option)_SET` and `PIN_(option)_CLR` for turning it on and off. The goal was to make it hard to not get the constants right.
 
@@ -247,7 +255,12 @@ While pinConfigure is not as fast as the fast digital I/O functions above, it's 
 
 *Note that you must have defined an interrupt iof you enable and interrupt like this (which is perfectly fine). Remember that you must clear the intflags at the end of the interrupt!*
 
-*Note: All four Interrupt, and the the disable-digital-input-buffer option, as well as normal no-interrupts, digital-input-enabled mode are mutually exclusive. 
+
+### Regarding the digital input buffer and interrupt options
+Each pin can be in one of five modes: Enabled without interrupts, disabled without interrupts (saves power when connected to external voltages between Vdd and Gnd)
+
+
+
 ### INLVL - input logic levels
 More recent parts (The AVR-DB, DD, DU, EA and EB) allow you to configure on a per-pin basis one of two sets of input voltage levels: either the normal schmitt triggert input, which has thresholds as a fraction of Vdd, or the TTL mode which has fixed thresholds independent of operating voltage. On MVIO pins, using the schmitt trigger Vddio2 takes the place of VDDIO. Note that this is overridden when pins are used for the TWI - that defaults to I2C voltage levels, but supports an optional SMBus 3.0 mode.
 
@@ -256,7 +269,7 @@ More recent parts (The AVR-DB, DD, DU, EA and EB) allow you to configure on a pe
 | Low input (Max)     | 0.2 x Vdd | 0.3 x Vdd | 0.80 V |    0.80 V |
 | High Input (Min)    | 0.8 x Vdd | 0.7 x Vdd | 1.60 V |    1.35 V |
 
-These are the maximum voltage guaranteed to qualify as LOW and the minimum guaranteed to qualify as `HIGH`. Although the I2C levels are described as being different, it is worth noting that 1) if the schmitt trigger input on a recognized a 0.3 x Vdd voltage as LOW, it would surely do the same for a 0.2 x Vdd one, likewise at the high end. And typical characteristics graphs, when available, for modern AVRs with the same thresholds and I2C levels, show typical I/O pin thresholds as easily meeting the specs given for the I2C levels. The two options for I2C levels are not new for the DB either - they are widespread. What appears to be new is a less tightly specified but conceptually similar input circuit on all pins, selectable by a bit in PINnCTRL, instead of just I2C pins. It's important to keep in mind how this divides up possible input voltages (note: this is just based on room temp typical characteristics)
+These are the maximum voltage guaranteed to qualify as `LOW` and the minimum guaranteed to qualify as `HIGH`. Although the I2C levels are described as being different, it is worth noting that 1) if the schmitt trigger input on a recognized a 0.3 x Vdd voltage as `LOW`, it would surely do the same for a 0.2 x Vdd one, likewise at the high end. And typical characteristics graphs, when available, for modern AVRs with the same thresholds and I2C levels, show typical I/O pin thresholds as easily meeting the specs given for the I2C levels. The two options for I2C levels are not new for the DB either - they are widespread. What appears to be new is a less tightly specified but conceptually similar input circuit on all pins, selectable by a bit in PINnCTRL, instead of just I2C pins. It's important to keep in mind how this divides up possible input voltages (note: this is just based on room temp typical characteristics)
 * With Schmitt trigger inputs, highest and lowest 1/5th of the voltage-space each go to a definite value, while the voltages between allow the hysteresis that the schmitt triggers are known for. The graphs in the DA-series datasheet (DB typical charachteristics are not yet available) show that in practice, the hysteresis occurs over a much narrower voltage range than the same graph for the 4809 (which depicted three regions of similar size).
   * Typical falling threshold ranged from 0.8 up to 2.05, and rising thresholds from 1.05 V to 2.75 V. Thus, the hysteresis region ranged in size from 0.2 to 0.7 volts, but reached a nadir just around 2-2.25 V where it could be as small as 0.15 V, since the lower threshold increases faster than the upper one at the bottom of the range.
   * When Vdd = 5.0 V - 3.3 V is not guaranteed to be `HIGH`, though the typical characteristic graphs suggest that it will be, as has always been the case on AVRs.
@@ -365,7 +378,6 @@ These parts (like many electronics) are better at driving pins low than high, an
 With a 24 MHz system clock, that means "normal" would be just over half a clock cycle while rising, and just under half a clock cycle falling; with slew rate limiting, it would be just over a clock cycle rising, and 3/4ths of a clock cycle on the falling side.
 
 ## There is no INLVL or PINCONFIG on tinyAVR devices
-The configurable input level option (`INLVL`) is only available on the AVR Dx and Ex series (and likely and future series).
 The configurable input level option (`INLVL`) is only available on the AVR Dx and Ex series (and likely any future series).
 
 
@@ -382,9 +394,9 @@ uint8_t digitalPinToBitMask(uint8_t pin);
 uint8_t analogPinToBitPosition(uint8_t pin);
 uint8_t analogPinToBitMask(uint8_t pin);
 ```
-These take a pin number (which can be represented as a uint8_t - though it is unfortunately common practice to use 16-bit signed integers to store pin numbers in Arduino-land). If the pin passed is valid, these will return either the bit position (PIN_PA0 would return 0, PIN_PD4 will return 4 and so on), the bit mask (bit mask = 1 << (bit position), so PIN_PA0 would return 0x01, PIN_PD4 would return 0x10, etc) `*`, or the port number (PORTA = 0, PORTB = 1, etc).
+These take a pin number (we recommend representing pin numbers with a uint8_t, though it is unfortunately common practice to use 16-bit signed integers to store pin numbers in Arduino-land). If the pin passed is valid, these will return either the bit position (PIN_PA0 would return 0, PIN_PD4 will return 4 and so on), the bit mask (bit mask = 1 << (bit position), so PIN_PA0 would return 0x01, PIN_PD4 would return 0x10, etc) `*`, or the port number (PORTA = 0, PORTB = 1, etc).
 
-> Unlike more CISCy instructionsets, the instructions we have for shifts are only one bit in either direction. So if you want to do 1 << x where x is known at compile time, that's a 1 word 1 clock ldi because it'll be precalculated. if x is volatile or unknown at compile time it does the equivalent of while (x){ val << 1; x--}. That's like 4 or 5 clocks per bit shifted. It's just as shitty going the other direction, See, that's *WHY* we have a bitmask and a bitposition table. :-/
+> On CISC instructionsets, a right/left-shift-by-n instruction is common. We, obviously, have no such instructions; shifting a 1 byte value N bits in either direction  So if you want to do 1 << x where x is known at compile time, that's a 1 word 1 clock ldi, then a loop over the . if x is volatile or unknown at compile time it does the equivalent of while (x){ val << 1; x--}. That's like 4 or 5 clocks per bit shifted. It's just as shitty going the other direction, See, that's *WHY* we have a bitmask and a bitposition table. :-/
 
 In the event that the pin passed to it does NOT correspond to a valid pin, the following behavior should be expected:
 

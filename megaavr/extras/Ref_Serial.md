@@ -87,7 +87,9 @@ The options field takes a 16-bit value. The low 8 bits configure the "basic" uar
 
 **Parity**: if used, this must be set up in the same way on both the sender and receiver. It adds an additional bit to each character which is used to verify that the character was received correctly. This is far from foolproof - it's very good at catching single bit errors caused by noise, but errors that flip two bits (or, in fact, any even number of bits) will not be caught). To conform to the behavior of the standard Arduino Serial implementation, unlike framing errors, if a parity error is detected, the character, known to be erroneous, is discarded.
 
-**Stop Bits**: Since the idle state and a stop bit are both HIGH, using 2 stop bits is equivalent to pausing for an extra bit period between each character sent. The transmitting device might be configured to use 2 stop bits if it is communicating with a device that is using a softweare serial implementation or that struggles to keep up with serial data for some other reason (for example, if it needs some time to process each incoming byte), or to help mitihate issues caused by a baud rate mismatch that's just on the edge of working (many parts - though not the AVRs) can use 1.5 stop bits, often for this reason - it helps ensure that if the receiver's clock is running a bit slower than the transmitter's clock, the next start bit won't come before it's ready. The stop bit setting is only used by the transmitter.
+**Stop Bits**: Since the idle state and a stop bit are both HIGH, using 2 stop bits is equivalent to pausing for an extra bit period between each character sent. This is of great utility (necessity, often) in two situations:
+1. When required by the receiving device according to it's documentation. Some devices (particularly ones with software serial implementations) need an extra moment to set themselves back up for the next byte. An extra stop bit gives them that chance (normally, in software serial, you stop sampling when you read in the middle of the stop bit, and try to dothat cleanup in the remaining 1.5 bit periods), otherwise these marginal software serial implementations would struggle with twp consecutive characters. 
+2. When you are using non-ideal clock source, *and* you wish to send long blocks of continuous data (including excessively verbose console logging. Note: Unless you broke into God's stock room and stle some His clock generators (He won't be happy when he finds out, which he already did because he's omniscient - so you can't hide, and he's omnipotent, so you can't run. Overall, stealing stuff from God(s) is not recommended - didn't work for Prometheus, and it won't work for you. 
 
 These basic options all conveniently reside in a single register.
 
@@ -500,28 +502,92 @@ First three columns are normal mode, last three are U2X, which is used if you ar
 
 That table is from the receiver's perspective - notice how baud rate does not appear there: It's all about the number of bits, and the magnitude of the mismatch (and if U2X is in use - it is favorable if you have larger baud rate calculation error without it, which is often the case on classic AVRs. Classic AVRs always used it on Arduino land... because they desperately needed anything that would lower the baud rate calculation error. On a modern AVR, however, U2X mode is only favorable if you can't otherwise reach the required speed). Now, obviously the baud rate changes the baud rate calculation error (at least on a classic AVR) but that is the only way that baud rate makes a difference. The common chorus of "Lower the baud rate" is not exactly accurate here, because among commonly used baud rates on classic AVRs, certain frequencies are very favorable and othrs are not - though if you lower it enough, you do get rid of all the calculation error. That may be why 9600 baud was so popular. You will notice that in the examples I now use a baud rate of 115200 baud. That's because we are no longer using legacy parts with crap baud generators, and the slow speed of transmission at 9600 baud resulted in frequent confusion when they were logging data faster than the serial port could output it, and wondering why it was so slow.
 
-### Okay, THIS is the final table
-Communication with classic AVRs, preferred bauds vs F_CPU
-| Baud rate | 4 MHz | 8 MHz  | 12 MHz | 16 MHz | 20 MHz | 24 MHz (o/c) |
-|-----------|-------|--------|--------|--------|--------|----------------------|
-|  38400    | **Great** | **Great**  | **Great**  | **Great**  | **Great**  | **Great**    |
-|  57600    | No    |2.1% slo| **Great**  |0.8% fst|1.3% slo| **Great**                |
-|  76800    | Ha!   | **Great** | No     | **Great**  |1.7% fst| 2.3% fast            |
-| 115200    | Ha!   | No     | **Great**  |2.1% slo|1.4% slo| **Great**                |
-| 153600    | Ha!   | No     | No     | **Great**  |1.7% fst| 2.3% fast            |
+### No, actual final tables, the ones you care about "Does serial work at this baud rate, assuming an ideal receiver?"
 
-A UART clock would have a table like:
-| Baud rate | Most any uart clock |
-|-----------|-----------|
-| 38400     | **Great** |
-| 57600     | **Great** |
-| 76800     | **Great** |
-| 115200    | **Great** |
-| 153600    | **Great** |
-| 230400    | **Great** |
-| 460800    | **Great** |
+
+Classic AVR, UART crystal. Not bad. It is somewhat challenging to set up the millis timer to keep proper count when the system clock is 14745600 Hz than when it's 16000000 Hz, imposing a performance penalty (I implemented this on old classic ATTinyCore)
+
+ F_CPU   | 921k| 460k| 345k| 230k| 172k| 115k| 76k | 57.6k
+ --------|-----|-----|-----|-----|-----|-----|-----|------
+ 7372800 | YES | YES | NO! | YES | NO! | YES | YES | YES  
+ 9216000 | NO! | NO! | NO! | YES | NO! | YES | YES | YES  
+11059200 | NO! | YES | YES | YES | YES | YES | YES | YES  
+12902400 | NO! | NO! | NO! | YES | NO? | YES | YES | YES  
+14745600 | YES | YES | NO! | YES | NO? | YES | YES | YES  
+18432000 | NO! | YES | NO! | YES | NO? | YES | YES | YES  
+20275200 | NO! | NO! | NO! | YES | NO? | YES | YES | YES  
+22118400 | YES | YES | YES | YES | YES | YES | YES | YES  
+
+"NO!" indicates no prayer of it working on a classic AVR 
+"YES" indicates perfect baud matching
+"NO?" indicates it is highly unlikely to work
+There are no cases I found in my quick review of a UART crystal at a realistic, "traditional" UART baud rate (only looked at 56.7k and up) where the crystal was able to make a baud rate that worked but waas not dead on. 
+
+#### Classic AVR, clock speeds you actually want to ise
+In contrast, with actual common CPU speeds on classic AVRs it was also pretty ugly and I am amazed it worked as well as it did. 
+
+ F_CPU   | 921k| 460k| 345k| 230k| 172k| 115k| 76k |56.6k|36.4k|19.2k|
+ --------|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+ 4000000 | No  |Great|Great||Great|Great|Great|Great|Great|Great|
+ 8000000 | NO! | No  | No  | YES | NO! | Bad |Great|Poor |Great|Great|
+12000000 | NO! | NO! | NO! | No  | No  |Great|Poor |Great|Great|Great|
+16000000 | NO! | No  | No  | No  | Poor|Poor |Poor | Good|Great|Great|
+20000000 | NO! | NO! | Poor| Good| Poor| Good| Good|Great|Great|Great|
+24000000 | NO  | NO  | No  |Great|Great|Great|Great|Great|Great|Great|
+
+New ratings: Great - within 1%
+Good - within 2%, likely to work
+Poor - Wirthin 4%, crapshoot. 
+
+#### Modern AVRs like the ones covered in this document
+And for modern AVRs (I dropped the last two baud rates, I think you can guess how well it will do :-) )
+ F_CPU   | 921k| 460k| 345k| 230k| 172k| 115k| 76k |56.6k|
+ --------|-----|-----|-----|-----|-----|-----|-----|-----|
+ 4000000 |Barely|Great|Great|Great|Great|Great|Great|Great|
+ 8000000 |Great|Great|Great|Great|Great|Great|Great|Great|
+16000000 |Great|Great|Great|Great|Great|Great|Great|Great|
+20000000 |Great|Great|Great|Great|Great|Great|Great|Great|
+28000000 |Great|Great|Great|Great|Great|Great|Great|Great|
+30000000 |Great|Great|Great|Great|Great|Great|Great|Great|
+32000000 |Great|Great|Great|Great|Great|Great|Great|Great|
+40000000 |Great|Great|Great|Great|Great|Great|Great|Great|
+48000000 |Great|Great|Great|Great|Great|Great|Great|Great|
+
+Yeah, this is much simpler. Guaranteed under 1% baud calc error . Not only that, the "Great"s are often 0.2% or less compared to classic's "Greats" which are often 0.5%
+
+I think we can all be thankful for the fractional baud rate generator. 
+
+Unless you happen to be a UART crystal manufacturer maybe. 
+
+### Of couerse, there IS still clock skew
+On tinyAVR or EB, you probably don't have an external oscillator, and you may not choose to put one on your DA/DB/DD/EA. In these cases, the internakl oscillator error is added to the calcuilation error (which is thankfully near nil, as we just discussed. 
+
+In the past (classicv AVR) making serial work without a crystal could be impossible, an adventure, or a cake walk depending on the specimen (not part, specimwn), and what it's talking to (cause sometimes the adapters are off)
+
+UARTs sample their RX line 16 times per bit period (or optionall half that on AVR, an option that is almost always advantageous on classic and almost alwatys disadvantageous on modwen - so we don't have Serial.begin() turn that on unless you request a baud requires it. The three middle samples (either 8, 9, and 10, or 4, 5, and 6) then majority vote on whether the bit was a high or a low. As soon as the receiver has taken their last sample of the stop bit, and confirmed it to be such a thing, it it s ready to receive another,.k
+
+
+
+
+
+`*` Aliexpress sucks this way. The first thing you do when you buy oscillators or crystals from them (which is very tempting, as the china discount on the most desirable packages - 4-pin SMD 5032 or 3225 packages is like 5 to 1, with better selection available. Tjthe china discount smaller on shittier packages like the collossal HC/49) is repack them and clearly lablel them). Oscillators are all that crystals are that we hate, cost as much as the MCU, only work in one voltage range (ie, 1.5-2, 3.3.6, 4.5-5.5), are polarity semsitive, and static senstivive, and current hogs. Ugh! (Don't buy oscillators on aliexpress - or at all if tyou can avoid it - the china discount is barely 2:1 and they don't even appear to *know* the part numbers... OR THE VOLTAGE OF OSCILLATORS! Given that the last oscilator rated for operation from 1.8-5v went out of production around when the DB came out, and that in fact, no single oscillator is good for more than one common voltage range since the discontinuation of that line from... was it epson? Not a company you think of when you think of frequency crystals. I'm annoyed I didn't stock up! I was distracted by the DBs. So you really have maybe a 1/3 chance assuming all voltage ranges are equally represented, unless they all hail from some no-name Chinese manufacturer who hasn't forgotten the lessons of - what 5 years ago? and still knows how to build wide voltage rannge oscillators? The alternative is that clueless vendors are selling oscillators to clueless buyers who will have a 1 in 3 chance of operating withing specification assuming all voltage ranges are equally represented (I suspect 3.3 an4 5 are overrepresented). Oh and remember how I said the markings are often unreadable or absent (and when present, may be a code number useless without knowing the mfg, if it's public at all)? In some cases, that includes THE POLARITY MARKING. In case you haven't worked with these, when installed backwards, they instantly fail. 
 
 Anyway, enough about classic AVRs, let us look forward, not back!
+
+### A word about baud rate mismatch
+"I said moving on!" *You're not moving on without explaining "barely-working regime" that we constntly find outselves in. Or **I** will!* "Considering the morbid examples you pick, fine." 
+
+So let's consider  1 USART frame (character), data 0bABCDEFGH (where uppercase letters are 1's or 0's)
+
+1. USART line starts HIGH. It first sends the start bit, a 0 bit,
+2. It then sends the rest of the databytes in the opposite order of how everything else does it: HGFEDCBA
+3. It finally ends the frame with a stop bit, which bis a 1. 
+4. It returns to idle state. 
+
+Now the transmitter is timing these bits based on the baud rate you asked for, and assumes it's timebase is accurate. So is the receiver. The internal osciallators on modern AVRs really are good enough that you rarely need to worry about using a crystal in most situations, including this. but it deos raise the prospect of a specific and baffling behavior where **Short bursts of data work, but longer messages turn into gibberish partway through**, occurring in in one direction (from the faster to the slower device (eg, from a device a a percent or two fast to one a percent or two slow).
+
+This is easy to understand if you imagine what is being output by the transmitter. If it's g
+
 
 ### Minimum and Maximum baud rates
 Like Classic AVRs the maximum baud rate is F_CPU / 8, using the `U2X` mode, which is still the case.
