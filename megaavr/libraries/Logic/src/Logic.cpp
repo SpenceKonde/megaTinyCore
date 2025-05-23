@@ -122,13 +122,20 @@ void Logic::init() {
   }
 
   // Set logic output state and output filter
-  block.LUTCTRLA = (output ? CCL_OUTEN_bm : 0)
-                   | (edgedetect ? CCL_EDGEDET_EN_gc : 0)
-                   | (filter << CCL_FILTSEL_gp)
-                   #ifdef CCL_CLKSRC_gp
-                   | (clocksource << CCL_CLKSRC_gp)
-                   #else
-                   | (clocksource << CCL_CLKSRC_bm)
-                   #endif
-                   | (enable ? CCL_ENABLE_bm : 0);
+  // Register layout everything except modern tinyAVR 0/1-series.
+  // LUTCTRLA: EDGEDET | OUTEN  | FILTSEL [1:0] | CLKSRC [2:0]  | Enable, e O F_F C_C_C E
+  // 0/1-series tinyAVR:
+  // LUTCTRLA: EDGEDET | CLKSRC | FILTSEL [1:0] | OUTEN | - | - | Enable, e C F_F O _ _ E
+
+  block.LUTCTRLA = (output       ?  CCL_OUTEN_bm      : 0)
+                 | (edgedetect   ?  CCL_EDGEDET_EN_gc : 0)
+                 | (filter      <<  CCL_FILTSEL_gp       ) /* << 4 is emitted as swap, andi 0xF0, not 4x lsl */
+    #ifdef CCL_CLKSRC_gp
+                 | (clocksource <<  CCL_CLKSRC_gp        ) /* group position in this case is 1 */
+    #else
+                 | (clocksource  ?  CCL_CLKSRC_bp : 0    ) /* w/out the group defined, that means there were only two options, and that thats the only bit that should be impacted by the setting */
+    #endif
+                 | (enable       ?  CCL_ENABLE_bm : 0    );
 }
+
+/* Generally speaking, in code that is executed often or which isspeed sensitive, you prefer to avoid shift operations where one or both of the operands is not compiletime known.

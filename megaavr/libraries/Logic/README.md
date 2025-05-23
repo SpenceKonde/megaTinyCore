@@ -1,13 +1,18 @@
 # Logic
 A library for interfacing with the CCL (Configurable Custom Logic) peripherals on modern AVR MCUs.
-Developed by MCUdude for use with [MegaCoreX](https://github.com/MCUdude/MegaCoreX), adapted to tinyAVR 0/1-series parts by [Tadashi G. Takaoka](https://github.com/tgtakaoka), and to 2-series and Dx-series by [Spence Konde](https://github.com/SpenceKonde)
+Developed by MCUdude for use with [MegaCoreX](https://github.com/MCUdude/MegaCoreX), adapted to tinyAVR 0/1-series parts by [Tadashi G. Takaoka](https://github.com/tgtakaoka), and to 2-series and Dx-series, Ex-series, and SD-series by [Spence Konde](https://github.com/SpenceKonde)
 Correction of several issues on the tinyAVR parts and adaptation of examples by [Spence Konde](https://github.com/SpenceKonde).
-All of the examples assume the use of megaTinyCore, MegaCoreX or DxCore as appropriate (code is generally directly portable between megaAVR 0-series, tinyAVR 2-series and AVR Dx-series parts, minor modifications may be required for porting to or from tinyAVR 0/1-series parts). This document is focused on the Dx-series parts. For information on this library relating to the megaAVR or tinyAVR parts, see the version of this document included with MegaCoreX or megaTinyCore.
+
+All of the examples assume the use of megaTinyCore, MegaCoreX or DxCore as appropriate (code is generally directly portable between megaAVR 0-series, tinyAVR 2-series and AVR Dx-series parts, minor modifications may be required for porting to or from tinyAVR 0/1-series parts). 
+
+This library is easy to update for more parts as long as they're well behaved. Support for a part family does not imply that a core is available, as adding support for parts to that is more complicated.
+
 More information about CCL can be found in the [Microchip Application Note TB3218](http://ww1.microchip.com/downloads/en/AppNotes/TB3218-Getting-Started-with-CCL-90003218A.pdf) and in the [megaAVR-0 family data sheet](http://ww1.microchip.com/downloads/en/DeviceDoc/megaAVR0-series-Family-Data-Sheet-DS40002015B.pdf) and the datasheet for the part in question.
 
 
 
-## Pin availability and Quick Reference (Dx-series)
+
+## Pin availability and Quick Reference (Dx/Ex-series)
 
 Logic Block |  IN0-2  | OUT | ALT OUT | Availability  | Notes:
 ------------|---------|-----|---------|---------------|-----------------------------
@@ -18,19 +23,22 @@ Logic3      | PF0-PF2 | PF3 |     --- |    All parts  | Link input broken on mos
 Logic4      | PB0-PB2 | PB3 |     PB6 | 48+ pin DA/DB |
 Logic5      | PC0-PC2 | PC3 |     PG6 | 48+ pin DA/DB |
 
-Logic Block |  14-pin DD            |  20-pin DD          |  28 pin Dx          |  32-pin Dx          |  48-pin Dx          |  64-pin Dx          |
-------------|-----------------------|---------------------|---------------------|---------------------|---------------------|---------------------|
-Logic0 IN   | IN0/1 if no xtal used | No IN0/1 if HF xtal | No IN0/1 if HF xtal | No IN0/1 if HF xtal | No IN0/1 if HF xtal | No IN0/1 if HF xtal |
-Logic0 OUT  | None                  | YES, Both           | YES, both           | YES, both           | YES, both           | YES, both           |
-Logic1 IN   | No IN0 because no PC0 | No IN0 - no PC0     | YES, all            | YES, all            | YES, all            | YES, all            |
-Logic1 OUT  | No alt output         | No alt output       | YES, both           | YES, both           | YES, both           | YES, both           |
-Logic2 IN   | None                  | None                | No IN0 on DB/DD     | No IN0 on DB/DD     | YES, all            | YES, all            |
-Logic3 IN   | None                  | None                | IN0, IN1 only       | YES, all            | YES, all            | YES, all            |
-Logic3 OUT  | None                  | None                | None                | No alt output       | No alt output       | No alt output       |
-Logic4 IN   | Not present on DD     | Not present on DD   | Not present on 28pin| Not present on 28pin| YES, all            | YES, all            |
-Logic4 OUT  | Not present on DD     | Not present on DD   | Not present on 28pin| Not present on 28pin| No alt output       | YES, both           |
-Logic5 IN   | Not present on DD     | Not present on DD   | Not present on 28pin| Not present on 28pin| NO (no PORTG)       | YES, all            |
-Logic5 Out  | Not present on DD     | Not present on DD   | Not present on 28pin| Not present on 28pin| NO (no PORTG)       | YES, both           |
+As you can see, things are fairly straightforward, and exactly what you would expect from the pinout. Not all CCL LUTs have inputs on lower pincounts, same with outputs. No allowance is made for peculiarities of a part regarding it's pin mappings. I think Microchip came in, looked at the pinout of their last half dozen AVR releases, finding no commonality of port functionality, peripheral-to-pin mapping, or whathaveyou, swept them off the table in disgust
+
+Logic Block |  14-pin DD            |  20-pin DD          |  28 pin DA          |  32-pin DA          |  48-pin DA/B, EA    |  64-pin DA/B        | DB, DD 28, 32 pin | DU            | EA               | EB                | SD
+------------|-----------------------|---------------------|---------------------|---------------------|---------------------|---------------------|-------------------|---------------|------------------|-------------------|------------------|
+Logic0 IN   | IN0/1 if no xtal used | No IN0/1 if HF xtal | All                 | All                 | All                 | All                 | All per DA,       | As DD or DA   | As DA except,    | As DU, except:    | As DD/DB         |
+Logic0 OUT  | None                  | YES, Both           | YES, both           | YES, both           | YES, both           | YES, both           | except:           | except:       | always 4 LUTs    |                   | always 6 LUTs    | 
+Logic1 IN   | No IN0 because no PC0 | No IN0 - no PC0     | YES, all            | YES, all            | YES, all            | YES, all            |                   | None          |                  | CCL1 In avail.    |                  |
+Logic1 OUT  | No alt output         | No alt output       | No alt output       | No alt output       | YES, both           | YES, both           |                   | No alt output |                  |                   |                  |
+Logic2 IN   | None                  | None                | All                 | All                 | YES, all            | YES, all            | No PD0            | PD0 if > 28pin|                  |                   |                  |
+Logic2 OUT  | Alt only              | Alt only            | All                 | All                 | All                 | All                 |                   |               |                  |                   |                  |
+Logic3 IN   | None                  | None                | IN0, IN1 only       | YES, all            | YES, all            | YES, all            |                   |               |                  |                   |                  |
+Logic3 OUT  | None                  | None                | None                | No alt output       | No alt output       | No alt output       |                   |               |                  |                   |                  |
+Logic4 IN   | Not present on DD     | Not present on DD   | Not present on 28pin| Not present on 32pin| YES, all(DA/DB only)| YES, all            |                   |               |                  |                   |                  |
+Logic4 OUT  | Not present on DD     | Not present on DD   | Not present on 28pin| Not present on 32pin| No alt output       | YES, both           |                   |               |                  |                   |                  |
+Logic5 IN   | Not present on DD     | Not present on DD   | Not present on 28pin| Not present on 32pin| NO (no PORTG)       | YES, all            |                   |               |                  |                   |                  |
+Logic5 Out  | Not present on DD     | Not present on DD   | Not present on 28pin| Not present on 32pin| NO (no PORTG)       | YES, both           |                   |               |                  |                   |                  |
 
 Notice how logic block 2 and 3 on 14/20 pin DD and logic block 5 on 48-pin parts have no dedicated pins. If you are not using pin input or output, use these logic blocks to conserve the more useful ones when not precluded by other considerations.
 
@@ -93,7 +101,7 @@ Note that there exist reserved and invalid values for many of the bitfields cont
 | filter      | logic::filter::             | 'filter'/'sync' or 'disable' filter         |
 | edgedetect  | logic::edgedetect::         | 'enable'/'disable' edge detect mode         |
 | sequencer   | logic::sequencer::          | selects the sequecer, even #'ed blocks only |
-| clocksource | logic::clocksource::        | select clock source, if not async.          |
+| clocksource | logic::clocksource::        | select clock source for applicable functions|
 | truth       | uint8_t                     | truth table                                 |
 
 Compatibility note: Since the version released with metaTinyCore 2.6.1 and DxCore 1.5.0, all the namespaces for the enumerated types are within the `logic::` namespace, as otherwise conflicts arose with other libraries that used namespaces of the same names.
@@ -106,38 +114,39 @@ Compatibility note: Since the version released with metaTinyCore 2.6.1 and DxCor
 | attachInterrupt();  | Attach an interrupt on the CCL, supports RISING/FALLING/CHANGE              |
 | detachInterrupt();  | Detach the currently attached interrupt.                                    |
 
-The correct order for for initialization is:
-1. Set the properties as required for your application.
-2. Attach any interrupts if using attachInterrupt. Note that interrupts may also be defined manually - if this is done, you must avoid calling LogicN.attachInterrupt and LogicN.detachInterrupt on any logic block, and write to the appropriate registers to enable them. Interrupts defined this way, particularly if short and simple, will execute much faster. Refer to the datasheet for more information.
-2. call `LogicN.init()` to write those properties to the CCL registers.
+### The correct order for for initialization is... that depends
 
-The correct procedure for modifying the configuration of one or more logic blocks is impacted by a significant erratum on most extant silicon. Currently, only the AVR DD-series is spared.
+There is an erratum that cannot be papered over:
 
-**When ERRATA_CCL_PROTECTION is undefined, or defined and -1 or a number higher than SYSCFG.REVID:**
-1. Set the properties as required for all logic blocks being changed.
-2. Call `Logic::stop()`.
-3. Call `LogicN.init()` on all logic blocks that have been changed.
-4. Call `Logic::start()` to restart the CCL as a whole.
+**Intended Behavior:** When a LUT is enabled, and the CCL in general is enabled, the settings for that LUT cannot be changed and one of those must be disabled before it is reconfigured. 
 
-**When ERRATA_CCL_PROTECTION is defined, and is 0 or a number lower than SYSCFG.REVID** this behavior has been fixed, and you do not need to shut down the CCL entirely
-1. Set the properties as required for logic block being changed.
-2. Call `LogicN.init()` on all that logic block. This will briefly shut down only that particular logic block, just long enough to reconfigure it. Other logic blocks will continue to function.
-3. Repeat if configuring more than one. You may set all the properties of multiple blocks and then call init in succession, or not, as you please.
+In this case, no special developer action is needed. Init knows that it needs to turn the LUT off if it's enabled. You may use `logic::start()` a single time in setup() and never call `logic::stop()`, and reconfigure freely. Unfortunately, a great many parts are impacted by this bug (It happened at the same time the TCA restart erratum was added. That erratum has the distinction of explicitly being exactly what the datasheet states the behavior was. )
 
-NOTE: You may wish to follow the first process even on parts without this erratum - if all of your LUTs are interdependent, you probably want them to come back on simultaneously.
+**Errata-impacted Behavior:** When a LUT is enabled *OR* the CCL in general is enabled, the settings for that LUT cannot be  changed. Thus, to reconfigure, you set up all the new properties, then you must disable the whole CCL. Then you can call the then use the `LogicN.init()` to write the new configuration. Then you call `Logic::start()` to turn the CCL back on. 
 
-You may test for this as shown below:
+
+(in both cases, properties of LogicN objects are assumed to have been set)
 ```c++
-// assumes you've already set the properties
-if (checkErrata(ERRATA_CCL_PROTECTION)) {
-  Logic::stop(); //All other logic blocks briefly disabled!
-  Logic1.init();
-  Logic2.init();
-  Logic::start(); // all logic blocks re-enabled.
-} else {
-  Logic1.init(); // Only logic block 1 disabled while this runs.
-  Logic2.init(); // Only logic block 2 disabled while this runs.
-}
+// first time setup, with erratum:
+Logic0.init();
+Logic1.init();
+Logic::start(); //must be after all inits
+
+
+//Reconfigure Logic2:
+Logic::stop(); // Logic0 and Logic1 do not run while applying changes to Logic2.
+Logic2.init();
+Logic::start();
+```
+```c++
+// first time setup, without erratum:
+Logic0.init();
+Logic1.init();
+Logic::start(); //Can be aanywhere depending on your needs. 
+
+
+//Reconfigure Logic2:
+Logic2.init(); // Logic0 and Logic1 do run while applying changes to Logic2.
 ```
 
 
@@ -173,39 +182,6 @@ General notes:
   * If the sequencer is enabled, for the purposes of pin output, and the `logic::in::feedback` option and likely event generation, it replaces the output of the even logic block
   * If the sequencer for the pair consisting of logic block 2 and 3 is used, it is not clear whether the link input from logic block 1 will get the sequencce output or the logic block output before the sequencer.
 
-#### Accepted values for Dx-series and EA-series parts
-
-``` c++
-logic::in::masked;           // Pin not in use
-logic::in::unused;           // Synonym for masked
-logic::in::disable;          // Synonym for masked
-logic::in::feedback;         // Connect output of even logic block in this pair or the sequencer if in use, to this input
-logic::in::link;             // Connect output of next logic block to this input **Errata Warning**
-logic::in::event_a;          // Connect input to event a (preferred)
-logic::in::event_0;          // Connect input to event a
-logic::in::event_b;          // Connect input to event b (preferred)
-logic::in::event_1;          // Connect input to event b
-logic::in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode (imagine using an OUTPUT to switch modes)
-logic::in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on
-logic::in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off
-logic::in::input;            // Synonym for input_no_pullup
-logic::in::ac;               // Connect input to AC0-2 for input 0-2. If a part does not have all 3 ACs, only inputs from ACs present on the chip can be used.
-logic::in::tcb;              // Connect to TCB0-2 output for input 0-2.
-logic::in::tca0;             // Connect input to TCA0 WO0~2 for input 0~2
-logic::in::tca1;             // Connect input to TCA1 WO0~2 for input 0~2 - unavailable on parts without a second TCA1
-logic::in::tca;              // Synonym for tca0 (for compatibility with code written for tinyAVRs and megaAVR 0-series)
-logic::in::tcd;              // Connect input to TCD0 WOA, WOB, WOC (for input 0~2). Unavailable on EA-series as they don't have a TCD.
-logic::in::usart;            // Connect input to TXD of USART 0~2 (for input 0~2). On parts with 2 USARTS, only works on inputs 0 and 1.
-logic::in::spi;              // Connect input to SPI0 MOSI, MOSI, SCK (for input 0~2)
-```
-Notes specific to Dx-series:
-* Notice that only SPI0 can be used. SPI input is supported in master mode only.
-* Notice that only TCB0-2, USART 0-2, and TCA0/1 WO0-2 can be used in this way.
-* logic:in:tcb uses outputs the level that the pin would have whether or not the pin is enabled. It only works in single shot and 8-bit pwm mode, as the others do not use the output pin.
-* That the instance of the peripheral used is equal to the input number for ACs, TCBs, and USARTs, and requirement to use a certain input to get certain signals from SPI1 may become problematic when using more than one such peripheral. The same is true to a lesser extent of the WOA-C, WO0-2 <-> input number correlation.
-  * This means that depending on your needs, your choice of inputs may be dictated by the
-* TCD0 *WOC is always set by the core to WOA*, not WOB. Changing the relevant register manually will break analogWrite() on the corresponding pins if takeOverTCD0() has not been called. TCD only has two outputs; WOA and WOB - WOC and WOD just mirror one of the others to allow more freedom choosing pins
-* **Errata warning** If input on the highest-number Logic is set to link, it will use the output of Logic0 **unless** the part is a 28 or 32 pin part, in which case, depending on the silicon rev, series, and flash size, it may not receive anything (presumable because of a mistake when scaling down the number of LUTs for the lower pincounts.)
 
 #### Accepted values for tinyAVR 0/1-series parts
 
@@ -223,15 +199,16 @@ logic::in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do n
 logic::in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on
 logic::in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off
 logic::in::input;            // Synonym for input_no_pullup
-logic::in::ac;               // Synonym for ac0 - Compatibility warning
+logic::in::ac;               // Synonym for ac0 - Compatibility warning. 
 logic::in::ac0;              // Connect input to the output of analog comparator (AC0) - Compatibility warning
-logic::in::tcb0;             // Connect input to TCB0 WO - Compatibility warning
-logic::in::tcb;              // Synonym for tcb0 - on other parts, there is only one TCB input option, and in0 is TCB0, in1 TCB1 etc.
+logic::in::tcb0;             // Connect input to TCB0 - Compatibility Warning
+logic::in::tcb;              // Synonym for tcb0 - Compatibiliy warning
 logic::in::tca0;             // Connect input to TCA0 WO0~2 for input 0~2
-logic::in::tca;              // Synonym for tca0
-logic::in::tcd;              // Connect input to TCD0 WOA, WOB, WOA for input 0, 1, 2
-logic::in::usart;            // Connect input to USART0 XCK and TXD for input 0, 1 - on other parts only TX is accessible this way, and input number = USART number.
-logic::in::spi;              // Connect input to SPI0 SCK, MOSI, MISO for input 0, 1, 2 - Compatibility warning
+logic::in::tca;              // Synonym for tca0 Not recommended for new code. 
+logic::in::tcd0;             // Connect input to TCD0 WOA, WOB, WOA for input 0, 1, 2
+logic::in::tcd;              // Synonym for tcd0 Not recommended for new code. 
+logic::in::usart;            // Connect input to USART0 XCK and TXD for input 0, 1 - Compatibility warning - feature removed!
+logic::in::spi;              // Connect input to SPI0 SCK, MOSI, MISO for input 0, 1, 2 - Compatibility warning - feature removed!
 logic::in::ac1;              // Connect input to AC1 OUT (input 0, 1 on parts with 3 ACs only - Compatibility warning
 logic::in::ac2;              // Connect input to AC2 OUT (input 0, 1 on parts with 3 ACs only) - Compatibility warning
 logic::in::tcb1;             // Connect input to TCB1 WO (input 0, 1 on parts with 2 TCBs only) - Compatibility warning
@@ -246,13 +223,6 @@ Notes specific to ATtiny 0/1-series:
 * Among tinyAVR 1-series Only the ATtiny1614, 1616, 1617, 3216, and 3217 have TCB1, AC1, and AC2. All tiny 2-series have TCB1, but they never have more than one AC.
 * DA/DB have 3 AC's, EA 2, and the DD, DU and EB have one.
 The two final limits add further chaos to the distributions of numeric values for users and generators - the two seem to have had separate algorithms for determining when to leave holes for absent peripherals, and when to fill them in. They *really* seem to like filling in the holes in the generator lists, leaving me wondering what it is abouut the length of the list with such a high cost...
-
-* **Errata warning** Many parts in circulation are impacted by an errata (though not all - some never had it, while the 32k parts have gotten a die rev that fixes it. On effected parts, the link input does not work unless pin output of the other logic block is enabled. Check the applicable errata and datasheet clarification document from Microchip to see if your part is impacted. Other parts have a
-* **Compatibility warning** The tinyAVR 0/1's were the first AVRs with CCL. They made some decisions that they realized weren't such a good idea after all and changed for parts released more recently. Most importantly, for TCBs and ACs, as well as USARTs, the peripheral number used is the input number. SPI on these parts makes MISO available supposedly. Later parts do not. Later parts also only make USART TXD available - though you can get XCK from the event system.
-* USART option will use XCK on input 0, TXD on input 1, and is not valid for input 2.
-  * MISO is (supposedly) available as an input when SPI is used as the input.
-  * Parts with two TCBs or three ACs give them their own channel on 0/1-series. Obviously there wouldn't be enough channels for this if it were done on a Dx with 5 TCBs, and 3 ACs. The other parts that have multiples of these (2-series and Dx) have one channel for this, and the input number selects which one is used, but only the first two can be used.
-* The tinyAVR 0/1-series datasheets refer to the event channels as 0 and 1. On all subsequent parts, they are referred to as A and B. The Logic library always accepts both, though we recommend using `event_a`/`event_b`everywhere, as it is clear that that is the convention that Microchip chose to settle on.
 
 #### Accepted values for tinyAVR 2-series
 ``` c++
@@ -282,6 +252,94 @@ Notes for tinyAVR 2-series:
 * If input on the highest-number Logic3 is set to link, it will use the output of Logic0
 * If you need to link input to logic block other than block N+1, or if you need feedback output from the an odd-numbered logic block, use the event system.
 * Not all pin inputs are available on all parts (see table above). The event system can be used to bring in input from other pins.
+
+#### Accepted values for Dx-series and Ex-series parts
+
+``` c++
+logic::in::masked;           // Pin not in use
+logic::in::unused;           // Synonym for masked
+logic::in::disable;          // Synonym for masked
+logic::in::feedback;         // Connect output of even logic block in this pair or the sequencer if in use, to this input
+logic::in::link;             // Connect output of next logic block to this input WARNING: There are errata involving this on 28 and 32 pin DA/DB parts. 
+logic::in::event_a;          // Connect input to event a (preferred)
+logic::in::event_0;          // Connect input to event a
+logic::in::event_b;          // Connect input to event b (preferred)
+logic::in::event_1;          // Connect input to event b
+logic::in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode. For example, you might leave it output, and toggle the pin to switch modes of your CCL contraption. 
+logic::in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on. 
+logic::in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off - set only when a push-pull output of something is connected.
+logic::in::input;            // Synonym for input_no_pullup
+logic::in::ac;               // Connect input to one of the analog comparators. See table below. 
+logic::in::tcb;              // Connect to TCB0-2 output for input 0-2. See table.
+                             // There is no tcb0 or tcb1 option. The TCB instance used as so
+logic::in::tca0;             // Connect input to TCA0 WO0~2 for input 0~2
+logic::in::tca1;             // Connect input to TCA1 WO0~2 for input 0~2 - only available on parts with a second TCA: 48/64 pin DA/DB, and all EA-series parts. 
+logic::in::tca;              // Synonym for tca0 (for compatibility with code written for tinyAVRs and megaAVR 0-series). Not recommended for new code. 
+logic::in::tcd0;             // Connect input to TCD0 WOA, WOB, WOC (for input 0~2). Unavailable on parts which do not have a TCD. 
+logic::in::tcd;              // Synonym for tcd, as no part has been released with two TCDs. Presently, I question the liklihood of any device ever having a second TCD. Still, not recommended for new code. 
+logic::in::tce0;             // Connect to WO0 ~ 2 of TCE0. There is no way to get TCE WO3. except through an event channel.
+logic::in::tcf0;             // Connect to WO0, WO1, or WO0 of TCF0. No unnumbered tcf provided as I expect a 2x TCF part at some point. 
+logic::in::usart;            // Connect input to TXD of USART 0~2 (for input 0~2). On parts with 2 USARTS, only works on inputs 0 and 1.
+logic::in::spi;              // Connect input to SPI0 MOSI, MOSI, SCK (for input 0~2) - hence SCK goes on the one you can use as the clock, which makes sense. 
+```
+Notes specific to Dx-series:
+* Notice that only SPI0 can be used. SPI input is supported in master mode only.
+* Notice that only TCB0-2, USART 0-2, and TCA0/1 WO0-2 can be used in this way.
+* logic:in:tcb uses outputs the level that the pin would have whether or not the pin is enabled. It only works in single shot and 8-bit pwm mode, as the others do not use the output pin.
+* That the instance of the peripheral used is equal to the input number for ACs, TCBs, and USARTs, and requirement to use a certain input to get certain signals from SPI1 may become problematic when using more than one such peripheral. The same is true to a lesser extent of the WOA-C, WO0-2 <-> input number correlation.
+  * This means that depending on your needs, your choice of inputs may be dictated by the
+* TCD0 *WOC is always set by the core to WOA*, not WOB. Changing the relevant register manually will break analogWrite() on the corresponding pins if takeOverTCD0() has not been called. TCD only has two outputs; WOA and WOB - WOC and WOD just mirror one of the others to allow more freedom choosing pins
+* **Errata warning** If input on the highest-number Logic is set to link, it will use the output of Logic0 **unless** the part is a 28 or 32 pin part, in which case, depending on the silicon rev, series, and flash size, it may not receive anything (presumable because of a mistake when scaling down the number of LUTs for the lower pincounts.)
+
+
+
+#### Compatibility Warnings and differences between parts:
+In most cases, we are able to paper over differences between parts transparently. This is one place where they haven't renamed options, but actually removed options that were previously present, such that a small number of CCL configurations that were possible on tiny1616/17 and 32k versions which will need inputs reordered, and in a few cases may be impossible, because a feature (of dubious utility) was removed. I doubt anyone was using it, but, see the tables below. 
+
+
+##### Analog Comparator input
+The tiny 0/1, and the single-comparator parts from other series are very simple, all inputs can be connected to AC0 output. 
+The tiny 1+ parts (16k flash 1-series parts), which get a bushel of extra features (discussed elsewhere, but including three analog comparators) get an option for all three analog comparators on each part.
+All other parts with more than one analog comparator expose AC0 output on IN0, AC1 on IN1, and AC2 on IN2 (if they have it), otjherwise either another copy of AC1, or nothing.
+
+Heading | tiny0/1 | tiny1+  | DA/DB   | DD/DU/m0/t2| EA      | EB      | SD       |
+--------|---------|---------|---------|------------|---------|---------|----------|
+IN0     | ac->AC0 | ac0,1,2 | ac->AC0 | ac->AC0    | ac->AC0 | ac->AC0 | ac->AC0  |
+IN1     | ac->AC0 | ac0,1,2 | ac->AC1 | ac->AC0    | ac->AC1 | ac->AC1 | ac->AC1  |
+IN2     | ac->AC0 | ac0,1,2 | ac->AC2 | ac->AC0    | rsvd.   | ac->AC1 | ac->AC2  |
+
+##### SPI, USART and TCB are not the same on the tinyAVR 0 and 1
+On all parts except tinyAVR 0, 1, and 1+ (the above mentioned enhanced 1-series parts), the TCB, SPI, and USART options act the same way:
+* INn gets USARTn TXD. No USARTn XCK. No UARTs higher than 2 can be used. 
+  * On early-modern tinyAVRs, which had one USART, IN2 is unused, IN1 gives USART0 TXD, and IN0 gives USART0 XCK (clock in synchronous mode)
+* INn gets the waveform output of TCBn. No event channels for TCBs beyon the first. 
+  * 2-series parts do not have a TCB option for IN2, having no TCB2.
+  * All other 2-timer parts see TCB1 repeated in IN2. 
+
+
+Heading    | tiny0/1/1+ | Everything else |
+-----------|------------|-----------------|
+IN0, usart | USART0 XCK | USART0 TXD      |
+IN1, usart | USART0 TXD | USART1 TXD *    |
+IN2, usart | rsvd.      | USART2 TXD **   |
+IN0, spi   | SPI0 SCK   | SPI0 MOSI       | 
+IN1, spi   | SPI0 MOSI  | SPI0 MOSI       |
+IN2, spi   | SPI0 MISO  | SPI0 SCK        |
+IN0, tcb   | alias tcb0 | TCB0 WO         | 
+IN1, tcb   | alias tcb0 | TCB1 WO         |
+IN2, tcb   | alias tcb0 | TCB2 WO  **     |
+IN0, tcb0  | TCB0 WO    | Use tcb         |
+IN1, tcb0  | TCB0 WO    | Not an option   |
+IN2, tcb0  | TCB0 WO    | Not an option   |
+IN0, tcb1  | TCB1 WO    | Not an option   |
+IN1, tcb1  | TCB1 WO    | Use tcb         |
+IN2, tcb1  | TCB1 WO    | Not an option   |
+
+
+
+`*` Parts like the EB-series, which have only a single UART, have that UART available on all input channels. 
+`**` tinyAVR 2-series parts have no USART input option on IN2. On all non-tiny devices  devices without USART2, this is USART1, if present, else USART0. On non-tinyAVR parts 
+
 
 #### Input "value"
 As shown above not all inputs are equal, particularly on tinyAVR 2-series and Dx/Ex-series, nor are all instances of the peripherals that can generate inputs equal. This effect is most prominent on devices with smaller numbers of pins and peripherals, particularly the DD-series. However, unlike with the event system it is harder to give specific guidance, because the type of inputs needed will vary so much. This challenge manifests most acutely on the 2-series tinyAVR and the DD-series parts with low pincount, which have fewer instances of peripherals (2 TCB, 1 AC, 2 USART). The larger DD's have another TCB, but are still limited to 2 USARTs and 1 AC. On all parts, input 2 is also very special - it's the only input that you can use to clock the filter/synchronizer ande sequential logic - this means that you can't get the SPI SCK input this way unless you're using it as the clock for the logic block (though that's probably the thing one would be most likely to use that for). This constraint only applies to using one of these inputs as the clock - you can used the internal oscillator, 32kHz internal
@@ -336,6 +394,30 @@ Logic0.output_swap = logic::out::no_swap; // No pin swap for output of block0
 `LogicN.output_swap` defaults to `logic::out::no_swap` if not specified in the user program.
 
 
+### clocksource
+Property to set the clock source for the logic block. The CCL itself is asynchronous and combinatorial, however, several accessories do require a clock. These functions are the Synchronizer/Filter, the edge-detector, and the two flip-flop sequential logic options (but not the two latch options). The asence of 
+
+Accepted values:
+```c++
+/* Value:                            Description                                                 Tiny 0/1/1+    EB-series   Everything else                     
+logic::clocksource::clk_per;      // Clock from the peripheral clock (ie, system clock)           Yes           Yes         Yes
+logic::clocksource::in2;          // Clock from the selected input2. Igmored in truth table.      Yes           Yes         Yes
+logic::clocksource::oschf;        // Clock from the **unprescaled** internal HF oscillator.       No            Yes         Yes
+logic::clocksource::osc32k;       // Clock from the internal 32.768 kHz oscillator                No            Yes         Yes
+logic::clocksource::osc1k;        // As above but prescaled by 32;                                No            Yes         Yes
+logic::clocksource::pll;          // Clock from on-chip PLL                                       No            Yes         No
+```
+
+
+#### Usage
+```c++
+Logic2.clocksource = logic::clocksource::oschf; // Set block 2 to use unprescaled high frequency internal oscillator.
+```
+
+#### Default state
+`LogicN.clocksource` defaults to `logic::clocksource::clk_per` if not specified in the user program.
+
+
 ### filter
 Property to control whether the output is passed through a filter or synchronizer. Useful when multiple logic blocks are connected internally to prevent race conditions and glitches that could arise due to the asynchronous nature of CCL. Alternately, the delay itself may be desirable, or it can be combined with a configuration which inverts it's own output (and would otherwise oscillate asynchronously), but is clocked by some other source; this will then act to divide that clock speed by 4 (synchronizer) or 8 (filter).
 Accepted values:
@@ -358,27 +440,6 @@ See also [Prescaling Clocks with CCLs](https://github.com/SpenceKonde/AVR-Guidan
 `LogicN.filter` defaults to `logic::filter::disable` if not specified in the user program.
 
 
-### clocksource
-Property to set the clock source for the logic block; this is used for the synchronizer, filter, edge detector, and sequential logic that uses a clock (otherwise, the logic blocks are asynchronous - and shockingly fast. If you rig them up so that they oscillate (ie set the input to feedback, and output the opposite of the input), it can reach upwards of 100 MHz!). Note that 32kHz-derived and unprescaled clock options are not available on 0-series and 1-series parts; keep this in mind if backwards portability is important. If sequential logic is used, it is clocked from the clock source used by the even-numbered logic block, assuming it uses any clock at all.
-Accepted values:
-```c++
-logic::clocksource::clk_per;      // Clock from the peripheral clock (ie, system clock)
-logic::clocksource::in2;          // Clock from the selected input2; it is treated as a 0 in the truth table.
-logic::clocksource::oschf;        // Clock from the **unprescaled** internal HF oscillator. Same as clk_per if system clock not prescaled, unless using external clock or crystal
-logic::clocksource::osc32k;       // Clock from the internal 32.768 kHz oscillator - tinyAVR 2-series and Dx-series only
-logic::clocksource::osc1k;        // Clock from the internal 32.768 kHz oscillator prescaled by 32 - tinyAVR 2-series and Dx-series only
-```
-
-
-#### Usage
-```c++
-Logic2.clocksource = logic::clocksource::oschf; // Set block 2 to use unprescaled high frequency internal oscillator.
-```
-
-#### Default state
-`LogicN.clocksource` defaults to `logic::clocksource::clk_per` if not specified in the user program.
-
-
 
 ### edgedetect
 Property to enable the edge detector. The edge detector can be used to generate a pulse when detecting a rising edge on its input. To detect a falling edge, the TRUTH table should be programmed to provide inverted output. "In order to avoid unpredictable behavior, a valid filter option must be enabled" (note: that's what the datasheet says; it's not clear whether you can get the unpredictable behavior, or if the edge detector won't be connected unless a filter or synchronizer is enabled). Note that the edge detector is likely only of use when the output is being used for sequential logic or as the input to another logic block; it looks particularly useful on the odd LUT input to a J-K flip-flop sequential logic unit.
@@ -389,7 +450,7 @@ logic::edgedetect::enable;       // Edge detection used
 ```
 
 ### sequencer
-Property controlling the "sequencer" for this pair of logic blocks - these are latches or flip-flops which will remember their state. There is 1 sequencer per 2 logic blocks; each logic block controls one of the two inputs to a flip flop or latch; **this property is ignored for the odd-numbered logic blocks**. Flip-flops are clocked from the same clock source as the even logic block. Latches are asynchronous. **The output of the sequencer will for all purposes, including link, feedback, pin and event outputs, replace the output of the even logic block**
+Property controlling the "sequencer" for this pair of logic blocks - these are latches or flip-flops which will remember their state. There is 1 sequencer per 2 logic blocks; each logic block controls one of the two inputs to a flip flop or latch. Under the hood, there is an extra register for each pair of LUTs that controls this - so there are 2 LUTs for every SEQ. The SEQ is always associated more with the EVEN numbered LUTs, the clock source of that LUT will also Flip-flops are clocked from the same clock source as the even logic block. Latches are asynchronous. **The output of the sequencer will for all purposes (other than the signal between the logic block and the sequencer, of course), including link, feedback, pin and event outputs, replace the output of the even logic block**
 
 Accepted values:
 ```c++
@@ -400,8 +461,10 @@ logic::sequencer::d_latch;      // Gated D latch sequencer connected (broken on 
 logic::sequencer::rs_latch;     // RS latch sequencer connected
 ```
 
-The available sequencer options, unfortunately, are capable of only slightly moore than what can be done with just a logic block alone using feedback. See the examples below. You can do many tasks that would at first blush look like a job for the latches by simply setting one input as feedback, and the other two to your latch inputs; if 2 is feedback and say Clear or G is 1 and Set or D is 0
-Below is shown in the 4 left columns an RS latch, and in the right 4, a D latch on the left
+The available sequencer options, unfortunately, are capable of only slightly moore than what can be done with just an even LUT using the Feedback output, or an odd LUT with an event channel. 
+
+Particularly, if you don;t need a logic block to generate the inputs to an RS latch or D latch, you can do it easily: 
+IN0 and IN1 are the two inputs, while IN2 is feedback (I find this by far the easiest to work with when making truth tables. )
 
 | 2 | 1 | 0 | Out | 2 | 1 | 0 | Out |
 |---|---|---|-----|---|---|---|-----|
@@ -414,7 +477,9 @@ Below is shown in the 4 left columns an RS latch, and in the right 4, a D latch 
 | 1 | 1 | 0 |  0  | 1 | 1 | 0 |  0  |
 | 1 | 1 | 1 |  1  | 1 | 1 | 1 |  1  |
 
-Hence truth tables are 0xB2 and 0xB8, and both of these leave the odd LUT available. Of course, if you need a logic block to come up with the inputs to set and reset, this is less useful.
+Hence truth tables are 0xB2 and 0xB8, and both of these leave the odd LUT available. Of course, if you need a logic block to come up with the inputs to set and reset, or if you need the clockedness of a flipflop, these are less useful. 
+
+
 
 #### D Flip-flop
 The D-type fiip-flow outputs a 0 or a 1, and retains it's value unless told otherwise. The inputs consist of G and D input. As long as G is low, nothing will change, When G is high, each rising edge will latch the value on the D line to the output. As I understand, D is derived from "Data" and G from "Gate", in the sense that it opens the gate and allows new data in.
@@ -596,7 +661,7 @@ The two bits per LUT allow the interrupt to be triggered on
 ```
 
 ## Reconfiguring
-There are TWO levels of "enable protection" on the CCL hardware except on the newest parts . According to the Silicon Errata, only one of these is intended. As always, it's anyone's guess when or if this issue will be corrected in a future silicon rev. That it is likely to be fixed on any part that gets a die rev is not in doubt; when (and indeed whether) they will rev the die to fix all the nasty bugs that they've now corrected in their peripheral designs. (It would appear that Microchip only became aware of the issue after the Dx-series parts were released; it's the kind of thing where you could believe that it was intended if annoying behavior, which is probably why it wasn't noticed sooner (It came at the same time as the "TCA does what the datasheet says on RESTART command" (paraphrased, ofc), another bug like that; both may indeed have been intended at the time, and only later classified as bugs, perhaps by a newly installed product manager or QA czar who thought the original intent was folly (I do suspect that there was a changing of the guard around that time. That and/or an influx of testing manpower and resources. How else do you introduce a new ADC while reducing the number of errata from the previous generation from around 20, several serious, to like 5, of which this is the only one without a workaround); I happen to agree on this count and think it's a big deal (the other feature that got this treatment I agree with as well, but why did they ever let the timers have a port direction override? . Since there is no indication that there are die revs coming out any time soon, users are advised to proceed with use of workarounds, rather than delay work in the hopes of corrected silicon.
+There are TWO levels of "enable protection" on the CCL hardware. I think the intended behavior was "Protection is enabled on the LUT config when that LUT is enabled, AND the CCL is enabled" - which is what we got, except that the locked registers included the one with the bit to enable/disable that LUT, so you had toturn off the whole CCL. This dreadful behavior is  (It would appear that Microchip only became aware of the issue after the Dx-series parts were released; it's the kind of thing where you could believe that it was intended if annoying behavior, which is probably why it wasn't noticed sooner (It came at the same time as the "TCA does what the datasheet says on RESTART command" (paraphrased, ofc), another bug like that; both may indeed have been intended at the time, and only later classified as bugs, perhaps by a newly installed product manager or QA czar who thought the original intent was folly (I do suspect that there was a changing of the guard around that time. That and/or an influx of testing manpower and resources. How else do you introduce a new ADC while reducing the number of errata from the previous generation from around 20, several serious, to like 5, of which this is the only one without a workaround); I happen to agree on this count and think it's a big deal (the other feature that got this treatment I agree with as well, but why did they ever let the timers have a port direction override? . Since there is no indication that there are die revs coming out any time soon, users are advised to proceed with use of workarounds, rather than delay work in the hopes of corrected silicon.
 
 The intended enable-protection is that a given logic block cannot be reconfigured while enabled. *This is handled by `init()` - you can write your new setting to a logic block, call `LogicN.init()` and it will briefly disable the logic block, make the changes, and re-enable it.*
 
@@ -605,7 +670,9 @@ The unintended layer is that no logic block can be enabled or disabled (such as 
 Changes can always be freely made to the `Logic` classes - changes aren't written to the hardware until you call `init()`, so that's the only thing the CCL must be disabled for. On parts which are impacted by this (All tinyAVRs, the mega 0s and the DA and DB), you must call `Logic::stop()` before calling `init()`, and `Logic::start()` afterwards. On other parts, and the above listed parts if/when they get a silicon rev, you need not call `Logic::stop()/start()` - init() handles the per-LUT disable/enable correctly.
 
 ### Testing if the enable-lock erratum is present
-At present, there is never a need to test this, because you know from the part family whether or not it has this erratum - nothing that shipped with this broken has gotten a die rev that fixed it, so it impacts all tinyAVR, mega0, DA, and DB. However DxCore provides #defines for all Arduino-relevant errata, and this errata can be tested like this; note that **this is not a macro and cannot be made a macro. The die rev is not compile time known!** How could it be? The compiler doesn't know what you're going to do with the hex file.
+At time of writing, up through rev AB of the DA, no fix is available, nor is any for tinyAVR. The DD and later never had the problem, and everything before them did. The DB-series recently received the first major die rev, B0 or B1 (depending on the flash size), which fixes this and much other errata. 
+
+
 ```c
 if (checkErrata(ERRATA_CCL_PROTECTION)) { /*true if errata present */
   Logic::stop();
@@ -673,7 +740,7 @@ void applyCCLChanges() {
   // Adjust to suit the logic blocks you need
   // As noted at the start we wanted to avoid disturbing the Logic0 channel if possible, so we want to avoid the stop-start.
   #if defined(ERRATA_CCL_PROTECTION) && ERRATA_CCL_PROTECTION == 1
-    /* Some parts have not received a die rev and hence all extant specimens exhibit this erratum */
+    /* Some parts have not received a die rev and hence all extant specimens exhibit this erratum, other parts came out after the bug was fixed and never had the issue.  */
     Logic::stop();  // have to turn off Logic0 too, even though I might not want to
     Logic1.init();  // apply changes to logic block 1
     Logic3.init();  // apply settings to logic block 3 for the first time
@@ -699,6 +766,17 @@ void applyCCLChanges() {
 
 ## Think outside the box
 To consider the CCL system as simply a built-in multifunction gate IC is to greatly undersell it. The true power of the CCL is in it's ability to use events directly, and to take inputs from almost everything. Even doing neat stuff like the above mentioned "latch with no sequencer" is only scratching the surface of what these can do! Taking that a step farther... you could then use the odd-numbered logic block with that same feedback to, say, switch between two waveforms being output by one of the PWM timers, depending on what the latch is set to. See the [Tricks and Tips page](Tricks_and_Tips.md)
+
+## About the clocked components
+It is important to be absolutely clear about what is and is not clocked, because it is not always immediately clear what's being clocked and what isn't. The logic embodied in the truth table is combinatorial logic, and has no need for a clock. The clock is ONLY used for the synchronizer/filter, the edge detector, and (for even numbered LUTs) the sequencer. 
+
+The clocks also span about the broadest range of clock speeds I've seen offered for any component: From 1 kHz all the way up to above-CPU clock speeds (on the EB's potentially 4x the system clock!)
+
+**REMEMBER NYQUIST**
+*Or at least his sampling criterion! Did he do anything else important?* 
+
+You must not expect to be able to reliably or accurately recognize pulses in the signal being sampled (in this case, the *output* of 3-input truth table lookup, before all that other machinery) 
+
 
 ## Note on terminology
 Yes, technically, C++ doesn't have "properties" or "methods" - these are "member variables" and "member functions" in C++ parlance. They mean the same thing. I've chosen to use the more familiar, preseent day terminology.

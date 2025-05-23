@@ -11,25 +11,29 @@ The ADC on the the Ex-series is even better - it is nearly the same ADC that the
 | Part family | Min. Res. | Max. Res. | CLK Max | CLK used | Max Ovrsamp Res. | Extras
 |-------------|-----------|-----------|---------|----------|------------------|---
 | tinyAVR 0/1 |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | (1), (2), (3)
-| tinyAVR 1+  |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | (1), (2), (3), (4), Whole second copy of ADC.
+| tinyAVR 1+  |     8-bit |    10-bit | 0.2-1.5 | 1-1.25MHz|           13-bit | (1), (2), (4), two identical ADCs.
 | AVR DA      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | (5) "Differential" ADC
 | AVR DB      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | (5) "Differential" ADC
 | AVR DD      |    10-bit |    12-bit | 0.125-2 | 1-1.4MHz |           15-bit | (5) "Differential" ADC more pins can be ADC pins.
 | tinyAVR 2   |     8-bit |    12-bit |   3/6 * | 2-2.5MHz |           17-bit | (6) True differential, 1-16x PGA
 | AVR EA      |     8-bit |    12-bit |   3/6 * | 2-2.5MHz |           17-bit | (6) True differential, 1-16x PGA, sign chopping.
+| AVR EB      |     8-bit |    12-bit |   3/6 * | 2-2.5MHz |           17-bit | (6) True differential, 1-16x PGA, sign chopping.
+| AVR DU      |     8-bit |    10-bit | 0.125-2 | 1-1.4MHz |           13-bit | Single ended
+| AVR SD      |     8-bit |    10-bit | 0.125-2 | 1-1.4MHz |           13-bit | Single ended, two identical ADCs.
 
 `*` 6 MHz with external or Vdd reference, 3 MHz with internal.
-
+`**` - "After the USB natives were done with him, you could barely recognize him. They'd cut TCD clean out of his chest, torn off and roasted his MVIO for a villiage feast in honor of the 3.3v logic levels of USB data lines... and ah - removed two bits from his "analog-to-digital converter" *damn... I tried to tell him they weren't friendly, and that negotiations wouldn't go well.... but he just had to give peace a chance* "Well, to his credit, they do seem to have avoided an outright war with the USB natives" *But at what cost? Rsze their primitive hovels, execute the relevant designers and use a tried and true USB stack from any of the several lines of ! 
 Notes:
 1. This part initially had aspired to function at F_ADC = 2.00 MHz, RES = 8-bits. This didn't work so well. See the errata for the marginally successful workarounds.
 2. This part has a dumbass set of reference voltages (4.3, 2.5, 1.1, 1.5, 0.55). For the ultra low reference voltage, use analogSetClock() to ensure that the clock speed is within the much lower sped'ed range of 65-200 kHz. You may also want to lower sample duration since that's what it's denominated in. All other parts have 1.024/2.048/4.096/2.5
 3. No external reference on 0-series and 1-series below 16k.
 4. 16k (1+series) parts are blessed with a number a boons. One of them is a second ADC. I think the intent was to provide a way to approximate having a differential ADC by triggering both at once (well, one of the intents, another one was because the ADC0 is taken over by the PTC if that is in use.
 5. The Dx-series differential ADC is a bad joke. First: The maximum absolute value both voltages is V<sub>ref</sub>, above that, wrong results are returned. And there's no amplification other than what you can press the opamps into service as.
-  **Unsubstantiated and slanderous speculation** My theory is this: The dual ADC on the 1+ series was to get dual ADC field tested because even then they could see that the new ADC was going to be an ordeal. They figured they can get away with 1 generation of chips without explicit differential ADC, but they still needed a way to get the same effect for some major customer application
+  **Unsubstantiated and slanderous speculation** My theory is this: The dual ADC on the 1+ series was to get dual ADC field tested because even then they could see that the new ADC was going to be an ordeal. They figured they can get away with 1 generation of chips without explicit differential ADC, but they still needed a way for some friendly customers to be able to do something like a differential ADC reading - and they were going to have to dothat inthe DX - I think the Dx-series parts's "differential mode" is equivalent to two single ended measurements and some simple math) 
 6. This is a REAL differential ADC. Max V<sub>Ain</sub> = Vdd + .1 or .2V and for useful readings their difference must be smaller than VREF. The tiny2 has some mysterious tunables, proper tuning of which is unclear. Offset error is disappointingly high, which Microchip noticed and introduced sign chopping (and removed a mysterious tunable or two) in the EA series, which should help significantly.
 
 The differential ADC on the Dx-series is disappointing.
+
 
 ## Reference Voltages
 Analog reference voltage can be selected as usual using analogReference(). Supported reference voltages are listed below:
@@ -59,7 +63,7 @@ In some cases the voltage determines the maximum ADC clock speed. Call analogRef
  | `INTERNAL4V1` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      7 | . |
  | `EXTERNAL`                              |       - |         Vdd |      2 | External ref works at 6 MHz CLK ADC! |
 
- | AVR Dx/Ex-series (all)                  | Voltage | Minimum Vdd | Number | Notes |
+ | AVR Dx/Ex-series                        | Voltage | Minimum Vdd | Number | Notes |
  |-----------------------------------------|---------|-------------|--------|---------|
  | `VDD` (default)                         | Vcc/Vdd |             |      5 | . |
  | `INTERNAL1V024`                         | 1.024 V |      2.5* V |      0 | 10-bit reading with 1.025 ref gives apx.   1 mv/ADC count |
@@ -337,23 +341,26 @@ Returns the number of ADC clocks by which the minimum sample length has been ext
 ### ADC Runtime errors
 When taking an analog reading, you may receive a value near -2.1 billion, or a negative value on a part without a differential ADC - these are runtime error codes.
 The busy and disabled errors are the only ones that we never know at compile time. I don't think analogClockSpeed can generate runtime errors - it should always do it's best to meet your request, and if it can't, return the closest it could find.
-Note that the numeric values, though not the names, of some of these were changed to make the error checking more efficient. As long as you used the named constants like you're supposed to you'll be fine. The values returned by checkAnalogError will not change in future releases, we make not guarantees about the values of the error constants themselves, though no changes are expected.
+Note that the numeric values, though not the names, of some of these were changed to make the error checking more efficient. As long as you used the named constants like you're supposed to you'll be fine. The values returned by checkAnalogError will not change in future releases, we make not guarantees about the values of the error constants themselves, though no changes are expecteed.
 
-| Error name                     |     Value   | analogCheckError val | Notes
-|--------------------------------|-------------|----------------------|----------------------------------------------
-|ADC_ERROR_BAD_PIN_OR_CHANNEL    |      -32001 |                   -1 | The specified pin or ADC channel does not exist or does not support analog reads.
-|ADC_ERROR_BUSY                  |      -32002 |                   -2 | The ADC is busy with another conversion.
-|ADC_ERROR_DISABLED              |      -32007 |                   -7 | The ADC is disabled at this time. Did you disable it before going to sleep and not re-enable it?
-|ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL| -2100000001 |                   -1 | The specified pin or ADC channel does not exist or does not support analog reads.
-|ADC_ENH_ERROR_BUSY              | -2100000002 |                   -2 | The ADC is busy with another conversion.
-|ADC_ENH_ERROR_RES_TOO_LOW       | -2100000003 |                   -3 | Minimum ADC resolution is 8 bits. If you really want less, you can always rightshift it.
-|ADC_ENH_ERROR_RES_TOO_HIGH      | -2100000004 |                   -4 | Maximum resolution using automatic oversampling and decimation is less than the requested resolution.
-|ADC_DIFF_ERROR_BAD_NEG_PIN      | -2100000005 |                   -5 | analogReadDiff() was called with a negative input that is not valid.
-|ADC_ENH_ERROR_DISABLED          | -2100000007 |                   -7 | The ADC is currently disabled. You must enable it to take measurements. Did you disable it before going to sleep and not re-enable it?
-|ADC_IMPOSSIBLE_VALUE            |         N/A |                 -127 | 16-bit value > 4095, or 32-bit value that's not an error code and is outside the range of -2,097,152-4,194,303 (raw 1024-sample accumulation range.
-|Potentially valid reading       |see previous |                    0 | If there is some combinations of settings that could get this value without an error condition it returns 0.
+| Error name                     |Value (signed) |   unsigned              | analogCheckError val | Notes
+|--------------------------------|---------------|-------------------------|----------------------|----------------------------------------------
+|ADC_ERROR_BAD_PIN_OR_CHANNEL    |      -32001   |     0x82FF      (33535) |                   -1 | The specified pin or ADC channel does not exist or does not support analog reads.
+|ADC_ERROR_BUSY                  |      -32002   |     0x82FE      (33534) |                   -2 | The ADC is busy with another conversion.
+|ADC_ERROR_DISABLED              |      -32007   |     0x82F9      (33533) |                   -7 | The ADC is disabled at this time. Did you disable it before going to sleep and not re-enable it?
+|ADC_ENH_ERROR_BAD_PIN_OR_CHANNEL| -2100000001   | 0x82D48AFF (2194967295) |                   -1 | The specified pin or ADC channel does not exist or does not support analog reads. 
+|ADC_ENH_ERROR_BUSY              | -2100000002   | 0x82D48AFE (2194967294) |                   -2 | The ADC is busy with another conversion.
+|ADC_ENH_ERROR_RES_TOO_LOW       | -2100000003   | 0x82D48AFD (2194967293) |                   -3 | Minimum ADC resolution is 8 bits. If you really want less, you can always rightshift it.
+|ADC_ENH_ERROR_RES_TOO_HIGH      | -2100000004   | 0x82D48AFC (2194967292) |                   -4 | Maximum resolution using automatic oversampling and decimation is less than the requested resolution.
+|ADC_DIFF_ERROR_BAD_NEG_PIN      | -2100000005   | 0x82D48AFB (2194967291) |                   -5 | analogReadDiff() was called with a negative input that is not valid.
+|ADC_ENH_ERROR_DISABLED          | -2100000007   | 0x82D48AFA (2194967289) |                   -7 | The ADC is currently disabled. You must enable it to take measurements. Did you disable it before going to sleep and not re-enable it?
+|ADC_IMPOSSIBLE_VALUE            |         N/A   |                         |                 -127 | 16-bit value > 4095, or a 32-bit signed value that is not a valid return value even under error conditions, 
+|Potentially valid reading       |see previous   |                         |                    0 | analogCheckError() will return 0 when passed a 16-bit datatype with a number less than 4096, or a signed 32-bit datatype containing a number between 
+| -                              |             . |                       . |                    - | -2,097,152 and 4,194,303, that is. 4095 * 1024 accumulated samples, or -2048 * 1024 accumulatted samples. (note, millions, 32-bit type can hold billions)
 
-The impossible values are checked for without testing all of the bytes for greater efficiency. If you see that result one of two things was the case: the value you passed in wasn't from analog read or had been cast to a different type before you passed it, or it or was corrupted somehow (writing off end of adjacent array in memory? Overclocking too hard such that the chip was doing math wrong?).
+Unsigned column is provided for convenience for those not interested in using the helper function, The reason the numbers are in the middle of nowhere is so we didnt collide with negative differential readings, and they start just below a byte so I can subtract the LSB from 0 to get the error code. 
+
+These errors are mostly of the sort that point to a bug in user code or a designer misunderstanding key aspects of the functionality, or something silly like a pin selection issue, or a peripheral conflict trying to use the ADC for two different things. adjacent array in memory? Overclocking too hard such that the chip was doing math wrong?).
 
 ### (mTC/DxC - New!) ADCPowerOptions(options) *2-series only prior to 2.5.12*
 *For compatibility, a much more limited version is provided for 0/1-series. See below*

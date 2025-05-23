@@ -29,13 +29,7 @@
 #define CLOCK_TUNE_START (USER_SIGNATURES_SIZE - 12)
 
 #include "core_devices.h"
-/* Gives names to all the timer pins - relies on core_devices.h being included first.*/
-/* These names look like:
- * PIN_TCD0_WOC_DEFAULT
- * PIN_TCA0_WO5_ALT3
- * and so on.
- * They are #defines. Pins that don't exist are #defined as NOT_A_PIN.
- * TCA and TCD only currently */
+
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 
@@ -82,7 +76,7 @@
     void check_constant_pin(__attribute__((unused))pin_size_t pin) {
       return;
     }
-  #endif // Intentionally outside of the above #if so that your console gets fucking spammed with this warning.
+  #endif // Intentionally outside of the above #_if so that your console gets fucking spammed with this warning.
   // The linker errors you turned off LTO to better understand will still be at the bottom.
   #warning "LTO is disabled. digitalWriteFast(), digitalReadFast(), pinModeFast() and openDrainFast() are unavailable, delayMicroseconds() for short delays and delay() with millis timing disabled is less accuratetest. Unsupported forms of 'new' compile without errors (but always return a NULL pointer). Additionally, functions which normally generate a compile error when passed a value that is known to be invalid at compile time will not do so. The same is true of functions which are not valid with the currently selected tools submenu options."
   #warning "This mode is ONLY for debugging LINK-TIME ERRORS that are reported by the linker as being located at .text+0, and you can't figure out where the bug is from other information it provides. As noted above, while this may make compilation succeed, it will only turn compile-time errors into incorrect runtime behavior, which is much harder to debug. As soon as the bug that forced this to be used is fixed, switch back to the standard platform.txt!"
@@ -219,7 +213,7 @@
   #define _ADC_LOWLAT_VAL   0x04
   #define _ADC_ENABLE_VAL   0x10
   #define _ADC_ENABLE_CTRL  0x20
-  #define _ADC_STANDBY_VAL  0X40
+  #define _ADC_STANDBY_VAL  0x40
   #define _ADC_STANDBY_CTRL 0x80
   #define PGA_OFF_ONCE      0x01
   #define PGA_KEEP_ON       0x02
@@ -725,7 +719,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
 #define portOutputRegister(P) ((volatile uint8_t *)(&portToPortStruct(P)->OUT))
 #define portInputRegister(P)  ((volatile uint8_t *)(&portToPortStruct(P)->IN ))
 #define portModeRegister(P)   ((volatile uint8_t *)(&portToPortStruct(P)->DIR))
-#if defined(PORTA_EVGENCTRL) //Ex-series only - this all may belong in the Event library anyway, but since the conditional is never met, this code is never used.
+#if defined(PORTA_EVGENCTRLA) //Ex-series only - this all may belong in the Event library anyway, but since the conditional is never met, this code is never used.
   #define portEventRegister(p)  ((volatile uint8_t *)(&portToPortStruct(P)->EVGENCTRL))
   uint8_t _setRTCEventChan(uint8_t val, uint8_t chan);
   uint8_t _setEventPin(uint8_t pin, uint8_t number); // preliminary thought - pass a pin number, it looks up port, and from there the event control register and sets it.
@@ -927,123 +921,123 @@ void _pinconfigure(uint8_t pin, uint16_t pin_config);
 void pinConfigure(uint8_t digital_pin, uint16_t pin_config);
 
 #ifdef __cplusplus
-typedef enum : uint16_t
-{
- // OUTPUT
-  PIN_DIR_SET        = 0x0001,
-  PIN_DIRSET         = 0x0001,
-  PIN_DIR_OUTPUT     = 0x0001,
-  PIN_DIR_OUT        = 0x0001,
- // INPUT
-  PIN_DIR_CLR        = 0x0002,
-  PIN_DIRCLR         = 0x0002,
-  PIN_DIR_INPUT      = 0x0002,
-  PIN_DIR_IN         = 0x0002,
- // TOGGLE INPUT/OUTPUT
-  PIN_DIR_TGL        = 0x0003,
-  PIN_DIRTGL         = 0x0003,
-  PIN_DIR_TOGGLE     = 0x0003,
- // HIGH
-  PIN_OUT_SET        = 0x0004,
-  PIN_OUTSET         = 0x0004,
-  PIN_OUT_HIGH       = 0x0004,
- // LOW
-  PIN_OUT_CLR        = 0x0008,
-  PIN_OUTCLR         = 0x0008,
-  PIN_OUT_LOW        = 0x0008,
-// CHANGE/TOGGLE
-  PIN_OUT_TGL        = 0x000C,
-  PIN_OUTTGL         = 0x000C,
-  PIN_OUT_TOGGLE     = 0x000C,
-//Interrupt disabled but input buffer enabled
-  PIN_ISC_ENABLE     = 0x0080,
-  PIN_INPUT_ENABLE   = 0x0080,
- // Interrupt on change
-  PIN_ISC_CHANGE     = 0x0090,
-  PIN_INT_CHANGE     = 0x0090,
-// Interrupt on rising edge
-  PIN_ISC_RISE       = 0x00A0,
-  PIN_INT_RISE       = 0x00A0,
-// Interrupt on falling edge
-  PIN_ISC_FALL       = 0x00B0,
-  PIN_INT_FALL       = 0x00B0,
-// Interrupt and input buffer disabled
-  PIN_ISC_DISABLE    = 0x00C0,
-  PIN_INPUT_DISABLE  = 0x00C0,
-// Interrupt enabled with sense on low level
-  PIN_ISC_LEVEL      = 0x00D0,
-  PIN_INT_LEVEL      = 0x00D0,
-// PULLUP ON
-  PIN_PULLUP_ON      = 0x0100,
-  PIN_PULLUP         = 0x0100,
-  PIN_PULLUP_SET     = 0x0100,
-// PULLUP OFF
-  PIN_PULLUP_OFF     = 0x0200,
-  PIN_PULLUP_CLR     = 0x0200,
-// PULLUP TOGGLE
-  PIN_PULLUP_TGL     = 0x0300,
-  PIN_PULLUP_TOGGLE  = 0x0300,
-  PIN_NOPULLUP       = 0x0200,
-// Pin Input Level Control
-  PIN_INLVL_TTL      = 0x1000,
-  PIN_INLVL_ON       = 0x1000,
-  PIN_INLVL_SET      = 0x1000,
-  PIN_INLVL_SCHMITT  = 0x2000,
-  PIN_INLVL_OFF      = 0x2000,
-  PIN_INLVL_CLR      = 0x2000, // alias
-// PIN INVERT ON
-  PIN_INVERT_ON      = 0x4000,
-  PIN_INVERT_SET     = 0x4000,
-// PIN INVERT OFF
-  PIN_INVERT_OFF     = 0x8000,
-  PIN_INVERT_CLR     = 0x8000,
-// PIN_INVERT_TOGGLE
-  PIN_INVERT_TGL     = 0xC000,
-  PIN_INVERT_TOGGLE  = 0xC000
-} pin_configure_t;
+  typedef enum : uint16_t
+  {
+   // OUTPUT
+    PIN_DIR_SET        = 0x0001,
+    PIN_DIRSET         = 0x0001,
+    PIN_DIR_OUTPUT     = 0x0001,
+    PIN_DIR_OUT        = 0x0001,
+   // INPUT
+    PIN_DIR_CLR        = 0x0002,
+    PIN_DIRCLR         = 0x0002,
+    PIN_DIR_INPUT      = 0x0002,
+    PIN_DIR_IN         = 0x0002,
+   // TOGGLE INPUT/OUTPUT
+    PIN_DIR_TGL        = 0x0003,
+    PIN_DIRTGL         = 0x0003,
+    PIN_DIR_TOGGLE     = 0x0003,
+   // HIGH
+    PIN_OUT_SET        = 0x0004,
+    PIN_OUTSET         = 0x0004,
+    PIN_OUT_HIGH       = 0x0004,
+   // LOW
+    PIN_OUT_CLR        = 0x0008,
+    PIN_OUTCLR         = 0x0008,
+    PIN_OUT_LOW        = 0x0008,
+  // CHANGE/TOGGLE
+    PIN_OUT_TGL        = 0x000C,
+    PIN_OUTTGL         = 0x000C,
+    PIN_OUT_TOGGLE     = 0x000C,
+  //Interrupt disabled but input buffer enabled
+    PIN_ISC_ENABLE     = 0x0080,
+    PIN_INPUT_ENABLE   = 0x0080,
+   // Interrupt on change
+    PIN_ISC_CHANGE     = 0x0090,
+    PIN_INT_CHANGE     = 0x0090,
+  // Interrupt on rising edge
+    PIN_ISC_RISE       = 0x00A0,
+    PIN_INT_RISE       = 0x00A0,
+  // Interrupt on falling edge
+    PIN_ISC_FALL       = 0x00B0,
+    PIN_INT_FALL       = 0x00B0,
+  // Interrupt and input buffer disabled
+    PIN_ISC_DISABLE    = 0x00C0,
+    PIN_INPUT_DISABLE  = 0x00C0,
+  // Interrupt enabled with sense on low level
+    PIN_ISC_LEVEL      = 0x00D0,
+    PIN_INT_LEVEL      = 0x00D0,
+  // PULLUP ON
+    PIN_PULLUP_ON      = 0x0100,
+    PIN_PULLUP         = 0x0100,
+    PIN_PULLUP_SET     = 0x0100,
+  // PULLUP OFF
+    PIN_PULLUP_OFF     = 0x0200,
+    PIN_PULLUP_CLR     = 0x0200,
+  // PULLUP TOGGLE
+    PIN_PULLUP_TGL     = 0x0300,
+    PIN_PULLUP_TOGGLE  = 0x0300,
+    PIN_NOPULLUP       = 0x0200,
+  // Pin Input Level Control
+    PIN_INLVL_TTL      = 0x1000,
+    PIN_INLVL_ON       = 0x1000,
+    PIN_INLVL_SET      = 0x1000,
+    PIN_INLVL_SCHMITT  = 0x2000,
+    PIN_INLVL_OFF      = 0x2000,
+    PIN_INLVL_CLR      = 0x2000, // alias
+  // PIN INVERT ON
+    PIN_INVERT_ON      = 0x4000,
+    PIN_INVERT_SET     = 0x4000,
+  // PIN INVERT OFF
+    PIN_INVERT_OFF     = 0x8000,
+    PIN_INVERT_CLR     = 0x8000,
+  // PIN_INVERT_TOGGLE
+    PIN_INVERT_TGL     = 0xC000,
+    PIN_INVERT_TOGGLE  = 0xC000
+  } pin_configure_t;
 
-/**
- * @brief Helper functions to catch the last argument in the pincfg recursion loop
- *
- * @param mode Mode parameter
- * @return pin_configure_t
- */
-
-
-inline pin_configure_t _pincfg(const pin_configure_t mode) {
-  return mode;
-}
-
-/**
- * @brief Helper functions to catch the nth in the pincfg recursion loop
- *
- * @param digital_pin Arduino pin
- * @param mode First "mode" parameter
- * @param modes Nth "mode" parameter
- * @return uint16_t pin configuration or'ed together
- */
-template <typename... MODES>
-uint16_t _pincfg(const pin_configure_t mode, const MODES&... modes) {
-  return mode | _pincfg(modes...);
-}
+  /**
+   * @brief Helper functions to catch the last argument in the pincfg recursion loop
+   *
+   * @param mode Mode parameter
+   * @return pin_configure_t
+   */
 
 
+  inline pin_configure_t _pincfg(const pin_configure_t mode) {
+    return mode;
+  }
 
-//void        pinConfigure(const uint8_t pinNumber, const uint16_t mode, const MODES&... modes);
+  /**
+   * @brief Helper functions to catch the nth in the pincfg recursion loop
+   *
+   * @param digital_pin Arduino pin
+   * @param mode First "mode" parameter
+   * @param modes Nth "mode" parameter
+   * @return uint16_t pin configuration or'ed together
+   */
+  template <typename... MODES>
+  uint16_t _pincfg(const pin_configure_t mode, const MODES&... modes) {
+    return mode | _pincfg(modes...);
+  }
 
-/**
- * @brief Variadic template function for configuring a pin
- *
- * @param digital_pin Arduino pin number
- * @param mode First "mode" parameter
- * @param modes Nth "mode" parameter
- */
-template <typename... MODES>
-void pinConfigure(const uint8_t digital_pin, const pin_configure_t mode, const MODES&... modes) {
-  // Or-ing together the arguments using recursion
-  uint16_t pin_config = _pincfg(mode, modes...);
-  _pinconfigure(digital_pin, pin_config);
-}
+
+
+  //void        pinConfigure(const uint8_t pinNumber, const uint16_t mode, const MODES&... modes);
+
+  /**
+   * @brief Variadic template function for configuring a pin
+   *
+   * @param digital_pin Arduino pin number
+   * @param mode First "mode" parameter
+   * @param modes Nth "mode" parameter
+   */
+  template <typename... MODES>
+  void pinConfigure(const uint8_t digital_pin, const pin_configure_t mode, const MODES&... modes) {
+    // Or-ing together the arguments using recursion
+    uint16_t pin_config = _pincfg(mode, modes...);
+    _pinconfigure(digital_pin, pin_config);
+  }
 #endif // end
 
 

@@ -744,9 +744,9 @@ namespace event {
 #if defined(CCL_LUT14CTRLA)
       ccl14_out         = 0x1E,
       ccl15_out         = 0x1F,
-      // Hey, I can dream can't I? Can you imagine what you could do with 4 TCA's 16 event channels, 16 LUTs and a 3-phase TCD?
-      // Forget having to clock your own SPI port in slave mode to get clocked data out at arbitrary baud rates....
-      // you could wire the CCL up as an 8 bit shift register at that point, load it with a SWEVENT....
+      // Hey, I can dream can't I? Can you imagine what you could do with 4 TCA's 16 event channels, 16 LUTs, a TCE and a bevy of TCBs!
+      //    With that kind of an arsenal, even the PIC chips with those fancy "Configurable Logic Blocks" - a ripoff of our fair CCL - would cower in fear! AVR! AVR!
+      // Who said that? Maybe I'm still dreaming...
 #endif
       ac0_out           = 0x20,
 #if defined(ac1) // An Ex with only one AC would not surprise me
@@ -773,7 +773,7 @@ namespace event {
 #if defined(OPAMP0) // Shouldn't there be a later Ex-series with opamps? Would synergize great with the improved ADC
       opamp0_ready      = 0x34,
 #endif
-#if defined(OPAMP1)
+#if defined(OPAMP1) //   Our ADC is good enough we don't need opamps!
       opamp1_ready      = 0x35,
 #endif
 #if defined(OPAMP2)
@@ -787,7 +787,7 @@ namespace event {
       portb_evgen1      = 0x43,
 #endif
       portc_evgen0      = 0x44, // All current and announced modern non-tiny parts have a PORTC
-      portc_evgen1      = 0x45,
+      portc_evgen1      = 0x45, //
       portd_evgen0      = 0x46, // All current and announced modern non-tiny parts have a PORTD
       portd_evgen1      = 0x47,
 #if defined(PORTE)          // PORTE is only on 48+ pin parts.
@@ -800,23 +800,25 @@ namespace event {
       portg_evgen0      = 0x4C,
       portg_evgen1      = 0x4D,
 #endif
-#if defined(PORTH)  // At some point they will need to either surrender a non-trivial amount of market share, or offer a migration path from the m2560.
+#if defined(PORTH)  // At some point they will need to either surrender a non-trivial amount of market share (I mean, they're still making those chips, and still selling them for eyewatering prices), or offer a migration path from the m2560.
                     // Becayse the uniform EVSYS channels introduced with the EA leave plenty of holes, it's likely that that part would have it's channels numbered similarly,
-                    // with it's extra ports
+                    // with it's extra ports. Such a part would come in a 100 pin package, with 84 to 88 port pins. Port G, the last port that can have VPORTs brings us to 56 in a 64 pin package.
+                    // There was never a PORTI, probably because I and 1 look too similar.
+                    // The m2560 had ports H, J, K, and L. Ports H and later were second class ports.
       porth_evgen0      = 0x4E,
-        porth_evgen1      = 0x4F,
+      porth_evgen1      = 0x4F,
 #endif
 #if defined(PORTJ)  // not clear how the remaining ports would be handled, but that's probably what the 0x5_ range is earmarked for.
-        portj_evgen0      = 0x50,
-        portj_evgen1      = 0x51,
+      portj_evgen0      = 0x50, // They might throw a curveball and either use PORTI (stupid!) or skip 2 numbers
+      portj_evgen1      = 0x51,
 #endif
 #if defined(PORTK)
-        portk_evgen0      = 0x52,
-        portk_evgen1      = 0x53,
+      portk_evgen0      = 0x52,
+      portk_evgen1      = 0x53,
 #endif
-#if defined(PORTL)
-        portl_evgen0      = 0x54,
-        portl_evgen1      = 0x55,
+#if defined(PORTL) // No AVR has ever gone past PORTL. I would question the wisdom of anything larger.
+      portl_evgen0      = 0x54,
+      portl_evgen1      = 0x55,
 #endif
       usart0_xck        = 0x60,
 #if defined(USART1)
@@ -837,8 +839,10 @@ namespace event {
 #if defined(USART6)
       usart6_xck        = 0x66,
 #endif
-#if defined(USART7) // The highest number of USARTs that naturally fit this numbering coincides with the maximum plausible number on a 100 pin chip
-        usart7_xck        = 0x67,
+#if defined(USART7) // The highest number of USARTs that naturally fit this numbering is the upper plausible limit of UART ports, I think.
+                    // I expect that a chip like that, there would be options to remap most of the peripheral overridden pins onto the second-rate pins without VPORTs, so those could be freed up for whole-port parallel I/O which is the only plausible way to consume so many pins.
+                    // On the other hand, such a chip might have an XMEM interface, which would consume at least 2 ports and change, and could get better performance with three.
+      usart7_xck        = 0x67,
 #endif
       spi0_sck          = 0x68,
 #if defined(SPI1)   // I fully expect to see Ex-series parts with more SPI ports and higher pincounts.

@@ -268,6 +268,12 @@ Not enabled. Ugly ways to get delays at very small flash cost.
  * These allow you to perform surgery on a 16-bit values that already exist, where you wish to change the high or low byte
  * without altering the other byte. Amazingly, the compiler doesn't optimize this like you'd expect it to (likely because
  * of C type promotion rules).
+ *
+ * SK: isn't this the architecture specific stuff, which we know is poor for AVR? GCC compiles to an architecture agnostic intermediate form, optimizes that,
+ * and then transforms that into the architecture specific output. The first part has gotten a ton of attention because it effects everything. Atmel used to pay
+ * people to work on GCC. I do not belive that is still occurring, at least not to the extent it did. Pretty much all of these fall into two categories:
+ * Either we're desperately scrambling for every last cycle, and using knowledge that the computer isn't permitted to, like knowing that we don't need to finish a math
+ * opperation on a multi-byte datatype because we just need to low byte or know the high byte will be 0.
  */
 
 /************/
@@ -340,7 +346,13 @@ Not enabled. Ugly ways to get delays at very small flash cost.
  *
  * _makeFastPtr() should be used when you are only reading from that one address, or consecutive addresses starting there (eg, *ptr++ or *--ptr),
  *  so it can use the X, Y or Z register.
- * _makeFastPtr_d() uses only X or Y register, and should be used if you expect to be accessing constant compile time known constant offsets
+ * _makeFastPtr_d() uses only Y or Z register, and should be used if you expect to be accessing constant compile time known constant offsets
+ *
+ * Using STD or LDD, you can access an offset up to 64 bytesaway from where the pointer is aimed in the same timeas accessing that location, provided that the value is known at compile time.
+ * This is good for accessing data in structs. Usually the compiler does an acceptable job of using efficient way of going about it. Occasionally the register allocator makes some regretable decisions, typically by , for example, and will generally use LDD/STD to load/store from
+ *
+ *
+ *
  *
  */
 

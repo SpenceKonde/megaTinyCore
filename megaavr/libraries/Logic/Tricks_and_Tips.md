@@ -2,6 +2,41 @@
 
 There are some simple patterns that you can use with the CCL/Logic library to generate very widly applicable effects:
 
+## Reordering inputs
+Say 
+TRUTH = 0bHGFEDCBA when IN0 is α, IN1 is β and IN2 is γ
+TRUTH = 0bHDFBGCEA when IN0 is γ, IN1 is β and IN2 is α - D and G, B and E swap
+TRUTH = 0bHFGEDBCA when IN0 is α, IN1 is γ and IN2 is β - G and F, B and C swap
+TRUTH = 0bHGDCFEBA when IN0 is γ, IN1 is α and IN2 is β - F and D, E and C swap
+TRUTH = 0bHFDBGECA when IN0 is β, IN1 is γ and IN2 is α - F->G->D->F rotate, and B->E->C->B rotate. 
+TRUTH = 0bHDGCFBEA when IN0 is β, IN1 is α and IN2 is γ - F->D->G->F rotate, and B->C->E->B rotate.
+
+the highest and lowest bits do not change when reordering the inputs. 
+
+Note also that not all truthtables have six distinct permutations that can be made by reordering the inputs. Ignoring the MSB and LSB, which are unchanged by input swapping - each of these thus has 4 variants with each possible permutation of those bits), of the 64 possible permutations: 
+4 do not change no matter how you switch around the inputs (assuming we've bitwise and'ed truth with 0b01111110 and have not shifted it in any way): 
+0x00. 0x16, 0x68, 0x7E
+
+A significant number of options come in sets of three, unsurprising (again, MSB and LSB omitted)
+* 0x02, 0x04, 0x10
+* 0x06, 0x12, 0x14
+* 0x08, 0x20, 0x40
+* 0x1E, 0x36, 0x56
+* 0x28, 0x48, 0x60
+* 0x3E, 0x5E, 0x76
+* 0x6A, 0x6C, 0x78
+* 0x6E, 0x7A, 0x7C
+
+Finally, the remaining ones form 4 groups of 8:
+* 0x0A,0x0C,0x18,0x22,0x24,0x30,0x42,0x50
+* 0x1A,0x1C,0x26,0x32,0x34,0x46,0x52,0x54
+* 0x2A,0x2C,0x4A,0x4C,0x58,0x62,0x64,0x70
+* 0x2E,0x3A,0x3C,0x4E,0x5C,0x66,0x72,0x74
+
+Reordering the inputs, according to my calculations, can rearrange any of these into 3 to 5 others on that list, and not into any others. I have not yet been able to rationalize this observation. 
+
+## Examples
+
 In the below examples X, Y, Z and 2 are used to refer to inputs. X, Y, and Z can refer to any input, but for the purposes of the LUT presented, X = 0, Y = 1, Z = 2
 
 Input 2, since it can be used as a clock, may be specifically required.
@@ -286,28 +321,6 @@ Clock: N/A
 
 Sync/Filter: Off
 
-### Double-gated Buffer
-There are many variants on this where different combinations of logic are used. The point is to get an "If A and B, output C, else output (whatever level you want it to default to)"
-
-INSEL:
-* X: D - When G is high, D is output
-* Y: G - When G1 is low, the output is low.
-* Z: /G - When G is high, the output is low.
-
-LUT:
-* 000: 0
-* 001: 0
-* 010: 0
-* 011: 1
-* 100: 0
-* 101: 0
-* 110: 0
-* 111: 0
-Ergo: TRUTH = 0x08
-
-Clock: N/A
-
-Sync/Filter: Off
 
 ### Buffer (0 clock delay), 2 clock delay or 4 clock delay for level events
 Without the synchronizer or prescaler, this is just a buffer (which is far from useless - you can use a LUT with this truth table and no synchronizer to get a level event onto a pin; For example, if you're on a 14-pin DD series. You've got the 3 PWM outputs coming from PC1-3, and the two TCD's on PD6 and PD7, you can't get any more PWM channels directly. If you're on a 14-pin tiny, and you've taken over TCA0 to do the 16-bit PWM that you need (TCA0 event output only works in SINGLE mode, not SPLIT mode, supposedly. I should probably check that the WO outputs aren't actually still being fed - that would make this trick go from niche to "widely useful", because any time that the pin on the low half of a TCA is used or missing, you could reclaim the PWM channels this way.)
