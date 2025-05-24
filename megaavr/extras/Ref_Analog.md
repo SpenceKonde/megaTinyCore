@@ -47,7 +47,7 @@ In some cases the voltage determines the maximum ADC clock speed. Call analogRef
  |-----------------------------------------|---------|-------------|--------|-------|
  | `VDD` (default)                         | Vcc/Vdd |           - |     16 | . |
  | `INTERNAL0V55`                          |  0.55 V |           - |      0 | ADC clock needs to be 100kHz to 260 kHz to get accurate results |
- | `INTERNAL1v1`                           |  1.10 V |           - |      1 | . |
+ | `INTERNAL1V1`                           |  1.10 V |           - |      1 | . |
  | `INTERNAL2V5`                           |  2.50 V |           - |      2 | . |
  | `INTERNAL4V3`                           |  4.30 V |           - |      3 | . |
  | `INTERNAL1V5`                           |  1.50 V |           - |      4 | . |
