@@ -15,7 +15,7 @@
     #if defined(DB_28_PINS) || defined(DB_32_PINS)
       #define ANALOG_COMP_NO_N1
     #endif
-  #elif defined(__AVR_DD__)
+  #elif defined(__AVR_DD__) || defined(__AVR_DU__)
     /* DD:1 AC:  P0, P3, P4, N0, N2, N3 */
     #define ANALOG_COMP_PINS_DD
     #define AC_NULL_REG _SFR_MEM8(0x04B0)
@@ -26,6 +26,10 @@
     #if !defined(PORTE)
       #define AC_NULL_REG _SFR_MEM8(0x04B0)
     #endif
+  #elif defined(__AVR_EB__)
+    /* EA:2 ACs: P0, P1, P2, P3, P4, N0, N1, N2, N3 */
+    #define ANALOG_COMP_PINS_EB
+    #define AC_NULL_REG _SFR_MEM8(0x04B0)
   #else
     /* mega0:1 AC P0, P1, P2, P3, N0, N1, N2 */
     #define ANALOG_COMP_PINS_MEGA
@@ -99,10 +103,14 @@ namespace comparator {
     #endif
         in3    = 0x03,
       pd6    = 0x03,
-      #if defined(__AVR_DD__) || defined(__AVR_EA__)
+      #if defined(__AVR_DD__) || defined(__AVR_EA__) || defined(__AVR_EB__) || defined(__AVR_DU__)
         in4    = 0x04,
         pc3    = 0x04,
-    #endif
+      #endif
+      #if defined(__AVR_EB__)
+        in5    = 0x05,
+        in6    = 0x06,
+      #endif
       };
     };
 
@@ -117,7 +125,7 @@ namespace comparator {
         pd7    = 0x02,
         #if defined(__AVR_DD__) || defined(__AVR_EA__) || defined(__AVR_EB__)
           in3    = 0x03,
-          pc3    = 0x03,
+          pc2    = 0x03,
           dacref = 0x04
         #else
           dacref = 0x03
