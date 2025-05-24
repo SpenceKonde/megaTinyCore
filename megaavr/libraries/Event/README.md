@@ -31,7 +31,7 @@ The event system, under the hood, is asynchronous - it can react faster than the
 Thus: 
 * Users modules know whether they need a sync or async signal, and use the appropriate event subchannel. 
 * There is only one type of channel - with a sync and async subchannel. 
-  * If the generator is synchronous, both subchannels are identical syncronous signals.
+  * If the generator is synchronous, both subchannels are identical synchronous signals.
   * If it's not, then the async subchannel gets the unchantged asynchronous signal, which goes through a synchronizer and the output of the synchronizer goes onto the sync channel. 
 
 The fact that it is asynchronous usually doesn't matter - it's either "faster than anything else" (if the user is async), or "2-3 clock cycles behind", but it is one of the things one should keep in mind when using these features, because every so often it does matter. 
@@ -170,7 +170,7 @@ The tinyAVR 0/1-series layouts are really weird. See the documentation included 
 
 
 ## Okay, so how do I read the state of these event channels?
-All you can do is use it for something that you can detect the response of. Yes, this is bizzare. They're already syncingh it for the sync subchannel! Use that to feed a register
+All you can do is use it for something that you can detect the response of. Yes, this is bizarre. They're already syncingh it for the sync subchannel! Use that to feed a register
 
 ## The Event class
 Class for interfacing with the Event system (`EVSYS`). Each event channel has its own object.
@@ -395,7 +395,7 @@ Shown below, generators/user per instance  (second argument should be less than 
 
 `*` - the tiny1 parts with 1 AC work normally. This is unfortunately not supported for tiny1 parts with the triple-AC configuration:
 `**` - There is only one CCL peripheral, with multiple logic blocks. Each logic block has 1 event generator and 2 event users. If using the logic library, get the Logic instance number. The output generator is that number. The input is twice that number, and twice that number + 1.
-`***` - This peripheral is not supported by t6his function, as the the generator numbers are channel dependent. Only effects aging parts anyway (though not that they do;t hve some worthy features)
+`***` - This peripheral is not supported by t6his function, as the the generator numbers are channel dependent. Only effects aging parts anyway (though not that they do;t have some worthy features)
 
 `!` - These parts do have an option, but we didn't bother to implement it because it isn't particularly useful. But the Event RX mode combined with the TX input to the CCL permit arbitrary remapping of RX and very flexible remapping of TX.
 

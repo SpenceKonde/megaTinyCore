@@ -271,9 +271,9 @@ Not enabled. Ugly ways to get delays at very small flash cost.
  *
  * SK: isn't this the architecture specific stuff, which we know is poor for AVR? GCC compiles to an architecture agnostic intermediate form, optimizes that,
  * and then transforms that into the architecture specific output. The first part has gotten a ton of attention because it effects everything. Atmel used to pay
- * people to work on GCC. I do not belive that is still occurring, at least not to the extent it did. Pretty much all of these fall into two categories:
+ * people to work on GCC. I do not believe that is still occurring, at least not to the extent it did. Pretty much all of these fall into two categories:
  * Either we're desperately scrambling for every last cycle, and using knowledge that the computer isn't permitted to, like knowing that we don't need to finish a math
- * opperation on a multi-byte datatype because we just need to low byte or know the high byte will be 0.
+ * operation on a multi-byte datatype because we just need to low byte or know the high byte will be 0.
  */
 
 /************/

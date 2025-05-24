@@ -414,7 +414,7 @@
  * generators allows them to add both options for all ports and both RTC options to all generator channels
  * Too bad they released so many parts with the other versions :-/ */
 
-#if defined(PORTA_EVGENCTRL)||defined(PORTA_EVGENCTRLA) // Starting with EA, they have EVGENCTRL registers onthe PORTS and RTC, so all channels are equal.
+#if defined(PORTA_EVGENCTRL)||defined(PORTA_EVGENCTRLA) // Starting with EA, they have EVGENCTRL registers on the PORTS and RTC, so all channels are equal.
                                                         // Starting with EB, and retroactively changing EA, they renamed them to EVGENCTRLA. Elsewhere we define the other if either one of the two is defined, as we always do when they change spellings.
   #define _AVR_EVSYS_VERSION   (3)
 #elif defined(EVSYS_STROBE) // mega0 - basically Dx, but different name for strobe.
@@ -1001,7 +1001,7 @@ has once worked for the same thing as meaning that thing */
     #define TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc TCA_SINGLE_EVACTA_CNT_HIGHLVL_gc
     #define TCA_SINGLE_EVACTA_UPDOWN_gc TCA_SINGLE_EVACTA_UPDOWN_gc
   #endif
-  // TCA V1.1 - DA/2-series and everthing since
+  // TCA V1.1 - DA/2-series and everything since
   //  with two inputs changes the names the existing ones to specify channel A
   // We add in the non-postfixed ana
   #if !defined(TCA_SINGLE_CNTEI_bm)

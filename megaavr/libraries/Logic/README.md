@@ -202,7 +202,7 @@ logic::in::input;            // Synonym for input_no_pullup
 logic::in::ac;               // Synonym for ac0 - Compatibility warning. 
 logic::in::ac0;              // Connect input to the output of analog comparator (AC0) - Compatibility warning
 logic::in::tcb0;             // Connect input to TCB0 - Compatibility Warning
-logic::in::tcb;              // Synonym for tcb0 - Compatibiliy warning
+logic::in::tcb;              // Synonym for tcb0 - Compatibility warning
 logic::in::tca0;             // Connect input to TCA0 WO0~2 for input 0~2
 logic::in::tca;              // Synonym for tca0 Not recommended for new code. 
 logic::in::tcd0;             // Connect input to TCD0 WOA, WOB, WOA for input 0, 1, 2
@@ -276,7 +276,7 @@ logic::in::tca0;             // Connect input to TCA0 WO0~2 for input 0~2
 logic::in::tca1;             // Connect input to TCA1 WO0~2 for input 0~2 - only available on parts with a second TCA: 48/64 pin DA/DB, and all EA-series parts. 
 logic::in::tca;              // Synonym for tca0 (for compatibility with code written for tinyAVRs and megaAVR 0-series). Not recommended for new code. 
 logic::in::tcd0;             // Connect input to TCD0 WOA, WOB, WOC (for input 0~2). Unavailable on parts which do not have a TCD. 
-logic::in::tcd;              // Synonym for tcd, as no part has been released with two TCDs. Presently, I question the liklihood of any device ever having a second TCD. Still, not recommended for new code. 
+logic::in::tcd;              // Synonym for tcd, as no part has been released with two TCDs. Presently, I question the likelihood of any device ever having a second TCD. Still, not recommended for new code. 
 logic::in::tce0;             // Connect to WO0 ~ 2 of TCE0. There is no way to get TCE WO3. except through an event channel.
 logic::in::tcf0;             // Connect to WO0, WO1, or WO0 of TCF0. No unnumbered tcf provided as I expect a 2x TCF part at some point. 
 logic::in::usart;            // Connect input to TXD of USART 0~2 (for input 0~2). On parts with 2 USARTS, only works on inputs 0 and 1.

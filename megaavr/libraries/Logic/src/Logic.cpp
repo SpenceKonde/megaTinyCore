@@ -133,9 +133,9 @@ void Logic::init() {
     #ifdef CCL_CLKSRC_gp
                  | (clocksource <<  CCL_CLKSRC_gp        ) /* group position in this case is 1 */
     #else
-                 | (clocksource  ?  CCL_CLKSRC_bp : 0    ) /* w/out the group defined, that means there were only two options, and that thats the only bit that should be impacted by the setting */
+                 | (clocksource  ?  CCL_CLKSRC_bp : 0    ) /* w/out the group defined, that means there were only two options, and that that's the only bit that should be impacted by the setting */
     #endif
                  | (enable       ?  CCL_ENABLE_bm : 0    );
 }
 
-/* Generally speaking, in code that is executed often or which isspeed sensitive, you prefer to avoid shift operations where one or both of the operands is not compiletime known.
+/* Generally speaking, in code that is executed often or which isspeed sensitive, you prefer to avoid shift operations where one or both of the operands is not compile time known.

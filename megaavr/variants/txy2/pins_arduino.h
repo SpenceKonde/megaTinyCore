@@ -55,7 +55,7 @@
     #define DAC_PIN                         (PIN_PA6)
   #else
     #pragma message("TCD is enabled for PWM output; DAC output via analogWrite() is disabled in favor of TCD PWM")
-    /* If you got a problem with that, do it manually! The DAC is about as easy to confgiure as it gets!*/
+    /* If you got a problem with that, do it manually! The DAC is about as easy to configure as it gets!*/
   #endif
 #endif
 
