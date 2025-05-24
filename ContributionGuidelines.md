@@ -242,7 +242,7 @@ Particularly within the core API, performance matters. That means that things li
 | Multiplication |       8 |       22 |       81 |      371 |   141 |
 | Division (avg) |     233 |      235 |      604 |     1734 |   479 |
 
-Seriously, those are not typos or mistakes on the division line (and the time is non-constant). Addition of two 8-bit values takes 5 clocks, their multiplication 8, and their division, on average, 233. Clearly somethings being promoted to 16-bity, but even there the numbers are 14, 22, and 235. Large binary size and slow execution are closely correllated, so avoiding doing bad kinds of math will help both.
+Seriously, those are not typos or mistakes on the division line (and the time is non-constant). Addition of two 8-bit values takes 5 clocks, their multiplication 8, and their division, on average, 233. Clearly somethings being promoted to 16-bity, but even there the numbers are 14, 22, and 235. Large binary size and slow execution are closely correlated, so avoiding doing bad kinds of math will help both.
 
 The obscenely slow division of 32-bit datatypes is why micros has all that ugly assembly in it - division was way too slow. So we used a combination of bitshifts and addition, and used tricks to minimize the size of the operands at all times. But the compiler rendered it as an incredibly inefficient mess. (a + (a >> 1) + (a >> 2)) was rendered as (copy a to a temp register. Then copy it again, rightshift that once, add to temp register. Copy the original, replacing that singly rightshifted version. Rightshift twice, and add). Instead of simply rightshifting the intermediate value another place and repeating the addition.
 

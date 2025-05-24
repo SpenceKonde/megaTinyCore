@@ -537,7 +537,7 @@ So - the message is you shouldn't busywait on micros() if you need microsecond a
 
 ```c
 setupTCB(); // call your function to configure TCB in single shot mode, outputting a pulse 2000 clocks long triggered by a rising edge.
-setupEVSYS(); // anc connect pina to an event channel, and set the TCB to use it.
+setupEVSYS(); // and connect pina to an event channel, and set the TCB to use it.
 while (!digitalReadFast(pina));  // we'll see the pin at the same time as the TCB,
 starttime = micros(); // this is 6 us @ 20 MHz. starttime returns the time measured in the first few clocks after calling it.
 //timetwo = micros(); // starttime - timetwo = ~6
@@ -548,7 +548,7 @@ A table is presented for each type of timer comparing the percentage of CPU time
 
 ```c
 setupTCB(); // call your function to configure TCB in single shot mode, outputting a pulse 2000 clocks long triggered by a rising edge.
-setupEVSYS(); // anc connect pina to an event channel, and set the TCB to use it.
+setupEVSYS(); // and connect pina to an event channel, and set the TCB to use it.
 while (!digitalReadFast(pina));  // we'll see the pin at the same time as the TCB,
 starttime = micros(); // this is 6 us @ 20 MHz. starttime returns the time measured in the first few clocks after calling it.
 //timetwo = micros(); // starttime - timetwo = ~6
@@ -558,7 +558,7 @@ endtime = micros(); //
 You're probably hoping to time the input pulse and make sure the output pulse has ended before continuing:
 ```c
 setupTCB(); // call your function to configure TCB in single shot mode, outputting a pulse 2000 clocks long triggered by a rising edge. If it is desired to not retrigger, enable the TCB interrupt and use it to disable the TCB and/or event channel.
-setupEVSYS(); // anc connect pina to an event channel, and set the TCB to use it.
+setupEVSYS(); // and connect pina to an event channel, and set the TCB to use it.
 while (!digitalReadFast(pina));  // we'll see the pin at the same time as the TCB,
 starttime = micros(); // this is 6 us @ 20 MHz. starttime returns the time measured in the first few clocks after calling it.
 //timetwo = micros(); // starttime - timetwo = ~6
@@ -846,7 +846,7 @@ Calls to `_gCMT` should be conditionally compiled based on CORE_HAS_CURRENTTIMER
 4. If high bit of copy is set, there is no PWM on this pin, but there is a DAC (for dPTT[N]), or millis is using the RTC (for `_gCMT`).
   a. Currently there is no announced or released AVR with more than one DAC channel.
   b. For `_gCMT`, DACOUT will never be returned, as can the generic TIMER_RTC and TIMER_PIT.
-  In the future, there may be additioal timers supported above 0x80.
+  In the future, there may be additional timers supported above 0x80.
 5. Otherwise, check bit 6 (0x40). If it is a 1, you have a type D timer on this pin. Bits 4 and 5 indicate which waveform output channel, and bits 0-2 indicate the mux option. Bit 3 is reserved for any future TCD1.
   Having both those pieces of information in the table improves performance.
 6. Finally, check bit 5 (0x20). If set, means a type B timer pin

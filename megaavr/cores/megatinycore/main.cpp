@@ -132,7 +132,7 @@ int main() {
 /**************************************************************************************************
  * INITIALIZATION FUNCTIONS LOCATED ANYWHERE SPECIAL GO HERE!                                     *
  *                                                                                                *
- * They *MUST* be declared with both the ((naked)) ahd ((used)) attributes! Without the latter,   *
+ * They *MUST* be declared with both the ((naked)) and ((used)) attributes! Without the latter,   *
  * the optimizer will eliminate them. Without the former, the sketch will not start...            *
  * Wait what? Yeah, it was generating a and outputting a ret instruction, which caused the        *
  * sketch to return to nowhere under certain conditions and never reach main() at all.            *
@@ -158,7 +158,7 @@ int main() {
   * megaTinyCore. You must write to flash    *
   * using optiboot if required               *
   *******************************************/
-      // if we are, we also need to move the vectors. See longwinded deascription above.
+      // if we are, we also need to move the vectors. See long-winded deascription above.
       void _initThreeStuff() {
         init_reset_flags();
         _PROTECTED_WRITE(CPUINT_CTRLA,CPUINT_IVSEL_bm);

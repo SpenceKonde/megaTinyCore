@@ -17,7 +17,7 @@
 // choices for the pin in this sketch as an example and automated testing sketch.
 
 // You can use any I/O pin that is not being overridden by some peripheral for either purpose.
-// No pin is inherrently better or worse than any other for either of these purposes; it's all about what
+// No pin is inherently better or worse than any other for either of these purposes; it's all about what
 // other things you need pins for, and whether any of them are picky about which pins are used.
 
 #define PIXEL_PIN    PIN_PA1    // Digital IO pin connected to the NeoPixels

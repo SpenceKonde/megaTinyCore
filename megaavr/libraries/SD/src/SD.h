@@ -64,7 +64,7 @@ namespace SDLib {
       SdFile root;
 
       // my quick&dirty iterator, should be replaced
-      SdFile getParentDir(const char *filepath, int *indx);
+      SdFile getParentDir(const char *filepath, int *index);
     public:
       // This needs to be called to set up the connection to the SD card
       // before other methods are used.

@@ -39,7 +39,7 @@ We only officially support (and test on) the Arduino IDE. Other IDEs are often u
 * [Arduino-cli](Arduino-cli.md) is an official command-line version of Arduino. This guide was submitted by @dattasaurabh82 - THANKS!
 
 ## General information
-* [Change Log](../../ChangeLog.md) weith listings of all changes that I remembered to record.
+* [Change Log](../../ChangeLog.md) with listings of all changes that I remembered to record.
 * [README](../../README.md) **(READ IT)** This is the main documentation which describes the state of the standard Arduino API functions and general caveats and key information about these parts, as well as special features of this core. There are sections of that file covering most significant areas of megaTinyCore, including sections on I2C, SPI, and reading analog voltages, including the advanced functionality of the ADC in the 2-series parts, and much more.
 * [Making UPDI programmer](../../MakeUPDIProgrammer.md) These (unless running Optiboot) require a UPDI programmer, not a classic SPI programmer like a USBAsp/etc. Fortunately a dirt cheap serial adapter can be used as a UPDI programmer - or a cheap nano clone can be loaded with jtag2updi - either way gets you a UPDI programmer for the cost of a cup of coffee.
 * [Direct Port Manipulation](Ref_DirectPortManipulation.md) Like with the classic AVR parts, you can use direct port manipulation for ultra-fast read and write from pin. The names of the registers are different, and there are some additional caveats, but also some improvements, and the pins and their interrupts are, overall, more powerful.
