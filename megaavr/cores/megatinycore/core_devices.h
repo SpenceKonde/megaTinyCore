@@ -1013,39 +1013,39 @@ has once worked for the same thing as meaning that thing */
     #define TCA_SINGLE_EVACT_UPDOWN_gc TCA_SINGLE_EVACTA_UPDOWN_gc
   #endif
   // Some versions of the EA headers have it as PORTx_EVGENCTRL, retroactively changed to PORTx_EVGENCTRLA, implying plans for more.
-  #if defined(PORTA_EVGENCTRL)
+    #if defined(PORTA_EVGENCTRL)
     #define PORTA_EVGENCTRLA PORTA_EVGENCTRL
-  #else
+  #elif defined(PORTA_EVGENCTRLA)
     #define PORTA_EVGENCTRL PORTA_EVGENCTRLA
   #endif
   #if defined(PORTB_EVGENCTRL)
     #define PORTB_EVGENCTRLA PORTB_EVGENCTRL
-  #else
+  #elif defined(PORTB_EVGENCTRLA)
     #define PORTB_EVGENCTRL PORTB_EVGENCTRLA
   #endif
   #if defined(PORTC_EVGENCTRL)
     #define PORTC_EVGENCTRLA PORTC_EVGENCTRL
-  #else
+  #elif defined(PORTC_EVGENCTRLA)
     #define PORTC_EVGENCTRL PORTC_EVGENCTRLA
   #endif
   #if defined(PORTD_EVGENCTRL)
     #define PORTD_EVGENCTRLA PORTD_EVGENCTRL
-  #else
+  #elif defined(PORTD_EVGENCTRLA)
     #define PORTD_EVGENCTRL PORTD_EVGENCTRLA
   #endif
   #if defined(PORTE_EVGENCTRL)
     #define PORTE_EVGENCTRLA PORTE_EVGENCTRL
-  #else
+  #elif defined(PORTE_EVGENCTRLA)
     #define PORTE_EVGENCTRL PORTE_EVGENCTRLA
   #endif
   #if defined(PORTF_EVGENCTRL)
     #define PORTF_EVGENCTRLA PORTF_EVGENCTRL
-  #else
+  #elif defined(PORTF_EVGENCTRLA)
     #define PORTF_EVGENCTRL PORTF_EVGENCTRLA
   #endif
   #if defined(PORTG_EVGENCTRL)
     #define PORTG_EVGENCTRLA PORTG_EVGENCTRL
-  #else
+  #elif defined(PORTG_EVGENCTRLA)
     #define PORTG_EVGENCTRL PORTG_EVGENCTRLA
   #endif
 

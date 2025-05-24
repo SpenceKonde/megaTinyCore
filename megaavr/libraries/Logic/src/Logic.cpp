@@ -138,4 +138,5 @@ void Logic::init() {
                  | (enable       ?  CCL_ENABLE_bm : 0    );
 }
 
-/* Generally speaking, in code that is executed often or which isspeed sensitive, you prefer to avoid shift operations where one or both of the operands is not compile time known.
+/* Generally speaking, in code that is executed often or which isspeed sensitive, you prefer to avoid shift operations where one or both of the operands is not compile time known.*/
+
