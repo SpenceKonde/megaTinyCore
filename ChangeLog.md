@@ -25,8 +25,11 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 ### Planned 2.6.11
 * Correct numerous issues with the microchip board defs. Clearly nobody is using them - since 2 of them didn't compile, and none of the optiboot ones would ever be able to successfully be programmed over the bootloader because selfprogramming wasn't enabled (BOOTEND = 0).
 * Major Bugfix: Correct issue #1164 thanks to John Vasileff. This would cause Serial.flush to hang in one-wire mode.
-* Major Bugfix: Correct buffered PWM on all parts. 
-* 
+* Major Bugfix: Correct buffered PWM on all parts.
+* Major Bugfix: Correct PWM on non-default pins on all parts; digitalPinHasPWM.
+* Fix bug with CCL clock source.
+* Fix bug with Comparator
+* Enhance error messages from wrong-part on upload (pending - currently it just crashes instead of giving a cryptic error, and in prvious releases, the error has been causing confusion.
 
 ## Released Versions
 

@@ -160,7 +160,7 @@ bool TwoWire::swap(uint8_t state) {
         #endif
         false)) {
           if (state > 3) {
-            badArg("The requested swap level is not available on any current or announced part - did you pass a bitmask instead of a number?");
+            badArg("The requested swap level is known at compile time to be one that is not available on any part. (did you pass a bitmask instead of a number?)");
           } else if (state == 3){
             badArg("Swap level 3 is not available on DA or DB devices, only swaps 0, 1 and 2.");
           } else {
