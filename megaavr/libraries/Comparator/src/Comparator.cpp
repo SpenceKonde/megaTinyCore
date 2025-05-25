@@ -61,22 +61,62 @@ AltOUT |  PIN_PC6* |  PIN_PC6* |  PIN_PC6* |   n/a    | PIN_PC6* | PIN_PC6* |   
   #if defined(AC0_AC_vect)
     AnalogComparator    Comparator0(0, AC0, PORTDPIN2,      /* No in_p1 or in_p2          */ PORTD.PIN6CTRL, (IS_MVIO_ENABLED() ? AC_NULL_REG : PORTC.PIN3CTRL),   PORTD.PIN3CTRL,                 PORTD.PIN7CTRL, (IS_MVIO_ENABLED() ? AC_NULL_REG : PORTC.PIN2CTRL));
   #endif
+#elif defined(ANALOG_COMP_PINS_DD)
+  /* DD:1 AC:  P0, P3, P4, N0, N1 N2*/
+  /* IS_MVIO_ENABLED() may *or may not* be a compile time known constant!
+   * This depends on the tools menu option selected for MVIO, and whether we can assume that the code is running on a properly configured part.
+   * That is a safe assumption when we build for direct upload, since users will upload the code via UPDI and we can set the fuse then.
+   * When using a bootloader, we have no such guarantee - we can't set the fuses when we upload, so unless the user tells us that they
+   * really are sure it's configured right, we will test whether MVIO is enabled.
+   * In any event, PD2 is only present on parts with the nearly complete PORTD. */
+  #if _AVR_PINCOUNT > 28
+    #define PORTDPIN0 PORTD.PIN0CTRL
+    #define PORTDPIN2 PORTD.PIN2CTRL
+    #define PORTDPIN3 PORTD.PIN3CTRL
+  #else
+    #define PORTDPIN0 AC_NULL_REG
+    #define PORTDPIN2 AC_NULL_REG
+    #define PORTDPIN3 AC_NULL_REG
+  #endif
+  #if defined(AC0_AC_vect)
+    AnalogComparator    Comparator0(0, AC0,      PORTDPIN2, /* No PORTE, so none of these*/ PORTD.PIN6CTRL, PORTC.PIN3CTRL,/*      No INP5, nor INP6 on DUs    */      PORTDPIN3,      PORTDPIN0, PORTD.PIN7CTRL);
+  #endif
 #elif defined(ANALOG_COMP_PINS_EA)
   /* EA:2 ACs: P0, P1, P2, P3, P4, N0, N1, N2, N3 */
+
   #if defined(AC0_AC_vect)
     #if defined(PORTE)
-      AnalogComparator  Comparator0(0, AC0, PORTD.PIN2CTRL, PORTE.PIN0CTRL, PORTE.PIN2CTRL, PORTD.PIN6CTRL, PORTC.PIN3CTRL,/* EA-series has no MVIO */            PORTD.PIN3CTRL, PORTD.PIN0CTRL, PORTD.PIN7CTRL, PORTC.PIN2CTRL);
+      AnalogComparator  Comparator0(0, AC0, PORTD.PIN2CTRL, PORTE.PIN0CTRL, PORTE.PIN2CTRL, PORTD.PIN6CTRL, PORTC.PIN3CTRL,/*      No INP5,   nor INP6 on EAs, */ PORTD.PIN3CTRL, PORTD.PIN0CTRL, PORTD.PIN7CTRL, PORTC.PIN2CTRL);
     #else
-      AnalogComparator  Comparator0(0, AC0, PORTD.PIN2CTRL, AC_NULL_REG,    AC_NULL_REG,    PORTD.PIN6CTRL, PORTC.PIN3CTRL,/* EA-series has no MVIO */            PORTD.PIN3CTRL, PORTD.PIN0CTRL, PORTD.PIN7CTRL, PORTC.PIN2CTRL);
+      AnalogComparator  Comparator0(0, AC0, PORTD.PIN2CTRL, AC_NULL_REG,    AC_NULL_REG,    PORTD.PIN6CTRL, PORTC.PIN3CTRL,/*      No INP5,   nor INP6 on EAs, */ PORTD.PIN3CTRL, PORTD.PIN0CTRL, PORTD.PIN7CTRL, PORTC.PIN2CTRL);
     #endif
   #endif
   #if defined(AC1_AC_vect)
-    AnalogComparator    Comparator1(1, AC1, PORTD.PIN2CTRL, PORTD.PIN3CTRL, PORTD.PIN4CTRL, PORTD.PIN6CTRL, PORTC.PIN3CTRL,/* EA-series has no MVIO */            PORTD.PIN5CTRL, PORTD.PIN0CTRL, PORTD.PIN7CTRL, PORTC.PIN2CTRL);
+    AnalogComparator    Comparator1(1, AC1, PORTD.PIN2CTRL, PORTD.PIN3CTRL, PORTD.PIN4CTRL, PORTD.PIN6CTRL, PORTC.PIN3CTRL,/*      No INP5,   nor INP6 on EAs, */ PORTD.PIN5CTRL, PORTD.PIN0CTRL, PORTD.PIN7CTRL, PORTC.PIN2CTRL);
   #endif
 #elif defined(ANALOG_COMP_PINS_EB)
   /* EB: 2 ACs: P0, P1, P2, P3, P4, P5, P6, N0, N1, N2, N3 */
-    AnalogComparator    Comparator0(0, AC0, PORTD.PIN2CTRL, AC_NULL_REG,    AC_NULL_REG,    PORTD.PIN6CTRL, PORTC.PIN3CTRL, PORTD.PIN4CTRL,    PORTD.PIN5CTRL,    PORTD.PIN3CTRL, PORTD.PIN0CTRL, PORTD.PIN7CTRL, PORTC.PIN2CTRL);
-    AnalogComparator    Comparator1(1, AC1, PORTD.PIN2CTRL, PORTD.PIN3CTRL, PORTD.PIN4CTRL, PORTD.PIN6CTRL, PORTC.PIN3CTRL, PORTA.PIN6CTRL,    PORTA.PIN7CTRL,    PORTD.PIN5CTRL, PORTD.PIN0CTRL, PORTD.PIN7CTRL, PORTC.PIN2CTRL);
+  #if _AVR_PINCOUNT <20
+    #define PORTDPIN0 AC_NULL_REG
+    #define PORTDPIN2 AC_NULL_REG
+    #define PORTDPIN3 AC_NULL_REG    /* 20 and 14 pin parts don't have the lower half of PORTD */
+    #define PORTAPIN6 AC_NULL_REG
+    #define PORTAPIN7 AC_NULL_REG    /* 14 pin parts don't have pins A2~A7 */
+  #elif _AVR_PINCOUNT <28
+    #define PORTDPIN0 AC_NULL_REG
+    #define PORTDPIN2 AC_NULL_REG
+    #define PORTDPIN3 AC_NULL_REG       /* 20 and 14 pin parts don't have the lower half of PORTD */
+    #define PORTAPIN6 PORTA.PIN6CTRL
+    #define PORTAPIN7 PORTA.PIN7CTRL
+  #else
+    #define PORTDPIN0 PORTD.PIN0CTRL
+    #define PORTDPIN2 PORTD.PIN2CTRL
+    #define PORTDPIN3 PORTD.PIN3CTRL
+    #define PORTAPIN6 PORTA.PIN6CTRL
+    #define PORTAPIN7 PORTA.PIN7CTRL    /* 14 pin parts don't have pins A2~A7 */
+  #endif
+    AnalogComparator    Comparator0(0, AC0,      PORTDPIN2,    AC_NULL_REG,    AC_NULL_REG, PORTD.PIN6CTRL, PORTC.PIN3CTRL, PORTD.PIN4CTRL,    PORTD.PIN5CTRL,         PORTDPIN3,      PORTDPIN0, PORTD.PIN7CTRL, PORTC.PIN2CTRL);
+    AnalogComparator    Comparator1(1, AC1,      PORTDPIN2,      PORTDPIN3, PORTD.PIN4CTRL, PORTD.PIN6CTRL, PORTC.PIN3CTRL,      PORTAPIN6,         PORTAPIN7,    PORTD.PIN5CTRL,      PORTDPIN0, PORTD.PIN7CTRL, PORTC.PIN2CTRL);
 #elif defined(ANALOG_COMP_PINS_MEGA)
   /* mega0:1 AC P0, P1, P2, P3, N0, N1, N2*/
   #if defined(AC0_AC_vect)
@@ -179,6 +219,25 @@ AnalogComparator::AnalogComparator(
                                      IN0_N(in0_n),
                                      IN2_N(in2_n),
                                      IN3_N(in3_n) { }
+#elif defined(ANALOG_COMP_PINS_DD) /*6 inputs: P0, P3, P4, N0, N2, N3 */
+AnalogComparator::AnalogComparator(
+                                   const uint8_t comp_number,
+                                   AC_t& ac,
+                                   register8_t& in0_p,
+                                   register8_t& in3_p,
+                                   register8_t& in4_p,
+                                   register8_t& in0_n,
+                                   register8_t& in1_n,
+                                   register8_t& in2_n
+                                   )
+                                   : comparator_number(comp_number),
+                                     AC(ac),
+                                     IN0_P(in0_p),
+                                     IN3_P(in3_p),
+                                     IN4_P(in4_p),
+                                     IN0_N(in0_n),
+                                     IN1_N(in1_n)
+                                     IN2_N(in2_n), { }
 #elif defined(ANALOG_COMP_PINS_EA) /*9 inputs P0, P1, P2, P3, P4, N0, N1, N2, N3 */
 AnalogComparator::AnalogComparator(
                                    const uint8_t comp_number,

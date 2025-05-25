@@ -15,12 +15,15 @@
     #if defined(DB_28_PINS) || defined(DB_32_PINS)
       #define ANALOG_COMP_NO_N1
     #endif
-  #elif defined(__AVR_DD__) || defined(__AVR_DU__)
+  #elif defined(__AVR_DD__)
     /* DD:1 AC:  P0, P3, P4, N0, N2, N3 */
     #define ANALOG_COMP_PINS_DD
     #define AC_NULL_REG _SFR_MEM8(0x04B0)
     #define ANALOG_COMP_NO_N1
-  #elif defined(__AVR_EA__)
+  #elif defined(__AVR_DU__)
+    /* DD:1 AC:  P0, P3, P4, N0, N1, N2, */
+    #define ANALOG_COMP_PINS_DU
+    #define AC_NULL_REG _SFR_MEM8(0x04B0)=
     /* EA:2 ACs: P0, P1, P2, P3, P4, N0, N1, N2, N3 */
     #define ANALOG_COMP_PINS_EA
     #if !defined(PORTE)
@@ -246,6 +249,15 @@ class AnalogComparator {
                        register8_t& in0_n,
                        register8_t& in2_n,
                        register8_t& in3_n);
+    #elif defined(ANALOG_COMP_PINS_DU) /*Exactly like the DU, except there's no PC2 on any of them hence no INN3 but the 28/32 pin versions have PD0 unlike the DD's so they have that input. */
+      AnalogComparator(const uint8_t comparator_number,
+                       AC_t& ac,
+                       register8_t& in0_p,
+                       register8_t& in3_p,
+                       register8_t& in4_p,
+                       register8_t& in0_n,
+                       register8_t& in1_n,
+                       register8_t& in2_n);
     #elif defined(ANALOG_COMP_PINS_EA) /*9 inputs - with 48 pins EA gets all inputs for at least one comparator. P0, P1, P2, P3, P4, N0, N1, N2, N3 */
       AnalogComparator(const uint8_t comparator_number,
                        AC_t& ac,
