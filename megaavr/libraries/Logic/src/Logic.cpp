@@ -126,7 +126,7 @@ void Logic::init() {
   // LUTCTRLA: EDGEDET | OUTEN  | FILTSEL [1:0] | CLKSRC [2:0]  | Enable, e O F_F C_C_C E
   // 0/1-series tinyAVR:
   // LUTCTRLA: EDGEDET | CLKSRC | FILTSEL [1:0] | OUTEN | - | - | Enable, e C F_F O _ _ E
-
+//*INDENT-OFF*
   block.LUTCTRLA = (output       ?  CCL_OUTEN_bm      : 0)
                  | (edgedetect   ?  CCL_EDGEDET_EN_gc : 0)
                  | (filter      <<  CCL_FILTSEL_gp       ) /* << 4 is emitted as swap, andi 0xF0, not 4x lsl */
@@ -137,6 +137,4 @@ void Logic::init() {
     #endif
                  | (enable       ?  CCL_ENABLE_bm : 0    );
 }
-
-/* Generally speaking, in code that is executed often or which isspeed sensitive, you prefer to avoid shift operations where one or both of the operands is not compile time known.*/
-
+//*INDENT-ON*
