@@ -9,7 +9,7 @@
 void init_millis() {
   ;
 }
-// NO CLOCK CONFIG! 
+// NO CLOCK CONFIG!
 void init_clock() {
   ;
 }
@@ -19,7 +19,7 @@ void ensureCleanReset() {
   uint8_t rstfr = RSTCTRL.RSTFR;
   if (rstfr == 0) {
     _PROTECTED_WRITE(RSTCTRL_SWRR, RSTCTRL_SWRE_bm);
-  } else if ((rstfr & 0x21) || ) 
+  } else if ((rstfr & 0x21) || )
     _PROTECTED_WRITE(RSTCTRL_SWRR, RSTCTRL_SWRE_bm);
   } else {
     if (rstfr & 0x20) { // UPDI reset - that implies we just uploaded this and that we should retune the oscillator.
@@ -49,7 +49,7 @@ void setup() {
   ensureCleanReset();
   #ifdef SERIAL_DEBUG
     Serial.begin(BAUDHACK);
-    delay_ms(1); //6 ms 
+    delay_ms(1); //6 ms
     Serial.println("Chip Sig:");
   #endif
     for (byte i = 0; i < 64; i++) {

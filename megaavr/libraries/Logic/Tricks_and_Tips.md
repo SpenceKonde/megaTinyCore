@@ -3,18 +3,18 @@
 There are some simple patterns that you can use with the CCL/Logic library to generate very widly applicable effects:
 
 ## Reordering inputs
-Say 
+Say
 TRUTH = 0bHGFEDCBA when IN0 is α, IN1 is β and IN2 is γ
 TRUTH = 0bHDFBGCEA when IN0 is γ, IN1 is β and IN2 is α - D and G, B and E swap
 TRUTH = 0bHFGEDBCA when IN0 is α, IN1 is γ and IN2 is β - G and F, B and C swap
 TRUTH = 0bHGDCFEBA when IN0 is γ, IN1 is α and IN2 is β - F and D, E and C swap
-TRUTH = 0bHFDBGECA when IN0 is β, IN1 is γ and IN2 is α - F->G->D->F rotate, and B->E->C->B rotate. 
+TRUTH = 0bHFDBGECA when IN0 is β, IN1 is γ and IN2 is α - F->G->D->F rotate, and B->E->C->B rotate.
 TRUTH = 0bHDGCFBEA when IN0 is β, IN1 is α and IN2 is γ - F->D->G->F rotate, and B->C->E->B rotate.
 
-the highest and lowest bits do not change when reordering the inputs. 
+the highest and lowest bits do not change when reordering the inputs.
 
-Note also that not all truthtables have six distinct permutations that can be made by reordering the inputs. Ignoring the MSB and LSB, which are unchanged by input swapping - each of these thus has 4 variants with each possible permutation of those bits), of the 64 possible permutations: 
-4 do not change no matter how you switch around the inputs (assuming we've bitwise and'ed truth with 0b01111110 and have not shifted it in any way): 
+Note also that not all truthtables have six distinct permutations that can be made by reordering the inputs. Ignoring the MSB and LSB, which are unchanged by input swapping - each of these thus has 4 variants with each possible permutation of those bits), of the 64 possible permutations:
+4 do not change no matter how you switch around the inputs (assuming we've bitwise and'ed truth with 0b01111110 and have not shifted it in any way):
 0x00. 0x16, 0x68, 0x7E
 
 A significant number of options come in sets of three, unsurprising (again, MSB and LSB omitted)
@@ -33,7 +33,7 @@ Finally, the remaining ones form 4 groups of 8:
 * 0x2A,0x2C,0x4A,0x4C,0x58,0x62,0x64,0x70
 * 0x2E,0x3A,0x3C,0x4E,0x5C,0x66,0x72,0x74
 
-Reordering the inputs, according to my calculations, can rearrange any of these into 3 to 5 others on that list, and not into any others. I have not yet been able to rationalize this observation. 
+Reordering the inputs, according to my calculations, can rearrange any of these into 3 to 5 others on that list, and not into any others. I have not yet been able to rationalize this observation.
 
 ## Examples
 
