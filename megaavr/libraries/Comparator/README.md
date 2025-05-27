@@ -82,11 +82,11 @@ comparator::in_n::in0;    // Use negative input pin 0 as input
 comparator::in_n::in1;    // Use negative input pin 1 as input (if present)
 comparator::in_n::in2;    // Use negative input pin 2 as input (if present, 2-series and Dx/Ex only)
 comparator::in_n::in3;    // Use negative input pin 3 as input (DD and later only)
-comparator::in_n::vref;   // Use the voltage reference w/out DAC (0/1-series only. 
+comparator::in_n::vref;   // Use the voltage reference w/out DAC (0/1-series only.
 comparator::in_n::dacref; // Use DACREF as input - not available on megaAVR 0-series. Available on all other devices. On tiny1
 ```
 #### What is the DACREF?
-On the tinyAVR 1-series, a new feature was added to the AC's (okay, it was a new feature that they dropped on the 0-series, since the 1-series came out first) - the 1-series had a DAC, so they let you use the output of that as the negative input, without having to output it on a pin! Of course, when they packed all those extra peripherals onto the larger tiny1's to test things out for the Dx, that was awkward, since they now had 3 comparators to model the window comparator feature going in the DA/DB. They only had one full fledged DAC. And they sure weren't going to put 3 full DACs on the DA/DB nor one DAC (normally only found on higher end parts) per comparator (at least one is found on every or nearly every AVR that has ever been made). So on the 1+-series parts, they just gave them kneecapped DACs with no pin output, except for the first one, which was unchanged from the other 1-series. That was fine for the 1-series, but it wasn't great. 
+On the tinyAVR 1-series, a new feature was added to the AC's (okay, it was a new feature that they dropped on the 0-series, since the 1-series came out first) - the 1-series had a DAC, so they let you use the output of that as the negative input, without having to output it on a pin! Of course, when they packed all those extra peripherals onto the larger tiny1's to test things out for the Dx, that was awkward, since they now had 3 comparators to model the window comparator feature going in the DA/DB. They only had one full fledged DAC. And they sure weren't going to put 3 full DACs on the DA/DB nor one DAC (normally only found on higher end parts) per comparator (at least one is found on every or nearly every AVR that has ever been made). So on the 1+-series parts, they just gave them kneecapped DACs with no pin output, except for the first one, which was unchanged from the other 1-series. That was fine for the 1-series, but it wasn't great.
 
 #### Usage
 ``` c++

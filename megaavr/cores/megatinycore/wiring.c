@@ -1360,7 +1360,7 @@ void restart_millis()
     #elif (defined(MILLIS_USE_TIMERB0) || defined(MILLIS_USE_TIMERB1) || defined(MILLIS_USE_TIMERB2) || defined(MILLIS_USE_TIMERB3) || defined(MILLIS_USE_TIMERB4)) // It's a type b timer
       _timer->CTRLB       = 0;
       #if defined(TCB_CTRLC)
-        // What the bloody hell was this added for? 
+        // What the bloody hell was this added for?
         _timer->CTRLC       = 0;
       #endif
     #endif

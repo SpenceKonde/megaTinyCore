@@ -372,15 +372,33 @@ High Speed Mode is different animal altogether: FM+ more or less exhausted what 
 ```c++
 void flush();
 ```
+TLDR: It does nothing, and likely will continue to do nothing moving forward.
 
 
 ~A `flush()` method exists on all versions of Wire.h; indeed, `Stream` which it subclasses demands that - however very rarely is it actually implemented by anything other than Serial - (where there is a specific and very common use case for the concept that that flush function exposes. That is not the same as what the TWI flush command does. Where one must clear the buffer in a specific way (by waiting for it to empty) before doing things like going to sleep or performing a software reset, Serial.flush() is just the ticket. Wire has rarely implemented such a tool. If it weren't for an erratum, there would be an available command that the datasheets refer to as a "TWI_FLUSH" - this resets the internal state *of the master* - and at the Wire library level, the buffers wouldneed to be cleared too. That command is apparently intended for error handling. The hardware keeps track of activity on the bus (as required by the protocol), but misbehaving devices can confuse the master - they might do something that the specification says a device will will not do, or generate electrical conditions that the master is unable to interpret in a useful way - pins not reaching the logic level thresholds, malformed data and which may in turn leave it confused as to whether the bus is available. It might be necessary to call in an attempt to recover from adverse events, which has historically been a challenge for the Wire library.~
 
-There are two issues that lead to this method being a stub (do-nothing method, required to subclass stream). First is the tension with between the hardware "flush" functionality, which according to the datasheet is intended to clear up detected bus errors, with the arduino API for HardwareSerial, the only stream where flush is generally implemented, where it instead waits for outgoing transmissions to finish. Secondly, either all, or all non-tinyAVR parts appear likely to be impacted by an erratum that renders the hardware mechanism less than useful: "Flush Non-Functional", which according to the errata sheets can in practice cause the very problem it was intended to solve, and advising us to disable and re-enable TWI master instead.
+There are two issues that lead to this method being a stub (do-nothing method, required to subclass stream).
+
+First is the tension with between the hardware "flush" functionality, which according to the datasheet is intended to clear up detected bus errors ie, "Reset the TWI's internal state to flush errors", with the arduino API for Stream (see HardwareSerial, the only class that typically implements flush()) where it means "stall until all pending outgoing data has finished sending".
+These are *totally different things*. We have no business calling our method "flush" if/when they finally fix it, because there's already a flush() method of stream, and if we're making an instance of Stream, ours should work the same way. That means flush() is wait for send to finish, and meaningless on I2C because we don't stealthily send the data in the background via interrupts like we do for HardwareSerial (where the issue of forgetting to flush before going to sleep led to lost and corrupted serial output).
+
+Secondly, the source attesting to the name "flush" for this, while having the gravitas of being the manufacturer. It turns out there isn't actually a working "flush" function on most parts; Almost every part with dual mode capable TWI modules has come with an erratum whose name says it all "Flush non-functional" - Flush was intended to reset the TWI's beliefs about the state of the bus to recover from a hung I2C bus, but the errata implies that it doesn't necessarily restore it to a valid state, and gives the trivial workaround of simply turning the module off and back on.
+
 
 It raises some very thorny questions:
 
-Most fundamental is the simplest question to ask about the Stream.Flush that subclasses are required to implement: What does it do?
+Most fundamental is the dead simple question: "What is the flush method of a stream supposed to do?"
+
+While all stream subclasses must have that method, it has only ever had a meaningful (ie, non-stub) definition for one sort of stream, and that's HardwareSerial, where it's used to make it stall until the TX ring buffer is empty.
+
+Within that paradigm, in master mode, since the method that starts a transfer doesn't return until it finishes (like SPI), the TX buffer cannot be full when non-library code is running exceot in an ISR, andafunction that stalls waiting for something shouldn't be in an ISR.
+
+Within the same paradigm though, in slave mode, if you want to go to sleep, you should wait until the curreent I2C transfer, if any, is closed.
+
+On the other hand, another school of thought says "The holy scripture from the creators calls the clearing of I2C bus error states "flush" so that's what the flush method shelt do. When the Creators have named a concept, mortals like Arduino have no right to declare it is named something else. Who's with me? To Arms!"
+
+In short, this is a topic where the only *correct* answer requires a time machine and a trip to Arduino HQ in it's earliest days, and make them give flush a better name. *No, we need to go back a shorter time, to just before they released the tiny1's at Microchip, and just convince them not to call the command flush, cause that's the dumber name for what it's supposed to do* "Good point. Or just convince them not to put it in, since they apparently still haven't made it work right"
+
 
 This is well-defined only for serial ports, where it specifically means "wait until the transmit buffer is done transmitting". This generalizes very poorly to other Streams, including Wire, and is greatly complicated by the fact Microchip has it's own idea of what "Flush" means for TWI (although it doesn't work on most parts that have it). The
 
@@ -401,7 +419,7 @@ In 2.5.4/1.4.4 it was reported that the return value of this method did not matc
 | Value | Meaning                                                        | Standard |
 |-------|----------------------------------------------------------------|----------|
 |  0x00 | Success                                                        | Yes      |
-|  0x01 | ~TX buffer overflow~ (see note)                                | Yes      |
+|  0x01 | ~TX buffer overflow~ Not Used                                  | "Yes"    |
 |  0x02 | Timeout waiting for ack of address                             | Yes      |
 |  0x03 | Timeout waiting for ack of data                                | Yes      |
 |  0x04 | Unknown error                                                  | Yes      |
@@ -409,6 +427,8 @@ In 2.5.4/1.4.4 it was reported that the return value of this method did not matc
 |  0x10 | Arbitration lost                                               | No       |
 |  0x11 | Line held low or not pulled up                                 | No       |
 |  0xFF | Bus in unknown state (begin() not called?)                     | No       |
+
+
 
 In the case of a TX buffer overflow, this is not indicated by endTransmission(). endTransmission simply transmits the portion of the buffer that fits. This condition should be detected (if your code could potentially generate it), because write() earlier returned a number smaller than the number of bytes passed to it. Error code 1 is never returned by endTransmission; we do not store an extra byte of state just to report this condition that was already reported by write(), with more complete information
 
