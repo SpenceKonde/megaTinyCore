@@ -62,7 +62,7 @@ comparator::in_p::in2; // Use positive input pin 2 as input (if present)
 comparator::in_p::in3; // Use positive input pin 3 as input (if present)
 comparator::in_p::in4; // Use positive input pin 4 as input (if present, DD and later omly)
 comparator::in_p::in5; // Use positive input pin 5 as input (if present, EB and later only)
-comparator::in_p::in5; // Use positive input pin 6 as input (if present, EB and later only)
+comparator::in_p::in6; // Use positive input pin 6 as input (if present, EB and later only)
 ```
 
 #### Usage
@@ -83,10 +83,10 @@ comparator::in_n::in1;    // Use negative input pin 1 as input (if present)
 comparator::in_n::in2;    // Use negative input pin 2 as input (if present, 2-series and Dx/Ex only)
 comparator::in_n::in3;    // Use negative input pin 3 as input (DD and later only)
 comparator::in_n::vref;   // Use the voltage reference w/out DAC (0/1-series only.
-comparator::in_n::dacref; // Use DACREF as input - not available on megaAVR 0-series. Available on all other devices. On tiny1
+comparator::in_n::dacref; // Use DACREF as input,
 ```
 #### What is the DACREF?
-On the tinyAVR 1-series, a new feature was added to the AC's (okay, it was a new feature that they dropped on the 0-series, since the 1-series came out first) - the 1-series had a DAC, so they let you use the output of that as the negative input, without having to output it on a pin! Of course, when they packed all those extra peripherals onto the larger tiny1's to test things out for the Dx, that was awkward, since they now had 3 comparators to model the window comparator feature going in the DA/DB. They only had one full fledged DAC. And they sure weren't going to put 3 full DACs on the DA/DB nor one DAC (normally only found on higher end parts) per comparator (at least one is found on every or nearly every AVR that has ever been made). So on the 1+-series parts, they just gave them kneecapped DACs with no pin output, except for the first one, which was unchanged from the other 1-series. That was fine for the 1-series, but it wasn't great.
+On the tinyAVR 1-series, a new feature was added to the ACs: The parts had an 8-bit DAC, so they tied it to the AC's negative mux, an obvious choice. When they added the extra AC's on the 16k and 32k parts, they wanted to have the sme functionality on the other AC's (as it was very well suited to things like windowed mode, which was now posible), so they added two more DAC instances which didn't have an output buffer, and were used only for the AC's. That seemed to be a great combination, and was adopted from the mega0-series onwards built into the AC and called the DACREF. At this point, it replaced the previous VREF option entirely, and when the DAC returned as a peripheral in the Dx-series, it was independent of the ACs. In fact, it isn't even routed to the AC's; the DAC there gets direct internal connections to the ADC and the OPAMPS but nt the ACs.
 
 #### Usage
 ``` c++
@@ -100,7 +100,7 @@ Comparator.input_n = comparator::in_n::vref;  // Connect voltage reference to th
 ### reference
 On the 0-series and 1-series, this sets the voltage reference that will be used if VREF is selected as the negative input. On non-0-series, this also sets the voltage that DACREF is derived from.
 
-On 1-series parts with multiple comparators, these reference voltages can be set independently for each comparator. On the Dx and Ex parts, parts with multiple comparators  have to share just one reference voltage.. On the tinyAVR 1-series, AC0 and the DAC that can be output on PA6 share the same reference. The 0/1-series uses a rather strange set of voltages, while the 2-series uses the same voltages that most modern AVRs do.
+On 1-series parts with multiple comparators, these reference voltages can be set independently for each comparator. On the Dx and Ex parts, parts with multiple comparators have to share just one reference voltage.. On the tinyAVR 1-series, AC0 and the DAC that can be output on PA6 share the same reference. The 0/1-series uses a rather strange set of voltages, while the 2-series uses the same voltages that most modern AVRs do.
 
 Accepted values (0/1-series):
 ``` c++
@@ -136,7 +136,7 @@ This property configures the DACREF value - this voltage can be selected as the 
 
 <img src="http://latex.codecogs.com/svg.latex?V_{DACREF} = \frac{Comparator.dacref}{256} * Comparator.reference" border="0"/>
 
-Or, in words, the the voltage from ACn.DACREF is that many 256th's of the reference voltage
+Or, in words, the voltage from ACn.DACREF is that many 256th's of the reference voltage
 *(it does not appear to be `ACn.DACREF + 1` 256'ths interestingly enough, which is what one would naively expect, and would be strictly speaking slightly better) -SK*
 
 #### Usage
@@ -197,11 +197,6 @@ PORTA.PIN5CTRL = PORT_INVEN_bm;         // Invert PA5
 | PIN | PA5 | PB3 | PB2 |         PA3        |
 
 
-#### Usage
-``` c++
-Comparator.output = comparator::out::enable; // Enable output comparator's output pin. Comparator is AC0, so this is PA5.
-```
-
 #### Default state
 `Comparator.output` defaults to `comparator::out::disable` if not specified in the user program.
 
@@ -231,7 +226,7 @@ Comparator.output_initval = comparator::out::init_high;
 #### Default state
 `Comparator.output_initval` defaults to `comparator::out::init_low` if not specified in the user program.
 
-### Which properties work where
+### Which options are available where
 
 |                    Option | DA/DB   |  DD  |  EA | Tiny0 | Tiny1 | Tiny1+ | Tiny2 | Mega0 |
 |---------------------------|---------|------|-----|-------|-------|--------|-------|-------|

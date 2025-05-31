@@ -474,10 +474,6 @@ void AnalogComparator::init() {
     } else { /* it is being disabled */
       if (comparator_number == 0) {
         #if defined(VREF_AC0REFEN_bm)
-        /* 0/1-series and 2-series name it differently
-           See, on the 0-series, where there's nothing like a DAC, still called
-           DAC0REF. But on 2-series, where there's a DACREF for AC0, this is
-           called AC0REF. Totally reasonable bitfield naming right? */
           VREF.CTRLB &= ~VREF_AC0REFEN_bm;
         #else
           VREF.CTRLB &= ~VREF_DAC0REFEN_bm;
@@ -520,7 +516,7 @@ void AnalogComparator::init() {
     AC.CTRLA = (AC.CTRLA & ~AC_HYSMODE_gm) | hysteresis | (output & AC_OUTEN_bm);
   #endif
   // Now, we disable the appropriate pins...
-  #if !defined(MEGATINYCORE) /* At least Dx and megaAVR can share this part */
+  #if !defined(MEGATINYCORE) /* Tinies are weird, and have different "style" of pinout rules. */
     #if defined(ANALOG_COMP_PINS_DD)
       if        (input_p == comparator::in_p::in0) {
         IN0_P = PORT_ISC_INPUT_DISABLE_gc;
@@ -642,7 +638,7 @@ void AnalogComparator::init() {
       }
     #endif
     if          (input_n == comparator::in_n::in0) {
-      IN0_N   = PORT_ISC_INPUT_DISABLE_gc;
+        IN0_N = PORT_ISC_INPUT_DISABLE_gc;
     }
     #if defined(ANALOG_COMP_PINS_TINY_SOME)   || defined(ANALOG_COMP_PINS_TINY_TWO) || defined(ANALOG_COMP_PINS_TINY_GOLDEN)
       else if   (input_n == comparator::in_n::in1) {
@@ -655,6 +651,14 @@ void AnalogComparator::init() {
       }
     #endif
   #endif  // Phew!
+/* Eugh! Why did it come out such a mess?
+ * Largely a consequence of concern over codesize and memory, since each AC instance instantiated needs passed to the constructor one 16-bit value, which it then stores in ram, which is the pointer to the
+ * PINnCTRL register... for EVERY input and output. And they keep adding them. So, we tweak the internal structure, so that if no comparator on a part has that input, the class is initialized with one less argument
+ * and has to check one less possibility to figure out which pin's input buffer is to be disabled (as the datasheet specifies; in fact, all pins with analog voltages on them should be disabled to prevent excessive power consumption;
+ * it's unclear whether there is a specific issue with the DAC in this case, or whether it's just a bad idea because it wastes power for no reason. If it's the latter, I would not have implemented this knowing that, because this is just ugly as hell.)
+ */
+
+
 }
 
 void AnalogComparator::start(bool state) {
@@ -790,7 +794,7 @@ void AnalogComparator::stop(bool restorepins) {
         }
       #endif
       if          (input_n == comparator::in_n::in0) {
-        IN0_N   = 0;
+          IN0_N = 0;
       }
       #if defined(ANALOG_COMP_PINS_TINY_SOME)   || defined(ANALOG_COMP_PINS_TINY_TWO) || defined(ANALOG_COMP_PINS_TINY_GOLDEN)
         else if   (input_n == comparator::in_n::in1) {

@@ -293,7 +293,7 @@ Notes specific to Dx-series:
 
 
 
-#### Compatibility Warnings and differences between parts:
+#### Compatibility Warnings and differences between parts
 In most cases, we are able to paper over differences between parts transparently. This is one place where they haven't renamed options, but actually removed options that were previously present, such that a small number of CCL configurations that were possible on tiny1616/17 and 32k versions which will need inputs reordered, and in a few cases may be impossible, because a feature (of dubious utility) was removed. I doubt anyone was using it, but, see the tables below.
 
 

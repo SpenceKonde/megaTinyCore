@@ -51,6 +51,17 @@ Availability of pin mappings by pincount for AVR Dx-series
 `Wire.pins(SDA pin, SCL pin)` - this will set the mapping to whichever mapping has the specified pins `SDA` and `SCL`. See API reference below for details. Wire.pins() only supports specifying mapping by pins for the master/slave pins, not the dualmode slave only pins. If you want the mode with the pins that can't do dual mode slave (PA2/3, or PF2/3) but with the alternate slave pins, you MUST use Wire.swap().
 
 In all cases, the part specific documentation included with the core takes precedence over this document and will include information about parts not mentioned here.
+
+## Default Buffer Sizes
+This can be overridden with compiler parameters (particularly suitable if using PIO which makes that easy) with `-DBUFFER_LENGTH = `.
+The size of the buffer is based simply on the available RAM on the part (note that multiple buffers may be needed depending on operational modes).
+
+ RAM    | Buffer size | Parts               | Notes
+--------|-------------|---------------------|---------------------
+ <256b  | 16b         | 2k tinyAVR parts    | The 128b ram parts do not have space for 32-byte buffers. Note that many libraries may unknowingly rely on a 32+ bit buffer.
+ <4096  | 32b         | Almost everything   | 32b buffers are the default.
+ >4095  | 130b        | 32k+ Dx, some Ex    | 130b allows a full 128b page write (including the two address bytes) to be sent to a 24-series I2C EEPROM;<br/> that's the largest blob of data I am aware of people hving reason to send over I2C <br/>(and these parts can afford the memory, unlike the tinyAVR). <br/>(Note that EEPROM sizes on modern AVRs are smaller than classic ones, and some also have signifiantly lower flash endurance, <br/> so there may be more reason to use such things now).
+
 ## Official specification of I2C
 [From NXP, the current owner of the relevant IP](https://www.nxp.com/docs/en/user-guide/UM10204.pdf)
 Grab it while you can! They'll probably pull it down again.
@@ -136,10 +147,9 @@ All devices have at least 2 options,
 * Master or Slave x2 - In this mode, there is a Wire, and a Wire1 - corresponding to TWI0 and TWI1 peripherals; available on DA and DB only. You can have two masters, two slaves, or most usefully, one of each)
 * Master and Slave x2 - Both Wire and Wire1 are provided, and *both* can be both a master and a slave at the same time, for a total of 4 pairs of I2C pins (note: having more than one I2C slave enabled at once is not recommended, though this library should work)
 
-## API reference
-### The TwoWire class
+## API reference: The TwoWire class
 Wire is an object of class TwoWire. The classic AVR Wire.h, like this library, has TwoWire as a subclass of Stream.
-The official megaAVR 0-series core that megaTinyCore was based on in the distant past subclassed a new "HardwareI2C" class. Unfortunately, that imposed a shocking amount of overhead with no practical benefit. Code that relies on TwoWire being a subclass of HardwareI2C is virtually non-existent, and code that would benefit from an 500 bytes or so of flash is very common. Any library you encounter that works on classic AVRs (e.g., Uno) but complains of this different inheritance is straightforward to fix, likely as simple as searching the library files for "HardwareI2C" and changing it to "Stream".
+The official megaAVR 0-series core that megaTinyCore was based on in the distant past subclassed a new "HardwareI2C" class. Unfortunately, that imposed a shocking amount of overhead with no user benefit. Code that relies on TwoWire being a subclass of HardwareI2C is virtually non-existent. The stock megaAVR 0-series Wire library was so bloated that tinyAVR parts could not compile eventhe simplest I2C tests, because of the appalling bloat in Wire.. Any library you encounter that works on classic AVRs (e.g., Uno) but complains of this different inheritance is straightforward to fix, likely as simple as searching the library files for "HardwareI2C" and changing it to "Stream".
 Wire is an object of class TwoWire. The classic AVR Wire.h, like this library, has TwoWire as a subclass of Stream.
 The official megaAVR 0-series core that megaTinyCore was based on in the distant past subclassed a new "HardwareI2C" class. Unfortunately, that imposed a shocking amount of overhead with no practical benefit (due to the whole virtual function thing). Code that relies on TwoWire being a subclass of HardwareI2C is virtually non-existent, and code that would benefit from the added flash is very common, especially considering the popularity of the ATtiny412, which is sadly the largest-flash 8-pin part. . Any library you encounter that works on classic AVRs (e.g., Uno) but complains of this different inheritance is straightforward to fix, likely as simple as searching the library files for "HardwareI2C" and changing it to "Stream".
 This is a full listing of methods provided for the TwoWire class (the class is named TwoWire, and Wire is an object of class TwoWire). Where they exist and behave the same way as documented in the Arduino Wire API reference they are simply listed. Where they do not, it is described here.
@@ -173,7 +183,7 @@ To replicate the sort of auto-incrementing pointer that retains state across mul
 When this is called, it resets the internal count; be sure to retain it. It can be called from within or outside of either handlers. See the register_model() and register_model_master examples.
 I had always wondered why Arduino sketches that implemented slave functionality used it like Serial-with-a-clock instead of Wire/TWI/I2C. Now I know. Without a function like this, that's all they CAN do!
 
-This method is only useful when operating as a slave. See the register model example for a demonstration of how one might use it.
+This method is only meaningful when operating as a slave. See the register model example for a demonstration of how one might use it.
 
 `twi_buffer_index_t` is a `uint8_t` unless the buffer length has been set to more than 255 bytes, in which case it is a `uint16_t`
 
@@ -200,7 +210,7 @@ This is analogous to `Wire.end()`, but only effects the slave functionality, as 
 ```c++
 void usePullups();
 ```
-Unlike the official core, we do not automatically turn on the internal pullups, specifically because it can hide problems in simple tests - but not more complicated cases. Combined with the frustrating failure modes of I2C in general (not specific to this library) this can lead to a very challenging debugging experience if/when it does manifest as most I2C devices are added or longer wires are used, possibly dependent on orientation and spatial organization. Thus, we require that you read this paragraph and recognize that it could fail unpredictably before enabling the internal pullups. This is particularly problematic since Arduino users are accustomed to not having to think much about things like wire length and capacitance of wire; this is one of only a few cases where they often become relevant.
+Unlike the official core, we do not automatically turn on the internal pullups, specifically because it can hide problems in simple tests - which manifest later as more devices are added, incorrectly directing attention to the new arrival, rather than the bus that never should have worked to begin with Combined with the frustrating failure modes of I2C in general (not specific to this library) this can lead to a very challenging debugging experience if/when it does manifest as most I2C devices are added or longer wires are used, possibly dependent on orientation and spatial organization. Thus, we require that you read this paragraph and recognize that it could fail unpredictably before enabling the internal pullups. This is particularly problematic since Arduino users are accustomed to not having to think much about things like wire length and capacitance of wire; this is one of only a few cases where they often become relevant.
 
 #### `uint8_t checkPinLevels()`
 ```c++
@@ -248,33 +258,39 @@ Feature      | TinyAVR 0/1/2 | megaAVR 0 | Dx/Ex |
 -------------|---------------|-----------|-------|
 SMBus levels | No            | No        | Yes   |
 Long setup`**`|Yes           | Yes       | Yes   |
-SDA hold     | Yes, no dual  | Yes       | Yes`*`|
+SDA hold     | Yes           | Yes       | Yes`*`|
+Dual Mode    | No            | Yes       | Yes`*`|
 
 `*` This option on the DA-series is impacted by errata on 128k parts:  two values are swapped.
 `**` The setup time applies to the slave when the slave is stretching the clock.
 
-**SMBus levels**
+
+
+##### SMBus Level option
 Enabling this (Dx, Ex only) changes the input levels, making them drastically lower, much like the TTL input level option available on DB, DD, and Ex-series parts. Thresholds as always are the maximum voltage that is still low enough to guarantee will read as low, and the minimum voltage guaranteed to be a high. These normally depend on Vdd - in SMBus voltage level mode, they do not. This is very useful for communicating with lower voltage devices - this is something that is most useful on either the DA (where there is no MVIO) or when the system contains three different voltage levels (say, the AVR running at 5v, using MVIO to talk to a 3.3v device, wishing to use some 1.8V I2C devices).
 
-Vdd               | SMBus levels |  1.8V |  2.5V |  3.3V | 5.0V |
-------------------|--------------|-------|-------|-------|------|
-Vin Low (max)     |        0.80V | 0.54V | 0.75V | 0.99V | 1.5V |
-Vin High (min) DB |        1.35V | 1.26V | 1.75V | 2.31V | 3.5V |
-Vin High (min) DA/DD | 1.35V or 1.45 `*` | 1.26V | 1.75V | 2.31V | 3.5V |
+Vdd                  | SMBus levels Vdd = 1.8-5.5V) |  1.8V |  2.5V |  3.3V | 5.0V | Notes
+---------------------|------------------------------|-------|-------|-------|------|-----------
+Vin Low (max)        |                        0.80V | 0.54V | 0.75V | 0.99V | 1.5V | Any voltage below this value is guaranteed to be seen as a 0
+Vin High (min) DB    |                        1.35V | 1.26V | 1.75V | 2.31V | 3.5V | Any voltage above this value is guaranteed to be seen as a 1.
+Vin High (min) DA/DD |                 ~1.45V  `*`  | 1.26V | 1.75V | 2.31V | 3.5V |
 
-`*` The DA and DD (but not the DB) datasheets imply that the minimum guaranteed high is 1.45V in SMbus mode if running at less than 2.5v. Whether this is an issue with the documentation or an actual difference is unclear.
+`*` The DA and DD (but not the DB) datasheets imply that the minimum guaranteed high is 1.45V in SMbus mode if running at less than 2.5v.
+
+See also (Ref_Digital.md#INLVL)[the digital I/O reference] for the analogous data for these pins when used in non-I2C mode, in normal mode, and wheresupported, TTL mode.
 
 
-**SDA setup and hold times**
-The setup time for SDA can be either 4 or 8 cycles. May be required for compatibility with some unusual devices. This refers specifically to operation in slave mode
 
-The hold time can be turned off, or set to 50, 300 or 500 ns. A non-default option is required to comply with SMBus protocol. 300 and 500 are backwards on AVR128DA parts until some future die rev that corrects it. We do not attempt an errata check - this is a very niche feature, and only AVR128DA parts are impacted (AVR64DA and AVR128DB are both fine)
+##### SDA setup and hold times
+The setup time for SDA can be either 4 or 8 cycles. This may be required for compatibility with some unusual devices, but is specific to slave mode operation.
 
-**Dual mode options**
+The hold time can be turned off, or set to 50, 300 or 500 ns. A non-default option is required to comply with SMBus protocol. 300 and 500 are backwards on AVR128DA parts until some future die rev that corrects it. At present this is not tested for with an errata check, but as this is restricted to a single chip, which has been on the market for a very long time with the erratum, and will likely receive a die rev to correct that issue. At some point before that happens, an errata check specific to the 128DA parts will be implemented. This is a very niche feature and the bug is present in only a single flash size of a single family of parts.
+
+##### Dual mode options
 Both the voltage levels and the hold times can be configured for the dual mode pins independently from the master/slave pins on parts with those features.
 
 
-**Constants associated with specialConfig()**.
+Constants associated with specialConfig()*
 ```C++
 #define WIRE_SDA_HOLD_OFF   0
 #define WIRE_SDA_HOLD_50    1
@@ -292,26 +308,38 @@ This method should always return 0 (success). We try to error if compiletime-kno
 
 If not:
 
-| Return value | Meaning                                                   |
-|--------------|-----------------------------------------------------------|
-| 0x00         | Successful                                                |
-| 0x01         | SMBus level requested on part without that feature        |
-| 0x02         | Dual mode options passed - but part does not support dual mode |
-| 0x04         | Dual mode options passed, dual mode present, but not enabled. Refer to startup order. |
+| Return value | Meaning                                                    |
+|--------------|------------------------------------------------------------|
+| 0x00         | Successful                                                 |
+| 0x01         | SMBus levels requested on part without that feature        |
+| 0x02         | Dual mode options passed; part does not support dual mode! |
+| 0x04         | Dual mode options passed before dual mode enabled.         |
 | 0x08         | Invalid sda hold value passed (must be 0 - 3 or one of the named cosntants). The default is used instead |
+| 0x0X         | (where X is any other hexadecimal digit) - more than one error occurred. The return value is the bitwise OR of the error codes.
 
 Linear combinations are possible; 0x0B indicates that you asked for SMBus levels, and one or more dual mode options on a tinyAVR which supports none of those things, and you passed an invalid value for the SDA hold times, 0x05 indicates you asked for SMBus levels and one or more dual mode options without first enabling dual mode, on a megaAVR 0-series which does not support SMBus, and so on.
 
 Note: These options are each applicable to a different subset of conditions. They're mashed under one heading because they're all the ones that made no sense anywhere else
 
-### Standard methods and features significant differences
+### Standard methods and features with significant differences
+These methods exist in the standard implementation, with the same function - HOWEVER there is at least one important difference between these and the standard versions that you should be aware of; the difference and brief summary of the reasoning is given here.
+
 #### `void begin()`
 ```c++
 void begin();
 ```
-Calling `begin()` with no arguments starts the master. It does not start slave mode.
+Calling `begin()` with no arguments starts the master. It does not start slave mode. This must be called before attempting to communicate as an I2C master.
 
-It does NOT turn on the pullups on any pin - unlike the standard version.
+**Difference from Canon:** The canonical Wire library turns on the pullups on the I2C pins. As the pullups are a fraction of the strength required to meet the timing specifications for I2C, the canonical wire library leads userstothe false conclusion that external pullups are unneeded (as the simplest I2C bus configurations - 1 master 1slave right next toeachother, generally does work). However,the bus becomes unreliable and, and the appearance of the bug when new hardware isadded misdirects debugging attention to the new hardware, when the problem was that the system was missing two resistors - in the part of the design that the designer has already tested ad concluded was working correctly.
+
+Users who built their systems correctly, on the other hand, if they (as is commonly done to interface with lower voltage sensors) ran I2C at 3.3v and the MCU at 5V, using the canonical library, if they were attentive, they'd probably wonder why the voltage on the data lines was slightly higher than 3.3v while idle (thankfully the low strength of the pullups allows evemn the frailest protection diodes to keep the lower voltage chip safe - the current flowing from an internalpullup on a 5v chip to the protectio ndiode of a 3.3v chip (neglectign the diode drop, because that varies between what the device is, it will always lower the current by reducing the voltage drop).  )
+
+**This version of Wire does not turn on the pullups**  This means that if external pullups are missing, even the simplest I2C configurations will not work. Even a multimeter is then sufficient to determine that the SCL and SDA lines are not HIGH.
+  * Locate the pullup resistors if you believe you have installed them, Otherwise, power down the system and install the necessary pullups.
+    * If you find pullups, but one or both of them does not appear to be pulling up the data line, examine the solder joints for cold solder joints (which should be reworked via the usual methods), and the resistors for damage (chip reistors, rarely, can crack during assembly, and must be replaced. High rates of such failure indicate a problem with your assembly, component selection, or operating conditions). Power down system and perform appropriate repairs, if needed, and and measure resistance from ground to the malfunctioning line, if it is ~0 ohms, locate the solder bridge between the line and ground and correct it.
+  * Following above, if the lines are still not going HIGH, and you've checked that the other side of those pullups really does have the proper voltage on the high side, and really does have the same (incorrect) voltage on the SCL or SDA side, then something is dragging the bus down to ground.
+    * 2 bullet points ago, you should have tested with power off, and confirmed that neither line is shorted to ground. You did do that right? If you see a short here on the multimeter, but can't locate it,
+    * Disconnect the slave device. Power on the system, and upload code that calls Wire.begin() but does nothing else. measure the voltage on the SCL and SDA lines. If they are not high, and you've ruled out solder bridges testing with power off
 
 ```c++
 void begin(uint8_t  address, bool receive_broadcast = 0, uint8_t second_address = 0);
@@ -391,9 +419,9 @@ Most fundamental is the dead simple question: "What is the flush method of a str
 
 While all stream subclasses must have that method, it has only ever had a meaningful (ie, non-stub) definition for one sort of stream, and that's HardwareSerial, where it's used to make it stall until the TX ring buffer is empty.
 
-Within that paradigm, in master mode, since the method that starts a transfer doesn't return until it finishes (like SPI), the TX buffer cannot be full when non-library code is running exceot in an ISR, andafunction that stalls waiting for something shouldn't be in an ISR.
+Within that paradigm, in master mode, since the method that starts a transfer doesn't return until it finishes (like SPI), the TX buffer cannot be full when non-library code is running except in an ISR, andafunction that stalls waiting for something shouldn't be in an ISR.
 
-Within the same paradigm though, in slave mode, if you want to go to sleep, you should wait until the curreent I2C transfer, if any, is closed.
+Within the same paradigm though, in slave mode, if you want to go to sleep, you should wait until the current I2C transfer, if any, is closed.
 
 On the other hand, another school of thought says "The holy scripture from the creators calls the clearing of I2C bus error states "flush" so that's what the flush method shelt do. When the Creators have named a concept, mortals like Arduino have no right to declare it is named something else. Who's with me? To Arms!"
 
@@ -408,6 +436,8 @@ One can also argue that because of the precedent set by HardwareSerial, we shoul
 
 It is not hard to imagine a scenario where that would be relevant: Just consider the case of writing application code for the master, and uploading a new version while it happens to be in the middle of a transaction. You probably do not want to wait for the (reset) master to attempt (and fail at, because it would get a bus arbitration error as the slave attempted to answer at the same time the master tried to clock out the address) communication before doing anything, as you'd likely then have to reset both devices at once to upload - sometimes. If you're waiting on the completion of transactions before taking some action, you probably want to make sure you are handling the case where the master does not finish the transaction for some reason. I2C masters rarely take long periods of time between clocking in bytes when functioning correctly. At 100kHz, a byte takes under 100 us to transfer, and the master (if it's another Arduino device) is likely blocking during that time, waiting to grab another byte immediately. Even with a 130 byte buffer, this means that after a dozen ms, it should have been able to receive an entire buffer. If you were to wait 20 ms (or somewhat longer if you specifically modify the library for a massive buffer), you could conclude that the master is unlikely to ever finish. On the other hand, when the only think you intend to do is put the part to sleep, you can attempt to sleep on every pass through loop() instead as described below. On the third hand, if the system were battery powered, and that occurred, the slave would still be in a bad state, consuming IDLE sleep mode current, instead of POWER_DOWN current, which is many times lower, so maybe this would not be so great after all. In any event, a flush that worked like hardware serial would not help that case either, but rather make it drain the battery about twice as fast by not sleeping at all. This brings discussion back to the point I mentioned near the beginning: When something goes wrong with I2C, it usually goes very wrong. Unlike SPI, where you have a pin state to watch to see if the master thinks you are in a transaction, there is nothing physical that you can monitor and notice that the master vanished in the middle of a transaction.
 
+On the other hand, writing code to be an I2C slave on Arduino is much easier than writing an SPI slave. Actually, it is in general if the library stuff is done for your, because I2C devices don't need to worry about whether they can get the data to the data register in time. With I2C typically run no faster than 400 kHz and often at 100 kHz (and never faster than 1 MHz)
+
 
 
 #### `uint8_t endTransmission()`
@@ -416,21 +446,45 @@ uint8_t endTransmission(bool sendStop);
 ```
 In 2.5.4/1.4.4 it was reported that the return value of this method did not match the API - it was returning a count of bytes written, which broke lots of existing code. This is now corrected. Values returned are a superset of the the stock version, covering three additional causes of errors. These are not expected to break existing code, since a 0 still indicates success, and it only reports some things with new codes that previously were considered "unknown errors", which should still be treated as errors by code.
 
-| Value | Meaning                                                        | Standard |
-|-------|----------------------------------------------------------------|----------|
-|  0x00 | Success                                                        | Yes      |
-|  0x01 | ~TX buffer overflow~ Not Used                                  | "Yes"    |
-|  0x02 | Timeout waiting for ack of address                             | Yes      |
-|  0x03 | Timeout waiting for ack of data                                | Yes      |
-|  0x04 | Unknown error                                                  | Yes      |
-|  0x05 | Timeout                                                        | Yes      |
-|  0x10 | Arbitration lost                                               | No       |
-|  0x11 | Line held low or not pulled up                                 | No       |
-|  0xFF | Bus in unknown state (begin() not called?)                     | No       |
+| Value | Meaning                                                        | Standard | Data transferred?   |
+|-------|----------------------------------------------------------------|----------|---------------------|
+|  0x00 | Success                                                        | Yes      | Yes                 |
+|  0x01 | ~TX buffer overflow~ Not Used                                  | "Yes"    | Partial if uncaught |
+|  0x02 | Timeout waiting for ack of address                             | Yes      | None                |
+|  0x03 | Timeout waiting for ack of data                                | Yes      | Some, but target likely now in bad state |
+|  0x04 | Unknown error                                                  | Yes      | Unknown             |
+|  0x05 | Timeout                                                        | Yes      | No                  |
+|  0x10 | Arbitration lost                                               | No       | No - wait and retry |
+|  0x11 | Line held low or not pulled up                                 | No       | No.                 |
+|  0xFF | Bus in unknown state (begin() not called?)                     | No       | No. Bug likely yours|
 
+##### Handling endTransmission errors
 
+* 0 is a success, so the ideom `if(endTransaction()) {errorhandler();}` or `uint8_t temp = endTransaction(); if (temp) {errorHandler(temp);}` should be used
 
-In the case of a TX buffer overflow, this is not indicated by endTransmission(). endTransmission simply transmits the portion of the buffer that fits. This condition should be detected (if your code could potentially generate it), because write() earlier returned a number smaller than the number of bytes passed to it. Error code 1 is never returned by endTransmission; we do not store an extra byte of state just to report this condition that was already reported by write(), with more complete information
+* 1 will never be seen, because (just like in stock versions) the information that In the case of a TX buffer overflow, this is not indicated by endTransmission(). endTransmission simply transmits the portion of the buffer that fits. This condition should be detected (if your code could potentially generate it), because write() earlier returned a number smaller than the number of bytes passed to it. Error code 1 is never returned by endTransmission; we do not store an extra byte of state just to report this condition that was already reported by write(), with more complete information
+
+* 2, A timeout waiting for the ack of address implies the chip is able to manipulate the bus pins and see the expected result (the I2C master hardware, but never saw any response from the client
+  * The address may be wrong. Be aware that I2C addresses have 7 bits, and that conventions for how to align the bits when representing the address (0b0AAAAAAA, which is the logical representation, and the one which we use, versus 0bAAAAAAA0, which is also used). In the opinion of this author, neither way is strictly better - the first is less confusing, but only slightly so, while the second one is the natural way to think about it if you're used to working with the I2C protocol at a very low level (when the actual address is transmitted, the address byte is, in fact, sent as 0bAAAAAAAR with the final bit indicating a read (1) or write (0), which is the main argument in favor of the second convention.
+    * What is not in question is that the fact that there are two slightly different conventions does not aid individuals working with I2C devices
+    * I believe that this phenomenon is likely baked into silicon (ie, that companies exist making microcontrollers where the address register is left aligned instead of right aligned.
+  * We always use right aligned addresses, if the address from the datasheet doesn't work, but you can't find wiring problems, if the address is even (LSB 0) try rightshifting the address one place.
+  * Any address 128 or higher is *definitely* left alighted, and must be rightshifted one place.
+  * This error can also be caused by a variety of wiring problems, including the peripheral being disconnected entirely. Another very simple I2C device on the bus that's easy to talk to can help by allowing you to verify that any wiring error could only be confined to the connection between the SDA and SCL bus lines, and the corresponding pins on slave device that is not cooperating (and anything in it's path (such as a bidirectional level shifter - which may not have been connected properly, or may be designed only for shifting between 3.3 and 5v levels (this will be obvious measuring the data line on either side of the level shifter with the 'scope )
+* 3, A timeout waiting for the ack of data is mysterious. It typically implies that a device, likely the one addressed, choked on whatever it was sent and collapsed on top of the SCL and SDA lines. After this error occurs, you may find that one or both of the I2C lines are held low. If this is resolved while disconnecting the SCL and SDA pins from the device you were talking to, this would provide positive proof that the cause was the device getting into a bad state, likely because you missed a key detail in the datasheet.
+* 4, unknown error, indicates an error not otherwise specified. As suggested by the name, the cause and corrective actions should it occur are unknown to the writer of this document.
+* 5, timeout, indicated a timeout waiting for the bus to return to idle state. This may imply that some device is malfunctioning and refusing to release pins.
+* 0x10, Arbitration lost, indicates that it attempted to start sending, but must have started at the exact moment another master did. As I2C checks the state of the lines as it's sending data (necessary considering it's nature as a multidrop bus with two bidirectional lines) The master became aware of this when it attempted to transmit a high level, but saw that the line did not rise, indicating something else was holding it down, which must be another masterIn the case of Arbitration loss, that means on a multimaster bus, another device started transmitting at the same moment. At the first bit where the addresses being targeted by the respective masters differed, the master who was tying to output a 1, but can't because the line is held low by the other master, notices that the line isn't at the voltage its' supposed to be at, and deduces that it has lost arbitration. No data was sent.
+* 0x11 indicates a line-state error (SCL and SDA were not both high), implying missing or insufficient external pullups, a device on the bus in a bad state holding SDA and/or SCL low eternally, or a simple short between ground and one or both lines. No data could be sent with the linesin this state.
+Line held low or not pulled up indicates one of the following are true of SCL and/or SDA; a multimeter will instantly tell you which line is hung. I
+  * Pullup resistors are missing. Pullups are mandatory as discussed at lengths elsewhere here.
+  * A soldering error has accidentally shorted one of both of those lines to ground
+  * A I2C slave device is in a bad state.
+    * This is nearly always the fault of your code or your hardware.
+    * You didn't leave the data lines connected and try to save power by disconnecting them from Vcc while leaving the bus pulled up did you? Very few devices will resume function correctly after this, and could potentially be damaged.
+    * Sending bogus commands to some devices will hang them make them hang, crash, or sit on the data and/or clock lines until powercycled.
+After determining the line that's stuck, start disconnecting the I2C devices (if possible) with power still on and multimeter monitoring the stuck line. At some point, it will llikely return to HIGH after removing something. Now plug everything else back in and make sure one the others isn't holding the line low (if power has not been removed, and reconnecing a device drags the line back down again, disconnect it entirely and reconnect it - line till low indicates wiring or soldering defect or bad part connected, as it should not ever drag the line down without being addressed by the master)
+
 
 ### Methods that have their standard behaviour
 The implementation isn't identical, but the behaviour is unchanged, or is different only in an irrelevant and implicitly convertible return or argument type.
@@ -443,7 +497,7 @@ The implementation isn't identical, but the behaviour is unchanged, or is differ
     int peek();
     void end();
 ```
-`twi_buffer_index_t` is a `uint8_t` unless the buffer length has been set to more than 255 bytes, in which case it is a `uint16_t`
+`twi_buffer_index_t` is a `uint8_t` unless the buffer length has been set to more than 255 bytes (this is never a default setting - few I2C devices transfer such large blocks of data
 
 ### Remember when the handlers are called
 ```c++

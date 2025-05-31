@@ -465,30 +465,30 @@ void TWI0_usePullups() {
 uint8_t TWI0_checkPinLevel(void) {
   #if defined(PORTMUX_TWIROUTEA)     /* Dx-series */
     uint8_t portmux = (PORTMUX.TWIROUTEA & PORTMUX_TWI0_gm);
-    VPORT_t *vport;
+    PORT_t *port;
     if (portmux == PORTMUX_TWI0_ALT2_gc) {
-      vport = &VPORTC;
+      port = &PORTC;
     } else {
-      vport = &VPORTA;
+      port = &PORTA;
     }
 
     #if !defined(__AVR_DA__) && !defined(__AVR_DB__) //DD and EA, and presumably later parts, have an extra mux option.
       if (portmux == 3) {
-        return (vport->IN & 0x03);
+        return (port->IN & 0x03);
       } else
     #endif
     {
-      return ((vport->IN & 0x0C) >> 2);
+      return ((port->IN & 0x0C) >> 2);
     }
   #elif defined(PORTMUX_TWISPIROUTEA)
     uint8_t portmux = (PORTMUX.TWISPIROUTEA & PORTMUX_TWI0_gm);
-    VPORT_t *vport;
+    PORT_t *port;
     if (portmux == PORTMUX_TWI0_ALT2_gc) {
-      vport = &VPORTC;
+      port = &PORTC;
     } else {
-      vport = &VPORTA;
+      port = &PORTA;
     }
-    return ((vport->IN & 0x0C) >> 2);
+    return ((port->IN & 0x0C) >> 2);
   #elif defined(MEGATINYCORE)  /* tinyAVR 0/1-series */
     #if defined(PORTMUX_TWI0_bm)  // Has a pin multiplexer
       if (PORTMUX.CTRLB & PORTMUX_TWI0_bm) {

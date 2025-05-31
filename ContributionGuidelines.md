@@ -209,32 +209,43 @@ uint8_t myfunc(uint8_t a, uint8_t b) {
 ## Things to be aware of when writing PR's
 
 ### Help us prevent bad code from getting merged
-Do not submit pull requests containing bad code.
+The best way to prevent bad code that breaks existing sketches from being merged is to *not submit PR's containing bad breaking code*
 
 
-### Do not introduce abominations to the codebase!
-There exist abominations spawned in the very depths of Hell! Surprising nobody whose been in the technology field, many of these hellspawned abomainations are - in fact - digital (this makes them much easier to spawn, ya see, so there are way more). They often take the form of severely pathological code which taints all that it touches, turning honorable men into lechers, good parents into deadbeats and drunks. It causes toxic mold to grow in vents, and man-eating tigers to emerge from closets. These abombinations are not under any circumstance be introduced into the codebase. This list will be added to as more tiger attacks upon deadbeat, drunken parents with toxic mold in their HVAC systems are reported. 
+### Do not introduce abominations to the codebase
+There exist abominations - monsters, spawned in the very depths of Hell - ("Surprising nobody whose been in the technology field, many of the extant hellspawned abominations are digital. It's only natural, for them to be the most common of hellspawned abominations, as spawning copies of yourself is considerably easier for digital life than it is for biological life" *Speak for yourself...* "Windows 11 treating you that bad?"  They often take the form of severely pathological code which taints all that it touches, turning honorable men into lechers, good parents into deadbeats and drunks. It causes toxic mold to grow in vents, and man-eating tigers to emerge from closets. These abombinations are not under any circumstance be introduced into the codebase. This list will be added to as more tiger attacks upon deadbeat, drunken parents with toxic mold in their HVAC systems are reported.
 
-#### `if(true == (SOME_REG & SOME_FEATURE_bm)`
-**THIS ONLY WORKS IF SOME_FEATURE_bm = 0x01**
 
-Imagine if register holds 0x10, and SOME_FEATURE_bm is 0x10. So that becomes
-
-`if (true == 0x10)`
-
-Obviously the author was imagining the comparioson happening as a boolean - 0x10 evaluates to true when we need a boolean, so true == true great right? Except that C has type *promotion*, not *demotion*. The bool gets promoted to the same size data type (here a byte), takes the value 1. 0x01 != 0x10, so the if statement will never run
-
-But it looks like it works as long as the bitwise and is non-zero. There's no reason to do this, it's harder to read and it's usually a bug.
 
 ### Avoid common mistakes
-* macro definitions must have parentheses around the value they will take.
+* macro definition are mindless copy-pasting, and can have very counterintuitive results. Parenthecize all inputs and the output of all function like macros
+```c++
+#define TIMES_TWO(x) x*2
+
+// TIMES_TWO(2) = 4, good.
+// TIMES_TWO(1+1) = 3, not good - resolves to 1+1*2, and order of operations makes that into 1+2 = 3
+
+#define PLUS_TWO(x) x+2
+// PLUS_TWO(2) = 4, good.
+// PLUS_TWO(2)*2 = 6, not good - resolves to 2+2*2
+
+
+#define RIGHT_WAY(x) ((x)*2)
+
+
+
+```
 * Be sure to consider what happens when millis is disabled. **This is the second most commonly chosen option for millis timekeeping after the default!**
   * delay() and delayMicroseconds() both work with millis disabled (in the case of delay, only if millis is actually disabled from the menu, not enabled and subsequently broken by user code).
-* macros DO NOT CHECK TYPES; your macros that are exposed to user code library code must be hardened to take stupid types passed to them. Remember that while the core uses uint8_t's for all pin identifiers, code in the wild frequently follows the boneheaded lead of the Arduino IDE and uses signed 16-bit integers. A bug discovered in early 2023 involved the fact that if certain pin information macros were called with a signed value, the math where we checked if it was a valid pin could fuck up; we were checking if pin >= NUM_DIGITAL_PINS. When the values are unsigned, this works because -1 = 255 > pin whenever pin is valid - a single test can be used to catch both known NOT_A_PIN and other invalid pins not yet identified as much. But if a signed integer was passed to the macro, the default signed integer type would remain in use for the comparison with 0. So any negative number would pass through the test, and down the line would cause us to read from a memory location that was not part of the table we were looking values up in. If there is anything type sensitive, explicitly cast it.
+* macros DO NOT CHECK TYPES; your macros that are exposed to user code must be designed to react with - not necessarily grace, but at least non-perverse behavior when users pass stupid types passed to them. Remember that while the core uses uint8_t's for all pin identifiers, code in the wild frequently follows the boneheaded lead of the Arduino IDE and uses signed 16-bit integers. A bug discovered in early 2023 involved the fact that if certain pin information macros were called with a signed value, the math where we checked if it was a valid pin could fuck up; we were checking if pin >= NUM_DIGITAL_PINS. When the values are unsigned, this works because -1 = 255 > pin whenever pin is valid - a single test can be used to catch both known NOT_A_PIN and other invalid pins not yet identified as much. But if a signed integer was passed to the macro, the default signed integer type would remain in use for the comparison with 0. So any negative number would pass through the test, and down the line would cause us to read from a memory location that was not part of the table we were looking values up in. If there is anything type sensitive, explicitly cast it.
 * Because of this, in macros, always use 255 if for some reason you have to write out the value of the NOT_A_whateveritis error values, not -1, even though you know it will end up in a uint8_t. There's no advantage to -1, but though you may know what type it will eventually have, you do not know the path it will take to get there, which may involve multiple data types.
 
+
+
 ### Performance and binary size matter
-Particularly within the core API, performance matters. That means that things like division and modulo are bad, especially on large datatypes. Division and modulo both run the same routines. Approx time cost of math (how the variables are initialized may have an impact of +/- 2 x (size of datatype), so this is not gospel. The time required for division shown below is an average, since that routine does not execute in a fixed period of time. Large numerators and small denominators make it worse - as you would expect, computing x / y where x < y is highly favorable. Notice that switching to 64-bit types from 32-bit ones more than doubles the execution time - this is due to register pressure. It is likely to actually have an even larger effect in practice if there are other variables that need to be swapped out of working registers and reloaded.*
+Particularly within the core API, performance matters. You may be thinking about your AVR128DB64 and see a few hundred bytes as no big deal. Most code is shared between mTC and DxC, and the people using tinyAVRs with only 2k of flash scream bloody murder if the core functions are bloated by a change.
+
+That means that things like division and modulo are bad, especially on large datatypes or time-sensitive code (micros is one painful example where division is needed but unacceptably slow. Division and modulo both run the same routines. Approx time cost of math (how the variables are initialized may have an impact of +/- 2 x (size of datatype), so this is not gospel. The time required for division shown below is an average, since that routine does not execute in a fixed period of time. Large numerators and small denominators make it worse - as you would expect, computing x / y where x < y is highly favorable. Notice that switching to 64-bit types from 32-bit ones more than doubles the execution time - this is due to register pressure. It is likely to actually have an even larger effect in practice if there are other variables that need to be swapped out of working registers and reloaded.*
 
 | Math Operation | uint8_t | uint16_t | uint32_t | uint64_t | float |
 |----------------|---------|----------|----------|----------|-------|
@@ -242,7 +253,7 @@ Particularly within the core API, performance matters. That means that things li
 | Multiplication |       8 |       22 |       81 |      371 |   141 |
 | Division (avg) |     233 |      235 |      604 |     1734 |   479 |
 
-Seriously, those are not typos or mistakes on the division line (and the time is non-constant). Addition of two 8-bit values takes 5 clocks, their multiplication 8, and their division, on average, 233. Clearly somethings being promoted to 16-bity, but even there the numbers are 14, 22, and 235. Large binary size and slow execution are closely correlated, so avoiding doing bad kinds of math will help both.
+Seriously, those are not typos or mistakes on the division line (and the time is non-constant). Addition of two 8-bit values takes 5 clocks, their multiplication 8, and their division, on average, 233. Clearly somethings being promoted to 16-bits which oughn't be in that case, but even there the numbers are 14, 22, and 235. Large binary size and slow execution are closely correlated, so avoiding doing bad kinds of math will help both.
 
 The obscenely slow division of 32-bit datatypes is why micros has all that ugly assembly in it - division was way too slow. So we used a combination of bitshifts and addition, and used tricks to minimize the size of the operands at all times. But the compiler rendered it as an incredibly inefficient mess. (a + (a >> 1) + (a >> 2)) was rendered as (copy a to a temp register. Then copy it again, rightshift that once, add to temp register. Copy the original, replacing that singly rightshifted version. Rightshift twice, and add). Instead of simply rightshifting the intermediate value another place and repeating the addition.
 
