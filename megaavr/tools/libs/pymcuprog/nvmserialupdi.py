@@ -82,14 +82,14 @@ class NvmAccessProviderSerial(NvmAccessProvider):
             self.logger.error("ID read ('%06X') does not match expected device id! ('%06X')", device_id_read, self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID))
             if device_id_read in avrid_to_name:
                 if self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID) in avrid_to_name:
-                    raise ValueError("Device ID does not match - Expected: "+avrid_to_name[self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID)]+"Found: "+avrid_to_name(device_id_read))
+                    raise ValueError("Expected: "+avrid_to_name[self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID)]+" Instead, found: "+avrid_to_name[device_id_read]+". Check tools -> chip selection & identity of part")
                 else:
-                    raise ValueError("Device ID does not match - Expected part cannot be identified by SerialUPDI, this is a bug, please report it. Found: "+avrid_to_name(device_id_read))
+                    raise ValueError("Internal error determining expected part name. This is a bug, please report it. Found: "+avrid_to_name[device_id_read])
             else:
                 if self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID) in avrid_to_name:
-                    raise ValueError("Device ID does not match - Expected: "+avrid_to_name[self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID)]+"Found: Unrecognized ID")
+                    raise ValueError("Expected: "+avrid_to_name[self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID)]+" ID returned by part unknown to SerailUPDI")
                 else:
-                    raise ValueError("Device ID does not match - Additionally, the SerialUPDI hackjob to get human readable part names isn't working")
+                    raise ValueError("Neither expected nor found part IDs are recognized by SeralUPDI, yet the number above was returned")
 
         """
         Jesus that is hideous!
@@ -97,7 +97,7 @@ class NvmAccessProviderSerial(NvmAccessProvider):
         Yeah, we imported a list culled from the IO headers (find in files in sublime to get the line with the signature bytes in it, copy results to a new file, use regexes to snip out everything except the file name (subliume includes this in fine in files output)
         More regexe to get only the six hex characters of the sig in a row and the name, with a comma between it. Save as .txt
         Open with excel, delimited, comma. Before exiting the import dialog, the format for the column containing hexadecimal values had to be set to "text" to prevent it from trashing them. complete the import dialog, hex2dec() in a third column, to get numeric valies
-        copy/paste back into sublime to postprocess with regexes to yield the proper syntax for a python dictionary, indexed by the numeric representation. They're all around 2 million 
+        copy/paste back into sublime to postprocess with regexes to yield the proper syntax for a python dictionary, indexed by the numeric representation. They're all around 2 million
         """
         revision = self.avr.read_data(self.device_info.get(DeviceInfoKeysAvr.SYSCFG_BASE) + 1, 1)
         self.logger.info("Device revision: '%s'", chr(revision[0] + ord('A')))

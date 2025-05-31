@@ -214,7 +214,9 @@ def pymcuprog_basic(args, fuses_dict):
 
     try:
         pymcu._action_ping(backend)
-    except ValueError:
+    except ValueError as e:
+    # Print the error message
+        print(f"Error: {e}")
         print("Device ID mismatch! Stopping.")
         backend.end_session()
         backend.disconnect_from_tool()
