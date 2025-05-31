@@ -60,7 +60,7 @@ The size of the buffer is based simply on the available RAM on the part (note th
 --------|-------------|---------------------|---------------------
  <256b  | 16b         | 2k tinyAVR parts    | The 128b ram parts do not have space for 32-byte buffers. Note that many libraries may unknowingly rely on a 32+ bit buffer.
  <4096  | 32b         | Almost everything   | 32b buffers are the default.
- >4095  | 130b        | 32k+ Dx, some Ex    | 130b allows a full 128b page write (including the two address bytes) to be sent to a 24-series I2C EEPROM;<br/> that's the largest blob of data I am aware of people hving reason to send over I2C <br/>(and these parts can afford the memory, unlike the tinyAVR). <br/>(Note that EEPROM sizes on modern AVRs are smaller than classic ones, and some also have signifiantly lower flash endurance, <br/> so there may be more reason to use such things now).
+ >4095  | 130b        | 32k+ Dx, some Ex    | 130b allows a full 128b page write (including the two address bytes) to be sent to a 24-series I2C EEPROM;<br/> that's the largest blob of data I am aware of people hving reason to send over I2C <br/>(and these parts can afford the memory, unlike the tinyAVR). <br/>(Note that EEPROM sizes on modern AVRs are smaller than classic ones, and some also have significantly lower flash endurance, <br/> so there may be more reason to use such things now).
 
 ## Official specification of I2C
 [From NXP, the current owner of the relevant IP](https://www.nxp.com/docs/en/user-guide/UM10204.pdf)
