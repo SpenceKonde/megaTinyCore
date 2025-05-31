@@ -12,7 +12,7 @@ The OSCCFG fuse selects whether the speed is derived from a 20 MHz or 16 MHz osc
 They additionally have the equivalent of the classic AVR's OSCCAL calibration register, and like those parts, the compliance is many times what the datasheet claims, and you can get a very wide range of speeds from them. 0/1-series has 64 settings for each nominal clock frequency, and 2-series parts have 128. Determining the value to set it to in order to obtain a desired clock speed is called "Tuning", even though you're not doing it for accuracy (it's generally already at the best setting from factory cal if you want the nominal clock speed.)
 
 ### On Dx-series
-Fuses only control whether it starts up at 4 MHz or 32 kHz (we don't support the latter). Code that runs very early in the sketch (before start() but after the dirty reset check and after the clears initializers) serves to initialize the peripherals, including clkctrl to their requested settings. 
+Fuses only control whether it starts up at 4 MHz or 32 kHz (we don't support the latter). Code that runs very early in the sketch (before start() but after the dirty reset check and after the clears initializers) serves to initialize the peripherals, including clkctrl to their requested settings.
 
 The OSCCTRL.OSCHFCTRLA register's *middle* 4 bits control the frequency of the internal oscillator. This field divides neatly into two sections. 0x0, 0x1, 0x2 and 0x3 are 1, 2, 3, and 4 MHz. The next one is reserved (I'd wager it would give 4 MHz). That's followed by the next section, 8, and every subsequent multiple of 4 up to 24 are listed in the datasheet, and at least at room temperature, extending the pattern 2 more rungs is consistent, and leads to speeds of 28 and 32 MHz, generally work at room temperature. (beyond that, the last 4 are repeated).
 
@@ -31,7 +31,7 @@ On the tinyAVRs, these are like the old parts in that the compliance is many tim
 The worst of both worlds! The OSCCFG fuse selects whether the speed is derived from a 20 MHz or 16 MHz oscillator. At power-on, these are always set to a prescaler of /6 hence 2.66 or 3.33 MHz. The core, prior to calling setup, will reconfigure the prescaler to match the requested speed. The OSCCFG fuse is always set when a sketch is uploaded via a UPDI programmer.
 Yhere is a tuning register, CLKCTRL.OSCHFTUNE. Unfortunately, it is much less useful than the tinyAVR one. The register is limited to -32 to +31, corresponding to - and + around 16%. +/-16% doesn't exactly open up new frontiers.
 If an external 32.768 MHz crystal has been connected, you can, for improved temperature stability, autotune the internal oscillator from this. I had to direct a torch at the chip (from a distance) to heat it up enough to see the speed autotune....
-Not the feature I'm most impressed with. A+ on concept, C on execution. More tuning bits to improve granularity and compliance (at least 8) would allow autotune to lock onto a frequency that was closer to the target. The biggest enemy of autotune is the granularity. 
+Not the feature I'm most impressed with. A+ on concept, C on execution. More tuning bits to improve granularity and compliance (at least 8) would allow autotune to lock onto a frequency that was closer to the target. The biggest enemy of autotune is the granularity.
 
 The EB-series is almost in the same boat... except it's also got that wild PLL to play with.
 
@@ -46,7 +46,7 @@ The AVR Dx-series come in I (105C) and E (125C) spec parts. Since the DA-series 
 Some of the listed speeds, while supported by the hardware are not supported by the core - typically weird, slow clocks, particularly from a crystal
 For unsupported speeds, the micros and delay-us columns indicate what internal plumbing has been implemented. micros is implemented for almost all speeds, delayMicroseconds with non-compile-time-known delays for most, even some unsupported ones. delayMicroseconds() is supported and accurate at all speeds when the argument is a compile-time-known constant, as we use the avr-libc implementation.
 
-### 
+###
 
 | Clock Speed | W/in Spec (tiny, Ex) | W/in Spec (Dx) | Internal (tiny) | Internal (Dx) |  Ext. Crystal |    Ext. Clock | micros | delay-us | Notes
 |-------------|----------------------|----------------|-----------------|---------------|---------------|--------|----------|-------------
@@ -76,7 +76,7 @@ For unsupported speeds, the micros and delay-us columns indicate what internal p
 Notes:
 The tiny and Ex-series have the same clock speed grades, including the voltage dependence.
 
-`*` This speed is not exposed by the core because no sound argument has been presented in favor of including these odd, low frequencies. The mechanics are mostly written, so should someone convince me that these are useful, they could be made available easily. **Note that a desire to reduce power consumption is NOT a sound argument!** Refer to the electrical characteristics table. While current at frequency is only comparable at constant voltage, enough data is available that you can plot the current consumption versus frequency. Doing this, we find that the graph is roughly linear, at least in the region of interest. So we ask - when we halve the processor speed, is the current less than half or more than half? The answer is "More than", on every AVR I have checked (which is essentially every modern AVR), and every classic AVR I checked (a more limited number of examples). 
+`*` This speed is not exposed by the core because no sound argument has been presented in favor of including these odd, low frequencies. The mechanics are mostly written, so should someone convince me that these are useful, they could be made available easily. **Note that a desire to reduce power consumption is NOT a sound argument!** Refer to the electrical characteristics table. While current at frequency is only comparable at constant voltage, enough data is available that you can plot the current consumption versus frequency. Doing this, we find that the graph is roughly linear, at least in the region of interest. So we ask - when we halve the processor speed, is the current less than half or more than half? The answer is "More than", on every AVR I have checked (which is essentially every modern AVR), and every classic AVR I checked (a more limited number of examples).
 
 1. 1 MHz is often used for low power applications, and so is supported with the internal oscillator only. It is not supported with other clock sources. Crystal uses more power, and so doesn't make sense, and external clocks seem to be power hogs. Also refer to the Idd vs Vdd characteristics graphs: If you are CPU-bound, since a first order approximation of power vs frequency is a * F_CPU + b, where b is larger than sleeping power consumption
 2. Unsupported because of low demand, not technical obstacle.
@@ -84,11 +84,11 @@ The tiny and Ex-series have the same clock speed grades, including the voltage d
 4. This is not natively supported by the internal oscillator but could be generated by prescaling the internal oscillator at 12 or 28 MHz. Other possible frequencies that can be created through prescaling are not shown, only integer number of MHz is included in table.
 5. This is an overclock that is likely to work on all parts as long as it is run at room temperature.
 7. 30 MHz is notable because it is the highest overclocked option available for tinyAVR 0/1-series running from tuned internal oscillator.
-8. This is an aggressive overclock, and cannot be expected to work on all parts. Best results can be had by using E-spec (extended temperature range) parts, and higher speeds will always be achieved with an external clock. 
-  *To ensure a good yield, place your order on a new moon, then purify the room prior to experimentation by burning a quantity of US or Euro zone currency* 
+8. This is an aggressive overclock, and cannot be expected to work on all parts. Best results can be had by using E-spec (extended temperature range) parts, and higher speeds will always be achieved with an external clock.
+  *To ensure a good yield, place your order on a new moon, then purify the room prior to experimentation by burning a quantity of US or Euro zone currency*
 9. a 0/1-series tinyAVR can normally run no fatster than 30 MHz on internal, thought the oscillator can exceed 32, the core isn't happy at that clock speed from the internal oscillator, But with an external 32 MHz clock and a 5.1-5.2Vpower supply with good decoupling F-spec 1-series will generally run at 32 on external at room temp, but not intyernal.. In general, at all tiumes, an external clock will givbe a slightly cleaner clock signal, and thus slightly higher maximum speed before things start visibly crapping out immediately (you want to back off more than a little bit from that before you use it for anything.)
 
-General note: Signs you've overclocked too hard: Random resets, these show as having been software resets, even if you don't use a software reset anywhere. Usually rtesults of arithmetic and logical instructions get polluted with 0's that should be 1's/ The same can happen with load/store 
+General note: Signs you've overclocked too hard: Random resets, these show as having been software resets, even if you don't use a software reset anywhere. Usually rtesults of arithmetic and logical instructions get polluted with 0's that should be 1's/ The same can happen with load/store
 
 There are multiple ways to generate some of the lower frequencies from internal oscillator (do you prescale from higher frequency, or set the oscillator to the desired one? Suspect the latter is more power efficient, but with the former you could still use the PLL while staying in spec - (in my tests the PLL worked well beyond the spec in both directions, at least at room temperature, not that you'd want to do that in production) - currently, we set the main oscillator to the desired frequency, however we may revisit this decision in the future. There might be reasons to just run the TCD off the unprescaled clock in order to.... I'm not sure what....
 
