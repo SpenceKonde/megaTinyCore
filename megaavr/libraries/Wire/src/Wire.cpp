@@ -670,8 +670,7 @@ uint8_t TwoWire::masterReceive(auto *length, uint8_t *buffer, uint8_t addr, uint
     #endif
 
     if (currentStatus & TWI_ARBLOST_bm) {   // Check for Bus error
-      TWIR_SET_ERROR(TWI_ERR_BUS_ARB);      // set error flag
-      break;                                // leave RX loop
+      return TWI_ERR_BUS_ARB;               // leave RX loop
     }
 
     if (currentSM != TWI_BUSSTATE_BUSY_gc) {
@@ -732,6 +731,10 @@ twi_buf_index_t TwoWire::requestFrom(uint8_t  address,  twi_buf_index_t quantity
     if (quantity > TWI_BUFFER_LENGTH) {
       badArg("requestFrom requests more bytes then there is Buffer space");
     }
+  }
+  if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
+    badArg("Supplied address seems to be 8 bit. Only 7-bit-addresses are supported");
+    return;
   }
   if (quantity >= TWI_BUFFER_LENGTH) {
     quantity = TWI_BUFFER_LENGTH;
@@ -862,8 +865,7 @@ uint8_t TwoWire::masterTransmit(auto *length, uint8_t *buffer, uint8_t addr, uin
     #endif
 
     if (currentStatus & TWI_ARBLOST_bm) {     // Check for Bus error
-      TWI_SET_ERROR(TWI_ERR_BUS_ARB);       // set error flag
-      break;                                // leave TX loop
+      return TWI_ERR_BUS_ARB;                 // leave TX loop, don't update bytes to read and don't try to send stop
     }
 
     if (currentSM != TWI_BUSSTATE_BUSY_gc) {  // Undefined was excluded, so make sure it's IDLE or OWNER
