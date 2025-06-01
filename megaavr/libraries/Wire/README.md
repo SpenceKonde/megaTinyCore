@@ -53,7 +53,7 @@ Availability of pin mappings by pincount for AVR Dx-series
 In all cases, the part specific documentation included with the core takes precedence over this document and will include information about parts not mentioned here.
 
 ## Default Buffer Sizes
-This can be overridden with compiler parameters (particularly suitable if using PIO which makes that easy) with `-DBUFFER_LENGTH = `.
+This can be overridden with compiler parameters (particularly suitable if using PIO which makes that easy) with `-DBUFFER_LENGTH = ...`.
 The size of the buffer is based simply on the available RAM on the part (note that multiple buffers may be needed depending on operational modes).
 
  RAM    | Buffer size | Parts               | Notes
@@ -277,7 +277,7 @@ Vin High (min) DA/DD |                 ~1.45V  `*`  | 1.26V | 1.75V | 2.31V | 3.
 
 `*` The DA and DD (but not the DB) datasheets imply that the minimum guaranteed high is 1.45V in SMbus mode if running at less than 2.5v.
 
-See also (Ref_Digital.md#INLVL)[the digital I/O reference] for the analogous data for these pins when used in non-I2C mode, in normal mode, and wheresupported, TTL mode.
+See also [the digital I/O reference](Ref_Digital.md#INLVL) for the analogous data for these pins when used in non-I2C mode, in normal mode, and wheresupported, TTL mode.
 
 
 
@@ -335,11 +335,11 @@ Calling `begin()` with no arguments starts the master. It does not start slave m
 Users who built their systems correctly, on the other hand, if they (as is commonly done to interface with lower voltage sensors) ran I2C at 3.3v and the MCU at 5V, using the canonical library, if they were attentive, they'd probably wonder why the voltage on the data lines was slightly higher than 3.3v while idle (thankfully the low strength of the pullups allows evemn the frailest protection diodes to keep the lower voltage chip safe - the current flowing from an internalpullup on a 5v chip to the protectio ndiode of a 3.3v chip (neglectign the diode drop, because that varies between what the device is, it will always lower the current by reducing the voltage drop).  )
 
 **This version of Wire does not turn on the pullups**  This means that if external pullups are missing, even the simplest I2C configurations will not work. Even a multimeter is then sufficient to determine that the SCL and SDA lines are not HIGH.
-  * Locate the pullup resistors if you believe you have installed them, Otherwise, power down the system and install the necessary pullups.
-    * If you find pullups, but one or both of them does not appear to be pulling up the data line, examine the solder joints for cold solder joints (which should be reworked via the usual methods), and the resistors for damage (chip reistors, rarely, can crack during assembly, and must be replaced. High rates of such failure indicate a problem with your assembly, component selection, or operating conditions). Power down system and perform appropriate repairs, if needed, and and measure resistance from ground to the malfunctioning line, if it is ~0 ohms, locate the solder bridge between the line and ground and correct it.
-  * Following above, if the lines are still not going HIGH, and you've checked that the other side of those pullups really does have the proper voltage on the high side, and really does have the same (incorrect) voltage on the SCL or SDA side, then something is dragging the bus down to ground.
-    * 2 bullet points ago, you should have tested with power off, and confirmed that neither line is shorted to ground. You did do that right? If you see a short here on the multimeter, but can't locate it,
-    * Disconnect the slave device. Power on the system, and upload code that calls Wire.begin() but does nothing else. measure the voltage on the SCL and SDA lines. If they are not high, and you've ruled out solder bridges testing with power off
+* Locate the pullup resistors if you believe you have installed them, Otherwise, power down the system and install the necessary pullups.
+  * If you find pullups, but one or both of them does not appear to be pulling up the data line, examine the solder joints for cold solder joints (which should be reworked via the usual methods), and the resistors for damage (chip reistors, rarely, can crack during assembly, and must be replaced. High rates of such failure indicate a problem with your assembly, component selection, or operating conditions). Power down system and perform appropriate repairs, if needed, and and measure resistance from ground to the malfunctioning line, if it is ~0 ohms, locate the solder bridge between the line and ground and correct it.
+* Following above, if the lines are still not going HIGH, and you've checked that the other side of those pullups really does have the proper voltage on the high side, and really does have the same (incorrect) voltage on the SCL or SDA side, then something is dragging the bus down to ground.
+  * 2 bullet points ago, you should have tested with power off, and confirmed that neither line is shorted to ground. You did do that right? If you see a short here on the multimeter, but can't locate it,
+  * Disconnect the slave device. Power on the system, and upload code that calls Wire.begin() but does nothing else. measure the voltage on the SCL and SDA lines. If they are not high, and you've ruled out solder bridges testing with power off
 
 ```c++
 void begin(uint8_t  address, bool receive_broadcast = 0, uint8_t second_address = 0);
