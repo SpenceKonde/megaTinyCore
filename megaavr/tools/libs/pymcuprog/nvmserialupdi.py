@@ -82,7 +82,7 @@ class NvmAccessProviderSerial(NvmAccessProvider):
             self.logger.error("ID read ('%06X') does not match expected device id! ('%06X')", device_id_read, self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID))
             if device_id_read in avrid_to_name:
                 if self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID) in avrid_to_name:
-                    raise ValueError("Expected: "+avrid_to_name[self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID)]+" Instead, found: "+avrid_to_name[device_id_read]+". Check tools -> chip selection & identity of part")
+                    raise ValueError("Expected: "+avrid_to_name[self.device_info.get(DeviceInfoKeysAvr.DEVICE_ID)]+" Instead, found: "+avrid_to_name[device_id_read])
                 else:
                     raise ValueError("Internal error determining expected part name. This is a bug, please report it. Found: "+avrid_to_name[device_id_read])
             else:

@@ -151,12 +151,15 @@ Comparator.dacref = 128;  // Divide the reference voltage by two
 ### hysteresis
 This variable configures the comparator hysteresis (the difference between when state transitions from 0 to 1, and when it transitions from 1 to 0. Useful for eliminating undesirable stochastic or oscillatory behavior which might be seen when the two inputs are almost at the same voltage.
 
+**WARNING: Each part family has it's own variant of the AC. These have different hysteresis values! On tinyAVR, they even depend on whether LP mode is enabled!**
+
 Accepted values:
 ``` c++
-comparator::hyst::disable; // No hysteresis
-comparator::hyst::small;   // 10mV hysteresis (±5mV)
-comparator::hyst::medium;  // 25mV hysteresis (±12.5mV)
-comparator::hyst::large;   // 50mV hysteresis (±25mV)
+// Approximate Hysteresis Threshold:            tinyAVR, tinyAVR LP, AVR Dx, AVR Ex
+comparator::hyst::disable; // No hysteresis        0 mV |     0 mV |  0 mV |  0 mV |
+comparator::hyst::small;   // 10mV hysteresis     10 mV |    10 mV | 10 mV | 10 mV |
+comparator::hyst::medium;  // More hysteresis     30 mV |    40 mV | 25 mV | 20 mV |
+comparator::hyst::large;   // Lots of hysteresis  55 mV |    80 mV | 50 mV | 30 mV |
 ```
 
 #### Usage
@@ -355,4 +358,44 @@ enterStandbySleep();  // enter standby sleep mode until the comparator interrupt
 
 ## *Future development*
 *shouldn't LP_MODE/PROFILE and RUNSTBY be properties, and treated like everything else? Why **aren't** they? I would imagine that wanting to wake on the AC int would be one of the most common uses of that interrupt.*
+
 *They certainly **want** to be properties and it would make the library more coherent. But it would come at a 4-8 bytes of flash (unsure if per comparator or total) and 1 or 2 bytes of ram per comparator, depending on implementation details. Probably wouldn't be popular with people on 212's, but that's a pretty small overhead considering the general level of bloat introduced by classy wrappers around peripherals like Logic, Comparator and Opamp). Maybe a new optional argument to start it in low power, low power - run standby, and run standby (correspondingly more options on DxCore of course). Because how often are you going to be changing the mode once you've turned it on? That's an odd use case (and in any case, the intuitive solution of calling start with a different argument to change it would behave as expected. By passing as the argument the value to be written to the CTRLA register it would have almost no overhead, too. -SK*
+
+### Constants, tinyAVR (prop.)
+* AC_PWR_DEFAULT   - No low power mode, no run in standby. 50ns response time. 0x00
+* AC_PWR_LP        - No run in standby, using low power mode. 150ns response time. Saves 47uA. 0x08
+* AC_PWR_RUNSTBY   - Run in standby, not using low power mode. 0x80.
+* AC_PWR_LPSTBY    - Low Power mode and Run Standy (likely the most useful option). 0x88
+
+On tinyAVR, LP Mode also changes the hysteresis thresholds from 10/30/55 to 10/40/80mV. This is not the case on later parts
+
+### Constants, Dx
+* AC_PWR_DEFAULT    - No low power mode, no run in standby. 85ns response time. 0x00
+* AC_PWR_PMODE1     - No run in standby, using low power mode. 235ns`*` response time. Saves 53uA. 0x08
+* AC_PWR_PMODE2     - No run in standby, not using low power mode. 445ns`*` response time. Saves 58uA. 0x10
+* AC_PWR_RUNSTBY    - Run in standby, power mode 0. 0x80.
+* AC_PWR_PMODE1STBY - Run in standby, power mode 1 150ns response time. Saves 53uA. 0x88
+* AC_PWR_PMODE2STBY - Run in standby, power mode 2 150ns response time. Saves 58uA. 0x90
+
+## Constants, Ex
+* AC_PWR_DEFAULT    - No low power mode, no run in standby. 50ns response time. 0x00
+* AC_PWR_PMODE1     - No run in standby, using low power mode. 150ns response time. Saves 40uA. 0x08
+* AC_PWR_RUNSTBY    - Run in standby, power mode 0. 0x80.
+* AC_PWR_PMODE1STBY - Run in standby, power mode 1 150ns response time. Saves 40uA. 0x88
+
+Uh, yeah, the analog comparators have response times ot 50-445 ns, and use between 12 and 150 uA.
+
+### Peripheral Power Consumption
+
+Figures are as reported by manufacturer in datasheets for analog comparator as "typical" values.
+
+Mode | TinyAVR 2 | AVR Dx | AVR Ex |
+-----|-----------|--------|--------|
+Base |     92 uA |  70 uA | 150 uA |
+LP   |     45 uA |      - |      - |
+PM1  |         - |  17 uA | 110 uA |
+PM2  |         - |  12 uA | n/s    |
+PM3  |         - |  Rsvd. | n/s    |
+
+
+Note that the overall device power while in power-down sleep is typically on the order of <0.1 uA in power down sleep, and <1 uA in standby sleep with the RTC running. Standby sleep with the RTC and an AC running in RUNSTBY in contrast is ~92 uA, or half that with LP mode. Users considering use of `RUNSTBY` should take heed of the power ramifications of this, and consider if there is a better way to achieve their goal. If that must be done, `LPMODE` is recommended.

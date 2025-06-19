@@ -2,90 +2,16 @@
 This core includes a number of features to provide more control or performance when doing digital I/O. This page describes how to use them. All of the options that can be configured for a pin are exposed. The only things that aren't exposed are the slew rate limiting feature, and the multi-pin configuration facilities. The slew rate limiting is can only be configured on a per port basis; turning it on and off is so simple (see below) that it needs no wrapper. The multi-pin configuration system does not have an obvious "right way" to expose it and should be handled directly by the sketch - it is very flexible and no wrapper around it would be able to preserve it's virtues while being much of a wrapper.
 
 ## Table of Contents
-* [But first, about the hardware](Ref_Digital.md#but-first-about-the-hardware)
-* [Ballpark overhead figures](Ref_Digital.md#ballpark-overhead-figures)
-* [openDrain()](Ref_Digital.md#opendrain)
-* [Fast Digital I/O](Ref_Digital.md#fast-digital-io)
-  * [Flash use of fast digital output functions](Ref_Digital.md#flash-use-of-fast-digital-output-functions)
-* [pinConfigure()](Ref_Digital.md#pinconfigure)
-  * [INLVL - input logic levels](Ref_Digital.md#inlvl---input-logic-levels)
-* [PINCONFIG and associated registers](Ref_Digital.md#pinconfig-and-associated-registers) (Dx, Ex only)
-* [Slew Rate Limiting](Ref_Digital.md#slew-rate-limiting)(Dx-series and 2-series only)
-* [There is no INLVL or PINCONFIG on tinyAVR devices](Ref_Digital.md#there-is-no-inlvl-or-pinconfig-on-tinyavr-devices)
-* [Standard and semi-standard API functions](Ref_Digital.md#standard-and-semi-standard-api-functions)
-  * [Basic pin information](Ref_Digital.md#basic-pin-information)
-  * [Things that return pointers](Ref_Digital.md#things-that-return-pointers)
-* [Finding current PWM timer, if any: digitalPinToTimerNow()](Ref_Digital.md#finding-current-pwm-timer-if-any-digitalpintotimernow)  (DxCore only)
-* [Note on number of pins and future parts](Ref_Digital.md#note-on-number-of-pins-and-future-parts)
 
 
-## But first, about the hardware
-As there is a good chance you;ve noticed, a lot of hardware is better at driving pins low than high (sinking vs sourcing). Classic AVRs supposedly had symmetric drive - they were very similar in their ability to source and sink current (this varied by part though - for comparison below I used the last classic AVR that came out in it's fully evolved form, the 328PB. But ever since they've been publishing graphs, it's been clear the drive strength is not symmetric.
-
-The pretense - in the form of matching specs in the electrical characteristics table - was abandoned on the Dx-series parts, though it mysteriously returned in the Ex-series, though none have gotten graphs published yet... This summarizes the differences in digital I/O capability (not counting pincount and peripheral differences)
-
-The EB specs 0.4V max of drop, symmetric, at 6mA and Vdd = 3.0V. But as with the tinies and classics, that doesn't mean it actually is symmetric. The Dx-series just admitted it, specing 0.6V sinking 10mA at 3.0V and 0.7V sourcing 6mA
-
-| Part Family         | classic | tiny0/1 | tiny2  |    Dx   |    Ex   |
-|---------------------|---------|---------|--------|---------|---------|
-| Abs max current     | +/-40mA | +/-40mA |+/-40mA | +/-50mA | +/-40mA |
-| Abs max injection   | +/-1 ma | +/-15mA |+/-15mA | +/-20mA | +/-20mA |
-|    .. @ Vdd > 4.9   | +/-1 ma | +/-1 mA |+/- 1mA | (same)  | (same)  |
-| IOH, max on graph   | 20 mA   | 20 mA   | 20 mA  |   50 mA | tbd**   | Sourcing Current Current shown for highest voltage shown on the highest operating voltage chart (the most favorable)
-| Vdd - V@IOHnax      |  1.05V  |  0.65V  | 4.3V   |   2.0 V | tbd**   | Voltage shown corresponding to that point. Both are at the "25 C mean" line.
-| IOL,max from graph  | 20 ma   | 20 mA   | 20 mA  |   100mA | tbd**   | These taken together imply that the tiny2 is about 62% better at sinking current than sourcing it (as measured by voltage drop)
-| VOL,max from graph  |  0.45V  |  0.45V  | 0.43   |   1.4V  | tbd**   | while the Dx is 185% better at sinking current than sourcing it, under extreme conditions. Who the hell tests and gives graphs to 2x the abs max? Love it!
-| Rpullup             | ~35k    | ~35k    | ~35k   |   ~35k  | 32k     |
-| INLVL supported     |      No |      No |     No |     Yes |     Yes | Not supported on AVR DA(S).
-| Fully Async Pins    | none    |    2, 6 |  2, 6  | 2,6/All |     All | From the DD onward, all pins are treated as "fully async". It means you can trigger on super short pulses (and noise), and wake on rise/fall, not just change/low. On all pins.
-| PINCONTROL bulk-set | n/a     |      No |     No |     Yes |     Yes | The PINCONTROL bulk-PINnCTRL writing registers are only on Dx/Ex, where there may be a lot more unused pins.
-| EVGENCTRL           | n/a     |      No |     No | DU Only |     Yes | The DU, being rather late (notice how two of the E's cut in front of it), did manage to pick up the EVGENCTRL features (user facing only if not using included Event.h library. It's an improvement, as it makes the event channels - finally - equivalent.
-| Those special pins  | -       |  -      | -      | -       | -       | UPDI and reset have various levels of functionality on different parts.
-| UPDI pin            | n/a     |    PA0  | PA0    | PF7*    | PF7     |
-| Pin for HV pulse    | Reset   |    PA0  | PA0    | PF6*    | PF6     | This is the pin that the HV pulse for reprogramming a UPDI pin set to be non UPDI ust be sent to. If it can be used as GPIO, the pin drive is ~1/30th that of other pins.
-| Pin PA0 can be GPIO | ***     | Hard    | Hard   | n/a     | n/a     | Nothing special about PA0 on Dx/Ex, other than that if there's a crystal somewhere, it's likely on those pins.
-|   .. can be Reset   | n/a     | Possible| Yes    | n/a     | n/a     | as above
-|   .. can be UPDI    | n/a     | Default |Default | n/a     | n/a     | as above
-| Pin PB4 can be RST  | n/a     |   No    | Yes    | No      | No      | Note that 14-pin parts don't have a PB4.
-| Pin PF6 can be RST  | n/a     | n/a     | n/a    | Yes     | Yes     |
-|   .. can be GPIO    | n/a     | n/a     | n/a    | No      | No      | On no modern AVR with a PF6 is the pin usable as an output.
-|   .. can be GPI     | n/a     | n/a     | n/a    | see     |  -->    | Yes. And this is the DEFAULT setting according to Microchip, but on these parts, it's a "harmless" fuse that gets set as specified on all updi uploads.
-| Pin PF7 can be UPDI | n/a     | n/a     | n/a    | Yes     | Yes     |
-| Pin PF7 can be GPIO | n/a     | n/a     | n/a    | DD/DU   | Yes     |
-
-`*` In the DA and DB-series, although it obviously was PF7, as there was no way to enable it for general I/O prior to the DDs, they never called it that. On the DA and DB families, PF7 cannot be made GPIO, and it's only ever UPDI. Since the DD that is no longer the case, and seems to be part of their standard features now *You mean, they didn't have it ready in time for the DA/DB? Obviously they were planning it, or they'd have left output drivers on PF6.* "Or they didn't want to add unnecessary porting complexity for the same of 1 extra output on the highest pincount devices in the pipeline"
-
-`**` - It remains to be seen what the pin drive strength will be like on the Ex-series or any other future part, and until the IO pin output current is added to the characteristics graphs section of the datasheet, you don't really have much information; preliminary datasheets typically omit this sort of data. Right now in the EA-series datasheets, we still have a specification of Minimum, Typical, and Maximum VOH and VOL of "-", "-", and "-" (though they helpfully note that the test conditions are 6mA at VDD = 3.0V; presumably yet to be conducted). Now, one really has to wonder how it takes them so long to characterize the behavior of an I/O pin. I understand how complex peripherals would be hard to test. And subtle ISA bugs like the cursed write sequence that the compiler would be perfectly within it's rights to emit but never does, nobody noticed that for like 5 years or more. But an I/O pin is pretty simple. You put a controlled load on it, and change the load while measuring the voltage on the pin. It's the sort of thing that I'm sure, nowadays, would be easy for anyone well versed in microcontrollers to automate, especially if they had to do that sort of thing, oh, every time they released a product? I'm sure Microchip has some employees who are quite knowledgeable about microcontrollers. I sure hope they do. Like, I'd expect new figures to be automatically generated by the automated testing on each new internal development rev that comes to of the fab.
-
-`***` - On a Tiny85 or Tiny84/841, HVSP really doesn't seem too bad - sure it was way more of a pain than normal ISP, but normal ISP kinda sucks in most ways compared to UPDI. It's similar to a modern AVR with UPDI disabled, and I'd call it "Hard". But only those three part families use HVSP. Everything else takes HVPP to reprogram after reset is disabled, and HVPP requires connection of around 20 wires to the target (with 20 chances to make a mistake), most of them can't be loaded so you can just forget about doing it in system. I do not recall reading any account on forums of someone using HVPP outside of work, and those were rare. HVPP is much harder than "Hard".
-
-### The tinies aren't symmettric drive?
-You might be scurrying to your datasheets thinking "I swear they were symmetric on the tinys!" and if you look at the table - which gives worst case values, they are. But the graphs, which give observed "typical" values, tell a different story - they show a voltage drop when sourcing 20mA on a tiny2 of around 0.7V at room temp, but a voltage drop of 0.4-0.45 on at sinking the same amount of current. The low side drivers are stronger. The Dx-series takes it to a new level: At max opperating voltage (5.5v) they ran it up to the absolute max on the high side (recording a 2 volt drop). On the low side though, at the 50mA absolute max, they were still only seeing 0.6V. So they ran it up to twice the absolute maximum rating, which saw a 1.4V drop. Though it's hardly novel for the graphs in the datasheet to show that that the parts typically blow their rated specs out of the water, at least briefly or in favorable conditions (as in when being pushed very hard) or under normal, mild conditions; no particular AVR example comes to mind, but my preferred 1117-series regulator specs the usual dropout as a maximum. The typical characteristics graphs, in contrast, show dropout on the order of a tenth of a volt at light loads. I appreciate the transparency on behavior in overload conditions. I wish they did that more.
-
-**IN FACT, NONE OF THE AVRS HAVE EVER ACTUALLY BEEN SYMMETRIC DRIVE**
-
-They met symmetric specs, butr exceeded tem in one direction far more than the other
-
-
-### Other notes on that table
-What tinyAVR calls current injection, Dx/Ex-series call "Clamp current"; the latter is, in my opinion, more proper. It's current through the protection diodes, which are called "clamp diodes" because they constrain ("clamp") the voltage between supply and ground, thus preventing damage to the chip. As these are microcontrollers not power rectifiers, these diodes are very small, so the current through these diodes has to be kept low, else they fail, followed immediaely by the pin-driver they were protecting. This failure is typified by the pin always behaving as if set output, driving in the direction of the voltage excursion. Oddly It wasn't spec'ed on classic AVRs (but was well known to be low, and to be a highly effective way of blowing pins). It's said that the most experienced AVR developers can simply stare intently at a chosen pin on the old classic AVRs, imagining a voltage in excess of VDD applied to it, and burn out the pin driver just like that. In any event, Atmel employees are rumored to have said +/- 1mA maximum on classic AVRs, (in spite of an app note advising connecting a tiny85 through a high value resistor to mains to do zero cross detection. That app note describes basically doing what the ZCD on the Dx-series does, only with less help from the hardware).
-
-Anyway, the takeaways I intended from this are:
-* The I/O pins we have are a hell of a lot better than the ones classic had, and they're getting better
-* The I/O pins on the Dx-series in particular are spectacularly strong, and they have greatly improved resilience to clamp current across the board.
-* Pin drive is not symmetric. This has ramifications for the design constraints on an RC filter used to make analog voltages out of PWM.
-* The section of the datasheet where they are talking about
-
-
-## Now we can talk about the digital I/O features supplied by the core
-(murmurs of annoyance from the audience 'about damn time!')
+## Features:
 
 * We supply the classics, which work as you know them to:
-  * pinMode(uint8_t pin, uint8_t mode) `i'ts slow as shit! `
-  * digitalWrite(uint8_t pin, uint8_t state)- state should be `LOW`, `HIGH`, or `CHANGE`. *All other values are invalid* and have *undefined behavior*  `LOW`, `HIGH` and `CHANGE` have numeric values of 0, 1, and 2, though using the numbers is deprecated. What digitalWrite() does not do is evaluate the state argument as a boolean and branch based on that.
-  * digitalRead(uint8_t pin) - returns a uint8_t, not an int. **Does not turn off PWM when used on a pin currently outputting PWM, unlike the default core. Do you really want all the turnOffPWM overhead? Does it even make sense that reading will cancel an effect you enabled with a function ending in "Write"?**
-  * analogWrite(uint8_t pin, uint8_t duty) - *That's not digital* "Well I can't very well talk about the ovewrhead without bringing up PWM, as you'll see."
-* There has always been an internal function by this name, which does exactly what it sounds like. For reasons unclear to me, it was hidden.
+  * pinMode(uint8_t pin, uint8_t mode) - mode should be INPUT, OUTPUT, or INPUT_PULLUP. *All other values are invalid* and have *undefined behavior*
+  * digitalWrite(uint8_t pin, uint8_t state)- state should be `LOW`, `HIGH`, or `CHANGE`. *All other values are invalid* and have *undefined behavior*  `LOW`, `HIGH` and `CHANGE` have numeric values of 0, 1, and 2, though using the numbers is deprecated (but means that it does work when passed booleans, which are promoted to 8-bit values of 0 or 1, are passed)
+  * digitalRead(uint8_t pin) - returns a uint8_t, not an int. **Does not turn off PWM when used on a pin currently outputting PWM, unlike the default core.** There are limits to how far I will toe the line, and this is beyond them, how often do you want to read a pin immediately after PWMing on it?
+  * analogWrite(uint8_t pin, uint8_t duty) - *That's not digital* "Well I can't very well talk about the ovewrhead without bringing up PWM, as you'll see. Besides, PWM is digital"
+* There has always been an internal function by this name, which does exactly what it sounds like. For reasons unclear to me, it was hidden. It no lomger is. Since it dominates the execution time of any function that calls it, it can't be igored.
   * turnOffPWM(uint8_t pin) - turns off PWM on the pin passed to it, if it's a PWM pin. Otherwise does nothing but burn a lot of clock cycles, especially on Dx-series. Mostly used internally, and you just digitalWrite() the pin for the same effect.
 * And we have added a bunch of new API extensions...
   * openDrain(uint8_t pin, uint8_t state) - State = `LOW` or `FLOATING` (HIGH will work, but is not recommended). Leaves the port output value at 0 (and sets it to that if it isn't there already), and just changes the direction.
@@ -93,65 +19,24 @@ Anyway, the takeaways I intended from this are:
   * digitalReadFast(uint8_t pin) - As above; in a construction like `if(digitalReadFast(PINNUMBER)){...}` may use only a single clock cycle on the test.
   * pinModeFast(uint8_t pin, uint8_t mode) - as above. Performance and overhead suffer significantly if mode not constant.
   * openDrainFast(uint8_t pin, uint8_t state) - as above.
-  *] pinConfigure(uint8_t pin, uint16_t pin_config) - wrapper around all things pin maniupulation related, allowing direction and output value to be set along with all the options in the PINnCFG register.
-* We have applied some policies to all of these functions
-  * Things like digitalWrite() or pinMode() that get an argument where only a small number of options are valid, if you pass a compile time known constant that isn't valid, you'll get a compile error telling you as much.
+  * pinConfigure(uint8_t pin, uint16_t pin_config) - wrapper around all things pin maniupulation related, allowing direction and output value to be set along with all the options in the PINnCFG register.
+* Some policies apply to all of these functions
+  * Things like digitalWrite() or pinMode() that get an argument where only a small number of options are valid, if you pass a compile time known constant that isn't valid, you'll get a compile error telling you as much (ie, (`digitalWrite(HIGH,5)` would resolve HIGH to 1, which is probably a valid pin, but the 5 passed as the state, is not LOW, HIGH or CHANGE, so that gives an error, which would hopefully lead you to correctly order the arguments.)
   * All things that take a pin number as an argument, if that argument is compile time known constant, and is invalid (eg, pin doesn't exist), you'll be told as much through a compile error
-    * This is consistent with my philosophy that "There is no way this line could ever not be a bug" - such as telling a pin to do something that didn't correspond to anything a pin could do is a valid and appropriate reason to generate a compile error.
+    * This is consistent with my philosophy that "When there is no way this line could ever not be a bug, and we can see that, it shouldn't compile" - such as telling a pin to enter a mode that doesn't exist, or writing to a pin that doesn't exist.
+    * The exception to the non-existent pin is that NOT_A_PIN is allowed to fail silently, rather than giving a compile error as some libraries use that as a placeholder for "this pin function isn't used"... and then just rely on invalid pin numbers not doing anything when written to.
   * There are many ways to outfox these "badArg" errors, since they only work on foldable compile-time-known constants. But they help to quickly catch the stupid bugs - bad tab completions, constant pin assignments copy/pasted from code for other modern AVRs, etc
-* We discourage referrign to pins by numbers. PIN_PA1, PIN_PB3 is preferred. If they're not defined at compile time, you're compiling for the wrong part or are trying to use ports you don't have.
-  * It's also a great help when porting between modern AVRs, as the same peripherals are found on the same port pins*
-
-
-
-
-## Ballpark overhead figures
-The digital I/O functions are astonishingly inefficient. This isn't my fault (not on mTC - on DxC I have definitely not helped...) - it's the Arduino API's fault
-These figures are the difference between a sketch containing a single call to the function, with volatile variables used as arguments to prevent compiler from making assumptions about their values, which may substantially reduce the size of the binary otherwise.
-
-The comparison to the fast I/O functions is grossly unfair, because the fast I/O functions have constant arguments - but this gives an idea of the scale.
-Remember also that executing 1 word of code (2 bytes) takes 1 clock cycle, though not all of the code paths are traversed for all pins (indeed, we know that large portions will be skipped for all pins, because each pin can have only one PWM timer, but on the other hand, there are a few small loops in there). Gives an idea of the scale.
-
-| Function           | DB64 | t3224 | t3216 | Notes
-|--------------------|------|-------|-------|-------------------------
-| pinMode()          | +306 |  +112 |  +130 | Does NOT call turnOffPWM().
-| digitalWrite()     | +656 |  +216 |  +340 | Calls turnOffPWM(), included in figures.
-| both of above      | +784 |  +300 |  +358 | Calls turnOffPWM()
-| openDrain()        | +584 |  +136 |  +272 | calls turnOffPWM()
-| turnOffPWM()       | +572 |  +100 |  +266 | Dx pays dearly for the pwm remapping. 3216 is paying for the TCD PWM.
-| digitalRead()      |  +76 |   +60 |   +72 | Official core calls turnOffPWM (we don't)
-| pinConfigure() 1   | +216 |  +104 |  +116 | Only direction/output level
-| pinConfigure() 2   | +362 |  +202 |  +220 | Only pullup, input sense, and direction/outlevel
-| pinConfigure() 3   | +414 |  +232 |  +252 | Unconstrained
-| digitalWriteFast() |   +2 |    +2 |    +2 | With constant arguments.
-| pinModeFast()      |  +12 |   +12 |   +12 | With constant arguments.
-| dW-turnOffPWM()    |  +84 |  +126 |  +112 | Digital write times above less the turnOffPWM()
-
-These figures compare the size of a while loop that continually writes to a pin number that it loads from an I/O register. This is compared with an assignment of a value to one of those registers in an otherwise empty sketch. That is to say, a sketch for a 3224 that uses pinMode, digitalWrite, openDrain, and digitalRead will use less than 300 + 136 + 60 = 496 more than a sketch with just the dummy loop (ie, `while (1) {GPIOR1 = GPIOR0};`). This comparison thus includes the digital_pin_to_* tables, with one entry per pin each. There are 4 such tables (bit_mask, bit_position , port, and timer). *Thus this table does not include call overhead, because the function, called from a single place, gets inlined*. The overhead of such a call is at least 2 bytes per place that it is called from, but that neglects additional overhead required by making callable functions. Once the processor has loaded the values of the arguments into a working register (how long this takes depends on your code), it may need to move them around to put them in the registers according to the avr-gcc ABI, and then the function may have to then move them again to get them into the register it needs them in.
-
-The takeaways from this should be that:
-* digitalWrite() can easily take 35-75 or more clock cycle with turnOffPWM and then over 50 itself. So digitalWrite can take up to 7 us per call (at 20 MHz; digitalWriteFast takes 0.05 us), and it is by far the worst offender. A small consolation is that turnOffPWM does not execute the entire block of code for all parts. It checks which timer is used, and uses that block, which very roughly gives 70 clocks on a TCA pin, around 150 on a TCD pin, and considerably fewer on a pin with no PWM, though it still has to determine that the pin doesn't have pwm.
-* If you know you won't have PWM coming out of a pin, pinConfigure is faster than pinMode() and digitalWrite(), especially if only setting up the more common properties. pinConfigure 1 above has the effect of a combined pinMode and digitalWrite, and it's faster than either of them.
-* With great power comes greater overhead. With only 1 timer doing PWM, the 3224 only needs 72 words to handle turning off that timer. The 3216 with 2 TCD pins has to pay around 150 words of flash in turnOffPWM, and a similar amount in analogWrite. And on Dx, it's even worse (though you only traverse a small portion of it on any given call. But we gotta handle 3 kinds of timers, some with errata to work around)
-* pinConfigure is optimized differently when called with the second argument constrained to 0x00-0x0F (setting only direction and output value) (1), with it constrained to that plus configuring pullups (2), and without restrictions (3).
-* Up to 4 bytes times the highest numbered digital pin are in the form of lookup tables. Which tables the compiler needs to include depends on which functions are used.
-  * digital_pin_to_port[] is used by all of them.
-  * digital_pin_to_bit_mask[] is used by all of them.
-  * digital_pin_to_bit_position[] is used by is used by every call that needs to set the pullup, or configure interrupts on a pin;
-  * digital_pin_to_timer[] is used by turnOffPWM(), anything that calls that, and analogWrite().
-  * The tables are only used when the pin is not known at compile time, and it hence must be able to look up an arbitrary pin number. Fast digital I/O requires the pin number to be a compile time known constant (that's where a significant portion of the benefit is concentrated. )
-* This is why the fast digital I/O functions exist, and why there are people who habitually do `VPORTA.OUT |= 0x80;` instead of `digitalWrite(PIN_PA7,HIGH);`
-* This unexpectedly poor performance of the I/O functions is also why I am not comfortable automatically switching digital I/O to "fast" type when constant arguments are given. The normal functions are just SO SLOW that such a change would be certain to break code implicitly. I have seen libraries which, for example, would not meet (nor come close to meeting) setup and hold time specifications for an external device, but for the grindingly slow pin I/O. *This breakage would likely be wholly unexpected by both library author and the user, and would furthermore be very difficult for most users to diagnose, requiring an oscilloscope, awareness of the poor performance of these API functions, and sufficient familiarity with electronics to know that this was a problem that could occur*. Hence, it would be directly contrary to the goal of making electronics accessible (which Arduino is directed towards), and the goal of maintaining a high degree of compatibility with existing Arduino libraries, which is one of the primary goals of most Arduino cores.
-
-megaTinyCore and DxCore, like all Arduino cores, provides implementations of the usual digital I/O functions. *These implementations are not guaranteed to have identical argument and return types, though we do guarantee that same will be implicitly convertible to the types used by the reference implementation* See below for specifics
-
-pinConfigure called with second argument constrained to 0x00-0x0F (setting only direction and output value) (1), with it constrained to that plus configuring pullups (2), and without restrictions (3).
-
-About 200 bytes of that space is used for lookup tables, not instructions.
-
-This is why the fast digital I/O functions exist, and why there are people who habitually do `VPORTA.OUT |= 0x80;` instead of `digitalWrite(PIN_PA7, HIGH);`
-
-It's also why I am not comfortable automatically switching digital I/O to "fast" type when constant arguments are given. The normal functions are just SO SLOW that you're sure to break code that hadn't realized they were depending on the time it took for digital write, even if just for setup or hold time for the thing it's talking to. And yes, I absolutely have seen an example of the code where they used super short delays amongst digitalWrites(), and the result was totally different than what their comments described. In their case, the whole thing was a kludge, so it was compensated for by an arbitrary fudge factor somewhere (IIRC there were several of those - what was it, making a tiny85 or something act like a
+* We discourage referrign to pins by numbers. PIN_PA1, PIN_PB3 is preferred. If they're not defined at compile time, you're compiling for the wrong part or are mistaken about the part's available pins and are trying to write pins you don't have. .
+  * It's also a great help when porting between modern AVRs:
+    * All tinyAVRs with a copy of a given peripheral (excepting the ADC, because they have a very very different ADC onthe 2-series) have the same pins with the same functions. The 2-series only took away one pin mapping option, the ability to remap the TWI pins found on some 1-series parts.
+    * All non-tiny modern AVRs with a copy of a given peripheral, if they have it's pins (as used on previous modern AVRs that were not tinyAVRs), those pins will be available for that peripheral.
+      * New parts may gain additional pin mappings, but they have never lost a pin mapping.
+      * The sole exception to this, to my knowledge, is the SPI and TWI mappings for the megaAVR 0-series, the immediate predecessor to the Dx-series.
+        * 0-series megaAVR had one TWI and one SPI, respectively on pins 2/3 of PA or PC, with PC or PF as the dual mode pins and PA4-7, PC0-3, PE0-3.
+        * Dx-series TWI0 is on: pins 2/3 of PA or PC, dual mode on PC2-3 or PC6-7. and TWI1 is on: pins 2/3 of PF or PB, dual mode on PB2-3 or PB6-7. SPI0 is on: PC0-3, PC4-7, PB4-7 and SPI1 is on: PA4-7, PE0-3, PG4-7.
+        * Notice that all pins that had *a* TWI or SPI on them still do. it just may not be the same one.
+        * Above lists do not include the later mappings that were added with the DD-series to make low pincounts less painful.
+    * All this means that startlingly low level code can often be used with no code changes, which is how DxCore and mTC support a combined 142 (38 tinyAVR, rest Dx/Ex) chips and share most code. ATTinyCore supported under 25 parts, and is full of "one-off" implementations for parts idiosyncracies. This dark days are OVER!
 
 ## openDrain()
 It has always been possible to get the benefit of an open drain configuration - you set a pin's output value to 0 and toggle it between input and output. This core provides a slightly smoother (also faster) wrapper around this than using pinmode (since pinMode must also concern itself with configuring the pullup, whether it needs to be changed or not, every time - it's actually significantly slower setting things input vs output. The openDrain() function takes a pin and a value - `LOW`, `FLOATING` (or `HIGH`) or `CHANGE`. `openDrain()` always makes sure the output buffer is not set to drive the pin high; often the other end of a pin you're using in open drain mode may be connected to something running from a lower supply voltage, where setting it OUTPUT with the pin set high could damage the other device.
@@ -205,7 +90,15 @@ if (digitalReadFast(PIN_PA3)) {
   Serial.println("PA3 is high")
 }
 ```
-Getting a 1 or 0 into a variable is slower and uses more flash; I can think of at least one way to do it in 3 which makes no assumption about whether it's stored in an upper or lower register, but I'm not confident in how clever the compiler is, and it's tricky to set something up where the compiler doesn't have options such that you can generalize the result.
+
+Or more practically:
+
+```c
+
+
+```
+
+
 
 **The fast digital I/O functions do not turn off PWM** as that is inevitably slower (far slower) than writing to pins and they would no longer be "fast" digital I/O.
 
@@ -261,7 +154,7 @@ Each pin can be in one of five modes: Enabled without interrupts, disabled witho
 
 
 
-### INLVL - input logic levels
+### INLVL - input logic levels (AVR DB, DU, EA, EB, DU only)
 More recent parts (The AVR-DB, DD, DU, EA and EB) allow you to configure on a per-pin basis one of two sets of input voltage levels: either the normal schmitt triggert input, which has thresholds as a fraction of Vdd, or the TTL mode which has fixed thresholds independent of operating voltage. On MVIO pins, using the schmitt trigger Vddio2 takes the place of VDDIO. Note that this is overridden when pins are used for the TWI - that defaults to I2C voltage levels, but supports an optional SMBus 3.0 mode.
 
 | Voltage             |  Schmitt  |     I2C   |  TTL   | SMBus 3.0 |
@@ -378,7 +271,59 @@ These parts (like many electronics) are better at driving pins low than high, an
 With a 24 MHz system clock, that means "normal" would be just over half a clock cycle while rising, and just under half a clock cycle falling; with slew rate limiting, it would be just over a clock cycle rising, and 3/4ths of a clock cycle on the falling side.
 
 ## There is no INLVL or PINCONFIG on tinyAVR devices
-The configurable input level option (`INLVL`) is only available on the AVR Dx and Ex series (and likely any future series).
+The configurable input level option (`INLVL`) is only available on the AVR Dx (except for the DA - it was added with the DBs along with MVIO for obvious reasons, and I guess the cost of including it everywhere was small enough that they figured "might as well") and Ex series (and likely any future series)
+
+
+
+## Ballpark overhead figures
+The digital I/O functions are astonishingly inefficient. This isn't my fault (not on mTC - on DxC I have definitely not helped...) - it's the Arduino API's fault
+These figures are the difference between a sketch containing a single call to the function, with volatile variables used as arguments to prevent compiler from making assumptions about their values, which may substantially reduce the size of the binary otherwise.
+
+The comparison to the fast I/O functions is grossly unfair, because the fast I/O functions have constant arguments - but this gives an idea of the scale.
+Remember also that executing 1 word of code (2 bytes) takes 1 clock cycle, though not all of the code paths are traversed for all pins (indeed, we know that large portions will be skipped for all pins, because each pin can have only one PWM timer, but on the other hand, there are a few small loops in there). Gives an idea of the scale.
+
+| Function           | DB64 | t3224 | t3216 | Notes
+|--------------------|------|-------|-------|-------------------------
+| pinMode()          | +306 |  +112 |  +130 | Does NOT call turnOffPWM().
+| digitalWrite()     | +656 |  +216 |  +340 | Calls turnOffPWM(), included in figures.
+| both of above      | +784 |  +300 |  +358 | Calls turnOffPWM()
+| openDrain()        | +584 |  +136 |  +272 | calls turnOffPWM()
+| turnOffPWM()       | +572 |  +100 |  +266 | Dx pays dearly for the pwm remapping. 3216 is paying for the TCD PWM.
+| dW-turnOffPWM()    |  +84 |  +126 |  +112 | Digital write times above less the turnOffPWM()
+| oD-turnOffPWM()    |  +12 |   +36 |    +6 | Digital write times above less the turnOffPWM()
+| digitalRead()      |  +76 |   +60 |   +72 | Official core calls turnOffPWM (we don't)
+| pinConfigure() 1   | +216 |  +104 |  +116 | Only direction/output level
+| pinConfigure() 2   | +362 |  +202 |  +220 | Only pullup, input sense, and direction/outlevel
+| pinConfigure() 3   | +414 |  +232 |  +252 | Unconstrained, DB has INLVL, tiny does not.
+| digitalWriteFast() |   +2 |    +2 |    +2 | With constant arguments.
+| pinModeFast()      |  +12 |   +12 |   +12 | With constant arguments.
+
+These figures compare the size of a while loop that continually writes to a pin number that it loads from an I/O register. This is compared with an assignment of a value to one of those registers in an otherwise empty sketch. That is to say, a sketch for a 3224 that uses pinMode, digitalWrite, openDrain, and digitalRead will use less than 300 + 136 + 60 = 496 more than a sketch with just the dummy loop (ie, `while (1) {GPIOR1 = GPIOR0};`). This comparison thus includes the digital_pin_to_* tables, with one entry per pin each. There are 4 such tables (bit_mask, bit_position , port, and timer). *Thus this table does not include call overhead, because the function, called from a single place, gets inlined*. The overhead of such a call is at least 2 bytes per place that it is called from, but that neglects additional overhead required by making callable functions. Once the processor has loaded the values of the arguments into a working register (how long this takes depends on your code), it may need to move them around to put them in the registers according to the avr-gcc ABI, and then the function may have to then move them again to get them into the register it needs them in.
+
+The takeaways from this should be that:
+* digitalWrite() can easily take 35-75 or more clock cycle with turnOffPWM and then over 50 itself. So digitalWrite can take up to 7 us per call (at 20 MHz; digitalWriteFast takes 0.05 us), and it is by far the worst offender. A small consolation is that turnOffPWM does not execute the entire block of code for all parts. It checks which timer is used, and uses that block, which very roughly gives 70 clocks on a TCA pin, around 150 on a TCD pin, and considerably fewer on a pin with no PWM, though it still has to determine that the pin doesn't have pwm.
+* If you know you don't have PWM coming out of a pin that you want to make stop, pinConfigure is faster than pinMode() and digitalWrite(), especially if only setting up the more common properties. pinConfigure 1 above has the effect of a combined pinMode and digitalWrite, and it's faster than either of them.
+* With great power comes greater overhead. With only 1 timer doing PWM, the 3224 only needs 72 words to handle turning off that timer. The 3216 with 2 TCD pins has to pay around 150 words of flash in turnOffPWM, and a similar amount in analogWrite. And on Dx, it's even worse (though you only traverse a small portion of it on any given call. But we gotta handle 3 kinds of timers, some with errata to work around)
+* pinConfigure is optimized differently when called with the second argument constrained to 0x00-0x0F (setting only direction and output value) (1), with it constrained to that plus configuring pullups (2), and without restrictions (3).
+* Up to 4 bytes times the highest numbered digital pin are in the form of lookup tables. Which tables the compiler needs to include depends on which functions are used.
+  * digital_pin_to_port[] is used by all of them.
+  * digital_pin_to_bit_mask[] is used by all of them.
+  * digital_pin_to_bit_position[] is used by is used by every call that needs to set the pullup, or configure interrupts on a pin;
+  * digital_pin_to_timer[] is used by turnOffPWM(), anything that calls that, and analogWrite().
+  * The tables are only used when the pin is not known at compile time, and it hence must be able to look up an arbitrary pin number. Fast digital I/O requires the pin number to be a compile time known constant (that's where a significant portion of the benefit is concentrated. )
+* This is why the fast digital I/O functions exist, and why there are people who habitually do `VPORTA.OUT |= 0x80;` instead of `digitalWrite(PIN_PA7,HIGH);`
+* This unexpectedly poor performance of the I/O functions is also why I am not comfortable automatically switching digital I/O to "fast" type when constant arguments are given. The normal functions are just SO SLOW that such a change would be certain to break code implicitly. I have seen libraries which, for example, would not meet (nor come close to meeting) setup and hold time specifications for an external device, but for the grindingly slow pin I/O. *This breakage would likely be wholly unexpected by both library author and the user, and would furthermore be very difficult for most users to diagnose, requiring an oscilloscope, awareness of the poor performance of these API functions, and sufficient familiarity with electronics to know that this was a problem that could occur*. Hence, it would be directly contrary to the goal of making electronics accessible (which Arduino is directed towards), and the goal of maintaining a high degree of compatibility with existing Arduino libraries, which is one of the primary goals of most Arduino cores.
+
+megaTinyCore and DxCore, like all Arduino cores, provides implementations of the usual digital I/O functions. *These implementations are not guaranteed to have identical argument and return types, though we do guarantee that same will be implicitly convertible to the types used by the reference implementation* See below for specifics
+
+pinConfigure called with second argument constrained to 0x00-0x0F (setting only direction and output value) (1), with it constrained to that plus configuring pullups (2), and without restrictions (3).
+
+About 200 bytes of that space is used for lookup tables, not instructions.
+
+This is why the fast digital I/O functions exist, and why there are people who habitually do `VPORTA.OUT |= 0x80;` instead of `digitalWrite(PIN_PA7, HIGH);`
+
+It's also why I am not comfortable automatically switching digital I/O to "fast" type when constant arguments are given. The normal functions are just SO SLOW that you're sure to break code that hadn't realized they were depending on the time it took for digital write, even if just for setup or hold time for the thing it's talking to. And yes, I absolutely have seen an example of the code where they used super short delays amongst digitalWrites(), and the result was totally different than what their comments described. In their case, the whole thing was a kludge, so it was compensated for by an arbitrary fudge factor somewhere (IIRC there were several of those - what was it, making a tiny85 or something act like a
+
 
 
 ## Standard and semi-standard API functions
@@ -444,6 +389,64 @@ Avoid placing yourself in any of the following situations, as these **should not
 * Setting an interrupt on a pin on a Major Die Rev. "A" DA or DB-series device, then performing an analogRead() of the pin, due to an erratum impacting these devices: Whenever selected by the POSMUX/NEGMUX registers, while the ADC is enabled (like all cores, we do this during init()) get their digital input buffers disabled (yes, this meant that when I did a crude sanity check - turn on all the pullups, then read each port, and expect to see a 1 everywhere there is a pin other than the serial port you're outputting on - I found that PD0 (AIN0) was not reading anything. After the initial errata list came out, a trivial workaround was implemented (enabled by the improvements to the ADC on modern AVRs: On classic AVRs, remember how you had to take several throw-away readings and then your actual reading you used? Yeah you don't need to do that so much anymore. The effect is still there, but considerably smaller.
 
 (*Another one of your stupid "physical laws"? Bah! Vote for me! Vote for the repeal of physical law!* "Do you think people will fall for that?" *Why not? Candidates ignore mathematics all the time, why should physics be any different?* "I thought you were running for president, not God" *I was, then I watched the longest standing democracy impeach two of their presidents in a row. Now I'm aiming higher - ever hear of a God-Emperor?* "Yes, but I was under the impression that they eschew elections..." *Once they're in power sure, but they gotta get there somehow*)
+
+
+## Note about about the hardware, drive strength
+As there is a good chance you;ve noticed, a lot of hardware is better at driving pins low than high (sinking vs sourcing). Classic AVRs supposedly had symmetric drive - they were very similar in their ability to source and sink current (this varied by part though - for comparison below I used the last classic AVR that came out in it's fully evolved form, the 328PB. But ever since they've been publishing graphs, it's been clear the drive strength is not symmetric.
+
+The pretense - in the form of matching specs in the electrical characteristics table - was abandoned on the Dx-series parts, though it mysteriously returned in the Ex-series, though none have gotten graphs published yet... This summarizes the differences in digital I/O capability (not counting pincount and peripheral differences)
+
+The EB specs 0.4V max of drop, symmetric, at 6mA and Vdd = 3.0V. But as with the tinies and classics, that doesn't mean it actually is symmetric. The Dx-series just admitted it, specing 0.6V sinking 10mA at 3.0V and 0.7V sourcing 6mA
+
+| Part Family         | classic | tiny0/1 | tiny2  |    Dx   |    Ex   |
+|---------------------|---------|---------|--------|---------|---------|
+| Abs max current     | +/-40mA | +/-40mA |+/-40mA | +/-50mA | +/-40mA |
+| Abs max injection   | +/-1 ma | +/-15mA |+/-15mA | +/-20mA | +/-20mA |
+|    .. @ Vdd > 4.9   | +/-1 ma | +/-1 mA |+/- 1mA | (same)  | (same)  |
+| IOH, max on graph   | 20 mA   | 20 mA   | 20 mA  |   50 mA | tbd**   | Sourcing Current Current shown for highest voltage shown on the highest operating voltage chart (the most favorable)
+| Vdd - V@IOHnax      |  1.05V  |  0.65V  | 4.3V   |   2.0 V | tbd**   | Voltage shown corresponding to that point. Both are at the "25 C mean" line.
+| IOL,max from graph  | 20 ma   | 20 mA   | 20 mA  |   100mA | tbd**   | These taken together imply that the tiny2 is about 62% better at sinking current than sourcing it (as measured by voltage drop)
+| VOL,max from graph  |  0.45V  |  0.45V  | 0.43   |   1.4V  | tbd**   | while the Dx is 185% better at sinking current than sourcing it, under extreme conditions. Who the hell tests and gives graphs to 2x the abs max? Love it!
+| Rpullup             | ~35k    | ~35k    | ~35k   |   ~35k  | 32k     |
+| INLVL supported     |      No |      No |     No |     Yes |     Yes | Not supported on AVR DA(S).
+| Fully Async Pins    | none    |    2, 6 |  2, 6  | 2,6/All |     All | From the DD onward, all pins are treated as "fully async". It means you can trigger on super short pulses (and noise), and wake on rise/fall, not just change/low. On all pins.
+| PINCONTROL bulk-set | n/a     |      No |     No |     Yes |     Yes | The PINCONTROL bulk-PINnCTRL writing registers are only on Dx/Ex, where there may be a lot more unused pins.
+| EVGENCTRL           | n/a     |      No |     No | DU Only |     Yes | The DU, being rather late (notice how two of the E's cut in front of it), did manage to pick up the EVGENCTRL features (user facing only if not using included Event.h library. It's an improvement, as it makes the event channels - finally - equivalent.
+| Those special pins  | -       |  -      | -      | -       | -       | UPDI and reset have various levels of functionality on different parts.
+| UPDI pin            | n/a     |    PA0  | PA0    | PF7*    | PF7     |
+| Pin for HV pulse    | Reset   |    PA0  | PA0    | PF6*    | PF6     | This is the pin that the HV pulse for reprogramming a UPDI pin set to be non UPDI ust be sent to. If it can be used as GPIO, the pin drive is ~1/30th that of other pins.
+| Pin PA0 can be GPIO | ***     | Hard    | Hard   | n/a     | n/a     | Nothing special about PA0 on Dx/Ex, other than that if there's a crystal somewhere, it's likely on those pins.
+|   .. can be Reset   | n/a     | Possible| Yes    | n/a     | n/a     | as above
+|   .. can be UPDI    | n/a     | Default |Default | n/a     | n/a     | as above
+| Pin PB4 can be RST  | n/a     |   No    | Yes    | No      | No      | Note that 14-pin parts don't have a PB4.
+| Pin PF6 can be RST  | n/a     | n/a     | n/a    | Yes     | Yes     |
+|   .. can be GPIO    | n/a     | n/a     | n/a    | No      | No      | On no modern AVR with a PF6 is the pin usable as an output.
+|   .. can be GPI     | n/a     | n/a     | n/a    | see     |  -->    | Yes. And this is the DEFAULT setting according to Microchip, but on these parts, it's a "harmless" fuse that gets set as specified on all updi uploads.
+| Pin PF7 can be UPDI | n/a     | n/a     | n/a    | Yes     | Yes     |
+| Pin PF7 can be GPIO | n/a     | n/a     | n/a    | DD/DU   | Yes     |
+
+`*` In the DA and DB-series, although it obviously was PF7, as there was no way to enable it for general I/O prior to the DDs, they never called it that. On the DA and DB families, PF7 cannot be made GPIO, and it's only ever UPDI. Since the DD that is no longer the case, and seems to be part of their standard features now *You mean, they didn't have it ready in time for the DA/DB? Obviously they were planning it, or they'd have left output drivers on PF6.* "Or they didn't want to add unnecessary porting complexity for the same of 1 extra output on the highest pincount devices in the pipeline"
+
+`**` - It remains to be seen what the pin drive strength will be like on the Ex-series or any other future part, and until the IO pin output current is added to the characteristics graphs section of the datasheet, you don't really have much information; preliminary datasheets typically omit this sort of data. Right now in the EA-series datasheets, we still have a specification of Minimum, Typical, and Maximum VOH and VOL of "-", "-", and "-" (though they helpfully note that the test conditions are 6mA at VDD = 3.0V; presumably yet to be conducted). Now, one really has to wonder how it takes them so long to characterize the behavior of an I/O pin. I understand how complex peripherals would be hard to test. And subtle ISA bugs like the cursed write sequence that the compiler would be perfectly within it's rights to emit but never does, nobody noticed that for like 5 years or more. But an I/O pin is pretty simple. You put a controlled load on it, and change the load while measuring the voltage on the pin. It's the sort of thing that I'm sure, nowadays, would be easy for anyone well versed in microcontrollers to automate, especially if they had to do that sort of thing, oh, every time they released a product? I'm sure Microchip has some employees who are quite knowledgeable about microcontrollers. I sure hope they do. Like, I'd expect new figures to be automatically generated by the automated testing on each new internal development rev that comes to of the fab.
+
+`***` - On a Tiny85 or Tiny84/841, HVSP really doesn't seem too bad - sure it was way more of a pain than normal ISP, but normal ISP kinda sucks in most ways compared to UPDI. It's similar to a modern AVR with UPDI disabled, and I'd call it "Hard". But only those three part families use HVSP. Everything else takes HVPP to reprogram after reset is disabled, and HVPP requires connection of around 20 wires to the target (with 20 chances to make a mistake), most of them can't be loaded so you can just forget about doing it in system. I do not recall reading any account on forums of someone using HVPP outside of work, and those were rare. HVPP is much harder than "Hard".
+
+### The tinies aren't symmettric drive?
+You might be scurrying to your datasheets thinking "I swear they were symmetric on the tinys!" and if you look at the table - which gives worst case values, they are. But the graphs, which give observed "typical" values, tell a different story - they show a voltage drop when sourcing 20mA on a tiny2 of around 0.7V at room temp, but a voltage drop of 0.4-0.45 on at sinking the same amount of current. The low side drivers are stronger. The Dx-series takes it to a new level: At max opperating voltage (5.5v) they ran it up to the absolute max on the high side (recording a 2 volt drop). On the low side though, at the 50mA absolute max, they were still only seeing 0.6V. So they ran it up to twice the absolute maximum rating, which saw a 1.4V drop. Though it's hardly novel for the graphs in the datasheet to show that that the parts typically blow their rated specs out of the water, at least briefly or in favorable conditions (as in when being pushed very hard) or under normal, mild conditions; no particular AVR example comes to mind, but my preferred 1117-series regulator specs the usual dropout as a maximum. The typical characteristics graphs, in contrast, show dropout on the order of a tenth of a volt at light loads. I appreciate the transparency on behavior in overload conditions. I wish they did that more.
+
+**IN FACT, NONE OF THE AVRS HAVE EVER ACTUALLY BEEN SYMMETRIC DRIVE**
+
+They met symmetric specs, butr exceeded tem in one direction far more than the other
+
+
+### Other notes on that table
+What tinyAVR calls current injection, Dx/Ex-series call "Clamp current"; the latter is, in my opinion, more proper. It's current through the protection diodes, which are called "clamp diodes" because they constrain ("clamp") the voltage between supply and ground, thus preventing damage to the chip. As these are microcontrollers not power rectifiers, these diodes are very small, so the current through these diodes has to be kept low, else they fail, followed immediaely by the pin-driver they were protecting. This failure is typified by the pin always behaving as if set output, driving in the direction of the voltage excursion. Oddly It wasn't spec'ed on classic AVRs (but was well known to be low, and to be a highly effective way of blowing pins). It's said that the most experienced AVR developers can simply stare intently at a chosen pin on the old classic AVRs, imagining a voltage in excess of VDD applied to it, and burn out the pin driver just like that. In any event, Atmel employees are rumored to have said +/- 1mA maximum on classic AVRs, (in spite of an app note advising connecting a tiny85 through a high value resistor to mains to do zero cross detection. That app note describes basically doing what the ZCD on the Dx-series does, only with less help from the hardware).
+
+Anyway, the takeaways I intended from this are:
+* The I/O pins we have are a hell of a lot better than the ones classic had, and they're getting better
+* The I/O pins on the Dx-series in particular are spectacularly strong, and they have greatly improved resilience to clamp current across the board.
+* Pin drive is not symmetric. This has ramifications for the design constraints on an RC filter used to make analog voltages out of PWM.
+* The section of the datasheet where they are talking about
 
 
 

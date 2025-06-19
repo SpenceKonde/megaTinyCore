@@ -511,11 +511,14 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
 #define TIMERB2         (0x22) // TCB2
 #define TIMERB3         (0x23) // TCB3
 #define TIMERB4         (0x24) // TCB4
+#define TIMERB5         (0x25) // TCB5
+#define TIMERB6         (0x26) // TCB6
+#define TIMERB7         (0x27) // TCB7
 #define TIMERD0         (0x40) // If any of these bits match it's potentially on TCD0
 #define DACOUT          (0x80) /// If the high bit is set, it;s either the DAC oone of the new timers.
-#define TIMERE0         (0x90) //  Full dettails not known, the below constants are guesses
-#define TIMERF0         (0xC0)  // as abpve
-#define TIMERE1         (0xA0)
+#define TIMERE0         (0x10) // I do not expect TCE and TCA to ever coexist on the same chip. TCE comes with WEX and the need for the PLL. Whould they put TCA's on a part that had the infrastructre for TCEs? Doubtful
+#define TIMERE1         (0x08)
+#define TIMERF0         (0xA0)
 #define TIMERF1         (0xD0)
 /* The above are all used in the digitalPinToTimer() macro and appear in the timer table, in addition to being how we identify millis timer.
  * For the millis timer, there's nothing weird here.
@@ -532,153 +535,154 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
 #define TIMERRTC_XTAL   (0x91) // RTC with crystal
 #define TIMERRTC_CLK    (0x92) // RTC with ext clock
 
-/* Not used in table */
-#define TIMERA0_MUX0    (0x10) // Mapping0 (PORTA 0-5)
-#define TIMERA0_MUX1    (0x11) // Mapping1 (PORTB 0-5)
-#define TIMERA0_MUX2    (0x12) // Mapping2 (PORTC 0-5)
-#define TIMERA0_MUX3    (0x13) // Mapping3 (PORTD 0-5)
-#define TIMERA0_MUX4    (0x14) // Mapping4 (PORTE 0-5)
-#define TIMERA0_MUX5    (0x15) // Mapping5 (PORTF 0-5)
-#define TIMERA0_MUX6    (0x16) // Mapping6 (PORTG 0-5)
-#define TIMERA0_MUX7    (0x17) // Mapping7 (PORTA 0-5)
-#define TIMERA1_MUX0    (0x08) // Mapping0 (PORTB 0-5) - 48+ pin only.
-#define TIMERA1_MUX1    (0x09) // Mapping1 (PORTC 4-6) - only three channels available. 48+ pin only.
-#define TIMERA1_MUX2    (0x0A) // Mapping2 (PORTE 4-6) - only three channels available. DB-series only due to errata. 64-pin parts only
-#define TIMERA1_MUX3    (0x0B) // Mapping3 (PORTG 0-5) - DB-series only due to errata. 64-pin parts only.
-#define TIMERA1_MUX4    (0x0C) // Mapping4 (PORTA 4-6) - only three channels available. New on EA-series.
-#define TIMERA1_MUX5    (0x0D) // Mapping5 (PORTD 4-6) - only three channels available. New on EA-series.
+#if !defined(MEGATINYCORE)
+  /* Not used in table */
+  #define TIMERA0_MUX0    (0x10) // Mapping0 (PORTA 0-5)
+  #define TIMERA0_MUX1    (0x11) // Mapping1 (PORTB 0-5)
+  #define TIMERA0_MUX2    (0x12) // Mapping2 (PORTC 0-5)
+  #define TIMERA0_MUX3    (0x13) // Mapping3 (PORTD 0-5)
+  #define TIMERA0_MUX4    (0x14) // Mapping4 (PORTE 0-5)
+  #define TIMERA0_MUX5    (0x15) // Mapping5 (PORTF 0-5)
+  #define TIMERA0_MUX6    (0x16) // Mapping6 (PORTG 0-5)
+  #define TIMERA0_MUX7    (0x17) // Mapping7 (PORTA 0-5)
+  #define TIMERA1_MUX0    (0x08) // Mapping0 (PORTB 0-5) - 48+ pin only.
+  #define TIMERA1_MUX1    (0x09) // Mapping1 (PORTC 4-6) - only three channels available. 48+ pin only.
+  #define TIMERA1_MUX2    (0x0A) // Mapping2 (PORTE 4-6) - only three channels available. DB-series only due to errata. 64-pin parts only
+  #define TIMERA1_MUX3    (0x0B) // Mapping3 (PORTG 0-5) - DB-series only due to errata. 64-pin parts only.
+  #define TIMERA1_MUX4    (0x0C) // Mapping4 (PORTA 4-6) - only three channels available. New on EA-series.
+  #define TIMERA1_MUX5    (0x0D) // Mapping5 (PORTD 4-6) - only three channels available. New on EA-series.
 
-/* Not used in table or at all, yet */
-#define TIMERB0_ALT     (0x30) // TCB0 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
-#define TIMERB1_ALT     (0x31) // TCB1 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
-#define TIMERB2_ALT     (0x32) // TCB2 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
-#define TIMERB3_ALT     (0x33) // TCB3 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
-#define TIMERB4_ALT     (0x34) // TCB4 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
-#define TIMERB0_ALT     (0x30) // TCB0 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
-#define TIMERB1_ALT     (0x31) // TCB1 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
-#define TIMERB2_ALT     (0x32) // TCB2 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
-#define TIMERB3_ALT     (0x33) // TCB3 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
-#define TIMERB4_ALT     (0x34) // TCB4 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
 
+  /* Not used in table or at all, yet */
+  #define TIMERB0_ALT     (0x30) // TCB0 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+  #define TIMERB1_ALT     (0x31) // TCB1 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+  #define TIMERB2_ALT     (0x32) // TCB2 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+  #define TIMERB3_ALT     (0x33) // TCB3 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+  #define TIMERB4_ALT     (0x34) // TCB4 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+  #define TIMERB0_ALT     (0x30) // TCB0 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+  #define TIMERB1_ALT     (0x31) // TCB1 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+  #define TIMERB2_ALT     (0x32) // TCB2 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+  #define TIMERB3_ALT     (0x33) // TCB3 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+  #define TIMERB4_ALT     (0x34) // TCB4 with alternate pin mapping - DANGER: NOT YET USED BY CORE.
+#endif
 
 // 0b01MC 0mmm - the 3 lowest bits refer to the PORTMUX.
+//                            Remrmbr, this is the DX version of this
 //                            bit C specifies whether it's channel A (0) or B (1). If M is 1 it is WOC outputting chan A or WOB outputting D.
-//                            WOD outputting A or WOC outputting B is not supported by the core. WOB outputting A or WOA outputting B is not supported by the hardware.
+//                            WOD outputting A or WOC outputting B is not supported by the core (though tyhe hardeware supports it, it imposes overhead on lots of people to benefit very very feww.
+//                            WOB outputting A or WOA outputting B is not supported by the hardware.
+//
 //                            Hence, PORTMUX.TCDROUTEA == (timer table entry) & (0x07)
 //                            and any table entry > 0x40 but less than 0x80 could be a TCD
-/*
+
 #define TIMERD0_0WOA      (0x40) // PORTA
 #define TIMERD0_0WOB      (0x50)
 #define TIMERD0_0WOC      (0x60)
 #define TIMERD0_0WOD      (0x70)
-#define TIMERD0_1WOA      (0x41) // PORTB
-#define TIMERD0_1WOB      (0x51)
-#define TIMERD0_1WOC      (0x61)
-#define TIMERD0_1WOD      (0x71)
-#define TIMERD0_2WOA      (0x42) // PORTF
-#define TIMERD0_2WOB      (0x52)
-#define TIMERD0_2WOC      (0x62)
-#define TIMERD0_2WOD      (0x72)
-#define TIMERD0_3WOA      (0x43) // PORTG
-#define TIMERD0_3WOB      (0x53)
-#define TIMERD0_3WOC      (0x63)
-#define TIMERD0_3WOD      (0x73)
-#define TIMERD0_4WOA      (0x44) // this is PA4, duplicates mux 0.
-#define TIMERD0_4WOB      (0x54) // this is PA5, duplicates mux 0.
-#define TIMERD0_4WOC      (0x64) // second half is PORTD
-#define TIMERD0_4WOD      (0x74)
-
-// For future use
-// If timer D ever gets all 8 options, we'd need these
-
-#define TIMERD0_5WOA      (0x45) // hypothetical TCD0 WOA ALT5
-#define TIMERD0_5WOB      (0x55) // hypothetical TCD0 WOB ALT5
-#define TIMERD0_5WOC      (0x65) // hypothetical TCD0 WOC ALT5
-#define TIMERD0_5WOD      (0x75) // hypothetical TCD0 WOD ALT5
-#define TIMERD0_6WOA      (0x46) // hypothetical TCD0 WOA ALT6
-#define TIMERD0_6WOB      (0x56) // hypothetical TCD0 WOB ALT6
-#define TIMERD0_6WOC      (0x66) // hypothetical TCD0 WOC ALT6
-#define TIMERD0_6WOD      (0x76) // hypothetical TCD0 WOD ALT6
-#define TIMERD0_7WOA      (0x47) // hypothetical TCD0 WOA ALT7
-#define TIMERD0_7WOB      (0x57) // hypothetical TCD0 WOB ALT7
-#define TIMERD0_7WOC      (0x67) // hypothetical TCD0 WOC ALT7
-#define TIMERD0_7WOD      (0x77) // hypothetical TCD0 WOD ALT7
-
-// Uhoh, EB has a new kind of timer, a TCE which looks a lot like a TCA-PWM-Powerhouse timer, only better.
-// We predict that PORTMUX.TCEROUTEA will not give individual pin control, but that it will be much like TCA.
-// and we will thus be able to quickly detect if the port it's poimted at is ours.
-
-#define TIMERE0_MUX0      (0x90) // HypotheticalTCE/WEX mux
-#define TIMERE0_MUX1      (0x91) // HypotheticalTCE/WEX mux
-#define TIMERE0_MUX2      (0x92) // HypotheticalTCE/WEX mux
-#define TIMERE0_MUX3      (0x93) // HypotheticalTCE/WEX mux
-#define TIMERE0_MUX4      (0x94) // HypotheticalTCE/WEX mux
-#define TIMERE0_MUX5      (0x95) // HypotheticalTCE/WEX mux
-#define TIMERE0_MUX6      (0x96) // HypotheticalTCE/WEX mux
-#define TIMERE0_MUX7      (0x97) // HypotheticalTCE/WEX mux
-
-// They might make a chip with 2 of them!
-#define TIMERE1_MUX0      (0xA0) // HypotheticalTCE/WEX mux
-#define TIMERE1_MUX1      (0xA1) // HypotheticalTCE/WEX mux
-#define TIMERE1_MUX2      (0xA2) // HypotheticalTCE/WEX mux
-#define TIMERE1_MUX3      (0xA3) // HypotheticalTCE/WEX mux
-#define TIMERE1_MUX4      (0xA4) // HypotheticalTCE/WEX mux
-#define TIMERE1_MUX5      (0xA5) // HypotheticalTCE/WEX mux
-#define TIMERE1_MUX6      (0xA6) // HypotheticalTCE/WEX mux
-#define TIMERE1_MUX7      (0xA7) // HypotheticalTCE/WEX mux
+#if !defined(MEGATINYCORE)
+  #define TIMERD0_1WOA      (0x41) // PORTB
+  #define TIMERD0_1WOB      (0x51)
+  #define TIMERD0_1WOC      (0x61)
+  #define TIMERD0_1WOD      (0x71)
+  #define TIMERD0_2WOA      (0x42) // PORTF
+  #define TIMERD0_2WOB      (0x52)
+  #define TIMERD0_2WOC      (0x62)
+  #define TIMERD0_2WOD      (0x72)
+  #define TIMERD0_3WOA      (0x43) // PORTG
+  #define TIMERD0_3WOB      (0x53)
+  #define TIMERD0_3WOC      (0x63)
+  #define TIMERD0_3WOD      (0x73)
+  #define TIMERD0_4WOA      (0x44) // this is PA4, duplicates mux 0.
+  #define TIMERD0_4WOB      (0x54) // this is PA5, duplicates mux 0.
+  #define TIMERD0_4WOC      (0x64) // second half is PORTD
+  #define TIMERD0_4WOD      (0x74)
+  #define TIMERD0_5WOA      (0x45) // hypothetical TCD0 WOA ALT5
+  #define TIMERD0_5WOB      (0x55) // hypothetical TCD0 WOB ALT5
+  #define TIMERD0_5WOC      (0x65) // hypothetical TCD0 WOC ALT5
+  #define TIMERD0_5WOD      (0x75) // hypothetical TCD0 WOD ALT5
+  #define TIMERD0_6WOA      (0x46) // hypothetical TCD0 WOA ALT6
+  #define TIMERD0_6WOB      (0x56) // hypothetical TCD0 WOB ALT6
+  #define TIMERD0_6WOC      (0x66) // hypothetical TCD0 WOC ALT6
+  #define TIMERD0_6WOD      (0x76) // hypothetical TCD0 WOD ALT6
+  #define TIMERD0_7WOA      (0x47) // hypothetical TCD0 WOA ALT7
+  #define TIMERD0_7WOB      (0x57) // hypothetical TCD0 WOB ALT7
+  #define TIMERD0_7WOC      (0x67) // hypothetical TCD0 WOC ALT7
+  #define TIMERD0_7WOD      (0x77) // hypothetical TCD0 WOD ALT7
 
 
-// They might make a chip with 3 of them!
-#define TIMERE2_MUX0      (0xB0) // HypotheticalTCE/WEX mux
-#define TIMERE2_MUX1      (0xB1) // HypotheticalTCE/WEX mux
-#define TIMERE2_MUX2      (0xB2) // HypotheticalTCE/WEX mux
-#define TIMERE2_MUX3      (0xB3) // HypotheticalTCE/WEX mux
-#define TIMERE2_MUX4      (0xB4) // HypotheticalTCE/WEX mux
-#define TIMERE2_MUX5      (0xB5) // HypotheticalTCE/WEX mux
-#define TIMERE2_MUX6      (0xB6) // HypotheticalTCE/WEX mux
-#define TIMERE2_MUX7      (0xB7) // HypotheticalTCE/WEX mux
-
-// Plus this wacky TCF thing.
-// Premering on low pincount parts, it's hard to say what the full lineup of pin options will be likek
-// I predict... 3 bits for the mux position, and that a larger chip might have 2....
-
-#define TIMERF0_MUX0A      (0xC0) // Hypothetical TCF MUX
-#define TIMERF0_MUX0B      (0xC8) // Hypothetical TCF MUX
-#define TIMERF0_MUX1A      (0xC1) // Hypothetical TCF MUX
-#define TIMERF0_MUX1B      (0xC9) // Hypothetical TCF MUX
-#define TIMERF0_MUX2A      (0xC2) // Hypothetical TCF MUX
-#define TIMERF0_MUX2B      (0xCA) // Hypothetical TCF MUX
-#define TIMERF0_MUX3A      (0xC3) // Hypothetical TCF MUX
-#define TIMERF0_MUX3B      (0xCB) // Hypothetical TCF MUX
-#define TIMERF0_MUX4A      (0xC4) // Hypothetical TCF MUX
-#define TIMERF0_MUX4B      (0xCC) // Hypothetical TCF MUX
-#define TIMERF0_MUX5A      (0xC5) // Hypothetical TCF MUX
-#define TIMERF0_MUX5B      (0xCD) // Hypothetical TCF MUX
-#define TIMERF0_MUX6A      (0xC6) // Hypothetical TCF MUX
-#define TIMERF0_MUX6B      (0xCE) // Hypothetical TCF MUX
-#define TIMERF0_MUX7A      (0xC7) // Hypothetical TCF MUX
-#define TIMERF0_MUX7B      (0xCF) // Hypothetical TCF MUX
-
-// What if a chip has two of them? No problem!
-#define TIMERF1_MUX0A      (0xD0) // Hypothetical TCF MUX
-#define TIMERF1_MUX0B      (0xD8) // Hypothetical TCF MUX
-#define TIMERF1_MUX1A      (0xD1) // Hypothetical TCF MUX
-#define TIMERF1_MUX1B      (0xD9) // Hypothetical TCF MUX
-#define TIMERF1_MUX2A      (0xD2) // Hypothetical TCF MUX
-#define TIMERF1_MUX2B      (0xDA) // Hypothetical TCF MUX
-#define TIMERF1_MUX3A      (0xD3) // Hypothetical TCF MUX
-#define TIMERF1_MUX3B      (0xDB) // Hypothetical TCF MUX
-#define TIMERF1_MUX4A      (0xD4) // Hypothetical TCF MUX
-#define TIMERF1_MUX4B      (0xDC) // Hypothetical TCF MUX
-#define TIMERF1_MUX5A      (0xD5) // Hypothetical TCF MUX
-#define TIMERF1_MUX5B      (0xDD) // Hypothetical TCF MUX
-#define TIMERF1_MUX6A      (0xD6) // Hypothetical TCF MUX
-#define TIMERF1_MUX6B      (0xDE) // Hypothetical TCF MUX
-#define TIMERF1_MUX7A      (0xD7) // Hypothetical TCF MUX
-#define TIMERF1_MUX7B      (0xDF) // Hypothetical TCF MUX
-*/
+  #define TIMERE0_MUX0      (0x90) // TCE/WEX mux
+  #define TIMERE0_MUX1      (0x91) // TCE/WEX mux
+  #define TIMERE0_MUX2      (0x92) // TCE/WEX mux
+  #define TIMERE0_MUX3      (0x93) // TCE/WEX mux
+  #define TIMERE0_MUX4      (0x94) // TCE/WEX mux
+  #define TIMERE0_MUX5      (0x95) // TCE/WEX mux
+  #define TIMERE0_MUX6      (0x96) // Hypothetical TCE/WEX mux
+  #define TIMERE0_MUX7      (0x97) // Hypothetical TCE/WEX mux
+  /*
+  // They might make a chip with 2 of them!
+  #define TIMERE1_MUX0      (0xA0) // Hypothetical TCE/WEX mux
+  #define TIMERE1_MUX1      (0xA1) // Hypothetical TCE/WEX mux
+  #define TIMERE1_MUX2      (0xA2) // Hypothetical TCE/WEX mux
+  #define TIMERE1_MUX3      (0xA3) // Hypothetical TCE/WEX mux
+  #define TIMERE1_MUX4      (0xA4) // Hypothetical TCE/WEX mux
+  #define TIMERE1_MUX5      (0xA5) // Hypothetical TCE/WEX mux
+  #define TIMERE1_MUX6      (0xA6) // Hypothetical TCE/WEX mux
+  #define TIMERE1_MUX7      (0xA7) // Hypothetical TCE/WEX mux
 
 
+  // They might make a chip with 3 of them! (unlikely. They'll add some other timerlike thing that'll get this block)
+  #define TIMERE2_MUX0      (0xB0) // Hypothetical TCE/WEX mux
+  #define TIMERE2_MUX1      (0xB1) // Hypothetical TCE/WEX mux
+  #define TIMERE2_MUX2      (0xB2) // Hypothetical TCE/WEX mux
+  #define TIMERE2_MUX3      (0xB3) // Hypothetical TCE/WEX mux
+  #define TIMERE2_MUX4      (0xB4) // Hypothetical TCE/WEX mux
+  #define TIMERE2_MUX5      (0xB5) // Hypothetical TCE/WEX mux
+  #define TIMERE2_MUX6      (0xB6) // Hypothetical TCE/WEX mux
+  #define TIMERE2_MUX7      (0xB7) // Hypothetical TCE/WEX mux
+  */
+  // Plus this wacky TCF thing.
+  // First on low pincount parts - part of a pattern with new peripherals.
+  // But this makes it hard to say what the full lineup of pin options will be likek
+  // We get a 3-bit mux for the pin options, but that's hardly surprising.
+  // A chip might even have two of them. I hope so.
+
+  #define TIMERF0_MUX0A      (0xC0)
+  #define TIMERF0_MUX0B      (0xC8)
+  #define TIMERF0_MUX1A      (0xC1)
+  #define TIMERF0_MUX1B      (0xC9)
+  #define TIMERF0_MUX2A      (0xC2)
+  #define TIMERF0_MUX2B      (0xCA)
+  #define TIMERF0_MUX3A      (0xC3) // Hypothetical TCF MUX
+  #define TIMERF0_MUX3B      (0xCB) // Hypothetical TCF MUX
+  #define TIMERF0_MUX4A      (0xC4) // Hypothetical TCF MUX
+  #define TIMERF0_MUX4B      (0xCC) // Hypothetical TCF MUX
+  #define TIMERF0_MUX5A      (0xC5) // Hypothetical TCF MUX
+  #define TIMERF0_MUX5B      (0xCD) // Hypothetical TCF MUX
+  #define TIMERF0_MUX6A      (0xC6) // Hypothetical TCF MUX
+  #define TIMERF0_MUX6B      (0xCE) // Hypothetical TCF MUX
+  #define TIMERF0_MUX7A      (0xC7) // Hypothetical TCF MUX
+  #define TIMERF0_MUX7B      (0xCF) // Hypothetical TCF MUX
+  /*
+  // What if a chip has two of them? No problem!
+  #define TIMERF1_MUX0A      (0xD0) // Hypothetical TCF MUX
+  #define TIMERF1_MUX0B      (0xD8) // Hypothetical TCF MUX
+  #define TIMERF1_MUX1A      (0xD1) // Hypothetical TCF MUX
+  #define TIMERF1_MUX1B      (0xD9) // Hypothetical TCF MUX
+  #define TIMERF1_MUX2A      (0xD2) // Hypothetical TCF MUX
+  #define TIMERF1_MUX2B      (0xDA) // Hypothetical TCF MUX
+  #define TIMERF1_MUX3A      (0xD3) // Hypothetical TCF MUX
+  #define TIMERF1_MUX3B      (0xDB) // Hypothetical TCF MUX
+  #define TIMERF1_MUX4A      (0xD4) // Hypothetical TCF MUX
+  #define TIMERF1_MUX4B      (0xDC) // Hypothetical TCF MUX
+  #define TIMERF1_MUX5A      (0xD5) // Hypothetical TCF MUX
+  #define TIMERF1_MUX5B      (0xDD) // Hypothetical TCF MUX
+  #define TIMERF1_MUX6A      (0xD6) // Hypothetical TCF MUX
+  #define TIMERF1_MUX6B      (0xDE) // Hypothetical TCF MUX
+  #define TIMERF1_MUX7A      (0xD7) // Hypothetical TCF MUX
+  #define TIMERF1_MUX7B      (0xDF) // Hypothetical TCF MUX
+  */
+
+#endif
 __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us);
 
 
@@ -761,7 +765,7 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
  * CORE_HAS_ERRORFUNS is defined and 1 if there is a badArg() and badCall() function supplied by the core
  * CORE_HAS_FASTIO is 1 when digitalReadFast and digitalWriteFast are supplied, and 2 when openDrainFast and pinModeFast are as well.
  * CORE_HAS_OPENDRAIN
- * CORE_HAS_PINCONFIG is 1 if pinConfig is supplied. The allows full configuration of any pin. It is 2 if it accepts commas instead of bitwise or between configuration parameters (NYI)
+ * CORE_HAS_PINCONFIG is 1 if pinConfig is supplied. The allows full configuration of any pin. It is 2 if it accepts commas instead of bitwise or between configuration parameters
  * CORE_HAS_FASTPINMODE is 1 if pinModeFast is supplied
  * CORE_HAS_ANALOG_ENH is 0 if no analogReadEnh is supplied, 1 if it is, and 2 if it is supplied and both core and hardware support a PGA.
  * CORE_HAS_ANALOG_DIFF is 0 if no analogReadDiff is supplied, 1 if it's DX-like (Vin < VREF), and 2 if it's a proper
@@ -771,12 +775,12 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
  * CORE_HAS_TIMER_RESUME is 1 if resumeTCAn functions are provided to hand control back to the core and reinitialize them.
  * CORE_DETECTS_TCD_PORTMUX is 1 if the TCD portmux works correctly on the hardware and is used by the core, 0 if it would be if
  * the hardware worked, and not defined at all if the hardware doesn't have such a feature even in theory
- * CORE_SUPPORT_LONG_TONES is 1 if the core supports the three argument tone for unreasonably long tones.
+ * CORE_SUPPORT_LONG_TONES is 1 if the core supports the three argument tone for unreasonably long, high-pitched beeps. Because that's what the world needs more of.
  ********************************************************************************/
 #define CORE_HAS_ERRORFUNS              (1) /* megaTinyCore implements badArg and badCall */
 #define CORE_HAS_FASTIO                 (2)
 #define CORE_HAS_OPENDRAIN              (1)
-#define CORE_HAS_PINCONFIG              (1)
+#define CORE_HAS_PINCONFIG              (2)
 #define CORE_HAS_FASTPINMODE            (1)
 
 #define CORE_HAS_TIMER_TAKEOVER         (1)
@@ -845,10 +849,10 @@ See Ref_Analog.md for more information of the representations of "analog pins". 
   #endif
 #endif
 #if !defined(NUM_I2C_PINS)
-  #define NUM_I2C_PINS                  (2) // per I2C port in use - this number is nonsensical without qualification is is only for compatibility.
+  #define NUM_I2C_PINS                  (2) // per I2C port in use - this number is nonsensical without qualification it is only for compatibility.
 #endif
 #if !defined(NUM_SPI_PINS)
-  #define NUM_SPI_PINS                  (3) // per SPI port in use - this number is nonsensical without qualification is is only for compatibility.
+  #define NUM_SPI_PINS                  (3) // per SPI port in use - this number is nonsensical without qualification it is only for compatibility.
 #endif
 #if !defined(NUM_TOTAL_FREE_PINS)
   #define NUM_TOTAL_FREE_PINS           (PINS_COUNT - NUM_INTERNALLY_USED_PINS)

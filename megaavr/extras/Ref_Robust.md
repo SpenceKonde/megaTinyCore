@@ -9,9 +9,15 @@ This is a work in progress, and is not exhaustive. It is however a starting poin
 These parts have multiple features for enhanced robustness. You should like, use themm..... (hardly anyone does)
 
 ### Use BOD if you can spare the power for sampled mode, at least while the chip is awake
-See the datasheet for your part to check the exact power consumption and compare to your power budget. If you can - use it! Without BOD, there is nothing to keep the chip from continuing to try (and fail) to operate despite insufficient power supply voltage to do so.
+See the datasheet for your part to check the exact power consumption and compare to your power budget. If you can - use it! Without BOD, there is nothing to keep the chip from operating incorrectly in amost arbitrary manners, as the symptoms (above VPOR)of insufficient voltage for a given clock speed is that *instructions will get the wrong answers to basic math, often with 1 bits coming out as 0's.* This includes pointers, indirect jumps, probably function return addresses pushed onto the stack, in short, for predictable behvior in undervoltage, use the BOD, that's what it's there for.
 
 BOD will keep the chip in reset when you it knows the voltage is too low to keep the chip running.
+
+### If you don't use BOD...
+You need to ask yourself a few hard questions:
+  * ~if~ When the system is hung in production, how hard/embarassing will it be to have to run to reset them by hand?
+  * If it's hard to reset the device (mounted on a 20 meter pole, in the canopy of a tree, in a drainage ditch six feet up, or worst of all, mounted on a 20 meter pole attached to the canopy of a tree growing our of a drainage ditch located at a customer site.), use the watchdog timer!
+  * Running a simple program at 20 MHz, lowering voltage until output ceases, and then restoring voltage does NOT reliably restore execution without BOD!
 
 ### A bootloader is likely the right approach if you want end users to be uploading updates
 There's a python library to upload via STK500 (the protocol we use) which would allow you to make an appropriate updater for your device
@@ -19,7 +25,7 @@ There's a python library to upload via STK500 (the protocol we use) which would 
 That is the only case in which it makes sense to use Optiboot on a device you are going to be selling (except a development board, but in that case, your users are hopefully able to manage "burn bootloader" if they want it....
 
 ### Use the WDT whenever you are not sleeping if preventing hangs is a priority
-It can be inconvenient to have to keep feeding the dog - but this is a nearly bulletproof way to keep your code from getting hung! Watchdog timer use is very widespread in commercial products. The windowed feature gives you a way to fix the hole in this that existed on classic avrs - the potential for it to get hung in an area where the WDT was being repeatedly reset, but it had lost the ability
+It can be inconvenient to have to keep feeding the dog - but this is a nearly bulletproof way to keep your code from getting hung (as long as it doesn't end up hung in a loop including WDR. Dont write loops it can hang in that WDR) Watchdog timer use is very widespread in commercial products. The windowed feature gives you a way to fix the hole in this that existed on classic avrs - the potential for it to get hung in an area where the WDT was being repeatedly reset, but it had lost the ability
 
 ### Read the new reset reference, and include the "recommended" override of init_reset_flags
 This is described in [the Reset Reference](./Ref_Reset.md), and provides strong defense against "dirty resets" regardless of where the come from. The fact that virtually nobody in Arduino-land looks at the reset flags, clears them and takes corrective action when it looks during startup and doesn't find any accounts for a great many of the times a part gets into a "bad state" after an adverse event, and never comes back until you pwer-cycles it.

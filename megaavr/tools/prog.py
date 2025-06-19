@@ -149,7 +149,7 @@ def print_report(args):
     print("UPDI programming for Arduino using a serial adapter")
     print("Based on pymcuprog, with significant modifications")
     print("By Quentin Bolsee and Spence Konde")
-    print("Version 1.2.3 - Jan 2022")
+    print("Version 1.2.4 - Jun 2025")
     print("Using serial port {} at {} baud.".format(args.uart, args.baudrate))
     if (args.write_chunk != -1):
         print("Writing in chunks not longer than {} bytes (-wc).".format(args.write_chunk))
@@ -217,7 +217,7 @@ def pymcuprog_basic(args, fuses_dict):
     except ValueError as e:
     # Print the error message
         print(f"Error: {e}")
-        print("Device ID mismatch! Stopping.")
+        print("Device ID mismatch! Ensure chip selected in Tools -> Chip menu and verify identity of chip.")
         backend.end_session()
         backend.disconnect_from_tool()
         return 1

@@ -3,8 +3,15 @@
 There are some simple patterns that you can use with the CCL/Logic library to generate very widly applicable effects:
 
 ## Reordering inputs
-Say
+**THIS SECTION IGNORES THE MSB AND LSB OF THE TRUTH TABLE**
+There are four trivial variations on each of these with different behavior when all inputs are the same.
+
+These are not relevant to reordering. Reordering is confusing enough as is (and it really shouldn't be, but our brains aren't wired well for this I don't think)
+
 TRUTH = 0bHGFEDCBA when IN0 is α, IN1 is β and IN2 is γ
+
+To get identical behavior:
+
 TRUTH = 0bHDFBGCEA when IN0 is γ, IN1 is β and IN2 is α - D and G, B and E swap
 TRUTH = 0bHFGEDBCA when IN0 is α, IN1 is γ and IN2 is β - G and F, B and C swap
 TRUTH = 0bHGDCFEBA when IN0 is γ, IN1 is α and IN2 is β - F and D, E and C swap
@@ -14,26 +21,42 @@ TRUTH = 0bHDGCFBEA when IN0 is β, IN1 is α and IN2 is γ - F->D->G->F rotate, 
 the highest and lowest bits do not change when reordering the inputs.
 
 Note also that not all truthtables have six distinct permutations that can be made by reordering the inputs. Ignoring the MSB and LSB, which are unchanged by input swapping - each of these thus has 4 variants with each possible permutation of those bits), of the 64 possible permutations:
+
 4 do not change no matter how you switch around the inputs (assuming we've bitwise and'ed truth with 0b01111110 and have not shifted it in any way):
-0x00. 0x16, 0x68, 0x7E
 
-A significant number of options come in sets of three, unsurprising (again, MSB and LSB omitted)
-* 0x02, 0x04, 0x10
-* 0x06, 0x12, 0x14
-* 0x08, 0x20, 0x40
-* 0x1E, 0x36, 0x56
-* 0x28, 0x48, 0x60
-* 0x3E, 0x5E, 0x76
-* 0x6A, 0x6C, 0x78
-* 0x6E, 0x7A, 0x7C
+These are cases that treat all inputs equally.
 
-Finally, the remaining ones form 4 groups of 8:
-* 0x0A,0x0C,0x18,0x22,0x24,0x30,0x42,0x50
-* 0x1A,0x1C,0x26,0x32,0x34,0x46,0x52,0x54
-* 0x2A,0x2C,0x4A,0x4C,0x58,0x62,0x64,0x70
-* 0x2E,0x3A,0x3C,0x4E,0x5C,0x66,0x72,0x74
+| TRUTH & 0x7E | Bits set | Rationalization
+|--------------|----------|---------------------
+| 0x00         |      0/6 | LOW always
+| 0x16         |      3/6 | HIGH if exactly one input is HIGH
+| 0x68         |      3/6 | HIGH if exactly two inputs are HIGH
+| 0x7E         |      6/6 | HIGH in all cases except (potentially) when all three outputs are the same
 
-Reordering the inputs, according to my calculations, can rearrange any of these into 3 to 5 others on that list, and not into any others. I have not yet been able to rationalize this observation.
+There are 4 distinct ways of treating all pins equally.
+
+A significant number of options come in sets of three. These reflect cases where two inputs are treated the same, while a third is treated differently
+
+| TRUTH & 0x7E     | Bits set | Rationalization
+|------------------|----------|---------------------
+| 0x02, 0x04, 0x10 |      1/6 | HIGH if one specified input HIGH and all others LOW
+| 0x08, 0x20, 0x40 |      1/6 | HIGH IF a specific input is LOW  and all others HIGH.
+| 0x06, 0x12, 0x14 |      2/6 | HIGH IF one (not both) of two specified inputs is high, and the third is low
+| 0x28, 0x48, 0x60 |      2/6 | HIGH IF specified input HIGH and one of the others HIGH
+| 0x1E, 0x36, 0x56 |      4/6 | HIGH IF either a specific input is HIGH and the others low, or either of the others are high
+| 0x6A, 0x6C, 0x78 |      4/6 | HIGH if speciefied input, or both other inputs HIGH.
+| 0x6E, 0x7A, 0x7C |      5/6 | HIGH UNLESS one specified input HIGH
+| 0x3E, 0x5E, 0x76 |      5/6 | HIGH UNLESS one specified input HIGH and others LOW
+
+24 possibilities there, so we have gotten to 4 + 24 = 28 so far.
+
+However, there are only 8 logical operations described there.
+
+Finally, the remaining 36 possibilities form into 4 groups of 9 to cover the 4 behaviors that have all three inputs as distinct.
+* 0x0A, 0x0C, 0x18, 0x22, 0x24, 0x30, 0x42, 0x44, 0x50 - HIGH if one specified input LOW and another specified input HIGH, without caring for third.
+* 0x0E, 0x1A, 0x1C, 0x26, 0x32, 0x34, 0x46, 0x52, 0x54 - HIGH if one specified input alone HIGH
+* 0x2A, 0x2C, 0x38, 0x4A, 0x4C, 0x58, 0x62, 0x64, 0x70 - Add high and low bits for A/B selects
+* 0x2E, 0x34, 0x3A, 0x3C, 0x4E, 0x5A, 0x5C, 0x72, 0x74 - Add high and low bits for inverted AB selects.
 
 ## Examples
 
@@ -42,26 +65,97 @@ In the below examples X, Y, Z and 2 are used to refer to inputs. X, Y, and Z can
 Input 2, since it can be used as a clock, may be specifically required.
 
 ## Feedback
-The "Feedback" channel is the **output of the sequencer if used, and the even LUT in that pair if not**,
+The "Feedback" channel is the **output of the sequencer if used, and the even LUT in that pair if not. It is NEVER the output of the ODD LUT!**,
 
 ### But I need feedback on an ODD LUT
-"Ya can't get there from here". Well, you can, but it'll cost you. The price is one event channel: Use the output as a generator, and set one of the event inputs of the CCL block to that channel
+"Ya can't get there from here".
+
+Well, you can, but it'll cost you. The price is one event channel: Use the output as a generator, and set one of the event inputs of the CCL block to that channel - note that the response time of the two is not identical (can be seen easily with the free-running oscillator)
+
+## Speaking of response time, how fast is it?
+Faster than a bat out of hell, as long as the whole path is async (otherwise, you're limited by the 2-3 clock cycle delay introduced by the synchronizer)
+* All Async:
+  * 1 LUT with one input (feedbsck) and truthtable 0x01 will freerun at ~83 MHz on a 2-series -> 6-6.25ns prop delay
+  * 1 LUT with one input (event channel) and truthtable 0x01 will freerun at ~48 MHz  -> around 10.5ns prop delay,
+  * 2 LUTs (ODD lut takes feedback (which always comes from the even LUT) and outputs unchanged, EVEN lut takes link input and inverts) will freerun at ~41 MHz. notable in that 2 stages have exactly twice the propagation time, perfect.
+  * 4 LUTs (all set to 1 input, link, hence going in a loop. One of them set to invert output, all others to output input). Will freerun around 20 MHz. 4 stages = 4x the propagation time, how cool is that?
+  * Thus, if LUTs have a propagation time of 6.25ns, event channels may be more like 4.25 ns. This, ah, this is fast.
+  * All of above speeds are variable depending on environmental conditions, such as temperature and voltage. As with the internal oscillator
+* If a user of the output isn't async, add 2-3 clocks for each time synchronization has to occur, and note that TCB's async mode may not do what it's supposed to. Whenever I've poked a stick in the direction of some obscure async fact, it just stirs up a lot of mud. I did, after many dead ends, manage to manifest a difference in behavior (other than higher noise sensitivity) from pins 2 and 6 vs other pins. a. the behavior is never relevant in practice because the reti takes longer than a synchronization delay to return anyway. I could manifest it by turning interrupts off, setting the pin to interrupt on low level, with the pin tied to ground. Then I'd clear the interrupt and read the intflags, then clear the interrupt, noop, read the intflags; 2 noop
+  * In fully async mode, since 80 MHz is 160 transitions per microsecond, we see a propagation delay of just over 6 nanoseconds (on 2-series) per "stage" implying that it will have the time to propagate 3-4 stages in one system clock
+  * When the synchronizer or filter is used, an extra 2-3 clocks are needed. 2 clocks is much more likely t
+* Voltage dependence? Yes, yes there is.
+
+Propagation time (Tp) is in ns, and has been rounded to quarter-nanoseconds to drive home the limited accuracy to which we can calculate it. The freerunning oscillator isnt and should be considered approximate, as the small sample size (n = 1) is clearly not sufficient to judge if these specs are even representative, much less could be specified in general to that level of precision. With the values these take, I maintain that this is an appropriate approach.
+
+Current was also measured using a bench power supply. As the power supply in quetion is known to be of low quality (typical low cost chinese import bench supply). It was deemed sufficiently accurate for this purpose, though its readings were sometimes not reproducible, leading to uncertainty about whether the discrepancy was within the microcontroller or elsewheremember, this is a sample size of 1 tested under conditions governed by expediency, not precision. I did, however, set the cpu speed to 1 MHz to reach lower voltages and to make the control numbers more useful
+
+| Vdd   | F(case1) | F(case2) | Tp CCL   | Tp EVSYS | I (case1) | I (case2) | I(control) |Notes
+|-------|----------|----------|---------------------|-----------|-----------|------------|
+| 5.2   | 84.x MHz | 49 MHz   |  6.0     |  4.25    |    n/t    |    n/t    |     n/t    | *VUSB, current unmetered.
+| 5.0   | 83.x MHz | 48 MHz   |  6.0     |  4.50    |     17 mA |      6 mA |       0    |
+| 4.5   | 78 MHz   | 44 MHz   |  6.5     |  5.0     |     12 mA |      6    |       0    |
+| 4.0   | 71 MHz   | 40 MHz   |  7.0     |  5.5     |    7.5 mA |      6    |       0    |
+| 3.5   | 63 MHz   | 36 MHz   |  8.0     |  6.0     |      6 mA |      6    |       0    |
+| 3.3   | 59 MHz   | 34 MHz   |  8.5     |  6.25    |      6 mA |      5    |       0    |
+| 3.3   | 59 MHz   |  n/t     |  8.5     |  n/t     |     n/t   |     n/t   |      n/t   | *From 3.3v regulator (LDL1117), current unmetered
+| 3.0   | 53 MHz   | 30.5 MHz |  9.5     |  7.0     |      6 mA |      3    |       0    |
+| 2.5   | 42 MHz   | 24.1 MHz | 12.0     |  8.75    |      4 mA |      0    |       0    |  At 20 Mhz, 2.4V no longer works.Raising voltage again does not fix it, power cycle needed. That is not surprising
+| 2.0   | 29 MHz   | 16.6 MHz | 17.25    |  13.0    |      0 mA |      0    |       0    |  Current readings obviously of
+| 1.9   | 26.0 MHz | 15.0 MHz | 19.25    |  14.0    |      0 mA |      0    |       0    |  little value below here. But
+| 1.8   | 23.4 MHz | 13.4 MHz | 21.5     |  16.0    |      0 mA |      0    |       0    |  This is the minimum rated voltage for these parts, and the lowest BOD voltage
+| 1.7   | 20.5 MHz | 11.8 MHz | 24.5     |  18.0    |      0 mA |      0    |       0    |
+| 1.6   | 17.8 MHz | 10.1 MHz | 28.0     |  21.5    |      0 mA |      0    |       0    |
+| 1.5   | 15.1 MHz |  8.6 MHz | 33.0     |  25.0    |      0 mA |      0    |       0    |
+| 1.4   | 12.3 MHz |  7.1 MHz | 40.75    |  29.75   |      0 mA |      0    |       0    | At least the CCL kept at it down to 1.4v, before hitting the power on reset threshold at 1.3V
+| 1.3   | 0 MHz    | 0 MHz    | n/a      | n/a      |      0 mA |      0 mA |       0 mA | Chip below POR threshold
+
+Conclusions:
+* Vdd has expected effect on CCL propagation delays on tinyAVR 2-series
+* Turning off all port input buffers had no effect on the CCL's performance. Negligible impact on current, but 1 mA is huge in powerdown.
+* Why was current under control conditions (identical except CCL configured to not oscillate) in all cases nil? Seems IDD @ 1 MHz active mode is < 1.0 mA?
+  * At 1 MHz clock, when I had both functions activated at the same time (logic 0 and event 0 doing one output and logic 2 independently freerunning) at 5v Idd was 24 MHz, more than the sum of it's parts.
+  * No futher current measurements are to be made via this device, as I do not have sufficent confidence in the accuracy of the tool to draw conclusions. It may just suck at measuring current at the low end of it's range
+  * That I also recorded 6 mA with no load connected at one point supports the theory that these current numbers are of dubious value.
+  * Further evidence comes from the non-repeatable measurements of current at 5.0v during case 1, which was read as 12mA and 17 mA, both measurements could be repeated and got the same value. I cannot reconcile how, despite no firmware upload having occurred in the interim and conditions being unchanged,
+* Therefore, all current values reported above should be considered quantitatively meaningless, but the observed correlations are strong enough that we can still say some things about current.
+  * The CCL power consumption can be significant when transitioning quickly. The speed of the transitions, and the voltage, seem to be the main determining factors. I suspect that the lower current seen with the eventsys involvedwas simply a case of low
+  * The CCL power consumption is insignificantwhen not transitioning.
+  * Excess power consumption is mostly dependent on the frequency of pin transitions.
+  * Excess power consumption was observed by misconfiguring a CCL in an arguably pathological way, typical applications of the CCL use very little power.
+* CCL propagation delay at 5V is arond 6.0 ns. EVSYS 4.25 ns.
+  * Only about 50% higher at 3.3V
+  * Between 3.0 and 1.9V, the propagation delay doubles.
+* Some general learnings about the parts:
+  * At room temperatiure, this 3224 specimen didn't quit working at 20 MHz (was repeated at 1 to get cleaner numbers to lower voltages) until vdd was below 2.5V, which is 0.2v below the stated minimum voltage for 10 MHz. Of course, all the CPU had to do was execute repeated rjmp .-2 instructions, but this once again prooves that these parts blow their specs out of the water at room temperatire
+  * If voltage may droop and return without going to zero, USE BOD IF YOU WANT IT TO COME BACK CLEANLY FROM UNDERVOLTAGE EVENT!
+
 
 ## A bit more on clocks and timing
-The clocks have some counterintuitive behavior. First off, what do they and do they not effect? The clocks are used by:
-* The Filter or Synchronizer, if enabled.
-* The sequencer, if it is configured as a flip-flop.
-* The Edge Detector
-It does not govern the speed of the response otherwise - the CCL reacts asynchronously (it is not clocked, and happens as fast as the silicon can manage) unless the edge detector, synchronizer, filter, or sequencer are enabled.
+The clocks have some counterintuitive behavior. First off, what do they and do they not effect?
+* The clocks are used only by:
+  * The Filter or Synchronizer, if enabled.
+  * The sequencer, if it is configured as a flip-flop.
+  * The Edge Detector
+* The clock is not used for:
+  * The logic block itself
+
+### Ugly graphic depicting above
+[Clock Domain Illustration][ClockDomains.png]
 
 ### The edge detector
 Sometimes you need a pulse when all you have is a level. This gets you there. The clock is involved because the resulting pulse is 1 CCL clock long (occasionally this is not long enough, since the CCL clock can be faster than the system clock, particularly on the EB, where you can clock the CCL from the PLL, or you may be using a very slow clock, and it could be troublesome how long it is.
 
 ### The ~programmable delay~ synchronizer/filter
-This is one of the really cool, repurposable features. The intended use is that you can use the synchronizer to take a 2 clock cycle delay to ensure clean transitions and prevent glitches, with the filter meant to provide a means of cleanly handling more substantial noise by requiring that the signal be unchanged for 4 CCL clocks before outputting it. One nuisance is that according to the datasheet, one of these settings must be enabled to use the synchronizer.
+This is one of the really cool, repurposable features. The intended use is that you can use the synchronizer to take a 2 clock cycle delay to ensure clean transitions and prevent glitches, with the filter meant to provide a means of cleanly handling more substantial noise by requiring that the signal be unchanged for 4 CCL clocks before outputting it. One of these must be used forthe edge detector to work.
+
+I'd love to see longer delay option, (synchronize + delay with more stages and without filter I think would be the most fun...)
 
 ### The sequencer
-The sequencer, in some modes, also uses the clock. It takes the clock from the EVEN LUT when acting as a flip-flop (but not when acting as a latch - the latch isn't clocked).
+The sequencer is an optional pathway that takes the two outputs of the pair of LUTs as the inputs to a latch or flip-flop. As flipflops are clocked, these use the EVEN LUTs clock It takes the clock from the EVEN LUT when acting as a flip-flop. Latches have no clock.
+
+I have not tested how the RS latch behaves when both inputs are high (which is forbidden on an RS latch). My guess is that the state of output during that time is undefined admd could be high or low. , and when one of the inputs is deasserted, the other one will take effect
+
 
 ### The signal proceeds through a logic block's subcomponents in an order
 It's important to understand the signal path.
@@ -73,11 +167,14 @@ It's important to understand the signal path.
 
 Thus - the LUT comes first. It's output then may or may not be filtered/synchronized and if it is, may be edge-detected. If we imagine a LUT taking say, the OR of 2 inputs, and put a filter on it, and each of those inputs is (for simplicity) changing according to the same clock as the LUT. If the two inputs are, repeating: HLL and LHL, the output from the first stage will be HHL. The filter will then turn that into *a continuous high level*.
 
+
+
+
 ## PWM is magic
 Unlike the event channels, where you get a single clock long pulse from a compare match or overflow, the inputs to logic blocks are the level of the output compare! That means that you can remap pins that don't exist on your part but would have PWM if they did to the LUT output pin.
 
 ### Long-armed PWM
-Reach out and use a timer on a distant pin instead of the (otherwise occupied or non-existent) one it would normally get.
+Reach out and use a timer on a distant pin instead of the (non-existent) one it would normally output on
 
 INSEL:
 ```text
@@ -94,10 +191,10 @@ Y: masked
 Z: TCA WO2, TCB2 or TCD WOC (which is WOA)
 ```
 
-LUT - Only one input is used, so there will be 2 bits that matter and 6 that don't (and should be left 0 by convention), one will be 0 (the low bit - you want ) and the other 1. So for non-inverted PWM, this is just
-* 0x02 (0b00000010)
-* 0x04 (0b00000100)
-* 0x10 (0b00010000)
+LUT - Only one input is used, so there will be 2 bits that matter and 6 that don't (and should be left 0 by convention). One of them is 0 - typically the LSB for non-inverted PWM, the other is a 1:
+* 0x02 (0b00000010) for input 0
+* 0x04 (0b00000100) for input 1
+* 0x10 (0b00010000) for input 2
 
 Clock: N/A
 
@@ -105,15 +202,23 @@ Sync/Filter: Off
 
 Note that TCA WO3-5, TCB3+, and TCD WOD are not available as inputs.
 
+Of particular utility when:
+* On a 20-pin part upon which you must use a crystal for some godawful reason, thus taking up pin 0 and 1, and you want all 6 PWMs from TCA0, LUT0 and LUT1 can give output on PA6 and PC3 on their alternate and default pin respectively.
+  * Since on these parts, you also can't use either of the TCBs to generate PWM (the timers having, respectively, zero and one pin present, and the one pin is PA3, used by another PWM channel). LUT2 can output on PD6 (and TCD0 outputting on PD4 and PD5) and LUT3 has to go to an event channel and come out on PA6.
+  * Thus, with a HF crystal for the clock, you can still get PWM on PA2, PA3, PA4, PA5, PA6 (via LUT0), PA7 (via LUT3 and EVSYS), PC3 (via LUT1), PD4 (TCD), PD5 (TCD), PD6 (via LUT2) = 10 pins, leaving only 3 non-power, non-programming pins - PC1, PC2 (which you'll probably use as a UART) and PD7 (can do PD6 instead at the cost of an event channel).
+* On a DA, or DB with the TCD PORTMUX erratum (most extant specimens), especially on low pincount parts where there's a lot of stuff with only it's default mux option.
+* When you attemt to find the pattern in the TCB and TCA1 PORTMUX options (there isn't one) and lose the ability to think rationally about pin assignment.
+  * Maybe it's contagious... look at the pinouts on classic AVRs.
+
 ### Out-of-phase PWM
 Problem: You have 3 output channels, each of which requires PWM at a different duty cycle (total not exceeding 100%), but they control large loads, and your power supply can only power one at a time.
 
 If you use a TCA (remembering to call the takeover function), you can run it in in SINGLE mode, getting 16 bits of resolution.
 
 If you then used it normally, the three duty cycles would be written to CMP0, CMP1, and CMP2, but they would all turn on at once, that's not okay. Instead, you could set them as:
-* CMP0 = DS0 - 1 -> Output on the pin by setting pin output and writing 1 to the CMP0 bit
-* CMP1 = DS0 + DS1 -1 -> Output through the CCL
-* CMP2 = PER - DS3 -> Output on the pin by setting pin output, setting INVEN (inverting the pin), writing 1 to the CMP2 bit.
+* CMP0 = DC0 - 1 -> Output on the pin by setting pin output and writing 1 to the CMP0 bit
+* CMP1 = DC0 + DC1 -1 -> Output through the CCL
+* CMP2 = PER - DC2 -> Output on the pin by setting pin output, setting INVEN (inverting the pin), writing 1 to the CMP2 bit.
 
 CMP0 < CMP1 - Ensured by above, provided that:
 
@@ -323,7 +428,8 @@ Sync/Filter: Off
 
 
 ### Buffer (0 clock delay), 2 clock delay or 4 clock delay for level events
-Without the synchronizer or prescaler, this is just a buffer (which is far from useless - you can use a LUT with this truth table and no synchronizer to get a level event onto a pin; For example, if you're on a 14-pin DD series. You've got the 3 PWM outputs coming from PC1-3, and the two TCD's on PD6 and PD7, you can't get any more PWM channels directly. If you're on a 14-pin tiny, and you've taken over TCA0 to do the 16-bit PWM that you need (TCA0 event output only works in SINGLE mode, not SPLIT mode, supposedly. I should probably check that the WO outputs aren't actually still being fed - that would make this trick go from niche to "widely useful", because any time that the pin on the low half of a TCA is used or missing, you could reclaim the PWM channels this way.)
+Without the synchronizer or prescaler, this is just a buffer (which is far from useless, recall the part above regarding PWM pins
+With the synchronizer or prescaler, it inserts a delay of 2 or 4 clocks into a level transition.
 
 INSEL:
 * X: Input

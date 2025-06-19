@@ -1,5 +1,5 @@
 # Changelog
-This page documents (nearly) all bugfixes and enhancements that produce visible changes in behavior throughout the history of megaTinyCore. Note that this document is maintained by a human, who is - by nature - imperfect (this is also why there are so many bugs to fix); sometimes the changelog may not be updated at the same time as the changes go in, and occasionally a change is missed entirely in the changelog, though this is rare. Change descriptions may be incomplete or unclear; this is not meant to be an indepth reference.
+This page documents (nearly) all bugfixes and enhancements that produce visible changes in behavior throughout the history of megaTinyCore. Note that this document is maintained by a human, who is - by nature - imperfect (this is also why there are so many bugs to fix); sometimes the changelog may not be updated at the same time as the changes go in, and occasionally a change is missed entirely in the changelog, though this is rare. Change descriptions may be incomplete or unclear; this is not meant to be an indepth reference. Versions that have been ~struck through~ are versions that are known to be no good and should not be used
 
 ## Planned changes not yet implemented
 These items are in addition to what was listed under changes already in release.
@@ -23,13 +23,16 @@ These items are in addition to what was listed under changes already in release.
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes
 
 ### Planned 2.6.11
+* Correct bug with Comparator (#1236)
 * Correct numerous issues with the microchip board defs. Clearly nobody is using them - since 2 of them didn't compile, and none of the optiboot ones would ever be able to successfully be programmed over the bootloader because selfprogramming wasn't enabled (BOOTEND = 0).
 * Major Bugfix: Correct issue #1164 thanks to John Vasileff. This would cause Serial.flush to hang in one-wire mode.
 * Major Bugfix: Correct buffered PWM on all parts.
 * Major Bugfix: Correct PWM on non-default pins on all parts; digitalPinHasPWM.
 * Fix bug with CCL clock source.
 * Fix bug with Comparator
-* Enhance error messages from wrong-part on upload (pending - currently it just crashes instead of giving a cryptic error, and in prvious releases, the error has been causing confusion.
+* Enhance documentation
+* Removed example of exactly the sort of boneheaded and strictly-worse in a trivial part of Wire. While it was merely a bad example at the time it was written, it is now known to be a bad, dangerous example, because it featured code that demonstrated Strictly Worse access to registers, by loading a vport register to a pointer register, and using that - not only is it stupid and just a less-featureful PORT when accessed that way, avoiding pointer access to the I/O space (64 addresses, - 28 VPORTs and 4 GPIORs in low I/O and SP, RAMPZ (if applicable), CCP (the register used for `__PROTECTED_WRITE()`}), and of course the SREG. And indeed, none of those are registers that anyone should ever acccess using a pointer, even if it didn't wasn't safe against an incredibly scary bug - the low I/O is all about the bitwise instructions, which need both the register and bit compile time known. `VPORT_t*` is not a type you should ever declare - if you have had to declare it, *you get no benefit* from faster access to it (like you do if you use the compile-time known VPORT's amd access them without pointing. )
+* Enhance error messages from wrong-part on upload.
 
 ## Released Versions
 
