@@ -40,7 +40,7 @@ inline uint8_t bitMaskToPosition2(uint8_t bitmask) {
 inline uint8_t bitMaskToPosition(uint8_t bitmask) {
   if (__builtin_constant_p(bitmask)) {
     if (bitmask > 128) {
-      badArg("bitMaskToPosition is being called a constant which is not a bitmask");
+      badArg("bitMaskToPosition is being called a on a constant which is not a bitmask");
       return 255;
     }
   }

@@ -77,7 +77,7 @@ uint16_t readSupplyVoltage() { // returns value in millivolts to avoid floating 
   #else
     int16_t returnval = 0;
     analogReference(INTERNAL1V024);
-    analogReadEnh(ADC_VDDDIV10, 12); // take a reading, crumple, toss, take another reading and use that. Unlike the 0/1/classic parts, it is possible to get
+    analogReadEnh(ADC_VDDDIV10, 12); // take a reading, crumple, toss, take another reading and use that.
     int32_t vddmeasure = analogReadEnh(ADC_VDDDIV10, 12); // Take it at 12 bits
     uint16_t intermediate = (uint16_t) vddmeasure;
     //vddmeasure *= 10; // since we measured 1/10th VDD, then divide by 4 to get into millivolts NO! Don't do that! This way takes 81 clocks for the multiply,

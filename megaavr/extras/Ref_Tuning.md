@@ -1,5 +1,34 @@
 # Internal oscillators and Tuning on tinyAVR devices
-All of the 0/1/2-series tinyAVR devices have an internal high-frequency oscillator which is generally used as the main oscillator; it's the only option you have other than and external clock, or running from the 32kHz internal oscillator (which makes execution of any code painfully slow and is not supported by megaTinyCore - running anything other than very carefully written straight C making use of no Arduino API functions is hopelessly slow, which is why we don't support it). For brevity and familiarity to classic AVR users, we will use the familiar name, `OSCCAL` to refer to the oscillator calibration register - this is `CLKCTRL.OSC20MCALIBA` on the tinyAVR parts.
+All of the 0/1/2-series tinyAVR devices have an internal high-frequency oscillator which is generally used as the main oscillator; it's the only option you have other than and external clock, or running from the 32kHz internal oscillator (which makes execution of any code painfully slow and is not supported by megaTinyCore - running anything other than very carefully written straight C making use of no Arduino API functions is hopelessly slow, which is why we don't support it). For brevity and familiarity to classic AVR users, we will use the familiar name, `OSCCAL` to refer to the oscillator calibration register - this is `CLKCTRL.OSC20MCALIBA` on the tinyAVR parts (note: the register name is unchanged on tinyAVR Automotive 0/1-series parts, in spite of the fact that the 0/1-series automotive parts only support running the HF internal oscillator at 16 MHz)
+
+## **This is not for serious/practical applications**
+With the possible exception of tuning to 16 or 20 MHz on a chip if you get one with an abnormally poor factory calibration or are running them far from room temperature, tuning is probably not appropriate. It involves adjusting the internal oscillator beyondthe specifications given in the datasheet, and generally involves running the chip at speed higher than it'r rated speed as well. Overclocking an AVR is something you do for fun on devices for investigative use, or deployment in easilly accessible locations where malfunctions have negligible consequences.
+
+### Overclocking an AVR also doesn't make much sense
+Even accepting the caveat that overclocked devices are unsuitable for applications where malfunction is undesirable - which I'll grant rules out a great many use cases - it's hard to find cases that see a benefit from overclocking. Typically, perceived performance issues are related to code that is limited by something dependent on real time, not CPU time (ex, large volume of I2C activity, running at 400 kHz regardless of what F_CPU is, or verbose logging that fills a serial buffer, causing Serial.print() to block), or are due to design flaws or bugs. When the problem is a bona fide lack of CPU cycles, it's uncommon for this to be intrinsic to the task unless the task is inappropriate for AVR for other reasons - that is, either user or library code is doing something very ineffiently, or the task is one that an AVR will never be very good at.
+
+## **THIS IS ONLY FOR tinyAVR**
+There are many good reasons not to use it on the Dx-series; the factory cal is pretty much dead on, and you can crank it up to 32 MHz without doing anything with the cal, and most importantly, you just can't change the speed as much by tuning - They shrank the step size and the number of steps. Dx can get on the order of 10-20% difference in speed. Rarely interesting. In contrast, while achievable range varies from part to part, these figures are pretty typical
+
+ Series  |        16 MHz |      20 MHz |
+---------|---------------|-------------|
+Tiny 0/1 | 10   - 25 MHz | 12.x-32 MHz | 30 MHz is practical upper limit, and not stable on all parts. 32 generally is not.
+Tiny 2   | 12.x - 30 MHz | 14 - 35 MHz | 32 MHz is practical upper limit - Chips consistently stopped working under non-rigorous conditions at 35.5 MHz @ 5.0 V.
+
+
+The tuning system implemented on mTC is intended to maximize the availability of interesting speeds. You can see that the above range doesn't give much room for going significantly lower - at least not to an extent that would make it more interesting than what can be achieved with a prescaler for lowering power. The tuning points are chosen as the most plausibly interesting speeds that are likely to be achievable. Only the 0/1-series 16 MHz oscillator can commonly be tuned down to 12 MHz, and the 20 MHz one on the 2-series often doesn't quite reach 14 MHz - to do 12 MHz tuned on other osc settings with tuning, we have to tune up to 24 MHz and then prescale by /2
+
+Speed:     | 0/1 @ 16 nom. | 0/1 @ 20 nom. |  2 @ 16 nom. | 2 @ 20 nom.  |
+-----------|---------------|---------------|--------------|--------------|
+12 MHz     |           Yes |  Unachievable | Unachievable | Unachievable |
+14 MHz     |           Yes |           Yes |          Yes | Unachievable |
+16 MHz     |           Yes |           Yes |          Yes |          Yes |
+20 MHz     |           Yes |           Yes |          Yes |          Yes |
+24 MHz     |           Yes |           Yes |          Yes |          Yes |
+25 MHz     |           Yes |           Yes |          Yes |          Yes |
+30 MHz     |  Unachievable |           Yes |          Yes |          Yes |
+32 MHz     |  Unachievable |      Unstable | Unachievable |          Yes |
+
 
 ## IMPORTANT NOTE - If you tuned prior to 2.6.0, you must tune again to get correct results
 It was found that many oscillators couldn't be turned down enough to reach the speeds that we were targeting, so we added 14 MHz as a clock speed tune to on configurations except a tinyAVR 2-series @ 20 MHz, where we felt it more valuable to squeeze in the magic 32 MHz option than 14 MHz. Note that this is only relevant when uploading using Optiboot - over UPDI we set the base osc speed during upload
@@ -9,24 +38,30 @@ In the table below, **bold** speeds are prescaled from higher speeds, and *itali
 
 Numbers are given by column for the 0/1-series and 2 series at 16 and 20 base osc speed (0-series is assumed to be same as 1-series.
 
-|  F_CPU   |   1 @ 16  |  1 @ 20   |   2 @ 16  |   2 @ 20   |
-|----------|-----------|-----------|-----------|------------|
-|  1 MHz   |  **Yes**  | **Tuned** |  **Yes**  | **Tuned**  |
-|  2 MHz   |  **Yes**  |  **Yes**  |  **Yes**  |  **Yes**   |
-|  4 MHz   |  **Yes**  | **Tuned** |  **Yes**  | **Tuned**  |
-|  5 MHz   | **Tuned** |  **Yes**  | **Tuned** |  **Yes**   |
-|  6 MHz   | **Tuned** | **Tuned** | **Tuned** | **Tuned**  |
-|  7 MHz   | **Tuned** | **Tuned** | **Tuned** |    No      |
-|  8 MHz   |  **Yes**  | **Tuned** |  **Yes**  | **Tuned**  |
-| 10 MHz   | **Tuned** |  **Yes**  | **Tuned** |  **Yes**   |
-| 12 MHz   |   Tuned   | **Tuned** | **Tuned** | **Tuned**  |
-| 14 MHz   |   Tuned   |   Tuned   |   Tuned   |    No      |
-| 16 MHz   |  Natural  |   Tuned   |  Natural  |   Tuned    |
-| 20 MHz   |   Tuned   |  Natural  |   Tuned   |  Natural   |
-| 24 MHz   |  *Tuned*  |  *Tuned*  |  *Tuned*  |  *Tuned*   |
-| 25 MHz   |  *Maybe*  |  *Tuned*  |  *Tuned*  |  *Tuned*   |
-| 30 MHz   |   *No!!*  |  *Maybe*  |  *Maybe*  | *Usually*  |
-| 32 MHz   |   *No!!*  |  *No!!*   |  *No!!*   |  *Maybe*   |
+|  F_CPU   |   1 @ 16          |  1 @ 20           |   2 @ 16          |   2 @ 20           |
+|----------|-------------------|-------------------|-------------------|--------------------|
+|  1 MHz   |  **Yes**    16/16 | **Tuned**  16T/16 |  **Yes**    16/16 | **Tuned**  16T/16  |
+|  2 MHz   |  **Yes**    16/8  |  **Yes**   20/10  |  **Yes**    16/8  |  **Yes**    20/10  |
+|  4 MHz   |  **Yes**    16/4  | **Tuned**  16T/4  |  **Yes**    16/4  | **Tuned**   16T/4  |
+|  5 MHz   | **Tuned**  20T/4  |  **Yes**    20/4  | **Tuned**  20T/4  |  **Yes**     20/4  |
+|  6 MHz   | **Tuned**  12T/2  | **Tuned**  24T/4  | **Tuned**   **    | **Tuned**   24T/4  |
+|  7 MHz   | **Tuned**  14T/4  | **Tuned**    *    | **Tuned**  14T/4  |        Unsupported |
+|  8 MHz   |  **Yes**    16/2  | **Tuned**  16T/2  |  **Yes**    16/2  | **Tuned**   16T/2  |
+| 10 MHz   | **Tuned**  20T/2  |  **Yes**    20/2  | **Tuned**  20T/2  |  **Yes**     20/2  |
+| 12 MHz   |   Tuned           | **Tuned**  24T/2  | **Tuned**   **    | **Tuned**   24T/2  |
+| 14 MHz   |   Tuned           |   Tuned           |   Tuned           |        Unsupported |
+| 16 MHz   |  Natural          |   Tuned           |  Natural          |              Tuned |
+| 20 MHz   |   Tuned           |  Natural          |   Tuned           |            Natural |
+| 24 MHz   |  *Tuned*          |  *Tuned*          |  *Tuned*          |            *Tuned* |
+| 25 MHz   |  *Maybe*          |  *Tuned*          |  *Tuned*          |            *Tuned* |
+| 30 MHz   |   *No!!*          |  *Maybe*          |  *Maybe*          |          *Usually* |
+| 32 MHz   |   *No!!*          |  *No!!*           |  *No!!*           |            *Maybe* |
+
+Prescaled clocks are shown in bold, next to the prescaling used to achieve that speed.
+
+* This can only
+
+All tinyavrs (except very rare specimens, usually because of abnormally slow internal osc) are able to oscillate to higher frequencies than they can actually run at - the oscillator on the 2's should go up to 36, but i've never seen it run stable above 32, and the 1-seriescan exceed 32 most of the time, but i've never seen one run that fast from internal.
 
 ## Chart legend
 * **boldface**indicates prescaling used.
@@ -36,18 +71,21 @@ Numbers are given by column for the 0/1-series and 2 series at 16 and 20 base os
 * ~Tuned~ Could be reached by tuning, but we don't cal to that.
 * No - 14 MHz and thus 7 MHz are only supported on 2-series with base oscillator set to 16 MHz with tuning performed.
 * Usually - An aggressive overclocking which the oscillator can almost always reach, but which may not be stable.
-* Maybe - An aggressive overclocking which the oscillator may not be able to reach, or if it is able to reach it, may be unstable
-* No!! - the oscillator cannot reach this speed on many specimens, and when it can, device is unstable.
+* Maybe - An aggressive overclocking which the oscillator may not be able to reach, or if it is able to reach it, may be unstable - but I have run chips at room temperature at this speed successfully, from tuned internal oscillator.
+* No!! - the oscillator cannot reach this speed on most/all specimens, and when it can, device is unstable.
 
-**Note:** These values apply only to internal oscillator 32 MHz is often achievable on 0/1-series with an external clock, though good decoupling and a solid 5v supply is required. 36 MHz may work on 2=series (maybe only extended temperature range ones) with an external clock.
+**Note:** These values apply only to internal oscillator 32 MHz is often achievable on 0/1-series with an external
 
 **7 and 14 MHz speeds are not exposed by the core** even though in some cases we record the tuned value for it  - nor are other speeds that some people might want to run at like 27, 28, or 21. I wanted to leave some of the user row open.
 
 
-## **THIS IS ONLY FOR TINYAVR**
-There are many good reasons not to use it on the Dx-series; the factory cal is pretty much dead on, and you can crank it up to 32 MHz without doing anything with the cal, and most importantly, you just can't change the speed as much by tuning.
 
-## Don't use this core, particularly
+## Tuning may adversely affect stability or, potentially, even product life
+It should go without saying that it voids any warranty to do such things to the parts.
+
+It should be avoided wherever the consequences of a failure are more severe than "minor nuissance", eg, if the device is hard to get to to replace or reset (say, in your back yard, ten feet up a snow-covered tree) or embarrassing (customer site - don't overclock stuff you sell to customers, it's dishonest and unethical).
+
+As a reminder, megaTinyCore (and the Arduino IDE in general) are not a suitable platform for developing life safety critical devices on; this includes anything connected to your car. *Good thing I only attach my poorly coded electronic gadgets to other people's cars*
 
 ## General Concepts
 As usual for AVR parts, the internal oscillator's compliance covers a far wider range than the datasheet describes. In my testing on 1-series parts, it appeared that both the 16 MHz and 20 MHz oscillator can be calibrated to as low as approximately 5/8 of their nominal speed or as high as 1 5/8 of their nominal speed The oscillator on the tinyAVR 2-series parts has gotten an upgrade in the form of the calibration register getting an additional bit - it now has 7 bit granularity instead of 6! (the high bit indicates whether the center frequency is 16 or 20 MHz). The 128 settings cover a similarly sized range of speeds, though both the top and bottom ends of this range are higher. The 2-series parts also reach higher speeds before they start to fail.
@@ -131,7 +169,7 @@ Disconnect the tuner from your target and now the (tuned) options will be far mo
 
 Upload blink to the tuned target using one of the (tuned) options, and it should blink at the correct speed. Test blink with the speed you want to run at before uploading the sketch you want to run.
 
-The tuning will persist unless you explicitly erase the USERROW (also known as a the User Signature Space). It can be manipulated with the USERSIG.h library. Even across bootloading - so if you wanted to put Optiboot onto it, you can do that, and a sketch uploaded through Optiboot with Internal 20MHz (tuned) would run at 20 MHz, and with Internal 16 MHz (tuned) would run at 16 MHz.
+The tuning will persist unless you explicitly erase the USERROW (also known as a the User Signature Space), even through bootloading. However, it will only be used in cases
 
 #### Step 5: Removing or retuning
 Note that unless you select a tuned clock option, no tuning will be attempted or performed, so unless you need the full USERROW, there's no reason to remove this.
@@ -199,27 +237,28 @@ The included ClockDiagnose example can be used to diagnose a variety of clock is
 
 ## Internals of oscillator tuning
 
-It is possible to take a reasonable guess if there is no tuning data saved on the part; this is what we do when tuned options are requested but the chip hasn't been tuned (what, you want me to read the chip before uploading to make sure it has been tuned? This would actually be a ) we will stay at the startup frequency (3.33 or 2.66 MHz) making it obvious to the user that the clock isn't set right instead of trying to set as close as we can (eg, 0x7F or 0x3F for above examples) - one of my guiding principles is that if I know I can't give the user the behavior they ask for and that nothing that is possible is good enough in current conditions, I should try to make the failure obvious and hard to miss.
+It is possible to take a reasonable guess if there is no tuning data saved on the part; this is what we do when tuned options are requested but the chip hasn't been tuned (what, you want me to read the chip before uploading to make sure it has been tuned? For a feature that is not meant for serious use? If this was a normal feature, ) we will stay at the startup frequency (3.33 or 2.66 MHz) making it obvious to the user that the clock isn't set right instead of trying to set as close as we can (eg, 0x7F or 0x3F for above examples) - one of my guiding principles is that if I know I can't give the user the behavior they ask for and that nothing that is possible is good enough in current conditions, I should try to make the failure obvious and hard to miss.
 
 See the oscillator debug sketch for more information on troubleshooting oscillator problems - it examines the state of the part and prints out what the name of the error is. The two high bits in GPIOR0 are used to pass notice of errors in tuning to the user code (the lower 6 bits are used to communicate reset cause when optiboot is in use) since there is no other guaranteed way to communicate error messages; you may well not even have a serial port set up. But if you see it running at a fraction of the expected speed, you're going to suspect the problem is related to that new tuned clock speed option you chose, right? You might even come looking at the documentation and see this explanation - that's the hope, at least.
 
-The tuning sketch is actually fairly simple, but ugly - #ifdefs at the top choose which speeds to target as the number of microseconds they should count within eight 1ms pulses. Special tuning requirements can be met by using different numbers there (though one would still need to then compile with the correct F_CPU - meaning creating your own board file on Arduino; I gather this is easier to do with Platform.io and similar). Setup tests for a clean reset (either UPDI, or software reset, so if it doesn't have that, it can issue a software reset to ensure that it wasn't left in a bad state after being overclocked too far, If it was a UPDI upload, we store TuningDone as 255, indicating first-upload-tuning. It then waits for a FORCE pin pulled up internally - which must be held low for half a second out of the next 3. After that if it either hasn't been tuned, the FORCE pin was grounded, or it was just uploaded, it proceeds to loop, where the clock prescale is set to 4, and we start incrementing the OSCCAL, then measure 8 pulses of around 1ms each. The timing is actually done using plain old pulseIn 8 times.  Which is in fact accurate, being a tight loop of assembly. We use 1ms pulses not longer ones????? to ensure millis counts aren't lost. Alternately the 1 kHz standard output of a scope could even be used, this is twice as fast, so 16 samples are taken if it is chosen by defining ONEKHZMODE. if it decides tuning isn't needed, and after successful tuning, it will jump to a loop that acts like BLINK.
+The tuning sketch is actually fairly simple, but ugly due to an abundance of conditional compilation. Special tuning requirements can be met by using different numbers there (though one would still need to then compile with the correct F_CPU - meaning creating your own board file on Arduino; I gather this is easier to do with Platform.io and similar). Setup tests for a clean reset (either UPDI, or software reset, so if it doesn't have that, it can issue a software reset to ensure that it wasn't left in a bad state after being overclocked too far, If it was a UPDI upload, we store TuningDone as 255, indicating first-upload-tuning. It then waits for a FORCE pin pulled up internally - which must be held low for half a second out of the next 3. After that if it either hasn't been tuned, the FORCE pin was grounded, or it was just uploaded, it proceeds to loop, where the clock prescale is set to 4, and we start incrementing the OSCCAL, then measure 8 pulses of around 1ms each. The timing is actually done using plain old pulseIn 8 times.  Which is in fact accurate, being a tight loop of assembly. We use 1ms pulses not longer ones????? to ensure millis counts aren't lost. Alternately the 1 kHz standard output of a scope could even be used, this is twice as fast, so 16 samples are taken if it is chosen by defining ONEKHZMODE. if it decides tuning isn't needed, and after successful tuning, it will jump to a loop that acts like BLINK.
 
 See also comments in the sketches.
 
-### Selftuning
+### Self-Tuning
 SelfTuning without a crystal makes the following assumptions:
-* the factory calibration picked the closest room temperature option.
-* If a 0/1-series, that the oscillator error value in the sigrow is accurate.
-* The 32kHz oscillator is stable, but very poorly calibrated (it is extremely crude)
+* The factory calibration picked the closest room temperature option (empirically, this is the case)
+* If a 0/1-series, that the oscillator error value in the sigrow is accurate (belived accurate).
+  * Thus, from the two above, we assume that the CPU is running at `F_OSC(nom)` or `F_OSC(nom)*(cal correction)`, and we base everything else on that assumption.
+* The 32kHz oscillator is reasonably stable over brief timescales, though it may only vaguely approximate 32 kHz.
 Assuming assumptions are correct, passable tuning can be achieved in this way.it can time the ratio of the system clock to the internal 32k oscillator. Since internal 16/20 MHz clock is known quite accurately thanks to the error terms or the 2 series just plain , we can determine the frequency of the "32khz" oscillator, and then loop over all OSCCAL values starting from 0 using the 32khz osc , calculating the main oscillator speed from the "32k" one, with a list of the 6 target values , and compare it's calculated speed to them, and if it's farther than the previous one was, it writes whichever value was closer to the target to the USERROW and then go on to the next target. We drop back to a div/4 prescaler while adjusting the clock speed, and follow the oscillator adjustments with a nop which is supposedly able to prevent bad behavior immediately after an adjustment to osccal, we then disable the prescaling and start timing the RTC event generator channel accumulating 8 samples./*
 
 ### Tidying and unstable speeds
 Any OSCCAL value which is found to produce anomalous results for logical and arithmetic functions is considered to be unstable. This very often results in a crash, which is why the watchdog is used. If we survive long enough to set the prescaler back to 4, we record, The calbyte is marked 0x80. Upon startup, when all the tuning sketches see if they've already been run. They always attempt to run after a UPDI reset (ie, when you uploaded the sketch over UPDI, that ended with a UPDI reset) but otherwise they will run only after a reset if either the configurable FORCE_PIN is held low (to force recalibration, or if 0xFF is the value stored in the userrow address corresponding to the nominal oscillator speed ("Home". While checking this it will look for an unexpected 0xFF or 0x00 near the higher targets, which would imply that the microcontroller crashed before reaching the target speed; it will mark that speed and all higher one 0xC0. So when a tuned speed that the oscillator can on some parts of that model achieve is selected, `init_clock` checks the calbytes we stored in the userrow. If "home" ix 0xFF, we will guess (in terms of an offset from factory cal), and unless it gets a above 258 (which is treated as 255) or below -3 (negative numbers treated as 0). If it is out side that range, it's guess is that the speed cannot be achieves with that part and it leaves the speed at default.
-The ClockDebug example can get more information on what's going on.
-If there IS a value in "home", we check the calbyte for the target speed, If that & 0x80, we abort, because it has been shown to be unstable. (bit six is recorded to help humans to debug problems, and is shown by things like ClockDebug example - that is a very strong sign that you ain't never gonna get that thing running at that speed - it crashed before it even made it to the target!/
 
-As of 2.5.13 we have finished this, and
+The ClockDebug example can get more information on what's going on.
+
+If there IS a value in "home", we check the calbyte for the target speed, If that & 0x80, we abort, because it has been shown to be unstable. (bit six is recorded to help humans to debug problems, and is shown by things like ClockDebug example - that is a very strong sign that you ain't never gonna get that thing running at that speed - it crashed before it even made it to the target when trying to tune to that speed.
 
 
 ## Historical
@@ -233,7 +272,7 @@ Setting: A classroom full of programmers and anthropomorphized peripherals are a
 
 *My name's Clock, and - unlike a certain instructor - I value yer Time, and I specialize in keeping it Real... I've got just what you need, right here....*
 
-The idea here is simple: Run RTC from internal 32kHz oscillator. This is inaccurate (if you have a crystal, it's not, rich kid), but pretty stable stable. Pipe it to the event system via ASYNCCH3 for 1-series or any odd channel for the 2-series (0-series parts and their owners are S. O. L. here - as usual for those low budget parts. I hope we don't have any of those here today, we dun like your kind round these parts, you hear me? The 0-series is strictly inferior and can't selftune! So if you're a 0-series, get out of here, I'm not talking to your kind. *several sadfaced 0-series parts slink out of the classroom with tears in their eyess* Because, ya see here one of the many ways ways the 0-series `EVSYS` is gimped is that, lacking async channels 2 and 3 while having the exactly same list of peripherals for the channels they do have... they don't got no PIT output channels. So they can't use the divided PIT signals as event generators. It's a little hard to imagine who'd save 7 cents tops at that kinda cost isn't it? What I never got was way there was always so many of em around, taking our precious die space!
+The idea here is simple: Run RTC from internal 32kHz oscillator. This is inaccurate (unless ya got a watch crystal hooked up, but I can't remember the last time I saw one of those, and they're my department), but . Pipe it to the event system via ASYNCCH3 for 1-series or any odd channel for the 2-series (0-series parts and their owners are S. O. L. here - as usual for those low budget parts. I hope we don't have any of those here today, we dun like your kind round these parts, you hear me? The 0-series is strictly inferior and can't selftune! So if you're a 0-series, get out of here, I'm not talking to your kind. *several sadfaced 0-series parts slink out of the classroom with tears in their eyess* Because, ya see here one of the many ways ways the 0-series `EVSYS` is gimped is that, lacking async channels 2 and 3 while having the exactly same list of peripherals for the channels they do have... they don't got no PIT output channels. So they can't use the divided PIT signals as event generators. It's a little hard to imagine who'd save 7 cents tops at that kinda cost isn't it? What I never got was way there was always so many of em around, taking our precious die space!
 
 Anyway, so let's turn on the RTC and turn on the PIT! PIT/64 should be around 512 Hz
 
@@ -241,11 +280,19 @@ Now grab a type B timer (not yer millis timer you fool! Who let you into this cl
 "I'm a 2-series they don't give us our osciullator error during factory cal anymore!
 "Well OBVIOUSLY if you don't have a OSC ERR value in yer sig, you keep good enough time without it, so quit braggging." Now to find the true expected value,. Average a few captures (I'd, say, accumulate a power of 2 number of samples in an unsigned long and rightshfit the appropriate number of times - or leftshift the expected value that many times). Your sample will likely be within a percent or two of the expected, and now it's simple math to derive the frequency that the RTC is actually running at. You can now determine how many system clock cycles the TCB would count for the desired tuned speed, and just step through each cal value, time it a few times, until you find what you're looking for. And unlike that doddering fool who rambles up here every day, I've got the code you need right here! [SelfTuning example](../libraries/megaTinyCore/examples/SelfTuning/SelfTuning.ino)
 
-Okay! Class dismissed, let's hit the beaches, I heard them AVR double-D's are there! (cheers as students leap up)
+(Student) Uh, What do we do for zero series?
+You spend the extra 2 cents to get the 1 or 2 series?! Duh, 0-series is for suckers.
+
+(Student II) Mr. Clock, I was working with one of your guys on the 1-series, and when I turned on the RTC, if I didn't also turn on the PIT ev-- (student is cut off as Clock flings a blackboard eraser at them)
+Okay! Class dismissed, let's hit the beaches, I heard the AVR-double-D's are there! (cheers as students leap up)
 
 *As Mr. Clock struts towards the door a dog barks in the distance. Mr. Clock's expression turns to one of terror... He does a 180 and runs for the window himself, but before he can get there he is tackled by a huge, vicious dog*
 
-"It looks like someone wasn't paying attentione when I was talking about the windowed watchdog timer - which is the perfect way to return to controlled operation after a wild pointer, unintentional infinite loop or..." looking at Mr. Clock, still pinnned by the watchdog " a misbehaving peripheral...... Remember, using the window lets you reset if WDR is issued to late **OR too early** And might I note that I don't believe Mr. Clock actually tested that code... Now, where was I.....
+"It looks like someone wasn't paying attentione when I was talking about the windowed watchdog timer - which is the perfect way to return to controlled operation after a wild pointer, unintentional infinite loop or..." looking at Mr. Clock, still pinnned by the watchdog " a misbehaving peripheral...... Remember, using the window lets you reset if WDR is issued to late **OR too early**. Now, where was I.....
 
 Right.....
 *Using a timebase to tune from is - of course - inconvenient.* (the class starts over to a chorus of groans throughout the room)
+
+
+
+

@@ -2,6 +2,46 @@
 
 There are some simple patterns that you can use with the CCL/Logic library to generate very widly applicable effects:
 
+* [CCL Toolbox](Tips_and_Tricks.md#ccl-toolbox)
+  * [Reordering inputs](Tips_and_Tricks.md#reordering-inputs)
+  * [Examples](Tips_and_Tricks.md#examples)
+  * [Feedback](Tips_and_Tricks.md#feedback)
+    * [But I need feedback on an ODD LUT](Tips_and_Tricks.md#but-i-need-feedback-on-an-odd-lut)
+  * [Speaking of response time, how fast is it?](Tips_and_Tricks.md#speaking-of-response-time,-how-fast-is-it?)
+  * [A bit more on clocks and timing](Tips_and_Tricks.md#a-bit-more-on-clocks-and-timing)
+    * [Ugly graphic depicting above](Tips_and_Tricks.md#ugly-graphic-depicting-above)
+    * [The edge detector](Tips_and_Tricks.md#the-edge-detector)
+    * [The ~programmable delay~ synchronizer/filter](Tips_and_Tricks.md#the-~programmable-delay~-synchronizer/filter)
+    * [The sequencer](Tips_and_Tricks.md#the-sequencer)
+    * [The signal proceeds through a logic block's subcomponents in an order](Tips_and_Tricks.md#the-signal-proceeds-through-a-logic-block's-subcomponents-in-an-order)
+  * [PWM is magic](Tips_and_Tricks.md#pwm-is-magic)
+    * [Long-armed PWM](Tips_and_Tricks.md#long-armed-pwm)
+    * [Out-of-phase PWM](Tips_and_Tricks.md#out-of-phase-pwm)
+    * [Modulated PWM](Tips_and_Tricks.md#modulated-pwm)
+  * [Sequential logic with just one LUT](Tips_and_Tricks.md#sequential-logic-with-just-one-lut)
+
+    * [S-R latch](Tips_and_Tricks.md#s-r-latch)
+    * [D-Type latch](Tips_and_Tricks.md#d-type-latch)
+    * [Pulse-stretcher](Tips_and_Tricks.md#pulse-stretcher)
+      * [Even LUT](Tips_and_Tricks.md#even-lut)
+      * [Odd LUT](Tips_and_Tricks.md#odd-lut)
+    * [Pulse Stretcher 2](Tips_and_Tricks.md#pulse-stretcher-2)
+      * [Even LUT](Tips_and_Tricks.md#even-lut)
+      * [Odd LUT](Tips_and_Tricks.md#odd-lut)
+  * [More patterns](Tips_and_Tricks.md#more-patterns)
+    * [A/B select](Tips_and_Tricks.md#ab-select)
+    * [Gated Buffer](Tips_and_Tricks.md#gated-buffer)
+    * [Buffer (0 clock delay), 2 clock delay or 4 clock delay for level events](Tips_and_Tricks.md#buffer-0-clock-delay,-2-clock-delay-or-4-clock-delay-for-level-events)
+    * [2 LUT edge detector for RISING *or* FALLING](Tips_and_Tricks.md#2-lut-edge-detector-for-rising-or-falling)
+      * [LUTn+1: Configure for 2 or 4 clock delay as above](Tips_and_Tricks.md#lutn+1:-configure-for-2-or-4-clock-delay-as-above)
+      * [LUTn](Tips_and_Tricks.md#lutn)
+      * [Variant: Lightning fast pulses](Tips_and_Tricks.md#variant:-lightning-fast-pulses)
+      * [Review - what determines what](Tips_and_Tricks.md#review---what-determines-what)
+  * [Prescaling clocks with the CCL](Tips_and_Tricks.md#prescaling-clocks-with-the-ccl)
+    * [The general scheme](Tips_and_Tricks.md#the-general-scheme)
+    * [The giant table](Tips_and_Tricks.md#the-giant-table)
+
+
 ## Reordering inputs
 **THIS SECTION IGNORES THE MSB AND LSB OF THE TRUTH TABLE**
 There are four trivial variations on each of these with different behavior when all inputs are the same.
@@ -24,39 +64,42 @@ Note also that not all truthtables have six distinct permutations that can be ma
 
 4 do not change no matter how you switch around the inputs (assuming we've bitwise and'ed truth with 0b01111110 and have not shifted it in any way):
 
-These are cases that treat all inputs equally.
+These are cases that treat all inputs equally (the logic formulas are hideous or trivial to write out)
 
 | TRUTH & 0x7E | Bits set | Rationalization
 |--------------|----------|---------------------
-| 0x00         |      0/6 | LOW always
+| 0x00         |      0/6 | LOW always, except potentially when all three inputs are HIGH or all three inputs are LOW.
 | 0x16         |      3/6 | HIGH if exactly one input is HIGH
 | 0x68         |      3/6 | HIGH if exactly two inputs are HIGH
-| 0x7E         |      6/6 | HIGH in all cases except (potentially) when all three outputs are the same
-
-There are 4 distinct ways of treating all pins equally.
+| 0x7E         |      6/6 | HIGH in all cases except (potentially) when all three inputs are HIGH or all three inputs are LOW.
 
 A significant number of options come in sets of three. These reflect cases where two inputs are treated the same, while a third is treated differently
 
-| TRUTH & 0x7E     | Bits set | Rationalization
-|------------------|----------|---------------------
-| 0x02, 0x04, 0x10 |      1/6 | HIGH if one specified input HIGH and all others LOW
-| 0x08, 0x20, 0x40 |      1/6 | HIGH IF a specific input is LOW  and all others HIGH.
-| 0x06, 0x12, 0x14 |      2/6 | HIGH IF one (not both) of two specified inputs is high, and the third is low
-| 0x28, 0x48, 0x60 |      2/6 | HIGH IF specified input HIGH and one of the others HIGH
-| 0x1E, 0x36, 0x56 |      4/6 | HIGH IF either a specific input is HIGH and the others low, or either of the others are high
-| 0x6A, 0x6C, 0x78 |      4/6 | HIGH if speciefied input, or both other inputs HIGH.
-| 0x6E, 0x7A, 0x7C |      5/6 | HIGH UNLESS one specified input HIGH
-| 0x3E, 0x5E, 0x76 |      5/6 | HIGH UNLESS one specified input HIGH and others LOW
+| TRUTH & 0x7E     | Bits set | Rationalization                                                                                               | Logic
+|------------------|----------|---------------------------------------------------------------------------------------------------------------|---------------
+| 0x02, 0x04, 0x10 |      1/6 | HIGH if one specified input HIGH and all others LOW.                                                          |  A and !(B or  C)
+| 0x08, 0x20, 0x40 |      1/6 | HIGH IF a specific input is LOW  and all others HIGH.                                                         | !A and  (B and C)
+| 0x06, 0x12, 0x14 |      2/6 | HIGH IF one (not both) of two specified inputs is high, and the third is low.                                 | !A and  (B xor C)
+| 0x28, 0x48, 0x60 |      2/6 | HIGH IF specified input HIGH and one of the others HIGH A and                                                 |         (B  or C)
+| 0x18, 0x24, 0x42 |      2/6 | HIGH IF specified input HIGH and both others LOW, or specified input LOW and both others HIGH.                | (A and !(B  or C)) or (!A and  B and C)
+| 0x0E, 0x32, 0x54 |      3/6 | HIGH if specified input LOW.                                                                                  |        (!A)
+| 0x2A, 0x4C, 0x70 |      3/6 | HIGH if specified input HIGH.                                                                                 |         (A)
+| 0x1E, 0x36, 0x56 |      4/6 | HIGH IF either a specific input is HIGH and the others low, or either of the others are high.                 | (A and !(B  or C)) or (!A and (B  or C))
+| 0x6A, 0x6C, 0x78 |      4/6 | HIGH if speciefied input, or both other inputs HIGH.                                                          |  A  or  (B and C)
+| 0x6E, 0x7A, 0x7C |      5/6 | HIGH UNLESS one specified input HIGH and others LOW.                                                          | !A  or  (B  or C)
+| 0x3E, 0x5E, 0x76 |      5/6 | HIGH UNLESS one specified input LOW and others HIGH.                                                          |  A  or !(B and C)
 
 24 possibilities there, so we have gotten to 4 + 24 = 28 so far.
 
-However, there are only 8 logical operations described there.
+|                   TRUTH & 0x7E     | Bits set | Rationalization
+|------------------------------------|----------|--------------------------
+| 0x0A, 0x0C, 0x22, 0x30, 0x44, 0x50 |      2/6 | If one specified input HIGH and other specified input LOW, without specifying the last one. | (A  and !B)
+| 0x1A, 0x1C, 0x26, 0x34, 0x46, 0x52 |      3/6 | If specified input HIGH and other specified input LOW, or first input LOW and second HIGH   | (A  xor  B)
+| 0x2C, 0x38, 0x4A, 0x58, 0x62, 0x64 |      3/6 | Opposite of the second                                                                      | !(A xor  B)
+| 0x2E, 0x3A, 0x4E, 0x5C, 0x72, 0x74 |      4/6 | Opposite of first                                                                           | (!A  or  B)
 
-Finally, the remaining 36 possibilities form into 4 groups of 9 to cover the 4 behaviors that have all three inputs as distinct.
-* 0x0A, 0x0C, 0x18, 0x22, 0x24, 0x30, 0x42, 0x44, 0x50 - HIGH if one specified input LOW and another specified input HIGH, without caring for third.
-* 0x0E, 0x1A, 0x1C, 0x26, 0x32, 0x34, 0x46, 0x52, 0x54 - HIGH if one specified input alone HIGH
-* 0x2A, 0x2C, 0x38, 0x4A, 0x4C, 0x58, 0x62, 0x64, 0x70 - Add high and low bits for A/B selects
-* 0x2E, 0x34, 0x3A, 0x3C, 0x4E, 0x5A, 0x5C, 0x72, 0x74 - Add high and low bits for inverted AB selects.
+Each of the preceeding 64 "middles" corresponds to 4 different truth tables. So 3E, 5E and 76
+
 
 ## Examples
 
@@ -171,7 +214,7 @@ Thus - the LUT comes first. It's output then may or may not be filtered/synchron
 
 
 ## PWM is magic
-Unlike the event channels, where you get a single clock long pulse from a compare match or overflow, the inputs to logic blocks are the level of the output compare! That means that you can remap pins that don't exist on your part but would have PWM if they did to the LUT output pin.
+Unlike the event channels, where you get a single clock long pulse from a compare match or overflow, the inputs to logic blocks are the level of the output compare! That means that you can remap pins that don't exist on your part (but which would have PWM if they did) to the LUT output pin.
 
 ### Long-armed PWM
 Reach out and use a timer on a distant pin instead of the (non-existent) one it would normally output on
@@ -200,9 +243,15 @@ Clock: N/A
 
 Sync/Filter: Off
 
+Output: Enabled
+
 Note that TCA WO3-5, TCB3+, and TCD WOD are not available as inputs.
 
 Of particular utility when:
+* Using low-pincount parts with peripherals squabbling over special function pins
+  * Of particular use on tinyAVRs in 14-pin packages, pin-starved AVRxxDD14 or AVRxxDU14.
+    * The tinyAVR, low-half of PORTB (which is the only part of PORTB on a 14-pin part is a high-contention block of pins, PB2 and PB3 are used for serial, WO2 and WO0 from TCA0, and the crystal. TCA0 WO0 and WO1 are on PB0 and PB1, as is the TWI.
+    * PWM output on 14-pin Dx-series parts is pretty craptacular. You get to pick *one of*: PWM on PA0/PA1, PWM on PC1, 2, and 3 (or just PC3 for the DU), or PWM on PD4 and PD5. 14-pin EB's, in contrast,
 * On a 20-pin part upon which you must use a crystal for some godawful reason, thus taking up pin 0 and 1, and you want all 6 PWMs from TCA0, LUT0 and LUT1 can give output on PA6 and PC3 on their alternate and default pin respectively.
   * Since on these parts, you also can't use either of the TCBs to generate PWM (the timers having, respectively, zero and one pin present, and the one pin is PA3, used by another PWM channel). LUT2 can output on PD6 (and TCD0 outputting on PD4 and PD5) and LUT3 has to go to an event channel and come out on PA6.
   * Thus, with a HF crystal for the clock, you can still get PWM on PA2, PA3, PA4, PA5, PA6 (via LUT0), PA7 (via LUT3 and EVSYS), PC3 (via LUT1), PD4 (TCD), PD5 (TCD), PD6 (via LUT2) = 10 pins, leaving only 3 non-power, non-programming pins - PC1, PC2 (which you'll probably use as a UART) and PD7 (can do PD6 instead at the cost of an event channel).

@@ -2,17 +2,18 @@
 This section seeks to cover information about the clocking options on the tinyAVR parts at somewhat greater depth than a simple list of supported options.
 Be aware that this is very different from the equivalent document for the Dx and Ex-series. The oscillators are very different.
 
-**Crystal** is not supported as a clock source on the DA-series, or EB-series, but is on the DB, DD, and DU-series.
+## Overview
+The modern AVRs have been released with, effectively, three different systems for the clock generation.
 
-## Background - how the timers work
-see also [the timer reference](Ref_Timer.md)
+### On tinyAVR
+The OSCCFG fuse selects whether the speed is derived from a 20 MHz or 16 MHz oscillator. At power-on, these are always set to a prescaler of /6 hence 2.66 or 3.33 MHz. The core, prior to calling setup, will reconfigure the prescaler to match the requested speed. The OSCCFG fuse is always set when a sketch is uploaded via a UPDI programmer using megaTinyCore, however it cannot be set using the bootloader. These parts can't use an external HF crystal, only an external *clock*.
 
-### On tinyAVR and Ex-series
-The OSCCFG fuse selects whether the speed is derived from a 20 MHz or 16 MHz oscillator. At power-on, these are always set to a prescaler of /6 hence 2.66 or 3.33 MHz. The core, prior to calling setup, will reconfigure the prescaler to match the requested speed. The OSCCFG fuse is always set when a sketch is uploaded via a UPDI programmer.
-They additionally have the equivalent of the classic AVR's OSCCAL calibration register, and like those parts, the compliance is many times what the datasheet claims, and you can get a very wide range of speeds from them. 0/1-series has 64 settings for each nominal clock frequency, and 2-series parts have 128. Determining the value to set it to in order to obtain a desired clock speed is called "Tuning", even though you're not doing it for accuracy (it's generally already at the best setting from factory cal if you want the nominal clock speed.)
+They additionally have the equivalent of the classic AVR's OSCCAL calibration register, and like those parts, the compliance is many times what the datasheet claims, and you can get a very wide range of speeds from them. 0/1-series has 64 settings for each nominal clock frequency, and 2-series parts have 128. At a range of clock speeds (12-24 on the main clock on most parts), both oscillators could be tuned to output the desired clock.
+
+I suspect that the classic AVR oscillator withthe 8-bit OSCCAL register that was bifurcated in the middle is a very similar mechanism. Note that while the ranges overlap,
 
 ### On Dx-series
-Fuses only control whether it starts up at 4 MHz or 32 kHz (we don't support the latter). Code that runs very early in the sketch (before start() but after the dirty reset check and after the clears initializers) serves to initialize the peripherals, including clkctrl to their requested settings.
+Fuses only control whether it starts up at 4 MHz or 32 kHz (the latter is unsupported as a clock source . Code that runs very early in the sketch (before start() but after the dirty reset check and after the clears initializers) serves to initialize the peripherals, including clkctrl to their requested settings.
 
 The OSCCTRL.OSCHFCTRLA register's *middle* 4 bits control the frequency of the internal oscillator. This field divides neatly into two sections. 0x0, 0x1, 0x2 and 0x3 are 1, 2, 3, and 4 MHz. The next one is reserved (I'd wager it would give 4 MHz). That's followed by the next section, 8, and every subsequent multiple of 4 up to 24 are listed in the datasheet, and at least at room temperature, extending the pattern 2 more rungs is consistent, and leads to speeds of 28 and 32 MHz, generally work at room temperature. (beyond that, the last 4 are repeated).
 
@@ -40,7 +41,9 @@ Tuning to achieve non-standard speeds is not supported on the AVR Ex-series part
 ## Supported Clock Speeds
 Like classic AVRs, tinyAVRs have a "speed grades" depending on the voltage and operating conditions that they are rated for operation within. The spec is 5 MHz @ 1.8V , 10 MHz @ 2.7V (3.3V nominal) and 20 @ 4.5V (5.0V nominal) (2.7 or 4.5 for 8MHz and 16 MHz at >105C . See the Speed Grade reference for more information on this. Note that the speed grades are extremely conservative for room temperature operation, and unreal overclocking is easily achievable at room temperaturee, particularly with high temp. rated parts.
 
-The AVR Dx-series come in I (105C) and E (125C) spec parts. Since the DA-series was released, Microchip has STOPPED MARKING THE SPEED GRADE ON THE CHIPS. Be sure that if you have both speed grades, you mark the chips somehow (0 and 1-series parts do still have the temperature rating marked (N = 105, F = 125).
+The AVR Dx-series come in I and E  spec parts.
+
+Since the DA-series was released, Microchip has STOPPED MARKING THE SPEED GRADE ON THE CHIPS. Be sure that if you have both speed grades, you mark the chips somehow (0 and 1-series parts do still have the temperature rating marked (N = 105, F = 125).
 
 
 Some of the listed speeds, while supported by the hardware are not supported by the core - typically weird, slow clocks, particularly from a crystal
@@ -50,12 +53,12 @@ For unsupported speeds, the micros and delay-us columns indicate what internal p
 
 | Clock Speed | W/in Spec (tiny, Ex) | W/in Spec (Dx) | Internal (tiny) | Internal (Dx) |  Ext. Crystal |    Ext. Clock | micros | delay-us | Notes
 |-------------|----------------------|----------------|-----------------|---------------|---------------|--------|----------|-------------
-|       1 MHz |  (>1.8V) !       Yes |            Yes | Yes, 16/16=1  | Not by DxCore | Not by DxCore |    Yes |      Yes | 1
-| *     2 MHz |  (>1.8V) !       Yes |            Yes | Yes, 16/8 =2  | Not by DxCore | Not by DxCore |    Yes |      Yes | 2
-| *     3 MHz |  (>1.8V) !       Yes |            Yes | Tuned 12/4=3  | Not by DxCore | Not by DxCore |    Yes |       No | 2
-|       4 MHz |  (>1.8V) !       Yes |            Yes |           Yes | Not by DxCore | Not by DxCore |    Yes |      Yes | 3
-| *     5 MHz |  (>1.8V) !       Yes |            Yes | Yes, 20/ | Not by DxCore | Not by DxCore |    Yes |      Yes |
-| *     6 MHz |  (>2.7V)         Yes |            Yes | Not by DxCore | Not by DxCore | Not by DxCore |    Yes |       No | 2, 4
+|       1 MHz |  (>1.8V) !       Yes |            Yes | Yes, 16/16 = 1  | Not by DxCore | Not by DxCore |    Yes |      Yes | 1
+| *     2 MHz |  (>1.8V) !       Yes |            Yes | Yes, 16/8  = 2  | Not by DxCore | Not by DxCore |    Yes |      Yes | 2
+| *     3 MHz |  (>1.8V) !       Yes |            Yes | Tuned 12/4 = 3  | Not by DxCore | Not by DxCore |    Yes |       No | 2
+|       4 MHz |  (>1.8V) !       Yes |            Yes |             Yes | Yes           | Not by DxCore |    Yes |      Yes | 3
+| *     5 MHz |  (>1.8V) !       Yes |            Yes |   Yes, 20/4 = 5 | Not by DxCore | Not by DxCore |    Yes |      Yes |
+| *     6 MHz |  (>2.7V)         Yes |            Yes | Tuned 12/4 = 3  | Not by DxCore | Not by DxCore |    Yes |       No | 2, 4
 | *     7 MHz |  (>2.7V)         Yes |            Yes | Not by DxCore | Not by DxCore | Not by DxCore |    Yes |      Yes | 2, 4
 |       8 MHz |  (>2.7V)         Yes |            Yes |           Yes |           Yes |           Yes |    Yes |      Yes |
 |      10 MHz |  (>2.7V) !       Yes |            Yes |     Prescaled |           Yes |           Yes |    Yes |      Yes |

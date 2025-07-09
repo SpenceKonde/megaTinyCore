@@ -120,7 +120,7 @@ There is an erratum that cannot be papered over:
 
 **Intended Behavior:** When a LUT is enabled, and the CCL in general is enabled, the settings for that LUT cannot be changed and one of those must be disabled before it is reconfigured.
 
-In this case, no special developer action is needed. Init knows that it needs to turn the LUT off if it's enabled. You may use `logic::start()` a single time in setup() and never call `logic::stop()`, and reconfigure freely. Unfortunately, a great many parts are impacted by this bug (It happened at the same time the TCA restart erratum was added. That erratum has the distinction of explicitly being exactly what the datasheet states the behavior was. )
+In this case, no special developer action is needed. Init knows that it needs to turn the LUT off if it's enabled. You may use `logic::start()` a single time in setup() and never call `logic::stop()`, and reconfigure freely.
 
 **Errata-impacted Behavior:** When a LUT is enabled *OR* the CCL in general is enabled, the settings for that LUT cannot be  changed. Thus, to reconfigure, you set up all the new properties, then you must disable the whole CCL. Then you can call the then use the `LogicN.init()` to write the new configuration. Then you call `Logic::start()` to turn the CCL back on.
 
@@ -174,9 +174,14 @@ Properties setting input sources for the three inputs of this logic block.
 
 General notes:
 * Timer/Counter input sources are associated with a WO (Waveform Output) channel - they are logic 1 (true) when the PWM output on that channel is `HIGH` (See the datasheet I/O multiplexed signals chart to associate WO channels with pins). This is in contrast to the timer match *event* channels. Those are kind of lame, because they only give you a single clock cycle pulse instead (that is, EVSYS gives you pulse inputs, while CCL gives you level inputs)
-* The point of `in::pin` to enable you to use a pin which is configured as an **output** too - either as a way to manually switch behavior, or when a pin is being controlled by a peripheral that is not directly accessible as an input. There are only a few cases like this that apply to tinyAVR parts (USART XDIR, TCA WO3-5 in split mode) and anything TWI come to mind)
-* Logic blocks come in pairs. This matters greatly for the Feedback output, which takes the output of the even logic blocks in the pair. Hence, for each pair:
-  * The evenlogic block can use it's own output, or the output of the odd logic block as inputs without issue.
+* The point of `in::pin` to enable you to use a pin which is configured as an **output** too - either as a way to manually switch behavior, or when a pin is being controlled by a peripheral that is not directly accessible as an input. There are only a few cases like this that apply to tinyAVR parts (USART XDIR, TCA WO3-5 in split mode) and anything TWI come to mind, and the last one is a real stretch. )
+* Logic blocks come in pairs. This matters greatly for the Feedback output, which takes the output of the even logic blocks in the pair.
+
+             |  EVEN   |  ODD    |
+             |---------|---------|------------------
+in::link     | Out n+1 | Out n+1 | Out seq(n,n+1)
+in::feedback |
+  * The even logic block can use it's own output, or the output of the odd logic block as inputs without issue.
   * The odd logic block can use the output of the even logic block, or the output of the even logic block in the next pair.
   * The odd logic block must be set to use an event channel and the event channel pointed at it's own output in order to use it's output as an input.
   * If the sequencer is enabled, for the purposes of pin output, and the `logic::in::feedback` option and likely event generation, it replaces the output of the even logic block
@@ -186,42 +191,44 @@ General notes:
 #### Accepted values for tinyAVR 0/1-series parts
 
 ``` c++
-logic::in::masked;           // Pin not in use
+logic::in::masked;           // Input not in use (for TRUTH, input treated as always 0)
 logic::in::unused;           // Synonym for masked
 logic::in::disable;          // Synonym for masked
-logic::in::feedback;         // Connect output of even logic block in this pair or the sequencer if in use, to this input
-logic::in::link;             // Connect output of the next logic block to this input. Errata warning!
-logic::in::event_a;          // Connect input to event a (preferred)
-logic::in::event_0;          // Connect input to event a
-logic::in::event_b;          // Connect input to event b (preferred)
-logic::in::event_1;          // Connect input to event b
-logic::in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode (imagine using an OUTPUT to switch modes)
-logic::in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on
-logic::in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off
+logic::in::feedback;         // Receive input from output of EVEN logic block in this pair if sequencer not in use, or the sequencer if it is.
+logic::in::link;             // Connect output of the next logic block to this input. Errata warning: almost all tinyAVR 0/1 parts require pin output enabled for this to work.
+logic::in::event_a;          // Connect input to event a
+logic::in::event_0;          // Deprecated, syn. event a
+logic::in::event_b;          // Connect input to event b
+logic::in::event_1;          // Deprecated, syn. event b
+logic::in::pin;              // Receive input from CCL IN0, IN1, or IN2 - and do not change pinMode.
+logic::in::input_pullup;     // Receive input from CCL IN0, IN1, or IN2 - and set input, pullup on.
+logic::in::input_no_pullup;  // Receive input from CCL IN0, IN1, or IN2 - and set input, pullup off.
 logic::in::input;            // Synonym for input_no_pullup
-logic::in::ac;               // Synonym for ac0 - Compatibility warning.
-logic::in::ac0;              // Connect input to the output of analog comparator (AC0) - Compatibility warning
-logic::in::tcb0;             // Connect input to TCB0 - Compatibility Warning
+logic::in::ac;               // Synonym for ac0 - deprecated on 1-series tinyAVRs with more than one AC.
+logic::in::ac0;              // Receive input from AC0
+logic::in::tcb0;             // Receive input from TCB0 - Compatibility Warning
 logic::in::tcb;              // Synonym for tcb0 - Compatibility warning
-logic::in::tca0;             // Connect input to TCA0 WO0~2 for input 0~2
+logic::in::tca0;             // Receive input from TCA0 WO0~2 for input 0~2. WO3-5 are not available.
 logic::in::tca;              // Synonym for tca0 Not recommended for new code.
-logic::in::tcd0;             // Connect input to TCD0 WOA, WOB, WOA for input 0, 1, 2
+logic::in::tcd0;             // Receive input from TCD0 WOA, WOB, WOA for input 0, 1, 2 - 1-series only
 logic::in::tcd;              // Synonym for tcd0 Not recommended for new code.
-logic::in::usart;            // Connect input to USART0 XCK and TXD for input 0, 1 - Compatibility warning - feature removed!
-logic::in::spi;              // Connect input to SPI0 SCK, MOSI, MISO for input 0, 1, 2 - Compatibility warning - feature removed!
-logic::in::ac1;              // Connect input to AC1 OUT (input 0, 1 on parts with 3 ACs only - Compatibility warning
-logic::in::ac2;              // Connect input to AC2 OUT (input 0, 1 on parts with 3 ACs only) - Compatibility warning
-logic::in::tcb1;             // Connect input to TCB1 WO (input 0, 1 on parts with 2 TCBs only) - Compatibility warning
+logic::in::usart;            // Receive input from USART0 XCK = IN0, TX = IN1 - On all other parts, TX of USARTn is available on INn
+logic::in::spi;              // Receive input from SPI0 SCK, MOSI, MISO for input 0, 1, 2 respectively. This is very different from other parts.
+logic::in::ac1;              // Receive input from AC1 OUT. Parts with 3 AC's only. AC0, AC1, and AC2 are available on all inputs unlike later parts Compatibility warning!
+logic::in::ac2;              // Receive input from AC2 OUT. Parts with 3 AC's only. As above. Compatibility warning!
+logic::in::tcb1;             // Receive input from TCB1 WO. TCB0 and TCB1 are available on all inputs unlike later parts - Compatibility warning!
 ```
 
 Notes specific to ATtiny 0/1-series:
 * Not all inputs are available on all parts - only input sources corresponding to peripherals on that device are available. Not all options are available for input 2, as noted above.
-* The CCL on the 0/1-series is different from every other part with a CCL. Options which are different are marked with **WEIRD** - whenever these options are used, if code will be released publicly or you may some day want to port it to other parts, it is suggested to include comments describing exactly what it's doing. See the tinyAVR 2-series for the "normal" version of these input options.
-* If you need feedback input from an odd-numbered logic block, use the event system for that.
-* Not all pin inputs are available on all parts (see table above). The event system can be used to bring in input from other pins.
-* CCL0's IN0 pin is on PA0, which is nominally the UPDI pin. This may limit the usefulness of CCL0 on the ATtiny parts (though it may work as long as the input cannot be mistaken for a UPDI activation command); configuring UPDI as GPIO prevents further programming via UPDI except via HV programming. One can always use the event system to substitute another input for IN0; This is demonstrated in the three input example.
-* Among tinyAVR 1-series Only the ATtiny1614, 1616, 1617, 3216, and 3217 have TCB1, AC1, and AC2. All tiny 2-series have TCB1, but they never have more than one AC.
-* DA/DB have 3 AC's, EA 2, and the DD, DU and EB have one.
+* The CCL on the 0/1-series is different from every other part with a CCL. Options which are different are marked with a warning. Whenever these options are used in code that will be released publicly or that you may some day want to port it to other parts, it is suggested to include comments describing exactly what it's doing. See the tinyAVR 2-series for the "normal" version of these input options.
+* These parts have only two LUTs, thus:
+  * LUT0 can use LUT0/SEQ0 output or LUT output (via feedback and link)
+  * LUT1 will get LUT0/SEQ0 from both feedback and link
+  * Link will not work if output is not enabled due to an erratum that is only corrected on some ATtiny3216/7 parts as of mid 2025.
+* Not all pin inputs are available on all parts (see table above), however EVSYS can be used to bring in other pins if need be.
+  * CCL0's IN0 pin is on PA0, which is nominally the UPDI pin. This may limit the usefulness of CCL0 on the ATtiny parts, particularly here where there is only a single pair.
+* Among tinyAVR 1-series, only the ATtiny1614, 1616, 1617, 3216, and 3217 have TCB1, AC1, and AC2, all others have only AC0 and TCB0. All tiny 2-series have TCB1, and a single AC, AC0.
 The two final limits add further chaos to the distributions of numeric values for users and generators - the two seem to have had separate algorithms for determining when to leave holes for absent peripherals, and when to fill them in. They *really* seem to like filling in the holes in the generator lists, leaving me wondering what it is abouut the length of the list with such a high cost...
 
 #### Accepted values for tinyAVR 2-series
@@ -231,10 +238,10 @@ logic::in::unused;           // Pin not in use
 logic::in::disable;          // Pin not in use
 logic::in::feedback;         // Connect output of even logic block in this pair or the sequencer if in use, to this input
 logic::in::link;             // Connect output of logic block n+1 to this input, or block 0 for the last block.
-logic::in::event_a;          // Connect input to event a (preferred)
-logic::in::event_0;          // Connect input to event a
-logic::in::event_b;          // Connect input to event b (preferred)
-logic::in::event_1;          // Connect input to event b
+logic::in::event_a;          // Connect input to event a
+logic::in::event_0;          // Deprecated, syn. event a
+logic::in::event_b;          // Connect input to event 0
+logic::in::event_1;          // Deprecated, syn. event b
 logic::in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode
 logic::in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on
 logic::in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off
@@ -242,13 +249,12 @@ logic::in::input;            // Synonym for input_no_pullup
 logic::in::ac;               // Connect input to the output of the internal analog comparator AC0.
 logic::in::uart;             // Connect input to UART TX. Input 0 connects to UART0 TX, input 1 to UART1 TX. Not available on input 2. XCK is not available (though it can be accessed via the event system)
 logic::in::spi;              // Connect input to SPI. Input 0 and 1 connect to MOSI, and input 2 connects to SCK. MISO not available.
-logic::in::tca0;             // Connect input to TCA0. Input 0 connects to WO0, input 1 to WO1 and input2 to WO2
-logic::in::tca;              // Synonym for tca0
-logic::in::tcb;              // Connect to TCB output (this is HIGH when the output pin would be (though output need not be enabled) in single shot and PWM modes. TCB used has same number as input number (only TCB0-2 can be used).
+logic::in::tca0;             // Connect input to TCA0. Input 0 connects to WO0, input 1 to WO1 and input2 to WO2. WO3-5 are not available.
+logic::in::tca;              // (deprecated) Synonym for tca0; deprecated as parts with multiple TCA instances are available, and these all have their own input options.
+logic::in::tcb;              // Connect to TCB output (this is HIGH when the output pin would be (though output need not be enabled) in single shot and PWM modes). Input 0 is TCB0, Input 1 TCB1, Input 2 TCB2.
 ```
 
 Notes for tinyAVR 2-series:
-* SPI input is supported in master mode only.
 * If input on the highest-number Logic3 is set to link, it will use the output of Logic0
 * If you need to link input to logic block other than block N+1, or if you need feedback output from the an odd-numbered logic block, use the event system.
 * Not all pin inputs are available on all parts (see table above). The event system can be used to bring in input from other pins.
@@ -261,17 +267,16 @@ logic::in::unused;           // Synonym for masked
 logic::in::disable;          // Synonym for masked
 logic::in::feedback;         // Connect output of even logic block in this pair or the sequencer if in use, to this input
 logic::in::link;             // Connect output of next logic block to this input WARNING: There are errata involving this on 28 and 32 pin DA/DB parts.
-logic::in::event_a;          // Connect input to event a (preferred)
-logic::in::event_0;          // Connect input to event a
-logic::in::event_b;          // Connect input to event b (preferred)
-logic::in::event_1;          // Connect input to event b
+logic::in::event_a;          // Connect input to event a
+logic::in::event_0;          // Deprecated, syn. event a
+logic::in::event_b;          // Connect input to event b
+logic::in::event_1;          // Deprecated, syn. event b
 logic::in::pin;              // Connect input to CCL IN0, IN1, or IN2 - and do not change pinMode. For example, you might leave it output, and toggle the pin to switch modes of your CCL contraption.
 logic::in::input_pullup;     // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup on.
 logic::in::input_no_pullup;  // Connect input to CCL IN0, IN1, or IN2 - and set input, pullup off - set only when a push-pull output of something is connected.
 logic::in::input;            // Synonym for input_no_pullup
 logic::in::ac;               // Connect input to one of the analog comparators. See table below.
-logic::in::tcb;              // Connect to TCB0-2 output for input 0-2. See table.
-                             // There is no tcb0 or tcb1 option. The TCB instance used as so
+logic::in::tcb;              // Connect to TCB0-2 output for input 0-2.
 logic::in::tca0;             // Connect input to TCA0 WO0~2 for input 0~2
 logic::in::tca1;             // Connect input to TCA1 WO0~2 for input 0~2 - only available on parts with a second TCA: 48/64 pin DA/DB, and all EA-series parts.
 logic::in::tca;              // Synonym for tca0 (for compatibility with code written for tinyAVRs and megaAVR 0-series). Not recommended for new code.
