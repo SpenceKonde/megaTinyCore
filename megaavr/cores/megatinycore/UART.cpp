@@ -543,6 +543,7 @@
     void HardwareSerial::begin(unsigned long baud, uint16_t options) {
       // Make sure no transmissions are ongoing and USART is disabled in case begin() is called by accident
       // without first calling end()
+      _poll_tx_data_empty();
       if (_state & 1) {
         this->end();
       }
