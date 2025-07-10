@@ -732,9 +732,11 @@ twi_buf_index_t TwoWire::requestFrom(uint8_t  address,  twi_buf_index_t quantity
       badArg("requestFrom requests more bytes then there is Buffer space");
     }
   }
-  if (__builtin_constant_p(address) > 0x7F) {     // Compile-time check if address is actually 7 bit long
-    badArg("Supplied address seems to be 8 bit. Only 7-bit-addresses are supported");
-    return;
+  if (__builtin_constant_p(address)) {
+      if(address > 0x7F) {     // Compile-time check if address is actually 7 bit long
+      badArg("Supplied address seems to be 8 bit. Only 7-bit-addresses are supported");
+      return 0; /* This return 0 is never actually returned, but it still generates a warning, and sometimes fails!*/
+    }
   }
   if (quantity >= TWI_BUFFER_LENGTH) {
     quantity = TWI_BUFFER_LENGTH;
