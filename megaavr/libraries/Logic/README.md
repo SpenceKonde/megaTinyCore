@@ -177,15 +177,16 @@ General notes:
 * The point of `in::pin` to enable you to use a pin which is configured as an **output** too - either as a way to manually switch behavior, or when a pin is being controlled by a peripheral that is not directly accessible as an input. There are only a few cases like this that apply to tinyAVR parts (USART XDIR, TCA WO3-5 in split mode) and anything TWI come to mind, and the last one is a real stretch. )
 * Logic blocks come in pairs. This matters greatly for the Feedback output, which takes the output of the even logic blocks in the pair.
 
-             |  EVEN   |  ODD    |
-             |---------|---------|------------------
-in::link     | Out n+1 | Out n+1 | Out seq(n,n+1)
-in::feedback |
-  * The even logic block can use it's own output, or the output of the odd logic block as inputs without issue.
-  * The odd logic block can use the output of the even logic block, or the output of the even logic block in the next pair.
-  * The odd logic block must be set to use an event channel and the event channel pointed at it's own output in order to use it's output as an input.
-  * If the sequencer is enabled, for the purposes of pin output, and the `logic::in::feedback` option and likely event generation, it replaces the output of the even logic block
-  * If the sequencer for the pair consisting of logic block 2 and 3 is used, it is not clear whether the link input from logic block 1 will get the sequencce output or the logic block output before the sequencer.
+| Option      |  EVEN   |  ODD    | SEQ in use
+|-------------|---------|---------|------------------
+|in::link     | Out n+1 | Out n+1 | Out seq(n,n+1)
+|in::feedback | Out     | Out n-1 | Out seq(n-1,n)
+
+* The even logic block can use it's own output, or the output of the odd logic block as inputs without issue.
+* The odd logic block can use the output of the even logic block, or the output of the even logic block in the next pair.
+* The odd logic block must be set to use an event channel and the event channel pointed at it's own output in order to use it's output as an input.
+* If the sequencer is enabled, for the purposes of pin output, and the `logic::in::feedback` option and likely event generation, it replaces the output of the even logic block
+* If the sequencer for the pair consisting of logic block 2 and 3 is used, it is not clear whether the link input from logic block 1 will get the sequencce output or the logic block output before the sequencer.
 
 
 #### Accepted values for tinyAVR 0/1-series parts

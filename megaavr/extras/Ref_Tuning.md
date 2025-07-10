@@ -292,7 +292,3 @@ Okay! Class dismissed, let's hit the beaches, I heard the AVR-double-D's are the
 
 Right.....
 *Using a timebase to tune from is - of course - inconvenient.* (the class starts over to a chorus of groans throughout the room)
-
-
-
-
