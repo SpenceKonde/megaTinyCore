@@ -1,45 +1,43 @@
 # CCL Toolbox
 
-There are some simple patterns that you can use with the CCL/Logic library to generate very widly applicable effects:
-
-* [CCL Toolbox](Tips_and_Tricks.md#ccl-toolbox)
-  * [Reordering inputs](Tips_and_Tricks.md#reordering-inputs)
-  * [Examples](Tips_and_Tricks.md#examples)
-  * [Feedback](Tips_and_Tricks.md#feedback)
-    * [But I need feedback on an ODD LUT](Tips_and_Tricks.md#but-i-need-feedback-on-an-odd-lut)
-  * [Speaking of response time, how fast is it?](Tips_and_Tricks.md#speaking-of-response-time,-how-fast-is-it?)
-  * [A bit more on clocks and timing](Tips_and_Tricks.md#a-bit-more-on-clocks-and-timing)
-    * [Ugly graphic depicting above](Tips_and_Tricks.md#ugly-graphic-depicting-above)
-    * [The edge detector](Tips_and_Tricks.md#the-edge-detector)
-    * [The ~programmable delay~ synchronizer/filter](Tips_and_Tricks.md#the-~programmable-delay~-synchronizer/filter)
-    * [The sequencer](Tips_and_Tricks.md#the-sequencer)
-    * [The signal proceeds through a logic block's subcomponents in an order](Tips_and_Tricks.md#the-signal-proceeds-through-a-logic-block's-subcomponents-in-an-order)
-  * [PWM is magic](Tips_and_Tricks.md#pwm-is-magic)
-    * [Long-armed PWM](Tips_and_Tricks.md#long-armed-pwm)
-    * [Out-of-phase PWM](Tips_and_Tricks.md#out-of-phase-pwm)
-    * [Modulated PWM](Tips_and_Tricks.md#modulated-pwm)
-  * [Sequential logic with just one LUT](Tips_and_Tricks.md#sequential-logic-with-just-one-lut)
-
-    * [S-R latch](Tips_and_Tricks.md#s-r-latch)
-    * [D-Type latch](Tips_and_Tricks.md#d-type-latch)
-    * [Pulse-stretcher](Tips_and_Tricks.md#pulse-stretcher)
-      * [Even LUT](Tips_and_Tricks.md#even-lut)
-      * [Odd LUT](Tips_and_Tricks.md#odd-lut)
-    * [Pulse Stretcher 2](Tips_and_Tricks.md#pulse-stretcher-2)
-      * [Even LUT](Tips_and_Tricks.md#even-lut)
-      * [Odd LUT](Tips_and_Tricks.md#odd-lut)
-  * [More patterns](Tips_and_Tricks.md#more-patterns)
-    * [A/B select](Tips_and_Tricks.md#ab-select)
-    * [Gated Buffer](Tips_and_Tricks.md#gated-buffer)
-    * [Buffer (0 clock delay), 2 clock delay or 4 clock delay for level events](Tips_and_Tricks.md#buffer-0-clock-delay,-2-clock-delay-or-4-clock-delay-for-level-events)
-    * [2 LUT edge detector for RISING *or* FALLING](Tips_and_Tricks.md#2-lut-edge-detector-for-rising-or-falling)
-      * [LUTn+1: Configure for 2 or 4 clock delay as above](Tips_and_Tricks.md#lutn+1:-configure-for-2-or-4-clock-delay-as-above)
-      * [LUTn](Tips_and_Tricks.md#lutn)
-      * [Variant: Lightning fast pulses](Tips_and_Tricks.md#variant:-lightning-fast-pulses)
-      * [Review - what determines what](Tips_and_Tricks.md#review---what-determines-what)
-  * [Prescaling clocks with the CCL](Tips_and_Tricks.md#prescaling-clocks-with-the-ccl)
-    * [The general scheme](Tips_and_Tricks.md#the-general-scheme)
-    * [The giant table](Tips_and_Tricks.md#the-giant-table)
+There are some simple patterns that you can use with the CCL/Logic library to generate very widly applicable effects
+* [Reordering inputs](Tricks_and_Tips.md#Reordering_inputs)
+* [Examples](Tricks_and_Tips.md#Examples)
+* [Feedback](Tricks_and_Tips.md#Feedback)
+  * [But I need feedback on an ODD LUT](Tricks_and_Tips.md#But_I_need_feedback_on_an_ODD_LUT)
+* [Speaking of response time, how fast is it?](Tricks_and_Tips.md#speaking-of-response-time-how-fast-is-it)
+* [A bit more on clocks and timing](Tricks_and_Tips.md#A_bit_more_on_clocks_and_timing)
+  * [Ugly graphic depicting above](Tricks_and_Tips.md#Ugly_graphic_depicting_above)
+  * [The edge detector](Tricks_and_Tips.md#The_edge_detector)
+  * [The ~programmable delay~ synchronizer/filter](Tricks_and_Tips.md#The_~programmable_delay~_synchronizerfilter)
+  * [The sequencer](Tricks_and_Tips.md#The_sequencer)
+  * [The signal proceeds through a logic block's subcomponents in an order](Tricks_and_Tips.md#The_signal_proceeds_through_a_logic_block's_subcomponents_in_an_order)
+* [PWM is magic](Tricks_and_Tips.md#PWM_is_magic)
+  * [Long-armed PWM](Tricks_and_Tips.md#Long-armed_PWM)
+  * [Out-of-phase PWM](Tricks_and_Tips.md#Out-of-phase_PWM)
+  * [Modulated PWM](Tricks_and_Tips.md#Modulated_PWM)
+* [Sequential logic with just one LUT](Tricks_and_Tips.md#Sequential_logic_with_just_one_LUT)
+  * [S-R latch](Tricks_and_Tips.md#S-R_latch)
+  * [D-Type latch](Tricks_and_Tips.md#D-Type_latch)
+  * [Pulse-stretcher](Tricks_and_Tips.md#Pulse-stretcher)
+    * [Even LUT](Tricks_and_Tips.md#Even_LUT)
+    * [Odd LUT](Tricks_and_Tips.md#Odd_LUT)
+  * [Pulse Stretcher 2](Tricks_and_Tips.md#Pulse_Stretcher_2)
+    * [Even LUT](Tricks_and_Tips.md#Even_LUT)
+    * [Odd LUT](Tricks_and_Tips.md#Odd_LUT)
+* [More patterns](Tricks_and_Tips.md#More_patterns)
+  * [A/B select](Tricks_and_Tips.md#AB_select)
+  * [Gated Buffer](Tricks_and_Tips.md#Gated_Buffer)
+  * [Buffer (0 clock delay), 2 clock delay or 4 clock delay for level events](Tricks_and_Tips.md#Buffer_(0_clock_delay),_2_clock_delay_or_4_clock_delay_for_level_events)
+  * [2 LUT edge detector for RISING *or* FALLING](Tricks_and_Tips.md#2_LUT_edge_detector_for_RISING_or_FALLING)
+    * [LUTn+1: Configure for 2 or 4 clock delay as above](Tricks_and_Tips.md#LUTn1:_Configure_for_2_or_4_clock_delay_as_above)
+    * [LUTn](Tricks_and_Tips.md#LUTn)
+    * [Variant: Lightning fast pulses](Tricks_and_Tips.md#Variant:_Lightning_fast_pulses)
+    * [Review - what determines what](Tricks_and_Tips.md#Review_-_what_determines_what)
+* [Prescaling clocks with the CCL](Tricks_and_Tips.md#Prescaling_clocks_with_the_CCL)
+  * [The general scheme](Tricks_and_Tips.md#The_general_scheme)
+* [Appendix I: The giant table of clock division via CCL](Tricks_and_Tips.md#Appendix_I:_The_giant_table_of_clock_division_via_CCL)
+  * [An alternate approach to generating clock signals](Tricks_and_Tips.md#An_alternate_approach_to_generating_clock_signals)
 
 
 ## Reordering inputs
@@ -571,7 +569,7 @@ Generally, I would argue that if you're using more than 3 LUTs, you should consi
   h. The highest LUT, and any luts multiplying the previous one, should get a truth table of 0x01 (output a 1 when input is 0).
   i. Take the table with a spoonful of salt.  I found several errors in a short time looking at it.
 
-### The giant table
+## Appendix I: The giant table of clock division via CCL
 
 | Total | p0 | 0 | 1 | oppr 0    | oppr 1    | p2+3 | p2 | 2 | 3 | oppr 2    | oppr 3    | p3 | 4 | 5 | op4 | LUTS | Events | Warning |
 |-------|----|---|---|-----------|-----------|------|----|---|---|-----------|-----------|----|---|---|-----|------|--------|---------|
@@ -637,3 +635,11 @@ Generally, I would argue that if you're using more than 3 LUTs, you should consi
 |262144 | 64 | 8 | 8 |       MUL |       MUL | 4096 | 64 | 8 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      3 |         |
 
 `*` - This column is cannot express a value for the two combined pair of LUTs LUTs in the case where one of them is added to the lower LUTs, and the whole thing multiplied by the other.
+
+### An alternate approach to generating clock signals
+1. Sacrifice the XCK pin of an unneeded USART. You must set the pin output.
+2. Configure that USART for synchronous mode, at a baud rate equal to the desired frequency.
+3. Use the event system USART generator.
+4. You now have a programmable clock source. Remember to read the [Serial](../../extras/REF_Serial.md) documentation on async mode, as it is a niche feature, it was decided to avoid compromising performance parameters of the popular UART for the less common USRT mode.
+
+This exploits the fact that the XCK output is always active - though the fractional baud rate generation is not enabled, allowing speeds of `F_CPU/(2 * BAUD[15:6]) ` `BAUD[15:6]` refers to the 10 high bits of BAUD (the lower ones cannot be used and must be written zero in synchronous mode. )
