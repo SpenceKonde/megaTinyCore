@@ -26,6 +26,7 @@
              value the user overode them with, likely 0. Also high byte of UART address always 0x08, so replace
              2-clock ldd with 1 clock ldi. - Spence
  * 03/12/23: Correct bug in TxD1' and XCK1'
+ * 07/10/25: Correct bug causing strange compilation failures in ModBus and possibly other conditions.
 */
 
 #pragma once
@@ -420,7 +421,7 @@ class HardwareSerial : public Stream {
 
   private:
     void _poll_tx_data_empty(void);
-    static void        _set_pins(uint8_t port_num, uint8_t mux_setting, uint8_t enmask);
+    static void _set_pins(uint8_t port_num, uint8_t mux_setting, uint8_t enmask);
     static uint8_t _pins_to_swap(uint8_t port_num, uint8_t tx_pin, uint8_t rx_pin);
 
 
