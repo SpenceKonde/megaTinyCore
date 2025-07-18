@@ -277,7 +277,7 @@ Vin High (min) DA/DD |                 ~1.45V  `*`  | 1.26V | 1.75V | 2.31V | 3.
 
 `*` The DA and DD (but not the DB) datasheets imply that the minimum guaranteed high is 1.45V in SMbus mode if running at less than 2.5v.
 
-See also [the digital I/O reference](Ref_Digital.md#INLVL) for the analogous data for these pins when used in non-I2C mode, in normal mode, and wheresupported, TTL mode.
+See also [the digital I/O reference](../../extras/Ref_Digital.md#INLVL) for the analogous data for these pins when used in non-I2C mode, in normal mode, and wheresupported, TTL mode.
 
 
 

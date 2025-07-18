@@ -1,5 +1,5 @@
 # Some technical notes from Microchip
-Many of the technical briefs from Microchip are... maybe not the most helpful documents. Some of them aren't totally worthless however, and these are some that look like the might be more useful than average.  Obviously, the official titles of these documents are different from the titles of the links in almost every case. These are but a few of many. [Dont bother with the app note section, find the product page, and scroll down](https://www.microchip.com/)
+Many of the technical briefs from Microchip are... maybe not the most helpful documents. Some of them aren't totally worthless however, and these are some that look like the might be more useful than average.  Obviously, the official titles of these documents are different from the titles of the links in almost every case. These are but a few of many. [Dont bother with the app note section, find the product page, and scroll down](http://www.microchip.com/)
 
 ## CCL
 Microchip has in the past demonstrated a complete lack of creativity in the use of the CCL. Thankfully, they've been waking up to the power of the CCL - though sadly there's no indicaion that the functionality might be expanded any time soon. I've got over a dozen features on my wish-list for the CCL ranging from specific inputs (no way to get TCA WO3-5? No TCB 3 or 4?), to a shift register that doesn't involve taking over an SPI, to a one or more CCL++ blocks on a chip that have a 16-bit truth table and a fourth input (that's about the largest that the truth table doesn't become awkwardly large for. )
@@ -51,31 +51,37 @@ In fact, because of the great consistency between modern AVRs this has proven to
 If working with assembly you should make a rigorous study of the insruction set reference. One of the great strengths of AVR is the simplicity of the instruction set. You should know all the mneumonics, what arguments they take and what constraints apply - and this does not take a terribly great deal of effort, as there are not that many instructions. This is the Bible of the AVR architecture. Much like any other tome of the sort, it is packed with insight and wisdom from the creators, and describe in detail considerations you must observe, and some parts are not readily applicable to the present day`*`, and reading it is a long slog through obtuse verbiage and grammar. Unlike other more famous scriptures, you won't suffer eternal damnation for not reading this - but if you're writing assembly without it you may not be able to tell the difference. Even those who merely write C should try to make time for a cursory study of this, because this is what the compiler is turning your C into, and you can sometimes make choices that lead to the compiler being able to make better code.
 
 ### The datasheets giveth
-* [tinyAVR 2-series](https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny1624-26-27-DataSheet-DS40002234B.pdf). Written for the 16k parts but applies to 32k ones as well.
-* [tinyAVR 1+Series](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny1614-16-17-DataSheet-DS40002204A.pdf) Written for 16k parts, but the 32k parts are the same
 
-* [tinyAVR 1-Series](https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny417-817-DataSheet-DS40001901C.pdf) Written for 817/417, but applies equally to the smaller parts with fewer pins.
-
-* [tinyAVR 1-series with 2 or 4k of flash](https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny212-214-412-414-416-DataSheet-DS40002287A.pdf)
-* [tinyAVR 0-series](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/DataSheets/ATtiny804-06-07-1604-06-07-DataSheet-DS40002312A.pdf) written for 8/16k parts, should apply to all.
-* [tinyAVR402/202](http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny202-402-AVR-MCU-with-Core-Independent-Peripherals_and-picoPower-40001969A.pdf)
 
 ### And the errata taketh away
 Notice that while datasheet information can be generalized across the whole family of parts The datasheets typically differ only in the header and footer (excepting the 1-series, which is effectively two part families, the 16k+ and the 2-8k parts). But because they use different dies, and dies are designed at discrete points in time, flash sizes released later have fewer bugs, because they've been spending the intervening months stomping out errata. On the 0 and 1 series tinyAVRs, there is a mindboggling amount of errata and a terrible shortage of die revisions. The 2-series tinyAVR by contrast has very little and the DD even less, though the EA's new RWW flash system is pretty janky.
 
 See also [Errata.md](Errata.md).
-* Short and sweet for the 2-series.
-  * [tinyAVR 2-series 32k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny3224-3226-3227-SilConErrataClarif-DS40002342A.pdf)
-  * [tinyAVR 2-series 16k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny1624-26-27-SilConErrataClarif-DS80000902D.pdf)
-  * [tinyAVR 2-series 4/8k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny424-426-427-824-826-827-SilConErrataClarif-DS80000955B.pdf)
-* Lots more taketh away on the 1-series
-  * [tinyAVR 1+series 32k parts - does NOT apply to smaller parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny3216-17-SilConErrataClarif-DS80000887B.pdf)
-  * [tinyAVR 1+series 16k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny1614-16-17-SilConErrataClarif-DS80000886C.pdf) - yeah, the 32k ones are at Rev. C of the die, and had no Rev B, and most of the bugs are fixed, but down on 16k, we did get a Rev. B which fixed almost nothing.
-  * [tinyAVR 1-series 8k parts + 417](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny417-814-816-817-SilConErrataClarif-DS80000934A.pdf) - Based on the early revision of this document, I am skeptical of it's completeness
-  * [tinyAVR 1-series 2-4k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny212-214-412-414-416-SilConErrataClarif-DS80000933.pdf) (note: this is now the latest version)
-* Down a bit on the 0-series. This is unsurprising; based on device ID's, they look to have been registered in the database later (and things do get registered some time before release, because parts that were never released leave "holes" ))
-  * [tinyAVR 0-series 8-16k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny804-06-07-1604-06-07-SilConErrataClarif-DS80000951A.pdf) - Based on the early revision of this document, I am skeptical of it's completeness
-  * [tinyAVR 0-series 2-4k parts](https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/ATtiny202-204-402-404-406-SilConErrataClarif-DS80000956A.pdf)
+
+Previously, there were links to Microchip's website. But they constantly change the URLs so now I just link to the product pages.
+
+[ATtiny3227](https://www.microchip.com/en-us/product/ATTINY3227) | [ATtiny3226](https://www.microchip.com/en-us/product/ATTINY3226) | [ATtiny3224](https://www.microchip.com/en-us/product/ATTINY3224) |
+[ATtiny1627](https://www.microchip.com/en-us/product/ATTINY1627) | [ATtiny1626](https://www.microchip.com/en-us/product/ATTINY1626) | [ATtiny1624](https://www.microchip.com/en-us/product/ATTINY1624) |
+[ATtiny827](https://www.microchip.com/en-us/product/ATTINY827)   | [ATtiny826](https://www.microchip.com/en-us/product/ATTINY826)   | [ATtiny824](https://www.microchip.com/en-us/product/ATTINY824)   |
+[ATtiny427](https://www.microchip.com/en-us/product/ATTINY427)   | [ATtiny426](https://www.microchip.com/en-us/product/ATTINY426)   | [ATtiny424](https://www.microchip.com/en-us/product/ATTINY424)   |
+[ATtiny3217](https://www.microchip.com/en-us/product/ATTINY3217) | [ATtiny3216](https://www.microchip.com/en-us/product/ATTINY3216) | [ATtiny1617](https://www.microchip.com/en-us/product/ATTINY1617) |
+[ATtiny1616](https://www.microchip.com/en-us/product/ATTINY1616) | [ATtiny1614](https://www.microchip.com/en-us/product/ATTINY1614) | [ATtiny817](https://www.microchip.com/en-us/product/ATTINY817)   |
+[ATtiny816](https://www.microchip.com/en-us/product/ATTINY816)   | [ATtiny814](https://www.microchip.com/en-us/product/ATTINY814)   | [ATtiny417](https://www.microchip.com/en-us/product/ATTINY417)   |
+[ATtiny416](https://www.microchip.com/en-us/product/ATTINY416)   | [ATtiny414](https://www.microchip.com/en-us/product/ATTINY414)   | [ATtiny412](https://www.microchip.com/en-us/product/ATTINY412)   |
+[ATtiny214](https://www.microchip.com/en-us/product/ATTINY214)   | [ATtiny212](https://www.microchip.com/en-us/product/ATTINY212)   |  . |
+[ATtiny1607](https://www.microchip.com/en-us/product/ATTINY1607) | [ATtiny1606](https://www.microchip.com/en-us/product/ATTINY1606) | [ATtiny1604](https://www.microchip.com/en-us/product/ATTINY1604) |
+[ATtiny807](https://www.microchip.com/en-us/product/ATTINY807)   | [ATtiny806](https://www.microchip.com/en-us/product/ATTINY806)   | [ATtiny804](https://www.microchip.com/en-us/product/ATTINY804)   |
+[ATtiny407](https://www.microchip.com/en-us/product/ATTINY407)   | [ATtiny406](https://www.microchip.com/en-us/product/ATTINY406)   | [ATtiny404](https://www.microchip.com/en-us/product/ATTINY404)   |
+[ATtiny402](https://www.microchip.com/en-us/product/ATTINY402)   | [ATtiny204](https://www.microchip.com/en-us/product/ATTINY204)   | [ATtiny202](https://www.microchip.com/en-us/product/ATTINY202)   |
+
+**NOTE THAT THERE ARE FAR FEWER DATASHEETS THAN PARTS**
+
+For 2-series, there are three - 32k, 16k, and 4/8k. Errata and Datasheets are grouped by Microchip in a 1:1 linkage. This also, obviously, implies that all tiny-2's of a given size use the same die.
+
+For 1-series, 32k, 16k, 8k + the 417, and the 2-4k parts
+
+For 0-series, 16k, 8k, 2-4k
+
 
 #### What can be inferred from the groupings of errata?
 It is almost certain that Microchip is using the same die for several parts, and that different parts with the same flash size just have different numbers of pads connected, and have been told what they are during factory calibration.
