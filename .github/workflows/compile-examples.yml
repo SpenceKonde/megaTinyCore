@@ -30,6 +30,8 @@ jobs:
       platform-name: megaTinyCore:megaavr
       bootloader-optiboot-o-flash-7_5kB-plus-true-sketch-paths: |
         - megaavr/libraries/Optiboot_flasher/examples/Flash_put_get
+      available-flash-15_5kB-plus-true-sketch-paths: |
+        - megaavr/extras/CompileTestSketches/test_analog_read
       available-flash-7_5kB-plus-true-sketch-paths: |
         - megaavr/libraries/EEPROM/examples/eeprom_get
         - megaavr/libraries/USERSIG/examples/usersig_get
@@ -37,7 +39,6 @@ jobs:
         - megaavr/libraries/SoftwareSerial/examples/TwoPortReceive
         - megaavr/libraries/Wire/examples/SFRRanger_reader
         - megaavr/libraries/tinyNeoPixel/examples/RGBWstrandtest
-        - megaavr/extras/CompileTestSketches/test_analog_read
         - megaavr/libraries/Wire/examples/slave_address_mask
         - megaavr/libraries/Wire/examples/master_multi_address_write
       available-flash-7_5kB-plus-true-1620only-sketch-paths: |
@@ -219,6 +220,7 @@ jobs:
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
             ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
+            ${{ env[format('available-flash-15_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 15.5)] }}
             ${{ env[format('available-flash-7_5kB-plus-{0}-1620only-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
