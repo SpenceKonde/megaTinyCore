@@ -199,4 +199,4 @@ DD support has been added
 ## Future Devices
 * Optiboot_dx is expected to be the base for any future word-at-a-time NVMCTRL based AVR. This only such devices announced are the DA, DB, and DD and of course the long awaited DU - but nobody's going to care about it on the DU because we'll all be praying for a USB bootloader.
 * Optiboot_x (for megaTinyCore and MegaCoreX) is likely to be the basis of page-buffer-using NVMCTRL AVRs.
-* The EA-series is page-based (unfortunately) Not only that, but it's got poor flash endurance and you can't execute any instructions during the write half of a page erasewrite, so you are basically going to be doing tinyAVR algorithm plus added complications to account for this mess.
+* The EA-series is page-based (unfortunately)
