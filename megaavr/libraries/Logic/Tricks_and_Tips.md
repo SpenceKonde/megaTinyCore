@@ -638,6 +638,6 @@ Generally, I would argue that if you're using more than 3 LUTs, you should consi
 1. Sacrifice the XCK pin of an unneeded USART. You must set the pin output.
 2. Configure that USART for synchronous mode, at a baud rate equal to the desired frequency.
 3. Use the event system USART generator.
-4. You now have a programmable clock source. Remember to read the [Serial](../../extras/REF_Serial.md) documentation on async mode, as it is a niche feature, it was decided to avoid compromising performance parameters of the popular UART for the less common USRT mode.
+4. You now have a programmable clock source. Remember to read the [Serial](../../extras/Ref_Serial.md) documentation on async mode, as it is a niche feature, it was decided to avoid compromising performance parameters of the popular UART for the less common USRT mode.
 
 This exploits the fact that the XCK output is always active - though the fractional baud rate generation is not enabled, allowing speeds of `F_CPU/(2 * BAUD[15:6]) ` `BAUD[15:6]` refers to the 10 high bits of BAUD (the lower ones cannot be used and must be written zero in synchronous mode. )
