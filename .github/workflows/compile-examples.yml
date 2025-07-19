@@ -30,8 +30,6 @@ jobs:
       platform-name: megaTinyCore:megaavr
       bootloader-optiboot-o-flash-7_5kB-plus-true-sketch-paths: |
         - megaavr/libraries/Optiboot_flasher/examples/Flash_put_get
-      available-flash-15_5kB-plus-true-sketch-paths: |
-        - megaavr/extras/CompileTestSketches/test_analog_read
       available-flash-7_5kB-plus-true-sketch-paths: |
         - megaavr/libraries/EEPROM/examples/eeprom_get
         - megaavr/libraries/USERSIG/examples/usersig_get
@@ -107,6 +105,8 @@ jobs:
         - megaavr/libraries/megaTinyCore/examples/SelfTuning
       Series-2-available-flash-16kB-plus-true-1620only-sketch-paths: |
         - megaavr/libraries/megaTinyCore/examples/SelfTuning
+      available-flash-15_5kB-plus-true-sketch-paths: |
+        - megaavr/extras/CompileTestSketches/test_analog_read
 
     strategy:
       fail-fast: false
@@ -257,6 +257,7 @@ jobs:
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
             ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
+            ${{ env[format('available-flash-15_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 15.5)] }}
             ${{ env[format('available-flash-7_5kB-plus-{0}-1620only-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
@@ -291,6 +292,7 @@ jobs:
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
             ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
+            ${{ env[format('available-flash-15_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 15.5)] }}
             ${{ env[format('available-flash-7_5kB-plus-{0}-1620only-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
@@ -321,6 +323,7 @@ jobs:
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
             ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
+            ${{ env[format('available-flash-15_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 15.5)] }}
             ${{ env[format('available-flash-7_5kB-plus-{0}-1620only-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
             ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
@@ -355,6 +358,7 @@ jobs:
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
             ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
+            ${{ env[format('available-flash-15_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 15.5)] }}
             ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
@@ -386,6 +390,7 @@ jobs:
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
             ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
+            ${{ env[format('available-flash-15_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 15.5)] }}
             ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
@@ -417,6 +422,7 @@ jobs:
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
             ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
+            ${{ env[format('available-flash-15_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 15.5)] }}
             ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
@@ -449,6 +455,7 @@ jobs:
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
             ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
+            ${{ env[format('available-flash-15_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 15.5)] }}
             ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
@@ -481,6 +488,7 @@ jobs:
             # It's necessary to jump through some hoops to dynamically generate the env object keys to define the non-universal sketch paths
             # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#format
             ${{ env[format('available-flash-7_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 7.5)] }}
+            ${{ env[format('available-flash-15_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 15.5)] }}
             ${{ env[format('available-flash-4kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 4)] }}
             ${{ env[format('available-flash-3_5kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 3.5)] }}
             ${{ env[format('available-flash-2kB-plus-{0}-sketch-paths', matrix.available-flash-kB >= 2)] }}
