@@ -10,7 +10,7 @@ The OSCCFG fuse selects whether the speed is derived from a 20 MHz or 16 MHz osc
 
 They additionally have the equivalent of the classic AVR's OSCCAL calibration register, and like those parts, the compliance is many times what the datasheet claims, and you can get a very wide range of speeds from them. 0/1-series has 64 settings for each nominal clock frequency, and 2-series parts have 128. At a range of clock speeds (12-24 on the main clock on most parts), both oscillators could be tuned to output the desired clock.
 
-I suspect that the classic AVR oscillator withthe 8-bit OSCCAL register that was bifurcated in the middle is a very similar mechanism. Note that while the ranges overlap,
+I suspect that the classic AVR oscillator with the 8-bit OSCCAL register that was bifurcated in the middle is a very similar mechanism. Note that while the ranges overlap,
 
 ### On Dx-series
 Fuses only control whether it starts up at 4 MHz or 32 kHz (the latter is unsupported as a clock source . Code that runs very early in the sketch (before start() but after the dirty reset check and after the clears initializers) serves to initialize the peripherals, including clkctrl to their requested settings.

@@ -9,13 +9,13 @@ This is a work in progress, and is not exhaustive. It is however a starting poin
 These parts have multiple features for enhanced robustness. You should like, use themm..... (hardly anyone does)
 
 ### Use BOD if you can spare the power for sampled mode, at least while the chip is awake
-See the datasheet for your part to check the exact power consumption and compare to your power budget. If you can - use it! Without BOD, there is nothing to keep the chip from operating incorrectly in amost arbitrary manners, as the symptoms (above VPOR)of insufficient voltage for a given clock speed is that *instructions will get the wrong answers to basic math, often with 1 bits coming out as 0's.* This includes pointers, indirect jumps, probably function return addresses pushed onto the stack, in short, for predictable behvior in undervoltage, use the BOD, that's what it's there for.
+See the datasheet for your part to check the exact power consumption and compare to your power budget. If you can - use it! Without BOD, there is nothing to keep the chip from operating incorrectly in amost arbitrary manners, as the symptoms (above VPOR)of insufficient voltage for a given clock speed is that *instructions will get the wrong answers to basic math, often with 1 bits coming out as 0's.* This includes pointers, indirect jumps, probably function return addresses pushed onto the stack, in short, for predictable behavior in undervoltage, use the BOD, that's what it's there for.
 
 BOD will keep the chip in reset when you it knows the voltage is too low to keep the chip running.
 
 ### If you don't use BOD...
 You need to ask yourself a few hard questions:
-* ~if~ When the system is hung in production, how hard/embarassing will it be to have to run to reset them by hand?
+* ~if~ When the system is hung in production, how hard/embarrassing will it be to have to run to reset them by hand?
 * If it's hard to reset the device (mounted on a 20 meter pole, in the canopy of a tree, in a drainage ditch six feet up, or worst of all, mounted on a 20 meter pole attached to the canopy of a tree growing our of a drainage ditch located at a customer site.), use the watchdog timer!
 * Running a simple program at 20 MHz, lowering voltage until output ceases, and then restoring voltage does NOT reliably restore execution without BOD!
 

@@ -81,7 +81,7 @@ A significant number of options come in sets of three. These reflect cases where
 | 0x0E, 0x32, 0x54 |      3/6 | HIGH if specified input LOW.                                                                                  |        (!A)
 | 0x2A, 0x4C, 0x70 |      3/6 | HIGH if specified input HIGH.                                                                                 |         (A)
 | 0x1E, 0x36, 0x56 |      4/6 | HIGH IF either a specific input is HIGH and the others low, or either of the others are high.                 | (A and !(B  or C)) or (!A and (B  or C))
-| 0x6A, 0x6C, 0x78 |      4/6 | HIGH if speciefied input, or both other inputs HIGH.                                                          |  A  or  (B and C)
+| 0x6A, 0x6C, 0x78 |      4/6 | HIGH if specified input, or both other inputs HIGH.                                                          |  A  or  (B and C)
 | 0x6E, 0x7A, 0x7C |      5/6 | HIGH UNLESS one specified input HIGH and others LOW.                                                          | !A  or  (B  or C)
 | 0x3E, 0x5E, 0x76 |      5/6 | HIGH UNLESS one specified input LOW and others HIGH.                                                          |  A  or !(B and C)
 
@@ -94,7 +94,7 @@ A significant number of options come in sets of three. These reflect cases where
 | 0x2C, 0x38, 0x4A, 0x58, 0x62, 0x64 |      3/6 | Opposite of the second                                                                      | !(A xor  B)
 | 0x2E, 0x3A, 0x4E, 0x5C, 0x72, 0x74 |      4/6 | Opposite of first                                                                           | (!A  or  B)
 
-Each of the preceeding 64 "middles" corresponds to 4 different truth tables. So 3E, 5E and 76
+Each of the preceding 64 "middles" corresponds to 4 different truth tables. So 3E, 5E and 76
 
 
 ## Examples
@@ -125,7 +125,7 @@ Faster than a bat out of hell, as long as the whole path is async (otherwise, yo
   * When the synchronizer or filter is used, an extra 2-3 clocks are needed. 2 clocks is much more likely t
 * Voltage dependence? Yes, yes there is.
 
-Propagation time (Tp) is in ns, and has been rounded to quarter-nanoseconds to drive home the limited accuracy to which we can calculate it. The freerunning oscillator isnt and should be considered approximate, as the small sample size (n = 1) is clearly not sufficient to judge if these specs are even representative, much less could be specified in general to that level of precision. With the values these take, I maintain that this is an appropriate approach.
+Propagation time (Tp) is in ns, and has been rounded to quarter-nanoseconds to drive home the limited accuracy to which we can calculate it. The freerunning oscillator isn't and should be considered approximate, as the small sample size (n = 1) is clearly not sufficient to judge if these specs are even representative, much less could be specified in general to that level of precision. With the values these take, I maintain that this is an appropriate approach.
 
 Current was also measured using a bench power supply. As the power supply in quetion is known to be of low quality (typical low cost chinese import bench supply). It was deemed sufficiently accurate for this purpose, though its readings were sometimes not reproducible, leading to uncertainty about whether the discrepancy was within the microcontroller or elsewheremember, this is a sample size of 1 tested under conditions governed by expediency, not precision. I did, however, set the cpu speed to 1 MHz to reach lower voltages and to make the control numbers more useful
 
@@ -154,7 +154,7 @@ Conclusions:
 * Turning off all port input buffers had no effect on the CCL's performance. Negligible impact on current, but 1 mA is huge in powerdown.
 * Why was current under control conditions (identical except CCL configured to not oscillate) in all cases nil? Seems IDD @ 1 MHz active mode is < 1.0 mA?
   * At 1 MHz clock, when I had both functions activated at the same time (logic 0 and event 0 doing one output and logic 2 independently freerunning) at 5v Idd was 24 MHz, more than the sum of it's parts.
-  * No futher current measurements are to be made via this device, as I do not have sufficent confidence in the accuracy of the tool to draw conclusions. It may just suck at measuring current at the low end of it's range
+  * No further current measurements are to be made via this device, as I do not have sufficient confidence in the accuracy of the tool to draw conclusions. It may just suck at measuring current at the low end of it's range
   * That I also recorded 6 mA with no load connected at one point supports the theory that these current numbers are of dubious value.
   * Further evidence comes from the non-repeatable measurements of current at 5.0v during case 1, which was read as 12mA and 17 mA, both measurements could be repeated and got the same value. I cannot reconcile how, despite no firmware upload having occurred in the interim and conditions being unchanged,
 * Therefore, all current values reported above should be considered quantitatively meaningless, but the observed correlations are strong enough that we can still say some things about current.
@@ -162,11 +162,11 @@ Conclusions:
   * The CCL power consumption is insignificantwhen not transitioning.
   * Excess power consumption is mostly dependent on the frequency of pin transitions.
   * Excess power consumption was observed by misconfiguring a CCL in an arguably pathological way, typical applications of the CCL use very little power.
-* CCL propagation delay at 5V is arond 6.0 ns. EVSYS 4.25 ns.
+* CCL propagation delay at 5V is around 6.0 ns. EVSYS 4.25 ns.
   * Only about 50% higher at 3.3V
   * Between 3.0 and 1.9V, the propagation delay doubles.
 * Some general learnings about the parts:
-  * At room temperatiure, this 3224 specimen didn't quit working at 20 MHz (was repeated at 1 to get cleaner numbers to lower voltages) until vdd was below 2.5V, which is 0.2v below the stated minimum voltage for 10 MHz. Of course, all the CPU had to do was execute repeated rjmp .-2 instructions, but this once again prooves that these parts blow their specs out of the water at room temperatire
+  * At room temperatiure, this 3224 specimen didn't quit working at 20 MHz (was repeated at 1 to get cleaner numbers to lower voltages) until vdd was below 2.5V, which is 0.2v below the stated minimum voltage for 10 MHz. Of course, all the CPU had to do was execute repeated rjmp .-2 instructions, but this once again proves that these parts blow their specs out of the water at room temperatire
   * If voltage may droop and return without going to zero, USE BOD IF YOU WANT IT TO COME BACK CLEANLY FROM UNDERVOLTAGE EVENT!
 
 
@@ -186,7 +186,7 @@ The clocks have some counterintuitive behavior. First off, what do they and do t
 Sometimes you need a pulse when all you have is a level. This gets you there. The clock is involved because the resulting pulse is 1 CCL clock long (occasionally this is not long enough, since the CCL clock can be faster than the system clock, particularly on the EB, where you can clock the CCL from the PLL, or you may be using a very slow clock, and it could be troublesome how long it is.
 
 ### The ~programmable delay~ synchronizer/filter
-This is one of the really cool, repurposable features. The intended use is that you can use the synchronizer to take a 2 clock cycle delay to ensure clean transitions and prevent glitches, with the filter meant to provide a means of cleanly handling more substantial noise by requiring that the signal be unchanged for 4 CCL clocks before outputting it. One of these must be used forthe edge detector to work.
+This is one of the really cool, repurposable features. The intended use is that you can use the synchronizer to take a 2 clock cycle delay to ensure clean transitions and prevent glitches, with the filter meant to provide a means of cleanly handling more substantial noise by requiring that the signal be unchanged for 4 CCL clocks before outputting it. One of these must be used for the edge detector to work.
 
 I'd love to see longer delay option, (synchronize + delay with more stages and without filter I think would be the most fun...)
 
@@ -252,7 +252,7 @@ Of particular utility when:
   * Since on these parts, you also can't use either of the TCBs to generate PWM (the timers having, respectively, zero and one pin present, and the one pin is PA3, used by another PWM channel). LUT2 can output on PD6 (and TCD0 outputting on PD4 and PD5) and LUT3 has to go to an event channel and come out on PA6.
   * Thus, with a HF crystal for the clock, you can still get PWM on PA2, PA3, PA4, PA5, PA6 (via LUT0), PA7 (via LUT3 and EVSYS), PC3 (via LUT1), PD4 (TCD), PD5 (TCD), PD6 (via LUT2) = 10 pins, leaving only 3 non-power, non-programming pins - PC1, PC2 (which you'll probably use as a UART) and PD7 (can do PD6 instead at the cost of an event channel).
 * On a DA, or DB with the TCD PORTMUX erratum (most extant specimens), especially on low pincount parts where there's a lot of stuff with only it's default mux option.
-* When you attemt to find the pattern in the TCB and TCA1 PORTMUX options (there isn't one) and lose the ability to think rationally about pin assignment.
+* When you attempt to find the pattern in the TCB and TCA1 PORTMUX options (there isn't one) and lose the ability to think rationally about pin assignment.
   * Maybe it's contagious... look at the pinouts on classic AVRs.
 
 ### Out-of-phase PWM

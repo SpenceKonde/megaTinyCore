@@ -516,7 +516,7 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
 #define TIMERB7         (0x27) // TCB7
 #define TIMERD0         (0x40) // If any of these bits match it's potentially on TCD0
 #define DACOUT          (0x80) /// If the high bit is set, it;s either the DAC oone of the new timers.
-#define TIMERE0         (0x10) // I do not expect TCE and TCA to ever coexist on the same chip. TCE comes with WEX and the need for the PLL. Whould they put TCA's on a part that had the infrastructre for TCEs? Doubtful
+#define TIMERE0         (0x10) // I do not expect TCE and TCA to ever coexist on the same chip. TCE comes with WEX and the need for the PLL. Would they put TCA's on a part that had the infrastructre for TCEs? Doubtful
 #define TIMERE1         (0x08)
 #define TIMERF0         (0xA0)
 #define TIMERF1         (0xD0)
@@ -569,7 +569,7 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
 // 0b01MC 0mmm - the 3 lowest bits refer to the PORTMUX.
 //                            Remrmbr, this is the DX version of this
 //                            bit C specifies whether it's channel A (0) or B (1). If M is 1 it is WOC outputting chan A or WOB outputting D.
-//                            WOD outputting A or WOC outputting B is not supported by the core (though tyhe hardeware supports it, it imposes overhead on lots of people to benefit very very feww.
+//                            WOD outputting A or WOC outputting B is not supported by the core (though they hardeware supports it, it imposes overhead on lots of people to benefit very very feww.
 //                            WOB outputting A or WOA outputting B is not supported by the hardware.
 //
 //                            Hence, PORTMUX.TCDROUTEA == (timer table entry) & (0x07)

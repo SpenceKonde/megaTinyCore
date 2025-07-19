@@ -365,7 +365,7 @@ enterStandbySleep();  // enter standby sleep mode until the comparator interrupt
 * AC_PWR_DEFAULT   - No low power mode, no run in standby. 50ns response time. 0x00
 * AC_PWR_LP        - No run in standby, using low power mode. 150ns response time. Saves 47uA. 0x08
 * AC_PWR_RUNSTBY   - Run in standby, not using low power mode. 0x80.
-* AC_PWR_LPSTBY    - Low Power mode and Run Standy (likely the most useful option). 0x88
+* AC_PWR_LPSTBY    - Low Power mode and Run Standby (likely the most useful option). 0x88
 
 On tinyAVR, LP Mode also changes the hysteresis thresholds from 10/30/55 to 10/40/80mV. This is not the case on later parts
 
@@ -383,7 +383,7 @@ On tinyAVR, LP Mode also changes the hysteresis thresholds from 10/30/55 to 10/4
 * AC_PWR_RUNSTBY    - Run in standby, power mode 0. 0x80.
 * AC_PWR_PMODE1STBY - Run in standby, power mode 1 150ns response time. Saves 40uA. 0x88
 
-Uh, yeah, the analog comparators have response times ot 50-445 ns, and use between 12 and 150 uA.
+Uh, yeah, the analog comparators have response times to 50-445 ns, and use between 12 and 150 uA.
 
 ### Peripheral Power Consumption
 
