@@ -69,7 +69,12 @@ These are cases that treat all inputs equally (the logic formulas are hideous or
 | 0x7E         |      6/6 | HIGH in all cases except (potentially) when all three inputs are HIGH or all three inputs are LOW.
 
 A significant number of options come in sets of threes; these indicate:
-1. All of these have a logical formula of (α [and|or] ())
+1. All of these have a logical formula of `( α [and|or] (β [opp] γ))`
+  * `[opp]` is any binary logical operator where the order of the arguments doesn't matter; essentially all of them
+    * "Don't care" is an option, too.
+    * So the two 3/6 bit-set sets (A, and !A) fit the above 1 same 2 different pattern: 1 significant input, and two that are treated the same: they're disregarded.
+  * It's worth noting that even whacky behavior - eg `A and !(B or C) or (!A and (B or C))` does conform to this.
+
 
 | TRUTH & 0x7E     | Bits set | Rationalization                                                                                               | Logic
 |------------------|----------|---------------------------------------------------------------------------------------------------------------|---------------
@@ -78,8 +83,8 @@ A significant number of options come in sets of threes; these indicate:
 | 0x06, 0x12, 0x14 |      2/6 | HIGH IF one (not both) of two specified inputs is high, and the third is low.                                 | !A and  (B xor C)
 | 0x28, 0x48, 0x60 |      2/6 | HIGH IF specified input HIGH and one of the others HIGH A and                                                 |         (B  or C)
 | 0x18, 0x24, 0x42 |      2/6 | HIGH IF specified input HIGH and both others LOW, or specified input LOW and both others HIGH.                | (A and !(B  or C)) or (!A and  B and C)
-| 0x0E, 0x32, 0x54 |      3/6 | HIGH if specified input LOW.                                                                                  |        (!A)
-| 0x2A, 0x4C, 0x70 |      3/6 | HIGH if specified input HIGH.                                                                                 |         (A)
+| 0x0E, 0x32, 0x54 |      3/6 | HIGH if specified input LOW.                                                                                  |        (!A), DNC B/C
+| 0x2A, 0x4C, 0x70 |      3/6 | HIGH if specified input HIGH.                                                                                 |         (A), DNC B/C
 | 0x1E, 0x36, 0x56 |      4/6 | HIGH IF either a specific input is HIGH and the others low, or either of the others are high.                 | (A and !(B  or C)) or (!A and (B  or C))
 | 0x6A, 0x6C, 0x78 |      4/6 | HIGH if specified input, or both other inputs HIGH.                                                          |  A  or  (B and C)
 | 0x6E, 0x7A, 0x7C |      5/6 | HIGH UNLESS one specified input HIGH and others LOW.                                                          | !A  or  (B  or C)
@@ -89,12 +94,13 @@ A significant number of options come in sets of threes; these indicate:
 
 |                   TRUTH & 0x7E     | Bits set | Rationalization
 |------------------------------------|----------|--------------------------
-| 0x0A, 0x0C, 0x22, 0x30, 0x44, 0x50 |      2/6 | If one specified input HIGH and other specified input LOW, without specifying the last one. | (A  and !B)
-| 0x1A, 0x1C, 0x26, 0x34, 0x46, 0x52 |      3/6 | If specified input HIGH and other specified input LOW, or first input LOW and second HIGH   | (A  xor  B)
-| 0x2C, 0x38, 0x4A, 0x58, 0x62, 0x64 |      3/6 | Opposite of the second                                                                      | !(A xor  B)
-| 0x2E, 0x3A, 0x4E, 0x5C, 0x72, 0x74 |      4/6 | Opposite of first                                                                           | (!A  or  B)
+| 0x0A, 0x0C, 0x22, 0x30, 0x44, 0x50 |      2/6 | If one specified input HIGH and other specified input LOW, without specifying the last one. | (A  and !B) DNC C
+| 0x1A, 0x1C, 0x26, 0x34, 0x46, 0x52 |      3/6 | If specified input HIGH and other specified input LOW, or first input LOW and second HIGH   | (A  and B) or (B xor C)
+| 0x2C, 0x38, 0x4A, 0x58, 0x62, 0x64 |      3/6 | Opposite of the second                                                                      | (A and (B or C)) or (B and !C)
+| 0x2E, 0x3A, 0x4E, 0x5C, 0x72, 0x74 |      4/6 | Opposite of first                                                                           | A or (B and !C)
 
-I am unsure as the hoe
+In these cases, we have three distinct types of pins
+
 
 Each of the preceding 64 "middles" corresponds to 4 different truth tables. So 3E, 5E and 76
 
@@ -124,6 +130,10 @@ _swap(nettruth);
 
 ```
 
+### Brief comments on the high and low bit
+I will mention that it is *markedly harder than makes sense* to find patterns in these. 256 is enough that the quantity is too much to keep straight without structure, and doing it while not looking at the two most "relevant" bits of a typical truth table doesn't make it as much easier as I'd hoped. It's a lot harder to see the structure without the low and high bits (though that also drives home how important those bits are when you try to rationalize a given truth table, and convert it into a flow-chart or logic diagram or verbal description.)
+
+One interesting thing is that
 
 
 ## Examples
@@ -211,6 +221,9 @@ The clocks have some counterintuitive behavior. First off, what do they and do t
 ### Ugly graphic depicting above
 [Clock Domain Illustration][ClockDomains.png]
 
+### Annotated graphic from the datasheet re: feedback paths
+Highlighted in color below. No part announced, much less shipped, has had an odd number of LUTs. They're unlikely to start now.
+[Annotated block diagram][LUTFeedback.png]
 ### The edge detector
 Sometimes you need a pulse when all you have is a level. This gets you there. The clock is involved because the resulting pulse is 1 CCL clock long (occasionally this is not long enough, since the CCL clock can be faster than the system clock, particularly on the EB, where you can clock the CCL from the PLL, or you may be using a very slow clock, and it could be troublesome how long it is.
 
@@ -675,4 +688,4 @@ Generally, I would argue that if you're using more than 3 LUTs, you should consi
 3. Use the event system USART generator.
 4. You now have a programmable clock source. Remember to read the [Serial](../../extras/Ref_Serial.md) documentation on async mode, as it is a niche feature, it was decided to avoid compromising performance parameters of the popular UART for the less common USRT mode.
 
-This exploits the fact that the XCK output is always active - though the fractional baud rate generation is not enabled, allowing speeds of `F_CPU/(2 * BAUD[15:6]) ` `BAUD[15:6]` refers to the 10 high bits of BAUD (the lower ones cannot be used and must be written zero in synchronous mode. )
+This exploits the fact that the XCK output is always active - though the fractional baud rate generation is not enabled, allowing speeds of `F_CPU/(2 * BAUD[15:6])` `BAUD[15:6]` refers to the 10 high bits of BAUD (the lower ones cannot be used and must be written zero in synchronous mode. )
