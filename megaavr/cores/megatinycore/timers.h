@@ -14,6 +14,7 @@
   #define DISABLE_MILLIS
 #endif
 #if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_XOSC))
+  #error Ping
   #define MILLIS_USE_TIMERRTC
 #endif
 #if !defined(TCA_PORTMUX)

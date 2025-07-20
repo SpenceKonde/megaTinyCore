@@ -36,7 +36,7 @@ The differential ADC on the Dx-series is disappointing.
 
 
 ## Reference Voltages
-Analog reference voltage can be selected as usual using analogReference(). Supported reference voltages are listed below:
+Analog reference voltage can be selected as usual using analogReference(). Supported reference voltages are listed below. The references available on the Dx and Ex parts are chosen from the same list as the tiny2's got to pick from, but somehow they wound up in a different order on these parts. You should never have to use the numbers (though that's all those constants are), unless your code loses track of what reference it has selected
 In some cases the voltage determines the maximum ADC clock speed. Call analogReference() before analogClockSpeed() to ensure that the analog clock speed is appropriate when any of these apply:
 * You are switching between internal and external/VDD reference on an Ex/2-series
 * You are using the half volt reference on the 0/1-series, or switching from that to another reference
@@ -51,28 +51,20 @@ In some cases the voltage determines the maximum ADC clock speed. Call analogRef
  | `INTERNAL2V5`                           |  2.50 V |           - |      2 |
  | `INTERNAL4V3`                           |  4.30 V |           - |      3 |
  | `INTERNAL1V5`                           |  1.50 V |           - |      4 |
- | `EXTERNAL`                              |       - |           - |     32 | 1+series only
+ | `EXTERNAL`                              |   < VDD |           - |     32 | 1+series only
 
- | tinyAVR (2-series)  or Ex-series        | Voltage | Minimum Vdd | Number | Notes
- |-----------------------------------------|---------|-------------|--------|-------
- | `VDD` (default)                         | Vcc/Vdd |             |      0 | VDD Ref works at 6 MHz CLK ADC!
- | `INTERNAL1V024`                         | 1.024 V |      2.5* V |      4 | 10-bit reading with 1.025 ref gives apx.   1 mv/ADC count
- | `INTERNAL2V048`                         | 2.048 V |      2.5  V |      5 | 12-bit reading with 2.048 ref gives apx. 0.5 mv/ADC count
- | `INTERNAL4V096`                         | 4.096 V |      4.55 V |      7 | 12-bit reading with 4.096 ref gives apx.   1 mv/ADC count
- | `INTERNAL2V500`                         | 2.500 V |      2.7  V |      6 |
- | `INTERNAL4V1` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      7 |
- | `EXTERNAL`                              |       - |         Vdd |      2 | External ref works at 6 MHz CLK ADC!
+ | tinyAVR (2-series)  or anything else    | Voltage | Minimum Vdd | # tiny2| # Dx    | Notes
+ |-----------------------------------------|---------|-------------|--------|---------|-------
+ | `VDD` (default)                         | Vcc/Vdd |             |      0 |       5 | Good to 6 MHz ADC clock on 2-series and Ex
+ | `INTERNAL1V024`                         | 1.024 V |      2.5* V |      4 |       0 | 10-bit reading with 1.025 ref gives apx.   1 mv/ADC count
+ | `INTERNAL2V048`                         | 2.048 V |      2.5  V |      5 |       1 | 12-bit reading with 2.048 ref gives apx. 0.5 mv/ADC count
+ | `INTERNAL4V096`                         | 4.096 V |      4.55 V |      7 |       2 | 12-bit reading with 4.096 ref gives apx.   1 mv/ADC count
+ | `INTERNAL2V500`                         | 2.500 V |      2.7  V |      6 |       3 |
+ | `INTERNAL4V1` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      7 |       2 |
+ | `EXTERNAL`  (tiny2/Ex version)          |   < VDD |  VREF +0.5V |      2 |       - | External ref good to 6 MHz ADC clock on 2-series and Ex
+ | `EXTERNAL`  (Dx-series)                 | 1.0-1.8 |  VREF +0.5V |      - |       6 | Dx: CLK_ADC =< 500 kHz
+ | `EXTERNAL`  (Dx-series)                 | 1.8-VDD |  VREF +0.5V |      - |       6 | Dx: Normal limits apply (see this document for DxCore for details)
 
- | AVR Dx/Ex-series                        | Voltage | Minimum Vdd | Number | Notes
- |-----------------------------------------|---------|-------------|--------|---------
- | `VDD` (default)                         | Vcc/Vdd |             |      5 |
- | `INTERNAL1V024`                         | 1.024 V |      2.5* V |      0 | 10-bit reading with 1.025 ref gives apx.   1 mv/ADC count
- | `INTERNAL2V048`                         | 2.048 V |      2.5  V |      1 | 12-bit reading with 2.048 ref gives apx. 0.5 mv/ADC count
- | `INTERNAL4V096`                         | 4.096 V |      4.55 V |      2 | 12-bit reading with 4.096 ref gives apx.   1 mv/ADC count
- | `INTERNAL2V500`                         | 2.500 V |      2.7  V |      3 |
- | `INTERNAL4V1` (alias of INTERNAL4V096)  | 4.096 V |      4.55 V |      2 |
- | `EXTERNAL`                              | >=1.0 V |         Vdd |      6 | Dx: CLK_ADC =< 500 kHz
- | `EXTERNAL`                              | >=1.8 V |         Vdd |      6 | Dx: No CLK_ADC restriction
 
  You can test like `if(getAnalogReference()==INTERNAL2V500)`, but if you try to say, print them, you just get a number. That's what is shown in the last column: contains the numerical value of the constants representing these references. Don't use those, then nobody will understand your code - including yourself in two weeks. However, if you are printing the results of `getAnalogReference()` or `getDACReference()`, these are the numbers you will see.
 

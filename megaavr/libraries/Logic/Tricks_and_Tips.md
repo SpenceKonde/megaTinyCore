@@ -39,20 +39,19 @@ There are some simple patterns that you can use with the CCL/Logic library to ge
 * [Appendix I: The giant table of clock division via CCL](Tricks_and_Tips.md#appendix-I-the-giant-table-of-clock-division-via-ccl)
   * [An alternate approach to generating clock signals](Tricks_and_Tips.md#an-alternate-approach-to-generating-clock-signals)
 ## Reordering inputs
-**THIS SECTION IGNORES THE MSB AND LSB OF THE TRUTH TABLE**
-There are four trivial variations on each of these with different behavior when all inputs are the same.
+**MOST OF THIS DISCUSSION (reordering) NEGLECTS THE MSB AND LSB, as the reordering behavior only effects the non-extremal values.**
 
+There are four variations on each of these with different behavior when all inputs are the same, as the behavior with all 1's or all 0's is independent of what order they are in.
 These are not relevant to reordering. Reordering is confusing enough as is (and it really shouldn't be, but our brains aren't wired well for this I don't think)
-
-TRUTH = 0bHGFEDCBA when IN0 is α, IN1 is β and IN2 is γ
 
 To get identical behavior:
 
+TRUTH = 0bHGFEDCBA when IN0 is α, IN1 is β and IN2 is γ
 TRUTH = 0bHDFBGCEA when IN0 is γ, IN1 is β and IN2 is α - D and G, B and E swap
 TRUTH = 0bHFGEDBCA when IN0 is α, IN1 is γ and IN2 is β - G and F, B and C swap
 TRUTH = 0bHGDCFEBA when IN0 is γ, IN1 is α and IN2 is β - F and D, E and C swap
-TRUTH = 0bHFDBGECA when IN0 is β, IN1 is γ and IN2 is α - F->G->D->F rotate, and B->E->C->B rotate.
 TRUTH = 0bHDGCFBEA when IN0 is β, IN1 is α and IN2 is γ - F->D->G->F rotate, and B->C->E->B rotate.
+TRUTH = 0bHFDBGECA when IN0 is β, IN1 is γ and IN2 is α - F->G->D->F rotate, and B->E->C->B rotate.
 
 the highest and lowest bits do not change when reordering the inputs.
 
@@ -69,7 +68,8 @@ These are cases that treat all inputs equally (the logic formulas are hideous or
 | 0x68         |      3/6 | HIGH if exactly two inputs are HIGH
 | 0x7E         |      6/6 | HIGH in all cases except (potentially) when all three inputs are HIGH or all three inputs are LOW.
 
-A significant number of options come in sets of three. These reflect cases where two inputs are treated the same, while a third is treated differently
+A significant number of options come in sets of threes; these indicate:
+1. All of these have a logical formula of (α [and|or] ())
 
 | TRUTH & 0x7E     | Bits set | Rationalization                                                                                               | Logic
 |------------------|----------|---------------------------------------------------------------------------------------------------------------|---------------
@@ -94,7 +94,36 @@ A significant number of options come in sets of three. These reflect cases where
 | 0x2C, 0x38, 0x4A, 0x58, 0x62, 0x64 |      3/6 | Opposite of the second                                                                      | !(A xor  B)
 | 0x2E, 0x3A, 0x4E, 0x5C, 0x72, 0x74 |      4/6 | Opposite of first                                                                           | (!A  or  B)
 
+I am unsure as the hoe
+
 Each of the preceding 64 "middles" corresponds to 4 different truth tables. So 3E, 5E and 76
+
+### Other simple transforms
+(Convention of A being in 0, C being in 2)
+TRUTH = 0bJKLMNOPQ
+Change  | Truth change |
+--------|--------------|
+A -> !A | 0bKJMLONQP   |
+B -> !B | 0bLMJKPQNO   |
+C -> !C | 0bNOPQJKLM   |
+
+```c++
+
+//A -> !A
+uint8_t newtruth = ((oldtruth & 0x55) << 1) | ((oldtruth & 0xAA) >> 1);
+
+//B -> !B
+uint8_t newtruth = ((oldtruth & 0x33) << 2) | ((oldtruth & 0xCC) >> 2);
+
+//C -> !C
+uint8_t newtruth = ((oldtruth & 0x0F) << 4) | ((oldtruth & 0xF0) >> 4);
+// Now this, if the compiler implements it, could end up looking hideous. There's actually a single instruction swap-nybble instruction, which is exposed by _swap()
+uint8_t newtruth = oldtruth;
+_swap(nettruth);
+//(this will not work correctly on 16-byte or 32-byte values; but arguably "swap the two nybbles" of a datatype with 4 or more of them is a malformed statement of intent)
+
+```
+
 
 
 ## Examples
@@ -310,20 +339,24 @@ Enable the synchronizer to get the analogous flip-flop.
 ### S-R latch
 
 INSEL:
-* X: Feedback
+* X: Clear (any input source)
 * Y: Set (any input source)
-* Z: Clear (any input source)
+* Z: Feedback
 
 LUT:
-* 000: 0
-* 001: 1
-* 010: 1
-* 011: 1
-* 100: 0
-* 101: 0
-* 110: Per application requirements - logic block is getting contradictroy signals
-* 111: Per application requirements - logic block is getting contradictroy signals
-Ergo: TRUTH = 0x0b??001110 = 0x07 (go low when told to go both directions), 0xC7 (go high when...) or 0x47 (don't change when...). Avoid 0x87 (Oscillate rapidly at an unpredictable speed when...)
+* 000: 0   - feedback is 0 and neither control asserted -> does nothing
+* 001: 0   - feedback is 0 and clear asserted -> does nothing
+* 010: 1   - feedback is 0 and set asserted. -> 1
+* 011: -   - Per app requirements. Currently a 0, forbidden state with both lines asserted.
+* 100: 1   - feedback is 1 and neither control asserted -> does nothing
+* 101: 0   - feedback is 1 but clear asserted -> 0
+* 110: 1   - feedback is 1. set asserted, does nothing. -> does nothing
+* 111: -   - Per app requirements. Currently a 1, forbidden state with both lines asserted.
+Ergo: TRUTH = 0x0b?101?100 = 0x54, 0x5C, 0xD4 or 0xDC
+
+It's clear that 0x5C is no good, unless you want it to oscillate at a very high rate when both control signals are high; you probably don't want that. The remaining ones have a simple relationship to eachother
+
+0x54 will always go low in event of both controls being high, 0xDC will always go high, and 0xD4 will not change the output until one of the input signals is removed. Which one makes sense depends on your application and the kind of signals you can get access to easily.
 
 Clock: N/A for latch, anything except IN2 as clock as demanded by application for flipflop.
 
@@ -345,7 +378,9 @@ LUT:
 * 101: 0
 * 110: 1
 * 111: 1
-Ergo: TRUTH = 0xCB
+Ergo: TRUTH = 0xCB (corresponding to the 1...1 subtype of 0x4A above)
+
+Unlike the RS case, there is only one coherent
 
 Clock: N/A for latch, anything except IN2 as clock as demanded by application for flipflop.
 
