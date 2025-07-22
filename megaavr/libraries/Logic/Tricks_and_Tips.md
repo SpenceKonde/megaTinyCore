@@ -367,7 +367,7 @@ LUT:
 * 111: -   - Per app requirements. Currently a 1, forbidden state with both lines asserted.
 Ergo: TRUTH = 0x0b?101?100 = 0x54, 0x5C, 0xD4 or 0xDC
 
-It's clear that 0x5C is no good, unless you want it to oscillate at a very high rate when both control signals are high; you probably don't want that. The remaining ones have a simple relationship to eachother
+It's clear that 0x5C is no good, unless you want it to oscillate at a very high rate when both control signals are high; you probably don't want that. The remaining ones have a simple relationship to each other
 
 0x54 will always go low in event of both controls being high, 0xDC will always go high, and 0xD4 will not change the output until one of the input signals is removed. Which one makes sense depends on your application and the kind of signals you can get access to easily.
 

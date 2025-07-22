@@ -15,7 +15,8 @@ In addition to the synchronization, some of the intentional features make it cha
 You can do the following things and continue using `analogWrite()` and expect it to keep behaving normally. Do not expect anything else to work - if you need to do more, you need to take it over entirely.
 
 ### ~You can change frequency by multiplying the period by up to a 2, 4, 8, or 16~
-If this were DxCore, where much higher frequencies can realistically end up on the TCD, where the chip can run faster and where the flash bottoms out at 16k instead of 2k, this would be a section talking about how to modify the period of the TCD to slow it down; DxC will automatically notice you've done this and leftshift arguments to `analogWrite()` appropriately. But we've got parts with type D timers and 2k of flash, so that's not happening here.
+If this were DxCore, where much higher frequencies can realistically end up on the TCD, where the chip can run faster and where the flash bottoms out at 16k instead of 2k, this would be a section talking about how to modify the period of the TCD to slow it down or speed it up - setting it to certain magic values will be noticed by DxCore in analogWrite, and automatically leftshift `analogWrite()` values to appropriately. megaTinyCore does not support this.
+
 
 ### You can change frequency, clock source, prescaler
 As a general rule, given two options for how to achieve a given frequency (by combination of syncronizer and count prescalers and clock source selection), preference should be given as:
@@ -55,24 +56,43 @@ For example, to make a third passable PWM pin by using the event system and a CC
 This requires that CNTPRES = DLYPRES.
 
 This limits you to count prescaler of 4 or 1, because those are the only matching options for the delay prescaler:
-```
+```text
 TCD_DLYPRES_DIV1_gc <--- viable
 TCD_DLYPRES_DIV2_gc
 TCD_DLYPRES_DIV4_gc <--- viable
 TCD_DLYPRES_DIV8_gc
 ```
+An EVEN NUMBERED LUT (LUT 0 on tiny 1-series) is used, set up as non-sequencer-using R/S latch, using the CMPBCLR and PROGEV event channels.
+```
 
+DLYCTRL = 0x0E; // /1 prescale
+DLYCTRL = 0x2E; // /4 prescale
 
+Write values to DLYVAL (this can be written without stopping the timer - as can DLYCTRL!) that are your desired duty cycle for the third PWM
 
-The idea is, you take a CCL and 2 event channels
+The Logic library provides a wrapper around the CCL; the Event library provides a wrapper around the event system.
+
+Connect TCD's PROGEV event and TCD CMPBCLR to asynchronous event channels.
+Connect the CCL0 event users to those two event channels.
+
+Configure the CCL block with:
+IN0 using the CMPBCLR event channel
+IN1 using the PROGEV event channel
+IN2 is FEEDBACK.
+
+Truth table is 0xE2
+
+```
+
+### Finally, you can configure fault events and that sort of thing (requires disabling the timer while making changes)
 
 ## Otherwise, you must take over TCD and manually configure everything
 `takeOverTCD0()` will tell the core that you are assuming full responsibility for TCD0. It will ignore everything that would normally make it reconfigure this timer. This will make `analogWrite()` and `digitalWrite()` act like TCD0 doesn't exist when configuring pins.
 `init_TCD0()` is called during init to configure the timer. You can override it with an empty function to prevent this. If you do this, you must call `takeOverTCD0()` before `analogWrite()` or `digitalWrite()` are called. Actually - that's silly, just override `init_TCD()` with a all to `takeOverTCD0()`.
-You can do all kinds of crazy things with this timer! It can dither it's output for 16x more accurate frequencies, there are 11 different things it can do on events, you can set the default state of the compare outputs... With some persistence you can even capture the current count!
+You can do all kinds of crazy things with this timer! It can dither it's output for 16x more accurate frequencies, there are 11 different things it can do on events, you can set the default state of the compare outputs... With some persistence you can even capture the current counter value!
 
 ### What next? Study the TCD0 chapter of the datasheet
 The rest is beyond the scope of the core's documentation.
 
-### Yes, 4-year old parts are growing new errata
-Like I said, not many people were getting too deep on these timers. A lot of bugs in the weird features have been turning up on the Dx-series and then found on tinyAVRs, because the TCD PLL makes this into a very different and more tempting peripheral to use.
+### Is the TCD done growing new errata?
+Uncertain. It took *years* for the errata we have to show up. Some weren't listed for over 4 years (seemingly only after the Dx-series was out, and people found the bugs there and Microchip realized they were on the 1-series as well). The TCD is a complicated timer that **really** would benefit from a... how to say it... "designer's statement of intent" regarding the wierder options. There are cases where it's clear that they intended some niche use case, but I can't say I know exactly what.

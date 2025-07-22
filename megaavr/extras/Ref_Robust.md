@@ -13,7 +13,7 @@ See the datasheet for your part to check the exact power consumption and compare
 
 BOD will keep the chip in reset when you it knows the voltage is too low to keep the chip running.
 
-### If you don't use BOD...
+### If you don't use BOD
 You need to ask yourself a few hard questions:
 * ~if~ When the system is hung in production, how hard/embarrassing will it be to have to run to reset them by hand?
 * If it's hard to reset the device (mounted on a 20 meter pole, in the canopy of a tree, in a drainage ditch six feet up, or worst of all, mounted on a 20 meter pole attached to the canopy of a tree growing our of a drainage ditch located at a customer site.), use the watchdog timer!
@@ -39,7 +39,7 @@ Microchip advises that minimum power consumption requires disabling the digital 
 I think I've made it so you can't disable them in the Arduino IDE now. compile warnings are a HUGE red flag. At best they represent haphazard programming practices. Frequently they are latent (or active) bugs - what sets them apart is that unlike most bugs, these are carrying big neon signs telling you where they are.
 
 ### There's a CRC check feature on these parts
-It can be set to automaticallty check the flash and compare it to a checksum stored at the end. We don't support this directly (or generate a hex with the CRC), but literally all you need to do to force it on once you calculate the CRC and put it at the end of the file you upload is to set the two high bits of SYSCGF0 to something other than 11. See the datasheet for details). If the firmware is misuploaded, or if it's corrupted by cosmic rays or god knows what else, the device will sit there bootlooping, rather than working well enough that the user believes it it's fine until it suddenly fails catastrophically at some crucial momemnt. Depending on the type of product and intended use case, this could be either a foolish obstacle that you don't want to use, or a necessary countermeasure that you absolutely must use.
+It can be set to automaticallty check the flash and compare it to a checksum stored at the end. We don't support this directly (or generate a hex with the CRC), but literally all you need to do to force it on once you calculate the CRC and put it at the end of the file you upload is to set the two high bits of `SYSCGF0` to something other than 11. See the datasheet for details). If the firmware is misuploaded, or if it's corrupted by cosmic rays or god knows what else, the device will sit there bootlooping, rather than working well enough that the user believes it it's fine until it suddenly fails catastrophically at some crucial momemnt. Depending on the type of product and intended use case, this could be either a foolish obstacle that you don't want to use, or a necessary countermeasure that you absolutely must use.
 
 ## Hardware design
 
