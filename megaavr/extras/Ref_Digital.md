@@ -98,8 +98,12 @@ while(digitalReadFast(PIN_PA3)) {
 }
 ```
 
-This,
-
+This is markedly less sound:
+```c++
+while(digitalRead(pin)) {
+  ; //busywait. Instead of 0-2 cycles, it could spend a hundred clocks per read just turning off the PWM repeatedly. Now you're only starting within 5 us of the event, instead of 0.15us.
+}
+```
 
 **The fast digital I/O functions do not turn off PWM** as that is inevitably slower (far slower) than writing to pins and they would no longer be "fast" digital I/O.
 
@@ -176,71 +180,7 @@ These are the maximum voltage guaranteed to qualify as `LOW` and the minimum gua
 Particularly in the context of these MVIO-equipped parts, however, the TTL input level option has an obvious major advantage: It makes communication with parts that run at lower voltages easier, and reduces competition for the limited number of MVIO pins. If we allow the low part to control it push-pull (aka totam-pole and other names), and treat it as an `INPUT`, we will always read what they intend. The fact that you can switch a pin between input and output, while pulling it up externally was noted above, and the voltage it was pulled up to could be the lower operating vboltage. That can be done on any AVR. But with INLVL, this scheme is viable for a bidirectional line: the The line between devices could either be pulled up to the lowest operating voltage externally, with the DB or DD series part manipulating the pin as an open drain output (see above). One need not stop with just two devices - multiple DB/DD-series parts with `INVLV = TTL` set could communicate with multiple devices operating at the low voltage, as long as none of them ever drove it `HIGH` (though, if it was low, they would not know which device was doing that. The designer would have to make sure this approach made sense in that regard, and that everything was smart enough to not hold onto the line or anything.
 
 ## PINCONFIG and associated registers (Dx, Ex only)
-This section applies only to DxCore. megaTinyCore users should skip this unless they want to drool over the new features in those Dx-ey new parts.
-
-The hardware has a series of registers - one shared across all ports, `PORTx.PINCONFIG` with bitfields matching the ones in the the PINnCTRL registers, and three which always read zero, `PORTx.PINCTRLUPD`,  `PORTx.PINCTRLSET` and  `PORTx.PINCTRLCLR`. These allow mass updating of the PINnCTRL registers: Every pin corresponding to a 1 on the port will have the contents of their PINnCTRL register either set to (`PINCTRLUPD`), bitwise-OR'ed with (`PINCTRLSET`) or bitwise-AND'ed with the inverse (`PORTx.PINCTRLCLR`) of the  `PINCONFIG` register. Noting keeps you from setting ISC bitfield that way, you shouldn't do that, unless you really know what you're doing,
-
-
-So:
-```c
-PORTA.PINCONFIG = PORT_PULLUPEN_bm;
-PORTA.PINCTRLSET = 0b11110000; // Turns on the pullup on PA4~7
-PORTB.PINCTRLUPD = 0b10000001; // Sets PINnCTRL to only have pullup enabled on PB0 and PB7. If one of those pins was inverted or using TTL levels or had an interrupt on it, it doesn't anymore.
-PORTC.PINCTRLCLR = 0b11111111; // Turns off the pullup on every pin on PORTC
-PORTA.PINCONFIG = PORT_PULLUPEN_bm | PORT_INVEN_bm; //invert and turn on pullup
-PORTG.PINCTRLUPD = 0b00001111; // inverts and turns on pullups on PG0~3
-PORTF.PINCTRLUPD = 0b01010101; // inverts and turns on pullups on PF 0, 2, 4, and 6.
-
-/* executes faster and looks less hideous than: */
-PORTA.PIN4CTRL |=  PORT_PULLUPEN_bm; //Read-modify-write takes 6 clocks and 5 words of flash! - lds, ori, sts
-PORTA.PIN5CTRL |=  PORT_PULLUPEN_bm;
-PORTA.PIN6CTRL |=  PORT_PULLUPEN_bm;
-PORTA.PIN7CTRL |=  PORT_PULLUPEN_bm;
-PORTB.PIN0CTRL  =  PORT_PULLUPEN_bm; // Simple write 2 clocks 2 words to write, plus a single 1 for the whole group to load the value to a working register.
-PORTB.PIN7CTRL  =  PORT_PULLUPEN_bm;
-PORTC.PIN0CTRL &= ~PORT_PULLUPEN_bm; // 6 clocks again!
-PORTC.PIN1CTRL &= ~PORT_PULLUPEN_bm;
-PORTC.PIN2CTRL &= ~PORT_PULLUPEN_bm;
-PORTC.PIN3CTRL &= ~PORT_PULLUPEN_bm;
-PORTC.PIN4CTRL &= ~PORT_PULLUPEN_bm;
-PORTC.PIN5CTRL &= ~PORT_PULLUPEN_bm;
-PORTC.PIN6CTRL &= ~PORT_PULLUPEN_bm;
-PORTC.PIN7CTRL &= ~PORT_PULLUPEN_bm;
-PORTF.PIN4CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
-PORTF.PIN5CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
-PORTF.PIN6CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
-PORTF.PIN7CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
-PORTG.PIN0CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
-PORTG.PIN1CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
-PORTG.PIN2CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
-PORTG.PIN3CTRL  =  PORT_PULLUPEN_bm | PORT_INVEN_bm;
-
-/* The above contrived examples are 7 x 3 - 21 clocks and 21 words for the multipin-configuration method.
- * versus 4*6 + 2*2+1 + 8*6 + 2*8+1 = 94 clocks and 82 words of flash for the alternative.
- * The contrast is even more stark for somee realistic scenarios on high pincount devices.
- */
-
-```
-PORTA.PINCONFIG =
-All bits make sense with PINCTRLUPD - some more than others - as long as you don't forget that it will replace whatever is there currently.
-The lower three bits, controlling whether the pin is acting as an interrupt, will have surprising and likely unwelcome effects with  `PORTx.PINCTRLSET` and  `PORTx.PINCTRLCLR`. For PINCTRLSET they should never be 1 (any of them). For PINCTRLCLR, all should be 0 or all should be 1 ( 0b00000111 would turn off pin interrupts on the pins it's applied to without otherwise changing PINnCTRL register contents). Otherwise, the concept of flipping individual bits makes little sense for that last bitfield - the bits individually do not have a separate function, there is just the function of those three bits as a group. When changing the input sense configuration on large numbers of pins, use PINCTRLUPD instead.
-
-This system is most useful at startup for devices running on battery to meet the datasheet requirement that the pins not be allowed to float if their digital input buffers are enabled.
-
-```c++
-// Practical example
-/* Say we are using a Dx48, but only have any digital I/O on PORTA (maybe we are only using the DB48 because we need the three configurable opamps, and nothing else on other ports
- * but we need to be able to go into power down sleep mode to minimize power consumption, meaning unused pins must have pin buffer disabled */
-
-PORTB.PINCONFIG = PORT_ISC_DISABLED_gc; //doesn't matter which port, shared between all ports.
-PORTB.PINCTRLUPD = 0x3F; //disable input buffer on all pins of portB
-PORTF.PINCTRLUPD = 0x3F; // disable input buffer on all pins of PORTF
-PORTD.PINCTRLUPD = 0xFF; // disable input buffer on all pins of PORTD
-PORTC.PINCTRLUPD = 0xFF; // disable input buffer on all pins of PORTC
-PORTE.PINCTRLUPD = 0x0F; // disable input buffer on all pins of PORTE
-// this is 1+2, 1+2+2, 1+2+2, 1+2 = 16 words, and executes in that many clocks. Imagine how much longer it would take to loop over 32 pins setting PINnCTRL for each (minimum words and more than that many clocks) plus the machinery for picking the port, likely hundreds of bytes total.
-
-```
+This section applies only to DxCore.  This doc was a bit lengthy.
 
 This core *currently* does not make use of this feature - However in the future, sleepTime will have a function that will turn pins to their most power efficient settings en masse. On parts with PINCONFIG, that will be used.
 
@@ -273,8 +213,6 @@ With a 24 MHz system clock, that means "normal" would be just over half a clock 
 
 ## There is no INLVL or PINCONFIG on tinyAVR devices
 The configurable input level option (`INLVL`) is only available on the AVR Dx (except for the DA - it was added with the DBs along with MVIO for obvious reasons, and I guess the cost of including it everywhere was small enough that they figured "might as well") and Ex series (and likely any future series)
-
-
 
 ## Ballpark overhead figures
 The digital I/O functions are astonishingly inefficient. This isn't my fault (not on mTC - on DxC I have definitely not helped...) - it's the Arduino API's fault
@@ -377,15 +315,14 @@ When working with the SET/CLR/TGL registers, remember that you must never use op
 This used to be a function only used within wiring_digital. It is now exposed to user code - as the name suggests it turns off PWM (only if analogWrite() could have put it there) for the given pin. It's performance is similar to analogWrite (nothing to get excited over), but sometimes an explicit function to turn off PWM and not change anything else is preferable: Recall that digitalWrite calls this (indeed, as shown in the above table, it's one of the main reasons digitalWrite is so damned bloated on the DX-series parts!), and that large code takes a long time to run. DigitalWrite thus does a terrible job of bitbanging. It would not be unreasonable to call this to turn off PWM, but avoid digitalWrite entirely. The pin will return to whatever state it was in before being told to generate PWM, unless digitalWriteFast() or direct writes to the port register have been used since. If the pin is set input after PWM is enabled with analogWrite (or through other means - though in such cases, the behavior when turnOffPWM() is called on any pin which nominally outputs PWM controlled by the same timer *should be treated as undefined* - it is not possible to efficiently implement such a feature on AVRs nor most other microcontrollers while maintaining behavior consistent with the API - the core would (at least on an AVR) have to iterate through every possible source of PWM, testing each in turn to see if it might have PWM output enabled on this pin. In many cases, including this core, each timer would require checking a separate bit in one or more special function registers, as well as storing a database that associates each pin with one or more combinations of bits and the corresponding bit to clear to disable PWM through that pathway. Suffice to say, that is not practical within the resource constraints of embedded systems.
 
 ## Finding current PWM timer, if any: digitalPinToTimerNow() (DxCore only)
-On many cores, there is a `digitalPinToTimer(pin)` macro, mostly for internal use, which returns the timer associated with the pin. The Arduino API implicitly assumes that this is constant, and both core libraries and code in the wild often assume that it is. The digitalPinToTimer() implementation is as a macro, which frequently is optimized to a constant (provided the argument is constant, of course). The assumption that there exists not-more-than-1-to-1 timer:pin mapping was never universally valid even among AVRs (there are examples of classic AVRs that have multiple timers usable on some pins, and some even permit that to be remapped easily at runtime (the classic ATtiny841 being a notable example). All modern AVRs have at least two pins available to each timer output compare channel; and while the tinyAVRs never have more than two timers potentially usable with a given pin, the Dx-series allows one of up to 7 pins to be associated with a given timer (in groups), with some pins having as many as 4 options.
-
+On many cores, there is a `digitalPinToTimer(pin)` macro, mostly for internal use, which returns the timer associated with the pin. The Arduino API implicitly assumes that this is constant, and both core libraries and code in the wild often assume that it is. The digitalPinToTimer() implementation is as a macro, which frequently is optimized to a constant (provided the argument is constant, of course). The assumption that there exists not-more-than-1-to-1 timer:pin mapping was never universally valid even among AVRs (there are examples of classic AVRs that have multiple timers usable on some pins, and some even permit that to be remapped easily at runtime (the classic ATtiny841 being a notable example). All modern AVRs have at least two pins available to each timer output compare channel; and while the tinyAVRs never have more than two timers potentially usable with a given pin, the Dx-series allows one of up to 7 pins to be associated with a given timer (in groups), with some pins having as many as 4 options. This is documented in those datasheets and the DxCore documentation.
 
 ## The following cases are NOT EXPECTED TO WORK
 Avoid placing yourself in any of the following situations, as these **should not be expected to produce the desired result:**
-* **Calling turnOffPWM, digitalPinToTimer, digitalPinToTimerNow or analogWrite on a pin nominally driven by a timer which the core has been instructed not to reconfigure using the takeOverTCxn() function**. The core will treat the pin as an ordinary digital pin - by calling the timer takeover, you assume full responsibility for all management of that timer. That function must be called if any manual configuration of a PWM timer will be or has been performed, except as specifically noted in in the timer and PWM reference or type D timer reference (we make an effort to give more leeway with semi-manual configuration of TCD (particularly on DxCore, where the timer is more powerful) because fully manual configuration is a pain in the arse).
+* **Calling turnOffPWM(), digitalPinToTimer(), ~digitalPinToTimerNow()~ or analogWrite() on a pin nominally driven by a timer which the core has been instructed not to reconfigure using the takeOverTCxn() function**. The core will treat the pin as an ordinary digital pin - by calling the timer takeover, you assume full responsibility for all management of that timer. That function must be called if any manual configuration of a PWM timer will be or has been performed, except as specifically noted in in the timer and PWM reference or type D timer reference (we make an effort to give more leeway with semi-manual configuration of TCD (particularly on DxCore, where the timer is more powerful) because fully manual configuration is a pain in the arse).
 * **Calling turnOffPWM(), digitalPinToTimer(), digitalPinToTimerNow(), analogWrite() or digitalWrite() on a pin nominally driven by a type A timer which has been manually reconfigured**, *particularly* if it has been configured in *single mode* for 3x16-bit PWM channels. The Arduino API does not support PWM with > 8 bits of resolution, so we don't take it outside of 8 bit mode, meaning we're writing halves of registers separately. . Users who require that level of control must call `takeOverTCxn()`. See the timer and PWM reference and the included TCA takeover examples.
-* **Calling turnOffPWM, digitalPinToTimer, digitalPinToTimerNow, analogWrite or digitalWrite on a pin nominally driven by a type B timer, but which has been configured to use an output pin other than the one shown on the core pin mapping** for that part - this will reconfigure PWM on the wrong pin if at all.
-* **Manually configuring any timer without calling takeOverTCxn, except as explicitly documented in the core documentation, and then calling any function on a pin nominally (but not presently) controlled by that timer** (be sure you are reading the correct core's documentation - usually mTC = DxC, but in this case, that assumption is NOT valid - the ample resources of the Dx-series allow us a bit more room to be clever there, particularly regarding TCD0, which is considerably more powerful on the Dx-series than on tinyAVR 1-series - more because of the features around the timer than any specific differences in the timers - TCD is near identical, but on the Dx, the richer environment is
+* ~turnOffPWM(), digitalPinToTimer(), digitalPinToTimerNow() or analogWrite() or digitalWrite() on a pin nominally driven by a type B timer if the TCB portmux was used move the output off of that pin.~ We don't support PWM from TCBs, so this issue is irrelevant to mTC as we donot support wasting our precious TCB(s) on generating a single mediocre 8-bit PWM channel!
+* **Manually configuring any timer without calling takeOverTCxn, except as explicitly documented in the core documentation, and then calling any function on a pin nominally (but not presently) controlled by that timer** (be sure you are reading the correct core's documentation - usually mTC = DxC, but in this case, that assumption is NOT valid - the ample resources of the Dx-series allow us a bit more room to be clever there, particularly regarding TCD0, which is considerably more powerful on the Dx-series than on tinyAVR 1-series - more because of the features around the timer than any specific differences in the timers - TCD is near identical, but on the Dx, the richer environment and new clocking options, including the PLL, making the incentive correspondingly greater for a more flexible implementation there.
 * **Changing PORTMUX manually on megaTinyCore** - we do not support this. Use the PWM option menus to set this at compile-time - this greatly simplifies (read, smaller and faster) the code. The mux options on the tinyAVRs were also picked apparently while still under Atmel's "dart board" peripheral placement policy, whereas there are more symmetries to take advantage of on Dx-series and Ex-series parts, and they have oodles more flash to do that taking advantage in.
 * Setting an interrupt on a pin on a Major Die Rev. "A" DA or DB-series device, then performing an `analogRead()` of the pin, due to an erratum impacting these devices: Whenever selected by the POSMUX/NEGMUX registers, while the ADC is enabled (like all cores, we do this during `init()`) get their digital input buffers disabled (yes, this meant that when I did a crude sanity check - turn on all the pullups, then read each port, and expect to see a 1 everywhere there is a pin other than the serial port you're outputting on - I found that PD0 (AIN0) was not reading anything. After the initial errata list came out, a trivial workaround was implemented (enabled by the improvements to the ADC on modern AVRs: On classic AVRs, remember how you had to take several throw-away readings and then your actual reading you used? Yeah you don't need to do that so much anymore. The effect is still there, but considerably smaller.
 
@@ -433,12 +370,10 @@ The EB specs 0.4V max of drop, symmetric, at 6mA and Vdd = 3.0V. But as with the
 `***` - On a Tiny85 or Tiny84/841, HVSP really doesn't seem too bad - sure it was way more of a pain than normal ISP, but normal ISP kinda sucks in most ways compared to UPDI. It's similar to a modern AVR with UPDI disabled, and I'd call it "Hard". But only those three part families use HVSP. Everything else takes HVPP to reprogram after reset is disabled, and HVPP requires connection of around 20 wires to the target (with 20 chances to make a mistake), most of them can't be loaded so you can just forget about doing it in system. I do not recall reading any account on forums of someone using HVPP outside of work, and those were rare. HVPP is much harder than "Hard".
 
 ### The tinies aren't symmettric drive?
-You might be scurrying to your datasheets thinking "I swear they were symmetric on the tinys!" and if you look at the table - which gives worst case values, they are. But the graphs, which give observed "typical" values, tell a different story - they show a voltage drop when sourcing 20mA on a tiny2 of around 0.7V at room temp, but a voltage drop of 0.4-0.45 on at sinking the same amount of current. The low side drivers are stronger. The Dx-series takes it to a new level: At max opperating voltage (5.5v) they ran it up to the absolute max on the high side (recording a 2 volt drop). On the low side though, at the 50mA absolute max, they were still only seeing 0.6V. So they ran it up to twice the absolute maximum rating, which saw a 1.4V drop. Though it's hardly novel for the graphs in the datasheet to show that that the parts typically blow their rated specs out of the water, at least briefly or in favorable conditions (as in when being pushed very hard) or under normal, mild conditions; no particular AVR example comes to mind, but my preferred 1117-series regulator specs the usual dropout as a maximum. The typical characteristics graphs, in contrast, show dropout on the order of a tenth of a volt at light loads. I appreciate the transparency on behavior in overload conditions. I wish they did that more.
+You might be scurrying to your datasheets thinking "I swear they were symmetric on the tinys!" and if you look at the table - which gives worst case values, they are. But the graphs, which give observed "typical" values, tell a different story - they show a voltage drop when sourcing 20mA on a tiny2 of around 0.7V at room temp, but a voltage drop of 0.4-0.45 sinking the same amount of current. The low side drivers are stronger. The Dx-series takes it to a new level: At max opperating voltage (5.5v) they ran it up to the absolute max on the high side (recording a 2 volt drop). On the low side though, at the 50mA absolute max, they were still only seeing 0.6V. So they ran it up to twice the absolute maximum rating, which saw a 1.4V drop. Though it's hardly novel for the graphs in the datasheet to show that that the parts typically blow their rated specs out of the water, at least briefly or in favorable conditions (as in when being pushed very hard) or under normal, mild conditions; no particular AVR example comes to mind, but my preferred 1117-series regulator specs the usual dropout as a maximum. The typical characteristics graphs, in contrast, show dropout on the order of a tenth of a volt at light loads. I appreciate the transparency on behavior in overload conditions. I wish they did that more.
 
-**IN FACT, NONE OF THE AVRS HAVE EVER ACTUALLY BEEN SYMMETRIC DRIVE**
-
-They met symmetric specs, butr exceeded tem in one direction far more than the other
-
+**IN FACT, NONE OF THE AVRS HAVE EVER ACTUALLY BEEN SYMMETRIC DRIVE!**
+Not classic tinies, not classic atmegas. They met symmetric specs, the low side driver always met it with far more room to spare than the high side one. That said, the differene in drive strength is on the magntude of a power of two. (compare to some older devices that would have a 0.4mA high-side drive and 20mA low side drive (at least they could drive high, which wasn't universal then))
 
 ### Other notes on that table
 What tinyAVR calls current injection, Dx/Ex-series call "Clamp current"; the latter is, in my opinion, more proper. It's current through the protection diodes, which are called "clamp diodes" because they constrain ("clamp") the voltage between supply and ground, thus preventing damage to the chip. As these are microcontrollers not power rectifiers, these diodes are very small, so the current through these diodes has to be kept low, else they fail, followed immediaely by the pin-driver they were protecting. This failure is typified by the pin always behaving as if set output, driving in the direction of the voltage excursion. Oddly It wasn't spec'ed on classic AVRs (but was well known to be low, and to be a highly effective way of blowing pins). It's said that the most experienced AVR developers can simply stare intently at a chosen pin on the old classic AVRs, imagining a voltage in excess of VDD applied to it, and burn out the pin driver just like that. In any event, Atmel employees are rumored to have said +/- 1mA maximum on classic AVRs, (in spite of an app note advising connecting a tiny85 through a high value resistor to mains to do zero cross detection. That app note describes basically doing what the ZCD on the Dx-series does, only with less help from the hardware).

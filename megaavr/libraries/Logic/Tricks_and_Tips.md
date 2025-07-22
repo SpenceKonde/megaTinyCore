@@ -46,12 +46,12 @@ These are not relevant to reordering. Reordering is confusing enough as is (and 
 
 To get identical behavior:
 
-TRUTH = 0bHGFEDCBA when IN0 is α, IN1 is β and IN2 is γ
-TRUTH = 0bHDFBGCEA when IN0 is γ, IN1 is β and IN2 is α - D and G, B and E swap
-TRUTH = 0bHFGEDBCA when IN0 is α, IN1 is γ and IN2 is β - G and F, B and C swap
-TRUTH = 0bHGDCFEBA when IN0 is γ, IN1 is α and IN2 is β - F and D, E and C swap
-TRUTH = 0bHDGCFBEA when IN0 is β, IN1 is α and IN2 is γ - F->D->G->F rotate, and B->C->E->B rotate.
-TRUTH = 0bHFDBGECA when IN0 is β, IN1 is γ and IN2 is α - F->G->D->F rotate, and B->E->C->B rotate.
+* TRUTH = 0bHGFEDCBA when IN0 is α, IN1 is β and IN2 is γ
+* TRUTH = 0bHDFBGCEA when IN0 is γ, IN1 is β and IN2 is α - D and G, B and E swap
+* TRUTH = 0bHFGEDBCA when IN0 is α, IN1 is γ and IN2 is β - G and F, B and C swap
+* TRUTH = 0bHGDCFEBA when IN0 is γ, IN1 is α and IN2 is β - F and D, E and C swap
+* TRUTH = 0bHDGCFBEA when IN0 is β, IN1 is α and IN2 is γ - F→D→G→F rotate, and B→C→E→B rotate.
+* TRUTH = 0bHFDBGECA when IN0 is β, IN1 is γ and IN2 is α - F→G→D→F rotate, and B→E→C→B rotate.
 
 the highest and lowest bits do not change when reordering the inputs.
 
@@ -109,9 +109,9 @@ Each of the preceding 64 "middles" corresponds to 4 different truth tables. So 3
 TRUTH = 0bJKLMNOPQ
 Change  | Truth change |
 --------|--------------|
-A -> !A | 0bKJMLONQP   |
-B -> !B | 0bLMJKPQNO   |
-C -> !C | 0bNOPQJKLM   |
+A → !A | 0bKJMLONQP   |
+B → !B | 0bLMJKPQNO   |
+C → !C | 0bNOPQJKLM   |
 
 ```c++
 
@@ -542,16 +542,12 @@ Note that with sync/filter off, the delay is not zero, obviously, but the respon
 
 1. Pin input -> Event channel -> CCL -> Pin output
 2. Pin input -> CCL -> Pin output
-
-This was investigated a while back using the much more convenient sandbox of a LUT oscillator (set to invert it's own output with no sync/filter)
 3. CCL -> CCL -> CCL -> Pin output
 4. CCL -> Event channel -> CCL -> Pin output
 5. CCL output -> CCL -> Pin output
 6. CCL -> Event channel -> CCL -> CCL -> Pin output.
 
-In the second case, the idea was to exclude everything except the propagation time of the signal in the chip. It will oscillate, allowing a scope to be used to measure the frequency (hence the meaningful measure, the propagation delay). Note that bandwidth limiting needs to be off - scopes often are designed to attenuate signals above 20 MHz, and this is typically turned on by default. You usually want it on because it reduces the visibility of any high frequency noise that might be obscuring the signal, but not if you're looking at a signal above the ceiling (which this will be)).
-
-When I tested it, 3 (lut pair, odd one takes the feedback as input, even one takes LINK as input, one echoes input unchanges (TRUTH=2) and the other inverts it (TRUTH=1). and 4 (odd lut, feeding an event channel used as it's input) generated the same frequency iirc, but 5 (even lut inverting own output) resulted in output twice as fast. Variant 6 (non-paired, consecutive luts, ie, first stage on LUT2, second on LUT1. LUT1 can take output from LUT2 via link, but to get it's output back to LUT2 needs an event channel) had a third the frequency of variant 5. The frequency of variant 5 was in the area of 80-100 MHz (!!!), indicating a propagation time per stage of 10-12ns (depending on temperature - dF<sub>LUT OSC</sub>/dT is orders of magnitude larger than dF<sub>Int. 20 MHz OSC</sub>/dT). I do not know what the speed of cases 1 and 2 are - but I predict that t<sub>1</sub> = A t<sub>5</sub>, t<sub>2</sub> = (A + B)t<sub>5</sub>, and that the values of A, B are either (2, 1), (2,2) or (3,2), and I think it's 2, 1.
+In the second case, the idea was to exclude everything except the propagation time of the signal in the chip. It will oscillate, allowing a scope to be used to measure the frequency (hence the meaningful measure, the propagation delay). Note that bandwidth limiting needs to be off - scopes often are designed to attenuate signals above 20 MHz, and this is typically turned on by default. You usually want it on because it reduces the visibility of any high frequency noise that might be obscuring the signal, but not if you're looking at a signal in that range.
 
 ### 2 LUT edge detector for RISING *or* FALLING
 This generates a pulse two or four clocks long on either a rising *or* falling edge.
@@ -622,64 +618,67 @@ Generally, I would argue that if you're using more than 3 LUTs, you should consi
 |     8 |  8 | 4 | - |     FIRST |         - |    - |  - | - | - |         - |         - |  - | - | - |   - |    2 |      0 |         |
 |    12 | 12 | 4 | 8 |       ADD |     FIRST |    - |  - | - | - |         - |         - |  - | - | - |   - |    2 |      0 |         |
 |    16 | 16 | 8 | 8 |       ADD |     FIRST |    - |  - | - | - |         - |         - |  - | - | - |   - |    2 |      0 |         |
-|    20 | 16 | 8 | 8 |       ADD |       ADD |    - |  4 | 4 | - |     FIRST |         - |  - | - | - |   - |    3 |      1 |         |
-|    24 | 16 | 4 | 4 |      ADD2 |       ADD |    - |  8 | 8 | - |     FIRST |         - |  - | - | - |   - |    3 |      1 |         |
-|    28 | 16 | 8 | 8 |       ADD |       ADD |    - | 12 | 8 | 4 |       ADD |     FIRST |  - | - | - |   - |    4 |      0 |         |
+|    20 | 16 | 8 | 8 |       ADD |       ADD |    - |  4 | 4 | - |     FIRST |         - |  - | - | - |   - |    3 |      1 | No 0/1s |
+|    24 | 16 | 4 | 4 |      ADD2 |       ADD |    - |  8 | 8 | - |     FIRST |         - |  - | - | - |   - |    3 |      1 | No 0/1s |
+|    28 | 16 | 8 | 8 |       ADD |       ADD |    - | 12 | 8 | 4 |       ADD |     FIRST |  - | - | - |   - |    4 |      0 | No 0/1s |
 |    32 | 32 | 4 | 8 |       MUL |     FIRST |    - |  - | - | - |         - |         - |  - | - | - |   - |    2 |      0 |         |
-|    36 |  4 | - | 4 |        -  |       ADD |    - | 32 | 8 | 4 |       MUL |     FIRST |  - | - | - |   - |    3 |      1 | ODD LOW |
-|    40 |  8 | - | 8 |        -  |       ADD |    - | 32 | 8 | 4 |       MUL |     FIRST |  - | - | - |   - |    3 |      1 | ODD LOW |
-|    44 | 12 | 4 | 8 |       ADD |       ADD |    - | 32 | 8 | 4 |       MUL |     FIRST |  - | - | - |   - |    4 |      2 |         |
-|    48 | 16 | 8 | 8 |       ADD |       ADD |    - | 32 | 8 | 4 |       MUL |     FIRST |  - | - | - |   - |    4 |      1 |         |
-|    52 | 32 | 4 | 8 |       MUL |       ADD |    - | 16 | 4 | 4 |       MUL |      ADD4 |  4 | 4 | - | FST |    5 |      1 |         |
+|    36 |  4 | - | 4 |        -  |       ADD |    - | 32 | 8 | 4 |       MUL |     FIRST |  - | - | - |   - |    3 |      1 | No 0/1s |
+|    40 |  8 | - | 8 |        -  |       ADD |    - | 32 | 8 | 4 |       MUL |     FIRST |  - | - | - |   - |    3 |      1 | No 0/1s |
+|    44 | 12 | 4 | 8 |       ADD |       ADD |    - | 32 | 8 | 4 |       MUL |     FIRST |  - | - | - |   - |    4 |      2 | No 0/1s |
+|    48 | 16 | 8 | 8 |       ADD |       ADD |    - | 32 | 8 | 4 |       MUL |     FIRST |  - | - | - |   - |    4 |      1 | No 0/1s |
+|    52 | 32 | 4 | 8 |       MUL |       ADD |    - | 16 | 4 | 4 |       MUL |      ADD4 |  4 | 4 | - | FST |    5 |      1 | Dx ONLY |
 |    64 | 64 | 8 | 8 |       MUL |     FIRST |    - |  - | - | - |         - |         - |  - | - | - |   - |    2 |      0 |         |
-|    68 |  4 | - | 4 |        -  |       ADD |    - | 64 | 8 | 8 |       MUL |     FIRST |  - | - | - |   - |    3 |      1 | ODD LOW |
-|    72 |  4 | - | 8 |        -  |       ADD |    - | 64 | 8 | 8 |       MUL |     FIRST |  - | - | - |   - |    3 |      1 | ODD LOW |
-|    76 |  4 | 4 | 8 |       ADD |       ADD |    - | 64 | 8 | 8 |       MUL |     FIRST |  - | - | - |   - |    4 |      1 |         |
-|    80 |  4 | 8 | 8 |       ADD |       ADD |    - | 64 | 8 | 8 |       MUL |     FIRST |  - | - | - |   - |    4 |      1 |         |
-|    84 | 64 | 8 | 8 |       MUL |       ADD |    - | 16 | 8 | 8 |       ADD |      ADD4 |  4 | 4 | - | FST |    5 |      1 |         |
-|    88 |  8 | 4 | 4 |       ADD |  ADD2MUL3 |    - |  * | 4 | 4 |       ADD |  ADD4MUL5 |  * | 4 | 4 |   - |    6 |      1 |         |
-|    96 |  8 | 4 | 4 |       ADD |       ADD |    - | 12 | 4 | 8 |       ADD |      MUL4 |  4 | 4 | - |   - |    5 |      1 |         |
-|   100 | 64 | 8 | 8 |       MUL |       ADD |    - | 32 | 4 | 8 |       MUL |      ADD4 |  4 | 4 | - |   - |    5 |      1 |         |
-|   108 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  * | 4 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 4 | ADD |    6 |      1 |         |
-|   128 | 16 | 4 | 4 |      MUL2 |       MUL |    - |  8 | 8 | - |     FIRST |         - |  - | - | - |   - |    3 |      1 |         |
-|   140 | 12 | 4 | 8 |       ADD |       ADD |  128 | 16 | 8 | 8 |       ADD |       MUL |  8 | 4 | 4 | ADD |    6 |      0 |         |
-|   144 | 12 | 4 | 8 |       ADD |       MUL |    - | 12 | 4 | 8 |       ADD |     FIRST |  - | - | - |   - |    4 |      1 |         |
-|   152 |  8 | 4 | 4 |       ADD |  ADD2MUL3 |    - |  * | 4 | 4 |       ADD |  ADD4MUL5 |  * | 4 | 8 |   - |    6 |      1 |         |
-|   160 |  8 | 4 | 4 |       ADD |       MUL |    - | 12 | 4 | 8 |       ADD |      ADD4 |  4 | 8 | - |   - |    5 |      1 |         |
-|   172 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  - | 4 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 8 |   - |    6 |      1 |         |
-|   192 | 16 | 8 | 8 |       ADD |       MUL |    - | 12 | 4 | 8 |       ADD |     FIRST |  - | - | - |   - |    4 |      1 |         |
-|   204 | 12 | 4 | 8 |       ADD |       ADD |  192 | 16 | 8 | 8 |       ADD |       MUL | 12 | 4 | 8 | ADD |    6 |      0 |         |
-|   208 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  * | 8 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 4 |   - |    6 |      1 |         |
-|   224 | 32 | 4 | 8 |       MUL |       ADD |  192 | 16 | 8 | 8 |       ADD |       MUL | 12 | 4 | 8 | ADD |    6 |      0 |         |
-|   256 | 16 | 4 | 4 |       MUL |       MUL |    - | 16 | 4 | 4 |       MUL |     FIRST |  - | - | - |   - |    4 |      1 |         |
-|   268 | 12 | 4 | 8 |       ADD |       ADD |  256 | 16 | 8 | 8 |       ADD |       MUL | 16 | 8 | 8 | ADD |    6 |      0 |         |
-|   288 | 12 | 4 | 8 |       ADD |       MUL |    - | 16 | 8 | 8 |       ADD |      ADD4 |  8 | 8 | - |   - |    5 |      1 |         |
-|   300 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  * | 4 | 8 |       ADD |  ADD4MUL5 |  * | 8 | 8 |   - |    6 |      2 |         |
-|   336 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  * | 8 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 8 |   - |    6 |      2 |         |
-|   384 | 16 | 8 | 8 |       ADD |       MUL |    - | 16 | 4 | 4 |       MUL |      ADD4 |  8 | 8 | - |   - |    5 |      1 |         |
-|   512 | 64 | 8 | 8 |       MUL |       ADD |    - | 16 | 8 | 8 |       ADD |      MUL4 |  4 | 4 | - |   - |    5 |      1 |         |
-|   576 | 12 | 4 | 8 |       ADD |       MUL |   48 | 32 | 4 | 8 |       MUL |       ADD | 16 | 4 | 4 | MUL |    6 |      2 |         |
-|   592 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  * | 8 | 8 |       ADD |  ADD4MUL5 |  * | 8 | 8 |   - |    6 |      1 |         |
-|   640 | 16 | 4 | 4 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |      ADD4 |  8 | 8 | - |   - |    5 |      2 |         |
-|   768 | 12 | 4 | 8 |       ADD |       MUL |   64 | 32 | 4 | 8 |       MUL |       ADD | 32 | 4 | 8 | MUL |    6 |      2 |         |
-|  1024 | 32 | 4 | 8 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |     FIRST |  - | - | - |   - |    4 |      2 |         |
-|  1088 | 16 | 4 | 4 |      MUL2 |       MUL |    - | 68 | 8 | 8 |       MUL |  ADD4MUL5 |  * | 8 | 4 | MUL |    5 |      3 |         |
-|  1152 | 12 | 4 | 8 |       ADD |       MUL |    - | 16 | 8 | 8 |       ADD |      MUL4 |  8 | 8 | - |   - |    5 |      1 |         |
-|  1280 | 16 | 4 | 4 |       MUL |       MUL |   80 | 16 | 4 | 4 |       MUL |       ADD | 64 | 8 | 8 | MUL |    6 |      2 |         |
-|  1536 | 16 | 8 | 8 |       ADD |       MUL |    - | 16 | 4 | 4 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 |         |
-|  2048 | 16 | 4 | 4 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 |         |
-|  2304 | 32 | 4 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      ADD4 |  8 | 8 | - |   - |    5 |      2 |         |
-|  4096 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |     FIRST |  - | - | - |   - |    4 |      2 |         |
-|  4608 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      ADD4 | 12 | 8 | 4 | ADD |    5 |      2 |         |
-|  8192 | 32 | 4 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 |         |
-| 16384 | 16 | 8 | 8 |       ADD |       MUL | 1024 | 32 | 4 | 8 |       MUL |       MUL | 32 | 4 | 8 | MUL |    6 |      2 |         |
-| 24576 | 12 | 4 | 8 |       ADD |       MUL | 2048 | 32 | 4 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      2 |         |
-| 32768 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 |         |
-| 65536 | 16 | 8 | 8 |       ADD |       MUL | 4096 | 64 | 8 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      3 |         |
-|131072 | 64 | 8 | 8 |       MUL |       MUL | 2048 | 32 | 4 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      3 |         |
-|262144 | 64 | 8 | 8 |       MUL |       MUL | 4096 | 64 | 8 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      3 |         |
+|    68 |  4 | - | 4 |        -  |       ADD |    - | 64 | 8 | 8 |       MUL |     FIRST |  - | - | - |   - |    3 |      1 | No 0/1s |
+|    72 |  4 | - | 8 |        -  |       ADD |    - | 64 | 8 | 8 |       MUL |     FIRST |  - | - | - |   - |    3 |      1 | No 0/1s |
+|    76 |  4 | 4 | 8 |       ADD |       ADD |    - | 64 | 8 | 8 |       MUL |     FIRST |  - | - | - |   - |    4 |      1 | No 0/1s |
+|    80 |  4 | 8 | 8 |       ADD |       ADD |    - | 64 | 8 | 8 |       MUL |     FIRST |  - | - | - |   - |    4 |      1 | No 0/1s |
+|    84 | 64 | 8 | 8 |       MUL |       ADD |    - | 16 | 8 | 8 |       ADD |      ADD4 |  4 | 4 | - | FST |    5 |      1 | Dx ONLY |
+|    88 |  8 | 4 | 4 |       ADD |  ADD2MUL3 |    - |  * | 4 | 4 |       ADD |  ADD4MUL5 |  * | 4 | 4 |   - |    6 |      1 | Dx ONLY |
+|    96 |  8 | 4 | 4 |       ADD |       ADD |    - | 12 | 4 | 8 |       ADD |      MUL4 |  4 | 4 | - |   - |    5 |      1 | Dx ONLY |
+|   100 | 64 | 8 | 8 |       MUL |       ADD |    - | 32 | 4 | 8 |       MUL |      ADD4 |  4 | 4 | - |   - |    5 |      1 | Dx ONLY |
+|   108 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  * | 4 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 4 | ADD |    6 |      1 | Dx ONLY |
+|   128 | 16 | 4 | 4 |      MUL2 |       MUL |    - |  8 | 8 | - |     FIRST |         - |  - | - | - |   - |    3 |      1 | No 0/1s |
+|   140 | 12 | 4 | 8 |       ADD |       ADD |  128 | 16 | 8 | 8 |       ADD |       MUL |  8 | 4 | 4 | ADD |    6 |      0 | Dx ONLY |
+|   144 | 12 | 4 | 8 |       ADD |       MUL |    - | 12 | 4 | 8 |       ADD |     FIRST |  - | - | - |   - |    4 |      1 | No 0/1s |
+|   152 |  8 | 4 | 4 |       ADD |  ADD2MUL3 |    - |  * | 4 | 4 |       ADD |  ADD4MUL5 |  * | 4 | 8 |   - |    6 |      1 | Dx ONLY |
+|   160 |  8 | 4 | 4 |       ADD |       MUL |    - | 12 | 4 | 8 |       ADD |      ADD4 |  4 | 8 | - |   - |    5 |      1 | Dx ONLY |
+|   172 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  - | 4 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 8 |   - |    6 |      1 | Dx ONLY |
+|   192 | 16 | 8 | 8 |       ADD |       MUL |    - | 12 | 4 | 8 |       ADD |     FIRST |  - | - | - |   - |    4 |      1 | No 0/1s |
+|   204 | 12 | 4 | 8 |       ADD |       ADD |  192 | 16 | 8 | 8 |       ADD |       MUL | 12 | 4 | 8 | ADD |    6 |      0 | Dx ONLY |
+|   208 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  * | 8 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 4 |   - |    6 |      1 | Dx ONLY |
+|   224 | 32 | 4 | 8 |       MUL |       ADD |  192 | 16 | 8 | 8 |       ADD |       MUL | 12 | 4 | 8 | ADD |    6 |      0 | Dx ONLY |
+|   256 | 16 | 4 | 4 |       MUL |       MUL |    - | 16 | 4 | 4 |       MUL |     FIRST |  - | - | - |   - |    4 |      1 | No 0/1s |
+|   268 | 12 | 4 | 8 |       ADD |       ADD |  256 | 16 | 8 | 8 |       ADD |       MUL | 16 | 8 | 8 | ADD |    6 |      0 | Dx ONLY |
+|   288 | 12 | 4 | 8 |       ADD |       MUL |    - | 16 | 8 | 8 |       ADD |      ADD4 |  8 | 8 | - |   - |    5 |      1 | Dx ONLY |
+|   300 | 12 | 4 | 8 |       ADD |  ADD2MUL3 |    - |  * | 4 | 8 |       ADD |  ADD4MUL5 |  * | 8 | 8 |   - |    6 |      2 | Dx ONLY |
+|   336 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  * | 8 | 8 |       ADD |  ADD4MUL5 |  * | 4 | 8 |   - |    6 |      2 | Dx ONLY |
+|   384 | 16 | 8 | 8 |       ADD |       MUL |    - | 16 | 4 | 4 |       MUL |      ADD4 |  8 | 8 | - |   - |    5 |      1 | Dx ONLY |
+|   512 | 64 | 8 | 8 |       MUL |       ADD |    - | 16 | 8 | 8 |       ADD |      MUL4 |  4 | 4 | - |   - |    5 |      1 | Dx ONLY |
+|   576 | 12 | 4 | 8 |       ADD |       MUL |   48 | 32 | 4 | 8 |       MUL |       ADD | 16 | 4 | 4 | MUL |    6 |      2 | Dx ONLY |
+|   592 | 16 | 8 | 8 |       ADD |  ADD2MUL3 |    - |  * | 8 | 8 |       ADD |  ADD4MUL5 |  * | 8 | 8 |   - |    6 |      1 | Dx ONLY |
+|   640 | 16 | 4 | 4 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |      ADD4 |  8 | 8 | - |   - |    5 |      2 | Dx ONLY |
+|   768 | 12 | 4 | 8 |       ADD |       MUL |   64 | 32 | 4 | 8 |       MUL |       ADD | 32 | 4 | 8 | MUL |    6 |      2 | Dx ONLY |
+|  1024 | 32 | 4 | 8 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |     FIRST |  - | - | - |   - |    4 |      2 | No 0/1s |
+|  1088 | 16 | 4 | 4 |      MUL2 |       MUL |    - | 68 | 8 | 8 |       MUL |  ADD4MUL5 |  * | 8 | 4 | MUL |    5 |      3 | Dx ONLY |
+|  1152 | 12 | 4 | 8 |       ADD |       MUL |    - | 16 | 8 | 8 |       ADD |      MUL4 |  8 | 8 | - |   - |    5 |      1 | Dx ONLY |
+|  1280 | 16 | 4 | 4 |       MUL |       MUL |   80 | 16 | 4 | 4 |       MUL |       ADD | 64 | 8 | 8 | MUL |    6 |      2 | Dx ONLY |
+|  1536 | 16 | 8 | 8 |       ADD |       MUL |    - | 16 | 4 | 4 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 | Dx ONLY |
+|  2048 | 16 | 4 | 4 |       MUL |       MUL |    - | 32 | 4 | 8 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 | Dx ONLY |
+|  2304 | 32 | 4 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      ADD4 |  8 | 8 | - |   - |    5 |      2 | Dx ONLY |
+|  4096 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |     FIRST |  - | - | - |   - |    4 |      2 | No 0/1s |
+|  4608 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      ADD4 | 12 | 8 | 4 | ADD |    5 |      2 | Dx ONLY |
+|  8192 | 32 | 4 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 | Dx ONLY |
+| 16384 | 16 | 8 | 8 |       ADD |       MUL | 1024 | 32 | 4 | 8 |       MUL |       MUL | 32 | 4 | 8 | MUL |    6 |      2 | Dx ONLY |
+| 24576 | 12 | 4 | 8 |       ADD |       MUL | 2048 | 32 | 4 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      2 | Dx ONLY |
+| 32768 | 64 | 8 | 8 |       MUL |       MUL |    - | 64 | 8 | 8 |       MUL |      MUL4 |  8 | 8 | - |   - |    5 |      2 | Dx ONLY |
+| 65536 | 16 | 8 | 8 |       ADD |       MUL | 4096 | 64 | 8 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      3 | Dx ONLY |
+|131072 | 64 | 8 | 8 |       MUL |       MUL | 2048 | 32 | 4 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      3 | Dx ONLY |
+|262144 | 64 | 8 | 8 |       MUL |       MUL | 4096 | 64 | 8 | 8 |       MUL |       MUL | 64 | 8 | 8 | MUL |    6 |      3 | Dx ONLY |
 
 `*` - This column is cannot express a value for the two combined pair of LUTs LUTs in the case where one of them is added to the lower LUTs, and the whole thing multiplied by the other.
+
+`Dx ONLY` indicates that this is only possible on an AVR DA or DB-series part, because it requires 6 LUTs, and no other parts have yet had that.
+`No 0/1s` indicates that this is not possible on the tinyAVR 0-series or tinyAVR 1-series. It is possible on the megaAVR 0-series, tinyAVR 2-series, and all Dx-series and Ex-series parts.
 
 ### An alternate approach to generating clock signals
 1. Sacrifice the XCK pin of an unneeded USART. You must set the pin output.
