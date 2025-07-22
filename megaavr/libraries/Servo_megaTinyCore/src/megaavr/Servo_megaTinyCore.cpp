@@ -4,12 +4,12 @@
 #include <Servo_megaTinyCore.h>
 
 #if (F_CPU > 10000000)
-  #define usToTicks(_us)    ((( (_us) / 2) * clockCyclesPerMicrosecond()))            // converts microseconds to tick
+  #define usToTicks(_us)    ((((_us) / 2) * clockCyclesPerMicrosecond()))            // converts microseconds to tick
   #define ticksToUs(_ticks) (((unsigned) (_ticks) * 2) / clockCyclesPerMicrosecond()) // converts from ticks back to microseconds
   #define TRIM_DURATION  51                                                           // compensation ticks to trim adjust delays in the ISR
 #else
-  #define usToTicks(_us)    ((( _us) * clockCyclesPerMicrosecond()))                  // converts microseconds to tick
-  #define ticksToUs(_ticks) (((unsigned) _ticks) / clockCyclesPerMicrosecond())       // converts from ticks back to microseconds
+  #define usToTicks(_us)    ((( _us) * clockCyclesPerMicrosecond()))                 // converts microseconds to tick
+  #define ticksToUs(_ticks) (((unsigned) _ticks) / clockCyclesPerMicrosecond())      // converts from ticks back to microseconds
   #define TRIM_DURATION  102                                                          // compensation ticks to trim adjust delays in the ISR
 #endif
 
@@ -101,18 +101,8 @@ void ServoHandler(int timer) {
   _timer->INTFLAGS = TCB_CAPT_bm;
 }
 
-#if defined USE_TIMERB0
-  ISR(TCB0_INT_vect)
-#elif defined USE_TIMERB1
-  ISR(TCB1_INT_vect)
-#elif defined USE_TIMERB2
-  ISR(TCB2_INT_vect)
-#elif defined USE_TIMERB3
-  ISR(TCB3_INT_vect)
-#elif defined USE_TIMERB4
-  ISR(TCB4_INT_vect)
-#endif
-{
+/* Defined in ServoTimers.h */
+ISR(SERVO_INT_vect) {
   ServoHandler(0);
 }
 

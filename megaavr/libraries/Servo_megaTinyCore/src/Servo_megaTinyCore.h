@@ -9,8 +9,8 @@
   This library is included with megaTinyCore and DxCore.
 
   This version was designed for and will be included with:
-  megaTinyCore 2.3.0+
-  DxCore 1.3.2+
+  megaTinyCore 2.6.0+
+  DxCore 1.5.0+
 */
 
 /*  OBLIGATORY LEGAL BOILERPLATE
@@ -56,22 +56,20 @@
 
 
   This library supports 12 servos controlled by one timer.
-  It does not recruit additional timers. Who the hell runs over a dozen
-  servos from one board? Complain in the github issues for the core if
-  this is actually a problem - I'm inclined to think it's not.
+  It does not recruit additional timers.
 
-  This version is the alternate-name one for megaTinyCore
-  These are used to load this library even if the original one has been
-  installed - would take preference over a core-supplied library named
-  Servo - even though the core-supplied one worked, and the one in library
-  folder would just #error about unsupported part.
-*/
+  Who the hell runs over a dozen servos from one board? Complain in the github
+  issues for the core this was packaged with if this is actually a problem for you...
+  I don't expect to hear from anyone. -Spence, Jan 2021
+ */
 
 #ifndef Servo_h
 #define Servo_h
-
 #include <inttypes.h>
-#if (!defined(TCB_CLKSEL2_bm))
+#include <core_devices.h> // They renamed about a thousand _bm and _bp defines in latest atpacks, this file (included automatically via Arduino.h for sketches)
+// ensures compatibility with both toolchain versions without the header having to include the whole Arduino.h). About 4000 lines of fixes, generatede with
+// find-all, a manual read-through, and then regex replacement to add the workaround). That is, I did what they should have done.
+#if (!defined(TCB_CLKSEL_2_bm))
   // This means it's a tinyAVR 0/1-series, or a megaAVR 0-series.
   // Their TCB_CLKSEL enums use different names for the clock settings, for reasons unclear.
   // To align with the future, we use the Dx-series names for these.
@@ -80,7 +78,7 @@
 #endif
 #if defined(ARDUINO_ARCH_MEGAAVR)
   #include "megaavr/ServoTimers.h"
-  #if (F_CPU==1000000)
+  #if (F_CPU == 1000000)
     #pragma message("Running at 1MHz results in unstable servo signal.")
   #endif
 #else
@@ -92,17 +90,15 @@
 #define MIN_PULSE_WIDTH          544     // the shortest pulse sent to a servo
 #define MAX_PULSE_WIDTH         2400     // the longest pulse sent to a servo
 #define DEFAULT_PULSE_WIDTH     1500     // default pulse width when servo is attached
-#define REFRESH_INTERVAL       20000UL   // minumim time to refresh servos in microseconds
-                                         // UL is super-important, otherwise it will work at low system clock
-                                         // but overflow at higher ones!
+#define REFRESH_INTERVAL       20000UL   // minumim time to refresh servos in microseconds - UL is super-important!
 #define SERVOS_PER_TIMER          12     // the maximum number of servos controlled by one timer
 #define INVALID_SERVO            255     // flag indicating an invalid servo index
-
-#define MAX_SERVOS (_Nbr_16timers  * SERVOS_PER_TIMER)
 // *INDENT-ON*
+#define MAX_SERVOS (_Nbr_16timers  * SERVOS_PER_TIMER)
 
-typedef struct  {
-  uint8_t isActive ;    // true if this channel is enabled, pin not pulsed if false
+
+typedef struct  {       // port & bitmask used instead of pin number to realize dramatic performance boost
+  uint8_t isActive;    // true if this channel is enabled, pin not pulsed if false
   uint8_t port;         // port number (A=0, B=1, and so on)
   uint8_t bitmask;      // port & bitmask used instead of pin number to realize dramatic performance boost
 } ServoPin_t   ;
