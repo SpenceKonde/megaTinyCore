@@ -169,7 +169,7 @@ Propagation time (Tp) is in ns, and has been rounded to quarter-nanoseconds to d
 Current was also measured using a bench power supply. As the power supply in quetion is known to be of low quality (typical low cost chinese import bench supply). It was deemed sufficiently accurate for this purpose, though its readings were sometimes not reproducible, leading to uncertainty about whether the discrepancy was within the microcontroller or elsewheremember, this is a sample size of 1 tested under conditions governed by expediency, not precision. I did, however, set the cpu speed to 1 MHz to reach lower voltages and to make the control numbers more useful
 
 | Vdd   | F(case1) | F(case2) | Tp CCL   | Tp EVSYS | I (case1) | I (case2) | I(control) |Notes
-|-------|----------|----------|---------------------|-----------|-----------|------------|
+|-------|----------|----------|---------------------|-----------|-----------|------------|----
 | 5.2   | 84.x MHz | 49 MHz   |  6.0     |  4.25    |    n/t    |    n/t    |     n/t    | *VUSB, current unmetered.
 | 5.0   | 83.x MHz | 48 MHz   |  6.0     |  4.50    |     17 mA |      6 mA |       0    |
 | 4.5   | 78 MHz   | 44 MHz   |  6.5     |  5.0     |     12 mA |      6    |       0    |
