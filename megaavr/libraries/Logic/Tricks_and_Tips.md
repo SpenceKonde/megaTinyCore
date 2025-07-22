@@ -70,10 +70,10 @@ These are cases that treat all inputs equally (the logic formulas are hideous or
 
 A significant number of options come in sets of threes; these indicate:
 1. All of these have a logical formula of `( α [and|or] (β [opp] γ))`
-  * `[opp]` is any binary logical operator where the order of the arguments doesn't matter; essentially all of them
-    * "Don't care" is an option, too.
-    * So the two 3/6 bit-set sets (A, and !A) fit the above 1 same 2 different pattern: 1 significant input, and two that are treated the same: they're disregarded.
-  * It's worth noting that even whacky behavior - eg `A and !(B or C) or (!A and (B or C))` does conform to this.
+* `[opp]` is any binary logical operator where the order of the arguments doesn't matter; essentially all of them
+  * "Don't care" is an option, too.
+  * So the two 3/6 bit-set sets (A, and !A) fit the above 1 same 2 different pattern: 1 significant input, and two that are treated the same: they're disregarded.
+* It's worth noting that even whacky behavior - eg `A and !(B or C) or (!A and (B or C))` does conform to this.
 
 
 | TRUTH & 0x7E     | Bits set | Rationalization                                                                                               | Logic
@@ -219,11 +219,10 @@ The clocks have some counterintuitive behavior. First off, what do they and do t
   * The logic block itself
 
 ### Ugly graphic depicting above
-[Clock Domain Illustration][ClockDomains.png]
-
+![Clock Domain Illustration](ClockDomains.png "Clock Domain Illustration")
 ### Annotated graphic from the datasheet re: feedback paths
 Highlighted in color below. No part announced, much less shipped, has had an odd number of LUTs. They're unlikely to start now.
-[Annotated block diagram][LUTFeedback.png]
+![Annotated block diagram](LUTFeedback.png "Annotated block diagram")
 ### The edge detector
 Sometimes you need a pulse when all you have is a level. This gets you there. The clock is involved because the resulting pulse is 1 CCL clock long (occasionally this is not long enough, since the CCL clock can be faster than the system clock, particularly on the EB, where you can clock the CCL from the PLL, or you may be using a very slow clock, and it could be troublesome how long it is.
 
