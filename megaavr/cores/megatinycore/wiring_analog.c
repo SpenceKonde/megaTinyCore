@@ -1115,7 +1115,6 @@ void analogWrite(uint8_t pin, int val) {
     return;
   }
   #if defined(TCD0) && defined(USE_TIMERD0_PWM) && defined(NO_GLITCH_TIMERD0)
-
     uint8_t set_inven = 0;
   #endif
   // Set pin output because that's what Arduino does
@@ -1286,7 +1285,7 @@ void analogWrite(uint8_t pin, int val) {
   /**********************************************************************
   * PART 3.5: TIMERD noglitch
   **********************************************************************/
-          #if defined(NO_GLITCH_TIMERD0) // This mode is always used with the stock variant.
+          #if defined(NO_GLITCH_TIMERD0) // This mode is no longer used by default, as it caused some other problems.
             #if defined(USE_TCD_WOAB) && _AVR_PINCOUNT != 8
               // TCD is on PA4 or PA5 on 14+ pin parts
               if (set_inven == 0) { // we are not setting invert to make the pin HIGH when not set; either was 0 (just set CMPxSET > CMPBCLR) or somewhere in between.

@@ -10,10 +10,6 @@ The event system allows routing of signals from event "generators" (outputs on v
 
 More information about the Event system and how it works can be found in the [Microchip Application Note AN2451](http://ww1.microchip.com/downloads/en/AppNotes/DS00002451B.pdf) and in the [megaAVR-0 family data sheet](http://ww1.microchip.com/downloads/en/DeviceDoc/megaAVR0-series-Family-Data-Sheet-DS40002015B.pdf), or the datasheet for the part you're using.
 
-
-
-
-
 ## Level vs. Pulse events
 There are two types of events - a "pulse" interrupt, which lasts for the duration of a single clock cycle (either `CLK_PER` or a relevant (slower) clock - for example, the USART XCK generator provides a pulse event which lasts one XCK period, which is far slower than CLK_PER (the "peripheral; . while the TCD0-derived ones are) or a "level" interrupt which lasts for the duration of some condition. Often for a given even generator or user only one or the other makes sense. Less often, for some reason or another, you may need a level event, but all you have is a pulse event - or the other way around. A [CCL module (Logic.h)](../Logic/README.md) event between the two at the cost of the logic module and one event channel. In the case of timer WO (PWM) channels, the CCL already has level inputs to match the pulse inputs that the event system can get on compare match. Many of the pulse interrupts are generated at the same moment that interrupt flags get set - except that where an interrupt bit sticks around until serviced, the pulse bit is present generally for only a single clock cycle (meaning they are only *usable* for triggering other event system things or peripherals. s can be (they often let you do similar things faster with less CPU involvement, too), but unlike interrupts, they won't stick around until you explicitly clear them
 
@@ -32,7 +28,12 @@ Thus:
 * Users modules know whether they need a sync or async signal, and use the appropriate event subchannel.
 * There is only one type of channel - with a sync and async subchannel.
   * If the generator is synchronous, both subchannels are identical synchronous signals.
-  * If it's not, then the async subchannel gets the unchantged asynchronous signal, which goes through a synchronizer and the output of the synchronizer goes onto the sync channel.
+  * If it's not, then the async subchannel gets the unchanged asynchronous signal, which goes through a synchronizer and the output of the synchronizer goes onto the sync channel.
+* Now, if you read the above a couple of times, you realize that *on a 2-series, or anything not a 0/1-series you can forget about sync/async channels, because anything that needs a synchronous signal will get a synchronized one*.
+  * You still need to be cognizant of pulse lengths, especially if you have something that ha
+* It is difficult to understand why, in light of this, there is no register we can read to see the state of all these signals that are supposedly synchronized, and should be easy to make available on a register.
+  * There must be some technical issue with this, as it's too obvious to have not gone in if it was easy to implement.
+  * UNLESS the paradigm of the original design - which DID have
 
 The fact that it is asynchronous usually doesn't matter - it's either "faster than anything else" (if the user is async), or "2-3 clock cycles behind", but it is one of the things one should keep in mind when using these features, because every so often it does matter.
 
@@ -151,20 +152,24 @@ Below is a table with all of the event users for the tinyAVR 0/1/2-series parts
 
 | Part Series | Event Channels | Chan/port | Layout  | 1port ch | pinless  |
 |-------------|----------------|-----------|---------|----------|----------|
-| tinyAVR 0   | 1 sync 2 async |    1 or 2 |V. Wacky |  1 or 0  |       0  |
-| tinyAVR 1   | 2 sync 4 async |         2 |  Wacky  |       4  |1,2 or 4  |
-| megaAVR 0   | 6 <48pin or 8  |         2 | Uniform |  2 or 0  |  0 or 2  |
-| tinyAVR 2   |   Always 6     |         4 |AB-CA-BC |  2 or 0  |       0  |
-| AVR DB/DA   | 8 <48pin or 10 |         2 | Uniform |       2  |       2  |
-| AVR DD      |   Always 6     |         2 | Uniform |    *2-4  |       0  |
-| AVR DU      |   Always 6     |       All | Ident.  |     n/a  |     n/a  |
-| AVR EA      |   Always 6     |       All | Ident.  |     n/a  |     n/a  |
+| tinyAVR 0   | 1 sync 2 async |    1 or 2 |V. Wacky |  1 or 0  |  0 or 1  |  A+C, A, B, NO PIT EVENTS EVER
+| tinyAVR 1   | 2 sync 4 async |         2 |  Wacky  | all but 1|1,2 or 4  |  A+C, B, A, B, C, RTC
+| megaAVR 0   | 6 <48pin or 8  |         2 | Uniform |  2 or 0  |  0 or 2  |  A+Bx2, C+Dx2, E+Fx2, 2 new channels added on 09's are pinless, 4 of 8 RTC opts per channel
+| tinyAVR 2   |   Always 6     |         4 |AB-CA-BC |  4 or 0  |       0  |  A+Bx2, C+Ax2, B+Cx2, 4 of 8 RTC opts per channel
+| AVR DB/DA   | 8 <48pin or 10 |         2 | Uniform |4, 0 or 2 |2, 4 or 2 |  A+Bx2, C+Dx2, E+Fx2, G x2. The 28-pin parts have 2 pinless event channels,<br/> and 4 single port channels. 48-pin gains the 2 missing ports, plus 2 new pinless,<br/> then 64-pin gets the PORTG, govomg channels 6-7 a promotion from pinless to 1-port.
+| AVR DD      |   Always 6     |         2 | Uniform |       4  |       0  |  A+Bx2, C+Dx2, E+Fx2  As DA/DB. with 14-pins, all 1-port channels have 2-pin ports with special functions (UPDI programming, reset, etc)
+| AVR DU      |   Always 6     |       All | Ident.  |     n/a  |     n/a  |  All chan have EVGEN0/1 from ALL ports, port event pins via PORT's EVGENCTRL. RTC PIT got same treatment.
+| AVR EA      |   Always 6     |       All | Ident.  |     n/a  |     n/a  |  Event channel equality at last!
 | AVR EB      |   Always 6     |       All | Ident.  |     n/a  |     n/a  |
 
-Chan/Port: Number of generator channels that pins with of a specific port can be routed to; On the 0-series and 1-series there were 3 or 5 channels available (the last async channel was dedicated to the RTC event generators)
 
 
-1port ch: The parts potentially have this many event channelsthat can only access one port's event inputs (number of these inferior channels will be )
+
+1port ch: The parts potentially (per pinout) have this many event channels that can only access one port's event generator
+
+pinless: The parts potentially (per pinout) have this many event channels that can't be connected to any port's event generator
+
+
 
 The tinyAVR 0/1-series layouts are really weird. See the documentation included with megaTinyCore for the table; 0-series don't have any RTC-PIT options, and 1-series has them all crowded onto one channel; both of them have two kinds of channels, and are generally a lot less flexible. The tinyAVR 2-series, on the other hand, is almost normal - except they have a better layout - (channels 0/1 get PA, PB, 2/3 get PC, PA and the last 2 get PB, PC. It's unclear how EA will be handled, Taken at face value the EA's product brief implies 6 channels in the standard layout, for 2 channels per port. 14-pin AVR-DD will have only 2 pins in PORTA (and with no portB, those 2 pins have channels 0 and 1 to themselves), and with no port E either, the 14 and 20pin parts will have only the two pins on PORTF, which are not going to be everyone's first choice for I/O (PF6 and PF7 are Reset and UPDI), so channels 4 and 5 are nearly pinless - assuming that what's in the headers pre-release is what they will ship. There is room for improvement, though it's really not bad.
 

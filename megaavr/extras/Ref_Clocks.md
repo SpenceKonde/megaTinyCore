@@ -45,11 +45,8 @@ The AVR Dx-series come in I and E  spec parts.
 
 Since the DA-series was released, Microchip has STOPPED MARKING THE SPEED GRADE ON THE CHIPS. Be sure that if you have both speed grades, you mark the chips somehow (0 and 1-series parts do still have the temperature rating marked (N = 105, F = 125).
 
-
 Some of the listed speeds, while supported by the hardware are not supported by the core - typically weird, slow clocks, particularly from a crystal
 For unsupported speeds, the micros and delay-us columns indicate what internal plumbing has been implemented. micros is implemented for almost all speeds, delayMicroseconds with non-compile-time-known delays for most, even some unsupported ones. delayMicroseconds() is supported and accurate at all speeds when the argument is a compile-time-known constant, as we use the avr-libc implementation.
-
-###
 
 | Clock Speed | W/in Spec (tiny, Ex) | W/in Spec (Dx) | Internal (tiny) | Internal (Dx) |  Ext. Crystal |    Ext. Clock | micros | delay-us | Notes
 |-------------|----------------------|----------------|-----------------|---------------|---------------|--------|----------|-------------
@@ -112,7 +109,6 @@ void setup() {
 
   // more stuff after this to set up your sketch
 }
-
 ```
 
 ## Overclocking

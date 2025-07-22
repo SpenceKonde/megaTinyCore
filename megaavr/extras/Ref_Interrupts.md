@@ -25,29 +25,29 @@ You cannot define the same vector as two different things. This is most often a 
 ## List of interrupt vector names
 If there is a list of the names defined for the interrupt vectors is present somewhere in the datasheet, I was never able to find it. These are the possible names for interrupt vectors on the parts supported by megaTinyCore. Not all parts will have all interrupts listed below (interrupts associated with hardware not present on a chip won't exist there). An ISR is created with the `ISR()` macro.
 
-**WARNING** If you misspell the name of a vector, you will get a compiler warning BUT NOT AN ERROR! Hence, you can upload the bad code... in this case the chip will reset the instant the ISR you thought you assigned is called, as it jumps to BAD_ISR, which in turn jumps to the reset vector... but since the reti instruction is never executed, it still thinks its in an interrupt. Unless you've defanged the megaTiynCore dirty reset protection, this will be caught and trigger an unexpected reset. Otherwise, it will either reset uncleanly, hang, or behave unpredictably. See the [reset reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md) for more information on this potential failure mode.
+**WARNING** If you misspell the name of a vector, you will get a compiler warning BUT NOT AN ERROR! Hence, you can upload the bad code... in this case the chip will reset the instant the ISR you thought you assigned is triggered, as it jumps to BAD_ISR (yeah, this behavior sucks. Look at AVRlibc if you want to blame someone), which in turn jumps to the reset vector... but since the reti instruction is never executed, it still thinks its in an interrupt. Unless you've defanged the megaTiynCore dirty reset protection, this will be caught and trigger an unexpected reset. Otherwise, it will either reset uncleanly, hang, or behave unpredictably. See the [reset reference](https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/Ref_Reset.md) for more information on this potential failure mode.
 
 | Vector Name       | 0 | 1 | 2 |Flags| Flag Cleared on | Notes                                       |
 |-------------------|---|---|---|-----|-----------------|---------------------------------------------|
 | AC0_AC_vect       | X | X | X |  1  | Manually        |                                             |
 | AC1_AC_vect       |   | * |   |  1  | Manually        | 1-series with 16k or 32k flash only         |
 | AC2_AC_vect       |   | * |   |  1  | Manually        | 1-series with 16k or 32k flash only         |
-| ADC0_ERROR_vect   |   |   | X | >1  | Manually        | Multiple flags for different errors         |
-| ADC0_SAMPRDY_vect |   |   | X | 1/2 | Read sample reg | WCOMP uses SAMPRDY or RESRDY on 2-series    |
-| ADC0_RESRDY_vect  | X | X | X | 1/2 | Read result reg |                                             |
+| ADC0_ERROR_vect   |   |   | X |  3^ | Manually        | Multiple flags for different errors         |
+| ADC0_SAMPRDY_vect |   |   | X |  2! | Read sample reg | WCOMP uses SAMPRDY or RESRDY on 2-series    |
+| ADC0_RESRDY_vect  | X | X | X |  2! | Read result reg |                                             |
 | ADC0_WCOMP_vect   | X | X |   |  1  | Manually        | Window Comparator on 0/1-series             |
 | ADC1_RESRDY_vect  |   | * |   |  1  | Read result reg | 1-series with 16k or 32k flash only         |
 | ADC1_WCOMP_vect   |   | * |   |  1  | Manually        | 1-series with 16k or 32k flash only         |
 | BOD_VLM_vect      | X | X | X |  1  | Manually(?)     | The behavior is not exactly clear for flag  |
-| CCL_CCL_vect      |   |   | X | 2/4 | Manually        | Shared by whole CCL. Not present on 0/1     |
+| CCL_CCL_vect      |   |   | X |  4! | Manually        | Shared by whole CCL. Not present on 0/1     |
 | CRCSCAN_NMI_vect  | X | X | X |  1  | Reset           | NMI can ensure device stopped if CRC fails  |
 | NVMCTRL_EE_vect   | X | X | X |  1  | Write/Manually  | ISR must write data or disable interrupt    |
-| PORTA_PORT_vect   | X | X | X |  8  | Manually        |                                             |
-| PORTB_PORT_vect   | X | X | X |  8  | Manually        | Not present on 8-pin parts                  |
-| PORTC_PORT_vect   | X | X | X |  8  | Manually        | Not present on 8 or 14-pin parts            |
+| PORTA_PORT_vect   | X | X | X |  8! | Manually        |                                             |
+| PORTB_PORT_vect   | X | X | X |  8! | Manually        | Not present on 8-pin parts                  |
+| PORTC_PORT_vect   | X | X | X |  8! | Manually        | Not present on 8 or 14-pin parts            |
 | RTC_CNT_vect      | X | X | X |  2  | Manually        | Two possible flags, CNT and OVF             |
 | RTC_PIT_vect      | X | X | X |  1  | Manually        |                                             |
-| SPI0_INT_vect     | X | X | X | 2-5 | Depends on mode | 2 in normal, 5 in buffered mode. See datasheet|
+| SPI0_INT_vect     | X | X | X |     | Depends on mode | 2 in normal, 5 in buffered mode. See datasheet|
 | TCA0_CMP0_vect    | X | X | X |  1  | Manually        | Alias: TCA0_LCMP0_vect if in SPLIT mode **  |
 | TCA0_CMP1_vect    | X | X | X |  1  | Manually        | Alias: TCA0_LCMP1_vect if in SPLIT mode **  |
 | TCA0_CMP2_vect    | X | X | X |  1  | Manually        | Alias: TCA0_LCMP2_vect if in SPLIT mode **  |
@@ -57,15 +57,22 @@ If there is a list of the names defined for the interrupt vectors is present som
 | TCB1_INT_vect     |   | * | X |  2  | Depends on mode | 1-series with 16k or 32k flash or 2-series, 2 flags on 2-series only  |
 | TCD0_OVF_vect     |   | X |   |  1  | Manually        |                                             |
 | TCD0_TRIG_vect    |   | X |   |  1  | Manually        |                                             |
-| TWI0_TWIM_vect    | X | X | X | >1  | Usually Auto    | See datasheet, this is complicated and kind |
-| TWI0_TWIS_vect    | X | X | X | >1  | Usually Auto    | -of obtuse. Just use Wire.h                 |
+| TWI0_TWIM_vect    | X | X | X |  2+ | Usually Auto    | See datasheet, this is complicated and kind |
+| TWI0_TWIS_vect    | X | X | X |  2+ | Usually Auto    | -of obtuse. Just use Wire.h                 |
 | USART0_DRE_vect   | X | X | X |  1  | Write/Disable   | ISR must write data or disable interrupt    |
-| USART0_RXC_vect   | X | X | X |  1  | RXCIF, on read  | Error flags, if enabled, only cleared manually |
+| USART0_RXC_vect   | X | X | X |     | RXCIF, on read  | Error flags, if enabled, only cleared manually |
 | USART0_TXC_vect   | X | X | X |  1  | Manually        | Often used without the interrupt enabled    |
+| USART0_DRE_vect   |   | X | X |  1  | Write/Disable   | ISR must write data or disable interrupt    |
+| USART0_RXC_vect   |   | X | X |     | RXCIF, on read  | Error flags, if enabled, only cleared manually |
+| USART0_TXC_vect   |   | X | X |  1  | Manually        | Often used without the interrupt enabled    |
 
-`*` - There are two classes of 1-series - the ones with 16k or more of flash, and the ones with less. These are only available on the larger ones, because they operate on a peripheral that only exists there.
-`**` - These vectors are traditionally referred to by different names when in split mode or normal mode, but the hardware can't tell the difference between the names.
+Interrupts *with more than one flag* need to act knowing that if the ISR exits without clearing all enabled interrupt flags that could lead tothat ISR being fired again almost immediately. This is potentially useful (in admittedly pathological conditions) where you have a slow interrupt (with somewhat forgiving timing requirements, which is why it shouldn't be in the ISR), such that you're forced to enable the roundrobin mode, and still found that if you handled two of the long ones within a single ISR (without returning so other ISRs could run) would blow the spec'ed timing requirements; Your handler might then check theflags until it found one that was set, do what neededto be done and clear that bit andreturn. If there was another flag lit up for it, all the other interrupts would get achance to run before it came back around. Like I said, that's indicative of poor code (as is round-robin mode more generally.)
 
+In most other circumstances, the flag behavior is just a pain in the ass. Several notes are marked in the flags column
+```text
+! = There are more than flag, but the differences between them are obvious (ex, port interrupts - there's a separate bit per pin, or the 2-series ADC where SAMPRDY or RESRDY can be set to trigger from the windowcomparator - if you want that, you know what it is, )
+
+```
 
 ## Why clearing flags is so complicated
 Almost all flags *can* be manually cleared - the ones that can be cleared automatically generally do that to be helpful:
@@ -346,3 +353,49 @@ ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 
 
 `*` Those registers have, between 2015 and 2021 been called GPIORn. GPIOn, and GPIORn. At this rate, by 2030, we'll have
+
+
+## Appendix: Vector Index for tinyAVR
+
+| Vector Name       | T2 | 16k+ | 2-8k |
+|-------------------|----|------|------|
+| CRCSCAN_NMI_vect  |  1 |    1 |    1 |
+| BOD_VLM_vect      |  2 |    2 |    2 |
+| RTC_CNT_vect      |  3 |    6 |    6 |
+| RTC_PIT_vect      |  4 |    7 |    7 |
+| CCL_CCL_vect      |  5 |    . |    . |
+| PORTA_PORT_vect   |  6 |    3 |    3 |
+| PORTB_PORT_vect   |  7 |    4 |    4 |
+| TCA0_LUNF_vect    |  8 |    8 |    8 |
+| TCA0_OVF_vect     |  8 |    8 |    8 |
+| TCA0_HUNF_vect    |  9 |    9 |    9 |
+| TCA0_CMP0_vect    | 10 |   10 |   10 |
+| TCA0_LCMP0_vect   | 10 |   10 |   10 |
+| TCA0_CMP1_vect    | 11 |   11 |   11 |
+| TCA0_LCMP1_vect   | 11 |   11 |   11 |
+| TCA0_CMP2_vect    | 12 |   12 |   12 |
+| TCA0_LCMP2_vect   | 12 |   12 |   12 |
+| TCB0_INT_vect     | 13 |   13 |   13 |
+| TCD0_OVF_vect     |  . |   15 |   14 |
+| TCD0_TRIG_vect    |  . |   16 |   15 |
+| TWI0_TWIM_vect    | 14 |   24 |   19 |
+| TWI0_TWIS_vect    | 15 |   25 |   20 |
+| SPI0_INT_vect     | 16 |   26 |   21 |
+| USART0_DRE_vect   | 17 |   27 |   22 |
+| USART0_RXC_vect   | 18 |   28 |   23 |
+| USART0_TXC_vect   | 19 |   29 |   24 |
+| AC0_AC_vect       | 20 |   17 |   16 |
+| AC1_AC_vect       |  . |   18 |    . |
+| AC2_AC_vect       |  . |   19 |    . |
+| ADC0_ERROR_vect   | 21 |    . |    . |
+| ADC0_SAMPRDY_vect | 22 |    . |   17 |
+| ADC0_RESRDY_vect  | 23 |   20 |   18 |
+| ADC0_WCOMP_vect   |  . |   21 |    . |
+| ADC1_RESRDY_vect  |  . |   22 |    . |
+| ADC1_WCOMP_vect   |  . |   23 |    . |
+| PORTC_PORT_vect   | 24 |    5 |    5 |
+| TCB1_INT_vect     | 25 |   14 |    . |
+| USART1_DRE_vect   | 26 |    . |    . |
+| USART1_RXC_vect   | 27 |    . |    . |
+| USART1_TXC_vect   | 28 |    . |    . |
+| NVMCTRL_EE_vect   | 29 |   30 |   25 |

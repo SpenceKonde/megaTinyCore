@@ -18,6 +18,7 @@ The lists of errata are ~hidden~ located in a separate document, the "Errata and
 Serial.print("Silicon revision is: ");
 Serial.println(SYSCFG.REVID);
 ```
+Oh, and I've seen parts where SYSCFG.REVID reads as 0... *shrug* They're definitely normal chips though.
 
 Thankfully, most of these issues will not be encountered by most Arduino users. The impact column indicates the likelihood that someone working with an impacted part through megaTinyCore and Arduino would encounter it.
 
@@ -44,13 +45,13 @@ Errata apply to a specific die. But the same die may be used on multiple parts, 
   * 212, 214, 412, 414, 416 - the small flash ones
   * 814, 816, 817, 417 - 8k parts
   * 1614, 1616, 1617 - 16k parts
-  * 3216, 3217 - 32k parts (we very nearly got a 3214! They had even started including the IO headers for it (I mean, it's the same die as a 3217 in a 14-pin package) But they never shipped any silicon. No idea why - I'd like to think it was strategic decision based on expected market demand, rather than an "oh shit", but I have my suspicions... One imagines the development was done on the 24-pin part. We also know they were tight on die size, that's why there's no 3216 in QFN. The QFN24 is slightly wider than a SOIC-N... maybe the die just barely fit in the QFN24 they wanted to use, and although you could fit more die area into a SOIC-N package if the die were rectangular, it was forced to be square to fit the QFN).
+  * 3216, 3217 - 32k parts (we very nearly got a 3214! They had even started including the IO headers for it. I mean, it's the same die as a 3217 in a 14-pin package... But they never shipped any silicon. No idea why - I'd like to think it was strategic decision based on expected market demand, rather than an "oh shit", but I have my suspicions... One imagines the development was done on the 24-pin part. We also know they were tight on die size, that's why there's no 3216 in QFN. The QFN24 is slightly wider than a SOIC-N... maybe the die just barely fit in the QFN24 they wanted to use, and although you could fit more die area into a SOIC-N package if the die were rectangular, it was forced to be square to fit the QFN).
 * tinyAVR 2-series
   * all 4k/8k - Interesting, no longer worth it to separate the 4 and 8k parts into different dies.
   * all 16k - This is clearly what was used for development - it's at rev E!
   * all 32k
 
-## The grand combined table, now readable
+## The grand combined table, now on google sheets
 [**The table is now in Google Sheets and publicly viewable - color coded too!**](https://docs.google.com/spreadsheets/d/1N-dDZ3WogEXRYcOip5kOREj_ExPQQRD1OrgMuywjXzw/edit?usp=sharing)
 
 
@@ -76,7 +77,7 @@ For each issue, if warranted. we have added a **megaTinyCore note** describing i
 
 ### Device
 
-#### Write Operation Lost if Consecutive Writes to Specific Address Spaces
+#### Write Operation Lost if Consecutive Writes to Specific Address Spaces I
 An ST/STD/STS instruction to address > = 64 followed by an ST/STD instruction to address < 64 or SLPCTRL.CTRLA will cause loss of the last write.
 
 **Work Around:**
@@ -85,7 +86,7 @@ To avoid loss of write operation, use one of the following workarounds depending
 * Insert a NOP instruction before writing to SLPCTRL.CTRLA
 
 **megaTinyCore notes:**
-Currently, this is only in the tinyAVR 1-series w/under 8k flash errata sheet. However it is also present of the opposite side of the AVR line impacting their latest parts, the EA-series (which I believe are more closely related to tinyAVRs than Dx-series). I think it is very unlikely that this issue is not present on all modern tinyAVRs, and I wouldn't be surprised if it impacted all AVRxt parts period. As you can see from the instruction set manual, AVRxt was closely modeled on AVRxm, with one of the major areas of difference being that AVRxt has changed the memory interface, trading the wacky combined read/write instructions for performance and probably die size. This bug was likely a consequence of that, in combination with the removal of the 20 working registers from the main data address space (that accounts for why it can strike addresses as high as 0x5F - rather than only going up to 0x3F).
+This effects all modern AVRs as of the time of writing. As you can see from the instruction set manual, AVRxt was closely modeled on AVRxm, with one of the major areas of difference being that AVRxt has changed the memory interface, trading the wacky combined read/write instructions for performance and probably die size. This bug was likely a consequence of that, in combination with the removal of the 20 working registers from the main data address space (that accounts for why it can strike addresses as high as 0x5F - rather than only going up to 0x3F).
 
 Though some will think this bug to be mighty and dreadful, it is not so.
 
@@ -103,6 +104,10 @@ If anyone can come up with a case contrary to this, where if it weren't for this
 The IDD power-down leakage can exceed the targeted maximum value of 2 µA. Note that this maximum value is a target and not documented in the preliminary data sheet.
 
 **Workaround:** None.
+
+**megaTinyCore note:** The typical charachteristics paint a much better picture than this erratum. (of course, these are *typical* charachteristics) - The current stays under 0.5uA in power down sleep until around 80C, at which point it tacks sharply upward, with around 2uA at 125C and 1.8 volts, and twice that at 5.5V - though the voltage dependence is also exponential (less dramatically so) - it's only 2.5 uA at 4V.
+
+Anyway, *the charachteristics graphs for all 2-series show the same power down current*. There has only been one rev of each released to production. So either the target was 2.0 uA across all voltages, but the parts only hit that on average at 1.8V, and the power consumption is the same on all of them (that is, they raised the target so it wasn't an erratum on the others), or does the graph show what it would be without the erratum? If so, how do they know?
 
 #### On ~24-Pin~ *ATtiny1617* Automotive Devices Pin PC5 is Not Available
 
@@ -123,7 +128,7 @@ The temperature sensor is not calibrated on parts with date code 727/728 (used o
 
 **megaTinyCore note:** These are unlikely to be found in the wild anymore.
 
-### AC - Analog Comparator
+### AC - Analog Comparator (All exckusive to 0/1-series)
 #### Coupling Through AC Pins
 There is a capacitive coupling through the Analog Comparator. Toggling the selected positive AC pin may affect the selected negative input pin and vice versa.
 
@@ -158,7 +163,7 @@ A false trigger may occur if sweeping the negative input of the AC with a negati
 ### ADC - Analog-to-Digital Converter
 Note that the 0/1-series ADC and the 2-series ADC are fundamentally very different. There is no erratum that is not specific to one or the other. All of the 2-series specific ones involve LOWLAT in some way.
 
-#### ADC Stays Active in Sleep Modes for Low Latency Mode and Free Running Mode
+#### ADC Stays Active in Sleep Modes for Low Latency Mode and Free Running Mode (2-series)
 If the Low Latency bit (LOWLAT in ADCn.CTRLA) is '1', the ADC stays active when the device enters Power-Down
 or Standby sleep modes. If the Free-Running bit (FREERUN in ADCn.CTRLF) is '1', the ADC continues to run in
 Standby sleep mode even if the Run in Standby bit (RUNSTDBY in ADCn.CTRLA) is '0'. In both cases, the interrupts
@@ -167,14 +172,14 @@ will not trigger when the device enters Power-Down or Standby sleep mode.
 
 **megaTinyCore note:** We always set LOWLAT mode unless it is explicitly turned off. Therefore, **you must disable the ADC prior to entering sleep mode in order to get acceptable power consumption while sleeping**.
 
-#### Low Latency Mode Must Be Set Before Changing ADC Configuration
+#### Low Latency Mode Must Be Set Before Changing ADC Configuration (2-series)
 If using the low latency mode in the ADC, the initialization delay does not start for settings configured before the Low Latency (LOWLAT) bit in the Control A (ADCn.CTRLA) register. This may result in a conversion starting before the initialization time has ended and give a corrupt result.
 
 **Work Around:** Enable the low latency bit (LOWLAT) in the Control A (ADCn.CTRLA) register at the start of ADC initialization before configuring any other register in the ADC.
 
 **megaTinyCore note:** The core enables LOWLAT be default. ADCPowerOptions *attempts* to ensure that this erratum does not cause problems, but it is recommended that users not rely on our guardrail.
 
-#### The PGA Initialization Delay Does Not Work Outside Low Latency Mode
+#### The PGA Initialization Delay Does Not Work Outside Low Latency Mode (2-series)
 The initialization delay for the PGA does not start when the LOWLAT bit is ‘0’. This may cause a corrupt conversion
 when the PGA is the module with the slowest initialization time. When using the internal references, this is not an
 issue because of a slower initialization delay.
@@ -183,42 +188,42 @@ issue because of a slower initialization delay.
 
 **megaTinyCore note:** If using the PGA, but not the internal references, you must have LOWLAT mode enabled. This is done by the core by default and can be controlled with ADCPowerOptions().
 
-#### SAMPDLY and ASDV Does Not Work Together With SAMPLEN
+#### SAMPDLY and ASDV Does Not Work Together With SAMPLEN (0/1-series)
 Using `SAMPCTRL.SAMPLEN` at the same time as `CTRLD.SAMPDLY` or `CTRLD.ASDV` will cause an unpredictable sampling length.
 
 **Workaround:** When setting `SAMPCTRL.SAMPLEN` greater than 0x0, the `CTRLD.SAMPDLY` and `CTRLD.ASDV` must be cleared.
 
 **megaTinyCore note:** Not an issue unless you reconfigure the ADC manually. Be aware that SAMPLEN is configured by the core to roughly match expected behavior (based on other Arduino-compatible AVRs and official boards) when reading high impedance analog inputs. Thus, on effected parts, the ASDV and SAMPDLY features should not be used. The core never makes use of these features.
 
-#### Pending Event Stuck When Disabling the ADC
+#### Pending Event Stuck When Disabling the ADC (0/1-series)
 If the ADC is disabled during an event-triggered conversion, the event will not be cleared.
 
 **Workaround:** Clear `ADC.EVCTRL.STARTEI` and wait for the conversion to complete before disabling the ADC.
 
 **megaTinyCore note:** Only an issue if you reconfigure the ADC to use the event system as a start trigger, and then disable the ADC. Use suggested workaround in this case.
 
-#### ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle
+#### ADC Functionality Cannot be Ensured with CLKADC Above 1.5 MHz and a Setting of 25% Duty Cycle (0/1-series)
 The ADC functionality cannot be ensured if CLKADC > 1.5 MHz with `ADCn.CALIB.DUTYCYC` set to '1'.
 
 **Workaround:** If ADC is operated with CLKADC > 1.5 MHz, `ADCn.CALIB.DUTYCYC` must be set to '0' (50% duty cycle).
 
 **megaTinyCore note:** megaTinyCore sets CLKADC at 1.0 - 1.25 MHz. As far as I can tell, 1.5MHz is the maximum ADC clock specified. So this "erratum" would appear to be inapplicable unless an individual is using the device in a manner contrary to the recommended operating conditions outlined in the datasheet.
 
-#### ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V
+#### ADC Performance Degrades with CLKADC Above 1.5 MHz and VDD < 2.7V (0/1-series)
 The ADC INL performance degrades if CLKADC > 1.5 MHz and `ADCn.CALIB.DUTYCYC` set to '0' for VDD < 2.7V.
 
 **Workaround:** None.
 
 **megaTinyCore note:** megaTinyCore sets CLKADC at 1.0 - 1.25 MHz. As far as I can tell, 1.5MHz is the maximum ADC clock specified. So this "erratum" would appear to be inapplicable unless an individual is using the device in a manner contrary to the recommended operating conditions outlined in the datasheet.
 
-#### ADC Interrupt Flags Cleared When Reading RESH
+#### ADC Interrupt Flags Cleared When Reading RESH (0/1-series)
 `ADCn.INTFLAGS.RESRDY` and `ADCn.INTFLAGS.WCOMP` are cleared when reading `ADCn.RESH`.
 
 **Workaround:** In 8-bit mode, read `ADCn.RESH` to clear the flag or clear the flag directly.
 
 **megaTinyCore note:** megaTinyCore always reads the whole register, so this is not an issue unless you write your own routine for reading the ADC result in 8-bit mode.
 
-#### Changing ADC Control Bits During Free-Running Mode not Working
+#### Changing ADC Control Bits During Free-Running Mode not Working (0/1-series)
 If control signals are changed during Free-Running mode, the new configuration is not properly taken into account in the next measurement. This is valid for the `ADC.CTRLB`, `ADC.CTRLC`, `ADC.SAMPCTRL` registers and the `ADC.MUXPOS`, `ADC.WINLT` and `ADC.WINHT` registers.
 
 **Workaround:** Disable ADC Free-Running mode before updating the `ADC.CTRLB`, `ADC.CTRLC`, `ADC.SAMPCTRL`,
@@ -226,7 +231,7 @@ If control signals are changed during Free-Running mode, the new configuration i
 
 **megaTinyCore note:** If you reconfigure the ADC for free running mode and were hoping to configure it while it was live, you must be aware of this.
 
-#### One Extra Measurement Performed After Disabling ADC Free-Running Mode
+#### One Extra Measurement Performed After Disabling ADC Free-Running Mode (0/1-series)
 The ADC may perform one additional measurement after clearing `ADCn.CTRLA.FREERUN`.
 
 **Workaround:** Write `ADCn.CTRLA.ENABLE` to '0' to stop the Free-Running mode immediately.
@@ -242,7 +247,7 @@ before the device enters ACTIVE mode. A new INITDLY is required before the next 
 **megaTinyCore note:** And how do you force it to wait for another INITDLY?
 
 ### PORTMUX - Port Multiplexer
-#### Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5
+#### Selecting Alternative Output Pin for TCA0 Waveform Output 0-2 also Changes Waveform Output 3-5 (0/1-series, small flash sizes)
 Selecting alternative output pin for TCA0 in PORTMUX.CTRLC does not work as described when TCA0 operates in split mode.
 * Writing PORTMUX.CTRLC bit 0 to '1' will shift the pin position for both WO0 and WO3
 * Writing PORTMUX.CTRLC bit 1 to '1' will shift the pin position for both WO1 and WO4
@@ -251,7 +256,7 @@ PORTMUX.CTRLC[5:3] are non-functional.
 
 **Workaround:** None.
 
-**megaTinyCore note:** megaTinyCore does not currently use the remapping functions except on 8-pin pards. Only some 14-pin parts are impacted.
+**megaTinyCore note:** This impacts some users if the alternate timing positions are selected on the small number of effected parts
 
 ### CCL - Configurable Custom Logic
 #### The CCL Must be Disabled to Change the Configuration of a Single LUT
@@ -259,7 +264,7 @@ To reconfigure a LUT, the CCL peripheral must be disabled (write ENABLE in CCL.C
 
 **Workaround:** None
 
-**megaTinyCore note:** I had assumed this annoying behavior was intended. It is present in literally every part that has a CCL in all silicon revisions available as of July 2021
+**megaTinyCore note:** I had assumed this annoying behavior was intended. But no, it's not. Apparently this behavior was not intended, and they apparently accidentally put a second interlock they didn't want in.  Took a long time to get fixed, and tinies with this fixed are not yet available.
 
 #### Connecting LUTs in Linked Mode Requires OUTEN Set to '1'
 Connecting the LUTs in linked mode requires `LUTnCTRLA.OUTEN` set to '1' for the LUT providing the input source.
@@ -268,24 +273,24 @@ Connecting the LUTs in linked mode requires `LUTnCTRLA.OUTEN` set to '1' for the
 
 **megaTinyCore note:** - I have rated the severity a 3 on 1-series and 5 on 0-series, because they only have 2 event channels total that can carry async signal.
 
-#### D-latch is Not Functional
+#### D-latch is Not Functional (0/1-series)
 The CCL D-latch is not functional.
 
 **Workaround:** None.
 
 **megaTinyCore note:** This is broken on anything released before 2020. Don't try to use the D-latch sequential logic on 0/1-series parts. The D Flip-Flop can be used instead for many use cases, though it is clocked, which may make it less convenient than the latch. In any case, that's the less useful kind of latch anyway for most CCL use cases, thankfully.
 
-### RTC - Real-Time Counter
+### RTC - Real-Time Counter (All exckusive to 0/1-series - 2-series RTC works fine)
 These errata are *extremely nasty* if you're using the RTC and are not aware of them!
 
-#### Any Write to the `RTC.CTRLA` Register Resets the RTC and PIT Prescaler
+#### Any Write to the `RTC.CTRLA` Register Resets the RTC and PIT Prescaler (0/1-series)
 Any write to the `RTC.CTRLA` register resets the RTC and PIT prescaler.
 
 **Workaround:** None.
 
 **megaTinyCore note:** Neither RTC as millis source nor megaTinySleep are impacted. However, any use of the RTC other than those provided by the core has a high chance of encountering this. Additionally, the behavior that results is just wacky. We had a user who was just going nuts with this and the other RTC bug. Thia issue is particularly dangerous, as it can lead to code that implicitly requires this erratum to function.
 
-#### Disabling the RTC Stops the PIT
+#### Disabling the RTC Stops the PIT (0/1-series)
 Writing `RTC.CTRLA.RTCEN` to '0' will stop the PIT.
 Writing `RTC.PITCTRLA.PITEN` to '0' will stop the RTC.
 
@@ -305,7 +310,7 @@ When the TCA is configured to a NORMAL or FRQ mode (WGMODE in TCAn.CTRLB is ‘0
 
 **Workaround:** None.
 
-**megaTinyCore note:** Only impacts users who reconfigure TCA0 and use RESTART commands or events while the timer is counting down, a small crosssection of all users, and especially megaTinyCore users. Impacts every released part with a TCA up until the release of the AVR DD-series. What may be confusing to readers is what the problem is, because it works exactly as the datasheet specifies: *"The software can force a restart of the current waveform period by issuing a RESTART command. In this case, the counter, **direction**, and all compare outputs are set to '0'."* The issue, however, is that this behavior is considered wrong, and was documented as-it-behaves, rather than as-it-was-intended-to-behave. The correct behavior is that the restart event and restart should not change the the direction, and this implies that there may come a time when future die revisions "correct" this.
+**megaTinyCore note:** Only impacts users who reconfigure TCA0 and use RESTART commands or events while the timer is counting down, a small crosssection of all users, and especially megaTinyCore users. Impacts every released part with a TCA up until the release of the AVR DD-series. What may be confusing to readers is what the problem is, because it works exactly as the datasheet specifies: *"The software can force a restart of the current waveform period by issuing a RESTART command. In this case, the counter, **direction**, and all compare outputs are set to '0'."* The issue, however, is that this behavior is considered wrong, and was documented as-it-behaves, rather than as-it-was-intended-to-behave. The correct behavior is that the restart event and restart should not change the the direction, and this implies that there may come a time when future die revisions correct this.
 
 ### TCB - Timer/Counter B
 #### CCMP and CNT Registers Operate as 16-Bit Registers in 8-Bit PWM Mode
@@ -313,7 +318,7 @@ When the TCB is operating in 8-bit PWM mode (CNTMODE in TCBn.CTRLB is ‘0x7’)
 
 **Work Around:** Use 16-bit register access. Refer to the data sheet for further information.
 
-**megaTinyCore note:** Only impacts users who reconfigure a Type B timer to get PWM - which isn't terribly useful on these parts anyway, especially considering competing demands for TCBs. Impacts every released part with a TCB as if July 2021. I had run into this several times and been confused by it, but somehow never figured out what was going on until a few weeks before it was added to errata sheets.
+**megaTinyCore note:** Only impacts users who reconfigure a Type B timer to get PWM - which isn't terribly useful on these parts anyway, especially considering competing demands for TCBs. Impacts every released part with a TCB as if July 2021. I had run into this several times and been confused by it, but somehow never figured out what was going on until a few weeks before it was added to errata sheets. Very irritating if you don't know about it
 
 #### Minimum Event Duration Must Exceed the Selected Clock Period
 Event detection will fail if TCBn receives an input event with a high/low period shorter than the period of the selected clock source (CLKSEL in `TCBn.CTRLA`). This applies to the TCB modes (CNTMODE in `TCBn.CTRLB`) Time-Out Check and Input Capture Frequency and Pulse-Width Measurement mode.
@@ -328,9 +333,9 @@ Event detection will fail if TCBn receives an input event with a high/low period
 
 **Workaround:** Read both `TCBn.CCMPL` and `TCBn.CCMPH`.
 
-**megaTinyCore note:** Only impacts users who reconfigure a Type B timer for input capture, but only cares about the low byte, not the high byte, and doesn't immediately recognize that when running into the bug that the interrupt flag isn't getting cleared and clear it manually (which is the most obvious cause and something to check first whenever sketch activity nearly hangs as soon as an interrupt is triggered, especially if it's only "nearly" hung). In addition to the suggested workaround of reading both bytes, you can also just manually clear the interrupt flag. Under typical conditions, whether you read the second byte or manually clear the flag will have the same run time - but manually clearing it will typically take 3 extra words of flash, while reading it will only take 1 or 2 extra words. `uint8_t val=TCBn.CCMP`will generate correct code.
+**megaTinyCore note:** Only impacts users who reconfigure a Type B timer for input capture, but only cares about the low byte, not the high byte, and doesn't immediately recognize that when running into the bug that the interrupt flag isn't getting cleared and clear it manually (which is the most obvious cause and something to check first whenever sketch activity nearly hangs as soon as an interrupt is triggered, especially if it's only "nearly" hung). In addition to the suggested workaround of reading both bytes, you can also just manually clear the interrupt flag. Under typical conditions, whether you read the second byte or manually clear the flag will have the same run time - but manually clearing it will typically take 3 extra words of flash, while reading it will only take 1 or 2 extra words. `uint8_t val=TCBn.CCMP`will generate correct code. *though you probably want to store it in a uint16 since it's probably a 16-bit value!*
 
-#### TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working with Prescaled
+#### TCB Input Capture Frequency and Pulse-Width Measurement Mode Not Working with Prescaled (0/1-series)
 Clock The TCB Input Capture Frequency and Pulse-Width Measurement mode may lock to Freeze state if CLKSEL in
 `TCB.CTRLA` is set to any other value than 0x0.
 
@@ -345,7 +350,7 @@ The TCA restart command does not force a restart of the TCB when TCB is running 
 
 **megaTinyCore note:** No impact unless you are trying to use this unusual feature.
 
-### TCD - Timer/Counter D
+### TCD - Timer/Counter D (All exckusive to 1-series)
 The type D timer is the most complex peripheral (by number of pages, as well as subjectively) on modern AVR devices. Many of these issues were not discovered until the AVR Dx-series was released, in some cases over a year after that initial relealse. TCD0 is an extremely difficult peripheral to work with in the best of times
 
 #### TCD Event Output Lines May Give False Events
@@ -376,7 +381,7 @@ Halting TCD and waiting for software restart (INPUTMODE in TCDn.INPUTCTRLA is �
 
 **megaTinyCore note:** Irrelevant unless taking a very deep dive into TCD0.  This issue is almost universal on devices with a TCD.
 
-### TWI - Two-Wire Interface
+### TWI - Two-Wire Interface (All exckusive to 0/1-series)
 #### TIMEOUT Bits in the `TWI.MCTRLB` Register are Not Accessible
 
 The TIMEOUT bits in the `TWI.MCTRLB` register are not accessible from software.
