@@ -63,7 +63,7 @@ TCD_DLYPRES_DIV4_gc <--- viable
 TCD_DLYPRES_DIV8_gc
 ```
 An EVEN NUMBERED LUT (LUT 0 on tiny 1-series) is used, set up as non-sequencer-using R/S latch, using the CMPBCLR and PROGEV event channels.
-```
+```text
 
 DLYCTRL = 0x0E; // /1 prescale
 DLYCTRL = 0x2E; // /4 prescale

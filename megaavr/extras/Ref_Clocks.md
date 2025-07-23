@@ -23,11 +23,6 @@ Not the feature I'm most impressed with. A+ on concept, C on execution.
 
 Tuning to achieve non-standard speeds is not supported on the AVR Dx-series parts under DxCore.
 
-### On tinyAVR
-The OSCCFG fuse selects whether the speed is derived from a 20 MHz or 16 MHz oscillator. At power-on, these are always set to a prescaler of /6 hence 2.66 or 3.33 MHz. The core, prior to calling setup, will reconfigure the prescaler to match the requested speed. The OSCCFG fuse is always set when a sketch is uploaded via a UPDI programmer.
-They additionally have the equivalent of the classic AVR's OSCCAL calibration register.
-On the tinyAVRs, these are like the old parts in that the compliance is many times what is documented, and you can get a very wide range of speeds from them. 0/1-series has 64 settings for each nominal clock frequency, and 2-series parts have 128. Determining the value to set it to in order to obtain a desired clock speed is called "Tuning", even though you're not doing it for accuracy (it's generally already at the best setting from factory cal if you want the nominal clock speed.)
-
 ### On EA-series
 The worst of both worlds! The OSCCFG fuse selects whether the speed is derived from a 20 MHz or 16 MHz oscillator. At power-on, these are always set to a prescaler of /6 hence 2.66 or 3.33 MHz. The core, prior to calling setup, will reconfigure the prescaler to match the requested speed. The OSCCFG fuse is always set when a sketch is uploaded via a UPDI programmer.
 Yhere is a tuning register, CLKCTRL.OSCHFTUNE. Unfortunately, it is much less useful than the tinyAVR one. The register is limited to -32 to +31, corresponding to - and + around 16%. +/-16% doesn't exactly open up new frontiers.
@@ -69,7 +64,7 @@ For unsupported speeds, the micros and delay-us columns indicate what internal p
 |      30 MHz |                   No | No, easy o/c   |           Yes |           Yes |           Yes |    Yes |      Yes | 5, 7, 9
 |      32 MHz |                   No | No, easy o/c   |           Yes |           Yes |           Yes |    Yes |      Yes | 5, 9
 |      36 MHz |                      | No, some work  |            No |    Most chips |    Most Chips |    Yes |      Yes | 8
-|      40 MHz | realistic goal       | No, some work  |            No |    Most chips |    Most chips |    Yes |      Yes | 8
+|      40 MHz |                -     | No, some work  |            No |    Most chips |    Most chips |    Yes |      Yes | 8
 | *    44 MHz |                -     | No, some E's OK|            No | Not by DxCore | Not by DxCore |    Yes |      Yes | 2, 8
 |      48 MHz |                -     | No, some E's OK|            No |  Some E-specs |   Some E-Spec |    Yes |      Yes | 8
 
@@ -88,33 +83,25 @@ The tiny and Ex-series have the same clock speed grades, including the voltage d
   *To ensure a good yield, place your order on a new moon, then purify the room prior to experimentation by burning a quantity of US or Euro zone currency*
 9. a 0/1-series tinyAVR can normally run no fatster than 30 MHz on internal, thought the oscillator can exceed 32, the core isn't happy at that clock speed from the internal oscillator, But with an external 32 MHz clock and a 5.1-5.2Vpower supply with good decoupling F-spec 1-series will generally run at 32 on external at room temp, but not intyernal.. In general, at all tiumes, an external clock will givbe a slightly cleaner clock signal, and thus slightly higher maximum speed before things start visibly crapping out immediately (you want to back off more than a little bit from that before you use it for anything.)
 
-General note: Signs you've overclocked too hard: Random resets, these show as having been software resets, even if you don't use a software reset anywhere. Usually rtesults of arithmetic and logical instructions get polluted with 0's that should be 1's/ The same can happen with load/store
+General note: Signs you've overclocked too hard: Random resets, these show as having been software resets, even if you don't use a software reset anywhere. Usually rtesults of arithmetic and logical instructions get polluted with 0's that should be 1's. The same can happen with load/store. In principle, the hardware is free to do whatever it pleases when being run outside of it's operating range. These parts seem to be rather cooperative, though.
 
 There are multiple ways to generate some of the lower frequencies from internal oscillator (do you prescale from higher frequency, or set the oscillator to the desired one? Suspect the latter is more power efficient, but with the former you could still use the PLL while staying in spec - (in my tests the PLL worked well beyond the spec in both directions, at least at room temperature, not that you'd want to do that in production) - currently, we set the main oscillator to the desired frequency, however we may revisit this decision in the future. There might be reasons to just run the TCD off the unprescaled clock in order to.... I'm not sure what....
 
 The DA-series does not support use of an external high frequency crystal, only external clock or the internal oscillator can be used. The internal oscillator is pretty accurate, so internal clock will work fine for UART communication (they're within a fraction of a percent at room temp) with very little voltage dependence (they have an internal regulator to generate the core voltage, which runs at a much lower voltage, and I suspect that's where the internal oscillator is located.
 
 ## Auto-tuning
-All parts, can - if needed - use an external watch crystal to automatically tune the internal oscillator frequency, a feature called Auto-Tune. Though they specify +/- 3% internal oscillator speed, in practice, I have yet to find one that was off by more than 1 calibration "notch" at room temperature - the accuracy is limited by the granularity of tuning more than anything else. These are just in a different universe than the classic AVRs where a couple percent was normal. I had to use a torch aimed at the chip (obviously (I hope) from a distance) to swing the temperature enough that autotune had to correct the frequency on the fly (resting the soldering iron on top of the chip didn't). The modern AVR internal oscillator is really good. Nonetheless, we provide a wrapper around enabling external 32K crystal and enabling/disabling Auto-Tune in [the DxCore library](../libraries/DxCore/README.md).
-
-```c
-#include <DxCore.h>
-
-void setup() {
-  //optionally call configXOSC32K() to get specific crystal settings; otherwise it uses conservative defaults.
-  enableAutoTune(); //that easy - this returns 0 on success, you can check that if you want to be particularly
-  // careful about whether or not it worked it can not-work if the crystal doesn't actually start
-  // oscillating, either due to design flaws  inappropriate loading caps, improper crystal selection,
-  // or poor layout, or for other reasons such as damage, extreme temperature, and so on.
-
-  // more stuff after this to set up your sketch
-}
-```
+Autotuning is supported in hardware from a watch crystal on AVR Dx and Ex series parts, but not on tinyAVR. This is actually only for tuning (not overclocking).
 
 ## Overclocking
-The capacity of these parts to run at speeds in excess of their rated maximum boggles the mind. To my knowledge, the maximum is around 48 MHz with an external clock. It didn't work on an I-spec part, but seems to work with E-spec parts (most of them anyway). E-spec always overclocks better than I-spec. There is no known voltage dependence related to overclocking - the DB-series power consumption errata implies that if there is, it only manifests low voltages, namely below 2.1 volts, when that power consumption errata manifests (likely a result of the regulator getting into a bad state = these parts have an internal regulator to generate a core voltage in the neighborhood of 1.8v)
+The capacity of these parts to run at speeds in excess of their rated maximum boggles the mind.
 
-Running at 48 MHz is an ambitious overclock and is totally unnecessary - so obviously this is a very exciting chance to do something for that fundamental instintive reason: "Because I can"! And you can to!  So far, I had success at room temperature with external clocks, but not external crystals, and only when using the E-spec (extended temperature range) parts (which makes sense). I am surprised how they will "just work" at 40 from a crystal though, even I-spec parts usually do However, not all parts are capable of this. Out of around a dozen parts, I've so far found 1 that doesn't work at 40. As usual with AVRs, it's the ALU that starts failing first. I have an I-spec that, at 48 external clock will run a program that does a 1 second delay between calling micros (so lots of math is being done, then prints it). Like with over-overclocked tinies, if it's not so high that they crash immediately, they start getting math wrong, which shows up as 0's being printed for micros/millis(). This is unstable, as eventually a return address will get broken, it will return to that, and everything will fail (this may now turn into a reset if you're properly handling reset flags)
+My "records":
+48 MHz crystal on DB, E-spec part.
+40 MHz crystal on DB, DD with I-spec parts. 32int x 4 = 128 MHz PLL clocking the TCD. When I switched to 40x4=160 MHz, the output started glitching something fierce. It looked to me as if it was finally unable to synchronize the double-buffered registers without breaking things - it looked almost okay if you didn't write new duty cycles...
+
+I have tinyAVRs that might be stable at 36 internal (tiny2), but I haven't bothered to enable that on mTC.
+
+Running a DA at 48 MHz (or a tiny at 32) is an ambitious overclock and is totally unnecessary - so obviously this is a very exciting chance to do something for that fundamental instintive reason: "Because I can"! And you can to!  So far, I had success at room temperature with external clocks, but not external crystals, and only when using the E-spec (extended temperature range) parts (which makes sense). I am surprised how they will "just work" at 40 from a crystal though, even I-spec parts usually do However, not all parts are capable of this. Out of around a dozen parts, I've so far found 1 that doesn't work at 40. As usual with AVRs, it's the ALU that starts failing first. I have an I-spec that, at 48 external clock will run a program that does a 1 second delay between calling micros (so lots of math is being done, then prints it). Like with over-overclocked tinies, if it's not so high that they crash immediately, they start getting math wrong, which shows up as 0's being printed for micros/millis(). This is unstable, as eventually a return address will get broken, it will return to that, and everything will fail (this may now turn into a reset if you're properly handling reset flags)
 
 These can be returned to normal operation by uploading code that doesn't try to use an excessively fast clock - since the heat generated by the CPU core is negligible even at double it's rated clock speed, the damage that a desktop computer CPU might incur when overclocked too hard is not an issue.
 
