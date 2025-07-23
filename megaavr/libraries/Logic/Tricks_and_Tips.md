@@ -169,25 +169,25 @@ Propagation time (Tp) is in ns, and has been rounded to quarter-nanoseconds to d
 Current was also measured using a bench power supply. As the power supply in quetion is known to be of low quality (typical low cost chinese import bench supply). It was deemed sufficiently accurate for this purpose, though its readings were sometimes not reproducible, leading to uncertainty about whether the discrepancy was within the microcontroller or elsewheremember, this is a sample size of 1 tested under conditions governed by expediency, not precision. I did, however, set the cpu speed to 1 MHz to reach lower voltages and to make the control numbers more useful
 
 
- Vdd   | F(case1) | F(case2) | Tp CCL   | Tp EVSYS | I (case1) | I (case2) | I(control) |Notes
--------|----------|----------|---------------------|-----------|-----------|------------|----
- 5.2   | 84.x MHz | 49 MHz   |  6.0     |  4.25    |    n/t    |    n/t    |     n/t    | (VUSB, current unmetered)
- 5.0   | 83.x MHz | 48 MHz   |  6.0     |  4.50    |     17 mA |      6 mA |       0    | .
- 4.5   | 78 MHz   | 44 MHz   |  6.5     |  5.0     |     12 mA |      6    |       0    | .
- 4.0   | 71 MHz   | 40 MHz   |  7.0     |  5.5     |    7.5 mA |      6    |       0    | .
- 3.5   | 63 MHz   | 36 MHz   |  8.0     |  6.0     |      6 mA |      6    |       0    | .
- 3.3   | 59 MHz   | 34 MHz   |  8.5     |  6.25    |      6 mA |      5    |       0    | .
- 3.3   | 59 MHz   |  n/t     |  8.5     |  n/t     |     n/t   |     n/t   |      n/t   | (From 3.3v regulator (LDL1117), current unmetered)
- 3.0   | 53 MHz   | 30.5 MHz |  9.5     |  7.0     |      6 mA |      3    |       0    | .
- 2.5   | 42 MHz   | 24.1 MHz | 12.0     |  8.75    |      4 mA |      0    |       0    | At 20 Mhz, 2.4V no longer works.Raising voltage again does not fix it, power cycle needed. That is not surprising
- 2.0   | 29 MHz   | 16.6 MHz | 17.25    |  13.0    |      0 mA |      0    |       0    | Current readings obviously of
- 1.9   | 26.0 MHz | 15.0 MHz | 19.25    |  14.0    |      0 mA |      0    |       0    | little value below here. But
- 1.8   | 23.4 MHz | 13.4 MHz | 21.5     |  16.0    |      0 mA |      0    |       0    | This is the minimum rated voltage for these parts, and the lowest BOD voltage
- 1.7   | 20.5 MHz | 11.8 MHz | 24.5     |  18.0    |      0 mA |      0    |       0    | .
- 1.6   | 17.8 MHz | 10.1 MHz | 28.0     |  21.5    |      0 mA |      0    |       0    | .
- 1.5   | 15.1 MHz |  8.6 MHz | 33.0     |  25.0    |      0 mA |      0    |       0    | .
- 1.4   | 12.3 MHz |  7.1 MHz | 40.75    |  29.75   |      0 mA |      0    |       0    | At least the CCL kept at it down to 1.4v, before hitting the power on reset threshold at 1.3V
- 1.3   | 0 MHz    | 0 MHz    | n/a      | n/a      |      0 mA |      0 mA |       0 mA | Chip below POR threshold
+| Vdd   | F(case1) | F(case2) | Tp CCL   | Tp EVSYS | I (case1) | I (case2) | I(control) |Notes |
+|-------|----------|----------|---------------------|-----------|-----------|------------|----|
+| 5.2   | 84.x MHz | 49 MHz   |  6.0     |  4.25    |    n/t    |    n/t    |     n/t    | (VUSB, current unmetered) |
+| 5.0   | 83.x MHz | 48 MHz   |  6.0     |  4.50    |     17 mA |      6 mA |       0    | . |
+| 4.5   | 78 MHz   | 44 MHz   |  6.5     |  5.0     |     12 mA |      6    |       0    | . |
+| 4.0   | 71 MHz   | 40 MHz   |  7.0     |  5.5     |    7.5 mA |      6    |       0    | . |
+| 3.5   | 63 MHz   | 36 MHz   |  8.0     |  6.0     |      6 mA |      6    |       0    | . |
+| 3.3   | 59 MHz   | 34 MHz   |  8.5     |  6.25    |      6 mA |      5    |       0    | . |
+| 3.3   | 59 MHz   |  n/t     |  8.5     |  n/t     |     n/t   |     n/t   |      n/t   | (From 3.3v regulator (LDL1117), current unmetered) |
+| 3.0   | 53 MHz   | 30.5 MHz |  9.5     |  7.0     |      6 mA |      3    |       0    | . |
+| 2.5   | 42 MHz   | 24.1 MHz | 12.0     |  8.75    |      4 mA |      0    |       0    | At 20 Mhz, 2.4V no longer works.Raising voltage again does not fix it, power cycle needed. That is not surprising |
+| 2.0   | 29 MHz   | 16.6 MHz | 17.25    |  13.0    |      0 mA |      0    |       0    | Current readings obviously of |
+| 1.9   | 26.0 MHz | 15.0 MHz | 19.25    |  14.0    |      0 mA |      0    |       0    | little value below here. But |
+| 1.8   | 23.4 MHz | 13.4 MHz | 21.5     |  16.0    |      0 mA |      0    |       0    | This is the minimum rated voltage for these parts, and the lowest BOD voltage |
+| 1.7   | 20.5 MHz | 11.8 MHz | 24.5     |  18.0    |      0 mA |      0    |       0    | . |
+| 1.6   | 17.8 MHz | 10.1 MHz | 28.0     |  21.5    |      0 mA |      0    |       0    | . |
+| 1.5   | 15.1 MHz |  8.6 MHz | 33.0     |  25.0    |      0 mA |      0    |       0    | . |
+| 1.4   | 12.3 MHz |  7.1 MHz | 40.75    |  29.75   |      0 mA |      0    |       0    | At least the CCL kept at it down to 1.4v, before hitting the power on reset threshold at 1.3V |
+| 1.3   | 0 MHz    | 0 MHz    | n/a      | n/a      |      0 mA |      0 mA |       0 mA | Chip below POR threshold |
 
 
 Conclusions:
