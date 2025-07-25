@@ -24,6 +24,8 @@ Changes listed here are checked in to GitHub ("master" branch unless specificall
 
 ### Planned 2.6.11
 * Pending: New toolchain version.
+* Make wiring.c have the functions referred to in the doc.
+* Fix some of the constants for timers so that all timers can still get uniform codes specifying the portmux and (for non-TCA's) which pin within the mux it is, which matters forthe other core.
 * Documentation improvements.
 * Corrected bug sometimes encountered when using serial under atypical cases the causes of which remain mysterious), where it would complain about `__poll_dre_done`.
 * Correct bug with Comparator (#1236)

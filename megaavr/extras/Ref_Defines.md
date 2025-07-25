@@ -60,9 +60,10 @@ if (MILLIS_TIMER & 0x40) {
 } else if (MILLIS_TIMER & 0x80) {
   //RTC
 }
-
-
 ```
+
+Note also the existence of the run-time function,
+
 ### Timer identifier interpretation (digitalPinToTimer() return values)
 These are 8-bit values. They are fully enumerated and much more detail provided near the end of this document.
 

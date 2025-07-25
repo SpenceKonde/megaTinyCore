@@ -47,6 +47,8 @@ void init_timers();
  */
 uint8_t __PeripheralControl = 0xFF;
 
+uint8_t __MillisState = 0xFF;
+
 // the prescaler is set so that timer ticks every 64 clock cycles, and the
 // the overflow handler is called every 256 ticks.
 
@@ -1327,6 +1329,7 @@ void stop_millis()
     #else
       _timer->INTCTRL &= ~TCB_CAPT_bm;
     #endif
+      __MillisState == 0x01;
   #endif
 }
 
@@ -1369,10 +1372,21 @@ void restart_millis()
 }
 
 
+uint8_t getCurrentMillisTimer() {
+  #if defined(MILLIS_USE_TIMERNONE)
+    return NOT_ON_TIMER;
+  #elif !defined(MILLIS_TIMER)
+    badCall("Can't happen! Millis defines busted");
+  #else
+    if (!__MillisState) {
+      return MILLIS_TIMER;
+    } else {
+      return __MillisState;
+    }
+  #endif
+}
 
-
-void __attribute__((weak)) init_millis()
-{
+void __attribute__((weak)) init_millis() {
   #if defined(MILLIS_USE_TIMERNONE)
     badCall("init_millis() is only valid with millis time keeping enabled.");
   #else
@@ -1393,8 +1407,7 @@ void __attribute__((weak)) init_millis()
       pTCD->INTCTRL        = 0x01; // enable interrupt
       pTCD->CTRLA          = TIMERD0_PRESCALER | 0x01; // set clock source and enable!
     #elif defined(MILLIS_USE_TIMERRTC)
-      while(RTC.STATUS); // if RTC is currently busy, spin until it's not.
-      // to do: add support for RTC timer initialization
+      while(RTC.STATUS);
       RTC.PER             = 0xFFFF;
       #ifdef MILLIS_USE_TIMERRTC_XTAL
         _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA,0x03);
@@ -1414,11 +1427,11 @@ void __attribute__((weak)) init_millis()
       // CLK_PER/1 is 0b00, . CLK_PER/2 is 0b01, so bitwise OR of valid divider with enable works
       _timer->CTRLA = TIME_TRACKING_TIMER_DIVIDER|TCB_ENABLE_bm;  // Keep this last before enabling interrupts to ensure tracking as accurate as possible
     #endif
+    __MillisState == 0x00;
   #endif
 }
 
-void set_millis(__attribute__((unused))uint32_t newmillis)
-{
+void set_millis(__attribute__((unused))uint32_t newmillis) {
   #if defined(MILLIS_USE_TIMERNONE)
     badCall("set_millis() is only valid with millis timekeeping enabled.");
     (void)newmillis; // unused parameter
@@ -1663,7 +1676,9 @@ void __attribute__((weak)) init_ADC0() {
     /* Default low latency mode on
      * Users can turn it off if they care about power consumption while ADC is on
      * and chip is awake, since these parts don't have the perverse ADC-left-on
-     * behavior of classic AVRs. */
+     * behavior of classic AVRs.
+     * ... Yes they do afterall. Fudge. Fixed on Ex though.
+     */
     pADC->CTRLC = TIMEBASE_1US; // defined in Arduino.h.
     pADC->PGACTRL = ADC_PGABIASSEL_3_4X_gc | ADC_ADCPGASAMPDUR_15CLK_gc;
     /* Note that we don't *enable* it automatically in init().

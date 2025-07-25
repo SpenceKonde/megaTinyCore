@@ -16,7 +16,7 @@ BOD will keep the chip in reset when you it knows the voltage is too low to keep
 ### If you don't use BOD
 You need to ask yourself a few hard questions:
 * ~if~ When the system is hung in production, how hard/embarrassing will it be to have to run to reset them by hand?
-* If it's hard to reset the device (mounted on a 20 meter pole, in the canopy of a tree, in a drainage ditch six feet up, or worst of all, mounted on a 20 meter pole attached to the canopy of a tree growing our of a drainage ditch located at a customer site.), use the watchdog timer!
+* If it's hard to reset the device (mounted on a 20 meter pole, in the canopy of a tree, in a drainage ditch six feet up, or worst of all, mounted on a 20 meter pole attached to the canopy of a tree growing out of a drainage ditch located at a customer site.), use the watchdog timer!
 * Running a simple program at 20 MHz, lowering voltage until output ceases, and then restoring voltage does NOT reliably restore execution without BOD!
 
 ### A bootloader is likely the right approach if you want end users to be uploading updates

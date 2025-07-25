@@ -12,9 +12,12 @@
 void setup() {
   /* test manipulation functions */
   #ifndef MILLIS_USE_TIMERNONE
+    GPIOR0 = _getCurrentMillisTimer();
     stop_millis();
+    GPIOR0 = _getCurrentMillisTimer();
     set_millis(_SFR_MEM32(0x001C));
     restart_millis();
+    GPIOR0 = _getCurrentMillisTimer();
   #endif
 }
 void loop() {

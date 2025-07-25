@@ -356,6 +356,7 @@ ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 
 
 ## Appendix: Vector Index for tinyAVR
+For debugging - "Duplicate of vector 25?! the hell one is that?!"
 
 | Vector Name       | T2 | 16k+ | 2-8k |
 |-------------------|----|------|------|
@@ -399,3 +400,7 @@ ISR(PERIPHERAL_INT_vect, ISR_NAKED)
 | USART1_RXC_vect   | 27 |    . |    . |
 | USART1_TXC_vect   | 28 |    . |    . |
 | NVMCTRL_EE_vect   | 29 |   30 |   25 |
+
+## Why do the few pieces of documentation mentioning this speak as though it were impossible to give better compile errors?
+
+This is a bit of a puzzler. It appears that the names are "set in stone" when the C runtimes are precompiled. Which is only done for instruction set variants, and so doesn't have the names of the vectors; further, it sounds as though there's no way to get the linker to give better errors. It definitely seems that there is a communictions bottleneck between everything else, and the linker.
