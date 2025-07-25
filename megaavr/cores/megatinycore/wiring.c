@@ -1372,7 +1372,7 @@ void restart_millis()
 }
 
 
-uint8_t getCurrentMillisTimer() {
+uint8_t _getCurrentMillisTimer() {
   #if defined(MILLIS_USE_TIMERNONE)
     return NOT_ON_TIMER;
   #elif !defined(MILLIS_TIMER)

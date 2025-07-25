@@ -314,7 +314,7 @@ void initVariant();
 void takeOverTCA0();
 void takeOverTCD0();
 
-uint8_t getCurrentMillisTimer();
+uint8_t _getCurrentMillisTimer();
 
 
 
