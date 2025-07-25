@@ -1677,7 +1677,7 @@ void __attribute__((weak)) init_ADC0() {
      * Users can turn it off if they care about power consumption while ADC is on
      * and chip is awake, since these parts don't have the perverse ADC-left-on
      * behavior of classic AVRs.
-     * ... Yes they do afterall. Fudge. Fixed on Ex though.
+     * ... Yes they do after all. Fudge. Fixed on Ex though.
      */
     pADC->CTRLC = TIMEBASE_1US; // defined in Arduino.h.
     pADC->PGACTRL = ADC_PGABIASSEL_3_4X_gc | ADC_ADCPGASAMPDUR_15CLK_gc;
