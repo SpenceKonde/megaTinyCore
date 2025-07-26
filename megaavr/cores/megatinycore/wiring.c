@@ -1329,7 +1329,7 @@ void stop_millis()
     #else
       _timer->INTCTRL &= ~TCB_CAPT_bm;
     #endif
-      __MillisState == 0x01;
+      __MillisState = 0x01;
   #endif
 }
 
@@ -1427,7 +1427,7 @@ void __attribute__((weak)) init_millis() {
       // CLK_PER/1 is 0b00, . CLK_PER/2 is 0b01, so bitwise OR of valid divider with enable works
       _timer->CTRLA = TIME_TRACKING_TIMER_DIVIDER|TCB_ENABLE_bm;  // Keep this last before enabling interrupts to ensure tracking as accurate as possible
     #endif
-    __MillisState == 0x00;
+    __MillisState = 0x00;
   #endif
 }
 
