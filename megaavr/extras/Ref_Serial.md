@@ -569,7 +569,7 @@ And for modern AVRs
 40000000 |Super|Super|Super|Super|Super|Super|Super|Super|Super| Poor|
 48000000 |Super|Super|Super|Super|Super|Super|Super|Super|Super| No  |
 
-Yeah, this is much simpler. Guaranteed under 0.75% baud calc error over all supported clock speeds. Same maximum baud rate in theory (F_CPU=8), except here it's *actually achievable at baud rates people want to use*. mTC and DxC use a very tightly optimized ISR which I belive is just barely fast enough for cyclic receive of up to the buffer length, so you CAN actually receive a block of characters at those baud rates.
+Yeah, this is much simpler. Guaranteed under 0.75% baud calc error over all supported clock speeds. Same maximum baud rate in theory (F_CPU=8), except here it's *actually achievable at baud rates people want to use*. mTC and DxC use a very tightly optimized ISR which I believe is just barely fast enough for cyclic receive of up to the buffer length, so you CAN actually receive a block of characters at those baud rates.
 
 U2X mode is only used for speeds above F_CPU/16 (where it must be used).
 
