@@ -161,12 +161,13 @@ void turnOffPWM(uint8_t pin)
         DAC0.CTRLA = 0x00;
         break;
     #endif
-    /* 1-series parts also have a wacky async Type D timer, but we only use it on the 20 and 24-pin parts, as it doesn't buy us anything on the 14-pin ones...
+    /* 1-series parts also have a wacky async Type D timer, but we only use it by default on the 20 and 24-pin parts, as it doesn't buy us anything on the 14-pin ones...
      * In a future update, an option to use TCD0 for PWM on PA4 and PA5 on the 14-pin parts, with TCA0 initialized in SINGLE mode is possible, but this would
      * open a can of worms regarding SINGLE mode. I think we are best off telling people to call takeOverTCA0(), takeOverTCD0() and configure it themselves
      * to do what they want, because you'll never make everyone happy otherwise. My calculus would be different if they'd made 8-pin parts with more than 4k
      * of flash to fit the overhead of supporting TCA0 and TCD0 with analogWrite() comfortably - that would give a pin mapping with PWM on all pins - AND
-     * it would be able to do buffering on  the TCA pins (TCD pins can always do that).*/
+     * it would be able to do buffering on  the TCA pins (TCD pins can always do that).
+     * Update: That has now been implemented. */
     #if (defined(TCD0) && defined(USE_TIMERD0_PWM))
       case TIMERD0:
       {
@@ -182,9 +183,7 @@ void turnOffPWM(uint8_t pin)
             _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~fc_mask));
             while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it can be re-enabled
             TCD0.CTRLA |= TCD_ENABLE_bm;           // re-enable it
-            #if defined(NO_GLITCH_TIMERD0) /* This is enabled in all cases where TCD0 is used for PWM */
-              // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
-              // So we need to make sure that's off - wouldn't that be fun to debug?
+            #if defined(NO_GLITCH_TIMERD0) /* This is no longer the default. It seemed to cause more issues than it prevented */
               if (bit_mask == 0x10) {
                 PORTA.PIN4CTRL &= ~(PORT_INVEN_bm);
               } else {
@@ -203,11 +202,9 @@ void turnOffPWM(uint8_t pin)
             //
             TCD0.CTRLA &= ~TCD_ENABLE_bm;
             _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~fc_mask));
-            while (!(TCD0.STATUS & TCD_ENRDY_bm)); // wait until it can be re-enabled
-            TCD0.CTRLA |= TCD_ENABLE_bm;           // re-enable it
-            #if defined(NO_GLITCH_TIMERD0) /* This is enabled in all cases where TCD0 is used for PWM */
-              // Assuming this mode is enabled, PWM can leave the pin with INVERTED mode enabled
-              // So we need to make sure that's off - wouldn't that be fun to debug?
+            while (!(TCD0.STATUS & TCD_ENRDY_bm));
+            TCD0.CTRLA |= TCD_ENABLE_bm;
+            #if defined(NO_GLITCH_TIMERD0)
               #if defined(USE_TCD_WOAB)
                 if (bit_mask == 0x01) {
                   PORTA.PIN4CTRL &= ~(PORT_INVEN_bm);
@@ -252,12 +249,9 @@ void digitalWrite(uint8_t pin, uint8_t val) {
   /* Get port */
   PORT_t *port = digitalPinToPortStruct(pin);
   /* Set output to value
-  This now runs even if port set INPUT in order to emulate
-  the behavior of digitalWrite() on classic AVR devices, where
-  you could digitalWrite() a pin while it's an input, to ensure
-  that the value of the port was set correctly when it was
+  This runs regardless of whether the pin is an output,
+  allowing the pin to be staged with
   changed to an output. Code in the wild relies on this behavior. */
-
   if (val == LOW) { /* If LOW */
     port->OUTCLR = bit_mask;
   } else if (val == CHANGE) { /* If TOGGLE
@@ -284,14 +278,8 @@ void digitalWrite(uint8_t pin, uint8_t val) {
 
   /* Input direction */
   if (!(port->DIR & bit_mask)) {
-    /* Old implementation has side effect when pin set as input -
-      pull up is enabled if this function is called.
-      Should we purposely implement this side effect?
-    */
-
     /* Get bit position for getting pin ctrl reg */
     uint8_t bit_pos = digitalPinToBitPosition(pin);
-
     /* Calculate where pin control register is */
     volatile uint8_t *pin_ctrl_reg = getPINnCTRLregister(port, bit_pos);
 

@@ -40,7 +40,7 @@ unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
   uint8_t stateMask = (state ? bit : 0);
 
   // convert the timeout from microseconds to a number of times through
-  // the initial loop; it takes approximately 16 clock cycles per iteration
+  // the initial loop; it takes exactly 16 clock cycles per iteration
   unsigned long maxloops = (uint32_t)microsecondsToClockCycles(timeout) / 16;
 
   unsigned long width = countPulseASM(portInputRegister(port), bit, stateMask, maxloops);
