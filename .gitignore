@@ -30,3 +30,4 @@ megaavr/python3/sqlite3.dll
 megaavr/python3/unicodedata.pyd
 megaavr/python3/vcruntime140.dll
 *.pyd
+*.bak
