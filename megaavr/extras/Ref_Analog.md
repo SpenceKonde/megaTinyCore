@@ -143,7 +143,7 @@ At least there's a plausible use of the DAC input: recognizing that the voltage 
 `?` The DD-series lists a "BGTEMPSENSE" option in preliminary material, but it was removed by launch. It is unclear if this was ever implemented or if it exists in the silicon.
 
 ### Measuring VDD and Temperature
-See [the example we give for very talkative implementation](../libraries/megaTinyCore/examples/ReadTempVcc/ReadTempVcc.ino) and the [megaTinyCore.h library](../libraries/megaTinycore/README.md) which provides ready-to-use function calls for these measurements.
+See [the example we give for very talkative implementation](../libraries/megaTinyCore/examples/readTempVcc/readTempVcc.ino) and the [megaTinyCore.h library](../libraries/megaTinyCore/README.md) which provides ready-to-use function calls for these measurements.
 
 
 #### Measuring VDD on 0/1-series

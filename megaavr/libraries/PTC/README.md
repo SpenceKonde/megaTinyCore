@@ -94,8 +94,8 @@ The ptc_ch_bm_t is a typedef that depends on the pincount of the device and rang
 
 ### PTC Operation
 ![PTC_InnerWorkings](https://github.com/MX682X/ptc_touch/assets/58419867/823c487c-0633-4031-b381-45e7a32867fb)
-(Source: [Microchip's PTC Subsystem Firmware User's Guide](<https://web.archive.org/web/20221225142000/https://www.mouser.com/pdfdocs/SAMA5D2_PTC_Firmware_UG.pdf>))
-This schematic was made for a different chip, but it is likely to look similar on the AVRs.
+(Source: [Microchip's PTC Subsystem Firmware User's Guide](https://web.archive.org/web/20221225142000/https://www.mouser.com/pdfdocs/SAMA5D2_PTC_Firmware_UG.pdf))
+This schematic was made for a different chip, but it is likely to look similar to this on the AVRs.
 
 Most of the following is a hypothesis based on the publicly available documentation and observation.
 The PTC is using a charge transfer between a variable and a fixed capacitance to measure a difference between those two. The variable capacitance in this case is the sensor electrode and the fixed one is the internal Cc. The neat thing about having a dedicated hardware for this, is that Cc is not really fixed, compared to the Sample-and-Hold capacitor of the normal ADC, it can be calibrated to be about the same as the electrode we want to measure (See below).
@@ -115,7 +115,7 @@ If you have trouble understanding: Imagine two equally sized volumes connected t
 
 Based on the documentation found online, the PTC has an internal, tunable capacitor connected after the series resistance to ground that is used to compensate the parasitic capacitance of the electrodes. Every node starts with a default compensation value. As soon as the node is enabled, the library attempts to find a compensation setting that will result in an ADC value of about 512 counts (1/2 of ADC resolution). Based on oscilloscope readings, it can also be said that the PTC tries to have a charge of 50% VCC on the electrode when being acquired. This is the also the reason, why the digital input function of the pins is disabled.
 
-The maximum compensation is about 30pF for Mutual-cap and about 50pF for Self-cap. It is possible to get the compensation capacitance with uint16_t ptc_get_node_cc_femto(cap_sensor_t* node); - however this function has to do a lot of calculations and is thus a bit bloat-y. It will also return the value in femto farrads, to avoid floats. Read more here: <https://www.microchipdeveloper.com/touch:guide-to-interpret-cc-calibration-value>
+The maximum compensation is about 30pF for Mutual-cap and about 50pF for Self-cap. It is possible to get the compensation capacitance with uint16_t ptc_get_node_cc_femto(cap_sensor_t* node); - however this function has to do a lot of calculations and is thus a bit bloat-y. It will also return the value in femto farrads, to avoid floats. Read more here: (dead link pruned; I don't know what document it was, I don't think I've seen it).
 
 Different pins have a different parasitic capacitance. I suspect this is depends on the internal circuitry and alternative functions, so it's normal to see some difference with pins next to each other.
 
