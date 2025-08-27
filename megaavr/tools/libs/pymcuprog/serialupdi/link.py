@@ -69,7 +69,7 @@ class UpdiDatalink:
                 self.logger.info("UPDI init OK")
                 return True
         except PymcuprogError:
-            self.logger.warning("UPDI init failed: Can't read CS register.")
+            self.logger.warning("UPDI init failed: Can't read CS register. likely wiring error.")
             return False
         self.logger.info("UPDI not OK - reinitialisation required")
         return False

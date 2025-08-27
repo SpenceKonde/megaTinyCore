@@ -765,7 +765,7 @@ class TestIntelHex(TestIntelHexBase):
         # normal object
         ih = IntelHex({1:2, 7:8, 10:0})
         self.assertEqual((1,10), ih._get_start_end())
-        self.assertEqual((1,10), ih._get_start_end(size=10))        
+        self.assertEqual((1,10), ih._get_start_end(size=10))
         self.assertEqual((0,9), ih._get_start_end(start=0, size=10))
         self.assertEqual((1,10), ih._get_start_end(end=10, size=10))
 
@@ -1092,7 +1092,7 @@ class TestIntelHexDump(TestIntelHexBase):
         self.assertEqual(
             '0000  12 34 --  |.4 |\n',
             sio.getvalue())
-            
+
         ih[16] = 0x56
         ih[30] = 0x98
         sio = StringIO()
@@ -1682,7 +1682,7 @@ class TestInSubprocess(unittest.TestCase):
         if stdout:
             output = stdout.decode('ascii', 'replace')
         elif stderr:
-            output = stderr.decode('ascii', 'replace')        
+            output = stderr.decode('ascii', 'replace')
         output = output.replace('\r', '')
         return retcode, output
 
@@ -1756,7 +1756,7 @@ class TestWriteHexFileByteCount(unittest.TestCase):
         s = sio.getvalue()
         # control written hex first line to check that byte count is 13
         sio.seek(0)
-        self.assertEqual(sio.readline(), 
+        self.assertEqual(sio.readline(),
             ':0D0000000205A2E576246AF8E6057622786E\n',
             "Written hex is not in byte count 13")
         sio.close()
@@ -1774,7 +1774,7 @@ class TestWriteHexFileByteCount(unittest.TestCase):
         s = sio.getvalue()
         # control written hex first line to check that byte count is 255
         sio.seek(0)
-        self.assertEqual(sio.readline(), 
+        self.assertEqual(sio.readline(),
             (':FF0000000205A2E576246AF8E60576227867300702786AE475F0011204AD02'
               '04552000EB7F2ED2008018EF540F2490D43440D4FF30040BEF24BFB41A0050'
               '032461FFE57760021577057AE57A7002057930070D7867E475F0011204ADEF'

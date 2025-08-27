@@ -671,7 +671,7 @@ class Emitter:
             # Check for indicators.
             if index == 0:
                 # Leading indicators are special characters.
-                if ch in '#,[]{}&*!|>\'\"%@`': 
+                if ch in '#,[]{}&*!|>\'\"%@`':
                     flow_indicators = True
                     block_indicators = True
                 if ch in '?:':

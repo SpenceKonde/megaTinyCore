@@ -51,8 +51,8 @@ Errata apply to a specific die. But the same die may be used on multiple parts, 
   * all 16k - This is clearly what was used for development - it's at rev E!
   * all 32k
 
-## The grand combined table, now on google sheets
-[**The table is now in Google Sheets and publicly viewable - color coded too!**](https://docs.google.com/spreadsheets/d/1N-dDZ3WogEXRYcOip5kOREj_ExPQQRD1OrgMuywjXzw/edit?usp=sharing)
+## The grand combined table, now on Google Sheets
+[**The table is now in Google Sheets and publicly viewable - color coded too!**](https://docs.google.com/spreadsheets/d/1vRSt0s7Kpi_VehmFYBX8__OBbs7hbN87KwTNzwDcE2o/edit?usp=sharing)
 
 
 

@@ -123,7 +123,7 @@ class BaseConstructor:
         mapping = {}
         for key_node, value_node in node.value:
             key = self.construct_object(key_node, deep=deep)
-            
+
             ## Version Check
             python_version = sys.version
             version = python_version.split()[0]
