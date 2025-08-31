@@ -822,6 +822,8 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
 
 
   // Now for the ISRs. This gets a little bit more interesting now...
+
+#if !defined(MILLIS_USE_TIMERNONE)
   #if defined (MILLIS_USE_TIMERRTC)
     ISR(MILLIS_TIMER_VECTOR) {
       if (RTC.INTFLAGS & RTC_OVF_bm) {
@@ -1020,11 +1022,4 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
 
     }
   #endif /* defined (MILLIS_USE_TIMERRTC)*/
-
-
-
-
-
-
-
-
+#endif
