@@ -463,15 +463,15 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
  */
 #ifdef MILLIS_USE_TIMERD0
   #if (F_CPU == 20000000UL || F_CPU == 10000000UL ||F_CPU == 5000000UL)
-    #define millisClockCyclesPerMicrosecond() ((uint16_t)(20)) // this always runs off the 20MHz oscillator
-  #else
-    #define millisClockCyclesPerMicrosecond() ((uint16_t)(16))
+    #define millisClockCyclesPerMicrosecond() (20) // this always runs off the 20MHz oscillator
+  #else //16. 8, 4, 2, 1
+    #define millisClockCyclesPerMicrosecond() (16)
   #endif
 #else
-  #define millisClockCyclesPerMicrosecond() ((uint16_t)((F_CPU / 1000000UL)))
+  #define millisClockCyclesPerMicrosecond() ((F_CPU / 1000000UL))
 #endif
-#define millisClockCyclesToMicroseconds(__a__) ((uint32_t)(__a__ / millisClockCyclesPerMicrosecond()))
-#define microsecondsToMillisClockCycles(__a__) ((uint32_t)(__a__ * millisClockCyclesPerMicrosecond()))
+#define millisClockCyclesToMicroseconds(__a__) ((__a__ / millisClockCyclesPerMicrosecond()))
+#define microsecondsToMillisClockCycles(__a__) ((__a__ * millisClockCyclesPerMicrosecond()))
 
 /* Timers and Timer-like-things
  * These are used for two things: Identifying the timer on a pin in
@@ -697,7 +697,13 @@ uint32_t microsecondsToMillisClockCycles(uint32_t microseconds);
 #define MILLIS_RUNNING      (0x00)
 #define MILLIS_PAUSED       (0x01)
 #define MILLIS_ON_ALT_TIMER (0x02)
-
+// MILLIS_TYPE
+#define MILLIS_TCA          (0x01)
+#define MILLIS_TCB          (0x02)
+#define MILLIS_TCD          (0x04)
+#define MILLIS_TCE          (0x05)
+#define MILLIS_TCF          (0x06)
+#define MILLIS_RTC          (0x20)
 
 
 __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us);

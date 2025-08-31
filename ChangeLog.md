@@ -20,26 +20,31 @@ These items are in addition to what was listed under changes already in release.
 * If there are *other substantial changes that need to occur* within the core, I am unaware of the complaints and hence have no plans to address them before the heat death of the universe. If you desire changes on a more rapid timeline, please create an issue so that I am aware of the presence of said problem, deficiency, or imperfection. Those form the action item list for core development activity, so if something is not listed there, **it is unlikely to be implemented/fixed/etc** simply due to my being unaware of any concern.
 
 ## Unreleased changes
-Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes
+Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-### Planned 2.6.11
-* Pending: New toolchain version.
-* Make wiring.c have the functions referred to in the doc.
-* Fix some of the constants for timers so that all timers can still get uniform codes specifying the portmux and (for non-TCA's) which pin within the mux it is, which matters for the other core.
-* Documentation improvements.
-* Corrected bug sometimes encountered when using serial under atypical cases the causes of which remain mysterious), where it would complain about `__poll_dre_done`.
-* Correct bug with Comparator (#1236)
-* Correct numerous issues with the microchip board defs. Clearly nobody is using them - since 2 of them didn't compile, and none of the optiboot ones would ever be able to successfully be programmed over the bootloader because selfprogramming wasn't enabled (BOOTEND = 0).
-* Major Bugfix: Correct issue #1164 thanks to John Vasileff. This would cause Serial.flush to hang in one-wire mode.
-* Major Bugfix: Correct buffered PWM on all parts.
-* Major Bugfix: Correct PWM on non-default pins on all parts; digitalPinHasPWM.
-* Fix bug with CCL clock source.
-* Fix bug with Comparator
-* Enhance documentation
-* Removed example of exactly the sort of boneheaded and strictly-worse in a trivial part of Wire. While it was merely a bad example at the time it was written, it is now known to be a bad, dangerous example, because it featured code that demonstrated Strictly Worse access to registers, by loading a vport register to a pointer register, and using that - not only is it stupid and just a less-featureful PORT when accessed that way, avoiding pointer access to the I/O space (64 addresses, - 28 VPORTs and 4 GPIORs in low I/O and SP, RAMPZ (if applicable), CCP (the register used for `__PROTECTED_WRITE()`}), and of course the SREG. And indeed, none of those are registers that anyone should ever access using a pointer, even if it didn't wasn't safe against an incredibly scary bug - the low I/O is all about the bitwise instructions, which need both the register and bit compile time known. `VPORT_t*` is not a type you should ever declare - if you have had to declare it, *you get no benefit* from faster access to it (like you do if you use the compile-time known VPORT's amd access them without pointing. )
-* Enhance error messages from wrong-part on upload.
+The 2.6.11 release is pending, following that the next version will by 2.7.0.
 
 ## Released Versions
+
+### 2.6.11 (release pending)
+* New toolchain version.
+* Make wiring.c have the functions referred to in the doc.
+* Split the three ugly functions that constituted 60% of wiring.c into a separate file, because finding anything else with those #ifdef-hell-spawned abominations is awful.
+* General cleanup of wiring.c and timers.h for maintainability.
+* Fix some of the constants for timers so that all timers can still get uniform codes specifying the portmux and (for non-TCA's) which pin within the mux it is, which matters for the other core.
+* Documentation improvements.
+* Corrected critical bug in the TCD0 millis option (the default on 1-series parts) (#1243)
+* Corrected bug sometimes encountered when using serial under atypical cases the causes of which remain mysterious), where it would complain about `__poll_dre_done`. (#1226)
+* Correct bug with Comparator (#1236)
+* Correct numerous issues with the microchip board defs. Clearly nobody is using them - since 2 of them didn't compile, and none of the optiboot ones would ever be able to successfully be programmed over the bootloader because selfprogramming wasn't enabled (BOOTEND = 0).
+* Major Bugfix: Correct issue #1164 thanks to John Vasileff. This would cause Serial.flush() to hang in one-wire mode.
+* Major Bugfix: Correct buffered PWM on all parts.
+* Major Bugfix: Correct PWM on non-default pins on all parts; digitalPinHasPWM() macro.
+* Fix bug with CCL clock source selection options.
+* Enhance documentation
+* Correct critical problem with timekeeping on parts with a TCD. (#1243)
+* Removed example of exactly the sort of boneheaded and strictly-worse code I rail against in a trivial part of Wire. While it was merely a bad example at the time it was written, it is now known to be a bad, dangerous example, because it featured code that demonstrated Strictly Worse access to registers, by loading a vport register to a pointer register, and using that - not only is it stupid and just a less-featureful PORT when accessed that way, avoiding pointer access to the I/O space (64 addresses, - 28 VPORTs and 4 GPIORs in low I/O and SP, RAMPZ (if applicable), CCP (the register used for `__PROTECTED_WRITE()`}), and of course the SREG) is necessary due to an erratum effecting all AVRxm parts. And indeed, none of those are registers that anyone should ever access using a pointer, even if it didn't wasn't safe against an incredibly scary bug - the low I/O is all about the bitwise instructions, which need both the register and bit compile time known. `VPORT_t*` is not a type you should ever declare - if you have had to declare it, *you get no benefit* from faster access to it (like you do if you use the compile-time known VPORT's amd access them without pointing. )
+* Enhance error messages from wrong-part on upload.
 
 ### 2.6.10 - Critical fix
 * Critical bugfix: Switch to using Azduino7c, which is the same as the Azduino7b binary, but with the correct CRC attached.

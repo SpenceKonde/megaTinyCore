@@ -25,7 +25,7 @@ It is often more convenient to use these newer macros, which identify instead te
 
 ### Millis timer and vector
 * `MILLIS_TIMER`
-* `MILLIS_VECTOR`
+* `MILLIS_TIMER_VECTOR`
 
 #### Millis timer codes
 These are the values that the MILLIS_TIMER may be defined as:
