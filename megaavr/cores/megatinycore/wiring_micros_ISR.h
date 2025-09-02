@@ -827,7 +827,7 @@ __attribute__ ((noinline)) void _delayMicroseconds(unsigned int us) {
   #if defined (MILLIS_USE_TIMERRTC)
     ISR(MILLIS_TIMER_VECTOR) {
       if (RTC.INTFLAGS & RTC_OVF_bm) {
-        timingStruct.timer_millis += RTC_MILLIS_INCREMENT;
+        timingStruct.timer_millis += MILLIS_INC;
       }
       RTC.INTFLAGS = RTC_OVF_bm | RTC_CMP_bm; // clear flag
     }

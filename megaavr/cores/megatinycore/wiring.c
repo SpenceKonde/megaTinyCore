@@ -350,16 +350,25 @@ void __attribute__((weak)) init_millis() {
       pTCD->CTRLA          = _TIMERD0_PRESCALER | 0x01; // set clock source and enable!
     #elif MILLIS_TYPE == MILLIS_RTC
       while(RTC.STATUS);
-      RTC.PER             = 0xFFFF;
-      #ifdef MILLIS_USE_TIMERRTC_XTAL
+      RTC.PER             = TIME_TRACKING_TIMER_PERIOD;
+      #if defined(MILLIS_USE_TIMERRTC_XTAL)
         _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA,0x03);
         RTC.CLKSEL        = 2; // external crystal
+      #elif defined(MILLIS_USE_TIMERRTC_OSC)
+        _PROTECTED_WRITE(CLKCTRL.XOSC32KCTRLA,0x07);
+        RTC.CLKSEL        = 2; // external crystal
+      #elif defined(MILLIS_USE_TIMERRTC_CLK)
+        RTC.CLKSEL        = 3; // external CLOCK on CLKIN
       #else
         _PROTECTED_WRITE(CLKCTRL.OSC32KCTRLA,0x02);
         // RTC.CLKSEL=0; this is the power on value
       #endif
       RTC.INTCTRL         = 0x01; // enable overflow interrupt
-      RTC.CTRLA           = (RTC_RUNSTDBY_bm|RTC_RTCEN_bm|RTC_PRESCALER_DIV32_gc);//fire it up, prescale by 32.
+      RTC.CTRLA           = (RTC_RUNSTDBY_bm|RTC_RTCEN_bm|_RTC_PRESCALE_VALUE);//fire it up, prescale by 32.
+      #if MEGATINYCORE_SERIES != 2 && _AVR_FLASH < 32
+        // There's an erratum here. I don't think it's worth checking whrther the erratum is present, as essentially all 321x's don't have it, and everything else that's not 2-series has the bug.
+        RTC.PITCTRLA      = 0x01; // turn on the PIT doing nothing (needs to be on due to errata)
+      #endif
     #else // It's a type b timer - we have already errored out if that wasn't defined
       _timer->CCMP = TIME_TRACKING_TIMER_PERIOD;
       // Enable timer interrupt, but clear the rest of register
@@ -382,7 +391,7 @@ void set_millis(__attribute__((unused))uint32_t newmillis) {
       uint8_t oldSREG = SREG; // save SREG
       cli();                // interrupts off
       timingStruct.timer_millis = newmillis;
-      while(RTC.STATUS&RTC_CNTBUSY_bm); // wait if RTC busy
+      while(RTC.STATUS & RTC_CNTBUSY_bm); // wait if RTC busy
       RTC.CNT = 0;
       SREG = oldSREG; // re-enable interrupts if we killed them,
     #else

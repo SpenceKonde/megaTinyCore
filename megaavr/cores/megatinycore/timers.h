@@ -48,11 +48,12 @@
 |     #   # ### #### #### ### ####       |
 |_______________________________________*/
 
-#if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_XOSC))
+#if (defined(MILLIS_USE_TIMERRTC_XTAL) || defined(MILLIS_USE_TIMERRTC_OSC) || defined(MILLIS_USE_TIMERRTC_CLK))
   #define MILLIS_USE_TIMERRTC
   #define MILLIS_TIMER_VECTOR (RTC_CNT_vect)
 #endif
-#ifdef MILLIS_USE_TIMERNONE
+
+#if defined(MILLIS_USE_TIMERNONE)
   #define DISABLE_MILLIS
   #define MILLIS_TYPE NOT_ON_TIMER
   #define MILLIS_TIMER NOT_ON_TIMER
@@ -134,11 +135,17 @@
   #ifndef RTC
     #error "RTC, selected for millis, does not exist on this part"
   #endif
-  #define MILLIS_TIMER TIMERRTC
-  #define MILLIS_TYPE MILLIS_RTC
+  #define MILLIS_TIMER                    (TIMERRTC)
+  #define MILLIS_TYPE                     (MILLIS_RTC)
+  #define MILLIS_TIMER_VECTOR             (RTC_CNT_vect)
+  #define TIME_TRACKING_TIMER_PERIOD      (0xFFFF)
+  #define TIME_TRACKING_TIMER_DIVIDER     (32)
+  #define MILLIS_INC                      (64000)
+  #define _RTC_PRESCALE_VALUE             (0x05)
 #else
   #error "Millis timer not specified, nor is millis disabled - can't happen!"
 #endif
+
 #if (MILLIS_TYPE == MILLIS_TCB)
   #if (F_CPU == 1000000UL)
     #define TIME_TRACKING_TIMER_DIVIDER   (1)
@@ -159,7 +166,7 @@
   #endif
 #elif (MILLIS_TYPE == MILLIS_TCF)
   #error "TCF not yet supported, and may never be. See AVR EB-series errata."
-#else // Otherwise it must be a TCA or TCE. TCE can be used with nearly the same setup (though this may be changed)
+#elif (MILLIS_TYPE == MILLIS_TCA || MILLIS_TYPE == MILLIS_TCE)
   #define   TIME_TRACKING_TIMER_PERIOD    (0xFE)
   #if     (F_CPU > 30000000UL)
     #define TIME_TRACKING_TIMER_DIVIDER   (256)
@@ -184,9 +191,7 @@
   #endif
 #endif
 
-#ifndef MILLIS_USE_TIMERNONE
-
-  #endif  /* defined(MILLIS_USE_TIMERRTC) */
+#if (MILLIS_TYPE == MILLIS_TCA || MILLIS_TYPE == MILLIS_TCD || MILLIS_TYPE == MILLIS_TCE)
   #define ClockCyclesToMicroseconds(__a__) ((__a__) / (F_CPU / 1000000L))
   #define FRACT_MAX (1000)
   #define FRACT_INC (millisClockCyclesToMicroseconds(TIME_TRACKING_CYCLES_PER_OVF)%1000)
@@ -402,4 +407,5 @@
     #error "timer configuration conflict - millis and pwm components of core not in agreement. This bug should be reported immediately. "
   #endif
   #define _TIMERA_PRESCALER (TCA_SPLIT_CLKSEL_DIV8_gc)
+#endif
 #endif

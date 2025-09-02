@@ -7,17 +7,11 @@ You cannot check for options that depend on the fuses at compile-time, because w
 
 ## Timer identification from within code
 You may need to know programmatically what millis source is in use. There are several defines to help with this.
-There are the legacy ones:
+There are the legacy ones (which are still used and kept updated)
 * `MilLIS_USE_TIMERA0`
-* `MILLIS_USE_TIMERA1`
 * `MILLIS_USE_TIMERB0`
 * `MILLIS_USE_TIMERB1`
-* `MILLIS_USE_TIMERB2`
-* `MILLIS_USE_TIMERB3`
-* `MILLIS_USE_TIMERB4`
 * `MILLIS_USE_TIMERD0`
-* `MILLIS_USE_TIMERE0` - for the unreleased AVR EB-series. This may be removed upon datasheet release if it is apparent that TCE is not suitable for millis.
-* `MILLIS_USE_TIMERF0` - for the unreleased AVR EB-series. This may be removed upon datasheet release if it is apparent that TCF is not suitable for millis.
 * `MILLIS_USE_TIMERRTC`
 * `MILLIS_USE_TIMERNONE`
 
@@ -32,50 +26,31 @@ These are the values that the MILLIS_TIMER may be defined as:
 
 | Name            | Numeric value | Meaning
 |-----------------|---------------|----------------------------------------------------------
-| `NOT_ON_TIMER`  |          0x00 | Millis is disabled
-| `TIMERA0`       |          0x10 | Millis is generated from TCA0 (All non-EB-series)
-| `TIMERA1`       |          0x08 | Millis is generated from TCA1 (DA`*`, DB`*`, EA only)
-| `TIMERB0`       |          0x20 | Millis is generated from TCB0 (all parts)
-| `TIMERB1`       |          0x21 | Millis is generated from TCB1 (No tinyAVR 0-series or 1-series with 4k or 8k of flash)
-| `TIMERB2`       |          0x22 | Millis is generated from TCB2 (DA, DB, DD`*`, EA only)
-| `TIMERB3`       |          0x23 | Millis is generated from TCB3 (DA`*`, DB`*`, EA only)
-| `TIMERB4`       |          0x24 | Millis is generated from TCB4 (DA`*`, DB`*`, only)
-| `TIMERD0`       |          0x40 | Millis is generated from TCD0 (megaTinyCore only)
-| `TIMERE0`       | TBD - undefined | Millis is generated from TCE0 (EB-series only).
-| `TIMERF0`       | TBD - undefined | Millis is generated from TCF0 (EB-series only).
-| `TIMERRTC`      |          0x80 | Millis is generated from the RTC from internal low frequency osc. (megaTinyCore only currently)
-| `TIMERRTC_XTAL` |          0x81 | Millis is generated from the RTC from external crystal oscillator. (megaTinyCore only currently)
-| `TIMERRTC_XOSC` |          0x82 | Millis is generated from the RTC from external active oscillator. (megaTinyCore only currently)
+| `NOT_ON_TIMER`  | rev. pending  | Millis is disabled
+| `TIMERA0`       | rev. pending  | Millis is generated from TCA0
+| `TIMERB0`       | rev. pending  | Millis is generated from TCB0
+| `TIMERB1`       | rev. pending  | Millis is generated from TCB1 (No tinyAVR 0-series or 1-series with 4k or 8k of flash)
+| `TIMERD0`       | rev. pending  | Millis is generated from TCD0 (This timer option not available on DxC, only megaTinyCore)
+| `TIMERRTC`      | rev. pending  | Millis is generated from the RTC from internal low frequency osc. (This timer option not available on DxC, only megaTinyCore)
+| `TIMERRTC_XTAL` | rev. pending  | Millis is generated from the RTC from external crystal oscillator. (This timer option not available on DxC, only megaTinyCore)
+| `TIMERRTC_OSC`  | rev. pending  | Millis is generated from the RTC from external active oscillator on TOSC1 (PB3) (This timer option not available on DxC, only megaTinyCore)
+| `TIMERRTC_CLK`  | rev. pending  | Millis is generated from the RTC from external clock or active oscillator on CLKIN (PA3). Not supported by the core.
 
-To to find the millis timer:
-```c
-if (MILLIS_TIMER & 0x40) {
-  //timer D (not available on DxCore)
-} else if (MILLIS_TIMER & 0x10) {
-  //TCA0
-} else if (MILLIS_TIMER & 0x08){
-  //TCA1
-} else if (MILLIS_TIMER & 0x20) {
-  //timer B, look to othr nybble to find which one
-} else if (MILLIS_TIMER & 0x80) {
-  //RTC
-}
-```
-
-Note also the existence of the run-time function,
+Numeric values are undergoing a revision, following which there will be defined constants totest against.
 
 ### Timer identifier interpretation (digitalPinToTimer() return values)
 These are 8-bit values. They are fully enumerated and much more detail provided near the end of this document.
 
-```text
-0x10-0x15 are TCA0. The three low bits are the mux option (DxCore only - other.
-0x08-0x0D is TCA1. The three low bits are the mux option (DxCore only).
-0x20-0x2F is a TCB
-0x30-0x3F is a TCB alt pin (not yet implemented for PWM)
-0x40-0x77 is a TCD pin (high nybble is the bit within the group, low nybble is the mux. On megaTinyCore, this is always 0x40, as there is no mux for TCD.)
-0x80  is the DAC output pin
-TCE and TCF details pending release of more information
-```
+| megaTinyCore | DxCore        |
+|--------------|---------------|-------------------------------------------------------------------------|
+|         0x10 | 0x10-0x15     | TCA0. The three low bits are the mux option (DxCore only - other.
+|            - | 0x08-0x0D     | TCA1. The three low bits are the mux option (DxCore only).
+|            - | 0x20-0x37 *   | TCB pin. Low bit indicates the peripheral instance number, bit 4 reserved for distinguishing alt and default pins on DxC.
+|         0x40 | 0x40-0x77 *   | TCD0. On DxC, anything with the 0x40 bit set is a TCD.
+|            - | 0b01__0xxx    | __ is the pin within the pinset,
+| 0x40-0x77 is a TCD pin (high nybble is the bit within the group, low nybble is the mux. On megaTinyCore, this is always 0x40, as there is no mux for TCD.)
+| 0x80  is the DAC output pin
+
 
 ### Using to check that correct menu option is selected
 If your sketch requires a certain timer NOT be used for millis, or that a certain timer nust be the timekeeping timer, you should check these #defines and be sure to either `#error` out, or at least emit a `#warning`.
@@ -375,8 +350,8 @@ TIMERB1           0x21
 TIMERB2           0x22
 TIMERB3           0x23
 TIMERB4           0x24
-TIMERD0           0x40 (see notes)
-DACOUT            0x80 (not a timer - but treated like it was for purposes of pin-info.)
+TIMERD0  rev. pending (see notes)
+DACOUT   rev. pending (not a timer - but treated like it was for purposes of pin-info.)
 ```
 
 TCD0 will be 0x40 when it's being used as the millis timer (not supported on DxCore), but when a pin is interrogated and reveals that it can be used by TCD0, the value it returns will be of the form 0b01cc_0mmm. Here cc is the channel (0 = WOA, 1 = WOB, 2 = WOC, 3 = WOD), and mmm is the value of `PORTMUX.TCDROUTEA | PORTMUX_TCD0_gm`. In the event that a future part is released with a second type D timer, there are two bits that could be used to signify that, leaving a second bit available if they added a WOE and WOF (to replicate the functionality of the venerable ATtiny861, which is still the only game in town if you want to control a three-phase BLDC motor), without having to change the numbering system otherwise. Regardless, unless madness breaks out at Microchip and they release a part with 3 or more type D timers and a third comparison channel, or a part with 5 or more type D timers, you can count on `timer & 0x40 == 0x40` for a type D timer. We'll burn that bridge when we come to it.

@@ -500,7 +500,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
       uint8_t gainbits =0;
       while (gain > 1) {
         gain >>= 1;
-        gainbits+=32;
+        gainbits += 32;
       }
       ADC0.PGACTRL = (ADC0.PGACTRL & ~ADC_GAIN_gm) | gainbits | ADC_PGAEN_bm;
     }
@@ -522,7 +522,7 @@ void DACReference(__attribute__ ((unused))uint8_t mode) {
         shift--;
       }
       // Sanity checks
-      // uint8_t roundup=result&0x01;
+      // uint8_t roundup=result & 0x01;
       // result >>= 1;
       // result += roundup;
     } else if (res == 8) {

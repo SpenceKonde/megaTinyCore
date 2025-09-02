@@ -177,7 +177,7 @@ void turnOffPWM(uint8_t pin)
           if (TCD0.FAULTCTRL & fc_mask) {
             uint8_t oldSREG = SREG;
             cli();
-            // uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
+            // uint8_t TCD0_prescaler=TCD0.CTRLA & (~TCD_ENABLE_bm);
             //
             TCD0.CTRLA &= ~TCD_ENABLE_bm;
             _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~fc_mask));
@@ -198,7 +198,7 @@ void turnOffPWM(uint8_t pin)
           if (TCD0.FAULTCTRL & fc_mask) {
             uint8_t oldSREG = SREG;
             cli();
-            // uint8_t TCD0_prescaler=TCD0.CTRLA&(~TCD_ENABLE_bm);
+            // uint8_t TCD0_prescaler=TCD0.CTRLA & (~TCD_ENABLE_bm);
             //
             TCD0.CTRLA &= ~TCD_ENABLE_bm;
             _PROTECTED_WRITE(TCD0.FAULTCTRL, TCD0.FAULTCTRL & (~fc_mask));
