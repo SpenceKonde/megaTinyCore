@@ -50,7 +50,7 @@
 
 // Constructor when length, pin and type are known at compile-time:
 tinyNeoPixel::tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t) :
-  begun(false), brightness(0), pixels(NULL), latchTime(50), endTime(0) {
+  begun(false), brightness(0), latchTime(50), pixels(NULL), endTime(0) {
   updateType(t);
   updateLength(n);
   setPin(p);
@@ -62,9 +62,8 @@ tinyNeoPixel::tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t) :
 // command.  If using this constructor, MUST follow up with updateType(),
 // updateLength(), etc. to establish the strand type, length and pin number!
 tinyNeoPixel::tinyNeoPixel() :
-  begun(false), numLEDs(0), numBytes(0), pin(NOT_A_PIN), brightness(0), pixels(NULL),
-  rOffset(1), gOffset(0), bOffset(2), wOffset(1), latchTime(50), endTime(0)  {
-}
+  begun(false), numLEDs(0), numBytes(0), latchTime(50), pin(NOT_A_PIN), brightness(0), pixels(NULL),
+  rOffset(1), gOffset(0), bOffset(2), wOffset(1), endTime(0)  {
 
 tinyNeoPixel::~tinyNeoPixel() {
   if (pixels) {
@@ -1117,9 +1116,6 @@ void tinyNeoPixel::show(uint16_t leds) {
   #if (!defined(MILLIS_USE_TIMERNONE) && !defined(MILLIS_USE_TIMERRTC) && !defined(MILLIS_USE_TIMERRTC_XTAL) && !defined(MILLIS_USE_TIMERRTC_XOSC))
     endTime = micros();
     // Save EOD time for latch on next call
-    #pragma message("micros() present. This library assumes the canonical 50 us latch delay; some pixels will wait as long as 250us. In these cases, you must be sure to not call show more often. See documentation.")
-  #else
-    #pragma message("micros() is not available because millis is disabled from the tools subemnu. It is your responsibility to ensure a sufficient time has passed between calls to show(). See documentation.")
   #endif
 }
 
