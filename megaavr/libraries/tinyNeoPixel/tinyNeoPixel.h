@@ -349,3 +349,4 @@ class tinyNeoPixel {
 };
 
 #endif // TINYNEOPIXEL_H
+
