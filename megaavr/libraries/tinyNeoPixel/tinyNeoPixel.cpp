@@ -50,11 +50,12 @@
 
 // Constructor when length, pin and type are known at compile-time:
 tinyNeoPixel::tinyNeoPixel(uint16_t n, uint8_t p, neoPixelType t) :
-  begun(false), brightness(0), latchTime(50), pixels(NULL), endTime(0) {
+  begun(false), latchTime(50), brightness(0), pixels(NULL), endTime(0) {
   updateType(t);
   updateLength(n);
   setPin(p);
 }
+
 
 // via Michael Vogt/neophob: empty constructor is used when strand length
 // isn't known at compile-time; situations where program config might be
