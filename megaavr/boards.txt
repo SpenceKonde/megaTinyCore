@@ -435,7 +435,7 @@ atxy7.menu.millis.timerb0.build.millistimer=B0
 atxy7.menu.millis.timerb1.build.millistimer=B1
 atxy7.menu.millis.rtc.build.millistimer=RTC
 atxy7.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-atxy7.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+atxy7.menu.millis.rtcxosc.build.millistimer=RTC_OSC
 
 #----------------------------------------#
 # UPDI/RESET PIN CONFIGURATION           #
@@ -1003,7 +1003,7 @@ atxy6.menu.millis.timerb0.build.millistimer=B0
 atxy6.menu.millis.timerb1.build.millistimer=B1
 atxy6.menu.millis.rtc.build.millistimer=RTC
 atxy6.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-atxy6.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+atxy6.menu.millis.rtcxosc.build.millistimer=RTC_OSC
 
 #----------------------------------------#
 # UPDI/RESET PIN CONFIGURATION           #
@@ -1542,7 +1542,7 @@ atxy4.menu.millis.timerb0.build.millistimer=B0
 atxy4.menu.millis.timerb1.build.millistimer=B1
 atxy4.menu.millis.rtc.build.millistimer=RTC
 atxy4.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-atxy4.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+atxy4.menu.millis.rtcxosc.build.millistimer=RTC_OSC
 
 #----------------------------------------#
 # UPDI/RESET PIN CONFIGURATION           #
@@ -2408,7 +2408,7 @@ microchip.menu.millis.timerb0.build.millistimer=B0
 microchip.menu.millis.timerb1.build.millistimer=B1
 microchip.menu.millis.rtc.build.millistimer=RTC
 microchip.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-microchip.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+microchip.menu.millis.rtcxosc.build.millistimer=RTC_OSC
 
 #----------------------------------------#
 # UPDI/RESET PIN CONFIGURATION           #
@@ -2832,7 +2832,7 @@ atxy7o.menu.millis.timerb0.build.millistimer=B0
 atxy7o.menu.millis.timerb1.build.millistimer=B1
 atxy7o.menu.millis.rtc.build.millistimer=RTC
 atxy7o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-atxy7o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+atxy7o.menu.millis.rtcxosc.build.millistimer=RTC_OSC
 
 #----------------------------------------#
 #  UPDI and RESET PIN configuration      #
@@ -3277,7 +3277,7 @@ atx27o.menu.millis.timerb0.build.millistimer=B0
 atx27o.menu.millis.timerb1.build.millistimer=B1
 atx27o.menu.millis.rtc.build.millistimer=RTC
 atx27o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-atx27o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+atx27o.menu.millis.rtcxosc.build.millistimer=RTC_OSC
 
 #----------------------------------------#
 # BODVOLTAGE                             #
@@ -3757,7 +3757,7 @@ atxy6o.menu.millis.timerb0.build.millistimer=B0
 atxy6o.menu.millis.timerb1.build.millistimer=B1
 atxy6o.menu.millis.rtc.build.millistimer=RTC
 atxy6o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-atxy6o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+atxy6o.menu.millis.rtcxosc.build.millistimer=RTC_OSC
 
 #----------------------------------------#
 # BOD VOLTAGE                            #
@@ -4216,7 +4216,7 @@ atx26o.menu.millis.timerb0.build.millistimer=B0
 atx26o.menu.millis.timerb1.build.millistimer=B1
 atx26o.menu.millis.rtc.build.millistimer=RTC
 atx26o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-atx26o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+atx26o.menu.millis.rtcxosc.build.millistimer=RTC_OSC
 
 #----------------------------------------#
 # BODVOLTAGE                             #
@@ -4694,7 +4694,7 @@ atxy4o.menu.millis.timerb0.build.millistimer=B0
 atxy4o.menu.millis.timerb1.build.millistimer=B1
 atxy4o.menu.millis.rtc.build.millistimer=RTC
 atxy4o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-atxy4o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+atxy4o.menu.millis.rtcxosc.build.millistimer=RTC_OSC
 
 #----------------------------------------#
 # BOD VOLTAGE                            #
@@ -5110,7 +5110,7 @@ atx24o.menu.millis.timerb0.build.millistimer=B0
 atx24o.menu.millis.timerb1.build.millistimer=B1
 atx24o.menu.millis.rtc.build.millistimer=RTC
 atx24o.menu.millis.rtcxtal.build.millistimer=RTC_XTAL
-atx24o.menu.millis.rtcxosc.build.millistimer=RTC_XOSC
+atx24o.menu.millis.rtcxosc.build.millistimer=RTC_OSC
 
 #----------------------------------------#
 # BODVOLTAGE                             #

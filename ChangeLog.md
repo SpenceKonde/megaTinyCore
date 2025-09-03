@@ -22,7 +22,7 @@ These items are in addition to what was listed under changes already in release.
 ## Unreleased changes
 Changes listed here are checked in to GitHub ("master" branch unless specifically noted; this is only done when a change involves a large amount of work and breaks the core in the interim, or where the change is considered very high risk, and needs testing by others prior to merging the changes with master - everything else goes straight into master). These changes are not yet in any "release" nor can they be installed through board manager, only downloading latest code from github will work. These changes will be included in the listed version, though planned version numbers may change without notice - critical fixes may be inserted before a planned release and the planned release bumped up a version, or versions may go from patch to minor version depending on the scale of changes.
 
-The 2.6.11 release is pending, following that the next version will by 2.7.0.
+The 2.6.11 release is pending, following that the next version will by 2.7.0, barring major catastrophes.
 
 ## Released Versions
 
@@ -33,6 +33,7 @@ The 2.6.11 release is pending, following that the next version will by 2.7.0.
 * General cleanup of wiring.c and timers.h for maintainability.
 * Fix some of the constants for timers so that all timers can still get uniform codes specifying the portmux and (for non-TCA's) which pin within the mux it is, which matters for the other core.
 * Documentation improvements.
+* Study of the state of 20 MHz timekeeping is ongoing. By my calculations it resulted in time passing 1/51th too fast
 * Corrected critical bug in the TCD0 millis option (the default on 1-series parts) (#1243)
 * Corrected bug sometimes encountered when using serial under atypical cases the causes of which remain mysterious), where it would complain about `__poll_dre_done`. (#1226)
 * Correct bug with Comparator (#1236)
@@ -41,6 +42,7 @@ The 2.6.11 release is pending, following that the next version will by 2.7.0.
 * Major Bugfix: Correct buffered PWM on all parts.
 * Major Bugfix: Correct PWM on non-default pins on all parts; digitalPinHasPWM() macro.
 * Fix bug with CCL clock source selection options.
+* Correct some ambiguities with the clock specification defines for RTC Millis using external clock; we don't support it,
 * Enhance documentation
 * Correct critical problem with timekeeping on parts with a TCD. (#1243)
 * Removed example of exactly the sort of boneheaded and strictly-worse code I rail against in a trivial part of Wire. While it was merely a bad example at the time it was written, it is now known to be a bad, dangerous example, because it featured code that demonstrated Strictly Worse access to registers, by loading a vport register to a pointer register, and using that - not only is it stupid and just a less-featureful PORT when accessed that way, avoiding pointer access to the I/O space (64 addresses, - 28 VPORTs and 4 GPIORs in low I/O and SP, RAMPZ (if applicable), CCP (the register used for `__PROTECTED_WRITE()`}), and of course the SREG) is necessary due to an erratum effecting all AVRxm parts. And indeed, none of those are registers that anyone should ever access using a pointer, even if it didn't wasn't safe against an incredibly scary bug - the low I/O is all about the bitwise instructions, which need both the register and bit compile time known. `VPORT_t*` is not a type you should ever declare - if you have had to declare it, *you get no benefit* from faster access to it (like you do if you use the compile-time known VPORT's amd access them without pointing. )

@@ -298,7 +298,7 @@ class tinyNeoPixel {
   */
   static uint32_t gamma32(uint32_t x);
 
-  #if (!defined(MILLIS_USE_TIMERNONE) && !defined(MILLIS_USE_TIMERRTC) && !defined(MILLIS_USE_TIMERRTC_XTAL) && !defined(MILLIS_USE_TIMERRTC_XOSC))
+  #if (defined(micros))
     inline bool canShow(void) { return (micros() - endTime) >= (uint32_t) latchTime; }
   #else
     inline bool canShow(void) {return 1;} // we don't have micros here;

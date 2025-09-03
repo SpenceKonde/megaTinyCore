@@ -1115,7 +1115,7 @@ void tinyNeoPixel::show(uint16_t leds) {
 
 
   interrupts();
-  #if (!defined(MILLIS_USE_TIMERNONE) && !defined(MILLIS_USE_TIMERRTC) && !defined(MILLIS_USE_TIMERRTC_XTAL) && !defined(MILLIS_USE_TIMERRTC_XOSC))
+  #if (defined(micros))
     endTime = micros();
     // Save EOD time for latch on next call
   #endif
