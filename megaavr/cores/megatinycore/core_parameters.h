@@ -21,7 +21,7 @@
   // The whole purpose of this file is largely for for the purpose of being something that can be included anywhere to make sure we know what core we are
   // which becomes more and more important as more code is shared between the cores.
 
-  #define MEGATINYCORE "Unknown 2.6.9+"
+  #define MEGATINYCORE "Unknown 2.6.11+"
 #else
   #if defined(DXCORE) || defined(ATTINYCORE)
     #error "This is megaTinyCore being compiled, but DXCORE and/or ATTINYCORE is defined already, something is way wrong."
