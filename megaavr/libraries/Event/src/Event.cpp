@@ -197,9 +197,8 @@ Event& Event::get_generator_channel(uint8_t generator_pin)
   uint8_t gen = 0xFF;
   if (port != NOT_A_PIN && port_pin != NOT_A_PIN) {
     #if defined(PORTA_EVGENCTRL)
-      #error "what the f?"
       volatile PORT_t* port_ptr = portToPortStruct(port);
-      uint8_t temp = port_ptr.EVGENCTRL;
+      uint8_t temp = port_ptr->EVGENCTRL;
         if ((temp & 0x0F) == port_pin) {
           gen = 0x40 + (port << 1);
           _SWAP(port_pin);
@@ -834,19 +833,35 @@ int8_t Event::set_user_pin(uint8_t pin_number) {
   int8_t event_user = -1;
   if (port != NOT_A_PIN && port_pin != NOT_A_PIN) {
     #if !defined(TINY_0_OR_1_SERIES)
-    /* Woah, we were missing a huge optimization opportunity here....
+    /* Woah, we were missing a huge optimization opportunity here.... but only for DA/DB-series parts
        - The users are numbered in the same orderas the ports.
        - PA is #defined as 0, PB as 2, etc.
        - there are no parts for which a port exists that has a pin 2 or 7, but which does not allow that pin to be used as an event output, except for tiny 0/1, where only pin 2 is an option...
        We basically **don't have to test the port** as long as it's a valid port as we just tested. This is probably like 6-8 instructions instead of several dozen */
 
-      uint8_t evout_user = (int8_t) event::user::evouta_pin_pa2;
-      if (port_pin == 2) { //non-0/1 pin 2 handling
-        event_user = (evout_user + port);
-      } //non-0/1 pin 7 handling
-      else if (port_pin == 7) {
-        event_user = (0x80 | (evout_user + port));
-      }
+      #if !defined(__AVR_DD__)
+        uint8_t evout_user = (int8_t) event::user::evouta_pin_pa2;
+        if (port_pin == 2) { //non-0/1 pin 2 handling
+          event_user = (evout_user + port);
+        } //non-0/1 pin 7 handling
+        else if (port_pin == 7) {
+          event_user = (0x80 | (evout_user + port));
+        }
+      #else
+        uint8_t evout_user = -1;
+        if (port_pin == 7 || port_pin == 2) {
+          evout_user = port_pin == 7 ? 0x89 : 0x09;
+        }
+        if (port >= PC) {
+          port--; // PA = 0 PC = 1, PD = 2, PF = 3
+          if (port == PE) {
+            port--; // We decremented port once already if it was >= PC, so the last valid port, PF now is PE.
+          }
+        }
+        if (port <= PD) {
+          event_user = evout_user + port;
+        }
+      #endif
     #else // Ugh, it's a 0/1-series....
       if (port_pin == 2) {
         #if defined (PIN_PB2)
@@ -863,7 +878,7 @@ int8_t Event::set_user_pin(uint8_t pin_number) {
         #else // No PIN_PB2, meaning it could only be an 8-pin tiny, and the only evout pin there is PA2.
           event_user = (int8_t) event::user::evouta_pin_pa2;
         #endif
-        } // end if (port_pin==2)
+      } // end if (port_pin==2)
     #endif // end 0/1-series
     else {
       return -1;
@@ -1035,7 +1050,7 @@ void Event::soft_event() {
   #endif
 }
 
-static void __attribute__((unused))  _long_soft_event(uint8_t channel, uint8_t length);    // holds the bulky assembly routine for the long softevent.
+static void __attribute__((__unused__)) _long_soft_event(uint8_t channel, uint8_t length);    // holds the bulky assembly routine for the long softevent.
 
 void Event::long_soft_event(uint8_t length) {
   _long_soft_event(channel_number, length);
@@ -1110,7 +1125,7 @@ event::gen::generator_t Event::gen_from_peripheral(__attribute__((unused))TCB_t&
   #if defined(TINY_0_OR_1_SERIES)
     badCall("gen_from_peripheral() does not support channel-specific generators. The TCBs on 0/1-series are.");
   #else
-    #if !(defined(DXCORE) || defined(TINY_2_SERIES))  // Dx-series and 2-series have ovf event. Others dont.
+    #if !(defined(DXCORE) || defined(TINY_2_SERIES))  // Dx-series and 2-series have ovf event. Others don't.
       if (event_type != 1) {
         return (event::gen::generator_t) -1;
       } else {

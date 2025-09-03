@@ -1,3 +1,24 @@
+/*  OBLIGATORY LEGAL BOILERPLATE
+ This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ either version 2.1 of the License, or (at your option) any later version. This library is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ See the GNU Lesser General Public License for more details. You should have received a copy of the GNU Lesser General Public License along with this library;
+ if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*//*
+  Servo.h - Interrupt driven Servo library for Arduino using 16 bit timers- Version 2
+  Copyright (c) 2009 Michael Margolis, and modified, extended, hacked up
+  butchered and otherwise mangled by countless others over the years,
+  (c) Arduino LLC circo 2018, and most recently by Spence Konde 2019 ~ 2023 to
+  provide reliable behavior on the tinyAVR 0/1/2-series, megaAVR 0-series, and AVR Dx-series.
+  https://github.com/SpenceKonde
+
+  This library is included with megaTinyCore and DxCore.
+
+  This version was designed for and will be included with:
+  megaTinyCore 2.3.3+
+  DxCore 1.3.6+
+*/
+
 #if defined(ARDUINO_ARCH_MEGAAVR)
 
 #include <Arduino.h>
@@ -129,6 +150,7 @@ static void initISR() {
   // Enable timer
   _timer->CTRLA |= TCB_ENABLE_bm;
 }
+
 
 static void finISR() {
   // Disable interrupt

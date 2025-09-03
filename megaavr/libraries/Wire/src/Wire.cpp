@@ -160,7 +160,7 @@ bool TwoWire::swap(uint8_t state) {
         #endif
         false)) {
           if (state > 3) {
-            badArg("The requested swap level is known at compile time to be one that is not available on any part. (did you pass a bitmask instead of a number?)");
+            badArg("The requested swap level is not available on any current or announced part - did you pass a bitmask instead of a number?");
           } else if (state == 3){
             badArg("Swap level 3 is not available on DA or DB devices, only swaps 0, 1 and 2.");
           } else {
@@ -670,7 +670,8 @@ uint8_t TwoWire::masterReceive(auto *length, uint8_t *buffer, uint8_t addr, uint
     #endif
 
     if (currentStatus & TWI_ARBLOST_bm) {   // Check for Bus error
-      return TWI_ERR_BUS_ARB;               // leave RX loop
+      TWIR_SET_ERROR(TWI_ERR_BUS_ARB);      // set error flag
+      break;                                // leave RX loop
     }
 
     if (currentSM != TWI_BUSSTATE_BUSY_gc) {
@@ -867,7 +868,8 @@ uint8_t TwoWire::masterTransmit(auto *length, uint8_t *buffer, uint8_t addr, uin
     #endif
 
     if (currentStatus & TWI_ARBLOST_bm) {     // Check for Bus error
-      return TWI_ERR_BUS_ARB;                 // leave TX loop, don't update bytes to read and don't try to send stop
+      TWI_SET_ERROR(TWI_ERR_BUS_ARB);       // set error flag
+      break;                                // leave TX loop
     }
 
     if (currentSM != TWI_BUSSTATE_BUSY_gc) {  // Undefined was excluded, so make sure it's IDLE or OWNER
@@ -1291,6 +1293,7 @@ void TwoWire::HandleSlaveIRQ(TwoWire *wire_s) {
   if (wire_s == NULL) {
     return;
   }
+
 
   uint8_t *address,  *buffer;
   twi_buf_index_t *head, *tail;

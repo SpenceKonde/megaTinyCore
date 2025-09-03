@@ -1,24 +1,22 @@
-/*
-  Copyright (c) 2018 Arduino LLC. All right reserved.
-  Copyright (c) 2021 Spence Konde
+/*  OBLIGATORY LEGAL BOILERPLATE
+ This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ either version 2.1 of the License, or (at your option) any later version. This library is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ See the GNU Lesser General Public License for more details. You should have received a copy of the GNU Lesser General Public License along with this library;
+ if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*//*
+  Servo.h - Interrupt driven Servo library for Arduino using 16 bit timers- Version 2
+  Copyright (c) 2009 Michael Margolis, and modified, extended, hacked up
+  butchered and otherwise mangled by countless others over the years,
+  (c) Arduino LLC circo 2018, and most recently by Spence Konde 2019 ~ 2023 to
+  provide reliable behavior on the tinyAVR 0/1/2-series, megaAVR 0-series, and AVR Dx-series.
+  https://github.com/SpenceKonde
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+  This library is included with megaTinyCore and DxCore.
 
   This version was designed for and will be included with:
-  megaTinyCore 2.6.0+
-  DxCore 1.5.0+
+  megaTinyCore 2.6.11+
+  DxCore 1.6.0+
 */
 
 #ifndef __SERVO_TIMERS_H__
@@ -54,25 +52,37 @@
     #define USE_TIMERB2
   #endif
 
-#elif (defined(TCB1) && defined(SERVO_USE_TIMERB1))
-  #if defined(MILLIS_USE_TIMERB1)
+#elif (defined(SERVO_USE_TIMERB1))
+  #if defined(TCB1)
+    #error "SERVO_USE_TIMERB2 is defined, but there is no TCB1 on this part (or there's a system level issue and you're not getting the headers somehow)"
+  #elif defined(MILLIS_USE_TIMERB1)
     #error "SERVO_USE_TIMERB1 is defined, but so is MILLIS_USE_TIMERB1 - TCB1 can only be used for one of these."
   #else
     #define USE_TIMERB1
   #endif
 #elif (defined(TCB0) && defined(SERVO_USE_TIMERB0))
-  #if defined(MILLIS_USE_TIMERB0)
+  #if defined(TCB0)
+    #error "Either your system isn't properly loading headers for some reason, or Microchip released something without a TCB (in which case we don't support it yet)"
+  #elif defined(MILLIS_USE_TIMERB0)
     #error "SERVO_USE_TIMERB0 is defined, but so is MILLIS_USE_TIMERB0 - TCB0 can only be used for one of these."
   #else
     #define USE_TIMERB0
   #endif
-  // No defines try to force using a specific timer, use TCB1 if it exists unless it's being used for millis.
+  // No defines try to force using a specific timer.
+  // If we have a TCB3, that means we're on a DA/DB 48/64, or an EA, and in the latter case, we are taking this step only
+  // for 48 pin parts, because then we default to putting PWM on PORTC, and if a TCA is on PORTC, then that pin can
+  // not be used for TCB PWM The priority is: (TCA = TCE) > (TCD = TCB = TCF). This makes timers 2 and 3 the least useful
+  // for other things - they can output PWM on PC0 and 1. Their alternate pins are PB4 and PB5. Guess what's likely on PORTB?
+  // You guessed it, the other TCA. While the TCA's can be moved around more easily that this can, it still seems more reasonable
+  // to pick the timer that is least likely to be considered desirable.
+#elif (defined(TCB3) && !defined(MILLIS_USE_TIMERB3) && _AVR_PINCOUNT > 32)
+  #define USE_TIMERB3
 #elif (defined(TCB1) && !defined(MILLIS_USE_TIMERB1))
   #define USE_TIMERB1
 #elif !defined(MILLIS_USE_TIMERB0)
   #define USE_TIMERB0
 #else
-  #error "Only one TCB, TCB0 but it is being used for millis - choose a different millis timer."
+  #error "Only one TCB, TCB0 - but it is being used for millis - choose a different millis timer."
 #endif
 
 
@@ -99,6 +109,7 @@ static volatile __attribute__((used))  TCB_t *_timer =
   &TCB4;
   #define SERVO_INT_vect TCB4_INT_vect
 #endif
+
 
 typedef enum {
   timer0,

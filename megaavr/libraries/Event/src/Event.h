@@ -20,7 +20,7 @@
  * set_generator(uint8_t pin_number) - to handle to more complicated setup of pin generators.
  *
  */
-
+/* *INDENT-OFF* */
 class Event {
   public:
     Event(uint8_t channel_num, volatile uint8_t &channel_addr);
@@ -34,7 +34,7 @@ class Event {
     void set_generator(uint8_t pin_number);
     static Event& assign_generator_pin(uint8_t port, uint8_t port_pin);
     static Event& assign_generator_pin(uint8_t pin_number);
-    // *INDENT-OFF*
+
     #if defined(TINY_0_OR_1_SERIES)
       void get_generator_channel(event::gens::generator_t generator) {
         get_generator_channel((event::gen::generator_t)generator);
@@ -52,7 +52,7 @@ class Event {
     #endif
     // *INDENT-ON*
     static int8_t get_user_channel_number(event::user::user_t event_user);
-    static Event& get_user_channel(event::user::user_t event_user);
+    static Event &get_user_channel(event::user::user_t event_user);
     void set_user(event::user::user_t event_user);
     int8_t set_user_pin(uint8_t pin_number);
     static void clear_user(event::user::user_t event_user);
@@ -61,14 +61,14 @@ class Event {
     void start(bool state = true);
     void stop();
     /* event_types: They start from 0x00 for inputs. Outputs start at 0x40 */
-    static event::gen::generator_t gen_from_peripheral(TCB_t& timer, uint8_t event_type  = 0);
-    static event::user::user_t    user_from_peripheral(TCB_t& timer, uint8_t user_type   = 0);
-    static event::user::user_t    user_from_peripheral(USART_t& usart                       );
-    static event::gen::generator_t gen_from_peripheral(TCA_t& timer, uint8_t event_type  = 0);
-    static event::user::user_t    user_from_peripheral(TCA_t& timer, uint8_t user_type   = 0);
-    static event::gen::generator_t gen_from_peripheral(CCL_t& logic, uint8_t event_type  = 0);
-    static event::user::user_t    user_from_peripheral(CCL_t& logic, uint8_t user_type   = 0);
-    static event::gen::generator_t gen_from_peripheral(AC_t&  comp                          );
+    static event::gen::generator_t gen_from_peripheral(TCB_t &timer, uint8_t event_type  = 0);
+    static event::user::user_t    user_from_peripheral(TCB_t &timer, uint8_t user_type   = 0);
+    static event::user::user_t    user_from_peripheral(USART_t &usart);
+    static event::gen::generator_t gen_from_peripheral(TCA_t &timer, uint8_t event_type  = 0);
+    static event::user::user_t    user_from_peripheral(TCA_t &timer, uint8_t user_type   = 0);
+    static event::gen::generator_t gen_from_peripheral(CCL_t &logic, uint8_t event_type  = 0);
+    static event::user::user_t    user_from_peripheral(CCL_t &logic, uint8_t user_type   = 0);
+    static event::gen::generator_t gen_from_peripheral(AC_t &comp);
 
   private:
     const uint8_t channel_number;      // Holds the event generator channel number

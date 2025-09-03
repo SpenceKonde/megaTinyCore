@@ -184,6 +184,7 @@ void SPIClass::end() {
   initialized = false;
 }
 
+
 #ifdef CORE_ATTACH_OLD
 void SPIClass::usingInterrupt(uint8_t interruptNumber) {
   if ((interruptNumber == NOT_AN_INTERRUPT))
@@ -208,7 +209,7 @@ void SPIClass::usingInterrupt(uint8_t interruptNumber) {
 }
 
 void SPIClass::notUsingInterrupt(uint8_t interruptNumber) {
-  if ((interruptNumber == NOT_AN_INTERRUPT)){
+  if ((interruptNumber == NOT_AN_INTERRUPT)) {
     return;
   }
 
@@ -224,8 +225,8 @@ void SPIClass::notUsingInterrupt(uint8_t interruptNumber) {
   if (interruptMask_lo == 0 && interruptMask_hi == 0) {
     interruptMode = SPI_IMODE_NONE;
     #if USE_MALLOC_FOR_IRQ_MAP
-    free(irqMap);
-    irqMap = NULL;
+      free(irqMap);
+      irqMap = NULL;
     #endif
   }
 }
@@ -332,6 +333,8 @@ void SPIClass::endTransaction(void) {
   }
 }
 #endif // End new attachInterrupt-compatible implementation.
+
+
 void SPIClass::setBitOrder(uint8_t order) {
   if (order == LSBFIRST) {
     SPI0.CTRLA |= (SPI_DORD_bm);
@@ -350,7 +353,7 @@ void SPIClass::setClockDivider(uint8_t div) {
                 | div);                           // write value
 }
 
-byte SPIClass::transfer(uint8_t data) {
+uint8_t SPIClass::transfer(uint8_t data) {
   /*
   * The following NOP introduces a small delay that can prevent the wait
   * loop from iterating when running at the maximum speed. This gives

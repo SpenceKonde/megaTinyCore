@@ -149,11 +149,15 @@
   #define  TWI_ERR_UNINIT        0x10  // TWI was in bad state when function was called.
   #define  TWI_ERR_PULLUP        0x11  // Likely problem with pull-ups
   #define  TWI_ERR_BUS_ARB       0x12  // Bus error and/or Arbitration lost
+  #define  TWI_ERR_BUF_OVERFLOW  0x13  // Buffer overflow on master read
+  #define  TWI_ERR_CLKHLD        0x14  // Something's holding the clock
 #else
   // DISABLE_NEW_ERRORS can be used to more completely emulate the old error reporting behavior; this should rarely be needed.
   #define  TWI_ERR_UNINIT        TWI_ERR_UNDEFINED  // TWI was in bad state when method was called.
   #define  TWI_ERR_PULLUP        TWI_ERR_UNDEFINED  // Likely problem with pull-ups
   #define  TWI_ERR_BUS_ARB       TWI_ERR_UNDEFINED  // Bus error and/or Arbitration lost
+  #define  TWI_ERR_BUF_OVERFLOW  TWI_ERR_UNDEFINED  // Buffer overflow on master read
+  #define  TWI_ERR_CLKHLD        TWI_ERR_UNDEFINED  // Something's holding the clock
 #endif
 
 #if defined(TWI_ERROR_ENABLED)
@@ -196,6 +200,8 @@ struct twiDataBools {         // using a struct so the compiler can use skip if 
   bool _hostDataSent:     1;
   uint8_t _reserved:      4;
 };
+
+
 
 
 

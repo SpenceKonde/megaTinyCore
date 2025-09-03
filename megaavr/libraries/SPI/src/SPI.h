@@ -127,10 +127,10 @@ class SPISettings {
 
       uint32_t clockSetting = 0;
 
-      clockSetting = F_CPU / 2;
+      clockSetting = F_CPU >> 1;
       clockDiv = 0;
       while ((clockDiv < 6) && (clock < clockSetting)) {
-        clockSetting /= 2;
+        clockSetting >>= 1;
         clockDiv++;
       }
 
@@ -149,10 +149,9 @@ class SPISettings {
       /* they have had SSD added to the modebits. That permits the SPI   */
       /* library to coeexist with code that uses the SPI as a slave,     */
       /* if and only if the SPI_MODEn named constants are used           */
-      ctrlb = (dataMode);
-      // (SPI_SSD_bm)          |
-      // (0 << SPI_BUFWR_bp)   |
-      // (0 << SPI_BUFEN_bp);
+      ctrlb = (dataMode) | (SPI_SSD_bm);
+      //      | (0 << SPI_BUFWR_bp)
+      //      | (0 << SPI_BUFEN_bp);
 
       /* Get Clock related values.*/
       uint8_t clockDiv_mult = (clockDiv & 0x1);
@@ -165,7 +164,7 @@ class SPISettings {
               (clockDiv_mult << SPI_CLK2X_bp)         |
               (SPI_ENABLE_bm)                         |
               (SPI_MASTER_bm)                         |
-              ((bitOrder == LSBFIRST) << SPI_DORD_bp);
+              ((bitOrder == LSBFIRST) ? SPI_DORD_bm : 0);
 
     }
     /* member variables containing the desired SPI settings */
@@ -198,7 +197,6 @@ class SPIClass {
     void setClockDivider(uint8_t uc_div);
 
   private:
-
     void init();
     void config(SPISettings settings);
 
