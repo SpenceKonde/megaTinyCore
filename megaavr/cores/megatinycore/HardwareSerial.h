@@ -69,17 +69,17 @@
  * Since the USE_ASM_* = 1 option is apparently working, we do not recommend disabling it, as it will waste flash and hurt performance.
  *
  * Flash versus RAM table
- * |       |  modern tinyAVR series parts   | Other modern parts          |
- * | Flash | 0-series | 1-series | 2-series | mega | All Dx |  EA  |  EB  |
- * |-------|----------|----------|----------|------|--------|------|------|
- * |  2048 |      128 |      128 |       -  |   -  |     -  |   -  |   -  |
- * |  4096 |      256 |      256 |      512 |   -  |     -  |   -  |   -  |
- * |  8192 |      512 |      512 |     1024 | 1024 |     -  | 1024 | 1024 |
- * | 16384 |     1024 |     2048 |     2048 | 2048 |   2048 | 2048 | 2048 |
- * | 32768 |       -  |     2048 |     3072 | 4096 |   4096 | 4096 | 3072 |
- * | 49152 |       -  |       -  |       -  | 6120 |     -  |   -  |   -  |
- * | 65536 |       -  |       -  |       -  |   -  |   8192 | 6120 |   -  |
- * |  128k |       -  |       -  |       -  |   -  |  16384 |   -  |   -  |
+ * |       |  modern tinyAVR series parts   | Other modern parts          |      |
+ * | Flash | 0-series | 1-series | 2-series | mega | All Dx |  EA  |  EB  |  SD  |
+ * |-------|----------|----------|----------|------|--------|------|------|------|
+ * |  2048 |      128 |      128 |       -  |   -  |     -  |   -  |   -  |   -  |
+ * |  4096 |      256 |      256 |      512 |   -  |     -  |   -  |   -  |   -  |
+ * |  8192 |      512 |      512 |     1024 | 1024 |     -  |   -  |   -  |   -  |
+ * | 16384 |     1024 |     2048 |     2048 | 2048 |   2048 | 2048 | 2048 |   -  |
+ * | 32768 |       -  |     2048 |     3072 | 4096 |   4096 | 4096 | 3072 | 4096 |
+ * | 49152 |       -  |       -  |       -  | 6120 |     -  |   -  |   -  |   -  |
+ * | 65536 |       -  |       -  |       -  |   -  |   8192 | 6120 |   -  | 8182 |
+ * |  128k |       -  |       -  |       -  |   -  |  16384 |   -  |   -  |   -  |
  * This ratio is remarkably consistent. No AVR part was ever made with less than 8:1 flash:ram,
  * nor more than 16:1, since the earliest recognizable AVRs. I am only aware of one exception. Was it some bizarro part
  * from the dark ages? Nope - it's the surprisingly popular ATmega2560!
@@ -97,8 +97,13 @@
  *
  * (the two numbers in final column are given because 0/1-serieas has 1 port, but tiny2 has 2, though if you only use one, you only
  * get one set of buffers)
+ *
+ * The rationale behind those numbers is simple: The ring buffer code has calculate a modulo (several hundred clock cycles, and it would have to do it in an ISR - yeah, not good.
+ * But if you cheat by having a power of two size of the buffer, you can do the calculation in a low single digit number of clocks. So it's gotta be a power of 2.
+ * And RX iis obviously more important than TX for the buffer size, because a TX underrun will not lose your data, just slow down transmission, while a RX overrun means lost data
+ * But TX isn't unimportant, because of the importance of serial logging to Arduino development. It is very easily to, in an attempt to log enough information to debug the problem,
+ * force the CPU to spend most of it's time waiting for a chance to put the next byte of log output into the buffer, which is full.
  */
-
 /* Buffer Sizing */
 
 // The buffer sizes can be overridden in by defining SERIAL_TX_BUFFER either in variant file (as defines in pins_arduino.h) or boards.txt (By passing them as extra flags).
@@ -154,8 +159,13 @@
 #endif
 
 /* Buffer sizing done */
-
-
+/* DANGER DANGER DANGER */
+/* The ASM implementations push the envelope, *hard*. The asm implementations themselves are only slightly better than what the compiler makes. That improvement does not justify the asm.
+ * The magic is all from a couple of tricks which, if you look at them carefully, all turn out to rely on one specific trick. That trick, strictly speaking, is illegal; we are explicitly
+ * told in the compiler documentation that you cannot use labels in one asm statement in another asm statement. This (as well as the more performant attachInterrupt and the Flash.h library
+ * when not using optiboot, with full flash write enabled) rely on being able to do this, because we have 3 identical functions which must be present for each of the up to 6 serial ports
+ * announced and released products - these fuinctions in total waste 202 bytes of flash per serial instance, with code that is identical except for a single constant./
+ */
 #if !defined(LTODISABLED)
 #if !defined(USE_ASM_TXC)
   #define USE_ASM_TXC 2    // A bit slower than 1 in exchange for halfduplex.

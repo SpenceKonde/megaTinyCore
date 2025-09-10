@@ -68,8 +68,9 @@
   hardware. Crucially the only thing different betweren the USARTs here isthe addressthey're working with.
   Much of the benefit comes from being able to get the benefits of functionsin terms of flash use without the
   penalties that come with using a true CALL instruction in an ISR (50-80 byte prologue + epiloge), and also
-  being aware that the X register can't do displacement when planning what goes in which regiseser... which
-  is not avr-gcc's strong suite, and often ends up displacing from the X with adiw/sbiw spam. savings for one
+  being aware that the X-register can't do displacement when planning what pointer goes in which register
+  (The mechanics of the ring buffer wound up juggling pointers; this is avoided in the hand optimized versions
+  to the extent possible; knowledge of the USART behavior allows some further optimizations)
   copy of it is small. Savings for several is gets large fast! Performance is better, but not much.
   Biggest advantage is for 2-series with the dual UARTs, but potentially as little as 4k of flash.
 
@@ -81,6 +82,7 @@
                 "rjmp do_txc"       "\n\t" // 1
                 :::);
     }
+
 
     */
 
@@ -136,8 +138,8 @@
           "_txc_flush_rx:"            "\n\t"  // start of rx flush loop.
             "ld       r24,        Z"  "\n\t"  // Z + 0 = USARTn.RXDATAL rx data
             "ldd      r24,   Z +  4"  "\n\t"  // Z + 4 = USARTn.STATUS
-            "sbrc     r24,        7"  "\n\t"  // if RXC bit is set...
-            "rjmp     _txc_flush_rx"  "\n\t"  // .... skip this jump to remove more from the buffer.
+            "sbrc     r24,        7"  "\n\t"  // if RXC bit is cleared.
+            "rjmp     _txc_flush_rx"  "\n\t"  // .... skip this jump (which will remove more from the buffer).
             "ldd      r24,   Z +  5"  "\n\t"  // Z + 5 = USARTn.CTRLA read CTRLA
             "andi     r24,     0xBF"  "\n\t"  // clear TXCIE
             "ori      r24,     0x80"  "\n\t"  // set RXCIE
@@ -808,7 +810,6 @@
           (*_hwserial_module).CTRLA = ctrla;
         } else {
           // Enable "data register empty interrupt"
-
           (*_hwserial_module).CTRLA |= USART_DREIE_bm;
         }
         return 1;
