@@ -91,7 +91,7 @@ sleep_cpu();
 This can be in your loop() section of your sketch.
 Now the device will enter sleep mode and you will notice (depending on your sleep mode setting) the power consumption is less than 1μA (very difficult to measure). Waking it up with the real time counter is described next.
 
-### Unused pins and sleep modes
+### Unused pins and Sleep modes
 **IMPORTANT** In order to minimize power consumption, you *must* eliminate or disable all floating pins. A floating pin is any pin which is not being driven high or low (by this or another device) nor held in a specific state (for example by pullup resistors). Because these pins transition randomly in response to ambient noise, those digital input buffers are consuming power with every transition. To minimize power consumption, one or more of the following must apply to every pin:
 * It is set as an OUTPUT
 * It is set INPUT_PULLUP or the internal pullups are otherwise enabled

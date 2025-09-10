@@ -29,7 +29,7 @@ Notes:
 3. No external reference on 0-series and 1-series below 16k.
 4. 16k (1+series) parts are blessed with a number a boons. One of them is a second ADC. I think the intent was to provide a way to approximate having a differential ADC by triggering both at once (well, one of the intents, another one was because the ADC0 is taken over by the PTC if that is in use.
 5. The Dx-series differential ADC is a bad joke. First: The maximum absolute value both voltages is V<sub>ref</sub>, above that, wrong results are returned. And there's no amplification other than what you can press the opamps into service as.
-  **Unsubstantiated and slanderous speculation** My theory is this: The dual ADC on the 1+ series was to get dual ADC field tested because even then they could see that the new ADC was going to be an ordeal. They figured they can get away with 1 generation of chips without explicit differential ADC, but they still needed a way for some friendly customers to be able to do something like a differential ADC reading - and they were going to have to dothat in the DX - I think the Dx-series parts's "differential mode" is equivalent to two single ended measurements and some simple math)
+  **Unsubstantiated and slanderous speculation** My theory is this: The dual ADC on the 1+ series was to get dual ADC field tested because even then they could see that the new ADC was going to be an ordeal. They figured they can get away with 1 generation of chips without explicit differential ADC, but they still needed a way to get the same effect for some major customer application
 6. This is a REAL differential ADC. Max V<sub>Ain</sub> = Vdd + .1 or .2V and for useful readings their difference must be smaller than VREF. The tiny2 has some mysterious tunables, proper tuning of which is unclear. Offset error is disappointingly high, which Microchip noticed and introduced sign chopping (and removed a mysterious tunable or two) in the EA series, which should help significantly.
 
 The differential ADC on the Dx-series is disappointing.
@@ -109,27 +109,27 @@ analogReference() as you know takes only a single argument, and the overhead of 
 ## Internal Sources
 In addition to reading from pins, you can read from a number of internal sources - this is done just like reading a pin, except the constant listed in the table below is used instead of the pin number:
 
+| AVR DA           | AVR DB            | AVR DD            | AVR EA           |
+|------------------|-------------------|-------------------|------------------|
+| `ADC_TEMPERATURE`| `ADC_VDDDIV10`    | `ADC_VDDDIV10`    | `ADC_VDDDIV10`   |
+| `ADC_GROUND` *   | `ADC_TEMPERATURE` | `ADC_TEMPERATURE` | `ADC_TEMPERATURE`|
+| `ADC_DACREF0` *  | `ADC_GROUND` *    | `ADC_GROUND`      | `ADC_GROUND`     |
+| `ADC_DACREF1` *  | `ADC_DACREF0` *   | `ADC_DACREF0`     | `ADC_DACREF0`    |
+| `ADC_DACREF2` *  | `ADC_DACREF1` *   | `ADC_DAC0`        | `ADC_DACREF1`    |
+| `ADC_DAC0`       | `ADC_DACREF2` *   | `ADC_VDDIO2DIV10` | `ADC_DAC0`       |
+|                  | `ADC_DAC0` *      |                   |                  |
+|                  | `ADC_VDDIO2DIV10` |                   |                  |
 
-| AVR DA           | AVR DB            | AVR DD            | AVR EA
-|------------------|-------------------|-------------------|------------------
-| `ADC_TEMPERATURE`| `ADC_VDDDIV10`    | `ADC_VDDDIV10`    | `ADC_VDDDIV10`
-| `ADC_GROUND` *   | `ADC_TEMPERATURE` | `ADC_TEMPERATURE` | `ADC_TEMPERATURE`
-| `ADC_DACREF0` *  | `ADC_GROUND` *    | `ADC_GROUND`      | `ADC_GROUND`
-| `ADC_DACREF1` *  | `ADC_DACREF0` *   | `ADC_DACREF0`     | `ADC_DACREF0`
-| `ADC_DACREF2` *  | `ADC_DACREF1` *   | `ADC_DAC0`        | `ADC_DACREF1`
-| `ADC_DAC0`       | `ADC_DACREF2` *   | `ADC_VDDIO2DIV10` | `ADC_DAC0`
-|                  | `ADC_DAC0` *      |                   |
-|                  | `ADC_VDDIO2DIV10` |                   |
 
-| tinyAVR 0/1-series                     | tinyAVR 2-series
-|----------------------------------------|-------------------------------------
-| `ADC_INTREF`                           | `ADC_VDDDIV10`
-| `ADC_TEMPERATURE`                      | `ADC_TEMPERATURE`
-| `ADC_DAC0` (1-series only)             | `ADC_GROUND` (offset calibration?)
-| `ADC_GROUND` (offset calibration?)     | `ADC_DACREF0`
-| `ADC_DACREF0` (alias of ADC_DAC0)      | `ADC_DAC0` (alias of `ADC_DACREF0`)
-| `ADC_PTC` (not particularly useful)    | *see note*
-| `ADC1_DACREF1` (16/32k 1-series only)† |
+| tinyAVR 0/1-series                     | tinyAVR 2-series                    |
+|----------------------------------------|-------------------------------------|
+| `ADC_INTREF`                           | `ADC_VDDDIV10`                      |
+| `ADC_TEMPERATURE`                      | `ADC_TEMPERATURE`                   |
+| `ADC_DAC0` (1-series only)             | `ADC_GROUND` (offset calibration?)  |
+| `ADC_GROUND` (offset calibration?)     | `ADC_DACREF0`                       |
+| `ADC_DACREF0` (alias of ADC_DAC0)      | `ADC_DAC0` (alias of `ADC_DACREF0`) |
+| `ADC_PTC` (not particularly useful)    | *see note*                          |
+| `ADC1_DACREF1` (16/32k 1-series only)† |                                     |
 
 The Ground internal sources are presumably meant to help correct for offset error. On Classic AVRs they made a point of talking about offset cal for differential channels. They are thus far silent on this, despite a great number of tech briefs related to the new ADC has been coming out, greatly improving the quality of the available information
 DACREF0 is the the reference voltage for the analog comparator, AC0. On the 1-series, this is the same as the `DAC0` voltage (yup, the analog voltage is shared). Analog comparators AC1 and AC2 on 1-series parts with at least 16k of flash also have a DAC1 and DAC2 to generate a reference voltage for them (though it does not have an output buffer). On the 2-series, this is only used as the AC0 reference voltage; it cannot be output to a pin.
@@ -456,8 +456,6 @@ As of 2.5.12 (1.6.8) we will always disable and re-enable the ADC if touching LO
 **On most 2-series parts LOW_LAT mode is REQUIRED in order to use the PGA when not using an internal reference or measuring the DACREF!**
 
 **Disabling the ADC is REQUIRED for acceptable sleep power consumption on the 2-series!**
-
-**No word either way on the EA-series!**
 
 Lowlat mode is enabled by default for this reason, as well as to generally improve performance. Disabling the ADC will end the power consumption associated with it.
 

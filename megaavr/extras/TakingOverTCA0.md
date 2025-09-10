@@ -69,7 +69,6 @@ uint8_t DutyCycle = 0;
 #endif
 
 void setup() {
-
   // We will be outputting PWM on PB1 or PC1
 
   pinMode(OutputPin, OUTPUT); //PB0 - TCA0 WO1, pin7 on 14-pin parts
@@ -174,6 +173,7 @@ Do note that if pushing the PWM frequency is your aim, you can go considerably h
 #if defined(MILLIS_USE_TIMERA0) || !defined(__AVR_ATtinyxy2__)
   #error "This sketch takes over TCA0, don't use for millis here. Pin mapping is specific to 8-pin"
 #endif
+
 void setup() {
   // We will be outputting PWM on PA3 on an 8-pin part
   pinMode(PIN_PA3, OUTPUT);                     // PA3 - TCA0 WO0, pin 4 on 8-pin parts

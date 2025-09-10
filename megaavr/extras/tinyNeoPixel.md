@@ -112,13 +112,45 @@ This example uses 1946 bytes of flash, and reports using only 34 bytes of RAM (i
 byte pixels[NUMLEDS * 3];
 tinyNeoPixel leds = tinyNeoPixel(NUMLEDS, PIN_PA6, NEO_GRB, pixels);
 void setup() {
+  /* less efficient, more obvious method */
   pinMode(PIN_PA6, OUTPUT); //pinModeFast() now exists and would shave a few more bytes off if this and any other instances of pinMode were converted to pinModeFast.
+  // see below for ways to make this even smaller.
+  // No begin - any class member at any address,
   leds.setPixelColor(0, 255, 0, 0); // first LED full RED
   leds.show();                   // LED turns on.
 }
 void loop() {/* empty loop */}
 ```
-The equivalent example with the Static version uses only 894 bytes and reports (accurately) that it uses 323 bytes of RAM. While you can't run many leds with them, you can still cram in the basics on 2k tinyAVR 0/1-series parts (note that, with a mere 128b of ram, it's implausible that a buffer for more than 32 LEDs would fit on the 2k parts after allowing for the rest of the sketch's RAM use.)
+The equivalent example with the Static version uses only 968 bytes and reports (accurately) that it uses 325 bytes of RAM. While you can't run many leds with them, you can still cram in the basics on 2k tinyAVR 0/1-series parts (note that, with a mere 128b of ram, it's implausible that a buffer for more than 32 LEDs would fit on the 2k parts after allowing for the rest of the sketch's RAM use). So, that `pinMode(PIN_PA6, OUTPUT);` can be done better. The normal recommended way for users on on mTC/DxC is to just replace it with pinModeFast - as long as the arguments are both compile time known constants,, if the second one is OUTPUT,it takes 1 clock, while either of the
+
+```c
+  /* More efficient, but annoying method. Does not depend on any API calls */
+  // VPORTA.DIR |= (1 << 6);
+  /* Similarly efficient - but much more readable - mTC and DxC only at this point (though digitalWriteFast() is more common)*/
+  // pinModeFast(PIN_PA6, OUTPUT);
+  // Both of these faster variants depend on you knowing at compile time which pin it's going to be using. In the first version
+  // you *must* know the port and bit at compile time if you want a safe, atomic single clock bit write, and you must set or
+  // clear 1 and only 1 bit. If you act on more than 1 bit, the compile will fall back to a normal RMW operation, so for
+  // VPORTA.OUT |= 0x03 would render as: in Ra, 0; ori Ra, 0x03; out 0, Ra; where Ra is an upper working register (r16-r31)
+  // (note: VPORTA.DIR is located at address 0). Unlike the case of setting or clearing a single bit in low I/O, this is
+  // not atomic, so if any interrupt writes the same register, it would have to be guarded by disabling interrupts during the
+  // write. You should *never* put yourself in that situation - if you wanted to set, say, PA0 and PA1 output in one operation,
+  // PORTA.DIRSET = 0x03 rendeds as ldi 0x03; sts 0x0401, 3; - that's still 6 bytes and 3 clocks (STS is a 32-bit instruction)
+  // but because there's no read involved, just a ___SET/CLR/TGL register being written, it can't "lose" the write made in the
+  // interrupt.
+  // pinModeFast() is limited by the same compile-time-known-constant requirement for the pin, however, it allows you to use
+  // the pin number, and (at compile time, during the LTO step) it looks up the port and bit of the pin number. The same goes
+  // for the value, and with that info can generate the correct single instruction to set it (or, if it's an input, it's an
+  // extra 5 clocks to turn the pullup on or off (this is not atomic - but for this to cause a problem, you have to use it
+  // in non-interrupt context, and write to the PORTx.PINnCTRL register for the same pin within an interrupt, which is an atypical
+  // use case)
+  // So pinModeFast() is **actually** the recommended way to do a single pin (though if you're desperate for space, you can
+  // combine "direction" and "output" changes that happen at the same time, on a single port, into one port write (though not
+  // pullup. Though if you know you want the pullup on and all other option on those pins, you can turn on the pullup for n pins
+  // in 2n+1 clocks and as many words with just a dead simple construction like: PORTx.PINaCTRL = 0x08; PORTy.PINbCTRL = 0x08;
+  // and so on for all pins (note, linebreaks were omitted for space. We do not condone that practice on real code. )
+  // can do it, since pinModeFast needs to)
+  ```
 
 
 `tinyNeoPixel()` -  Empty constructor is available for `tinyNeoPixel` only - for when you won't even know the type of LEDs, or how many of them, until your sketch starts running. You must set pin, type, and length later with `setPin()`, `updateLength()`, and `updateType()` before you can control any LEDs.
@@ -132,8 +164,8 @@ void setup() {
   leds.updateLength(numleds);         // Set the length
   leds.updateType(led_type);          // Set the type
   leds.setPin(neopin);                // set the pin
-
-  leds.setPixelColor(0, 255, 0, 0);      // first LED full RED
+  leds.begin();                       // now we've setup everything, and must call begin().
+  leds.setPixelColor(0, 255, 0, 0);   // first LED full RED
   leds.show();                        // LED turns on.
 }
 
@@ -144,9 +176,13 @@ This compiles to 2204 bytes and reports 39 bytes of RAM used as well (actually u
 ### API Summary
 A very brief summary of the API functions present in and essentially unmodified (at least in user/programmer facing areas) follows.
 
-`begin()` Enable the LEDs, on tinyNeoPixel, must be called before show() - not applicable for tinyNeoPixel_Static.
+#### Basic Functionality
 
-`show()` Output the contents of the pixel buffer to the LEDs
+`begin()` **tinyNeoPixel only!** This must be called after all configuration to enable data output through this library. It sets the pin `OUTPUT` and `LOW`.
+
+`begin()` **tinyNeoPixel_static only!** This method *does not exist* on tinyNeoPixel_static, because that version of the library requires all of the information that begin would require in the constructor. Furthermore **tinyNeoPixel_static neither sets the pin direction nor makes sure it's set LOW** - on the static version, it is the responsibility of the user to not only supply the pixel buffer, but also to ensure that the pin passed to the constructor is set as an OUTPUT, and is LOW (the latter only needs to be checked if you've done something else with the pin - all pins always start up set `INPUT` and `LOW`). This permits highly space constrained contexts (which the statically allocated version was designed to work with) to save not only the aprx. 1.3k associated with malloc/free/etc, but - assuming the rest of the sketch has been written aggressively w/rt flash, and in particular, that one of these functions is called nowhere else in the application: pinMode(), digitalWrite(). If none of pinMode, digitalWrite, openDrain, digitalRead are called from the sketch (including indirectly) a small amount of additional space cam be saved.
+
+`show()` Output the contents of the pixel buffer to the LEDs. Note - this involves vanishing into a disabled interrupt black hole for a long peroiod of time by computer standards. If CORE_SUPPORT_NUDGE_MILLIS >= 1, calls
 
 `show(uint16_t n)` **New Feature 2.0.6+, > 4k of flash only** Output the contents of the first n pixels in the buffer to the LEDs. This doesn't add much overhead, but it does add a little bit - so to avoid causing problems for those on very low flash tinyAVRs, who have a hard enough time already we won't build this weird feature there.
 
@@ -170,7 +206,7 @@ A very brief summary of the API functions present in and essentially unmodified 
 
 `updateType(neoPixelType_t)` Set the color order and number of colors per pixel. Not available on tinyNeoPixel_Static.
 
-`updateLatch(uint16_t time)` On some pixels, the time needed for the colors to latch is as short as six microseconds. While you aren't going to notice 50 us delays when using 6us latching pixels, if the pattern is small and you're sending it as fast as you can, if you have 250us pixels, you might not have 250 us pauses. That would prevent the LEDs from latching properly (or if there is never a long enough pause, at all). Remember 250 us = up to 12000 system clock cycles (on the highest speed overclocked part we support, an AVR Dx-series @ 48 MHz). This function will set the number of microseconds, minimum, after one call to send() has finished before calling send again will have any effect. *This feature is not available if millis is disabled, because that breaks micros, and micros is how we time this.*
+`updateLatch(uint16_t time)` **tinyNeopixel and tinyNeoPixel_static only** On some pixels, the time needed for the colors to latch is as short as six microseconds. While you aren't going to notice 50 us delays when using 6us latching pixels, if the pattern is small and you're sending it as fast as you can, if you have 250us pixels, you might not have 250 us pauses. That would prevent the LEDs from latching properly (or if there is never a long enough pause, at all). Remember 250 us = up to 12000 system clock cycles (on the highest speed overclocked part we support, an AVR Dx-series @ 48 MHz). This function will set the number of microseconds, minimum, after one call to send() has finished before calling send again will have any effect. *This feature is not available if millis is disabled, because that breaks micros, and micros is how we time this.*
 
 It is debatable whether the correct solution to canShow() having had a fixed value inconsistent with reality was to add this method; I think the two options for this would be to either:
 1. Implement updateLatch() as described above.
@@ -179,33 +215,34 @@ It is debatable whether the correct solution to canShow() having had a fixed val
 Whether the correct choice was made depends largely on a piece of information I don't know: A histogram showing the fraction of such LEDs on the market with various latching times. I only know that "some" are 6us, "some" are 200, and "some" are 250. I do not know if there are any with latch times between those extremes, including whether 50 us latch time pixels even exist. My reasoning is as follows:
 * The latch time is relevant only when a complicated pattern is not being generated. 250 us is 5000 clocks at 20 MHz and 12000 clocks at 48 MHz. At a bare minimum every LED requires three clock cycles to generate a "pattern" for - but this just gives a single color down the whole strip - is 3 clocks per LED to 'store' 3 8-bit values to RAM with `st X+` or similar, plus the loop overhead, which consists of a sbiw and a brneq which usually follows the branch - a total of 7 clocks per LED. A "push" that moves a pixel down strip by one spot requires an additional 6 above that (3 x 2 clock `ld Y+`) for a total of 13 clocks/led. Thus, for example, for 250us LEDs, if all you did was push or pull pixels, you'd need >900 pixels to exceed the wait time. Hence, we would expect many people to run into this unless either:
   * Everyone or almost everyone has some sort of delay in their code that prevents show() from being called too often, separate from canShow (since canShow would fail to prevent you from calling it during the latching pause for parts with latch delays longer than 50 us).
-  * Everyone or almost everyone has much, much slower code to generate the pixel data (if you're achieving the pixel writes with setPixel, for example, that will greatly increase
+  * Everyone or almost everyone has much, much slower code to generate the pixel data (if you're achieving the pixel writes with setPixel, for example, that will greatly increase executions time
 
-`getPixels()` Returns a pointer to the pixel buffer (a uint_8 array); note that this is the same pointer that you passed the constructor if using tinyNeoPixel_Static, and so calling this function just to get a pointer to a global variable is silly in most use cases.
+`uint8_t getPin()` Returns the current pin number; This will be 255, aka `NOT_A_PIN` if no pin has been set, or if an attempt was made to set a pin, but the pin number passed in was not a valid pins. Note that this function is very rarely needed, since the vast majority of cases - one way or another - supply the pin number through an integer constant. Unless you are doing something weird where the pin number is determined and set at runtime, it is more performant to to simply put the number into a preprocessor macro or const uint8_t variable, and use that.
+
+`numPixels()` Returns the number of LEDs in the string. This is another function that just gives you back a value you passed the constructor, and which one rarely needs to use.
+
+`getPixels()` Returns a pointer to the pixel buffer (a uint_8 array); note that this is the same pointer that you passed the constructor if using tinyNeoPixel_Static, and so calling this function will just get a pointer to a global variable that you already defined, and could have used directly. However, if using the non-static tinyNeoPixel, which dynamically allocates that buffer, if you want to write to it directly instead of through the neopixel setColor functions (for example, because you are CPU-bound and need to aggressively optimize the pixel drawing code), this is how you get a pointer to it.
 
 `getBrightness()` Returns the current brightness setting (per setBrightness())
 
-`getPin()` Returns the current pin number.
-
-`numPixels()` Returns the number of LEDs in the string
-
 `sine8(uint8_t angle)` Returns the sine of the angle (angle in 256's of a circle, that is, 128 = 180 degrees), from 0 to 255. Used for some animation effects. Because this makes use of a lookup table
 
-`gamma8(uint8_t input_brightness)` Performs basic gamma correction for smoother color transitions, returns a gamma corrected brightness that can be passed to setPixelColor().
+`uint8_t gamma8(uint8_t input_brightness)` Performs basic gamma correction for smoother color transitions, returns a gamma corrected brightness that can be passed to setPixelColor().
 
-`gamma32(uint_32 input_color)` As gamma8, only acts on and returns a 32-bit "packed" color (uint32_t).
+`uint32_t gamma32(uint_32 input_color)` As gamma8, only acts on and returns a 32-bit "packed" color (uint32_t).
 
-`Color(uint8_t r, uint8_t g, uint8_t b)` Return the color `r,g,b` as a "packed" color, which is a uint32_t (For RGB leds)
+`uint32_t Color(uint8_t r, uint8_t g, uint8_t b)` Return the color `r,g,b` as a "packed" color, which is a uint32_t (For RGB leds)
 
-`Color(uint8_t r, uint8_t g, uint8_t b, uint8_t w)` Return the color `r,g,b,w` as a uint_32 as a "packed" color, which is a uint32_t (For RGBW leds)
+`uint32_t Color(uint8_t r, uint8_t g, uint8_t b, uint8_t w)` Return the color `r,g,b,w` as a uint_32 as a "packed" color, which is a uint32_t (For RGBW leds)
 
-`ColorHSV(uint16_t hue, uint8_t sat, uint8_t val)` Return the color described by the given Hue, Saturation and Value numbers as a uint32_t
+`uint32_t ColorHSV(uint16_t hue, uint8_t sat, uint8_t val)` Return the color described by the given Hue, Saturation and Value numbers as a uint32_t
 
 #### Another few words on setBrightness()
 setBrightness was, IMO, a terrible idea. I mean it's a great idea when you aren't thinking about the implementation and its impact on performance. It's not a terrible idea you're planning to call it less often than new values for all pixels are calculated (otherwise you get quantization error - draw a smooth rainbow pattern for example, then do setBrightness(2); setBrightness(255) to see what I mean). It also tempts users into thinking it's a good idea to setBrightness to a lower value, and then write brightnesses from 0 to 255, and think they have 255<sup>3</sup> distinct combinations. Nope, there are only brightness<sup>3</sup>
 
 ## Pixel order constants
 In order to specify the order of the colors on each LED, the third argument passed to the constructor should be one of these constants; a define is provided for every possible permutation, however only a small subset of those are widespread in the wild. GRB is by FAR the most common. No, I don't know why either, but I wager there it wasn't random; the human visual system does some surprising things with light and color, and mankind has been figuring out how to make the most of those unexpected factors since we first started painting on cave walls.
+
 ### For RGB LEDs
 ```c++
     NEO_RGB /* Less common than you'd think */
@@ -268,7 +305,7 @@ Typically made with sticky tape on one side, and 5050 LEDs on the other, or cove
 There are a few notable variations on the LED strip:
 ### SK6805 COB LED strip
 "COB" LEDs are those LEDs wherein the emitter is embedded in some sort of soft rubber, generally featuring large numbers of smaller LEDs (which is more efficient, and looks better). In this case, there is a row of incredibly high density (332/m) of SK6805 LEDs in a very small packages, hidden under a white rubbery diffuser that leaves the total strip barely thicker than a standard 5050-strip. While it doesn't throw off as much light because of the lower power LEDs, the tight packing of the pattern makes it appear almost continuous. Vendors claim (though I find dubious) that they only need power injected every 3m (at both ends). 1M with power into 1 end does work, though, so maybe the claim holds up. It certainly shouldn't be hard to avoid voltage droop browning if it doesn't actually hold up by limiting brightness in software. COB LED strip is incredibly beautiful - and eye-wateringly expensive - $30/m or so.
-* Individually addressable 12v LED strip with external IC's and standalone RGB LEDs, usually with three LEDs per IC has each group of LEDs controlled as a group. This means less data needs to be sent for the same number of LEDs, but also limits flexibility. This is not recommended (though see Diffused String Lights below).
+* Individually addressable 12v LED strip with external ICs and standalone RGB LEDs, usually with three LEDs per IC has each group of LEDs controlled as a group. This means less data needs to be sent for the same number of LEDs, but also limits flexibility. This is not recommended (though see Diffused String Lights below).
 * Individually addressable 12v LED strip with just the LEDs is usually based on the WS2815 (this is likely what you want if going the 12v route - they put three tiny lower current LEDs in series, and drop the current they put through them). These also have an extra "bypass" data in and out, so that if one of the LEDs fails completely, the whole string doesn't go out.
 * Warning: There exist 12v LED strips that are not addressable. These have no relation to this library, they are controlled using beefy mosfets, and all the LEDs on the strip must be the same color. Further discussion of these is beyond the scope of this document. They're no where near as much fun as addressable ones.
 

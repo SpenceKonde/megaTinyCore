@@ -175,7 +175,7 @@ void resetViaWDT() {
 void resetViaWDTFaster() {
   _PROTECTED_WRITE(WDT.CTRLA,WDT_WINDOW_8CLK_gc | WDT_PERIOD_8CLK_gc); //enable the WDT, minimum timeout, minimum window.
   while (1) __asm__ __volatile__ ("wdr"::);
-  // execute WDR's until reset. The loop should in total take 3 clocks (the compiler will implement it as wdr, rjmp .-4)
+  // execute WDRs until reset. The loop should in total take 3 clocks (the compiler will implement it as wdr, rjmp .-4)
   // but because of the sync delay described above, it will run thousands of times before the first premature (from the
   // WDT's perspective) wdr finally makes it to the WDT domain and slams into the closed window.
 }
@@ -285,6 +285,7 @@ void setup() {
 }
 
 ```
+
 
 ## The WRONG way to reset from software
 I have seen people throw around `asm volatile("jmp 0");` as a solution to a need to reset from software. **Don't do that** - all compiled C code makes assumptions about the state from which it is run. Jumping to 0 from a running application violates several of them unless you take care to avoid those pitfalls (if I were to add a comment after that line, it would read something like `// Reset chip uncleanly to produce unpredictable results`. Resetting with a jump to 0 was always risky business and should never be done on any part, ever (certainly not without taking a bunch of precautions and knowing exactly what you're getting into (which nobody who did this ever seemed to). Now that we have a right way to do software reset, there is absolutely no excuse for intentionally triggering a dirty reset like this.
