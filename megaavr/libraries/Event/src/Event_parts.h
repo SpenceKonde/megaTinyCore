@@ -1285,7 +1285,6 @@ namespace event {
         adc0_start        = 0x08,
         evouta_pin_pa2    = 0x09,
         evouta_pin_pa7    = 0x89,
-        
         evoutb_pin_pb2    = 0x0A,
 #if defined(PIN_PB7)
         evoutb_pin_pb7    = 0x8A,
