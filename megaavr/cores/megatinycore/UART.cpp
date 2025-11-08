@@ -310,7 +310,7 @@
           "push        r25"               "\n\t"
           "push        r26"               "\n\t"
           "push        r27"               "\n\t"
-          "set"                           "\n\t"  // SEt the T flag - we use this to determine how we got here and hence whether to rjmp to end of poll or reti
+          "set"                           "\n\t"  // Set the T flag - we use this to determine how we got here and hence whether to rjmp to end of poll or reti
         "_poll_dre:"                      "\n\t"
           "push        r28"               "\n\t"
           "push        r29"               "\n\t"

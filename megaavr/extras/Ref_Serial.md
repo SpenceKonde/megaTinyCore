@@ -133,7 +133,9 @@ The "other" RS485 mode, according to the ATtiny3216/3217 datasheet:
 "Writing RS485[1] to `1` enables the RS-485 mode which automatically sets the TXD pin to output one clock cycle
 before starting transmission and sets it back to input when the transmission is complete."
 
-Obviously this begs the question of how any of the devices involved are supposed to prevent collisions - I don't think there *is* a way. That would explain why this feature was removed from the Dx-series documentation (it was present in the initial DA-series IO headers, and is likely still in the hardware...).
+Obviously this begs the question of how any of the devices involved are supposed to prevent collisions - I don't think there *is* a way. That would explain why this feature was removed from the Dx-series documentation. I was suspecting this was going to get quietly killed, but it seems to in fact be coming back with the V2 USART debuting on the LA and likely EC-series parts, under the name of hardware flow control.
+
+Yes, serial will need total reimplementation.
 
 
 
@@ -159,10 +161,10 @@ Below is an unabridged list of the versions:
     void                printHexln(const      double  f, bool s = 0)  {_prtHxdw((uint8_t *) &f, s); println();} // compiler knows the difference.
     void                printHexln(const     int32_t  d, bool s = 0)  {_prtHxdw((uint8_t *) &d, s); println();} // with just float, it can't tell if an
     void                printHexln(const    uint32_t  l, bool s = 0)  {_prtHxdw((uint8_t *) &l, s); println();} // a "long" "unsigned long" or "float"
-    uint8_t *           printHex(          uint8_t* p, uint8_t len, char sep = 0            ); // is intended when passing a floating point literal.
-    uint16_t *          printHex(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0); // But it works if we provide a copy of printHex for double
-    volatile uint8_t *  printHex(volatile  uint8_t* p, uint8_t len, char sep = 0            ); // Anomalies were observed with the above when used on the
-    volatile uint16_t * printHex(volatile uint16_t* p, uint8_t len, char sep = 0, bool s = 0); // extended I/O space. Nothing definitive was found.
+    uint8_t *             printHex(          uint8_t* p, uint8_t len, char sep = 0            );
+    uint16_t *            printHex(         uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
+    volatile uint8_t *    printHex(volatile  uint8_t* p, uint8_t len, char sep = 0            );
+    volatile uint16_t *   printHex(volatile uint16_t* p, uint8_t len, char sep = 0, bool s = 0);
 ```
 
 There are two particular features worth noting in addition to the correct number of leading zeros, and the fact that it is not horrendously bloated like full serial print.
@@ -213,7 +215,6 @@ Many peripherals have a couple of 16-bit registers, amongst a sea of 8-bit ones.
 This starts the serial port. Options should be made by combining the constant referring to the desired character size, parity and stop bit length, zero or more of the modifiers below
 
 #### Basic USART options
-
 | Data Size | Parity | 1 stop bit | 2 stop bit |
 |-----------|--------|------------|------------|
 | 5 bit     |  NONE  | SERIAL_5N1 | SERIAL_5N2 |
@@ -229,9 +230,11 @@ This starts the serial port. Options should be made by combining the constant re
 | 7 bit     |   ODD  | SERIAL_7O1 | SERIAL_7O2 |
 | 8 bit     |   ODD  | SERIAL_8O1 | SERIAL_8O2 |
 
+**Tip**: SERIAL_8N2 is much more robust to clock variation than SERIAL_8N1. I advocate defaulting to using two stop bits unless there's a compelling reason not to (there almost never is, because any signal that could be output with 2 stop bits selected could also have been output idf only 1 stop bit was selected, if you assume that
 
 #### Modifiers
 * SERIAL_RS485        - Enables RS485 mode.
+* SERIAL_RS485_OTHER  - sets the othger RS485 bit (if present) or attempts to (if not). It is unclear whether this bit is setable and if settable, whether it has any function. This feature returns as hardware flow control in the refreshged USART coming on the LA.
 * SERIAL_OPENDRAIN    - Sets port to open-drain mode
 * SERIAL_LOOPBACK     - Enables single wire operation and internally connects tx to rx.
 * SERIAL_TX_ONLY      - Enables only Tx.
@@ -468,7 +471,7 @@ While there's always some dead time between bits, that is usually *very* small, 
 
 
 ### How bad baud rate calculation used to be
-This chart shows what baud rates will work at what system clocks, on classic AVRs and modern AVRs. the difference is shocking. 
+This chart shows what baud rates will work at what system clocks, on classic AVRs and modern AVRs. the difference is shocking.
 [AVR Baud Rate Accuracy Chart](https://docs.google.com/spreadsheets/d/1rzxFOs6a89jr69ouCdZp8Za1PuUdj1u1IoepTaHVFPk/edit?usp=sharing)
 
 It was mentioned previously that one of most common places to encounter grossly inaccurate baud rates is classic AVRs. This example illustrates just *how bad* one of the most popular baud rate was on classic AVRs, namely 115200 baud. "Well it says the baud rate can be up to 1/8th the system clock, and I'm running at 8 MHz, no problem" you think "And see, it talks just fine to my other classic AVR". Nope. When you do this, you've dug a big hole, covered it with a tablecloth and waited until the sun went down. Adding a modern AVR or anything with a decent baud rate generator is then taking a late night stroll in the area of that covered hole. You're begging for trouble
