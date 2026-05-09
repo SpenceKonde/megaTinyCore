@@ -16,7 +16,7 @@ version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.post
 # Stupid workaround #
 # for IDE bug       #
 #####################
-version=2.7.0-pre1
+version=2.7.0-pre3
 
 build.versiondefines=-DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DMEGATINYCORE="{version}" -DMEGATINYCORE_MAJOR={versionnum.major}UL -DMEGATINYCORE_MINOR={versionnum.minor}UL -DMEGATINYCORE_PATCH={versionnum.patch}UL -DMEGATINYCORE_RELEASED={versionnum.released}
 
@@ -29,10 +29,18 @@ build.optiondefines=-DF_CPU={build.f_cpu} -DCLOCK_SOURCE={build.clocksource} -DT
 # Optimization flags for debugging
 # The {build.relax} flags can be added to the release
 # optimization flags. However, they make debugging impossible
-# because -mrelax distorts the line numbering.
+# because -mrelax distorts the line numbering. The debugger behaves
+# seriously buggy, reporting to be on one line being on a completely
+# different line, ot not stopping at all. Since one sometimes
+# wants to debug the relase version, -mrelax should be banned.
+# Usually LTO is switched off for debugging because
+# it removes some important debugging information, such
+# as information about class objects or the information that
+# variables are global. In this core, this is impossible, though,
+# because LTO is used to do compile time checks.
 compiler.optimization_flags=-Os -ggdb3 -flto -DNDEBUG
 compiler.optimization_flags.release=-Os -ggdb3 -flto -DNDEBUG
-compiler.optimization_flags.debug=-Og -ggdb3 -fno-lto -DLTODISABLED -DDEBUG
+compiler.optimization_flags.debug=-Og -ggdb3 -flto -DDEBUG
 
 compiler.warning_flags=-Wall
 compiler.warning_flags.none=-Wall
