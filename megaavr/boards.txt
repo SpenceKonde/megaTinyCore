@@ -2144,7 +2144,7 @@ microchip.build.pwmflags=
 #----------------------------------------#
 # BOOTLOADING PARAMETERS (FUSES)         #
 #________________________________________#
-microchip.bootloader.WDTCFG=0b0b{bootloader.wdtwindowbits}{bootloader.wdttimeoutbits}
+microchip.bootloader.WDTCFG=0b{bootloader.wdtwindowbits}{bootloader.wdttimeoutbits}
 microchip.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 microchip.bootloader.OSCCFG=0x01
 microchip.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
