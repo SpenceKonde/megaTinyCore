@@ -76,23 +76,51 @@ medbg.program.protocol=xplainedmini_updi
 medbg.program.tool=avrdude
 medbg.program.extra_params=-Pusb
 
-atmelice_updi.name=Atmel-ICE
+atmelice_updi.name=Atmel-ICE (UPDI mode)
 atmelice_updi.communication=usb
 atmelice_updi.protocol=atmelice_updi
-atmelice_updi.program.protocol=jtagice3_updi
+atmelice_updi.program.protocol=atmelice_updi
 atmelice_updi.program.tool=avrdude
 atmelice_updi.program.extra_params=-Pusb
 
 pickit4_updi.name=PICkit4 (UPDI mode)
 pickit4_updi.communication=usb
 pickit4_updi.protocol=pickit4_updi
-pickit4_updi.program.protocol=jtagice3_updi
+pickit4_updi.program.protocol=pickit4_updi
 pickit4_updi.program.tool=avrdude
 pickit4_updi.program.extra_params=-Pusb
 
 snap_updi.name=MPLAB SNAP (UPDI mode)
 snap_updi.communication=usb
 snap_updi.protocol=snap_updi
-snap_updi.program.protocol=jtagice3_updi
+snap_updi.program.protocol=snap_updi
 snap_updi.program.tool=avrdude
 snap_updi.program.extra_params=-Pusb
+
+jtagice3_updi.name=JTAGICE3 (UPDI mode)
+jtagice3_updi.communication=usb
+jtagice3_updi.protocol=jtag3updi
+jtagice3_updi.program.protocol=jtag3updi
+jtagice3_updi.program.tool=avrdude
+jtagice3_updi.program.extra_params=
+
+pickit5_updi.name=PICkit5 (UPDI mode)
+pickit5_updi.communication=usb
+pickit5_updi.protocol=pickit5_updi
+pickit5_updi.program.protocol=pickit5_updi
+pickit5_updi.program.tool=avrdude
+pickit5_updi.program.extra_params=
+
+pickit_basic_updi.name=PICkit Basic (UPDI mode)
+pickit_basic_updi.communication=usb
+pickit_basic_updi.protocol=pickit_basic_updi
+pickit_basic_updi.program.protocol=pickit_basic_updi
+pickit_basic_updi.program.tool=avrdude
+pickit_basic_updi.program.extra_params=
+
+atmel_powerdebugger_updi.name=Power Debugger (UPDI mode)
+atmel_powerdebugger_updi.communication=usb
+atmel_powerdebugger_updi.protocol=powerdebugger_updi
+atmel_powerdebugger_updi.program.protocol=powerdebugger_updi
+atmel_powerdebugger_updi.program.tool=avrdude
+atmel_powerdebugger_updi.program.extra_params=
