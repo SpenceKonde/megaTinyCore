@@ -141,7 +141,7 @@
   #define TIME_TRACKING_TIMER_PERIOD      (0xFFFF)
   #define TIME_TRACKING_TIMER_DIVIDER     (32)
   #define MILLIS_INC                      (64000)
-  #define _RTC_PRESCALE_VALUE             (0x05)
+  #define _RTC_PRESCALE_VALUE             (0x28) //change from 0x05 to set prescaler to divide by 32, prescaler field is shifted by three bits. Alows millis()/delay() to run at correct speed.
 #else
   #error "Millis timer not specified, nor is millis disabled - can't happen!"
 #endif
