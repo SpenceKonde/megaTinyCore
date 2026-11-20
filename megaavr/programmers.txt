@@ -79,20 +79,20 @@ medbg.program.extra_params=-Pusb
 atmelice_updi.name=Atmel-ICE
 atmelice_updi.communication=usb
 atmelice_updi.protocol=atmelice_updi
-atmelice_updi.program.protocol=jtagice3_updi
+atmelice_updi.program.protocol=atmelice_updi
 atmelice_updi.program.tool=avrdude
 atmelice_updi.program.extra_params=-Pusb
 
 pickit4_updi.name=PICkit4 (UPDI mode)
 pickit4_updi.communication=usb
 pickit4_updi.protocol=pickit4_updi
-pickit4_updi.program.protocol=jtagice3_updi
+pickit4_updi.program.protocol=pickit4_updi
 pickit4_updi.program.tool=avrdude
 pickit4_updi.program.extra_params=-Pusb
 
 snap_updi.name=MPLAB SNAP (UPDI mode)
 snap_updi.communication=usb
 snap_updi.protocol=snap_updi
-snap_updi.program.protocol=jtagice3_updi
+snap_updi.program.protocol=snap_updi
 snap_updi.program.tool=avrdude
 snap_updi.program.extra_params=-Pusb
