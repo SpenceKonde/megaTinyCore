@@ -1,0 +1,3 @@
+# The fallback stubs from AvrDebugger: shell scripts without an extension
+megaavr/debugger/fallback/bin/avr-gdb  text eol=lf
+megaavr/debugger/fallback/bin/pyavrocd text eol=lf
