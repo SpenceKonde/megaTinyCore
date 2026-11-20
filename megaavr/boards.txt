@@ -2172,6 +2172,9 @@ microchip.build.pwmabr=
 # ALL UPLOADING VIA UPDI                 #
 #________________________________________#
 microchip.upload.tool=avrdude
+# The on-board debugger is used like any other programmer (Upload goes through the
+# selected one); the Curiosity Nanos' nEDBG is the default (IDE >= 2.3)
+microchip.programmer.default=nedbg
 microchip.upload.workaround=
 microchip.upload.prog_interlock=
 microchip.upload.extra_params=-Pusb
@@ -2189,7 +2192,6 @@ microchip.menu.board_name.cn3217.build.attiny=3217
 microchip.menu.board_name.cn3217.build.mrelax= -mrelax
 microchip.menu.board_name.cn3217.build.millistimer=D0
 microchip.menu.board_name.cn3217.build.pwmflags=-DUSE_TIMERD0_PWM
-microchip.menu.board_name.cn3217.upload.protocol=curiosity_updi
 microchip.menu.board_name.cn3217.upload.maximum_size=32768
 microchip.menu.board_name.cn3217.upload.maximum_data_size=2048
 
@@ -2205,7 +2207,6 @@ microchip.menu.board_name.cn1627.bootloader.SYSCFG0=0b1111{bootloader.resetpinbi
 microchip.menu.board_name.cn1627.bootloader.TCD0CFG_avrdude=
 microchip.menu.board_name.cn1627.bootloader.TCD0CFG_serialupdi=
 microchip.menu.board_name.cn1627.bootloader.altreset=11
-microchip.menu.board_name.cn1627.upload.protocol=curiosity_updi
 microchip.menu.board_name.cn1627.upload.maximum_size=16384
 microchip.menu.board_name.cn1627.upload.maximum_data_size=2048
 
@@ -2218,7 +2219,6 @@ microchip.menu.board_name.cn1607.build.millistimer=A0
 microchip.menu.board_name.cn1607.build.pwmflags=
 microchip.menu.board_name.cn1607.bootloader.TCD0CFG_avrdude=
 microchip.menu.board_name.cn1607.bootloader.TCD0CFG_serialupdi=
-microchip.menu.board_name.cn1607.upload.protocol=curiosity_updi
 microchip.menu.board_name.cn1607.upload.maximum_size=16384
 microchip.menu.board_name.cn1607.upload.maximum_data_size=1024
 
@@ -2229,7 +2229,6 @@ microchip.menu.board_name.xp3217.build.attiny=3217
 microchip.menu.board_name.xp3217.build.mrelax= -mrelax
 microchip.menu.board_name.xp3217.build.millistimer=D0
 microchip.menu.board_name.xp3217.build.pwmflags=-DUSE_TIMERD0_PWM
-microchip.menu.board_name.xp3217.upload.protocol=xplainedpro_updi
 microchip.menu.board_name.xp3217.upload.maximum_size=32768
 microchip.menu.board_name.xp3217.upload.maximum_data_size=2048
 
@@ -2240,7 +2239,6 @@ microchip.menu.board_name.xp817.build.attiny=817
 microchip.menu.board_name.xp817.build.mrelax=
 microchip.menu.board_name.xp817.build.millistimer=D0
 microchip.menu.board_name.xp817.build.pwmflags=-DUSE_TIMERD0_PWM
-microchip.menu.board_name.xp817.upload.protocol=xplainedpro_updi
 microchip.menu.board_name.xp817.upload.maximum_size=8192
 microchip.menu.board_name.xp817.upload.maximum_data_size=512
 
@@ -2251,7 +2249,6 @@ microchip.menu.board_name.xm817.build.attiny=817
 microchip.menu.board_name.xm817.build.mrelax=
 microchip.menu.board_name.xm817.build.millistimer=D0
 microchip.menu.board_name.xm817.build.pwmflags=-DUSE_TIMERD0_PWM
-microchip.menu.board_name.xm817.upload.protocol=xplainedmini_updi
 microchip.menu.board_name.xm817.upload.maximum_size=8192
 microchip.menu.board_name.xm817.upload.maximum_data_size=512
 
@@ -2263,7 +2260,6 @@ microchip.menu.board_name.xn416.build.mrelax=
 microchip.menu.board_name.xn416.build.variant=txy6
 microchip.menu.board_name.xn416.build.millistimer=D0
 microchip.menu.board_name.xn416.build.pwmflags=-DUSE_TIMERD0_PWM
-microchip.menu.board_name.xn416.upload.protocol=xplainedmini_updi
 microchip.menu.board_name.xn416.upload.maximum_size=4096
 microchip.menu.board_name.xn416.upload.maximum_data_size=256
 
@@ -5738,7 +5734,7 @@ microchipo.bootloader.BODCFG=0b{bootloader.bodlevbits}{bootloader.bodmodebits}
 microchipo.bootloader.OSCCFG=0x01
 microchipo.bootloader.TCD0CFG_avrdude="-Ufuse4:w:0x00:m"
 microchipo.bootloader.TCD0CFG_serialupdi=4:0x00
-microchipo.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}0{bootloader.eesavebit}
+microchipo.bootloader.SYSCFG0=0b1100{bootloader.resetpinbits}00
 microchipo.bootloader.APPEND=0x00
 microchipo.bootloader.BOOTEND=0x02
 microchipo.bootloader.tool=avrdude
